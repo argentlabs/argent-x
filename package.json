@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "private": true,
+  "name": "argent-x",
+  "devDependencies": {
+    "lerna": "^4.0.0",
+    "prettier": ">=2"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,md}\"",
+    "posttest": "npm run format"
+  }
+}

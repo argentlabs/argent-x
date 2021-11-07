@@ -1,0 +1,42 @@
+{
+  "name": "@argent-x/extension",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@svgr/webpack": "^5.5.0",
+    "@types/react": "^17.0.34",
+    "@types/react-copy-to-clipboard": "^5.0.2",
+    "@types/react-dom": "^17.0.11",
+    "@types/styled-components": "^5.1.15",
+    "@types/webextension-polyfill": "^0.8.1",
+    "copy-webpack-plugin": "^9.0.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "raw-loader": "^4.0.2",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.4.4",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.62.1",
+    "webpack-cli": "^4.9.1"
+  },
+  "scripts": {
+    "start": "webpack",
+    "dev": "webpack --watch"
+  },
+  "dependencies": {
+    "@xstate/react": "^1.6.2",
+    "ethers": "^5.5.1",
+    "mitt": "^3.0.0",
+    "react": "^18.0.0-alpha-ee069065d-20211105",
+    "react-copy-to-clipboard": "^5.0.4",
+    "react-dom": "^18.0.0-alpha-ee069065d-20211105",
+    "react-promise-suspense": "^0.3.3",
+    "react-router-dom": "^6.0.1",
+    "starknet": "^1.5.4",
+    "styled-components": "^5.3.3",
+    "styled-normalize": "^8.0.7",
+    "webextension-polyfill": "^0.8.0",
+    "xstate": "^4.26.0"
+  }
+}
