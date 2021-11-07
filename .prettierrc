@@ -13,12 +13,6 @@
         "arrowParens": "avoid",
         "proseWrap": "never"
       }
-    },
-    {
-      "files": "*.{json,babelrc,eslintrc,remarkrc,prettierrc}",
-      "options": {
-        "useTabs": false
-      }
     }
   ]
 }

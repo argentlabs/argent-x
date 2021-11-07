@@ -117,7 +117,6 @@ export const routerMachine = createMachine<
     determineEntry: {
       invoke: {
         src: async () => {
-          await new Promise((res) => setTimeout(res, 2000))
           const keyStore = getKeystoreFromLocalStorage()
           const jsonKeyStore = JSON.parse(keyStore)
           return { wallets: jsonKeyStore.wallets }

@@ -47,9 +47,11 @@ module.exports = {
   plugins: [
     htmlPlugin,
     new CopyPlugin({
-      patterns: [{ from: "./src/favicon.ico", to: "favicon.ico" }],
-      patterns: [{ from: "./src/manifest.json", to: "manifest.json" }],
-      patterns: [{ from: "./src/assets", to: "assets" }],
+      patterns: [
+        { from: "./src/favicon.ico", to: "favicon.ico" },
+        { from: "./src/manifest.json", to: "manifest.json" },
+        { from: "./src/assets", to: "assets" },
+      ],
     }),
   ],
   resolve: {
