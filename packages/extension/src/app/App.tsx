@@ -15,6 +15,31 @@ import { AddToken } from "./screens/AddToken"
 import { ResetScreen } from "./screens/Reset"
 import { ApproveTx } from "./screens/ApproveTx"
 import { Success } from "./screens/Success"
+import { Messenger } from "../utils/Messenger"
+
+const messenger = new Messenger(
+  (emit) => {
+    window.addEventListener("message", function (event) {
+      if (
+        event.data.from &&
+        event.data.type &&
+        ["INJECT", "INPAGE"].includes(event.data.from)
+      ) {
+        const { type, data } = event.data
+        emit(type, data)
+      }
+    })
+  },
+  (type, data) => {
+    window.postMessage({ from: "UI", type, data }, "*")
+  },
+)
+
+messenger.listen((type, data) => {
+  console.log("UI", type, data)
+})
+
+messenger.emit("HELLO", "from ui")
 
 async function fileToString(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
