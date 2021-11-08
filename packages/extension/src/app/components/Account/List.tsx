@@ -1,21 +1,21 @@
-import { FC } from 'react';
-import styled from 'styled-components';
-import { getProfileImageUrl, WalletStatus } from '../../utils/wallet';
-import { makeClickable } from '../../utils/a11y';
-import { AccountAddress, AccountName } from './Address';
-import { AccountColumn, AccountRow } from './Header';
+import { FC } from "react"
+import styled from "styled-components"
+import { getProfileImageUrl, WalletStatus } from "../../utils/wallet"
+import { makeClickable } from "../../utils/a11y"
+import { AccountAddress, AccountName } from "./Address"
+import { AccountColumn, AccountRow } from "./Header"
 import {
   AccountStatusIndicator,
   AccountStatusText,
   AccountStatusWrapper,
-} from './Network';
-import { ProfilePicture } from './ProfilePicture';
+} from "./Network"
+import { ProfilePicture } from "./ProfilePicture"
 
 export const AccountList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
-`;
+`
 
 export const AccountListItemWrapper = styled.div`
   cursor: pointer;
@@ -36,13 +36,13 @@ export const AccountListItemWrapper = styled.div`
     background: rgba(255, 255, 255, 0.25);
     outline: 0;
   }
-`;
+`
 
 interface AccountListProps {
-  accountNumber: number;
-  address: string;
-  status: WalletStatus;
-  onClick?: () => void;
+  accountNumber: number
+  address: string
+  status: WalletStatus
+  onClick?: () => void
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
@@ -66,5 +66,5 @@ export const AccountListItem: FC<AccountListProps> = ({
         </AccountStatusWrapper>
       </AccountRow>
     </AccountListItemWrapper>
-  );
-};
+  )
+}

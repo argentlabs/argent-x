@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components"
 
 export const H1 = styled.h1`
   font-weight: bold;
@@ -6,7 +6,7 @@ export const H1 = styled.h1`
   text-align: center;
   color: #fff;
   margin: 12px 0;
-`;
+`
 
 export const H2 = styled.h2`
   font-weight: bold;
@@ -14,13 +14,13 @@ export const H2 = styled.h2`
   line-height: 41px;
   color: #ffffff;
   margin: 16px 0px;
-`;
+`
 
 export const P = styled.p`
   font-size: 16px;
   line-height: 19px;
   color: #fff;
-`;
+`
 
 export const A = styled.a`
   display: inline-block;
@@ -46,4 +46,4 @@ export const A = styled.a`
     outline: 0;
     border: 0;
   }
-`;
+`

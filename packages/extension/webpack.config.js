@@ -12,6 +12,7 @@ module.exports = {
     main: "./src/index",
     inject: "./src/inject",
     inpage: "./src/inpage",
+    background: "./src/background",
   },
   devtool: "inline-source-map",
   mode: "development",

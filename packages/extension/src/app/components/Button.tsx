@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components"
 
 export const Button = styled.button`
   margin: 0;
@@ -29,18 +29,18 @@ export const Button = styled.button`
     cursor: auto;
     cursor: not-allowed;
   }
-`;
+`
 
 export const ButtonGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
-`;
+`
 
 export const ButtonGroupVertical = styled.div`
   display: flex;
   flex-direction: row;
   gap: 12px;
   width: 100%;
-`;
+`

@@ -2,12 +2,17 @@
   "name": "Argent x Starknet Wallet",
   "description": "The power of Starknet in a nice wallet interface made by Argent",
   "version": "1.0",
-  "manifest_version": 3,
-  "action": {
-    "default_popup": "index.html",
-    "default_title": "Open wallet"
+  "manifest_version": 2,
+  "browser_action": {
+    "default_icon": {
+      "16": "assets/logo.png",
+      "48": "assets/logo.png",
+      "128": "assets/logo.png"
+    },
+    "default_title": "Argent X",
+    "default_popup": "index.html"
   },
-  "permissions": ["downloads", "activeTab", "webRequest"],
+  "permissions": ["downloads", "activeTab", "webRequest", "tabs"],
   "icons": {
     "16": "assets/logo.png",
     "48": "assets/logo.png",
@@ -21,10 +26,9 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": ["inpage.js"],
-      "matches": ["file://*/*", "http://*/*", "https://*/*"]
-    }
-  ]
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "web_accessible_resources": ["inpage.js"]
 }

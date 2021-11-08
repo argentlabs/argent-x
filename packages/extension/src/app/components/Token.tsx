@@ -1,12 +1,12 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { ethers } from 'ethers';
-import { FC, useState } from 'react';
-import styled, { css } from 'styled-components';
-import { makeClickable } from '../utils/a11y';
-import { getProfileColor } from '../utils/wallet';
-import { Button, ButtonGroup } from './Button';
-import { IconButton } from './IconButton';
-import { InputText } from './Input';
+import { BigNumber } from "@ethersproject/bignumber"
+import { ethers } from "ethers"
+import { FC, useState } from "react"
+import styled, { css } from "styled-components"
+import { makeClickable } from "../utils/a11y"
+import { getProfileColor } from "../utils/wallet"
+import { Button, ButtonGroup } from "./Button"
+import { IconButton } from "./IconButton"
+import { InputText } from "./Input"
 
 export const TokenWrapper = styled.div`
   display: flex;
@@ -22,40 +22,40 @@ export const TokenWrapper = styled.div`
     outline: 0;
     background: rgba(255, 255, 255, 0.25);
   }
-`;
+`
 
 const TokenIcon = styled.img`
   height: 40px;
   width: 40px;
   border-radius: 40px;
   flex: 0;
-`;
+`
 
 const TokenDetailsWrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-`;
+`
 
 const TokenTextGroup = styled.div`
   display: flex;
   flex-direction: column;
-`;
+`
 
 export const TokenTitle = styled.h3`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
   margin: 0;
-`;
+`
 
 const TokenMeta = styled.p`
   font-size: 13px;
   line-height: 18px;
   color: #8f8e8c;
   margin: 0;
-`;
+`
 
 const TokenBalance = styled.p`
   font-weight: 600;
@@ -65,7 +65,7 @@ const TokenBalance = styled.p`
   max-width: 64px;
   overflow: hidden;
   white-space: nowrap;
-`;
+`
 
 export const AddTokenIconButton = styled(IconButton)`
   &:hover,
@@ -73,7 +73,7 @@ export const AddTokenIconButton = styled(IconButton)`
     background-color: rgba(255, 255, 255, 0.15);
     outline: 0;
   }
-`;
+`
 
 const TokenExtensionWrapper = styled.div<{ show: boolean }>`
   display: flex;
@@ -93,20 +93,20 @@ const TokenExtensionWrapper = styled.div<{ show: boolean }>`
           padding: 0 8px;
           max-height: 0px;
         `}
-`;
+`
 
 export type TokenAction =
-  | { type: 'MINT'; amount: BigNumber }
-  | { type: 'TRANSFER'; to: string; amount: BigNumber };
+  | { type: "MINT"; amount: BigNumber }
+  | { type: "TRANSFER"; to: string; amount: BigNumber }
 interface TokenListItemProps {
-  symbol: string;
-  name: string;
-  balance: string;
-  decimals?: number;
-  index?: number;
-  mintable?: boolean;
-  onClick?: () => void;
-  onAction?: (action: TokenAction) => Promise<void> | void;
+  symbol: string
+  name: string
+  balance: string
+  decimals?: number
+  index?: number
+  mintable?: boolean
+  onClick?: () => void
+  onAction?: (action: TokenAction) => Promise<void> | void
 }
 export const TokenListItem: FC<TokenListItemProps> = ({
   balance,
@@ -119,29 +119,29 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   mintable = false,
   ...props
 }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [amount, setAmount] = useState('');
-  const [recipient, setRecipient] = useState('');
+  const [expanded, setExpanded] = useState(false)
+  const [amount, setAmount] = useState("")
+  const [recipient, setRecipient] = useState("")
   return (
     <div
       {...props}
       style={{
         borderRadius: 4,
-        overflow: 'hidden',
-        border: '1px solid transparent',
-        borderColor: expanded ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+        overflow: "hidden",
+        border: "1px solid transparent",
+        borderColor: expanded ? "rgba(255, 255, 255, 0.25)" : "transparent",
       }}
     >
       <TokenWrapper
         {...makeClickable(() => {
-          setExpanded((x) => !x);
-          onClick?.();
+          setExpanded((x) => !x)
+          onClick?.()
         })}
       >
         <TokenIcon
           src={`https://eu.ui-avatars.com/api/?name=${name}&background=${getProfileColor(
             index + 3,
-            false
+            false,
           )}&color=fff`}
         />
         <TokenDetailsWrapper>
@@ -159,9 +159,9 @@ export const TokenListItem: FC<TokenListItemProps> = ({
             <Button
               {...makeClickable(() => {
                 onAction?.({
-                  type: 'MINT',
-                  amount: ethers.utils.parseUnits('1000', decimals),
-                });
+                  type: "MINT",
+                  amount: ethers.utils.parseUnits("1000", decimals),
+                })
               })}
             >
               Mint
@@ -171,10 +171,10 @@ export const TokenListItem: FC<TokenListItemProps> = ({
             as="form"
             onSubmit={() => {
               onAction?.({
-                type: 'TRANSFER',
+                type: "TRANSFER",
                 to: recipient,
                 amount: ethers.utils.parseUnits(amount, decimals),
-              });
+              })
             }}
           >
             <InputText
@@ -187,10 +187,10 @@ export const TokenListItem: FC<TokenListItemProps> = ({
               value={recipient}
               onChange={(e: any) => setRecipient(e.target.value)}
             />
-            <Button type="submit">Sent</Button>
+            <Button type="submit">Send</Button>
           </ButtonGroup>
         </ButtonGroup>
       </TokenExtensionWrapper>
     </div>
-  );
-};
+  )
+}

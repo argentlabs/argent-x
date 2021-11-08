@@ -1,11 +1,11 @@
-import { FC, useState, useMemo } from 'react';
-import styled from 'styled-components';
-import { H2, P } from '../components/Typography';
-import { Button } from '../components/Button';
-import { StickyArgentFooter } from '../components/StickyArgentFooter';
-import { InputText } from '../components/Input';
-import { makeClickable } from '../utils/a11y';
-import { BackButton } from '../components/BackButton';
+import { FC, useState, useMemo } from "react"
+import styled from "styled-components"
+import { H2, P } from "../components/Typography"
+import { Button } from "../components/Button"
+import { StickyArgentFooter } from "../components/StickyArgentFooter"
+import { InputText } from "../components/Input"
+import { makeClickable } from "../utils/a11y"
+import { BackButton } from "../components/BackButton"
 
 const NewSeedScreen = styled.div`
   padding: 48px 40px 24px;
@@ -18,34 +18,34 @@ const NewSeedScreen = styled.div`
   ${InputText}:last-of-type {
     margin-bottom: 116px;
   }
-`;
+`
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {};
+const noop = () => {}
 
 interface NewSeedProps {
-  onSubmit?: (password: string) => void;
-  onBack?: () => void;
+  onSubmit?: (password: string) => void
+  onBack?: () => void
 }
 
 export function isValidPassword(password: string): boolean {
-  return password.length > 5;
+  return password.length > 5
 }
 
 export const NewSeed: FC<NewSeedProps> = ({
   onSubmit = noop,
   onBack = noop,
 }) => {
-  const [password, setPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
+  const [password, setPassword] = useState("")
+  const [repeatPassword, setRepeatPassword] = useState("")
 
   const continueDisabled = useMemo(() => {
     return !(
       isValidPassword(password) &&
       isValidPassword(repeatPassword) &&
       password === repeatPassword
-    );
-  }, [password, repeatPassword]);
+    )
+  }, [password, repeatPassword])
 
   return (
     <NewSeedScreen>
@@ -73,5 +73,5 @@ export const NewSeed: FC<NewSeedProps> = ({
       </form>
       <StickyArgentFooter />
     </NewSeedScreen>
-  );
-};
+  )
+}

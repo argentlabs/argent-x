@@ -21,14 +21,14 @@ const Pre = styled.pre`
 export const ApproveTx: FC<ApproveTxProps> = ({ tx, onSubmit, ...props }) => {
   return (
     <Confirm
-      title="Sent transaction"
+      title="Send transaction"
       confirmButtonText="Sign"
       onSubmit={() => {
         onSubmit(tx)
       }}
       {...props}
     >
-      <P>Somebody wants to sent this transaction in your name:</P>
+      <P>Somebody wants to send this transaction in your name:</P>
       <Pre>{JSON.stringify(tx, null, 2)}</Pre>
     </Confirm>
   )
