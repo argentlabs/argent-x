@@ -1,9 +1,9 @@
-import { FC } from 'react';
-import styled from 'styled-components';
+import { FC } from "react"
+import styled from "styled-components"
 
-import { A } from '../components/Typography';
+import { A } from "../components/Typography"
 
-import SuccessGif from '../../assets/loading.gif';
+import SuccessGif from "../../assets/loading.gif"
 
 const SuccessScreen = styled.div`
   display: flex;
@@ -13,17 +13,17 @@ const SuccessScreen = styled.div`
   justify-content: center;
   text-align: center;
   height: 100vh;
-`;
+`
 
 const Spinner = styled.img`
   max-width: 128px;
   max-height: 128px;
-`;
+`
 
 const SuccessText = styled(A)`
   font-size: 18px;
   line-height: 32px;
-`;
+`
 
 export const Success: FC<{ txHash: string }> = ({ txHash }) => {
   return (
@@ -33,5 +33,5 @@ export const Success: FC<{ txHash: string }> = ({ txHash }) => {
         Transaction was submitted
       </SuccessText>
     </SuccessScreen>
-  );
-};
+  )
+}

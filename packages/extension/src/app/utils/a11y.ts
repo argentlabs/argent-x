@@ -3,7 +3,7 @@ export const makeClickable = (handler?: () => void, tabIndex = 0) => ({
   onClick: handler,
   onKeyUp: (e: any) => {
     if (e.keyCode === 13) {
-      handler?.();
+      handler?.()
     }
   },
-});
+})

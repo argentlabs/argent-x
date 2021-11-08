@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { FC, useState, useMemo } from 'react';
-import styled from 'styled-components';
-import { Button } from '../components/Button';
-import { H2 } from '../components/Typography';
+import { FC, useState, useMemo } from "react"
+import styled from "styled-components"
+import { Button } from "../components/Button"
+import { H2 } from "../components/Typography"
 
 const UploadKeystoreScreen = styled.div`
   display: flex;
   flex-direction: column;
-`;
+`
 
 interface UploadKeystoreProps {
-  onSubmit?: (uploadKeystore: File) => void;
+  onSubmit?: (uploadKeystore: File) => void
 }
 
 export const UploadKeystore: FC<UploadKeystoreProps> = ({ onSubmit }) => {
-  const [uploadKeystore, setUploadKeystore] = useState<File>();
+  const [uploadKeystore, setUploadKeystore] = useState<File>()
 
-  const disableSubmit = useMemo(() => !uploadKeystore, [uploadKeystore]);
+  const disableSubmit = useMemo(() => !uploadKeystore, [uploadKeystore])
 
   return (
     <UploadKeystoreScreen>
@@ -32,5 +32,5 @@ export const UploadKeystore: FC<UploadKeystoreProps> = ({ onSubmit }) => {
         Upload
       </Button>
     </UploadKeystoreScreen>
-  );
-};
+  )
+}

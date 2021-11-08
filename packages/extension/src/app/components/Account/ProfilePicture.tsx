@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components"
 
 export const ProfilePicture = styled.img`
   width: 36px;
@@ -7,4 +7,4 @@ export const ProfilePicture = styled.img`
   border-radius: 18px;
 
   cursor: pointer;
-`;
+`

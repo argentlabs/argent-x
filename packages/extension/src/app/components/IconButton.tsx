@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components"
 
 export const IconButton = styled.span<{ size: number }>`
   height: ${({ size }) => size}px;
@@ -18,4 +18,4 @@ export const IconButton = styled.span<{ size: number }>`
     background: rgba(255, 255, 255, 0.25);
     outline: 0;
   }
-`;
+`

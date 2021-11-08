@@ -1,12 +1,12 @@
-import { FC, useRef } from 'react';
-import styled from 'styled-components';
+import { FC, useRef } from "react"
+import styled from "styled-components"
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
   width: 100%;
-`;
+`
 
 const Label = styled.label`
   color: #8f8e8c;
@@ -19,7 +19,7 @@ const Label = styled.label`
   transform: scale(1) translate3d(0, 22px, 0);
   transition: all 200ms ease-in-out;
   text-align: start;
-`;
+`
 
 const Input = styled.input`
   border-radius: 0;
@@ -60,15 +60,15 @@ const Input = styled.input`
     color: #8f8e8c;
     border-bottom: 1px solid #8f8e8c;
   }
-`;
+`
 
 function randomString() {
-  return Math.floor(Math.random() * 1000).toString();
+  return Math.floor(Math.random() * 1000).toString()
 }
 
 export const InputText = styled(
   ({ placeholder, type, onChange, autoFocus, value, disabled, ...props }) => {
-    const idRef = useRef(randomString());
+    const idRef = useRef(randomString())
     return (
       <Container {...props}>
         <Input
@@ -82,6 +82,6 @@ export const InputText = styled(
         />
         <Label>{placeholder}</Label>
       </Container>
-    );
-  }
-)``;
+    )
+  },
+)``

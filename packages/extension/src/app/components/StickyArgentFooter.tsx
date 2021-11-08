@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import styled from 'styled-components';
+import { FC } from "react"
+import styled from "styled-components"
 
 const StickyArgentFooterP = styled.p`
   position: absolute;
@@ -12,9 +12,9 @@ const StickyArgentFooterP = styled.p`
   line-height: 14px;
   text-align: center;
   color: #fff;
-`;
+`
 
 export const StickyArgentFooter: FC = () => {
   // eslint-disable-next-line jsx-a11y/accessible-emoji
-  return <StickyArgentFooterP>Built with ❤️ by Argent</StickyArgentFooterP>;
-};
+  return <StickyArgentFooterP>Built with ❤️ by Argent</StickyArgentFooterP>
+}

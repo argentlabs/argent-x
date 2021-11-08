@@ -1,7 +1,7 @@
-import { FC } from 'react';
-import styled from 'styled-components';
-import { Button, ButtonGroupVertical } from '../components/Button';
-import { H2 } from '../components/Typography';
+import { FC } from "react"
+import styled from "styled-components"
+import { Button, ButtonGroupVertical } from "../components/Button"
+import { H2 } from "../components/Typography"
 
 const ConfirmScreen = styled.div`
   display: flex;
@@ -15,17 +15,17 @@ const ConfirmScreen = styled.div`
   > ${H2} {
     margin: 0 0 40px;
   }
-`;
+`
 
 export interface ConfirmPageProps {
-  onSubmit?: () => void;
-  onReject?: () => void;
+  onSubmit?: () => void
+  onReject?: () => void
 }
 
 interface ConfirmProps extends ConfirmPageProps {
-  title: string;
-  rejectButtonText?: string;
-  confirmButtonText?: string;
+  title: string
+  rejectButtonText?: string
+  confirmButtonText?: string
 }
 
 const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
@@ -35,12 +35,12 @@ const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
   right: 0;
   padding: 16px 40px 56px;
   background-color: #161616;
-`;
+`
 
 export const Confirm: FC<ConfirmProps> = ({
   title,
-  confirmButtonText = 'Confirm',
-  rejectButtonText = 'Reject',
+  confirmButtonText = "Confirm",
+  rejectButtonText = "Reject",
   onSubmit,
   onReject,
   children,
@@ -58,5 +58,5 @@ export const Confirm: FC<ConfirmProps> = ({
         <Button type="submit">{confirmButtonText}</Button>
       </StickyButtonGroupVertical>
     </ConfirmScreen>
-  );
-};
+  )
+}
