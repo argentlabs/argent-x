@@ -4,6 +4,9 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 
+// import getStarknet from '../../old-connect/src';
+import getStarknet from '../../connect/dist/esm/main';
+
 const Home: NextPage = () => {
   const [mintAmount, setMintAmount] = React.useState("10");
   const [transferTo, setTransferTo] = React.useState("");
@@ -19,6 +22,10 @@ const Home: NextPage = () => {
     console.log("submit", { transferTo, transferAmount });
   }
 
+  const connectWallet = () => {
+    const starknet = getStarknet();
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -28,6 +35,9 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+
+        <button onClick={connectWallet}>Connect Wallet</button>
+
         <h2 className={styles.title}>Mint token</h2>
         <form onSubmit={handleMintSubmit}>
           <label htmlFor="mint-amount">Amount:</label>
