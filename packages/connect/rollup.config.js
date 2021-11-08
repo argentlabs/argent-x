@@ -8,14 +8,8 @@ import typescript from "@rollup/plugin-typescript"
 const production = !process.env.ROLLUP_WATCH
 
 export default {
-  input: "src/main.ts",
-  output: [
-    {
-      format: "esm",
-      dir: "dist/esm/",
-    },
-    { format: "cjs", dir: "dist/cjs/" },
-  ],
+  input: "src/index.ts",
+  output: [{ format: "cjs", dir: "dist/" }],
   plugins: [
     svelte({
       preprocess: sveltePreprocess(),

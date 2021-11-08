@@ -14,8 +14,17 @@
       tempor accumsan.
     </p>
 
-    <a href="https://chrome.google.com/webstore/category/extensions"
-      >Download ArgentX now!</a
+    <a
+      href="https://chrome.google.com/webstore/category/extensions"
+      target="_blank">Download ArgentX now!</a
     >
   </Modal>
 {/if}
+
+<style>
+  a {
+    color: blue;
+    background-color: transparent;
+    text-decoration: none;
+  }
+</style>

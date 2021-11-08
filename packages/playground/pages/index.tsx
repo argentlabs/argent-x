@@ -4,8 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 
-// import getStarknet from '../../old-connect/src';
-import getStarknet from '../../connect/dist/esm/main';
+import getStarknet from '../../connect/dist';
 
 const Home: NextPage = () => {
   const [mintAmount, setMintAmount] = React.useState("10");
