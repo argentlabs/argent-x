@@ -1,9 +1,24 @@
-import type { NextPage } from "next"
-import Head from "next/head"
-import Image from "next/image"
-import styles from "../styles/Home.module.css"
+import React from 'react';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
+  const [mintAmount, setMintAmount] = React.useState("10");
+  const [transferTo, setTransferTo] = React.useState("");
+  const [transferAmount, setTransferAmount] = React.useState("1");
+
+  const handleMintSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("mint", mintAmount);
+  }
+
+  const handleTransferSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("submit", { transferTo, transferAmount });
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -13,58 +28,28 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h2 className={styles.title}>Mint token</h2>
+        <form onSubmit={handleMintSubmit}>
+          <label htmlFor="mint-amount">Amount:</label>
+          <br/>
+          <input type="text" id="mint-amount" name="fname" value={mintAmount} onChange={e => setMintAmount(e.target.value)} />
+          <br/>
+          <input type="submit" value="Mint" />
+        </form> 
 
-        <p className={styles.description}>
-          Get started by editing{" "}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <h2 className={styles.title} style={{marginTop: 10}}>Transfer token</h2>
+        <form onSubmit={handleTransferSubmit}>
+          <label htmlFor="transfer-to">To:</label>
+          <br/>
+          <input type="text" id="transfer-to" name="fname" value={transferTo} onChange={e => setTransferTo(e.target.value)} />
+          <br/>
+          <label htmlFor="transfer-amount">Amount:</label>
+          <br/>
+          <input type="text" id="transfer-amount" name="fname" value={transferAmount} onChange={e => setTransferAmount(e.target.value)} />
+          <br/>
+          <input type="submit" value="Transfer" />
+        </form> 
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
   )
 }
