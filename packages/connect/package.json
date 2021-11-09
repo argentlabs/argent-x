@@ -1,11 +1,14 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
-  "private": true,
+  "name": "get-starknet",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "files": [
+    "dist/",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
@@ -22,7 +25,5 @@
     "tslib": "^2.0.0",
     "@tsconfig/svelte": "^2.0.0"
   },
-  "dependencies": {
-    "sirv-cli": "^1.0.0"
-  }
+  "dependencies": {}
 }
