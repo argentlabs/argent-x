@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 
-import getStarknet from '../../connect';
+import getStarknet from '../../get-starknet/';
 
 const Home: NextPage = () => {
   const [mintAmount, setMintAmount] = React.useState("10");
@@ -22,7 +22,7 @@ const Home: NextPage = () => {
   }
 
   const connectWallet = () => {
-    const starknet = getStarknet();
+    const starknetSigner = getStarknet();
   }
 
   return (

@@ -1,10 +1,10 @@
 {
-  "name": "get-starknet",
+  "name": "@argent/get-starknet",
   "version": "0.0.1",
+  "private": false,
   "main": "dist/index.js",
   "files": [
-    "dist/",
-    "LICENSE"
+    "dist/"
   ],
   "scripts": {
     "build": "rollup -c",
