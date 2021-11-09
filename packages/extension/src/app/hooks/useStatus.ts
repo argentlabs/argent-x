@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { waitForTx } from "starknet"
+import { defaultProvider } from "starknet"
 import { getStatus } from "../utils/wallet"
 import { Wallet } from "../Wallet"
 
@@ -9,7 +9,8 @@ export const useTxStatus = (txHash?: string): Status => {
 
   useEffect(() => {
     if (txHash)
-      waitForTx(txHash)
+      defaultProvider
+        .waitForTx(txHash)
         .then(() => {
           setTxStatus("SUCCESS")
         })

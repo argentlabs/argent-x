@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ethers } from "ethers"
-import { getKeyPair, KeyPair, Args } from "starknet"
+import { ec, KeyPair, Args } from "starknet"
 import { assign, createMachine, DoneEvent } from "xstate"
 import browser from "webextension-polyfill"
 import { addToken } from "../utils/tokens"
@@ -176,7 +176,7 @@ export const routerMachine = createMachine<
           const ev = event as DoneEvent
           const wallet: ethers.Wallet = ev.data.l1
           const wallets: string[] = ev.data.wallets
-          const keyPair = getKeyPair(wallet.privateKey)
+          const keyPair = ec.getKeyPair(wallet.privateKey)
           return {
             l1: wallet,
             wallets: wallets

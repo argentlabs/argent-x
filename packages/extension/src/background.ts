@@ -19,8 +19,8 @@ browser.runtime.onConnect.addListener(function (port) {
     },
   )
 
-  const NOTIFICATION_WIDTH = 320
-  const NOTIFICATION_HEIGHT = 568
+  const NOTIFICATION_WIDTH = 322
+  const NOTIFICATION_HEIGHT = 610
 
   console.log("listening")
 
