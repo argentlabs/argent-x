@@ -1,12 +1,12 @@
 import App from "./App.svelte"
 
-const getStarknet = () => {
-  if (window["starknet"]) {
-    return window["starknet"]
+export const getStarknet = ({ showModal = false } = {}) => {
+  if (globalThis["starknet"]) {
+    return globalThis["starknet"]
   } else {
     console.log("no starknet found in window")
-    new App({ target: document.body })
+    if (showModal && typeof document !== "undefined") {
+      new App({ target: document.body })
+    }
   }
 }
-
-export default getStarknet

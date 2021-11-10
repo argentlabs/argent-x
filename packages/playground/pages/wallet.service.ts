@@ -1,10 +1,10 @@
 import * as starknet from "starknet"
-
-export const getStarknet = () => (globalThis as any).starknet
+import { getStarknet } from "../../get-starknet/"
 
 export const isWalletConnected = (): boolean => !!getStarknet()?.isConnected
 
-export const connectWallet = async () => await getStarknet()?.enable()
+export const connectWallet = async () =>
+  await getStarknet({ showModal: true })?.enable()
 
 export const walletAddress = async (): Promise<string | undefined> => {
   try {

@@ -1,6 +1,6 @@
 import { utils } from "ethers"
 import * as starknet from "starknet"
-import { getStarknet } from "./wallet.service"
+import { getStarknet } from "../../get-starknet/"
 
 const erc20TokenAddress =
   "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
