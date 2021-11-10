@@ -44,12 +44,10 @@
 
 <div class="modal" role="dialog" aria-modal="true" bind:this={modal}>
   <slot name="header" />
-  <hr />
   <slot />
-  <hr />
 
   <!-- svelte-ignore a11y-autofocus -->
-  <button autofocus on:click={close}>close modal</button>
+  <button autofocus on:click={close} class="modal-close" aria-label="Close modal">X</button>
 </div>
 
 <style>
@@ -59,24 +57,43 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.7);
   }
 
   .modal {
+    box-sizing: border-box;
     position: absolute;
     left: 50%;
     top: 50%;
     width: calc(100vw - 4em);
-    max-width: 32em;
+    max-width: 640px;
     max-height: calc(100vh - 4em);
-    overflow: auto;
     transform: translate(-50%, -50%);
-    padding: 1em;
-    border-radius: 0.2em;
-    background: white;
+    padding: 80px 64px;
+    border-radius: 16px;
+    background: #000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+
+    font-size: 1.25em;
+    font-weight: 300;
+    line-height: 1.4;
+    text-align: center;
+    color: #fff;
   }
 
-  button {
+  .modal-close {
     display: block;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: 0;
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.15);
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
   }
 </style>

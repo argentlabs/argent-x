@@ -2,29 +2,34 @@
   import Modal from "./Modal.svelte"
 
   let showModal = true
+  let downloadButton = 'button-download.svg';
 </script>
 
 {#if showModal}
   <Modal on:close={() => (showModal = false)}>
     <h2 slot="header">No Wallet Detected</h2>
 
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dui quam,
-      malesuada porta fringilla ac, consequat a lectus. Ut iaculis enim in orci
-      tempor accumsan.
-    </p>
-
+    <p>Please download ArgentX to use this dapp, which runs on StarkNet, a ZK-Rollup Layer-2 network on Ethereum.</p>
     <a
       href="https://chrome.google.com/webstore/category/extensions"
-      target="_blank">Download ArgentX now!</a
-    >
+      target="_blank">
+      <img src={downloadButton} alt="Download ArgentX for StarkNet">
+    </a>
   </Modal>
 {/if}
 
 <style>
   a {
-    color: blue;
+    color: orange;
     background-color: transparent;
     text-decoration: none;
+  }
+
+  h2 {
+    font-size: 48px;
+  }
+
+  h2:first-child {
+    margin-top: 0;
   }
 </style>
