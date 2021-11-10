@@ -4,6 +4,7 @@ import resolve from "@rollup/plugin-node-resolve"
 import { terser } from "rollup-plugin-terser"
 import sveltePreprocess from "svelte-preprocess"
 import typescript from "@rollup/plugin-typescript"
+import { svelteSVG } from "rollup-plugin-svelte-svg"
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -11,6 +12,9 @@ export default {
   input: "src/index.ts",
   output: [{ format: "cjs", dir: "dist/" }],
   plugins: [
+    // SVGR to transform svg files into svelte components
+    svelteSVG(),
+
     svelte({
       preprocess: sveltePreprocess(),
       emitCss: false,

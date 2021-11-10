@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher, onDestroy } from "svelte"
+  import CloseSvg from "./close.svg"
 
   const dispatch = createEventDispatcher()
   const close = () => dispatch("close")
@@ -47,7 +48,14 @@
   <slot />
 
   <!-- svelte-ignore a11y-autofocus -->
-  <button autofocus on:click={close} class="modal-close" aria-label="Close modal">X</button>
+  <button
+    autofocus
+    on:click={close}
+    class="modal-close"
+    aria-label="Close modal"
+  >
+    <CloseSvg />
+  </button>
 </div>
 
 <style>
@@ -72,7 +80,7 @@
     padding: 80px 64px;
     border-radius: 16px;
     background: #000;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 
     font-size: 1.25em;
     font-weight: 300;
@@ -82,7 +90,10 @@
   }
 
   .modal-close {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     width: 40px;
     height: 40px;
     position: absolute;
@@ -91,8 +102,7 @@
     border: 0;
     border-radius: 50%;
 
-    background: rgba(255,255,255,0.15);
-    font-size: 20px;
+    background: rgba(255, 255, 255, 0.15);
     color: #fff;
     cursor: pointer;
   }
