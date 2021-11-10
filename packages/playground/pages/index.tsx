@@ -1,24 +1,79 @@
-import React from 'react';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
-import styles from '../styles/Home.module.css';
+import React, { useEffect } from "react"
+import type { NextPage } from "next"
+import Head from "next/head"
+import Image from "next/image"
+import styles from "../styles/Home.module.css"
+import { utils } from "ethers"
+import { number, defaultProvider } from "starknet"
 
 import getStarknet from '../../get-starknet/';
 
 const Home: NextPage = () => {
-  const [mintAmount, setMintAmount] = React.useState("10");
-  const [transferTo, setTransferTo] = React.useState("");
-  const [transferAmount, setTransferAmount] = React.useState("1");
+  const [mintAmount, setMintAmount] = React.useState("10")
+  const [transferTo, setTransferTo] = React.useState("")
+  const [transferAmount, setTransferAmount] = React.useState("1")
+  const [lastTxHash, setLastTxHash] = React.useState("")
+  const [txStatus, setTxStatus] = React.useState<
+    "idle" | "approve" | "pending" | "success"
+  >("idle")
+  const btnsDisabled = ["approve", "pending"].includes(txStatus)
 
-  const handleMintSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("mint", mintAmount);
+  useEffect(() => {
+    if (lastTxHash && txStatus === "pending") {
+      defaultProvider.waitForTx(lastTxHash).then(() => {
+        setTxStatus("success")
+      })
+    }
+  }, [txStatus, lastTxHash])
+
+  const handleMintSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      setTxStatus("approve")
+      const [activeAccount] = await (window as any).starknet.enable()
+      console.log("mint", mintAmount)
+
+      const res = await (window as any).starknet.signer.invokeFunction(
+        "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97", // to (erc20 contract)
+        "0x2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354", // selector (mint)
+        [
+          number.toBN(activeAccount).toString(), //receiver (self)
+          utils.parseUnits(mintAmount, 18).toString(), // amount
+        ],
+      )
+
+      console.log(res)
+      setLastTxHash(res.transaction_hash)
+      setTxStatus("pending")
+    } catch (e) {
+      console.error(e)
+      setTxStatus("idle")
+    }
   }
 
-  const handleTransferSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("submit", { transferTo, transferAmount });
+  const handleTransferSubmit = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault()
+      setTxStatus("approve")
+      await (window as any).starknet.enable()
+      console.log("mint", mintAmount)
+
+      const res = await (window as any).starknet.signer.invokeFunction(
+        "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97", // to (erc20 contract)
+        "0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e", // selector (transfer)
+        [
+          number.toBN(transferTo).toString(), //receiver
+          utils.parseUnits(transferAmount, 18).toString(), // amount
+        ],
+      )
+
+      console.log(res)
+      setLastTxHash(res.transaction_hash)
+      setTxStatus("pending")
+    } catch (e) {
+      console.error(e)
+      setTxStatus("idle")
+    }
   }
 
   const connectWallet = () => {
@@ -37,27 +92,60 @@ const Home: NextPage = () => {
 
         <button onClick={connectWallet}>Connect Wallet</button>
 
+        <h3 style={{ margin: 0 }}>
+          Transaction status: <code>{txStatus}</code>
+        </h3>
+        {lastTxHash && (
+          <a
+            href={`https://voyager.online/tx/${lastTxHash}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "blue", margin: "0 0 1em" }}
+          >
+            <code>{lastTxHash}</code>
+          </a>
+        )}
         <h2 className={styles.title}>Mint token</h2>
         <form onSubmit={handleMintSubmit}>
           <label htmlFor="mint-amount">Amount:</label>
-          <br/>
-          <input type="text" id="mint-amount" name="fname" value={mintAmount} onChange={e => setMintAmount(e.target.value)} />
-          <br/>
-          <input type="submit" value="Mint" />
-        </form> 
+          <br />
+          <input
+            type="text"
+            id="mint-amount"
+            name="fname"
+            value={mintAmount}
+            onChange={(e) => setMintAmount(e.target.value)}
+          />
+          <br />
+          <input type="submit" disabled={btnsDisabled} value="Mint" />
+        </form>
 
-        <h2 className={styles.title} style={{marginTop: 10}}>Transfer token</h2>
+        <h2 className={styles.title} style={{ marginTop: 10 }}>
+          Transfer token
+        </h2>
         <form onSubmit={handleTransferSubmit}>
           <label htmlFor="transfer-to">To:</label>
-          <br/>
-          <input type="text" id="transfer-to" name="fname" value={transferTo} onChange={e => setTransferTo(e.target.value)} />
-          <br/>
+          <br />
+          <input
+            type="text"
+            id="transfer-to"
+            name="fname"
+            value={transferTo}
+            onChange={(e) => setTransferTo(e.target.value)}
+          />
+          <br />
           <label htmlFor="transfer-amount">Amount:</label>
-          <br/>
-          <input type="text" id="transfer-amount" name="fname" value={transferAmount} onChange={e => setTransferAmount(e.target.value)} />
-          <br/>
-          <input type="submit" value="Transfer" />
-        </form> 
+          <br />
+          <input
+            type="text"
+            id="transfer-amount"
+            name="fname"
+            value={transferAmount}
+            onChange={(e) => setTransferAmount(e.target.value)}
+          />
+          <br />
+          <input type="submit" disabled={btnsDisabled} value="Transfer" />
+        </form>
       </main>
     </div>
   )

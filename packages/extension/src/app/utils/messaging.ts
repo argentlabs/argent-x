@@ -1,0 +1,34 @@
+import browser from "webextension-polyfill"
+
+import { Transaction } from "starknet"
+import { Messenger } from "../../utils/Messenger"
+
+const allowedSender = ["INJECT", "INPAGE", "BACKGROUND"]
+const port = browser.runtime.connect({ name: "argent-x-ui" })
+export const messenger = new Messenger(
+  (emit) => {
+    port.onMessage.addListener(function (msg) {
+      if (msg.from && msg.type && allowedSender.includes(msg.from)) {
+        const { type, data } = msg
+        emit(type, data)
+      }
+    })
+  },
+  (type, data) => {
+    port.postMessage({ from: "INJECT", type, data })
+  },
+)
+
+export const readRequestedTransactions = async (): Promise<Transaction[]> => {
+  messenger.emit("READ_REQUESTED_TRANSACTIONS", {})
+  return messenger.waitForEvent("READ_REQUESTED_TRANSACTIONS_RES", 2000)
+}
+
+export const getLastSelectedWallet = async (): Promise<string | undefined> => {
+  messenger.emit("GET_SELECTED_WALLET_ADDRESS", {})
+  return messenger.waitForEvent("GET_SELECTED_WALLET_ADDRESS_RES", 2000)
+}
+
+messenger.listen((type, data) => {
+  console.log("UI", type, data)
+})

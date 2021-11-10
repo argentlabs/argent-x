@@ -1,21 +1,23 @@
 import {
-  utils,
   KeyPair,
   CompiledContract,
-  getKeyPair,
-  getStarkKey,
-  deployContract,
   Contract,
   AddTransactionResponse,
   Args,
-  hashMessage,
-  sign,
   Calldata,
-  genKeyPair,
+  json,
+  compileCalldata,
+  hash,
+  encode,
+  stark,
+  ec,
+  number,
+  defaultProvider,
 } from "starknet"
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 
-const ArgentCompiledContractJson: CompiledContract = utils.json.parse(
+const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
 )
 
@@ -51,29 +53,30 @@ export class Wallet {
 
   public async invoke(
     address: string,
-    method: string,
+    method: BigNumberish,
     args?: Args | Calldata,
   ): Promise<AddTransactionResponse> {
+    let methodHex = ""
+    try {
+      if (typeof method === "string" && !number.isHex(method))
+        throw Error("only hex strings allowed")
+      methodHex = BigNumber.from(method).toHexString()
+    } catch {}
+
+    const selector = methodHex || stark.getSelectorFromName(method as string)
+    const calldata = Array.isArray(args) ? args : compileCalldata(args || {})
     const nonce = await this.getCurrentNonce()
-    const messageHash = utils.enc.addHexPrefix(
-      hashMessage(
-        "0",
-        address,
-        utils.starknet.getSelectorFromName(method),
-        Array.isArray(args) ? args : Contract.compileCalldata(args || {}),
-        nonce,
-      ),
+    const messageHash = encode.addHexPrefix(
+      hash.hashMessage("0", address, selector, calldata, nonce),
     )
-    const { r, s } = sign(this.signer, messageHash)
+    const { r, s } = ec.sign(this.signer, messageHash)
 
     return this.contract.invoke(
       "execute",
       {
         to: address,
-        selector: utils.starknet.getSelectorFromName(method),
-        calldata: Array.isArray(args)
-          ? args
-          : Contract.compileCalldata(args || {}),
+        selector,
+        calldata,
         nonce,
       },
       [r, s],
@@ -87,18 +90,18 @@ export class Wallet {
   ): Promise<Wallet> {
     const starkKeyPair =
       typeof seedOrKeyPair === "string"
-        ? getKeyPair(seedOrKeyPair)
+        ? ec.getKeyPair(seedOrKeyPair)
         : seedOrKeyPair
-    const starkPub = getStarkKey(starkKeyPair)
+    const starkPub = ec.getStarkKey(starkKeyPair)
 
-    const seed = overwriteSeed ?? getStarkKey(genKeyPair())
+    const seed = overwriteSeed ?? ec.getStarkKey(ec.genKeyPair())
 
-    const deployTransaction = await deployContract(
+    const deployTransaction = await defaultProvider.deployContract(
       ArgentCompiledContract,
-      Contract.compileCalldata({
+      compileCalldata({
         signer: starkPub,
         guardian: "0",
-        L1_address: utils.starknet.makeAddress(l1Address),
+        L1_address: stark.makeAddress(l1Address),
       }),
       seed,
     )

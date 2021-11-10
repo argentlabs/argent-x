@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ethers } from "ethers"
-import { getKeyPair, KeyPair, Args } from "starknet"
+import { ec, KeyPair, Args, InvokeFunctionTransaction } from "starknet"
 import { assign, createMachine, DoneEvent } from "xstate"
 import browser from "webextension-polyfill"
 import { addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
+import {
+  getLastSelectedWallet,
+  messenger,
+  readRequestedTransactions,
+} from "../utils/messaging"
 
 export type TxRequest = { to: string; method: string; calldata: Args }
 
@@ -27,7 +32,7 @@ type RouterEvents =
       data: { address: string; symbol: string; name: string; decimals: string }
     }
   | { type: "ADD_WALLET" }
-  | { type: "APPROVE_TX"; data: TxRequest }
+  | { type: "APPROVE_TX"; data: TxRequest | InvokeFunctionTransaction }
   | { type: "APPROVED_TX" }
   | { type: "GENERATE_L1"; data: { password: string } }
 
@@ -37,9 +42,10 @@ type Context = {
   l1?: ethers.Wallet
   uploadedBackup?: string
   signer?: KeyPair
-  txToApprove?: TxRequest
+  txToApprove?: TxRequest | InvokeFunctionTransaction
   txHash?: string
   wallets: Record<string, Wallet>
+  isPopup?: boolean
 }
 
 type RouterTypestate =
@@ -116,7 +122,8 @@ export const routerMachine = createMachine<
   states: {
     determineEntry: {
       invoke: {
-        src: async () => {
+        src: async (_ctx, ev) => {
+          console.log(ev)
           const keyStore = getKeystoreFromLocalStorage()
           const jsonKeyStore = JSON.parse(keyStore)
           return { wallets: jsonKeyStore.wallets }
@@ -139,6 +146,7 @@ export const routerMachine = createMachine<
           const l1 = await ethers.Wallet.fromEncryptedJson(
             keyStore,
             event.data.password,
+            (per) => console.log(per),
           )
 
           return {
@@ -148,23 +156,22 @@ export const routerMachine = createMachine<
             password: event.data.password,
           }
         },
-        onDone: [
-          {
-            target: "recover",
-            actions: [
-              assign((_, ev) => ({
-                password: ev.data.password,
-              })),
-              (_, ev) => {
-                try {
-                  getKeystoreFromLocalStorage()
-                } catch {
-                  localStorage.setItem(KEYSTORE_KEY, ev.data.keyStore)
-                }
-              },
-            ],
-          },
-        ],
+        onDone: {
+          target: "recover",
+          actions: [
+            assign((_, ev) => ({
+              password: ev.data.password,
+            })),
+            (_, ev) => {
+              try {
+                getKeystoreFromLocalStorage()
+              } catch {
+                localStorage.setItem(KEYSTORE_KEY, ev.data.keyStore)
+              }
+            },
+          ],
+        },
+
         onError: {
           target: "enterPassword",
         },
@@ -176,7 +183,19 @@ export const routerMachine = createMachine<
           const ev = event as DoneEvent
           const wallet: ethers.Wallet = ev.data.l1
           const wallets: string[] = ev.data.wallets
-          const keyPair = getKeyPair(wallet.privateKey)
+
+          const lastSelectedWallet = await getLastSelectedWallet().catch(
+            () => "",
+          )
+          const selectedWalletIndex =
+            (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
+
+          // if transactions are pending show them first
+          const requestedTransactions = await readRequestedTransactions().catch(
+            () => [],
+          )
+
+          const keyPair = ec.getKeyPair(wallet.privateKey)
           return {
             l1: wallet,
             wallets: wallets
@@ -188,16 +207,40 @@ export const routerMachine = createMachine<
                 }
               }, {}),
             signer: keyPair,
-            selectedWallet: wallets[0],
+            selectedWallet: wallets[selectedWalletIndex],
+
+            requestedTransactions,
           }
         },
-        onDone: {
-          target: "account",
-          actions: assign((_, event) => ({
-            ...event.data,
-            uploadedBackup: undefined,
-          })),
-        },
+        onDone: [
+          {
+            target: "approveTx",
+            cond: (_ctx, ev) => {
+              return Boolean(ev.data?.requestedTransactions?.length)
+            },
+            actions: [
+              assign((_, event) => {
+                const { requestedTransactions, ...ctx } = event.data
+                return {
+                  ...ctx,
+                  uploadedBackup: undefined,
+                  txToApprove: requestedTransactions?.[0],
+                  isPopup: true,
+                }
+              }),
+            ],
+          },
+          {
+            target: "account",
+            actions: assign((_, event) => {
+              const { requestedTransactions, ...ctx } = event.data
+              return {
+                ...ctx,
+                uploadedBackup: undefined,
+              }
+            }),
+          },
+        ],
         onError: "determineEntry",
       },
     },
@@ -286,6 +329,9 @@ export const routerMachine = createMachine<
       },
     },
     account: {
+      entry: async (ctx) => {
+        messenger.emit("WALLET_CONNECTED", ctx.selectedWallet)
+      },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",
         SHOW_ADD_TOKEN: "addToken",
@@ -334,6 +380,7 @@ export const routerMachine = createMachine<
           target: "determineEntry",
           actions: () => {
             localStorage.clear()
+            messenger.emit("RESET_ALL", {})
           },
         },
       },
@@ -355,19 +402,62 @@ export const routerMachine = createMachine<
         src: async (ctx, event) => {
           const wallet = ctx.wallets[ctx.selectedWallet!]!
 
-          const { to, method, calldata } = ctx.txToApprove!
+          if (
+            "type" in ctx.txToApprove! &&
+            ctx.txToApprove.type === "INVOKE_FUNCTION"
+          ) {
+            // raw request
+            const {
+              contract_address,
+              entry_point_selector,
+              calldata = [],
+            } = ctx.txToApprove
 
-          const { transaction_hash } = await wallet.invoke(to, method, calldata)
+            const { transaction_hash } = await wallet.invoke(
+              contract_address,
+              entry_point_selector,
+              calldata,
+            )
 
-          return transaction_hash
+            return transaction_hash
+          } else if ("to" in ctx.txToApprove!) {
+            // request which needs compilation
+            const { to, method, calldata } = ctx.txToApprove!
+
+            const { transaction_hash } = await wallet.invoke(
+              to,
+              method,
+              calldata,
+            )
+
+            return transaction_hash
+          }
         },
         onDone: {
           target: "submittedTx",
-          actions: assign((_, event) => ({
-            txHash: event.data,
-          })),
+          actions: [
+            assign((_, event) => ({
+              txHash: event.data,
+            })),
+            (ctx, event) => {
+              messenger.emit("SUBMITTED_TX", {
+                tx: ctx.txToApprove,
+                txHash: event.data,
+              })
+            },
+          ],
         },
-        onError: "determineEntry",
+        onError: {
+          target: "determineEntry",
+          actions: (ctx) => {
+            messenger.emit("FAILED_TX", {
+              data: ctx.txToApprove,
+            })
+          },
+        },
+      },
+      exit: (ctx) => {
+        if (ctx.isPopup) window.close()
       },
     },
     submittedTx: {

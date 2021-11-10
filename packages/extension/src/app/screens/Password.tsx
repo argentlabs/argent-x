@@ -29,7 +29,7 @@ const PasswordScreen = styled.div`
   }
 
   ${Button} {
-    margin-top: 92px;
+    margin-top: 64px;
   }
 `
 

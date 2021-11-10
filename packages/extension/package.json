@@ -34,7 +34,7 @@
     "react-dom": "^17.0.2",
     "react-promise-suspense": "^0.3.3",
     "react-router-dom": "^6.0.1",
-    "starknet": "^1.5.4",
+    "starknet": "^1.6.0",
     "styled-components": "^5.3.3",
     "styled-normalize": "^8.0.7",
     "webextension-polyfill": "^0.8.0",
