@@ -12,7 +12,7 @@
     "default_title": "Argent X",
     "default_popup": "index.html"
   },
-  "permissions": ["downloads", "activeTab", "webRequest", "tabs"],
+  "permissions": ["downloads", "activeTab", "webRequest", "tabs", "storage"],
   "icons": {
     "16": "assets/logo.png",
     "48": "assets/logo.png",

@@ -11,9 +11,11 @@ import {
   encode,
   stark,
   ec,
+  number,
   defaultProvider,
 } from "starknet"
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -51,18 +53,21 @@ export class Wallet {
 
   public async invoke(
     address: string,
-    method: string,
+    method: BigNumberish,
     args?: Args | Calldata,
   ): Promise<AddTransactionResponse> {
+    let methodHex = ""
+    try {
+      if (typeof method === "string" && !number.isHex(method))
+        throw Error("only hex strings allowed")
+      methodHex = BigNumber.from(method).toHexString()
+    } catch {}
+
+    const selector = methodHex || stark.getSelectorFromName(method as string)
+    const calldata = Array.isArray(args) ? args : compileCalldata(args || {})
     const nonce = await this.getCurrentNonce()
     const messageHash = encode.addHexPrefix(
-      hash.hashMessage(
-        "0",
-        address,
-        stark.getSelectorFromName(method),
-        Array.isArray(args) ? args : compileCalldata(args || {}),
-        nonce,
-      ),
+      hash.hashMessage("0", address, selector, calldata, nonce),
     )
     const { r, s } = ec.sign(this.signer, messageHash)
 
@@ -70,8 +75,8 @@ export class Wallet {
       "execute",
       {
         to: address,
-        selector: stark.getSelectorFromName(method),
-        calldata: Array.isArray(args) ? args : compileCalldata(args || {}),
+        selector,
+        calldata,
         nonce,
       },
       [r, s],
