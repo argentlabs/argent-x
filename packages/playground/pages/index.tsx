@@ -3,8 +3,8 @@ import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
 import styles from "../styles/Home.module.css"
-import { utils } from "ethers"
-import { number, defaultProvider } from "starknet"
+import { defaultProvider } from "starknet"
+import { mintToken, transfer } from "./token.service"
 
 const Home: NextPage = () => {
   const [mintAmount, setMintAmount] = React.useState("10")
@@ -28,20 +28,12 @@ const Home: NextPage = () => {
     e.preventDefault()
     try {
       setTxStatus("approve")
-      const [activeAccount] = await (window as any).starknet.enable()
+
       console.log("mint", mintAmount)
+      const result = await mintToken(mintAmount)
+      console.log(result)
 
-      const res = await (window as any).starknet.signer.invokeFunction(
-        "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97", // to (erc20 contract)
-        "0x2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354", // selector (mint)
-        [
-          number.toBN(activeAccount).toString(), //receiver (self)
-          utils.parseUnits(mintAmount, 18).toString(), // amount
-        ],
-      )
-
-      console.log(res)
-      setLastTxHash(res.transaction_hash)
+      setLastTxHash(result.transaction_hash)
       setTxStatus("pending")
     } catch (e) {
       console.error(e)
@@ -53,20 +45,12 @@ const Home: NextPage = () => {
     try {
       e.preventDefault()
       setTxStatus("approve")
-      await (window as any).starknet.enable()
-      console.log("mint", mintAmount)
 
-      const res = await (window as any).starknet.signer.invokeFunction(
-        "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97", // to (erc20 contract)
-        "0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e", // selector (transfer)
-        [
-          number.toBN(transferTo).toString(), //receiver
-          utils.parseUnits(transferAmount, 18).toString(), // amount
-        ],
-      )
+      console.log("transfer", { transferTo, transferAmount })
+      const result = await transfer(transferTo, transferAmount)
+      console.log(result)
 
-      console.log(res)
-      setLastTxHash(res.transaction_hash)
+      setLastTxHash(result.transaction_hash)
       setTxStatus("pending")
     } catch (e) {
       console.error(e)
