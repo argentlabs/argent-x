@@ -27,6 +27,7 @@ interface ConfirmProps extends ConfirmPageProps {
   title: string
   rejectButtonText?: string
   confirmButtonText?: string
+  confirmButtonBgColor?: string
 }
 
 const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
@@ -42,6 +43,7 @@ export const Confirm: FC<ConfirmProps> = ({
   title,
   confirmButtonText = "Confirm",
   rejectButtonText = "Reject",
+  confirmButtonBgColor,
   onSubmit,
   onReject,
   children,
@@ -56,7 +58,9 @@ export const Confirm: FC<ConfirmProps> = ({
         <Button onClick={onReject} type="button">
           {rejectButtonText}
         </Button>
-        <Button type="submit">{confirmButtonText}</Button>
+        <Button style={{ backgroundColor: confirmButtonBgColor }} type="submit">
+          {confirmButtonText}
+        </Button>
       </StickyButtonGroupVertical>
     </ConfirmScreen>
   )
