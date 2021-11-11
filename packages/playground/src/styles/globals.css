@@ -12,7 +12,6 @@
   flex-grow: 1;
 }
 
-
 /* MVP.css v1.8 - https://github.com/andybrewer/mvp */
 
 :root {
@@ -26,11 +25,12 @@
   --color-link: #118bee;
   --color-secondary: #920de9;
   --color-secondary-accent: #920de90b;
-  --color-shadow: rgba(0,0,0,0.1);
+  --color-shadow: rgba(0, 0, 0, 0.1);
   --color-table: #118bee;
   --color-text: #000;
   --color-text-secondary: #999;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --hover-brightness: 1.2;
   --justify-important: center;
   --justify-normal: left;
@@ -50,7 +50,7 @@
     --color-link: #0097fc;
     --color-secondary: #e20de9;
     --color-secondary-accent: #e20de94f;
-    --color-shadow: rgba(0,0,0,0.2);
+    --color-shadow: rgba(0, 0, 0, 0.2);
     --color-table: #0097fc;
     --color-text: #f7f7f7;
     --color-text-secondary: #aaa;
@@ -184,7 +184,7 @@ nav ul li ul {
   display: none;
   height: auto;
   left: -2px;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   position: absolute;
   top: 1.7rem;
   white-space: nowrap;
@@ -331,7 +331,7 @@ a strong,
 button {
   background-color: var(--color-link);
   border: 2px solid var(--color-link);
-  color: var(--color-bg);
+  color: white;
 }
 
 a em,
@@ -406,8 +406,8 @@ input[type="radio"] {
   display: inline-block;
 }
 
-input[type="checkbox"]+label,
-input[type="radio"]+label {
+input[type="checkbox"] + label,
+input[type="radio"] + label {
   display: inline-block;
   font-weight: normal;
   position: relative;
