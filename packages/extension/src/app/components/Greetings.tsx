@@ -37,10 +37,12 @@ const FadeInAndOutText = styled(Text)`
   animation: ${FadeInAndOut} 3s ease-in-out forwards;
 `
 
-const useCarusel = (length: number, delay = 3000): number => {
+const useCarusel = (greetings: string[], delay = 3000): number => {
   const [index, setState] = useState(0)
+  const length = greetings.length
 
   useEffect(() => {
+    setState(0)
     const pid = setInterval(() => {
       setState((lIndex) => (lIndex + 1) % length)
     }, delay)
@@ -48,7 +50,7 @@ const useCarusel = (length: number, delay = 3000): number => {
       clearInterval(pid)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [length, delay])
+  }, [greetings, delay, length])
 
   return index
 }
@@ -58,7 +60,7 @@ interface GreetingsProps {
 }
 
 export const Greetings: FC<GreetingsProps> = ({ greetings, ...props }) => {
-  const index = useCarusel(greetings.length)
+  const index = useCarusel(greetings)
   return (
     <GreetingsWrapper {...props}>
       <FadeInAndOutText key={index}>{greetings[index]}</FadeInAndOutText>

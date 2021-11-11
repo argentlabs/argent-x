@@ -4,6 +4,7 @@ interface ProgressStore {
   progress: number
   text: string
   setProgress: (progress: number, text?: string) => void
+  reset: () => void
 }
 
 export const useProgress = create<ProgressStore>((set) => ({
@@ -14,4 +15,5 @@ export const useProgress = create<ProgressStore>((set) => ({
 
     return set({ progress })
   },
+  reset: () => set({ progress: 0, text: "" }),
 }))

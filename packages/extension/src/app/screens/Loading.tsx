@@ -3,7 +3,6 @@ import styled from "styled-components"
 
 import { Greetings } from "../components/Greetings"
 import { Spinner } from "../components/Spinner"
-import { H2 } from "../components/Typography"
 import { useProgress } from "../states/progress"
 
 const LoadingScreen = styled.div`

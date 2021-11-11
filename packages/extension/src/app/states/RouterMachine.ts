@@ -257,6 +257,7 @@ export const routerMachine = createMachine<
     generateL1: {
       invoke: {
         src: async (ctx, event) => {
+          useProgress.setState({ progress: 0, text: "Generate Keypair..." })
           if (event.type === "GENERATE_L1")
             return {
               l1: ethers.Wallet.createRandom(),
@@ -276,6 +277,10 @@ export const routerMachine = createMachine<
     deployWallet: {
       invoke: {
         src: async (ctx) => {
+          useProgress.setState({
+            progress: 0,
+            text: "Deploying...",
+          })
           const newWallet = await Wallet.fromDeploy(
             ctx.l1!.privateKey,
             ctx.l1!.address,
@@ -304,7 +309,10 @@ export const routerMachine = createMachine<
         src: async (ctx) => {
           const password = ctx.password!
           if (password) {
-            const backup = await ctx.l1!.encrypt(password)
+            const backup = await ctx.l1!.encrypt(password, {}, (progress) =>
+              useProgress.setState({ progress, text: "Encrypting..." }),
+            )
+            useProgress.setState({ progress: 0, text: "" })
 
             const extendedBackup = JSON.stringify(
               {
