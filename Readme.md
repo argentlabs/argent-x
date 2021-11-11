@@ -1,44 +1,12 @@
 <!-- logo -->
 <p align="center">
-  <img width='300' src="https://raw.githubusercontent.com/seanjameshan/starknet.js/main/img/logo.svg">
+  <img src="assets/readme-header.png">
 </p>
+
+---
 
 <!-- tag line -->
-<h4 align='center'> Wallet extension <b>ArgentX</b> for StarkNet.</h4>
-
-<!-- primary badges -->
-<p align="center">
-  <a href="https://github.com/seanjameshan/starknet.js/actions">
-    <img src="https://img.shields.io/github/workflow/status/seanjameshan/starknet.js/Release">
-  </a>
-  <a href="https://www.npmjs.com/package/starknet">
-    <img src='https://img.shields.io/npm/v/starknet' />
-  </a>
-  <a href="https://www.npmjs.com/package/starknet">
-    <img src='https://img.shields.io/npm/v/starknet/next' />
-  </a>
-  <a href="https://bundlephobia.com/package/starknet">
-    <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
-  </a>
-  <a href="https://www.npmjs.com/package/starknet">
-    <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' />
-  </a>
-  <a href="https://github.com/seanjameshan/starknet.js/blob/main/LICENSE/">
-    <img src="https://img.shields.io/badge/license-MIT-black">
-  </a>
-  <a href="https://github.com/seanjameshan/starknet.js/stargazers">
-    <img src='https://img.shields.io/github/stars/seanjameshan/starknet.js?color=yellow' />
-  </a>
-  <a href="https://starkware.co/">
-    <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
-  </a>
-</p>
-
-⬆️ `TODO`: Change to ArgentX
-
-## ⬇️ Use ArgentX Extension
-
-The easiest way get the ArgentX Extension is from the Chrome Extension Store:
+<h2 align='center'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h2>
 
 <p align="center">
   <a href="https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest">
@@ -46,9 +14,11 @@ The easiest way get the ArgentX Extension is from the Chrome Extension Store:
   </a>
 </p>
 
+
+---
+
 ## 🌈 Table of contents
 
-- [⬇️ Use ArgentX Extension](#️-use-argentx-extension)
 - [🌈 Table of contents](#-table-of-contents)
 - [🌐 Usage with your DApp](#-usage-with-your-dapp)
 - [👩🏾‍💻 Development](#-development)
