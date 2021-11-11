@@ -73,47 +73,48 @@ export const TokenDapp: FC = () => {
           <code>{lastTransactionHash}</code>
         </a>
       )}
-      <h2 className={styles.title}>Mint token</h2>
-      <form onSubmit={handleMintSubmit}>
-        <label htmlFor="mint-amount">Amount:</label>
-        <br />
-        <input
-          type="text"
-          id="mint-amount"
-          name="fname"
-          value={mintAmount}
-          onChange={(e) => setMintAmount(e.target.value)}
-        />
-        <br />
-        <input type="submit" disabled={buttonsDisabled} value="Mint" />
-      </form>
+      <div className="columns">
+        <form onSubmit={handleMintSubmit}>
+          <h2 className={styles.title}>Mint token</h2>
 
-      <h2 className={styles.title} style={{ marginTop: 10 }}>
-        Transfer token
-      </h2>
-      <form onSubmit={handleTransferSubmit}>
-        <label htmlFor="transfer-to">To:</label>
-        <br />
-        <input
-          type="text"
-          id="transfer-to"
-          name="fname"
-          value={transferTo}
-          onChange={(e) => setTransferTo(e.target.value)}
-        />
-        <br />
-        <label htmlFor="transfer-amount">Amount:</label>
-        <br />
-        <input
-          type="text"
-          id="transfer-amount"
-          name="fname"
-          value={transferAmount}
-          onChange={(e) => setTransferAmount(e.target.value)}
-        />
-        <br />
-        <input type="submit" disabled={buttonsDisabled} value="Transfer" />
-      </form>
+          <label htmlFor="mint-amount">Amount</label>
+          <input
+            type="text"
+            id="mint-amount"
+            name="fname"
+            value={mintAmount}
+            onChange={(e) => setMintAmount(e.target.value)}
+          />
+
+          <input type="submit" disabled={buttonsDisabled} value="Mint" />
+        </form>
+
+        <form onSubmit={handleTransferSubmit}>
+          <h2 className={styles.title}>
+            Transfer token
+          </h2>
+
+          <label htmlFor="transfer-to">To</label>
+          <input
+            type="text"
+            id="transfer-to"
+            name="fname"
+            value={transferTo}
+            onChange={(e) => setTransferTo(e.target.value)}
+          />
+
+          <label htmlFor="transfer-amount">Amount</label>
+          <input
+            type="text"
+            id="transfer-amount"
+            name="fname"
+            value={transferAmount}
+            onChange={(e) => setTransferAmount(e.target.value)}
+          />
+          <br />
+          <input type="submit" disabled={buttonsDisabled} value="Transfer" />
+        </form>
+      </div>
     </>
   )
 }
