@@ -86,6 +86,9 @@ function App() {
         onSubmit={async () => {
           send({ type: "APPROVED_TX" })
         }}
+        onReject={async () => {
+          send("REJECT_TX")
+        }}
       />
     )
 

@@ -166,6 +166,7 @@ browser.runtime.onConnect.addListener(function (port) {
       case "SUBMITTED_TX":
       case "FAILED_TX": {
         const { tx } = data
+        console.log("rm", tx)
         return removeTransaction(tx)
       }
 

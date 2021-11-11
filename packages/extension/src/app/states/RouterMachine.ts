@@ -20,6 +20,7 @@ type RouterEvents =
   | { type: "SHOW_RECOVER" }
   | { type: "GO_BACK" }
   | { type: "RESET" }
+  | { type: "REJECT_TX" }
   | { type: "SHOW_ACCOUNT_LIST" }
   | { type: "SHOW_ADD_TOKEN" }
   | { type: "FORGOT_PASSWORD" }
@@ -413,7 +414,18 @@ export const routerMachine = createMachine<
         }
         return {}
       }),
-      on: { APPROVED_TX: "submitTx" },
+      on: {
+        APPROVED_TX: "submitTx",
+        REJECT_TX: {
+          target: "account",
+          actions: (ctx) => {
+            messenger.emit("FAILED_TX", {
+              tx: ctx.txToApprove,
+            })
+            if (ctx.isPopup) window.close()
+          },
+        },
+      },
     },
     submitTx: {
       invoke: {
@@ -469,7 +481,7 @@ export const routerMachine = createMachine<
           target: "determineEntry",
           actions: (ctx) => {
             messenger.emit("FAILED_TX", {
-              data: ctx.txToApprove,
+              tx: ctx.txToApprove,
             })
           },
         },

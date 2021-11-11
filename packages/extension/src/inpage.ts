@@ -110,9 +110,16 @@ export class WalletSigner extends Provider implements SignerInterface {
     this.sendMsg("OPEN_UI", {})
 
     const res: any = await Promise.race([
-      this.waitForMsgOfType("SUBMITTED_TX"),
-      this.waitForMsgOfType("FAILED_TX").finally(() => "error"),
+      this.waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
+      this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
+        .then(() => "error")
+        .catch(() => {
+          this.sendMsg("FAILED_TX", { tx })
+          return "error"
+        }),
     ])
+
+    console.log("res", res)
 
     if (res === "error") throw Error("User abort")
 
