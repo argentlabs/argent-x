@@ -6,7 +6,7 @@
 ---
 
 <!-- tag line -->
-<h2 align='center'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h2>
+<h3 align='center'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h3>
 
 <p align="center">
   <a href="https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest">
