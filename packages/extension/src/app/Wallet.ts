@@ -1,21 +1,21 @@
+import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import {
-  KeyPair,
-  CompiledContract,
-  Contract,
   AddTransactionResponse,
   Args,
   Calldata,
-  json,
+  CompiledContract,
+  Contract,
+  KeyPair,
   compileCalldata,
-  hash,
-  encode,
-  stark,
-  ec,
-  number,
   defaultProvider,
+  ec,
+  encode,
+  hash,
+  json,
+  number,
+  stark,
 } from "starknet"
-import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,

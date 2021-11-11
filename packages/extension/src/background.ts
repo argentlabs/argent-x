@@ -1,5 +1,6 @@
 import { InvokeFunctionTransaction } from "starknet"
 import browser from "webextension-polyfill"
+
 import { Messenger } from "./utils/Messenger"
 
 const allowedSender = ["INJECT", "UI", "INPAGE"]

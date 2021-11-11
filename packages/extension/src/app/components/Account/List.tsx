@@ -1,7 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
-import { getProfileImageUrl, WalletStatus } from "../../utils/wallet"
+
 import { makeClickable } from "../../utils/a11y"
+import { WalletStatus, getProfileImageUrl } from "../../utils/wallet"
 import { AccountAddress, AccountName } from "./Address"
 import { AccountColumn, AccountRow } from "./Header"
 import {

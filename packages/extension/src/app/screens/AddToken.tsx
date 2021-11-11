@@ -1,17 +1,18 @@
+import { BigNumber } from "@ethersproject/bignumber"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { FC, useState, useMemo, useEffect, useRef } from "react"
+import { FC, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
+
+import LoadingGif from "../../assets/loading.gif"
+import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { InputText } from "../components/Input"
-import LoadingGif from "../../assets/loading.gif"
 import { H2 } from "../components/Typography"
 import {
+  TokenDetails,
   fetchTokenDetails,
   isValidAddress,
-  TokenDetails,
 } from "../utils/tokens"
-import { BigNumber } from "@ethersproject/bignumber"
-import { BackButton } from "../components/BackButton"
 
 const AddTokenScreen = styled.div`
   display: flex;

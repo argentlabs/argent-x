@@ -1,12 +1,13 @@
-import { FC, useState, useMemo } from "react"
+import { FC, useMemo, useState } from "react"
 import styled from "styled-components"
-import { Button } from "../components/Button"
+
 import LogoSvg from "../../assets/logo.svg"
+import { Button } from "../components/Button"
+import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
 import { A, P } from "../components/Typography"
-import { isValidPassword } from "./NewSeed"
-import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { makeClickable } from "../utils/a11y"
+import { isValidPassword } from "./NewSeed"
 
 const PasswordScreen = styled.div`
   display: flex;

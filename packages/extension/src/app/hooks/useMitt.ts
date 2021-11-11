@@ -1,5 +1,5 @@
 import { Emitter, EventType } from "mitt"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 type Initilized<
   B extends boolean,

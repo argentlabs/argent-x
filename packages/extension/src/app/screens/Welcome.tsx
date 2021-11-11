@@ -1,9 +1,10 @@
 import { FC } from "react"
 import styled from "styled-components"
-import { H1, P } from "../components/Typography"
+
 import LogoSvg from "../../assets/logo.svg"
 import { Button, ButtonGroup } from "../components/Button"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
+import { H1, P } from "../components/Typography"
 
 const WelcomeScreen = styled.div`
   padding: 70px 40px 24px;

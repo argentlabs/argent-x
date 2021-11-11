@@ -2,7 +2,10 @@
   "name": "@argent/get-starknet",
   "version": "0.0.1",
   "private": false,
-  "main": "dist/index.js",
+  "main": "dist/",
+  "browser": {
+    "crypto": false
+  },
   "files": [
     "dist/"
   ],
@@ -12,19 +15,29 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^3.1.8",
     "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
     "rollup": "^2.3.4",
+    "rollup-plugin-polyfill-node": "^0.7.0",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-svelte-svg": "^1.0.0-beta.5",
     "rollup-plugin-terser": "^7.0.0",
+    "starknet": "^1.6.0",
     "svelte": "^3.0.0",
     "svelte-check": "^2.0.0",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
     "typescript": "^4.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@rollup/plugin-alias": "^3.1.8",
+    "crypto-js": "^4.1.1"
+  },
+  "peerDependencies": {
+    "starknet": "^1.6.0"
+  }
 }

@@ -1,7 +1,8 @@
 import { FC } from "react"
-import { IconButton } from "./IconButton"
+
 import BackSvg from "../../assets/back.svg"
 import { makeClickable } from "../utils/a11y"
+import { IconButton } from "./IconButton"
 
 export const BackButton: FC<{ onClick?: () => void }> = ({
   onClick,

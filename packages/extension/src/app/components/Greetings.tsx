@@ -1,5 +1,6 @@
-import { FC, useState, useEffect } from "react"
+import { FC, useEffect, useState } from "react"
 import styled, { keyframes } from "styled-components"
+
 import { H2 } from "./Typography"
 
 const greetings = [

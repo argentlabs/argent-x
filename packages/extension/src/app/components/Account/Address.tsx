@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import { H1, P } from "../Typography"
 
 export const AccountName = styled(H1)`

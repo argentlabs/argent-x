@@ -1,34 +1,33 @@
+import { ethers } from "ethers"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { FC, Suspense } from "react"
-import Copy from "../../assets/copy.svg"
-import Qr from "../../assets/qr.svg"
+import CopyToClipboard from "react-copy-to-clipboard"
+import usePromise from "react-promise-suspense"
+import styled from "styled-components"
+
 import Add from "../../assets/add.svg"
+import Copy from "../../assets/copy.svg"
 import LoadingGif from "../../assets/loading.gif"
+import Qr from "../../assets/qr.svg"
+import {
+  AccountAddress,
+  AccountAddressIconsWrapper,
+  AccountAddressWrapper,
+  AccountName,
+} from "../components/Account/Address"
 import {
   AccountColumn,
-  AccountRow,
   AccountHeader,
+  AccountRow,
 } from "../components/Account/Header"
 import {
   AccountNetwork,
-  AccountStatusWrapper,
-  AccountStatusText,
   AccountStatusIndicator,
+  AccountStatusText,
+  AccountStatusWrapper,
 } from "../components/Account/Network"
-import {
-  AccountName,
-  AccountAddressWrapper,
-  AccountAddressIconsWrapper,
-  AccountAddress,
-} from "../components/Account/Address"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
-import { getProfileImageUrl, getProfileName } from "../utils/wallet"
-import { makeClickable } from "../utils/a11y"
-import { useStatus } from "../hooks/useStatus"
-import CopyToClipboard from "react-copy-to-clipboard"
-import { Wallet } from "../Wallet"
-import styled from "styled-components"
 import {
   AddTokenIconButton,
   TokenAction,
@@ -37,14 +36,16 @@ import {
   TokenWrapper,
 } from "../components/Token"
 import { useMitt } from "../hooks/useMitt"
+import { useStatus } from "../hooks/useStatus"
+import { makeClickable } from "../utils/a11y"
 import {
+  TokenDetails,
   fetchTokenDetails,
   getTokens,
-  TokenDetails,
   tokensMitt,
 } from "../utils/tokens"
-import usePromise from "react-promise-suspense"
-import { ethers } from "ethers"
+import { getProfileImageUrl, getProfileName } from "../utils/wallet"
+import { Wallet } from "../Wallet"
 
 const ARGENT_TOKEN_CONTRACT =
   "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"

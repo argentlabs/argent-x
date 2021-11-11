@@ -1,9 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { A } from "../components/Typography"
-
 import SuccessGif from "../../assets/loading.gif"
+import { A } from "../components/Typography"
 
 const SuccessScreen = styled.div`
   display: flex;

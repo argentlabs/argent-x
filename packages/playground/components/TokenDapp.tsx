@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from "react"
+
+import { mintToken, transfer } from "../services/token.service"
+import { waitForTransaction, walletAddress } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
-import { mintToken, transfer } from "./token.service"
-import { waitForTransaction, walletAddress } from "./wallet.service"
 
 export const TokenDapp: FC = () => {
   const [mintAmount, setMintAmount] = useState("10")

@@ -1,6 +1,7 @@
 import { FC } from "react"
 import type { Args } from "starknet"
 import styled from "styled-components"
+
 import { P } from "../components/Typography"
 import { Confirm, ConfirmPageProps } from "./Confirm"
 

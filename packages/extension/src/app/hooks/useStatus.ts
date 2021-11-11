@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { defaultProvider } from "starknet"
+
 import { getStatus } from "../utils/wallet"
 import { Wallet } from "../Wallet"
 

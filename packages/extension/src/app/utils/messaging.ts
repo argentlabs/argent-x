@@ -1,6 +1,6 @@
+import { Transaction } from "starknet"
 import browser from "webextension-polyfill"
 
-import { Transaction } from "starknet"
 import { Messenger } from "../../utils/Messenger"
 
 const allowedSender = ["INJECT", "INPAGE", "BACKGROUND"]

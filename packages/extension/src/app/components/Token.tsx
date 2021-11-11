@@ -2,6 +2,7 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import { FC, useState } from "react"
 import styled, { css } from "styled-components"
+
 import { makeClickable } from "../utils/a11y"
 import { getProfileColor } from "../utils/wallet"
 import { Button, ButtonGroup } from "./Button"

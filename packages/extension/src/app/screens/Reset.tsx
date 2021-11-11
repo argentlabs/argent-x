@@ -1,4 +1,5 @@
 import { FC } from "react"
+
 import { P } from "../components/Typography"
 import { Confirm, ConfirmPageProps } from "./Confirm"
 

@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill"
+
 import { Messenger } from "./utils/Messenger"
 
 const container = document.head || document.documentElement

@@ -1,9 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { H2 } from "../components/Typography"
-
 import LoadingGif from "../../assets/loading.gif"
+import { H2 } from "../components/Typography"
 
 const LoadingScreen = styled.div`
   display: flex;

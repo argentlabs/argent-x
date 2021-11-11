@@ -1,5 +1,4 @@
-import * as starknet from "starknet"
-import { getStarknet } from "../../get-starknet/"
+import { getStarknet } from "@argent/get-starknet"
 
 export const isWalletConnected = (): boolean => !!getStarknet()?.isConnected
 
@@ -14,4 +13,4 @@ export const walletAddress = async (): Promise<string | undefined> => {
 }
 
 export const waitForTransaction = async (hash: string) =>
-  await starknet.defaultProvider.waitForTx(hash)
+  await getStarknet().provider.waitForTx(hash)

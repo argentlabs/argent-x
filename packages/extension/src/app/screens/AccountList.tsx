@@ -1,5 +1,6 @@
 import { FC } from "react"
 import styled from "styled-components"
+
 // import Settings from '../../assets/settings.svg';
 import Add from "../../assets/add.svg"
 import { AccountRow } from "../components/Account/Header"

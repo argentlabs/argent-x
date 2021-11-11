@@ -1,11 +1,12 @@
-import { FC, useState, useMemo } from "react"
+import { FC, useMemo, useState } from "react"
 import styled from "styled-components"
-import { H2, P } from "../components/Typography"
-import { Button } from "../components/Button"
-import { StickyArgentFooter } from "../components/StickyArgentFooter"
-import { InputText } from "../components/Input"
-import { makeClickable } from "../utils/a11y"
+
 import { BackButton } from "../components/BackButton"
+import { Button } from "../components/Button"
+import { InputText } from "../components/Input"
+import { StickyArgentFooter } from "../components/StickyArgentFooter"
+import { H2, P } from "../components/Typography"
+import { makeClickable } from "../utils/a11y"
 
 const NewSeedScreen = styled.div`
   padding: 48px 40px 24px;

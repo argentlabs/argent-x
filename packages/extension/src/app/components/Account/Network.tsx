@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import { WalletStatusCode } from "../../utils/wallet"
 import { P } from "../Typography"
 

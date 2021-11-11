@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ethers } from "ethers"
-import { ec, KeyPair, Args, InvokeFunctionTransaction } from "starknet"
-import { assign, createMachine, DoneEvent } from "xstate"
+import { Args, InvokeFunctionTransaction, KeyPair, ec } from "starknet"
 import browser from "webextension-polyfill"
-import { addToken } from "../utils/tokens"
-import { Wallet } from "../Wallet"
+import { DoneEvent, assign, createMachine } from "xstate"
+
 import {
   getLastSelectedWallet,
   messenger,
   readRequestedTransactions,
 } from "../utils/messaging"
+import { addToken } from "../utils/tokens"
+import { Wallet } from "../Wallet"
 
 export type TxRequest = { to: string; method: string; calldata: Args }
 

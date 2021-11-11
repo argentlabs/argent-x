@@ -1,16 +1,18 @@
-import svelte from "rollup-plugin-svelte"
 import commonjs from "@rollup/plugin-commonjs"
+import json from "@rollup/plugin-json"
 import resolve from "@rollup/plugin-node-resolve"
+import typescript from "@rollup/plugin-typescript"
+import svelte from "rollup-plugin-svelte"
+import { svelteSVG } from "rollup-plugin-svelte-svg"
 import { terser } from "rollup-plugin-terser"
 import sveltePreprocess from "svelte-preprocess"
-import typescript from "@rollup/plugin-typescript"
-import { svelteSVG } from "rollup-plugin-svelte-svg"
 
 const production = !process.env.ROLLUP_WATCH
 
 export default {
   input: "src/index.ts",
-  output: [{ format: "cjs", dir: "dist/" }],
+  output: [{ format: "cjs", dir: "dist/", sourcemap: !production }],
+  external: ["starknet"],
   plugins: [
     // SVGR to transform svg files into svelte components
     svelteSVG(),
@@ -23,6 +25,8 @@ export default {
         dev: !production,
       },
     }),
+
+    json(),
 
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In
