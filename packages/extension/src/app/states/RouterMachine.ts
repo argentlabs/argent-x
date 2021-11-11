@@ -11,6 +11,7 @@ import {
 } from "../utils/messaging"
 import { addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
+import { useProgress } from "./progress"
 
 export type TxRequest = { to: string; method: string; calldata: Args }
 
@@ -124,7 +125,6 @@ export const routerMachine = createMachine<
     determineEntry: {
       invoke: {
         src: async (_ctx, ev) => {
-          console.log(ev)
           const keyStore = getKeystoreFromLocalStorage()
           const jsonKeyStore = JSON.parse(keyStore)
           return { wallets: jsonKeyStore.wallets }
@@ -147,8 +147,11 @@ export const routerMachine = createMachine<
           const l1 = await ethers.Wallet.fromEncryptedJson(
             keyStore,
             event.data.password,
-            (per) => console.log(per),
+            (progress) =>
+              useProgress.setState({ progress, text: "Decrypting ..." }),
           )
+
+          useProgress.setState({ progress: 0, text: "" })
 
           return {
             l1,

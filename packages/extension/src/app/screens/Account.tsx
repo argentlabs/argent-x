@@ -8,7 +8,6 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import Copy from "../../assets/copy.svg"
-import LoadingGif from "../../assets/loading.gif"
 import Qr from "../../assets/qr.svg"
 import {
   AccountAddress,
@@ -28,6 +27,7 @@ import {
   AccountStatusWrapper,
 } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
+import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
   TokenAction,
@@ -100,12 +100,6 @@ const TokenList: FC<{
   )
 }
 
-const Spinner = styled.img`
-  max-width: 92px;
-  max-height: 92px;
-  margin: auto;
-`
-
 export const Account: FC<{
   wallet: Wallet
   accountNumber: number
@@ -147,7 +141,7 @@ export const Account: FC<{
         </AccountRow>
       </AccountHeader>
       <AccountContent>
-        <Suspense fallback={<Spinner src={LoadingGif} alt="Loading..." />}>
+        <Suspense fallback={<Spinner size={92} />}>
           <TokenList onAction={onAction} walletAddress={wallet.address} />
           <TokenWrapper {...makeClickable(onAddToken)}>
             <AddTokenIconButton size={40}>

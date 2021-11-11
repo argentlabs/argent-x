@@ -2,6 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import SuccessGif from "../../assets/loading.gif"
+import { Spinner } from "../components/Spinner"
 import { A } from "../components/Typography"
 
 const SuccessScreen = styled.div`
@@ -14,11 +15,6 @@ const SuccessScreen = styled.div`
   height: 100vh;
 `
 
-const Spinner = styled.img`
-  max-width: 128px;
-  max-height: 128px;
-`
-
 const SuccessText = styled(A)`
   font-size: 18px;
   line-height: 32px;
@@ -27,7 +23,7 @@ const SuccessText = styled(A)`
 export const Success: FC<{ txHash: string }> = ({ txHash }) => {
   return (
     <SuccessScreen>
-      <Spinner src={SuccessGif} alt="Success" />
+      <Spinner size={128} />
       <SuccessText href={`https://voyager.online/tx/${txHash}`} target="_blank">
         Transaction was submitted
       </SuccessText>

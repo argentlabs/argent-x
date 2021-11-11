@@ -39,6 +39,15 @@ interface PasswordProps {
   onForgotPassword?: () => void
 }
 
+const greetings = [
+  "gm!",
+  "Hello!",
+  "Guten Tag!",
+  "Привет!",
+  "gm, ser!",
+  "hi fren",
+]
+
 export const Password: FC<PasswordProps> = ({ onSubmit, onForgotPassword }) => {
   const [password, setPassword] = useState("")
 
@@ -49,7 +58,7 @@ export const Password: FC<PasswordProps> = ({ onSubmit, onForgotPassword }) => {
   return (
     <PasswordScreen>
       <LogoSvg />
-      <Greetings />
+      <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 
       <form onSubmit={() => onSubmit?.(password)}>

@@ -1,8 +1,10 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import LoadingGif from "../../assets/loading.gif"
+import { Greetings } from "../components/Greetings"
+import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
+import { useProgress } from "../states/progress"
 
 const LoadingScreen = styled.div`
   display: flex;
@@ -14,21 +16,21 @@ const LoadingScreen = styled.div`
   height: 100vh;
 `
 
-const Spinner = styled.img`
-  max-width: 128px;
-  max-height: 128px;
-`
-
-const LoadingText = styled(H2)`
-  font-size: 28px;
-  line-height: 32px;
-`
+const loadingTexts = [
+  "Please wait...",
+  "hello mom...",
+  "Just a little bit more...",
+]
 
 export const Loading: FC = () => {
+  const loadingText = useProgress((x) => x.text)
+
   return (
     <LoadingScreen>
-      <Spinner src={LoadingGif} alt="Loading" />
-      <LoadingText>Loading...</LoadingText>
+      <Spinner size={128} />
+      <Greetings greetings={[loadingText || "Loading...", ...loadingTexts]}>
+        {loadingText || "Loading..."}
+      </Greetings>
     </LoadingScreen>
   )
 }

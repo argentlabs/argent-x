@@ -3,15 +3,6 @@ import styled, { keyframes } from "styled-components"
 
 import { H2 } from "./Typography"
 
-const greetings = [
-  "gm!",
-  "Hello!",
-  "Guten Tag!",
-  "Привет!",
-  "gm, ser!",
-  "hi fren",
-]
-
 export const GreetingsWrapper = styled.div`
   position: relative;
 
@@ -62,7 +53,11 @@ const useCarusel = (length: number, delay = 3000): number => {
   return index
 }
 
-export const Greetings: FC = ({ ...props }) => {
+interface GreetingsProps {
+  greetings: string[]
+}
+
+export const Greetings: FC<GreetingsProps> = ({ greetings, ...props }) => {
   const index = useCarusel(greetings.length)
   return (
     <GreetingsWrapper {...props}>

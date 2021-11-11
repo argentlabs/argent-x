@@ -3,10 +3,10 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { FC, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 
-import LoadingGif from "../../assets/loading.gif"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { InputText } from "../components/Input"
+import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
 import {
   TokenDetails,
@@ -53,12 +53,6 @@ const isDataComplete = (data: TokenDetails) => {
     return true
   return false
 }
-
-const Spinner = styled.img`
-  max-width: 92px;
-  max-height: 92px;
-  margin: auto;
-`
 
 export const AddToken: FC<AddTokenProps> = ({
   walletAddress,
@@ -163,7 +157,7 @@ export const AddToken: FC<AddTokenProps> = ({
             </Button>
           </>
         )}
-        {loading && <Spinner src={LoadingGif} alt="Loading..." />}
+        {loading && <Spinner size={92} />}
       </form>
     </AddTokenScreen>
   )
