@@ -2,6 +2,8 @@
   "version": "0.1.0",
   "private": true,
   "name": "argent-x",
+  "repository": "github:argentlabs/argent-x",
+  "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
     "import-sort-style-module": "^6.0.0",
     "lerna": "^4.0.0",
@@ -23,5 +25,6 @@
       "style": "module",
       "parser": "typescript"
     }
-  }
+  },
+  "license": "MIT"
 }
