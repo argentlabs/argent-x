@@ -16,7 +16,7 @@
     "posttest": "npm run format",
     "dev": "lerna run dev --parallel",
     "build": "lerna run build",
-    "prepare": "lerna bootstrap"
+    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
