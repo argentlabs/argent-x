@@ -115,13 +115,12 @@ export class WalletSigner extends Provider implements SignerInterface {
         .then(() => "error")
         .catch(() => {
           this.sendMsg("FAILED_TX", { tx })
-          return "error"
+          return "timeout"
         }),
     ])
 
-    console.log("res", res)
-
     if (res === "error") throw Error("User abort")
+    if (res === "timeout") throw Error("User action timed out")
 
     return {
       code: "TRANSACTION_RECEIVED",
