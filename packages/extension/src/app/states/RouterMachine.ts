@@ -48,6 +48,7 @@ type Context = {
   txHash?: string
   wallets: Record<string, Wallet>
   isPopup?: boolean
+  error?: string
 }
 
 type RouterTypestate =
@@ -165,6 +166,7 @@ export const routerMachine = createMachine<
           actions: [
             assign((_, ev) => ({
               password: ev.data.password,
+              error: undefined,
             })),
             (_, ev) => {
               try {
@@ -177,6 +179,10 @@ export const routerMachine = createMachine<
         },
 
         onError: {
+          actions: assign((ctx) => ({
+            ...ctx,
+            error: "Password was wrong",
+          })),
           target: "enterPassword",
         },
       },

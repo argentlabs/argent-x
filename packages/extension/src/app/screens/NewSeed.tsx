@@ -1,12 +1,12 @@
 import { FC, useMemo, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
 import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { InputText } from "../components/Input"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
-import { H2, P } from "../components/Typography"
-import { makeClickable } from "../utils/a11y"
+import { FormError, H2, P } from "../components/Typography"
 
 const NewSeedScreen = styled.div`
   padding: 48px 40px 24px;
@@ -16,8 +16,8 @@ const NewSeedScreen = styled.div`
   ${InputText} {
     margin-top: 15px;
   }
-  ${InputText}:last-of-type {
-    margin-bottom: 116px;
+  ${Button} {
+    margin-top: 116px;
   }
 `
 
@@ -37,39 +37,61 @@ export const NewSeed: FC<NewSeedProps> = ({
   onSubmit = noop,
   onBack = noop,
 }) => {
-  const [password, setPassword] = useState("")
-  const [repeatPassword, setRepeatPassword] = useState("")
-
-  const continueDisabled = useMemo(() => {
-    return !(
-      isValidPassword(password) &&
-      isValidPassword(repeatPassword) &&
-      password === repeatPassword
-    )
-  }, [password, repeatPassword])
-
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isDirty },
+    watch,
+  } = useForm<{
+    password: string
+    repeatPassword: string
+  }>({
+    criteriaMode: "firstError",
+  })
+  const password = watch("password")
   return (
     <NewSeedScreen>
       <BackButton onClick={onBack} />
       <H2>New password</H2>
       <P>Enter a password to protect your recovery phrase</P>
-      <form onSubmit={() => onSubmit(password)}>
-        <InputText
-          autoFocus
-          type="password"
-          placeholder="Password"
-          onChange={(e: any) => setPassword(e.target.value)}
-          value={password}
+      <form onSubmit={handleSubmit(({ password }) => onSubmit(password))}>
+        <Controller
+          name="password"
+          control={control}
+          rules={{ required: true, validate: isValidPassword }}
+          render={({ field }) => (
+            <InputText
+              autoFocus
+              type="password"
+              placeholder="Password"
+              {...field}
+            />
+          )}
         />
-        <InputText
-          type="password"
-          placeholder="Repeat password"
-          onChange={(e: any) => setRepeatPassword(e.target.value)}
-          value={repeatPassword}
+        {errors.password?.type === "required" && (
+          <FormError>A new password is required</FormError>
+        )}
+        {errors.password?.type === "validate" && (
+          <FormError>Password is too short</FormError>
+        )}
+        <Controller
+          name="repeatPassword"
+          control={control}
+          rules={{ validate: (x) => x === password }}
+          render={({ field }) => (
+            <InputText
+              type="password"
+              placeholder="Repeat password"
+              {...field}
+            />
+          )}
         />
+        {errors.repeatPassword?.type === "validate" && (
+          <FormError>Passwords do not match</FormError>
+        )}
 
-        <Button type="submit" disabled={continueDisabled}>
-          Continue
+        <Button type="submit" disabled={!isDirty}>
+          Create Wallet
         </Button>
       </form>
       <StickyArgentFooter />

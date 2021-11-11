@@ -67,10 +67,20 @@ function randomString() {
 }
 
 export const InputText = styled(
-  ({ placeholder, type, onChange, autoFocus, value, disabled, ...props }) => {
+  ({
+    placeholder,
+    type,
+    onChange,
+    autoFocus,
+    value,
+    disabled,
+    className,
+    style,
+    ...props
+  }) => {
     const idRef = useRef(randomString())
     return (
-      <Container {...props}>
+      <Container className={className} style={style}>
         <Input
           placeholder={placeholder}
           id={idRef.current}
@@ -79,6 +89,7 @@ export const InputText = styled(
           value={value}
           autoFocus={autoFocus}
           disabled={disabled}
+          {...props}
         />
         <Label>{placeholder}</Label>
       </Container>

@@ -1,11 +1,12 @@
-import { FC, useMemo, useState } from "react"
+import { FC, useEffect, useMemo, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
 import styled from "styled-components"
 
 import LogoSvg from "../../assets/logo.svg"
 import { Button } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
-import { A, P } from "../components/Typography"
+import { A, FormError, P } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
 import { isValidPassword } from "./NewSeed"
 
@@ -37,6 +38,7 @@ const PasswordScreen = styled.div`
 interface PasswordProps {
   onSubmit?: (password: string) => void
   onForgotPassword?: () => void
+  error?: string
 }
 
 const greetings = [
@@ -48,12 +50,23 @@ const greetings = [
   "hi fren",
 ]
 
-export const Password: FC<PasswordProps> = ({ onSubmit, onForgotPassword }) => {
-  const [password, setPassword] = useState("")
+export const Password: FC<PasswordProps> = ({
+  onSubmit,
+  onForgotPassword,
+  error,
+}) => {
+  const {
+    control,
+    formState: { errors, isDirty },
+    handleSubmit,
+    setError,
+  } = useForm<{ password: string }>()
 
-  const disableSubmit = useMemo(() => {
-    return !isValidPassword(password)
-  }, [password])
+  useEffect(() => {
+    setError("password", {
+      message: error,
+    })
+  }, [error])
 
   return (
     <PasswordScreen>
@@ -61,16 +74,32 @@ export const Password: FC<PasswordProps> = ({ onSubmit, onForgotPassword }) => {
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 
-      <form onSubmit={() => onSubmit?.(password)}>
-        <InputText
-          autoFocus
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e: any) => setPassword(e.target.value)}
+      <form onSubmit={handleSubmit(({ password }) => onSubmit?.(password))}>
+        <Controller
+          name="password"
+          control={control}
+          rules={{ required: true, validate: isValidPassword }}
+          render={({ field }) => (
+            <InputText
+              autoFocus
+              placeholder="Password"
+              type="password"
+              {...field}
+            />
+          )}
         />
+        {errors.password?.type === "validate" && (
+          <FormError>Password is too short</FormError>
+        )}
+        {errors.password?.type === "required" && (
+          <FormError>Password is required</FormError>
+        )}
+        {errors.password?.message && (
+          <FormError>{errors.password.message}</FormError>
+        )}
+
         <A {...makeClickable(onForgotPassword)}>or import backup</A>
-        <Button type="submit" disabled={disableSubmit}>
+        <Button type="submit" disabled={!isDirty}>
           Unlock
         </Button>
       </form>

@@ -16,7 +16,6 @@ import { Success } from "./screens/Success"
 import { UploadKeystore } from "./screens/UploadKeystore"
 import { Welcome } from "./screens/Welcome"
 import { routerMachine } from "./states/RouterMachine"
-import { messenger } from "./utils/messaging"
 
 async function fileToString(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -67,6 +66,7 @@ function App() {
           send({ type: "SUBMIT_PASSWORD", data: { password } })
         }}
         onForgotPassword={() => send("FORGOT_PASSWORD")}
+        error={state.context.error}
       />
     )
 

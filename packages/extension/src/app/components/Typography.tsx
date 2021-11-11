@@ -22,6 +22,14 @@ export const P = styled.p`
   color: #fff;
 `
 
+export const FormError = styled.p`
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #ff675c;
+  text-align: left;
+`
+
 export const A = styled.a`
   display: inline-block;
   text-decoration: none;
