@@ -1,8 +1,10 @@
 import {
   AddTransactionResponse,
   Provider,
+  Signer,
   SignerInterface,
   Transaction,
+  defaultProvider,
 } from "starknet"
 
 import { EmitFn, Messenger } from "./utils/Messenger"
@@ -30,9 +32,26 @@ const messenger = new Messenger(
   },
 )
 
+type StarknetWindowObject =
+  | {
+      enable: () => Promise<string[]>
+      signer: Signer
+      provider: Provider
+      selectedAddress: string
+      isConnected: true
+    }
+  | {
+      enable: () => Promise<string[]>
+      signer?: Signer
+      provider: Provider
+      selectedAddress?: string
+      isConnected: false
+    }
+
 // window.ethereum like
-;(window as any).starknet = {
+const starknetWindowObject: StarknetWindowObject = {
   signer: undefined,
+  provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
   enable: () =>
@@ -49,6 +68,7 @@ const messenger = new Messenger(
       })
     }),
 }
+;(window as any).starknet = starknetWindowObject
 
 export class WalletSigner extends Provider implements SignerInterface {
   public address: string
