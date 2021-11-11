@@ -10,11 +10,9 @@ browser.runtime.onConnect.addListener(function (port) {
   browser.runtime.onConnect.addListener(function (uiPort) {
     if (uiPort.name !== "argent-x-ui") return
     const uiToContentForwarder = async (data: any) => {
-      console.log("FORWARD UI->CONTENT")
       port.postMessage(data)
     }
     const contentToUiForwarder = async (data: any) => {
-      console.log("FORWARD CONTENT->UI")
       uiPort.postMessage(data)
     }
 
@@ -129,7 +127,6 @@ browser.runtime.onConnect.addListener(function (port) {
   }
 
   messenger.listen(async (type, data) => {
-    console.log("BACKGROUND", type, data)
     switch (type) {
       case "OPEN_UI": {
         return openUi()
@@ -166,7 +163,6 @@ browser.runtime.onConnect.addListener(function (port) {
       case "SUBMITTED_TX":
       case "FAILED_TX": {
         const { tx } = data
-        console.log("rm", tx)
         return removeTransaction(tx)
       }
 

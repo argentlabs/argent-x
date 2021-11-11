@@ -58,7 +58,6 @@ const starknetWindowObject: StarknetWindowObject = {
     new Promise((res) => {
       messenger.emit("CONNECT", {})
       messenger.listen((type, data) => {
-        console.log("INPAGE", type, data)
         if (type === "WALLET_CONNECTED" && typeof data === "string") {
           ;(window as any).starknet.signer = new WalletSigner(data)
           ;(window as any).starknet.selectedAddress = data
@@ -101,10 +100,8 @@ export class WalletSigner extends Provider implements SignerInterface {
   ): Promise<AddTransactionResponse> {
     if (tx.type === "DEPLOY") return super.addTransaction(tx)
 
-    console.assert(
-      !tx.signature,
-      "Adding signatures to a signer tx currently isn't supported",
-    )
+    if (tx.signature?.length)
+      throw Error("Adding signatures to a signer tx currently isn't supported")
 
     this.sendMsg("ADD_TRANSACTION", tx)
     this.sendMsg("OPEN_UI", {})

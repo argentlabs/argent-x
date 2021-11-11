@@ -28,7 +28,3 @@ export const getLastSelectedWallet = async (): Promise<string | undefined> => {
   messenger.emit("GET_SELECTED_WALLET_ADDRESS", {})
   return messenger.waitForEvent("GET_SELECTED_WALLET_ADDRESS_RES", 2000)
 }
-
-messenger.listen((type, data) => {
-  console.log("UI", type, data)
-})

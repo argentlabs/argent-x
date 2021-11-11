@@ -40,7 +40,3 @@ const messenger = new Messenger(
     port.postMessage({ from: "INJECT", type, data })
   },
 )
-
-messenger.listen((type, data) => {
-  console.log("INJECT", type, data)
-})
