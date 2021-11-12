@@ -20,7 +20,8 @@ jobs:
           node-version: "14"
 
       - run: yarn install --frozen-lockfile
-      - run: echo 'module.exports = { basePath: "/argent-x" }' > packages/playground/next.config.js
+      - run: |
+        echo 'module.exports = { basePath: "/argent-x" }' > packages/playground/next.config.js
       - run: yarn build
       - run: yarn --cwd packages/playground export
 
