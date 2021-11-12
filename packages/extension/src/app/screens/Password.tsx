@@ -79,7 +79,8 @@ export const Password: FC<PasswordProps> = ({
           name="password"
           control={control}
           rules={{ required: true, validate: isValidPassword }}
-          render={({ field }) => (
+          defaultValue=""
+          render={({ field: { ref, ...field } }) => (
             <InputText
               autoFocus
               placeholder="Password"

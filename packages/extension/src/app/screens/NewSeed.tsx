@@ -58,8 +58,9 @@ export const NewSeed: FC<NewSeedProps> = ({
         <Controller
           name="password"
           control={control}
+          defaultValue=""
           rules={{ required: true, validate: isValidPassword }}
-          render={({ field }) => (
+          render={({ field: { ref, ...field } }) => (
             <InputText
               autoFocus
               type="password"
@@ -78,7 +79,8 @@ export const NewSeed: FC<NewSeedProps> = ({
           name="repeatPassword"
           control={control}
           rules={{ validate: (x) => x === password }}
-          render={({ field }) => (
+          defaultValue=""
+          render={({ field: { ref, ...field } }) => (
             <InputText
               type="password"
               placeholder="Repeat password"
