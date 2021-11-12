@@ -10,6 +10,10 @@
   flex-direction: column;
 }
 
+.connect {
+  max-width: 300px;
+}
+
 .title a {
   color: #0070f3;
   text-decoration: none;
