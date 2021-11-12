@@ -3,6 +3,7 @@ import { FC, useMemo, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import styled from "styled-components"
 
+import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { H2 } from "../components/Typography"
 
@@ -23,7 +24,7 @@ const DropZone = styled.div`
   font-weight: bold;
   line-height: 24px;
   text-align: center;
-  margin: 32px 0 64px;
+  margin: 32px 0 48px;
   cursor: pointer;
   border-radius: 8px;
   border: 2px dashed rgba(255, 255, 255, 0.5);
@@ -37,9 +38,13 @@ const DropZone = styled.div`
 
 interface UploadKeystoreProps {
   onSubmit?: (uploadKeystore: File) => void
+  onBack?: () => void
 }
 
-export const UploadKeystore: FC<UploadKeystoreProps> = ({ onSubmit }) => {
+export const UploadKeystore: FC<UploadKeystoreProps> = ({
+  onSubmit,
+  onBack,
+}) => {
   const {
     acceptedFiles: [acceptedFile],
     getRootProps,
@@ -53,6 +58,7 @@ export const UploadKeystore: FC<UploadKeystoreProps> = ({ onSubmit }) => {
 
   return (
     <UploadKeystoreScreen>
+      <BackButton onClick={onBack} />
       <H2>Upload Keystore</H2>
       <DropZone {...getRootProps()}>
         <input {...getInputProps()} />

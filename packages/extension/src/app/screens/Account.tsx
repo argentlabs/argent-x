@@ -8,7 +8,7 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import Copy from "../../assets/copy.svg"
-import Qr from "../../assets/qr.svg"
+import Open from "../../assets/open.svg"
 import {
   AccountAddress,
   AccountAddressIconsWrapper,
@@ -127,7 +127,12 @@ export const Account: FC<{
                 <CopyToClipboard text={wallet.address}>
                   <Copy style={{ cursor: "pointer" }} />
                 </CopyToClipboard>
-                <Qr />
+                <a
+                  href={`https://voyager.online/contract/${wallet.address}`}
+                  target="_blank"
+                >
+                  <Open />
+                </a>
               </AccountAddressIconsWrapper>
             </AccountAddressWrapper>
           </AccountColumn>

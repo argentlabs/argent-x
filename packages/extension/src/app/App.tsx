@@ -76,6 +76,9 @@ function App() {
         onSubmit={async (file) => {
           send({ type: "SUBMIT_KEYSTORE", data: await fileToString(file) })
         }}
+        onBack={() => {
+          send("GO_BACK")
+        }}
       />
     )
 
