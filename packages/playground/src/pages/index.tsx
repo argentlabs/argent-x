@@ -37,7 +37,9 @@ const Home: NextPage = () => {
           </>
         ) : (
           <>
-            <button onClick={handleConnectClick}>Connect Wallet</button>
+            <button className={styles.connect} onClick={handleConnectClick}>
+              Connect Wallet
+            </button>
             <p>First connect wallet to use dapp.</p>
           </>
         )}
