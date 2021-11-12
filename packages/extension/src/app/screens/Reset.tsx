@@ -14,10 +14,10 @@ export const ResetScreen: FC<ConfirmPageProps> = (props) => {
     >
       <P>
         If you forgot your password, your only option for recovery is to reset
-        the extension and load your prior downloaded Backup.
+        the extension and load your prior downloaded backup.
       </P>
       <P style={{ marginTop: 32 }}>
-        The Backup downloads automatically each time you add an account to your
+        The backup downloads automatically each time you add an account to your
         wallet.
       </P>
     </Confirm>
