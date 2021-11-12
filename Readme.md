@@ -112,4 +112,4 @@ One more thank you to the Starkware Team and Discord.
 
 [Argent](https://github.com/argentlabs) and [contributors](https://github.com/argentlabs/argent-x/graphs/contributors).
 
-MIT License, see the included [License.md](License.md) file.
+GNU General Public License V3, see the included [License.md](License.md) file.
