@@ -1,6 +1,6 @@
 {
   "name": "Argent x StarkNet Wallet",
-  "description": "The power of StarkNet in a nice wallet interface made by Argent",
+  "description": "The security of Ethereum with the scale of StarkNet",
   "version": "0.1.0",
   "manifest_version": 2,
   "browser_action": {

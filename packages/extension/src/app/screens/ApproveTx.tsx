@@ -29,7 +29,7 @@ export const ApproveTx: FC<ApproveTxProps> = ({ tx, onSubmit, ...props }) => {
       }}
       {...props}
     >
-      <P>Somebody wants to send this transaction in your name:</P>
+      <P>A Dapp wants you to make this transaction:</P>
       <Pre>{JSON.stringify(tx, null, 2)}</Pre>
     </Confirm>
   )
