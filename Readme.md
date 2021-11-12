@@ -120,4 +120,3 @@ GNU General Public License V3, see the included [License.md](License.md) file.
 ## 🏎 Coming soon
 
 - [ ] Publish extension to Chrome Extension Store
-- [ ] Publish example DApp so users can try the extension
