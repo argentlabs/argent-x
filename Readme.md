@@ -50,7 +50,7 @@ yarn add @argent/get-starknet starknet
 The package is a light wrapper around [starknet.js](https://github.com/seanjameshan/starknet.js) to interact with the wallet extension. You can then use it like the following:
 
 ```javascript
-import getStarknet from "@argent/get-starknet"
+import { getStarknet } from "@argent/get-starknet"
 
 // check if wallet extension is installed and initialized. Shows a modal prompting the user to download ArgentX otherwise.
 const starknet = getStarknet({ showModal: true })
