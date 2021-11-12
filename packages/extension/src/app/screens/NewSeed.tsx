@@ -91,7 +91,7 @@ export const NewSeed: FC<NewSeedProps> = ({
         )}
 
         <Button type="submit" disabled={!isDirty}>
-          Create Wallet
+          Create wallet
         </Button>
       </form>
       <StickyArgentFooter />
