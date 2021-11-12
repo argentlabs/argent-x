@@ -53,7 +53,7 @@ export const NewSeed: FC<NewSeedProps> = ({
     <NewSeedScreen>
       <BackButton onClick={onBack} />
       <H2>New password</H2>
-      <P>Enter a password to protect your recovery phrase</P>
+      <P>Enter a password to protect your account</P>
       <form onSubmit={handleSubmit(({ password }) => onSubmit(password))}>
         <Controller
           name="password"
