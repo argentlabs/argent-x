@@ -18,7 +18,8 @@
     "posttest": "npm run format",
     "dev": "lerna run dev --parallel",
     "build": "lerna run build",
-    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build"
+    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build",
+    "gh-pages": "yarn build && yarn --cwd packages/playground next export -o ../../docs"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
