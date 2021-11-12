@@ -20,6 +20,7 @@
 ## 🌈 Table of contents
 
 - [🌈 Table of contents](#-table-of-contents)
+- [🧒 Example DApp](#-example-dapp)
 - [🌐 Usage with your DApp](#-usage-with-your-dapp)
 - [👩🏾‍💻 Development](#-development)
   - [Developing chrome extensions](#developing-chrome-extensions)
@@ -28,15 +29,15 @@
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
 - [🏎 Coming soon](#-coming-soon)
 
-<!--
+
 ## 🧒 Example DApp
 
 You can try the extension using our example DApp hosted at:
 
-[https://argentlabs.github.io/argent-x](https://argentlabs.github.io/argent-x)
+[https://argentlabs.github.io/argent-x/](https://argentlabs.github.io/argent-x/)
 
 The example DApp is also contained in this repository.
--->
+
 
 ## 🌐 Usage with your DApp
 
