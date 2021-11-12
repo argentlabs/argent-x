@@ -3,9 +3,8 @@
   <img src="assets/readme-header.png">
 </p>
 
----
+<!-- ---
 
-<!-- tag line -->
 <h3 align='center'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h3>
 
 <p align="center">
@@ -14,20 +13,22 @@
   </a>
 </p>
 
+-->
 
 ---
 
 ## 🌈 Table of contents
 
 - [🌈 Table of contents](#-table-of-contents)
-- [🧒 Example DApp](#-example-dapp)
 - [🌐 Usage with your DApp](#-usage-with-your-dapp)
 - [👩🏾‍💻 Development](#-development)
   - [Developing chrome extensions](#developing-chrome-extensions)
 - [✏️ Contributing](#️-contributing)
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
+- [🏎 Coming soon](#-coming-soon)
 
+<!--
 ## 🧒 Example DApp
 
 You can try the extension using our example DApp hosted at:
@@ -35,6 +36,7 @@ You can try the extension using our example DApp hosted at:
 [https://argentlabs.github.io/argent-x](https://argentlabs.github.io/argent-x)
 
 The example DApp is also contained in this repository.
+-->
 
 ## 🌐 Usage with your DApp
 
@@ -79,12 +81,11 @@ yarn dev  # run build process for all packages in watch mode
 
 This project contains 3 packages:
 
-
-| package      | description                                                                       |
-| ------------ | --------------------------------------------------------------------------------- |
-| extension    | ArgentX extension                                                                 |
-| get-starknet | npm module to get started with starknet.js and ArgentX quickly                    |
-| playground   | example DApp for testing purposes and example for DApps how to use `get-starknet` |
+| package | description |
+| --- | --- |
+| extension | ArgentX extension |
+| get-starknet | npm module to get started with starknet.js and ArgentX quickly |
+| playground | example DApp for testing purposes and example for DApps how to use `get-starknet` |
 
 ### Developing chrome extensions
 
@@ -104,7 +105,7 @@ Everyone is welcome to contribute. Please take a moment to review the [contribut
 
 ## ❤️ Family and friends
 
-Since this project were not possible without [starknet.js](https://github.com/seanjameshan/starknet.js) a big thank you to all [starknet.js contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors) and [@seanjameshan](https://github.com/seanjameshan) for starting it. 
+Since this project were not possible without [starknet.js](https://github.com/seanjameshan/starknet.js) a big thank you to all [starknet.js contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors) and [@seanjameshan](https://github.com/seanjameshan) for starting it.
 
 One more thank you to the Starkware Team and Discord.
 
@@ -113,3 +114,8 @@ One more thank you to the Starkware Team and Discord.
 [Argent](https://github.com/argentlabs) and [contributors](https://github.com/argentlabs/argent-x/graphs/contributors).
 
 GNU General Public License V3, see the included [License.md](License.md) file.
+
+## 🏎 Coming soon
+
+- [ ] Publish extension to Chrome Extension Store
+- [ ] Publish example DApp so users can try the extension
