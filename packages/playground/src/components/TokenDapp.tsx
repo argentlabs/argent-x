@@ -123,6 +123,7 @@ export const TokenDapp: FC = () => {
           <a
             target="_blank"
             href={`https://voyager.online/contract/${erc20TokenAddress}`}
+            rel="noreferrer"
           >
             {erc20TokenAddress}
           </a>
