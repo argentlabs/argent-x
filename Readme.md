@@ -17,9 +17,8 @@
 
 ---
 
-## 🌈 Table of contents
+<h2>🌈 Table of contents</h2>
 
-- [🌈 Table of contents](#-table-of-contents)
 - [🧒 Example DApp](#-example-dapp)
 - [🌐 Usage with your DApp](#-usage-with-your-dapp)
 - [👩🏾‍💻 Development](#-development)
