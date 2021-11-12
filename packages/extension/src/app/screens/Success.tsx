@@ -23,7 +23,7 @@ const SuccessText = styled(A)`
 export const Success: FC<{ txHash: string }> = ({ txHash }) => {
   return (
     <SuccessScreen>
-      <Spinner size={128} />
+      <Spinner size={92} />
       <SuccessText href={`https://voyager.online/tx/${txHash}`} target="_blank">
         Transaction was submitted
       </SuccessText>

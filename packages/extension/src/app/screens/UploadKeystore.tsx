@@ -63,7 +63,7 @@ export const UploadKeystore: FC<UploadKeystoreProps> = ({
       <DropZone {...getRootProps()}>
         <input {...getInputProps()} />
         {disableSubmit ? (
-          <p>Drag 'n' drop your backup file here, or click to select it</p>
+          <p>Drag & drop your backup file here, or click to select it</p>
         ) : (
           <div>
             <p>Backup selected:</p>

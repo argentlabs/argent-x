@@ -157,7 +157,7 @@ export const AddToken: FC<AddTokenProps> = ({
             </Button>
           </>
         )}
-        {loading && <Spinner size={92} />}
+        {loading && <Spinner size={64} />}
       </form>
     </AddTokenScreen>
   )

@@ -13,7 +13,7 @@ export const ResetScreen: FC<ConfirmPageProps> = (props) => {
       {...props}
     >
       <P>
-        If you forgot your password, your only option for revocery is to reset
+        If you forgot your password, your only option for recovery is to reset
         the extension and load your prior downloaded Backup.
       </P>
       <P style={{ marginTop: 32 }}>
