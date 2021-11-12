@@ -59,7 +59,7 @@ export const UploadKeystore: FC<UploadKeystoreProps> = ({
   return (
     <UploadKeystoreScreen>
       <BackButton onClick={onBack} />
-      <H2>Upload Keystore</H2>
+      <H2>Select backup</H2>
       <DropZone {...getRootProps()}>
         <input {...getInputProps()} />
         {disableSubmit ? (
