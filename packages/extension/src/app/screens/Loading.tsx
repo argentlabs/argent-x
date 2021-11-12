@@ -16,9 +16,9 @@ const LoadingScreen = styled.div`
 `
 
 const loadingTexts = [
-  "Please wait...",
-  "hello mom...",
-  "Just a little bit more...",
+  "Please wait…",
+  "Patience is a virtue…",
+  "Almost there…",
 ]
 
 export const Loading: FC = () => {
