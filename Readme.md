@@ -8,7 +8,7 @@
 <h3 align='center'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h3>
 
 <p align="center">
-  <a href="https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest">
+  <a href="https://github.com/argentlabs/argent-x">
     <img src="packages/get-starknet/src/button-download.svg">
   </a>
 </p>
