@@ -1,7 +1,11 @@
 import { FC, useEffect, useState } from "react"
 
-import { mintToken, transfer } from "../services/token.service"
-import { waitForTransaction, walletAddress } from "../services/wallet.service"
+import {
+  erc20TokenAddress,
+  mintToken,
+  transfer,
+} from "../services/token.service"
+import { waitForTransaction } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
 export const TokenDapp: FC = () => {
@@ -90,9 +94,7 @@ export const TokenDapp: FC = () => {
         </form>
 
         <form onSubmit={handleTransferSubmit}>
-          <h2 className={styles.title}>
-            Transfer token
-          </h2>
+          <h2 className={styles.title}>Transfer token</h2>
 
           <label htmlFor="transfer-to">To</label>
           <input
@@ -115,6 +117,17 @@ export const TokenDapp: FC = () => {
           <input type="submit" disabled={buttonsDisabled} value="Transfer" />
         </form>
       </div>
+      <h3 style={{ margin: 0 }}>
+        ERC-20 token address:{" "}
+        <code>
+          <a
+            target="_blank"
+            href={`https://voyager.online/contract/${erc20TokenAddress}`}
+          >
+            {erc20TokenAddress}
+          </a>
+        </code>
+      </h3>
     </>
   )
 }
