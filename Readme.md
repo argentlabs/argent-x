@@ -20,6 +20,7 @@
 ## 🌈 Table of contents
 
 - [🌈 Table of contents](#-table-of-contents)
+- [🧒 Example DApp](#-example-dapp)
 - [🌐 Usage with your DApp](#-usage-with-your-dapp)
 - [👩🏾‍💻 Development](#-development)
   - [Developing chrome extensions](#developing-chrome-extensions)
@@ -27,12 +28,21 @@
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
 
+## 🧒 Example DApp
+
+You can try the extension using our example DApp hosted at:
+
+[https://argentlabs.github.io/argent-x](https://argentlabs.github.io/argent-x)
+
+The example DApp is also contained in this repository.
+
 ## 🌐 Usage with your DApp
 
 If you want to use this Starknet Wallet extension with your DApp, the easiest way is to checkout the `@argent/get-starknet` package developed in this repo by running:
 
 ```bash
-yarn add @argent/get-starknet
+# starknet.js is a peer dependency
+yarn add @argent/get-starknet starknet
 ```
 
 The package is a light wrapper around [starknet.js](https://github.com/seanjameshan/starknet.js) to interact with the wallet extension. You can then use it like the following:
