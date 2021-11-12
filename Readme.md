@@ -1,6 +1,6 @@
 <!-- logo -->
 <p align="center">
-  <img src="assets/readme-header.png">
+  <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/assets/readme-header.png">
 </p>
 
 <!-- ---
@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://github.com/argentlabs/argent-x">
-    <img src="packages/get-starknet/src/button-download.svg">
+    <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/packages/get-starknet/src/button-download.svg">
   </a>
 </p>
 
