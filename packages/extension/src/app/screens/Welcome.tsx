@@ -52,7 +52,7 @@ export const Welcome: FC<WelcomePageProps> = ({
     <WelcomeScreen>
       <LogoSvg />
       <Greetings greetings={greetings} />
-      <P>Enjoy the security of Ethereum with the scale of Starknet</P>
+      <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
       <ButtonGroup>
         <Button onClick={onPrimaryBtnClick}>New account</Button>
         <Button onClick={onSecondaryBtnClick}>Restore account</Button>
