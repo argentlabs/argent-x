@@ -8,6 +8,7 @@ import { Account } from "./screens/Account"
 import { AccountListScreen } from "./screens/AccountList"
 import { AddToken } from "./screens/AddToken"
 import { ApproveTx } from "./screens/ApproveTx"
+import { DisclaimerScreen } from "./screens/Disclaimer"
 import { Loading } from "./screens/Loading"
 import { NewSeed } from "./screens/NewSeed"
 import { Password } from "./screens/Password"
@@ -97,6 +98,9 @@ function App() {
 
   if (state.matches("submittedTx"))
     return <Success txHash={state.context.txHash} />
+
+  if (state.matches("disclaimer"))
+    return <DisclaimerScreen onSubmit={() => send("AGREE")} />
 
   if (state.matches("account"))
     return (

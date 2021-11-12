@@ -24,6 +24,7 @@ type RouterEvents =
   | { type: "SHOW_ACCOUNT_LIST" }
   | { type: "SHOW_ADD_TOKEN" }
   | { type: "FORGOT_PASSWORD" }
+  | { type: "AGREE" }
   | { type: "SUBMIT_KEYSTORE"; data: string }
   | { type: "SELECT_WALLET"; data: string }
   | {
@@ -62,6 +63,7 @@ type RouterTypestate =
         | "enterPassword"
         | "verifyPassword"
         | "recover"
+        | "disclaimer"
         | "reset"
         | "generateL1"
       context: Context
@@ -132,7 +134,34 @@ export const routerMachine = createMachine<
           return { wallets: jsonKeyStore.wallets }
         },
         onDone: { target: "enterPassword" },
-        onError: "welcome",
+        onError: [
+          {
+            target: "disclaimer",
+            cond: () => {
+              try {
+                const understoodDisclaimer = JSON.parse(
+                  localStorage.getItem("UNDERSTOOD_DISCLAIMER") || "false",
+                )
+                return !understoodDisclaimer
+              } catch {
+                return true
+              }
+            },
+          },
+          {
+            target: "welcome",
+          },
+        ],
+      },
+    },
+    disclaimer: {
+      on: {
+        AGREE: {
+          target: "welcome",
+          actions: () => {
+            localStorage.setItem("UNDERSTOOD_DISCLAIMER", JSON.stringify(true))
+          },
+        },
       },
     },
     enterPassword: {
