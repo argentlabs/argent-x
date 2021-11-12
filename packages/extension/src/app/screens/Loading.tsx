@@ -26,7 +26,7 @@ export const Loading: FC = () => {
 
   return (
     <LoadingScreen>
-      <Spinner size={128} />
+      <Spinner size={92} />
       <Greetings greetings={[loadingText || "Loading...", ...loadingTexts]}>
         {loadingText || "Loading..."}
       </Greetings>

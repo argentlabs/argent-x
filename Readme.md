@@ -79,6 +79,8 @@ yarn      # setup dependencies
 yarn dev  # run build process for all packages in watch mode
 ```
 
+Now you need to load the locally build chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist` as [described below](#developing-chrome-extensions).
+
 This project contains 3 packages:
 
 | package | description |

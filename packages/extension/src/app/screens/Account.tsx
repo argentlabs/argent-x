@@ -146,7 +146,7 @@ export const Account: FC<{
         </AccountRow>
       </AccountHeader>
       <AccountContent>
-        <Suspense fallback={<Spinner size={92} />}>
+        <Suspense fallback={<Spinner size={64} />}>
           <TokenList onAction={onAction} walletAddress={wallet.address} />
           <TokenWrapper {...makeClickable(onAddToken)}>
             <AddTokenIconButton size={40}>
