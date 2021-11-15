@@ -188,8 +188,8 @@ const GlobalStyle = createGlobalStyle`
     background-color: #161616;;
     color: white;
 
-    width: 320px;
-    height: 568px;
+    min-width: 320px;
+    min-height: 568px;
   }
 
   * {
