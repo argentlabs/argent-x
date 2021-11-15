@@ -15,7 +15,7 @@ const Pre = styled.pre`
   padding: 8px;
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.15);
-  width: 100%;
+  max-width: calc(100vw - 64px);
   overflow: auto;
 `
 
