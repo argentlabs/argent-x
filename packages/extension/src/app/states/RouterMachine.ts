@@ -7,6 +7,7 @@ import { DoneEvent, assign, createMachine } from "xstate"
 import {
   getLastSelectedWallet,
   messenger,
+  readPendingWhitelist,
   readRequestedTransactions,
 } from "../utils/messaging"
 import { addToken } from "../utils/tokens"
@@ -23,8 +24,10 @@ type RouterEvents =
   | { type: "REJECT_TX" }
   | { type: "SHOW_ACCOUNT_LIST" }
   | { type: "SHOW_ADD_TOKEN" }
+  | { type: "SHOW_SETTINGS" }
   | { type: "FORGOT_PASSWORD" }
   | { type: "AGREE" }
+  | { type: "REJECT" }
   | { type: "SUBMIT_KEYSTORE"; data: string }
   | { type: "SELECT_WALLET"; data: string }
   | {
@@ -50,6 +53,7 @@ type Context = {
   txHash?: string
   wallets: Record<string, Wallet>
   isPopup?: boolean
+  hostToWhitelist?: string
   error?: string
 }
 
@@ -65,6 +69,7 @@ type RouterTypestate =
         | "recover"
         | "disclaimer"
         | "reset"
+        | "settings"
         | "generateL1"
       context: Context
     }
@@ -103,6 +108,14 @@ type RouterTypestate =
         txHash: string
       }
     }
+  | {
+      value: "connect"
+      context: Context & {
+        hostToWhitelist: string
+      }
+    }
+
+const isDev = process.env.NODE_ENV === "development"
 
 const KEYSTORE_KEY = "keystore"
 
@@ -234,6 +247,8 @@ export const routerMachine = createMachine<
           const requestedTransactions = await readRequestedTransactions().catch(
             () => [],
           )
+          // if hosts are pending for connect
+          const requestedConnects = await readPendingWhitelist().catch(() => [])
 
           const keyPair = ec.getKeyPair(wallet.privateKey)
           return {
@@ -250,6 +265,7 @@ export const routerMachine = createMachine<
             selectedWallet: wallets[selectedWalletIndex],
 
             requestedTransactions,
+            requestedConnects,
           }
         },
         onDone: [
@@ -265,6 +281,23 @@ export const routerMachine = createMachine<
                   ...ctx,
                   uploadedBackup: undefined,
                   txToApprove: requestedTransactions?.[0],
+                  isPopup: true,
+                }
+              }),
+            ],
+          },
+          {
+            target: "connect",
+            cond: (_ctx, ev) => {
+              return Boolean(ev.data?.requestedConnects?.length)
+            },
+            actions: [
+              assign((_, event) => {
+                const { requestedConnects, ...ctx } = event.data
+                return {
+                  ...ctx,
+                  uploadedBackup: undefined,
+                  hostToWhitelist: requestedConnects?.[0],
                   isPopup: true,
                 }
               }),
@@ -345,8 +378,16 @@ export const routerMachine = createMachine<
         src: async (ctx) => {
           const password = ctx.password!
           if (password) {
-            const backup = await ctx.l1!.encrypt(password, {}, (progress) =>
-              useProgress.setState({ progress, text: "Encrypting..." }),
+            const backup = await ctx.l1!.encrypt(
+              password,
+              {
+                scrypt: {
+                  // The number must be a power of 2 (default: 131072)
+                  N: isDev ? 64 : 131072,
+                },
+              },
+              (progress) =>
+                useProgress.setState({ progress, text: "Encrypting..." }),
             )
             useProgress.setState({ progress: 0, text: "" })
 
@@ -373,7 +414,10 @@ export const routerMachine = createMachine<
           }
         },
         onDone: "account",
-        onError: "determineEntry",
+        onError: {
+          target: "determineEntry",
+          actions: (_, ev) => console.error(ev),
+        },
       },
     },
     account: {
@@ -395,6 +439,7 @@ export const routerMachine = createMachine<
           })),
         },
         ADD_WALLET: "deployWallet",
+        SHOW_SETTINGS: "settings",
       },
     },
     addToken: {
@@ -518,6 +563,29 @@ export const routerMachine = createMachine<
       exit: (ctx) => {
         if (ctx.isPopup) window.close()
       },
+    },
+    connect: {
+      on: {
+        AGREE: {
+          target: "accountList",
+          actions: (ctx) => {
+            messenger.emit("APPROVE_WHITELIST", ctx.hostToWhitelist)
+          },
+        },
+        REJECT: {
+          target: "accountList",
+          actions: (ctx) => {
+            messenger.emit("REJECT_WHITELIST", ctx.hostToWhitelist)
+          },
+        },
+      },
+      exit: (ctx) => {
+        if (ctx.isPopup) window.close()
+      },
+    },
+
+    settings: {
+      on: { GO_BACK: "accountList" },
     },
     submittedTx: {
       type: "final",

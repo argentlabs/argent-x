@@ -8,6 +8,7 @@ const port = browser.runtime.connect({ name: "argent-x-ui" })
 export const messenger = new Messenger(
   (emit) => {
     port.onMessage.addListener(function (msg) {
+      console.log(msg)
       if (msg.from && msg.type && allowedSender.includes(msg.from)) {
         const { type, data } = msg
         emit(type, data)
@@ -15,13 +16,18 @@ export const messenger = new Messenger(
     })
   },
   (type, data) => {
-    port.postMessage({ from: "INJECT", type, data })
+    port.postMessage({ from: "UI", type, data })
   },
 )
 
 export const readRequestedTransactions = async (): Promise<Transaction[]> => {
   messenger.emit("READ_REQUESTED_TRANSACTIONS", {})
   return messenger.waitForEvent("READ_REQUESTED_TRANSACTIONS_RES", 2000)
+}
+
+export const readPendingWhitelist = async (): Promise<string[]> => {
+  messenger.emit("GET_PENDING_WHITELIST", {})
+  return messenger.waitForEvent("GET_PENDING_WHITELIST_RES", 2000)
 }
 
 export const getLastSelectedWallet = async (): Promise<string | undefined> => {
