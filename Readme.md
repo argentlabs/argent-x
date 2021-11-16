@@ -21,8 +21,8 @@
 
 - [🧒 Example DApp](#-example-dapp)
 - [🌐 Usage with your DApp](#-usage-with-your-dapp)
+- [🚀 Install from sources](#install-from-sources)
 - [👩🏾‍💻 Development](#-development)
-  - [Developing chrome extensions](#developing-chrome-extensions)
 - [✏️ Contributing](#️-contributing)
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
@@ -68,6 +68,25 @@ if(starknet.isConnected) {
 
 Checkout [starknet.js](https://github.com/seanjameshan/starknet.js) to learn more about how to use `Provider` and `Signer`.
 
+## 🚀 Install from sources
+
+First clone this repository on your machine then run:
+
+```bash
+yarn      # setup dependencies
+yarn build  # run build process for all packages
+```
+
+Now you need to load the locally build chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
+
+1. Open the Extension Management page by navigating to `chrome://extensions`.
+2. Enable Developer Mode by clicking the toggle switch next to **Developer mode**.
+3. Click the Load unpacked button and select the extension directory.
+
+![Chrome screenshot of setup](https://wd.imgix.net/image/BhuKGJaIeLNPW9ehns59NfwqKxF2/vOu7iPbaapkALed96rzN.png?auto=format)
+
+[Source](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest)
+
 ## 👩🏾‍💻 Development
 
 To contribute to this repository please read the [contributing guidelines](Contributing.md) first.
@@ -79,8 +98,6 @@ yarn      # setup dependencies
 yarn dev  # run build process for all packages in watch mode
 ```
 
-Now you need to load the locally build chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist` as [described below](#developing-chrome-extensions).
-
 This project contains 3 packages:
 
 | package | description |
@@ -89,17 +106,7 @@ This project contains 3 packages:
 | get-starknet | npm module to get started with starknet.js and ArgentX quickly |
 | playground | example DApp for testing purposes and example for DApps how to use `get-starknet` |
 
-### Developing chrome extensions
-
-To test changes made to the `extension` package you need to load the local unpacked extension into Chrome. Changes are shown after reopening the extension. Changes to `background.js` are just shown after a complete restart of the Chrome process.
-
-1. Open the Extension Management page by navigating to `chrome://extensions`.
-2. Enable Developer Mode by clicking the toggle switch next to **Developer mode**.
-3. Click the Load unpacked button and select the extension directory.
-
-![Chrome screenshot of setup](https://wd.imgix.net/image/BhuKGJaIeLNPW9ehns59NfwqKxF2/vOu7iPbaapkALed96rzN.png?auto=format)
-
-[Source](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest)
+To test changes made to the `extension` package you need to load the local unpacked extension into Chrome as [described above](#install-fromsources). Changes are shown after reopening the extension. Changes to `background.js` are just shown after a complete restart of the Chrome process.
 
 ## ✏️ Contributing
 
