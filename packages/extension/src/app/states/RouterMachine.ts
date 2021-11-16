@@ -43,7 +43,7 @@ type RouterEvents =
   | { type: "APPROVED_TX" }
   | { type: "GENERATE_L1"; data: { password: string } }
 
-type Context = {
+interface Context {
   password?: string
   selectedWallet?: string
   l1?: ethers.Wallet
