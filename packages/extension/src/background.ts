@@ -69,6 +69,46 @@ browser.runtime.onConnect.addListener(function (port) {
     })
   }
 
+  async function addToWhitelist(host: string) {
+    const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
+    await setToStorage(`WHITELIST:APPROVED`, [...(approved || []), host])
+  }
+
+  async function addPendingWhitelist(host: string) {
+    const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
+    await setToStorage(`WHITELIST:PENDING`, [...(pending || []), host])
+  }
+
+  async function approvePendingWhitelist(host: string) {
+    const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
+    if (!(pending || []).includes(host))
+      throw Error("host isnt waiting for approval")
+
+    await removePendingWhitelist(host)
+    await addToWhitelist(host)
+  }
+
+  async function removePendingWhitelist(host: string) {
+    const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
+    await setToStorage(
+      `WHITELIST:PENDING`,
+      (pending || []).filter((x) => x !== host),
+    )
+  }
+
+  async function removeFromWhitelist(host: string) {
+    const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
+    await setToStorage(
+      `WHITELIST:APPROVED`,
+      (approved || []).filter((x) => x !== host),
+    )
+  }
+
+  async function isOnWhitelist(host: string) {
+    const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
+    return (approved || []).includes(host)
+  }
+
   async function getFromStorage<
     T extends any,
     K extends string = string,
@@ -149,9 +189,14 @@ browser.runtime.onConnect.addListener(function (port) {
 
       case "CONNECT": {
         const selectedWallet = await getSelectedWalletAddress()
+        const isWhitelisted = await isOnWhitelist(data.host)
 
-        if (selectedWallet)
-          return messenger.emit("WALLET_CONNECTED", selectedWallet)
+        if (!isWhitelisted) {
+          addPendingWhitelist(data.host)
+        }
+
+        if (isWhitelisted && selectedWallet)
+          return messenger.emit("CONNECT_RES", selectedWallet)
 
         return openUi()
       }
@@ -168,6 +213,35 @@ browser.runtime.onConnect.addListener(function (port) {
 
       case "RESET_ALL": {
         return browser.storage.local.clear()
+      }
+
+      case "ADD_WHITELIST": {
+        return addPendingWhitelist(data)
+      }
+      case "APPROVE_WHITELIST": {
+        const selectedWallet = await getSelectedWalletAddress()
+        await approvePendingWhitelist(data)
+        return messenger.emit("CONNECT_RES", selectedWallet)
+      }
+      case "REJECT_WHITELIST": {
+        return removePendingWhitelist(data)
+      }
+      case "REMOVE_WHITELIST": {
+        return removeFromWhitelist(data)
+      }
+      case "GET_PENDING_WHITELIST": {
+        const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
+        console.log("pending", pending)
+        return messenger.emit("GET_PENDING_WHITELIST_RES", pending || [])
+      }
+      case "IS_WHITELIST": {
+        const valid = await isOnWhitelist(data)
+        return messenger.emit("IS_WHITELIST_RES", valid)
+      }
+      case "RESET_WHITELIST": {
+        setToStorage(`WHITELIST:APPROVED`, [])
+        setToStorage(`WHITELIST:PENDING`, [])
+        return
       }
     }
   })

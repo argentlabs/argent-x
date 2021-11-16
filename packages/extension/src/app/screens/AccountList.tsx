@@ -1,8 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-// import Settings from '../../assets/settings.svg';
 import Add from "../../assets/add.svg"
+import Settings from "../../assets/settings.svg"
 import { AccountRow } from "../components/Account/Header"
 import { AccountList, AccountListItem } from "../components/Account/List"
 import { IconButton } from "../components/IconButton"
@@ -25,10 +25,10 @@ const AccountListWrapper = styled.div`
     margin-top: 32px;
     width: 100%;
   }
+`
 
-  ${IconButton} {
-    margin: auto;
-  }
+const IconButtonCenter = styled(IconButton)`
+  margin: auto;
 `
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -37,6 +37,7 @@ const noop = () => {}
 interface AccountListPageProps {
   onAccountSelect?: (account: string) => void
   onAddAccount?: () => void
+  onSettings?: () => void
   wallets: Wallet[]
   activeWallet: string
 }
@@ -44,6 +45,7 @@ interface AccountListPageProps {
 export const AccountListScreen: FC<AccountListPageProps> = ({
   onAccountSelect = noop,
   onAddAccount = noop,
+  onSettings = noop,
   wallets,
   activeWallet,
 }) => {
@@ -51,9 +53,9 @@ export const AccountListScreen: FC<AccountListPageProps> = ({
     <AccountListWrapper>
       <AccountRow>
         <H2>Accounts</H2>
-        {/* <IconButton size={32}>
+        <IconButton size={32} {...makeClickable(onSettings, 99)}>
           <Settings />
-        </IconButton> */}
+        </IconButton>
       </AccountRow>
       <AccountList>
         {wallets.map((wallet, index) => {
@@ -69,9 +71,9 @@ export const AccountListScreen: FC<AccountListPageProps> = ({
             />
           )
         })}
-        <IconButton size={48} {...makeClickable(onAddAccount)}>
+        <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
           <Add />
-        </IconButton>
+        </IconButtonCenter>
       </AccountList>
     </AccountListWrapper>
   )

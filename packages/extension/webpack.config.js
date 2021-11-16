@@ -7,6 +7,8 @@ const htmlPlugin = new HtmlWebPackPlugin({
   filename: "./index.html",
 })
 
+const isProd = process.env.NODE_ENV === "production"
+
 module.exports = {
   entry: {
     main: "./src/index",
@@ -15,7 +17,7 @@ module.exports = {
     background: "./src/background",
   },
   devtool: "inline-source-map",
-  mode: "development",
+  mode: isProd ? "production" : "development",
   module: {
     rules: [
       {

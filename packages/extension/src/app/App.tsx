@@ -8,11 +8,13 @@ import { Account } from "./screens/Account"
 import { AccountListScreen } from "./screens/AccountList"
 import { AddToken } from "./screens/AddToken"
 import { ApproveTx } from "./screens/ApproveTx"
+import { ConnectScreen } from "./screens/Connect"
 import { DisclaimerScreen } from "./screens/Disclaimer"
 import { Loading } from "./screens/Loading"
 import { NewSeed } from "./screens/NewSeed"
 import { Password } from "./screens/Password"
 import { ResetScreen } from "./screens/Reset"
+import { Settings } from "./screens/Settings"
 import { Success } from "./screens/Success"
 import { UploadKeystore } from "./screens/UploadKeystore"
 import { Welcome } from "./screens/Welcome"
@@ -99,8 +101,24 @@ function App() {
   if (state.matches("submittedTx"))
     return <Success txHash={state.context.txHash} />
 
+  if (state.matches("connect"))
+    return (
+      <ConnectScreen
+        host={state.context.hostToWhitelist}
+        onReject={() => {
+          send("REJECT")
+        }}
+        onSubmit={() => {
+          send("AGREE")
+        }}
+      />
+    )
+
   if (state.matches("disclaimer"))
     return <DisclaimerScreen onSubmit={() => send("AGREE")} />
+
+  if (state.matches("settings"))
+    return <Settings onBack={() => send("GO_BACK")} />
 
   if (state.matches("account"))
     return (
@@ -149,6 +167,7 @@ function App() {
         wallets={Object.values(state.context.wallets)}
         activeWallet={state.context.selectedWallet}
         onAddAccount={() => send("ADD_WALLET")}
+        onSettings={() => send("SHOW_SETTINGS")}
         onAccountSelect={(address) => {
           send({ type: "SELECT_WALLET", data: address })
         }}

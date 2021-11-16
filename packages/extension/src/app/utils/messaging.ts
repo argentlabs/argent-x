@@ -15,13 +15,18 @@ export const messenger = new Messenger(
     })
   },
   (type, data) => {
-    port.postMessage({ from: "INJECT", type, data })
+    port.postMessage({ from: "UI", type, data })
   },
 )
 
 export const readRequestedTransactions = async (): Promise<Transaction[]> => {
   messenger.emit("READ_REQUESTED_TRANSACTIONS", {})
   return messenger.waitForEvent("READ_REQUESTED_TRANSACTIONS_RES", 2000)
+}
+
+export const readPendingWhitelist = async (): Promise<string[]> => {
+  messenger.emit("GET_PENDING_WHITELIST", {})
+  return messenger.waitForEvent("GET_PENDING_WHITELIST_RES", 2000)
 }
 
 export const getLastSelectedWallet = async (): Promise<string | undefined> => {
