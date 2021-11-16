@@ -382,8 +382,8 @@ export const routerMachine = createMachine<
               password,
               {
                 scrypt: {
-                  // The number must be a power of 2 (default: 131072)
-                  N: isDev ? 64 : 131072,
+                  // The number must be a power of 2 (default: 131072 = 2 ^ 17)
+                  N: isDev ? 2 ^ 6 : 2 ^ 15,
                 },
               },
               (progress) =>
