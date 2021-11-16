@@ -8,7 +8,6 @@ const port = browser.runtime.connect({ name: "argent-x-ui" })
 export const messenger = new Messenger(
   (emit) => {
     port.onMessage.addListener(function (msg) {
-      console.log(msg)
       if (msg.from && msg.type && allowedSender.includes(msg.from)) {
         const { type, data } = msg
         emit(type, data)
