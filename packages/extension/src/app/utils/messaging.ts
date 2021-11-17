@@ -1,3 +1,4 @@
+import type { JWK } from "jose"
 import { Transaction } from "starknet"
 import browser from "webextension-polyfill"
 
@@ -32,4 +33,9 @@ export const readPendingWhitelist = async (): Promise<string[]> => {
 export const getLastSelectedWallet = async (): Promise<string | undefined> => {
   messenger.emit("GET_SELECTED_WALLET_ADDRESS", {})
   return messenger.waitForEvent("GET_SELECTED_WALLET_ADDRESS_RES", 2000)
+}
+
+export const getPublicKey = async (): Promise<JWK> => {
+  messenger.emit("REQ_PUB", {})
+  return messenger.waitForEvent("REQ_PUB_RES", 2000)
 }

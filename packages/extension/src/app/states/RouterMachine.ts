@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ethers } from "ethers"
-import { Args, InvokeFunctionTransaction, KeyPair, ec } from "starknet"
+import { CompactEncrypt, importJWK } from "jose"
+import { Args, InvokeFunctionTransaction, KeyPair, ec, encode } from "starknet"
 import browser from "webextension-polyfill"
 import { DoneEvent, assign, createMachine } from "xstate"
 
 import {
   getLastSelectedWallet,
+  getPublicKey,
   messenger,
   readPendingWhitelist,
   readRequestedTransactions,
@@ -178,6 +180,23 @@ export const routerMachine = createMachine<
       invoke: {
         src: async (ctx, event) => {
           if (event.type !== "SUBMIT_PASSWORD") throw Error("wrong entry point")
+
+          try {
+            const pubJwk = await getPublicKey()
+            const pubKey = await importJWK(pubJwk)
+
+            console.log(pubKey)
+
+            const encMsg = await new CompactEncrypt(
+              encode.utf8ToArray(event.data.password),
+            )
+              .setProtectedHeader({ alg: "RSA-OAEP-512", enc: "A256GCM" })
+              .encrypt(pubKey)
+
+            messenger.emit("START_SESSION", { enc: true, body: encMsg })
+          } catch (e) {
+            console.error(e)
+          }
 
           const keyStore = ctx.uploadedBackup ?? getKeystoreFromLocalStorage()
           const jsonKeyStore = JSON.parse(keyStore)

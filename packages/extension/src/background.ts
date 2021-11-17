@@ -1,11 +1,19 @@
-import { InvokeFunctionTransaction } from "starknet"
+import {
+  JWK,
+  KeyLike,
+  compactDecrypt,
+  exportJWK,
+  generateKeyPair,
+  importJWK,
+} from "jose"
+import { InvokeFunctionTransaction, encode } from "starknet"
 import browser from "webextension-polyfill"
 
 import { Messenger } from "./utils/Messenger"
 
 const allowedSender = ["INJECT", "UI", "INPAGE"]
 
-browser.runtime.onConnect.addListener(function (port) {
+browser.runtime.onConnect.addListener(async function (port) {
   if (port.name !== "argent-x-content") return
   browser.runtime.onConnect.addListener(function (uiPort) {
     if (uiPort.name !== "argent-x-ui") return
@@ -25,6 +33,41 @@ browser.runtime.onConnect.addListener(function (port) {
       uiPort.onMessage.removeListener(contentToUiForwarder)
     })
   })
+
+  let privateKey: KeyLike
+  let publicKey: KeyLike
+  let publicKeyJwk: JWK
+
+  const { PRIVATE_KEY, PUBLIC_KEY } = (await browser.storage.local.get([
+    "PRIVATE_KEY",
+    "PUBLIC_KEY",
+  ])) as { PRIVATE_KEY?: string; PUBLIC_KEY?: string }
+  if (!(PRIVATE_KEY && PUBLIC_KEY)) {
+    console.log("GEN")
+    const keypair = await generateKeyPair("RSA-OAEP-512", { extractable: true })
+
+    publicKeyJwk = await exportJWK(keypair.publicKey)
+
+    browser.storage.local.set({
+      PRIVATE_KEY: JSON.stringify({
+        alg: "RSA-OAEP-512",
+        ...(await exportJWK(keypair.privateKey)),
+      }),
+      PUBLIC_KEY: JSON.stringify({
+        alg: "RSA-OAEP-512",
+        ...publicKeyJwk,
+      }),
+    })
+
+    privateKey = keypair.privateKey
+    publicKey = keypair.publicKey
+  } else {
+    console.log("REC")
+
+    publicKeyJwk = JSON.parse(PUBLIC_KEY)
+    privateKey = (await importJWK(JSON.parse(PRIVATE_KEY))) as KeyLike
+    publicKey = (await importJWK(publicKeyJwk)) as KeyLike
+  }
 
   const messenger = new Messenger(
     (emit) => {
@@ -242,6 +285,17 @@ browser.runtime.onConnect.addListener(function (port) {
         setToStorage(`WHITELIST:APPROVED`, [])
         setToStorage(`WHITELIST:PENDING`, [])
         return
+      }
+      case "REQ_PUB": {
+        return messenger.emit("REQ_PUB_RES", publicKeyJwk)
+      }
+      case "START_SESSION": {
+        console.log(data)
+        const { enc, body } = data
+        if (!(enc === true))
+          throw Error("session can only be started with encryption")
+        const { plaintext } = await compactDecrypt(body, privateKey)
+        console.log(encode.arrayBufferToString(plaintext))
       }
     }
   })
