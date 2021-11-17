@@ -190,7 +190,7 @@ export const routerMachine = createMachine<
             const encMsg = await new CompactEncrypt(
               encode.utf8ToArray(event.data.password),
             )
-              .setProtectedHeader({ alg: "RSA-OAEP-512", enc: "A256GCM" })
+              .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
               .encrypt(pubKey)
 
             messenger.emit("START_SESSION", { enc: true, body: encMsg })

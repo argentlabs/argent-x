@@ -44,17 +44,17 @@ browser.runtime.onConnect.addListener(async function (port) {
   ])) as { PRIVATE_KEY?: string; PUBLIC_KEY?: string }
   if (!(PRIVATE_KEY && PUBLIC_KEY)) {
     console.log("GEN")
-    const keypair = await generateKeyPair("RSA-OAEP-512", { extractable: true })
+    const keypair = await generateKeyPair("ECDH-ES", { extractable: true })
 
     publicKeyJwk = await exportJWK(keypair.publicKey)
 
     browser.storage.local.set({
       PRIVATE_KEY: JSON.stringify({
-        alg: "RSA-OAEP-512",
+        alg: "ECDH-ES",
         ...(await exportJWK(keypair.privateKey)),
       }),
       PUBLIC_KEY: JSON.stringify({
-        alg: "RSA-OAEP-512",
+        alg: "ECDH-ES",
         ...publicKeyJwk,
       }),
     })
