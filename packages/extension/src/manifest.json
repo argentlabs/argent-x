@@ -12,7 +12,7 @@
     "default_title": "Argent X",
     "default_popup": "index.html"
   },
-  "permissions": ["downloads", "activeTab", "webRequest", "tabs", "storage"],
+  "permissions": ["downloads", "tabs", "storage"],
   "icons": {
     "16": "assets/logo.png",
     "48": "assets/logo.png",
@@ -20,7 +20,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "matches": ["<all_urls>"],
       "js": ["inject.js"],
       "run_at": "document_start",
       "all_frames": true
