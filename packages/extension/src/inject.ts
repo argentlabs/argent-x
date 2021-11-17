@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill"
 
+import { MessageType } from "./utils/MessageType"
 import { Messenger } from "./utils/Messenger"
 
 const container = document.head || document.documentElement
@@ -14,7 +15,7 @@ container.insertBefore(script, container.children[0])
 
 const allowedSender = ["INPAGE", "UI", "BACKGROUND"]
 const port = browser.runtime.connect({ name: "argent-x-content" })
-const messenger = new Messenger(
+const messenger = new Messenger<MessageType>(
   (emit) => {
     window.addEventListener("message", function (event) {
       port.postMessage(event.data)

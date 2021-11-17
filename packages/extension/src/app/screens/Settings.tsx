@@ -28,7 +28,7 @@ export const Settings: FC<{ onBack?: () => void }> = ({ onBack }) => {
       </P>
       <Button
         onClick={() => {
-          messenger.emit("RESET_WHITELIST", {})
+          messenger.emit("RESET_WHITELIST", undefined)
           onBack?.()
         }}
       >

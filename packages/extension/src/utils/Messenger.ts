@@ -1,11 +1,15 @@
-export type EmitFn = (type: string, data: any) => void
+export interface Emit<M> {
+  <K extends keyof M>(type: K, data: M[K]): any
+}
 
-export type DispatchFn = (emit: EmitFn) => void
+export interface Dispatch<M> {
+  (emit: Emit<M>): void
+}
 
-export class Messenger {
-  actionArray: EmitFn[] = []
-  sender: EmitFn
-  constructor(listener: DispatchFn, sender: EmitFn) {
+export class Messenger<M extends Record<string, any> = Record<string, any>> {
+  actionArray: Emit<M>[] = []
+  sender: Emit<M>
+  constructor(listener: Dispatch<M>, sender: Emit<M>) {
     this.sender = sender
 
     listener((type, data) => {
@@ -15,18 +19,18 @@ export class Messenger {
     })
   }
 
-  public listen: DispatchFn = (action) => {
+  public listen: Dispatch<M> = (action) => {
     this.actionArray.push(action)
   }
 
-  public unlisten: DispatchFn = (action) => {
+  public unlisten: Dispatch<M> = (action) => {
     this.actionArray = this.actionArray.filter((a) => a !== action)
   }
 
   public waitForEvent(type: string, timeout = 5 * 60 * 1000): Promise<any> {
     return new Promise((res, rej) => {
       const pid = setTimeout(() => rej("waitForEvent timeout"), timeout)
-      const handler: EmitFn = (localType, data) => {
+      const handler: Emit<M> = (localType, data) => {
         if (localType === type) {
           this.unlisten(handler)
           clearTimeout(pid)
@@ -37,7 +41,7 @@ export class Messenger {
     })
   }
 
-  public emit: EmitFn = (type, data) => {
+  public emit: Emit<M> = (type, data) => {
     this.sender(type, data)
   }
 }

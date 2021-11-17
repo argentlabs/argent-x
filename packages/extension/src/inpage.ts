@@ -7,14 +7,15 @@ import {
   defaultProvider,
 } from "starknet"
 
-import { EmitFn, Messenger } from "./utils/Messenger"
+import { MessageType } from "./utils/MessageType"
+import { Emit, Messenger } from "./utils/Messenger"
 
 const extId = document
   .getElementById("argent-x-extension")
   ?.getAttribute("data-extension-id")
 
 const allowedSender = ["INJECT", "UI", "BACKGROUND"]
-const messenger = new Messenger(
+const messenger = new Messenger<MessageType>(
   (emit) => {
     window.addEventListener("message", function (event) {
       if (
@@ -86,14 +87,10 @@ export class WalletSigner extends Provider implements SignerInterface {
     this.address = address
   }
 
-  private sendMsg(type: string, data: any) {
-    return messenger.emit(type, data)
-  }
-
   private waitForMsgOfType(type: string, timeout = 5 * 60 * 1000) {
     return new Promise((res, rej) => {
       const pid = setTimeout(() => rej("Timeout"), timeout)
-      const handler: EmitFn = (eType, eData) => {
+      const handler: Emit<MessageType> = (eType, eData) => {
         if (eType === type) {
           clearTimeout(pid)
           messenger.unlisten(handler)
@@ -112,15 +109,15 @@ export class WalletSigner extends Provider implements SignerInterface {
     if (tx.signature?.length)
       throw Error("Adding signatures to a signer tx currently isn't supported")
 
-    this.sendMsg("ADD_TRANSACTION", tx)
-    this.sendMsg("OPEN_UI", {})
+    messenger.emit("ADD_TRANSACTION", tx)
+    messenger.emit("OPEN_UI", undefined)
 
     const res: any = await Promise.race([
       this.waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
       this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
         .then(() => "error")
         .catch(() => {
-          this.sendMsg("FAILED_TX", { tx })
+          messenger.emit("FAILED_TX", { tx })
           return "timeout"
         }),
     ])

@@ -435,7 +435,7 @@ export const routerMachine = createMachine<
     },
     account: {
       entry: async (ctx) => {
-        messenger.emit("WALLET_CONNECTED", ctx.selectedWallet)
+        messenger.emit("WALLET_CONNECTED", ctx.selectedWallet!)
       },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",
@@ -500,7 +500,7 @@ export const routerMachine = createMachine<
           target: "determineEntry",
           actions: () => {
             localStorage.clear()
-            messenger.emit("RESET_ALL", {})
+            messenger.emit("RESET_ALL", undefined)
           },
         },
       },
@@ -521,7 +521,7 @@ export const routerMachine = createMachine<
           target: "account",
           actions: (ctx) => {
             messenger.emit("FAILED_TX", {
-              tx: ctx.txToApprove,
+              tx: ctx.txToApprove as InvokeFunctionTransaction,
             })
             if (ctx.isPopup) window.close()
           },
@@ -572,7 +572,7 @@ export const routerMachine = createMachine<
             })),
             (ctx, event) => {
               messenger.emit("SUBMITTED_TX", {
-                tx: ctx.txToApprove,
+                tx: ctx.txToApprove as InvokeFunctionTransaction,
                 txHash: event.data,
               })
             },
@@ -582,7 +582,7 @@ export const routerMachine = createMachine<
           target: "determineEntry",
           actions: (ctx) => {
             messenger.emit("FAILED_TX", {
-              tx: ctx.txToApprove,
+              tx: ctx.txToApprove as InvokeFunctionTransaction,
             })
           },
         },
@@ -596,13 +596,13 @@ export const routerMachine = createMachine<
         AGREE: {
           target: "accountList",
           actions: (ctx) => {
-            messenger.emit("APPROVE_WHITELIST", ctx.hostToWhitelist)
+            messenger.emit("APPROVE_WHITELIST", ctx.hostToWhitelist!)
           },
         },
         REJECT: {
           target: "accountList",
           actions: (ctx) => {
-            messenger.emit("REJECT_WHITELIST", ctx.hostToWhitelist)
+            messenger.emit("REJECT_WHITELIST", ctx.hostToWhitelist!)
           },
         },
       },

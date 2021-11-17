@@ -9,6 +9,7 @@ import {
 import { InvokeFunctionTransaction, encode } from "starknet"
 import browser from "webextension-polyfill"
 
+import { MessageType } from "./utils/MessageType"
 import { Messenger } from "./utils/Messenger"
 
 const allowedSender = ["INJECT", "UI", "INPAGE"]
@@ -69,7 +70,7 @@ browser.runtime.onConnect.addListener(async function (port) {
     publicKey = (await importJWK(publicKeyJwk)) as KeyLike
   }
 
-  const messenger = new Messenger(
+  const messenger = new Messenger<MessageType>(
     (emit) => {
       port.onMessage.addListener((data) => {
         if (data.from && data.type && allowedSender.includes(data.from)) {
@@ -216,7 +217,7 @@ browser.runtime.onConnect.addListener(async function (port) {
       }
 
       case "ADD_TRANSACTION": {
-        return await addTransaction(data)
+        return await addTransaction(data as MessageType["ADD_TRANSACTION"])
       }
 
       case "READ_REQUESTED_TRANSACTIONS": {
@@ -232,10 +233,12 @@ browser.runtime.onConnect.addListener(async function (port) {
 
       case "CONNECT": {
         const selectedWallet = await getSelectedWalletAddress()
-        const isWhitelisted = await isOnWhitelist(data.host)
+        const isWhitelisted = await isOnWhitelist(
+          (data as MessageType["CONNECT"]).host,
+        )
 
         if (!isWhitelisted) {
-          addPendingWhitelist(data.host)
+          addPendingWhitelist((data as MessageType["CONNECT"]).host)
         }
 
         if (isWhitelisted && selectedWallet)
@@ -250,7 +253,7 @@ browser.runtime.onConnect.addListener(async function (port) {
 
       case "SUBMITTED_TX":
       case "FAILED_TX": {
-        const { tx } = data
+        const { tx } = data as MessageType["SUBMITTED_TX" | "FAILED_TX"]
         return removeTransaction(tx)
       }
 
@@ -259,18 +262,19 @@ browser.runtime.onConnect.addListener(async function (port) {
       }
 
       case "ADD_WHITELIST": {
-        return addPendingWhitelist(data)
+        return addPendingWhitelist(data as MessageType["ADD_WHITELIST"])
       }
       case "APPROVE_WHITELIST": {
         const selectedWallet = await getSelectedWalletAddress()
-        await approvePendingWhitelist(data)
-        return messenger.emit("CONNECT_RES", selectedWallet)
+        await approvePendingWhitelist(data as MessageType["APPROVE_WHITELIST"])
+        if (selectedWallet) return messenger.emit("CONNECT_RES", selectedWallet)
+        return openUi()
       }
       case "REJECT_WHITELIST": {
-        return removePendingWhitelist(data)
+        return removePendingWhitelist(data as MessageType["REJECT_WHITELIST"])
       }
       case "REMOVE_WHITELIST": {
-        return removeFromWhitelist(data)
+        return removeFromWhitelist(data as MessageType["REMOVE_WHITELIST"])
       }
       case "GET_PENDING_WHITELIST": {
         const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
@@ -278,7 +282,7 @@ browser.runtime.onConnect.addListener(async function (port) {
         return messenger.emit("GET_PENDING_WHITELIST_RES", pending || [])
       }
       case "IS_WHITELIST": {
-        const valid = await isOnWhitelist(data)
+        const valid = await isOnWhitelist(data as MessageType["IS_WHITELIST"])
         return messenger.emit("IS_WHITELIST_RES", valid)
       }
       case "RESET_WHITELIST": {
@@ -290,9 +294,8 @@ browser.runtime.onConnect.addListener(async function (port) {
         return messenger.emit("REQ_PUB_RES", publicKeyJwk)
       }
       case "START_SESSION": {
-        console.log(data)
-        const { enc, body } = data
-        if (!(enc === true))
+        const { enc, body } = data as MessageType["START_SESSION"]
+        if (enc !== true)
           throw Error("session can only be started with encryption")
         const { plaintext } = await compactDecrypt(body, privateKey)
         console.log(encode.arrayBufferToString(plaintext))
