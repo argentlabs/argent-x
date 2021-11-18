@@ -47,7 +47,7 @@ export class Wallet {
   }
 
   public async getCurrentNonce(): Promise<string> {
-    const { nonce } = await this.contract.call("get_current_nonce")
+    const { nonce } = await this.contract.call("get_nonce")
     return nonce.toString()
   }
 
@@ -111,7 +111,7 @@ export class Wallet {
     }
 
     return new Wallet(
-      deployTransaction.address,
+      deployTransaction.address!,
       starkKeyPair,
       deployTransaction.transaction_hash,
     )
