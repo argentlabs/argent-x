@@ -14,3 +14,6 @@ export const walletAddress = async (): Promise<string | undefined> => {
 
 export const waitForTransaction = async (hash: string) =>
   await getStarknet().provider.waitForTx(hash)
+
+export const watchAsset = async (params: any) =>
+  await getStarknet().request({ method: "wallet_watchAsset", params })

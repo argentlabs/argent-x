@@ -7,16 +7,13 @@ import {
   defaultProvider,
 } from "starknet"
 
+import { RpcMessage } from "./app/utils/messaging.model"
 import { EmitFn, Messenger } from "./utils/Messenger"
-
-const extId = document
-  .getElementById("argent-x-extension")
-  ?.getAttribute("data-extension-id")
 
 const allowedSender = ["INJECT", "UI", "BACKGROUND"]
 const messenger = new Messenger(
   (emit) => {
-    window.addEventListener("message", function (event) {
+    window.addEventListener("message", (event) => {
       if (
         event.data.from &&
         event.data.type &&
@@ -34,6 +31,7 @@ const messenger = new Messenger(
 
 type StarknetWindowObject =
   | {
+      request: (call: RpcMessage) => Promise<unknown>
       enable: () => Promise<string[]>
       signer: Signer
       provider: Provider
@@ -41,6 +39,7 @@ type StarknetWindowObject =
       isConnected: true
     }
   | {
+      request: (call: RpcMessage) => Promise<unknown>
       enable: () => Promise<string[]>
       signer?: Signer
       provider: Provider
@@ -54,8 +53,17 @@ const starknetWindowObject: StarknetWindowObject = {
   provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
+  request: (call) =>
+    new Promise((resolve) => {
+      messenger.emit("RPC", call)
+      messenger.listen((type, data) => {
+        if (type === "RPC_RES") {
+          resolve(data)
+        }
+      })
+    }),
   enable: () =>
-    new Promise((res) => {
+    new Promise((resolve) => {
       messenger.emit("CONNECT", {
         host: window.location.hostname,
       })
@@ -64,11 +72,12 @@ const starknetWindowObject: StarknetWindowObject = {
           ;(window as any).starknet.signer = new WalletSigner(data)
           ;(window as any).starknet.selectedAddress = data
           ;(window as any).starknet.isConnected = true
-          res([data])
+          resolve([data])
         }
       })
     }),
 }
+
 ;(window as any).starknet = starknetWindowObject
 
 export class WalletSigner extends Provider implements SignerInterface {
@@ -84,13 +93,13 @@ export class WalletSigner extends Provider implements SignerInterface {
   }
 
   private waitForMsgOfType(type: string, timeout = 5 * 60 * 1000) {
-    return new Promise((res, rej) => {
-      const pid = setTimeout(() => rej("Timeout"), timeout)
+    return new Promise((resolve, reject) => {
+      const pid = setTimeout(() => reject("Timeout"), timeout)
       const handler: EmitFn = (eType, eData) => {
         if (eType === type) {
           clearTimeout(pid)
           messenger.unlisten(handler)
-          return res(eData)
+          return resolve(eData)
         }
       }
       messenger.listen(handler)
@@ -98,14 +107,14 @@ export class WalletSigner extends Provider implements SignerInterface {
   }
 
   public async addTransaction(
-    tx: Transaction,
+    transaction: Transaction,
   ): Promise<AddTransactionResponse> {
-    if (tx.type === "DEPLOY") return super.addTransaction(tx)
+    if (transaction.type === "DEPLOY") return super.addTransaction(transaction)
 
-    if (tx.signature?.length)
+    if (transaction.signature?.length)
       throw Error("Adding signatures to a signer tx currently isn't supported")
 
-    this.sendMsg("ADD_TRANSACTION", tx)
+    this.sendMsg("ADD_TRANSACTION", transaction)
     this.sendMsg("OPEN_UI", {})
 
     const res: any = await Promise.race([
@@ -113,7 +122,7 @@ export class WalletSigner extends Provider implements SignerInterface {
       this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
         .then(() => "error")
         .catch(() => {
-          this.sendMsg("FAILED_TX", { tx })
+          this.sendMsg("FAILED_TX", { tx: transaction })
           return "timeout"
         }),
     ])
@@ -123,7 +132,7 @@ export class WalletSigner extends Provider implements SignerInterface {
 
     return {
       code: "TRANSACTION_RECEIVED",
-      address: tx.contract_address,
+      address: transaction.contract_address,
       transaction_hash: res.txHash,
     }
   }

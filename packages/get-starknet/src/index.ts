@@ -1,12 +1,19 @@
-import { Provider, Signer, defaultProvider } from "starknet"
+import { defaultProvider } from "starknet"
+import type { Provider, Signer } from "starknet"
 
 import App from "./App.svelte"
 
 // nextjs ie needs this to be typeof window !== "undefined" as it's replacing it in client bundles
 const IS_BROWSER = typeof window !== "undefined"
 
+interface RpcMessage {
+  method: string
+  params?: unknown[] | object
+}
+
 type StarknetWindowObject =
   | {
+      request: (call: RpcMessage) => Promise<unknown>
       enable: () => Promise<string[]>
       signer: Signer
       provider: Provider
@@ -14,6 +21,7 @@ type StarknetWindowObject =
       isConnected: true
     }
   | {
+      request: (call: RpcMessage) => Promise<unknown>
       enable: () => Promise<string[]>
       signer?: Signer
       provider: Provider
@@ -33,8 +41,11 @@ export function getStarknet({
     }
     return {
       isConnected: false,
+      request: async () => {
+        throw new Error("no starknet found in window")
+      },
       enable: async () => {
-        throw Error("no starknet found in window")
+        throw new Error("no starknet found in window")
       },
       provider: defaultProvider,
     }

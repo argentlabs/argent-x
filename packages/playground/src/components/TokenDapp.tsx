@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from "react"
 
 import {
+  addToken,
   erc20TokenAddress,
   mintToken,
   transfer,
@@ -128,6 +129,11 @@ export const TokenDapp: FC = () => {
             {erc20TokenAddress}
           </a>
         </code>
+        <div>
+          <button onClick={async () => await addToken()}>
+            Add token to Argent X wallet
+          </button>
+        </div>
       </h3>
     </>
   )

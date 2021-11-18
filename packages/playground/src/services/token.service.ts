@@ -2,6 +2,8 @@ import { getStarknet } from "@argent/get-starknet"
 import { utils } from "ethers"
 import { number } from "starknet"
 
+import { watchAsset } from "./wallet.service"
+
 export const erc20TokenAddress =
   "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
 
@@ -50,4 +52,15 @@ export const transfer = async (
       utils.parseUnits(transferAmount, 18).toString(), // amount
     ],
   )
+}
+
+export const addToken = async (): Promise<void> => {
+  await watchAsset({
+    type: "ERC20",
+    options: {
+      address: erc20TokenAddress,
+      symbol: "TEST",
+      decimals: 18,
+    },
+  })
 }

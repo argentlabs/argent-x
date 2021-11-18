@@ -187,6 +187,11 @@ browser.runtime.onConnect.addListener(function (port) {
         return messenger.emit("GET_SELECTED_WALLET_ADDRESS_RES", selectedWallet)
       }
 
+      case "RPC": {
+        console.warn(`RPC`, data)
+        return openUi()
+      }
+
       case "CONNECT": {
         const selectedWallet = await getSelectedWalletAddress()
         const isWhitelisted = await isOnWhitelist(data.host)
