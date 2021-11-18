@@ -86,9 +86,9 @@ const TokenList: FC<{
         <TokenListItem
           key={i}
           index={i}
-          decimals={token.decimals!.toNumber()}
+          decimals={token.decimals?.toNumber()}
           balance={
-            ethers.utils.formatUnits(token.balance!, token.decimals!) || "0"
+            ethers.utils.formatUnits(token.balance ?? 0, token.decimals) || "0"
           }
           name={token.name || ""}
           symbol={token.symbol || ""}
