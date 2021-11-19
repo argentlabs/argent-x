@@ -35,18 +35,24 @@ const messenger = new Messenger(
 type StarknetWindowObject =
   | {
       enable: () => Promise<string[]>
-      signer: Signer
+      signer: SignerInterface
       provider: Provider
       selectedAddress: string
       isConnected: true
     }
   | {
       enable: () => Promise<string[]>
-      signer?: Signer
+      signer?: SignerInterface
       provider: Provider
       selectedAddress?: string
       isConnected: false
     }
+
+declare global {
+  interface Window {
+    starknet?: StarknetWindowObject
+  }
+}
 
 // window.ethereum like
 const starknetWindowObject: StarknetWindowObject = {
@@ -60,16 +66,17 @@ const starknetWindowObject: StarknetWindowObject = {
         host: window.location.hostname,
       })
       messenger.listen((type, data) => {
-        if (type === "CONNECT_RES" && typeof data === "string") {
-          ;(window as any).starknet.signer = new WalletSigner(data)
-          ;(window as any).starknet.selectedAddress = data
-          ;(window as any).starknet.isConnected = true
+        const { starknet } = window
+        if (starknet && type === "CONNECT_RES" && typeof data === "string") {
+          starknet.signer = new WalletSigner(data)
+          starknet.selectedAddress = data
+          starknet.isConnected = true
           res([data])
         }
       })
     }),
 }
-;(window as any).starknet = starknetWindowObject
+window.starknet = starknetWindowObject
 
 export class WalletSigner extends Provider implements SignerInterface {
   public address: string
