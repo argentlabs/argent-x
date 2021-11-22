@@ -67,7 +67,7 @@ export class Wallet {
     const calldata = Array.isArray(args) ? args : compileCalldata(args || {})
     const nonce = await this.getCurrentNonce()
     const messageHash = encode.addHexPrefix(
-      hash.hashMessage("0", address, selector, calldata, nonce),
+      hash.hashMessage(this.address, address, selector, calldata, nonce),
     )
     const { r, s } = ec.sign(this.signer, messageHash)
 

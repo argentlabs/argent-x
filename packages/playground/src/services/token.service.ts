@@ -1,15 +1,13 @@
 import { getStarknet } from "@argent/get-starknet"
 import { utils } from "ethers"
-import { number } from "starknet"
+import { number, stark } from "starknet"
 
 export const erc20TokenAddress =
-  "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
+  "0x00a45e3942b7a75983dea7afffda9304d0273773619d1e3d5eaa757d751bfaf3"
 
-const mintSelector =
-  "0x2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354"
+const mintSelector = stark.getSelectorFromName("mint")
 
-const transferSelector =
-  "0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e"
+const transferSelector = stark.getSelectorFromName("transfer")
 
 export const mintToken = async (mintAmount: string): Promise<any> => {
   const starknet = getStarknet()
