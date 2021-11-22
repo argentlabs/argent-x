@@ -33,6 +33,6 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "starknet": "^1.6.0"
+    "starknet": "^2.0.1"
   }
 }
