@@ -1,11 +1,13 @@
 import type { JWK } from "jose"
 import type { InvokeFunctionTransaction } from "starknet"
 
+import { ActionItem } from "../background/actionQueue"
+
 export type MessageType = {
   OPEN_UI: undefined
   ADD_TRANSACTION: InvokeFunctionTransaction
-  READ_REQUESTED_TRANSACTIONS: undefined
-  READ_REQUESTED_TRANSACTIONS_RES: InvokeFunctionTransaction[]
+  GET_LATEST_ACTION_AND_COUNT: undefined
+  GET_LATEST_ACTION_AND_COUNT_RES: { action: ActionItem | null; count: number }
   GET_SELECTED_WALLET_ADDRESS: undefined
   GET_SELECTED_WALLET_ADDRESS_RES: string | undefined
   CONNECT: { host: string }

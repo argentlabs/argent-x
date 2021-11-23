@@ -1,16 +1,14 @@
-import {
-  JWK,
-  KeyLike,
-  compactDecrypt,
-  exportJWK,
-  generateKeyPair,
-  importJWK,
-} from "jose"
-import { InvokeFunctionTransaction, encode } from "starknet"
+import { compactDecrypt } from "jose"
+import { encode } from "starknet"
 import browser from "webextension-polyfill"
 
 import { MessageType } from "../shared/MessageType"
 import { Messenger } from "../shared/Messenger"
+import { ActionItem, getQueue } from "./actionQueue"
+import { getKeyPair } from "./key"
+import { openUi } from "./openUi"
+import { Storage, getFromStorage, setToStorage } from "./storage"
+import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
 const allowedSender = ["INJECT", "UI", "INPAGE"]
 
@@ -35,40 +33,7 @@ browser.runtime.onConnect.addListener(async function (port) {
     })
   })
 
-  let privateKey: KeyLike
-  let publicKey: KeyLike
-  let publicKeyJwk: JWK
-
-  const { PRIVATE_KEY, PUBLIC_KEY } = (await browser.storage.local.get([
-    "PRIVATE_KEY",
-    "PUBLIC_KEY",
-  ])) as { PRIVATE_KEY?: string; PUBLIC_KEY?: string }
-  if (!(PRIVATE_KEY && PUBLIC_KEY)) {
-    console.log("GEN")
-    const keypair = await generateKeyPair("ECDH-ES", { extractable: true })
-
-    publicKeyJwk = await exportJWK(keypair.publicKey)
-
-    browser.storage.local.set({
-      PRIVATE_KEY: JSON.stringify({
-        alg: "ECDH-ES",
-        ...(await exportJWK(keypair.privateKey)),
-      }),
-      PUBLIC_KEY: JSON.stringify({
-        alg: "ECDH-ES",
-        ...publicKeyJwk,
-      }),
-    })
-
-    privateKey = keypair.privateKey
-    publicKey = keypair.publicKey
-  } else {
-    console.log("REC")
-
-    publicKeyJwk = JSON.parse(PUBLIC_KEY)
-    privateKey = (await importJWK(JSON.parse(PRIVATE_KEY))) as KeyLike
-    publicKey = (await importJWK(publicKeyJwk)) as KeyLike
-  }
+  const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const messenger = new Messenger<MessageType>(
     (emit) => {
@@ -84,131 +49,13 @@ browser.runtime.onConnect.addListener(async function (port) {
     },
   )
 
-  const NOTIFICATION_WIDTH = 322
-  const NOTIFICATION_HEIGHT = 610
+  const actionQueue = await getQueue<ActionItem>("ACTIONS")
 
-  async function addTransaction(tx: InvokeFunctionTransaction): Promise<void> {
-    const { txQueue = [] } = (await browser.storage.local.get("txQueue")) as {
-      txQueue: InvokeFunctionTransaction[]
-    }
-    txQueue.push(tx)
-    return browser.storage.local.set({ txQueue })
-  }
-
-  async function removeTransaction(
-    tx: InvokeFunctionTransaction,
-  ): Promise<void> {
-    const { txQueue = [] } = (await browser.storage.local.get("txQueue")) as {
-      txQueue: InvokeFunctionTransaction[]
-    }
-    return browser.storage.local.set({
-      txQueue: txQueue.filter(
-        (item) =>
-          !(
-            item.contract_address === tx.contract_address &&
-            item.calldata?.toString() === tx.calldata?.toString() &&
-            item.entry_point_selector === tx.entry_point_selector
-          ),
-      ),
-    })
-  }
-
-  async function addToWhitelist(host: string) {
-    const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
-    await setToStorage(`WHITELIST:APPROVED`, [...(approved || []), host])
-  }
-
-  async function addPendingWhitelist(host: string) {
-    const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
-    await setToStorage(`WHITELIST:PENDING`, [...(pending || []), host])
-  }
-
-  async function approvePendingWhitelist(host: string) {
-    const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
-    if (!(pending || []).includes(host))
-      throw Error("host isnt waiting for approval")
-
-    await removePendingWhitelist(host)
-    await addToWhitelist(host)
-  }
-
-  async function removePendingWhitelist(host: string) {
-    const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
-    await setToStorage(
-      `WHITELIST:PENDING`,
-      (pending || []).filter((x) => x !== host),
-    )
-  }
-
-  async function removeFromWhitelist(host: string) {
-    const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
-    await setToStorage(
-      `WHITELIST:APPROVED`,
-      (approved || []).filter((x) => x !== host),
-    )
-  }
-
-  async function isOnWhitelist(host: string) {
-    const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
-    return (approved || []).includes(host)
-  }
-
-  async function getFromStorage<
-    T extends any,
-    K extends string = string,
-  >(key: K): Promise<T> {
-    return (await browser.storage.local.get(key))[key]
-  }
-
-  function setToStorage(key: string, value: any) {
-    return browser.storage.local.set({ [key]: value })
-  }
-
-  async function getTransactions(): Promise<InvokeFunctionTransaction[]> {
-    return (await getFromStorage<InvokeFunctionTransaction[]>("txQueue")) || []
-  }
-
-  function getSelectedWalletAddress(): Promise<string | undefined> {
-    return getFromStorage<string | undefined>("selectedWallet")
-  }
-
-  async function openUi() {
-    const [existingPopup] = await browser.tabs.query({
-      url: browser.runtime.getURL("/index.html"),
-    })
-
-    if (existingPopup && existingPopup.windowId)
-      return browser.windows.update(existingPopup.windowId, { focused: true })
-
-    let left = 0
-    let top = 0
-    try {
-      const lastFocused = await browser.windows.getLastFocused()
-
-      // Position window in top right corner of lastFocused window.
-      top = lastFocused.top ?? 0
-      left =
-        (lastFocused.left ?? 0) +
-        Math.max((lastFocused.width ?? 0) - NOTIFICATION_WIDTH, 0)
-    } catch (_) {
-      // The following properties are more than likely 0, due to being
-      // opened from the background chrome process for the extension that
-      // has no physical dimensions
-      const { screenX, screenY, outerWidth } = window
-      top = Math.max(screenY, 0)
-      left = Math.max(screenX + (outerWidth - NOTIFICATION_WIDTH), 0)
-    }
-    const popup = await browser.windows.create({
-      url: "index.html",
-      type: "popup",
-      width: NOTIFICATION_WIDTH,
-      height: NOTIFICATION_HEIGHT,
-      left,
-      top,
-    })
-
-    return popup
-  }
+  const store = new Storage<{
+    SELECTED_WALLET: string
+  }>({
+    SELECTED_WALLET: "",
+  })
 
   messenger.listen(async (type, data) => {
     switch (type) {
@@ -217,28 +64,41 @@ browser.runtime.onConnect.addListener(async function (port) {
       }
 
       case "ADD_TRANSACTION": {
-        return await addTransaction(data as MessageType["ADD_TRANSACTION"])
+        return await actionQueue.push({
+          type: "TRANSACTION",
+          payload: data as MessageType["ADD_TRANSACTION"],
+        })
       }
 
-      case "READ_REQUESTED_TRANSACTIONS": {
-        const txs = await getTransactions()
-        return messenger.emit("READ_REQUESTED_TRANSACTIONS_RES", txs)
+      case "GET_LATEST_ACTION_AND_COUNT": {
+        const action = await actionQueue.getLatest()
+        const count = await actionQueue.length()
+        return messenger.emit("GET_LATEST_ACTION_AND_COUNT_RES", {
+          action,
+          count,
+        })
       }
 
       case "GET_SELECTED_WALLET_ADDRESS": {
-        const selectedWallet = await getSelectedWalletAddress()
+        const selectedWallet = await store.getItem("SELECTED_WALLET")
 
-        return messenger.emit("GET_SELECTED_WALLET_ADDRESS_RES", selectedWallet)
+        return messenger.emit(
+          "GET_SELECTED_WALLET_ADDRESS_RES",
+          selectedWallet || "",
+        )
       }
 
       case "CONNECT": {
-        const selectedWallet = await getSelectedWalletAddress()
+        const selectedWallet = await store.getItem("SELECTED_WALLET")
         const isWhitelisted = await isOnWhitelist(
           (data as MessageType["CONNECT"]).host,
         )
 
         if (!isWhitelisted) {
-          addPendingWhitelist((data as MessageType["CONNECT"]).host)
+          actionQueue.push({
+            type: "CONNECT",
+            payload: { host: (data as MessageType["CONNECT"]).host },
+          })
         }
 
         if (isWhitelisted && selectedWallet)
@@ -248,13 +108,15 @@ browser.runtime.onConnect.addListener(async function (port) {
       }
 
       case "WALLET_CONNECTED": {
-        return setToStorage("selectedWallet", data)
+        return store.setItem(
+          "SELECTED_WALLET",
+          data as MessageType["WALLET_CONNECTED"],
+        )
       }
 
       case "SUBMITTED_TX":
       case "FAILED_TX": {
-        const { tx } = data as MessageType["SUBMITTED_TX" | "FAILED_TX"]
-        return removeTransaction(tx)
+        return await actionQueue.removeLatest()
       }
 
       case "RESET_ALL": {
@@ -262,24 +124,23 @@ browser.runtime.onConnect.addListener(async function (port) {
       }
 
       case "ADD_WHITELIST": {
-        return addPendingWhitelist(data as MessageType["ADD_WHITELIST"])
+        return actionQueue.push({
+          type: "CONNECT",
+          payload: { host: data as MessageType["ADD_WHITELIST"] },
+        })
       }
       case "APPROVE_WHITELIST": {
-        const selectedWallet = await getSelectedWalletAddress()
-        await approvePendingWhitelist(data as MessageType["APPROVE_WHITELIST"])
+        const selectedWallet = await store.getItem("SELECTED_WALLET")
+        await actionQueue.removeLatest()
+        await addToWhitelist(data as MessageType["APPROVE_WHITELIST"])
         if (selectedWallet) return messenger.emit("CONNECT_RES", selectedWallet)
         return openUi()
       }
       case "REJECT_WHITELIST": {
-        return removePendingWhitelist(data as MessageType["REJECT_WHITELIST"])
+        return actionQueue.removeLatest()
       }
       case "REMOVE_WHITELIST": {
         return removeFromWhitelist(data as MessageType["REMOVE_WHITELIST"])
-      }
-      case "GET_PENDING_WHITELIST": {
-        const pending = await getFromStorage<string[]>(`WHITELIST:PENDING`)
-        console.log("pending", pending)
-        return messenger.emit("GET_PENDING_WHITELIST_RES", pending || [])
       }
       case "IS_WHITELIST": {
         const valid = await isOnWhitelist(data as MessageType["IS_WHITELIST"])

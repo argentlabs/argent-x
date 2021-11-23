@@ -9,8 +9,7 @@ import {
   getLastSelectedWallet,
   getPublicKey,
   messenger,
-  readPendingWhitelist,
-  readRequestedTransactions,
+  readLatestActionAndCount,
 } from "../utils/messaging"
 import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
@@ -257,11 +256,11 @@ export const routerMachine = createMachine<
             (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
 
           // if transactions are pending show them first
-          const requestedTransactions = await readRequestedTransactions().catch(
-            () => [],
+          const requestedActions = await readLatestActionAndCount().catch(
+            () => null,
           )
-          // if hosts are pending for connect
-          const requestedConnects = await readPendingWhitelist().catch(() => [])
+
+          console.log(requestedActions)
 
           const keyPair = ec.getKeyPair(wallet.privateKey)
           return {
@@ -277,23 +276,22 @@ export const routerMachine = createMachine<
             signer: keyPair,
             selectedWallet: wallets[selectedWalletIndex],
 
-            requestedTransactions,
-            requestedConnects,
+            requestedActions,
           }
         },
         onDone: [
           {
             target: "approveTx",
             cond: (_ctx, ev) => {
-              return Boolean(ev.data?.requestedTransactions?.length)
+              return ev.data?.requestedActions?.action?.type === "TRANSACTION"
             },
             actions: [
               assign((_, event) => {
-                const { requestedTransactions, ...ctx } = event.data
+                const { requestedActions, ...ctx } = event.data
                 return {
                   ...ctx,
                   uploadedBackup: undefined,
-                  txToApprove: requestedTransactions?.[0],
+                  txToApprove: requestedActions?.action?.payload,
                   isPopup: true,
                 }
               }),
@@ -302,15 +300,15 @@ export const routerMachine = createMachine<
           {
             target: "connect",
             cond: (_ctx, ev) => {
-              return Boolean(ev.data?.requestedConnects?.length)
+              return ev.data?.requestedActions?.action?.type === "CONNECT"
             },
             actions: [
               assign((_, event) => {
-                const { requestedConnects, ...ctx } = event.data
+                const { requestedActions, ...ctx } = event.data
                 return {
                   ...ctx,
                   uploadedBackup: undefined,
-                  hostToWhitelist: requestedConnects?.[0],
+                  hostToWhitelist: requestedActions?.action?.payload?.host,
                   isPopup: true,
                 }
               }),

@@ -1,7 +1,7 @@
 import type { JWK } from "jose"
-import { Transaction } from "starknet"
 import browser from "webextension-polyfill"
 
+import type { ActionItem } from "../../background/actionQueue"
 import { MessageType } from "../../shared/MessageType"
 import { Messenger } from "../../shared/Messenger"
 
@@ -21,14 +21,12 @@ export const messenger = new Messenger<MessageType>(
   },
 )
 
-export const readRequestedTransactions = async (): Promise<Transaction[]> => {
-  messenger.emit("READ_REQUESTED_TRANSACTIONS", undefined)
-  return messenger.waitForEvent("READ_REQUESTED_TRANSACTIONS_RES", 2000)
-}
-
-export const readPendingWhitelist = async (): Promise<string[]> => {
-  messenger.emit("GET_PENDING_WHITELIST", undefined)
-  return messenger.waitForEvent("GET_PENDING_WHITELIST_RES", 2000)
+export const readLatestActionAndCount = async (): Promise<{
+  action: ActionItem | null
+  count: number
+}> => {
+  messenger.emit("GET_LATEST_ACTION_AND_COUNT", undefined)
+  return messenger.waitForEvent("GET_LATEST_ACTION_AND_COUNT_RES", 2000)
 }
 
 export const getLastSelectedWallet = async (): Promise<string | undefined> => {
