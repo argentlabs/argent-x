@@ -9,8 +9,8 @@ import {
 import { InvokeFunctionTransaction, encode } from "starknet"
 import browser from "webextension-polyfill"
 
-import { MessageType } from "./utils/MessageType"
-import { Messenger } from "./utils/Messenger"
+import { MessageType } from "../shared/MessageType"
+import { Messenger } from "../shared/Messenger"
 
 const allowedSender = ["INJECT", "UI", "INPAGE"]
 

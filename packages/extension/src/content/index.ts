@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
 
-import { MessageType } from "./utils/MessageType"
-import { Messenger } from "./utils/Messenger"
+import { MessageType } from "../shared/MessageType"
+import { Messenger } from "../shared/Messenger"
 
 const container = document.head || document.documentElement
 const script = document.createElement("script")

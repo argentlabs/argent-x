@@ -7,8 +7,8 @@ import {
   defaultProvider,
 } from "starknet"
 
-import { MessageType } from "./utils/MessageType"
-import { Emit, Messenger } from "./utils/Messenger"
+import { MessageType } from "../shared/MessageType"
+import { Emit, Messenger } from "../shared/Messenger"
 
 const extId = document
   .getElementById("argent-x-extension")

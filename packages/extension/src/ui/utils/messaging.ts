@@ -2,8 +2,8 @@ import type { JWK } from "jose"
 import { Transaction } from "starknet"
 import browser from "webextension-polyfill"
 
-import { MessageType } from "../../utils/MessageType"
-import { Messenger } from "../../utils/Messenger"
+import { MessageType } from "../../shared/MessageType"
+import { Messenger } from "../../shared/Messenger"
 
 const allowedSender = ["INJECT", "INPAGE", "BACKGROUND"]
 const port = browser.runtime.connect({ name: "argent-x-ui" })
