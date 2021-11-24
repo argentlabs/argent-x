@@ -13,6 +13,7 @@ import {
   AccountAddressWrapper,
 } from "../components/Account/Address"
 import { truncateAddress } from "../components/Account/address.service"
+import { EmptyWalletAlert } from "../components/Account/EmptyWalletAlert"
 import { AccountColumn, AccountHeader } from "../components/Account/Header"
 import {
   AccountNetwork,
@@ -39,9 +40,6 @@ import {
 } from "../utils/tokens"
 import { getAccountImageUrl, getAccountName } from "../utils/wallet"
 import { Wallet } from "../Wallet"
-
-const ARGENT_TOKEN_CONTRACT =
-  "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
 
 const AccountContent = styled.div`
   display: flex;
@@ -92,8 +90,13 @@ const TokenList: FC<{
     Infinity,
   )
 
+  const hasBalance = tokenDetails.some(
+    ({ balance }) => balance && !balance.isZero(),
+  )
+
   return (
     <>
+      {!hasBalance && <EmptyWalletAlert onAction={onAction} />}
       {tokenDetails.map((token, i) => (
         <TokenListItem
           key={i}
@@ -105,7 +108,6 @@ const TokenList: FC<{
           name={token.name || ""}
           symbol={token.symbol || ""}
           onAction={(action) => onAction?.(token.address, action)}
-          mintable={token.address === ARGENT_TOKEN_CONTRACT}
         />
       ))}
     </>

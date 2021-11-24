@@ -99,6 +99,7 @@ const TokenExtensionWrapper = styled.div<{ show: boolean }>`
 export type TokenAction =
   | { type: "MINT"; amount: BigNumber }
   | { type: "TRANSFER"; to: string; amount: BigNumber }
+
 interface TokenListItemProps {
   symbol: string
   name: string
@@ -109,6 +110,7 @@ interface TokenListItemProps {
   onClick?: () => void
   onAction?: (action: TokenAction) => Promise<void> | void
 }
+
 export const TokenListItem: FC<TokenListItemProps> = ({
   balance,
   name,
