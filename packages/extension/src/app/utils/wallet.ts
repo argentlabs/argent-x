@@ -39,7 +39,7 @@ export const getStatus = (
   forceDeployed = false,
 ): WalletStatus => {
   if (!isWalletDeployed(wallet) && !forceDeployed) {
-    return { code: "DEPLOYING", text: "Deploying" }
+    return { code: "DEPLOYING", text: "Deploying..." }
   } else if (activeWalletAddress === wallet.address) {
     return { code: "CONNECTED", text: "Active" }
   } else {
