@@ -1,13 +1,6 @@
 import styled from "styled-components"
 
-import { H1, P } from "../Typography"
-
-export const AccountName = styled(H1)`
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 22px;
-  margin: 0;
-`
+import { H1 } from "../Typography"
 
 export const AccountAddressWrapper = styled.span`
   display: flex;
@@ -23,9 +16,13 @@ export const AccountAddressIconsWrapper = styled.span`
   border-radius: 10px;
   padding: 4px 4px;
   margin-left: 5px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
 `
 
-export const AccountAddress = styled(P)`
+export const AccountAddressLink = styled.a`
   font-size: 10px;
   line-height: 12px;
   max-width: 150px;
@@ -35,4 +32,10 @@ export const AccountAddress = styled(P)`
   border-radius: 10px;
   padding: 4px 10px;
   white-space: nowrap;
+  color: white;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
 `

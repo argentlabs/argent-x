@@ -1,6 +1,4 @@
 import { ethers } from "ethers"
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { FC, Suspense } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import usePromise from "react-promise-suspense"
@@ -10,21 +8,15 @@ import Add from "../../assets/add.svg"
 import Copy from "../../assets/copy.svg"
 import Open from "../../assets/open.svg"
 import {
-  AccountAddress,
   AccountAddressIconsWrapper,
+  AccountAddressLink,
   AccountAddressWrapper,
-  AccountName,
 } from "../components/Account/Address"
-import {
-  AccountColumn,
-  AccountHeader,
-  AccountRow,
-} from "../components/Account/Header"
+import { truncateAddress } from "../components/Account/address.service"
+import { AccountColumn, AccountHeader } from "../components/Account/Header"
 import {
   AccountNetwork,
   AccountStatusIndicator,
-  AccountStatusText,
-  AccountStatusWrapper,
 } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Spinner } from "../components/Spinner"
@@ -35,6 +27,7 @@ import {
   TokenTitle,
   TokenWrapper,
 } from "../components/Token"
+import { H1 } from "../components/Typography"
 import { useMitt } from "../hooks/useMitt"
 import { useStatus } from "../hooks/useStatus"
 import { makeClickable } from "../utils/a11y"
@@ -46,7 +39,6 @@ import {
 } from "../utils/tokens"
 import { getAccountImageUrl, getAccountName } from "../utils/wallet"
 import { Wallet } from "../Wallet"
-import { truncateAddress } from "./account.service"
 
 const ARGENT_TOKEN_CONTRACT =
   "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
@@ -56,6 +48,28 @@ const AccountContent = styled.div`
   flex-direction: column;
   gap: 16px;
   padding: 16px;
+`
+
+const AccountRow = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`
+
+const AccountStatusText = styled.p`
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 12px;
+  text-align: center;
+  margin-top: 6px;
+`
+
+const AccountName = styled(H1)`
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 38.4px;
+  margin: 0;
 `
 
 const TokenList: FC<{
@@ -70,13 +84,10 @@ const TokenList: FC<{
   )
 
   const tokenDetails: TokenDetails[] = usePromise(
-    async (tokens: string[], walletAddress: string) => {
-      return Promise.all(
-        tokens.map((address) => {
-          return fetchTokenDetails(address, walletAddress)
-        }),
-      )
-    },
+    async (tokens: string[], walletAddress: string) =>
+      Promise.all(
+        tokens.map((address) => fetchTokenDetails(address, walletAddress)),
+      ),
     [tokens, walletAddress],
     Infinity,
   )
@@ -118,29 +129,27 @@ export const Account: FC<{
           src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
-          <AccountColumn />
-          <AccountColumn>
-            <AccountNetwork>Goerli alpha</AccountNetwork>
-            <AccountStatusWrapper>
-              <AccountStatusText>{text}</AccountStatusText>
-              <AccountStatusIndicator status={code} />
-            </AccountStatusWrapper>
-          </AccountColumn>
+          <AccountNetwork>
+            <span>Goerli alpha</span>
+            <AccountStatusIndicator status={code} />
+          </AccountNetwork>
         </AccountRow>
       </AccountHeader>
       <AccountContent>
-        <AccountName>{getAccountName(accountNumber)}</AccountName>
+        <div>
+          <AccountName>{getAccountName(accountNumber)}</AccountName>
+          {code !== "CONNECTED" && code !== "DEFAULT" && (
+            <AccountStatusText>{text}</AccountStatusText>
+          )}
+        </div>
         <AccountAddressWrapper>
-          <AccountAddress>
+          <AccountAddressLink
+            href={`https://voyager.online/contract/${wallet.address}`}
+            target="_blank"
+          >
             starknet: {truncateAddress(wallet.address)}
-            <a
-              href={`https://voyager.online/contract/${wallet.address}`}
-              target="_blank"
-              style={{ marginLeft: 7 }}
-            >
-              <Open />
-            </a>
-          </AccountAddress>
+            <Open style={{ marginLeft: 7 }} />
+          </AccountAddressLink>
           <AccountAddressIconsWrapper>
             <CopyToClipboard text={wallet.address}>
               <Copy style={{ cursor: "pointer" }} />

@@ -3,13 +3,10 @@ import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
-import { AccountAddress, AccountName } from "./Address"
-import { AccountColumn, AccountRow } from "./Header"
-import {
-  AccountStatusIndicator,
-  AccountStatusText,
-  AccountStatusWrapper,
-} from "./Network"
+import { H1 } from "../Typography"
+import { truncateAddress } from "./address.service"
+import { AccountColumn } from "./Header"
+import { AccountStatusIndicator, AccountStatusWrapper } from "./Network"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const AccountList = styled.div`
@@ -39,6 +36,27 @@ export const AccountListItemWrapper = styled.div`
   }
 `
 
+const AccountRow = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const AccountStatusText = styled.p`
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 12px;
+  text-align: center;
+`
+
+const AccountName = styled.h1`
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 18px;
+  margin: 0 0 5px 0;
+`
+
 interface AccountListProps {
   accountNumber: number
   address: string
@@ -59,7 +77,7 @@ export const AccountListItem: FC<AccountListProps> = ({
       <AccountRow>
         <AccountColumn>
           <AccountName>Account {accountNumber}</AccountName>
-          <AccountAddress>{address}</AccountAddress>
+          <p>{truncateAddress(address)}</p>
         </AccountColumn>
         <AccountStatusWrapper>
           <AccountStatusIndicator status={status.code} />
