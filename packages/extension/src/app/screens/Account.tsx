@@ -44,7 +44,7 @@ import {
   getTokens,
   tokensMitt,
 } from "../utils/tokens"
-import { getProfileImageUrl, getProfileName } from "../utils/wallet"
+import { getAccountImageUrl, getAccountName } from "../utils/wallet"
 import { Wallet } from "../Wallet"
 
 const ARGENT_TOKEN_CONTRACT =
@@ -114,11 +114,11 @@ export const Account: FC<{
       <AccountHeader>
         <ProfilePicture
           {...makeClickable(onShowAccountList)}
-          src={getProfileImageUrl(accountNumber)}
+          src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
           <AccountColumn>
-            <AccountName>{getProfileName(accountNumber)}</AccountName>
+            <AccountName>{getAccountName(accountNumber)}</AccountName>
             <AccountAddressWrapper>
               <CopyToClipboard text={wallet.address}>
                 <AccountAddress>{wallet.address}</AccountAddress>

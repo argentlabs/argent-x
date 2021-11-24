@@ -11,19 +11,19 @@ const argentColorsArray = [
   "FF5C72",
 ]
 
-export const getProfileColor = (accountNumber: number, withPrefix = true) =>
+export const getAccountColor = (accountNumber: number, withPrefix = true) =>
   `${withPrefix ? "#" : ""}${
     argentColorsArray[(accountNumber % (argentColorsArray.length - 1)) + 1]
   }`
 
-export const getProfileImageUrl = (accountNumber: number) =>
-  `https://eu.ui-avatars.com/api/?name=Account+${accountNumber}&background=${getProfileColor(
+export const getAccountImageUrl = (accountNumber: number) =>
+  `https://eu.ui-avatars.com/api?name=Account+${accountNumber}&background=${getAccountColor(
     accountNumber,
     false,
   )}&color=fff`
 
-export const getProfileName = (accountNumber: number) =>
-  `Address ${accountNumber}`
+export const getAccountName = (accountNumber: number) =>
+  `Account ${accountNumber}`
 
 export const isWalletDeployed = (wallet: Wallet): boolean =>
   !wallet.deployTransaction

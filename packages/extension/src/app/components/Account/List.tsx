@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
-import { WalletStatus, getProfileImageUrl } from "../../utils/wallet"
+import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
 import { AccountAddress, AccountName } from "./Address"
 import { AccountColumn, AccountRow } from "./Header"
 import {
@@ -55,7 +55,7 @@ export const AccountListItem: FC<AccountListProps> = ({
 }) => {
   return (
     <AccountListItemWrapper {...makeClickable(onClick)}>
-      <ProfilePicture src={getProfileImageUrl(accountNumber)} />
+      <ProfilePicture src={getAccountImageUrl(accountNumber)} />
       <AccountRow>
         <AccountColumn>
           <AccountName>Account {accountNumber}</AccountName>

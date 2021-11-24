@@ -4,7 +4,7 @@ import { FC, useState } from "react"
 import styled, { css } from "styled-components"
 
 import { makeClickable } from "../utils/a11y"
-import { getProfileColor } from "../utils/wallet"
+import { getAccountColor } from "../utils/wallet"
 import { Button, ButtonGroup } from "./Button"
 import { IconButton } from "./IconButton"
 import { InputText } from "./Input"
@@ -140,7 +140,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
         })}
       >
         <TokenIcon
-          src={`https://eu.ui-avatars.com/api/?name=${name}&background=${getProfileColor(
+          src={`https://eu.ui-avatars.com/api/?name=${name}&background=${getAccountColor(
             index + 3,
             false,
           )}&color=fff`}
