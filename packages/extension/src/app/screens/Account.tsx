@@ -46,6 +46,7 @@ import {
 } from "../utils/tokens"
 import { getAccountImageUrl, getAccountName } from "../utils/wallet"
 import { Wallet } from "../Wallet"
+import { truncateAddress } from "./account.service"
 
 const ARGENT_TOKEN_CONTRACT =
   "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
@@ -117,25 +118,7 @@ export const Account: FC<{
           src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
-          <AccountColumn>
-            <AccountName>{getAccountName(accountNumber)}</AccountName>
-            <AccountAddressWrapper>
-              <CopyToClipboard text={wallet.address}>
-                <AccountAddress>{wallet.address}</AccountAddress>
-              </CopyToClipboard>
-              <AccountAddressIconsWrapper>
-                <CopyToClipboard text={wallet.address}>
-                  <Copy style={{ cursor: "pointer" }} />
-                </CopyToClipboard>
-                <a
-                  href={`https://voyager.online/contract/${wallet.address}`}
-                  target="_blank"
-                >
-                  <Open />
-                </a>
-              </AccountAddressIconsWrapper>
-            </AccountAddressWrapper>
-          </AccountColumn>
+          <AccountColumn />
           <AccountColumn>
             <AccountNetwork>Goerli alpha</AccountNetwork>
             <AccountStatusWrapper>
@@ -146,6 +129,25 @@ export const Account: FC<{
         </AccountRow>
       </AccountHeader>
       <AccountContent>
+        <AccountName>{getAccountName(accountNumber)}</AccountName>
+        <AccountAddressWrapper>
+          <AccountAddress>
+            starknet: {truncateAddress(wallet.address)}
+            <a
+              href={`https://voyager.online/contract/${wallet.address}`}
+              target="_blank"
+              style={{ marginLeft: 7 }}
+            >
+              <Open />
+            </a>
+          </AccountAddress>
+          <AccountAddressIconsWrapper>
+            <CopyToClipboard text={wallet.address}>
+              <Copy style={{ cursor: "pointer" }} />
+            </CopyToClipboard>
+          </AccountAddressIconsWrapper>
+        </AccountAddressWrapper>
+
         <Suspense fallback={<Spinner size={64} />}>
           <TokenList onAction={onAction} walletAddress={wallet.address} />
           <TokenWrapper {...makeClickable(onAddToken)}>
