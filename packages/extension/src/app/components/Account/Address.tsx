@@ -16,6 +16,7 @@ export const AccountAddressIconsWrapper = styled.span`
   border-radius: 10px;
   padding: 4px 4px;
   margin-left: 5px;
+  cursor: pointer;
 
   &:hover {
     background: rgba(255, 255, 255, 0.15);

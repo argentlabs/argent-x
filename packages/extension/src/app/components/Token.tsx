@@ -1,13 +1,10 @@
 import { BigNumber } from "@ethersproject/bignumber"
-import { ethers } from "ethers"
-import { FC, useState } from "react"
-import styled, { css } from "styled-components"
+import { FC } from "react"
+import styled from "styled-components"
 
 import { makeClickable } from "../utils/a11y"
 import { getAccountColor } from "../utils/wallet"
-import { Button, ButtonGroup } from "./Button"
 import { IconButton } from "./IconButton"
-import { InputText } from "./Input"
 
 export const TokenWrapper = styled.div`
   display: flex;
@@ -76,26 +73,6 @@ export const AddTokenIconButton = styled(IconButton)`
   }
 `
 
-const TokenExtensionWrapper = styled.div<{ show: boolean }>`
-  display: flex;
-  flex-direction: column;
-  transition: all 200ms ease-in-out;
-  margin: 0;
-  height: auto;
-  padding: 16px 8px;
-  overflow: hidden;
-
-  ${({ show }) =>
-    show
-      ? css`
-          max-height: 400px;
-        `
-      : css`
-          padding: 0 8px;
-          max-height: 0px;
-        `}
-`
-
 export type TokenAction =
   | { type: "MINT"; amount: BigNumber }
   | { type: "TRANSFER"; to: string; amount: BigNumber }
@@ -106,9 +83,7 @@ interface TokenListItemProps {
   balance: string
   decimals?: number
   index?: number
-  mintable?: boolean
   onClick?: () => void
-  onAction?: (action: TokenAction) => Promise<void> | void
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
@@ -118,34 +93,14 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   index = 0,
   decimals,
   onClick,
-  onAction,
-  mintable = false,
   ...props
 }) => {
-  const [expanded, setExpanded] = useState(false)
-  const [amount, setAmount] = useState("")
-  const [recipient, setRecipient] = useState("")
+  const color = getAccountColor(index + 3, false)
   return (
-    <div
-      {...props}
-      style={{
-        borderRadius: 4,
-        overflow: "hidden",
-        border: "1px solid transparent",
-        borderColor: expanded ? "rgba(255, 255, 255, 0.25)" : "transparent",
-      }}
-    >
-      <TokenWrapper
-        {...makeClickable(() => {
-          setExpanded((x) => !x)
-          onClick?.()
-        })}
-      >
+    <div {...props} style={{ borderRadius: 4, overflow: "hidden" }}>
+      <TokenWrapper {...makeClickable(onClick)}>
         <TokenIcon
-          src={`https://eu.ui-avatars.com/api/?name=${name}&background=${getAccountColor(
-            index + 3,
-            false,
-          )}&color=fff`}
+          src={`https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`}
         />
         <TokenDetailsWrapper>
           <TokenTextGroup>
@@ -155,45 +110,6 @@ export const TokenListItem: FC<TokenListItemProps> = ({
           <TokenBalance>{balance}</TokenBalance>
         </TokenDetailsWrapper>
       </TokenWrapper>
-
-      <TokenExtensionWrapper show={expanded}>
-        <ButtonGroup>
-          {mintable && (
-            <Button
-              {...makeClickable(() => {
-                onAction?.({
-                  type: "MINT",
-                  amount: ethers.utils.parseUnits("1000", decimals),
-                })
-              })}
-            >
-              Mint
-            </Button>
-          )}
-          <ButtonGroup
-            as="form"
-            onSubmit={() => {
-              onAction?.({
-                type: "TRANSFER",
-                to: recipient,
-                amount: ethers.utils.parseUnits(amount, decimals),
-              })
-            }}
-          >
-            <InputText
-              placeholder="Amount"
-              value={amount}
-              onChange={(e: any) => setAmount(e.target.value)}
-            />
-            <InputText
-              placeholder="Recipient"
-              value={recipient}
-              onChange={(e: any) => setRecipient(e.target.value)}
-            />
-            <Button type="submit">Send</Button>
-          </ButtonGroup>
-        </ButtonGroup>
-      </TokenExtensionWrapper>
     </div>
   )
 }

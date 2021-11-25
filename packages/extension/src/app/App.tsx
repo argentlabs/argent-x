@@ -1,5 +1,4 @@
 import { useMachine } from "@xstate/react"
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Suspense } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
@@ -16,15 +15,17 @@ import { Password } from "./screens/Password"
 import { ResetScreen } from "./screens/Reset"
 import { Settings } from "./screens/Settings"
 import { Success } from "./screens/Success"
+import { Token } from "./screens/Token"
 import { UploadKeystore } from "./screens/UploadKeystore"
 import { Welcome } from "./screens/Welcome"
 import { routerMachine } from "./states/RouterMachine"
+import { TokenDetails } from "./utils/tokens"
 
 async function fileToString(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader()
     fileReader.onload = (event) => {
-      const { result } = event!.target!
+      const result = event?.target?.result
       if (result) {
         resolve(result.toString())
       } else {
@@ -124,6 +125,9 @@ function App() {
     return (
       <Account
         onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
+        onShowToken={(token: TokenDetails) =>
+          send({ type: "SHOW_TOKEN", data: token })
+        }
         onAddToken={() => send("SHOW_ADD_TOKEN")}
         wallet={state.context.wallets[state.context.selectedWallet]}
         accountNumber={
@@ -170,6 +174,29 @@ function App() {
         onSettings={() => send("SHOW_SETTINGS")}
         onAccountSelect={(address) => {
           send({ type: "SELECT_WALLET", data: address })
+        }}
+      />
+    )
+
+  if (state.matches("token"))
+    return (
+      <Token
+        token={state.context.selectedToken}
+        onBack={() => {
+          send("GO_BACK")
+        }}
+        onTransfer={(tokenAddress, recipient, amount) => {
+          send({
+            type: "APPROVE_TX",
+            data: {
+              to: tokenAddress,
+              method: "transfer",
+              calldata: {
+                recipient,
+                amount: amount.toHexString(),
+              },
+            },
+          })
         }}
       />
     )

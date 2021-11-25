@@ -1,9 +1,10 @@
 import { ethers } from "ethers"
-import { FC } from "react"
+import { FC, useState } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
 import { Button } from "../Button"
+import { CopyTooltip } from "../CopyTooltip"
 import { TokenAction } from "../Token"
 
 const PLAYGROUND_TEST_TOKEN =
@@ -15,7 +16,7 @@ const Alert = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 18px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   margin: 40px 20px;
@@ -42,16 +43,27 @@ const AlertButton = styled(Button)`
   width: 100px;
 `
 
-export const EmptyWalletAlert: FC<{
+interface EmptyWalletAlertProps {
+  walletAddress: string
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
-}> = ({ onAction }) => (
+}
+
+export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
+  walletAddress,
+  onAction,
+}) => (
   <Alert>
     <Title>Deposit Funds</Title>
     <Paragraph>
       Or learn how to deploy a contract and mint some tokens
     </Paragraph>
     <Buttons>
-      <AlertButton>Receive</AlertButton>
+      <CopyTooltip
+        copyValue={`starknet:${walletAddress}`}
+        message="Wallet address copied!"
+      >
+        <AlertButton>Receive</AlertButton>
+      </CopyTooltip>
       <AlertButton
         {...makeClickable(() => {
           onAction?.(PLAYGROUND_TEST_TOKEN, {

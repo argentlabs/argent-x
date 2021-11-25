@@ -1,6 +1,5 @@
 import { ethers } from "ethers"
-import { FC, Suspense } from "react"
-import CopyToClipboard from "react-copy-to-clipboard"
+import { FC, Suspense, useState } from "react"
 import usePromise from "react-promise-suspense"
 import styled from "styled-components"
 
@@ -20,6 +19,7 @@ import {
   AccountStatusIndicator,
 } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
+import { CopyTooltip } from "../components/CopyTooltip"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
@@ -72,8 +72,9 @@ const AccountName = styled(H1)`
 
 const TokenList: FC<{
   walletAddress: string
+  onShowToken: (token: TokenDetails) => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
-}> = ({ walletAddress, onAction }) => {
+}> = ({ walletAddress, onShowToken, onAction }) => {
   const tokens = useMitt(
     tokensMitt,
     "UPDATE",
@@ -96,10 +97,12 @@ const TokenList: FC<{
 
   return (
     <>
-      {!hasBalance && <EmptyWalletAlert onAction={onAction} />}
+      {!hasBalance && (
+        <EmptyWalletAlert walletAddress={walletAddress} onAction={onAction} />
+      )}
       {tokenDetails.map((token, i) => (
         <TokenListItem
-          key={i}
+          key={token.address}
           index={i}
           decimals={token.decimals?.toNumber()}
           balance={
@@ -107,7 +110,7 @@ const TokenList: FC<{
           }
           name={token.name || ""}
           symbol={token.symbol || ""}
-          onAction={(action) => onAction?.(token.address, action)}
+          onClick={() => onShowToken(token)}
         />
       ))}
     </>
@@ -118,9 +121,17 @@ export const Account: FC<{
   wallet: Wallet
   accountNumber: number
   onShowAccountList?: () => void
+  onShowToken: (token: TokenDetails) => void
   onAddToken?: () => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
-}> = ({ wallet, accountNumber, onShowAccountList, onAddToken, onAction }) => {
+}> = ({
+  wallet,
+  accountNumber,
+  onShowAccountList,
+  onShowToken,
+  onAddToken,
+  onAction,
+}) => {
   const { code, text } = useStatus(wallet)
 
   return (
@@ -131,7 +142,7 @@ export const Account: FC<{
           src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
-          <AccountNetwork>
+          <AccountNetwork title={text}>
             <span>Goerli alpha</span>
             <AccountStatusIndicator status={code} />
           </AccountNetwork>
@@ -152,15 +163,22 @@ export const Account: FC<{
             starknet: {truncateAddress(wallet.address)}
             <Open style={{ marginLeft: 7 }} />
           </AccountAddressLink>
-          <AccountAddressIconsWrapper>
-            <CopyToClipboard text={wallet.address}>
-              <Copy style={{ cursor: "pointer" }} />
-            </CopyToClipboard>
-          </AccountAddressIconsWrapper>
+          <CopyTooltip
+            copyValue={`starknet:${wallet.address}`}
+            message="Copied!"
+          >
+            <AccountAddressIconsWrapper>
+              <Copy />
+            </AccountAddressIconsWrapper>
+          </CopyTooltip>
         </AccountAddressWrapper>
 
         <Suspense fallback={<Spinner size={64} />}>
-          <TokenList onAction={onAction} walletAddress={wallet.address} />
+          <TokenList
+            onAction={onAction}
+            onShowToken={onShowToken}
+            walletAddress={wallet.address}
+          />
           <TokenWrapper {...makeClickable(onAddToken)}>
             <AddTokenIconButton size={40}>
               <Add />

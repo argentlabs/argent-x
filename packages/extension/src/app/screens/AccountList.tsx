@@ -37,9 +37,6 @@ const AccountRow = styled.div`
   justify-content: space-between;
 `
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {}
-
 interface AccountListPageProps {
   onAccountSelect?: (account: string) => void
   onAddAccount?: () => void
@@ -49,9 +46,9 @@ interface AccountListPageProps {
 }
 
 export const AccountListScreen: FC<AccountListPageProps> = ({
-  onAccountSelect = noop,
-  onAddAccount = noop,
-  onSettings = noop,
+  onAccountSelect,
+  onAddAccount,
+  onSettings,
   wallets,
   activeWallet,
 }) => {
@@ -70,7 +67,7 @@ export const AccountListScreen: FC<AccountListPageProps> = ({
             accountNumber={index + 1}
             address={wallet.address}
             status={getStatus(wallet, activeWallet)}
-            onClick={() => onAccountSelect(wallet.address)}
+            onClick={() => onAccountSelect?.(wallet.address)}
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
