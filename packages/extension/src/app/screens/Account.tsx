@@ -1,11 +1,9 @@
 import Tippy from "@tippyjs/react"
 import { FC, Suspense } from "react"
-import usePromise from "react-promise-suspense"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
-import { EmptyWalletAlert } from "../components/Account/EmptyWalletAlert"
 import {
   AccountColumn,
   AccountHeader,
@@ -16,25 +14,18 @@ import {
   AccountStatusIndicator,
 } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
+import { TokenList } from "../components/Account/TokenList"
 import { Tooltip } from "../components/CopyTooltip"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
   TokenAction,
-  TokenListItem,
   TokenTitle,
   TokenWrapper,
 } from "../components/Token"
-import { H1 } from "../components/Typography"
-import { useMitt } from "../hooks/useMitt"
 import { useStatus } from "../hooks/useStatus"
 import { makeClickable } from "../utils/a11y"
-import {
-  TokenDetails,
-  fetchTokenDetails,
-  getTokens,
-  tokensMitt,
-} from "../utils/tokens"
+import { TokenDetails } from "../utils/tokens"
 import { getAccountImageUrl } from "../utils/wallet"
 import { Wallet } from "../Wallet"
 
@@ -49,55 +40,16 @@ const AccountRow = styled(DefaultAccountRow)`
   justify-content: flex-end;
 `
 
-const TokenList: FC<{
-  walletAddress: string
-  onShowToken: (token: TokenDetails) => void
-  onAction?: (token: string, action: TokenAction) => Promise<void> | void
-}> = ({ walletAddress, onShowToken, onAction }) => {
-  const tokens = useMitt(
-    tokensMitt,
-    "UPDATE",
-    () => getTokens(walletAddress),
-    true,
-  )
-
-  const tokenDetails: TokenDetails[] = usePromise(
-    async (tokens: string[], walletAddress: string) =>
-      Promise.all(
-        tokens.map((address) => fetchTokenDetails(address, walletAddress)),
-      ),
-    [tokens, walletAddress],
-    Infinity,
-  )
-
-  const hasBalance = tokenDetails.some(
-    ({ balance }) => balance && !balance.isZero(),
-  )
-
-  return (
-    <>
-      {!hasBalance && (
-        <EmptyWalletAlert walletAddress={walletAddress} onAction={onAction} />
-      )}
-      {tokenDetails.map((token) => (
-        <TokenListItem
-          key={token.address}
-          token={token}
-          onClick={() => onShowToken(token)}
-        />
-      ))}
-    </>
-  )
-}
-
-export const Account: FC<{
+interface AccountProps {
   wallet: Wallet
   accountNumber: number
   onShowAccountList?: () => void
   onShowToken: (token: TokenDetails) => void
   onAddToken?: () => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
-}> = ({
+}
+
+export const Account: FC<AccountProps> = ({
   wallet,
   accountNumber,
   onShowAccountList,

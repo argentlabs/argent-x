@@ -28,33 +28,37 @@ const AccountName = styled(H1)`
   margin: 0;
 `
 
-export const AccountSubHeader: FC<{
+interface AccountSubheaderProps {
   status: WalletStatus
   accountNumber: number
   walletAddress: string
-}> = ({ status, accountNumber, walletAddress }) => {
-  return (
-    <>
-      <div>
-        <AccountName>{getAccountName(accountNumber)}</AccountName>
-        {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
-          <AccountStatusText>{status.text}</AccountStatusText>
-        )}
-      </div>
-      <AccountAddressWrapper>
-        <AccountAddressLink
-          href={`https://voyager.online/contract/${walletAddress}`}
-          target="_blank"
-        >
-          starknet: {truncateAddress(walletAddress)}
-          <Open style={{ marginLeft: 7 }} />
-        </AccountAddressLink>
-        <CopyTooltip copyValue={`starknet:${walletAddress}`} message="Copied!">
-          <AccountAddressIconsWrapper>
-            <Copy />
-          </AccountAddressIconsWrapper>
-        </CopyTooltip>
-      </AccountAddressWrapper>
-    </>
-  )
 }
+
+export const AccountSubHeader: FC<AccountSubheaderProps> = ({
+  status,
+  accountNumber,
+  walletAddress,
+}) => (
+  <>
+    <div>
+      <AccountName>{getAccountName(accountNumber)}</AccountName>
+      {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
+        <AccountStatusText>{status.text}</AccountStatusText>
+      )}
+    </div>
+    <AccountAddressWrapper>
+      <AccountAddressLink
+        href={`https://voyager.online/contract/${walletAddress}`}
+        target="_blank"
+      >
+        starknet: {truncateAddress(walletAddress)}
+        <Open style={{ marginLeft: 7 }} />
+      </AccountAddressLink>
+      <CopyTooltip copyValue={`starknet:${walletAddress}`} message="Copied!">
+        <AccountAddressIconsWrapper>
+          <Copy />
+        </AccountAddressIconsWrapper>
+      </CopyTooltip>
+    </AccountAddressWrapper>
+  </>
+)
