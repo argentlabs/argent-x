@@ -3,6 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../utils/a11y"
+import { TokenDetails, toDisplayToken } from "../utils/tokens"
 import { IconButton } from "./IconButton"
 import { TokenIcon } from "./TokenIcon"
 
@@ -71,23 +72,16 @@ export type TokenAction =
   | { type: "TRANSFER"; to: string; amount: BigNumber }
 
 interface TokenListItemProps {
-  symbol: string
-  name: string
-  balance: string
-  decimals?: number
-  index?: number
+  token: TokenDetails
   onClick?: () => void
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
-  balance,
-  name,
-  symbol,
-  index = 0,
-  decimals,
+  token,
   onClick,
   ...props
 }) => {
+  const { name, symbol, balance } = toDisplayToken(token)
   return (
     <div {...props} style={{ borderRadius: 4, overflow: "hidden" }}>
       <TokenWrapper {...makeClickable(onClick)}>

@@ -4,7 +4,7 @@ import styled from "styled-components"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
-import { AccountColumn } from "./Header"
+import { AccountColumn, AccountRow } from "./Header"
 import { AccountStatusIndicator, AccountStatusWrapper } from "./Network"
 import { ProfilePicture } from "./ProfilePicture"
 
@@ -33,13 +33,6 @@ export const AccountListItemWrapper = styled.div`
     background: rgba(255, 255, 255, 0.25);
     outline: 0;
   }
-`
-
-const AccountRow = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 `
 
 const AccountStatusText = styled.p`

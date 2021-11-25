@@ -3,7 +3,8 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import Settings from "../../assets/settings.svg"
-import { AccountList, AccountListItem } from "../components/Account/List"
+import { AccountList, AccountListItem } from "../components/Account/AccountList"
+import { AccountRow } from "../components/Account/Header"
 import { IconButton } from "../components/IconButton"
 import { H2 } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
@@ -28,13 +29,6 @@ const AccountListWrapper = styled.div`
 
 const IconButtonCenter = styled(IconButton)`
   margin: auto;
-`
-
-const AccountRow = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 `
 
 interface AccountListPageProps {

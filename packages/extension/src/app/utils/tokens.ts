@@ -8,7 +8,7 @@ import erc20Tokens from "../../assets/erc20-tokens.json"
 import { isValidAddress } from "./addresses"
 
 const playgroundToken = erc20Tokens.find(
-  ({ name }) => name === "Playground Test Token",
+  ({ name }) => name === "Playground Token",
 )
 
 if (!playgroundToken) {
