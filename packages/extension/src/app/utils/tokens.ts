@@ -1,9 +1,13 @@
 import { BigNumber } from "@ethersproject/bignumber"
+import { ethers } from "ethers"
 import mitt from "mitt"
 import { Abi, Contract } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
+
+export const PLAYGROUND_TEST_TOKEN =
+  "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
 
 const defaultErc20s = Object.fromEntries(
   erc20Tokens.map((token) => [token.address, token]),
@@ -57,6 +61,28 @@ export interface TokenDetails {
   decimals?: BigNumber
   balance?: BigNumber
 }
+
+export interface DisplayToken {
+  address: string
+  name: string
+  symbol: string
+  decimals: number
+  balance: string
+}
+
+export const toDisplayToken = ({
+  name,
+  symbol,
+  decimals,
+  balance,
+  ...rest
+}: TokenDetails): DisplayToken => ({
+  name: name || "Unknown token",
+  symbol: symbol || "",
+  decimals: decimals?.toNumber() || 0,
+  balance: ethers.utils.formatUnits(balance ?? 0, decimals) || "0",
+  ...rest,
+})
 
 export const fetchTokenDetails = async (
   address: string,

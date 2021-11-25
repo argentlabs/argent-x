@@ -1,25 +1,16 @@
 import { ethers } from "ethers"
-import { FC, useState } from "react"
+import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
+import { PLAYGROUND_TEST_TOKEN } from "../../utils/tokens"
+import { Alert } from "../Alert"
 import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
 import { TokenAction } from "../Token"
 
-const PLAYGROUND_TEST_TOKEN =
-  "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
-
-const Alert = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+const AlertWrapper = styled(Alert)`
   gap: 16px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  margin: 40px 20px;
 `
 
 const Title = styled.h2`
@@ -52,7 +43,7 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
   walletAddress,
   onAction,
 }) => (
-  <Alert>
+  <AlertWrapper>
     <Title>Deposit Funds</Title>
     <Paragraph>
       Or learn how to deploy a contract and mint some tokens
@@ -75,5 +66,5 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
         Mint
       </AlertButton>
     </Buttons>
-  </Alert>
+  </AlertWrapper>
 )

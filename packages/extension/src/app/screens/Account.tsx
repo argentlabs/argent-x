@@ -1,5 +1,6 @@
+import Tippy from "@tippyjs/react"
 import { ethers } from "ethers"
-import { FC, Suspense, useState } from "react"
+import { FC, Suspense } from "react"
 import usePromise from "react-promise-suspense"
 import styled from "styled-components"
 
@@ -11,7 +12,6 @@ import {
   AccountAddressLink,
   AccountAddressWrapper,
 } from "../components/Account/Address"
-import { truncateAddress } from "../components/Account/address.service"
 import { EmptyWalletAlert } from "../components/Account/EmptyWalletAlert"
 import { AccountColumn, AccountHeader } from "../components/Account/Header"
 import {
@@ -19,7 +19,7 @@ import {
   AccountStatusIndicator,
 } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
-import { CopyTooltip } from "../components/CopyTooltip"
+import { CopyTooltip, Tooltip } from "../components/CopyTooltip"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
@@ -32,6 +32,7 @@ import { H1 } from "../components/Typography"
 import { useMitt } from "../hooks/useMitt"
 import { useStatus } from "../hooks/useStatus"
 import { makeClickable } from "../utils/a11y"
+import { truncateAddress } from "../utils/address.service"
 import {
   TokenDetails,
   fetchTokenDetails,
@@ -142,10 +143,12 @@ export const Account: FC<{
           src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
-          <AccountNetwork title={text}>
-            <span>Goerli alpha</span>
-            <AccountStatusIndicator status={code} />
-          </AccountNetwork>
+          <Tippy content={<Tooltip>{text}</Tooltip>}>
+            <AccountNetwork title={text}>
+              <span>Goerli alpha</span>
+              <AccountStatusIndicator status={code} />
+            </AccountNetwork>
+          </Tippy>
         </AccountRow>
       </AccountHeader>
       <AccountContent>

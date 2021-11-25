@@ -3,8 +3,8 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../utils/a11y"
-import { getAccountColor } from "../utils/wallet"
 import { IconButton } from "./IconButton"
+import { TokenIcon } from "./TokenIcon"
 
 export const TokenWrapper = styled.div`
   display: flex;
@@ -20,13 +20,6 @@ export const TokenWrapper = styled.div`
     outline: 0;
     background: rgba(255, 255, 255, 0.25);
   }
-`
-
-const TokenIcon = styled.img`
-  height: 40px;
-  width: 40px;
-  border-radius: 40px;
-  flex: 0;
 `
 
 const TokenDetailsWrapper = styled.div`
@@ -95,13 +88,10 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   onClick,
   ...props
 }) => {
-  const color = getAccountColor(index + 3, false)
   return (
     <div {...props} style={{ borderRadius: 4, overflow: "hidden" }}>
       <TokenWrapper {...makeClickable(onClick)}>
-        <TokenIcon
-          src={`https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`}
-        />
+        <TokenIcon name={name} />
         <TokenDetailsWrapper>
           <TokenTextGroup>
             <TokenTitle>{symbol}</TokenTitle>
