@@ -23,6 +23,7 @@ const Title = styled.h2`
 const Paragraph = styled.p`
   font-size: 15px;
   line-height: 20px;
+  text-align: center;
 `
 
 const Buttons = styled.div`

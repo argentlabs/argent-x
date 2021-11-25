@@ -1,7 +1,5 @@
 import styled from "styled-components"
 
-import { H1 } from "../Typography"
-
 export const AccountAddressWrapper = styled.span`
   display: flex;
   align-items: center;
@@ -13,8 +11,8 @@ export const AccountAddressIconsWrapper = styled.span`
   gap: 6px;
   align-items: center;
   border: rgba(255, 255, 255, 0.15) solid 1px;
-  border-radius: 10px;
-  padding: 4px 4px;
+  border-radius: 12px;
+  padding: 5px;
   margin-left: 5px;
   cursor: pointer;
 
@@ -24,9 +22,9 @@ export const AccountAddressIconsWrapper = styled.span`
 `
 
 export const AccountAddressLink = styled.a`
-  font-size: 10px;
-  line-height: 12px;
-  max-width: 150px;
+  font-size: 12px;
+  line-height: 14px;
+  max-width: 170px;
   text-overflow: ellipsis;
   overflow: hidden;
   border: rgba(255, 255, 255, 0.15) solid 1px;
