@@ -5,9 +5,17 @@ import { Abi, Contract } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
+import { isValidAddress } from "./addresses"
 
-export const PLAYGROUND_TEST_TOKEN =
-  "0x4e3920043b272975b32dfc0121817d6e6a943dc266d7ead1e6152e472201f97"
+const playgroundToken = erc20Tokens.find(
+  ({ name }) => name === "Playground Test Token",
+)
+
+if (!playgroundToken) {
+  throw new Error("Need default token named 'Plauground Test Token")
+}
+
+export const PLAYGROUND_TEST_TOKEN = playgroundToken.address
 
 const defaultErc20s = Object.fromEntries(
   erc20Tokens.map((token) => [token.address, token]),
@@ -35,9 +43,6 @@ export const getTokens = (wallet: string): string[] =>
   Array.from(
     new Set([...Object.keys(defaultErc20s), ...getStoredTokens(wallet)]),
   )
-
-export const isValidAddress = (address: string): boolean =>
-  /^0x[0-9a-f]{63}$/.test(address)
 
 export const addToken = (
   wallet: string,

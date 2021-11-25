@@ -32,7 +32,7 @@ import { H1 } from "../components/Typography"
 import { useMitt } from "../hooks/useMitt"
 import { useStatus } from "../hooks/useStatus"
 import { makeClickable } from "../utils/a11y"
-import { truncateAddress } from "../utils/address.service"
+import { truncateAddress } from "../utils/addresses"
 import {
   TokenDetails,
   fetchTokenDetails,

@@ -8,11 +8,8 @@ import { Button } from "../components/Button"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
-import {
-  TokenDetails,
-  fetchTokenDetails,
-  isValidAddress,
-} from "../utils/tokens"
+import { isValidAddress } from "../utils/addresses"
+import { TokenDetails, fetchTokenDetails } from "../utils/tokens"
 
 const AddTokenScreen = styled.div`
   display: flex;

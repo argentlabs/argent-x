@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
-import { truncateAddress } from "../../utils/address.service"
+import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
 import { AccountColumn } from "./Header"
 import { AccountStatusIndicator, AccountStatusWrapper } from "./Network"
