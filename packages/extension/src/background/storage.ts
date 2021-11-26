@@ -16,16 +16,15 @@ export function setToStorage(key: string, value: any) {
 
 export class Storage<T extends Record<string, any>> {
   private NS: string
-  public defaults: Partial<T>
-  constructor(defaults: Partial<T> = {}, namespace: string = "") {
+  public defaults: T
+  constructor(defaults: T, namespace: string = "") {
     this.NS = namespace
     this.defaults = defaults
   }
-  async getItem<K extends keyof T>(key: K): Promise<T[K] | null> {
+  async getItem<K extends keyof T>(key: K): Promise<T[K]> {
     return (
       (await getFromStorage<T[K]>(this.NS + ":" + key.toString())) ??
-      this.defaults[key] ??
-      null
+      this.defaults[key]
     )
   }
   async setItem<K extends keyof T>(key: K, value: T[K]): Promise<void> {

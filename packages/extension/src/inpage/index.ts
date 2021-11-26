@@ -63,10 +63,8 @@ const starknetWindowObject: StarknetWindowObject = {
   isConnected: false,
   enable: () =>
     new Promise((res) => {
-      messenger.emit("CONNECT", {
-        host: window.location.hostname,
-      })
       messenger.listen((type, data) => {
+        console.log(type, data)
         const { starknet } = window
         if (starknet && type === "CONNECT_RES" && typeof data === "string") {
           starknet.signer = new WalletSigner(data)
@@ -74,6 +72,10 @@ const starknetWindowObject: StarknetWindowObject = {
           starknet.isConnected = true
           res([data])
         }
+      })
+
+      messenger.emit("CONNECT", {
+        host: window.location.hostname,
       })
     }),
 }

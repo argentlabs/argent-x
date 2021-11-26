@@ -1,53 +1,32 @@
 import { compactDecrypt } from "jose"
-import { encode } from "starknet"
+import { ec, encode } from "starknet"
 import browser from "webextension-polyfill"
 
 import { MessageType } from "../shared/MessageType"
 import { Messenger } from "../shared/Messenger"
 import { ActionItem, getQueue } from "./actionQueue"
-import { getKeyPair } from "./key"
+import { getKeyPair } from "./keys/communication"
+import {
+  createAccount,
+  existsL1,
+  getL1,
+  getWallets,
+  validatePassword,
+} from "./keys/l1"
 import { openUi } from "./openUi"
-import { Storage, getFromStorage, setToStorage } from "./storage"
+import {
+  getSession,
+  hasActiveSession,
+  startSession,
+  stopSession,
+} from "./session"
+import { Storage, setToStorage } from "./storage"
 import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
 const allowedSender = ["INJECT", "UI", "INPAGE"]
 
-browser.runtime.onConnect.addListener(async function (port) {
-  if (port.name !== "argent-x-content") return
-  browser.runtime.onConnect.addListener(function (uiPort) {
-    if (uiPort.name !== "argent-x-ui") return
-    const uiToContentForwarder = async (data: any) => {
-      port.postMessage(data)
-    }
-    const contentToUiForwarder = async (data: any) => {
-      uiPort.postMessage(data)
-    }
-
-    uiPort.onMessage.addListener(uiToContentForwarder)
-    port.onMessage.addListener(contentToUiForwarder)
-    uiPort.onDisconnect.addListener(() => {
-      port.onMessage.removeListener(uiToContentForwarder)
-    })
-    port.onDisconnect.addListener(() => {
-      uiPort.onMessage.removeListener(contentToUiForwarder)
-    })
-  })
-
+async function main() {
   const { privateKey, publicKeyJwk } = await getKeyPair()
-
-  const messenger = new Messenger<MessageType>(
-    (emit) => {
-      port.onMessage.addListener((data) => {
-        if (data.from && data.type && allowedSender.includes(data.from)) {
-          const { type, data: evData } = data
-          emit(type, evData)
-        }
-      })
-    },
-    (type, data) => {
-      port.postMessage({ from: "BACKGROUND", type, data })
-    },
-  )
 
   const actionQueue = await getQueue<ActionItem>("ACTIONS")
 
@@ -57,110 +36,198 @@ browser.runtime.onConnect.addListener(async function (port) {
     SELECTED_WALLET: "",
   })
 
-  messenger.listen(async (type, data) => {
-    switch (type) {
-      case "OPEN_UI": {
-        return openUi()
-      }
+  let uiPort: browser.Runtime.Port | undefined
+  let contentPort: browser.Runtime.Port | undefined
 
-      case "ADD_TRANSACTION": {
-        return await actionQueue.push({
-          type: "TRANSACTION",
-          payload: data as MessageType["ADD_TRANSACTION"],
+  browser.runtime.onConnect.addListener(async function (port) {
+    if (!port.name.startsWith("argent-x")) {
+      return console.warn("Not allowed", port.name)
+    }
+    if (port.name === "argent-x-content") {
+      contentPort = port
+      if (uiPort) {
+        port.onMessage.addListener((data) => {
+          uiPort?.postMessage(data)
         })
       }
-
-      case "GET_LATEST_ACTION_AND_COUNT": {
-        const action = await actionQueue.getLatest()
-        const count = await actionQueue.length()
-        return messenger.emit("GET_LATEST_ACTION_AND_COUNT_RES", {
-          action,
-          count,
+    } else if (port.name === "argent-x-ui") {
+      uiPort = port
+      if (contentPort) {
+        port.onMessage.addListener((data) => {
+          contentPort?.postMessage(data)
         })
       }
+    }
 
-      case "GET_SELECTED_WALLET_ADDRESS": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
+    console.log("CONNECT", port.name)
+    const messenger = new Messenger<MessageType>(
+      (emit) => {
+        port.onMessage.addListener((data) => {
+          console.log("BACKGROUND REC", data)
+          if (data.from && data.type && allowedSender.includes(data.from)) {
+            const { type, data: evData } = data
+            emit(type, evData)
+          }
+        })
+      },
+      (type, data) => {
+        console.log({ from: "BACKGROUND", type, data })
+        port.postMessage({ from: "BACKGROUND", type, data })
+      },
+    )
 
-        return messenger.emit(
-          "GET_SELECTED_WALLET_ADDRESS_RES",
-          selectedWallet || "",
-        )
-      }
+    messenger.listen(async (type, data) => {
+      switch (type) {
+        case "OPEN_UI": {
+          return openUi()
+        }
 
-      case "CONNECT": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
-        const isWhitelisted = await isOnWhitelist(
-          (data as MessageType["CONNECT"]).host,
-        )
-
-        if (!isWhitelisted) {
-          actionQueue.push({
-            type: "CONNECT",
-            payload: { host: (data as MessageType["CONNECT"]).host },
+        case "ADD_TRANSACTION": {
+          return await actionQueue.push({
+            type: "TRANSACTION",
+            payload: data as MessageType["ADD_TRANSACTION"],
           })
         }
 
-        if (isWhitelisted && selectedWallet)
-          return messenger.emit("CONNECT_RES", selectedWallet)
+        case "GET_LATEST_ACTION_AND_COUNT": {
+          const action = await actionQueue.getLatest()
+          const count = await actionQueue.length()
+          return messenger.emit("GET_LATEST_ACTION_AND_COUNT_RES", {
+            action,
+            count,
+          })
+        }
 
-        return openUi()
-      }
+        case "GET_SELECTED_WALLET_ADDRESS": {
+          const selectedWallet = await store.getItem("SELECTED_WALLET")
 
-      case "WALLET_CONNECTED": {
-        return store.setItem(
-          "SELECTED_WALLET",
-          data as MessageType["WALLET_CONNECTED"],
-        )
-      }
+          return messenger.emit(
+            "GET_SELECTED_WALLET_ADDRESS_RES",
+            selectedWallet || "",
+          )
+        }
 
-      case "SUBMITTED_TX":
-      case "FAILED_TX": {
-        return await actionQueue.removeLatest()
-      }
+        case "CONNECT": {
+          const selectedWallet = await store.getItem("SELECTED_WALLET")
+          const isWhitelisted = await isOnWhitelist(
+            (data as MessageType["CONNECT"]).host,
+          )
 
-      case "RESET_ALL": {
-        return browser.storage.local.clear()
-      }
+          if (!isWhitelisted) {
+            actionQueue.push({
+              type: "CONNECT",
+              payload: { host: (data as MessageType["CONNECT"]).host },
+            })
+          }
 
-      case "ADD_WHITELIST": {
-        return actionQueue.push({
-          type: "CONNECT",
-          payload: { host: data as MessageType["ADD_WHITELIST"] },
-        })
+          if (isWhitelisted && selectedWallet)
+            return messenger.emit("CONNECT_RES", selectedWallet)
+
+          return openUi()
+        }
+
+        case "WALLET_CONNECTED": {
+          return store.setItem(
+            "SELECTED_WALLET",
+            data as MessageType["WALLET_CONNECTED"],
+          )
+        }
+
+        case "SUBMITTED_TX":
+        case "FAILED_TX": {
+          return await actionQueue.removeLatest()
+        }
+
+        case "RESET_ALL": {
+          return browser.storage.local.clear()
+        }
+
+        case "ADD_WHITELIST": {
+          return actionQueue.push({
+            type: "CONNECT",
+            payload: { host: data as MessageType["ADD_WHITELIST"] },
+          })
+        }
+        case "APPROVE_WHITELIST": {
+          const selectedWallet = await store.getItem("SELECTED_WALLET")
+          await actionQueue.removeLatest()
+          await addToWhitelist(data as MessageType["APPROVE_WHITELIST"])
+
+          if (selectedWallet)
+            return messenger.emit("CONNECT_RES", selectedWallet)
+          return openUi()
+        }
+        case "REJECT_WHITELIST": {
+          return actionQueue.removeLatest()
+        }
+        case "REMOVE_WHITELIST": {
+          return removeFromWhitelist(data as MessageType["REMOVE_WHITELIST"])
+        }
+        case "IS_WHITELIST": {
+          const valid = await isOnWhitelist(data as MessageType["IS_WHITELIST"])
+          return messenger.emit("IS_WHITELIST_RES", valid)
+        }
+        case "RESET_WHITELIST": {
+          setToStorage(`WHITELIST:APPROVED`, [])
+          setToStorage(`WHITELIST:PENDING`, [])
+          return
+        }
+        case "REQ_PUB": {
+          return messenger.emit("REQ_PUB_RES", publicKeyJwk)
+        }
+        case "START_SESSION": {
+          const { secure, body } = data as MessageType["START_SESSION"]
+          if (secure !== true)
+            throw Error("session can only be started with encryption")
+          const { plaintext } = await compactDecrypt(body, privateKey)
+          const sessionPassword = encode.arrayBufferToString(plaintext)
+          if (await validatePassword(sessionPassword)) {
+            messenger.emit("START_SESSION_RES", undefined)
+            return startSession(sessionPassword, undefined, () =>
+              messenger.emit("STOP_SESSION", undefined),
+            )
+          }
+          return messenger.emit("START_SESSION_REJ", undefined)
+        }
+        case "HAS_SESSION": {
+          return messenger.emit("HAS_SESSION_RES", hasActiveSession())
+        }
+        case "STOP_SESSION": {
+          return stopSession()
+        }
+        case "IS_INITIALIZED": {
+          return messenger.emit("IS_INITIALIZED_RES", await existsL1())
+        }
+        case "GET_WALLETS": {
+          return messenger.emit("GET_WALLETS_RES", await getWallets())
+        }
+        case "NEW_ACCOUNT": {
+          const sessionPassword = getSession()
+          if (!sessionPassword) throw Error("you need an open session")
+
+          const newAccount = await createAccount(sessionPassword, (progress) =>
+            messenger.emit("REPORT_PROGRESS", progress),
+          )
+
+          store.setItem("SELECTED_WALLET", newAccount.address)
+
+          return messenger.emit("NEW_ACCOUNT_RES", newAccount)
+        }
+        case "SIGN": {
+          const sessionPassword = getSession()
+          if (!sessionPassword) throw Error("you need an open session")
+          const l1 = await getL1(sessionPassword)
+          const starkPair = ec.getKeyPair(l1.privateKey)
+          const { hash } = data as MessageType["SIGN"]
+          const { r, s } = ec.sign(starkPair, hash)
+          return messenger.emit("SIGN_RES", {
+            r: r.toString(),
+            s: s.toString(),
+          })
+        }
       }
-      case "APPROVE_WHITELIST": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
-        await actionQueue.removeLatest()
-        await addToWhitelist(data as MessageType["APPROVE_WHITELIST"])
-        if (selectedWallet) return messenger.emit("CONNECT_RES", selectedWallet)
-        return openUi()
-      }
-      case "REJECT_WHITELIST": {
-        return actionQueue.removeLatest()
-      }
-      case "REMOVE_WHITELIST": {
-        return removeFromWhitelist(data as MessageType["REMOVE_WHITELIST"])
-      }
-      case "IS_WHITELIST": {
-        const valid = await isOnWhitelist(data as MessageType["IS_WHITELIST"])
-        return messenger.emit("IS_WHITELIST_RES", valid)
-      }
-      case "RESET_WHITELIST": {
-        setToStorage(`WHITELIST:APPROVED`, [])
-        setToStorage(`WHITELIST:PENDING`, [])
-        return
-      }
-      case "REQ_PUB": {
-        return messenger.emit("REQ_PUB_RES", publicKeyJwk)
-      }
-      case "START_SESSION": {
-        const { enc, body } = data as MessageType["START_SESSION"]
-        if (enc !== true)
-          throw Error("session can only be started with encryption")
-        const { plaintext } = await compactDecrypt(body, privateKey)
-        console.log(encode.arrayBufferToString(plaintext))
-      }
-    }
+    })
   })
-})
+}
+
+main()

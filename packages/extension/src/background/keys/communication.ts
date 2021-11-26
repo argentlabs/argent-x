@@ -14,17 +14,17 @@ export async function getKeyPair() {
     console.log("GEN")
     const keypair = await generateKeyPair("ECDH-ES", { extractable: true })
 
-    publicKeyJwk = await exportJWK(keypair.publicKey)
+    publicKeyJwk = {
+      alg: "ECDH-ES",
+      ...(await exportJWK(keypair.publicKey)),
+    }
 
     browser.storage.local.set({
       PRIVATE_KEY: JSON.stringify({
         alg: "ECDH-ES",
         ...(await exportJWK(keypair.privateKey)),
       }),
-      PUBLIC_KEY: JSON.stringify({
-        alg: "ECDH-ES",
-        ...publicKeyJwk,
-      }),
+      PUBLIC_KEY: JSON.stringify(publicKeyJwk),
     })
 
     privateKey = keypair.privateKey

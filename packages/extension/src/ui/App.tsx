@@ -121,7 +121,8 @@ function App() {
   if (state.matches("settings"))
     return <Settings onBack={() => send("GO_BACK")} />
 
-  if (state.matches("account"))
+  if (state.matches("account")) {
+    console.log(state.context)
     return (
       <Account
         onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
@@ -164,6 +165,7 @@ function App() {
         }}
       />
     )
+  }
 
   if (state.matches("accountList"))
     return (

@@ -27,10 +27,13 @@ export class Messenger<M extends Record<string, any> = Record<string, any>> {
     this.actionArray = this.actionArray.filter((a) => a !== action)
   }
 
-  public waitForEvent(type: string, timeout = 5 * 60 * 1000): Promise<any> {
+  public waitForEvent<K extends keyof M>(
+    type: K,
+    timeout = 5 * 60 * 1000,
+  ): Promise<M[K]> {
     return new Promise((res, rej) => {
       const pid = setTimeout(() => rej("waitForEvent timeout"), timeout)
-      const handler: Emit<M> = (localType, data) => {
+      const handler: Emit<M> = (localType: keyof M, data) => {
         if (localType === type) {
           this.unlisten(handler)
           clearTimeout(pid)

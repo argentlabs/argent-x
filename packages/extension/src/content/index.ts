@@ -18,6 +18,7 @@ const port = browser.runtime.connect({ name: "argent-x-content" })
 const messenger = new Messenger<MessageType>(
   (emit) => {
     window.addEventListener("message", function (event) {
+      console.log("CONTENT", event?.data ?? event)
       port.postMessage(event.data)
       if (
         event.data.from &&

@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ethers } from "ethers"
-import { CompactEncrypt, importJWK } from "jose"
-import { Args, InvokeFunctionTransaction, KeyPair, ec, encode } from "starknet"
-import browser from "webextension-polyfill"
-import { DoneEvent, assign, createMachine } from "xstate"
+import { Args, InvokeFunctionTransaction, KeyPair } from "starknet"
+import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import {
   getLastSelectedWallet,
-  getPublicKey,
+  getWallets,
+  hasActiveSession,
+  isInitialized,
   messenger,
+  monitorProgress,
   readLatestActionAndCount,
+  startSession,
 } from "../utils/messaging"
 import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
@@ -137,11 +139,23 @@ export const routerMachine = createMachine<
     determineEntry: {
       invoke: {
         src: async (_ctx, ev) => {
-          const keyStore = getKeystoreFromLocalStorage()
-          const jsonKeyStore = JSON.parse(keyStore)
-          return { wallets: jsonKeyStore.wallets }
+          const initialized = await isInitialized()
+          if (!initialized) throw Error("Not initialized")
+
+          const hasSession = await hasActiveSession()
+
+          return hasSession
         },
-        onDone: { target: "enterPassword" },
+        onDone: [
+          {
+            target: "recover",
+            cond: (ctx, ev) => {
+              const event = ev as DoneInvokeEvent<boolean>
+              return event.data
+            },
+          },
+          { target: "enterPassword" },
+        ],
         onError: [
           {
             target: "disclaimer",
@@ -180,56 +194,20 @@ export const routerMachine = createMachine<
         src: async (ctx, event) => {
           if (event.type !== "SUBMIT_PASSWORD") throw Error("wrong entry point")
 
-          try {
-            const pubJwk = await getPublicKey()
-            const pubKey = await importJWK(pubJwk)
+          monitorProgress((progress) => {
+            useProgress.setState({ progress, text: "Decrypting ..." })
+          })
 
-            console.log(pubKey)
-
-            const encMsg = await new CompactEncrypt(
-              encode.utf8ToArray(event.data.password),
-            )
-              .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
-              .encrypt(pubKey)
-
-            messenger.emit("START_SESSION", { enc: true, body: encMsg })
-          } catch (e) {
-            console.error(e)
-          }
-
-          const keyStore = ctx.uploadedBackup ?? getKeystoreFromLocalStorage()
-          const jsonKeyStore = JSON.parse(keyStore)
-
-          const l1 = await ethers.Wallet.fromEncryptedJson(
-            keyStore,
-            event.data.password,
-            (progress) =>
-              useProgress.setState({ progress, text: "Decrypting ..." }),
-          )
+          await startSession(event.data.password)
 
           useProgress.setState({ progress: 0, text: "" })
-
-          return {
-            l1,
-            wallets: jsonKeyStore.wallets,
-            keyStore,
-            password: event.data.password,
-          }
         },
         onDone: {
           target: "recover",
           actions: [
-            assign((_, ev) => ({
-              password: ev.data.password,
+            assign((_, _ev) => ({
               error: undefined,
             })),
-            (_, ev) => {
-              try {
-                getKeystoreFromLocalStorage()
-              } catch {
-                localStorage.setItem(KEYSTORE_KEY, ev.data.keyStore)
-              }
-            },
           ],
         },
 
@@ -245,35 +223,42 @@ export const routerMachine = createMachine<
     recover: {
       invoke: {
         src: async (_, event) => {
-          const ev = event as DoneEvent
-          const wallet: ethers.Wallet = ev.data.l1
-          const wallets: string[] = ev.data.wallets
-
+          const wallets = await getWallets()
+          console.log("wallets", wallets)
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
+          console.log("lastSelectedWallet", lastSelectedWallet)
+
           const selectedWalletIndex =
             (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
 
-          // if transactions are pending show them first
+          // if actions are pending show them first
           const requestedActions = await readLatestActionAndCount().catch(
             () => null,
           )
-
-          console.log(requestedActions)
-
-          const keyPair = ec.getKeyPair(wallet.privateKey)
-          return {
-            l1: wallet,
+          console.log({
             wallets: wallets
-              .map((address) => new Wallet(address, keyPair))
+              .map((address) => new Wallet(address))
               .reduce((acc, wallet) => {
                 return {
                   ...acc,
                   [wallet.address]: wallet,
                 }
               }, {}),
-            signer: keyPair,
+            selectedWallet: wallets[selectedWalletIndex],
+
+            requestedActions,
+          })
+          return {
+            wallets: wallets
+              .map((address) => new Wallet(address))
+              .reduce((acc, wallet) => {
+                return {
+                  ...acc,
+                  [wallet.address]: wallet,
+                }
+              }, {}),
             selectedWallet: wallets[selectedWalletIndex],
 
             requestedActions,
@@ -332,43 +317,23 @@ export const routerMachine = createMachine<
       on: { SHOW_CREATE_NEW: "newSeed", SHOW_RECOVER: "uploadKeystore" },
     },
     newSeed: {
-      on: { GO_BACK: "welcome", GENERATE_L1: "generateL1" },
-    },
-    generateL1: {
-      invoke: {
-        src: async (ctx, event) => {
-          useProgress.setState({ progress: 0, text: "Generate Keypair..." })
-          if (event.type === "GENERATE_L1")
-            return {
-              l1: ethers.Wallet.createRandom(),
-              password: event.data.password,
-            }
-          throw Error("no password provided")
-        },
-        onDone: {
-          target: "deployWallet",
-          actions: assign((_ctx, { data }) => ({
-            ...data,
-          })),
-        },
-        onError: "welcome",
-      },
+      on: { GO_BACK: "welcome", GENERATE_L1: "deployWallet" },
     },
     deployWallet: {
       invoke: {
-        src: async (ctx) => {
+        src: async (ctx, event) => {
           useProgress.setState({
             progress: 0,
             text: "Deploying...",
           })
-          const newWallet = await Wallet.fromDeploy(
-            ctx.l1!.privateKey,
-            ctx.l1!.address,
-          )
+
+          if (event.type === "GENERATE_L1")
+            await startSession(event.data.password)
+
+          const newWallet = await Wallet.fromDeploy()
 
           return {
             newWallet,
-            password: ctx.password!,
           }
         },
         onDone: {
@@ -387,42 +352,7 @@ export const routerMachine = createMachine<
     downloadBackup: {
       invoke: {
         src: async (ctx) => {
-          const password = ctx.password!
-          if (password) {
-            const backup = await ctx.l1!.encrypt(
-              password,
-              {
-                scrypt: {
-                  // The number must be a power of 2 (default: 131072 = 2 ^ 17)
-                  N: isDev ? 64 : 32768,
-                },
-              },
-              (progress) =>
-                useProgress.setState({ progress, text: "Encrypting..." }),
-            )
-            useProgress.setState({ progress: 0, text: "" })
-
-            const extendedBackup = JSON.stringify(
-              {
-                ...JSON.parse(backup),
-                wallets: Object.keys(ctx.wallets),
-              },
-              null,
-              2,
-            )
-            const blob = new Blob([extendedBackup], {
-              type: "application/json",
-            })
-            const url = URL.createObjectURL(blob)
-            browser.downloads.download({
-              url,
-              filename: "starknet-backup.json",
-            })
-
-            localStorage.setItem(KEYSTORE_KEY, extendedBackup)
-          } else {
-            throw new Error("no password provided")
-          }
+          console.log("DOWNLOAD...")
         },
         onDone: "account",
         onError: {

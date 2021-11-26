@@ -27,5 +27,19 @@ export type MessageType = {
   RESET_ALL: undefined
   REQ_PUB: undefined
   REQ_PUB_RES: JWK
-  START_SESSION: { enc: true; body: string }
+  NEW_ACCOUNT: undefined
+  STOP_SESSION: undefined
+  NEW_ACCOUNT_RES: { txHash: string; address: string; wallets: string[] }
+  REPORT_PROGRESS: number
+  HAS_SESSION: undefined
+  HAS_SESSION_RES: boolean
+  IS_INITIALIZED: undefined
+  IS_INITIALIZED_RES: boolean
+  GET_WALLETS: undefined
+  GET_WALLETS_RES: string[]
+  START_SESSION: { secure: true; body: string }
+  START_SESSION_REJ: undefined
+  START_SESSION_RES: undefined
+  SIGN: { hash: string }
+  SIGN_RES: { r: string; s: string }
 }
