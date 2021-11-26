@@ -51,3 +51,8 @@ export type MessageType =
   | { type: "START_SESSION_RES" }
   | { type: "SIGN"; data: { hash: string } }
   | { type: "SIGN_RES"; data: { r: string; s: string } }
+
+export type WindowMessageType = {
+  forwarded?: boolean
+  extensionId: string
+} & MessageType

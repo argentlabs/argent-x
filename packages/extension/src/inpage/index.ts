@@ -6,7 +6,7 @@ import {
   defaultProvider,
 } from "starknet"
 
-import { MessageType } from "../shared/MessageType"
+import { MessageType, WindowMessageType } from "../shared/MessageType"
 
 const extId = document
   .getElementById("argent-x-extension")
@@ -35,7 +35,10 @@ declare global {
 }
 
 function sendMessage(msg: MessageType): void {
-  return window.postMessage(msg, window.location.origin)
+  return window.postMessage(
+    { ...msg, extensionId: extId },
+    window.location.origin,
+  )
 }
 
 // window.ethereum like
@@ -46,7 +49,7 @@ const starknetWindowObject: StarknetWindowObject = {
   isConnected: false,
   enable: () =>
     new Promise((res) => {
-      const handler = function (event: MessageEvent<MessageType>) {
+      const handler = function (event: MessageEvent<WindowMessageType>) {
         const { starknet } = window
         if (
           starknet &&
@@ -78,7 +81,7 @@ export class WalletSigner extends Provider implements SignerInterface {
   private waitForMsgOfType(type: string, timeout = 5 * 60 * 1000) {
     return new Promise((res, rej) => {
       const pid = setTimeout(() => rej("Timeout"), timeout)
-      const handler = (event: MessageEvent<MessageType>) => {
+      const handler = (event: MessageEvent<WindowMessageType>) => {
         if (event.data.type === type) {
           clearTimeout(pid)
           window.removeEventListener("message", handler)
