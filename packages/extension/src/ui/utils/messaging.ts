@@ -8,10 +8,6 @@ import {
   waitForMessage,
 } from "../../shared/messages"
 
-messageStream.subscribe(([msg, sender]) => {
-  console.log("ui", msg, sender)
-})
-
 export const readLatestActionAndCount = async (): Promise<{
   action: ActionItem | null
   count: number
@@ -47,7 +43,6 @@ export const getWallets = async (): Promise<string[]> => {
 
 export const startSession = async (password: string): Promise<void> => {
   const pubJwk = await getPublicKey()
-  console.log(pubJwk)
   const pubKey = await importJWK(pubJwk)
 
   const encMsg = await new CompactEncrypt(encode.utf8ToArray(password))

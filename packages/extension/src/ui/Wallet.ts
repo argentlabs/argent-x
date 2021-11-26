@@ -70,8 +70,6 @@ export class Wallet {
     sendMessage({ type: "SIGN", data: { hash: messageHash } })
     const { r, s } = await waitForMessage("SIGN_RES")
 
-    console.log(r, s)
-
     return this.contract.invoke(
       "execute",
       {

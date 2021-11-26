@@ -224,11 +224,10 @@ export const routerMachine = createMachine<
       invoke: {
         src: async (_, event) => {
           const wallets = await getWallets()
-          console.log("wallets", wallets)
+
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
-          console.log("lastSelectedWallet", lastSelectedWallet)
 
           const selectedWalletIndex =
             (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
@@ -237,19 +236,7 @@ export const routerMachine = createMachine<
           const requestedActions = await readLatestActionAndCount().catch(
             () => null,
           )
-          console.log({
-            wallets: wallets
-              .map((address) => new Wallet(address))
-              .reduce((acc, wallet) => {
-                return {
-                  ...acc,
-                  [wallet.address]: wallet,
-                }
-              }, {}),
-            selectedWallet: wallets[selectedWalletIndex],
 
-            requestedActions,
-          })
           return {
             wallets: wallets
               .map((address) => new Wallet(address))
@@ -337,7 +324,7 @@ export const routerMachine = createMachine<
           }
         },
         onDone: {
-          target: "downloadBackup",
+          target: "account",
           actions: assign((ctx, { data }) => ({
             ...ctx,
             selectedWallet: data.newWallet.address,
@@ -346,18 +333,6 @@ export const routerMachine = createMachine<
               [data.newWallet.address]: data.newWallet,
             },
           })),
-        },
-      },
-    },
-    downloadBackup: {
-      invoke: {
-        src: async (ctx) => {
-          console.log("DOWNLOAD...")
-        },
-        onDone: "account",
-        onError: {
-          target: "determineEntry",
-          actions: (_, ev) => console.error(ev),
         },
       },
     },

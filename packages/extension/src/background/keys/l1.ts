@@ -74,10 +74,8 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     if (!recoverPromise) recoverPromise = recoverL1(password)
     const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
-    console.log(hashString(password), await store.getItem("passwordHash"))
     store.setItem("passwordHash", hashString(password))
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
-    console.log("encKeyPair", encKeyPair)
     store.setItem("walletAddresses", encKeyPair.wallets ?? [])
     return recoveredWallet
   } else {

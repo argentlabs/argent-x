@@ -11,7 +11,6 @@ export async function getKeyPair() {
     "PUBLIC_KEY",
   ])) as { PRIVATE_KEY?: string; PUBLIC_KEY?: string }
   if (!(PRIVATE_KEY && PUBLIC_KEY)) {
-    console.log("GEN")
     const keypair = await generateKeyPair("ECDH-ES", { extractable: true })
 
     publicKeyJwk = {
@@ -30,8 +29,6 @@ export async function getKeyPair() {
     privateKey = keypair.privateKey
     publicKey = keypair.publicKey
   } else {
-    console.log("REC")
-
     publicKeyJwk = JSON.parse(PUBLIC_KEY)
     privateKey = (await importJWK(JSON.parse(PRIVATE_KEY))) as KeyLike
     publicKey = (await importJWK(publicKeyJwk)) as KeyLike

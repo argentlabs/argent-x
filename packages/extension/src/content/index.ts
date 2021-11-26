@@ -14,10 +14,8 @@ script.setAttribute("data-extension-id", argentExtensionId)
 container.insertBefore(script, container.children[0])
 
 window.addEventListener("message", function (event: MessageEvent<MessageType>) {
-  console.log("FORWARD INPAGE -> BG", event.data)
-  if (!("forwarded" in event.data)) sendMessage({ ...event.data })
+  if (!("forwarded" in event.data)) sendMessage({ ...event.data }) // circut breaker
 })
 messageStream.subscribe(([msg]) => {
-  console.log("FORWARD BG -> INPAGE", msg)
   window.postMessage({ ...msg, forwarded: true }, window.location.origin)
 })
