@@ -26,6 +26,7 @@
     "dev": "webpack --watch"
   },
   "dependencies": {
+    "@extend-chrome/messages": "^1.2.2",
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
     "@tippyjs/react": "^4.2.6",

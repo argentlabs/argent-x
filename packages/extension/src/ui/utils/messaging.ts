@@ -1,76 +1,64 @@
 import { CompactEncrypt, JWK, importJWK } from "jose"
 import { encode } from "starknet"
-import browser from "webextension-polyfill"
 
 import type { ActionItem } from "../../background/actionQueue"
-import { MessageType } from "../../shared/MessageType"
-import { Messenger } from "../../shared/Messenger"
+import {
+  messageStream,
+  sendMessage,
+  waitForMessage,
+} from "../../shared/messages"
 
-const allowedSender = ["INJECT", "INPAGE", "BACKGROUND"]
-const port = browser.runtime.connect({ name: "argent-x-ui" })
-export const messenger = new Messenger<MessageType>(
-  (emit) => {
-    port.onMessage.addListener(function (msg) {
-      console.log(msg)
-      if (msg.from && msg.type && allowedSender.includes(msg.from)) {
-        const { type, data } = msg
-        emit(type, data)
-      }
-    })
-  },
-  (type, data) => {
-    console.log({ from: "UI", type, data })
-    port.postMessage({ from: "UI", type, data })
-  },
-)
+messageStream.subscribe(([msg, sender]) => {
+  console.log("ui", msg, sender)
+})
 
 export const readLatestActionAndCount = async (): Promise<{
   action: ActionItem | null
   count: number
 }> => {
-  messenger.emit("GET_LATEST_ACTION_AND_COUNT", undefined)
-  return messenger.waitForEvent("GET_LATEST_ACTION_AND_COUNT_RES", 2000)
+  sendMessage({ type: "GET_LATEST_ACTION_AND_COUNT" })
+  return waitForMessage("GET_LATEST_ACTION_AND_COUNT_RES")
 }
 
 export const getLastSelectedWallet = async (): Promise<string | undefined> => {
-  messenger.emit("GET_SELECTED_WALLET_ADDRESS", undefined)
-  return messenger.waitForEvent("GET_SELECTED_WALLET_ADDRESS_RES", 2000)
+  sendMessage({ type: "GET_SELECTED_WALLET_ADDRESS" })
+  return waitForMessage("GET_SELECTED_WALLET_ADDRESS_RES")
 }
 
 export const getPublicKey = async (): Promise<JWK> => {
-  messenger.emit("REQ_PUB", undefined)
-  return messenger.waitForEvent("REQ_PUB_RES", 2000)
+  sendMessage({ type: "REQ_PUB" })
+  return waitForMessage("REQ_PUB_RES")
 }
 
 export const isInitialized = async (): Promise<boolean> => {
-  messenger.emit("IS_INITIALIZED", undefined)
-  return messenger.waitForEvent("IS_INITIALIZED_RES", 2000)
+  sendMessage({ type: "IS_INITIALIZED" })
+  return await waitForMessage("IS_INITIALIZED_RES")
 }
 
 export const hasActiveSession = async (): Promise<boolean> => {
-  messenger.emit("HAS_SESSION", undefined)
-  return messenger.waitForEvent("HAS_SESSION_RES", 2000)
+  sendMessage({ type: "HAS_SESSION" })
+  return waitForMessage("HAS_SESSION_RES")
 }
 
 export const getWallets = async (): Promise<string[]> => {
-  messenger.emit("GET_WALLETS", undefined)
-  return messenger.waitForEvent("GET_WALLETS_RES", 2000)
+  sendMessage({ type: "GET_WALLETS" })
+  return waitForMessage("GET_WALLETS_RES")
 }
 
 export const startSession = async (password: string): Promise<void> => {
   const pubJwk = await getPublicKey()
+  console.log(pubJwk)
   const pubKey = await importJWK(pubJwk)
 
   const encMsg = await new CompactEncrypt(encode.utf8ToArray(password))
     .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
     .encrypt(pubKey)
 
-  messenger.emit("START_SESSION", { secure: true, body: encMsg })
+  sendMessage({ type: "START_SESSION", data: { secure: true, body: encMsg } })
 
   const succeeded = await Promise.race([
-    messenger.waitForEvent("START_SESSION_RES", 3000).then(() => true),
-    messenger
-      .waitForEvent("START_SESSION_REJ", 2000)
+    waitForMessage("START_SESSION_RES").then(() => true),
+    waitForMessage("START_SESSION_REJ")
       .then(() => false)
       .catch(() => false),
   ])
@@ -79,16 +67,9 @@ export const startSession = async (password: string): Promise<void> => {
 }
 
 export const monitorProgress = (updateFn: (progress: number) => void) => {
-  const handler = <K extends keyof MessageType>(
-    type: K,
-    data: MessageType[K],
-  ) => {
-    if (type === "REPORT_PROGRESS") {
-      updateFn(data as MessageType["REPORT_PROGRESS"])
-      if (data === 1) {
-        messenger.unlisten(handler)
-      }
+  messageStream.subscribe(([msg]) => {
+    if (msg.type === "REPORT_PROGRESS") {
+      updateFn(msg.data)
     }
-  }
-  messenger.listen(handler)
+  })
 }

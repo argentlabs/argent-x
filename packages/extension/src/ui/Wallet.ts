@@ -7,7 +7,6 @@ import {
   CompiledContract,
   Contract,
   compileCalldata,
-  ec,
   encode,
   hash,
   json,
@@ -15,7 +14,7 @@ import {
   stark,
 } from "starknet"
 
-import { messenger } from "./utils/messaging"
+import { sendMessage, waitForMessage } from "../shared/messages"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -68,11 +67,8 @@ export class Wallet {
       hash.hashMessage(this.address, address, selector, calldata, nonce),
     )
 
-    messenger.emit("SIGN", { hash: messageHash })
-    const { r, s } = await messenger.waitForEvent(
-      "SIGN_RES",
-      5 * 60 * 60 * 1000,
-    )
+    sendMessage({ type: "SIGN", data: { hash: messageHash } })
+    const { r, s } = await waitForMessage("SIGN_RES")
 
     console.log(r, s)
 
@@ -89,11 +85,9 @@ export class Wallet {
   }
 
   public static async fromDeploy(): Promise<Wallet> {
-    messenger.emit("NEW_ACCOUNT", undefined)
-    const deployTransaction = await messenger.waitForEvent(
-      "NEW_ACCOUNT_RES",
-      5 * 60 * 60 * 1000,
-    )
+    sendMessage({ type: "NEW_ACCOUNT" })
+
+    const deployTransaction = await waitForMessage("NEW_ACCOUNT_RES")
 
     return new Wallet(deployTransaction.address, deployTransaction.txHash)
   }

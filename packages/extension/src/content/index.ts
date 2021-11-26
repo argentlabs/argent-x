@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
 
+import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { Messenger } from "../shared/Messenger"
 
 const container = document.head || document.documentElement
 const script = document.createElement("script")
@@ -13,32 +13,11 @@ script.setAttribute("data-extension-id", argentExtensionId)
 
 container.insertBefore(script, container.children[0])
 
-const allowedSender = ["INPAGE", "UI", "BACKGROUND"]
-const port = browser.runtime.connect({ name: "argent-x-content" })
-const messenger = new Messenger<MessageType>(
-  (emit) => {
-    window.addEventListener("message", function (event) {
-      console.log("CONTENT", event?.data ?? event)
-      port.postMessage(event.data)
-      if (
-        event.data.from &&
-        event.data.type &&
-        allowedSender.includes(event.data.from)
-      ) {
-        const { type, data } = event.data
-        emit(type, data)
-      }
-    })
-    port.onMessage.addListener(function (msg) {
-      window.postMessage(msg, "*")
-      if (msg.from && msg.type && allowedSender.includes(msg.from)) {
-        const { type, data } = msg
-        emit(type, data)
-      }
-    })
-  },
-  (type, data) => {
-    window.postMessage({ from: "INJECT", type, data }, "*")
-    port.postMessage({ from: "INJECT", type, data })
-  },
-)
+window.addEventListener("message", function (event: MessageEvent<MessageType>) {
+  console.log("FORWARD INPAGE -> BG", event.data)
+  if (!("forwarded" in event.data)) sendMessage({ ...event.data })
+})
+messageStream.subscribe(([msg]) => {
+  console.log("FORWARD BG -> INPAGE", msg)
+  window.postMessage({ ...msg, forwarded: true }, window.location.origin)
+})

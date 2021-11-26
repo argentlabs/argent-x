@@ -1,10 +1,10 @@
 import { FC } from "react"
 import styled from "styled-components"
 
+import { sendMessage } from "../../shared/messages"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { H2, P } from "../components/Typography"
-import { messenger } from "../utils/messaging"
 
 const SettingsScreen = styled.div`
   display: flex;
@@ -28,7 +28,7 @@ export const Settings: FC<{ onBack?: () => void }> = ({ onBack }) => {
       </P>
       <Button
         onClick={() => {
-          messenger.emit("RESET_WHITELIST", undefined)
+          sendMessage({ type: "RESET_WHITELIST" })
           onBack?.()
         }}
       >

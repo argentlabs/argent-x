@@ -66,11 +66,13 @@ async function generateL1(): Promise<ethers.Wallet> {
   return ethers.Wallet.createRandom()
 }
 
+let recoverPromise: Promise<ethers.Wallet> | undefined
 export async function getL1(password: string): Promise<ethers.Wallet> {
   if (rawWallet) {
     return rawWallet
   } else if (await existsL1()) {
-    const recoveredWallet = await recoverL1(password)
+    if (!recoverPromise) recoverPromise = recoverL1(password)
+    const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
     console.log(hashString(password), await store.getItem("passwordHash"))
     store.setItem("passwordHash", hashString(password))
@@ -129,7 +131,6 @@ export async function createAccount(
   password: string,
   progressFn: (progress: number) => void = () => {},
 ) {
-  progressFn(0)
   const l1 = await getL1(password)
   const starkPair = ec.getKeyPair(l1.privateKey)
   const starkPub = ec.getStarkKey(starkPair)
@@ -150,19 +151,15 @@ export async function createAccount(
     throw new Error("Deploy transaction failed")
   }
 
-  const encKeyStore = await getEncKeyStore(
-    l1,
-    password,
-    [...wallets, deployTransaction.address!],
-    progressFn,
-  )
+  const encKeyStore = await getEncKeyStore(l1, password, [
+    ...wallets,
+    deployTransaction.address!,
+  ])
   store.setItem("encKeystore", encKeyStore)
   store.setItem("walletAddresses", [...wallets, deployTransaction.address!])
   store.setItem("passwordHash", hashString(password))
 
   downloadTextFile(encKeyStore, "starknet-backup.json")
-
-  progressFn(1)
   return {
     address: deployTransaction.address!,
     txHash: deployTransaction.transaction_hash,

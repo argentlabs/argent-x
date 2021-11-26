@@ -3,12 +3,12 @@ import { ethers } from "ethers"
 import { Args, InvokeFunctionTransaction, KeyPair } from "starknet"
 import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
+import { sendMessage } from "../../shared/messages"
 import {
   getLastSelectedWallet,
   getWallets,
   hasActiveSession,
   isInitialized,
-  messenger,
   monitorProgress,
   readLatestActionAndCount,
   startSession,
@@ -363,7 +363,7 @@ export const routerMachine = createMachine<
     },
     account: {
       entry: async (ctx) => {
-        messenger.emit("WALLET_CONNECTED", ctx.selectedWallet!)
+        sendMessage({ type: "WALLET_CONNECTED", data: ctx.selectedWallet! })
       },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",
@@ -427,8 +427,8 @@ export const routerMachine = createMachine<
         RESET: {
           target: "determineEntry",
           actions: () => {
+            sendMessage({ type: "RESET_ALL" })
             localStorage.clear()
-            messenger.emit("RESET_ALL", undefined)
           },
         },
       },
@@ -448,9 +448,11 @@ export const routerMachine = createMachine<
         REJECT_TX: {
           target: "account",
           actions: (ctx) => {
-            messenger.emit("FAILED_TX", {
-              tx: ctx.txToApprove as InvokeFunctionTransaction,
+            sendMessage({
+              type: "FAILED_TX",
+              data: { tx: ctx.txToApprove as InvokeFunctionTransaction },
             })
+
             if (ctx.isPopup) window.close()
           },
         },
@@ -499,9 +501,12 @@ export const routerMachine = createMachine<
               txHash: event.data,
             })),
             (ctx, event) => {
-              messenger.emit("SUBMITTED_TX", {
-                tx: ctx.txToApprove as InvokeFunctionTransaction,
-                txHash: event.data,
+              sendMessage({
+                type: "SUBMITTED_TX",
+                data: {
+                  txHash: event.data,
+                  tx: ctx.txToApprove as InvokeFunctionTransaction,
+                },
               })
             },
           ],
@@ -509,8 +514,9 @@ export const routerMachine = createMachine<
         onError: {
           target: "determineEntry",
           actions: (ctx) => {
-            messenger.emit("FAILED_TX", {
-              tx: ctx.txToApprove as InvokeFunctionTransaction,
+            sendMessage({
+              type: "FAILED_TX",
+              data: { tx: ctx.txToApprove as InvokeFunctionTransaction },
             })
           },
         },
@@ -524,13 +530,19 @@ export const routerMachine = createMachine<
         AGREE: {
           target: "accountList",
           actions: (ctx) => {
-            messenger.emit("APPROVE_WHITELIST", ctx.hostToWhitelist!)
+            sendMessage({
+              type: "APPROVE_WHITELIST",
+              data: ctx.hostToWhitelist!,
+            })
           },
         },
         REJECT: {
           target: "accountList",
           actions: (ctx) => {
-            messenger.emit("REJECT_WHITELIST", ctx.hostToWhitelist!)
+            sendMessage({
+              type: "REJECT_WHITELIST",
+              data: ctx.hostToWhitelist!,
+            })
           },
         },
       },
