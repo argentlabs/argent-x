@@ -37,20 +37,24 @@ const AccountRow = styled(DefaultAccountRow)`
 
 interface AccountProps {
   wallet: Wallet
+  networkId: string
   accountNumber: number
   onShowAccountList?: () => void
   onShowToken: (token: TokenDetails) => void
   onAddToken?: () => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
+  onChangeNetwork: (networkId: string) => Promise<void> | void
 }
 
 export const Account: FC<AccountProps> = ({
   wallet,
   accountNumber,
+  networkId,
   onShowAccountList,
   onShowToken,
   onAddToken,
   onAction,
+  onChangeNetwork,
 }) => {
   const status = useStatus(wallet)
   return (
@@ -61,7 +65,10 @@ export const Account: FC<AccountProps> = ({
           src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
-          <NetworkSwitcher />
+          <NetworkSwitcher
+            networkId={networkId}
+            onChangeNetwork={onChangeNetwork}
+          />
         </AccountRow>
       </AccountHeader>
       <AccountContent>

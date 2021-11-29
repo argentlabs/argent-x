@@ -39,8 +39,10 @@ async function main() {
 
   const store = new Storage<{
     SELECTED_WALLET: string
+    SELECTED_NETWORK: string
   }>({
     SELECTED_WALLET: "",
+    SELECTED_NETWORK: "mainnet",
   })
 
   messageStream.subscribe(async ([msg, sender]) => {
@@ -214,6 +216,15 @@ async function main() {
             s: s.toString(),
           },
         })
+      }
+      case "GET_NETWORK": {
+        return sendToTabAndUi({
+          type: "GET_NETWORK_RES",
+          data: await store.getItem("SELECTED_NETWORK"),
+        })
+      }
+      case "CHANGE_NETWORK": {
+        return store.setItem("SELECTED_NETWORK", msg.data)
       }
       case "RECOVER_KEYSTORE": {
         await setKeystore(msg.data)

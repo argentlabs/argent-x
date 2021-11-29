@@ -8,9 +8,11 @@ import {
   waitForMessage,
 } from "../../shared/messages"
 
-messageStream.subscribe(([message]) => {
-  console.log("Received message", message)
-})
+if (process.env.NODE_ENV === "development") {
+  messageStream.subscribe(([message]) => {
+    console.log("Received message", message)
+  })
+}
 
 export const readLatestActionAndCount = async (): Promise<{
   action: ActionItem | null
@@ -71,6 +73,11 @@ export const startSession = async (password: string): Promise<void> => {
   ])
 
   if (!succeeded) throw Error("Wrong password")
+}
+
+export const getNetworkId = async () => {
+  sendMessage({ type: "GET_NETWORK" })
+  return waitForMessage("GET_NETWORK_RES")
 }
 
 export const monitorProgress = (updateFn: (progress: number) => void) => {

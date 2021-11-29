@@ -53,6 +53,9 @@ export type MessageType =
   | { type: "RECOVER_KEYSTORE_RES" }
   | { type: "SIGN"; data: { hash: string } }
   | { type: "SIGN_RES"; data: { r: string; s: string } }
+  | { type: "GET_NETWORK" }
+  | { type: "GET_NETWORK_RES"; data: string }
+  | { type: "CHANGE_NETWORK"; data: string }
 
 export type WindowMessageType = {
   forwarded?: boolean

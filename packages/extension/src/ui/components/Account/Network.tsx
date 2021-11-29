@@ -85,10 +85,18 @@ export const AccountStatusIndicator = styled.span<{
       : "transparent"};
 `
 
-interface NetworkSwitcherProps {}
+interface NetworkSwitcherProps {
+  networkId: string
+  onChangeNetwork: (networkId: string) => Promise<void> | void
+}
 
-export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({}) => {
-  const currentNetwork = defaultNetworks[0]
+export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
+  networkId,
+  onChangeNetwork,
+}) => {
+  const currentNetwork =
+    defaultNetworks.find(({ id }) => id === networkId) || defaultNetworks[0]
+
   const otherNetworks = defaultNetworks.filter(
     ({ id }) => id !== currentNetwork.id,
   )
@@ -101,7 +109,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({}) => {
       </AccountNetwork>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
-          <AccountNetwork key={id}>
+          <AccountNetwork key={id} onClick={() => onChangeNetwork(id)}>
             <span>{name}</span>
             <AccountStatusIndicator status="CONNECTED" />
           </AccountNetwork>

@@ -5,6 +5,7 @@ import { DoneInvokeEvent, assign, createMachine } from "xstate"
 import { sendMessage } from "../../shared/messages"
 import {
   getLastSelectedWallet,
+  getNetworkId,
   getWallets,
   hasActiveSession,
   isInitialized,
@@ -34,6 +35,7 @@ type RouterEvents =
   | { type: "REJECT" }
   | { type: "SUBMIT_KEYSTORE"; data: string }
   | { type: "SELECT_WALLET"; data: string }
+  | { type: "CHANGE_NETWORK"; data: string }
   | {
       type: "SUBMIT_PASSWORD"
       data: { password: string }
@@ -49,6 +51,7 @@ type RouterEvents =
 
 interface Context {
   wallets: Record<string, Wallet>
+  networkId: string
   selectedWallet?: string
   selectedToken?: TokenDetails
   uploadedBackup?: string
@@ -128,6 +131,7 @@ export const routerMachine = createMachine<
   initial: "determineEntry",
   context: {
     wallets: {},
+    networkId: "mainnet",
   },
   states: {
     determineEntry: {
@@ -216,17 +220,14 @@ export const routerMachine = createMachine<
       invoke: {
         src: async (_, event) => {
           const wallets = await getWallets()
-          console.log(wallets)
+          const networkId = await getNetworkId()
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
-          console.log(lastSelectedWallet)
 
           const selectedWalletIndex =
             (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
-          console.log(selectedWalletIndex)
-          console.log(wallets[selectedWalletIndex])
 
           // if actions are pending show them first
           const requestedActions = await readLatestActionAndCount().catch(
@@ -243,6 +244,7 @@ export const routerMachine = createMachine<
                 }
               }, {}),
             selectedWallet: wallets[selectedWalletIndex],
+            networkId,
 
             requestedActions,
           }
@@ -341,6 +343,18 @@ export const routerMachine = createMachine<
         SHOW_TOKEN: "token",
         SHOW_ADD_TOKEN: "addToken",
         APPROVE_TX: "approveTx",
+        CHANGE_NETWORK: {
+          target: "account",
+          actions: [
+            assign((ctx, { data }) => ({
+              ...ctx,
+              networkId: data,
+            })),
+            (ctx, { data }) => {
+              sendMessage({ type: "CHANGE_NETWORK", data })
+            },
+          ],
+        },
       },
     },
     accountList: {

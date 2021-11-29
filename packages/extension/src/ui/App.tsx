@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 
+import { sendMessage } from "../shared/messages"
 import { Account } from "./screens/Account"
 import { AccountListScreen } from "./screens/AccountList"
 import { AddToken } from "./screens/AddToken"
@@ -130,6 +131,7 @@ function App() {
         }
         onAddToken={() => send("SHOW_ADD_TOKEN")}
         wallet={state.context.wallets[state.context.selectedWallet]}
+        networkId={state.context.networkId}
         accountNumber={
           Object.keys(state.context.wallets).findIndex(
             (wallet) => wallet === state.context.selectedWallet,
@@ -161,6 +163,9 @@ function App() {
               },
             })
           }
+        }}
+        onChangeNetwork={(networkId) => {
+          send({ type: "CHANGE_NETWORK", data: networkId })
         }}
       />
     )
