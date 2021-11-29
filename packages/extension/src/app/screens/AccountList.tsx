@@ -3,8 +3,8 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import Settings from "../../assets/settings.svg"
+import { AccountList, AccountListItem } from "../components/Account/AccountList"
 import { AccountRow } from "../components/Account/Header"
-import { AccountList, AccountListItem } from "../components/Account/List"
 import { IconButton } from "../components/IconButton"
 import { H2 } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
@@ -31,9 +31,6 @@ const IconButtonCenter = styled(IconButton)`
   margin: auto;
 `
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {}
-
 interface AccountListPageProps {
   onAccountSelect?: (account: string) => void
   onAddAccount?: () => void
@@ -43,9 +40,9 @@ interface AccountListPageProps {
 }
 
 export const AccountListScreen: FC<AccountListPageProps> = ({
-  onAccountSelect = noop,
-  onAddAccount = noop,
-  onSettings = noop,
+  onAccountSelect,
+  onAddAccount,
+  onSettings,
   wallets,
   activeWallet,
 }) => {
@@ -58,19 +55,15 @@ export const AccountListScreen: FC<AccountListPageProps> = ({
         </IconButton>
       </AccountRow>
       <AccountList>
-        {wallets.map((wallet, index) => {
-          return (
-            <AccountListItem
-              key={wallet.address}
-              accountNumber={index + 1}
-              address={wallet.address}
-              status={getStatus(wallet, activeWallet)}
-              onClick={() => {
-                onAccountSelect(wallet.address)
-              }}
-            />
-          )
-        })}
+        {wallets.map((wallet, index) => (
+          <AccountListItem
+            key={wallet.address}
+            accountNumber={index + 1}
+            address={wallet.address}
+            status={getStatus(wallet, activeWallet)}
+            onClick={() => onAccountSelect?.(wallet.address)}
+          />
+        ))}
         <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
           <Add />
         </IconButtonCenter>

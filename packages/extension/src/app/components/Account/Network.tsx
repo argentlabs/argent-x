@@ -1,14 +1,23 @@
 import styled from "styled-components"
 
 import { WalletStatusCode } from "../../utils/wallet"
-import { P } from "../Typography"
 
-export const AccountNetwork = styled(P)`
+export const AccountNetwork = styled.div`
+  display: flex;
+  align-items: center;
+
   font-weight: 600;
-  font-size: 14px;
-  line-height: 17px;
-  text-align: right;
+  font-size: 12px;
+  line-height: 14.4px;
   margin-bottom: 2px;
+
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  padding: 8px 12px;
+
+  & > span {
+    padding-right: 5px;
+  }
 `
 export const AccountStatusWrapper = styled.div`
   display: flex;
@@ -16,13 +25,8 @@ export const AccountStatusWrapper = styled.div`
   justify-content: right;
   gap: 4px;
 `
-export const AccountStatusText = styled(P)`
-  font-size: 10px;
-  line-height: 12px;
-  text-align: right;
-  vertical-align: bottom;
-`
-export const AccountStatusIndicator = styled.div<{
+
+export const AccountStatusIndicator = styled.span<{
   status?: WalletStatusCode
 }>`
   height: 8px;

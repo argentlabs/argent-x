@@ -99,7 +99,7 @@ export const Password: FC<PasswordProps> = ({
           <FormError>{errors.password.message}</FormError>
         )}
 
-        <A {...makeClickable(onForgotPassword)}>or import backup</A>
+        <A {...makeClickable(onForgotPassword)}>reset or import backup</A>
         <Button type="submit" disabled={!isDirty}>
           Unlock
         </Button>

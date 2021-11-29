@@ -1,9 +1,15 @@
 import { BigNumber } from "@ethersproject/bignumber"
+import { ethers } from "ethers"
 import mitt from "mitt"
 import { Abi, Contract } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
+import { isValidAddress } from "./addresses"
+
+export const playgroundToken = erc20Tokens.find(
+  ({ name }) => name === "Playground Tokenx",
+)
 
 const defaultErc20s = Object.fromEntries(
   erc20Tokens.map((token) => [token.address, token]),
@@ -32,9 +38,6 @@ export const getTokens = (wallet: string): string[] =>
     new Set([...Object.keys(defaultErc20s), ...getStoredTokens(wallet)]),
   )
 
-export const isValidAddress = (address: string): boolean =>
-  /^0x[0-9a-f]{63}$/.test(address)
-
 export const addToken = (
   wallet: string,
   token: { address: string; symbol: string; name: string; decimals: string },
@@ -57,6 +60,28 @@ export interface TokenDetails {
   decimals?: BigNumber
   balance?: BigNumber
 }
+
+export interface TokenView {
+  address: string
+  name: string
+  symbol: string
+  decimals: number
+  balance: string
+}
+
+export const toTokenView = ({
+  name,
+  symbol,
+  decimals,
+  balance,
+  ...rest
+}: TokenDetails): TokenView => ({
+  name: name || "Unknown token",
+  symbol: symbol || "",
+  decimals: decimals?.toNumber() || 0,
+  balance: ethers.utils.formatUnits(balance ?? 0, decimals) || "0",
+  ...rest,
+})
 
 export const fetchTokenDetails = async (
   address: string,

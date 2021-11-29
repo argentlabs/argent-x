@@ -10,11 +10,11 @@ import {
   readPendingWhitelist,
   readRequestedTransactions,
 } from "../utils/messaging"
-import { addToken } from "../utils/tokens"
+import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
 import { useProgress } from "./progress"
 
-export type TxRequest = { to: string; method: string; calldata: Args }
+export type TransactionRequest = { to: string; method: string; calldata: Args }
 
 type RouterEvents =
   | { type: "SHOW_CREATE_NEW" }
@@ -23,6 +23,7 @@ type RouterEvents =
   | { type: "RESET" }
   | { type: "REJECT_TX" }
   | { type: "SHOW_ACCOUNT_LIST" }
+  | { type: "SHOW_TOKEN"; data: TokenDetails }
   | { type: "SHOW_ADD_TOKEN" }
   | { type: "SHOW_SETTINGS" }
   | { type: "FORGOT_PASSWORD" }
@@ -39,22 +40,30 @@ type RouterEvents =
       data: { address: string; symbol: string; name: string; decimals: string }
     }
   | { type: "ADD_WALLET" }
-  | { type: "APPROVE_TX"; data: TxRequest | InvokeFunctionTransaction }
+  | { type: "APPROVE_TX"; data: TransactionRequest | InvokeFunctionTransaction }
   | { type: "APPROVED_TX" }
   | { type: "GENERATE_L1"; data: { password: string } }
 
 interface Context {
+  wallets: Record<string, Wallet>
   password?: string
   selectedWallet?: string
+  selectedToken?: TokenDetails
   l1?: ethers.Wallet
   uploadedBackup?: string
   signer?: KeyPair
-  txToApprove?: TxRequest | InvokeFunctionTransaction
+  txToApprove?: TransactionRequest | InvokeFunctionTransaction
   txHash?: string
-  wallets: Record<string, Wallet>
   isPopup?: boolean
   hostToWhitelist?: string
   error?: string
+}
+
+interface SigningContext {
+  l1: ethers.Wallet
+  password: string
+  signer: KeyPair
+  selectedWallet: string
 }
 
 type RouterTypestate =
@@ -80,39 +89,24 @@ type RouterTypestate =
         | "accountList"
         | "deployWallet"
         | "addToken"
-      context: Context & {
-        l1: ethers.Wallet
-        password: string
-        signer: KeyPair
-        selectedWallet: string
-      }
+      context: Context & SigningContext
+    }
+  | {
+      value: "token"
+      context: Context & SigningContext & { selectedToken: string }
     }
   | {
       value: "approveTx" | "submitTx"
-      context: Context & {
-        l1: ethers.Wallet
-        password: string
-        signer: KeyPair
-        selectedWallet: string
-        txToApprove: TxRequest
-      }
+      context: Context & SigningContext & { txToApprove: TransactionRequest }
     }
   | {
       value: "submittedTx"
-      context: Context & {
-        l1: ethers.Wallet
-        password: string
-        signer: KeyPair
-        selectedWallet: string
-        txToApprove: TxRequest
-        txHash: string
-      }
+      context: Context &
+        SigningContext & { txToApprove: TransactionRequest; txHash: string }
     }
   | {
       value: "connect"
-      context: Context & {
-        hostToWhitelist: string
-      }
+      context: Context & { hostToWhitelist: string }
     }
 
 const isDev = process.env.NODE_ENV === "development"
@@ -426,6 +420,7 @@ export const routerMachine = createMachine<
       },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",
+        SHOW_TOKEN: "token",
         SHOW_ADD_TOKEN: "addToken",
         APPROVE_TX: "approveTx",
       },
@@ -440,6 +435,19 @@ export const routerMachine = createMachine<
         },
         ADD_WALLET: "deployWallet",
         SHOW_SETTINGS: "settings",
+      },
+    },
+    token: {
+      entry: assign((_, event) => {
+        if (event.type === "SHOW_TOKEN") {
+          return {
+            selectedToken: event.data,
+          }
+        }
+        return {}
+      }),
+      on: {
+        GO_BACK: "account",
       },
     },
     addToken: {

@@ -4,7 +4,6 @@ export const AccountHeader = styled.header`
   display: flex;
   gap: 9px;
   padding: 16px;
-  background-color: #272727;
 `
 
 export const AccountColumn = styled.div`
