@@ -6,10 +6,7 @@ import {
   Calldata,
   CompiledContract,
   Contract,
-  KeyPair,
   compileCalldata,
-  defaultProvider,
-  ec,
   encode,
   hash,
   json,
@@ -17,19 +14,19 @@ import {
   stark,
 } from "starknet"
 
+import { sendMessage, waitForMessage } from "../shared/messages"
+
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
 )
 
 export class Wallet {
   address: string
-  signer: KeyPair
   deployTransaction?: string
   contract: Contract
 
-  constructor(address: string, signer: KeyPair, deployTransaction?: string) {
+  constructor(address: string, deployTransaction?: string) {
     this.address = address
-    this.signer = signer
     this.deployTransaction = deployTransaction
     this.contract = new Contract(ArgentCompiledContractJson.abi, address)
 
@@ -69,7 +66,9 @@ export class Wallet {
     const messageHash = encode.addHexPrefix(
       hash.hashMessage(this.address, address, selector, calldata, nonce),
     )
-    const { r, s } = ec.sign(this.signer, messageHash)
+
+    sendMessage({ type: "SIGN", data: { hash: messageHash } })
+    const { r, s } = await waitForMessage("SIGN_RES")
 
     return this.contract.invoke(
       "execute",
@@ -83,37 +82,11 @@ export class Wallet {
     )
   }
 
-  public static async fromDeploy(
-    seedOrKeyPair: string | KeyPair,
-    l1Address = "0",
-    overwriteSeed?: string,
-  ): Promise<Wallet> {
-    const starkKeyPair =
-      typeof seedOrKeyPair === "string"
-        ? ec.getKeyPair(seedOrKeyPair)
-        : seedOrKeyPair
-    const starkPub = ec.getStarkKey(starkKeyPair)
+  public static async fromDeploy(): Promise<Wallet> {
+    sendMessage({ type: "NEW_ACCOUNT" })
 
-    const seed = overwriteSeed ?? ec.getStarkKey(ec.genKeyPair())
+    const deployTransaction = await waitForMessage("NEW_ACCOUNT_RES")
 
-    const deployTransaction = await defaultProvider.deployContract(
-      ArgentCompiledContract,
-      compileCalldata({
-        signer: starkPub,
-        guardian: "0",
-        L1_address: stark.makeAddress(l1Address),
-      }),
-      seed,
-    )
-
-    if (deployTransaction.code !== "TRANSACTION_RECEIVED") {
-      throw new Error("Deploy transaction failed")
-    }
-
-    return new Wallet(
-      deployTransaction.address!,
-      starkKeyPair,
-      deployTransaction.transaction_hash,
-    )
+    return new Wallet(deployTransaction.address, deployTransaction.txHash)
   }
 }

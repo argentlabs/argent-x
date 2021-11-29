@@ -1419,6 +1419,15 @@
     "@ethersproject/properties" "^5.5.0"
     "@ethersproject/strings" "^5.5.0"
 
+"@extend-chrome/messages@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@extend-chrome/messages/-/messages-1.2.2.tgz#7d4eb446a6527ee922692fbaada90b28e03e3e7a"
+  integrity sha512-1VyUCT+1jewkm7cVBE5fMrrazxuL5QrmCOg2azmItBpiTqwmV/XxhGDQAtfsT4i24xB4gwL0s7+6PpEPec+1mw==
+  dependencies:
+    "@types/chrome" "0.0.99"
+    "@types/node" "^13.9.0"
+    rxjs "^6.5.4 || ^7.1.0"
+
 "@gar/promisify@^1.0.1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.2.tgz#30aa825f11d438671d585bd44e7fd564535fc210"
@@ -2695,6 +2704,13 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/svelte/-/svelte-2.0.1.tgz#0e8d7caa693e9b2afce5e622c0475bb0fd89c12c"
   integrity sha512-aqkICXbM1oX5FfgZd2qSSAGdyo/NRxjWCamxoyi3T8iVQnzGge19HhDYzZ6NrVOW7bhcWNSq9XexWFtMzbB24A==
 
+"@types/chrome@0.0.99":
+  version "0.0.99"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.99.tgz#9453a5082a5291e78a0d24604b69796b16e9342c"
+  integrity sha512-la87+bjtZ6XstGqUdaLT5YfECSPw9Ex9iYQUOMGlBtgqI6FLGewGZtkByX5TcPBHM6XKp6RnR50Ytd+tI2m/6Q==
+  dependencies:
+    "@types/filesystem" "*"
+
 "@types/eslint-scope@^3.7.0":
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.1.tgz#8dc390a7b4f9dd9f1284629efce982e41612116e"
@@ -2720,6 +2736,18 @@
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
+
+"@types/filesystem@*":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@types/filesystem/-/filesystem-0.0.32.tgz#307df7cc084a2293c3c1a31151b178063e0a8edf"
+  integrity sha512-Yuf4jR5YYMR2DVgwuCiP11s0xuVRyPKmz8vo6HBY3CGdeMj8af93CFZX+T82+VD1+UqHOxTq31lO7MI7lepBtQ==
+  dependencies:
+    "@types/filewriter" "*"
+
+"@types/filewriter@*":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/filewriter/-/filewriter-0.0.29.tgz#a48795ecadf957f6c0d10e0c34af86c098fa5bee"
+  integrity sha512-BsPXH/irW0ht0Ji6iw/jJaK8Lj3FJemon2gvEqHKpCdDCeemHa+rI3WBGq5z7cDMZgoLjY40oninGxqk+8NzNQ==
 
 "@types/hoist-non-react-statics@*":
   version "3.3.1"
@@ -2758,6 +2786,11 @@
   version "16.11.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.6.tgz#6bef7a2a0ad684cf6e90fcfe31cecabd9ce0a3ae"
   integrity sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==
+
+"@types/node@^13.9.0":
+  version "13.13.52"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.52.tgz#03c13be70b9031baaed79481c0c0cfb0045e53f7"
+  integrity sha512-s3nugnZumCC//n4moGGe6tkNMyYEdaDBitVjwPxXmR5lnMG5dHePinH2EdxkG3Rh1ghFHHixAG4NJhpJW1rthQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -6210,6 +6243,11 @@ jest-worker@^27.0.6:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
+jose@^4.3.6:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.3.6.tgz#82988bca38e8a2759d561ae99c07ff50b66c8258"
+  integrity sha512-A/JgZGUerqG2IMuxkUDBtZ4aTxg/l1Y+pt/QAAYiRAR3EFlxIE0Su0xdpB8tQcPZK5eudB7g1PHCZ5uHatbY+g==
+
 js-sha3@0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.8.0.tgz#b9b7a5da73afad7dedd0f8c463954cbde6818840"
@@ -8344,6 +8382,13 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
+"rxjs@^6.5.4 || ^7.1.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.4.0.tgz#a12a44d7eebf016f5ff2441b87f28c9a51cebc68"
+  integrity sha512-7SQDi7xeTMCJpqViXh8gL/lebcwlp3d831F05+9B44A4B0WfsEwUQHR64gsH1kvJ+Ep/J9K2+n1hVl1CsGN23w==
+  dependencies:
+    tslib "~2.1.0"
+
 rxjs@^6.6.0:
   version "6.6.7"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
@@ -9223,6 +9268,11 @@ tslib@^2.0.0, tslib@^2.0.3:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
+
+tslib@~2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
+  integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
 
 tsutils@^3.21.0:
   version "3.21.0"

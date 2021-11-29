@@ -3,7 +3,7 @@ const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 
 const htmlPlugin = new HtmlWebPackPlugin({
-  template: "./src/index.html",
+  template: "./src/ui/index.html",
   filename: "./index.html",
 })
 
@@ -11,8 +11,8 @@ const isProd = process.env.NODE_ENV === "production"
 
 module.exports = {
   entry: {
-    main: "./src/index",
-    inject: "./src/inject",
+    main: "./src/ui",
+    inject: "./src/content",
     inpage: "./src/inpage",
     background: "./src/background",
   },
@@ -51,7 +51,7 @@ module.exports = {
     htmlPlugin,
     new CopyPlugin({
       patterns: [
-        { from: "./src/favicon.ico", to: "favicon.ico" },
+        { from: "./src/ui/favicon.ico", to: "favicon.ico" },
         { from: "./src/manifest.json", to: "manifest.json" },
         { from: "./src/assets", to: "assets" },
       ],

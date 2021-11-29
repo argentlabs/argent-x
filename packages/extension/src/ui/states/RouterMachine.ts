@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ethers } from "ethers"
-import { Args, InvokeFunctionTransaction, KeyPair, ec } from "starknet"
-import browser from "webextension-polyfill"
-import { DoneEvent, assign, createMachine } from "xstate"
+import { Args, InvokeFunctionTransaction } from "starknet"
+import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
+import { sendMessage } from "../../shared/messages"
 import {
   getLastSelectedWallet,
-  messenger,
-  readPendingWhitelist,
-  readRequestedTransactions,
+  getWallets,
+  hasActiveSession,
+  isInitialized,
+  monitorProgress,
+  readLatestActionAndCount,
+  startSession,
+  uploadKeystore,
 } from "../utils/messaging"
 import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
@@ -46,12 +49,9 @@ type RouterEvents =
 
 interface Context {
   wallets: Record<string, Wallet>
-  password?: string
   selectedWallet?: string
   selectedToken?: TokenDetails
-  l1?: ethers.Wallet
   uploadedBackup?: string
-  signer?: KeyPair
   txToApprove?: TransactionRequest | InvokeFunctionTransaction
   txHash?: string
   isPopup?: boolean
@@ -60,9 +60,6 @@ interface Context {
 }
 
 interface SigningContext {
-  l1: ethers.Wallet
-  password: string
-  signer: KeyPair
   selectedWallet: string
 }
 
@@ -136,11 +133,23 @@ export const routerMachine = createMachine<
     determineEntry: {
       invoke: {
         src: async (_ctx, ev) => {
-          const keyStore = getKeystoreFromLocalStorage()
-          const jsonKeyStore = JSON.parse(keyStore)
-          return { wallets: jsonKeyStore.wallets }
+          const initialized = await isInitialized()
+          if (!initialized) throw Error("Not initialized")
+
+          const hasSession = await hasActiveSession()
+
+          return hasSession
         },
-        onDone: { target: "enterPassword" },
+        onDone: [
+          {
+            target: "recover",
+            cond: (ctx, ev) => {
+              const event = ev as DoneInvokeEvent<boolean>
+              return event.data
+            },
+          },
+          { target: "enterPassword" },
+        ],
         onError: [
           {
             target: "disclaimer",
@@ -179,40 +188,19 @@ export const routerMachine = createMachine<
         src: async (ctx, event) => {
           if (event.type !== "SUBMIT_PASSWORD") throw Error("wrong entry point")
 
-          const keyStore = ctx.uploadedBackup ?? getKeystoreFromLocalStorage()
-          const jsonKeyStore = JSON.parse(keyStore)
+          monitorProgress((progress) => {
+            useProgress.setState({ progress, text: "Decrypting ..." })
+          })
 
-          const l1 = await ethers.Wallet.fromEncryptedJson(
-            keyStore,
-            event.data.password,
-            (progress) =>
-              useProgress.setState({ progress, text: "Decrypting ..." }),
-          )
+          await startSession(event.data.password)
 
           useProgress.setState({ progress: 0, text: "" })
-
-          return {
-            l1,
-            wallets: jsonKeyStore.wallets,
-            keyStore,
-            password: event.data.password,
-          }
         },
         onDone: {
           target: "recover",
-          actions: [
-            assign((_, ev) => ({
-              password: ev.data.password,
-              error: undefined,
-            })),
-            (_, ev) => {
-              try {
-                getKeystoreFromLocalStorage()
-              } catch {
-                localStorage.setItem(KEYSTORE_KEY, ev.data.keyStore)
-              }
-            },
-          ],
+          actions: assign((_, _ev) => ({
+            error: undefined,
+          })),
         },
 
         onError: {
@@ -227,54 +215,51 @@ export const routerMachine = createMachine<
     recover: {
       invoke: {
         src: async (_, event) => {
-          const ev = event as DoneEvent
-          const wallet: ethers.Wallet = ev.data.l1
-          const wallets: string[] = ev.data.wallets
+          const wallets = await getWallets()
+          console.log(wallets)
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
+          console.log(lastSelectedWallet)
+
           const selectedWalletIndex =
             (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
+          console.log(selectedWalletIndex)
+          console.log(wallets[selectedWalletIndex])
 
-          // if transactions are pending show them first
-          const requestedTransactions = await readRequestedTransactions().catch(
-            () => [],
+          // if actions are pending show them first
+          const requestedActions = await readLatestActionAndCount().catch(
+            () => null,
           )
-          // if hosts are pending for connect
-          const requestedConnects = await readPendingWhitelist().catch(() => [])
 
-          const keyPair = ec.getKeyPair(wallet.privateKey)
           return {
-            l1: wallet,
             wallets: wallets
-              .map((address) => new Wallet(address, keyPair))
+              .map((address) => new Wallet(address))
               .reduce((acc, wallet) => {
                 return {
                   ...acc,
                   [wallet.address]: wallet,
                 }
               }, {}),
-            signer: keyPair,
             selectedWallet: wallets[selectedWalletIndex],
 
-            requestedTransactions,
-            requestedConnects,
+            requestedActions,
           }
         },
         onDone: [
           {
             target: "approveTx",
             cond: (_ctx, ev) => {
-              return Boolean(ev.data?.requestedTransactions?.length)
+              return ev.data?.requestedActions?.action?.type === "TRANSACTION"
             },
             actions: [
               assign((_, event) => {
-                const { requestedTransactions, ...ctx } = event.data
+                const { requestedActions, ...ctx } = event.data
                 return {
                   ...ctx,
                   uploadedBackup: undefined,
-                  txToApprove: requestedTransactions?.[0],
+                  txToApprove: requestedActions?.action?.payload,
                   isPopup: true,
                 }
               }),
@@ -283,15 +268,15 @@ export const routerMachine = createMachine<
           {
             target: "connect",
             cond: (_ctx, ev) => {
-              return Boolean(ev.data?.requestedConnects?.length)
+              return ev.data?.requestedActions?.action?.type === "CONNECT"
             },
             actions: [
               assign((_, event) => {
-                const { requestedConnects, ...ctx } = event.data
+                const { requestedActions, ...ctx } = event.data
                 return {
                   ...ctx,
                   uploadedBackup: undefined,
-                  hostToWhitelist: requestedConnects?.[0],
+                  hostToWhitelist: requestedActions?.action?.payload?.host,
                   isPopup: true,
                 }
               }),
@@ -315,47 +300,27 @@ export const routerMachine = createMachine<
       on: { SHOW_CREATE_NEW: "newSeed", SHOW_RECOVER: "uploadKeystore" },
     },
     newSeed: {
-      on: { GO_BACK: "welcome", GENERATE_L1: "generateL1" },
-    },
-    generateL1: {
-      invoke: {
-        src: async (ctx, event) => {
-          useProgress.setState({ progress: 0, text: "Generate Keypair..." })
-          if (event.type === "GENERATE_L1")
-            return {
-              l1: ethers.Wallet.createRandom(),
-              password: event.data.password,
-            }
-          throw Error("no password provided")
-        },
-        onDone: {
-          target: "deployWallet",
-          actions: assign((_ctx, { data }) => ({
-            ...data,
-          })),
-        },
-        onError: "welcome",
-      },
+      on: { GO_BACK: "welcome", GENERATE_L1: "deployWallet" },
     },
     deployWallet: {
       invoke: {
-        src: async (ctx) => {
+        src: async (ctx, event) => {
           useProgress.setState({
             progress: 0,
             text: "Deploying...",
           })
-          const newWallet = await Wallet.fromDeploy(
-            ctx.l1!.privateKey,
-            ctx.l1!.address,
-          )
+
+          if (event.type === "GENERATE_L1")
+            await startSession(event.data.password)
+
+          const newWallet = await Wallet.fromDeploy()
 
           return {
             newWallet,
-            password: ctx.password!,
           }
         },
         onDone: {
-          target: "downloadBackup",
+          target: "account",
           actions: assign((ctx, { data }) => ({
             ...ctx,
             selectedWallet: data.newWallet.address,
@@ -367,56 +332,9 @@ export const routerMachine = createMachine<
         },
       },
     },
-    downloadBackup: {
-      invoke: {
-        src: async (ctx) => {
-          const password = ctx.password!
-          if (password) {
-            const backup = await ctx.l1!.encrypt(
-              password,
-              {
-                scrypt: {
-                  // The number must be a power of 2 (default: 131072 = 2 ^ 17)
-                  N: isDev ? 64 : 32768,
-                },
-              },
-              (progress) =>
-                useProgress.setState({ progress, text: "Encrypting..." }),
-            )
-            useProgress.setState({ progress: 0, text: "" })
-
-            const extendedBackup = JSON.stringify(
-              {
-                ...JSON.parse(backup),
-                wallets: Object.keys(ctx.wallets),
-              },
-              null,
-              2,
-            )
-            const blob = new Blob([extendedBackup], {
-              type: "application/json",
-            })
-            const url = URL.createObjectURL(blob)
-            browser.downloads.download({
-              url,
-              filename: "starknet-backup.json",
-            })
-
-            localStorage.setItem(KEYSTORE_KEY, extendedBackup)
-          } else {
-            throw new Error("no password provided")
-          }
-        },
-        onDone: "account",
-        onError: {
-          target: "determineEntry",
-          actions: (_, ev) => console.error(ev),
-        },
-      },
-    },
     account: {
       entry: async (ctx) => {
-        messenger.emit("WALLET_CONNECTED", ctx.selectedWallet)
+        sendMessage({ type: "WALLET_CONNECTED", data: ctx.selectedWallet! })
       },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",
@@ -448,6 +366,7 @@ export const routerMachine = createMachine<
       }),
       on: {
         GO_BACK: "account",
+        APPROVE_TX: "approveTx",
       },
     },
     addToken: {
@@ -467,11 +386,18 @@ export const routerMachine = createMachine<
       on: {
         GO_BACK: "welcome",
         SUBMIT_KEYSTORE: {
-          target: "enterPassword",
-          actions: assign((_, ev) => ({
-            uploadedBackup: ev.data,
-          })),
+          target: "uploadingKeystore",
         },
+      },
+    },
+    uploadingKeystore: {
+      invoke: {
+        src: async (ctx, ev) => {
+          if (ev.type !== "SUBMIT_KEYSTORE") throw Error("wrong entry point")
+          await uploadKeystore(ev.data)
+        },
+        onDone: "enterPassword",
+        onError: "determineEntry",
       },
     },
     reset: {
@@ -480,8 +406,8 @@ export const routerMachine = createMachine<
         RESET: {
           target: "determineEntry",
           actions: () => {
+            sendMessage({ type: "RESET_ALL" })
             localStorage.clear()
-            messenger.emit("RESET_ALL", {})
           },
         },
       },
@@ -501,9 +427,11 @@ export const routerMachine = createMachine<
         REJECT_TX: {
           target: "account",
           actions: (ctx) => {
-            messenger.emit("FAILED_TX", {
-              tx: ctx.txToApprove,
+            sendMessage({
+              type: "FAILED_TX",
+              data: { tx: ctx.txToApprove as InvokeFunctionTransaction },
             })
+
             if (ctx.isPopup) window.close()
           },
         },
@@ -552,9 +480,12 @@ export const routerMachine = createMachine<
               txHash: event.data,
             })),
             (ctx, event) => {
-              messenger.emit("SUBMITTED_TX", {
-                tx: ctx.txToApprove,
-                txHash: event.data,
+              sendMessage({
+                type: "SUBMITTED_TX",
+                data: {
+                  txHash: event.data,
+                  tx: ctx.txToApprove as InvokeFunctionTransaction,
+                },
               })
             },
           ],
@@ -562,8 +493,9 @@ export const routerMachine = createMachine<
         onError: {
           target: "determineEntry",
           actions: (ctx) => {
-            messenger.emit("FAILED_TX", {
-              tx: ctx.txToApprove,
+            sendMessage({
+              type: "FAILED_TX",
+              data: { tx: ctx.txToApprove as InvokeFunctionTransaction },
             })
           },
         },
@@ -577,13 +509,19 @@ export const routerMachine = createMachine<
         AGREE: {
           target: "accountList",
           actions: (ctx) => {
-            messenger.emit("APPROVE_WHITELIST", ctx.hostToWhitelist)
+            sendMessage({
+              type: "APPROVE_WHITELIST",
+              data: ctx.hostToWhitelist!,
+            })
           },
         },
         REJECT: {
           target: "accountList",
           actions: (ctx) => {
-            messenger.emit("REJECT_WHITELIST", ctx.hostToWhitelist)
+            sendMessage({
+              type: "REJECT_WHITELIST",
+              data: ctx.hostToWhitelist!,
+            })
           },
         },
       },

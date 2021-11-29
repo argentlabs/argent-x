@@ -1,36 +1,16 @@
 import {
   AddTransactionResponse,
   Provider,
-  Signer,
   SignerInterface,
   Transaction,
   defaultProvider,
 } from "starknet"
 
-import { EmitFn, Messenger } from "./utils/Messenger"
+import { MessageType, WindowMessageType } from "../shared/MessageType"
 
 const extId = document
   .getElementById("argent-x-extension")
   ?.getAttribute("data-extension-id")
-
-const allowedSender = ["INJECT", "UI", "BACKGROUND"]
-const messenger = new Messenger(
-  (emit) => {
-    window.addEventListener("message", function (event) {
-      if (
-        event.data.from &&
-        event.data.type &&
-        allowedSender.includes(event.data.from)
-      ) {
-        const { type, data } = event.data
-        emit(type, data)
-      }
-    })
-  },
-  (type, data) => {
-    window.postMessage({ from: "INPAGE", type, data }, "*")
-  },
-)
 
 type StarknetWindowObject =
   | {
@@ -54,6 +34,13 @@ declare global {
   }
 }
 
+function sendMessage(msg: MessageType): void {
+  return window.postMessage(
+    { ...msg, extensionId: extId },
+    window.location.origin,
+  )
+}
+
 // window.ethereum like
 const starknetWindowObject: StarknetWindowObject = {
   signer: undefined,
@@ -62,18 +49,23 @@ const starknetWindowObject: StarknetWindowObject = {
   isConnected: false,
   enable: () =>
     new Promise((res) => {
-      messenger.emit("CONNECT", {
-        host: window.location.hostname,
-      })
-      messenger.listen((type, data) => {
+      const handler = function (event: MessageEvent<WindowMessageType>) {
         const { starknet } = window
-        if (starknet && type === "CONNECT_RES" && typeof data === "string") {
-          starknet.signer = new WalletSigner(data)
-          starknet.selectedAddress = data
+        if (
+          starknet &&
+          event.data.type === "CONNECT_RES" &&
+          typeof event.data.data === "string"
+        ) {
+          window.removeEventListener("message", handler)
+          starknet.signer = new WalletSigner(event.data.data)
+          starknet.selectedAddress = event.data.data
           starknet.isConnected = true
-          res([data])
+          res([event.data.data])
         }
-      })
+      }
+      window.addEventListener("message", handler)
+
+      sendMessage({ type: "CONNECT", data: { host: window.location.host } })
     }),
 }
 window.starknet = starknetWindowObject
@@ -86,21 +78,17 @@ export class WalletSigner extends Provider implements SignerInterface {
     this.address = address
   }
 
-  private sendMsg(type: string, data: any) {
-    return messenger.emit(type, data)
-  }
-
   private waitForMsgOfType(type: string, timeout = 5 * 60 * 1000) {
     return new Promise((res, rej) => {
       const pid = setTimeout(() => rej("Timeout"), timeout)
-      const handler: EmitFn = (eType, eData) => {
-        if (eType === type) {
+      const handler = (event: MessageEvent<WindowMessageType>) => {
+        if (event.data.type === type) {
           clearTimeout(pid)
-          messenger.unlisten(handler)
-          return res(eData)
+          window.removeEventListener("message", handler)
+          return res("data" in event.data ? event.data.data : undefined)
         }
       }
-      messenger.listen(handler)
+      window.addEventListener("message", handler)
     })
   }
 
@@ -112,15 +100,15 @@ export class WalletSigner extends Provider implements SignerInterface {
     if (tx.signature?.length)
       throw Error("Adding signatures to a signer tx currently isn't supported")
 
-    this.sendMsg("ADD_TRANSACTION", tx)
-    this.sendMsg("OPEN_UI", {})
+    sendMessage({ type: "ADD_TRANSACTION", data: tx })
+    sendMessage({ type: "OPEN_UI" })
 
     const res: any = await Promise.race([
       this.waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
       this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
         .then(() => "error")
         .catch(() => {
-          this.sendMsg("FAILED_TX", { tx })
+          sendMessage({ type: "FAILED_TX", data: { tx } })
           return "timeout"
         }),
     ])

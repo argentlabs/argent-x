@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { starknetKeccak } from "starknet/dist/utils/hash"
+import { hash } from "starknet"
 import styled from "styled-components"
 
 import { getAccountColor } from "../utils/wallet"
@@ -17,7 +17,7 @@ interface TokenIconProps {
 }
 
 export const TokenIcon: FC<TokenIconProps> = ({ name, large = false }) => {
-  const index = parseInt(starknetKeccak(name).toString().slice(-2))
+  const index = parseInt(hash.starknetKeccak(name).toString().slice(-2))
   const color = getAccountColor(index + 3, false)
   return (
     <Icon
