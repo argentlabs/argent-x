@@ -1,8 +1,12 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { defaultNetworks } from "../../../shared/networks"
+import { defaultNetworks, getNetwork } from "../../../shared/networks"
 import { WalletStatusCode } from "../../utils/wallet"
+
+const NetworkName = styled.span`
+  text-align: right;
+`
 
 const AccountNetwork = styled.div<{ selected?: boolean }>`
   display: flex;
@@ -37,6 +41,9 @@ const NetworkList = styled.div`
   position: absolute;
   width: 100%;
   z-index: 1;
+  background: #161616;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 
   & > ${AccountNetwork} {
     border-top: 1px #525252 solid;
@@ -60,6 +67,10 @@ const NetworkSwitcherWrapper = styled.div`
 
   &:hover > ${AccountNetwork} {
     border-radius: 15px 15px 0 0;
+  }
+
+  &:hover ${NetworkName} {
+    min-width: 110px;
   }
 `
 
@@ -94,9 +105,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   networkId,
   onChangeNetwork,
 }) => {
-  const currentNetwork =
-    defaultNetworks.find(({ id }) => id === networkId) || defaultNetworks[0]
-
+  const currentNetwork = getNetwork(networkId)
   const otherNetworks = defaultNetworks.filter(
     ({ id }) => id !== currentNetwork.id,
   )
@@ -104,13 +113,13 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   return (
     <NetworkSwitcherWrapper>
       <AccountNetwork selected>
-        <span>{currentNetwork.name}</span>
+        <NetworkName>{currentNetwork.name}</NetworkName>
         <AccountStatusIndicator status="CONNECTED" />
       </AccountNetwork>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
           <AccountNetwork key={id} onClick={() => onChangeNetwork(id)}>
-            <span>{name}</span>
+            <NetworkName>{name}</NetworkName>
             <AccountStatusIndicator status="CONNECTED" />
           </AccountNetwork>
         ))}

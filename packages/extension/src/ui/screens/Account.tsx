@@ -73,6 +73,7 @@ export const Account: FC<AccountProps> = ({
       </AccountHeader>
       <AccountContent>
         <AccountSubHeader
+          networkId={networkId}
           status={status}
           accountNumber={accountNumber}
           walletAddress={wallet.address}

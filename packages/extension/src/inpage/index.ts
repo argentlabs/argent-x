@@ -48,19 +48,21 @@ const starknetWindowObject: StarknetWindowObject = {
   selectedAddress: undefined,
   isConnected: false,
   enable: () =>
-    new Promise((res) => {
-      const handler = function (event: MessageEvent<WindowMessageType>) {
+    new Promise((resolve) => {
+      const handler = ({ data }: MessageEvent<WindowMessageType>) => {
         const { starknet } = window
-        if (
-          starknet &&
-          event.data.type === "CONNECT_RES" &&
-          typeof event.data.data === "string"
-        ) {
+        if (!starknet) {
+          return
+        }
+
+        if (data.type === "CONNECT_RES" && typeof data.data === "string") {
           window.removeEventListener("message", handler)
-          starknet.signer = new WalletSigner(event.data.data)
-          starknet.selectedAddress = event.data.data
+          starknet.signer = new WalletSigner(data.data)
+          starknet.selectedAddress = data.data
           starknet.isConnected = true
-          res([event.data.data])
+          resolve([data.data])
+        } else if (data.type === "CHANGE_NETWORK") {
+          console.warn("network changed")
         }
       }
       window.addEventListener("message", handler)
@@ -79,13 +81,13 @@ export class WalletSigner extends Provider implements SignerInterface {
   }
 
   private waitForMsgOfType(type: string, timeout = 5 * 60 * 1000) {
-    return new Promise((res, rej) => {
-      const pid = setTimeout(() => rej("Timeout"), timeout)
+    return new Promise((resolve, reject) => {
+      const pid = setTimeout(() => reject("Timeout"), timeout)
       const handler = (event: MessageEvent<WindowMessageType>) => {
         if (event.data.type === type) {
           clearTimeout(pid)
           window.removeEventListener("message", handler)
-          return res("data" in event.data ? event.data.data : undefined)
+          return resolve("data" in event.data ? event.data.data : undefined)
         }
       }
       window.addEventListener("message", handler)

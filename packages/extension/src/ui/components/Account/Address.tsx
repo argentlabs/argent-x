@@ -37,4 +37,8 @@ export const AccountAddressLink = styled.a`
   &:hover {
     background: rgba(255, 255, 255, 0.15);
   }
+
+  & > svg {
+    margin-left: 7px;
+  }
 `

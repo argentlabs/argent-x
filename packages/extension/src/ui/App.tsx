@@ -101,7 +101,12 @@ function App() {
     )
 
   if (state.matches("submittedTx"))
-    return <Success txHash={state.context.txHash} />
+    return (
+      <Success
+        networkId={state.context.networkId}
+        txHash={state.context.txHash}
+      />
+    )
 
   if (state.matches("connect"))
     return (

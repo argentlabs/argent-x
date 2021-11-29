@@ -21,3 +21,6 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://goerli.voyager.online/",
   },
 ]
+
+export const getNetwork = (networkId: string) =>
+  defaultNetworks.find(({ id }) => id === networkId) || defaultNetworks[0]

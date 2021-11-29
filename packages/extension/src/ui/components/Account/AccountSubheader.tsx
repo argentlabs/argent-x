@@ -3,6 +3,7 @@ import styled from "styled-components"
 
 import Copy from "../../../assets/copy.svg"
 import Open from "../../../assets/open.svg"
+import { getNetwork } from "../../../shared/networks"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountName } from "../../utils/wallet"
 import { CopyTooltip } from "../CopyTooltip"
@@ -29,12 +30,14 @@ const AccountName = styled(H1)`
 `
 
 interface AccountSubheaderProps {
+  networkId: string
   status: WalletStatus
   accountNumber: number
   walletAddress: string
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
+  networkId,
   status,
   accountNumber,
   walletAddress,
@@ -48,11 +51,11 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
     </div>
     <AccountAddressWrapper>
       <AccountAddressLink
-        href={`https://voyager.online/contract/${walletAddress}`}
+        href={`${getNetwork(networkId).explorerUrl}/contract/${walletAddress}`}
         target="_blank"
       >
         starknet: {truncateAddress(walletAddress)}
-        <Open style={{ marginLeft: 7 }} />
+        <Open />
       </AccountAddressLink>
       <CopyTooltip copyValue={walletAddress} message="Copied!">
         <AccountAddressIconsWrapper>
