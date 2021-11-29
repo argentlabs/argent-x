@@ -4,6 +4,7 @@ import browser from "webextension-polyfill"
 
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
+import { defaultNetworkId } from "../shared/networks"
 import { ActionItem, getQueue } from "./actionQueue"
 import { getKeyPair } from "./keys/communication"
 import {
@@ -42,7 +43,7 @@ async function main() {
     SELECTED_NETWORK: string
   }>({
     SELECTED_WALLET: "",
-    SELECTED_NETWORK: "mainnet",
+    SELECTED_NETWORK: defaultNetworkId,
   })
 
   messageStream.subscribe(async ([msg, sender]) => {
@@ -187,15 +188,19 @@ async function main() {
       case "GET_WALLETS": {
         return sendToTabAndUi({
           type: "GET_WALLETS_RES",
-          data: await getWallets(),
+          data: await getWallets(await store.getItem("SELECTED_NETWORK")),
         })
       }
       case "NEW_ACCOUNT": {
         const sessionPassword = getSession()
         if (!sessionPassword) throw Error("you need an open session")
 
-        const newAccount = await createAccount(sessionPassword, (progress) =>
-          sendToTabAndUi({ type: "REPORT_PROGRESS", data: progress }),
+        const networkId = await store.getItem("SELECTED_NETWORK")
+        const newAccount = await createAccount(
+          sessionPassword,
+          networkId,
+          (progress) =>
+            sendToTabAndUi({ type: "REPORT_PROGRESS", data: progress }),
         )
 
         store.setItem("SELECTED_WALLET", newAccount.address)

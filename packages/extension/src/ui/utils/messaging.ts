@@ -1,7 +1,6 @@
-import { CompactEncrypt, JWK, importJWK } from "jose"
+import { CompactEncrypt, importJWK } from "jose"
 import { encode } from "starknet"
 
-import type { ActionItem } from "../../background/actionQueue"
 import {
   messageStream,
   sendMessage,
@@ -14,25 +13,22 @@ if (process.env.NODE_ENV === "development") {
   })
 }
 
-export const readLatestActionAndCount = async (): Promise<{
-  action: ActionItem | null
-  count: number
-}> => {
+export const readLatestActionAndCount = async () => {
   sendMessage({ type: "GET_LATEST_ACTION_AND_COUNT" })
   return waitForMessage("GET_LATEST_ACTION_AND_COUNT_RES")
 }
 
-export const getLastSelectedWallet = async (): Promise<string | undefined> => {
+export const getLastSelectedWallet = async () => {
   sendMessage({ type: "GET_SELECTED_WALLET_ADDRESS" })
   return waitForMessage("GET_SELECTED_WALLET_ADDRESS_RES")
 }
 
-export const getPublicKey = async (): Promise<JWK> => {
+export const getPublicKey = async () => {
   sendMessage({ type: "REQ_PUB" })
   return waitForMessage("REQ_PUB_RES")
 }
 
-export const uploadKeystore = async (keystore: string): Promise<void> => {
+export const uploadKeystore = async (keystore: string) => {
   sendMessage({
     type: "RECOVER_KEYSTORE",
     data: keystore,
@@ -40,17 +36,17 @@ export const uploadKeystore = async (keystore: string): Promise<void> => {
   return waitForMessage("RECOVER_KEYSTORE_RES")
 }
 
-export const isInitialized = async (): Promise<boolean> => {
+export const isInitialized = async () => {
   sendMessage({ type: "IS_INITIALIZED" })
   return await waitForMessage("IS_INITIALIZED_RES")
 }
 
-export const hasActiveSession = async (): Promise<boolean> => {
+export const hasActiveSession = async () => {
   sendMessage({ type: "HAS_SESSION" })
   return waitForMessage("HAS_SESSION_RES")
 }
 
-export const getWallets = async (): Promise<string[]> => {
+export const getWallets = async () => {
   sendMessage({ type: "GET_WALLETS" })
   return waitForMessage("GET_WALLETS_RES")
 }

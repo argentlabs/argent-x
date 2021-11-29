@@ -62,7 +62,8 @@ const starknetWindowObject: StarknetWindowObject = {
           starknet.isConnected = true
           resolve([data.data])
         } else if (data.type === "CHANGE_NETWORK") {
-          console.warn("network changed")
+          console.warn("CHANGE_NETWORK", data.data)
+          starknet.provider = new Provider({ network: data.data as any })
         }
       }
       window.addEventListener("message", handler)

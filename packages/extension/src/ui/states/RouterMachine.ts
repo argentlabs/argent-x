@@ -3,6 +3,7 @@ import { Args, InvokeFunctionTransaction } from "starknet"
 import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { sendMessage } from "../../shared/messages"
+import { defaultNetworkId } from "../../shared/networks"
 import {
   getLastSelectedWallet,
   getNetworkId,
@@ -131,7 +132,7 @@ export const routerMachine = createMachine<
   initial: "determineEntry",
   context: {
     wallets: {},
-    networkId: "mainnet",
+    networkId: defaultNetworkId,
   },
   states: {
     determineEntry: {
@@ -226,8 +227,13 @@ export const routerMachine = createMachine<
             () => "",
           )
 
-          const selectedWalletIndex =
-            (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
+          const selectedWallet =
+            wallets.find(({ address }) => address === lastSelectedWallet)
+              ?.address || wallets[0]?.address
+
+          if (!selectedWallet) {
+            throw new Error("no wallets")
+          }
 
           // if actions are pending show them first
           const requestedActions = await readLatestActionAndCount().catch(
@@ -236,14 +242,14 @@ export const routerMachine = createMachine<
 
           return {
             wallets: wallets
-              .map((address) => new Wallet(address))
+              .map(({ address }) => new Wallet(address))
               .reduce((acc, wallet) => {
                 return {
                   ...acc,
                   [wallet.address]: wallet,
                 }
               }, {}),
-            selectedWallet: wallets[selectedWalletIndex],
+            selectedWallet,
             networkId,
 
             requestedActions,
@@ -295,7 +301,13 @@ export const routerMachine = createMachine<
             }),
           },
         ],
-        onError: "determineEntry",
+        onError: [
+          {
+            target: "accountList",
+            cond: (_, event) => event.data.message === "no wallets",
+          },
+          { target: "determineEntry" },
+        ],
       },
     },
     welcome: {
@@ -344,7 +356,7 @@ export const routerMachine = createMachine<
         SHOW_ADD_TOKEN: "addToken",
         APPROVE_TX: "approveTx",
         CHANGE_NETWORK: {
-          target: "account",
+          target: "recover",
           actions: [
             assign((ctx, { data }) => ({
               ...ctx,

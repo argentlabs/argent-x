@@ -4,19 +4,16 @@ export interface Network {
   explorerUrl: string
 }
 
+export const defaultNetworkId = "goerli-alpha"
+
 export const defaultNetworks: Network[] = [
   {
-    id: "mainnet",
+    id: "mainnet-alpha",
     name: "Ethereum Mainnet",
     explorerUrl: "https://voyager.online/",
   },
   {
-    id: "fake",
-    name: "Fake Testnet",
-    explorerUrl: "https://fake.voyager.online/",
-  },
-  {
-    id: "goerli",
+    id: "goerli-alpha",
     name: "Goerli Testnet",
     explorerUrl: "https://goerli.voyager.online/",
   },

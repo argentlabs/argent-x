@@ -4,20 +4,18 @@ import { compileCalldata, defaultProvider, ec, encode, stark } from "starknet"
 import { hash } from "starknet"
 import browser from "webextension-polyfill"
 
+import { BackupWallet } from "../../shared/backup.model"
 import { Storage } from "../storage"
 
 const isDev = process.env.NODE_ENV === "development"
 
-const store = new Storage<{
+interface StorageProps {
   encKeystore?: string
   passwordHash?: string
-  walletAddresses: string[]
-}>(
-  {
-    walletAddresses: [],
-  },
-  "L1",
-)
+  walletAddresses: BackupWallet[]
+}
+
+const store = new Storage<StorageProps>({ walletAddresses: [] }, "L1")
 
 function hashString(str: string) {
   return hash.hashCalldata([encode.buf2hex(encode.utf8ToArray(str))])
@@ -100,7 +98,7 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
 async function getEncKeyStore(
   wallet: ethers.Wallet,
   password: string,
-  wallets: string[],
+  wallets: BackupWallet[],
   progressFn: (progress: number) => void = () => {},
 ): Promise<string> {
   const backup = await wallet.encrypt(
@@ -137,10 +135,25 @@ function downloadTextFile(text: string, filename: string) {
   })
 }
 
-export const getWallets = () => store.getItem("walletAddresses")
+export const getWallets = async (networkId?: string): Promise<BackupWallet[]> =>
+  (await store.getItem("walletAddresses"))
+    .map((wallet) => {
+      if (typeof wallet === "string") {
+        // backwards compatibility
+        return { network: "goerli-alpha", address: wallet } as const
+      }
+      return wallet
+    })
+    .filter((wallet) => {
+      if (networkId && networkId !== wallet.network) {
+        return false
+      }
+      return true
+    })
 
 export async function createAccount(
   password: string,
+  networkId: string,
   progressFn: (progress: number) => void = () => {},
 ) {
   const l1 = await getL1(password)
@@ -163,12 +176,11 @@ export async function createAccount(
     throw new Error("Deploy transaction failed")
   }
 
-  const encKeyStore = await getEncKeyStore(l1, password, [
-    ...wallets,
-    deployTransaction.address!,
-  ])
+  const newWallet = { network: networkId, address: deployTransaction.address! }
+  const newWallets = [...wallets, newWallet]
+  const encKeyStore = await getEncKeyStore(l1, password, newWallets)
   store.setItem("encKeystore", encKeyStore)
-  store.setItem("walletAddresses", [...wallets, deployTransaction.address!])
+  store.setItem("walletAddresses", newWallets)
   store.setItem("passwordHash", hashString(password))
 
   downloadTextFile(encKeyStore, "starknet-backup.json")

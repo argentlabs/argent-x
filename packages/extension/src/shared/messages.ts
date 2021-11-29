@@ -2,8 +2,13 @@ import { getMessage } from "@extend-chrome/messages"
 
 import { MessageType } from "./MessageType"
 
-export const [sendMessage, messageStream, _waitForMessage] =
+export const [sendMessage_, messageStream, _waitForMessage] =
   getMessage<MessageType>("ARGENTX")
+
+export const sendMessage = (...args: any[]) => {
+  console.log("Sending message", ...args)
+  return sendMessage_(args[0], args[1])
+}
 
 export async function waitForMessage<
   K extends MessageType["type"],

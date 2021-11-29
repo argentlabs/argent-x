@@ -2,6 +2,7 @@ import type { JWK } from "jose"
 import type { InvokeFunctionTransaction } from "starknet"
 
 import { ActionItem } from "../background/actionQueue"
+import { BackupWallet } from "./backup.model"
 
 export type MessageType =
   | { type: "OPEN_UI" }
@@ -37,7 +38,7 @@ export type MessageType =
   | { type: "STOP_SESSION" }
   | {
       type: "NEW_ACCOUNT_RES"
-      data: { txHash: string; address: string; wallets: string[] }
+      data: { txHash: string; address: string; wallets: BackupWallet[] }
     }
   | { type: "REPORT_PROGRESS"; data: number }
   | { type: "HAS_SESSION" }
@@ -45,7 +46,7 @@ export type MessageType =
   | { type: "IS_INITIALIZED" }
   | { type: "IS_INITIALIZED_RES"; data: boolean }
   | { type: "GET_WALLETS" }
-  | { type: "GET_WALLETS_RES"; data: string[] }
+  | { type: "GET_WALLETS_RES"; data: BackupWallet[] }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
   | { type: "START_SESSION_RES" }
