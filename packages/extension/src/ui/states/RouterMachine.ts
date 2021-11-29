@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ethers } from "ethers"
-import { Args, InvokeFunctionTransaction, KeyPair } from "starknet"
+import { Args, InvokeFunctionTransaction } from "starknet"
 import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { sendMessage } from "../../shared/messages"
@@ -12,6 +11,7 @@ import {
   monitorProgress,
   readLatestActionAndCount,
   startSession,
+  uploadKeystore,
 } from "../utils/messaging"
 import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
@@ -198,11 +198,9 @@ export const routerMachine = createMachine<
         },
         onDone: {
           target: "recover",
-          actions: [
-            assign((_, _ev) => ({
-              error: undefined,
-            })),
-          ],
+          actions: assign((_, _ev) => ({
+            error: undefined,
+          })),
         },
 
         onError: {
@@ -218,13 +216,17 @@ export const routerMachine = createMachine<
       invoke: {
         src: async (_, event) => {
           const wallets = await getWallets()
+          console.log(wallets)
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
+          console.log(lastSelectedWallet)
 
           const selectedWalletIndex =
             (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
+          console.log(selectedWalletIndex)
+          console.log(wallets[selectedWalletIndex])
 
           // if actions are pending show them first
           const requestedActions = await readLatestActionAndCount().catch(
@@ -384,11 +386,18 @@ export const routerMachine = createMachine<
       on: {
         GO_BACK: "welcome",
         SUBMIT_KEYSTORE: {
-          target: "enterPassword",
-          actions: assign((_, ev) => ({
-            uploadedBackup: ev.data,
-          })),
+          target: "uploadingKeystore",
         },
+      },
+    },
+    uploadingKeystore: {
+      invoke: {
+        src: async (ctx, ev) => {
+          if (ev.type !== "SUBMIT_KEYSTORE") throw Error("wrong entry point")
+          await uploadKeystore(ev.data)
+        },
+        onDone: "enterPassword",
+        onError: "determineEntry",
       },
     },
     reset: {

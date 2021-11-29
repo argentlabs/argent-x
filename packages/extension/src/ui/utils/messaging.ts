@@ -8,6 +8,10 @@ import {
   waitForMessage,
 } from "../../shared/messages"
 
+messageStream.subscribe(([message]) => {
+  console.log("Received message", message)
+})
+
 export const readLatestActionAndCount = async (): Promise<{
   action: ActionItem | null
   count: number
@@ -24,6 +28,14 @@ export const getLastSelectedWallet = async (): Promise<string | undefined> => {
 export const getPublicKey = async (): Promise<JWK> => {
   sendMessage({ type: "REQ_PUB" })
   return waitForMessage("REQ_PUB_RES")
+}
+
+export const uploadKeystore = async (keystore: string): Promise<void> => {
+  sendMessage({
+    type: "RECOVER_KEYSTORE",
+    data: keystore,
+  })
+  return waitForMessage("RECOVER_KEYSTORE_RES")
 }
 
 export const isInitialized = async (): Promise<boolean> => {

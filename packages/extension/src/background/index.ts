@@ -11,6 +11,7 @@ import {
   existsL1,
   getL1,
   getWallets,
+  setKeystore,
   validatePassword,
 } from "./keys/l1"
 import { openUi } from "./openUi"
@@ -213,6 +214,10 @@ async function main() {
             s: s.toString(),
           },
         })
+      }
+      case "RECOVER_KEYSTORE": {
+        await setKeystore(msg.data)
+        return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })
       }
     }
   })

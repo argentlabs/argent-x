@@ -8,7 +8,9 @@ import erc20Tokens from "../../assets/erc20-tokens.json"
 import { isValidAddress } from "./addresses"
 
 export const playgroundToken = erc20Tokens.find(
-  ({ name }) => name === "Playground Tokenx",
+  ({ address }) =>
+    address ===
+    "0x00a45e3942b7a75983dea7afffda9304d0273773619d1e3d5eaa757d751bfaf3",
 )
 
 const defaultErc20s = Object.fromEntries(

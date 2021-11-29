@@ -49,6 +49,8 @@ export type MessageType =
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
   | { type: "START_SESSION_RES" }
+  | { type: "RECOVER_KEYSTORE"; data: string }
+  | { type: "RECOVER_KEYSTORE_RES" }
   | { type: "SIGN"; data: { hash: string } }
   | { type: "SIGN_RES"; data: { r: string; s: string } }
 

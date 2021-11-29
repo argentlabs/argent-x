@@ -23,8 +23,22 @@ function hashString(str: string) {
   return hash.hashCalldata([encode.buf2hex(encode.utf8ToArray(str))])
 }
 
+export async function existsL1() {
+  return Boolean(await store.getItem("encKeystore"))
+}
+
 export async function validatePassword(password: string) {
   const passwordHashFromStorage = await store.getItem("passwordHash")
+
+  if (!passwordHashFromStorage && (await existsL1())) {
+    try {
+      await getL1(password)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   return passwordHashFromStorage
     ? hashString(password) === passwordHashFromStorage
     : true
@@ -40,8 +54,8 @@ function setRawWallet(wallet: ethers.Wallet) {
   }, 15 * 60 * 60 * 1000) as unknown as number
 }
 
-export async function existsL1() {
-  return Boolean(await store.getItem("encKeystore"))
+export async function setKeystore(keystore: string) {
+  await store.setItem("encKeystore", keystore)
 }
 
 async function recoverL1(
