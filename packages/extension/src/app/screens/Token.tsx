@@ -7,7 +7,7 @@ import { BackButton } from "../components/BackButton"
 import { Button, ButtonGroup } from "../components/Button"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
-import { TokenDetails, toDisplayToken } from "../utils/tokens"
+import { TokenDetails, toTokenView } from "../utils/tokens"
 
 const TokenScreen = styled.div`
   display: flex;
@@ -82,7 +82,7 @@ export const Token: FC<TokenProps> = ({ token, onBack, onTransfer }) => {
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
 
-  const { address, name, symbol, balance, decimals } = toDisplayToken(token)
+  const { address, name, symbol, balance, decimals } = toTokenView(token)
 
   const handleSubmit = () =>
     onTransfer(address, recipient, ethers.utils.parseUnits(amount, decimals))

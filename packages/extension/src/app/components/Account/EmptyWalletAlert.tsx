@@ -3,11 +3,13 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
-import { PLAYGROUND_TEST_TOKEN } from "../../utils/tokens"
+import { playgroundToken } from "../../utils/tokens"
 import { Alert } from "../Alert"
 import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
 import { TokenAction } from "../Token"
+
+const mintableAddress = playgroundToken?.address
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;
@@ -56,16 +58,18 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
       >
         <AlertButton>Receive</AlertButton>
       </CopyTooltip>
-      <AlertButton
-        {...makeClickable(() => {
-          onAction?.(PLAYGROUND_TEST_TOKEN, {
-            type: "MINT",
-            amount: ethers.utils.parseUnits("1000", 18),
-          })
-        })}
-      >
-        Mint
-      </AlertButton>
+      {mintableAddress && (
+        <AlertButton
+          {...makeClickable(() => {
+            onAction?.(mintableAddress, {
+              type: "MINT",
+              amount: ethers.utils.parseUnits("1000", 18),
+            })
+          })}
+        >
+          Mint
+        </AlertButton>
+      )}
     </Buttons>
   </AlertWrapper>
 )

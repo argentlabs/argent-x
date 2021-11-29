@@ -7,15 +7,9 @@ import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
 import { isValidAddress } from "./addresses"
 
-const playgroundToken = erc20Tokens.find(
-  ({ name }) => name === "Playground Token",
+export const playgroundToken = erc20Tokens.find(
+  ({ name }) => name === "Playground Tokenx",
 )
-
-if (!playgroundToken) {
-  throw new Error("Need default token named 'Plauground Test Token")
-}
-
-export const PLAYGROUND_TEST_TOKEN = playgroundToken.address
 
 const defaultErc20s = Object.fromEntries(
   erc20Tokens.map((token) => [token.address, token]),
@@ -67,7 +61,7 @@ export interface TokenDetails {
   balance?: BigNumber
 }
 
-export interface DisplayToken {
+export interface TokenView {
   address: string
   name: string
   symbol: string
@@ -75,13 +69,13 @@ export interface DisplayToken {
   balance: string
 }
 
-export const toDisplayToken = ({
+export const toTokenView = ({
   name,
   symbol,
   decimals,
   balance,
   ...rest
-}: TokenDetails): DisplayToken => ({
+}: TokenDetails): TokenView => ({
   name: name || "Unknown token",
   symbol: symbol || "",
   decimals: decimals?.toNumber() || 0,

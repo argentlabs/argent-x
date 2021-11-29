@@ -3,7 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../utils/a11y"
-import { TokenDetails, toDisplayToken } from "../utils/tokens"
+import { TokenDetails, toTokenView } from "../utils/tokens"
 import { IconButton } from "./IconButton"
 import { TokenIcon } from "./TokenIcon"
 
@@ -81,7 +81,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   onClick,
   ...props
 }) => {
-  const { name, symbol, balance } = toDisplayToken(token)
+  const { name, symbol, balance } = toTokenView(token)
   return (
     <div {...props} style={{ borderRadius: 4, overflow: "hidden" }}>
       <TokenWrapper {...makeClickable(onClick)}>
