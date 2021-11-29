@@ -54,7 +54,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
         starknet: {truncateAddress(walletAddress)}
         <Open style={{ marginLeft: 7 }} />
       </AccountAddressLink>
-      <CopyTooltip copyValue={`starknet:${walletAddress}`} message="Copied!">
+      <CopyTooltip copyValue={walletAddress} message="Copied!">
         <AccountAddressIconsWrapper>
           <Copy />
         </AccountAddressIconsWrapper>

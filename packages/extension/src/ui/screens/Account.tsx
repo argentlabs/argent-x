@@ -1,4 +1,3 @@
-import Tippy from "@tippyjs/react"
 import { FC, Suspense } from "react"
 import styled from "styled-components"
 
@@ -9,13 +8,9 @@ import {
   AccountHeader,
   AccountRow as DefaultAccountRow,
 } from "../components/Account/Header"
-import {
-  AccountNetwork,
-  AccountStatusIndicator,
-} from "../components/Account/Network"
+import { NetworkSwitcher } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { TokenList } from "../components/Account/TokenList"
-import { Tooltip } from "../components/CopyTooltip"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
@@ -66,12 +61,7 @@ export const Account: FC<AccountProps> = ({
           src={getAccountImageUrl(accountNumber)}
         />
         <AccountRow>
-          <Tippy content={<Tooltip>{status.text}</Tooltip>}>
-            <AccountNetwork>
-              <span>Goerli alpha</span>
-              <AccountStatusIndicator status={status.code} />
-            </AccountNetwork>
-          </Tippy>
+          <NetworkSwitcher />
         </AccountRow>
       </AccountHeader>
       <AccountContent>
