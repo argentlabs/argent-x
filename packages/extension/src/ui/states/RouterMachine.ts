@@ -364,6 +364,7 @@ export const routerMachine = createMachine<
       }),
       on: {
         GO_BACK: "account",
+        APPROVE_TX: "approveTx",
       },
     },
     addToken: {
