@@ -1,6 +1,8 @@
 import { getL1 } from "./keys/l1"
 
 let sessionPassword: string | undefined
+let sessionStartTime: number | undefined
+let sessionTimeoutDelay: number | undefined
 let sessionTimeout: number | undefined
 
 export function startSession(
@@ -9,6 +11,8 @@ export function startSession(
   onCloseCallback: () => void = () => {},
 ) {
   sessionPassword = password
+  sessionStartTime = Date.now()
+  sessionTimeoutDelay = duration
   sessionTimeout = setTimeout(() => {
     stopSession()
     onCloseCallback()
@@ -18,13 +22,21 @@ export function startSession(
 
 export function stopSession() {
   sessionPassword = undefined
+  sessionStartTime = undefined
   if (sessionTimeout) clearTimeout(sessionTimeout)
 }
 
 export function hasActiveSession() {
+  if (
+    sessionStartTime &&
+    sessionTimeoutDelay &&
+    sessionStartTime - sessionTimeoutDelay > Date.now()
+  )
+    return false
   return Boolean(sessionPassword)
 }
 
 export function getSession() {
+  if (!hasActiveSession()) return undefined
   return sessionPassword
 }
