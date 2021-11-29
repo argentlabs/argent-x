@@ -55,15 +55,14 @@ const starknetWindowObject: StarknetWindowObject = {
           return
         }
 
-        if (data.type === "CONNECT_RES" && typeof data.data === "string") {
+        if (data.type === "CONNECT_RES" && data.data) {
           window.removeEventListener("message", handler)
-          starknet.signer = new WalletSigner(data.data)
-          starknet.selectedAddress = data.data
+          const { address, network } = data.data
+          starknet.provider = new Provider({ network: network as any })
+          starknet.signer = new WalletSigner(address, starknet.provider)
+          starknet.selectedAddress = address
           starknet.isConnected = true
-          resolve([data.data])
-        } else if (data.type === "CHANGE_NETWORK") {
-          console.warn("CHANGE_NETWORK", data.data)
-          starknet.provider = new Provider({ network: data.data as any })
+          resolve([address])
         }
       }
       window.addEventListener("message", handler)
@@ -73,11 +72,26 @@ const starknetWindowObject: StarknetWindowObject = {
 }
 window.starknet = starknetWindowObject
 
+window.addEventListener(
+  "message",
+  ({ data }: MessageEvent<WindowMessageType>) => {
+    const { starknet } = window
+    if (starknet && starknet.signer && data.type === "CHANGE_NETWORK") {
+      console.warn("CHANGE_NETWORK", data.data)
+      starknet.provider = new Provider({ network: data.data as any })
+      starknet.signer = new WalletSigner(
+        starknet.signer.address,
+        starknet.provider,
+      )
+    }
+  },
+)
+
 export class WalletSigner extends Provider implements SignerInterface {
   public address: string
 
-  constructor(address: string) {
-    super()
+  constructor(address: string, provider?: Provider) {
+    super(provider || defaultProvider)
     this.address = address
   }
 

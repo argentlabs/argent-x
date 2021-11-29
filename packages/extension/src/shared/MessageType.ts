@@ -15,7 +15,7 @@ export type MessageType =
   | { type: "GET_SELECTED_WALLET_ADDRESS" }
   | { type: "GET_SELECTED_WALLET_ADDRESS_RES"; data: string | undefined }
   | { type: "CONNECT"; data: { host: string } }
-  | { type: "CONNECT_RES"; data: string }
+  | { type: "CONNECT_RES"; data: { address: string; network: string } }
   | {
       type: "SUBMITTED_TX"
       data: { tx: InvokeFunctionTransaction; txHash: string }

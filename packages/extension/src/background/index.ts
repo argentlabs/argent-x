@@ -95,6 +95,7 @@ async function main() {
 
       case "CONNECT": {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
+        const networkId = await store.getItem("SELECTED_NETWORK")
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
         if (!isWhitelisted) {
@@ -105,7 +106,10 @@ async function main() {
         }
 
         if (isWhitelisted && selectedWallet)
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
+          return sendToTabAndUi({
+            type: "CONNECT_RES",
+            data: { address: selectedWallet, network: networkId },
+          })
 
         return openUi()
       }
@@ -131,11 +135,16 @@ async function main() {
       }
       case "APPROVE_WHITELIST": {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
+        const networkId = await store.getItem("SELECTED_NETWORK")
+
         await actionQueue.removeLatest()
         await addToWhitelist(msg.data)
 
         if (selectedWallet)
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
+          return sendToTabAndUi({
+            type: "CONNECT_RES",
+            data: { address: selectedWallet, network: networkId },
+          })
         return openUi()
       }
       case "REJECT_WHITELIST": {

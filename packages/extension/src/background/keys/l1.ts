@@ -1,6 +1,6 @@
 import ArgentCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
 import { ethers } from "ethers"
-import { compileCalldata, defaultProvider, ec, encode, stark } from "starknet"
+import { Provider, compileCalldata, ec, encode, stark } from "starknet"
 import { hash } from "starknet"
 import browser from "webextension-polyfill"
 
@@ -162,7 +162,8 @@ export async function createAccount(
   const seed = ec.getStarkKey(ec.genKeyPair())
   const wallets = await getWallets()
 
-  const deployTransaction = await defaultProvider.deployContract(
+  const provider = new Provider({ network: networkId as any })
+  const deployTransaction = await provider.deployContract(
     ArgentCompiledContract,
     compileCalldata({
       signer: starkPub,

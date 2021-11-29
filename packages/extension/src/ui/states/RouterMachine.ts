@@ -242,7 +242,7 @@ export const routerMachine = createMachine<
 
           return {
             wallets: wallets
-              .map(({ address }) => new Wallet(address))
+              .map(({ address }) => new Wallet(address, networkId))
               .reduce((acc, wallet) => {
                 return {
                   ...acc,
@@ -305,6 +305,14 @@ export const routerMachine = createMachine<
           {
             target: "accountList",
             cond: (_, event) => event.data.message === "no wallets",
+            actions: assign((_, event) => {
+              return {
+                wallets: {},
+                selectedWallet: undefined,
+                selectedToken: undefined,
+                hostToWhitelist: undefined,
+              }
+            }),
           },
           { target: "determineEntry" },
         ],
