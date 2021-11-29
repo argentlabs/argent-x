@@ -49,12 +49,9 @@ type RouterEvents =
 
 interface Context {
   wallets: Record<string, Wallet>
-  password?: string
   selectedWallet?: string
   selectedToken?: TokenDetails
-  l1?: ethers.Wallet
   uploadedBackup?: string
-  signer?: KeyPair
   txToApprove?: TransactionRequest | InvokeFunctionTransaction
   txHash?: string
   isPopup?: boolean
@@ -63,9 +60,6 @@ interface Context {
 }
 
 interface SigningContext {
-  l1: ethers.Wallet
-  password: string
-  signer: KeyPair
   selectedWallet: string
 }
 
