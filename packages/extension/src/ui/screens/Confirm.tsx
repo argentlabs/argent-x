@@ -4,7 +4,7 @@ import styled from "styled-components"
 import { Button, ButtonGroupVertical } from "../components/Button"
 import { H2 } from "../components/Typography"
 
-const ConfirmScreen = styled.div`
+const ConfirmScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -23,7 +23,7 @@ export interface ConfirmPageProps {
   onReject?: () => void
 }
 
-interface ConfirmProps extends ConfirmPageProps {
+interface ConfirmScreenProps extends ConfirmPageProps {
   title: string
   rejectButtonText?: string
   confirmButtonText?: string
@@ -40,7 +40,7 @@ const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
   background-color: #161616;
 `
 
-export const Confirm: FC<ConfirmProps> = ({
+export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   title,
   confirmButtonText = "Confirm",
   rejectButtonText = "Reject",
@@ -49,23 +49,21 @@ export const Confirm: FC<ConfirmProps> = ({
   onReject,
   singleButton = false,
   children,
-}) => {
-  return (
-    <ConfirmScreen>
-      <H2>{title}</H2>
+}) => (
+  <ConfirmScreenWrapper>
+    <H2>{title}</H2>
 
-      {children}
+    {children}
 
-      <StickyButtonGroupVertical as="form" onSubmit={() => onSubmit?.()}>
-        {!singleButton && (
-          <Button onClick={onReject} type="button">
-            {rejectButtonText}
-          </Button>
-        )}
-        <Button style={{ backgroundColor: confirmButtonBgColor }} type="submit">
-          {confirmButtonText}
+    <StickyButtonGroupVertical as="form" onSubmit={() => onSubmit?.()}>
+      {!singleButton && (
+        <Button onClick={onReject} type="button">
+          {rejectButtonText}
         </Button>
-      </StickyButtonGroupVertical>
-    </ConfirmScreen>
-  )
-}
+      )}
+      <Button style={{ backgroundColor: confirmButtonBgColor }} type="submit">
+        {confirmButtonText}
+      </Button>
+    </StickyButtonGroupVertical>
+  </ConfirmScreenWrapper>
+)

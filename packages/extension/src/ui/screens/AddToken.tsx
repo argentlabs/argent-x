@@ -12,7 +12,7 @@ import { H2 } from "../components/Typography"
 import { isValidAddress } from "../utils/addresses"
 import { TokenDetails, fetchTokenDetails } from "../utils/tokens"
 
-const AddTokenScreen = styled.div`
+const AddTokenScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -29,7 +29,7 @@ const AddTokenScreen = styled.div`
   }
 `
 
-interface AddTokenProps {
+interface AddTokenScreenProps {
   walletAddress: string
   onSubmit?: (addToken: {
     address: string
@@ -56,7 +56,7 @@ function addressFormat64Byte(address: number.BigNumberish): string {
   return `0x${number.toBN(address).toString("hex").padStart(64, "0")}`
 }
 
-export const AddToken: FC<AddTokenProps> = ({
+export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   walletAddress,
   onSubmit,
   onBack,
@@ -105,7 +105,7 @@ export const AddToken: FC<AddTokenProps> = ({
   }
 
   return (
-    <AddTokenScreen>
+    <AddTokenScreenWrapper>
       <BackButton onClick={onBack} />
       <H2>Add token</H2>
 
@@ -174,6 +174,6 @@ export const AddToken: FC<AddTokenProps> = ({
         )}
         {loading && <Spinner size={64} />}
       </form>
-    </AddTokenScreen>
+    </AddTokenScreenWrapper>
   )
 }

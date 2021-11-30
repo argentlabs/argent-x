@@ -3,11 +3,16 @@ import type { Args } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
-import { Confirm, ConfirmPageProps } from "./Confirm"
+import { ConfirmPageProps, ConfirmScreen } from "./Confirm"
 
-interface ApproveTxProps extends Omit<ConfirmPageProps, "onSubmit"> {
-  tx: { to: string; method: string; calldata: Args }
-  onSubmit: (tx: { to: string; method: string; calldata: Args }) => void
+interface ApproveTransactionScreenProps
+  extends Omit<ConfirmPageProps, "onSubmit"> {
+  transaction: { to: string; method: string; calldata: Args }
+  onSubmit: (transaction: {
+    to: string
+    method: string
+    calldata: Args
+  }) => void
 }
 
 const Pre = styled.pre`
@@ -19,18 +24,20 @@ const Pre = styled.pre`
   overflow: auto;
 `
 
-export const ApproveTx: FC<ApproveTxProps> = ({ tx, onSubmit, ...props }) => {
-  return (
-    <Confirm
-      title="Send transaction"
-      confirmButtonText="Sign"
-      onSubmit={() => {
-        onSubmit(tx)
-      }}
-      {...props}
-    >
-      <P>A Dapp wants you to make this transaction:</P>
-      <Pre>{JSON.stringify(tx, null, 2)}</Pre>
-    </Confirm>
-  )
-}
+export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
+  transaction,
+  onSubmit,
+  ...props
+}) => (
+  <ConfirmScreen
+    title="Send transaction"
+    confirmButtonText="Sign"
+    onSubmit={() => {
+      onSubmit(transaction)
+    }}
+    {...props}
+  >
+    <P>A Dapp wants you to make this transaction:</P>
+    <Pre>{JSON.stringify(transaction, null, 2)}</Pre>
+  </ConfirmScreen>
+)

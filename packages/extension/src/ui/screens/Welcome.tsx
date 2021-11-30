@@ -7,7 +7,7 @@ import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { P } from "../components/Typography"
 
-const WelcomeScreen = styled.div`
+const WelcomeScreenWrapper = styled.div`
   padding: 70px 40px 24px;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@ const WelcomeScreen = styled.div`
   }
 `
 
-interface WelcomePageProps {
+interface WelcomeScreenProps {
   onPrimaryBtnClick?: () => void
   onSecondaryBtnClick?: () => void
 }
@@ -44,20 +44,18 @@ const greetings = [
   "hi fren",
 ]
 
-export const Welcome: FC<WelcomePageProps> = ({
+export const WelcomeScreen: FC<WelcomeScreenProps> = ({
   onPrimaryBtnClick,
   onSecondaryBtnClick,
-}) => {
-  return (
-    <WelcomeScreen>
-      <LogoSvg />
-      <Greetings greetings={greetings} />
-      <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
-      <ButtonGroup>
-        <Button onClick={onPrimaryBtnClick}>New account</Button>
-        <Button onClick={onSecondaryBtnClick}>Restore account</Button>
-      </ButtonGroup>
-      <StickyArgentFooter />
-    </WelcomeScreen>
-  )
-}
+}) => (
+  <WelcomeScreenWrapper>
+    <LogoSvg />
+    <Greetings greetings={greetings} />
+    <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
+    <ButtonGroup>
+      <Button onClick={onPrimaryBtnClick}>New account</Button>
+      <Button onClick={onSecondaryBtnClick}>Restore account</Button>
+    </ButtonGroup>
+    <StickyArgentFooter />
+  </WelcomeScreenWrapper>
+)

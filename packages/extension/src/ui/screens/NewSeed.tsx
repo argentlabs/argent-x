@@ -8,7 +8,7 @@ import { InputText } from "../components/Input"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
 
-const NewSeedScreen = styled.div`
+const NewSeedScreenWrapper = styled.div`
   padding: 48px 40px 24px;
   display: flex;
   flex-direction: column;
@@ -21,10 +21,7 @@ const NewSeedScreen = styled.div`
   }
 `
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {}
-
-interface NewSeedProps {
+interface NewSeedScreenProps {
   onSubmit?: (password: string) => void
   onBack?: () => void
 }
@@ -33,10 +30,7 @@ export function isValidPassword(password: string): boolean {
   return password.length > 5
 }
 
-export const NewSeed: FC<NewSeedProps> = ({
-  onSubmit = noop,
-  onBack = noop,
-}) => {
+export const NewSeedScreen: FC<NewSeedScreenProps> = ({ onSubmit, onBack }) => {
   const {
     control,
     handleSubmit,
@@ -50,11 +44,11 @@ export const NewSeed: FC<NewSeedProps> = ({
   })
   const password = watch("password")
   return (
-    <NewSeedScreen>
+    <NewSeedScreenWrapper>
       <BackButton onClick={onBack} />
       <H2>New password</H2>
       <P>Enter a password to protect your account</P>
-      <form onSubmit={handleSubmit(({ password }) => onSubmit(password))}>
+      <form onSubmit={handleSubmit(({ password }) => onSubmit?.(password))}>
         <Controller
           name="password"
           control={control}
@@ -97,6 +91,6 @@ export const NewSeed: FC<NewSeedProps> = ({
         </Button>
       </form>
       <StickyArgentFooter />
-    </NewSeedScreen>
+    </NewSeedScreenWrapper>
   )
 }

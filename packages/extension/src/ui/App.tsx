@@ -5,19 +5,19 @@ import { normalize } from "styled-normalize"
 
 import { AccountScreen } from "./screens/Account"
 import { AccountListScreen } from "./screens/AccountList"
-import { AddToken } from "./screens/AddToken"
-import { ApproveTx } from "./screens/ApproveTx"
+import { AddTokenScreen } from "./screens/AddToken"
+import { ApproveTransactionScreen } from "./screens/ApproveTx"
 import { ConnectScreen } from "./screens/Connect"
 import { DisclaimerScreen } from "./screens/Disclaimer"
-import { Loading } from "./screens/Loading"
-import { NewSeed } from "./screens/NewSeed"
-import { Password } from "./screens/Password"
+import { LoadingScreen } from "./screens/Loading"
+import { NewSeedScreen } from "./screens/NewSeed"
+import { PasswordScreen } from "./screens/Password"
 import { ResetScreen } from "./screens/Reset"
-import { Settings } from "./screens/Settings"
+import { SettingsScreen } from "./screens/Settings"
 import { SuccessScreen } from "./screens/Success"
 import { TokenScreen } from "./screens/Token"
-import { UploadKeystore } from "./screens/UploadKeystore"
-import { Welcome } from "./screens/Welcome"
+import { UploadKeystoreScreen } from "./screens/UploadKeystore"
+import { WelcomeScreen } from "./screens/Welcome"
 import { routerMachine } from "./states/RouterMachine"
 import { TokenDetails } from "./utils/tokens"
 
@@ -41,7 +41,7 @@ function App() {
   const [state, send] = useMachine(routerMachine)
   if (state.matches("welcome"))
     return (
-      <Welcome
+      <WelcomeScreen
         onPrimaryBtnClick={() => {
           send("SHOW_CREATE_NEW")
         }}
@@ -53,7 +53,7 @@ function App() {
 
   if (state.matches("newSeed"))
     return (
-      <NewSeed
+      <NewSeedScreen
         onSubmit={(password) => {
           send({ type: "GENERATE_L1", data: { password } })
         }}
@@ -65,7 +65,7 @@ function App() {
 
   if (state.matches("enterPassword"))
     return (
-      <Password
+      <PasswordScreen
         onSubmit={(password) => {
           send({ type: "SUBMIT_PASSWORD", data: { password } })
         }}
@@ -76,7 +76,7 @@ function App() {
 
   if (state.matches("uploadKeystore"))
     return (
-      <UploadKeystore
+      <UploadKeystoreScreen
         onSubmit={async (file) => {
           send({ type: "SUBMIT_KEYSTORE", data: await fileToString(file) })
         }}
@@ -88,8 +88,8 @@ function App() {
 
   if (state.matches("approveTx"))
     return (
-      <ApproveTx
-        tx={state.context.txToApprove}
+      <ApproveTransactionScreen
+        transaction={state.context.txToApprove}
         onSubmit={async () => {
           send({ type: "APPROVED_TX" })
         }}
@@ -124,7 +124,7 @@ function App() {
     return <DisclaimerScreen onSubmit={() => send("AGREE")} />
 
   if (state.matches("settings"))
-    return <Settings onBack={() => send("GO_BACK")} />
+    return <SettingsScreen onBack={() => send("GO_BACK")} />
 
   if (state.matches("account")) {
     return (
@@ -218,7 +218,7 @@ function App() {
 
   if (state.matches("addToken"))
     return (
-      <AddToken
+      <AddTokenScreen
         walletAddress={state.context.selectedWallet}
         onBack={() => {
           send("GO_BACK")
@@ -237,7 +237,7 @@ function App() {
       />
     )
 
-  return <Loading />
+  return <LoadingScreen />
 }
 
 const GlobalStyle = createGlobalStyle`
@@ -262,7 +262,7 @@ const GlobalStyle = createGlobalStyle`
 `
 
 export default () => (
-  <Suspense fallback={<Loading />}>
+  <Suspense fallback={<LoadingScreen />}>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link

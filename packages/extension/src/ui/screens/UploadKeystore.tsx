@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { FC, useMemo, useState } from "react"
+import { FC, useMemo } from "react"
 import { useDropzone } from "react-dropzone"
 import styled from "styled-components"
 
@@ -7,7 +7,7 @@ import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { H2 } from "../components/Typography"
 
-const UploadKeystoreScreen = styled.div`
+const UploadKeystoreScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -36,12 +36,12 @@ const DropZone = styled.div`
   }
 `
 
-interface UploadKeystoreProps {
+interface UploadKeystoreScreenProps {
   onSubmit?: (uploadKeystore: File) => void
   onBack?: () => void
 }
 
-export const UploadKeystore: FC<UploadKeystoreProps> = ({
+export const UploadKeystoreScreen: FC<UploadKeystoreScreenProps> = ({
   onSubmit,
   onBack,
 }) => {
@@ -57,7 +57,7 @@ export const UploadKeystore: FC<UploadKeystoreProps> = ({
   const disableSubmit = useMemo(() => !acceptedFile, [acceptedFile])
 
   return (
-    <UploadKeystoreScreen>
+    <UploadKeystoreScreenWrapper>
       <BackButton onClick={onBack} />
       <H2>Select backup</H2>
       <DropZone {...getRootProps()}>
@@ -78,6 +78,6 @@ export const UploadKeystore: FC<UploadKeystoreProps> = ({
       >
         Restore from backup
       </Button>
-    </UploadKeystoreScreen>
+    </UploadKeystoreScreenWrapper>
   )
 }

@@ -68,7 +68,7 @@ const BalanceSymbol = styled.div`
   line-height: 25px;
 `
 
-interface TokenProps {
+interface TokenScreenProps {
   token: TokenDetails
   onBack: () => void
   onTransfer: (
@@ -78,7 +78,11 @@ interface TokenProps {
   ) => Promise<void> | void
 }
 
-export const TokenScreen: FC<TokenProps> = ({ token, onBack, onTransfer }) => {
+export const TokenScreen: FC<TokenScreenProps> = ({
+  token,
+  onBack,
+  onTransfer,
+}) => {
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
 

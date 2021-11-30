@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
-import { Confirm, ConfirmPageProps } from "./Confirm"
+import { ConfirmPageProps, ConfirmScreen } from "./Confirm"
 
 interface ConnectProps extends ConfirmPageProps {
   host: string
@@ -14,14 +14,12 @@ const Code = styled.code`
   padding: 0 0.5em;
 `
 
-export const ConnectScreen: FC<ConnectProps> = ({ host, ...props }) => {
-  return (
-    <Confirm title="Connect to DApp" confirmButtonText="Connect" {...props}>
-      <P>
-        <Code>{host}</Code> wants to connect to your wallet. If you allow this
-        request the website will be able to read you wallet addresses and
-        request transactions, which you still need to sign.
-      </P>
-    </Confirm>
-  )
-}
+export const ConnectScreen: FC<ConnectProps> = ({ host, ...props }) => (
+  <ConfirmScreen title="Connect to DApp" confirmButtonText="Connect" {...props}>
+    <P>
+      <Code>{host}</Code> wants to connect to your wallet. If you allow this
+      request the website will be able to read you wallet addresses and request
+      transactions, which you still need to sign.
+    </P>
+  </ConfirmScreen>
+)

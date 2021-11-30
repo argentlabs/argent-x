@@ -51,38 +51,36 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
   activeWallet,
   networkId,
   onChangeNetwork,
-}) => {
-  return (
-    <AccountListWrapper>
-      <AccountHeader>
-        <IconButton size={36} {...makeClickable(onSettings, 99)}>
-          <Settings />
-        </IconButton>
-        <NetworkSwitcher
-          networkId={networkId}
-          onChangeNetwork={onChangeNetwork}
+}) => (
+  <AccountListWrapper>
+    <AccountHeader>
+      <IconButton size={36} {...makeClickable(onSettings, 99)}>
+        <Settings />
+      </IconButton>
+      <NetworkSwitcher
+        networkId={networkId}
+        onChangeNetwork={onChangeNetwork}
+      />
+    </AccountHeader>
+    <H1>Accounts</H1>
+    <AccountList>
+      {wallets.length === 0 && (
+        <Paragraph>
+          No wallets on this network, click below to add one.
+        </Paragraph>
+      )}
+      {wallets.map((wallet, index) => (
+        <AccountListItem
+          key={wallet.address}
+          accountNumber={index + 1}
+          address={wallet.address}
+          status={getStatus(wallet, activeWallet)}
+          onClick={() => onAccountSelect?.(wallet.address)}
         />
-      </AccountHeader>
-      <H1>Accounts</H1>
-      <AccountList>
-        {wallets.length === 0 && (
-          <Paragraph>
-            No wallets on this network, click below to add one.
-          </Paragraph>
-        )}
-        {wallets.map((wallet, index) => (
-          <AccountListItem
-            key={wallet.address}
-            accountNumber={index + 1}
-            address={wallet.address}
-            status={getStatus(wallet, activeWallet)}
-            onClick={() => onAccountSelect?.(wallet.address)}
-          />
-        ))}
-        <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
-          <Add />
-        </IconButtonCenter>
-      </AccountList>
-    </AccountListWrapper>
-  )
-}
+      ))}
+      <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
+        <Add />
+      </IconButtonCenter>
+    </AccountList>
+  </AccountListWrapper>
+)

@@ -10,7 +10,7 @@ import { A, FormError, P } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
 import { isValidPassword } from "./NewSeed"
 
-const PasswordScreen = styled.div`
+const PasswordScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,13 +35,13 @@ const PasswordScreen = styled.div`
   }
 `
 
-interface PasswordProps {
+interface PasswordScreenProps {
   onSubmit?: (password: string) => void
   onForgotPassword?: () => void
   error?: string
 }
 
-const greetings = [
+export const greetings = [
   "gm!",
   "Hello!",
   "Guten Tag!",
@@ -50,7 +50,7 @@ const greetings = [
   "hi fren",
 ]
 
-export const Password: FC<PasswordProps> = ({
+export const PasswordScreen: FC<PasswordScreenProps> = ({
   onSubmit,
   onForgotPassword,
   error,
@@ -69,7 +69,7 @@ export const Password: FC<PasswordProps> = ({
   }, [error])
 
   return (
-    <PasswordScreen>
+    <PasswordScreenWrapper>
       <LogoSvg />
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
@@ -104,6 +104,6 @@ export const Password: FC<PasswordProps> = ({
           Unlock
         </Button>
       </form>
-    </PasswordScreen>
+    </PasswordScreenWrapper>
   )
 }
