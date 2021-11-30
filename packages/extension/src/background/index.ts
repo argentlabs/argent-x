@@ -50,7 +50,6 @@ async function main() {
       if (currentTab && currentTab !== sender.tab?.id) {
         sendMessage(msg, { tabId: currentTab })
       }
-      if (msg.type === "CONNECT_RES") setActiveTab(sender.tab?.id)
     }
     if (currentTab && currentTab !== sender.tab?.id) {
       sendMessage(msg, { tabId: currentTab })
@@ -93,6 +92,7 @@ async function main() {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
+        setActiveTab(sender.tab?.id)
         if (!isWhitelisted) {
           actionQueue.push({
             type: "CONNECT",
