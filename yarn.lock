@@ -8742,20 +8742,6 @@ stacktrace-parser@0.1.10:
   dependencies:
     type-fest "^0.7.1"
 
-starknet@^2.0.1:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.0.2.tgz#3857e941c428cf9f9e652e7361d6ac33b4479237"
-  integrity sha512-IKCpDLAaVhdI1CVuJUKHzR1CBimF8mRpha3vEn2Bm6BPf3/AkGNx8aVaB+nrWTmAkUVHgkQ/4sMFoqBqe2sIhA==
-  dependencies:
-    axios "^0.23.0"
-    bn.js "^5.2.0"
-    elliptic "^6.5.4"
-    ethereum-cryptography "^0.2.0"
-    hash.js "^1.1.7"
-    json-bigint "^1.0.0"
-    minimalistic-assert "^1.0.1"
-    pako "^2.0.4"
-
 starknet@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.2.0.tgz#cca5716d0749663e7b3b9068f0966de0e753e231"
