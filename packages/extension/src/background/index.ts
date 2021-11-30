@@ -2,6 +2,7 @@ import { compactDecrypt } from "jose"
 import { ec, encode } from "starknet"
 import browser from "webextension-polyfill"
 
+import { BackupWallet } from "../shared/backup.model"
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 import { ActionItem, getQueue } from "./actionQueue"
@@ -37,10 +38,8 @@ async function main() {
 
   const actionQueue = await getQueue<ActionItem>("ACTIONS")
 
-  const store = new Storage<{
-    SELECTED_WALLET: string
-  }>({
-    SELECTED_WALLET: "",
+  const store = new Storage<{ SELECTED_WALLET: BackupWallet }>({
+    SELECTED_WALLET: { address: "", network: "" },
   })
 
   messageStream.subscribe(async ([msg, sender]) => {
@@ -51,7 +50,6 @@ async function main() {
       if (currentTab && currentTab !== sender.tab?.id) {
         sendMessage(msg, { tabId: currentTab })
       }
-      if (msg.type === "CONNECT_RES") setActiveTab(sender.tab?.id)
     }
     if (currentTab && currentTab !== sender.tab?.id) {
       sendMessage(msg, { tabId: currentTab })
@@ -82,11 +80,11 @@ async function main() {
       }
 
       case "GET_SELECTED_WALLET_ADDRESS": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
+        const { address } = await store.getItem("SELECTED_WALLET")
 
         return sendToTabAndUi({
           type: "GET_SELECTED_WALLET_ADDRESS_RES",
-          data: selectedWallet || "",
+          data: address,
         })
       }
 
@@ -94,6 +92,7 @@ async function main() {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
+        setActiveTab(sender.tab?.id)
         if (!isWhitelisted) {
           actionQueue.push({
             type: "CONNECT",
@@ -101,7 +100,7 @@ async function main() {
           })
         }
 
-        if (isWhitelisted && selectedWallet)
+        if (isWhitelisted && selectedWallet.address)
           return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
 
         return openUi()
@@ -128,6 +127,7 @@ async function main() {
       }
       case "APPROVE_WHITELIST": {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
+
         await actionQueue.removeLatest()
         await addToWhitelist(msg.data)
 
@@ -192,11 +192,11 @@ async function main() {
         const sessionPassword = getSession()
         if (!sessionPassword) throw Error("you need an open session")
 
-        const newAccount = await createAccount(sessionPassword, (progress) =>
-          sendToTabAndUi({ type: "REPORT_PROGRESS", data: progress }),
-        )
+        const network = msg.data
+        const newAccount = await createAccount(sessionPassword, network)
 
-        store.setItem("SELECTED_WALLET", newAccount.address)
+        const wallet = { address: newAccount.address, network }
+        store.setItem("SELECTED_WALLET", wallet)
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
       }

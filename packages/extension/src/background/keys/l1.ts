@@ -1,47 +1,31 @@
 import ArgentCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
 import { ethers } from "ethers"
-import { compileCalldata, defaultProvider, ec, encode, stark } from "starknet"
-import { hash } from "starknet"
+import { Provider, compileCalldata, ec, stark } from "starknet"
 import browser from "webextension-polyfill"
 
+import { BackupWallet } from "../../shared/backup.model"
 import { Storage } from "../storage"
 
 const isDev = process.env.NODE_ENV === "development"
 
-const store = new Storage<{
+interface StorageProps {
   encKeystore?: string
-  passwordHash?: string
-  walletAddresses: string[]
-}>(
-  {
-    walletAddresses: [],
-  },
-  "L1",
-)
-
-function hashString(str: string) {
-  return hash.hashCalldata([encode.buf2hex(encode.utf8ToArray(str))])
+  wallets: BackupWallet[]
 }
+
+const store = new Storage<StorageProps>({ wallets: [] }, "L1")
 
 export async function existsL1() {
   return Boolean(await store.getItem("encKeystore"))
 }
 
 export async function validatePassword(password: string) {
-  const passwordHashFromStorage = await store.getItem("passwordHash")
-
-  if (!passwordHashFromStorage && (await existsL1())) {
-    try {
-      await getL1(password)
-      return true
-    } catch {
-      return false
-    }
+  try {
+    await getL1(password)
+    return true
+  } catch {
+    return false
   }
-
-  return passwordHashFromStorage
-    ? hashString(password) === passwordHashFromStorage
-    : true
 }
 
 let rawWalletTimeoutPid: number | undefined
@@ -88,9 +72,8 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     if (!recoverPromise) recoverPromise = recoverL1(password)
     const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
-    store.setItem("passwordHash", hashString(password))
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
-    store.setItem("walletAddresses", encKeyPair.wallets ?? [])
+    store.setItem("wallets", encKeyPair.wallets ?? [])
     return recoveredWallet
   } else {
     return generateL1()
@@ -100,7 +83,7 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
 async function getEncKeyStore(
   wallet: ethers.Wallet,
   password: string,
-  wallets: string[],
+  wallets: BackupWallet[],
   progressFn: (progress: number) => void = () => {},
 ): Promise<string> {
   const backup = await wallet.encrypt(
@@ -137,39 +120,37 @@ function downloadTextFile(text: string, filename: string) {
   })
 }
 
-export const getWallets = () => store.getItem("walletAddresses")
+export const getWallets = async (): Promise<BackupWallet[]> =>
+  await store.getItem("wallets")
 
-export async function createAccount(
-  password: string,
-  progressFn: (progress: number) => void = () => {},
-) {
+export async function createAccount(password: string, networkId: string) {
   const l1 = await getL1(password)
   const starkPair = ec.getKeyPair(l1.privateKey)
   const starkPub = ec.getStarkKey(starkPair)
   const seed = ec.getStarkKey(ec.genKeyPair())
   const wallets = await getWallets()
 
-  const deployTransaction = await defaultProvider.deployContract(
+  const provider = new Provider({ network: networkId as any })
+  const deployTransaction = await provider.deployContract(
     ArgentCompiledContract,
     compileCalldata({
       signer: starkPub,
       guardian: "0",
-      L1_address: stark.makeAddress(await l1.getAddress()),
     }),
     seed,
   )
+
+  // TODO: register a L1 address with the wallet as soon as some registry is online
 
   if (deployTransaction.code !== "TRANSACTION_RECEIVED") {
     throw new Error("Deploy transaction failed")
   }
 
-  const encKeyStore = await getEncKeyStore(l1, password, [
-    ...wallets,
-    deployTransaction.address!,
-  ])
+  const newWallet = { network: networkId, address: deployTransaction.address! }
+  const newWallets = [...wallets, newWallet]
+  const encKeyStore = await getEncKeyStore(l1, password, newWallets)
   store.setItem("encKeystore", encKeyStore)
-  store.setItem("walletAddresses", [...wallets, deployTransaction.address!])
-  store.setItem("passwordHash", hashString(password))
+  store.setItem("wallets", newWallets)
 
   downloadTextFile(encKeyStore, "starknet-backup.json")
   return {

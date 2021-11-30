@@ -3,6 +3,7 @@ import { Args, InvokeFunctionTransaction } from "starknet"
 import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { sendMessage } from "../../shared/messages"
+import { defaultNetworkId } from "../../shared/networks"
 import {
   getLastSelectedWallet,
   getWallets,
@@ -34,6 +35,7 @@ type RouterEvents =
   | { type: "REJECT" }
   | { type: "SUBMIT_KEYSTORE"; data: string }
   | { type: "SELECT_WALLET"; data: string }
+  | { type: "CHANGE_NETWORK"; data: string }
   | {
       type: "SUBMIT_PASSWORD"
       data: { password: string }
@@ -49,6 +51,7 @@ type RouterEvents =
 
 interface Context {
   wallets: Record<string, Wallet>
+  networkId: string
   selectedWallet?: string
   selectedToken?: TokenDetails
   uploadedBackup?: string
@@ -106,19 +109,6 @@ type RouterTypestate =
       context: Context & { hostToWhitelist: string }
     }
 
-const isDev = process.env.NODE_ENV === "development"
-
-const KEYSTORE_KEY = "keystore"
-
-const getKeystoreFromLocalStorage = () => {
-  const keyStore = localStorage.getItem(KEYSTORE_KEY)
-  if (!keyStore) throw Error("no keystore found")
-  const jsonKeyStore = JSON.parse(keyStore)
-  if (!jsonKeyStore?.wallets?.length) throw Error("no argent keystore")
-
-  return keyStore
-}
-
 export const routerMachine = createMachine<
   Context,
   RouterEvents,
@@ -128,6 +118,7 @@ export const routerMachine = createMachine<
   initial: "determineEntry",
   context: {
     wallets: {},
+    networkId: defaultNetworkId,
   },
   states: {
     determineEntry: {
@@ -214,19 +205,18 @@ export const routerMachine = createMachine<
     },
     recover: {
       invoke: {
-        src: async (_, event) => {
-          const wallets = await getWallets()
-          console.log(wallets)
+        src: async ({ networkId }, ev) => {
+          const wallets = (await getWallets()).filter(
+            ({ network }) => network === networkId,
+          )
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
-          console.log(lastSelectedWallet)
 
-          const selectedWalletIndex =
-            (lastSelectedWallet ? wallets?.indexOf(lastSelectedWallet) : 0) || 0
-          console.log(selectedWalletIndex)
-          console.log(wallets[selectedWalletIndex])
+          const selectedWallet = wallets.find(
+            ({ address }) => address === lastSelectedWallet,
+          )?.address
 
           // if actions are pending show them first
           const requestedActions = await readLatestActionAndCount().catch(
@@ -235,19 +225,30 @@ export const routerMachine = createMachine<
 
           return {
             wallets: wallets
-              .map((address) => new Wallet(address))
+              .map(({ address }) => new Wallet(address, networkId))
               .reduce((acc, wallet) => {
                 return {
                   ...acc,
                   [wallet.address]: wallet,
                 }
               }, {}),
-            selectedWallet: wallets[selectedWalletIndex],
+            selectedWallet,
+            networkId,
 
             requestedActions,
+            showAccountList: ev.type === "CHANGE_NETWORK",
           }
         },
         onDone: [
+          {
+            target: "accountList",
+            cond: (_, event) =>
+              !event.data.selectedWallet || event.data.showAccountList,
+            actions: assign((_, event) => {
+              const { requestedActions, ...ctx } = event.data
+              return ctx
+            }),
+          },
           {
             target: "approveTx",
             cond: (_ctx, ev) => {
@@ -293,7 +294,7 @@ export const routerMachine = createMachine<
             }),
           },
         ],
-        onError: "determineEntry",
+        onError: [{ target: "determineEntry" }],
       },
     },
     welcome: {
@@ -313,7 +314,7 @@ export const routerMachine = createMachine<
           if (event.type === "GENERATE_L1")
             await startSession(event.data.password)
 
-          const newWallet = await Wallet.fromDeploy()
+          const newWallet = await Wallet.fromDeploy(ctx.networkId)
 
           return {
             newWallet,
@@ -334,13 +335,25 @@ export const routerMachine = createMachine<
     },
     account: {
       entry: async (ctx) => {
-        sendMessage({ type: "WALLET_CONNECTED", data: ctx.selectedWallet! })
+        sendMessage({
+          type: "WALLET_CONNECTED",
+          data: { address: ctx.selectedWallet!, network: ctx.networkId },
+        })
       },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",
         SHOW_TOKEN: "token",
         SHOW_ADD_TOKEN: "addToken",
         APPROVE_TX: "approveTx",
+        CHANGE_NETWORK: {
+          target: "recover",
+          actions: [
+            assign((ctx, { data }) => ({
+              ...ctx,
+              networkId: data,
+            })),
+          ],
+        },
       },
     },
     accountList: {
@@ -353,6 +366,15 @@ export const routerMachine = createMachine<
         },
         ADD_WALLET: "deployWallet",
         SHOW_SETTINGS: "settings",
+        CHANGE_NETWORK: {
+          target: "recover",
+          actions: [
+            assign((ctx, { data }) => ({
+              ...ctx,
+              networkId: data,
+            })),
+          ],
+        },
       },
     },
     token: {

@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 
-import { Account } from "./screens/Account"
+import { AccountScreen } from "./screens/Account"
 import { AccountListScreen } from "./screens/AccountList"
 import { AddToken } from "./screens/AddToken"
 import { ApproveTx } from "./screens/ApproveTx"
@@ -14,8 +14,8 @@ import { NewSeed } from "./screens/NewSeed"
 import { Password } from "./screens/Password"
 import { ResetScreen } from "./screens/Reset"
 import { Settings } from "./screens/Settings"
-import { Success } from "./screens/Success"
-import { Token } from "./screens/Token"
+import { SuccessScreen } from "./screens/Success"
+import { TokenScreen } from "./screens/Token"
 import { UploadKeystore } from "./screens/UploadKeystore"
 import { Welcome } from "./screens/Welcome"
 import { routerMachine } from "./states/RouterMachine"
@@ -100,7 +100,12 @@ function App() {
     )
 
   if (state.matches("submittedTx"))
-    return <Success txHash={state.context.txHash} />
+    return (
+      <SuccessScreen
+        networkId={state.context.networkId}
+        txHash={state.context.txHash}
+      />
+    )
 
   if (state.matches("connect"))
     return (
@@ -123,7 +128,7 @@ function App() {
 
   if (state.matches("account")) {
     return (
-      <Account
+      <AccountScreen
         onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
         onShowToken={(token: TokenDetails) =>
           send({ type: "SHOW_TOKEN", data: token })
@@ -162,11 +167,15 @@ function App() {
             })
           }
         }}
+        networkId={state.context.networkId}
+        onChangeNetwork={(networkId) => {
+          send({ type: "CHANGE_NETWORK", data: networkId })
+        }}
       />
     )
   }
 
-  if (state.matches("accountList"))
+  if (state.matches("accountList")) {
     return (
       <AccountListScreen
         wallets={Object.values(state.context.wallets)}
@@ -176,12 +185,17 @@ function App() {
         onAccountSelect={(address) => {
           send({ type: "SELECT_WALLET", data: address })
         }}
+        networkId={state.context.networkId}
+        onChangeNetwork={(networkId) => {
+          send({ type: "CHANGE_NETWORK", data: networkId })
+        }}
       />
     )
+  }
 
   if (state.matches("token"))
     return (
-      <Token
+      <TokenScreen
         token={state.context.selectedToken}
         onBack={() => {
           send("GO_BACK")

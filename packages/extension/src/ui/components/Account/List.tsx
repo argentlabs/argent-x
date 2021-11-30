@@ -5,7 +5,7 @@ import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
 import { AccountColumn, AccountRow } from "./Header"
-import { AccountStatusIndicator, AccountStatusWrapper } from "./Network"
+import { NetworkStatusIndicator, NetworkStatusWrapper } from "./Network"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const AccountList = styled.div`
@@ -71,10 +71,10 @@ export const AccountListItem: FC<AccountListProps> = ({
           <AccountName>Account {accountNumber}</AccountName>
           <p>{truncateAddress(address)}</p>
         </AccountColumn>
-        <AccountStatusWrapper>
-          <AccountStatusIndicator status={status.code} />
+        <NetworkStatusWrapper>
+          <NetworkStatusIndicator status={status.code} />
           <AccountStatusText>{status.text}</AccountStatusText>
-        </AccountStatusWrapper>
+        </NetworkStatusWrapper>
       </AccountRow>
     </AccountListItemWrapper>
   )

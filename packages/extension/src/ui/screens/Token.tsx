@@ -9,7 +9,7 @@ import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
 import { TokenDetails, toTokenView } from "../utils/tokens"
 
-const TokenScreen = styled.div`
+const TokenScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -78,7 +78,7 @@ interface TokenProps {
   ) => Promise<void> | void
 }
 
-export const Token: FC<TokenProps> = ({ token, onBack, onTransfer }) => {
+export const TokenScreen: FC<TokenProps> = ({ token, onBack, onTransfer }) => {
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
 
@@ -88,7 +88,7 @@ export const Token: FC<TokenProps> = ({ token, onBack, onTransfer }) => {
     onTransfer(address, recipient, ethers.utils.parseUnits(amount, decimals))
 
   return (
-    <TokenScreen>
+    <TokenScreenWrapper>
       <BackButton onClick={onBack} />
 
       <Header>
@@ -115,6 +115,6 @@ export const Token: FC<TokenProps> = ({ token, onBack, onTransfer }) => {
         />
         <Button type="submit">Send</Button>
       </ButtonGroup>
-    </TokenScreen>
+    </TokenScreenWrapper>
   )
 }

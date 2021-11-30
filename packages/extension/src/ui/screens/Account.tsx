@@ -1,21 +1,12 @@
-import Tippy from "@tippyjs/react"
 import { FC, Suspense } from "react"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
-import {
-  AccountColumn,
-  AccountHeader,
-  AccountRow as DefaultAccountRow,
-} from "../components/Account/Header"
-import {
-  AccountNetwork,
-  AccountStatusIndicator,
-} from "../components/Account/Network"
+import { AccountColumn, AccountHeader } from "../components/Account/Header"
+import { NetworkSwitcher } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { TokenList } from "../components/Account/TokenList"
-import { Tooltip } from "../components/CopyTooltip"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
@@ -36,26 +27,26 @@ const AccountContent = styled.div`
   padding: 16px;
 `
 
-const AccountRow = styled(DefaultAccountRow)`
-  justify-content: flex-end;
-`
-
-interface AccountProps {
+interface AccountScreenProps {
   wallet: Wallet
   accountNumber: number
   onShowAccountList?: () => void
   onShowToken: (token: TokenDetails) => void
   onAddToken?: () => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
+  networkId: string
+  onChangeNetwork: (networkId: string) => Promise<void> | void
 }
 
-export const Account: FC<AccountProps> = ({
+export const AccountScreen: FC<AccountScreenProps> = ({
   wallet,
   accountNumber,
   onShowAccountList,
   onShowToken,
   onAddToken,
   onAction,
+  networkId,
+  onChangeNetwork,
 }) => {
   const status = useStatus(wallet)
   return (
@@ -65,17 +56,14 @@ export const Account: FC<AccountProps> = ({
           {...makeClickable(onShowAccountList)}
           src={getAccountImageUrl(accountNumber)}
         />
-        <AccountRow>
-          <Tippy content={<Tooltip>{status.text}</Tooltip>}>
-            <AccountNetwork>
-              <span>Goerli alpha</span>
-              <AccountStatusIndicator status={status.code} />
-            </AccountNetwork>
-          </Tippy>
-        </AccountRow>
+        <NetworkSwitcher
+          networkId={networkId}
+          onChangeNetwork={onChangeNetwork}
+        />
       </AccountHeader>
       <AccountContent>
         <AccountSubHeader
+          networkId={networkId}
           status={status}
           accountNumber={accountNumber}
           walletAddress={wallet.address}

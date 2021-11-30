@@ -6,6 +6,7 @@ import {
   Calldata,
   CompiledContract,
   Contract,
+  Provider,
   compileCalldata,
   encode,
   hash,
@@ -25,10 +26,14 @@ export class Wallet {
   deployTransaction?: string
   contract: Contract
 
-  constructor(address: string, deployTransaction?: string) {
+  constructor(address: string, networkId: string, deployTransaction?: string) {
     this.address = address
     this.deployTransaction = deployTransaction
-    this.contract = new Contract(ArgentCompiledContractJson.abi, address)
+    this.contract = new Contract(
+      ArgentCompiledContractJson.abi,
+      address,
+      new Provider({ network: networkId as any }),
+    )
 
     if (deployTransaction) {
       localStorage.setItem(`walletTx:${address}`, deployTransaction)
@@ -82,11 +87,14 @@ export class Wallet {
     )
   }
 
-  public static async fromDeploy(): Promise<Wallet> {
-    sendMessage({ type: "NEW_ACCOUNT" })
-
+  public static async fromDeploy(networkId: string): Promise<Wallet> {
+    sendMessage({ type: "NEW_ACCOUNT", data: networkId })
     const deployTransaction = await waitForMessage("NEW_ACCOUNT_RES")
 
-    return new Wallet(deployTransaction.address, deployTransaction.txHash)
+    return new Wallet(
+      deployTransaction.address,
+      networkId,
+      deployTransaction.txHash,
+    )
   }
 }

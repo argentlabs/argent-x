@@ -19,8 +19,8 @@ export const DisclaimerScreen: FC<ConfirmPageProps> = (props) => {
       {...props}
     >
       <SP>
-        This is an alpha product for developers. Future versions will include
-        breaking changes and you will likely lose access to your accounts. Do
+        This is an alpha product for developers. Future versions will likely
+        include breaking changes and you may lose access to your accounts. Do
         not store valuable assets.
       </SP>
     </Confirm>

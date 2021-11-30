@@ -1,25 +1,10 @@
-import { Provider, Signer, defaultProvider } from "starknet"
+import { defaultProvider } from "starknet"
 
 import App from "./App.svelte"
+import type { StarknetWindowObject } from "./extension.model"
 
 // nextjs ie needs this to be typeof window !== "undefined" as it's replacing it in client bundles
 const IS_BROWSER = typeof window !== "undefined"
-
-type StarknetWindowObject =
-  | {
-      enable: () => Promise<string[]>
-      signer: Signer
-      provider: Provider
-      selectedAddress: string
-      isConnected: true
-    }
-  | {
-      enable: () => Promise<string[]>
-      signer?: Signer
-      provider: Provider
-      selectedAddress?: string
-      isConnected: false
-    }
 
 export function getStarknet({
   showModal = false,
@@ -31,12 +16,15 @@ export function getStarknet({
     if (IS_BROWSER && showModal) {
       new App({ target: document.body })
     }
+    const fail = async () => {
+      throw Error("no starknet found in window")
+    }
     return {
       isConnected: false,
-      enable: async () => {
-        throw Error("no starknet found in window")
-      },
       provider: defaultProvider,
+      enable: fail,
+      on: fail,
+      off: fail,
     }
   }
 }
