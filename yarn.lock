@@ -8756,9 +8756,10 @@ starknet@^2.0.1:
     minimalistic-assert "^1.0.1"
     pako "^2.0.4"
 
-starknet@seanjameshan/starknet.js#develop:
-  version "2.0.1"
-  resolved "https://codeload.github.com/seanjameshan/starknet.js/tar.gz/36e54e58614cf6df4d15ffbf582323e365ea163c"
+starknet@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.1.0.tgz#6addbf16c898d76d671b9b897a944ad3d635cf41"
+  integrity sha512-Pb7gATOizU6lvnE8YPQxYrEOZ3hvq0J5TPGDBC5XZMavmmO9qyKoVQCS6mwqo9qKmAxbWFlC3y+2SYv3cpNvUQ==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"

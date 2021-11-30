@@ -30,7 +30,7 @@ export type MessageType =
   | { type: "IS_WHITELIST"; data: string }
   | { type: "IS_WHITELIST_RES"; data: boolean }
   | { type: "RESET_WHITELIST" }
-  | { type: "WALLET_CONNECTED"; data: string }
+  | { type: "WALLET_CONNECTED"; data: BackupWallet }
   | { type: "RESET_ALL" }
   | { type: "REQ_PUB" }
   | { type: "REQ_PUB_RES"; data: JWK }

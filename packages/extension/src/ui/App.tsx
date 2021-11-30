@@ -176,7 +176,6 @@ function App() {
   }
 
   if (state.matches("accountList")) {
-    console.warn("app", state.context.networkId)
     return (
       <AccountListScreen
         wallets={Object.values(state.context.wallets)}

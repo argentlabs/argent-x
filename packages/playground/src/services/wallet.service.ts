@@ -12,5 +12,17 @@ export const walletAddress = async (): Promise<string | undefined> => {
   } catch {}
 }
 
+export const networkUrl = (): string | undefined => {
+  try {
+    return getStarknet().provider.baseUrl
+  } catch {}
+}
+
 export const waitForTransaction = async (hash: string) =>
   await getStarknet().provider.waitForTx(hash)
+
+export const addWalletChangeListener = async (
+  handleEvent: (accounts: string[]) => void,
+) => {
+  getStarknet().on("accountsChanged", handleEvent)
+}

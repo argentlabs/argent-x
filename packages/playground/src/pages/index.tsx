@@ -1,11 +1,13 @@
 import type { NextPage } from "next"
 import Head from "next/head"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { TokenDapp } from "../components/TokenDapp"
 import {
+  addWalletChangeListener,
   connectWallet,
   isWalletConnected,
+  networkUrl,
   walletAddress,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
@@ -13,6 +15,12 @@ import styles from "../styles/Home.module.css"
 const Home: NextPage = () => {
   const [isConnected, setIsConnected] = useState(isWalletConnected())
   const [address, setAddress] = useState<string>()
+
+  useEffect(() => {
+    addWalletChangeListener((accounts) => {
+      setAddress(accounts[0])
+    })
+  }, [])
 
   const handleConnectClick = async () => {
     await connectWallet()
@@ -32,6 +40,9 @@ const Home: NextPage = () => {
           <>
             <h3 style={{ margin: 0 }}>
               Wallet address: <code>{address}</code>
+            </h3>
+            <h3 style={{ margin: 0 }}>
+              Url: <code>{networkUrl()}</code>
             </h3>
             <TokenDapp />
           </>

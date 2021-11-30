@@ -115,7 +115,7 @@ async function main() {
       }
 
       case "WALLET_CONNECTED": {
-        return store.setItem("SELECTED_WALLET", msg.data)
+        return store.setItem("SELECTED_WALLET", msg.data.address)
       }
 
       case "SUBMITTED_TX":

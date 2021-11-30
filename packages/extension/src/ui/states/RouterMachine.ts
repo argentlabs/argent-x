@@ -209,7 +209,6 @@ export const routerMachine = createMachine<
         src: async (ctx, ev) => {
           const wallets = await getWallets()
           const networkId = await getNetworkId()
-          console.warn("recover", networkId, wallets)
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
@@ -336,7 +335,10 @@ export const routerMachine = createMachine<
     },
     account: {
       entry: async (ctx) => {
-        sendMessage({ type: "WALLET_CONNECTED", data: ctx.selectedWallet! })
+        sendMessage({
+          type: "WALLET_CONNECTED",
+          data: { address: ctx.selectedWallet!, network: ctx.networkId },
+        })
       },
       on: {
         SHOW_ACCOUNT_LIST: "accountList",

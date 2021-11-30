@@ -41,7 +41,7 @@
     "react-hook-form": "^7.19.4",
     "react-promise-suspense": "^0.3.3",
     "react-router-dom": "^6.0.1",
-    "starknet": "seanjameshan/starknet.js#develop",
+    "starknet": "^2.1.0",
     "styled-components": "^5.3.3",
     "styled-normalize": "^8.0.7",
     "webextension-polyfill": "^0.8.0",
