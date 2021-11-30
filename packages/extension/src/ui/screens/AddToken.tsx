@@ -130,7 +130,7 @@ export const AddToken: FC<AddTokenProps> = ({
           onChange={(e: any) => {
             setTokenAddress(e.target.value?.toLowerCase())
           }}
-          onBlur={(e: any) => {
+          onBlur={() => {
             try {
               if (tokenAddress)
                 setTokenAddress(addressFormat64Byte(tokenAddress))
