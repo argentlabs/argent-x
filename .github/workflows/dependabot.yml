@@ -7,6 +7,7 @@ jobs:
     steps:
       - uses: actions/github-script@v3
         with:
+          github-token: ${{ secrets.MY_PAT }}
           script: |-
             github.pulls.merge({
               owner: context.payload.repository.owner.login,
