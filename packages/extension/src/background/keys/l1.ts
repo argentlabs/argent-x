@@ -1,6 +1,6 @@
 import ArgentCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
 import { ethers } from "ethers"
-import { Provider, compileCalldata, ec, encode, stark } from "starknet"
+import { Provider, compileCalldata, ec, stark } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
@@ -10,10 +10,10 @@ const isDev = process.env.NODE_ENV === "development"
 
 interface StorageProps {
   encKeystore?: string
-  walletAddresses: BackupWallet[]
+  wallets: BackupWallet[]
 }
 
-const store = new Storage<StorageProps>({ walletAddresses: [] }, "L1")
+const store = new Storage<StorageProps>({ wallets: [] }, "L1")
 
 export async function existsL1() {
   return Boolean(await store.getItem("encKeystore"))
@@ -73,7 +73,7 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
-    store.setItem("walletAddresses", encKeyPair.wallets ?? [])
+    store.setItem("wallets", encKeyPair.wallets ?? [])
     return recoveredWallet
   } else {
     return generateL1()
@@ -120,27 +120,10 @@ function downloadTextFile(text: string, filename: string) {
   })
 }
 
-export const getWallets = async (networkId?: string): Promise<BackupWallet[]> =>
-  (await store.getItem("walletAddresses"))
-    .map((wallet) => {
-      if (typeof wallet === "string") {
-        // backwards compatibility
-        return { network: "goerli-alpha", address: wallet } as const
-      }
-      return wallet
-    })
-    .filter((wallet) => {
-      if (networkId && networkId !== wallet.network) {
-        return false
-      }
-      return true
-    })
+export const getWallets = async (): Promise<BackupWallet[]> =>
+  await store.getItem("wallets")
 
-export async function createAccount(
-  password: string,
-  networkId: string,
-  progressFn: (progress: number) => void = () => {},
-) {
+export async function createAccount(password: string, networkId: string) {
   const l1 = await getL1(password)
   const starkPair = ec.getKeyPair(l1.privateKey)
   const starkPub = ec.getStarkKey(starkPair)
@@ -166,7 +149,7 @@ export async function createAccount(
   const newWallets = [...wallets, newWallet]
   const encKeyStore = await getEncKeyStore(l1, password, newWallets)
   store.setItem("encKeystore", encKeyStore)
-  store.setItem("walletAddresses", newWallets)
+  store.setItem("wallets", newWallets)
 
   downloadTextFile(encKeyStore, "starknet-backup.json")
   return {

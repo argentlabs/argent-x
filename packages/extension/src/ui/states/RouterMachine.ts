@@ -6,7 +6,6 @@ import { sendMessage } from "../../shared/messages"
 import { defaultNetworkId } from "../../shared/networks"
 import {
   getLastSelectedWallet,
-  getNetworkId,
   getWallets,
   hasActiveSession,
   isInitialized,
@@ -206,9 +205,10 @@ export const routerMachine = createMachine<
     },
     recover: {
       invoke: {
-        src: async (ctx, ev) => {
-          const wallets = await getWallets()
-          const networkId = await getNetworkId()
+        src: async ({ networkId }, ev) => {
+          const wallets = (await getWallets()).filter(
+            ({ network }) => network === networkId,
+          )
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
@@ -314,7 +314,7 @@ export const routerMachine = createMachine<
           if (event.type === "GENERATE_L1")
             await startSession(event.data.password)
 
-          const newWallet = await Wallet.fromDeploy()
+          const newWallet = await Wallet.fromDeploy(ctx.networkId)
 
           return {
             newWallet,
@@ -352,9 +352,6 @@ export const routerMachine = createMachine<
               ...ctx,
               networkId: data,
             })),
-            (_, { data }) => {
-              sendMessage({ type: "CHANGE_NETWORK", data })
-            },
           ],
         },
       },
@@ -376,9 +373,6 @@ export const routerMachine = createMachine<
               ...ctx,
               networkId: data,
             })),
-            (_, { data }) => {
-              sendMessage({ type: "CHANGE_NETWORK", data })
-            },
           ],
         },
       },

@@ -71,11 +71,6 @@ export const startSession = async (password: string): Promise<void> => {
   if (!succeeded) throw Error("Wrong password")
 }
 
-export const getNetworkId = async () => {
-  sendMessage({ type: "GET_NETWORK" })
-  return waitForMessage("GET_NETWORK_RES")
-}
-
 export const monitorProgress = (updateFn: (progress: number) => void) => {
   messageStream.subscribe(([msg]) => {
     if (msg.type === "REPORT_PROGRESS") {

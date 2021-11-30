@@ -34,7 +34,7 @@ export type MessageType =
   | { type: "RESET_ALL" }
   | { type: "REQ_PUB" }
   | { type: "REQ_PUB_RES"; data: JWK }
-  | { type: "NEW_ACCOUNT" }
+  | { type: "NEW_ACCOUNT"; data: string }
   | { type: "STOP_SESSION" }
   | {
       type: "NEW_ACCOUNT_RES"
@@ -54,9 +54,6 @@ export type MessageType =
   | { type: "RECOVER_KEYSTORE_RES" }
   | { type: "SIGN"; data: { hash: string } }
   | { type: "SIGN_RES"; data: { r: string; s: string } }
-  | { type: "GET_NETWORK" }
-  | { type: "GET_NETWORK_RES"; data: string }
-  | { type: "CHANGE_NETWORK"; data: string }
 
 export type WindowMessageType = {
   forwarded?: boolean

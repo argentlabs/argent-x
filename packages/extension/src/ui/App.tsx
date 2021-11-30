@@ -15,7 +15,7 @@ import { Password } from "./screens/Password"
 import { ResetScreen } from "./screens/Reset"
 import { Settings } from "./screens/Settings"
 import { SuccessScreen } from "./screens/Success"
-import { Token } from "./screens/Token"
+import { TokenScreen } from "./screens/Token"
 import { UploadKeystore } from "./screens/UploadKeystore"
 import { Welcome } from "./screens/Welcome"
 import { routerMachine } from "./states/RouterMachine"
@@ -195,7 +195,7 @@ function App() {
 
   if (state.matches("token"))
     return (
-      <Token
+      <TokenScreen
         token={state.context.selectedToken}
         onBack={() => {
           send("GO_BACK")

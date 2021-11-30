@@ -2,9 +2,9 @@ import { compactDecrypt } from "jose"
 import { ec, encode } from "starknet"
 import browser from "webextension-polyfill"
 
+import { BackupWallet } from "../shared/backup.model"
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { defaultNetworkId } from "../shared/networks"
 import { ActionItem, getQueue } from "./actionQueue"
 import { getKeyPair } from "./keys/communication"
 import {
@@ -38,12 +38,8 @@ async function main() {
 
   const actionQueue = await getQueue<ActionItem>("ACTIONS")
 
-  const store = new Storage<{
-    SELECTED_WALLET: string
-    SELECTED_NETWORK: string
-  }>({
-    SELECTED_WALLET: "",
-    SELECTED_NETWORK: defaultNetworkId,
+  const store = new Storage<{ SELECTED_WALLET: BackupWallet }>({
+    SELECTED_WALLET: { address: "", network: "" },
   })
 
   messageStream.subscribe(async ([msg, sender]) => {
@@ -85,17 +81,15 @@ async function main() {
       }
 
       case "GET_SELECTED_WALLET_ADDRESS": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
-
+        const { address } = await store.getItem("SELECTED_WALLET")
         return sendToTabAndUi({
           type: "GET_SELECTED_WALLET_ADDRESS_RES",
-          data: selectedWallet || "",
+          data: address,
         })
       }
 
       case "CONNECT": {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
-        const networkId = await store.getItem("SELECTED_NETWORK")
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
         if (!isWhitelisted) {
@@ -105,17 +99,17 @@ async function main() {
           })
         }
 
-        if (isWhitelisted && selectedWallet)
+        if (isWhitelisted && selectedWallet.address)
           return sendToTabAndUi({
             type: "CONNECT_RES",
-            data: { address: selectedWallet, network: networkId },
+            data: selectedWallet,
           })
 
         return openUi()
       }
 
       case "WALLET_CONNECTED": {
-        return store.setItem("SELECTED_WALLET", msg.data.address)
+        return store.setItem("SELECTED_WALLET", msg.data)
       }
 
       case "SUBMITTED_TX":
@@ -135,7 +129,6 @@ async function main() {
       }
       case "APPROVE_WHITELIST": {
         const selectedWallet = await store.getItem("SELECTED_WALLET")
-        const networkId = await store.getItem("SELECTED_NETWORK")
 
         await actionQueue.removeLatest()
         await addToWhitelist(msg.data)
@@ -143,7 +136,7 @@ async function main() {
         if (selectedWallet)
           return sendToTabAndUi({
             type: "CONNECT_RES",
-            data: { address: selectedWallet, network: networkId },
+            data: selectedWallet,
           })
         return openUi()
       }
@@ -197,22 +190,18 @@ async function main() {
       case "GET_WALLETS": {
         return sendToTabAndUi({
           type: "GET_WALLETS_RES",
-          data: await getWallets(await store.getItem("SELECTED_NETWORK")),
+          data: await getWallets(),
         })
       }
       case "NEW_ACCOUNT": {
         const sessionPassword = getSession()
         if (!sessionPassword) throw Error("you need an open session")
 
-        const networkId = await store.getItem("SELECTED_NETWORK")
-        const newAccount = await createAccount(
-          sessionPassword,
-          networkId,
-          (progress) =>
-            sendToTabAndUi({ type: "REPORT_PROGRESS", data: progress }),
-        )
+        const networkId = msg.data
+        const newAccount = await createAccount(sessionPassword, networkId)
 
-        store.setItem("SELECTED_WALLET", newAccount.address)
+        const wallet = { address: newAccount.address, network: networkId }
+        store.setItem("SELECTED_WALLET", wallet)
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
       }
@@ -230,15 +219,6 @@ async function main() {
             s: s.toString(),
           },
         })
-      }
-      case "GET_NETWORK": {
-        return sendToTabAndUi({
-          type: "GET_NETWORK_RES",
-          data: await store.getItem("SELECTED_NETWORK"),
-        })
-      }
-      case "CHANGE_NETWORK": {
-        return store.setItem("SELECTED_NETWORK", msg.data)
       }
       case "RECOVER_KEYSTORE": {
         await setKeystore(msg.data)
