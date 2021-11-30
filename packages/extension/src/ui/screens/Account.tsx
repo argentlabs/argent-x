@@ -3,11 +3,7 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
-import {
-  AccountColumn,
-  AccountHeader,
-  AccountRow as DefaultAccountRow,
-} from "../components/Account/Header"
+import { AccountColumn, AccountHeader } from "../components/Account/Header"
 import { NetworkSwitcher } from "../components/Account/Network"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { TokenList } from "../components/Account/TokenList"
@@ -31,29 +27,25 @@ const AccountContent = styled.div`
   padding: 16px;
 `
 
-const AccountRow = styled(DefaultAccountRow)`
-  justify-content: flex-end;
-`
-
-interface AccountProps {
+interface AccountScreenProps {
   wallet: Wallet
-  networkId: string
   accountNumber: number
   onShowAccountList?: () => void
   onShowToken: (token: TokenDetails) => void
   onAddToken?: () => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
+  networkId: string
   onChangeNetwork: (networkId: string) => Promise<void> | void
 }
 
-export const Account: FC<AccountProps> = ({
+export const AccountScreen: FC<AccountScreenProps> = ({
   wallet,
   accountNumber,
-  networkId,
   onShowAccountList,
   onShowToken,
   onAddToken,
   onAction,
+  networkId,
   onChangeNetwork,
 }) => {
   const status = useStatus(wallet)
@@ -64,12 +56,10 @@ export const Account: FC<AccountProps> = ({
           {...makeClickable(onShowAccountList)}
           src={getAccountImageUrl(accountNumber)}
         />
-        <AccountRow>
-          <NetworkSwitcher
-            networkId={networkId}
-            onChangeNetwork={onChangeNetwork}
-          />
-        </AccountRow>
+        <NetworkSwitcher
+          networkId={networkId}
+          onChangeNetwork={onChangeNetwork}
+        />
       </AccountHeader>
       <AccountContent>
         <AccountSubHeader

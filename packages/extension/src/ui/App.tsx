@@ -3,8 +3,7 @@ import { Suspense } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 
-import { sendMessage } from "../shared/messages"
-import { Account } from "./screens/Account"
+import { AccountScreen } from "./screens/Account"
 import { AccountListScreen } from "./screens/AccountList"
 import { AddToken } from "./screens/AddToken"
 import { ApproveTx } from "./screens/ApproveTx"
@@ -15,7 +14,7 @@ import { NewSeed } from "./screens/NewSeed"
 import { Password } from "./screens/Password"
 import { ResetScreen } from "./screens/Reset"
 import { Settings } from "./screens/Settings"
-import { Success } from "./screens/Success"
+import { SuccessScreen } from "./screens/Success"
 import { Token } from "./screens/Token"
 import { UploadKeystore } from "./screens/UploadKeystore"
 import { Welcome } from "./screens/Welcome"
@@ -102,7 +101,7 @@ function App() {
 
   if (state.matches("submittedTx"))
     return (
-      <Success
+      <SuccessScreen
         networkId={state.context.networkId}
         txHash={state.context.txHash}
       />
@@ -129,14 +128,13 @@ function App() {
 
   if (state.matches("account")) {
     return (
-      <Account
+      <AccountScreen
         onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
         onShowToken={(token: TokenDetails) =>
           send({ type: "SHOW_TOKEN", data: token })
         }
         onAddToken={() => send("SHOW_ADD_TOKEN")}
         wallet={state.context.wallets[state.context.selectedWallet]}
-        networkId={state.context.networkId}
         accountNumber={
           Object.keys(state.context.wallets).findIndex(
             (wallet) => wallet === state.context.selectedWallet,
@@ -169,6 +167,7 @@ function App() {
             })
           }
         }}
+        networkId={state.context.networkId}
         onChangeNetwork={(networkId) => {
           send({ type: "CHANGE_NETWORK", data: networkId })
         }}
@@ -176,7 +175,8 @@ function App() {
     )
   }
 
-  if (state.matches("accountList"))
+  if (state.matches("accountList")) {
+    console.warn("app", state.context.networkId)
     return (
       <AccountListScreen
         wallets={Object.values(state.context.wallets)}
@@ -186,8 +186,13 @@ function App() {
         onAccountSelect={(address) => {
           send({ type: "SELECT_WALLET", data: address })
         }}
+        networkId={state.context.networkId}
+        onChangeNetwork={(networkId) => {
+          send({ type: "CHANGE_NETWORK", data: networkId })
+        }}
       />
     )
+  }
 
   if (state.matches("token"))
     return (

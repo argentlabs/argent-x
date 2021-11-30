@@ -2,8 +2,9 @@ import styled from "styled-components"
 
 export const AccountHeader = styled.header`
   display: flex;
-  gap: 9px;
   padding: 16px;
+  align-items: center;
+  justify-content: space-between;
 `
 
 export const AccountColumn = styled.div`

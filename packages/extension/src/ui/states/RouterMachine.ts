@@ -110,19 +110,6 @@ type RouterTypestate =
       context: Context & { hostToWhitelist: string }
     }
 
-const isDev = process.env.NODE_ENV === "development"
-
-const KEYSTORE_KEY = "keystore"
-
-const getKeystoreFromLocalStorage = () => {
-  const keyStore = localStorage.getItem(KEYSTORE_KEY)
-  if (!keyStore) throw Error("no keystore found")
-  const jsonKeyStore = JSON.parse(keyStore)
-  if (!jsonKeyStore?.wallets?.length) throw Error("no argent keystore")
-
-  return keyStore
-}
-
 export const routerMachine = createMachine<
   Context,
   RouterEvents,
@@ -219,17 +206,19 @@ export const routerMachine = createMachine<
     },
     recover: {
       invoke: {
-        src: async (_, event) => {
+        src: async () => {
           const wallets = await getWallets()
           const networkId = await getNetworkId()
+          console.warn("recover", networkId, wallets)
 
           const lastSelectedWallet = await getLastSelectedWallet().catch(
             () => "",
           )
 
-          const selectedWallet =
-            wallets.find(({ address }) => address === lastSelectedWallet)
-              ?.address || wallets[0]?.address
+          const selectedWallet = (
+            wallets.find(({ address }) => address === lastSelectedWallet) ||
+            wallets[0]
+          )?.address
 
           if (!selectedWallet) {
             throw new Error("no wallets")
@@ -370,7 +359,7 @@ export const routerMachine = createMachine<
               ...ctx,
               networkId: data,
             })),
-            (ctx, { data }) => {
+            (_, { data }) => {
               sendMessage({ type: "CHANGE_NETWORK", data })
             },
           ],
@@ -387,6 +376,18 @@ export const routerMachine = createMachine<
         },
         ADD_WALLET: "deployWallet",
         SHOW_SETTINGS: "settings",
+        CHANGE_NETWORK: {
+          target: "recover",
+          actions: [
+            assign((ctx, { data }) => ({
+              ...ctx,
+              networkId: data,
+            })),
+            (_, { data }) => {
+              sendMessage({ type: "CHANGE_NETWORK", data })
+            },
+          ],
+        },
       },
     },
     token: {

@@ -1,12 +1,11 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import SuccessGif from "../../assets/loading.gif"
 import { getNetwork } from "../../shared/networks"
 import { Spinner } from "../components/Spinner"
 import { A } from "../components/Typography"
 
-const SuccessScreen = styled.div`
+const SuccessScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -21,19 +20,22 @@ const SuccessText = styled(A)`
   line-height: 32px;
 `
 
-interface SuccessProps {
+interface SuccessScreenProps {
   networkId: string
   txHash: string
 }
 
-export const Success: FC<SuccessProps> = ({ networkId, txHash }) => {
+export const SuccessScreen: FC<SuccessScreenProps> = ({
+  networkId,
+  txHash,
+}) => {
   const { explorerUrl } = getNetwork(networkId)
   return (
-    <SuccessScreen>
+    <SuccessScreenWrapper>
       <Spinner size={92} />
       <SuccessText href={`${explorerUrl}/tx/${txHash}`} target="_blank">
         Transaction was submitted
       </SuccessText>
-    </SuccessScreen>
+    </SuccessScreenWrapper>
   )
 }

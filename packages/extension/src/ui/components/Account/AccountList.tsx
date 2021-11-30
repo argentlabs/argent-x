@@ -5,13 +5,14 @@ import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
 import { AccountColumn, AccountRow } from "./Header"
-import { AccountStatusIndicator, AccountStatusWrapper } from "./Network"
+import { NetworkStatusIndicator, NetworkStatusWrapper } from "./Network"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const AccountList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding: 48px 32px;
 `
 
 export const AccountListItemWrapper = styled.div`
@@ -60,8 +61,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   accountNumber,
   address,
   status,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onClick = () => {},
+  onClick,
 }) => {
   return (
     <AccountListItemWrapper {...makeClickable(onClick)}>
@@ -71,10 +71,10 @@ export const AccountListItem: FC<AccountListProps> = ({
           <AccountName>Account {accountNumber}</AccountName>
           <p>{truncateAddress(address)}</p>
         </AccountColumn>
-        <AccountStatusWrapper>
-          <AccountStatusIndicator status={status.code} />
+        <NetworkStatusWrapper>
+          <NetworkStatusIndicator status={status.code} />
           <AccountStatusText>{status.text}</AccountStatusText>
-        </AccountStatusWrapper>
+        </NetworkStatusWrapper>
       </AccountRow>
     </AccountListItemWrapper>
   )

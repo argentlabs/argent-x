@@ -8,7 +8,7 @@ const NetworkName = styled.span`
   text-align: right;
 `
 
-const AccountNetwork = styled.div<{ selected?: boolean }>`
+const Network = styled.div<{ selected?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: right;
@@ -45,11 +45,11 @@ const NetworkList = styled.div`
   border-radius: 0 0 15px 15px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 
-  & > ${AccountNetwork} {
+  & > ${Network} {
     border-top: 1px #525252 solid;
   }
 
-  & > ${AccountNetwork}:last-child {
+  & > ${Network}:last-child {
     border-radius: 0 0 15px 15px;
   }
 `
@@ -61,11 +61,11 @@ const NetworkSwitcherWrapper = styled.div`
     display: block;
   }
 
-  & > ${AccountNetwork} {
+  & > ${Network} {
     border-radius: 30px;
   }
 
-  &:hover > ${AccountNetwork} {
+  &:hover > ${Network} {
     border-radius: 15px 15px 0 0;
   }
 
@@ -74,14 +74,14 @@ const NetworkSwitcherWrapper = styled.div`
   }
 `
 
-export const AccountStatusWrapper = styled.div`
+export const NetworkStatusWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: right;
   gap: 4px;
 `
 
-export const AccountStatusIndicator = styled.span<{
+export const NetworkStatusIndicator = styled.span<{
   status?: WalletStatusCode
 }>`
   height: 8px;
@@ -106,22 +106,20 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   onChangeNetwork,
 }) => {
   const currentNetwork = getNetwork(networkId)
-  const otherNetworks = defaultNetworks.filter(
-    ({ id }) => id !== currentNetwork.id,
-  )
+  const otherNetworks = defaultNetworks.filter(({ id }) => id !== networkId)
 
   return (
     <NetworkSwitcherWrapper>
-      <AccountNetwork selected>
+      <Network selected>
         <NetworkName>{currentNetwork.name}</NetworkName>
-        <AccountStatusIndicator status="CONNECTED" />
-      </AccountNetwork>
+        <NetworkStatusIndicator status="CONNECTED" />
+      </Network>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
-          <AccountNetwork key={id} onClick={() => onChangeNetwork(id)}>
+          <Network key={id} onClick={() => onChangeNetwork(id)}>
             <NetworkName>{name}</NetworkName>
-            <AccountStatusIndicator status="CONNECTED" />
-          </AccountNetwork>
+            <NetworkStatusIndicator status="CONNECTED" />
+          </Network>
         ))}
       </NetworkList>
     </NetworkSwitcherWrapper>
