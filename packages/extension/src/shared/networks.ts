@@ -10,12 +10,12 @@ export const defaultNetworks: Network[] = [
   {
     id: "mainnet-alpha",
     name: "Ethereum Mainnet",
-    explorerUrl: "https://voyager.online/",
+    explorerUrl: "https://voyager.online",
   },
   {
     id: "goerli-alpha",
     name: "Goerli Testnet",
-    explorerUrl: "https://goerli.voyager.online/",
+    explorerUrl: "https://goerli.voyager.online",
   },
 ]
 

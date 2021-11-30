@@ -1,7 +1,6 @@
 import ArgentCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
 import { ethers } from "ethers"
 import { Provider, compileCalldata, ec, encode, stark } from "starknet"
-import { hash } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
