@@ -136,10 +136,11 @@ export async function createAccount(password: string, networkId: string) {
     compileCalldata({
       signer: starkPub,
       guardian: "0",
-      L1_address: stark.makeAddress(await l1.getAddress()),
     }),
     seed,
   )
+
+  // TODO: register a L1 address with the wallet as soon as some registry is online
 
   if (deployTransaction.code !== "TRANSACTION_RECEIVED") {
     throw new Error("Deploy transaction failed")
