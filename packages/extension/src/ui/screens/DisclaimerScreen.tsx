@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "./Confirm"
+import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 const SP = styled(P)`
   font-size: 18px;

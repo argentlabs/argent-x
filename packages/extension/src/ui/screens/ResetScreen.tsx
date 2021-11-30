@@ -1,7 +1,7 @@
 import { FC } from "react"
 
 import { P } from "../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "./Confirm"
+import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 export const ResetScreen: FC<ConfirmPageProps> = (props) => (
   <ConfirmScreen

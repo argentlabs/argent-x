@@ -8,7 +8,7 @@ import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
 import { A, FormError, P } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
-import { isValidPassword } from "./NewSeed"
+import { isValidPassword } from "./NewSeedScreen"
 
 const PasswordScreenWrapper = styled.div`
   display: flex;

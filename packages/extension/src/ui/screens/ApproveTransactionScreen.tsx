@@ -3,7 +3,7 @@ import type { Args } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "./Confirm"
+import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
