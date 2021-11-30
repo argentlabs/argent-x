@@ -11,35 +11,22 @@ const isDev = process.env.NODE_ENV === "development"
 
 interface StorageProps {
   encKeystore?: string
-  passwordHash?: string
   walletAddresses: BackupWallet[]
 }
 
 const store = new Storage<StorageProps>({ walletAddresses: [] }, "L1")
-
-function hashString(str: string) {
-  return hash.hashCalldata([encode.buf2hex(encode.utf8ToArray(str))])
-}
 
 export async function existsL1() {
   return Boolean(await store.getItem("encKeystore"))
 }
 
 export async function validatePassword(password: string) {
-  const passwordHashFromStorage = await store.getItem("passwordHash")
-
-  if (!passwordHashFromStorage && (await existsL1())) {
-    try {
-      await getL1(password)
-      return true
-    } catch {
-      return false
-    }
+  try {
+    await getL1(password)
+    return true
+  } catch {
+    return false
   }
-
-  return passwordHashFromStorage
-    ? hashString(password) === passwordHashFromStorage
-    : true
 }
 
 let rawWalletTimeoutPid: number | undefined
@@ -86,7 +73,6 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     if (!recoverPromise) recoverPromise = recoverL1(password)
     const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
-    store.setItem("passwordHash", hashString(password))
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
     store.setItem("walletAddresses", encKeyPair.wallets ?? [])
     return recoveredWallet
@@ -182,7 +168,6 @@ export async function createAccount(
   const encKeyStore = await getEncKeyStore(l1, password, newWallets)
   store.setItem("encKeystore", encKeyStore)
   store.setItem("walletAddresses", newWallets)
-  store.setItem("passwordHash", hashString(password))
 
   downloadTextFile(encKeyStore, "starknet-backup.json")
   return {
