@@ -82,6 +82,7 @@ async function main() {
 
       case "GET_SELECTED_WALLET_ADDRESS": {
         const { address } = await store.getItem("SELECTED_WALLET")
+
         return sendToTabAndUi({
           type: "GET_SELECTED_WALLET_ADDRESS_RES",
           data: address,
@@ -100,10 +101,7 @@ async function main() {
         }
 
         if (isWhitelisted && selectedWallet.address)
-          return sendToTabAndUi({
-            type: "CONNECT_RES",
-            data: selectedWallet,
-          })
+          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
 
         return openUi()
       }
@@ -134,10 +132,7 @@ async function main() {
         await addToWhitelist(msg.data)
 
         if (selectedWallet)
-          return sendToTabAndUi({
-            type: "CONNECT_RES",
-            data: selectedWallet,
-          })
+          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
         return openUi()
       }
       case "REJECT_WHITELIST": {
@@ -197,10 +192,10 @@ async function main() {
         const sessionPassword = getSession()
         if (!sessionPassword) throw Error("you need an open session")
 
-        const networkId = msg.data
-        const newAccount = await createAccount(sessionPassword, networkId)
+        const network = msg.data
+        const newAccount = await createAccount(sessionPassword, network)
 
-        const wallet = { address: newAccount.address, network: networkId }
+        const wallet = { address: newAccount.address, network }
         store.setItem("SELECTED_WALLET", wallet)
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
