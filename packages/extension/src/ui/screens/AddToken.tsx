@@ -1,6 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { FC, useEffect, useMemo, useRef, useState } from "react"
+import { number } from "starknet"
 import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
@@ -51,6 +52,10 @@ const isDataComplete = (data: TokenDetails) => {
   return false
 }
 
+function addressFormat64Byte(address: number.BigNumberish): string {
+  return `0x${number.toBN(address).toString("hex").padStart(64, "0")}`
+}
+
 export const AddToken: FC<AddTokenProps> = ({
   walletAddress,
   onSubmit,
@@ -94,7 +99,9 @@ export const AddToken: FC<AddTokenProps> = ({
     ...(tokenDetails ?? {}),
     ...(!tokenDetails?.name && { name: tokenName }),
     ...(!tokenDetails?.symbol && { symbol: tokenSymbol }),
-    ...(!tokenDetails?.decimals && { decimals: BigNumber.from(tokenDecimals) }),
+    ...(!tokenDetails?.decimals && {
+      decimals: BigNumber.from(tokenDecimals || "0"),
+    }),
   }
 
   return (
@@ -123,6 +130,12 @@ export const AddToken: FC<AddTokenProps> = ({
           onChange={(e: any) => {
             setTokenAddress(e.target.value?.toLowerCase())
           }}
+          onBlur={(e: any) => {
+            try {
+              if (tokenAddress)
+                setTokenAddress(addressFormat64Byte(tokenAddress))
+            } catch {}
+          }}
         />
         {!loading && (
           <>
@@ -147,7 +160,12 @@ export const AddToken: FC<AddTokenProps> = ({
               disabled={
                 tokenDetails?.decimals?.toString() || loading || !validAddress
               }
-              onChange={(e: any) => setTokenDecimals(e.target.value)}
+              onChange={(e: any) => {
+                try {
+                  BigNumber.from(e.target.value || "0")
+                  setTokenDecimals(e.target.value)
+                } catch {}
+              }}
             />
             <Button type="submit" disabled={!isDataComplete(compiledData)}>
               Continue

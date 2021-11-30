@@ -120,6 +120,6 @@ export const fetchTokenDetails = async (
     name: name || localStorageBackup.name || defaultBackup.name,
     symbol: symbol || localStorageBackup.symbol || defaultBackup.symbol,
     balance: balance ? BigNumber.from(balance) : undefined,
-    decimals: decimalsBigNumber.isZero() ? decimalsBigNumber : undefined,
+    decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
   }
 }
