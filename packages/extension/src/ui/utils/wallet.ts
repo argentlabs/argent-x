@@ -35,7 +35,7 @@ export interface WalletStatus {
 }
 export const getStatus = (
   wallet: Wallet,
-  activeWalletAddress: string = wallet.address,
+  activeWalletAddress?: string,
   forceDeployed = false,
 ): WalletStatus => {
   if (!isWalletDeployed(wallet) && !forceDeployed) {

@@ -206,7 +206,7 @@ export const routerMachine = createMachine<
     },
     recover: {
       invoke: {
-        src: async () => {
+        src: async (ctx, ev) => {
           const wallets = await getWallets()
           const networkId = await getNetworkId()
           console.warn("recover", networkId, wallets)
@@ -215,14 +215,9 @@ export const routerMachine = createMachine<
             () => "",
           )
 
-          const selectedWallet = (
-            wallets.find(({ address }) => address === lastSelectedWallet) ||
-            wallets[0]
+          const selectedWallet = wallets.find(
+            ({ address }) => address === lastSelectedWallet,
           )?.address
-
-          if (!selectedWallet) {
-            throw new Error("no wallets")
-          }
 
           // if actions are pending show them first
           const requestedActions = await readLatestActionAndCount().catch(
@@ -242,9 +237,19 @@ export const routerMachine = createMachine<
             networkId,
 
             requestedActions,
+            showAccountList: ev.type === "CHANGE_NETWORK",
           }
         },
         onDone: [
+          {
+            target: "accountList",
+            cond: (_, event) =>
+              !event.data.selectedWallet || event.data.showAccountList,
+            actions: assign((_, event) => {
+              const { requestedActions, ...ctx } = event.data
+              return ctx
+            }),
+          },
           {
             target: "approveTx",
             cond: (_ctx, ev) => {
@@ -290,21 +295,7 @@ export const routerMachine = createMachine<
             }),
           },
         ],
-        onError: [
-          {
-            target: "accountList",
-            cond: (_, event) => event.data.message === "no wallets",
-            actions: assign((_, event) => {
-              return {
-                wallets: {},
-                selectedWallet: undefined,
-                selectedToken: undefined,
-                hostToWhitelist: undefined,
-              }
-            }),
-          },
-          { target: "determineEntry" },
-        ],
+        onError: [{ target: "determineEntry" }],
       },
     },
     welcome: {
