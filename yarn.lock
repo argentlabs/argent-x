@@ -8731,10 +8731,10 @@ stacktrace-parser@0.1.10:
   dependencies:
     type-fest "^0.7.1"
 
-starknet@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.2.0.tgz#cca5716d0749663e7b3b9068f0966de0e753e231"
-  integrity sha512-a1IV3/FfV4aGB97Vi63eB9jMRM2RS/MDLCw28XJLkReAIOzSeFZWsNSKGho25rJJ+WZ48ABsQygDPGalKu8k+A==
+starknet@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.3.1.tgz#6c4ff1d74b2f20f8372fbb616587687756debd30"
+  integrity sha512-A5/POnt1s5gocVTx4NdrJDekhguLLvLQtgALV2w6sVNiCN8/yT2OIcUHjg1F82FB+vfE8usf2X8ccGyMwQteHw==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"

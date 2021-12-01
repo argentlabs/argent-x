@@ -1,7 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import mitt from "mitt"
-import { Abi, Contract } from "starknet"
+import { Abi, Contract, encode, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
@@ -10,7 +10,7 @@ import { isValidAddress } from "./addresses"
 export const playgroundToken = erc20Tokens.find(
   ({ address }) =>
     address ===
-    "0x00a45e3942b7a75983dea7afffda9304d0273773619d1e3d5eaa757d751bfaf3",
+    "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
 )
 
 const defaultErc20s = Object.fromEntries(
@@ -93,19 +93,25 @@ export const fetchTokenDetails = async (
   const [decimals, name, balance, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
-      .then((x) => x.res as string)
+      .then((x) => x.decimals as string)
       .catch(() => ""),
     tokenContract
       .call("name")
-      .then((x) => x.res as string)
+      .then((x) =>
+        shortString.decodeShortString(encode.addHexPrefix(x.name as string)),
+      )
       .catch(() => ""),
     tokenContract
-      .call("balance_of", { user: walletAddress })
-      .then((x) => x.res as string)
-      .catch(() => ""),
+      .call("balanceOf", { user: walletAddress })
+      .then((x) =>
+        BigNumber.from(uint256.uint256ToBN(x.balance as any).toString()),
+      )
+      .catch(() => BigNumber.from(0)),
     tokenContract
       .call("symbol")
-      .then((x) => x.res as string)
+      .then((x) =>
+        shortString.decodeShortString(encode.addHexPrefix(x.symbol as string)),
+      )
       .catch(() => ""),
   ])
   const localStorageBackup: TokenDetails = JSON.parse(
@@ -119,7 +125,7 @@ export const fetchTokenDetails = async (
     address,
     name: name || localStorageBackup.name || defaultBackup.name,
     symbol: symbol || localStorageBackup.symbol || defaultBackup.symbol,
-    balance: balance ? BigNumber.from(balance) : undefined,
+    balance,
     decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
   }
 }

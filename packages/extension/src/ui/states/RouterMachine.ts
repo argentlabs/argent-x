@@ -45,7 +45,10 @@ type RouterEvents =
       data: { address: string; symbol: string; name: string; decimals: string }
     }
   | { type: "ADD_WALLET" }
-  | { type: "APPROVE_TX"; data: TransactionRequest | InvokeFunctionTransaction }
+  | {
+      type: "APPROVE_TX"
+      data: TransactionRequest | InvokeFunctionTransaction
+    }
   | { type: "APPROVED_TX" }
   | { type: "GENERATE_L1"; data: { password: string } }
 

@@ -1,13 +1,17 @@
 import { getStarknet } from "@argent/get-starknet"
 import { utils } from "ethers"
-import { number, stark } from "starknet"
+import { compileCalldata, number, stark, uint256 } from "starknet"
 
 export const erc20TokenAddress =
-  "0x00a45e3942b7a75983dea7afffda9304d0273773619d1e3d5eaa757d751bfaf3"
+  "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10"
 
 const mintSelector = stark.getSelectorFromName("mint")
 
 const transferSelector = stark.getSelectorFromName("transfer")
+
+function getUint256CalldataFromBN(bn: number.BigNumberish) {
+  return { type: "struct" as "struct", ...uint256.bnToUint256(bn) }
+}
 
 export const mintToken = async (mintAmount: string): Promise<any> => {
   const starknet = getStarknet()
@@ -21,10 +25,12 @@ export const mintToken = async (mintAmount: string): Promise<any> => {
   return await starknet.signer.invokeFunction(
     erc20TokenAddress, // to (erc20 contract)
     mintSelector, // selector (mint)
-    [
-      number.toBN(activeAccount).toString(), //receiver (self)
-      utils.parseUnits(mintAmount, 18).toString(), // amount
-    ],
+    compileCalldata({
+      receiver: number.toBN(activeAccount).toString(), //receiver (self)
+      amount: getUint256CalldataFromBN(
+        utils.parseUnits(mintAmount, 18).toString(),
+      ), // amount
+    }),
   )
 }
 
@@ -43,9 +49,11 @@ export const transfer = async (
   return starknet.signer.invokeFunction(
     erc20TokenAddress, // to (erc20 contract)
     transferSelector, // selector (mint)
-    [
-      number.toBN(transferTo).toString(), //receiver (self)
-      utils.parseUnits(transferAmount, 18).toString(), // amount
-    ],
+    compileCalldata({
+      receiver: number.toBN(transferTo).toString(), //receiver (self)
+      amount: getUint256CalldataFromBN(
+        utils.parseUnits(transferAmount, 18).toString(),
+      ), // amount
+    }),
   )
 }
