@@ -1,22 +1,23 @@
-import { CircularProgress } from "@mui/material"
+import { CircularProgress, CircularProgressProps } from "@mui/material"
 import { FC } from "react"
 
 import { useProgress } from "../states/progress"
 
-interface SpinnerProps {
+interface SpinnerProps extends CircularProgressProps {
   size: number
   progress?: number
 }
 
-const styles = { color: "white", margin: "0 auto" }
+const defaultStyle = { color: "white", margin: "0 auto" }
 
-export const Spinner: FC<SpinnerProps> = ({ ...props }) => {
+export const Spinner: FC<SpinnerProps> = ({ style, ...props }) => {
+  style = { ...defaultStyle, ...style }
   const progress = useProgress((x) => x.progress)
   if (progress) {
     const progressInt = Math.round(progress * 100)
     return (
       <CircularProgress
-        style={styles}
+        style={style}
         variant="determinate"
         value={progressInt}
         {...props}
@@ -24,5 +25,5 @@ export const Spinner: FC<SpinnerProps> = ({ ...props }) => {
     )
   }
 
-  return <CircularProgress style={styles} {...props} />
+  return <CircularProgress style={style} {...props} />
 }

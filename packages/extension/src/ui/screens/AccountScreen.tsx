@@ -68,7 +68,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
           accountNumber={accountNumber}
           walletAddress={wallet.address}
         />
-        <Suspense fallback={<Spinner size={64} />}>
+        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
             onAction={onAction}
             onShowToken={onShowToken}
