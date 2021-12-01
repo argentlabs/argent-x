@@ -9,7 +9,7 @@ import { H2, P } from "../components/Typography"
 const SettingsScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 48px 32px;
+  padding: 20px 32px 48px;
 
   > ${P} {
     margin: 16px 0;

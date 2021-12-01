@@ -11,7 +11,7 @@ export const BackButton: FC<{ onClick?: () => void }> = ({
   return (
     <IconButton {...makeClickable(onClick, 99)} size={32} {...props}
       style={{
-        transform: "translateX(-8px)",
+        transform: "translateX(-12px)",
       }}
     >
       <BackSvg />
