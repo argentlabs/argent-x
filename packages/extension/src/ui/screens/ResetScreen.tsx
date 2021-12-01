@@ -7,7 +7,7 @@ export const ResetScreen: FC<ConfirmPageProps> = (props) => (
   <ConfirmScreen
     title="Reset wallet"
     confirmButtonText="RESET"
-    confirmButtonBgColor="#fe4d4d"
+    confirmButtonBgColor="#c12026"
     rejectButtonText="Cancel"
     {...props}
   >
