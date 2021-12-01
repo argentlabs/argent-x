@@ -54,7 +54,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
         href={`${getNetwork(networkId).explorerUrl}/contract/${walletAddress}`}
         target="_blank"
       >
-        starknet: {truncateAddress(walletAddress)}
+        {truncateAddress(walletAddress)}
         <Open />
       </AccountAddressLink>
       <CopyTooltip copyValue={walletAddress} message="Copied!">

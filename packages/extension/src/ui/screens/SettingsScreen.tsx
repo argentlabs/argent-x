@@ -21,9 +21,8 @@ export const SettingsScreen: FC<{ onBack?: () => void }> = ({ onBack }) => (
     <BackButton onClick={onBack} />
     <H2>Settings</H2>
     <P>
-      You can reset the whitelist of DApps, so all DApps which want to connect
-      to your wallet in the future need to go through the whitelist process
-      again:
+      Dapps you have previously connected to can auto-connect in the future.
+      Require all dapps to request a new connection to your wallet?
     </P>
     <Button
       onClick={() => {
@@ -31,7 +30,7 @@ export const SettingsScreen: FC<{ onBack?: () => void }> = ({ onBack }) => (
         onBack?.()
       }}
     >
-      Reset whitelist
+      Reset dapp connections
     </Button>
   </SettingsScreenWrapper>
 )

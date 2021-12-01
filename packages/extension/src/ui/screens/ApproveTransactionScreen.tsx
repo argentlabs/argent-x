@@ -37,7 +37,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     }}
     {...props}
   >
-    <P>A Dapp wants you to make this transaction:</P>
+    <P>A dapp wants you to make this transaction:</P>
     <Pre>{JSON.stringify(transaction, null, 2)}</Pre>
   </ConfirmScreen>
 )
