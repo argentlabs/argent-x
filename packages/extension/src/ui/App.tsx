@@ -1,5 +1,7 @@
+import { BigNumber } from "@ethersproject/bignumber"
 import { useMachine } from "@xstate/react"
 import { Suspense } from "react"
+import { uint256 } from "starknet"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 
@@ -20,6 +22,13 @@ import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { routerMachine } from "./states/RouterMachine"
 import { TokenDetails } from "./utils/tokens"
+
+function getUint256CalldataFromBN(bn: BigNumber) {
+  return {
+    type: "struct" as const,
+    ...uint256.bnToUint256(bn.toHexString()),
+  }
+}
 
 async function fileToString(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -149,7 +158,7 @@ function App() {
                 method: "mint",
                 calldata: {
                   recipient: state.context.selectedWallet,
-                  amount: action.amount.toHexString(),
+                  amount: getUint256CalldataFromBN(action.amount),
                 },
               },
             })
@@ -161,7 +170,7 @@ function App() {
                 method: "transfer",
                 calldata: {
                   recipient: action.to,
-                  amount: action.amount.toHexString(),
+                  amount: getUint256CalldataFromBN(action.amount),
                 },
               },
             })
@@ -208,7 +217,7 @@ function App() {
               method: "transfer",
               calldata: {
                 recipient,
-                amount: amount.toHexString(),
+                amount: getUint256CalldataFromBN(amount),
               },
             },
           })
