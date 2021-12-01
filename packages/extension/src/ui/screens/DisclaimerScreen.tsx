@@ -13,7 +13,7 @@ export const DisclaimerScreen: FC<ConfirmPageProps> = (props) => (
   <ConfirmScreen
     title="Disclaimer"
     confirmButtonText="I understand"
-    confirmButtonBgColor="#fe4d4d"
+    confirmButtonBgColor="#c12026"
     singleButton
     {...props}
   >
