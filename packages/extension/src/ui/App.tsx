@@ -133,7 +133,12 @@ function App() {
     return <DisclaimerScreen onSubmit={() => send("AGREE")} />
 
   if (state.matches("settings"))
-    return <SettingsScreen onBack={() => send("GO_BACK")} />
+    return (
+      <SettingsScreen
+        onBack={() => send("GO_BACK")}
+        onLock={() => send("LOCK")}
+      />
+    )
 
   if (state.matches("account")) {
     return (

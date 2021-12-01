@@ -24,6 +24,7 @@ type RouterEvents =
   | { type: "SHOW_CREATE_NEW" }
   | { type: "SHOW_RECOVER" }
   | { type: "GO_BACK" }
+  | { type: "LOCK" }
   | { type: "RESET" }
   | { type: "REJECT_TX" }
   | { type: "SHOW_ACCOUNT_LIST" }
@@ -556,7 +557,7 @@ export const routerMachine = createMachine<
     },
 
     settings: {
-      on: { GO_BACK: "accountList" },
+      on: { GO_BACK: "accountList", LOCK: "enterPassword" },
     },
     submittedTx: {
       type: "final",

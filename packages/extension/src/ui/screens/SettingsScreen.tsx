@@ -14,9 +14,18 @@ const SettingsScreenWrapper = styled.div`
   > ${P} {
     margin: 16px 0;
   }
+
+  ${Button} {
+    margin-top: 10px;
+  }
 `
 
-export const SettingsScreen: FC<{ onBack?: () => void }> = ({ onBack }) => (
+interface SettingsScreenProps {
+  onBack: () => void
+  onLock: () => void
+}
+
+export const SettingsScreen: FC<SettingsScreenProps> = ({ onBack, onLock }) => (
   <SettingsScreenWrapper>
     <BackButton onClick={onBack} />
     <H2>Settings</H2>
@@ -27,10 +36,18 @@ export const SettingsScreen: FC<{ onBack?: () => void }> = ({ onBack }) => (
     <Button
       onClick={() => {
         sendMessage({ type: "RESET_WHITELIST" })
-        onBack?.()
+        onBack()
       }}
     >
       Reset dapp connections
+    </Button>
+    <Button
+      onClick={() => {
+        sendMessage({ type: "STOP_SESSION" })
+        onLock()
+      }}
+    >
+      Lock
     </Button>
   </SettingsScreenWrapper>
 )
