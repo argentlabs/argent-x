@@ -25,7 +25,7 @@ import { TokenDetails } from "./utils/tokens"
 
 function getUint256CalldataFromBN(bn: BigNumber) {
   return {
-    type: "struct" as "struct",
+    type: "struct" as const,
     ...uint256.bnToUint256(bn.toHexString()),
   }
 }

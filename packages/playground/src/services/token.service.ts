@@ -10,7 +10,7 @@ const mintSelector = stark.getSelectorFromName("mint")
 const transferSelector = stark.getSelectorFromName("transfer")
 
 function getUint256CalldataFromBN(bn: number.BigNumberish) {
-  return { type: "struct" as "struct", ...uint256.bnToUint256(bn) }
+  return { type: "struct" as const, ...uint256.bnToUint256(bn) }
 }
 
 export const mintToken = async (mintAmount: string): Promise<any> => {
