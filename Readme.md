@@ -19,8 +19,8 @@
 
 <h2>🌈 Table of contents</h2>
 
-- [🧒 Example DApp](#-example-dapp)
-- [🌐 Usage with your DApp](#-usage-with-your-dapp)
+- [🧒 Example dapp](#-example-dapp)
+- [🌐 Usage with your dapp](#-usage-with-your-dapp)
 - [🚀 Install from sources](#install-from-sources)
 - [👩🏾‍💻 Development](#-development)
 - [✏️ Contributing](#️-contributing)
@@ -29,18 +29,18 @@
 - [🏎 Coming soon](#-coming-soon)
 
 
-## 🧒 Example DApp
+## 🧒 Example dapp
 
-You can try the extension using our example DApp hosted at:
+You can try the extension using our example dapp hosted at:
 
 [https://argentlabs.github.io/argent-x/](https://argentlabs.github.io/argent-x/)
 
-The example DApp is also contained in this repository.
+The example dapp is also contained in this repository.
 
 
-## 🌐 Usage with your DApp
+## 🌐 Usage with your dapp
 
-If you want to use this Starknet Wallet extension with your DApp, the easiest way is to checkout the `@argent/get-starknet` package developed in this repo by running:
+If you want to use this StarkNet Wallet extension with your dapp, the easiest way is to checkout the `@argent/get-starknet` package developed in this repo by running:
 
 ```bash
 # starknet.js is a peer dependency
@@ -104,7 +104,7 @@ This project contains 3 packages:
 | --- | --- |
 | extension | ArgentX extension |
 | get-starknet | npm module to get started with starknet.js and ArgentX quickly |
-| playground | example DApp for testing purposes and example for DApps how to use `get-starknet` |
+| playground | example dapp for testing purposes and example for DApps how to use `get-starknet` |
 
 To test changes made to the `extension` package you need to load the local unpacked extension into Chrome as [described above](#install-fromsources). Changes are shown after reopening the extension. Changes to `background.js` are just shown after a complete restart of the Chrome process.
 
@@ -116,7 +116,7 @@ Everyone is welcome to contribute. Please take a moment to review the [contribut
 
 Since this project were not possible without [starknet.js](https://github.com/seanjameshan/starknet.js) a big thank you to all [starknet.js contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors) and [@seanjameshan](https://github.com/seanjameshan) for starting it.
 
-One more thank you to the Starkware Team and Discord.
+One more thank you to the StarkWare Team and Discord.
 
 ## 👨🏼‍🎨 Authors and license
 
