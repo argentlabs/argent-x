@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/playground",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@argent/get-starknet": "^0.1.0",
+    "@argent/get-starknet": "^1.0.0",
     "ethers": "^5.5.1",
     "next": "12.0.4",
     "react": "17.0.2",

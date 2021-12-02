@@ -1,6 +1,6 @@
 {
   "name": "@argent/get-starknet",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "main": "dist/",
   "browser": {
@@ -31,7 +31,6 @@
     "tslib": "^2.0.0",
     "typescript": "^4.0.0"
   },
-  "dependencies": {},
   "peerDependencies": {
     "starknet": "^2.3.1"
   }
