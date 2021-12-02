@@ -1,7 +1,7 @@
 {
   "name": "Argent x StarkNet Wallet",
   "description": "The security of Ethereum with the scale of StarkNet",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "manifest_version": 2,
   "browser_action": {
     "default_icon": {
