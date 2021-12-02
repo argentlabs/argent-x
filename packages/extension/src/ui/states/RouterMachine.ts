@@ -219,6 +219,8 @@ export const routerMachine = createMachine<
         src: async () => {
           const { network } = await getLastSelectedWallet()
 
+          if (!network) throw Error("No network stored")
+
           return {
             networkId: network,
           }

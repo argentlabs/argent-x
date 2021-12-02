@@ -2,7 +2,6 @@ import { compactDecrypt } from "jose"
 import { ec, encode } from "starknet"
 import browser from "webextension-polyfill"
 
-import { BackupWallet } from "../shared/backup.model"
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 import { ActionItem, getQueue } from "./actionQueue"
@@ -16,6 +15,7 @@ import {
   validatePassword,
 } from "./keys/l1"
 import { openUi } from "./openUi"
+import { selectedWalletStore } from "./selectedWallet"
 import {
   getSession,
   hasActiveSession,
@@ -37,10 +37,6 @@ async function main() {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const actionQueue = await getQueue<ActionItem>("ACTIONS")
-
-  const store = new Storage<{ SELECTED_WALLET: BackupWallet }>({
-    SELECTED_WALLET: { address: "", network: "" },
-  })
 
   messageStream.subscribe(async ([msg, sender]) => {
     const currentTab = await getCurrentTab()
@@ -80,7 +76,9 @@ async function main() {
       }
 
       case "GET_SELECTED_WALLET": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
+        const selectedWallet = await selectedWalletStore.getItem(
+          "SELECTED_WALLET",
+        )
 
         return sendToTabAndUi({
           type: "GET_SELECTED_WALLET_RES",
@@ -89,7 +87,9 @@ async function main() {
       }
 
       case "CONNECT": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
+        const selectedWallet = await selectedWalletStore.getItem(
+          "SELECTED_WALLET",
+        )
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
         setActiveTab(sender.tab?.id)
@@ -107,7 +107,7 @@ async function main() {
       }
 
       case "WALLET_CONNECTED": {
-        return store.setItem("SELECTED_WALLET", msg.data)
+        return selectedWalletStore.setItem("SELECTED_WALLET", msg.data)
       }
 
       case "SUBMITTED_TX":
@@ -126,7 +126,9 @@ async function main() {
         })
       }
       case "APPROVE_WHITELIST": {
-        const selectedWallet = await store.getItem("SELECTED_WALLET")
+        const selectedWallet = await selectedWalletStore.getItem(
+          "SELECTED_WALLET",
+        )
 
         await actionQueue.removeLatest()
         await addToWhitelist(msg.data)
@@ -196,7 +198,7 @@ async function main() {
         const newAccount = await createAccount(sessionPassword, network)
 
         const wallet = { address: newAccount.address, network }
-        store.setItem("SELECTED_WALLET", wallet)
+        selectedWalletStore.setItem("SELECTED_WALLET", wallet)
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
       }

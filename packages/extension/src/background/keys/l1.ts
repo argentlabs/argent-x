@@ -4,6 +4,7 @@ import { Provider, compileCalldata, ec, stark } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
+import { selectedWalletStore } from "../selectedWallet"
 import { Storage } from "../storage"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -74,6 +75,15 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     setRawWallet(recoveredWallet)
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
     store.setItem("wallets", encKeyPair.wallets ?? [])
+    if (
+      (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
+      encKeyPair.wallets.length > 0
+    ) {
+      await selectedWalletStore.setItem(
+        "SELECTED_WALLET",
+        encKeyPair.wallets[0],
+      )
+    }
     return recoveredWallet
   } else {
     return generateL1()
