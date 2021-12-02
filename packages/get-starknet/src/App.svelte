@@ -13,7 +13,10 @@
       Please download ArgentX to use this dapp, which runs on StarkNet, a
       ZK-Rollup Layer-2 network on Ethereum.
     </p>
-    <a href="https://github.com/argentlabs/argent-x" target="_blank">
+    <a
+      href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/"
+      target="_blank"
+    >
       <DownloadSvg />
     </a>
   </Modal>

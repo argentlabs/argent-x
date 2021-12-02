@@ -3,17 +3,17 @@
   <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/assets/readme-header.png">
 </p>
 
-<!-- ---
+---
 
-<h3 align='center'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h3>
+<h3 align='center' style='margin: 1em;'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h3>
 
 <p align="center">
-  <a href="https://github.com/argentlabs/argent-x">
+  <a href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/">
     <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/packages/get-starknet/src/button-download.svg">
   </a>
 </p>
 
--->
+
 
 ---
 
@@ -21,12 +21,11 @@
 
 - [🧒 Example dapp](#-example-dapp)
 - [🌐 Usage with your dapp](#-usage-with-your-dapp)
-- [🚀 Install from sources](#install-from-sources)
+- [🚀 Install from sources](#-install-from-sources)
 - [👩🏾‍💻 Development](#-development)
 - [✏️ Contributing](#️-contributing)
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
-- [🏎 Coming soon](#-coming-soon)
 
 
 ## 🧒 Example dapp
@@ -123,7 +122,3 @@ One more thank you to the StarkWare Team and Discord.
 [Argent](https://github.com/argentlabs) and [contributors](https://github.com/argentlabs/argent-x/graphs/contributors).
 
 GNU General Public License V3, see the included [License.md](License.md) file.
-
-## 🏎 Coming soon
-
-- [ ] Publish extension to Chrome Extension Store
