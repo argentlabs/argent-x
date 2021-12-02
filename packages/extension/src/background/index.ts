@@ -11,6 +11,7 @@ import {
   existsL1,
   getL1,
   getWallets,
+  resetAll,
   setKeystore,
   validatePassword,
 } from "./keys/l1"
@@ -116,7 +117,7 @@ async function main() {
       }
 
       case "RESET_ALL": {
-        return browser.storage.local.clear()
+        return resetAll()
       }
 
       case "ADD_WHITELIST": {

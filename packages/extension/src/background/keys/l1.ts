@@ -32,7 +32,7 @@ export async function validatePassword(password: string) {
 let rawWalletTimeoutPid: number | undefined
 let rawWallet: ethers.Wallet | undefined
 
-function setRawWallet(wallet: ethers.Wallet) {
+function setRawWallet(wallet: ethers.Wallet | undefined) {
   rawWallet = wallet
   rawWalletTimeoutPid = setTimeout(() => {
     rawWallet = undefined
@@ -40,6 +40,7 @@ function setRawWallet(wallet: ethers.Wallet) {
 }
 
 export async function setKeystore(keystore: string) {
+  setRawWallet(undefined)
   await store.setItem("encKeystore", keystore)
 }
 
@@ -67,6 +68,7 @@ async function generateL1(): Promise<ethers.Wallet> {
 
 let recoverPromise: Promise<ethers.Wallet> | undefined
 export async function getL1(password: string): Promise<ethers.Wallet> {
+  console.log("getL1", rawWallet, await existsL1())
   if (rawWallet) {
     return rawWallet
   } else if (await existsL1()) {
@@ -74,6 +76,7 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
+    console.log("Set wallets", encKeyPair)
     store.setItem("wallets", encKeyPair.wallets ?? [])
     if (
       (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
@@ -168,4 +171,9 @@ export async function createAccount(password: string, networkId: string) {
     txHash: deployTransaction.transaction_hash,
     wallets,
   }
+}
+
+export async function resetAll() {
+  setRawWallet(undefined)
+  await browser.storage.local.clear()
 }
