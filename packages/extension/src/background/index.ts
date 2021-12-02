@@ -94,7 +94,7 @@ async function main() {
 
         setActiveTab(sender.tab?.id)
         if (!isWhitelisted) {
-          actionQueue.push({
+          await actionQueue.push({
             type: "CONNECT",
             payload: { host: msg.data.host },
           })
