@@ -4,8 +4,11 @@ import styled from "styled-components"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
+import {
+  NetworkStatusIndicator,
+  NetworkStatusWrapper,
+} from "../NetworkSwitcher"
 import { AccountColumn, AccountRow } from "./Header"
-import { NetworkStatusIndicator, NetworkStatusWrapper } from "../NetworkSwitcher"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const AccountList = styled.div`

@@ -43,7 +43,13 @@ type RouterEvents =
     }
   | {
       type: "ADD_TOKEN"
-      data: { address: string; symbol: string; name: string; decimals: string }
+      data: {
+        address: string
+        symbol: string
+        name: string
+        decimals: string
+        networkId: string
+      }
     }
   | { type: "ADD_WALLET" }
   | {

@@ -29,17 +29,6 @@ const AddTokenScreenWrapper = styled.div`
   }
 `
 
-interface AddTokenScreenProps {
-  walletAddress: string
-  onSubmit?: (addToken: {
-    address: string
-    symbol: string
-    name: string
-    decimals: string
-  }) => void
-  onBack?: () => void
-}
-
 const isDataComplete = (data: TokenDetails) => {
   if (
     isValidAddress(data.address) &&
@@ -56,8 +45,22 @@ function addressFormat64Byte(address: number.BigNumberish): string {
   return `0x${number.toBN(address).toString("hex").padStart(64, "0")}`
 }
 
+interface AddTokenScreenProps {
+  walletAddress: string
+  networkId: string
+  onSubmit?: (addToken: {
+    address: string
+    symbol: string
+    name: string
+    decimals: string
+    networkId: string
+  }) => void
+  onBack?: () => void
+}
+
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   walletAddress,
+  networkId,
   onSubmit,
   onBack,
 }) => {
@@ -75,7 +78,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   useEffect(() => {
     if (loading) {
-      fetchTokenDetails(tokenAddress, walletAddress)
+      fetchTokenDetails(tokenAddress, walletAddress, networkId)
         .then((details) => {
           setLoading(false)
           setTokenDetails(details)
@@ -102,6 +105,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     ...(!tokenDetails?.decimals && {
       decimals: BigNumber.from(tokenDecimals || "0"),
     }),
+    networkId,
   }
 
   return (
@@ -117,6 +121,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               decimals: compiledData.decimals!.toString(),
               name: compiledData.name!,
               symbol: compiledData.symbol!,
+              networkId: compiledData.networkId,
             })
           }
         }}

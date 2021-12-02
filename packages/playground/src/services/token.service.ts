@@ -2,8 +2,16 @@ import { getStarknet } from "@argent/get-starknet"
 import { utils } from "ethers"
 import { compileCalldata, number, stark, uint256 } from "starknet"
 
-export const erc20TokenAddress =
-  "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10"
+export const erc20TokenAddressByNetwork = {
+  "goerli-alpha":
+    "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+  "mainnet-alpha":
+    "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
+}
+
+export const getErc20TokenAddress = (
+  network: keyof typeof erc20TokenAddressByNetwork,
+) => erc20TokenAddressByNetwork[network]
 
 const mintSelector = stark.getSelectorFromName("mint")
 
@@ -13,7 +21,10 @@ function getUint256CalldataFromBN(bn: number.BigNumberish) {
   return { type: "struct" as const, ...uint256.bnToUint256(bn) }
 }
 
-export const mintToken = async (mintAmount: string): Promise<any> => {
+export const mintToken = async (
+  mintAmount: string,
+  network: keyof typeof erc20TokenAddressByNetwork,
+): Promise<any> => {
   const starknet = getStarknet()
 
   const [activeAccount] = await starknet.enable()
@@ -23,7 +34,7 @@ export const mintToken = async (mintAmount: string): Promise<any> => {
     throw Error("starknet wallet not connected")
 
   return await starknet.signer.invokeFunction(
-    erc20TokenAddress, // to (erc20 contract)
+    erc20TokenAddressByNetwork[network], // to (erc20 contract)
     mintSelector, // selector (mint)
     compileCalldata({
       receiver: number.toBN(activeAccount).toString(), //receiver (self)
@@ -37,6 +48,7 @@ export const mintToken = async (mintAmount: string): Promise<any> => {
 export const transfer = async (
   transferTo: string,
   transferAmount: string,
+  network: keyof typeof erc20TokenAddressByNetwork,
 ): Promise<any> => {
   const starknet = getStarknet()
 
@@ -47,7 +59,7 @@ export const transfer = async (
     throw Error("starknet wallet not connected")
 
   return starknet.signer.invokeFunction(
-    erc20TokenAddress, // to (erc20 contract)
+    erc20TokenAddressByNetwork[network], // to (erc20 contract)
     transferSelector, // selector (mint)
     compileCalldata({
       receiver: number.toBN(transferTo).toString(), //receiver (self)

@@ -1,11 +1,15 @@
 import { FC, useEffect, useState } from "react"
 
 import {
-  erc20TokenAddress,
+  getErc20TokenAddress,
   mintToken,
   transfer,
 } from "../services/token.service"
-import { waitForTransaction } from "../services/wallet.service"
+import {
+  getExplorerUrlBase,
+  networkId,
+  waitForTransaction,
+} from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
 export const TokenDapp: FC = () => {
@@ -34,7 +38,7 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("approve")
 
       console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount)
+      const result = await mintToken(mintAmount, networkId())
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -51,7 +55,7 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("approve")
 
       console.log("transfer", { transferTo, transferAmount })
-      const result = await transfer(transferTo, transferAmount)
+      const result = await transfer(transferTo, transferAmount, networkId())
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -69,7 +73,7 @@ export const TokenDapp: FC = () => {
       </h3>
       {lastTransactionHash && (
         <a
-          href={`https://voyager.online/tx/${lastTransactionHash}`}
+          href={`${getExplorerUrlBase()}/tx/${lastTransactionHash}`}
           target="_blank"
           rel="noreferrer"
           style={{ color: "blue", margin: "0 0 1em" }}
@@ -122,10 +126,12 @@ export const TokenDapp: FC = () => {
         <code>
           <a
             target="_blank"
-            href={`https://voyager.online/contract/${erc20TokenAddress}`}
+            href={`${getExplorerUrlBase()}/contract/${getErc20TokenAddress(
+              networkId(),
+            )}`}
             rel="noreferrer"
           >
-            {erc20TokenAddress}
+            {getErc20TokenAddress(networkId())}
           </a>
         </code>
       </h3>

@@ -1,17 +1,16 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import mitt from "mitt"
-import { Abi, Contract, encode, shortString, uint256 } from "starknet"
+import { Abi, Contract, Provider, encode, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
 import { isValidAddress } from "./addresses"
 
-export const playgroundToken = erc20Tokens.find(
-  ({ address }) =>
-    address ===
-    "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-)
+export const playgroundToken = (networkId: string) =>
+  erc20Tokens.find(
+    ({ name, network }) => name === "Playground Token" && network === networkId,
+  )
 
 const defaultErc20s = Object.fromEntries(
   erc20Tokens.map((token) => [token.address, token]),
@@ -35,14 +34,25 @@ const getStoredTokens = (wallet: string): string[] => {
   return []
 }
 
-export const getTokens = (wallet: string): string[] =>
+export const getTokens = (wallet: string, networkId: string): string[] =>
   Array.from(
-    new Set([...Object.keys(defaultErc20s), ...getStoredTokens(wallet)]),
+    new Set([
+      ...Object.values(defaultErc20s)
+        .filter((token) => token.network === networkId)
+        .map((token) => token.address),
+      ...getStoredTokens(wallet), // as stored tokens get stored by wallet there is no need to check network
+    ]),
   )
 
 export const addToken = (
   wallet: string,
-  token: { address: string; symbol: string; name: string; decimals: string },
+  token: {
+    address: string
+    symbol: string
+    name: string
+    decimals: string
+    networkId: string
+  },
 ) => {
   if (!isValidAddress(token.address)) throw Error("token address malformed")
 
@@ -51,7 +61,7 @@ export const addToken = (
     JSON.stringify(token),
   )
 
-  const tokens = getTokens(wallet)
+  const tokens = getTokens(wallet, token.networkId)
   tokensMitt.emit("UPDATE", { wallet, tokens: [...tokens, token.address] })
 }
 
@@ -61,6 +71,7 @@ export interface TokenDetails {
   symbol?: string
   decimals?: BigNumber
   balance?: BigNumber
+  networkId: string
 }
 
 export interface TokenView {
@@ -88,8 +99,10 @@ export const toTokenView = ({
 export const fetchTokenDetails = async (
   address: string,
   walletAddress: string,
+  networkId: string,
 ): Promise<TokenDetails> => {
-  const tokenContract = new Contract(parsedErc20Abi as Abi[], address)
+  const provider = new Provider({ network: networkId as any })
+  const tokenContract = new Contract(parsedErc20Abi as Abi[], address, provider)
   const [decimals, name, balance, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
@@ -126,6 +139,7 @@ export const fetchTokenDetails = async (
     name: name || localStorageBackup.name || defaultBackup.name,
     symbol: symbol || localStorageBackup.symbol || defaultBackup.symbol,
     balance,
+    networkId,
     decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
   }
 }
