@@ -34,14 +34,25 @@ const getStoredTokens = (wallet: string): string[] => {
   return []
 }
 
-export const getTokens = (wallet: string): string[] =>
+export const getTokens = (wallet: string, networkId: string): string[] =>
   Array.from(
-    new Set([...Object.keys(defaultErc20s), ...getStoredTokens(wallet)]),
+    new Set([
+      ...Object.values(defaultErc20s)
+        .filter((token) => token.network === networkId)
+        .map((token) => token.address),
+      ...getStoredTokens(wallet), // as stored tokens get stored by wallet there is no need to check network
+    ]),
   )
 
 export const addToken = (
   wallet: string,
-  token: { address: string; symbol: string; name: string; decimals: string },
+  token: {
+    address: string
+    symbol: string
+    name: string
+    decimals: string
+    networkId: string
+  },
 ) => {
   if (!isValidAddress(token.address)) throw Error("token address malformed")
 
@@ -50,7 +61,7 @@ export const addToken = (
     JSON.stringify(token),
   )
 
-  const tokens = getTokens(wallet)
+  const tokens = getTokens(wallet, token.networkId)
   tokensMitt.emit("UPDATE", { wallet, tokens: [...tokens, token.address] })
 }
 
@@ -60,6 +71,7 @@ export interface TokenDetails {
   symbol?: string
   decimals?: BigNumber
   balance?: BigNumber
+  networkId: string
 }
 
 export interface TokenView {
@@ -127,6 +139,7 @@ export const fetchTokenDetails = async (
     name: name || localStorageBackup.name || defaultBackup.name,
     symbol: symbol || localStorageBackup.symbol || defaultBackup.symbol,
     balance,
+    networkId,
     decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
   }
 }

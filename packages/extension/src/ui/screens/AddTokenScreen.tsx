@@ -53,6 +53,7 @@ interface AddTokenScreenProps {
     symbol: string
     name: string
     decimals: string
+    networkId: string
   }) => void
   onBack?: () => void
 }
@@ -104,6 +105,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     ...(!tokenDetails?.decimals && {
       decimals: BigNumber.from(tokenDecimals || "0"),
     }),
+    networkId,
   }
 
   return (
@@ -119,6 +121,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               decimals: compiledData.decimals!.toString(),
               name: compiledData.name!,
               symbol: compiledData.symbol!,
+              networkId: compiledData.networkId,
             })
           }
         }}

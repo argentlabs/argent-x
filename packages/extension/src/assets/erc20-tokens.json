@@ -4,7 +4,7 @@
     "name": "Playground Token",
     "symbol": "TEST",
     "decimals": "18",
-    "network": "goarli-alpha"
+    "network": "goerli-alpha"
   },
   {
     "address": "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
