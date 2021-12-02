@@ -9,8 +9,6 @@ import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
 import { TokenAction } from "../Token"
 
-const mintableAddress = playgroundToken?.address
-
 const AlertWrapper = styled(Alert)`
   gap: 16px;
 `
@@ -38,11 +36,13 @@ const AlertButton = styled(Button)`
 `
 
 interface EmptyWalletAlertProps {
+  mintableAddress?: string
   walletAddress: string
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
 
 export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
+  mintableAddress,
   walletAddress,
   onAction,
 }) => (

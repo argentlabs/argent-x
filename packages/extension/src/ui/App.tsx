@@ -234,6 +234,7 @@ function App() {
     return (
       <AddTokenScreen
         walletAddress={state.context.selectedWallet}
+        networkId={state.context.networkId}
         onBack={() => {
           send("GO_BACK")
         }}

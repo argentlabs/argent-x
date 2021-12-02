@@ -4,9 +4,9 @@ import styled from "styled-components"
 import Add from "../../assets/add.svg"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
 import { AccountColumn, AccountHeader } from "../components/Account/Header"
-import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { TokenList } from "../components/Account/TokenList"
+import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
@@ -70,6 +70,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
         />
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
+            networkId={networkId}
             onAction={onAction}
             onShowToken={onShowToken}
             walletAddress={wallet.address}

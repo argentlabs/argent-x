@@ -1,17 +1,16 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import mitt from "mitt"
-import { Abi, Contract, encode, shortString, uint256 } from "starknet"
+import { Abi, Contract, Provider, encode, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
 import { isValidAddress } from "./addresses"
 
-export const playgroundToken = erc20Tokens.find(
-  ({ address }) =>
-    address ===
-    "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-)
+export const playgroundToken = (networkId: string) =>
+  erc20Tokens.find(
+    ({ name, network }) => name === "Playground Token" && network === networkId,
+  )
 
 const defaultErc20s = Object.fromEntries(
   erc20Tokens.map((token) => [token.address, token]),
@@ -88,8 +87,10 @@ export const toTokenView = ({
 export const fetchTokenDetails = async (
   address: string,
   walletAddress: string,
+  networkId: string,
 ): Promise<TokenDetails> => {
-  const tokenContract = new Contract(parsedErc20Abi as Abi[], address)
+  const provider = new Provider({ network: networkId as any })
+  const tokenContract = new Contract(parsedErc20Abi as Abi[], address, provider)
   const [decimals, name, balance, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
