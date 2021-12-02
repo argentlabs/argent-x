@@ -1,8 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { defaultNetworks, getNetwork } from "../../../shared/networks"
-import { WalletStatusCode } from "../../utils/wallet"
+import { defaultNetworks, getNetwork } from "../../shared/networks"
+import { WalletStatusCode } from "../utils/wallet"
 
 const NetworkName = styled.span`
   text-align: right;
