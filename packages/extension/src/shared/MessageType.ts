@@ -12,8 +12,8 @@ export type MessageType =
       type: "GET_LATEST_ACTION_AND_COUNT_RES"
       data: { action: ActionItem | null; count: number }
     }
-  | { type: "GET_SELECTED_WALLET_ADDRESS" }
-  | { type: "GET_SELECTED_WALLET_ADDRESS_RES"; data: string | undefined }
+  | { type: "GET_SELECTED_WALLET" }
+  | { type: "GET_SELECTED_WALLET_RES"; data: BackupWallet }
   | { type: "CONNECT"; data: { host: string } }
   | { type: "CONNECT_RES"; data: BackupWallet }
   | {

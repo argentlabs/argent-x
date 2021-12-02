@@ -79,12 +79,12 @@ async function main() {
         })
       }
 
-      case "GET_SELECTED_WALLET_ADDRESS": {
-        const { address } = await store.getItem("SELECTED_WALLET")
+      case "GET_SELECTED_WALLET": {
+        const selectedWallet = await store.getItem("SELECTED_WALLET")
 
         return sendToTabAndUi({
-          type: "GET_SELECTED_WALLET_ADDRESS_RES",
-          data: address,
+          type: "GET_SELECTED_WALLET_RES",
+          data: selectedWallet,
         })
       }
 

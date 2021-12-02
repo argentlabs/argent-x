@@ -19,8 +19,8 @@ export const readLatestActionAndCount = async () => {
 }
 
 export const getLastSelectedWallet = async () => {
-  sendMessage({ type: "GET_SELECTED_WALLET_ADDRESS" })
-  return waitForMessage("GET_SELECTED_WALLET_ADDRESS_RES")
+  sendMessage({ type: "GET_SELECTED_WALLET" })
+  return waitForMessage("GET_SELECTED_WALLET_RES")
 }
 
 export const getPublicKey = async () => {
