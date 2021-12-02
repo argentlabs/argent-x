@@ -28,7 +28,7 @@ export const AccountAddressLink = styled.a`
   text-overflow: ellipsis;
   overflow: hidden;
   border: rgba(255, 255, 255, 0.15) solid 1px;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 4px 10px;
   white-space: nowrap;
   color: white;
