@@ -1,5 +1,5 @@
 import { FC } from "react"
-import usePromise from "react-promise-suspense"
+import useSWR from "swr"
 
 import { useMitt } from "../../hooks/useMitt"
 import {
@@ -32,15 +32,16 @@ export const TokenList: FC<TokenListProps> = ({
     true,
   )
 
-  const tokenDetails: TokenDetails[] = usePromise(
-    async (tokens: string[], walletAddress: string) =>
+  const { data: tokenDetails = [] } = useSWR(
+    [tokens, walletAddress],
+    async (tokens, walletAddress) =>
       Promise.all(
         tokens.map((address) =>
           fetchTokenDetails(address, walletAddress, networkId),
         ),
       ),
-    [tokens, walletAddress],
-    Infinity,
+
+    { suspense: true, refreshInterval: 5000 },
   )
 
   const hasBalance = tokenDetails.some(
