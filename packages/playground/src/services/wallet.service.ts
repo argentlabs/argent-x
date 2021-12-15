@@ -1,5 +1,5 @@
 import { getStarknet } from "@argent/get-starknet"
-import { Signature, shortString } from "starknet"
+import { shortString } from "starknet"
 
 import { erc20TokenAddressByNetwork } from "./token.service"
 
@@ -56,7 +56,7 @@ export const signMessage = async (message: string) => {
   return starknet.signer.signMessage({
     domain: {
       name: "Example DApp",
-      chainId: networkId() === "mainnet-alpha" ? 1 : 3,
+      chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
       version: "0.0.1",
     },
     types: {
