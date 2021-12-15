@@ -1,4 +1,5 @@
 import { getStarknet } from "@argent/get-starknet"
+import { Signature, shortString } from "starknet"
 
 import { erc20TokenAddressByNetwork } from "./token.service"
 
@@ -39,6 +40,38 @@ export const networkUrl = (): string | undefined => {
   try {
     return getStarknet().provider.baseUrl
   } catch {}
+}
+
+export const signMessage = async (message: string) => {
+  const starknet = getStarknet()
+  await starknet.enable()
+
+  // checks that enable succeeded
+  if (starknet.isConnected === false)
+    throw Error("starknet wallet not connected")
+  if (!shortString.isShortString(message)) {
+    throw Error("message must be a short string")
+  }
+
+  return starknet.signer.signMessage({
+    domain: {
+      name: "Example DApp",
+      chainId: networkId() === "mainnet-alpha" ? 1 : 3,
+      version: "0.0.1",
+    },
+    types: {
+      StarkNetDomain: [
+        { name: "name", type: "felt" },
+        { name: "chainId", type: "felt" },
+        { name: "version", type: "felt" },
+      ],
+      Message: [{ name: "message", type: "felt" }],
+    },
+    primaryType: "Message",
+    message: {
+      message,
+    },
+  })
 }
 
 export const waitForTransaction = async (hash: string) =>

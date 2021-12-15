@@ -1,9 +1,11 @@
 import {
   AddTransactionResponse,
   Provider,
+  Signature,
   SignerInterface,
   Transaction,
   defaultProvider,
+  typedData,
 } from "starknet"
 
 import { MessageType, WindowMessageType } from "../shared/MessageType"
@@ -93,14 +95,22 @@ export class WalletSigner extends Provider implements SignerInterface {
     this.address = address
   }
 
-  private waitForMsgOfType(type: string, timeout = 5 * 60 * 1000) {
+  private waitForMsgOfType<
+    K extends MessageType["type"],
+    T extends { type: K } & MessageType,
+  >(
+    type: K,
+    timeout: number,
+  ): Promise<T extends { data: any } ? T["data"] : undefined> {
     return new Promise((resolve, reject) => {
       const pid = setTimeout(() => reject("Timeout"), timeout)
       const handler = (event: MessageEvent<WindowMessageType>) => {
         if (event.data.type === type) {
           clearTimeout(pid)
           window.removeEventListener("message", handler)
-          return resolve("data" in event.data ? event.data.data : undefined)
+          return resolve(
+            ("data" in event.data ? event.data.data : undefined) as any,
+          )
         }
       }
       window.addEventListener("message", handler)
@@ -120,13 +130,13 @@ export class WalletSigner extends Provider implements SignerInterface {
     sendMessage({ type: "ADD_TRANSACTION", data: transaction })
     sendMessage({ type: "OPEN_UI" })
 
-    const result: any = await Promise.race([
+    const result = await Promise.race([
       this.waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
       this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
-        .then(() => "error")
+        .then(() => "error" as const)
         .catch(() => {
           sendMessage({ type: "FAILED_TX", data: { tx: transaction } })
-          return "timeout"
+          return "timeout" as const
         }),
     ])
 
@@ -138,5 +148,29 @@ export class WalletSigner extends Provider implements SignerInterface {
       address: transaction.contract_address,
       transaction_hash: result.txHash,
     }
+  }
+
+  public async hashMessage(data: typedData.TypedData): Promise<string> {
+    return typedData.getMessageHash(data, this.address)
+  }
+
+  public async signMessage(data: typedData.TypedData): Promise<Signature> {
+    sendMessage({ type: "ADD_SIGN", data })
+    sendMessage({ type: "OPEN_UI" })
+
+    const result = await Promise.race([
+      this.waitForMsgOfType("SUCCESS_SIGN", 11 * 60 * 1000),
+      this.waitForMsgOfType("FAILED_SIGN", 10 * 60 * 1000)
+        .then(() => "error" as const)
+        .catch(() => {
+          sendMessage({ type: "FAILED_SIGN" })
+          return "timeout" as const
+        }),
+    ])
+
+    if (result === "error") throw Error("User abort")
+    if (result === "timeout") throw Error("User action timed out")
+
+    return [result.r, result.s]
   }
 }
