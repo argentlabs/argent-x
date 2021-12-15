@@ -41,7 +41,7 @@ export const TokenList: FC<TokenListProps> = ({
         ),
       ),
 
-    { suspense: true, refreshInterval: 5000 },
+    { suspense: true, refreshInterval: 30000 },
   )
 
   const hasBalance = tokenDetails.some(

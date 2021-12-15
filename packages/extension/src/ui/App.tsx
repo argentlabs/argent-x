@@ -4,6 +4,7 @@ import { Suspense } from "react"
 import { uint256 } from "starknet"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
+import { SWRConfig } from "swr"
 
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
@@ -21,6 +22,7 @@ import { TokenScreen } from "./screens/TokenScreen"
 import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { routerMachine } from "./states/RouterMachine"
+import { swrCacheProvider } from "./utils/swrCache"
 import { TokenDetails } from "./utils/tokens"
 
 function getUint256CalldataFromBN(bn: BigNumber) {
@@ -277,14 +279,16 @@ const GlobalStyle = createGlobalStyle`
 `
 
 export default () => (
-  <Suspense fallback={<LoadingScreen />}>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <GlobalStyle />
-    <App />
-  </Suspense>
+  <SWRConfig value={{ provider: () => swrCacheProvider }}>
+    <Suspense fallback={<LoadingScreen />}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+        rel="stylesheet"
+      />
+      <GlobalStyle />
+      <App />
+    </Suspense>
+  </SWRConfig>
 )
