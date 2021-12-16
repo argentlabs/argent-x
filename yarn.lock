@@ -8708,9 +8708,9 @@ stacktrace-parser@0.1.10:
     type-fest "^0.7.1"
 
 starknet@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.3.1.tgz#6c4ff1d74b2f20f8372fbb616587687756debd30"
-  integrity sha512-A5/POnt1s5gocVTx4NdrJDekhguLLvLQtgALV2w6sVNiCN8/yT2OIcUHjg1F82FB+vfE8usf2X8ccGyMwQteHw==
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.5.0.tgz#451e0519567419823214ac967b98c66630b97139"
+  integrity sha512-vW07z9JcHQVxk6US2nh1A+Z2ZBWlWviy32KTBm7MUzNewT8lgRRrIK9pPH6yWxpAPaRlD/u+7C0Vjp1Nbowtjg==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"
@@ -8720,6 +8720,7 @@ starknet@^2.3.1:
     json-bigint "^1.0.0"
     minimalistic-assert "^1.0.1"
     pako "^2.0.4"
+    superstruct "^0.15.3"
     url-join "^4.0.1"
 
 "statuses@>= 1.5.0 < 2":
@@ -8923,6 +8924,11 @@ stylis@^4.0.10:
   version "4.0.10"
   resolved "https://registry.yarnpkg.com/stylis/-/stylis-4.0.10.tgz#446512d1097197ab3f02fb3c258358c3f7a14240"
   integrity sha512-m3k+dk7QeJw660eIKRRn3xPF6uuvHs/FFzjX3HQ5ove0qYsiygoAhwn5a3IYKaZPo5LrYD0rfVmtv1gNY1uYwg==
+
+superstruct@^0.15.3:
+  version "0.15.3"
+  resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.15.3.tgz#07edfc715259ebfe3b4b2e4cb53e8e45b51674a4"
+  integrity sha512-wilec1Rg3FtKuRjRyCt70g5W29YUEuaLnybdVQUI+VQ7m0bw8k7TzrRv5iYmo6IpjLVrwxP5t3RgjAVqhYh4Fg==
 
 supports-color@^5.3.0, supports-color@^5.5.0:
   version "5.5.0"
