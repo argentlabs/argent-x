@@ -8,7 +8,8 @@ import {
   NetworkStatusIndicator,
   NetworkStatusWrapper,
 } from "../NetworkSwitcher"
-import { AccountColumn, AccountRow } from "./Header"
+import { AccountColumn } from "./AccountColumn"
+import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const AccountList = styled.div`

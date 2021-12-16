@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { Alert } from "../components/Alert"
 import { BackButton } from "../components/BackButton"
 import { Button, ButtonGroup } from "../components/Button"
+import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
 import { TokenDetails, toTokenView } from "../utils/tokens"
@@ -12,7 +13,7 @@ import { TokenDetails, toTokenView } from "../utils/tokens"
 const TokenScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 48px 32px;
+  padding: 0 32px 48px 32px;
 
   > form {
     width: 100%;
@@ -26,7 +27,7 @@ const TokenScreenWrapper = styled.div`
   }
 `
 
-const Header = styled.header`
+const TokenTitle = styled.header`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -92,33 +93,36 @@ export const TokenScreen: FC<TokenScreenProps> = ({
     onTransfer(address, recipient, ethers.utils.parseUnits(amount, decimals))
 
   return (
-    <TokenScreenWrapper>
-      <BackButton onClick={onBack} />
-
+    <>
       <Header>
-        <TokenIcon name={name} large />
-        <TokenName>{name}</TokenName>
+        <BackButton onClick={onBack} />
       </Header>
+      <TokenScreenWrapper>
+        <TokenTitle>
+          <TokenIcon name={name} large />
+          <TokenName>{name}</TokenName>
+        </TokenTitle>
 
-      <BalanceAlert>
-        <BalanceTitle>Your balance</BalanceTitle>
-        <BalanceAmount>{balance}</BalanceAmount>
-        <BalanceSymbol>{symbol}</BalanceSymbol>
-      </BalanceAlert>
+        <BalanceAlert>
+          <BalanceTitle>Your balance</BalanceTitle>
+          <BalanceAmount>{balance}</BalanceAmount>
+          <BalanceSymbol>{symbol}</BalanceSymbol>
+        </BalanceAlert>
 
-      <ButtonGroup as="form" onSubmit={handleSubmit}>
-        <InputText
-          placeholder="Amount"
-          value={amount}
-          onChange={(e: any) => setAmount(e.target.value)}
-        />
-        <InputText
-          placeholder="Recipient"
-          value={recipient}
-          onChange={(e: any) => setRecipient(e.target.value)}
-        />
-        <Button type="submit">Send</Button>
-      </ButtonGroup>
-    </TokenScreenWrapper>
+        <ButtonGroup as="form" onSubmit={handleSubmit}>
+          <InputText
+            placeholder="Amount"
+            value={amount}
+            onChange={(e: any) => setAmount(e.target.value)}
+          />
+          <InputText
+            placeholder="Recipient"
+            value={recipient}
+            onChange={(e: any) => setRecipient(e.target.value)}
+          />
+          <Button type="submit">Send</Button>
+        </ButtonGroup>
+      </TokenScreenWrapper>
+    </>
   )
 }

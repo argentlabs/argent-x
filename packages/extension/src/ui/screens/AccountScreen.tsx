@@ -2,10 +2,11 @@ import { FC, Suspense } from "react"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
+import { AccountColumn } from "../components/Account/AccountColumn"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
-import { AccountColumn, AccountHeader } from "../components/Account/Header"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { TokenList } from "../components/Account/TokenList"
+import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { Spinner } from "../components/Spinner"
 import {
@@ -51,7 +52,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
   const status = useStatus(wallet)
   return (
     <AccountColumn>
-      <AccountHeader>
+      <Header>
         <ProfilePicture
           {...makeClickable(onShowAccountList)}
           src={getAccountImageUrl(accountNumber)}
@@ -60,7 +61,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
           networkId={networkId}
           onChangeNetwork={onChangeNetwork}
         />
-      </AccountHeader>
+      </Header>
       <AccountContent>
         <AccountSubHeader
           networkId={networkId}
