@@ -5,6 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin")
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
   filename: "./index.html",
+  excludeChunks: ["inject", "inpage", "background"],
 })
 
 const isProd = process.env.NODE_ENV === "production"
