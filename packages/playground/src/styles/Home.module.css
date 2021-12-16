@@ -87,6 +87,13 @@
   margin-left: 0.5rem;
 }
 
+.textarea {
+  width: 100%;
+  color: white;
+  resize: vertical;
+  min-height: 4em;
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;

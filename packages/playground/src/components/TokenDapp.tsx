@@ -8,6 +8,7 @@ import {
 import {
   getExplorerUrlBase,
   networkId,
+  signMessage,
   waitForTransaction,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
@@ -16,6 +17,8 @@ export const TokenDapp: FC = () => {
   const [mintAmount, setMintAmount] = useState("10")
   const [transferTo, setTransferTo] = useState("")
   const [transferAmount, setTransferAmount] = useState("1")
+  const [shortText, setShortText] = useState("")
+  const [lastSig, setLastSig] = useState<string[]>([])
   const [lastTransactionHash, setLastTransactionHash] = useState("")
   const [transactionStatus, setTransactionStatus] = useState<
     "idle" | "approve" | "pending" | "success"
@@ -60,6 +63,23 @@ export const TokenDapp: FC = () => {
 
       setLastTransactionHash(result.transaction_hash)
       setTransactionStatus("pending")
+    } catch (e) {
+      console.error(e)
+      setTransactionStatus("idle")
+    }
+  }
+
+  const handleSignSubmit = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault()
+      setTransactionStatus("approve")
+
+      console.log("sign", shortText)
+      const result = await signMessage(shortText)
+      console.log(result)
+
+      setLastSig(result)
+      setTransactionStatus("success")
     } catch (e) {
       console.error(e)
       setTransactionStatus("idle")
@@ -119,6 +139,44 @@ export const TokenDapp: FC = () => {
           />
           <br />
           <input type="submit" disabled={buttonsDisabled} value="Transfer" />
+        </form>
+      </div>
+      <div className="columns">
+        <form onSubmit={handleSignSubmit}>
+          <h2 className={styles.title}>Sign Message</h2>
+
+          <label htmlFor="mint-amount">Short Text</label>
+          <input
+            type="text"
+            id="short-text"
+            name="short-text"
+            value={shortText}
+            onChange={(e) => setShortText(e.target.value)}
+          />
+
+          <input type="submit" disabled={buttonsDisabled} value="Sign" />
+        </form>
+        <form>
+          <h2 className={styles.title}>Sign results</h2>
+
+          {/* Label and textarea for value r */}
+          <label htmlFor="r">r</label>
+          <textarea
+            className={styles.textarea}
+            id="r"
+            name="r"
+            value={lastSig[0]}
+            readOnly
+          />
+          {/* Label and textarea for value s */}
+          <label htmlFor="s">s</label>
+          <textarea
+            className={styles.textarea}
+            id="s"
+            name="s"
+            value={lastSig[1]}
+            readOnly
+          />
         </form>
       </div>
       <h3 style={{ margin: 0 }}>

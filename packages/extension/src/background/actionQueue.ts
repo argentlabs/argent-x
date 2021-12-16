@@ -1,4 +1,4 @@
-import { InvokeFunctionTransaction } from "starknet"
+import { InvokeFunctionTransaction, typedData } from "starknet"
 
 import { getFromStorage, setToStorage } from "./storage"
 
@@ -19,6 +19,10 @@ export type ActionItem = QueueItem &
     | {
         type: "TRANSACTION"
         payload: InvokeFunctionTransaction
+      }
+    | {
+        type: "SIGN"
+        payload: typedData.TypedData
       }
   )
 

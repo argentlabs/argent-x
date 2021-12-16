@@ -1,5 +1,5 @@
 import type { JWK } from "jose"
-import type { InvokeFunctionTransaction } from "starknet"
+import type { InvokeFunctionTransaction, typedData } from "starknet"
 
 import { ActionItem } from "../background/actionQueue"
 import { BackupWallet } from "./backup.model"
@@ -54,6 +54,10 @@ export type MessageType =
   | { type: "RECOVER_KEYSTORE_RES" }
   | { type: "SIGN"; data: { hash: string } }
   | { type: "SIGN_RES"; data: { r: string; s: string } }
+  | { type: "ADD_SIGN"; data: typedData.TypedData }
+  | { type: "APPROVE_SIGN"; data: typedData.TypedData }
+  | { type: "FAILED_SIGN" }
+  | { type: "SUCCESS_SIGN"; data: { r: string; s: string } }
 
 export type WindowMessageType = {
   forwarded?: boolean

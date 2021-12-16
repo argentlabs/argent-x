@@ -40,7 +40,7 @@
     "react-dropzone": "^11.4.2",
     "react-hook-form": "^7.19.4",
     "react-router-dom": "^6.0.1",
-    "starknet": "^2.3.1",
+    "starknet": "^2.5.0",
     "styled-components": "^5.3.3",
     "styled-normalize": "^8.0.7",
     "swr": "^1.1.0",

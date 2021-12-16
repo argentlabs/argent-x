@@ -1,6 +1,5 @@
 import { compactDecrypt } from "jose"
-import { ec, encode } from "starknet"
-import browser from "webextension-polyfill"
+import { ec, encode, typedData } from "starknet"
 
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
@@ -111,6 +110,8 @@ async function main() {
         return selectedWalletStore.setItem("SELECTED_WALLET", msg.data)
       }
 
+      case "FAILED_SIGN":
+      case "SUCCESS_SIGN":
       case "SUBMITTED_TX":
       case "FAILED_TX": {
         return await actionQueue.removeLatest()
@@ -209,7 +210,7 @@ async function main() {
         const l1 = await getL1(sessionPassword)
         const starkPair = ec.getKeyPair(l1.privateKey)
         const { hash } = msg.data
-        const { r, s } = ec.sign(starkPair, hash)
+        const [r, s] = ec.sign(starkPair, hash)
         return sendToTabAndUi({
           type: "SIGN_RES",
           data: {
@@ -218,6 +219,34 @@ async function main() {
           },
         })
       }
+      case "ADD_SIGN": {
+        return await actionQueue.push({
+          type: "SIGN",
+          payload: msg.data,
+        })
+      }
+      case "APPROVE_SIGN": {
+        const sessionPassword = getSession()
+        if (!sessionPassword) throw Error("you need an open session")
+        const l1 = await getL1(sessionPassword)
+        const starkPair = ec.getKeyPair(l1.privateKey)
+        const selectedWallet = await selectedWalletStore.getItem(
+          "SELECTED_WALLET",
+        )
+        if (!selectedWallet) throw Error("you need a selected wallet")
+
+        const hash = typedData.getMessageHash(msg.data, selectedWallet.address)
+        const [r, s] = ec.sign(starkPair, hash)
+        await actionQueue.removeLatest()
+        return sendToTabAndUi({
+          type: "SUCCESS_SIGN",
+          data: {
+            r: r.toString(),
+            s: s.toString(),
+          },
+        })
+      }
+
       case "RECOVER_KEYSTORE": {
         await setKeystore(msg.data)
         return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })

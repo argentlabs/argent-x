@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Args, InvokeFunctionTransaction } from "starknet"
+import { Args, InvokeFunctionTransaction, typedData } from "starknet"
 import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { sendMessage } from "../../shared/messages"
@@ -66,6 +66,7 @@ interface Context {
   selectedToken?: TokenDetails
   uploadedBackup?: string
   txToApprove?: TransactionRequest | InvokeFunctionTransaction
+  signdataToApprove?: typedData.TypedData
   txHash?: string
   isPopup?: boolean
   hostToWhitelist?: string
@@ -109,6 +110,11 @@ type RouterTypestate =
   | {
       value: "approveTx" | "submitTx"
       context: Context & SigningContext & { txToApprove: TransactionRequest }
+    }
+  | {
+      value: "approveSign"
+      context: Context &
+        SigningContext & { signdataToApprove: typedData.TypedData }
     }
   | {
       value: "submittedTx"
@@ -292,6 +298,23 @@ export const routerMachine = createMachine<
                   ...ctx,
                   uploadedBackup: undefined,
                   txToApprove: requestedActions?.action?.payload,
+                  isPopup: true,
+                }
+              }),
+            ],
+          },
+          {
+            target: "approveSign",
+            cond: (_ctx, ev) => {
+              return ev.data?.requestedActions?.action?.type === "SIGN"
+            },
+            actions: [
+              assign((_, event) => {
+                const { requestedActions, ...ctx } = event.data
+                return {
+                  ...ctx,
+                  uploadedBackup: undefined,
+                  signdataToApprove: requestedActions?.action?.payload,
                   isPopup: true,
                 }
               }),
@@ -574,6 +597,30 @@ export const routerMachine = createMachine<
             sendMessage({
               type: "REJECT_WHITELIST",
               data: ctx.hostToWhitelist!,
+            })
+          },
+        },
+      },
+      exit: (ctx) => {
+        if (ctx.isPopup) window.close()
+      },
+    },
+    approveSign: {
+      on: {
+        AGREE: {
+          target: "account",
+          actions: (ctx) => {
+            sendMessage({
+              type: "APPROVE_SIGN",
+              data: ctx.signdataToApprove!,
+            })
+          },
+        },
+        REJECT: {
+          target: "accountList",
+          actions: (ctx) => {
+            sendMessage({
+              type: "FAILED_SIGN",
             })
           },
         },

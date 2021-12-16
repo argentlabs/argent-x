@@ -7,7 +7,7 @@ import { H2 } from "../components/Typography"
 const ConfirmScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 48px 32px;
+  padding: 48px 32px 0;
 
   > form {
     width: 100%;
@@ -32,11 +32,11 @@ interface ConfirmScreenProps extends ConfirmPageProps {
 }
 
 const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
-  position: absolute;
+  position: sticky;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 40px 56px;
+  padding: 16px 0 48px;
   background-color: #161616;
 `
 

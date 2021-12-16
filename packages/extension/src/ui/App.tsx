@@ -9,6 +9,7 @@ import { SWRConfig } from "swr"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
+import { ApproveSignScreen } from "./screens/ApproveSignScreen"
 import { ApproveTransactionScreen } from "./screens/ApproveTransactionScreen"
 import { ConnectScreen } from "./screens/ConnectScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
@@ -106,6 +107,19 @@ function App() {
         }}
         onReject={async () => {
           send("REJECT_TX")
+        }}
+      />
+    )
+
+  if (state.matches("approveSign"))
+    return (
+      <ApproveSignScreen
+        dataToSign={state.context.signdataToApprove}
+        onSubmit={async () => {
+          send("AGREE")
+        }}
+        onReject={async () => {
+          send("REJECT")
         }}
       />
     )
