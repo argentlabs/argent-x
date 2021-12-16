@@ -6,6 +6,7 @@ import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
+import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
@@ -15,7 +16,7 @@ import { TokenDetails, fetchTokenDetails } from "../utils/tokens"
 const AddTokenScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 48px 32px;
+  padding: 0 32px 48px 32px;
 
   > form {
     width: 100%;
@@ -109,76 +110,80 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }
 
   return (
-    <AddTokenScreenWrapper>
-      <BackButton onClick={onBack} />
-      <H2>Add token</H2>
+    <>
+      <Header>
+        <BackButton onClick={onBack} />
+      </Header>
+      <AddTokenScreenWrapper>
+        <H2>Add token</H2>
 
-      <form
-        onSubmit={() => {
-          if (isDataComplete(compiledData)) {
-            onSubmit?.({
-              address: compiledData.address,
-              decimals: compiledData.decimals!.toString(),
-              name: compiledData.name!,
-              symbol: compiledData.symbol!,
-              networkId: compiledData.networkId,
-            })
-          }
-        }}
-      >
-        <InputText
-          autoFocus
-          placeholder="Contract address"
-          type="text"
-          value={tokenAddress}
-          disabled={loading}
-          onChange={(e: any) => {
-            setTokenAddress(e.target.value?.toLowerCase())
+        <form
+          onSubmit={() => {
+            if (isDataComplete(compiledData)) {
+              onSubmit?.({
+                address: compiledData.address,
+                decimals: compiledData.decimals!.toString(),
+                name: compiledData.name!,
+                symbol: compiledData.symbol!,
+                networkId: compiledData.networkId,
+              })
+            }
           }}
-          onBlur={() => {
-            try {
-              if (tokenAddress)
-                setTokenAddress(addressFormat64Byte(tokenAddress))
-            } catch {}
-          }}
-        />
-        {!loading && (
-          <>
-            <InputText
-              placeholder="Name"
-              type="text"
-              value={tokenDetails?.name ?? tokenName}
-              disabled={tokenDetails?.name || loading || !validAddress}
-              onChange={(e: any) => setTokenName(e.target.value)}
-            />
-            <InputText
-              placeholder="Symbol"
-              type="text"
-              value={tokenDetails?.symbol ?? tokenSymbol}
-              disabled={tokenDetails?.symbol || loading || !validAddress}
-              onChange={(e: any) => setTokenSymbol(e.target.value)}
-            />
-            <InputText
-              placeholder="Decimals"
-              type="text"
-              value={tokenDetails?.decimals?.toString() ?? tokenDecimals}
-              disabled={
-                tokenDetails?.decimals?.toString() || loading || !validAddress
-              }
-              onChange={(e: any) => {
-                try {
-                  BigNumber.from(e.target.value || "0")
-                  setTokenDecimals(e.target.value)
-                } catch {}
-              }}
-            />
-            <Button type="submit" disabled={!isDataComplete(compiledData)}>
-              Continue
-            </Button>
-          </>
-        )}
-        {loading && <Spinner size={64} />}
-      </form>
-    </AddTokenScreenWrapper>
+        >
+          <InputText
+            autoFocus
+            placeholder="Contract address"
+            type="text"
+            value={tokenAddress}
+            disabled={loading}
+            onChange={(e: any) => {
+              setTokenAddress(e.target.value?.toLowerCase())
+            }}
+            onBlur={() => {
+              try {
+                if (tokenAddress)
+                  setTokenAddress(addressFormat64Byte(tokenAddress))
+              } catch {}
+            }}
+          />
+          {!loading && (
+            <>
+              <InputText
+                placeholder="Name"
+                type="text"
+                value={tokenDetails?.name ?? tokenName}
+                disabled={tokenDetails?.name || loading || !validAddress}
+                onChange={(e: any) => setTokenName(e.target.value)}
+              />
+              <InputText
+                placeholder="Symbol"
+                type="text"
+                value={tokenDetails?.symbol ?? tokenSymbol}
+                disabled={tokenDetails?.symbol || loading || !validAddress}
+                onChange={(e: any) => setTokenSymbol(e.target.value)}
+              />
+              <InputText
+                placeholder="Decimals"
+                type="text"
+                value={tokenDetails?.decimals?.toString() ?? tokenDecimals}
+                disabled={
+                  tokenDetails?.decimals?.toString() || loading || !validAddress
+                }
+                onChange={(e: any) => {
+                  try {
+                    BigNumber.from(e.target.value || "0")
+                    setTokenDecimals(e.target.value)
+                  } catch {}
+                }}
+              />
+              <Button type="submit" disabled={!isDataComplete(compiledData)}>
+                Continue
+              </Button>
+            </>
+          )}
+          {loading && <Spinner size={64} />}
+        </form>
+      </AddTokenScreenWrapper>
+    </>
   )
 }

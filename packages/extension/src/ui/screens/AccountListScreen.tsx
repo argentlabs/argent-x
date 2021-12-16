@@ -4,10 +4,10 @@ import styled from "styled-components"
 import Add from "../../assets/add.svg"
 import Settings from "../../assets/settings.svg"
 import { AccountList, AccountListItem } from "../components/Account/AccountList"
-import { AccountHeader } from "../components/Account/Header"
-import { NetworkSwitcher } from "../components/NetworkSwitcher"
+import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
-import { H1, H2, P } from "../components/Typography"
+import { NetworkSwitcher } from "../components/NetworkSwitcher"
+import { H1, P } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
 import { getStatus } from "../utils/wallet"
 import { Wallet } from "../Wallet"
@@ -34,9 +34,9 @@ const Paragraph = styled(P)`
 `
 
 interface AccountListScreenProps {
-  onAccountSelect?: (account: string) => void
-  onAddAccount?: () => void
-  onSettings?: () => void
+  onAccountSelect: (account: string) => void
+  onAddAccount: () => void
+  onSettings: () => void
   wallets: Wallet[]
   activeWallet: string
   networkId: string
@@ -53,7 +53,7 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
   onChangeNetwork,
 }) => (
   <AccountListWrapper>
-    <AccountHeader>
+    <Header>
       <IconButton size={36} {...makeClickable(onSettings, 99)}>
         <Settings />
       </IconButton>
@@ -61,7 +61,7 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
         networkId={networkId}
         onChangeNetwork={onChangeNetwork}
       />
-    </AccountHeader>
+    </Header>
     <H1>Accounts</H1>
     <AccountList>
       {wallets.length === 0 && (
