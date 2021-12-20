@@ -2698,10 +2698,10 @@
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
   integrity sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==
 
-"@tsconfig/svelte@^2.0.0":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@tsconfig/svelte/-/svelte-2.0.1.tgz#0e8d7caa693e9b2afce5e622c0475bb0fd89c12c"
-  integrity sha512-aqkICXbM1oX5FfgZd2qSSAGdyo/NRxjWCamxoyi3T8iVQnzGge19HhDYzZ6NrVOW7bhcWNSq9XexWFtMzbB24A==
+"@tsconfig/svelte@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@tsconfig/svelte/-/svelte-3.0.0.tgz#b06e059209f04c414de0069f2f0e2796d979fc6f"
+  integrity sha512-pYrtLtOwku/7r1i9AMONsJMVYAtk3hzOfiGNekhtq5tYBGA7unMve8RvUclKLMT3PrihvJqUmzsRGh0RP84hKg==
 
 "@types/chrome@0.0.99":
   version "0.0.99"
@@ -8287,9 +8287,9 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     inherits "^2.0.1"
 
 rollup-plugin-svelte-svg@^1.0.0-beta.5:
-  version "1.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-svelte-svg/-/rollup-plugin-svelte-svg-1.0.0-beta.5.tgz#4b6fcbbdc21532c0ebea2fd000e00b3335dfc7bf"
-  integrity sha512-+Vezv3H/8IKkSjZpjyd0+gF3VcsDWkapaUu6aMjDULsv6mL/irRgTSnjPOSg5UmMhAFZL1kV+aMb97Vw/4ZsOA==
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-svelte-svg/-/rollup-plugin-svelte-svg-1.0.0-beta.6.tgz#0ee3deae2329abb1c90f50b83598aaf0bb0559fc"
+  integrity sha512-6uJb9kuaqK6p+DvkgphhGN18wvUzdT6h7MQC2B8P1omi9omC9lQC54pwaot21h6z9ibhGPLG9a1XFLeDQth/kg==
   dependencies:
     rollup-pluginutils "^2.8.2"
     svgo "^2.3.1"
