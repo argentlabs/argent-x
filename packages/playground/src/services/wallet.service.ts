@@ -1,7 +1,7 @@
 import { getStarknet } from "@argent/get-starknet"
 import { shortString } from "starknet"
 
-import { erc20TokenAddressByNetwork } from "./token.service"
+import { Network } from "./token.service"
 
 export const isWalletConnected = (): boolean => !!getStarknet()?.isConnected
 
@@ -15,17 +15,17 @@ export const walletAddress = async (): Promise<string | undefined> => {
   } catch {}
 }
 
-export const networkId = (): keyof typeof erc20TokenAddressByNetwork => {
+export const networkId = (): Network | undefined => {
   try {
-    const baseUrl = getStarknet().provider.baseUrl
+    const { baseUrl } = getStarknet().provider
     if (baseUrl.includes("alpha-mainnet.starknet.io")) {
       return "mainnet-alpha"
-    } else {
+    } else if (baseUrl.includes("alpha4.starknet.io")) {
       return "goerli-alpha"
+    } else if (baseUrl.match(/^https?:\/\/localhost.*/)) {
+      return "localhost"
     }
-  } catch {
-    return "goerli-alpha"
-  }
+  } catch {}
 }
 
 export const addToken = async (address: string): Promise<void> => {
@@ -42,10 +42,10 @@ export const addToken = async (address: string): Promise<void> => {
   })
 }
 
-export const getExplorerUrlBase = (): string => {
+export const getExplorerUrlBase = (): string | undefined => {
   if (networkId() === "mainnet-alpha") {
     return "https://voyager.online"
-  } else {
+  } else if (networkId() === "goerli-alpha") {
     return "https://goerli.voyager.online"
   }
 }

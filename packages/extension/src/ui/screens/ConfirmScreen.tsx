@@ -63,7 +63,11 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           src={getAccountImageUrl(selectedAccount.accountNumber)}
           disabled
         />
-        <NetworkSwitcher networkId={selectedAccount.networkId} disabled />
+        <NetworkSwitcher
+          networkId={selectedAccount.networkId}
+          port={0}
+          disabled
+        />
       </Header>
     )}
     <H2>{title}</H2>

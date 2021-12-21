@@ -4,6 +4,7 @@ import { Provider, ec, encode, number, stark } from "starknet"
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
+import { getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import { getKeyPair } from "./keys/communication"
 import {
@@ -112,7 +113,7 @@ async function main() {
           })
         }
 
-        const provider = new Provider({ network: msg.data.network as any })
+        const provider = getProvider(msg.data.network)
         const fetchedStatus = await getTransactionStatus(
           provider,
           msg.data.hash,

@@ -1,12 +1,15 @@
+import { Provider } from "starknet"
+
+import { BackupWallet } from "./backup.model"
+
 export interface Network {
   id: string
   name: string
-  explorerUrl: string
+  baseUrl?: string
+  explorerUrl?: string
 }
 
-export const defaultNetworkId = "goerli-alpha"
-
-export const defaultNetworks: Network[] = [
+export const networks: Network[] = [
   {
     id: "mainnet-alpha",
     name: "Ethereum Mainnet",
@@ -17,7 +20,33 @@ export const defaultNetworks: Network[] = [
     name: "Goerli Testnet",
     explorerUrl: "https://goerli.voyager.online",
   },
+  {
+    id: "localhost",
+    name: "Localhost",
+  },
 ]
 
-export const getNetwork = (networkId: string) =>
-  defaultNetworks.find(({ id }) => id === networkId) || defaultNetworks[0]
+export const defaultNetwork = networks[1] // goerli-alpha
+
+export const getNetwork = (networkId: string): Network => {
+  networkId = localNetworkId(networkId)
+  return networks.find(({ id }) => id === networkId) || defaultNetwork
+}
+
+export const networkWallets = (wallets: BackupWallet[], networkId: string) =>
+  wallets.filter(
+    ({ network }) => localNetworkId(network) === localNetworkId(networkId),
+  )
+
+export const localNetworkId = (network: string) =>
+  network.startsWith("http://localhost") ? "localhost" : network
+
+export const localNetworkUrl = (networkId: string, port: number) =>
+  networkId === "localhost" ? `http://localhost:${port}` : networkId
+
+export const getProvider = (network: string) =>
+  new Provider(
+    network.startsWith("http")
+      ? { baseUrl: network }
+      : { network: network as any },
+  )

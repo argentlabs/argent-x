@@ -33,7 +33,10 @@ export const SuccessScreen: FC<SuccessScreenProps> = ({
   return (
     <SuccessScreenWrapper>
       <Spinner size={92} />
-      <SuccessText href={`${explorerUrl}/tx/${txHash}`} target="_blank">
+      <SuccessText
+        href={explorerUrl && `${explorerUrl}/tx/${txHash}`}
+        target="_blank"
+      >
         Transaction was submitted
       </SuccessText>
     </SuccessScreenWrapper>

@@ -41,6 +41,7 @@ interface AccountListScreenProps {
   activeWallet: string
   networkId: string
   onChangeNetwork: (networkId: string) => Promise<void> | void
+  port: number
 }
 
 export const AccountListScreen: FC<AccountListScreenProps> = ({
@@ -51,6 +52,7 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
   activeWallet,
   networkId,
   onChangeNetwork,
+  port,
 }) => (
   <AccountListWrapper>
     <Header>
@@ -60,6 +62,7 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
       <NetworkSwitcher
         networkId={networkId}
         onChangeNetwork={onChangeNetwork}
+        port={port}
       />
     </Header>
     <H1>Accounts</H1>

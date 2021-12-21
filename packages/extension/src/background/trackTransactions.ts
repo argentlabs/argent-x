@@ -1,6 +1,7 @@
-import { Provider, Status } from "starknet"
+import { Provider } from "starknet"
 
 import { BackupWallet } from "../shared/backup.model"
+import { getProvider } from "../shared/networks"
 import {
   TransactionMeta,
   TransactionStatus,
@@ -9,6 +10,7 @@ import {
 interface TransactionStatusWithProvider extends TransactionStatus {
   provider: Provider
 }
+
 type FetchedTransactionStatus = Omit<
   TransactionStatus,
   "walletAddress" | "meta"
@@ -41,7 +43,7 @@ export class TransactionTracker {
       title: "Contract interaction",
     },
   ): Promise<void> {
-    const provider = new Provider({ network: wallet.network as any })
+    const provider = getProvider(wallet.network)
     this.transactions.push({
       hash: transactionHash,
       provider,

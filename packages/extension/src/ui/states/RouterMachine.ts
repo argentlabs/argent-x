@@ -9,7 +9,11 @@ import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { ExtActionItem } from "../../shared/actionQueue"
 import { sendMessage } from "../../shared/messages"
-import { defaultNetworkId } from "../../shared/networks"
+import {
+  defaultNetwork,
+  localNetworkUrl,
+  networkWallets,
+} from "../../shared/networks"
 import {
   getActions,
   getLastSelectedWallet,
@@ -43,6 +47,7 @@ type RouterEvents =
   | { type: "SUBMIT_KEYSTORE"; data: string }
   | { type: "SELECT_WALLET"; data: string }
   | { type: "CHANGE_NETWORK"; data: string }
+  | { type: "CHANGE_PORT"; data: number }
   | {
       type: "SUBMIT_PASSWORD"
       data: { password: string }
@@ -68,6 +73,7 @@ type RouterEvents =
 interface Context {
   wallets: Record<string, Wallet>
   networkId: string
+  localhostPort: number
   selectedWallet?: string
   selectedToken?: TokenDetails
   uploadedBackup?: string
@@ -118,7 +124,11 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
     initial: "determineEntry",
     context: {
       wallets: {},
-      networkId: defaultNetworkId,
+      networkId: defaultNetwork.id,
+      localhostPort: (() => {
+        const port = parseInt(localStorage.port)
+        return !port || isNaN(port) ? 5000 : port
+      })(),
       actions: [],
       isPopup: closeAfterActions,
     },
@@ -256,9 +266,7 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
               () => null,
             )
 
-            const wallets = (await getWallets()).filter(
-              ({ network }) => network === networkId,
-            )
+            const wallets = networkWallets(await getWallets(), networkId)
 
             const selectedWallet = wallets.find(
               ({ address }) => address === lastSelectedWallet?.address,
@@ -269,7 +277,7 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
 
             return {
               wallets: wallets
-                .map(({ address }) => new Wallet(address, networkId))
+                .map(({ address, network }) => new Wallet(address, network))
                 .reduce((acc, wallet) => {
                   return {
                     ...acc,
@@ -327,7 +335,8 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
             if (event.type === "GENERATE_L1")
               await startSession(event.data.password)
 
-            const newWallet = await Wallet.fromDeploy(ctx.networkId)
+            const network = localNetworkUrl(ctx.networkId, ctx.localhostPort)
+            const newWallet = await Wallet.fromDeploy(network)
 
             useProgress.setState({ progress: 0, text: "" })
 
@@ -352,7 +361,10 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
         entry: async (ctx) => {
           sendMessage({
             type: "WALLET_CONNECTED",
-            data: { address: ctx.selectedWallet!, network: ctx.networkId },
+            data: {
+              address: ctx.selectedWallet!,
+              network: localNetworkUrl(ctx.networkId, ctx.localhostPort),
+            },
           })
         },
         on: {
@@ -449,7 +461,6 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
           },
         },
       },
-
       settings: {
         on: {
           GO_BACK: "accountList",
@@ -458,6 +469,15 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
             actions: () => {
               sendMessage({ type: "STOP_SESSION" })
             },
+          },
+          CHANGE_PORT: {
+            target: "settings",
+            actions: [
+              assign((ctx, { data }) => {
+                localStorage.setItem("port", `${data}`)
+                return { ...ctx, localhostPort: data }
+              }),
+            ],
           },
         },
       },

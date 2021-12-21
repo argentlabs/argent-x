@@ -6,7 +6,6 @@ import {
   Calldata,
   CompiledContract,
   Contract,
-  Provider,
   compileCalldata,
   encode,
   hash,
@@ -16,6 +15,7 @@ import {
 } from "starknet"
 
 import { sendMessage, waitForMessage } from "../shared/messages"
+import { getProvider } from "../shared/networks"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -34,7 +34,7 @@ export class Wallet {
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,
-      new Provider({ network: networkId as any }),
+      getProvider(networkId),
     )
 
     if (deployTransaction) {

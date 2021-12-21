@@ -4,6 +4,7 @@ import { Provider, compileCalldata, ec, stark } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
+import { Network, getProvider } from "../../shared/networks"
 import { selectedWalletStore } from "../selectedWallet"
 import { Storage } from "../storage"
 
@@ -166,7 +167,7 @@ export async function createAccount(networkId: string) {
   const seed = ec.getStarkKey(ec.genKeyPair())
   const wallets = await getWallets()
 
-  const provider = new Provider({ network: networkId as any })
+  const provider = getProvider(networkId)
   const deployTransaction = await provider.deployContract(
     ArgentCompiledContract,
     compileCalldata({

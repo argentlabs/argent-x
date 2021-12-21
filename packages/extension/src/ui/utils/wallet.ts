@@ -29,10 +29,12 @@ export const isWalletDeployed = (wallet: Wallet): boolean =>
   !wallet.deployTransaction
 
 export type WalletStatusCode = "CONNECTED" | "DEFAULT" | "DEPLOYING"
+
 export interface WalletStatus {
   code: WalletStatusCode
   text: string
 }
+
 export const getStatus = (
   wallet: Wallet,
   activeWalletAddress?: string,
