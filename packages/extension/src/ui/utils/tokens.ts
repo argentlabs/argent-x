@@ -88,13 +88,16 @@ export const toTokenView = ({
   decimals,
   balance,
   ...rest
-}: TokenDetails): TokenView => ({
-  name: name || "Unknown token",
-  symbol: symbol || "",
-  decimals: decimals?.toNumber() || 0,
-  balance: ethers.utils.formatUnits(balance ?? 0, decimals) || "0",
-  ...rest,
-})
+}: TokenDetails): TokenView => {
+  const decimalsNumber = decimals?.toNumber() || 18
+  return {
+    name: name || "Unknown token",
+    symbol: symbol || "",
+    decimals: decimalsNumber,
+    balance: ethers.utils.formatUnits(balance ?? 0, decimalsNumber) || "0",
+    ...rest,
+  }
+}
 
 export const fetchTokenDetails = async (
   address: string,
