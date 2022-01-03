@@ -442,7 +442,15 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
       },
 
       settings: {
-        on: { GO_BACK: "accountList", LOCK: "enterPassword" },
+        on: {
+          GO_BACK: "accountList",
+          LOCK: {
+            target: "enterPassword",
+            actions: () => {
+              sendMessage({ type: "STOP_SESSION" })
+            },
+          },
+        },
       },
     },
   })

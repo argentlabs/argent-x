@@ -107,7 +107,13 @@ function App() {
   if (state.matches("disclaimer"))
     return <DisclaimerScreen onSubmit={() => send("AGREE")} />
 
-  if (actions[0]) {
+  if (
+    (state.matches("account") ||
+      state.matches("accountList") ||
+      state.matches("token") ||
+      state.matches("addToken")) &&
+    actions[0]
+  ) {
     const action = actions[0]
     const isLastAction = actions.length === 1
     switch (action.type) {

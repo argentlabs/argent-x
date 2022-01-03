@@ -28,7 +28,6 @@ export async function sentTransactionNotification(
   Status: ${status}`,
       iconUrl: "./assets/logo.png",
       eventTime: Date.now(),
-      priority: 1,
     })
   }
 }
