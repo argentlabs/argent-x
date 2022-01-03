@@ -44,11 +44,11 @@ async function main() {
           data: transactions,
         })
 
-        transactions.forEach(({ hash, status }) => {
+        for (const { hash, status } of transactions) {
           if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
             sentTransactionNotification(hash, status)
           }
-        })
+        }
       }
     },
 
@@ -78,7 +78,6 @@ async function main() {
       },
     })
 
-    console.log("message", msg)
     switch (msg.type) {
       case "OPEN_UI": {
         return openUi()
@@ -86,11 +85,12 @@ async function main() {
 
       case "GET_TRANSACTION": {
         const cached = transactionTracker.getTransactionStatus(msg.data.hash)
-        if (cached)
+        if (cached) {
           return sendToTabAndUi({
             type: "GET_TRANSACTION_RES",
             data: cached,
           })
+        }
 
         const provider = new Provider({ network: msg.data.network as any })
         const fetchedStatus = await getTransactionStatus(

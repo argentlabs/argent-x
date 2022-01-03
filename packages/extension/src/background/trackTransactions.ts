@@ -1,18 +1,22 @@
 import { Provider, Status } from "starknet"
 
-type Listener = (transactions: { hash: string; status: Status }[]) => void
+interface TransactionStatus {
+  hash: string
+  status: Status
+}
+type Listener = (transactions: TransactionStatus[]) => void
 
 export async function getTransactionStatus(
   provider: Provider,
   hash: string,
-): Promise<{ hash: string; status: Status }> {
+): Promise<TransactionStatus> {
   const { tx_status } = await provider.getTransactionStatus(hash)
   return { hash, status: tx_status }
 }
 
 export class TransactionTracker {
   private transactions: { hash: string; provider: Provider }[] = []
-  private transactionStatus: { hash: string; status: Status }[] = []
+  private transactionStatus: TransactionStatus[] = []
   private listeners: Listener[] = []
   private interval: NodeJS.Timeout
 
@@ -29,9 +33,7 @@ export class TransactionTracker {
     this.transactions.push({ hash: transactionHash, provider })
   }
 
-  public getTransactionStatus(
-    hash: string,
-  ): { hash: string; status: Status } | undefined {
+  public getTransactionStatus(hash: string): TransactionStatus | undefined {
     return this.transactionStatus.find(({ hash: txHash }) => txHash === hash)
   }
 

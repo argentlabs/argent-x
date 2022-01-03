@@ -6,7 +6,7 @@ import { ExtActionItem } from "../../shared/actionQueue"
 import { messageStream, sendMessage } from "../../shared/messages"
 import { getActions } from "../utils/messaging"
 
-type ActionsStore = {
+interface ActionsStore {
   actions: ExtActionItem[]
   approve: (action: ExtActionItem | string) => Promise<void>
   reject: (action: ExtActionItem | string) => Promise<void>
