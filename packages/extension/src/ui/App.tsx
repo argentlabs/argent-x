@@ -49,8 +49,7 @@ async function fileToString(file: File): Promise<string> {
   })
 }
 
-const url = new URL(window.location.href)
-const isPopup = url.searchParams.has("popup")
+const isPopup = new URLSearchParams(window.location.search).has("popup")
 const routerMachine = createRouterMachine(isPopup)
 
 function App() {

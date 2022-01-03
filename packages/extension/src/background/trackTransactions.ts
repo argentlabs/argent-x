@@ -16,8 +16,8 @@ export class TransactionTracker {
   private listeners: Listener[] = []
   private interval: NodeJS.Timeout
 
-  constructor(listeners: Listener, interval: number = 30 * 1000) {
-    this.listeners = [listeners]
+  constructor(listener: Listener, interval: number = 30 * 1000) {
+    this.listeners = [listener]
     this.interval = setInterval(() => this.checkTransactions(), interval)
   }
 
