@@ -1,5 +1,5 @@
 import { FC } from "react"
-import type { Args } from "starknet"
+import type { Args, InvokeFunctionTransaction } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
@@ -7,12 +7,8 @@ import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
-  transaction: { to: string; method: string; calldata: Args }
-  onSubmit: (transaction: {
-    to: string
-    method: string
-    calldata: Args
-  }) => void
+  transaction: InvokeFunctionTransaction
+  onSubmit: (transaction: InvokeFunctionTransaction) => void
 }
 
 const Pre = styled.pre`

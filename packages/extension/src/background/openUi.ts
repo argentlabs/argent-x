@@ -10,7 +10,10 @@ function wait(delay: number) {
 
 export async function openUi() {
   const [existingPopup] = await browser.tabs.query({
-    url: browser.runtime.getURL("/index.html"),
+    url: [
+      browser.runtime.getURL("/index.html"),
+      browser.runtime.getURL("/index.html*"),
+    ],
   })
 
   if (existingPopup && existingPopup.windowId)
@@ -36,7 +39,7 @@ export async function openUi() {
   }
   await wait(300)
   const popup = await browser.windows.create({
-    url: "index.html",
+    url: "index.html?popup",
     type: "popup",
     width: NOTIFICATION_WIDTH,
     height: NOTIFICATION_HEIGHT,
