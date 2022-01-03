@@ -26,6 +26,8 @@ interface SettingsScreenProps {
   onLock: () => void
 }
 
+const VERSION = `v${process.env.VERSION}`
+
 export const SettingsScreen: FC<SettingsScreenProps> = ({ onBack, onLock }) => (
   <>
     <Header>
@@ -53,6 +55,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({ onBack, onLock }) => (
       >
         Lock wallet
       </Button>
+      <P style={{ textAlign: "center" }}>Version: {VERSION}</P>
     </SettingsScreenWrapper>
   </>
 )
