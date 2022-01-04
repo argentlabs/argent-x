@@ -237,7 +237,29 @@ async function main() {
               },
             })
           }
+
+          case "ADD_TOKEN": {
+            return sendToTabAndUi({
+              type: "APPROVE_ADD_TOKEN",
+              data: {
+                actionHash,
+              },
+            })
+          }
         }
+      }
+
+      case "ADD_TOKEN": {
+        const { meta } = await actionQueue.push({
+          type: "ADD_TOKEN",
+          payload: msg.data,
+        })
+        return sendToTabAndUi({
+          type: "ADD_TOKEN_RES",
+          data: {
+            actionHash: meta.hash,
+          },
+        })
       }
 
       case "REJECT_ACTION": {
@@ -270,11 +292,20 @@ async function main() {
               },
             })
           }
+          case "ADD_TOKEN": {
+            return sendToTabAndUi({
+              type: "REJECT_ADD_TOKEN",
+              data: {
+                actionHash,
+              },
+            })
+          }
         }
       }
 
       case "FAILED_SIGN":
       case "REJECT_WHITELIST":
+      case "REJECT_ADD_TOKEN":
       case "FAILED_TX": {
         return await actionQueue.remove(msg.data.actionHash)
       }

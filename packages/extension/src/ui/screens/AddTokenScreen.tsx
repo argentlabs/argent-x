@@ -4,8 +4,9 @@ import { FC, useEffect, useMemo, useRef, useState } from "react"
 import { number } from "starknet"
 import styled from "styled-components"
 
+import { AddToken } from "../../shared/token.model"
 import { BackButton } from "../components/BackButton"
-import { Button } from "../components/Button"
+import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
@@ -30,7 +31,7 @@ const AddTokenScreenWrapper = styled.div`
   }
 `
 
-const isDataComplete = (data: TokenDetails) => {
+const isDataComplete = (data: TokenDetails): data is Required<TokenDetails> => {
   if (
     isValidAddress(data.address) &&
     data.balance?.toString() &&
@@ -49,26 +50,26 @@ function addressFormat64Byte(address: number.BigNumberish): string {
 interface AddTokenScreenProps {
   walletAddress: string
   networkId: string
-  onSubmit?: (addToken: {
-    address: string
-    symbol: string
-    name: string
-    decimals: string
-    networkId: string
-  }) => void
+  defaultToken?: AddToken
+  onSubmit?: (addToken: Required<AddToken>) => void
+  onReject?: () => void
   onBack?: () => void
 }
 
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   walletAddress,
   networkId,
+  defaultToken,
   onSubmit,
+  onReject,
   onBack,
 }) => {
-  const [tokenAddress, setTokenAddress] = useState("")
-  const [tokenName, setTokenName] = useState("")
-  const [tokenSymbol, setTokenSymbol] = useState("")
-  const [tokenDecimals, setTokenDecimals] = useState("0")
+  const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
+  const [tokenName, setTokenName] = useState(defaultToken?.name || "")
+  const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
+  const [tokenDecimals, setTokenDecimals] = useState(
+    defaultToken?.decimals || "0",
+  )
   const [loading, setLoading] = useState(false)
   const [tokenDetails, setTokenDetails] = useState<TokenDetails>()
   const prevValidAddress = useRef("")
@@ -111,20 +112,20 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   return (
     <>
-      <Header>
-        <BackButton onClick={onBack} />
-      </Header>
+      <Header>{onBack && <BackButton onClick={onBack} />}</Header>
+
       <AddTokenScreenWrapper>
         <H2>Add token</H2>
 
         <form
-          onSubmit={() => {
+          onSubmit={(e: any) => {
+            e.preventDefault()
             if (isDataComplete(compiledData)) {
               onSubmit?.({
                 address: compiledData.address,
-                decimals: compiledData.decimals!.toString(),
-                name: compiledData.name!,
-                symbol: compiledData.symbol!,
+                decimals: compiledData.decimals.toString(),
+                name: compiledData.name,
+                symbol: compiledData.symbol,
                 networkId: compiledData.networkId,
               })
             }
@@ -176,9 +177,16 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                   } catch {}
                 }}
               />
-              <Button type="submit" disabled={!isDataComplete(compiledData)}>
-                Continue
-              </Button>
+              <ButtonGroupVertical>
+                {onReject && (
+                  <Button onClick={onReject} type="button">
+                    Reject
+                  </Button>
+                )}
+                <Button type="submit" disabled={!isDataComplete(compiledData)}>
+                  Continue
+                </Button>
+              </ButtonGroupVertical>
             </>
           )}
           {loading && <Spinner size={64} />}

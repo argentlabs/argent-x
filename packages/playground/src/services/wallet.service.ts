@@ -28,6 +28,20 @@ export const networkId = (): keyof typeof erc20TokenAddressByNetwork => {
   }
 }
 
+export const addToken = async (address: string): Promise<void> => {
+  const starknet = getStarknet()
+  await starknet.enable()
+  await starknet.request({
+    type: "wallet_watchAsset",
+    params: {
+      type: "ERC20",
+      options: {
+        address,
+      },
+    },
+  })
+}
+
 export const getExplorerUrlBase = (): string => {
   if (networkId() === "mainnet-alpha") {
     return "https://voyager.online"

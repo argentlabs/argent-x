@@ -17,5 +17,15 @@ export type ActionItem =
       type: "SIGN"
       payload: typedData.TypedData
     }
+  | {
+      type: "ADD_TOKEN"
+      payload: {
+        address: string
+        decimals?: string
+        name?: string
+        symbol?: string
+        networkId?: string
+      }
+    }
 
 export type ExtActionItem = ExtQueueItem<ActionItem>

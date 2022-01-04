@@ -24,7 +24,7 @@ import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions } from "./states/actions"
 import { createRouterMachine } from "./states/RouterMachine"
 import { swrCacheProvider } from "./utils/swrCache"
-import { TokenDetails } from "./utils/tokens"
+import { TokenDetails, addToken } from "./utils/tokens"
 
 function getUint256CalldataFromBN(bn: BigNumber) {
   return {
@@ -130,6 +130,26 @@ function App() {
             }}
           />
         )
+      case "ADD_TOKEN": {
+        return (
+          <AddTokenScreen
+            walletAddress={state.context.selectedWallet}
+            networkId={state.context.networkId}
+            defaultToken={action.payload}
+            onSubmit={async (tokenDetails) => {
+              if (state.context.selectedWallet) {
+                addToken(state.context.selectedWallet, tokenDetails)
+              }
+              await approve(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+            onReject={async () => {
+              await reject(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+          />
+        )
+      }
       case "TRANSACTION":
         return (
           <ApproveTransactionScreen

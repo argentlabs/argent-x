@@ -313,6 +313,15 @@ button {
   padding: 1rem 2rem;
 }
 
+button.flat {
+  background: none;
+  border: none;
+  color: var(--color-link);
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
+}
+
 button {
   font-family: var(--font-family);
 }
