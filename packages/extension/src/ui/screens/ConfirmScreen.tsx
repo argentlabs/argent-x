@@ -70,7 +70,13 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
 
     {children}
 
-    <StickyButtonGroupVertical as="form" onSubmit={() => onSubmit?.()}>
+    <StickyButtonGroupVertical
+      as="form"
+      onSubmit={(e: any) => {
+        e.preventDefault()
+        return onSubmit?.()
+      }}
+    >
       {!singleButton && (
         <Button onClick={onReject} type="button">
           {rejectButtonText}

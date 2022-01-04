@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Args, InvokeFunctionTransaction, compileCalldata } from "starknet"
+import {
+  Args,
+  InvokeFunctionTransaction,
+  compileCalldata,
+  stark,
+} from "starknet"
 import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { ExtActionItem } from "../../shared/actionQueue"
@@ -120,7 +125,7 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
     states: {
       determineEntry: {
         entry: (_, event) => {
-          if (event.type === "APPROVE_TX")
+          if (event.type === "APPROVE_TX") {
             sendMessage({
               type: "ADD_TRANSACTION",
               data:
@@ -129,13 +134,15 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
                   : {
                       type: "INVOKE_FUNCTION",
                       contract_address: (event.data as TransactionRequest).to,
-                      entry_point_selector: (event.data as TransactionRequest)
-                        .method,
+                      entry_point_selector: stark.getSelectorFromName(
+                        (event.data as TransactionRequest).method,
+                      ),
                       calldata: compileCalldata(
                         (event.data as TransactionRequest).calldata || {},
                       ),
                     },
             })
+          }
         },
         invoke: {
           src: async (_ctx, ev) => {
