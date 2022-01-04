@@ -91,6 +91,7 @@ const starknetWindowObject: StarknetWindowObject = {
 
         return resolve()
       }
+      return reject(Error("Not implemented"))
     }),
   enable: () =>
     new Promise((resolve) => {
