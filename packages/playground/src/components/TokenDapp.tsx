@@ -6,6 +6,7 @@ import {
   transfer,
 } from "../services/token.service"
 import {
+  addToken,
   getExplorerUrlBase,
   networkId,
   signMessage,
@@ -180,7 +181,18 @@ export const TokenDapp: FC = () => {
         </form>
       </div>
       <h3 style={{ margin: 0 }}>
-        ERC-20 token address:{" "}
+        ERC-20 token address
+        <button
+          className="flat"
+          style={{ marginLeft: ".6em" }}
+          onClick={() => {
+            const tokenAddress = getErc20TokenAddress(networkId())
+            addToken(tokenAddress)
+          }}
+        >
+          Add to wallet
+        </button>
+        <br />
         <code>
           <a
             target="_blank"

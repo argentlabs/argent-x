@@ -3,6 +3,7 @@ import type { InvokeFunctionTransaction, Status, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
 import { BackupWallet } from "./backup.model"
+import { AddToken } from "./token.model"
 
 export type MessageType =
   | { type: "OPEN_UI" }
@@ -32,6 +33,10 @@ export type MessageType =
       data: { actionHash: string }
     }
   | { type: "ADD_WHITELIST"; data: string }
+  | { type: "ADD_TOKEN"; data: AddToken }
+  | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }
+  | { type: "REJECT_ADD_TOKEN"; data: { actionHash: string } }
+  | { type: "APPROVE_ADD_TOKEN"; data: { actionHash: string } }
   | { type: "APPROVE_WHITELIST"; data: { host: string; actionHash: string } }
   | { type: "REJECT_WHITELIST"; data: { host: string; actionHash: string } }
   | { type: "REMOVE_WHITELIST"; data: string }

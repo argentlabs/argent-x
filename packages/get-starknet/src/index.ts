@@ -20,6 +20,7 @@ export function getStarknet({
       throw Error("no starknet found in window")
     }
     return {
+      request: fail,
       isConnected: false,
       provider: defaultProvider,
       enable: fail,

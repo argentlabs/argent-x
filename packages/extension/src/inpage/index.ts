@@ -24,12 +24,74 @@ function sendMessage(msg: MessageType): void {
   )
 }
 
+function waitForMsgOfType<
+  K extends MessageType["type"],
+  T extends { type: K } & MessageType,
+>(
+  type: K,
+  timeout: number,
+  predicate: (x: T) => boolean = () => true,
+): Promise<T extends { data: any } ? T["data"] : undefined> {
+  return new Promise((resolve, reject) => {
+    const pid = setTimeout(() => reject("Timeout"), timeout)
+    const handler = (event: MessageEvent<WindowMessageType>) => {
+      if (event.data.type === type && predicate(event.data as any)) {
+        clearTimeout(pid)
+        window.removeEventListener("message", handler)
+        return resolve(
+          ("data" in event.data ? event.data.data : undefined) as any,
+        )
+      }
+    }
+    window.addEventListener("message", handler)
+  })
+}
+
 // window.ethereum like
 const starknetWindowObject: StarknetWindowObject = {
   signer: undefined,
   provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
+  request: (call) =>
+    new Promise(async (resolve, reject) => {
+      if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
+        sendMessage({
+          type: "ADD_TOKEN",
+          data: {
+            address: call.params.options.address,
+            symbol: call.params.options.symbol,
+            decimals: call.params.options.decimals?.toString(),
+            name: call.params.options.name,
+          },
+        })
+        const { actionHash } = await waitForMsgOfType("ADD_TOKEN_RES", 1000)
+        sendMessage({ type: "OPEN_UI" })
+
+        const result = await Promise.race([
+          waitForMsgOfType(
+            "APPROVE_ADD_TOKEN",
+            11 * 60 * 1000,
+            (x) => x.data.actionHash === actionHash,
+          ),
+          waitForMsgOfType(
+            "REJECT_ADD_TOKEN",
+            10 * 60 * 1000,
+            (x) => x.data.actionHash === actionHash,
+          )
+            .then(() => "error" as const)
+            .catch(() => {
+              sendMessage({ type: "FAILED_TX", data: { actionHash } })
+              return "timeout" as const
+            }),
+        ])
+
+        if (result === "error") return reject(Error("User abort"))
+        if (result === "timeout") return reject(Error("User action timed out"))
+
+        return resolve()
+      }
+    }),
   enable: () =>
     new Promise((resolve) => {
       const handleMessage = ({ data }: MessageEvent<WindowMessageType>) => {
@@ -95,28 +157,6 @@ export class WalletSigner extends Provider implements SignerInterface {
     this.address = address
   }
 
-  private waitForMsgOfType<
-    K extends MessageType["type"],
-    T extends { type: K } & MessageType,
-  >(
-    type: K,
-    timeout: number,
-  ): Promise<T extends { data: any } ? T["data"] : undefined> {
-    return new Promise((resolve, reject) => {
-      const pid = setTimeout(() => reject("Timeout"), timeout)
-      const handler = (event: MessageEvent<WindowMessageType>) => {
-        if (event.data.type === type) {
-          clearTimeout(pid)
-          window.removeEventListener("message", handler)
-          return resolve(
-            ("data" in event.data ? event.data.data : undefined) as any,
-          )
-        }
-      }
-      window.addEventListener("message", handler)
-    })
-  }
-
   public async addTransaction(
     transaction: Transaction,
   ): Promise<AddTransactionResponse> {
@@ -128,15 +168,12 @@ export class WalletSigner extends Provider implements SignerInterface {
       )
 
     sendMessage({ type: "ADD_TRANSACTION", data: transaction })
-    const { actionHash } = await this.waitForMsgOfType(
-      "ADD_TRANSACTION_RES",
-      1000,
-    )
+    const { actionHash } = await waitForMsgOfType("ADD_TRANSACTION_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
-      this.waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
-      this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
+      waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
+      waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
         .then(() => "error" as const)
         .catch(() => {
           sendMessage({ type: "FAILED_TX", data: { actionHash } })
@@ -160,12 +197,12 @@ export class WalletSigner extends Provider implements SignerInterface {
 
   public async signMessage(data: typedData.TypedData): Promise<Signature> {
     sendMessage({ type: "ADD_SIGN", data })
-    const { actionHash } = await this.waitForMsgOfType("ADD_SIGN_RES", 1000)
+    const { actionHash } = await waitForMsgOfType("ADD_SIGN_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
-      this.waitForMsgOfType("SUCCESS_SIGN", 11 * 60 * 1000),
-      this.waitForMsgOfType("FAILED_SIGN", 10 * 60 * 1000)
+      waitForMsgOfType("SUCCESS_SIGN", 11 * 60 * 1000),
+      waitForMsgOfType("FAILED_SIGN", 10 * 60 * 1000)
         .then(() => "error" as const)
         .catch(() => {
           sendMessage({ type: "FAILED_SIGN", data: { actionHash } })
