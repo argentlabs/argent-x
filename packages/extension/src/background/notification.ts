@@ -24,8 +24,7 @@ export async function sentTransactionNotification(
     return browser.notifications.create(id, {
       type: "basic",
       title: `Transaction ${displayedText}`,
-      message: `Transaction: ${hash}
-  Status: ${status}`,
+      message: `Transaction: ${hash} \nStatus: ${status}`,
       iconUrl: "./assets/logo.png",
       eventTime: Date.now(),
     })
