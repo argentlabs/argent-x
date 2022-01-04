@@ -87,7 +87,7 @@ export async function getL1(password?: string): Promise<ethers.Wallet> {
     setRawWallet(recoveredWallet)
     sessionPassword = password
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
-    console.log("Set wallets", encKeyPair)
+
     store.setItem("wallets", encKeyPair.wallets ?? [])
     if (
       (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
@@ -166,9 +166,7 @@ export async function createAccount(networkId: string) {
   const seed = ec.getStarkKey(ec.genKeyPair())
   const wallets = await getWallets()
 
-  console.log(networkId)
   const provider = new Provider({ network: networkId as any })
-  console.log(provider.baseUrl, provider.feederGatewayUrl)
   const deployTransaction = await provider.deployContract(
     ArgentCompiledContract,
     compileCalldata({
