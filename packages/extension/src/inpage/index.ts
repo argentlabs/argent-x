@@ -53,46 +53,45 @@ const starknetWindowObject: StarknetWindowObject = {
   provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
-  request: (call) =>
-    new Promise(async (resolve, reject) => {
-      if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
-        sendMessage({
-          type: "ADD_TOKEN",
-          data: {
-            address: call.params.options.address,
-            symbol: call.params.options.symbol,
-            decimals: call.params.options.decimals?.toString(),
-            name: call.params.options.name,
-          },
-        })
-        const { actionHash } = await waitForMsgOfType("ADD_TOKEN_RES", 1000)
-        sendMessage({ type: "OPEN_UI" })
+  request: async (call) => {
+    if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
+      sendMessage({
+        type: "ADD_TOKEN",
+        data: {
+          address: call.params.options.address,
+          symbol: call.params.options.symbol,
+          decimals: call.params.options.decimals?.toString(),
+          name: call.params.options.name,
+        },
+      })
+      const { actionHash } = await waitForMsgOfType("ADD_TOKEN_RES", 1000)
+      sendMessage({ type: "OPEN_UI" })
 
-        const result = await Promise.race([
-          waitForMsgOfType(
-            "APPROVE_ADD_TOKEN",
-            11 * 60 * 1000,
-            (x) => x.data.actionHash === actionHash,
-          ),
-          waitForMsgOfType(
-            "REJECT_ADD_TOKEN",
-            10 * 60 * 1000,
-            (x) => x.data.actionHash === actionHash,
-          )
-            .then(() => "error" as const)
-            .catch(() => {
-              sendMessage({ type: "FAILED_TX", data: { actionHash } })
-              return "timeout" as const
-            }),
-        ])
+      const result = await Promise.race([
+        waitForMsgOfType(
+          "APPROVE_ADD_TOKEN",
+          11 * 60 * 1000,
+          (x) => x.data.actionHash === actionHash,
+        ),
+        waitForMsgOfType(
+          "REJECT_ADD_TOKEN",
+          10 * 60 * 1000,
+          (x) => x.data.actionHash === actionHash,
+        )
+          .then(() => "error" as const)
+          .catch(() => {
+            sendMessage({ type: "FAILED_TX", data: { actionHash } })
+            return "timeout" as const
+          }),
+      ])
 
-        if (result === "error") return reject(Error("User abort"))
-        if (result === "timeout") return reject(Error("User action timed out"))
+      if (result === "error") throw Error("User abort")
+      if (result === "timeout") throw Error("User action timed out")
 
-        return resolve()
-      }
-      return reject(Error("Not implemented"))
-    }),
+      return
+    }
+    throw Error("Not implemented")
+  },
   enable: () =>
     new Promise((resolve) => {
       const handleMessage = ({ data }: MessageEvent<WindowMessageType>) => {
