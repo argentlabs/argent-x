@@ -1,17 +1,18 @@
 import { FC } from "react"
 import styled from "styled-components"
 
+import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Button, ButtonGroupVertical } from "../components/Button"
+import { Header } from "../components/Header"
+import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H2 } from "../components/Typography"
+import { getAccountImageUrl } from "../utils/wallet"
 
-const ConfirmScreenWrapper = styled.div`
+const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`
   display: flex;
   flex-direction: column;
   padding: 48px 32px 0;
-
-  > form {
-    width: 100%;
-  }
+  ${({ accountShown }) => (accountShown ? `padding-top: 0;` : ``)}
 
   > ${H2} {
     margin: 0 0 40px;
@@ -21,6 +22,10 @@ const ConfirmScreenWrapper = styled.div`
 export interface ConfirmPageProps {
   onSubmit?: () => void
   onReject?: () => void
+  selectedAccount?: {
+    accountNumber: number
+    networkId: string
+  }
 }
 
 interface ConfirmScreenProps extends ConfirmPageProps {
@@ -47,10 +52,20 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonBgColor,
   onSubmit,
   onReject,
+  selectedAccount,
   singleButton = false,
   children,
 }) => (
-  <ConfirmScreenWrapper>
+  <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)}>
+    {selectedAccount && (
+      <Header style={{ margin: "0 -32px 16px" }}>
+        <ProfilePicture
+          src={getAccountImageUrl(selectedAccount.accountNumber)}
+          disabled
+        />
+        <NetworkSwitcher networkId={selectedAccount.networkId} disabled />
+      </Header>
+    )}
     <H2>{title}</H2>
 
     {children}

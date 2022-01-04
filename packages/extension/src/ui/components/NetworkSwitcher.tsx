@@ -1,5 +1,5 @@
 import { FC } from "react"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 import { defaultNetworks, getNetwork } from "../../shared/networks"
 import { WalletStatusCode } from "../utils/wallet"
@@ -54,24 +54,30 @@ const NetworkList = styled.div`
   }
 `
 
-const NetworkSwitcherWrapper = styled.div`
+const NetworkSwitcherWrapper = styled.div<{
+  disabled: boolean
+}>`
   position: relative;
-
-  &:hover ${NetworkList} {
-    display: block;
-  }
 
   & > ${Network} {
     border-radius: 30px;
   }
 
-  &:hover > ${Network} {
-    border-radius: 15px 15px 0 0;
-  }
+  ${({ disabled }) =>
+    !disabled &&
+    css`
+      &:hover ${NetworkList} {
+        display: block;
+      }
 
-  &:hover ${NetworkName} {
-    min-width: 110px;
-  }
+      &:hover > ${Network} {
+        border-radius: 15px 15px 0 0;
+      }
+
+      &:hover ${NetworkName} {
+        min-width: 110px;
+      }
+    `}
 `
 
 export const NetworkStatusWrapper = styled.div`
@@ -98,25 +104,27 @@ export const NetworkStatusIndicator = styled.span<{
 
 interface NetworkSwitcherProps {
   networkId: string
-  onChangeNetwork: (networkId: string) => Promise<void> | void
+  disabled?: boolean
+  onChangeNetwork?: (networkId: string) => Promise<void> | void
 }
 
 export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   networkId,
   onChangeNetwork,
+  disabled = false,
 }) => {
   const currentNetwork = getNetwork(networkId)
   const otherNetworks = defaultNetworks.filter(({ id }) => id !== networkId)
 
   return (
-    <NetworkSwitcherWrapper>
+    <NetworkSwitcherWrapper disabled={disabled}>
       <Network selected>
         <NetworkName>{currentNetwork.name}</NetworkName>
         <NetworkStatusIndicator status="CONNECTED" />
       </Network>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
-          <Network key={id} onClick={() => onChangeNetwork(id)}>
+          <Network key={id} onClick={() => onChangeNetwork?.(id)}>
             <NetworkName>{name}</NetworkName>
             <NetworkStatusIndicator status="CONNECTED" />
           </Network>

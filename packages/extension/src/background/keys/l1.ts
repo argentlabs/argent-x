@@ -24,7 +24,8 @@ export async function validatePassword(password: string) {
   try {
     await getL1(password)
     return true
-  } catch {
+  } catch (e) {
+    console.error(e)
     return false
   }
 }
@@ -37,6 +38,10 @@ function setRawWallet(wallet: ethers.Wallet | undefined) {
   rawWalletTimeoutPid = setTimeout(() => {
     rawWallet = undefined
   }, 15 * 60 * 60 * 1000) as unknown as number
+}
+
+export function isUnlocked(): boolean {
+  return Boolean(rawWallet)
 }
 
 export async function setKeystore(keystore: string) {
@@ -66,17 +71,23 @@ async function generateL1(): Promise<ethers.Wallet> {
   return ethers.Wallet.createRandom()
 }
 
+let sessionPassword: string | undefined
 let recoverPromise: Promise<ethers.Wallet> | undefined
-export async function getL1(password: string): Promise<ethers.Wallet> {
-  console.log("getL1", rawWallet, await existsL1())
+export async function getL1(password?: string): Promise<ethers.Wallet> {
   if (rawWallet) {
     return rawWallet
   } else if (await existsL1()) {
-    if (!recoverPromise) recoverPromise = recoverL1(password)
+    if (!recoverPromise) {
+      if (!password) {
+        throw Error("Password required")
+      }
+      recoverPromise = recoverL1(password)
+    }
     const recoveredWallet = await recoverPromise
     setRawWallet(recoveredWallet)
+    sessionPassword = password
     const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
-    console.log("Set wallets", encKeyPair)
+
     store.setItem("wallets", encKeyPair.wallets ?? [])
     if (
       (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
@@ -89,8 +100,17 @@ export async function getL1(password: string): Promise<ethers.Wallet> {
     }
     return recoveredWallet
   } else {
-    return generateL1()
+    sessionPassword = password
+    const wallet = await generateL1()
+    setRawWallet(wallet)
+    return wallet
   }
+}
+
+export function lockWallet() {
+  setRawWallet(undefined)
+  recoverPromise = undefined
+  sessionPassword = undefined
 }
 
 async function getEncKeyStore(
@@ -136,8 +156,11 @@ function downloadTextFile(text: string, filename: string) {
 export const getWallets = async (): Promise<BackupWallet[]> =>
   await store.getItem("wallets")
 
-export async function createAccount(password: string, networkId: string) {
-  const l1 = await getL1(password)
+export async function createAccount(networkId: string) {
+  if (!sessionPassword) {
+    throw Error("Password required")
+  }
+  const l1 = await getL1()
   const starkPair = ec.getKeyPair(l1.privateKey)
   const starkPub = ec.getStarkKey(starkPair)
   const seed = ec.getStarkKey(ec.genKeyPair())
@@ -161,7 +184,7 @@ export async function createAccount(password: string, networkId: string) {
 
   const newWallet = { network: networkId, address: deployTransaction.address! }
   const newWallets = [...wallets, newWallet]
-  const encKeyStore = await getEncKeyStore(l1, password, newWallets)
+  const encKeyStore = await getEncKeyStore(l1, sessionPassword, newWallets)
   store.setItem("encKeystore", encKeyStore)
   store.setItem("wallets", newWallets)
 
@@ -174,6 +197,6 @@ export async function createAccount(password: string, networkId: string) {
 }
 
 export async function resetAll() {
-  setRawWallet(undefined)
+  lockWallet()
   await browser.storage.local.clear()
 }

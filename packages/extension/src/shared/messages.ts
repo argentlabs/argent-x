@@ -8,8 +8,11 @@ export const [sendMessage, messageStream, _waitForMessage] =
 export async function waitForMessage<
   K extends MessageType["type"],
   T extends { type: K } & MessageType,
->(type: K): Promise<T extends { data: any } ? T["data"] : undefined> {
-  return _waitForMessage(([msg]: any) => msg.type === type).then(
-    ([msg]: any) => msg.data,
-  )
+>(
+  type: K,
+  predicate: (x: T) => boolean = () => true,
+): Promise<T extends { data: any } ? T["data"] : undefined> {
+  return _waitForMessage(
+    ([msg]: any) => msg.type === type && predicate(msg),
+  ).then(([msg]: any) => msg.data)
 }

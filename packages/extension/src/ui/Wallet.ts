@@ -23,12 +23,14 @@ const ArgentCompiledContractJson: CompiledContract = json.parse(
 
 export class Wallet {
   address: string
+  networkId: string
   deployTransaction?: string
   contract: Contract
 
   constructor(address: string, networkId: string, deployTransaction?: string) {
     this.address = address
     this.deployTransaction = deployTransaction
+    this.networkId = networkId
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,
@@ -51,40 +53,6 @@ export class Wallet {
   public async getCurrentNonce(): Promise<string> {
     const { nonce } = await this.contract.call("get_nonce")
     return nonce.toString()
-  }
-
-  public async invoke(
-    address: string,
-    method: BigNumberish,
-    args?: Args | Calldata,
-  ): Promise<AddTransactionResponse> {
-    let methodHex = ""
-    try {
-      if (typeof method === "string" && !number.isHex(method))
-        throw Error("only hex strings allowed")
-      methodHex = BigNumber.from(method).toHexString()
-    } catch {}
-
-    const selector = methodHex || stark.getSelectorFromName(method as string)
-    const calldata = Array.isArray(args) ? args : compileCalldata(args || {})
-    const nonce = await this.getCurrentNonce()
-    const messageHash = encode.addHexPrefix(
-      hash.hashMessage(this.address, address, selector, calldata, nonce),
-    )
-
-    sendMessage({ type: "SIGN", data: { hash: messageHash } })
-    const { r, s } = await waitForMessage("SIGN_RES")
-
-    return this.contract.invoke(
-      "execute",
-      {
-        to: address,
-        selector,
-        calldata,
-        nonce,
-      },
-      [r, s],
-    )
   }
 
   public static async fromDeploy(networkId: string): Promise<Wallet> {

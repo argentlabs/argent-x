@@ -13,9 +13,14 @@ if (process.env.NODE_ENV === "development") {
   })
 }
 
-export const readLatestActionAndCount = async () => {
-  sendMessage({ type: "GET_LATEST_ACTION_AND_COUNT" })
-  return waitForMessage("GET_LATEST_ACTION_AND_COUNT_RES")
+export const getActions = async () => {
+  sendMessage({ type: "GET_ACTIONS" })
+  return waitForMessage("GET_ACTIONS_RES")
+}
+
+export const getTransactionStatus = async (hash: string, network: string) => {
+  sendMessage({ type: "GET_TRANSACTION", data: { hash, network } })
+  return waitForMessage("GET_TRANSACTION_RES", (x) => x.data.hash === hash)
 }
 
 export const getLastSelectedWallet = async () => {

@@ -1,16 +1,20 @@
 import type { JWK } from "jose"
-import type { InvokeFunctionTransaction, typedData } from "starknet"
+import type { InvokeFunctionTransaction, Status, typedData } from "starknet"
 
-import { ActionItem } from "../background/actionQueue"
+import { ExtActionItem } from "./actionQueue"
 import { BackupWallet } from "./backup.model"
 
 export type MessageType =
   | { type: "OPEN_UI" }
   | { type: "ADD_TRANSACTION"; data: InvokeFunctionTransaction }
-  | { type: "GET_LATEST_ACTION_AND_COUNT" }
+  | { type: "ADD_TRANSACTION_RES"; data: { actionHash: string } }
+  | { type: "TRANSACTION_UPDATES"; data: { hash: string; status: Status }[] }
+  | { type: "GET_TRANSACTION"; data: { hash: string; network: string } }
+  | { type: "GET_TRANSACTION_RES"; data: { hash: string; status: Status } }
+  | { type: "GET_ACTIONS" }
   | {
-      type: "GET_LATEST_ACTION_AND_COUNT_RES"
-      data: { action: ActionItem | null; count: number }
+      type: "GET_ACTIONS_RES"
+      data: ExtActionItem[]
     }
   | { type: "GET_SELECTED_WALLET" }
   | { type: "GET_SELECTED_WALLET_RES"; data: BackupWallet }
@@ -18,12 +22,18 @@ export type MessageType =
   | { type: "CONNECT_RES"; data: BackupWallet }
   | {
       type: "SUBMITTED_TX"
-      data: { tx: InvokeFunctionTransaction; txHash: string }
+      data: {
+        txHash: string
+        actionHash: string
+      }
     }
-  | { type: "FAILED_TX"; data: { tx: InvokeFunctionTransaction } }
+  | {
+      type: "FAILED_TX"
+      data: { actionHash: string }
+    }
   | { type: "ADD_WHITELIST"; data: string }
-  | { type: "APPROVE_WHITELIST"; data: string }
-  | { type: "REJECT_WHITELIST"; data: string }
+  | { type: "APPROVE_WHITELIST"; data: { host: string; actionHash: string } }
+  | { type: "REJECT_WHITELIST"; data: { host: string; actionHash: string } }
   | { type: "REMOVE_WHITELIST"; data: string }
   | { type: "GET_PENDING_WHITELIST" }
   | { type: "GET_PENDING_WHITELIST_RES"; data: string[] }
@@ -52,12 +62,20 @@ export type MessageType =
   | { type: "START_SESSION_RES" }
   | { type: "RECOVER_KEYSTORE"; data: string }
   | { type: "RECOVER_KEYSTORE_RES" }
-  | { type: "SIGN"; data: { hash: string } }
-  | { type: "SIGN_RES"; data: { r: string; s: string } }
   | { type: "ADD_SIGN"; data: typedData.TypedData }
-  | { type: "APPROVE_SIGN"; data: typedData.TypedData }
-  | { type: "FAILED_SIGN" }
-  | { type: "SUCCESS_SIGN"; data: { r: string; s: string } }
+  | { type: "ADD_SIGN_RES"; data: { actionHash: string } }
+  | { type: "APPROVE_ACTION"; data: { actionHash: string } }
+  | { type: "REJECT_ACTION"; data: { actionHash: string } }
+  | {
+      type: "ACTIONS_QUEUE_UPDATE"
+      data: { actions: ExtActionItem[] }
+    }
+  | {
+      type: "APPROVE_SIGN"
+      data: { typedData: typedData.TypedData; actionHash: string }
+    }
+  | { type: "FAILED_SIGN"; data: { actionHash: string } }
+  | { type: "SUCCESS_SIGN"; data: { r: string; s: string; actionHash: string } }
 
 export type WindowMessageType = {
   forwarded?: boolean

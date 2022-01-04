@@ -128,6 +128,10 @@ export class WalletSigner extends Provider implements SignerInterface {
       )
 
     sendMessage({ type: "ADD_TRANSACTION", data: transaction })
+    const { actionHash } = await this.waitForMsgOfType(
+      "ADD_TRANSACTION_RES",
+      1000,
+    )
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
@@ -135,7 +139,7 @@ export class WalletSigner extends Provider implements SignerInterface {
       this.waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
         .then(() => "error" as const)
         .catch(() => {
-          sendMessage({ type: "FAILED_TX", data: { tx: transaction } })
+          sendMessage({ type: "FAILED_TX", data: { actionHash } })
           return "timeout" as const
         }),
     ])
@@ -156,6 +160,7 @@ export class WalletSigner extends Provider implements SignerInterface {
 
   public async signMessage(data: typedData.TypedData): Promise<Signature> {
     sendMessage({ type: "ADD_SIGN", data })
+    const { actionHash } = await this.waitForMsgOfType("ADD_SIGN_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
@@ -163,7 +168,7 @@ export class WalletSigner extends Provider implements SignerInterface {
       this.waitForMsgOfType("FAILED_SIGN", 10 * 60 * 1000)
         .then(() => "error" as const)
         .catch(() => {
-          sendMessage({ type: "FAILED_SIGN" })
+          sendMessage({ type: "FAILED_SIGN", data: { actionHash } })
           return "timeout" as const
         }),
     ])

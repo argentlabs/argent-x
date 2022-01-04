@@ -18,11 +18,11 @@ import { NewSeedScreen } from "./screens/NewSeedScreen"
 import { PasswordScreen } from "./screens/PasswordScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
-import { SuccessScreen } from "./screens/SuccessScreen"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
-import { routerMachine } from "./states/RouterMachine"
+import { useActions } from "./states/actions"
+import { createRouterMachine } from "./states/RouterMachine"
 import { swrCacheProvider } from "./utils/swrCache"
 import { TokenDetails } from "./utils/tokens"
 
@@ -49,8 +49,13 @@ async function fileToString(file: File): Promise<string> {
   })
 }
 
+const isPopup = new URLSearchParams(window.location.search).has("popup")
+const routerMachine = createRouterMachine(isPopup)
+
 function App() {
   const [state, send] = useMachine(routerMachine)
+  const { actions, approve, reject } = useActions()
+
   if (state.matches("welcome"))
     return (
       <WelcomeScreen
@@ -98,55 +103,77 @@ function App() {
       />
     )
 
-  if (state.matches("approveTx"))
-    return (
-      <ApproveTransactionScreen
-        transaction={state.context.txToApprove}
-        onSubmit={async () => {
-          send({ type: "APPROVED_TX" })
-        }}
-        onReject={async () => {
-          send("REJECT_TX")
-        }}
-      />
-    )
-
-  if (state.matches("approveSign"))
-    return (
-      <ApproveSignScreen
-        dataToSign={state.context.signdataToApprove}
-        onSubmit={async () => {
-          send("AGREE")
-        }}
-        onReject={async () => {
-          send("REJECT")
-        }}
-      />
-    )
-
-  if (state.matches("submittedTx"))
-    return (
-      <SuccessScreen
-        networkId={state.context.networkId}
-        txHash={state.context.txHash}
-      />
-    )
-
-  if (state.matches("connect"))
-    return (
-      <ConnectScreen
-        host={state.context.hostToWhitelist}
-        onReject={() => {
-          send("REJECT")
-        }}
-        onSubmit={() => {
-          send("AGREE")
-        }}
-      />
-    )
-
   if (state.matches("disclaimer"))
     return <DisclaimerScreen onSubmit={() => send("AGREE")} />
+
+  if (
+    (state.matches("account") ||
+      state.matches("accountList") ||
+      state.matches("token") ||
+      state.matches("addToken")) &&
+    actions[0]
+  ) {
+    const action = actions[0]
+    const isLastAction = actions.length === 1
+    switch (action.type) {
+      case "CONNECT":
+        return (
+          <ConnectScreen
+            host={action.payload.host}
+            onReject={async () => {
+              await reject(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+            onSubmit={async () => {
+              await approve(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+          />
+        )
+      case "TRANSACTION":
+        return (
+          <ApproveTransactionScreen
+            transaction={action.payload}
+            onSubmit={async () => {
+              await approve(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+            onReject={async () => {
+              await reject(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+            selectedAccount={{
+              accountNumber:
+                Object.keys(state.context.wallets).findIndex(
+                  (wallet) => wallet === state.context.selectedWallet,
+                ) + 1,
+              networkId: state.context.networkId,
+            }}
+          />
+        )
+      case "SIGN":
+        return (
+          <ApproveSignScreen
+            dataToSign={action.payload}
+            onSubmit={async () => {
+              await approve(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+            onReject={async () => {
+              await reject(action)
+              if (isPopup && isLastAction) window.close()
+            }}
+            selectedAccount={{
+              accountNumber:
+                Object.keys(state.context.wallets).findIndex(
+                  (wallet) => wallet === state.context.selectedWallet,
+                ) + 1,
+              networkId: state.context.networkId,
+            }}
+          />
+        )
+    }
+  }
 
   if (state.matches("settings"))
     return (

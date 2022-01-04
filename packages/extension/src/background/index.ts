@@ -1,29 +1,29 @@
 import { compactDecrypt } from "jose"
-import { ec, encode, typedData } from "starknet"
+import { Provider, ec, encode } from "starknet"
 
+import { ActionItem } from "../shared/actionQueue"
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { ActionItem, getQueue } from "./actionQueue"
+import { getQueue } from "./actionQueue"
 import { getKeyPair } from "./keys/communication"
 import {
   createAccount,
   existsL1,
   getL1,
   getWallets,
+  isUnlocked,
+  lockWallet,
   resetAll,
   setKeystore,
   validatePassword,
 } from "./keys/l1"
+import { sentTransactionNotification } from "./notification"
 import { openUi } from "./openUi"
 import { selectedWalletStore } from "./selectedWallet"
-import {
-  getSession,
-  hasActiveSession,
-  startSession,
-  stopSession,
-} from "./session"
-import { Storage, setToStorage } from "./storage"
-import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
+import { getSigner } from "./signer"
+import { setToStorage } from "./storage"
+import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
+import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
 let activeTabId: number | undefined
 async function getCurrentTab() {
@@ -36,12 +36,30 @@ function setActiveTab(tabId?: number) {
 async function main() {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
-  const actionQueue = await getQueue<ActionItem>("ACTIONS")
+  const transactionTracker = new TransactionTracker(
+    (transactions) => {
+      if (transactions.length > 0) {
+        sendMessage({
+          type: "TRANSACTION_UPDATES",
+          data: transactions,
+        })
+
+        for (const { hash, status } of transactions) {
+          if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
+            sentTransactionNotification(hash, status)
+          }
+        }
+      }
+    },
+
+    30 * 1000,
+  )
 
   messageStream.subscribe(async ([msg, sender]) => {
     const currentTab = await getCurrentTab()
 
     const sendToTabAndUi = async (msg: MessageType) => {
+      sendMessage(msg)
       sendMessage(msg, { tabId: sender.tab?.id })
       if (currentTab && currentTab !== sender.tab?.id) {
         sendMessage(msg, { tabId: currentTab })
@@ -51,27 +69,58 @@ async function main() {
       sendMessage(msg, { tabId: currentTab })
     }
 
+    const actionQueue = await getQueue<ActionItem>("ACTIONS", {
+      onUpdate: (actions) => {
+        sendToTabAndUi({
+          type: "ACTIONS_QUEUE_UPDATE",
+          data: { actions },
+        })
+      },
+    })
+
     switch (msg.type) {
       case "OPEN_UI": {
         return openUi()
       }
 
-      case "ADD_TRANSACTION": {
-        return await actionQueue.push({
-          type: "TRANSACTION",
-          payload: msg.data,
+      case "GET_TRANSACTION": {
+        const cached = transactionTracker.getTransactionStatus(msg.data.hash)
+        if (cached) {
+          return sendToTabAndUi({
+            type: "GET_TRANSACTION_RES",
+            data: cached,
+          })
+        }
+
+        const provider = new Provider({ network: msg.data.network as any })
+        const fetchedStatus = await getTransactionStatus(
+          provider,
+          msg.data.hash,
+        )
+        return sendToTabAndUi({
+          type: "GET_TRANSACTION_RES",
+          data: fetchedStatus,
         })
       }
 
-      case "GET_LATEST_ACTION_AND_COUNT": {
-        const action = await actionQueue.getLatest()
-        const count = await actionQueue.length()
+      case "ADD_TRANSACTION": {
+        const { meta } = await actionQueue.push({
+          type: "TRANSACTION",
+          payload: msg.data,
+        })
         return sendToTabAndUi({
-          type: "GET_LATEST_ACTION_AND_COUNT_RES",
+          type: "ADD_TRANSACTION_RES",
           data: {
-            action,
-            count,
+            actionHash: meta.hash,
           },
+        })
+      }
+
+      case "GET_ACTIONS": {
+        const actions = await actionQueue.getAll()
+        return sendToTabAndUi({
+          type: "GET_ACTIONS_RES",
+          data: actions,
         })
       }
 
@@ -110,11 +159,124 @@ async function main() {
         return selectedWalletStore.setItem("SELECTED_WALLET", msg.data)
       }
 
+      case "APPROVE_ACTION": {
+        const { actionHash } = msg.data
+        const action = await actionQueue.remove(actionHash)
+        if (!action) throw new Error("Action not found")
+        switch (action.type) {
+          case "CONNECT": {
+            const { host } = action.payload
+            const selectedWallet = await selectedWalletStore.getItem(
+              "SELECTED_WALLET",
+            )
+
+            await addToWhitelist(host)
+
+            if (selectedWallet)
+              return sendToTabAndUi({
+                type: "CONNECT_RES",
+                data: selectedWallet,
+              })
+            return openUi()
+          }
+
+          case "TRANSACTION": {
+            const transaction = action.payload
+            if (!isUnlocked()) throw Error("you need an open session")
+            const l1 = await getL1()
+            const keyPair = ec.getKeyPair(l1.privateKey)
+            const selectedWallet = await selectedWalletStore.getItem(
+              "SELECTED_WALLET",
+            )
+            const signer = await getSigner({
+              type: "LOCAL",
+              address: selectedWallet.address,
+              keyPair,
+              network: selectedWallet.network,
+            })
+
+            const tx = await signer.addTransaction(transaction)
+
+            transactionTracker.trackTransaction(
+              tx.transaction_hash,
+              selectedWallet.network,
+            )
+
+            return sendToTabAndUi({
+              type: "SUBMITTED_TX",
+              data: {
+                txHash: tx.transaction_hash,
+                actionHash,
+              },
+            })
+          }
+
+          case "SIGN": {
+            const typedData = action.payload
+            if (!isUnlocked()) throw Error("you need an open session")
+            const l1 = await getL1()
+            const keyPair = ec.getKeyPair(l1.privateKey)
+            const selectedWallet = await selectedWalletStore.getItem(
+              "SELECTED_WALLET",
+            )
+            const signer = await getSigner({
+              type: "LOCAL",
+              address: selectedWallet.address,
+              keyPair,
+              network: selectedWallet.network,
+            })
+
+            const [r, s] = await signer.signMessage(typedData)
+
+            return sendToTabAndUi({
+              type: "SUCCESS_SIGN",
+              data: {
+                r: r.toString(),
+                s: s.toString(),
+                actionHash,
+              },
+            })
+          }
+        }
+      }
+
+      case "REJECT_ACTION": {
+        const { actionHash } = msg.data
+        const action = await actionQueue.remove(actionHash)
+        if (!action) throw new Error("Action not found")
+        switch (action.type) {
+          case "CONNECT": {
+            return sendToTabAndUi({
+              type: "REJECT_WHITELIST",
+              data: {
+                host: action.payload.host,
+                actionHash,
+              },
+            })
+          }
+          case "TRANSACTION": {
+            return sendToTabAndUi({
+              type: "FAILED_TX",
+              data: {
+                actionHash,
+              },
+            })
+          }
+          case "SIGN": {
+            return sendToTabAndUi({
+              type: "FAILED_SIGN",
+              data: {
+                actionHash,
+              },
+            })
+          }
+        }
+      }
+
       case "FAILED_SIGN":
-      case "SUCCESS_SIGN":
-      case "SUBMITTED_TX":
+      case "REJECT_WHITELIST":
       case "FAILED_TX": {
-        return await actionQueue.removeLatest()
+        return await actionQueue.remove(msg.data.actionHash)
       }
 
       case "RESET_ALL": {
@@ -126,24 +288,6 @@ async function main() {
           type: "CONNECT",
           payload: { host: msg.data },
         })
-      }
-      case "APPROVE_WHITELIST": {
-        const selectedWallet = await selectedWalletStore.getItem(
-          "SELECTED_WALLET",
-        )
-
-        await actionQueue.removeLatest()
-        await addToWhitelist(msg.data)
-
-        if (selectedWallet)
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
-        return openUi()
-      }
-      case "REJECT_WHITELIST": {
-        return actionQueue.removeLatest()
-      }
-      case "REMOVE_WHITELIST": {
-        return removeFromWhitelist(msg.data)
       }
       case "IS_WHITELIST": {
         const valid = await isOnWhitelist(msg.data)
@@ -165,20 +309,17 @@ async function main() {
         const sessionPassword = encode.arrayBufferToString(plaintext)
         if (await validatePassword(sessionPassword)) {
           sendToTabAndUi({ type: "START_SESSION_RES" })
-          return startSession(sessionPassword, undefined, () =>
-            sendToTabAndUi({ type: "STOP_SESSION" }),
-          )
         }
         return sendToTabAndUi({ type: "START_SESSION_REJ" })
       }
       case "HAS_SESSION": {
         return sendToTabAndUi({
           type: "HAS_SESSION_RES",
-          data: hasActiveSession(),
+          data: isUnlocked(),
         })
       }
       case "STOP_SESSION": {
-        return stopSession()
+        return lockWallet()
       }
       case "IS_INITIALIZED": {
         return sendToTabAndUi({
@@ -193,56 +334,28 @@ async function main() {
         })
       }
       case "NEW_ACCOUNT": {
-        const sessionPassword = getSession()
-        if (!sessionPassword) throw Error("you need an open session")
+        if (!isUnlocked()) throw Error("you need an open session")
 
         const network = msg.data
-        const newAccount = await createAccount(sessionPassword, network)
+        const newAccount = await createAccount(network)
 
         const wallet = { address: newAccount.address, network }
         selectedWalletStore.setItem("SELECTED_WALLET", wallet)
+        transactionTracker.trackTransaction(newAccount.txHash, network)
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
       }
-      case "SIGN": {
-        const sessionPassword = getSession()
-        if (!sessionPassword) throw Error("you need an open session")
-        const l1 = await getL1(sessionPassword)
-        const starkPair = ec.getKeyPair(l1.privateKey)
-        const { hash } = msg.data
-        const [r, s] = ec.sign(starkPair, hash)
-        return sendToTabAndUi({
-          type: "SIGN_RES",
-          data: {
-            r: r.toString(),
-            s: s.toString(),
-          },
-        })
-      }
+
       case "ADD_SIGN": {
-        return await actionQueue.push({
+        const { meta } = await actionQueue.push({
           type: "SIGN",
           payload: msg.data,
         })
-      }
-      case "APPROVE_SIGN": {
-        const sessionPassword = getSession()
-        if (!sessionPassword) throw Error("you need an open session")
-        const l1 = await getL1(sessionPassword)
-        const starkPair = ec.getKeyPair(l1.privateKey)
-        const selectedWallet = await selectedWalletStore.getItem(
-          "SELECTED_WALLET",
-        )
-        if (!selectedWallet) throw Error("you need a selected wallet")
 
-        const hash = typedData.getMessageHash(msg.data, selectedWallet.address)
-        const [r, s] = ec.sign(starkPair, hash)
-        await actionQueue.removeLatest()
         return sendToTabAndUi({
-          type: "SUCCESS_SIGN",
+          type: "ADD_SIGN_RES",
           data: {
-            r: r.toString(),
-            s: s.toString(),
+            actionHash: meta.hash,
           },
         })
       }

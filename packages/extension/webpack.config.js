@@ -1,6 +1,7 @@
 const path = require("path")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
+const { DefinePlugin } = require("webpack")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -56,6 +57,9 @@ module.exports = {
         { from: "./src/manifest.json", to: "manifest.json" },
         { from: "./src/assets", to: "assets" },
       ],
+    }),
+    new DefinePlugin({
+      "process.env.VERSION": JSON.stringify(process.env.npm_package_version),
     }),
   ],
   resolve: {
