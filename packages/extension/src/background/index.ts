@@ -8,6 +8,7 @@ import { getQueue } from "./actionQueue"
 import { getKeyPair } from "./keys/communication"
 import {
   createAccount,
+  downloadBackupFile,
   existsL1,
   getL1,
   getWallets,
@@ -410,6 +411,10 @@ async function main() {
       case "RECOVER_KEYSTORE": {
         await setKeystore(msg.data)
         return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })
+      }
+      case "DOWNLOAD_BACKUP_FILE": {
+        await downloadBackupFile()
+        return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
       }
     }
   })
