@@ -13,6 +13,7 @@ export const TokenWrapper = styled.div`
   gap: 16px;
   padding: 8px;
   cursor: pointer;
+  border-radius: 4px;
 
   transition: all 200ms ease-in-out;
 
@@ -23,14 +24,14 @@ export const TokenWrapper = styled.div`
   }
 `
 
-const TokenDetailsWrapper = styled.div`
+export const TokenDetailsWrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
 `
 
-const TokenTextGroup = styled.div`
+export const TokenTextGroup = styled.div`
   display: flex;
   flex-direction: column;
 `
@@ -42,14 +43,14 @@ export const TokenTitle = styled.h3`
   margin: 0;
 `
 
-const TokenMeta = styled.p`
+export const TokenMeta = styled.p`
   font-size: 13px;
   line-height: 18px;
   color: #8f8e8c;
   margin: 0;
 `
 
-const TokenBalance = styled.p`
+export const TokenBalance = styled.p`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
@@ -83,17 +84,15 @@ export const TokenListItem: FC<TokenListItemProps> = ({
 }) => {
   const { name, symbol, balance } = toTokenView(token)
   return (
-    <div {...props} style={{ borderRadius: 4, overflow: "hidden" }}>
-      <TokenWrapper {...makeClickable(onClick)}>
-        <TokenIcon name={name} />
-        <TokenDetailsWrapper>
-          <TokenTextGroup>
-            <TokenTitle>{symbol}</TokenTitle>
-            <TokenMeta>{name}</TokenMeta>
-          </TokenTextGroup>
-          <TokenBalance>{balance}</TokenBalance>
-        </TokenDetailsWrapper>
-      </TokenWrapper>
-    </div>
+    <TokenWrapper {...makeClickable(onClick)} {...props}>
+      <TokenIcon name={name} />
+      <TokenDetailsWrapper>
+        <TokenTextGroup>
+          <TokenTitle>{symbol}</TokenTitle>
+          <TokenMeta>{name}</TokenMeta>
+        </TokenTextGroup>
+        <TokenBalance>{balance}</TokenBalance>
+      </TokenDetailsWrapper>
+    </TokenWrapper>
   )
 }

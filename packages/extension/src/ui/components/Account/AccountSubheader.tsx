@@ -5,7 +5,7 @@ import Copy from "../../../assets/copy.svg"
 import Open from "../../../assets/open.svg"
 import { getNetwork } from "../../../shared/networks"
 import { truncateAddress } from "../../utils/addresses"
-import { WalletStatus, getAccountName } from "../../utils/wallet"
+import { WalletStatus, formatAddress, getAccountName } from "../../utils/wallet"
 import { CopyTooltip } from "../CopyTooltip"
 import { H1 } from "../Typography"
 import {
@@ -57,7 +57,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
         {truncateAddress(walletAddress)}
         <Open />
       </AccountAddressLink>
-      <CopyTooltip copyValue={walletAddress} message="Copied!">
+      <CopyTooltip copyValue={formatAddress(walletAddress)} message="Copied!">
         <AccountAddressIconsWrapper>
           <Copy />
         </AccountAddressIconsWrapper>

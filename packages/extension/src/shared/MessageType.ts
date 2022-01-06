@@ -1,17 +1,18 @@
 import type { JWK } from "jose"
-import type { InvokeFunctionTransaction, Status, typedData } from "starknet"
+import type { InvokeFunctionTransaction, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
 import { BackupWallet } from "./backup.model"
 import { AddToken } from "./token.model"
+import { TransactionStatus } from "./transactions.model"
 
 export type MessageType =
   | { type: "OPEN_UI" }
   | { type: "ADD_TRANSACTION"; data: InvokeFunctionTransaction }
   | { type: "ADD_TRANSACTION_RES"; data: { actionHash: string } }
-  | { type: "TRANSACTION_UPDATES"; data: { hash: string; status: Status }[] }
+  | { type: "TRANSACTION_UPDATES"; data: TransactionStatus[] }
   | { type: "GET_TRANSACTION"; data: { hash: string; network: string } }
-  | { type: "GET_TRANSACTION_RES"; data: { hash: string; status: Status } }
+  | { type: "GET_TRANSACTION_RES"; data: TransactionStatus }
   | { type: "GET_ACTIONS" }
   | {
       type: "GET_ACTIONS_RES"
@@ -81,6 +82,8 @@ export type MessageType =
     }
   | { type: "FAILED_SIGN"; data: { actionHash: string } }
   | { type: "SUCCESS_SIGN"; data: { r: string; s: string; actionHash: string } }
+  | { type: "GET_TRANSACTIONS" }
+  | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
 
 export type WindowMessageType = {
   forwarded?: boolean

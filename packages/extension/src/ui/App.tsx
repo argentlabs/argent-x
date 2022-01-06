@@ -1,11 +1,12 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { useMachine } from "@xstate/react"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import { uint256 } from "starknet"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
+import { waitForMessage } from "../shared/messages"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
@@ -55,6 +56,11 @@ const routerMachine = createRouterMachine(isPopup)
 function App() {
   const [state, send] = useMachine(routerMachine)
   const { actions, approve, reject } = useActions()
+  const [showLoading, setShowLoading] = useState(false)
+
+  if (showLoading) {
+    return <LoadingScreen />
+  }
 
   if (state.matches("welcome"))
     return (
@@ -156,7 +162,13 @@ function App() {
             transaction={action.payload}
             onSubmit={async () => {
               await approve(action)
+              setShowLoading(true)
+              await waitForMessage(
+                "SUBMITTED_TX",
+                ({ data }) => data.actionHash === action.meta.hash,
+              )
               if (isPopup && isLastAction) window.close()
+              setShowLoading(false)
             }}
             onReject={async () => {
               await reject(action)
@@ -177,7 +189,13 @@ function App() {
             dataToSign={action.payload}
             onSubmit={async () => {
               await approve(action)
+              setShowLoading(true)
+              await waitForMessage(
+                "SUCCESS_SIGN",
+                ({ data }) => data.actionHash === action.meta.hash,
+              )
               if (isPopup && isLastAction) window.close()
+              setShowLoading(false)
             }}
             onReject={async () => {
               await reject(action)
