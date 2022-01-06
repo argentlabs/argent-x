@@ -10,9 +10,10 @@ interface TransactionStatusWithProvider extends TransactionStatus {
   provider: Provider
 }
 type FetchedTransactionStatus = Omit<
-  Omit<TransactionStatus, "walletAddress">,
-  "meta"
+  TransactionStatus,
+  "walletAddress" | "meta"
 >
+
 type Listener = (transactions: TransactionStatus[]) => void
 
 export async function getTransactionStatus(

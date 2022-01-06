@@ -2,7 +2,6 @@ import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
 import { TransactionMeta as ITransactionMeta } from "../../../shared/transactions.model"
-// import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { CopyTooltip } from "../CopyTooltip"
 import { NetworkStatusIndicator } from "../NetworkSwitcher"
@@ -34,20 +33,20 @@ const TransactionWrapper = styled(TokenWrapper)`
 `
 
 const PulseAnimation = keyframes`
-	0% {
-		transform: scale(0.95);
-		box-shadow: 0 0 0 0 rgba(255, 168, 92, 0.7);
-	}
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 168, 92, 0.7);
+  }
 
-	70% {
-		transform: scale(1);
-		box-shadow: 0 0 0 6px rgba(255, 168, 92, 0);
-	}
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(255, 168, 92, 0);
+  }
 
-	100% {
-		transform: scale(0.95);
-		box-shadow: 0 0 0 0 rgba(255, 168, 92, 0);
-	}
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 168, 92, 0);
+  }
 `
 
 export const TransactionIndicator = styled(NetworkStatusIndicator)`
