@@ -49,6 +49,14 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({ onBack, onLock }) => (
       </Button>
       <Button
         onClick={() => {
+          sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
+          onBack()
+        }}
+      >
+        Download backup file for accounts
+      </Button>
+      <Button
+        onClick={() => {
           sendMessage({ type: "STOP_SESSION" })
           onLock()
         }}

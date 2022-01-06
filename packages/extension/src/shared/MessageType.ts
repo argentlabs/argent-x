@@ -81,6 +81,8 @@ export type MessageType =
     }
   | { type: "FAILED_SIGN"; data: { actionHash: string } }
   | { type: "SUCCESS_SIGN"; data: { r: string; s: string; actionHash: string } }
+  | { type: "DOWNLOAD_BACKUP_FILE" }
+  | { type: "DOWNLOAD_BACKUP_FILE_RES" }
 
 export type WindowMessageType = {
   forwarded?: boolean

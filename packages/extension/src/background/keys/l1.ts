@@ -196,6 +196,11 @@ export async function createAccount(networkId: string) {
   }
 }
 
+export async function downloadBackupFile() {
+  const encKeyStore = (await store.getItem("encKeystore")) ?? ""
+  downloadTextFile(encKeyStore, "starknet-backup.json")
+}
+
 export async function resetAll() {
   lockWallet()
   await browser.storage.local.clear()
