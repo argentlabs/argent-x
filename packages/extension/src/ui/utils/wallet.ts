@@ -1,3 +1,5 @@
+import { encode } from "starknet"
+
 import type { Wallet } from "../Wallet"
 
 const argentColorsArray = [
@@ -10,6 +12,10 @@ const argentColorsArray = [
   "FF675C",
   "FF5C72",
 ]
+
+export const formatAddress = (address: string) =>
+  // encode.addHexPrefix(encode.removeHexPrefix(address).padStart(64, "0")) // should we pad the address?
+  encode.addHexPrefix(address)
 
 export const getAccountColor = (accountNumber: number, withPrefix = true) =>
   `${withPrefix ? "#" : ""}${

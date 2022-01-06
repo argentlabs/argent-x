@@ -3,7 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
-import { playgroundToken } from "../../utils/tokens"
+import { formatAddress } from "../../utils/wallet"
 import { Alert } from "../Alert"
 import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
@@ -11,6 +11,7 @@ import { TokenAction } from "../Token"
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;
+  margin: 16px 20px;
 `
 
 const Title = styled.h2`
@@ -53,7 +54,7 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
     </Paragraph>
     <Buttons>
       <CopyTooltip
-        copyValue={`starknet:${walletAddress}`}
+        copyValue={formatAddress(walletAddress)}
         message="Wallet address copied!"
       >
         <AlertButton>Receive</AlertButton>
