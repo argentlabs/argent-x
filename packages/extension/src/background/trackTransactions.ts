@@ -1,22 +1,31 @@
 import { Provider, Status } from "starknet"
 
-interface TransactionStatus {
-  hash: string
-  status: Status
+import { BackupWallet } from "../shared/backup.model"
+import {
+  TransactionMeta,
+  TransactionStatus,
+} from "../shared/transactions.model"
+
+interface TransactionStatusWithProvider extends TransactionStatus {
+  provider: Provider
 }
+type FetchedTransactionStatus = Omit<
+  TransactionStatus,
+  "walletAddress" | "meta"
+>
+
 type Listener = (transactions: TransactionStatus[]) => void
 
 export async function getTransactionStatus(
   provider: Provider,
   hash: string,
-): Promise<TransactionStatus> {
+): Promise<FetchedTransactionStatus> {
   const { tx_status } = await provider.getTransactionStatus(hash)
   return { hash, status: tx_status }
 }
 
 export class TransactionTracker {
-  private transactions: { hash: string; provider: Provider }[] = []
-  private transactionStatus: TransactionStatus[] = []
+  private transactions: TransactionStatusWithProvider[] = []
   private listeners: Listener[] = []
   private interval: NodeJS.Timeout
 
@@ -27,24 +36,56 @@ export class TransactionTracker {
 
   public async trackTransaction(
     transactionHash: string,
-    network: string,
+    wallet: BackupWallet,
+    meta: TransactionMeta = {
+      title: "Contract interaction",
+    },
   ): Promise<void> {
-    const provider = new Provider({ network: network as any })
-    this.transactions.push({ hash: transactionHash, provider })
+    const provider = new Provider({ network: wallet.network as any })
+    this.transactions.push({
+      hash: transactionHash,
+      provider,
+      walletAddress: wallet.address,
+      status: "RECEIVED",
+      meta,
+    })
+
+    this.listeners.forEach((listener) => {
+      listener(this.transactions)
+    })
+  }
+
+  public getAllTransactions(byWalletAddress?: string): TransactionStatus[] {
+    return this.transactions
+      .filter(
+        (transaction) =>
+          !byWalletAddress || transaction.walletAddress === byWalletAddress,
+      )
+      .map(({ hash, walletAddress, meta }) => ({
+        hash,
+        walletAddress,
+        status: this.getTransactionStatus(hash)?.status || "NOT_RECEIVED",
+        meta,
+      }))
   }
 
   public getTransactionStatus(hash: string): TransactionStatus | undefined {
-    return this.transactionStatus.find(({ hash: txHash }) => txHash === hash)
+    return this.transactions.find(({ hash: txHash }) => txHash === hash)
   }
 
   private async checkTransactions(): Promise<void> {
     const transactionStatus = await Promise.all(
-      this.transactions.map(async ({ hash, provider }) => {
-        return getTransactionStatus(provider, hash)
+      this.transactions.map(async ({ hash, provider, walletAddress, meta }) => {
+        return getTransactionStatus(provider, hash).then((status) => ({
+          ...status,
+          walletAddress,
+          provider,
+          meta,
+        }))
       }),
     )
     if (transactionStatus.length > 0) {
-      this.transactionStatus = transactionStatus
+      this.transactions = transactionStatus
       this.listeners.forEach((listener) => {
         listener(transactionStatus)
       })

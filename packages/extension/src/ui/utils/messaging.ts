@@ -18,6 +18,11 @@ export const getActions = async () => {
   return waitForMessage("GET_ACTIONS_RES")
 }
 
+export const getTransactions = async () => {
+  sendMessage({ type: "GET_TRANSACTIONS" })
+  return waitForMessage("GET_TRANSACTIONS_RES")
+}
+
 export const getTransactionStatus = async (hash: string, network: string) => {
   sendMessage({ type: "GET_TRANSACTION", data: { hash, network } })
   return waitForMessage("GET_TRANSACTION_RES", (x) => x.data.hash === hash)

@@ -84,6 +84,20 @@ async function main() {
         return openUi()
       }
 
+      case "GET_TRANSACTIONS": {
+        const selectedWallet = await selectedWalletStore.getItem(
+          "SELECTED_WALLET",
+        )
+        const transactions = transactionTracker.getAllTransactions(
+          selectedWallet.address,
+        )
+
+        return sendToTabAndUi({
+          type: "GET_TRANSACTIONS_RES",
+          data: transactions,
+        })
+      }
+
       case "GET_TRANSACTION": {
         const cached = transactionTracker.getTransactionStatus(msg.data.hash)
         if (cached) {
@@ -200,7 +214,7 @@ async function main() {
 
             transactionTracker.trackTransaction(
               tx.transaction_hash,
-              selectedWallet.network,
+              selectedWallet,
             )
 
             return sendToTabAndUi({
@@ -373,7 +387,9 @@ async function main() {
 
         const wallet = { address: newAccount.address, network }
         selectedWalletStore.setItem("SELECTED_WALLET", wallet)
-        transactionTracker.trackTransaction(newAccount.txHash, network)
+        transactionTracker.trackTransaction(newAccount.txHash, wallet, {
+          title: "Deploy wallet",
+        })
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
       }

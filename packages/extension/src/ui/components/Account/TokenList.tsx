@@ -1,4 +1,5 @@
 import { FC } from "react"
+import styled, { css } from "styled-components"
 import useSWR from "swr"
 
 import { useMitt } from "../../hooks/useMitt"
@@ -11,10 +12,12 @@ import {
 } from "../../utils/tokens"
 import { TokenAction, TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
+import { SectionHeader } from "./SectionHeader"
 
 interface TokenListProps {
   networkId: string
   walletAddress: string
+  canShowEmptyWalletAlert?: boolean
   onShowToken: (token: TokenDetails) => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
@@ -22,6 +25,7 @@ interface TokenListProps {
 export const TokenList: FC<TokenListProps> = ({
   networkId,
   walletAddress,
+  canShowEmptyWalletAlert = true,
   onShowToken,
   onAction,
 }) => {
@@ -32,7 +36,7 @@ export const TokenList: FC<TokenListProps> = ({
     true,
   )
 
-  const { data: tokenDetails = [] } = useSWR(
+  const { data: tokenDetails = [], isValidating } = useSWR(
     [tokens, walletAddress],
     async (tokens, walletAddress) =>
       Promise.all(
@@ -50,18 +54,20 @@ export const TokenList: FC<TokenListProps> = ({
 
   return (
     <>
-      {!hasBalance && (
+      {canShowEmptyWalletAlert && !hasBalance && (
         <EmptyWalletAlert
           walletAddress={walletAddress}
           mintableAddress={playgroundToken(networkId)?.address}
           onAction={onAction}
         />
       )}
+      <SectionHeader>Coins</SectionHeader>
       {tokenDetails.map((token) => (
         <TokenListItem
           key={token.address}
           token={token}
           onClick={() => onShowToken(token)}
+          isLoading={isValidating}
         />
       ))}
     </>

@@ -329,6 +329,8 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
 
             const newWallet = await Wallet.fromDeploy(ctx.networkId)
 
+            useProgress.setState({ progress: 0, text: "" })
+
             return {
               newWallet,
             }

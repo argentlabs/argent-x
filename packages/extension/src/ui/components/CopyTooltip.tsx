@@ -1,5 +1,5 @@
 import Tippy from "@tippyjs/react"
-import { FC, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import styled from "styled-components"
 
@@ -14,20 +14,37 @@ export const Tooltip = styled.span`
 interface CopyTooltipProps {
   copyValue: string
   message: string
+  autoDismiss?: boolean
 }
 
 export const CopyTooltip: FC<CopyTooltipProps> = ({
   copyValue,
   message,
+  autoDismiss = true,
   children,
 }) => {
   const [visible, setVisible] = useState(false)
+  const pidRef = useRef<any>()
+
+  useEffect(() => {
+    if (autoDismiss && visible) {
+      pidRef.current = setTimeout(() => setVisible(false), 2500)
+    }
+    return () => {
+      clearTimeout(pidRef.current)
+    }
+  }, [autoDismiss, visible])
 
   return (
     <Tippy
       visible={visible}
       content={<Tooltip>{message}</Tooltip>}
-      onClickOutside={() => setVisible(false)}
+      onClickOutside={() => {
+        if (pidRef.current) {
+          clearTimeout(pidRef.current)
+        }
+        setVisible(false)
+      }}
     >
       <div>
         <CopyToClipboard text={copyValue} onCopy={() => setVisible(true)}>
