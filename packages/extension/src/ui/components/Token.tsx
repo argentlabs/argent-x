@@ -1,6 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { FC } from "react"
-import styled from "styled-components"
+import styled, { css, keyframes } from "styled-components"
 
 import { makeClickable } from "../utils/a11y"
 import { TokenDetails, toTokenView } from "../utils/tokens"
@@ -50,7 +50,21 @@ export const TokenMeta = styled.p`
   margin: 0;
 `
 
-export const TokenBalance = styled.p`
+const PulseAnimation = keyframes`
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+`
+
+export const TokenBalance = styled.p<{
+  isLoading?: boolean
+}>`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
@@ -58,6 +72,13 @@ export const TokenBalance = styled.p`
   max-width: 64px;
   overflow: hidden;
   white-space: nowrap;
+
+  opacity: 1;
+  ${({ isLoading }) =>
+    isLoading &&
+    css`
+      animation: ${PulseAnimation} 1.5s ease-in-out infinite;
+    `}
 `
 
 export const AddTokenIconButton = styled(IconButton)`
@@ -74,11 +95,13 @@ export type TokenAction =
 
 interface TokenListItemProps {
   token: TokenDetails
+  isLoading?: boolean
   onClick?: () => void
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
   token,
+  isLoading = false,
   onClick,
   ...props
 }) => {
@@ -91,7 +114,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
           <TokenTitle>{symbol}</TokenTitle>
           <TokenMeta>{name}</TokenMeta>
         </TokenTextGroup>
-        <TokenBalance>{balance}</TokenBalance>
+        <TokenBalance isLoading={isLoading}>{balance}</TokenBalance>
       </TokenDetailsWrapper>
     </TokenWrapper>
   )

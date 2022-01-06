@@ -13,7 +13,6 @@ import {
 import { TokenAction, TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
 import { SectionHeader } from "./SectionHeader"
-import { TransactionIndicator } from "./Transactions"
 
 interface TokenListProps {
   networkId: string
@@ -22,11 +21,6 @@ interface TokenListProps {
   onShowToken: (token: TokenDetails) => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
-
-const UpdateIndicator = styled(TransactionIndicator)<{ hide: boolean }>`
-  transition: all 200ms ease-in-out;
-  opacity: ${({ hide }) => (hide ? 0 : 1)};
-`
 
 export const TokenList: FC<TokenListProps> = ({
   networkId,
@@ -67,15 +61,13 @@ export const TokenList: FC<TokenListProps> = ({
           onAction={onAction}
         />
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <SectionHeader>Coins</SectionHeader>
-        <UpdateIndicator status="DEPLOYING" hide={!isValidating} />
-      </div>
+      <SectionHeader>Coins</SectionHeader>
       {tokenDetails.map((token) => (
         <TokenListItem
           key={token.address}
           token={token}
           onClick={() => onShowToken(token)}
+          isLoading={isValidating}
         />
       ))}
     </>
