@@ -3,7 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
-import { formatAddress } from "../../utils/wallet"
+import { formatAddress } from "../../utils/addresses"
 import { Alert } from "../Alert"
 import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
