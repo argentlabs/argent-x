@@ -217,10 +217,7 @@ async function main() {
 
             const nonce = await getNonce(signer)
 
-            const tx = await signer.addTransaction({
-              ...transaction,
-              nonce: nonce,
-            })
+            const tx = await signer.addTransaction({ ...transaction, nonce })
 
             increaseStoredNonce(signer.address)
             transactionTracker.trackTransaction(

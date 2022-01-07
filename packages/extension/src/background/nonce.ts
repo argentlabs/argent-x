@@ -1,8 +1,6 @@
 import { Signer, number, stark } from "starknet"
 
-const nonceStore: {
-  [walletAddress: string]: string
-} = {}
+const nonceStore: Record<string, string> = {}
 
 export async function getNonce(signer: Signer): Promise<string> {
   const { result } = await signer.callContract({
