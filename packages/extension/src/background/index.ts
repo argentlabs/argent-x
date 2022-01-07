@@ -1,5 +1,5 @@
 import { compactDecrypt } from "jose"
-import { Provider, ec, encode } from "starknet"
+import { Provider, ec, encode, number, stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream, sendMessage } from "../shared/messages"
@@ -18,6 +18,7 @@ import {
   setKeystore,
   validatePassword,
 } from "./keys/l1"
+import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
 import { sentTransactionNotification } from "./notification"
 import { openUi } from "./openUi"
 import { selectedWalletStore } from "./selectedWallet"
@@ -45,9 +46,13 @@ async function main() {
           data: transactions,
         })
 
-        for (const { hash, status } of transactions) {
+        for (const { hash, status, walletAddress, meta } of transactions) {
           if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
-            sentTransactionNotification(hash, status)
+            sentTransactionNotification(hash, status, meta)
+          }
+          // on error remove stored (increased) nonce
+          if (walletAddress && status === "REJECTED") {
+            resetStoredNonce(walletAddress)
           }
         }
       }
@@ -210,8 +215,14 @@ async function main() {
               network: selectedWallet.network,
             })
 
-            const tx = await signer.addTransaction(transaction)
+            const nonce = await getNonce(signer)
 
+            const tx = await signer.addTransaction({
+              ...transaction,
+              nonce: nonce,
+            })
+
+            increaseStoredNonce(signer.address)
             transactionTracker.trackTransaction(
               tx.transaction_hash,
               selectedWallet,
