@@ -9,23 +9,24 @@ const IS_BROWSER = typeof window !== "undefined"
 export function getStarknet({
   showModal = false,
 }: { showModal?: boolean } = {}): StarknetWindowObject {
-  if (globalThis["starknet"]) {
-    return globalThis["starknet"]
-  } else {
-    console.log("no starknet found in window")
-    if (IS_BROWSER && showModal) {
-      new App({ target: document.body })
-    }
+  // if extension isnt installed (didnt populate window.starknet) polyfill it
+  if (!globalThis["starknet"]) {
     const fail = async () => {
       throw Error("no starknet found in window")
     }
-    return {
+    globalThis["starknet"] = {
       request: fail,
       isConnected: false,
       provider: defaultProvider,
-      enable: fail,
+      enable: () => {
+        if (IS_BROWSER && showModal) {
+          new App({ target: document.body })
+        }
+        return fail()
+      },
       on: fail,
       off: fail,
     }
   }
+  return globalThis["starknet"]
 }
