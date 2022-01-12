@@ -106,7 +106,7 @@ interface NetworkSwitcherProps {
   networkId: string
   disabled?: boolean
   onChangeNetwork?: (networkId: string) => Promise<void> | void
-  port: number
+  port?: number
 }
 
 export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
@@ -119,7 +119,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   const otherNetworks = networks.filter((network) => network !== currentNetwork)
 
   const formatName = (name: string) =>
-    name === "Localhost" ? `Localhost ${port}` : name
+    port && name === "Localhost" ? `Localhost ${port}` : name
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>

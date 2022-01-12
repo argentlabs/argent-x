@@ -392,7 +392,12 @@ async function main() {
         if (!isUnlocked()) throw Error("you need an open session")
 
         const network = msg.data
-        const newAccount = await createAccount(network)
+        let newAccount
+        try {
+          newAccount = await createAccount(network)
+        } catch {
+          return sendToTabAndUi({ type: "NEW_ACCOUNT_REJ" })
+        }
 
         const wallet = { address: newAccount.address, network }
         selectedWalletStore.setItem("SELECTED_WALLET", wallet)

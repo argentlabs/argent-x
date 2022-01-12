@@ -14,12 +14,13 @@ import {
   AccountAddressWrapper,
 } from "./Address"
 
-const AccountStatusText = styled.p`
+const AccountStatusText = styled.p<{ color: string }>`
   font-size: 12px;
   font-weight: 600;
   line-height: 12px;
   text-align: center;
   margin-top: 6px;
+  color: ${({ color }) => color};
 `
 
 const AccountName = styled(H1)`
@@ -46,7 +47,9 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
     <div>
       <AccountName>{getAccountName(accountNumber)}</AccountName>
       {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
-        <AccountStatusText>{status.text}</AccountStatusText>
+        <AccountStatusText color={status.code === "ERROR" ? "red" : undefined}>
+          {status.text}
+        </AccountStatusText>
       )}
     </div>
     <AccountAddressWrapper>

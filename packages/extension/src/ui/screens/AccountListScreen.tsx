@@ -62,7 +62,6 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
       <NetworkSwitcher
         networkId={networkId}
         onChangeNetwork={onChangeNetwork}
-        port={port}
       />
     </Header>
     <H1>Accounts</H1>

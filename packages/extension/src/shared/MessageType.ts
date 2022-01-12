@@ -56,6 +56,7 @@ export type MessageType =
       type: "NEW_ACCOUNT_RES"
       data: { txHash: string; address: string; wallets: BackupWallet[] }
     }
+  | { type: "NEW_ACCOUNT_REJ" }
   | { type: "REPORT_PROGRESS"; data: number }
   | { type: "HAS_SESSION" }
   | { type: "HAS_SESSION_RES"; data: boolean }

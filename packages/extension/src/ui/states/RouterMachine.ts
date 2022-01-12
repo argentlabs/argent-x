@@ -355,18 +355,34 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
               },
             })),
           },
+          onError: {
+            target: "accountList",
+          },
         },
       },
       account: {
-        entry: async (ctx) => {
-          sendMessage({
-            type: "WALLET_CONNECTED",
-            data: {
-              address: ctx.selectedWallet!,
-              network: localNetworkUrl(ctx.networkId, ctx.localhostPort),
-            },
-          })
-        },
+        entry: [
+          async (ctx) => {
+            sendMessage({
+              type: "WALLET_CONNECTED",
+              data: {
+                address: ctx.selectedWallet!,
+                network: localNetworkUrl(ctx.networkId, ctx.localhostPort),
+              },
+            })
+          },
+          assign(({ wallets, selectedWallet }) => {
+            if (!selectedWallet) {
+              throw new Error()
+            }
+            const wallet = wallets[selectedWallet]
+            const url = new URL(wallet.networkId)
+            if (url.hostname !== "localhost") {
+              throw new Error()
+            }
+            return { localhostPort: parseInt(url.port) }
+          }),
+        ],
         on: {
           SHOW_ACCOUNT_LIST: "accountList",
           SHOW_TOKEN: "token",

@@ -41,8 +41,12 @@ export const networkWallets = (wallets: BackupWallet[], networkId: string) =>
 export const localNetworkId = (network: string) =>
   network.startsWith("http://localhost") ? "localhost" : network
 
-export const localNetworkUrl = (networkId: string, port: number) =>
-  networkId === "localhost" ? `http://localhost:${port}` : networkId
+export const localNetworkUrl = (networkId: string, port: number) => {
+  if (networkId.startsWith("http://localhost")) {
+    return networkId
+  }
+  return networkId === "localhost" ? `http://localhost:${port}` : networkId
+}
 
 export const getProvider = (network: string) =>
   new Provider(
