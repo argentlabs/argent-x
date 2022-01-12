@@ -6,7 +6,6 @@ import {
   Calldata,
   CompiledContract,
   Contract,
-  Provider,
   compileCalldata,
   encode,
   hash,
@@ -16,6 +15,7 @@ import {
 } from "starknet"
 
 import { sendMessage, waitForMessage } from "../shared/messages"
+import { getProvider } from "../shared/networks"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -34,7 +34,7 @@ export class Wallet {
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,
-      new Provider({ network: networkId as any }),
+      getProvider(networkId),
     )
 
     if (deployTransaction) {
@@ -57,12 +57,16 @@ export class Wallet {
 
   public static async fromDeploy(networkId: string): Promise<Wallet> {
     sendMessage({ type: "NEW_ACCOUNT", data: networkId })
-    const deployTransaction = await waitForMessage("NEW_ACCOUNT_RES")
 
-    return new Wallet(
-      deployTransaction.address,
-      networkId,
-      deployTransaction.txHash,
-    )
+    const result = await Promise.race([
+      waitForMessage("NEW_ACCOUNT_RES"),
+      waitForMessage("NEW_ACCOUNT_REJ"),
+    ])
+
+    if (!result) {
+      throw new Error("Failed to deploy account")
+    }
+
+    return new Wallet(result.address, networkId, result.txHash)
   }
 }

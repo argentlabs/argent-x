@@ -1,10 +1,11 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import mitt from "mitt"
-import { Abi, Contract, Provider, encode, shortString, uint256 } from "starknet"
+import { Abi, Contract, encode, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import erc20Tokens from "../../assets/erc20-tokens.json"
+import { getProvider } from "../../shared/networks"
 import { isValidAddress } from "./addresses"
 
 export const playgroundToken = (networkId: string) =>
@@ -104,7 +105,7 @@ export const fetchTokenDetails = async (
   walletAddress: string,
   networkId: string,
 ): Promise<TokenDetails> => {
-  const provider = new Provider({ network: networkId as any })
+  const provider = getProvider(networkId)
   const tokenContract = new Contract(parsedErc20Abi as Abi[], address, provider)
   const [decimals, name, balance, symbol] = await Promise.all([
     tokenContract

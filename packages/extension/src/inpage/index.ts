@@ -9,6 +9,7 @@ import {
 } from "starknet"
 
 import { MessageType, WindowMessageType } from "../shared/MessageType"
+import { getProvider } from "../shared/networks"
 import { EventHandler, StarknetWindowObject } from "./model"
 
 const extId = document
@@ -103,7 +104,7 @@ const starknetWindowObject: StarknetWindowObject = {
         if (data.type === "CONNECT_RES" && data.data) {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
-          starknet.provider = new Provider({ network: network as any })
+          starknet.provider = getProvider(network)
           starknet.signer = new WalletSigner(address, starknet.provider)
           starknet.selectedAddress = address
           starknet.isConnected = true
@@ -139,7 +140,7 @@ window.addEventListener(
       const { address, network } = data.data
       if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address
-        starknet.provider = new Provider({ network: network as any })
+        starknet.provider = getProvider(network)
         starknet.signer = new WalletSigner(address, starknet.provider)
         for (const handleEvent of userEventHandlers) {
           handleEvent([address])

@@ -1,5 +1,7 @@
 import { Provider, Signer } from "starknet"
 
+import { getProvider } from "../../shared/networks"
+
 type GetSignerOptions = {
   type: "LOCAL"
   address: string
@@ -10,7 +12,7 @@ type GetSignerOptions = {
 export async function getSigner(options: GetSignerOptions): Promise<Signer> {
   const { type, address, network, keyPair } = options
 
-  const provider = new Provider({ network: network as any })
+  const provider = getProvider(network)
 
   switch (type) {
     case "LOCAL":

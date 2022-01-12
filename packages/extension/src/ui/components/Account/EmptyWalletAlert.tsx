@@ -48,7 +48,7 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
   onAction,
 }) => (
   <AlertWrapper>
-    <Title>Deposit Funds</Title>
+    <Title>Deposit funds</Title>
     <Paragraph>
       Or learn how to deploy a contract and mint some tokens
     </Paragraph>

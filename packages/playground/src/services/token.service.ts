@@ -9,9 +9,11 @@ export const erc20TokenAddressByNetwork = {
     "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
 }
 
-export const getErc20TokenAddress = (
-  network: keyof typeof erc20TokenAddressByNetwork,
-) => erc20TokenAddressByNetwork[network]
+export type PublicNetwork = keyof typeof erc20TokenAddressByNetwork
+export type Network = PublicNetwork | "localhost"
+
+export const getErc20TokenAddress = (network: PublicNetwork) =>
+  erc20TokenAddressByNetwork[network]
 
 const mintSelector = stark.getSelectorFromName("mint")
 

@@ -44,6 +44,7 @@ interface AccountScreenProps {
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
   networkId: string
   onChangeNetwork: (networkId: string) => Promise<void> | void
+  port: number
 }
 
 export const AccountScreen: FC<AccountScreenProps> = ({
@@ -55,6 +56,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
   onAction,
   networkId,
   onChangeNetwork,
+  port,
 }) => {
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
@@ -79,6 +81,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
         <NetworkSwitcher
           networkId={networkId}
           onChangeNetwork={onChangeNetwork}
+          port={port}
         />
       </Header>
       <AccountContent>

@@ -36,13 +36,28 @@ export const TokenDapp: FC = () => {
     })()
   }, [transactionStatus, lastTransactionHash])
 
+  const network = networkId()
+  if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
+    return (
+      <>
+        <p>
+          There is no demo token for this network, but you can deploy one and
+          add its address to this file:
+        </p>
+        <div>
+          <pre>packages/playground/src/token.service.ts</pre>
+        </div>
+      </>
+    )
+  }
+
   const handleMintSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       setTransactionStatus("approve")
 
       console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount, networkId())
+      const result = await mintToken(mintAmount, network)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -59,7 +74,7 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("approve")
 
       console.log("transfer", { transferTo, transferAmount })
-      const result = await transfer(transferTo, transferAmount, networkId())
+      const result = await transfer(transferTo, transferAmount, network)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -86,6 +101,8 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("idle")
     }
   }
+
+  const tokenAddress = getErc20TokenAddress(network)
 
   return (
     <>
@@ -196,12 +213,10 @@ export const TokenDapp: FC = () => {
         <code>
           <a
             target="_blank"
-            href={`${getExplorerUrlBase()}/contract/${getErc20TokenAddress(
-              networkId(),
-            )}`}
+            href={`${getExplorerUrlBase()}/contract/${tokenAddress}`}
             rel="noreferrer"
           >
-            {getErc20TokenAddress(networkId())}
+            {tokenAddress}
           </a>
         </code>
       </h3>

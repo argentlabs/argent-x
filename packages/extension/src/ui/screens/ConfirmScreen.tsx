@@ -26,6 +26,7 @@ export interface ConfirmPageProps {
     accountNumber: number
     networkId: string
   }
+  port: number
 }
 
 interface ConfirmScreenProps extends ConfirmPageProps {
@@ -55,6 +56,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   selectedAccount,
   singleButton = false,
   children,
+  port,
 }) => (
   <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)}>
     {selectedAccount && (
@@ -63,7 +65,11 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           src={getAccountImageUrl(selectedAccount.accountNumber)}
           disabled
         />
-        <NetworkSwitcher networkId={selectedAccount.networkId} disabled />
+        <NetworkSwitcher
+          networkId={selectedAccount.networkId}
+          port={port}
+          disabled
+        />
       </Header>
     )}
     <H2>{title}</H2>

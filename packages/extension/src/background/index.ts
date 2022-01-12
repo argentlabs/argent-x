@@ -4,6 +4,7 @@ import { Provider, ec, encode, number, stark } from "starknet"
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream, sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
+import { getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import { getKeyPair } from "./keys/communication"
 import {
@@ -112,7 +113,7 @@ async function main() {
           })
         }
 
-        const provider = new Provider({ network: msg.data.network as any })
+        const provider = getProvider(msg.data.network)
         const fetchedStatus = await getTransactionStatus(
           provider,
           msg.data.hash,
@@ -391,7 +392,12 @@ async function main() {
         if (!isUnlocked()) throw Error("you need an open session")
 
         const network = msg.data
-        const newAccount = await createAccount(network)
+        let newAccount
+        try {
+          newAccount = await createAccount(network)
+        } catch {
+          return sendToTabAndUi({ type: "NEW_ACCOUNT_REJ" })
+        }
 
         const wallet = { address: newAccount.address, network }
         selectedWalletStore.setItem("SELECTED_WALLET", wallet)

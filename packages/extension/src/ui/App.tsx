@@ -110,7 +110,12 @@ function App() {
     )
 
   if (state.matches("disclaimer"))
-    return <DisclaimerScreen onSubmit={() => send("AGREE")} />
+    return (
+      <DisclaimerScreen
+        onSubmit={() => send("AGREE")}
+        port={state.context.localhostPort}
+      />
+    )
 
   if (
     (state.matches("account") ||
@@ -134,6 +139,7 @@ function App() {
               await approve(action)
               if (isPopup && isLastAction) window.close()
             }}
+            port={state.context.localhostPort}
           />
         )
       case "ADD_TOKEN": {
@@ -181,6 +187,7 @@ function App() {
                 ) + 1,
               networkId: state.context.networkId,
             }}
+            port={state.context.localhostPort}
           />
         )
       case "SIGN":
@@ -208,6 +215,7 @@ function App() {
                 ) + 1,
               networkId: state.context.networkId,
             }}
+            port={state.context.localhostPort}
           />
         )
     }
@@ -218,6 +226,8 @@ function App() {
       <SettingsScreen
         onBack={() => send("GO_BACK")}
         onLock={() => send("LOCK")}
+        port={state.context.localhostPort}
+        onPortChange={(port) => send({ type: "CHANGE_PORT", data: port })}
       />
     )
 
@@ -266,6 +276,7 @@ function App() {
         onChangeNetwork={(networkId) => {
           send({ type: "CHANGE_NETWORK", data: networkId })
         }}
+        port={state.context.localhostPort}
       />
     )
   }
@@ -284,6 +295,7 @@ function App() {
         onChangeNetwork={(networkId) => {
           send({ type: "CHANGE_NETWORK", data: networkId })
         }}
+        port={state.context.localhostPort}
       />
     )
   }
@@ -330,6 +342,7 @@ function App() {
       <ResetScreen
         onSubmit={() => send("RESET")}
         onReject={() => send("GO_BACK")}
+        port={state.context.localhostPort}
       />
     )
 

@@ -43,10 +43,28 @@ export const useTxStatus = (txHash?: string, network?: string): Status => {
 
 export const useStatus = (wallet: Wallet, activeWalletAddress?: string) => {
   const deployStatus = useTxStatus(wallet.deployTransaction, wallet.networkId)
+  const [isDeployed, setIsDeployed] = useState(true)
 
   useEffect(() => {
     if (deployStatus === "SUCCESS") wallet.completeDeployTx()
   }, [wallet, deployStatus])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const code = await wallet.contract.provider.getCode(wallet.address)
+        if (code.bytecode.length === 0) {
+          throw new Error()
+        }
+      } catch (err) {
+        setIsDeployed(false)
+      }
+    })()
+  }, [])
+
+  if (!isDeployed) {
+    return { code: "ERROR" as const, text: "Undeployed" }
+  }
 
   return getStatus(wallet, activeWalletAddress, deployStatus === "SUCCESS")
 }
