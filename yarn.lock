@@ -8310,9 +8310,9 @@ svelte-preprocess@^4.0.0:
     strip-indent "^3.0.0"
 
 svelte@^3.0.0:
-  version "3.46.0"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.46.0.tgz#8055e18f56cbaf86271fd4df6dcaf67664339c60"
-  integrity sha512-dTe/u1VYcWvmnrXUB9ZHtlYvLWrOiCStWyNyUzZGBjReUbKEJv6Bgv/9Amf24WKkml5+I2aluBh2FdWeWl6ziA==
+  version "3.46.2"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.46.2.tgz#f0ffbffaea3a9a760edcbefc0902b41998a686ad"
+  integrity sha512-RXSAtYNefe01Sb1lXtZ2I+gzn3t/h/59hoaRNeRrm8IkMIu6BSiAkbpi41xb+C44x54YKnbk9+dtfs3pM4hECA==
 
 svg-parser@^2.0.2:
   version "2.0.4"
