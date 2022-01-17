@@ -14,7 +14,7 @@ import {
   AccountAddressWrapper,
 } from "./Address"
 
-const AccountStatusText = styled.p<{ color: string }>`
+const AccountStatusText = styled.p<{ color?: string }>`
   font-size: 12px;
   font-weight: 600;
   line-height: 12px;

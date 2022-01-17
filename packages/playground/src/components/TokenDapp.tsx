@@ -203,7 +203,7 @@ export const TokenDapp: FC = () => {
           className="flat"
           style={{ marginLeft: ".6em" }}
           onClick={() => {
-            const tokenAddress = getErc20TokenAddress(networkId())
+            const tokenAddress = getErc20TokenAddress(networkId() as any)
             addToken(tokenAddress)
           }}
         >
