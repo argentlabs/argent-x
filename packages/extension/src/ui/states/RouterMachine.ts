@@ -372,15 +372,19 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
             })
           },
           assign(({ wallets, selectedWallet }) => {
-            if (!selectedWallet) {
-              throw new Error()
+            try {
+              if (!selectedWallet) {
+                throw new Error()
+              }
+              const wallet = wallets[selectedWallet]
+              const url = new URL(wallet.networkId)
+              if (url.hostname !== "localhost") {
+                throw new Error()
+              }
+              return { localhostPort: parseInt(url.port) }
+            } catch {
+              return {}
             }
-            const wallet = wallets[selectedWallet]
-            const url = new URL(wallet.networkId)
-            if (url.hostname !== "localhost") {
-              throw new Error()
-            }
-            return { localhostPort: parseInt(url.port) }
           }),
         ],
         on: {
