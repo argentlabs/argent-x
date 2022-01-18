@@ -13,7 +13,7 @@ export const H2 = styled.h2`
   font-size: 34px;
   line-height: 41px;
   color: #ffffff;
-  margin: 16px 0px;
+  margin: 0 0 16px 0;
 `
 
 export const P = styled.p`
