@@ -1,11 +1,14 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { localNetworkUrl } from "../../shared/networks"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H2 } from "../components/Typography"
+import { useGlobalState } from "../states/global"
 import { getAccountImageUrl } from "../utils/wallet"
 
 const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`
@@ -26,7 +29,6 @@ export interface ConfirmPageProps {
     accountNumber: number
     networkId: string
   }
-  port: number
 }
 
 interface ConfirmScreenProps extends ConfirmPageProps {
@@ -56,41 +58,46 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   selectedAccount,
   singleButton = false,
   children,
-  port,
-}) => (
-  <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)}>
-    {selectedAccount && (
-      <Header style={{ margin: "0 -32px 16px" }}>
-        <ProfilePicture
-          src={getAccountImageUrl(selectedAccount.accountNumber)}
-          disabled
-        />
-        <NetworkSwitcher
-          networkId={selectedAccount.networkId}
-          port={port}
-          disabled
-        />
-      </Header>
-    )}
-    <H2>{title}</H2>
+}) => {
+  const { localhostPort } = useGlobalState()
+  const navigate = useNavigate()
+  onReject ??= () => navigate(-1)
 
-    {children}
-
-    <StickyButtonGroupVertical
-      as="form"
-      onSubmit={(e: any) => {
-        e.preventDefault()
-        return onSubmit?.()
-      }}
-    >
-      {!singleButton && (
-        <Button onClick={onReject} type="button">
-          {rejectButtonText}
-        </Button>
+  return (
+    <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)}>
+      {selectedAccount && (
+        <Header style={{ margin: "0 -32px 16px" }}>
+          <ProfilePicture
+            src={getAccountImageUrl(selectedAccount.accountNumber)}
+            disabled
+          />
+          <NetworkSwitcher
+            networkId={selectedAccount.networkId}
+            port={localhostPort}
+            disabled
+          />
+        </Header>
       )}
-      <Button style={{ backgroundColor: confirmButtonBgColor }} type="submit">
-        {confirmButtonText}
-      </Button>
-    </StickyButtonGroupVertical>
-  </ConfirmScreenWrapper>
-)
+      <H2>{title}</H2>
+
+      {children}
+
+      <StickyButtonGroupVertical
+        as="form"
+        onSubmit={(e: any) => {
+          e.preventDefault()
+          return onSubmit?.()
+        }}
+      >
+        {!singleButton && (
+          <Button onClick={onReject} type="button">
+            {rejectButtonText}
+          </Button>
+        )}
+        <Button style={{ backgroundColor: confirmButtonBgColor }} type="submit">
+          {confirmButtonText}
+        </Button>
+      </StickyButtonGroupVertical>
+    </ConfirmScreenWrapper>
+  )
+}

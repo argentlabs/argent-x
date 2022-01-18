@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { FC, useMemo } from "react"
 import { useDropzone } from "react-dropzone"
+import { Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { H2 } from "../components/Typography"
+import { routes } from "../routes"
+import { fileToString } from "../utils/files"
+import { recoverKeystore } from "../utils/messaging"
 
 const UploadKeystoreScreenWrapper = styled.div`
   display: flex;
@@ -36,15 +40,8 @@ const DropZone = styled.div`
   }
 `
 
-interface UploadKeystoreScreenProps {
-  onSubmit?: (uploadKeystore: File) => void
-  onBack?: () => void
-}
-
-export const UploadKeystoreScreen: FC<UploadKeystoreScreenProps> = ({
-  onSubmit,
-  onBack,
-}) => {
+export const UploadKeystoreScreen: FC = () => {
+  const navigate = useNavigate()
   const {
     acceptedFiles: [acceptedFile],
     getRootProps,
@@ -55,15 +52,25 @@ export const UploadKeystoreScreen: FC<UploadKeystoreScreenProps> = ({
   })
 
   const disableSubmit = useMemo(() => !acceptedFile, [acceptedFile])
+  const handleRestoreClick = async () => {
+    try {
+      const data = await fileToString(acceptedFile)
+      await recoverKeystore(data)
+      navigate(routes.password)
+    } catch {
+      // TODO: determineEntry
+      navigate(routes.welcome)
+    }
+  }
 
   return (
     <UploadKeystoreScreenWrapper>
-      <BackButton onClick={onBack} />
+      <BackButton />
       <H2>Select backup</H2>
       <DropZone {...getRootProps()}>
         <input {...getInputProps()} />
         {disableSubmit ? (
-          <p>Drag & drop your backup file here, or click to select it</p>
+          <p>Drag &amp; drop your backup file here, or click to select it</p>
         ) : (
           <div>
             <p>Backup selected:</p>
@@ -72,10 +79,7 @@ export const UploadKeystoreScreen: FC<UploadKeystoreScreenProps> = ({
         )}
       </DropZone>
 
-      <Button
-        onClick={() => onSubmit?.(acceptedFile!)}
-        disabled={disableSubmit}
-      >
+      <Button onClick={handleRestoreClick} disabled={disableSubmit}>
         Restore from backup
       </Button>
     </UploadKeystoreScreenWrapper>

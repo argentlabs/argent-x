@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import usePromise from "react-promise-suspense"
-import create, { StateSelector, StoreApi, UseBoundStore } from "zustand"
+import create from "zustand"
 
 import { ExtActionItem } from "../../shared/actionQueue"
 import { messageStream, sendMessage } from "../../shared/messages"

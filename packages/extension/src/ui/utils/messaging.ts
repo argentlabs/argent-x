@@ -38,7 +38,7 @@ export const getPublicKey = async () => {
   return waitForMessage("REQ_PUB_RES")
 }
 
-export const uploadKeystore = async (keystore: string) => {
+export const recoverKeystore = async (keystore: string) => {
   sendMessage({
     type: "RECOVER_KEYSTORE",
     data: keystore,

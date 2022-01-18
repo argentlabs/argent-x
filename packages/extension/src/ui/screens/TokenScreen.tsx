@@ -95,7 +95,7 @@ export const TokenScreen: FC<TokenScreenProps> = ({
   return (
     <>
       <Header>
-        <BackButton onClick={onBack} />
+        <BackButton />
       </Header>
       <TokenScreenWrapper>
         <TokenTitle>

@@ -1,12 +1,16 @@
 import { FC, useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import LogoSvg from "../../assets/logo.svg"
+import { sendMessage } from "../../shared/messages"
 import { Button } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
 import { A, FormError, P } from "../components/Typography"
+import { routes } from "../routes"
+import { useGlobalState } from "../states/global"
 import { makeClickable } from "../utils/a11y"
 import { isValidPassword } from "./NewSeedScreen"
 
@@ -35,12 +39,6 @@ const PasswordScreenWrapper = styled.div`
   }
 `
 
-interface PasswordScreenProps {
-  onSubmit?: (password: string) => void
-  onForgotPassword?: () => void
-  error?: string
-}
-
 export const greetings = [
   "gm!",
   "Hello!",
@@ -50,11 +48,9 @@ export const greetings = [
   "hi fren",
 ]
 
-export const PasswordScreen: FC<PasswordScreenProps> = ({
-  onSubmit,
-  onForgotPassword,
-  error,
-}) => {
+export const PasswordScreen: FC = ({}) => {
+  const { error } = useGlobalState()
+  const navigate = useNavigate()
   const {
     control,
     formState: { errors, isDirty },
@@ -63,10 +59,10 @@ export const PasswordScreen: FC<PasswordScreenProps> = ({
   } = useForm<{ password: string }>()
 
   useEffect(() => {
-    setError("password", {
-      message: error,
-    })
+    setError("password", { message: error })
   }, [error])
+
+  const handleResetClick = () => navigate(routes.reset)
 
   return (
     <PasswordScreenWrapper>
@@ -74,7 +70,11 @@ export const PasswordScreen: FC<PasswordScreenProps> = ({
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 
-      <form onSubmit={handleSubmit(({ password }) => onSubmit?.(password))}>
+      <form
+        onSubmit={handleSubmit(({ password }) => {
+          // send({ type: "SUBMIT_PASSWORD", data: { password } })
+        })}
+      >
         <Controller
           name="password"
           control={control}
@@ -99,7 +99,7 @@ export const PasswordScreen: FC<PasswordScreenProps> = ({
           <FormError>{errors.password.message}</FormError>
         )}
 
-        <A {...makeClickable(onForgotPassword)}>reset or import backup</A>
+        <A {...makeClickable(handleResetClick)}>reset or import backup</A>
         <Button type="submit" disabled={!isDirty}>
           Unlock
         </Button>

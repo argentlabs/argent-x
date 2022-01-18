@@ -1,4 +1,32 @@
-import type { Wallet } from "../Wallet"
+import { localNetworkUrl } from "../../shared/networks"
+import { useGlobalState } from "../states/global"
+import { useProgress } from "../states/progress"
+import { Wallet } from "../Wallet"
+import { startSession } from "./messaging"
+
+export const deployWallet = async (
+  networkId: string,
+  localhostPort: number,
+  password?: string,
+) => {
+  useGlobalState.setState({ showLoading: true })
+  useProgress.setState({
+    progress: 0,
+    text: "Deploying...",
+  })
+
+  if (password) {
+    await startSession(password)
+  }
+
+  const network = localNetworkUrl(networkId, localhostPort)
+  const newWallet = await Wallet.fromDeploy(network)
+
+  useProgress.setState({ progress: 0, text: "" })
+  useGlobalState.setState({ showLoading: false })
+
+  return newWallet
+}
 
 const argentColorsArray = [
   "02BBA8",

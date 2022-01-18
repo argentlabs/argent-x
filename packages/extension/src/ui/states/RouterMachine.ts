@@ -21,8 +21,8 @@ import {
   hasActiveSession,
   isInitialized,
   monitorProgress,
+  recoverKeystore,
   startSession,
-  uploadKeystore,
 } from "../utils/messaging"
 import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
@@ -463,7 +463,7 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
         invoke: {
           src: async (ctx, ev) => {
             if (ev.type !== "SUBMIT_KEYSTORE") throw Error("wrong entry point")
-            await uploadKeystore(ev.data)
+            await recoverKeystore(ev.data)
           },
           onDone: "enterPassword",
           onError: "determineEntry",

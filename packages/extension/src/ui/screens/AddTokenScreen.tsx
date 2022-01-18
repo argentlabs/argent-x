@@ -112,7 +112,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   return (
     <>
-      <Header>{onBack && <BackButton onClick={onBack} />}</Header>
+      <Header>{onBack && <BackButton />}</Header>
 
       <AddTokenScreenWrapper>
         <H2>Add token</H2>
