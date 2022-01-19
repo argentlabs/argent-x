@@ -173,8 +173,16 @@ export class WalletSigner extends Provider implements SignerInterface {
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
-      waitForMsgOfType("SUBMITTED_TX", 11 * 60 * 1000),
-      waitForMsgOfType("FAILED_TX", 10 * 60 * 1000)
+      waitForMsgOfType(
+        "SUBMITTED_TX",
+        11 * 60 * 1000,
+        (x) => x.data.actionHash === actionHash,
+      ),
+      waitForMsgOfType(
+        "FAILED_TX",
+        10 * 60 * 1000,
+        (x) => x.data.actionHash === actionHash,
+      )
         .then(() => "error" as const)
         .catch(() => {
           sendMessage({ type: "FAILED_TX", data: { actionHash } })
@@ -202,8 +210,16 @@ export class WalletSigner extends Provider implements SignerInterface {
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
-      waitForMsgOfType("SUCCESS_SIGN", 11 * 60 * 1000),
-      waitForMsgOfType("FAILED_SIGN", 10 * 60 * 1000)
+      waitForMsgOfType(
+        "SUCCESS_SIGN",
+        11 * 60 * 1000,
+        (x) => x.data.actionHash === actionHash,
+      ),
+      waitForMsgOfType(
+        "FAILED_SIGN",
+        10 * 60 * 1000,
+        (x) => x.data.actionHash === actionHash,
+      )
         .then(() => "error" as const)
         .catch(() => {
           sendMessage({ type: "FAILED_SIGN", data: { actionHash } })

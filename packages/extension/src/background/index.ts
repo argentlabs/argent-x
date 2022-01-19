@@ -1,11 +1,18 @@
 import { compactDecrypt } from "jose"
-import { Provider, ec, encode, number, stark } from "starknet"
+import { ec, encode } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
-import { messageStream, sendMessage } from "../shared/messages"
+import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
+import {
+  addTab,
+  hasTab,
+  sendMessageToActiveTabs,
+  sendMessageToActiveTabsAndUi,
+  sendMessageToUi,
+} from "./activeTabs"
 import { getKeyPair } from "./keys/communication"
 import {
   createAccount,
@@ -28,21 +35,13 @@ import { setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
-let activeTabId: number | undefined
-async function getCurrentTab() {
-  return activeTabId
-}
-function setActiveTab(tabId?: number) {
-  activeTabId = tabId
-}
-
 async function main() {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const transactionTracker = new TransactionTracker(
     (transactions) => {
       if (transactions.length > 0) {
-        sendMessage({
+        sendMessageToUi({
           type: "TRANSACTION_UPDATES",
           data: transactions,
         })
@@ -63,17 +62,12 @@ async function main() {
   )
 
   messageStream.subscribe(async ([msg, sender]) => {
-    const currentTab = await getCurrentTab()
-
     const sendToTabAndUi = async (msg: MessageType) => {
-      sendMessage(msg)
-      sendMessage(msg, { tabId: sender.tab?.id })
-      if (currentTab && currentTab !== sender.tab?.id) {
-        sendMessage(msg, { tabId: currentTab })
-      }
+      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
     }
-    if (currentTab && currentTab !== sender.tab?.id) {
-      sendMessage(msg, { tabId: currentTab })
+    // forward UI messages to rest of the tabs
+    if (hasTab(sender.tab?.id)) {
+      sendMessageToActiveTabs(msg)
     }
 
     const actionQueue = await getQueue<ActionItem>("ACTIONS", {
@@ -162,7 +156,8 @@ async function main() {
         )
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
-        setActiveTab(sender.tab?.id)
+        addTab(sender.tab?.id)
+
         if (!isWhitelisted) {
           await actionQueue.push({
             type: "CONNECT",
