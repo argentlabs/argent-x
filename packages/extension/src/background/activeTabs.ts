@@ -3,7 +3,7 @@ import browser from "webextension-polyfill"
 import { sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 
-const activeTabs = new Set<number>([])
+const activeTabs = new Set<number>()
 
 export function addTab(tabId?: number) {
   if (tabId === undefined) return
@@ -13,7 +13,7 @@ export function addTab(tabId?: number) {
 }
 
 export function hasTab(tabId?: number) {
-  if (!tabId) {
+  if (tabId === undefined) {
     return false
   }
   return activeTabs.has(tabId)
@@ -25,13 +25,11 @@ browser.tabs.onRemoved.addListener((tabId) => {
 
 export async function sendMessageToActiveTabs(
   message: MessageType,
-  additionalTargets: (number | undefined)[] = [],
+  additionalTargets: Array<number | undefined> = [],
 ): Promise<void> {
   const promises = []
-  for (const tabId of activeTabs) {
-    promises.push(sendMessage(message, { tabId }))
-  }
-  for (const tabId of additionalTargets) {
+  // Set avoids duplicates
+  for (const tabId of new Set([...activeTabs, ...additionalTargets])) {
     if (tabId !== undefined) {
       promises.push(sendMessage(message, { tabId }))
     }
@@ -45,7 +43,7 @@ export async function sendMessageToUi(message: MessageType) {
 
 export async function sendMessageToActiveTabsAndUi(
   message: MessageType,
-  additionalTargets: (number | undefined)[] = [],
+  additionalTargets: Array<number | undefined> = [],
 ) {
   await sendMessageToUi(message)
   await sendMessageToActiveTabs(message)
