@@ -11,8 +11,9 @@ import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
+import { useGlobalState } from "../states/global"
 import { isValidAddress } from "../utils/addresses"
-import { TokenDetails, fetchTokenDetails } from "../utils/tokens"
+import { TokenDetails, addToken, fetchTokenDetails } from "../utils/tokens"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -48,8 +49,6 @@ function addressFormat64Byte(address: number.BigNumberish): string {
 }
 
 interface AddTokenScreenProps {
-  walletAddress: string
-  networkId: string
   defaultToken?: AddToken
   onSubmit?: (addToken: Required<AddToken>) => void
   onReject?: () => void
@@ -57,13 +56,12 @@ interface AddTokenScreenProps {
 }
 
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
-  walletAddress,
-  networkId,
   defaultToken,
   onSubmit,
   onReject,
   onBack,
 }) => {
+  const { networkId, selectedWallet } = useGlobalState()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
   const [tokenName, setTokenName] = useState(defaultToken?.name || "")
   const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
@@ -79,8 +77,8 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }, [tokenAddress])
 
   useEffect(() => {
-    if (loading) {
-      fetchTokenDetails(tokenAddress, walletAddress, networkId)
+    if (loading && selectedWallet) {
+      fetchTokenDetails(tokenAddress, selectedWallet, networkId)
         .then((details) => {
           setLoading(false)
           setTokenDetails(details)
@@ -97,7 +95,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
       prevValidAddress.current = tokenAddress
       setLoading(true)
     }
-  }, [loading, tokenAddress, walletAddress])
+  }, [loading, tokenAddress, selectedWallet])
 
   const compiledData = {
     address: tokenAddress,
@@ -120,14 +118,15 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
         <form
           onSubmit={(e: any) => {
             e.preventDefault()
-            if (isDataComplete(compiledData)) {
-              onSubmit?.({
+            if (isDataComplete(compiledData) && selectedWallet) {
+              const tokenDetails = {
                 address: compiledData.address,
                 decimals: compiledData.decimals.toString(),
                 name: compiledData.name,
                 symbol: compiledData.symbol,
                 networkId: compiledData.networkId,
-              })
+              }
+              addToken(selectedWallet, tokenDetails)
             }
           }}
         >

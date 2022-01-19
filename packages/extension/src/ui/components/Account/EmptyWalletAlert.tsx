@@ -2,8 +2,11 @@ import { ethers } from "ethers"
 import { FC } from "react"
 import styled from "styled-components"
 
+import { useGlobalState } from "../../states/global"
 import { makeClickable } from "../../utils/a11y"
 import { formatAddress } from "../../utils/addresses"
+import { getUint256CalldataFromBN } from "../../utils/numbers"
+import { sendTransaction } from "../../utils/transactions"
 import { Alert } from "../Alert"
 import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
@@ -39,38 +42,44 @@ const AlertButton = styled(Button)`
 interface EmptyWalletAlertProps {
   mintableAddress?: string
   walletAddress: string
-  onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
 
 export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
   mintableAddress,
   walletAddress,
-  onAction,
-}) => (
-  <AlertWrapper>
-    <Title>Deposit funds</Title>
-    <Paragraph>
-      Or learn how to deploy a contract and mint some tokens
-    </Paragraph>
-    <Buttons>
-      <CopyTooltip
-        copyValue={formatAddress(walletAddress)}
-        message="Wallet address copied!"
-      >
-        <AlertButton>Receive</AlertButton>
-      </CopyTooltip>
-      {mintableAddress && (
-        <AlertButton
-          {...makeClickable(() => {
-            onAction?.(mintableAddress, {
-              type: "MINT",
-              amount: ethers.utils.parseUnits("1000", 18),
-            })
-          })}
+}) => {
+  const { selectedWallet } = useGlobalState()
+  const handleMint = () => {
+    sendTransaction({
+      type: "APPROVE_TX",
+      data: {
+        to: mintableAddress,
+        method: "mint",
+        calldata: {
+          recipient: selectedWallet,
+          amount: getUint256CalldataFromBN(ethers.utils.parseUnits("1000", 18)),
+        },
+      },
+    } as any)
+  }
+
+  return (
+    <AlertWrapper>
+      <Title>Deposit funds</Title>
+      <Paragraph>
+        Or learn how to deploy a contract and mint some tokens
+      </Paragraph>
+      <Buttons>
+        <CopyTooltip
+          copyValue={formatAddress(walletAddress)}
+          message="Wallet address copied!"
         >
-          Mint
-        </AlertButton>
-      )}
-    </Buttons>
-  </AlertWrapper>
-)
+          <AlertButton>Receive</AlertButton>
+        </CopyTooltip>
+        {mintableAddress && (
+          <AlertButton {...makeClickable(handleMint)}>Mint</AlertButton>
+        )}
+      </Buttons>
+    </AlertWrapper>
+  )
+}

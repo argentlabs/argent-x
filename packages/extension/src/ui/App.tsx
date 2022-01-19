@@ -1,7 +1,5 @@
-import { BigNumber } from "@ethersproject/bignumber"
-import { FC, Suspense, useState } from "react"
+import { FC, Suspense, useEffect, useState } from "react"
 import { Link, Route, Routes, useNavigate } from "react-router-dom"
-import { uint256 } from "starknet"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -10,6 +8,7 @@ import { waitForMessage } from "../shared/messages"
 import { routes } from "./routes"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
+import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { ApproveSignScreen } from "./screens/ApproveSignScreen"
 import { ApproveTransactionScreen } from "./screens/ApproveTransactionScreen"
@@ -28,20 +27,16 @@ import { useGlobalState } from "./states/global"
 import { swrCacheProvider } from "./utils/swrCache"
 import { TokenDetails, addToken } from "./utils/tokens"
 
-function getUint256CalldataFromBN(bn: BigNumber) {
-  return {
-    type: "struct" as const,
-    ...uint256.bnToUint256(bn.toHexString()),
-  }
-}
-
 const App: FC = () => {
   const { showLoading } = useGlobalState()
-  const navigate = useNavigate()
-  const { actions, approve, reject } = useActions()
+  const { actions } = useActions()
 
   if (showLoading) {
     return <LoadingScreen />
+  }
+
+  if (actions[0]) {
+    return <ActionScreen />
   }
 
   return (
@@ -51,6 +46,7 @@ const App: FC = () => {
       <Route path={routes.deployAccount} element={<NewSeedScreen />} />
       <Route path={routes.recoverBackup} element={<UploadKeystoreScreen />} />
       <Route path={routes.password} element={<PasswordScreen />} />
+      <Route path={routes.account} element={<AccountScreen />} />
       <Route path={routes.reset} element={<ResetScreen />} />
       <Route path={routes.disclaimer} element={<DisclaimerScreen />} />
       <Route path={routes.settings} element={<SettingsScreen />} />
@@ -59,15 +55,75 @@ const App: FC = () => {
 
   /*
 
-  if (state.matches("settings"))
+  if (state.matches("account")) {
     return (
-      <SettingsScreen
-        onBack={() => send("GO_BACK")}
-        onLock={() => send("LOCK")}
+      <AccountScreen
+        onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
+        onShowToken={(token: TokenDetails) =>
+          send({ type: "SHOW_TOKEN", data: token })
+        }
+        onAddToken={() => send("SHOW_ADD_TOKEN")}
+        wallet={state.context.wallets[state.context.selectedWallet]}
+        accountNumber={
+          Object.keys(state.context.wallets).findIndex(
+            (wallet) => wallet === state.context.selectedWallet,
+          ) + 1
+        }
+        onAction={(tokenAddress, action) => {
+          if (action.type === "MINT") {
+            send({
+              type: "APPROVE_TX",
+              data: {
+                to: tokenAddress,
+                method: "mint",
+                calldata: {
+                  recipient: state.context.selectedWallet,
+                  amount: getUint256CalldataFromBN(action.amount),
+                },
+              },
+            })
+          } else if (action.type === "TRANSFER") {
+            send({
+              type: "APPROVE_TX",
+              data: {
+                to: tokenAddress,
+                method: "transfer",
+                calldata: {
+                  recipient: action.to,
+                  amount: getUint256CalldataFromBN(action.amount),
+                },
+              },
+            })
+          }
+        }}
+        networkId={state.context.networkId}
+        onChangeNetwork={(networkId) => {
+          send({ type: "CHANGE_NETWORK", data: networkId })
+        }}
         port={state.context.localhostPort}
-        onPortChange={(port) => send({ type: "CHANGE_PORT", data: port })}
       />
     )
+  }
+
+  if (state.matches("accountList")) {
+    return (
+      <AccountListScreen
+        wallets={Object.values(state.context.wallets)}
+        activeWallet={state.context.selectedWallet}
+        onAddAccount={() => send("ADD_WALLET")}
+        onSettings={() => send("SHOW_SETTINGS")}
+        onAccountSelect={(address) => {
+          send({ type: "SELECT_WALLET", data: address })
+        }}
+        networkId={state.context.networkId}
+        onChangeNetwork={(networkId) => {
+          send({ type: "CHANGE_NETWORK", data: networkId })
+        }}
+        port={state.context.localhostPort}
+      />
+    )
+  }
+
 
   if (
     (state.matches("account") ||
@@ -171,75 +227,6 @@ const App: FC = () => {
           />
         )
     }
-  }
-
-  if (state.matches("account")) {
-    return (
-      <AccountScreen
-        onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
-        onShowToken={(token: TokenDetails) =>
-          send({ type: "SHOW_TOKEN", data: token })
-        }
-        onAddToken={() => send("SHOW_ADD_TOKEN")}
-        wallet={state.context.wallets[state.context.selectedWallet]}
-        accountNumber={
-          Object.keys(state.context.wallets).findIndex(
-            (wallet) => wallet === state.context.selectedWallet,
-          ) + 1
-        }
-        onAction={(tokenAddress, action) => {
-          if (action.type === "MINT") {
-            send({
-              type: "APPROVE_TX",
-              data: {
-                to: tokenAddress,
-                method: "mint",
-                calldata: {
-                  recipient: state.context.selectedWallet,
-                  amount: getUint256CalldataFromBN(action.amount),
-                },
-              },
-            })
-          } else if (action.type === "TRANSFER") {
-            send({
-              type: "APPROVE_TX",
-              data: {
-                to: tokenAddress,
-                method: "transfer",
-                calldata: {
-                  recipient: action.to,
-                  amount: getUint256CalldataFromBN(action.amount),
-                },
-              },
-            })
-          }
-        }}
-        networkId={state.context.networkId}
-        onChangeNetwork={(networkId) => {
-          send({ type: "CHANGE_NETWORK", data: networkId })
-        }}
-        port={state.context.localhostPort}
-      />
-    )
-  }
-
-  if (state.matches("accountList")) {
-    return (
-      <AccountListScreen
-        wallets={Object.values(state.context.wallets)}
-        activeWallet={state.context.selectedWallet}
-        onAddAccount={() => send("ADD_WALLET")}
-        onSettings={() => send("SHOW_SETTINGS")}
-        onAccountSelect={(address) => {
-          send({ type: "SELECT_WALLET", data: address })
-        }}
-        networkId={state.context.networkId}
-        onChangeNetwork={(networkId) => {
-          send({ type: "CHANGE_NETWORK", data: networkId })
-        }}
-        port={state.context.localhostPort}
-      />
-    )
   }
 
   if (state.matches("token"))

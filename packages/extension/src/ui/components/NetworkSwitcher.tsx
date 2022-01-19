@@ -1,7 +1,8 @@
 import { FC } from "react"
 import styled, { css } from "styled-components"
 
-import { getNetwork, networks } from "../../shared/networks"
+import { getNetwork, localNetworkUrl, networks } from "../../shared/networks"
+import { useGlobalState } from "../states/global"
 import { WalletStatusCode } from "../utils/wallet"
 
 const NetworkName = styled.span`
@@ -55,7 +56,7 @@ const NetworkList = styled.div`
 `
 
 const NetworkSwitcherWrapper = styled.div<{
-  disabled: boolean
+  disabled?: boolean
 }>`
   position: relative;
 
@@ -103,23 +104,20 @@ export const NetworkStatusIndicator = styled.span<{
 `
 
 interface NetworkSwitcherProps {
-  networkId: string
   disabled?: boolean
-  onChangeNetwork?: (networkId: string) => Promise<void> | void
-  port?: number
+  hidePort?: boolean
 }
 
 export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
-  networkId,
-  onChangeNetwork,
-  disabled = false,
-  port,
+  disabled,
+  hidePort,
 }) => {
+  const { networkId, localhostPort } = useGlobalState()
   const currentNetwork = getNetwork(networkId)
   const otherNetworks = networks.filter((network) => network !== currentNetwork)
 
   const formatName = (name: string) =>
-    port && name === "Localhost" ? `Localhost ${port}` : name
+    hidePort && name === "Localhost" ? `Localhost ${localhostPort}` : name
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
@@ -129,7 +127,10 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
       </Network>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
-          <Network key={id} onClick={() => onChangeNetwork?.(id)}>
+          <Network
+            key={id}
+            onClick={() => useGlobalState.setState({ networkId: id })}
+          >
             <NetworkName>{formatName(name)}</NetworkName>
             <NetworkStatusIndicator status="CONNECTED" />
           </Network>

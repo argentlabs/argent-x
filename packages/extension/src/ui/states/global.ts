@@ -39,3 +39,13 @@ export const useGlobalState = create<GlobalStore>((set) => ({
       },
     })),
 }))
+
+export const selectWallet = ({ wallets, selectedWallet }: GlobalStore) => {
+  if (!selectedWallet) {
+    throw new Error("No selected wallet")
+  }
+  return wallets[selectedWallet]
+}
+
+export const selectAccountNumber = ({ wallets, selectedWallet }: GlobalStore) =>
+  Object.keys(wallets).findIndex((wallet) => wallet === selectedWallet) + 1

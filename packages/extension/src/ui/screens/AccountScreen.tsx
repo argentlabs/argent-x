@@ -1,4 +1,5 @@
 import { FC, Suspense, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
@@ -17,16 +18,19 @@ import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
-  TokenAction,
   TokenTitle,
   TokenWrapper,
 } from "../components/Token"
 import { useStatus } from "../hooks/useStatus"
+import { routes } from "../routes"
+import {
+  selectAccountNumber,
+  selectWallet,
+  useGlobalState,
+} from "../states/global"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
-import { TokenDetails } from "../utils/tokens"
 import { getAccountImageUrl } from "../utils/wallet"
-import { Wallet } from "../Wallet"
 
 const AccountContent = styled.div`
   display: flex;
@@ -35,29 +39,11 @@ const AccountContent = styled.div`
   padding: 16px;
 `
 
-interface AccountScreenProps {
-  wallet: Wallet
-  accountNumber: number
-  onShowAccountList?: () => void
-  onShowToken: (token: TokenDetails) => void
-  onAddToken?: () => void
-  onAction?: (token: string, action: TokenAction) => Promise<void> | void
-  networkId: string
-  onChangeNetwork: (networkId: string) => Promise<void> | void
-  port: number
-}
-
-export const AccountScreen: FC<AccountScreenProps> = ({
-  wallet,
-  accountNumber,
-  onShowAccountList,
-  onShowToken,
-  onAddToken,
-  onAction,
-  networkId,
-  onChangeNetwork,
-  port,
-}) => {
+export const AccountScreen: FC = () => {
+  const { networkId } = useGlobalState()
+  const wallet = useGlobalState(selectWallet)
+  const accountNumber = useGlobalState(selectAccountNumber)
+  const navigate = useNavigate()
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
 
@@ -75,14 +61,10 @@ export const AccountScreen: FC<AccountScreenProps> = ({
     <AccountColumn>
       <Header>
         <ProfilePicture
-          {...makeClickable(onShowAccountList)}
+          {...makeClickable(() => navigate(routes.accounts))}
           src={getAccountImageUrl(accountNumber)}
         />
-        <NetworkSwitcher
-          networkId={networkId}
-          onChangeNetwork={onChangeNetwork}
-          port={port}
-        />
+        <NetworkSwitcher />
       </Header>
       <AccountContent>
         <AccountSubHeader
@@ -114,12 +96,10 @@ export const AccountScreen: FC<AccountScreenProps> = ({
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
             networkId={networkId}
-            onAction={onAction}
-            onShowToken={onShowToken}
             walletAddress={wallet.address}
             canShowEmptyWalletAlert={!showPendingTransactions}
           />
-          <TokenWrapper {...makeClickable(onAddToken)}>
+          <TokenWrapper {...makeClickable(() => navigate(routes.newToken))}>
             <AddTokenIconButton size={40}>
               <Add />
             </AddTokenIconButton>

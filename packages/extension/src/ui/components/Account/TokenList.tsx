@@ -1,16 +1,16 @@
 import { FC } from "react"
-import styled, { css } from "styled-components"
+import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
 import { useMitt } from "../../hooks/useMitt"
+import { routes } from "../../routes"
 import {
-  TokenDetails,
   fetchTokenDetails,
   getTokens,
   playgroundToken,
   tokensMitt,
 } from "../../utils/tokens"
-import { TokenAction, TokenListItem } from "../Token"
+import { TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
 import { SectionHeader } from "./SectionHeader"
 
@@ -18,17 +18,14 @@ interface TokenListProps {
   networkId: string
   walletAddress: string
   canShowEmptyWalletAlert?: boolean
-  onShowToken: (token: TokenDetails) => void
-  onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
 
 export const TokenList: FC<TokenListProps> = ({
   networkId,
   walletAddress,
   canShowEmptyWalletAlert = true,
-  onShowToken,
-  onAction,
 }) => {
+  const navigate = useNavigate()
   const tokens = useMitt(
     tokensMitt,
     "UPDATE",
@@ -58,7 +55,6 @@ export const TokenList: FC<TokenListProps> = ({
         <EmptyWalletAlert
           walletAddress={walletAddress}
           mintableAddress={playgroundToken(networkId)?.address}
-          onAction={onAction}
         />
       )}
       <SectionHeader>Coins</SectionHeader>
@@ -66,7 +62,7 @@ export const TokenList: FC<TokenListProps> = ({
         <TokenListItem
           key={token.address}
           token={token}
-          onClick={() => onShowToken(token)}
+          onClick={() => navigate(routes.token(token.address))}
           isLoading={isValidating}
         />
       ))}
