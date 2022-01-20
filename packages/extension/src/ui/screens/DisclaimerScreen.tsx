@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 import { P } from "../components/Typography"
 import { routes } from "../routes"
+import { understandDisclaimer } from "../utils/disclaimer"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 const SP = styled(P)`
@@ -13,6 +14,7 @@ const SP = styled(P)`
 
 export const DisclaimerScreen: FC = () => {
   const navigate = useNavigate()
+
   return (
     <ConfirmScreen
       title="Disclaimer"
@@ -20,7 +22,7 @@ export const DisclaimerScreen: FC = () => {
       confirmButtonBgColor="#c12026"
       singleButton
       onSubmit={() => {
-        localStorage.setItem("UNDERSTOOD_DISCLAIMER", JSON.stringify(true))
+        understandDisclaimer()
         navigate(routes.welcome)
       }}
     >

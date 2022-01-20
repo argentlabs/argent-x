@@ -5,12 +5,13 @@ import styled from "styled-components"
 import { useGlobalState } from "../../states/global"
 import { makeClickable } from "../../utils/a11y"
 import { formatAddress } from "../../utils/addresses"
-import { getUint256CalldataFromBN } from "../../utils/numbers"
-import { sendTransaction } from "../../utils/transactions"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../../utils/transactions"
 import { Alert } from "../Alert"
 import { Button } from "../Button"
 import { CopyTooltip } from "../CopyTooltip"
-import { TokenAction } from "../Token"
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;

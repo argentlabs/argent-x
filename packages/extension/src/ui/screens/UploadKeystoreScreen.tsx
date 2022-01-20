@@ -58,7 +58,7 @@ export const UploadKeystoreScreen: FC = () => {
       await recoverKeystore(data)
       navigate(routes.password)
     } catch {
-      // TODO: determineEntry
+      // TODO: handle error
       navigate(routes.welcome)
     }
   }

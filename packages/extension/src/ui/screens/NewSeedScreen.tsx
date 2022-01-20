@@ -49,9 +49,9 @@ export const NewSeedScreen: FC = () => {
     try {
       const newWallet = await deployWallet(networkId, localhostPort, password)
       addWallet(newWallet)
-      navigate("/account")
+      navigate(routes.account(newWallet.address))
     } catch {
-      navigate("/accountList")
+      navigate(routes.accounts)
     }
   }
 

@@ -1,4 +1,10 @@
-import { InvokeFunctionTransaction, compileCalldata, stark } from "starknet"
+import { BigNumber } from "ethers"
+import {
+  InvokeFunctionTransaction,
+  compileCalldata,
+  stark,
+  uint256,
+} from "starknet"
 
 import { sendMessage } from "../../shared/messages"
 import { TransactionRequest } from "../states/RouterMachine"
@@ -22,4 +28,11 @@ export const sendTransaction = (
             ),
           },
   })
+}
+
+export function getUint256CalldataFromBN(bn: BigNumber) {
+  return {
+    type: "struct" as const,
+    ...uint256.bnToUint256(bn.toHexString()),
+  }
 }

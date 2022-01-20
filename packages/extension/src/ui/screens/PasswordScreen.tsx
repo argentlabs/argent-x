@@ -4,14 +4,16 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import LogoSvg from "../../assets/logo.svg"
-import { sendMessage } from "../../shared/messages"
 import { Button } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
 import { A, FormError, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useGlobalState } from "../states/global"
+import { useProgress } from "../states/progress"
 import { makeClickable } from "../utils/a11y"
+import { monitorProgress, startSession } from "../utils/messaging"
+import { recover } from "../utils/recovery"
 import { isValidPassword } from "./NewSeedScreen"
 
 const PasswordScreenWrapper = styled.div`
@@ -64,17 +66,35 @@ export const PasswordScreen: FC = ({}) => {
 
   const handleResetClick = () => navigate(routes.reset)
 
+  const verifyPassword = async (password: string) => {
+    try {
+      monitorProgress((progress) => {
+        useProgress.setState({ progress, text: "Decrypting ..." })
+      })
+
+      await startSession(password)
+
+      useProgress.setState({ progress: 0, text: "" })
+      useGlobalState.setState({ error: undefined })
+      const target = await recover()
+      if (target) {
+        navigate(target)
+      } else {
+        // TODO: handle error state properly
+        navigate(routes.welcome)
+      }
+    } catch {
+      useGlobalState.setState({ error: "Wrong password" })
+    }
+  }
+
   return (
     <PasswordScreenWrapper>
       <LogoSvg />
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 
-      <form
-        onSubmit={handleSubmit(({ password }) => {
-          // send({ type: "SUBMIT_PASSWORD", data: { password } })
-        })}
-      >
+      <form onSubmit={handleSubmit(({ password }) => verifyPassword(password))}>
         <Controller
           name="password"
           control={control}

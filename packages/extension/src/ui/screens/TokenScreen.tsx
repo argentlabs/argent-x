@@ -10,9 +10,11 @@ import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
 import { useTokens } from "../hooks/useTokens"
-import { getUint256CalldataFromBN } from "../utils/numbers"
 import { toTokenView } from "../utils/tokens"
-import { sendTransaction } from "../utils/transactions"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../utils/transactions"
 
 const TokenScreenWrapper = styled.div`
   display: flex;

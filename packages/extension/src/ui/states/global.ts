@@ -17,6 +17,7 @@ interface GlobalStore {
   txHash?: string
   error?: string
   showLoading: boolean
+  isFirstRender: boolean
   addWallet: (newWallet: Wallet) => void
 }
 
@@ -29,7 +30,8 @@ export const useGlobalState = create<GlobalStore>((set) => ({
   })(),
   actions: [],
   isPopup: new URLSearchParams(window.location.search).has("popup"),
-  showLoading: false,
+  showLoading: true,
+  isFirstRender: true,
   addWallet: (newWallet: Wallet) =>
     set((state) => ({
       selectedWallet: newWallet.address,

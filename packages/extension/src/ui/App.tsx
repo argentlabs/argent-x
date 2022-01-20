@@ -1,9 +1,10 @@
-import { FC, Suspense, useEffect, useState } from "react"
-import { Link, Route, Routes, useNavigate } from "react-router-dom"
+import { FC, Suspense, useEffect } from "react"
+import { Route, Routes, useNavigate } from "react-router-dom"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
+import { useEntry } from "./hooks/useEntry"
 import { routes } from "./routes"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
@@ -20,6 +21,7 @@ import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions } from "./states/actions"
 import { useGlobalState } from "./states/global"
+import { determineEntry } from "./utils/entry"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -59,6 +61,8 @@ export const App: FC = () => (
 )
 
 const Screen: FC = () => {
+  useEntry()
+
   const { showLoading } = useGlobalState()
   const { actions } = useActions()
 
