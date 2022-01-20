@@ -4,7 +4,7 @@ import { sendMessage } from "../../shared/messages"
 import { TransactionRequest } from "../states/RouterMachine"
 
 export const sendTransaction = (
-  data: TransactionRequest | InvokeFunctionTransaction,
+  data: any /*TransactionRequest | InvokeFunctionTransaction*/,
 ) => {
   sendMessage({
     type: "ADD_TRANSACTION",

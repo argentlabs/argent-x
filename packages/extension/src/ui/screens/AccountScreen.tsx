@@ -95,7 +95,6 @@ export const AccountScreen: FC = () => {
         )}
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
-            networkId={networkId}
             walletAddress={wallet.address}
             canShowEmptyWalletAlert={!showPendingTransactions}
           />

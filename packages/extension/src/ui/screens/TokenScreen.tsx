@@ -1,5 +1,6 @@
-import { BigNumber, ethers } from "ethers"
+import { ethers } from "ethers"
 import { FC, useState } from "react"
+import { useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import { Alert } from "../components/Alert"
@@ -8,7 +9,10 @@ import { Button, ButtonGroup } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
-import { TokenDetails, toTokenView } from "../utils/tokens"
+import { useTokens } from "../hooks/useTokens"
+import { getUint256CalldataFromBN } from "../utils/numbers"
+import { toTokenView } from "../utils/tokens"
+import { sendTransaction } from "../utils/transactions"
 
 const TokenScreenWrapper = styled.div`
   display: flex;
@@ -69,28 +73,33 @@ const BalanceSymbol = styled.div`
   line-height: 25px;
 `
 
-interface TokenScreenProps {
-  token: TokenDetails
-  onBack: () => void
-  onTransfer: (
-    token: string,
-    recipient: string,
-    amount: BigNumber,
-  ) => Promise<void> | void
-}
-
-export const TokenScreen: FC<TokenScreenProps> = ({
-  token,
-  onBack,
-  onTransfer,
-}) => {
+export const TokenScreen: FC = () => {
+  const { tokenAddress } = useParams()
+  const { tokenDetails } = useTokens()
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
+
+  const token = tokenDetails.find(({ address }) => address === tokenAddress)
+  if (!token) {
+    return <></>
+  }
 
   const { address, name, symbol, balance, decimals } = toTokenView(token)
 
   const handleSubmit = () =>
-    onTransfer(address, recipient, ethers.utils.parseUnits(amount, decimals))
+    sendTransaction({
+      type: "APPROVE_TX",
+      data: {
+        to: address,
+        method: "transfer",
+        calldata: {
+          recipient,
+          amount: getUint256CalldataFromBN(
+            ethers.utils.parseUnits(amount, decimals),
+          ),
+        },
+      },
+    })
 
   return (
     <>

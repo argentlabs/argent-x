@@ -1,6 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { FC, useEffect, useMemo, useRef, useState } from "react"
+import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { number } from "starknet"
 import styled from "styled-components"
 
@@ -50,16 +50,14 @@ function addressFormat64Byte(address: number.BigNumberish): string {
 
 interface AddTokenScreenProps {
   defaultToken?: AddToken
-  onSubmit?: (addToken: Required<AddToken>) => void
+  onSubmit?: () => void
   onReject?: () => void
-  onBack?: () => void
 }
 
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   defaultToken,
   onSubmit,
   onReject,
-  onBack,
 }) => {
   const { networkId, selectedWallet } = useGlobalState()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
@@ -110,13 +108,15 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   return (
     <>
-      <Header>{onBack && <BackButton />}</Header>
+      <Header>
+        <BackButton />
+      </Header>
 
       <AddTokenScreenWrapper>
         <H2>Add token</H2>
 
         <form
-          onSubmit={(e: any) => {
+          onSubmit={(e: React.FormEvent) => {
             e.preventDefault()
             if (isDataComplete(compiledData) && selectedWallet) {
               const tokenDetails = {
@@ -127,6 +127,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                 networkId: compiledData.networkId,
               }
               addToken(selectedWallet, tokenDetails)
+              onSubmit?.()
             }
           }}
         >

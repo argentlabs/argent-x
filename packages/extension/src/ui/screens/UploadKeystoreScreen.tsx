@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { FC, useMemo } from "react"
 import { useDropzone } from "react-dropzone"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"

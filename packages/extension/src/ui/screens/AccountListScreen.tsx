@@ -1,4 +1,5 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
@@ -8,9 +9,10 @@ import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H1, P } from "../components/Typography"
+import { routes } from "../routes"
+import { useGlobalState } from "../states/global"
 import { makeClickable } from "../utils/a11y"
 import { getStatus } from "../utils/wallet"
-import { Wallet } from "../Wallet"
 
 const AccountListWrapper = styled.div`
   display: flex;
@@ -33,56 +35,45 @@ const Paragraph = styled(P)`
   text-align: center;
 `
 
-interface AccountListScreenProps {
-  onAccountSelect: (account: string) => void
-  onAddAccount: () => void
-  onSettings: () => void
-  wallets: Wallet[]
-  activeWallet: string
-  networkId: string
-  onChangeNetwork: (networkId: string) => Promise<void> | void
-  port: number
-}
+export const AccountListScreen: FC = () => {
+  const { wallets, selectedWallet: activeWallet } = useGlobalState()
+  const navigate = useNavigate()
 
-export const AccountListScreen: FC<AccountListScreenProps> = ({
-  onAccountSelect,
-  onAddAccount,
-  onSettings,
-  wallets,
-  activeWallet,
-  networkId,
-  onChangeNetwork,
-  port,
-}) => (
-  <AccountListWrapper>
-    <Header>
-      <IconButton size={36} {...makeClickable(onSettings, 99)}>
-        <Settings />
-      </IconButton>
-      <NetworkSwitcher
-        networkId={networkId}
-        onChangeNetwork={onChangeNetwork}
-      />
-    </Header>
-    <H1>Accounts</H1>
-    <AccountList>
-      {wallets.length === 0 && (
-        <Paragraph>
-          No wallets on this network, click below to add one.
-        </Paragraph>
-      )}
-      {wallets.map((wallet, index) => (
-        <AccountListItem
-          key={wallet.address}
-          accountNumber={index + 1}
-          address={wallet.address}
-          status={getStatus(wallet, activeWallet)}
-          onClick={() => onAccountSelect?.(wallet.address)}
-        />
-      ))}
-      <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
-        <Add />
-      </IconButtonCenter>
-    </AccountList>
-  </AccountListWrapper>
-)
+  const walletsList = Object.values(wallets)
+
+  return (
+    <AccountListWrapper>
+      <Header>
+        <IconButton
+          size={36}
+          {...makeClickable(() => navigate(routes.settings), 99)}
+        >
+          <Settings />
+        </IconButton>
+        <NetworkSwitcher hidePort />
+      </Header>
+      <H1>Accounts</H1>
+      <AccountList>
+        {walletsList.length === 0 && (
+          <Paragraph>
+            No wallets on this network, click below to add one.
+          </Paragraph>
+        )}
+        {walletsList.map((wallet, index) => (
+          <AccountListItem
+            key={wallet.address}
+            accountNumber={index + 1}
+            address={wallet.address}
+            status={getStatus(wallet, activeWallet)}
+          />
+        ))}
+        <IconButtonCenter
+          size={48}
+          {...makeClickable(() => navigate(routes.newAccount))}
+        >
+          <Add />
+        </IconButtonCenter>
+      </AccountList>
+    </AccountListWrapper>
+  )
+}

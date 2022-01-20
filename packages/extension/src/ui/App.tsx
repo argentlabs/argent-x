@@ -4,15 +4,11 @@ import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
-import { waitForMessage } from "../shared/messages"
 import { routes } from "./routes"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
-import { ApproveSignScreen } from "./screens/ApproveSignScreen"
-import { ApproveTransactionScreen } from "./screens/ApproveTransactionScreen"
-import { ConnectScreen } from "./screens/ConnectScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { NewSeedScreen } from "./screens/NewSeedScreen"
@@ -25,249 +21,6 @@ import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions } from "./states/actions"
 import { useGlobalState } from "./states/global"
 import { swrCacheProvider } from "./utils/swrCache"
-import { TokenDetails, addToken } from "./utils/tokens"
-
-const App: FC = () => {
-  const { showLoading } = useGlobalState()
-  const { actions } = useActions()
-
-  if (showLoading) {
-    return <LoadingScreen />
-  }
-
-  if (actions[0]) {
-    return <ActionScreen />
-  }
-
-  return (
-    <Routes>
-      <Route path={routes.welcome} element={<WelcomeScreen />} />
-      <Route path={routes.newAccount} element={<NewSeedScreen />} />
-      <Route path={routes.deployAccount} element={<NewSeedScreen />} />
-      <Route path={routes.recoverBackup} element={<UploadKeystoreScreen />} />
-      <Route path={routes.password} element={<PasswordScreen />} />
-      <Route path={routes.account} element={<AccountScreen />} />
-      <Route path={routes.reset} element={<ResetScreen />} />
-      <Route path={routes.disclaimer} element={<DisclaimerScreen />} />
-      <Route path={routes.settings} element={<SettingsScreen />} />
-    </Routes>
-  )
-
-  /*
-
-  if (state.matches("account")) {
-    return (
-      <AccountScreen
-        onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
-        onShowToken={(token: TokenDetails) =>
-          send({ type: "SHOW_TOKEN", data: token })
-        }
-        onAddToken={() => send("SHOW_ADD_TOKEN")}
-        wallet={state.context.wallets[state.context.selectedWallet]}
-        accountNumber={
-          Object.keys(state.context.wallets).findIndex(
-            (wallet) => wallet === state.context.selectedWallet,
-          ) + 1
-        }
-        onAction={(tokenAddress, action) => {
-          if (action.type === "MINT") {
-            send({
-              type: "APPROVE_TX",
-              data: {
-                to: tokenAddress,
-                method: "mint",
-                calldata: {
-                  recipient: state.context.selectedWallet,
-                  amount: getUint256CalldataFromBN(action.amount),
-                },
-              },
-            })
-          } else if (action.type === "TRANSFER") {
-            send({
-              type: "APPROVE_TX",
-              data: {
-                to: tokenAddress,
-                method: "transfer",
-                calldata: {
-                  recipient: action.to,
-                  amount: getUint256CalldataFromBN(action.amount),
-                },
-              },
-            })
-          }
-        }}
-        networkId={state.context.networkId}
-        onChangeNetwork={(networkId) => {
-          send({ type: "CHANGE_NETWORK", data: networkId })
-        }}
-        port={state.context.localhostPort}
-      />
-    )
-  }
-
-  if (state.matches("accountList")) {
-    return (
-      <AccountListScreen
-        wallets={Object.values(state.context.wallets)}
-        activeWallet={state.context.selectedWallet}
-        onAddAccount={() => send("ADD_WALLET")}
-        onSettings={() => send("SHOW_SETTINGS")}
-        onAccountSelect={(address) => {
-          send({ type: "SELECT_WALLET", data: address })
-        }}
-        networkId={state.context.networkId}
-        onChangeNetwork={(networkId) => {
-          send({ type: "CHANGE_NETWORK", data: networkId })
-        }}
-        port={state.context.localhostPort}
-      />
-    )
-  }
-
-
-  if (
-    (state.matches("account") ||
-      state.matches("accountList") ||
-      state.matches("token") ||
-      state.matches("addToken")) &&
-    actions[0]
-  ) {
-    const action = actions[0]
-    const isLastAction = actions.length === 1
-    switch (action.type) {
-      case "CONNECT":
-        return (
-          <ConnectScreen
-            host={action.payload.host}
-            onReject={async () => {
-              await reject(action)
-              if (isPopup && isLastAction) window.close()
-            }}
-            onSubmit={async () => {
-              await approve(action)
-              if (isPopup && isLastAction) window.close()
-            }}
-            port={state.context.localhostPort}
-          />
-        )
-      case "ADD_TOKEN": {
-        return (
-          <AddTokenScreen
-            walletAddress={state.context.selectedWallet}
-            networkId={state.context.networkId}
-            defaultToken={action.payload}
-            onSubmit={async (tokenDetails) => {
-              if (state.context.selectedWallet) {
-                addToken(state.context.selectedWallet, tokenDetails)
-              }
-              await approve(action)
-              if (isPopup && isLastAction) window.close()
-            }}
-            onReject={async () => {
-              await reject(action)
-              if (isPopup && isLastAction) window.close()
-            }}
-          />
-        )
-      }
-      case "TRANSACTION":
-        return (
-          <ApproveTransactionScreen
-            transaction={action.payload}
-            onSubmit={async () => {
-              await approve(action)
-              setShowLoading(true)
-              await waitForMessage(
-                "SUBMITTED_TX",
-                ({ data }) => data.actionHash === action.meta.hash,
-              )
-              if (isPopup && isLastAction) window.close()
-              setShowLoading(false)
-            }}
-            onReject={async () => {
-              await reject(action)
-              if (isPopup && isLastAction) window.close()
-            }}
-            selectedAccount={{
-              accountNumber:
-                Object.keys(state.context.wallets).findIndex(
-                  (wallet) => wallet === state.context.selectedWallet,
-                ) + 1,
-              networkId: state.context.networkId,
-            }}
-            port={state.context.localhostPort}
-          />
-        )
-      case "SIGN":
-        return (
-          <ApproveSignScreen
-            dataToSign={action.payload}
-            onSubmit={async () => {
-              await approve(action)
-              setShowLoading(true)
-              await waitForMessage(
-                "SUCCESS_SIGN",
-                ({ data }) => data.actionHash === action.meta.hash,
-              )
-              if (isPopup && isLastAction) window.close()
-              setShowLoading(false)
-            }}
-            onReject={async () => {
-              await reject(action)
-              if (isPopup && isLastAction) window.close()
-            }}
-            selectedAccount={{
-              accountNumber:
-                Object.keys(state.context.wallets).findIndex(
-                  (wallet) => wallet === state.context.selectedWallet,
-                ) + 1,
-              networkId: state.context.networkId,
-            }}
-            port={state.context.localhostPort}
-          />
-        )
-    }
-  }
-
-  if (state.matches("token"))
-    return (
-      <TokenScreen
-        token={state.context.selectedToken}
-        onBack={() => {
-          send("GO_BACK")
-        }}
-        onTransfer={(tokenAddress, recipient, amount) => {
-          send({
-            type: "APPROVE_TX",
-            data: {
-              to: tokenAddress,
-              method: "transfer",
-              calldata: {
-                recipient,
-                amount: getUint256CalldataFromBN(amount),
-              },
-            },
-          })
-        }}
-      />
-    )
-
-  if (state.matches("addToken"))
-    return (
-      <AddTokenScreen
-        walletAddress={state.context.selectedWallet}
-        networkId={state.context.networkId}
-        onBack={() => {
-          send("GO_BACK")
-        }}
-        onSubmit={(tokenDetails) => {
-          send({ type: "ADD_TOKEN", data: tokenDetails })
-        }}
-      />
-    )
-
-    */
-}
 
 const GlobalStyle = createGlobalStyle`
   ${normalize}
@@ -290,7 +43,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
-export default () => (
+export const App: FC = () => (
   <SWRConfig value={{ provider: () => swrCacheProvider }}>
     <Suspense fallback={<LoadingScreen />}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -300,7 +53,37 @@ export default () => (
         rel="stylesheet"
       />
       <GlobalStyle />
-      <App />
+      <Screen />
     </Suspense>
   </SWRConfig>
 )
+
+const Screen: FC = () => {
+  const { showLoading } = useGlobalState()
+  const { actions } = useActions()
+
+  if (showLoading) {
+    return <LoadingScreen />
+  }
+
+  if (actions[0]) {
+    return <ActionScreen />
+  }
+
+  return (
+    <Routes>
+      <Route path={routes.welcome} element={<WelcomeScreen />} />
+      <Route path={routes.newAccount} element={<NewSeedScreen />} />
+      <Route path={routes.deployAccount} element={<NewSeedScreen />} />
+      <Route path={routes.recoverBackup} element={<UploadKeystoreScreen />} />
+      <Route path={routes.password} element={<PasswordScreen />} />
+      <Route path={routes.accountPath} element={<AccountScreen />} />
+      <Route path={routes.accounts} element={<AccountListScreen />} />
+      <Route path={routes.newToken} element={<AddTokenScreen />} />
+      <Route path={routes.tokenPath} element={<TokenScreen />} />
+      <Route path={routes.reset} element={<ResetScreen />} />
+      <Route path={routes.disclaimer} element={<DisclaimerScreen />} />
+      <Route path={routes.settings} element={<SettingsScreen />} />
+    </Routes>
+  )
+}
