@@ -80,7 +80,7 @@ export const addToken = (token: TokenDetails) => {
   useTokens.getState().addToken(token)
 }
 
-export const selectorTokensByNetwork =
+export const selectTokensByNetwork =
   (networkId: string) => (state: TokenState) =>
     state.tokens.filter((token) => token.networkId === networkId)
 
@@ -92,7 +92,7 @@ export const useTokensWithBalance = (
   networkId: string,
   walletAddress: string,
 ): Omit<SWRResponse<TokenDetailsWithBalance[]>, "mutate"> => {
-  const tokensInNetwork = useTokens(selectorTokensByNetwork(networkId))
+  const tokensInNetwork = useTokens(selectTokensByNetwork(networkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
     [tokensInNetwork],
