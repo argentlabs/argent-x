@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { BigNumber } from "ethers"
 import {
   Args,
   InvokeFunctionTransaction,
@@ -24,9 +25,9 @@ import {
   startSession,
   uploadKeystore,
 } from "../utils/messaging"
-import { TokenDetails, addToken } from "../utils/tokens"
 import { Wallet } from "../Wallet"
 import { useProgress } from "./progress"
+import { TokenDetails, addToken } from "./tokens"
 
 export type TransactionRequest = { to: string; method: string; calldata: Args }
 
@@ -445,7 +446,10 @@ export const createRouterMachine = (closeAfterActions?: boolean) =>
             target: "account",
             actions: (ctx, ev) => {
               if (ev.data.address) {
-                addToken(ctx.selectedWallet!, ev.data)
+                addToken({
+                  ...ev.data,
+                  decimals: BigNumber.from(ev.data.decimals),
+                })
               }
             },
           },
