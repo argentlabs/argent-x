@@ -81,7 +81,7 @@ const Screen: FC = () => {
       <Route path={routes.deployAccount} element={<NewSeedScreen />} />
       <Route path={routes.recoverBackup} element={<UploadKeystoreScreen />} />
       <Route path={routes.password} element={<PasswordScreen />} />
-      <Route path={routes.accountPath} element={<AccountScreen />} />
+      <Route path={routes.account} element={<AccountScreen />} />
       <Route path={routes.accounts} element={<AccountListScreen />} />
       <Route path={routes.newToken} element={<AddTokenScreen />} />
       <Route path={routes.tokenPath} element={<TokenScreen />} />

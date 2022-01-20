@@ -49,7 +49,8 @@ export const NewSeedScreen: FC = () => {
     try {
       const newWallet = await deployWallet(networkId, localhostPort, password)
       addWallet(newWallet)
-      navigate(routes.account(newWallet.address))
+      useGlobalState.setState({ selectedWallet: newWallet.address })
+      navigate(routes.account)
     } catch {
       navigate(routes.accounts)
     }

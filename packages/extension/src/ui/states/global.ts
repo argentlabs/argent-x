@@ -2,7 +2,6 @@ import create from "zustand"
 
 import { ExtActionItem } from "../../shared/actionQueue"
 import { defaultNetwork } from "../../shared/networks"
-import { TokenDetails } from "../utils/tokens"
 import { Wallet } from "../Wallet"
 
 interface GlobalStore {
@@ -10,7 +9,6 @@ interface GlobalStore {
   networkId: string
   localhostPort: number
   selectedWallet?: string
-  selectedToken?: TokenDetails
   uploadedBackup?: string
   actions: ExtActionItem[]
   isPopup?: boolean

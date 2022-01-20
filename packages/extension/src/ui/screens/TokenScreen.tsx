@@ -1,5 +1,5 @@
 import { ethers } from "ethers"
-import { FC, useState } from "react"
+import React, { FC, useState } from "react"
 import { useParams } from "react-router-dom"
 import styled from "styled-components"
 
@@ -88,7 +88,8 @@ export const TokenScreen: FC = () => {
 
   const { address, name, symbol, balance, decimals } = toTokenView(token)
 
-  const handleSubmit = () =>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     sendTransaction({
       type: "APPROVE_TX",
       data: {
@@ -102,6 +103,7 @@ export const TokenScreen: FC = () => {
         },
       },
     })
+  }
 
   return (
     <>

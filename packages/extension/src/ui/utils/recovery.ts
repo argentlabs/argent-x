@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom"
-
 import { networkWallets } from "../../shared/networks"
 import { routes } from "../routes"
 import { useGlobalState } from "../states/global"
@@ -22,9 +20,7 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    if (!networkId) {
-      networkId = await recoverNetwork()
-    }
+    networkId ||= await recoverNetwork()
 
     const lastSelectedWallet = await getLastSelectedWallet().catch(() => null)
 
@@ -52,7 +48,7 @@ export const recover = async ({
     if (showAccountList || !selectedWallet) {
       return routes.accounts
     }
-    return routes.account(selectedWallet)
+    return routes.account
   } catch (e: any) {
     console.error(e)
     useGlobalState.setState({ error: `${e}` })
