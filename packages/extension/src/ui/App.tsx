@@ -24,8 +24,8 @@ import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions } from "./states/actions"
 import { createRouterMachine } from "./states/RouterMachine"
+import { TokenDetailsWithBalance, addToken } from "./states/tokens"
 import { swrCacheProvider } from "./utils/swrCache"
-import { TokenDetails, addToken } from "./utils/tokens"
 
 function getUint256CalldataFromBN(bn: BigNumber) {
   return {
@@ -150,7 +150,10 @@ function App() {
             defaultToken={action.payload}
             onSubmit={async (tokenDetails) => {
               if (state.context.selectedWallet) {
-                addToken(state.context.selectedWallet, tokenDetails)
+                addToken({
+                  ...tokenDetails,
+                  decimals: BigNumber.from(tokenDetails.decimals),
+                })
               }
               await approve(action)
               if (isPopup && isLastAction) window.close()
@@ -235,7 +238,7 @@ function App() {
     return (
       <AccountScreen
         onShowAccountList={() => send("SHOW_ACCOUNT_LIST")}
-        onShowToken={(token: TokenDetails) =>
+        onShowToken={(token: TokenDetailsWithBalance) =>
           send({ type: "SHOW_TOKEN", data: token })
         }
         onAddToken={() => send("SHOW_ADD_TOKEN")}
@@ -332,7 +335,13 @@ function App() {
           send("GO_BACK")
         }}
         onSubmit={(tokenDetails) => {
-          send({ type: "ADD_TOKEN", data: tokenDetails })
+          send({
+            type: "ADD_TOKEN",
+            data: {
+              ...tokenDetails,
+              decimals: tokenDetails.decimals.toString(),
+            },
+          })
         }}
       />
     )

@@ -54,6 +54,18 @@ async function main() {
           if (walletAddress && status === "REJECTED") {
             resetStoredNonce(walletAddress)
           }
+          // on success notify ui
+          if (walletAddress && status === "ACCEPTED_ON_L2") {
+            sendMessageToUi({
+              type: "TRANSACTION_SUCCESS",
+              data: {
+                hash,
+                status,
+                walletAddress,
+                meta,
+              },
+            })
+          }
         }
       }
     },

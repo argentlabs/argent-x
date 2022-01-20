@@ -8,7 +8,8 @@ import { Button, ButtonGroup } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
-import { TokenDetails, toTokenView } from "../utils/tokens"
+import { TokenDetailsWithBalance } from "../states/tokens"
+import { toTokenView } from "../utils/tokens"
 
 const TokenScreenWrapper = styled.div`
   display: flex;
@@ -70,7 +71,7 @@ const BalanceSymbol = styled.div`
 `
 
 interface TokenScreenProps {
-  token: TokenDetails
+  token: TokenDetailsWithBalance
   onBack: () => void
   onTransfer: (
     token: string,

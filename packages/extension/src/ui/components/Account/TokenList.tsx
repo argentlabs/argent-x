@@ -1,15 +1,10 @@
 import { FC } from "react"
-import styled, { css } from "styled-components"
-import useSWR from "swr"
 
-import { useMitt } from "../../hooks/useMitt"
 import {
-  TokenDetails,
-  fetchTokenDetails,
-  getTokens,
-  playgroundToken,
-  tokensMitt,
-} from "../../utils/tokens"
+  TokenDetailsWithBalance,
+  useTokensWithBalance,
+} from "../../states/tokens"
+import { playgroundToken } from "../../utils/tokens"
 import { TokenAction, TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
 import { SectionHeader } from "./SectionHeader"
@@ -18,7 +13,7 @@ interface TokenListProps {
   networkId: string
   walletAddress: string
   canShowEmptyWalletAlert?: boolean
-  onShowToken: (token: TokenDetails) => void
+  onShowToken: (token: TokenDetailsWithBalance) => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
 
@@ -29,23 +24,9 @@ export const TokenList: FC<TokenListProps> = ({
   onShowToken,
   onAction,
 }) => {
-  const tokens = useMitt(
-    tokensMitt,
-    "UPDATE",
-    () => getTokens(walletAddress, networkId),
-    true,
-  )
-
-  const { data: tokenDetails = [], isValidating } = useSWR(
-    [tokens, walletAddress],
-    async (tokens, walletAddress) =>
-      Promise.all(
-        tokens.map((address) =>
-          fetchTokenDetails(address, walletAddress, networkId),
-        ),
-      ),
-
-    { suspense: true, refreshInterval: 30000 },
+  const { isValidating, data: tokenDetails = [] } = useTokensWithBalance(
+    networkId,
+    walletAddress,
   )
 
   const hasBalance = tokenDetails.some(

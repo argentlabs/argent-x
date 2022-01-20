@@ -11,8 +11,9 @@ import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
+import { TokenDetails } from "../states/tokens"
 import { isValidAddress } from "../utils/addresses"
-import { TokenDetails, fetchTokenDetails } from "../utils/tokens"
+import { fetchTokenDetails } from "../utils/tokens"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -34,7 +35,6 @@ const AddTokenScreenWrapper = styled.div`
 const isDataComplete = (data: TokenDetails): data is Required<TokenDetails> => {
   if (
     isValidAddress(data.address) &&
-    data.balance?.toString() &&
     data.decimals?.toString() &&
     data.name &&
     data.symbol
@@ -51,7 +51,7 @@ interface AddTokenScreenProps {
   walletAddress: string
   networkId: string
   defaultToken?: AddToken
-  onSubmit?: (addToken: Required<AddToken>) => void
+  onSubmit?: (addToken: Required<TokenDetails>) => void
   onReject?: () => void
   onBack?: () => void
 }
@@ -123,7 +123,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             if (isDataComplete(compiledData)) {
               onSubmit?.({
                 address: compiledData.address,
-                decimals: compiledData.decimals.toString(),
+                decimals: compiledData.decimals,
                 name: compiledData.name,
                 symbol: compiledData.symbol,
                 networkId: compiledData.networkId,

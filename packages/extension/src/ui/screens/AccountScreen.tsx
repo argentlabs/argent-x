@@ -22,9 +22,9 @@ import {
   TokenWrapper,
 } from "../components/Token"
 import { useStatus } from "../hooks/useStatus"
+import { TokenDetailsWithBalance } from "../states/tokens"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
-import { TokenDetails } from "../utils/tokens"
 import { getAccountImageUrl } from "../utils/wallet"
 import { Wallet } from "../Wallet"
 
@@ -39,7 +39,7 @@ interface AccountScreenProps {
   wallet: Wallet
   accountNumber: number
   onShowAccountList?: () => void
-  onShowToken: (token: TokenDetails) => void
+  onShowToken: (token: TokenDetailsWithBalance) => void
   onAddToken?: () => void
   onAction?: (token: string, action: TokenAction) => Promise<void> | void
   networkId: string

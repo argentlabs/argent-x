@@ -2,8 +2,9 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
+import { TokenDetailsWithBalance } from "../states/tokens"
 import { makeClickable } from "../utils/a11y"
-import { TokenDetails, toTokenView } from "../utils/tokens"
+import { toTokenView } from "../utils/tokens"
 import { IconButton } from "./IconButton"
 import { TokenIcon } from "./TokenIcon"
 
@@ -94,7 +95,7 @@ export type TokenAction =
   | { type: "TRANSFER"; to: string; amount: BigNumber }
 
 interface TokenListItemProps {
-  token: TokenDetails
+  token: TokenDetailsWithBalance
   isLoading?: boolean
   onClick?: () => void
 }
