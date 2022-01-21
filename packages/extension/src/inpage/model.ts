@@ -28,6 +28,7 @@ interface IStarketWindowObject {
   signer?: SignerInterface
   provider: Provider
   selectedAddress?: string
+  version: string
 }
 
 interface ConnectedStarketWindowObject extends IStarketWindowObject {
