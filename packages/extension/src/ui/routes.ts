@@ -12,4 +12,5 @@ export const routes = {
   reset: "/reset",
   disclaimer: "/disclaimer",
   settings: "/settings",
+  error: "/error",
 }

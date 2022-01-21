@@ -2,16 +2,16 @@ import create from "zustand"
 
 import { ExtActionItem } from "../../shared/actionQueue"
 import { defaultNetwork } from "../../shared/networks"
+import { getLocalhostPort } from "../utils/localhost"
 import { Wallet } from "../Wallet"
 
 interface GlobalStore {
   wallets: Record<string, Wallet>
-  networkId: string
+  switcherNetworkId: string
   localhostPort: number
   selectedWallet?: string
   uploadedBackup?: string
   actions: ExtActionItem[]
-  isPopup?: boolean
   txHash?: string
   error?: string
   showLoading: boolean
@@ -21,13 +21,9 @@ interface GlobalStore {
 
 export const useGlobalState = create<GlobalStore>((set) => ({
   wallets: {},
-  networkId: defaultNetwork.id,
-  localhostPort: (() => {
-    const port = parseInt(localStorage.port)
-    return !port || isNaN(port) ? 5000 : port
-  })(),
+  switcherNetworkId: defaultNetwork.id,
+  localhostPort: getLocalhostPort(),
   actions: [],
-  isPopup: new URLSearchParams(window.location.search).has("popup"),
   showLoading: true,
   isFirstRender: true,
   addWallet: (newWallet: Wallet) =>

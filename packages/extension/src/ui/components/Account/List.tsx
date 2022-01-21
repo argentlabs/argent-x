@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
-import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
+import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"
 import {
   NetworkStatusIndicator,
   NetworkStatusWrapper,

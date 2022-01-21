@@ -77,7 +77,7 @@ const BalanceSymbol = styled.div`
 
 export const TokenScreen: FC = () => {
   const { tokenAddress } = useParams()
-  const { data: tokenDetails = [] } = useTokensWithBalance()
+  const { tokenDetails } = useTokensWithBalance()
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
 

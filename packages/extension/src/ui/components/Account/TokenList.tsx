@@ -18,9 +18,9 @@ export const TokenList: FC<TokenListProps> = ({
   walletAddress,
   canShowEmptyWalletAlert = true,
 }) => {
-  const { networkId } = useGlobalState()
   const navigate = useNavigate()
-  const { isValidating, data: tokenDetails = [] } = useTokensWithBalance()
+  const { switcherNetworkId } = useGlobalState()
+  const { isValidating, tokenDetails } = useTokensWithBalance()
 
   const hasBalance = tokenDetails.some(
     ({ balance }) => balance && !balance.isZero(),
@@ -31,7 +31,7 @@ export const TokenList: FC<TokenListProps> = ({
       {canShowEmptyWalletAlert && !hasBalance && (
         <EmptyWalletAlert
           walletAddress={walletAddress}
-          mintableAddress={playgroundToken(networkId)?.address}
+          mintableAddress={playgroundToken(switcherNetworkId)?.address}
         />
       )}
       <SectionHeader>Coins</SectionHeader>

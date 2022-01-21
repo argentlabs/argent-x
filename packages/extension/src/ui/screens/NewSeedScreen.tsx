@@ -10,7 +10,7 @@ import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useGlobalState } from "../states/global"
-import { deployWallet } from "../utils/wallet"
+import { deployWallet } from "../utils/wallets"
 
 const NewSeedScreenWrapper = styled.div`
   padding: 48px 40px 24px;
@@ -30,8 +30,8 @@ export function isValidPassword(password: string): boolean {
 }
 
 export const NewSeedScreen: FC = () => {
-  const { networkId, localhostPort, addWallet } = useGlobalState()
   const navigate = useNavigate()
+  const { switcherNetworkId, localhostPort, addWallet } = useGlobalState()
   const {
     control,
     handleSubmit,
@@ -45,14 +45,19 @@ export const NewSeedScreen: FC = () => {
   })
   const password = watch("password")
 
-  const handleDeploy = async (password: string) => {
+  const handleDeploy = async (password?: string) => {
     try {
-      const newWallet = await deployWallet(networkId, localhostPort, password)
+      const newWallet = await deployWallet(
+        switcherNetworkId,
+        localhostPort,
+        password,
+      )
       addWallet(newWallet)
       useGlobalState.setState({ selectedWallet: newWallet.address })
       navigate(routes.account)
-    } catch {
-      navigate(routes.accounts)
+    } catch (error: any) {
+      useGlobalState.setState({ error })
+      navigate(routes.error)
     }
   }
 

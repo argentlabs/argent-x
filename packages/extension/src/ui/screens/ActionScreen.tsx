@@ -1,5 +1,4 @@
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../shared/messages"
 import { useActions } from "../states/actions"
@@ -9,10 +8,11 @@ import { ApproveSignScreen } from "./ApproveSignScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectScreen } from "./ConnectScreen"
 
+const isPopup = new URLSearchParams(window.location.search).has("popup")
+
 export const ActionScreen: FC = () => {
-  const { isPopup, networkId } = useGlobalState()
+  const { switcherNetworkId } = useGlobalState()
   const accountNumber = useGlobalState(selectAccountNumber)
-  const navigate = useNavigate()
   const { actions, approve, reject } = useActions()
 
   const [action] = actions
@@ -32,7 +32,7 @@ export const ActionScreen: FC = () => {
           }}
         />
       )
-    case "ADD_TOKEN": {
+    case "ADD_TOKEN":
       return (
         <AddTokenScreen
           defaultToken={action.payload}
@@ -46,7 +46,7 @@ export const ActionScreen: FC = () => {
           }}
         />
       )
-    }
+
     case "TRANSACTION":
       return (
         <ApproveTransactionScreen
@@ -65,7 +65,7 @@ export const ActionScreen: FC = () => {
             await reject(action)
             if (isPopup && isLastAction) window.close()
           }}
-          selectedAccount={{ accountNumber, networkId }}
+          selectedAccount={{ accountNumber, networkId: switcherNetworkId }}
         />
       )
     case "SIGN":
@@ -86,7 +86,7 @@ export const ActionScreen: FC = () => {
             await reject(action)
             if (isPopup && isLastAction) window.close()
           }}
-          selectedAccount={{ accountNumber, networkId }}
+          selectedAccount={{ accountNumber, networkId: switcherNetworkId }}
         />
       )
   }

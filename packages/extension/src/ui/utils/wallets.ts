@@ -10,22 +10,21 @@ export const deployWallet = async (
   password?: string,
 ) => {
   useGlobalState.setState({ showLoading: true })
-  useProgress.setState({
-    progress: 0,
-    text: "Deploying...",
-  })
+  useProgress.setState({ progress: 0, text: "Deploying..." })
 
   if (password) {
     await startSession(password)
   }
 
   const network = localNetworkUrl(networkId, localhostPort)
-  const newWallet = await Wallet.fromDeploy(network)
+  try {
+    return await Wallet.fromDeploy(network)
+  } catch (error: any) {
+    useProgress.setState({ progress: 0, text: "" })
+    useGlobalState.setState({ showLoading: false })
 
-  useProgress.setState({ progress: 0, text: "" })
-  useGlobalState.setState({ showLoading: false })
-
-  return newWallet
+    throw error
+  }
 }
 
 const argentColorsArray = [

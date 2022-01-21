@@ -12,7 +12,7 @@ import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useGlobalState } from "../states/global"
 import { makeClickable } from "../utils/a11y"
-import { getStatus } from "../utils/wallet"
+import { deployWallet, getStatus } from "../utils/wallets"
 
 const AccountListWrapper = styled.div`
   display: flex;
@@ -36,10 +36,30 @@ const Paragraph = styled(P)`
 `
 
 export const AccountListScreen: FC = () => {
-  const { wallets, selectedWallet: activeWallet } = useGlobalState()
   const navigate = useNavigate()
+  const {
+    switcherNetworkId,
+    localhostPort,
+    wallets,
+    selectedWallet,
+    addWallet,
+  } = useGlobalState()
 
   const walletsList = Object.values(wallets)
+
+  const handleAddWallet = async () => {
+    try {
+      const newWallet = await deployWallet(switcherNetworkId, localhostPort)
+      addWallet(newWallet)
+      useGlobalState.setState({ selectedWallet: newWallet.address })
+      navigate(routes.account)
+    } catch (error: any) {
+      console.warn("catch", error)
+      useGlobalState.setState({ error: `${error}` })
+      console.warn("navigating", error)
+      navigate(routes.error)
+    }
+  }
 
   return (
     <AccountListWrapper>
@@ -64,13 +84,10 @@ export const AccountListScreen: FC = () => {
             key={wallet.address}
             accountNumber={index + 1}
             address={wallet.address}
-            status={getStatus(wallet, activeWallet)}
+            status={getStatus(wallet, selectedWallet)}
           />
         ))}
-        <IconButtonCenter
-          size={48}
-          {...makeClickable(() => navigate(routes.newAccount))}
-        >
+        <IconButtonCenter size={48} {...makeClickable(handleAddWallet)}>
           <Add />
         </IconButtonCenter>
       </AccountList>

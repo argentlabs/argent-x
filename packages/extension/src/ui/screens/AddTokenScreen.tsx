@@ -59,7 +59,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   onSubmit,
   onReject,
 }) => {
-  const { networkId, selectedWallet } = useGlobalState()
+  const { switcherNetworkId, selectedWallet } = useGlobalState()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
   const [tokenName, setTokenName] = useState(defaultToken?.name || "")
   const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
@@ -76,7 +76,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   useEffect(() => {
     if (loading && selectedWallet) {
-      fetchTokenDetails(tokenAddress, selectedWallet, networkId)
+      fetchTokenDetails(tokenAddress, selectedWallet, switcherNetworkId)
         .then((details) => {
           setLoading(false)
           setTokenDetails(details)
@@ -103,7 +103,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     ...(!tokenDetails?.decimals && {
       decimals: BigNumber.from(tokenDecimals || "0"),
     }),
-    networkId,
+    networkId: switcherNetworkId,
   }
 
   return (

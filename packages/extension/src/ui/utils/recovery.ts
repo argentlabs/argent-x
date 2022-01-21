@@ -1,14 +1,12 @@
-import { networkWallets } from "../../shared/networks"
+import {
+  defaultNetwork,
+  localNetworkId,
+  networkWallets,
+} from "../../shared/networks"
 import { routes } from "../routes"
 import { useGlobalState } from "../states/global"
 import { Wallet } from "../Wallet"
 import { getActions, getLastSelectedWallet, getWallets } from "./messaging"
-
-const recoverNetwork = async () => {
-  const { network } = await getLastSelectedWallet()
-  if (!network) throw Error("No network stored")
-  return network
-}
 
 interface RecoveryOptions {
   networkId?: string
@@ -20,9 +18,10 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    networkId ||= await recoverNetwork()
-
     const lastSelectedWallet = await getLastSelectedWallet().catch(() => null)
+    networkId ||= lastSelectedWallet
+      ? localNetworkId(lastSelectedWallet?.network)
+      : defaultNetwork.id
 
     const backupWallets = networkWallets(await getWallets(), networkId)
 
@@ -40,7 +39,7 @@ export const recover = async ({
     useGlobalState.setState({
       wallets,
       selectedWallet,
-      networkId,
+      switcherNetworkId: networkId,
       actions,
       uploadedBackup: undefined,
     })
@@ -50,8 +49,8 @@ export const recover = async ({
     }
     return routes.account
   } catch (e: any) {
-    console.error(e)
+    console.error("Recovery error:", e)
     useGlobalState.setState({ error: `${e}` })
-    // TODO: handle this
+    return routes.error
   }
 }

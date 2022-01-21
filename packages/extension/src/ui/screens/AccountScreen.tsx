@@ -1,9 +1,10 @@
-import { FC, Suspense, useMemo } from "react"
+import { FC, Suspense, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
-import { getNetwork } from "../../shared/networks"
+import { sendMessage } from "../../shared/messages"
+import { getNetwork, localNetworkUrl } from "../../shared/networks"
 import { AccountColumn } from "../components/Account/AccountColumn"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
@@ -30,22 +31,49 @@ import {
 } from "../states/global"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
-import { getAccountImageUrl } from "../utils/wallet"
+import { getAccountImageUrl } from "../utils/wallets"
 
 const AccountContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px;
+  padding: 16px 32px;
 `
 
+// hacky, TODO: improve
 export const AccountScreen: FC = () => {
-  const { networkId } = useGlobalState()
+  const { selectedWallet } = useGlobalState()
+  if (selectedWallet) {
+    return <AccountScreenContent />
+  }
+  return <></>
+}
+
+export const AccountScreenContent: FC = () => {
+  const navigate = useNavigate()
+  const { switcherNetworkId, localhostPort } = useGlobalState()
   const wallet = useGlobalState(selectWallet)
   const accountNumber = useGlobalState(selectAccountNumber)
-  const navigate = useNavigate()
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
+
+  useEffect(() => {
+    ;(async () => {
+      sendMessage({
+        type: "WALLET_CONNECTED",
+        data: {
+          address: wallet.address,
+          network: localNetworkUrl(switcherNetworkId, localhostPort),
+        },
+      })
+      try {
+        const url = new URL(wallet.networkId)
+        if (url.hostname === "localhost") {
+          useGlobalState.setState({ localhostPort: parseInt(url.port) })
+        }
+      } catch {}
+    })()
+  }, [wallet, switcherNetworkId, localhostPort])
 
   const pendingTransactions = useMemo(
     () =>
@@ -68,7 +96,7 @@ export const AccountScreen: FC = () => {
       </Header>
       <AccountContent>
         <AccountSubHeader
-          networkId={networkId}
+          networkId={switcherNetworkId}
           status={status}
           accountNumber={accountNumber}
           walletAddress={wallet.address}
@@ -83,7 +111,7 @@ export const AccountScreen: FC = () => {
                   txHash={tx.hash}
                   meta={tx.meta}
                   onClick={() => {
-                    const { explorerUrl } = getNetwork(networkId)
+                    const { explorerUrl } = getNetwork(switcherNetworkId)
                     window
                       .open(`${explorerUrl}/tx/${tx.hash}`, "_blank")
                       ?.focus()

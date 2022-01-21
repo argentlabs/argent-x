@@ -51,8 +51,8 @@ export const greetings = [
 ]
 
 export const PasswordScreen: FC = ({}) => {
-  const { error } = useGlobalState()
   const navigate = useNavigate()
+  const { error } = useGlobalState()
   const {
     control,
     formState: { errors, isDirty },
@@ -77,12 +77,7 @@ export const PasswordScreen: FC = ({}) => {
       useProgress.setState({ progress: 0, text: "" })
       useGlobalState.setState({ error: undefined })
       const target = await recover()
-      if (target) {
-        navigate(target)
-      } else {
-        // TODO: handle error state properly
-        navigate(routes.welcome)
-      }
+      navigate(target)
     } catch {
       useGlobalState.setState({ error: "Wrong password" })
     }

@@ -1,9 +1,11 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
 import { getNetwork, localNetworkUrl, networks } from "../../shared/networks"
 import { useGlobalState } from "../states/global"
-import { WalletStatusCode } from "../utils/wallet"
+import { recover } from "../utils/recovery"
+import { WalletStatusCode } from "../utils/wallets"
 
 const NetworkName = styled.span`
   text-align: right;
@@ -112,8 +114,9 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   disabled,
   hidePort,
 }) => {
-  const { networkId, localhostPort } = useGlobalState()
-  const currentNetwork = getNetwork(networkId)
+  const navigate = useNavigate()
+  const { switcherNetworkId, localhostPort } = useGlobalState()
+  const currentNetwork = getNetwork(switcherNetworkId)
   const otherNetworks = networks.filter((network) => network !== currentNetwork)
 
   const formatName = (name: string) =>
@@ -129,7 +132,9 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
         {otherNetworks.map(({ id, name }) => (
           <Network
             key={id}
-            onClick={() => useGlobalState.setState({ networkId: id })}
+            onClick={async () =>
+              navigate(await recover({ networkId: id, showAccountList: true }))
+            }
           >
             <NetworkName>{formatName(name)}</NetworkName>
             <NetworkStatusIndicator status="CONNECTED" />

@@ -9,7 +9,7 @@ import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H2 } from "../components/Typography"
 import { useGlobalState } from "../states/global"
-import { getAccountImageUrl } from "../utils/wallet"
+import { getAccountImageUrl } from "../utils/wallets"
 
 const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`
   display: flex;
@@ -59,7 +59,6 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   singleButton = false,
   children,
 }) => {
-  const { localhostPort } = useGlobalState()
   const navigate = useNavigate()
   onReject ??= () => navigate(-1)
 

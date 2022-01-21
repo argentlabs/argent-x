@@ -89,26 +89,26 @@ export interface TokenDetailsWithBalance extends TokenDetails {
   balance?: BigNumber
 }
 
-export const useTokensWithBalance = (): Omit<
+const useSWRTokensWithBalance = (): Omit<
   SWRResponse<TokenDetailsWithBalance[]>,
   "mutate"
 > => {
-  const { networkId, selectedWallet: walletAddress } = useGlobalState()
-  const tokensInNetwork = useTokens(selectTokensByNetwork(networkId))
+  const { switcherNetworkId, selectedWallet } = useGlobalState()
+  const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
     [tokensInNetwork],
   )
 
   const { data, isValidating, error, mutate } = useSWR(
-    [walletAddress, ...tokenAddresses],
+    [selectedWallet, ...tokenAddresses],
     async (walletAddress, ...tokenAddresses) => {
       if (!walletAddress) {
         return {}
       }
       const balances = await Promise.all(
         tokenAddresses.map(async (address) =>
-          fetchTokenBalance(address, walletAddress, networkId),
+          fetchTokenBalance(address, walletAddress, switcherNetworkId),
         ),
       )
       return balances.reduce((acc, balance, i) => {
@@ -143,4 +143,14 @@ export const useTokensWithBalance = (): Omit<
   }, [tokenAddresses, data])
 
   return { data: tokensWithBalance, isValidating, error }
+}
+
+export const useTokensWithBalance = () => {
+  const {
+    data: tokenDetails = [],
+    isValidating,
+    error,
+  } = useSWRTokensWithBalance()
+
+  return { tokenDetails, isValidating, error }
 }

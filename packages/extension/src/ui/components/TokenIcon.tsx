@@ -2,7 +2,7 @@ import { FC } from "react"
 import { hash } from "starknet"
 import styled from "styled-components"
 
-import { getAccountColor } from "../utils/wallet"
+import { getAccountColor } from "../utils/wallets"
 
 const Icon = styled.img<{ size: number }>`
   height: ${({ size }) => size}px;
