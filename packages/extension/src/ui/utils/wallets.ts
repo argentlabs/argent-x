@@ -1,5 +1,5 @@
 import { localNetworkUrl } from "../../shared/networks"
-import { useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
 import { useProgress } from "../states/progress"
 import { Wallet } from "../Wallet"
 import { startSession } from "./messaging"
@@ -9,7 +9,7 @@ export const deployWallet = async (
   localhostPort: number,
   password?: string,
 ) => {
-  useGlobalState.setState({ showLoading: true })
+  useAppState.setState({ isLoading: true })
   useProgress.setState({ progress: 0, text: "Deploying..." })
 
   if (password) {
@@ -21,7 +21,7 @@ export const deployWallet = async (
     return await Wallet.fromDeploy(network)
   } catch (error: any) {
     useProgress.setState({ progress: 0, text: "" })
-    useGlobalState.setState({ showLoading: false })
+    useAppState.setState({ isLoading: false })
 
     throw error
   }

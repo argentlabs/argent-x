@@ -2,13 +2,11 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { localNetworkUrl } from "../../shared/networks"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H2 } from "../components/Typography"
-import { useGlobalState } from "../states/global"
 import { getAccountImageUrl } from "../utils/wallets"
 
 const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`

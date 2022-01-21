@@ -9,7 +9,8 @@ import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { H2, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
+import { setLocalhostPort } from "../utils/localhost"
 
 const SettingsScreenWrapper = styled.div`
   display: flex;
@@ -33,7 +34,7 @@ const Footer = styled.div`
 
 export const SettingsScreen: FC = () => {
   const navigate = useNavigate()
-  const { localhostPort } = useGlobalState()
+  const { localhostPort } = useAppState()
 
   return (
     <>
@@ -84,8 +85,8 @@ export const SettingsScreen: FC = () => {
           type="number"
           value={localhostPort}
           onChange={(e: any) => {
-            localStorage.setItem("port", `${e.target.value}`)
-            useGlobalState.setState({ localhostPort: e.target.value })
+            setLocalhostPort(e.target.value)
+            useAppState.setState({ localhostPort: e.target.value })
           }}
         />
         <Footer>

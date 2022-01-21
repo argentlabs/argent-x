@@ -2,7 +2,8 @@ import { ethers } from "ethers"
 import { FC } from "react"
 import styled from "styled-components"
 
-import { useGlobalState } from "../../states/global"
+import { useAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { formatAddress } from "../../utils/addresses"
 import {
@@ -15,7 +16,7 @@ import { CopyTooltip } from "../CopyTooltip"
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;
-  margin: 16px 20px;
+  margin: 16px 0;
 `
 
 const Title = styled.h2`
@@ -49,7 +50,7 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
   mintableAddress,
   walletAddress,
 }) => {
-  const { selectedWallet } = useGlobalState()
+  const { selectedWallet } = useAccount()
   const handleMint = () => {
     sendTransaction({
       type: "APPROVE_TX",

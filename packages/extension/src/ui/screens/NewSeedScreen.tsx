@@ -9,7 +9,8 @@ import { InputText } from "../components/Input"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useGlobalState } from "../states/global"
+import { useAccount } from "../states/account"
+import { useAppState } from "../states/app"
 import { deployWallet } from "../utils/wallets"
 
 const NewSeedScreenWrapper = styled.div`
@@ -31,7 +32,8 @@ export function isValidPassword(password: string): boolean {
 
 export const NewSeedScreen: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId, localhostPort, addWallet } = useGlobalState()
+  const { addWallet } = useAccount()
+  const { switcherNetworkId, localhostPort } = useAppState()
   const {
     control,
     handleSubmit,
@@ -53,10 +55,10 @@ export const NewSeedScreen: FC = () => {
         password,
       )
       addWallet(newWallet)
-      useGlobalState.setState({ selectedWallet: newWallet.address })
+      useAccount.setState({ selectedWallet: newWallet.address })
       navigate(routes.account)
     } catch (error: any) {
-      useGlobalState.setState({ error })
+      useAppState.setState({ error })
       navigate(routes.error)
     }
   }

@@ -4,7 +4,9 @@ import {
   networkWallets,
 } from "../../shared/networks"
 import { routes } from "../routes"
-import { useGlobalState } from "../states/global"
+import { useAccount } from "../states/account"
+import { useActions } from "../states/actions"
+import { useAppState } from "../states/app"
 import { Wallet } from "../Wallet"
 import { getActions, getLastSelectedWallet, getWallets } from "./messaging"
 
@@ -33,16 +35,8 @@ export const recover = async ({
       .map(({ address, network }) => new Wallet(address, network))
       .reduce((acc, wallet) => ({ ...acc, [wallet.address]: wallet }), {})
 
-    // if actions are pending show them first
-    const actions = await getActions().catch(() => [])
-
-    useGlobalState.setState({
-      wallets,
-      selectedWallet,
-      switcherNetworkId: networkId,
-      actions,
-      uploadedBackup: undefined,
-    })
+    useAccount.setState({ wallets, selectedWallet })
+    useAppState.setState({ switcherNetworkId: networkId })
 
     if (showAccountList || !selectedWallet) {
       return routes.accounts
@@ -50,7 +44,7 @@ export const recover = async ({
     return routes.account
   } catch (e: any) {
     console.error("Recovery error:", e)
-    useGlobalState.setState({ error: `${e}` })
+    useAppState.setState({ error: `${e}` })
     return routes.error
   }
 }

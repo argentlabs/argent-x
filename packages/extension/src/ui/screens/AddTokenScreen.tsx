@@ -11,7 +11,8 @@ import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
-import { useGlobalState } from "../states/global"
+import { useAccount } from "../states/account"
+import { useAppState } from "../states/app"
 import { TokenDetails, addToken } from "../states/tokens"
 import { isValidAddress } from "../utils/addresses"
 import { fetchTokenDetails } from "../utils/tokens"
@@ -59,7 +60,8 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   onSubmit,
   onReject,
 }) => {
-  const { switcherNetworkId, selectedWallet } = useGlobalState()
+  const { switcherNetworkId } = useAppState()
+  const { selectedWallet } = useAccount()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
   const [tokenName, setTokenName] = useState(defaultToken?.name || "")
   const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")

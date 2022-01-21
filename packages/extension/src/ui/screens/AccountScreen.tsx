@@ -27,8 +27,9 @@ import { routes } from "../routes"
 import {
   selectAccountNumber,
   selectWallet,
-  useGlobalState,
-} from "../states/global"
+  useAccount,
+} from "../states/account"
+import { useAppState } from "../states/app"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
 import { getAccountImageUrl } from "../utils/wallets"
@@ -42,7 +43,7 @@ const AccountContent = styled.div`
 
 // hacky, TODO: improve
 export const AccountScreen: FC = () => {
-  const { selectedWallet } = useGlobalState()
+  const { selectedWallet } = useAccount()
   if (selectedWallet) {
     return <AccountScreenContent />
   }
@@ -51,9 +52,9 @@ export const AccountScreen: FC = () => {
 
 export const AccountScreenContent: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId, localhostPort } = useGlobalState()
-  const wallet = useGlobalState(selectWallet)
-  const accountNumber = useGlobalState(selectAccountNumber)
+  const { switcherNetworkId, localhostPort } = useAppState()
+  const wallet = useAccount(selectWallet)
+  const accountNumber = useAccount(selectAccountNumber)
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
 
@@ -69,7 +70,7 @@ export const AccountScreenContent: FC = () => {
       try {
         const url = new URL(wallet.networkId)
         if (url.hostname === "localhost") {
-          useGlobalState.setState({ localhostPort: parseInt(url.port) })
+          useAppState.setState({ localhostPort: parseInt(url.port) })
         }
       } catch {}
     })()

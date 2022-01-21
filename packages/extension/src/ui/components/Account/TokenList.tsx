@@ -2,7 +2,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { useGlobalState } from "../../states/global"
+import { useAppState } from "../../states/app"
 import { useTokensWithBalance } from "../../states/tokens"
 import { playgroundToken } from "../../utils/tokens"
 import { TokenListItem } from "../Token"
@@ -19,7 +19,7 @@ export const TokenList: FC<TokenListProps> = ({
   canShowEmptyWalletAlert = true,
 }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useGlobalState()
+  const { switcherNetworkId } = useAppState()
   const { isValidating, tokenDetails } = useTokensWithBalance()
 
   const hasBalance = tokenDetails.some(

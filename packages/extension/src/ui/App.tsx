@@ -21,7 +21,7 @@ import { TokenScreen } from "./screens/TokenScreen"
 import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions } from "./states/actions"
-import { useGlobalState } from "./states/global"
+import { useAppState } from "./states/app"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -63,10 +63,10 @@ export const App: FC = () => (
 const Screen: FC = () => {
   useEntry()
 
-  const { showLoading } = useGlobalState()
+  const { isLoading } = useAppState()
   const { actions } = useActions()
 
-  if (showLoading) {
+  if (isLoading) {
     return <LoadingScreen />
   }
 

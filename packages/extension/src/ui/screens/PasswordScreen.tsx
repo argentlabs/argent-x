@@ -9,7 +9,7 @@ import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
 import { A, FormError, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
 import { useProgress } from "../states/progress"
 import { makeClickable } from "../utils/a11y"
 import { monitorProgress, startSession } from "../utils/messaging"
@@ -52,7 +52,7 @@ export const greetings = [
 
 export const PasswordScreen: FC = ({}) => {
   const navigate = useNavigate()
-  const { error } = useGlobalState()
+  const { error } = useAppState()
   const {
     control,
     formState: { errors, isDirty },
@@ -75,11 +75,11 @@ export const PasswordScreen: FC = ({}) => {
       await startSession(password)
 
       useProgress.setState({ progress: 0, text: "" })
-      useGlobalState.setState({ error: undefined })
+      useAppState.setState({ error: undefined })
       const target = await recover()
       navigate(target)
     } catch {
-      useGlobalState.setState({ error: "Wrong password" })
+      useAppState.setState({ error: "Wrong password" })
     }
   }
 

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
 import { getNetwork, localNetworkUrl, networks } from "../../shared/networks"
-import { useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
 import { recover } from "../utils/recovery"
 import { WalletStatusCode } from "../utils/wallets"
 
@@ -115,7 +115,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   hidePort,
 }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId, localhostPort } = useGlobalState()
+  const { switcherNetworkId, localhostPort } = useAppState()
   const currentNetwork = getNetwork(switcherNetworkId)
   const otherNetworks = networks.filter((network) => network !== currentNetwork)
 

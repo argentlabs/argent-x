@@ -1,8 +1,9 @@
 import { FC } from "react"
 
 import { waitForMessage } from "../../shared/messages"
+import { selectAccountNumber, useAccount } from "../states/account"
 import { useActions } from "../states/actions"
-import { selectAccountNumber, useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
 import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveSignScreen } from "./ApproveSignScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
@@ -11,8 +12,8 @@ import { ConnectScreen } from "./ConnectScreen"
 const isPopup = new URLSearchParams(window.location.search).has("popup")
 
 export const ActionScreen: FC = () => {
-  const { switcherNetworkId } = useGlobalState()
-  const accountNumber = useGlobalState(selectAccountNumber)
+  const { switcherNetworkId } = useAppState()
+  const accountNumber = useAccount(selectAccountNumber)
   const { actions, approve, reject } = useActions()
 
   const [action] = actions
@@ -53,13 +54,13 @@ export const ActionScreen: FC = () => {
           transaction={action.payload}
           onSubmit={async () => {
             await approve(action)
-            useGlobalState.setState({ showLoading: true })
+            useAppState.setState({ isLoading: true })
             await waitForMessage(
               "SUBMITTED_TX",
               ({ data }) => data.actionHash === action.meta.hash,
             )
             if (isPopup && isLastAction) window.close()
-            useGlobalState.setState({ showLoading: false })
+            useAppState.setState({ isLoading: false })
           }}
           onReject={async () => {
             await reject(action)
@@ -74,13 +75,13 @@ export const ActionScreen: FC = () => {
           dataToSign={action.payload}
           onSubmit={async () => {
             await approve(action)
-            useGlobalState.setState({ showLoading: true })
+            useAppState.setState({ isLoading: true })
             await waitForMessage(
               "SUCCESS_SIGN",
               ({ data }) => data.actionHash === action.meta.hash,
             )
             if (isPopup && isLastAction) window.close()
-            useGlobalState.setState({ showLoading: false })
+            useAppState.setState({ isLoading: false })
           }}
           onReject={async () => {
             await reject(action)

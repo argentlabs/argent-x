@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { useCallback, useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import useSWR, { SWRResponse } from "swr"
 import create from "zustand"
 import { persist } from "zustand/middleware"
@@ -8,7 +8,8 @@ import erc20Tokens from "../../assets/erc20-tokens.json"
 import { messageStream } from "../../shared/messages"
 import { isValidAddress } from "../utils/addresses"
 import { fetchTokenBalance } from "../utils/tokens"
-import { useGlobalState } from "./global"
+import { useAccount } from "./account"
+import { useAppState } from "./app"
 
 export interface TokenDetails {
   address: string
@@ -93,7 +94,8 @@ const useSWRTokensWithBalance = (): Omit<
   SWRResponse<TokenDetailsWithBalance[]>,
   "mutate"
 > => {
-  const { switcherNetworkId, selectedWallet } = useGlobalState()
+  const { switcherNetworkId } = useAppState()
+  const { selectedWallet } = useAccount()
   const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),

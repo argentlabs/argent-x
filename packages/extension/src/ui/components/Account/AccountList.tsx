@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { routes } from "../../routes"
-import { useGlobalState } from "../../states/global"
+import { useAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"
@@ -73,7 +74,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   return (
     <AccountListItemWrapper
       {...makeClickable(() => {
-        useGlobalState.setState({ selectedWallet: address })
+        useAccount.setState({ selectedWallet: address })
         navigate(routes.account)
       })}
     >

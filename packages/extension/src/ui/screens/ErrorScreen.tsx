@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
-import { useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
 import { Pre } from "./ApproveSignScreen"
 import { ConfirmScreen } from "./ConfirmScreen"
 
@@ -14,7 +14,7 @@ const SP = styled(P)`
 
 export const ErrorScreen: FC = () => {
   const navigate = useNavigate()
-  const { error } = useGlobalState()
+  const { error } = useAppState()
 
   return (
     <ConfirmScreen

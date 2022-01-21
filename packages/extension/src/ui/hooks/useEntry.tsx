@@ -1,12 +1,12 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useGlobalState } from "../states/global"
+import { useAppState } from "../states/app"
 import { determineEntry } from "../utils/entry"
 
 export const useEntry = () => {
   const navigate = useNavigate()
-  const { isFirstRender } = useGlobalState()
+  const { isFirstRender } = useAppState()
 
   useEffect(() => {
     ;(async () => {
@@ -14,7 +14,7 @@ export const useEntry = () => {
         return
       }
       const entry = await determineEntry()
-      useGlobalState.setState({ showLoading: false, isFirstRender: false })
+      useAppState.setState({ isLoading: false, isFirstRender: false })
       if (entry) {
         navigate(entry)
       } else {
