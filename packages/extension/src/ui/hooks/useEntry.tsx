@@ -1,8 +1,11 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { routes } from "../routes"
 import { useAppState } from "../states/app"
-import { determineEntry } from "../utils/entry"
+import { showDisclaimer } from "../utils/disclaimer"
+import { hasActiveSession, isInitialized } from "../utils/messaging"
+import { recover } from "../utils/recovery"
 
 export const useEntry = () => {
   const navigate = useNavigate()
@@ -15,11 +18,23 @@ export const useEntry = () => {
       }
       const entry = await determineEntry()
       useAppState.setState({ isLoading: false, isFirstRender: false })
-      if (entry) {
-        navigate(entry)
-      } else {
-        // TODO: handle error case
-      }
+      navigate(entry)
     })()
   }, [navigate])
+}
+
+const determineEntry = async () => {
+  const initialized = await isInitialized()
+  if (!initialized) {
+    if (showDisclaimer()) {
+      return routes.disclaimer
+    }
+    return routes.welcome
+  }
+
+  const hasSession = await hasActiveSession()
+  if (hasSession) {
+    return recover()
+  }
+  return routes.password
 }

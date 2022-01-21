@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers"
 import { useEffect, useMemo } from "react"
-import useSWR, { SWRResponse } from "swr"
+import useSWR from "swr"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -90,10 +90,13 @@ export interface TokenDetailsWithBalance extends TokenDetails {
   balance?: BigNumber
 }
 
-const useSWRTokensWithBalance = (): Omit<
-  SWRResponse<TokenDetailsWithBalance[]>,
-  "mutate"
-> => {
+interface UseTokens {
+  tokenDetails: TokenDetailsWithBalance[]
+  isValidating: boolean
+  error?: any
+}
+
+export const useTokensWithBalance = (): UseTokens => {
   const { switcherNetworkId } = useAppState()
   const { selectedWallet } = useAccount()
   const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
@@ -137,22 +140,12 @@ const useSWRTokensWithBalance = (): Omit<
     }
   }, [mutate])
 
-  const tokensWithBalance = useMemo(() => {
+  const tokenDetails = useMemo(() => {
     return tokensInNetwork.map((token) => ({
       ...token,
       balance: data?.[token.address],
     }))
   }, [tokenAddresses, data])
-
-  return { data: tokensWithBalance, isValidating, error }
-}
-
-export const useTokensWithBalance = () => {
-  const {
-    data: tokenDetails = [],
-    isValidating,
-    error,
-  } = useSWRTokensWithBalance()
 
   return { tokenDetails, isValidating, error }
 }

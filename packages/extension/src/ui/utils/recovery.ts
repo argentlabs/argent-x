@@ -5,10 +5,9 @@ import {
 } from "../../shared/networks"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
-import { useActions } from "../states/actions"
 import { useAppState } from "../states/app"
 import { Wallet } from "../Wallet"
-import { getActions, getLastSelectedWallet, getWallets } from "./messaging"
+import { getLastSelectedWallet, getWallets } from "./messaging"
 
 interface RecoveryOptions {
   networkId?: string

@@ -20,7 +20,7 @@ import { SettingsScreen } from "./screens/SettingsScreen"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
-import { useActions } from "./states/actions"
+import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
 import { swrCacheProvider } from "./utils/swrCache"
 
@@ -62,6 +62,7 @@ export const App: FC = () => (
 
 const Screen: FC = () => {
   useEntry()
+  useActionsSubscription()
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
