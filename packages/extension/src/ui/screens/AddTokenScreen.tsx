@@ -12,8 +12,9 @@ import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
 import { H2 } from "../components/Typography"
 import { useGlobalState } from "../states/global"
+import { TokenDetails, addToken } from "../states/tokens"
 import { isValidAddress } from "../utils/addresses"
-import { TokenDetails, addToken, fetchTokenDetails } from "../utils/tokens"
+import { fetchTokenDetails } from "../utils/tokens"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -35,7 +36,6 @@ const AddTokenScreenWrapper = styled.div`
 const isDataComplete = (data: TokenDetails): data is Required<TokenDetails> => {
   if (
     isValidAddress(data.address) &&
-    data.balance?.toString() &&
     data.decimals?.toString() &&
     data.name &&
     data.symbol
@@ -118,15 +118,14 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
         <form
           onSubmit={(e: React.FormEvent) => {
             e.preventDefault()
-            if (isDataComplete(compiledData) && selectedWallet) {
-              const tokenDetails = {
+            if (isDataComplete(compiledData)) {
+              addToken({
                 address: compiledData.address,
-                decimals: compiledData.decimals.toString(),
+                decimals: compiledData.decimals,
                 name: compiledData.name,
                 symbol: compiledData.symbol,
                 networkId: compiledData.networkId,
-              }
-              addToken(selectedWallet, tokenDetails)
+              })
               onSubmit?.()
             }
           }}

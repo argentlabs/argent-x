@@ -3,12 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../shared/messages"
 import { useActions } from "../states/actions"
-import {
-  selectAccountNumber,
-  selectWallet,
-  useGlobalState,
-} from "../states/global"
-import { addToken } from "../utils/tokens"
+import { selectAccountNumber, useGlobalState } from "../states/global"
 import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveSignScreen } from "./ApproveSignScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"

@@ -61,7 +61,7 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
           amount: getUint256CalldataFromBN(ethers.utils.parseUnits("1000", 18)),
         },
       },
-    } as any)
+    })
   }
 
   return (

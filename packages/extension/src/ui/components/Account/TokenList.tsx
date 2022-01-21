@@ -1,9 +1,9 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useTokens } from "../../hooks/useTokens"
 import { routes } from "../../routes"
 import { useGlobalState } from "../../states/global"
+import { useTokensWithBalance } from "../../states/tokens"
 import { playgroundToken } from "../../utils/tokens"
 import { TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
@@ -20,7 +20,11 @@ export const TokenList: FC<TokenListProps> = ({
 }) => {
   const { networkId } = useGlobalState()
   const navigate = useNavigate()
-  const { tokenDetails, isValidating, hasBalance } = useTokens()
+  const { isValidating, data: tokenDetails = [] } = useTokensWithBalance()
+
+  const hasBalance = tokenDetails.some(
+    ({ balance }) => balance && !balance.isZero(),
+  )
 
   return (
     <>

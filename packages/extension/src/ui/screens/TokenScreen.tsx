@@ -9,7 +9,7 @@ import { Button, ButtonGroup } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
-import { useTokens } from "../hooks/useTokens"
+import { useTokensWithBalance } from "../states/tokens"
 import { toTokenView } from "../utils/tokens"
 import {
   getUint256CalldataFromBN,
@@ -77,7 +77,7 @@ const BalanceSymbol = styled.div`
 
 export const TokenScreen: FC = () => {
   const { tokenAddress } = useParams()
-  const { tokenDetails } = useTokens()
+  const { data: tokenDetails = [] } = useTokensWithBalance()
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
 
