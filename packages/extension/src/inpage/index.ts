@@ -12,7 +12,7 @@ import { MessageType, WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { EventHandler, StarknetWindowObject } from "./model"
 
-const VERSION = `v${process.env.VERSION}`
+const VERSION = `${process.env.VERSION}`
 
 const extId = document
   .getElementById("argent-x-extension")
