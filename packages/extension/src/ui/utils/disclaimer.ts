@@ -2,13 +2,10 @@ export const understandDisclaimer = () => {
   localStorage.setItem("UNDERSTOOD_DISCLAIMER", JSON.stringify(true))
 }
 
-export const showDisclaimer = () => {
+export const isDisclaimerUnderstood = () => {
   try {
-    const understoodDisclaimer = JSON.parse(
-      localStorage.getItem("UNDERSTOOD_DISCLAIMER") || "false",
-    )
-    return !understoodDisclaimer
+    return JSON.parse(localStorage.getItem("UNDERSTOOD_DISCLAIMER") || "false")
   } catch {
-    return true
+    return false
   }
 }

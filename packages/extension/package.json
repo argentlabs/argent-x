@@ -47,7 +47,6 @@
     "styled-normalize": "^8.0.7",
     "swr": "^1.1.0",
     "webextension-polyfill": "^0.8.0",
-    "xstate": "^4.26.0",
     "zustand": "^3.6.5"
   }
 }

@@ -1,4 +1,4 @@
-import { FC, useRef } from "react"
+import { useRef } from "react"
 import styled from "styled-components"
 
 const Container = styled.div`

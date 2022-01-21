@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
-import { showDisclaimer } from "../utils/disclaimer"
+import { isDisclaimerUnderstood } from "../utils/disclaimer"
 import { hasActiveSession, isInitialized } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 
@@ -26,7 +26,7 @@ export const useEntry = () => {
 const determineEntry = async () => {
   const initialized = await isInitialized()
   if (!initialized) {
-    if (showDisclaimer()) {
+    if (!isDisclaimerUnderstood()) {
       return routes.disclaimer
     }
     return routes.welcome

@@ -50,9 +50,7 @@ export const AccountListScreen: FC = () => {
       useAccount.setState({ selectedWallet: newWallet.address })
       navigate(routes.account)
     } catch (error: any) {
-      console.warn("catch", error)
       useAppState.setState({ error: `${error}` })
-      console.warn("navigating", error)
       navigate(routes.error)
     }
   }

@@ -2,7 +2,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { getNetwork, localNetworkUrl, networks } from "../../shared/networks"
+import { getNetwork, networks } from "../../shared/networks"
 import { useAppState } from "../states/app"
 import { recover } from "../utils/recovery"
 import { WalletStatusCode } from "../utils/wallets"

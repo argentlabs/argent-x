@@ -4,7 +4,6 @@ import styled from "styled-components"
 
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
-import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"

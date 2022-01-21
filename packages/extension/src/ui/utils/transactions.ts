@@ -1,10 +1,5 @@
 import { BigNumber } from "ethers"
-import {
-  InvokeFunctionTransaction,
-  compileCalldata,
-  stark,
-  uint256,
-} from "starknet"
+import { compileCalldata, stark, uint256 } from "starknet"
 
 import { sendMessage } from "../../shared/messages"
 import { TransactionRequest } from "../states/RouterMachine"

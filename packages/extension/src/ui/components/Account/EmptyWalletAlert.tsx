@@ -3,7 +3,6 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { useAccount } from "../../states/account"
-import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { formatAddress } from "../../utils/addresses"
 import {
