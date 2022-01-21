@@ -12,6 +12,8 @@ import { MessageType, WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { EventHandler, StarknetWindowObject } from "./model"
 
+const VERSION = `v${process.env.VERSION}`
+
 const extId = document
   .getElementById("argent-x-extension")
   ?.getAttribute("data-extension-id")
@@ -54,6 +56,7 @@ const starknetWindowObject: StarknetWindowObject = {
   provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
+  version: VERSION,
   request: async (call) => {
     if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
       sendMessage({
