@@ -8,7 +8,7 @@ import {
 } from "../services/token.service"
 import {
   addToken,
-  getExplorerUrlBase,
+  getExplorerBaseUrl,
   networkId,
   signMessage,
   waitForTransaction,
@@ -116,7 +116,7 @@ export const TokenDapp: FC = () => {
       </h3>
       {lastTransactionHash && (
         <a
-          href={`${getExplorerUrlBase()}/tx/${lastTransactionHash}`}
+          href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
           target="_blank"
           rel="noreferrer"
           style={{ color: "blue", margin: "0 0 1em" }}
@@ -215,7 +215,7 @@ export const TokenDapp: FC = () => {
         <code>
           <a
             target="_blank"
-            href={`${getExplorerUrlBase()}/contract/${tokenAddress}`}
+            href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
             rel="noreferrer"
           >
             {truncateAddress(tokenAddress)}
@@ -236,7 +236,7 @@ export const TokenDapp: FC = () => {
           <code>
             <a
               target="_blank"
-              href={`${getExplorerUrlBase()}/contract/${ethAddress}`}
+              href={`${getExplorerBaseUrl()}/contract/${ethAddress}`}
               rel="noreferrer"
             >
               {truncateAddress(ethAddress)}
