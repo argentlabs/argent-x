@@ -1,8 +1,13 @@
 import { BigNumber } from "ethers"
-import { compileCalldata, stark, uint256 } from "starknet"
+import { Args, compileCalldata, stark, uint256 } from "starknet"
 
 import { sendMessage } from "../../shared/messages"
-import { TransactionRequest } from "../states/RouterMachine"
+
+interface TransactionRequest {
+  to: string
+  method: string
+  calldata: Args
+}
 
 export const sendTransaction = (
   data: any /*TransactionRequest | InvokeFunctionTransaction*/,
