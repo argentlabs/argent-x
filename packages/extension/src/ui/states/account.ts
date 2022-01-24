@@ -21,10 +21,9 @@ export const useAccount = create<AccountStore>((set) => ({
 }))
 
 export const selectWallet = ({ wallets, selectedWallet }: AccountStore) => {
-  if (!selectedWallet) {
-    throw new Error("No selected wallet")
+  if (selectedWallet) {
+    return wallets[selectedWallet]
   }
-  return wallets[selectedWallet]
 }
 
 export const selectAccountNumber = ({

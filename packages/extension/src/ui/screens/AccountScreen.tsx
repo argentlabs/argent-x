@@ -33,6 +33,7 @@ import { useAppState } from "../states/app"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
 import { getAccountImageUrl } from "../utils/wallets"
+import { Wallet } from "../Wallet"
 
 const AccountContent = styled.div`
   display: flex;
@@ -44,17 +45,27 @@ const AccountContent = styled.div`
 // hacky, TODO: improve
 export const AccountScreen: FC = () => {
   const { selectedWallet } = useAccount()
-  if (selectedWallet) {
-    return <AccountScreenContent />
+  const wallet = useAccount(selectWallet)
+  const accountNumber = useAccount(selectAccountNumber)
+  if (selectedWallet && wallet) {
+    return (
+      <AccountScreenContent wallet={wallet} accountNumber={accountNumber} />
+    )
   }
   return <></>
 }
 
-export const AccountScreenContent: FC = () => {
+interface AccountScreenContentProps {
+  wallet: Wallet
+  accountNumber: number
+}
+
+const AccountScreenContent: FC<AccountScreenContentProps> = ({
+  wallet,
+  accountNumber,
+}) => {
   const navigate = useNavigate()
   const { switcherNetworkId, localhostPort } = useAppState()
-  const wallet = useAccount(selectWallet)
-  const accountNumber = useAccount(selectAccountNumber)
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
 
