@@ -74,6 +74,18 @@ export const useTokens = create<TokenState>(
             return [key, value]
           }),
         ),
+      deserialize: (str) =>
+        JSON.parse(str, (_, v) => {
+          if (
+            typeof v === "object" &&
+            "type" in v &&
+            "hex" in v &&
+            v.type === "BigNumber"
+          ) {
+            return BigNumber.from(v.hex)
+          }
+          return v
+        }),
     },
   ),
 )
