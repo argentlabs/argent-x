@@ -19,11 +19,9 @@ export const deployWallet = async (
   const network = localNetworkUrl(networkId, localhostPort)
   try {
     return await Wallet.fromDeploy(network)
-  } catch (error: any) {
+  } finally {
     useProgress.setState({ progress: 0, text: "" })
     useAppState.setState({ isLoading: false })
-
-    throw error
   }
 }
 
