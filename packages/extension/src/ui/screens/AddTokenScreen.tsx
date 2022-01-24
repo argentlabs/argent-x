@@ -1,6 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
+import { Navigate, useNavigate } from "react-router-dom"
 import { number } from "starknet"
 import styled from "styled-components"
 
@@ -60,6 +61,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   onSubmit,
   onReject,
 }) => {
+  const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { selectedWallet } = useAccount()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
@@ -129,6 +131,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                 networkId: compiledData.networkId,
               })
               onSubmit?.()
+              navigate(-1)
             }
           }}
         >
