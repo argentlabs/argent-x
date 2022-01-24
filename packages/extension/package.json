@@ -31,7 +31,6 @@
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
     "@tippyjs/react": "^4.2.6",
-    "@xstate/react": "^1.6.2",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",
     "object-hash": "^2.2.0",
