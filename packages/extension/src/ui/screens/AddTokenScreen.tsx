@@ -1,7 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { number } from "starknet"
 import styled from "styled-components"
 
@@ -11,7 +11,7 @@ import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
-import { H2 } from "../components/Typography"
+import { A, H2 } from "../components/Typography"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { TokenDetails, addToken } from "../states/tokens"
@@ -79,16 +79,26 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }, [tokenAddress])
 
   useEffect(() => {
+    if (
+      defaultToken &&
+      defaultToken.address === tokenAddress &&
+      !tokenDetails
+    ) {
+      setLoading(true)
+    }
+  }, [defaultToken, tokenAddress, tokenDetails])
+
+  useEffect(() => {
     if (loading && selectedWallet) {
       fetchTokenDetails(tokenAddress, selectedWallet, switcherNetworkId)
         .then((details) => {
-          setLoading(false)
           setTokenDetails(details)
-          setLoading(false)
         })
         .catch(() => {
-          setLoading(false)
           setTokenDetails(undefined)
+        })
+        .finally(() => {
+          setLoading(false)
         })
     } else if (
       isValidAddress(tokenAddress) &&

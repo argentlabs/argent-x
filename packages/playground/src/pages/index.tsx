@@ -3,6 +3,7 @@ import Head from "next/head"
 import { useEffect, useState } from "react"
 
 import { TokenDapp } from "../components/TokenDapp"
+import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
   connectWallet,
@@ -39,7 +40,7 @@ const Home: NextPage = () => {
         {isConnected ? (
           <>
             <h3 style={{ margin: 0 }}>
-              Wallet address: <code>{address}</code>
+              Wallet address: <code>{address && truncateAddress(address)}</code>
             </h3>
             <h3 style={{ margin: 0 }}>
               Url: <code>{networkUrl()}</code>
