@@ -1,5 +1,5 @@
 import { FC } from "react"
-import type { Args, InvokeFunctionTransaction } from "starknet"
+import type { InvokeFunctionTransaction } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"

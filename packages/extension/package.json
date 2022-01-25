@@ -31,7 +31,6 @@
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
     "@tippyjs/react": "^4.2.6",
-    "@xstate/react": "^1.6.2",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",
     "object-hash": "^2.2.0",
@@ -47,7 +46,6 @@
     "styled-normalize": "^8.0.7",
     "swr": "^1.1.0",
     "webextension-polyfill": "^0.8.0",
-    "xstate": "^4.26.0",
     "zustand": "^3.6.5"
   }
 }

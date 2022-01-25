@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from "react"
 
+import { truncateAddress } from "../services/address.service"
 import {
   getErc20TokenAddress,
   mintToken,
@@ -7,7 +8,7 @@ import {
 } from "../services/token.service"
 import {
   addToken,
-  getExplorerUrlBase,
+  getExplorerBaseUrl,
   networkId,
   signMessage,
   waitForTransaction,
@@ -102,7 +103,11 @@ export const TokenDapp: FC = () => {
     }
   }
 
-  const tokenAddress = getErc20TokenAddress(network)
+  const tokenAddress = getErc20TokenAddress(networkId() as any)
+  const ethAddress =
+    networkId() === "goerli-alpha"
+      ? "0x2dd93e385742984bf2fc887cd5d8b5ec6917d80af09cf7a00a63710ad51ba53"
+      : undefined
 
   return (
     <>
@@ -111,7 +116,7 @@ export const TokenDapp: FC = () => {
       </h3>
       {lastTransactionHash && (
         <a
-          href={`${getExplorerUrlBase()}/tx/${lastTransactionHash}`}
+          href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
           target="_blank"
           rel="noreferrer"
           style={{ color: "blue", margin: "0 0 1em" }}
@@ -202,10 +207,7 @@ export const TokenDapp: FC = () => {
         <button
           className="flat"
           style={{ marginLeft: ".6em" }}
-          onClick={() => {
-            const tokenAddress = getErc20TokenAddress(networkId() as any)
-            addToken(tokenAddress)
-          }}
+          onClick={() => addToken(tokenAddress)}
         >
           Add to wallet
         </button>
@@ -213,13 +215,35 @@ export const TokenDapp: FC = () => {
         <code>
           <a
             target="_blank"
-            href={`${getExplorerUrlBase()}/contract/${tokenAddress}`}
+            href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
             rel="noreferrer"
           >
-            {tokenAddress}
+            {truncateAddress(tokenAddress)}
           </a>
         </code>
       </h3>
+      {ethAddress && (
+        <h3 style={{ margin: 0 }}>
+          Goerli ETH token address
+          <button
+            className="flat"
+            style={{ marginLeft: ".6em" }}
+            onClick={() => addToken(ethAddress)}
+          >
+            Add to wallet
+          </button>
+          <br />
+          <code>
+            <a
+              target="_blank"
+              href={`${getExplorerBaseUrl()}/contract/${ethAddress}`}
+              rel="noreferrer"
+            >
+              {truncateAddress(ethAddress)}
+            </a>
+          </code>
+        </h3>
+      )}
     </>
   )
 }

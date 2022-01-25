@@ -1,15 +1,17 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 
 import BackSvg from "../../assets/back.svg"
 import { makeClickable } from "../utils/a11y"
 import { IconButton } from "./IconButton"
 
-interface BackButtonProps {
-  onClick?: () => void
-}
+export const BackButton: FC = (props) => {
+  const navigate = useNavigate()
+  const onClick = () => navigate(-1)
 
-export const BackButton: FC<BackButtonProps> = ({ onClick, ...props }) => (
-  <IconButton {...makeClickable(onClick, 99)} size={36} {...props}>
-    <BackSvg />
-  </IconButton>
-)
+  return (
+    <IconButton {...makeClickable(onClick, 99)} size={36} {...props}>
+      <BackSvg />
+    </IconButton>
+  )
+}

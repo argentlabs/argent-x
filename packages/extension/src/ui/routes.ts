@@ -1,0 +1,16 @@
+export const routes = {
+  welcome: "/index.html",
+  newAccount: "/accounts/new",
+  deployAccount: "/accounts/new/deploy",
+  recoverBackup: "/recover",
+  password: "/password",
+  account: "/account",
+  accounts: "/accounts",
+  newToken: "/tokens/new",
+  token: (tokenAddress: string) => `/tokens/${tokenAddress}`,
+  tokenPath: "/tokens/:tokenAddress",
+  reset: "/reset",
+  disclaimer: "/disclaimer",
+  settings: "/settings",
+  error: "/error",
+}

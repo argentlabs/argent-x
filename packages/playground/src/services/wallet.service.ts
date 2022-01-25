@@ -42,7 +42,7 @@ export const addToken = async (address: string): Promise<void> => {
   })
 }
 
-export const getExplorerUrlBase = (): string | undefined => {
+export const getExplorerBaseUrl = (): string | undefined => {
   if (networkId() === "mainnet-alpha") {
     return "https://voyager.online"
   } else if (networkId() === "goerli-alpha") {

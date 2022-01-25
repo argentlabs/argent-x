@@ -1,33 +1,26 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 
-import {
-  TokenDetailsWithBalance,
-  useTokensWithBalance,
-} from "../../states/tokens"
+import { routes } from "../../routes"
+import { useAppState } from "../../states/app"
+import { useTokensWithBalance } from "../../states/tokens"
 import { playgroundToken } from "../../utils/tokens"
-import { TokenAction, TokenListItem } from "../Token"
+import { TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
 import { SectionHeader } from "./SectionHeader"
 
 interface TokenListProps {
-  networkId: string
   walletAddress: string
   canShowEmptyWalletAlert?: boolean
-  onShowToken: (token: TokenDetailsWithBalance) => void
-  onAction?: (token: string, action: TokenAction) => Promise<void> | void
 }
 
 export const TokenList: FC<TokenListProps> = ({
-  networkId,
   walletAddress,
   canShowEmptyWalletAlert = true,
-  onShowToken,
-  onAction,
 }) => {
-  const { isValidating, data: tokenDetails = [] } = useTokensWithBalance(
-    networkId,
-    walletAddress,
-  )
+  const navigate = useNavigate()
+  const { switcherNetworkId } = useAppState()
+  const { isValidating, tokenDetails } = useTokensWithBalance()
 
   const hasBalance = tokenDetails.some(
     ({ balance }) => balance && !balance.isZero(),
@@ -38,8 +31,7 @@ export const TokenList: FC<TokenListProps> = ({
       {canShowEmptyWalletAlert && !hasBalance && (
         <EmptyWalletAlert
           walletAddress={walletAddress}
-          mintableAddress={playgroundToken(networkId)?.address}
-          onAction={onAction}
+          mintableAddress={playgroundToken(switcherNetworkId)?.address}
         />
       )}
       <SectionHeader>Coins</SectionHeader>
@@ -47,7 +39,7 @@ export const TokenList: FC<TokenListProps> = ({
         <TokenListItem
           key={token.address}
           token={token}
-          onClick={() => onShowToken(token)}
+          onClick={() => navigate(routes.token(token.address))}
           isLoading={isValidating}
         />
       ))}

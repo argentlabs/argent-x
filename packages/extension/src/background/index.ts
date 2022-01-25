@@ -78,7 +78,7 @@ async function main() {
       sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
     }
     // forward UI messages to rest of the tabs
-    if (hasTab(sender.tab?.id)) {
+    if (!hasTab(sender.tab?.id)) {
       sendMessageToActiveTabs(msg)
     }
 
@@ -97,12 +97,7 @@ async function main() {
       }
 
       case "GET_TRANSACTIONS": {
-        const selectedWallet = await selectedWalletStore.getItem(
-          "SELECTED_WALLET",
-        )
-        const transactions = transactionTracker.getAllTransactions(
-          selectedWallet.address,
-        )
+        const transactions = transactionTracker.getAllTransactions()
 
         return sendToTabAndUi({
           type: "GET_TRANSACTIONS_RES",
@@ -223,23 +218,30 @@ async function main() {
               network: selectedWallet.network,
             })
 
-            const nonce = await getNonce(signer)
+            try {
+              const nonce = await getNonce(signer)
 
-            const tx = await signer.addTransaction({ ...transaction, nonce })
+              const tx = await signer.addTransaction({ ...transaction, nonce })
 
-            increaseStoredNonce(signer.address)
-            transactionTracker.trackTransaction(
-              tx.transaction_hash,
-              selectedWallet,
-            )
+              increaseStoredNonce(signer.address)
+              transactionTracker.trackTransaction(
+                tx.transaction_hash,
+                selectedWallet,
+              )
 
-            return sendToTabAndUi({
-              type: "SUBMITTED_TX",
-              data: {
-                txHash: tx.transaction_hash,
-                actionHash,
-              },
-            })
+              return sendToTabAndUi({
+                type: "SUBMITTED_TX",
+                data: {
+                  txHash: tx.transaction_hash,
+                  actionHash,
+                },
+              })
+            } catch (error: any) {
+              return sendToTabAndUi({
+                type: "FAILED_TX",
+                data: { actionHash, error: `${error}` },
+              })
+            }
           }
 
           case "SIGN": {

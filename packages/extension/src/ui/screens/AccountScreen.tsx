@@ -1,8 +1,10 @@
-import { FC, Suspense, useMemo } from "react"
+import { FC, Suspense, useEffect, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
-import { getNetwork } from "../../shared/networks"
+import { sendMessage } from "../../shared/messages"
+import { getNetwork, localNetworkUrl } from "../../shared/networks"
 import { AccountColumn } from "../components/Account/AccountColumn"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
@@ -17,49 +19,71 @@ import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { Spinner } from "../components/Spinner"
 import {
   AddTokenIconButton,
-  TokenAction,
   TokenTitle,
   TokenWrapper,
 } from "../components/Token"
 import { useStatus } from "../hooks/useStatus"
-import { TokenDetailsWithBalance } from "../states/tokens"
+import { routes } from "../routes"
+import {
+  selectAccountNumber,
+  selectWallet,
+  useAccount,
+} from "../states/account"
+import { useAppState } from "../states/app"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
-import { getAccountImageUrl } from "../utils/wallet"
+import { getAccountImageUrl } from "../utils/wallets"
 import { Wallet } from "../Wallet"
 
 const AccountContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px;
+  padding: 16px 32px;
 `
 
-interface AccountScreenProps {
-  wallet: Wallet
-  accountNumber: number
-  onShowAccountList?: () => void
-  onShowToken: (token: TokenDetailsWithBalance) => void
-  onAddToken?: () => void
-  onAction?: (token: string, action: TokenAction) => Promise<void> | void
-  networkId: string
-  onChangeNetwork: (networkId: string) => Promise<void> | void
-  port: number
+// hacky, TODO: improve
+export const AccountScreen: FC = () => {
+  const { selectedWallet } = useAccount()
+  const wallet = useAccount(selectWallet)
+  const accountNumber = useAccount(selectAccountNumber)
+  if (selectedWallet && wallet) {
+    return (
+      <AccountScreenContent wallet={wallet} accountNumber={accountNumber} />
+    )
+  }
+  return <></>
 }
 
-export const AccountScreen: FC<AccountScreenProps> = ({
+interface AccountScreenContentProps {
+  wallet: Wallet
+  accountNumber: number
+}
+
+const AccountScreenContent: FC<AccountScreenContentProps> = ({
   wallet,
   accountNumber,
-  onShowAccountList,
-  onShowToken,
-  onAddToken,
-  onAction,
-  networkId,
-  onChangeNetwork,
-  port,
 }) => {
+  const navigate = useNavigate()
+  const { switcherNetworkId, localhostPort } = useAppState()
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
+
+  useEffect(() => {
+    sendMessage({
+      type: "WALLET_CONNECTED",
+      data: {
+        address: wallet.address,
+        network: localNetworkUrl(switcherNetworkId, localhostPort),
+      },
+    })
+    try {
+      const url = new URL(wallet.networkId)
+      if (url.hostname === "localhost") {
+        useAppState.setState({ localhostPort: parseInt(url.port) })
+      }
+    } catch {}
+  }, [wallet, switcherNetworkId, localhostPort])
 
   const pendingTransactions = useMemo(
     () =>
@@ -75,18 +99,14 @@ export const AccountScreen: FC<AccountScreenProps> = ({
     <AccountColumn>
       <Header>
         <ProfilePicture
-          {...makeClickable(onShowAccountList)}
+          {...makeClickable(() => navigate(routes.accounts))}
           src={getAccountImageUrl(accountNumber)}
         />
-        <NetworkSwitcher
-          networkId={networkId}
-          onChangeNetwork={onChangeNetwork}
-          port={port}
-        />
+        <NetworkSwitcher />
       </Header>
       <AccountContent>
         <AccountSubHeader
-          networkId={networkId}
+          networkId={switcherNetworkId}
           status={status}
           accountNumber={accountNumber}
           walletAddress={wallet.address}
@@ -101,7 +121,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({
                   txHash={tx.hash}
                   meta={tx.meta}
                   onClick={() => {
-                    const { explorerUrl } = getNetwork(networkId)
+                    const { explorerUrl } = getNetwork(switcherNetworkId)
                     window
                       .open(`${explorerUrl}/tx/${tx.hash}`, "_blank")
                       ?.focus()
@@ -113,13 +133,10 @@ export const AccountScreen: FC<AccountScreenProps> = ({
         )}
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
-            networkId={networkId}
-            onAction={onAction}
-            onShowToken={onShowToken}
             walletAddress={wallet.address}
             canShowEmptyWalletAlert={!showPendingTransactions}
           />
-          <TokenWrapper {...makeClickable(onAddToken)}>
+          <TokenWrapper {...makeClickable(() => navigate(routes.newToken))}>
             <AddTokenIconButton size={40}>
               <Add />
             </AddTokenIconButton>

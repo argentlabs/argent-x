@@ -1,5 +1,6 @@
 import { FC } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
@@ -7,6 +8,10 @@ import { Button } from "../components/Button"
 import { InputText } from "../components/Input"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
+import { routes } from "../routes"
+import { useAccount } from "../states/account"
+import { useAppState } from "../states/app"
+import { deployWallet } from "../utils/wallets"
 
 const NewSeedScreenWrapper = styled.div`
   padding: 48px 40px 24px;
@@ -21,16 +26,14 @@ const NewSeedScreenWrapper = styled.div`
   }
 `
 
-interface NewSeedScreenProps {
-  onSubmit?: (password: string) => void
-  onBack?: () => void
-}
-
 export function isValidPassword(password: string): boolean {
   return password.length > 5
 }
 
-export const NewSeedScreen: FC<NewSeedScreenProps> = ({ onSubmit, onBack }) => {
+export const NewSeedScreen: FC = () => {
+  const navigate = useNavigate()
+  const { addWallet } = useAccount()
+  const { switcherNetworkId, localhostPort } = useAppState()
   const {
     control,
     handleSubmit,
@@ -43,12 +46,29 @@ export const NewSeedScreen: FC<NewSeedScreenProps> = ({ onSubmit, onBack }) => {
     criteriaMode: "firstError",
   })
   const password = watch("password")
+
+  const handleDeploy = async (password?: string) => {
+    try {
+      const newWallet = await deployWallet(
+        switcherNetworkId,
+        localhostPort,
+        password,
+      )
+      addWallet(newWallet)
+      useAccount.setState({ selectedWallet: newWallet.address })
+      navigate(routes.account)
+    } catch (error: any) {
+      useAppState.setState({ error })
+      navigate(routes.error)
+    }
+  }
+
   return (
     <NewSeedScreenWrapper>
-      <BackButton onClick={onBack} />
+      <BackButton />
       <H2>New password</H2>
       <P>Enter a password to protect your account</P>
-      <form onSubmit={handleSubmit(({ password }) => onSubmit?.(password))}>
+      <form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
         <Controller
           name="password"
           control={control}

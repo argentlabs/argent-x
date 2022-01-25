@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import usePromise from "react-promise-suspense"
-import create, { StateSelector, StoreApi, UseBoundStore } from "zustand"
+import create from "zustand"
 
 import { ExtActionItem } from "../../shared/actionQueue"
 import { messageStream, sendMessage } from "../../shared/messages"
@@ -12,7 +12,7 @@ interface ActionsStore {
   reject: (action: ExtActionItem | string) => Promise<void>
 }
 
-const useActionsStore = create<ActionsStore>(() => ({
+export const useActions = create<ActionsStore>(() => ({
   actions: [],
   approve: (action) => {
     const actionHash = typeof action === "string" ? action : action.meta.hash
@@ -34,15 +34,15 @@ const useActionsStore = create<ActionsStore>(() => ({
   },
 }))
 
-export const useActions = () => {
+export const useActionsSubscription = () => {
   const actions: ExtActionItem[] = usePromise(() => getActions(), [])
 
   useEffect(() => {
-    useActionsStore.setState({ actions })
+    useActions.setState({ actions })
 
     const listener = messageStream.subscribe(([message]) => {
       if (message.type === "ACTIONS_QUEUE_UPDATE") {
-        useActionsStore.setState({ actions: message.data.actions })
+        useActions.setState({ actions: message.data.actions })
       }
     })
 
@@ -52,6 +52,4 @@ export const useActions = () => {
       }
     }
   }, [])
-
-  return useActionsStore()
 }

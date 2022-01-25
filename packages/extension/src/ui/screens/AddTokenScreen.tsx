@@ -1,6 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber"
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { FC, useEffect, useMemo, useRef, useState } from "react"
+import React, { FC, useEffect, useMemo, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { number } from "starknet"
 import styled from "styled-components"
 
@@ -10,8 +11,10 @@ import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
-import { H2 } from "../components/Typography"
-import { TokenDetails } from "../states/tokens"
+import { A, H2 } from "../components/Typography"
+import { useAccount } from "../states/account"
+import { useAppState } from "../states/app"
+import { TokenDetails, addToken } from "../states/tokens"
 import { isValidAddress } from "../utils/addresses"
 import { fetchTokenDetails } from "../utils/tokens"
 
@@ -48,22 +51,19 @@ function addressFormat64Byte(address: number.BigNumberish): string {
 }
 
 interface AddTokenScreenProps {
-  walletAddress: string
-  networkId: string
   defaultToken?: AddToken
-  onSubmit?: (addToken: Required<TokenDetails>) => void
+  onSubmit?: () => void
   onReject?: () => void
-  onBack?: () => void
 }
 
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
-  walletAddress,
-  networkId,
   defaultToken,
   onSubmit,
   onReject,
-  onBack,
 }) => {
+  const navigate = useNavigate()
+  const { switcherNetworkId } = useAppState()
+  const { selectedWallet } = useAccount()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
   const [tokenName, setTokenName] = useState(defaultToken?.name || "")
   const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
@@ -79,16 +79,26 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }, [tokenAddress])
 
   useEffect(() => {
-    if (loading) {
-      fetchTokenDetails(tokenAddress, walletAddress, networkId)
+    if (
+      defaultToken &&
+      defaultToken.address === tokenAddress &&
+      !tokenDetails
+    ) {
+      setLoading(true)
+    }
+  }, [defaultToken, tokenAddress, tokenDetails])
+
+  useEffect(() => {
+    if (loading && selectedWallet) {
+      fetchTokenDetails(tokenAddress, selectedWallet, switcherNetworkId)
         .then((details) => {
-          setLoading(false)
           setTokenDetails(details)
-          setLoading(false)
         })
         .catch(() => {
-          setLoading(false)
           setTokenDetails(undefined)
+        })
+        .finally(() => {
+          setLoading(false)
         })
     } else if (
       isValidAddress(tokenAddress) &&
@@ -97,7 +107,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
       prevValidAddress.current = tokenAddress
       setLoading(true)
     }
-  }, [loading, tokenAddress, walletAddress])
+  }, [loading, tokenAddress, selectedWallet])
 
   const compiledData = {
     address: tokenAddress,
@@ -107,27 +117,31 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     ...(!tokenDetails?.decimals && {
       decimals: BigNumber.from(tokenDecimals || "0"),
     }),
-    networkId,
+    networkId: switcherNetworkId,
   }
 
   return (
     <>
-      <Header>{onBack && <BackButton onClick={onBack} />}</Header>
+      <Header>
+        <BackButton />
+      </Header>
 
       <AddTokenScreenWrapper>
         <H2>Add token</H2>
 
         <form
-          onSubmit={(e: any) => {
+          onSubmit={(e: React.FormEvent) => {
             e.preventDefault()
             if (isDataComplete(compiledData)) {
-              onSubmit?.({
+              addToken({
                 address: compiledData.address,
                 decimals: compiledData.decimals,
                 name: compiledData.name,
                 symbol: compiledData.symbol,
                 networkId: compiledData.networkId,
               })
+              onSubmit?.()
+              navigate(-1)
             }
           }}
         >

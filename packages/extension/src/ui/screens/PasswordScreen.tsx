@@ -1,5 +1,6 @@
 import { FC, useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import LogoSvg from "../../assets/logo.svg"
@@ -7,7 +8,12 @@ import { Button } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/Input"
 import { A, FormError, P } from "../components/Typography"
+import { routes } from "../routes"
+import { useAppState } from "../states/app"
+import { useProgress } from "../states/progress"
 import { makeClickable } from "../utils/a11y"
+import { monitorProgress, startSession } from "../utils/messaging"
+import { recover } from "../utils/recovery"
 import { isValidPassword } from "./NewSeedScreen"
 
 const PasswordScreenWrapper = styled.div`
@@ -35,12 +41,6 @@ const PasswordScreenWrapper = styled.div`
   }
 `
 
-interface PasswordScreenProps {
-  onSubmit?: (password: string) => void
-  onForgotPassword?: () => void
-  error?: string
-}
-
 export const greetings = [
   "gm!",
   "Hello!",
@@ -50,11 +50,9 @@ export const greetings = [
   "hi fren",
 ]
 
-export const PasswordScreen: FC<PasswordScreenProps> = ({
-  onSubmit,
-  onForgotPassword,
-  error,
-}) => {
+export const PasswordScreen: FC = ({}) => {
+  const navigate = useNavigate()
+  const { error } = useAppState()
   const {
     control,
     formState: { errors, isDirty },
@@ -63,10 +61,27 @@ export const PasswordScreen: FC<PasswordScreenProps> = ({
   } = useForm<{ password: string }>()
 
   useEffect(() => {
-    setError("password", {
-      message: error,
-    })
+    setError("password", { message: error })
   }, [error])
+
+  const handleResetClick = () => navigate(routes.reset)
+
+  const verifyPassword = async (password: string) => {
+    try {
+      monitorProgress((progress) => {
+        useProgress.setState({ progress, text: "Decrypting ..." })
+      })
+
+      await startSession(password)
+
+      useProgress.setState({ progress: 0, text: "" })
+      useAppState.setState({ error: undefined })
+      const target = await recover()
+      navigate(target)
+    } catch {
+      useAppState.setState({ error: "Wrong password" })
+    }
+  }
 
   return (
     <PasswordScreenWrapper>
@@ -74,7 +89,7 @@ export const PasswordScreen: FC<PasswordScreenProps> = ({
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 
-      <form onSubmit={handleSubmit(({ password }) => onSubmit?.(password))}>
+      <form onSubmit={handleSubmit(({ password }) => verifyPassword(password))}>
         <Controller
           name="password"
           control={control}
@@ -99,7 +114,7 @@ export const PasswordScreen: FC<PasswordScreenProps> = ({
           <FormError>{errors.password.message}</FormError>
         )}
 
-        <A {...makeClickable(onForgotPassword)}>reset or import backup</A>
+        <A {...makeClickable(handleResetClick)}>reset or import backup</A>
         <Button type="submit" disabled={!isDirty}>
           Unlock
         </Button>

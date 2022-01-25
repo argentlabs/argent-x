@@ -1,9 +1,12 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { routes } from "../../routes"
+import { useAccount } from "../../states/account"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
-import { WalletStatus, getAccountImageUrl } from "../../utils/wallet"
+import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"
 import {
   NetworkStatusIndicator,
   NetworkStatusWrapper,
@@ -58,17 +61,22 @@ interface AccountListProps {
   accountNumber: number
   address: string
   status: WalletStatus
-  onClick?: () => void
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
   accountNumber,
   address,
   status,
-  onClick,
 }) => {
+  const navigate = useNavigate()
+
   return (
-    <AccountListItemWrapper {...makeClickable(onClick)}>
+    <AccountListItemWrapper
+      {...makeClickable(() => {
+        useAccount.setState({ selectedWallet: address })
+        navigate(routes.account)
+      })}
+    >
       <ProfilePicture src={getAccountImageUrl(accountNumber)} />
       <AccountRow>
         <AccountColumn>

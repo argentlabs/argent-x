@@ -5,7 +5,7 @@ import Copy from "../../../assets/copy.svg"
 import Open from "../../../assets/open.svg"
 import { getNetwork } from "../../../shared/networks"
 import { formatAddress, truncateAddress } from "../../utils/addresses"
-import { WalletStatus, getAccountName } from "../../utils/wallet"
+import { WalletStatus, getAccountName } from "../../utils/wallets"
 import { CopyTooltip } from "../CopyTooltip"
 import { H1 } from "../Typography"
 import {

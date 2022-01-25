@@ -3,7 +3,7 @@ import { Status as TxStatus } from "starknet"
 
 import { messageStream } from "../../shared/messages"
 import { getTransactionStatus } from "../utils/messaging"
-import { getStatus } from "../utils/wallet"
+import { getStatus } from "../utils/wallets"
 import { Wallet } from "../Wallet"
 
 function transformStatus(status: TxStatus): Status {

@@ -1,18 +1,5 @@
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
-import {
-  AddTransactionResponse,
-  Args,
-  Calldata,
-  CompiledContract,
-  Contract,
-  compileCalldata,
-  encode,
-  hash,
-  json,
-  number,
-  stark,
-} from "starknet"
+import { CompiledContract, Contract, json } from "starknet"
 
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { getProvider } from "../shared/networks"

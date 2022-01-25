@@ -15,7 +15,7 @@ const useTransactionsStore = create<TransactionsStore>(() => ({
 
 export const useWalletTransactions = (walletAddress: string) => {
   useEffect(() => {
-    getTransactions().then((transactions) => {
+    getTransactions(walletAddress).then((transactions) => {
       useTransactionsStore.setState({ transactions })
     })
 

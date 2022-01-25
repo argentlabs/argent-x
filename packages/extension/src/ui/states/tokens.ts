@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers"
-import { useCallback, useEffect, useMemo } from "react"
-import useSWR, { SWRResponse } from "swr"
+import { useEffect, useMemo } from "react"
+import useSWR from "swr"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -8,6 +8,8 @@ import erc20Tokens from "../../assets/erc20-tokens.json"
 import { messageStream } from "../../shared/messages"
 import { isValidAddress } from "../utils/addresses"
 import { fetchTokenBalance } from "../utils/tokens"
+import { useAccount } from "./account"
+import { useAppState } from "./app"
 
 export interface TokenDetails {
   address: string
@@ -72,6 +74,18 @@ export const useTokens = create<TokenState>(
             return [key, value]
           }),
         ),
+      deserialize: (str) =>
+        JSON.parse(str, (_, v) => {
+          if (
+            typeof v === "object" &&
+            "type" in v &&
+            "hex" in v &&
+            v.type === "BigNumber"
+          ) {
+            return BigNumber.from(v.hex)
+          }
+          return v
+        }),
     },
   ),
 )
@@ -88,22 +102,30 @@ export interface TokenDetailsWithBalance extends TokenDetails {
   balance?: BigNumber
 }
 
-export const useTokensWithBalance = (
-  networkId: string,
-  walletAddress: string,
-): Omit<SWRResponse<TokenDetailsWithBalance[]>, "mutate"> => {
-  const tokensInNetwork = useTokens(selectTokensByNetwork(networkId))
+interface UseTokens {
+  tokenDetails: TokenDetailsWithBalance[]
+  isValidating: boolean
+  error?: any
+}
+
+export const useTokensWithBalance = (): UseTokens => {
+  const { switcherNetworkId } = useAppState()
+  const { selectedWallet } = useAccount()
+  const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
     [tokensInNetwork],
   )
 
   const { data, isValidating, error, mutate } = useSWR(
-    [walletAddress, ...tokenAddresses],
+    [selectedWallet, ...tokenAddresses],
     async (walletAddress, ...tokenAddresses) => {
+      if (!walletAddress) {
+        return {}
+      }
       const balances = await Promise.all(
         tokenAddresses.map(async (address) =>
-          fetchTokenBalance(address, walletAddress, networkId),
+          fetchTokenBalance(address, walletAddress, switcherNetworkId),
         ),
       )
       return balances.reduce((acc, balance, i) => {
@@ -130,12 +152,12 @@ export const useTokensWithBalance = (
     }
   }, [mutate])
 
-  const tokensWithBalance = useMemo(() => {
+  const tokenDetails = useMemo(() => {
     return tokensInNetwork.map((token) => ({
       ...token,
       balance: data?.[token.address],
     }))
   }, [tokenAddresses, data])
 
-  return { data: tokensWithBalance, isValidating, error }
+  return { tokenDetails, isValidating, error }
 }

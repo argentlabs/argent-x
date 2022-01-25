@@ -10,7 +10,7 @@ interface ApproveSignScreenProps extends Omit<ConfirmPageProps, "onSubmit"> {
   onSubmit: (data: typedData.TypedData) => void
 }
 
-const Pre = styled.pre`
+export const Pre = styled.pre`
   margin-top: 24px;
   padding: 8px;
   border-radius: 4px;
