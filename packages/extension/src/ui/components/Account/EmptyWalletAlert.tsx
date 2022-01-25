@@ -15,7 +15,7 @@ import { CopyTooltip } from "../CopyTooltip"
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;
-  margin: 16px 20x;
+  margin: 16px 20px;
 `
 
 const Title = styled.h2`

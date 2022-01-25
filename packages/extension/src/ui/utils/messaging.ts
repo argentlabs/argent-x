@@ -83,11 +83,3 @@ export const startSession = async (password: string): Promise<void> => {
 
   if (!succeeded) throw Error("Wrong password")
 }
-
-export const monitorProgress = (updateFn: (progress: number) => void) => {
-  messageStream.subscribe(([msg]) => {
-    if (msg.type === "REPORT_PROGRESS") {
-      updateFn(msg.data)
-    }
-  })
-}

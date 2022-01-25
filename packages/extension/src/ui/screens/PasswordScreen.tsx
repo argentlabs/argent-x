@@ -10,9 +10,8 @@ import { InputText } from "../components/Input"
 import { A, FormError, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
-import { useProgress } from "../states/progress"
 import { makeClickable } from "../utils/a11y"
-import { monitorProgress, startSession } from "../utils/messaging"
+import { startSession } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 import { isValidPassword } from "./NewSeedScreen"
 
@@ -67,19 +66,15 @@ export const PasswordScreen: FC = ({}) => {
   const handleResetClick = () => navigate(routes.reset)
 
   const verifyPassword = async (password: string) => {
+    useAppState.setState({ error: undefined, isLoading: true })
     try {
-      monitorProgress((progress) => {
-        useProgress.setState({ progress, text: "Decrypting ..." })
-      })
-
       await startSession(password)
 
-      useProgress.setState({ progress: 0, text: "" })
-      useAppState.setState({ error: undefined })
       const target = await recover()
+      useAppState.setState({ error: undefined, isLoading: false })
       navigate(target)
     } catch {
-      useAppState.setState({ error: "Wrong password" })
+      useAppState.setState({ error: "Wrong password", isLoading: false })
     }
   }
 
