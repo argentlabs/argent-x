@@ -39,7 +39,7 @@ const AccountContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 32px;
+  padding: 16px;
 `
 
 // hacky, TODO: improve
