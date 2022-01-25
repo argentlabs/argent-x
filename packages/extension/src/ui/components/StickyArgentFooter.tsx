@@ -15,6 +15,5 @@ const StickyArgentFooterP = styled.p`
 `
 
 export const StickyArgentFooter: FC = () => {
-  // eslint-disable-next-line jsx-a11y/accessible-emoji
   return <StickyArgentFooterP>Built with ❤️ by Argent</StickyArgentFooterP>
 }

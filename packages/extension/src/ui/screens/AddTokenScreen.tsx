@@ -11,7 +11,7 @@ import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
-import { A, H2 } from "../components/Typography"
+import { H2 } from "../components/Typography"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { TokenDetails, addToken } from "../states/tokens"
@@ -158,7 +158,9 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               try {
                 if (tokenAddress)
                   setTokenAddress(addressFormat64Byte(tokenAddress))
-              } catch {}
+              } catch {
+                // pass
+              }
             }}
           />
           {!loading && (
@@ -188,7 +190,9 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                   try {
                     BigNumber.from(e.target.value || "0")
                     setTokenDecimals(e.target.value)
-                  } catch {}
+                  } catch {
+                    // pass
+                  }
                 }}
               />
               <ButtonGroupVertical>

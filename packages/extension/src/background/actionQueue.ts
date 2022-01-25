@@ -1,8 +1,8 @@
 import oHash from "object-hash"
-import { InvokeFunctionTransaction, typedData } from "starknet"
 
 import { getFromStorage, setToStorage } from "./storage"
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 function objectHash(obj: {} | null) {
   return oHash(obj, { unorderedArrays: true })
 }
@@ -19,7 +19,7 @@ interface QueueConfig<T> {
   onUpdate?: (items: ExtQueueItem<T>[]) => void
 }
 
-export async function getQueue<T extends {}>(
+export async function getQueue<T extends object>(
   id: string,
   config: QueueConfig<T> = {},
 ) {

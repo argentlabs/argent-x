@@ -36,7 +36,7 @@ interface TokenState {
 
 export const useTokens = create<TokenState>(
   persist(
-    (set, get) => ({
+    (set, _) => ({
       tokens: parsedDefaultErc20Tokens,
       addToken: (token: TokenDetails) => {
         if (!isValidAddress(token.address))

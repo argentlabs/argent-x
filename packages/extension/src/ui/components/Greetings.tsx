@@ -49,7 +49,6 @@ const useCarusel = (greetings: string[], delay = 3000): number => {
     return () => {
       clearInterval(pid)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [greetings, delay, length])
 
   return index

@@ -1,4 +1,4 @@
-import { Provider, Signer } from "starknet"
+import { Signer } from "starknet"
 
 import { getProvider } from "../../shared/networks"
 

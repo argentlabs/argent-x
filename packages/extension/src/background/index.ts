@@ -75,7 +75,7 @@ async function main() {
 
   messageStream.subscribe(async ([msg, sender]) => {
     const sendToTabAndUi = async (msg: MessageType) => {
-      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
+      sendMessageToActiveTabsAndUi(msg)
     }
     // forward UI messages to rest of the tabs
     if (!hasTab(sender.tab?.id)) {
@@ -279,6 +279,9 @@ async function main() {
               },
             })
           }
+
+          default:
+            return
         }
       }
 
@@ -333,6 +336,8 @@ async function main() {
               },
             })
           }
+          default:
+            return
         }
       }
 

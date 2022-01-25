@@ -1,10 +1,10 @@
 import ArgentCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
 import { ethers } from "ethers"
-import { Provider, compileCalldata, ec, stark } from "starknet"
+import { compileCalldata, ec } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
-import { Network, getProvider } from "../../shared/networks"
+import { getProvider } from "../../shared/networks"
 import { selectedWalletStore } from "../selectedWallet"
 import { Storage } from "../storage"
 
@@ -31,14 +31,13 @@ export async function validatePassword(password: string) {
   }
 }
 
-let rawWalletTimeoutPid: number | undefined
 let rawWallet: ethers.Wallet | undefined
 
 function setRawWallet(wallet: ethers.Wallet | undefined) {
   rawWallet = wallet
-  rawWalletTimeoutPid = setTimeout(() => {
+  setTimeout(() => {
     rawWallet = undefined
-  }, 15 * 60 * 60 * 1000) as unknown as number
+  }, 15 * 60 * 60 * 1000)
 }
 
 export function isUnlocked(): boolean {
@@ -52,17 +51,16 @@ export async function setKeystore(keystore: string) {
 
 async function recoverL1(
   password: string,
-  progressFn: (progress: number) => void = () => {},
+  progressFn?: (progress: number) => void,
 ): Promise<ethers.Wallet> {
   if (!(await existsL1())) {
     throw Error("No KeyPair exists")
   }
   const encKeyPair = await store.getItem("encKeystore")
-  return await ethers.Wallet.fromEncryptedJson(
-    encKeyPair!,
-    password,
-    progressFn,
-  )
+  if (!encKeyPair) {
+    throw Error("No Keystore exists")
+  }
+  return await ethers.Wallet.fromEncryptedJson(encKeyPair, password, progressFn)
 }
 
 async function generateL1(): Promise<ethers.Wallet> {
@@ -125,7 +123,7 @@ async function getEncKeyStore(
   wallet: ethers.Wallet,
   password: string,
   wallets: BackupWallet[],
-  progressFn: (progress: number) => void = () => {},
+  progressFn?: (progress: number) => void,
 ): Promise<string> {
   const backup = await wallet.encrypt(
     password,
@@ -186,11 +184,14 @@ export async function createAccount(networkId: string) {
 
   // TODO: register a L1 address with the wallet as soon as some registry is online
 
-  if (deployTransaction.code !== "TRANSACTION_RECEIVED") {
+  if (
+    deployTransaction.code !== "TRANSACTION_RECEIVED" ||
+    !deployTransaction.address
+  ) {
     throw new Error("Deploy transaction failed")
   }
 
-  const newWallet = { network: networkId, address: deployTransaction.address! }
+  const newWallet = { network: networkId, address: deployTransaction.address }
   const newWallets = [...wallets, newWallet]
   const encKeyStore = await getEncKeyStore(l1, sessionPassword, newWallets)
   store.setItem("encKeystore", encKeyStore)
@@ -198,7 +199,7 @@ export async function createAccount(networkId: string) {
 
   downloadTextFile(encKeyStore, "starknet-backup.json")
   return {
-    address: deployTransaction.address!,
+    address: deployTransaction.address,
     txHash: deployTransaction.transaction_hash,
     wallets,
   }

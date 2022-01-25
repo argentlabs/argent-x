@@ -41,10 +41,7 @@ export async function sendMessageToUi(message: MessageType) {
   await Promise.allSettled([sendMessage(message)])
 }
 
-export async function sendMessageToActiveTabsAndUi(
-  message: MessageType,
-  additionalTargets: Array<number | undefined> = [],
-) {
+export async function sendMessageToActiveTabsAndUi(message: MessageType) {
   await sendMessageToUi(message)
   await sendMessageToActiveTabs(message)
 }
