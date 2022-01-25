@@ -84,22 +84,29 @@ export async function getL1(password?: string): Promise<ethers.Wallet> {
       }
       recoverPromise = recoverL1(password)
     }
-    const recoveredWallet = await recoverPromise
-    setRawWallet(recoveredWallet)
-    sessionPassword = password
-    const encKeyPair = JSON.parse((await store.getItem("encKeystore")) || "{}")
-
-    store.setItem("wallets", encKeyPair.wallets ?? [])
-    if (
-      (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
-      encKeyPair.wallets.length > 0
-    ) {
-      await selectedWalletStore.setItem(
-        "SELECTED_WALLET",
-        encKeyPair.wallets[0],
+    try {
+      const recoveredWallet = await recoverPromise
+      setRawWallet(recoveredWallet)
+      sessionPassword = password
+      const encKeyPair = JSON.parse(
+        (await store.getItem("encKeystore")) || "{}",
       )
+
+      store.setItem("wallets", encKeyPair.wallets ?? [])
+      if (
+        (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
+        encKeyPair.wallets.length > 0
+      ) {
+        await selectedWalletStore.setItem(
+          "SELECTED_WALLET",
+          encKeyPair.wallets[0],
+        )
+      }
+      return recoveredWallet
+    } catch (e) {
+      recoverPromise = undefined
+      throw e
     }
-    return recoveredWallet
   } else {
     sessionPassword = password
     const wallet = await generateL1()
