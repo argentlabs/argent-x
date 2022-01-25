@@ -51,15 +51,16 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
 }) => {
   const { selectedWallet } = useAccount()
   const handleMint = () => {
+    if (!selectedWallet || !mintableAddress) {
+      return
+    }
+
     sendTransaction({
-      type: "APPROVE_TX",
-      data: {
-        to: mintableAddress,
-        method: "mint",
-        calldata: {
-          recipient: selectedWallet,
-          amount: getUint256CalldataFromBN(ethers.utils.parseUnits("1000", 18)),
-        },
+      to: mintableAddress,
+      method: "mint",
+      calldata: {
+        recipient: selectedWallet,
+        amount: getUint256CalldataFromBN(ethers.utils.parseUnits("1000", 18)),
       },
     })
   }

@@ -32,7 +32,7 @@ export type MessageType =
     }
   | {
       type: "FAILED_TX"
-      data: { actionHash: string }
+      data: { actionHash: string; error?: string }
     }
   | { type: "ADD_WHITELIST"; data: string }
   | { type: "ADD_TOKEN"; data: AddToken }

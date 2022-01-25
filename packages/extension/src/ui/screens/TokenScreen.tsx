@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import React, { FC, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import { Alert } from "../components/Alert"
@@ -9,6 +9,7 @@ import { Button, ButtonGroup } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
+import { routes } from "../routes"
 import { useTokensWithBalance } from "../states/tokens"
 import { toTokenView } from "../utils/tokens"
 import {
@@ -76,6 +77,7 @@ const BalanceSymbol = styled.div`
 `
 
 export const TokenScreen: FC = () => {
+  const navigate = useNavigate()
   const { tokenAddress } = useParams()
   const { tokenDetails } = useTokensWithBalance()
   const [amount, setAmount] = useState("")
@@ -91,18 +93,16 @@ export const TokenScreen: FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     sendTransaction({
-      type: "APPROVE_TX",
-      data: {
-        to: address,
-        method: "transfer",
-        calldata: {
-          recipient,
-          amount: getUint256CalldataFromBN(
-            ethers.utils.parseUnits(amount, decimals),
-          ),
-        },
+      to: address,
+      method: "transfer",
+      calldata: {
+        recipient,
+        amount: getUint256CalldataFromBN(
+          ethers.utils.parseUnits(amount, decimals),
+        ),
       },
     })
+    navigate(routes.account)
   }
 
   return (

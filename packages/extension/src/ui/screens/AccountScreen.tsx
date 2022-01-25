@@ -70,21 +70,19 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
   const transactions = useWalletTransactions(wallet.address)
 
   useEffect(() => {
-    ;(async () => {
-      sendMessage({
-        type: "WALLET_CONNECTED",
-        data: {
-          address: wallet.address,
-          network: localNetworkUrl(switcherNetworkId, localhostPort),
-        },
-      })
-      try {
-        const url = new URL(wallet.networkId)
-        if (url.hostname === "localhost") {
-          useAppState.setState({ localhostPort: parseInt(url.port) })
-        }
-      } catch {}
-    })()
+    sendMessage({
+      type: "WALLET_CONNECTED",
+      data: {
+        address: wallet.address,
+        network: localNetworkUrl(switcherNetworkId, localhostPort),
+      },
+    })
+    try {
+      const url = new URL(wallet.networkId)
+      if (url.hostname === "localhost") {
+        useAppState.setState({ localhostPort: parseInt(url.port) })
+      }
+    } catch {}
   }, [wallet, switcherNetworkId, localhostPort])
 
   const pendingTransactions = useMemo(

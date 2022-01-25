@@ -18,9 +18,12 @@ export const getActions = async () => {
   return waitForMessage("GET_ACTIONS_RES")
 }
 
-export const getTransactions = async () => {
+export const getTransactions = async (address: string) => {
   sendMessage({ type: "GET_TRANSACTIONS" })
-  return waitForMessage("GET_TRANSACTIONS_RES")
+  const allTransactions = await waitForMessage("GET_TRANSACTIONS_RES")
+  return allTransactions.filter(
+    ({ walletAddress }) => walletAddress === address,
+  )
 }
 
 export const getTransactionStatus = async (hash: string, network: string) => {

@@ -9,24 +9,15 @@ interface TransactionRequest {
   calldata: Args
 }
 
-export const sendTransaction = (
-  data: any /*TransactionRequest | InvokeFunctionTransaction*/,
-) => {
+export const sendTransaction = (data: TransactionRequest) => {
   sendMessage({
     type: "ADD_TRANSACTION",
-    data:
-      "type" in data && data.type === "INVOKE_FUNCTION"
-        ? data
-        : {
-            type: "INVOKE_FUNCTION",
-            contract_address: (data as TransactionRequest).to,
-            entry_point_selector: stark.getSelectorFromName(
-              (data as TransactionRequest).method,
-            ),
-            calldata: compileCalldata(
-              (data as TransactionRequest).calldata || {},
-            ),
-          },
+    data: {
+      type: "INVOKE_FUNCTION",
+      contract_address: data.to,
+      entry_point_selector: stark.getSelectorFromName(data.method),
+      calldata: compileCalldata(data.calldata || {}),
+    },
   })
 }
 

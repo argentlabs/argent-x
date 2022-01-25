@@ -12,6 +12,10 @@ const SP = styled(P)`
   line-height: 24px;
 `
 
+const WrappingPre = styled(Pre)`
+  white-space: initial;
+`
+
 export const ErrorScreen: FC = () => {
   const navigate = useNavigate()
   const { error } = useAppState()
@@ -24,7 +28,7 @@ export const ErrorScreen: FC = () => {
       onSubmit={() => navigate(-1)}
     >
       <SP>Something went wrong:</SP>
-      <Pre>{error}</Pre>
+      <WrappingPre>{error}</WrappingPre>
     </ConfirmScreen>
   )
 }
