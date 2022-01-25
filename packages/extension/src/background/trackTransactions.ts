@@ -43,18 +43,22 @@ export class TransactionTracker {
       title: "Contract interaction",
     },
   ): Promise<void> {
-    const provider = getProvider(wallet.network)
-    this.transactions.push({
-      hash: transactionHash,
-      provider,
-      walletAddress: wallet.address,
-      status: "RECEIVED",
-      meta,
-    })
+    try {
+      const provider = getProvider(wallet.network)
+      this.transactions.push({
+        hash: transactionHash,
+        provider,
+        walletAddress: wallet.address,
+        status: "RECEIVED",
+        meta,
+      })
 
-    this.listeners.forEach((listener) => {
-      listener(this.transactions)
-    })
+      this.listeners.forEach((listener) => {
+        listener(this.transactions)
+      })
+    } catch (e) {
+      console.error("Failed to track transaction", e)
+    }
   }
 
   public getAllTransactions(byWalletAddress?: string): TransactionStatus[] {
@@ -87,7 +91,13 @@ export class TransactionTracker {
       }),
     )
     if (transactionStatus.length > 0) {
-      this.transactions = transactionStatus
+      // add transactions that were added while we were fetching
+      this.transactions = [
+        ...transactionStatus,
+        ...this.transactions.filter((tx) => {
+          return Boolean(transactionStatus.find(({ hash }) => hash === tx.hash))
+        }),
+      ]
       this.listeners.forEach((listener) => {
         listener(transactionStatus)
       })
