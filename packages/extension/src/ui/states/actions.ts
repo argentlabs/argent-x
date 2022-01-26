@@ -6,6 +6,9 @@ import { ExtActionItem } from "../../shared/actionQueue"
 import { messageStream, sendMessage } from "../../shared/messages"
 import { getActions } from "../utils/messaging"
 
+export const isActionableRoute = (route: string) =>
+  route.startsWith("/account") || route.startsWith("/token")
+
 interface ActionsStore {
   actions: ExtActionItem[]
   approve: (action: ExtActionItem | string) => Promise<void>

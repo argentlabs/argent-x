@@ -42,7 +42,6 @@ const AccountContent = styled.div`
   padding: 16px;
 `
 
-// hacky, TODO: improve
 export const AccountScreen: FC = () => {
   const wallet = useAccount(selectWallet)
   const accountNumber = useAccount(selectAccountNumber)
@@ -77,9 +76,9 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
       },
     })
     try {
-      const url = new URL(wallet.networkId)
-      if (url.hostname === "localhost") {
-        useAppState.setState({ localhostPort: parseInt(url.port) })
+      const { hostname, port } = new URL(wallet.networkId)
+      if (hostname === "localhost") {
+        useAppState.setState({ localhostPort: parseInt(port) })
       }
     } catch {}
   }, [wallet, switcherNetworkId, localhostPort])
@@ -87,8 +86,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
   const pendingTransactions = useMemo(
     () =>
       transactions.filter(
-        (transaction) =>
-          transaction.status === "PENDING" || transaction.status === "RECEIVED",
+        ({ status }) => status === "PENDING" || status === "RECEIVED",
       ),
     [transactions],
   )

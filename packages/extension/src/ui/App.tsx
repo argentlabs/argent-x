@@ -1,5 +1,5 @@
 import { FC, Suspense } from "react"
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -20,7 +20,11 @@ import { SettingsScreen } from "./screens/SettingsScreen"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
-import { useActions, useActionsSubscription } from "./states/actions"
+import {
+  isActionableRoute,
+  useActions,
+  useActionsSubscription,
+} from "./states/actions"
 import { useAppState } from "./states/app"
 import { swrCacheProvider } from "./utils/swrCache"
 
@@ -64,6 +68,7 @@ const Screen: FC = () => {
   useEntry()
   useActionsSubscription()
 
+  const { pathname } = useLocation()
   const { isLoading } = useAppState()
   const { actions } = useActions()
 
@@ -71,7 +76,7 @@ const Screen: FC = () => {
     return <LoadingScreen />
   }
 
-  if (actions[0]) {
+  if (actions[0] && isActionableRoute(pathname)) {
     return <ActionScreen />
   }
 
