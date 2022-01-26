@@ -6,9 +6,7 @@ import type { StarknetWindowObject } from "./extension.model"
 // nextjs ie needs this to be typeof window !== "undefined" as it's replacing it in client bundles
 const IS_BROWSER = typeof window !== "undefined"
 
-export function getStarknet({
-  showModal = false,
-}: { showModal?: boolean } = {}): StarknetWindowObject {
+export const getStarknet = (): StarknetWindowObject => {
   // if extension isnt installed (didnt populate window.starknet) polyfill it
   if (!globalThis["starknet"]) {
     const fail = async () => {
@@ -18,7 +16,7 @@ export function getStarknet({
       request: fail,
       isConnected: false,
       provider: defaultProvider,
-      enable: () => {
+      enable: ({ showModal } = {}) => {
         if (IS_BROWSER && showModal) {
           new App({ target: document.body })
         }
@@ -26,7 +24,8 @@ export function getStarknet({
       },
       on: fail,
       off: fail,
-    }
+      version: "uninstalled",
+    } as StarknetWindowObject
   }
   return globalThis["starknet"]
 }

@@ -6,7 +6,7 @@ import { Network } from "./token.service"
 export const isWalletConnected = (): boolean => !!getStarknet()?.isConnected
 
 export const connectWallet = async () =>
-  await getStarknet({ showModal: true }).enable()
+  await getStarknet().enable({ showModal: true })
 
 export const walletAddress = async (): Promise<string | undefined> => {
   try {
