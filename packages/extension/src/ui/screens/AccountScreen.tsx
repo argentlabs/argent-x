@@ -44,15 +44,14 @@ const AccountContent = styled.div`
 
 // hacky, TODO: improve
 export const AccountScreen: FC = () => {
-  const { selectedWallet } = useAccount()
   const wallet = useAccount(selectWallet)
   const accountNumber = useAccount(selectAccountNumber)
-  if (selectedWallet && wallet) {
-    return (
-      <AccountScreenContent wallet={wallet} accountNumber={accountNumber} />
-    )
+
+  if (!wallet) {
+    return <></>
   }
-  return <></>
+
+  return <AccountScreenContent wallet={wallet} accountNumber={accountNumber} />
 }
 
 interface AccountScreenContentProps {
