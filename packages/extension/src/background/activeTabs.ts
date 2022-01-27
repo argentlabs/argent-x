@@ -6,14 +6,9 @@ import { MessageType } from "../shared/MessageType"
 const activeTabs = new Set<number>()
 
 export function addTab(tabId?: number) {
-  if (tabId === undefined) {
-    return
+  if (tabId !== undefined && !hasTab(tabId)) {
+    activeTabs.add(tabId)
   }
-  if (hasTab(tabId)) {
-    return
-  }
-
-  activeTabs.add(tabId)
 }
 
 export function hasTab(tabId?: number) {
