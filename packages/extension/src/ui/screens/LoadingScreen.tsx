@@ -15,7 +15,7 @@ const LoadingScreenWrapper = styled.div`
 `
 
 const loadingTexts = [
-  "Loading...",
+  "Loading…",
   "Please wait…",
   "Patience is a virtue…",
   "Almost there…",
