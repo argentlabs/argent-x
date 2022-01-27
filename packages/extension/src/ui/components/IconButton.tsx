@@ -18,7 +18,7 @@ export const IconButton = styled.span<{ size: number }>`
     background: rgba(255, 255, 255, 0.25);
     outline: 0;
   }
-  
+
   & > * {
     max-width: 100%;
   }

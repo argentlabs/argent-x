@@ -16,8 +16,9 @@ export async function openUi() {
     ],
   })
 
-  if (existingPopup && existingPopup.windowId)
+  if (existingPopup && existingPopup.windowId) {
     return browser.windows.update(existingPopup.windowId, { focused: true })
+  }
 
   let left = 0
   let top = 0

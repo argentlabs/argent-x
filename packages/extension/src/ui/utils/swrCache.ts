@@ -8,7 +8,9 @@ export const swrCacheProvider: Cache = {
   get: (key: string) => {
     const value = localStorage.getItem(key)
     try {
-      if (!value) throw Error("no value")
+      if (!value) {
+        throw Error("no value")
+      }
       return (
         JSON.parse(value, (k, v) => {
           if (

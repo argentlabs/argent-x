@@ -39,8 +39,9 @@ export const useTokens = create<TokenState>(
     (set, _) => ({
       tokens: parsedDefaultErc20Tokens,
       addToken: (token: TokenDetails) => {
-        if (!isValidAddress(token.address))
+        if (!isValidAddress(token.address)) {
           throw Error("token address malformed")
+        }
         set((state) => ({ tokens: [...state.tokens, token] }))
       },
       removeToken: (token: TokenDetails) => {

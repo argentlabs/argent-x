@@ -46,7 +46,9 @@ export const useStatus = (wallet: Wallet, activeWalletAddress?: string) => {
   const [isDeployed, setIsDeployed] = useState(true)
 
   useEffect(() => {
-    if (deployStatus === "SUCCESS") wallet.completeDeployTx()
+    if (deployStatus === "SUCCESS") {
+      wallet.completeDeployTx()
+    }
   }, [wallet, deployStatus])
 
   useEffect(() => {

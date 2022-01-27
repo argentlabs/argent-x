@@ -28,11 +28,15 @@ export const ActionScreen: FC = () => {
           host={action.payload.host}
           onReject={async () => {
             await reject(action)
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
           }}
           onSubmit={async () => {
             await approve(action)
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
           }}
         />
       )
@@ -42,11 +46,15 @@ export const ActionScreen: FC = () => {
           defaultToken={action.payload}
           onSubmit={async () => {
             await approve(action)
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
           }}
           onReject={async () => {
             await reject(action)
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
           }}
         />
       )
@@ -76,13 +84,17 @@ export const ActionScreen: FC = () => {
               })
               navigate(routes.error)
             } else {
-              if (isPopup && isLastAction) window.close()
+              if (isPopup && isLastAction) {
+                window.close()
+              }
               useAppState.setState({ isLoading: false })
             }
           }}
           onReject={async () => {
             await reject(action)
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
           }}
           selectedAccount={{ accountNumber, networkId: switcherNetworkId }}
         />
@@ -98,12 +110,16 @@ export const ActionScreen: FC = () => {
               "SUCCESS_SIGN",
               ({ data }) => data.actionHash === action.meta.hash,
             )
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
             useAppState.setState({ isLoading: false })
           }}
           onReject={async () => {
             await reject(action)
-            if (isPopup && isLastAction) window.close()
+            if (isPopup && isLastAction) {
+              window.close()
+            }
           }}
           selectedAccount={{ accountNumber, networkId: switcherNetworkId }}
         />

@@ -41,8 +41,9 @@ const isDataComplete = (data: TokenDetails): data is Required<TokenDetails> => {
     data.decimals?.toString() &&
     data.name &&
     data.symbol
-  )
+  ) {
     return true
+  }
   return false
 }
 
@@ -156,8 +157,9 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             }}
             onBlur={() => {
               try {
-                if (tokenAddress)
+                if (tokenAddress) {
                   setTokenAddress(addressFormat64Byte(tokenAddress))
+                }
               } catch {
                 // pass
               }

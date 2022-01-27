@@ -81,5 +81,7 @@ export const startSession = async (password: string): Promise<void> => {
       .catch(() => false),
   ])
 
-  if (!succeeded) throw Error("Wrong password")
+  if (!succeeded) {
+    throw Error("Wrong password")
+  }
 }

@@ -17,8 +17,12 @@ window.addEventListener(
   "message",
   function (event: MessageEvent<WindowMessageType>) {
     // forward messages which were not forwarded before and belong to the extension
-    if (!event.data?.forwarded && event.data?.extensionId === argentExtensionId)
+    if (
+      !event.data?.forwarded &&
+      event.data?.extensionId === argentExtensionId
+    ) {
       sendMessage({ ...event.data })
+    }
   },
 )
 messageStream.subscribe(([msg]) => {
