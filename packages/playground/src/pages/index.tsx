@@ -26,9 +26,7 @@ const Home: NextPage = () => {
   }, [])
 
   useEffect(() => {
-    isPreauthorized().then((result) => {
-      setPreauthorized(result)
-    })
+    isPreauthorized().then(setPreauthorized)
   }, [])
 
   const handleConnectClick = async () => {
