@@ -75,7 +75,7 @@ async function main() {
 
   messageStream.subscribe(async ([msg, sender]) => {
     const sendToTabAndUi = async (msg: MessageType) => {
-      sendMessageToActiveTabsAndUi(msg)
+      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
     }
     // forward UI messages to rest of the tabs
     if (!hasTab(sender.tab?.id)) {
