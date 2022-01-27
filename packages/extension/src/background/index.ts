@@ -172,8 +172,9 @@ async function main() {
           })
         }
 
-        if (isWhitelisted && selectedWallet.address)
+        if (isWhitelisted && selectedWallet.address) {
           return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
+        }
 
         return openUi()
       }
@@ -185,7 +186,9 @@ async function main() {
       case "APPROVE_ACTION": {
         const { actionHash } = msg.data
         const action = await actionQueue.remove(actionHash)
-        if (!action) throw new Error("Action not found")
+        if (!action) {
+          throw new Error("Action not found")
+        }
         switch (action.type) {
           case "CONNECT": {
             const { host } = action.payload
@@ -195,17 +198,20 @@ async function main() {
 
             await addToWhitelist(host)
 
-            if (selectedWallet)
+            if (selectedWallet) {
               return sendToTabAndUi({
                 type: "CONNECT_RES",
                 data: selectedWallet,
               })
+            }
             return openUi()
           }
 
           case "TRANSACTION": {
             const transaction = action.payload
-            if (!isUnlocked()) throw Error("you need an open session")
+            if (!isUnlocked()) {
+              throw Error("you need an open session")
+            }
             const l1 = await getL1()
             const keyPair = ec.getKeyPair(l1.privateKey)
             const selectedWallet = await selectedWalletStore.getItem(
@@ -246,7 +252,9 @@ async function main() {
 
           case "SIGN": {
             const typedData = action.payload
-            if (!isUnlocked()) throw Error("you need an open session")
+            if (!isUnlocked()) {
+              throw Error("you need an open session")
+            }
             const l1 = await getL1()
             const keyPair = ec.getKeyPair(l1.privateKey)
             const selectedWallet = await selectedWalletStore.getItem(
@@ -301,7 +309,9 @@ async function main() {
       case "REJECT_ACTION": {
         const { actionHash } = msg.data
         const action = await actionQueue.remove(actionHash)
-        if (!action) throw new Error("Action not found")
+        if (!action) {
+          throw new Error("Action not found")
+        }
         switch (action.type) {
           case "CONNECT": {
             return sendToTabAndUi({
@@ -372,8 +382,9 @@ async function main() {
       }
       case "START_SESSION": {
         const { secure, body } = msg.data
-        if (secure !== true)
+        if (secure !== true) {
           throw Error("session can only be started with encryption")
+        }
         const { plaintext } = await compactDecrypt(body, privateKey)
         const sessionPassword = encode.arrayBufferToString(plaintext)
         if (await validatePassword(sessionPassword)) {
@@ -403,7 +414,9 @@ async function main() {
         })
       }
       case "NEW_ACCOUNT": {
-        if (!isUnlocked()) throw Error("you need an open session")
+        if (!isUnlocked()) {
+          throw Error("you need an open session")
+        }
 
         const network = msg.data
         let newAccount

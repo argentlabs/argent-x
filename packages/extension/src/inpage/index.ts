@@ -89,8 +89,12 @@ const starknetWindowObject: StarknetWindowObject = {
           }),
       ])
 
-      if (result === "error") throw Error("User abort")
-      if (result === "timeout") throw Error("User action timed out")
+      if (result === "error") {
+        throw Error("User abort")
+      }
+      if (result === "timeout") {
+        throw Error("User action timed out")
+      }
 
       return
     }
@@ -164,12 +168,15 @@ export class WalletSigner extends Provider implements SignerInterface {
   public async addTransaction(
     transaction: Transaction,
   ): Promise<AddTransactionResponse> {
-    if (transaction.type === "DEPLOY") return super.addTransaction(transaction)
+    if (transaction.type === "DEPLOY") {
+      return super.addTransaction(transaction)
+    }
 
-    if (transaction.signature?.length)
+    if (transaction.signature?.length) {
       throw Error(
         "Adding signatures to a signer transaction currently isn't supported",
       )
+    }
 
     sendMessage({ type: "ADD_TRANSACTION", data: transaction })
     const { actionHash } = await waitForMsgOfType("ADD_TRANSACTION_RES", 1000)
@@ -193,8 +200,12 @@ export class WalletSigner extends Provider implements SignerInterface {
         }),
     ])
 
-    if (result === "error") throw Error("User abort")
-    if (result === "timeout") throw Error("User action timed out")
+    if (result === "error") {
+      throw Error("User abort")
+    }
+    if (result === "timeout") {
+      throw Error("User action timed out")
+    }
 
     return {
       code: "TRANSACTION_RECEIVED",
@@ -230,8 +241,12 @@ export class WalletSigner extends Provider implements SignerInterface {
         }),
     ])
 
-    if (result === "error") throw Error("User abort")
-    if (result === "timeout") throw Error("User action timed out")
+    if (result === "error") {
+      throw Error("User abort")
+    }
+    if (result === "timeout") {
+      throw Error("User action timed out")
+    }
 
     return [result.r, result.s]
   }
