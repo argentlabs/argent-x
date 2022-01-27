@@ -8,6 +8,7 @@ import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { H2 } from "../components/Typography"
 import { routes } from "../routes"
+import { useAppState } from "../states/app"
 import { fileToString } from "../utils/files"
 import { recoverKeystore } from "../utils/messaging"
 
@@ -57,9 +58,9 @@ export const UploadKeystoreScreen: FC = () => {
       const data = await fileToString(acceptedFile)
       await recoverKeystore(data)
       navigate(routes.password)
-    } catch {
-      // TODO: handle error
-      navigate(routes.welcome)
+    } catch (error: any) {
+      useAppState.setState({ error: `${error}` })
+      navigate(routes.error)
     }
   }
 
