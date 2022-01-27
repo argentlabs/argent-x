@@ -23,6 +23,7 @@ export type RpcMessage = {
 interface IStarketWindowObject {
   request: (call: RpcMessage) => Promise<void>
   enable: (options?: { showModal?: boolean }) => Promise<string[]>
+  isPreauthorized: () => Promise<boolean>
   on: (event: "accountsChanged", handleEvent: EventHandler) => void
   off: (event: "accountsChanged", handleEvent: EventHandler) => void
   signer?: SignerInterface

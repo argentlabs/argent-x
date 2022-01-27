@@ -122,6 +122,13 @@ const starknetWindowObject: StarknetWindowObject = {
 
       sendMessage({ type: "CONNECT", data: { host: window.location.host } })
     }),
+  isPreauthorized: async () => {
+    sendMessage({
+      type: "IS_WHITELIST",
+      data: window.location.host,
+    })
+    return waitForMsgOfType("IS_WHITELIST_RES", 1000)
+  },
   on: (event, handleEvent) => {
     if (event !== "accountsChanged") {
       throw new Error(`Unknwown event: ${event}`)
