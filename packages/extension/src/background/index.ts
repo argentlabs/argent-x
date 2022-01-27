@@ -279,6 +279,9 @@ async function main() {
               },
             })
           }
+
+          default:
+            return
         }
       }
 
@@ -333,6 +336,8 @@ async function main() {
               },
             })
           }
+          default:
+            return
         }
       }
 

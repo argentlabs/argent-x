@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill"
 
-export async function getFromStorage<T extends any, K extends string = string>(
+export async function getFromStorage<T, K extends string = string>(
   key: K,
 ): Promise<T | null> {
   try {
@@ -17,7 +17,7 @@ export function setToStorage(key: string, value: any) {
 export class Storage<T extends Record<string, any>> {
   private NS: string
   public defaults: T
-  constructor(defaults: T, namespace: string = "") {
+  constructor(defaults: T, namespace = "") {
     this.NS = namespace
     this.defaults = defaults
   }

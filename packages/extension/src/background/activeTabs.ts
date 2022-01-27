@@ -46,5 +46,5 @@ export async function sendMessageToActiveTabsAndUi(
   additionalTargets: Array<number | undefined> = [],
 ) {
   await sendMessageToUi(message)
-  await sendMessageToActiveTabs(message)
+  await sendMessageToActiveTabs(message, additionalTargets)
 }

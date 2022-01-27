@@ -78,7 +78,9 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
       if (hostname === "localhost") {
         useAppState.setState({ localhostPort: parseInt(port) })
       }
-    } catch {}
+    } catch {
+      // pass
+    }
   }, [wallet, switcherNetworkId, localhostPort])
 
   const pendingTransactions = useMemo(

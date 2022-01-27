@@ -1,9 +1,8 @@
 import oHash from "object-hash"
-import { InvokeFunctionTransaction, typedData } from "starknet"
 
 import { getFromStorage, setToStorage } from "./storage"
 
-function objectHash(obj: {} | null) {
+function objectHash(obj: object | null) {
   return oHash(obj, { unorderedArrays: true })
 }
 export interface QueueItem {
@@ -19,7 +18,7 @@ interface QueueConfig<T> {
   onUpdate?: (items: ExtQueueItem<T>[]) => void
 }
 
-export async function getQueue<T extends {}>(
+export async function getQueue<T extends object>(
   id: string,
   config: QueueConfig<T> = {},
 ) {

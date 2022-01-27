@@ -2,6 +2,7 @@ const path = require("path")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin } = require("webpack")
+const ESLintPlugin = require("eslint-webpack-plugin")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -61,6 +62,7 @@ module.exports = {
     new DefinePlugin({
       "process.env.VERSION": JSON.stringify(process.env.npm_package_version),
     }),
+    new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],

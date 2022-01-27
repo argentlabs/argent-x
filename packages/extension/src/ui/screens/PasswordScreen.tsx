@@ -49,7 +49,7 @@ export const greetings = [
   "hi fren",
 ]
 
-export const PasswordScreen: FC = ({}) => {
+export const PasswordScreen: FC = () => {
   const navigate = useNavigate()
   const { error } = useAppState()
   const {
