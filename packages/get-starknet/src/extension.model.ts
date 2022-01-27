@@ -22,7 +22,7 @@ type RpcMessage = {
 
 interface IStarketWindowObject {
   request: (call: RpcMessage) => Promise<void>
-  enable: () => Promise<string[]>
+  enable: (options?: { showModal?: boolean }) => Promise<string[]>
   on: (event: "accountsChanged", handleEvent: EventHandler) => void
   off: (event: "accountsChanged", handleEvent: EventHandler) => void
   signer?: SignerInterface

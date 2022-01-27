@@ -10,8 +10,8 @@
     <h2 slot="header">No Wallet Detected</h2>
 
     <p>
-      Please download ArgentX to use this dapp, which runs on StarkNet, a
-      ZK-Rollup Layer-2 network on Ethereum.
+      Please download <strong>Argent X</strong> to use this dapp, which runs on StarkNet,
+      a ZK Rollup network on Ethereum Layer 2.
     </p>
     <a
       href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/"

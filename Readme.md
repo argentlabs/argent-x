@@ -5,15 +5,13 @@
 
 ---
 
-<h3 align='center' style='margin: 1em;'>⬇️ Get <b>ArgentX</b> for StarkNet today:</h3>
+<h3 align='center' style='margin: 1em;'>⬇️ Get <b>Argent X</b> for StarkNet today:</h3>
 
 <p align="center">
   <a href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/">
     <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/packages/get-starknet/src/button-download.svg">
   </a>
 </p>
-
-
 
 ---
 
@@ -27,7 +25,6 @@
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
 
-
 ## 🧒 Example dapp
 
 You can try the extension using our example dapp hosted at:
@@ -35,7 +32,6 @@ You can try the extension using our example dapp hosted at:
 [https://argentlabs.github.io/argent-x/](https://argentlabs.github.io/argent-x/)
 
 The example dapp is also contained in this repository.
-
 
 ## 🌐 Usage with your dapp
 
@@ -51,13 +47,14 @@ The package is a light wrapper around [starknet.js](https://github.com/seanjames
 ```javascript
 import { getStarknet } from "@argent/get-starknet"
 
-// check if wallet extension is installed and initialized. Shows a modal prompting the user to download ArgentX otherwise.
-const starknet = getStarknet({ showModal: true })
-const [userWalletContractAddress] = await starknet.enable() // may throws when no extension is detected
+// Check if wallet extension is installed and initialized.
+const starknet = getStarknet()
+// May throw when no extension is detected, otherwise shows a modal prompting the user to download Argent X.
+const [userWalletContractAddress] = await starknet.enable({ showModal: true })
 
-// check if connection was successful
+// Check if connection was successful
 if(starknet.isConnected) {
-    // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kind of requests through the users wallet contract.
+    // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kinds of requests through the user's wallet contract.
     starknet.signer.invokeFunction({ ... })
 } else {
     // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
@@ -72,11 +69,11 @@ Checkout [starknet.js](https://github.com/seanjameshan/starknet.js) to learn mor
 First clone this repository on your machine then run:
 
 ```bash
-yarn      # setup dependencies
+yarn        # setup dependencies
 yarn build  # run build process for all packages
 ```
 
-Now you need to load the locally build chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
+Now you need to load the locally built chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
 
 1. Open the Extension Management page by navigating to `chrome://extensions`.
 2. Enable Developer Mode by clicking the toggle switch next to **Developer mode**.
@@ -101,9 +98,9 @@ This project contains 3 packages:
 
 | package | description |
 | --- | --- |
-| extension | ArgentX extension |
-| get-starknet | npm module to get started with starknet.js and ArgentX quickly |
-| playground | example dapp for testing purposes and example for DApps how to use `get-starknet` |
+| extension | Argent X extension |
+| get-starknet | npm module to get started with starknet.js and Argent X quickly |
+| playground | example dapp for testing purposes and example for dapps how to use `get-starknet` |
 
 To test changes made to the `extension` package you need to load the local unpacked extension into Chrome as [described above](#install-fromsources). Changes are shown after reopening the extension. Changes to `background.js` are just shown after a complete restart of the Chrome process.
 
@@ -113,9 +110,9 @@ Everyone is welcome to contribute. Please take a moment to review the [contribut
 
 ## ❤️ Family and friends
 
-Since this project were not possible without [starknet.js](https://github.com/seanjameshan/starknet.js) a big thank you to all [starknet.js contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors) and [@seanjameshan](https://github.com/seanjameshan) for starting it.
+Since this project would not have been possible without [starknet.js](https://github.com/seanjameshan/starknet.js), we would like to say a big thank you to all [starknet.js contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors) and [@seanjameshan](https://github.com/seanjameshan) for starting it.
 
-One more thank you to the StarkWare Team and Discord.
+One more thank you to the StarkWare Team.
 
 ## 👨🏼‍🎨 Authors and license
 
