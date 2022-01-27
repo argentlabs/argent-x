@@ -54,15 +54,15 @@ export const useStatus = (wallet: Wallet, activeWalletAddress?: string) => {
       try {
         const code = await wallet.contract.provider.getCode(wallet.address)
         if (code.bytecode.length === 0) {
-          throw new Error()
+          setIsDeployed(false)
         }
-      } catch (err) {
-        setIsDeployed(false)
+      } catch {
+        // as api isnt very stable (especially this endpoint) lets do nothing if the request fails
       }
     })()
   }, [])
 
-  if (!isDeployed) {
+  if (deployStatus !== "PENDING" && !isDeployed) {
     return { code: "ERROR" as const, text: "Undeployed" }
   }
 

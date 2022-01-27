@@ -1,6 +1,5 @@
 import { localNetworkUrl } from "../../shared/networks"
 import { useAppState } from "../states/app"
-import { useProgress } from "../states/progress"
 import { Wallet } from "../Wallet"
 import { startSession } from "./messaging"
 
@@ -10,7 +9,6 @@ export const deployWallet = async (
   password?: string,
 ) => {
   useAppState.setState({ isLoading: true })
-  useProgress.setState({ progress: 0, text: "Deploying..." })
 
   if (password) {
     await startSession(password)
@@ -20,7 +18,6 @@ export const deployWallet = async (
   try {
     return await Wallet.fromDeploy(network)
   } finally {
-    useProgress.setState({ progress: 0, text: "" })
     useAppState.setState({ isLoading: false })
   }
 }
