@@ -80,7 +80,7 @@ export class TransactionTracker {
   }
 
   private async checkTransactions(): Promise<void> {
-    const transactionStatus = await Promise.all(
+    const transactionStatuses = await Promise.all(
       this.transactions.map(async ({ hash, provider, walletAddress, meta }) => {
         return getTransactionStatus(provider, hash).then((status) => ({
           ...status,
@@ -90,16 +90,20 @@ export class TransactionTracker {
         }))
       }),
     )
-    if (transactionStatus.length > 0) {
+    if (transactionStatuses.length > 0) {
       // add transactions that were added while we were fetching
       this.transactions = [
-        ...transactionStatus,
-        ...this.transactions.filter((tx) => {
-          return Boolean(transactionStatus.find(({ hash }) => hash === tx.hash))
+        ...transactionStatuses,
+        ...this.transactions.filter((transactionStatus) => {
+          return Boolean(
+            transactionStatuses.find(
+              ({ hash }) => hash === transactionStatus.hash,
+            ),
+          )
         }),
       ]
       this.listeners.forEach((listener) => {
-        listener(transactionStatus)
+        listener(this.transactions)
       })
     }
   }
