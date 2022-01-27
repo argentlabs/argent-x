@@ -2,8 +2,7 @@ import oHash from "object-hash"
 
 import { getFromStorage, setToStorage } from "./storage"
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-function objectHash(obj: {} | null) {
+function objectHash(obj: object | null) {
   return oHash(obj, { unorderedArrays: true })
 }
 export interface QueueItem {
