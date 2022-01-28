@@ -17,7 +17,7 @@ import styles from "../styles/Home.module.css"
 const Home: NextPage = () => {
   const [isConnected, setIsConnected] = useState(isWalletConnected())
   const [address, setAddress] = useState<string>()
-  const [preauthorized, setPreauthorized] = useState<boolean>(false)
+  const [preauthorized, setPreauthorized] = useState(false)
 
   useEffect(() => {
     addWalletChangeListener((accounts) => {
@@ -26,7 +26,12 @@ const Home: NextPage = () => {
   }, [])
 
   useEffect(() => {
-    isPreauthorized().then(setPreauthorized)
+    ;(async () => {
+      if (await isPreauthorized()) {
+        setPreauthorized(true)
+        await handleConnectClick()
+      }
+    })()
   }, [])
 
   const handleConnectClick = async () => {
