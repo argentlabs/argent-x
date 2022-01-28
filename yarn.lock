@@ -8423,9 +8423,9 @@ svgo@^2.3.1, svgo@^2.5.0:
     stable "^0.1.8"
 
 swr@^1.1.0:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/swr/-/swr-1.1.2.tgz#9f3de2541931fccf03c48f322f1fc935a7551612"
-  integrity sha512-UsM0eo5T+kRPyWFZtWRx2XR5qzohs/LS4lDC0GCyLpCYFmsfTk28UCVDbOE9+KtoXY4FnwHYiF+ZYEU3hnJ1lQ==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/swr/-/swr-1.2.0.tgz#8649f6e9131ce94bbcf7ffd65c21334da3d1ec20"
+  integrity sha512-C3IXeKOREn0jQ1ewXRENE7ED7jjGbFTakwB64eLACkCqkF/A0N2ckvpCTftcaSYi5yV36PzoehgVCOVRmtECcA==
 
 tapable@^2.0.0, tapable@^2.1.1, tapable@^2.2.0:
   version "2.2.1"
