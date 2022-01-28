@@ -2107,10 +2107,10 @@
     npmlog "^4.1.2"
     write-file-atomic "^3.0.3"
 
-"@mui/base@5.0.0-alpha.65":
-  version "5.0.0-alpha.65"
-  resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-alpha.65.tgz#58fb0a4334a57904144b405d16e8deea24bc31b6"
-  integrity sha512-6LCTWVoSnEoQuWdxA+Z1qqmlNK4aZj7LvCuLJzq3RVS2PskRuo1O3caVFxAzRu7xrY3zsyL/sUsJI+rdcjhuXw==
+"@mui/base@5.0.0-alpha.66":
+  version "5.0.0-alpha.66"
+  resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-alpha.66.tgz#5f03e641daecbc54a7b03d6368e625fef45cb7e4"
+  integrity sha512-LARfVx0HmGV5YwU2pdIqEApQwz/CtEnYtKkV856hlY0cgi5NQL2htzZ/9ujKz0j3LFUaMYiYuJ2AOwrNtGFGrw==
   dependencies:
     "@babel/runtime" "^7.16.7"
     "@emotion/is-prop-valid" "^1.1.1"
@@ -2121,12 +2121,12 @@
     react-is "^17.0.2"
 
 "@mui/material@^5.1.0":
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.3.0.tgz#564395bc4dd96bd12e51884214330f22ee876408"
-  integrity sha512-zLdlweBHrKpOwHFoMXA6FFgKQOONuX4sQhODcj9dk5uPeScuMDE26svcsrPam5Y1PKXZX78YEGHB5Jr5PHGpTA==
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.3.1.tgz#23c1e71b9cf995837ff5fdca34ac5052496861f5"
+  integrity sha512-XWPsJ2jet2zfnKojth5d2IaHIJPpJnHq1ACCSlNf898BjYh1j50gRWsPpIHiptQ0oc0pdWmMcmrXbdANKR1ybw==
   dependencies:
     "@babel/runtime" "^7.16.7"
-    "@mui/base" "5.0.0-alpha.65"
+    "@mui/base" "5.0.0-alpha.66"
     "@mui/system" "^5.3.0"
     "@mui/types" "^7.1.0"
     "@mui/utils" "^5.3.0"
