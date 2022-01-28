@@ -7,6 +7,7 @@ import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
   connectWallet,
+  isPreauthorized,
   isWalletConnected,
   networkUrl,
   walletAddress,
@@ -16,11 +17,16 @@ import styles from "../styles/Home.module.css"
 const Home: NextPage = () => {
   const [isConnected, setIsConnected] = useState(isWalletConnected())
   const [address, setAddress] = useState<string>()
+  const [preauthorized, setPreauthorized] = useState<boolean>(false)
 
   useEffect(() => {
     addWalletChangeListener((accounts) => {
       setAddress(accounts[0])
     })
+  }, [])
+
+  useEffect(() => {
+    isPreauthorized().then(setPreauthorized)
   }, [])
 
   const handleConnectClick = async () => {
@@ -52,7 +58,12 @@ const Home: NextPage = () => {
             <button className={styles.connect} onClick={handleConnectClick}>
               Connect Wallet
             </button>
-            <p>First connect wallet to use dapp.</p>
+            <p>
+              First connect wallet to use dapp.
+              {preauthorized && (
+                <span> The application is already preauthorized</span>
+              )}
+            </p>
           </>
         )}
       </main>

@@ -96,3 +96,7 @@ export const addWalletChangeListener = async (
 ) => {
   getStarknet().on("accountsChanged", handleEvent)
 }
+
+export const isPreauthorized = async (): Promise<boolean> => {
+  return getStarknet().isPreauthorized()
+}
