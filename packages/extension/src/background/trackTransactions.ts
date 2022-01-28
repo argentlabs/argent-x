@@ -94,13 +94,12 @@ export class TransactionTracker {
       // add transactions that were added while we were fetching
       this.transactions = [
         ...transactionStatuses,
-        ...this.transactions.filter((transactionStatus) => {
-          return Boolean(
-            transactionStatuses.find(
+        ...this.transactions.filter(
+          (transactionStatus) =>
+            !transactionStatuses.find(
               ({ hash }) => hash === transactionStatus.hash,
             ),
-          )
-        }),
+        ),
       ]
       this.listeners.forEach((listener) => {
         listener(this.transactions)

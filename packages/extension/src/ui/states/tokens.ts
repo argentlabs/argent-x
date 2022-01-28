@@ -36,11 +36,14 @@ interface TokenState {
 
 export const useTokens = create<TokenState>(
   persist(
-    (set, _) => ({
+    (set, get) => ({
       tokens: parsedDefaultErc20Tokens,
       addToken: (token: TokenDetails) => {
         if (!isValidAddress(token.address)) {
           throw Error("token address malformed")
+        }
+        if (get().tokens.find((t) => equalToken(t, token))) {
+          throw Error("token already added")
         }
         set((state) => ({ tokens: [...state.tokens, token] }))
       },

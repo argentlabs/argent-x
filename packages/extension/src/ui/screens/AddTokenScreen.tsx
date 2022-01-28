@@ -11,7 +11,8 @@ import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { Spinner } from "../components/Spinner"
-import { H2 } from "../components/Typography"
+import { FormError, H2 } from "../components/Typography"
+import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { TokenDetails, addToken } from "../states/tokens"
@@ -53,12 +54,14 @@ function addressFormat64Byte(address: number.BigNumberish): string {
 
 interface AddTokenScreenProps {
   defaultToken?: AddToken
+  hideBackButton?: boolean
   onSubmit?: () => void
   onReject?: () => void
 }
 
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   defaultToken,
+  hideBackButton,
   onSubmit,
   onReject,
 }) => {
@@ -72,6 +75,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     defaultToken?.decimals || "0",
   )
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [tokenDetails, setTokenDetails] = useState<TokenDetails>()
   const prevValidAddress = useRef("")
 
@@ -123,7 +127,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   return (
     <>
-      <Header>
+      <Header hide={hideBackButton}>
         <BackButton />
       </Header>
 
@@ -133,16 +137,21 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
         <form
           onSubmit={(e: React.FormEvent) => {
             e.preventDefault()
+            compiledData.address = addressFormat64Byte(compiledData.address)
             if (isDataComplete(compiledData)) {
-              addToken({
-                address: compiledData.address,
-                decimals: compiledData.decimals,
-                name: compiledData.name,
-                symbol: compiledData.symbol,
-                networkId: compiledData.networkId,
-              })
-              onSubmit?.()
-              navigate(-1)
+              try {
+                addToken({
+                  address: compiledData.address,
+                  decimals: compiledData.decimals,
+                  name: compiledData.name,
+                  symbol: compiledData.symbol,
+                  networkId: compiledData.networkId,
+                })
+                onSubmit?.()
+                navigate(routes.account)
+              } catch (e) {
+                setError("Token already exists")
+              }
             }
           }}
         >
@@ -154,15 +163,6 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             disabled={loading}
             onChange={(e: any) => {
               setTokenAddress(e.target.value?.toLowerCase())
-            }}
-            onBlur={() => {
-              try {
-                if (tokenAddress) {
-                  setTokenAddress(addressFormat64Byte(tokenAddress))
-                }
-              } catch {
-                // pass
-              }
             }}
           />
           {!loading && (
@@ -197,6 +197,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                   }
                 }}
               />
+              {error && <FormError>{error}</FormError>}
               <ButtonGroupVertical>
                 {onReject && (
                   <Button onClick={onReject} type="button">
@@ -209,7 +210,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               </ButtonGroupVertical>
             </>
           )}
-          {loading && <Spinner size={64} />}
+          {loading && <Spinner size={64} style={{ marginTop: 50 }} />}
         </form>
       </AddTokenScreenWrapper>
     </>

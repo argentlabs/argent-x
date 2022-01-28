@@ -44,6 +44,7 @@ export const ActionScreen: FC = () => {
       return (
         <AddTokenScreen
           defaultToken={action.payload}
+          hideBackButton
           onSubmit={async () => {
             await approve(action)
             if (isPopup && isLastAction) {
