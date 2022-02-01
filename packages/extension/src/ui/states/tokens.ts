@@ -108,9 +108,16 @@ export interface TokenDetailsWithBalance extends TokenDetails {
 
 type BalancesMap = Record<string, BigNumber | undefined>
 function mergeMaps(oldMap: BalancesMap, newMap: BalancesMap): BalancesMap {
-  return Object.fromEntries(
-    Object.entries(newMap).map(([key, value]) => [key, value ?? oldMap[key]]),
-  )
+  return Object.fromEntries([
+    ...Object.entries(oldMap).map(([key, value]) => [
+      key,
+      newMap[key] ?? value,
+    ]),
+    ...Object.entries(newMap).map(([key, value]) => [
+      key,
+      value ?? oldMap[key],
+    ]),
+  ])
 }
 
 interface UseTokens {
@@ -158,18 +165,20 @@ export const useTokensWithBalance = (): UseTokens => {
 
             const swr = useSWRNext(key, fetcher, config)
 
+            const data =
+              swr.data && prevResultRef.current
+                ? (mergeMaps(prevResultRef.current, swr.data as any) as any)
+                : swr.data
+
             useEffect(() => {
               if (swr.data !== undefined) {
-                prevResultRef.current = swr.data
+                prevResultRef.current = data
               }
-            }, [swr.data])
+            }, [data])
 
             return {
               ...(swr as any),
-              data:
-                swr.data && prevResultRef.current
-                  ? (mergeMaps(prevResultRef.current, swr.data as any) as any)
-                  : swr.data,
+              data,
             }
           }
         },
