@@ -170,14 +170,14 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               <InputText
                 placeholder="Name"
                 type="text"
-                value={tokenDetails?.name ?? tokenName}
+                value={tokenDetails?.name || tokenName}
                 disabled={tokenDetails?.name || loading || !validAddress}
                 onChange={(e: any) => setTokenName(e.target.value)}
               />
               <InputText
                 placeholder="Symbol"
                 type="text"
-                value={tokenDetails?.symbol ?? tokenSymbol}
+                value={tokenDetails?.symbol || tokenSymbol}
                 disabled={tokenDetails?.symbol || loading || !validAddress}
                 onChange={(e: any) => setTokenSymbol(e.target.value)}
               />
@@ -198,19 +198,22 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                 }}
               />
               {error && <FormError>{error}</FormError>}
-              <ButtonGroupVertical>
-                {onReject && (
-                  <Button onClick={onReject} type="button">
-                    Reject
-                  </Button>
-                )}
-                <Button type="submit" disabled={!isDataComplete(compiledData)}>
-                  Continue
-                </Button>
-              </ButtonGroupVertical>
             </>
           )}
           {loading && <Spinner size={64} style={{ marginTop: 50 }} />}
+          <ButtonGroupVertical>
+            {onReject && (
+              <Button onClick={onReject} type="button">
+                Reject
+              </Button>
+            )}
+            <Button
+              type="submit"
+              disabled={loading || !isDataComplete(compiledData)}
+            >
+              Continue
+            </Button>
+          </ButtonGroupVertical>
         </form>
       </AddTokenScreenWrapper>
     </>
