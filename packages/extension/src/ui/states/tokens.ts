@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import useSWR from "swr"
 import create from "zustand"
 import { persist } from "zustand/middleware"
@@ -106,6 +106,13 @@ export interface TokenDetailsWithBalance extends TokenDetails {
   balance?: BigNumber
 }
 
+type BalancesMap = Record<string, BigNumber | undefined>
+function mergeMaps(oldMap: BalancesMap, newMap: BalancesMap): BalancesMap {
+  return Object.fromEntries(
+    Object.entries(newMap).map(([key, value]) => [key, value ?? oldMap[key]]),
+  )
+}
+
 interface UseTokens {
   tokenDetails: TokenDetailsWithBalance[]
   isValidating: boolean
@@ -129,7 +136,9 @@ export const useTokensWithBalance = (): UseTokens => {
       }
       const balances = await Promise.all(
         tokenAddresses.map(async (address) =>
-          fetchTokenBalance(address, walletAddress, switcherNetworkId),
+          fetchTokenBalance(address, walletAddress, switcherNetworkId).catch(
+            () => undefined,
+          ),
         ),
       )
       return balances.reduce((acc, balance, i) => {
@@ -137,9 +146,35 @@ export const useTokensWithBalance = (): UseTokens => {
           ...acc,
           [tokenAddresses[i]]: balance,
         }
-      }, {} as Record<string, BigNumber>)
+      }, {} as BalancesMap)
     },
-    { suspense: true, refreshInterval: 30000 },
+    {
+      suspense: true,
+      refreshInterval: 30000,
+      use: [
+        (useSWRNext) => {
+          return (key, fetcher, config) => {
+            const prevResultRef = useRef<any>()
+
+            const swr = useSWRNext(key, fetcher, config)
+
+            useEffect(() => {
+              if (swr.data !== undefined) {
+                prevResultRef.current = swr.data
+              }
+            }, [swr.data])
+
+            return {
+              ...(swr as any),
+              data:
+                swr.data && prevResultRef.current
+                  ? (mergeMaps(prevResultRef.current, swr.data as any) as any)
+                  : swr.data,
+            }
+          }
+        },
+      ],
+    },
   )
 
   // refetch balances on transaction success

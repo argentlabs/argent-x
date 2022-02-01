@@ -27,7 +27,11 @@ import {
   validatePassword,
 } from "./keys/l1"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
-import { sentTransactionNotification } from "./notification"
+import {
+  addToAlreadyShown,
+  hasShownNotification,
+  sentTransactionNotification,
+} from "./notification"
 import { openUi } from "./openUi"
 import { selectedWalletStore } from "./selectedWallet"
 import { getSigner } from "./signer"
@@ -39,7 +43,7 @@ async function main() {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const transactionTracker = new TransactionTracker(
-    (transactions) => {
+    async (transactions) => {
       if (transactions.length > 0) {
         sendMessageToUi({
           type: "TRANSACTION_UPDATES",
@@ -47,24 +51,27 @@ async function main() {
         })
 
         for (const { hash, status, walletAddress, meta } of transactions) {
-          if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
+          if (
+            (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
+            !(await hasShownNotification(hash))
+          ) {
+            addToAlreadyShown(hash)
             sentTransactionNotification(hash, status, meta)
+            if (walletAddress && status === "ACCEPTED_ON_L2") {
+              sendMessageToUi({
+                type: "TRANSACTION_SUCCESS",
+                data: {
+                  hash,
+                  status,
+                  walletAddress,
+                  meta,
+                },
+              })
+            }
           }
           // on error remove stored (increased) nonce
           if (walletAddress && status === "REJECTED") {
             resetStoredNonce(walletAddress)
-          }
-          // on success notify ui
-          if (walletAddress && status === "ACCEPTED_ON_L2") {
-            sendMessageToUi({
-              type: "TRANSACTION_SUCCESS",
-              data: {
-                hash,
-                status,
-                walletAddress,
-                meta,
-              },
-            })
           }
         }
       }
