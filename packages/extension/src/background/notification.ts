@@ -8,6 +8,23 @@ const notificationsStorage = new Storage({
   notificationsShown: [] as string[],
 })
 
+export async function hasShownNotification(hash: string) {
+  const notificationsShown = await notificationsStorage.getItem(
+    "notificationsShown",
+  )
+  return notificationsShown.includes(hash)
+}
+
+export async function addToAlreadyShown(hash: string) {
+  const notificationsShown = await notificationsStorage.getItem(
+    "notificationsShown",
+  )
+  await notificationsStorage.setItem("notificationsShown", [
+    ...notificationsShown,
+    hash,
+  ])
+}
+
 export async function sentTransactionNotification(
   hash: string,
   status: Status,
@@ -17,20 +34,11 @@ export async function sentTransactionNotification(
   const title = `${meta?.title || "Transaction"} ${
     status === "ACCEPTED_ON_L2" ? "succeeded" : "rejected"
   }`
-  const alreadyShownTransactions = await notificationsStorage.getItem(
-    "notificationsShown",
-  )
-  if (!alreadyShownTransactions.includes(hash)) {
-    notificationsStorage.setItem("notificationsShown", [
-      ...alreadyShownTransactions,
-      hash,
-    ])
-    return browser.notifications.create(id, {
-      type: "basic",
-      title,
-      message: `${hash}\nStatus: ${status}`,
-      iconUrl: "./assets/logo.png",
-      eventTime: Date.now(),
-    })
-  }
+  return browser.notifications.create(id, {
+    type: "basic",
+    title,
+    message: `${hash}\nStatus: ${status}`,
+    iconUrl: "./assets/logo.png",
+    eventTime: Date.now(),
+  })
 }

@@ -52,17 +52,19 @@ export const useStatus = (wallet: Wallet, activeWalletAddress?: string) => {
   }, [wallet, deployStatus])
 
   useEffect(() => {
-    ;(async () => {
-      try {
-        const code = await wallet.contract.provider.getCode(wallet.address)
-        if (code.bytecode.length === 0) {
-          setIsDeployed(false)
+    if (deployStatus !== "PENDING") {
+      ;(async () => {
+        try {
+          const code = await wallet.contract.provider.getCode(wallet.address)
+          if (code.bytecode.length === 0) {
+            setIsDeployed(false)
+          }
+        } catch {
+          // as api isnt very stable (especially this endpoint) lets do nothing if the request fails
         }
-      } catch {
-        // as api isnt very stable (especially this endpoint) lets do nothing if the request fails
-      }
-    })()
-  }, [])
+      })()
+    }
+  }, [deployStatus])
 
   if (deployStatus !== "PENDING" && !isDeployed) {
     return { code: "ERROR" as const, text: "Undeployed" }
