@@ -81,14 +81,27 @@ export class TransactionTracker {
 
   private async checkTransactions(): Promise<void> {
     const transactionStatuses = await Promise.all(
-      this.transactions.map(async ({ hash, provider, walletAddress, meta }) => {
-        return getTransactionStatus(provider, hash).then((status) => ({
-          ...status,
-          walletAddress,
-          provider,
-          meta,
-        }))
-      }),
+      this.transactions.map(
+        async ({ hash, provider, walletAddress, meta, status }) => {
+          // TODO: We dont need to check for ACCEPTED_ON_L1 currently, as we just handle ACCEPTED_ON_L2 anyways. This may changes in the future.
+          // if (status === "ACCEPTED_ON_L1" || status === "REJECTED") {
+          if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
+            return Promise.resolve({
+              hash,
+              provider,
+              walletAddress,
+              meta,
+              status,
+            })
+          }
+          return getTransactionStatus(provider, hash).then((status) => ({
+            ...status,
+            walletAddress,
+            provider,
+            meta,
+          }))
+        },
+      ),
     )
     if (transactionStatuses.length > 0) {
       // add transactions that were added while we were fetching
