@@ -17,7 +17,6 @@ import styles from "../styles/Home.module.css"
 const Home: NextPage = () => {
   const [isConnected, setIsConnected] = useState(isWalletConnected())
   const [address, setAddress] = useState<string>()
-  const [preauthorized, setPreauthorized] = useState(false)
 
   useEffect(() => {
     addWalletChangeListener((accounts) => {
@@ -28,7 +27,6 @@ const Home: NextPage = () => {
   useEffect(() => {
     ;(async () => {
       if (await isPreauthorized()) {
-        setPreauthorized(true)
         await handleConnectClick()
       }
     })()
@@ -63,12 +61,7 @@ const Home: NextPage = () => {
             <button className={styles.connect} onClick={handleConnectClick}>
               Connect Wallet
             </button>
-            <p>
-              First connect wallet to use dapp.
-              {preauthorized && (
-                <span> The application is already preauthorized</span>
-              )}
-            </p>
+            <p>First connect wallet to use dapp.</p>
           </>
         )}
       </main>
