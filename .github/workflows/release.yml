@@ -1,0 +1,30 @@
+name: Main
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      - FILENAME: argent-extension-{{ github.ref_name }}.zip
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn --cwd packages/playground export
+      - run: zip -r {{ env.FILENAME }} packages/extension/dist/*
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            {{ env.FILENAME }}
