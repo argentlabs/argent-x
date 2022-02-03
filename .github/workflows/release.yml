@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write
     env:
-      - FILENAME: argent-extension-{{ github.ref_name }}.zip
+      FILENAME: argent-extension-{{ github.ref_name }}.zip
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node
