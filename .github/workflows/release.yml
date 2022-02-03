@@ -1,4 +1,4 @@
-name: Main
+name: Release
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write
     env:
-      FILENAME: argent-extension-{{ github.ref_name }}.zip
+      FILENAME: argent-extension-${{ github.ref_name }}.zip
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node
@@ -21,10 +21,10 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn --cwd packages/playground export
-      - run: zip -r {{ env.FILENAME }} packages/extension/dist/*
+      - run: zip -r ${{ env.FILENAME }} packages/extension/dist/*
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           files: |
-            {{ env.FILENAME }}
+            ${{ env.FILENAME }}
