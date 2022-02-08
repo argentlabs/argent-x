@@ -1,9 +1,9 @@
+import AddIcon from "@mui/icons-material/Add"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import Add from "../../assets/add.svg"
-import Settings from "../../assets/settings.svg"
 import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
@@ -69,7 +69,7 @@ export const AccountListScreen: FC = () => {
           size={36}
           {...makeClickable(() => navigate(routes.settings), 99)}
         >
-          <Settings />
+          <MoreVertIcon />
         </IconButton>
         <NetworkSwitcher hidePort />
       </Header>
@@ -89,7 +89,7 @@ export const AccountListScreen: FC = () => {
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddWallet)}>
-          <Add />
+          <AddIcon fontSize="large" />
         </IconButtonCenter>
       </AccountList>
     </AccountListWrapper>
