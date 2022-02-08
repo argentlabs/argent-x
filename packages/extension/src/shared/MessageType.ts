@@ -88,6 +88,9 @@ export type MessageType =
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
+  | { type: "DELETE_ACCOUNT"; data: string }
+  | { type: "DELETE_ACCOUNT_RES" }
+  | { type: "DELETE_ACCOUNT_REJ" }
 
 export type WindowMessageType = {
   forwarded?: boolean

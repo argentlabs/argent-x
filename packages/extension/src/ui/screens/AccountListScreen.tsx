@@ -86,6 +86,7 @@ export const AccountListScreen: FC = () => {
             accountNumber={index + 1}
             address={wallet.address}
             status={getStatus(wallet, selectedWallet)}
+            isDeleteable={switcherNetworkId === "localhost"}
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddWallet)}>

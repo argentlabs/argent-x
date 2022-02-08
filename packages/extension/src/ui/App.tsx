@@ -66,7 +66,6 @@ export const App: FC = () => (
         <Screen />
       </Suspense>
     </ThemeProvider>
-    ;
   </SWRConfig>
 )
 

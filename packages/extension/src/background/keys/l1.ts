@@ -44,23 +44,25 @@ export function isUnlocked(): boolean {
   return Boolean(rawWallet)
 }
 
+export async function getKeystore() {
+  const encKeystore = await store.getItem("encKeystore")
+  if (!encKeystore) {
+    throw Error("No keystore exists")
+  }
+  return encKeystore
+}
+
 export async function setKeystore(keystore: string) {
   setRawWallet(undefined)
   await store.setItem("encKeystore", keystore)
 }
 
-async function recoverL1(
-  password: string,
-  progressFn?: (progress: number) => void,
-): Promise<ethers.Wallet> {
+async function recoverL1(password: string): Promise<ethers.Wallet> {
   if (!(await existsL1())) {
     throw Error("No KeyPair exists")
   }
-  const encKeyPair = await store.getItem("encKeystore")
-  if (!encKeyPair) {
-    throw Error("No Keystore exists")
-  }
-  return await ethers.Wallet.fromEncryptedJson(encKeyPair, password, progressFn)
+  const encKeystore = await getKeystore()
+  return await ethers.Wallet.fromEncryptedJson(encKeystore, password)
 }
 
 async function generateL1(): Promise<ethers.Wallet> {
@@ -86,18 +88,18 @@ export async function getL1(password?: string): Promise<ethers.Wallet> {
       const recoveredWallet = await recoverPromise
       setRawWallet(recoveredWallet)
       sessionPassword = password
-      const encKeyPair = JSON.parse(
+      const encKeystore = JSON.parse(
         (await store.getItem("encKeystore")) || "{}",
       )
 
-      store.setItem("wallets", encKeyPair.wallets ?? [])
+      store.setItem("wallets", encKeystore.wallets ?? [])
       if (
         (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
-        encKeyPair.wallets.length > 0
+        encKeystore.wallets.length > 0
       ) {
         await selectedWalletStore.setItem(
           "SELECTED_WALLET",
-          encKeyPair.wallets[0],
+          encKeystore.wallets[0],
         )
       }
       return recoveredWallet
@@ -125,38 +127,18 @@ async function getEncKeyStore(
   wallets: BackupWallet[],
   progressFn?: (progress: number) => void,
 ): Promise<string> {
-  const backup = await wallet.encrypt(
-    password,
-    {
-      scrypt: {
-        // The number must be a power of 2 (default: 131072 = 2 ^ 17)
-        N: isDev ? 64 : 32768,
-      },
-    },
-    progressFn,
-  )
+  // The number of encryption rounds must be a power of 2 (default: 131072 = 2 ^ 17)
+  const N = isDev ? 64 : 32768
+  const backup = await wallet.encrypt(password, { scrypt: { N } }, progressFn)
 
-  const extendedBackup = JSON.stringify(
-    {
-      ...JSON.parse(backup),
-      wallets,
-    },
-    null,
-    2,
-  )
-
-  return extendedBackup
+  const extendedBackup = { ...JSON.parse(backup), wallets }
+  return JSON.stringify(extendedBackup, null, 2)
 }
 
 function downloadTextFile(text: string, filename: string) {
-  const blob = new Blob([text], {
-    type: "application/json",
-  })
+  const blob = new Blob([text], { type: "application/json" })
   const url = URL.createObjectURL(blob)
-  browser.downloads.download({
-    url,
-    filename,
-  })
+  browser.downloads.download({ url, filename })
 }
 
 export const getWallets = async (): Promise<BackupWallet[]> =>
@@ -175,10 +157,7 @@ export async function createAccount(networkId: string) {
   const provider = getProvider(networkId)
   const deployTransaction = await provider.deployContract(
     ArgentCompiledContract,
-    compileCalldata({
-      signer: starkPub,
-      guardian: "0",
-    }),
+    compileCalldata({ signer: starkPub, guardian: "0" }),
     seed,
   )
 

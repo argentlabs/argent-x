@@ -18,6 +18,7 @@ import {
   createAccount,
   downloadBackupFile,
   existsL1,
+  getKeystore,
   getL1,
   getWallets,
   isUnlocked,
@@ -39,7 +40,7 @@ import { setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
-async function main() {
+;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const transactionTracker = new TransactionTracker(
@@ -464,7 +465,21 @@ async function main() {
         await downloadBackupFile()
         return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
       }
+
+      case "DELETE_ACCOUNT": {
+        try {
+          const keystore = JSON.parse(await getKeystore())
+          const wallets = keystore.wallets.filter(
+            ({ address }: any) => address !== msg.data,
+          )
+          const newKeystore = JSON.stringify({ ...keystore, wallets })
+          await setKeystore(newKeystore)
+          return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
+        } catch (error) {
+          console.error(error)
+          return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
+        }
+      }
     }
   })
-}
-main()
+})()

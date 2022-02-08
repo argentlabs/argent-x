@@ -85,3 +85,18 @@ export const startSession = async (password: string): Promise<void> => {
     throw Error("Wrong password")
   }
 }
+
+export const deleteAccount = async (address: string) => {
+  sendMessage({ type: "DELETE_ACCOUNT", data: address })
+
+  const succeeded = await Promise.race([
+    waitForMessage("DELETE_ACCOUNT_RES").then(() => true),
+    waitForMessage("DELETE_ACCOUNT_REJ")
+      .then(() => false)
+      .catch(() => false),
+  ])
+
+  if (!succeeded) {
+    throw Error("Could not delete account")
+  }
+}
