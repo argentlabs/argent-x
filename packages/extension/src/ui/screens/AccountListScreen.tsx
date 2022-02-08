@@ -4,7 +4,10 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import Settings from "../../assets/settings.svg"
-import { AccountList, AccountListItem } from "../components/Account/AccountList"
+import {
+  AccountList,
+  AccountListItem,
+} from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
