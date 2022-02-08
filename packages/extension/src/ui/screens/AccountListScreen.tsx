@@ -4,10 +4,7 @@ import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
 import Settings from "../../assets/settings.svg"
-import {
-  AccountList,
-  AccountListItem,
-} from "../components/Account/AccountListItem"
+import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
@@ -17,6 +14,13 @@ import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { makeClickable } from "../utils/a11y"
 import { deployWallet, getStatus } from "../utils/wallets"
+
+const AccountList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 48px 32px;
+`
 
 const AccountListWrapper = styled.div`
   display: flex;

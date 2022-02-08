@@ -15,13 +15,6 @@ import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
 
-export const AccountList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 48px 32px;
-`
-
 export const AccountListItemWrapper = styled.div`
   cursor: pointer;
   height: 76px;
