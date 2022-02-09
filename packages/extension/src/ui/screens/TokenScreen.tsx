@@ -17,7 +17,7 @@ import {
   sendTransaction,
 } from "../utils/transactions"
 
-const TokenScreenWrapper = styled.div`
+export const TokenScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 32px 48px 32px;
@@ -34,14 +34,14 @@ const TokenScreenWrapper = styled.div`
   }
 `
 
-const TokenTitle = styled.header`
+export const TokenTitle = styled.header`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5px;
 `
 
-const TokenName = styled.h3`
+export const TokenName = styled.h3`
   font-style: normal;
   font-weight: 600;
   font-size: 15px;
@@ -49,7 +49,7 @@ const TokenName = styled.h3`
   color: #ffffff;
 `
 
-const BalanceAlert = styled(Alert)`
+export const BalanceAlert = styled(Alert)`
   padding-top: 32px;
   padding-bottom: 32px;
   margin-bottom: 20px;
@@ -134,6 +134,9 @@ export const TokenScreen: FC = () => {
             onChange={(e: any) => setRecipient(e.target.value)}
           />
           <Button type="submit">Send</Button>
+          <Button onClick={() => navigate(routes.hideToken(token.address))}>
+            Hide
+          </Button>
         </ButtonGroup>
       </TokenScreenWrapper>
     </>

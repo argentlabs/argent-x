@@ -98,6 +98,10 @@ export const addToken = (token: TokenDetails) => {
   useTokens.getState().addToken(token)
 }
 
+export const removeToken = (token: TokenDetails) => {
+  useTokens.getState().removeToken(token)
+}
+
 export const selectTokensByNetwork =
   (networkId: string) => (state: TokenState) =>
     state.tokens.filter((token) => token.networkId === networkId)
