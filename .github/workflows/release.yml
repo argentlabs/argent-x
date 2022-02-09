@@ -11,6 +11,7 @@ jobs:
     permissions:
       contents: write
     env:
+      NPM_ACCESS_TOKEN: { { secrets.NPM_ACCESS_TOKEN } }
       FILENAME: argent-extension-${{ github.ref_name }}.zip
     steps:
       - uses: actions/checkout@v2
@@ -20,6 +21,9 @@ jobs:
           node-version: "14"
       - run: yarn install --frozen-lockfile
       - run: yarn build
+      - run: yarn config set //registry.npmjs.org/:_authToken=$NPM_ACCESS_TOKEN
+      - run: yarn --cwd packages/get-starknet publish --access public
+        continue-on-error: true
       - run: yarn --cwd packages/playground export
       - run: zip -r ${{ env.FILENAME }} packages/extension/dist/*
       - name: Release
