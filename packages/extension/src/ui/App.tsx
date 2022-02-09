@@ -13,6 +13,7 @@ import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
+import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { NewSeedScreen } from "./screens/NewSeedScreen"
 import { PasswordScreen } from "./screens/PasswordScreen"
@@ -101,6 +102,7 @@ const Screen: FC = () => {
           <Route path={routes.accounts} element={<AccountListScreen />} />
           <Route path={routes.newToken} element={<AddTokenScreen />} />
           <Route path={routes.tokenPath} element={<TokenScreen />} />
+          <Route path={routes.hideTokenPath} element={<HideTokenScreen />} />
           <Route path={routes.settings} element={<SettingsScreen />} />
         </>
       )}
