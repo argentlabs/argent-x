@@ -5,6 +5,11 @@ export async function addToWhitelist(host: string) {
   await setToStorage(`WHITELIST:APPROVED`, [...(approved || []), host])
 }
 
+export async function getWhitelist() {
+  const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
+  return approved || []
+}
+
 export async function removeFromWhitelist(host: string) {
   const approved = await getFromStorage<string[]>(`WHITELIST:APPROVED`)
   await setToStorage(
