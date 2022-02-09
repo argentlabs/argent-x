@@ -1,7 +1,5 @@
 import oHash from "object-hash"
 
-import { getFromStorage, setToStorage } from "./storage"
-
 function objectHash(obj: object | null) {
   return oHash(obj, { unorderedArrays: true })
 }
@@ -18,22 +16,18 @@ interface QueueConfig<T> {
   onUpdate?: (items: ExtQueueItem<T>[]) => void
 }
 
-export async function getQueue<T extends object>(
-  id: string,
-  config: QueueConfig<T> = {},
-) {
-  const key = `QUEUE:${id}:ITEMS`
+// in-memory queue is better than localStorage, because it's way faster and persistance is not required
+let globalQueue: ExtQueueItem<any>[] = []
 
+export async function getQueue<T extends object>(config: QueueConfig<T> = {}) {
   async function getAll(): Promise<ExtQueueItem<T>[]> {
-    const retrievedQueue = (await getFromStorage<ExtQueueItem<T>[]>(key)) ?? []
-
-    const notExpiredQueue = retrievedQueue.filter(
+    const notExpiredQueue = globalQueue.filter(
       (item) => item.meta.expires > Date.now(),
     )
 
     // set queue to storage if it has changed
-    if (retrievedQueue.length !== notExpiredQueue.length) {
-      setToStorage(key, notExpiredQueue)
+    if (globalQueue.length !== notExpiredQueue.length) {
+      globalQueue = notExpiredQueue
     }
 
     return notExpiredQueue
@@ -44,7 +38,7 @@ export async function getQueue<T extends object>(
     expires: number = 5 * 60 * 60 * 1000,
   ): Promise<ExtQueueItem<T>> {
     const hash = objectHash(item)
-    const all = (await getAll()).filter((item) => item.meta.hash !== hash)
+    const existsAlready = globalQueue.some((item) => item.meta.hash === hash)
     const newItem = {
       ...item,
       meta: {
@@ -52,19 +46,18 @@ export async function getQueue<T extends object>(
         expires: Date.now() + expires,
       },
     }
-    all.unshift(newItem)
-    setToStorage(key, all)
-    config.onUpdate?.(all)
+    if (!existsAlready) {
+      globalQueue.unshift(newItem)
+      config.onUpdate?.(globalQueue)
+    }
 
     return newItem
   }
 
   async function remove(hash: string): Promise<ExtQueueItem<T> | null> {
-    const all = await getAll()
-    const hit = all.find((item) => item.meta.hash === hash)
-    const filtered = all.filter((item) => item.meta.hash !== hash)
-    setToStorage(key, filtered)
-    config.onUpdate?.(filtered)
+    const hit = globalQueue.find((item) => item.meta.hash === hash)
+    globalQueue = globalQueue.filter((item) => item.meta.hash !== hash)
+    config.onUpdate?.(globalQueue)
     return hit ?? null
   }
 

@@ -3,17 +3,21 @@ import browser from "webextension-polyfill"
 const NOTIFICATION_WIDTH = 322
 const NOTIFICATION_HEIGHT = 610
 
-// TODO: remove this workaround once the new action queue system is in place
-function wait(delay: number) {
-  return new Promise((resolve) => setTimeout(resolve, delay))
-}
+let openUiPending: Promise<browser.Windows.Window> | undefined
 
 export async function openUi() {
+  if (!openUiPending) {
+    openUiPending = openPopup().finally(() => {
+      openUiPending = undefined
+    })
+  }
+
+  return openUiPending
+}
+
+async function openPopup() {
   const [existingPopup] = await browser.tabs.query({
-    url: [
-      browser.runtime.getURL("/index.html"),
-      browser.runtime.getURL("/index.html*"),
-    ],
+    url: [browser.runtime.getURL("/*")],
   })
 
   if (existingPopup && existingPopup.windowId) {
@@ -38,7 +42,7 @@ export async function openUi() {
     top = Math.max(screenY, 0)
     left = Math.max(screenX + (outerWidth - NOTIFICATION_WIDTH), 0)
   }
-  await wait(300)
+
   const popup = await browser.windows.create({
     url: "index.html?popup",
     type: "popup",
