@@ -16,9 +16,9 @@ import {
 import { getKeyPair } from "./keys/communication"
 import {
   createAccount,
+  deleteAccount,
   downloadBackupFile,
   existsL1,
-  getKeystore,
   getL1,
   getWallets,
   isUnlocked,
@@ -468,13 +468,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
       case "DELETE_ACCOUNT": {
         try {
-          const keystore = JSON.parse(await getKeystore())
-          const wallets = keystore.wallets.filter(
-            ({ address }: any) => address !== msg.data,
-          )
-          const newKeystore = JSON.stringify({ ...keystore, wallets })
-          await setKeystore(newKeystore)
-          await getL1()
+          await deleteAccount(msg.data)
           return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
         } catch (error) {
           console.error(error)

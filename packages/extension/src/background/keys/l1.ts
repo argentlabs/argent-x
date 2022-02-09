@@ -12,10 +12,9 @@ const isDev = process.env.NODE_ENV === "development"
 
 interface StorageProps {
   encKeystore?: string
-  wallets: BackupWallet[]
 }
 
-const store = new Storage<StorageProps>({ wallets: [] }, "L1")
+const store = new Storage<StorageProps>({}, "L1")
 
 export async function existsL1() {
   return Boolean(await store.getItem("encKeystore"))
@@ -44,7 +43,7 @@ export function isUnlocked(): boolean {
   return Boolean(rawWallet)
 }
 
-export async function getKeystore() {
+async function getKeystore() {
   const encKeystore = await store.getItem("encKeystore")
   if (!encKeystore) {
     throw Error("No keystore exists")
@@ -93,7 +92,6 @@ export async function getL1(password?: string): Promise<ethers.Wallet> {
         (await store.getItem("encKeystore")) || "{}",
       )
 
-      store.setItem("wallets", encKeystore.wallets ?? [])
       if (
         (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
         encKeystore.wallets.length > 0
@@ -122,7 +120,7 @@ export function lockWallet() {
   sessionPassword = undefined
 }
 
-async function getEncKeyStore(
+async function getEncKeystore(
   wallet: ethers.Wallet,
   password: string,
   wallets: BackupWallet[],
@@ -142,8 +140,14 @@ function downloadTextFile(text: string, filename: string) {
   browser.downloads.download({ url, filename })
 }
 
-export const getWallets = async (): Promise<BackupWallet[]> =>
-  await store.getItem("wallets")
+export const getWallets = async (): Promise<BackupWallet[]> => {
+  try {
+    const { wallets } = JSON.parse(await getKeystore())
+    return wallets
+  } catch {
+    return []
+  }
+}
 
 export async function createAccount(networkId: string) {
   if (!sessionPassword) {
@@ -173,11 +177,10 @@ export async function createAccount(networkId: string) {
 
   const newWallet = { network: networkId, address: deployTransaction.address }
   const newWallets = [...wallets, newWallet]
-  const encKeyStore = await getEncKeyStore(l1, sessionPassword, newWallets)
-  store.setItem("encKeystore", encKeyStore)
-  store.setItem("wallets", newWallets)
+  const encKeystore = await getEncKeystore(l1, sessionPassword, newWallets)
+  store.setItem("encKeystore", encKeystore)
 
-  downloadTextFile(encKeyStore, "starknet-backup.json")
+  downloadTextFile(encKeystore, "starknet-backup.json")
   return {
     address: deployTransaction.address,
     txHash: deployTransaction.transaction_hash,
@@ -186,11 +189,21 @@ export async function createAccount(networkId: string) {
 }
 
 export async function downloadBackupFile() {
-  const encKeyStore = (await store.getItem("encKeystore")) ?? ""
-  downloadTextFile(encKeyStore, "starknet-backup.json")
+  const encKeystore = (await store.getItem("encKeystore")) ?? ""
+  downloadTextFile(encKeystore, "starknet-backup.json")
 }
 
 export async function resetAll() {
   lockWallet()
   await browser.storage.local.clear()
+}
+
+export const deleteAccount = async (account: string) => {
+  const keystore = JSON.parse(await getKeystore())
+  const wallets = keystore.wallets.filter(
+    ({ address }: any) => address !== account,
+  )
+  const newKeystore = JSON.stringify({ ...keystore, wallets }, null, 2)
+  await setKeystore(newKeystore)
+  await getL1()
 }
