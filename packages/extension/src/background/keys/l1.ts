@@ -33,7 +33,7 @@ export async function validatePassword(password: string) {
 
 let rawWallet: ethers.Wallet | undefined
 
-function setRawWallet(wallet: ethers.Wallet | undefined) {
+function setRawWallet(wallet?: ethers.Wallet) {
   rawWallet = wallet
   setTimeout(() => {
     rawWallet = undefined
@@ -74,6 +74,7 @@ async function generateL1(): Promise<ethers.Wallet> {
 
 let sessionPassword: string | undefined
 let recoverPromise: Promise<ethers.Wallet> | undefined
+
 export async function getL1(password?: string): Promise<ethers.Wallet> {
   if (rawWallet) {
     return rawWallet

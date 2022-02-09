@@ -474,6 +474,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           )
           const newKeystore = JSON.stringify({ ...keystore, wallets })
           await setKeystore(newKeystore)
+          await getL1()
           return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
         } catch (error) {
           console.error(error)
