@@ -67,7 +67,7 @@ export const NewSeedScreen: FC = () => {
     <NewSeedScreenWrapper>
       <BackButton />
       <H2>New password</H2>
-      <P>Enter a password to protect your account</P>
+      <P>Enter a password to protect your wallet</P>
       <form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
         <Controller
           name="password"

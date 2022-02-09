@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@extend-chrome/messages": "^1.2.2",
+    "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
     "@tippyjs/react": "^4.2.6",

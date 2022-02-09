@@ -1,10 +1,10 @@
+import AddIcon from "@mui/icons-material/Add"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import Add from "../../assets/add.svg"
-import Settings from "../../assets/settings.svg"
-import { AccountList, AccountListItem } from "../components/Account/AccountList"
+import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
@@ -14,6 +14,13 @@ import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { makeClickable } from "../utils/a11y"
 import { deployWallet, getStatus } from "../utils/wallets"
+
+const AccountList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 48px 32px;
+`
 
 const AccountListWrapper = styled.div`
   display: flex;
@@ -62,7 +69,7 @@ export const AccountListScreen: FC = () => {
           size={36}
           {...makeClickable(() => navigate(routes.settings), 99)}
         >
-          <Settings />
+          <MoreVertIcon />
         </IconButton>
         <NetworkSwitcher hidePort />
       </Header>
@@ -79,10 +86,11 @@ export const AccountListScreen: FC = () => {
             accountNumber={index + 1}
             address={wallet.address}
             status={getStatus(wallet, selectedWallet)}
+            isDeleteable={switcherNetworkId === "localhost"}
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddWallet)}>
-          <Add />
+          <AddIcon fontSize="large" />
         </IconButtonCenter>
       </AccountList>
     </AccountListWrapper>

@@ -1,8 +1,8 @@
+import AddIcon from "@mui/icons-material/Add"
 import { FC, Suspense, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import Add from "../../assets/add.svg"
 import { sendMessage } from "../../shared/messages"
 import { getNetwork, localNetworkUrl } from "../../shared/networks"
 import { AccountColumn } from "../components/Account/AccountColumn"
@@ -135,7 +135,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
           />
           <TokenWrapper {...makeClickable(() => navigate(routes.newToken))}>
             <AddTokenIconButton size={40}>
-              <Add />
+              <AddIcon />
             </AddTokenIconButton>
             <TokenTitle>Add token</TokenTitle>
           </TokenWrapper>

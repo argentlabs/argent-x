@@ -1,11 +1,16 @@
-import { FC } from "react"
+import DeleteIcon from "@mui/icons-material/Delete"
+import { IconButton } from "@mui/material"
+import { FC, MouseEventHandler } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
+import { deleteAccount } from "../../utils/messaging"
+import { recover } from "../../utils/recovery"
 import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"
 import {
   NetworkStatusIndicator,
@@ -15,11 +20,8 @@ import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
 
-export const AccountList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 48px 32px;
+export const DeleteAccountButton = styled(NetworkStatusWrapper)`
+  display: none;
 `
 
 export const AccountListItemWrapper = styled.div`
@@ -40,6 +42,13 @@ export const AccountListItemWrapper = styled.div`
   &:focus {
     background: rgba(255, 255, 255, 0.25);
     outline: 0;
+
+    &.deleteable ${NetworkStatusWrapper} {
+      display: none;
+    }
+    &.deleteable ${DeleteAccountButton} {
+      display: flex;
+    }
   }
 `
 
@@ -61,14 +70,24 @@ interface AccountListProps {
   accountNumber: number
   address: string
   status: WalletStatus
+  isDeleteable?: boolean
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
   accountNumber,
   address,
   status,
+  isDeleteable,
 }) => {
   const navigate = useNavigate()
+  const { switcherNetworkId } = useAppState()
+
+  const handleDeleteClick: MouseEventHandler = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    await deleteAccount(address)
+    await recover({ networkId: switcherNetworkId })
+  }
 
   return (
     <AccountListItemWrapper
@@ -76,6 +95,7 @@ export const AccountListItem: FC<AccountListProps> = ({
         useAccount.setState({ selectedWallet: address })
         navigate(routes.account)
       })}
+      className={isDeleteable ? "deleteable" : ""}
     >
       <ProfilePicture src={getAccountImageUrl(accountNumber)} />
       <AccountRow>
@@ -87,6 +107,11 @@ export const AccountListItem: FC<AccountListProps> = ({
           <NetworkStatusIndicator status={status.code} />
           <AccountStatusText>{status.text}</AccountStatusText>
         </NetworkStatusWrapper>
+        <DeleteAccountButton>
+          <IconButton color="error" onClick={handleDeleteClick}>
+            <DeleteIcon />
+          </IconButton>
+        </DeleteAccountButton>
       </AccountRow>
     </AccountListItemWrapper>
   )

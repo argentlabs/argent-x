@@ -1,3 +1,4 @@
+import { ThemeProvider, createTheme } from "@mui/material"
 import { FC, Suspense } from "react"
 import { Route, Routes } from "react-router-dom"
 import { createGlobalStyle } from "styled-components"
@@ -45,18 +46,26 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
+const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+})
+
 export const App: FC = () => (
   <SWRConfig value={{ provider: () => swrCacheProvider }}>
-    <Suspense fallback={<LoadingScreen />}>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
-        rel="stylesheet"
-      />
-      <GlobalStyle />
-      <Screen />
-    </Suspense>
+    <ThemeProvider theme={theme}>
+      <Suspense fallback={<LoadingScreen />}>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+          rel="stylesheet"
+        />
+        <GlobalStyle />
+        <Screen />
+      </Suspense>
+    </ThemeProvider>
   </SWRConfig>
 )
 

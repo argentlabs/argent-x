@@ -1,8 +1,8 @@
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
+import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { FC } from "react"
 import styled from "styled-components"
 
-import Copy from "../../../assets/copy.svg"
-import Open from "../../../assets/open.svg"
 import { getNetwork } from "../../../shared/networks"
 import { formatAddress, truncateAddress } from "../../utils/addresses"
 import { WalletStatus, getAccountName } from "../../utils/wallets"
@@ -58,11 +58,11 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
         target="_blank"
       >
         {truncateAddress(walletAddress)}
-        <Open />
+        <OpenInNewIcon style={{ fontSize: 10 }} />
       </AccountAddressLink>
       <CopyTooltip copyValue={formatAddress(walletAddress)} message="Copied!">
         <AccountAddressIconsWrapper>
-          <Copy />
+          <ContentCopyIcon style={{ fontSize: 12 }} />
         </AccountAddressIconsWrapper>
       </CopyTooltip>
     </AccountAddressWrapper>

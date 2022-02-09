@@ -16,6 +16,7 @@ import {
 import { getKeyPair } from "./keys/communication"
 import {
   createAccount,
+  deleteAccount,
   downloadBackupFile,
   existsL1,
   getL1,
@@ -39,7 +40,7 @@ import { setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
-async function main() {
+;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const transactionTracker = new TransactionTracker(
@@ -464,7 +465,15 @@ async function main() {
         await downloadBackupFile()
         return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
       }
+
+      case "DELETE_ACCOUNT": {
+        try {
+          await deleteAccount(msg.data)
+          return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
+        } catch {
+          return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
+        }
+      }
     }
   })
-}
-main()
+})()
