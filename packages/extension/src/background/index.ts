@@ -470,8 +470,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         try {
           await deleteAccount(msg.data)
           return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
-        } catch (error) {
-          console.error(error)
+        } catch {
           return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
         }
       }
