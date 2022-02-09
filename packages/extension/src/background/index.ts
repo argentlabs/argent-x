@@ -89,7 +89,7 @@ async function main() {
       sendMessageToActiveTabs(msg)
     }
 
-    const actionQueue = await getQueue<ActionItem>("ACTIONS", {
+    const actionQueue = await getQueue<ActionItem>({
       onUpdate: (actions) => {
         sendToTabAndUi({
           type: "ACTIONS_QUEUE_UPDATE",
