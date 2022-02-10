@@ -1,16 +1,27 @@
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
+import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { ethers } from "ethers"
 import React, { FC, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { getNetwork } from "../../shared/networks"
+import {
+  AccountAddressIconsWrapper,
+  AccountAddressLink,
+  AccountAddressWrapper,
+} from "../components/Account/Address"
 import { Alert } from "../components/Alert"
 import { BackButton } from "../components/BackButton"
 import { Button, ButtonGroup } from "../components/Button"
+import { CopyTooltip } from "../components/CopyTooltip"
 import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { TokenIcon } from "../components/TokenIcon"
 import { routes } from "../routes"
+import { useAppState } from "../states/app"
 import { useTokensWithBalance } from "../states/tokens"
+import { formatAddress, truncateAddress } from "../utils/addresses"
 import { toTokenView } from "../utils/tokens"
 import {
   getUint256CalldataFromBN,
@@ -48,6 +59,9 @@ export const TokenName = styled.h3`
   line-height: 20px;
   color: #ffffff;
 `
+const TokenAddressWrapper = styled(AccountAddressWrapper)`
+  padding-top: 6px;
+`
 
 export const BalanceAlert = styled(Alert)`
   padding-top: 32px;
@@ -82,6 +96,7 @@ export const TokenScreen: FC = () => {
   const { tokenDetails } = useTokensWithBalance()
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
+  const { switcherNetworkId } = useAppState()
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   if (!token) {
@@ -115,7 +130,22 @@ export const TokenScreen: FC = () => {
           <TokenIcon name={name} large />
           <TokenName>{name}</TokenName>
         </TokenTitle>
-
+        <TokenAddressWrapper>
+          <AccountAddressLink
+            href={`${
+              getNetwork(switcherNetworkId).explorerUrl
+            }/contract/${address}`}
+            target="_blank"
+          >
+            {truncateAddress(address)}
+            <OpenInNewIcon style={{ fontSize: 10 }} />
+          </AccountAddressLink>
+          <CopyTooltip copyValue={formatAddress(address)} message="Copied!">
+            <AccountAddressIconsWrapper>
+              <ContentCopyIcon style={{ fontSize: 12 }} />
+            </AccountAddressIconsWrapper>
+          </CopyTooltip>
+        </TokenAddressWrapper>
         <BalanceAlert>
           <BalanceTitle>Your balance</BalanceTitle>
           <BalanceAmount>{balance}</BalanceAmount>
