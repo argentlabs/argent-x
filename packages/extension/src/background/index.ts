@@ -430,8 +430,20 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         let newAccount
         try {
           newAccount = await createAccount(network)
-        } catch {
-          return sendToTabAndUi({ type: "NEW_ACCOUNT_REJ" })
+        } catch (e: any) {
+          let error = `${e}`
+          if (network.includes("localhost")) {
+            if (error.toLowerCase().includes("network error")) {
+              error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
+            }
+            if (error.includes("403")) {
+              error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+            }
+          }
+          return sendToTabAndUi({
+            type: "NEW_ACCOUNT_REJ",
+            data: { status: "ko", error },
+          })
         }
 
         const wallet = { address: newAccount.address, network }
@@ -440,7 +452,10 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           title: "Deploy wallet",
         })
 
-        return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })
+        return sendToTabAndUi({
+          type: "NEW_ACCOUNT_RES",
+          data: { status: "ok", ...newAccount },
+        })
       }
 
       case "ADD_SIGN": {
