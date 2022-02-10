@@ -64,6 +64,13 @@ export const SettingsScreen: FC = () => {
         >
           Reset dapp connections
         </Button>
+        <Button
+          onClick={() => {
+            navigate(routes.dappConnections)
+          }}
+        >
+          View dapp connections
+        </Button>
 
         <P>The backup file contains all your accounts, keep it secure.</P>
         <Button
