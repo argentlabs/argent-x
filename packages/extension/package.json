@@ -29,7 +29,7 @@
   "scripts": {
     "build": "NODE_ENV=production webpack",
     "start": "webpack",
-    "dev": "webpack --watch",
+    "dev": "webpack --color --watch",
     "version": "yarn run sync-manifest-version",
     "sync-manifest-version": "node -p \"JSON.stringify({...require('./src/manifest.json'), version: '$npm_package_version'}, null, 2)\" > ./src/manifest.temp.json && prettier --write ./src/manifest.temp.json && mv ./src/manifest.temp.json ./src/manifest.json"
   },
