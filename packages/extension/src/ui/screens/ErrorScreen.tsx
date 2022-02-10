@@ -13,7 +13,7 @@ const SP = styled(P)`
 `
 
 const WrappingPre = styled(Pre)`
-  white-space: initial;
+  white-space: pre-wrap;
 `
 
 export const ErrorScreen: FC = () => {

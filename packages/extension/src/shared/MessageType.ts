@@ -55,9 +55,14 @@ export type MessageType =
   | { type: "STOP_SESSION" }
   | {
       type: "NEW_ACCOUNT_RES"
-      data: { txHash: string; address: string; wallets: BackupWallet[] }
+      data: {
+        status: "ok"
+        txHash: string
+        address: string
+        wallets: BackupWallet[]
+      }
     }
-  | { type: "NEW_ACCOUNT_REJ" }
+  | { type: "NEW_ACCOUNT_REJ"; data: { status: "ko"; error: string } }
   | { type: "REPORT_PROGRESS"; data: number }
   | { type: "HAS_SESSION" }
   | { type: "HAS_SESSION_RES"; data: boolean }
