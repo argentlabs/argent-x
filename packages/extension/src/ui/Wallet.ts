@@ -50,8 +50,8 @@ export class Wallet {
       waitForMessage("NEW_ACCOUNT_REJ"),
     ])
 
-    if (!result) {
-      throw new Error("Failed to deploy account")
+    if (result.status === "ko") {
+      throw new Error(result.error)
     }
 
     return new Wallet(result.address, networkId, result.txHash)

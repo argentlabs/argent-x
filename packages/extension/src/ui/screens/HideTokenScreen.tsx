@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FC, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 
 import { BackButton } from "../components/BackButton"
 import { Button, ButtonGroupVertical } from "../components/Button"
@@ -31,7 +31,7 @@ export const HideTokenScreen: FC = () => {
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   if (!token) {
-    return <></>
+    return <Navigate to={routes.account} />
   }
 
   const { name } = toTokenView(token)

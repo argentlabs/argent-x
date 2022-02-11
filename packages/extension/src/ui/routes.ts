@@ -14,5 +14,6 @@ export const routes = {
   reset: "/reset",
   disclaimer: "/disclaimer",
   settings: "/settings",
+  dappConnections: "/dappConnections",
   error: "/error",
 }
