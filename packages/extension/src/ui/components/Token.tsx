@@ -43,6 +43,15 @@ export const TokenTitle = styled.h3`
   line-height: 22px;
   margin: 0;
 `
+export const TokenMetaContainer = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* number of lines to show */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+`
 
 export const TokenMeta = styled.p`
   font-size: 13px;
@@ -71,8 +80,10 @@ export const TokenBalance = styled.p<{
   line-height: 22px;
   text-align: right;
   max-width: 64px;
+  min-width: 52px;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 
   opacity: 1;
   ${({ isLoading }) =>
@@ -113,7 +124,9 @@ export const TokenListItem: FC<TokenListItemProps> = ({
       <TokenDetailsWrapper>
         <TokenTextGroup>
           <TokenTitle>{symbol}</TokenTitle>
-          <TokenMeta>{name}</TokenMeta>
+          <TokenMetaContainer>
+            <TokenMeta>{name}</TokenMeta>
+          </TokenMetaContainer>
         </TokenTextGroup>
         <TokenBalance isLoading={isLoading}>{balance}</TokenBalance>
       </TokenDetailsWrapper>
