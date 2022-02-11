@@ -9,6 +9,8 @@ export const routes = {
   newToken: "/tokens/new",
   token: (tokenAddress: string) => `/tokens/${tokenAddress}`,
   tokenPath: "/tokens/:tokenAddress",
+  hideToken: (tokenAddress: string) => `/tokens/${tokenAddress}/hide`,
+  hideTokenPath: "/tokens/:tokenAddress/hide",
   reset: "/reset",
   disclaimer: "/disclaimer",
   settings: "/settings",
