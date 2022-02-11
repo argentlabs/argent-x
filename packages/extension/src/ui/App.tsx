@@ -72,7 +72,7 @@ export const App: FC = () => (
 )
 
 const Screen: FC = () => {
-  // dummy change, TODO: remove this
+  // dummy edit, TODO: remove this
   useEntry()
   useActionsSubscription()
 
