@@ -48,6 +48,7 @@ export const AccountListScreen: FC = () => {
   const { switcherNetworkId, localhostPort } = useAppState()
   const { wallets, selectedWallet, addWallet } = useAccount()
 
+  console.log("AccountListScreen wallets", wallets)
   const walletsList = Object.values(wallets)
 
   const handleAddWallet = async () => {
@@ -83,6 +84,7 @@ export const AccountListScreen: FC = () => {
         {walletsList.map((wallet, index) => (
           <AccountListItem
             key={wallet.address}
+            accountName={wallet.name}
             accountNumber={index + 1}
             address={wallet.address}
             status={getStatus(wallet, selectedWallet)}

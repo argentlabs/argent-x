@@ -64,6 +64,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
   const { switcherNetworkId, localhostPort } = useAppState()
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
+  const { setWalletName } = useAccount()
 
   useEffect(() => {
     sendMessage({
@@ -97,7 +98,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
       <Header>
         <ProfilePicture
           {...makeClickable(() => navigate(routes.accounts))}
-          src={getAccountImageUrl(accountNumber)}
+          src={getAccountImageUrl(wallet.name, accountNumber)}
         />
         <NetworkSwitcher />
       </Header>
@@ -106,7 +107,9 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
           networkId={switcherNetworkId}
           status={status}
           accountNumber={accountNumber}
+          accountName={wallet.name}
           walletAddress={wallet.address}
+          onChangeWalletName={setWalletName}
         />
         {showPendingTransactions && (
           <>

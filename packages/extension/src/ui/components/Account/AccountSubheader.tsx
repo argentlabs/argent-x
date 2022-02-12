@@ -5,8 +5,10 @@ import styled from "styled-components"
 
 import { getNetwork } from "../../../shared/networks"
 import { formatAddress, truncateAddress } from "../../utils/addresses"
-import { WalletStatus, getAccountName } from "../../utils/wallets"
+import { WalletStatus } from "../../utils/wallets"
 import { CopyTooltip } from "../CopyTooltip"
+import { EditableHeader } from "../EditableHeader"
+import { InputText } from "../Input"
 import { H1 } from "../Typography"
 import {
   AccountAddressIconsWrapper,
@@ -23,7 +25,7 @@ const AccountStatusText = styled.p<{ color?: string }>`
   color: ${({ color }) => color};
 `
 
-const AccountName = styled(H1)`
+const AccountName = styled(EditableHeader)`
   font-weight: 600;
   font-size: 32px;
   line-height: 38.4px;
@@ -34,18 +36,33 @@ interface AccountSubheaderProps {
   networkId: string
   status: WalletStatus
   accountNumber: number
+  accountName?: string
   walletAddress: string
+  onChangeWalletName: (networkId: string, address: string, name: string) => void
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   networkId,
   status,
-  accountNumber,
   walletAddress,
+  onChangeWalletName,
+  accountName,
 }) => (
   <>
-    <div>
-      <AccountName>{getAccountName(accountNumber)}</AccountName>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        style={{
+          alignSelf: "center",
+          width: 200,
+        }}
+      >
+        <AccountName
+          value={accountName}
+          onChange={(e: any) =>
+            onChangeWalletName(networkId, walletAddress, e.target.value)
+          }
+        />
+      </div>
       {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
         <AccountStatusText color={status.code === "ERROR" ? "red" : undefined}>
           {status.text}

@@ -38,14 +38,16 @@ export const getAccountColor = (accountNumber: number, withPrefix = true) =>
     argentColorsArray[(accountNumber % (argentColorsArray.length - 1)) + 1]
   }`
 
-export const getAccountImageUrl = (accountNumber: number) =>
-  `https://eu.ui-avatars.com/api?name=Account+${accountNumber}&background=${getAccountColor(
+export const getAccountImageUrl = (
+  accountName: string | undefined,
+  accountNumber: number,
+) => {
+  const urlAccountName = accountName ? accountName : `Account ${accountNumber}`
+  return `https://eu.ui-avatars.com/api?name=${urlAccountName}&background=${getAccountColor(
     accountNumber,
     false,
   )}&color=fff`
-
-export const getAccountName = (accountNumber: number) =>
-  `Account ${accountNumber}`
+}
 
 export const isWalletDeployed = (wallet: Wallet): boolean =>
   !wallet.deployTransaction

@@ -65,7 +65,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       {selectedAccount && (
         <Header style={{ margin: "0 -32px 16px" }}>
           <ProfilePicture
-            src={getAccountImageUrl(selectedAccount.accountNumber)}
+            src={getAccountImageUrl(undefined, selectedAccount.accountNumber)}
             disabled
           />
           <NetworkSwitcher disabled />
