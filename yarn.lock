@@ -7238,9 +7238,9 @@ react-dom@17.0.2, react-dom@^17.0.2:
     scheduler "^0.20.2"
 
 react-dropzone@^12.0.0:
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-12.0.2.tgz#3c34f71f378bc35bf06e8e5a1ccb415a5b7c9917"
-  integrity sha512-wnU3+QZA9H5XqC+UNdEDs5YuB+XgJh5mQ9Bop4PUtN/2nKTGTpBbfkcsm9OVCYylBHak69Ezjzbhx/0Cb6OfjA==
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-12.0.3.tgz#9ff62ca37e0564e7a0b302a843904ea5c064192b"
+  integrity sha512-7yIthjpO90A1A6EZxriuuHRz2WDgTjmMoAtf0k9PpFzsVK3zNxmDetUe0xgrxwjNH0HcJjePi8KOewmbdpdQCg==
   dependencies:
     attr-accept "^2.2.2"
     file-selector "^0.4.0"
