@@ -100,7 +100,7 @@ This project contains 3 packages:
 | --- | --- |
 | extension | Argent X extension |
 | get-starknet | npm module to get started with starknet.js and Argent X quickly |
-| playground | example dapp for testing purposes and example for dapps how to use `get-starknet` |
+| dapp | example dapp for testing purposes and example for dapps how to use `get-starknet` |
 
 To test changes made to the `extension` package you need to load the local unpacked extension into Chrome as [described above](#install-fromsources). Changes are shown after reopening the extension. Changes to `background.js` are just shown after a complete restart of the Chrome process.
 

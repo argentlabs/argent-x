@@ -46,7 +46,7 @@ export const TokenDapp: FC = () => {
           add its address to this file:
         </p>
         <div>
-          <pre>packages/playground/src/token.service.ts</pre>
+          <pre>packages/dapp/src/token.service.ts</pre>
         </div>
       </>
     )

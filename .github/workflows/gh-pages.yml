@@ -21,13 +21,13 @@ jobs:
 
       - run: yarn install --frozen-lockfile
       - run: |
-          echo 'module.exports = { basePath: "/argent-x" }' > packages/playground/next.config.js
+          echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
       - run: yarn build
-      - run: yarn --cwd packages/playground export
+      - run: yarn --cwd packages/dapp export
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/playground/out
+          publish_dir: ./packages/dapp/out
