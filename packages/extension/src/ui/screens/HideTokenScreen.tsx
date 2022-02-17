@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 

@@ -177,7 +177,7 @@ export const TokenDapp: FC = () => {
             onChange={(e) => setShortText(e.target.value)}
           />
 
-          <input type="submit" disabled={buttonsDisabled} value="Sign" />
+          <input type="submit" value="Sign" />
         </form>
         <form>
           <h2 className={styles.title}>Sign results</h2>
