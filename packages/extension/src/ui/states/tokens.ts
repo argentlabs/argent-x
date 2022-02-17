@@ -4,7 +4,7 @@ import useSWR from "swr"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-import erc20Tokens from "../../assets/erc20-tokens.json"
+import defaultTokens from "../../assets/default-tokens.json"
 import { messageStream } from "../../shared/messages"
 import { isValidAddress } from "../utils/addresses"
 import { fetchTokenBalance } from "../utils/tokens"
@@ -22,7 +22,7 @@ export interface TokenDetails {
 const equalToken = (a: TokenDetails, b: TokenDetails) =>
   a.address === b.address && a.networkId === b.networkId
 
-const parsedDefaultErc20Tokens = erc20Tokens.map((token) => ({
+const parsedDefaultTokens = defaultTokens.map((token) => ({
   ...token,
   decimals: BigNumber.from(token.decimals),
   networkId: token.network,
@@ -37,7 +37,7 @@ interface TokenState {
 export const useTokens = create<TokenState>(
   persist(
     (set, get) => ({
-      tokens: parsedDefaultErc20Tokens,
+      tokens: parsedDefaultTokens,
       addToken: (token: TokenDetails) => {
         if (!isValidAddress(token.address)) {
           throw Error("token address malformed")
@@ -69,7 +69,7 @@ export const useTokens = create<TokenState>(
                 key,
                 (value as TokenDetails[]).filter(
                   (token) =>
-                    !parsedDefaultErc20Tokens.some((defaultToken) =>
+                    !parsedDefaultTokens.some((defaultToken) =>
                       equalToken(token, defaultToken),
                     ),
                 ),
