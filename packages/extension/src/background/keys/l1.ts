@@ -180,7 +180,6 @@ export async function createAccount(networkId: string) {
   const encKeystore = await getEncKeystore(l1, sessionPassword, newWallets)
   store.setItem("encKeystore", encKeystore)
 
-  downloadTextFile(encKeystore, "starknet-backup.json")
   return {
     address: deployTransaction.address,
     txHash: deployTransaction.transaction_hash,

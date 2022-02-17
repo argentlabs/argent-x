@@ -16,7 +16,9 @@ export const deployWallet = async (
 
   const network = localNetworkUrl(networkId, localhostPort)
   try {
-    return await Wallet.fromDeploy(network)
+    const wallet = await Wallet.fromDeploy(network)
+    useAppState.setState({ backupNeedsDownload: "force" })
+    return wallet
   } finally {
     useAppState.setState({ isLoading: false })
   }
