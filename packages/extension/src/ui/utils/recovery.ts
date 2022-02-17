@@ -31,7 +31,9 @@ export const recover = async ({
     )?.address
 
     const wallets = backupWallets
-      .map(({ address, network }) => new Wallet(address, network))
+      .map(
+        ({ address, network, signer }) => new Wallet(address, network, signer),
+      )
       .reduce((acc, wallet) => ({ ...acc, [wallet.address]: wallet }), {})
 
     useAccount.setState({ wallets, selectedWallet })

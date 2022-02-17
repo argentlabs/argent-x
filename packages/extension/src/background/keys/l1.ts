@@ -7,6 +7,11 @@ import { BackupWallet } from "../../shared/backup.model"
 import { getProvider } from "../../shared/networks"
 import { selectedWalletStore } from "../selectedWallet"
 import { Storage } from "../storage"
+import {
+  getNextPathIndex,
+  getPathForIndex,
+  getStarkPair,
+} from "./keyDerivation"
 
 const isDev = process.env.NODE_ENV === "development"
 
@@ -48,7 +53,11 @@ async function getKeystore() {
   if (!encKeystore) {
     throw Error("No keystore exists")
   }
-  return encKeystore
+  const encKeystoreObj = JSON.parse(encKeystore)
+  return JSON.stringify({
+    ...encKeystoreObj,
+    wallets: encKeystoreObj["x-argentx"].accounts,
+  })
 }
 
 export async function setKeystore(keystore: string) {
@@ -130,7 +139,10 @@ async function getEncKeystore(
   const N = isDev ? 64 : 32768
   const backup = await wallet.encrypt(password, { scrypt: { N } }, progressFn)
 
-  const extendedBackup = { ...JSON.parse(backup), wallets }
+  const extendedBackup = {
+    ...JSON.parse(backup),
+    "x-argentx": { version: 1, accounts: wallets },
+  }
   return JSON.stringify(extendedBackup, null, 2)
 }
 
@@ -154,10 +166,16 @@ export async function createAccount(networkId: string) {
     throw Error("Password required")
   }
   const l1 = await getL1()
-  const starkPair = ec.getKeyPair(l1.privateKey)
+  const wallets = await getWallets()
+
+  const current_paths = wallets
+    .filter((wallet) => wallet.signer.type === "local_secret")
+    .map((wallet) => wallet.signer.derivation_path)
+
+  const index = getNextPathIndex(current_paths)
+  const starkPair = getStarkPair(index, l1.privateKey)
   const starkPub = ec.getStarkKey(starkPair)
   const seed = ec.getStarkKey(ec.genKeyPair())
-  const wallets = await getWallets()
 
   const provider = getProvider(networkId)
   const deployTransaction = await provider.deployContract(
@@ -175,14 +193,22 @@ export async function createAccount(networkId: string) {
     throw new Error("Deploy transaction failed")
   }
 
-  const newWallet = { network: networkId, address: deployTransaction.address }
+  const signer = {
+    type: "local_secret",
+    derivation_path: getPathForIndex(index),
+  }
+  const newWallet = {
+    network: networkId,
+    address: deployTransaction.address,
+    signer,
+  }
   const newWallets = [...wallets, newWallet]
   const encKeystore = await getEncKeystore(l1, sessionPassword, newWallets)
   store.setItem("encKeystore", encKeystore)
 
   downloadTextFile(encKeystore, "starknet-backup.json")
   return {
-    address: deployTransaction.address,
+    wallet: newWallet,
     txHash: deployTransaction.transaction_hash,
     wallets,
   }

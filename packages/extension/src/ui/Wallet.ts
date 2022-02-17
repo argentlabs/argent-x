@@ -1,6 +1,7 @@
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import { CompiledContract, Contract, json } from "starknet"
 
+import { BackupWalletSigner } from "../shared/backup.model"
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { getProvider } from "../shared/networks"
 
@@ -12,12 +13,19 @@ export class Wallet {
   address: string
   networkId: string
   deployTransaction?: string
+  signer: BackupWalletSigner
   contract: Contract
 
-  constructor(address: string, networkId: string, deployTransaction?: string) {
+  constructor(
+    address: string,
+    networkId: string,
+    signer: BackupWalletSigner,
+    deployTransaction?: string,
+  ) {
     this.address = address
     this.deployTransaction = deployTransaction
     this.networkId = networkId
+    this.signer = signer
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,
@@ -54,6 +62,11 @@ export class Wallet {
       throw new Error(result.error)
     }
 
-    return new Wallet(result.address, networkId, result.txHash)
+    return new Wallet(
+      result.address,
+      networkId,
+      result.wallet.signer,
+      result.txHash,
+    )
   }
 }

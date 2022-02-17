@@ -71,6 +71,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
       data: {
         address: wallet.address,
         network: localNetworkUrl(switcherNetworkId, localhostPort),
+        signer: wallet.signer
       },
     })
     try {
