@@ -25,14 +25,16 @@ export const recover = async ({
       ? localNetworkId(lastSelectedAccount?.network)
       : defaultNetwork.id
 
-    const backupWallets = networkWallets(await getWallets(), networkId)
+    const walletAccounts = networkWallets(await getWallets(), networkId)
 
-    const selectedAccount = backupWallets.find(
+    const selectedAccount = walletAccounts.find(
       ({ address }) => address === lastSelectedAccount?.address,
     )?.address
 
-    const accounts = backupWallets
-      .map(({ address, network }) => new Account(address, network))
+    const accounts = walletAccounts
+      .map(
+        ({ address, network, signer }) => new Account(address, network, signer),
+      )
       .reduce((acc, account) => ({ ...acc, [account.address]: account }), {})
 
     setDefaultAccountNames(accounts)

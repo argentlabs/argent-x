@@ -446,7 +446,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           })
         }
 
-        const wallet = { address: newAccount.address, network }
+        const { wallet } = newAccount
         selectedWalletStore.setItem("SELECTED_WALLET", wallet)
         transactionTracker.trackTransaction(newAccount.txHash, wallet, {
           title: "Deploy wallet",
@@ -454,7 +454,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_RES",
-          data: { status: "ok", ...newAccount },
+          data: { status: "ok", address: wallet.address, ...newAccount },
         })
       }
 

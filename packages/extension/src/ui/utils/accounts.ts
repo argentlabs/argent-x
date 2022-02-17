@@ -39,6 +39,7 @@ export const connectAccount = async (
     data: {
       address: account.address,
       network: localNetworkUrl(switcherNetworkId, localhostPort),
+      signer: account.signer,
     },
   })
   try {

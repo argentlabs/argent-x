@@ -59,6 +59,7 @@ export type MessageType =
         status: "ok"
         txHash: string
         address: string
+        wallet: BackupWallet
         wallets: BackupWallet[]
       }
     }
