@@ -1,7 +1,6 @@
 export const routes = {
   welcome: "/index.html",
-  newAccount: "/accounts/new",
-  deployAccount: "/accounts/new/deploy",
+  newWallet: "/wallets/new",
   recoverBackup: "/recover",
   password: "/password",
   account: "/account",
