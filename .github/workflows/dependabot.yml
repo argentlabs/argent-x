@@ -12,7 +12,7 @@ jobs:
           node-version: "14"
       - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: yarn --cwd packages/playground export
+      - run: yarn --cwd packages/dapp export
       - uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.PAT }}

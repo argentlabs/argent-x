@@ -24,7 +24,7 @@ jobs:
       - run: npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
-      - run: yarn --cwd packages/playground export
+      - run: yarn --cwd packages/dapp export
       - run: zip -r ${{ env.FILENAME }} packages/extension/dist/*
       - name: Release
         uses: softprops/action-gh-release@v1

@@ -7,9 +7,9 @@ import erc20Tokens from "../../assets/erc20-tokens.json"
 import { getProvider } from "../../shared/networks"
 import { TokenDetailsWithBalance } from "../states/tokens"
 
-export const playgroundToken = (networkId: string) =>
+export const testDappToken = (networkId: string) =>
   erc20Tokens.find(
-    ({ name, network }) => name === "Playground Token" && network === networkId,
+    ({ name, network }) => name === "Test Token" && network === networkId,
   )
 
 export interface TokenView {
