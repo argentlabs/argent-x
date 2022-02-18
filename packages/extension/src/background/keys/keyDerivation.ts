@@ -3,15 +3,19 @@ import { ec, number } from "starknet"
 
 // from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2645.md
 // m / purpose' / layer' / application' / eth_address_1' / eth_address_2' / index
-// layer = pathHash(starknet)
-// application = pathHash(argentx)
+// layer = pathHash("starknet")
+// application = pathHash("argentx")
 
 const BASE_PATH = "m/2645'/1195502025'/1148870696'/0'/0'"
 
-export function getStarkPair(index: number, secret: BigNumberish) {
+export function getStarkPair(
+  indexOrPath: number | string,
+  secret: BigNumberish,
+) {
   const masterNode = utils.HDNode.fromSeed(BigNumber.from(secret).toHexString())
 
-  const path = getPathForIndex(index)
+  const path =
+    typeof indexOrPath === "number" ? getPathForIndex(indexOrPath) : indexOrPath
   const childNode = masterNode.derivePath(path)
   const grindedKey = grindKey(childNode.privateKey)
   const starkPair = ec.getKeyPair(grindedKey)
@@ -47,15 +51,16 @@ export function grindKey(keySeed: string) {
   const maxAllowedVal = sha256EcMaxDigest.sub(
     sha256EcMaxDigest.mod(keyValLimit),
   )
+
+  // Make sure the produced key is devided by the Stark EC order,
+  // and falls within the range [0, maxAllowedVal).
   let i = 0
-  let key = hashKeyWithIndex(keySeed, i)
-  i++
-  // Make sure the produced key is devided by the Stark EC order, and falls within the range
-  // [0, maxAllowedVal).
-  while (!key.lt(maxAllowedVal)) {
+  let key
+  do {
     key = hashKeyWithIndex(keySeed, i)
     i++
-  }
+  } while (!key.lt(maxAllowedVal))
+
   return "0x" + key.umod(keyValLimit).toString("hex")
 }
 
@@ -66,8 +71,8 @@ function hashKeyWithIndex(key: string, index: number) {
 }
 
 export function pathHash(name: string) {
-  const hash = utils.arrayify(utils.sha256(utils.toUtf8Bytes(name))).slice(-4)
-  return BigNumber.from(
-    utils.concat([[hash[0] & 127], hash.slice(-3)]),
-  ).toNumber()
+  return number
+    .toBN(utils.sha256(utils.toUtf8Bytes(name)))
+    .maskn(31)
+    .toNumber()
 }
