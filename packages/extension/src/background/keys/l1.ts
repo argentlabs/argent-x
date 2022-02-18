@@ -15,14 +15,15 @@ import {
 
 const isDev = process.env.NODE_ENV === "development"
 
+const STORAGE_KEY = "KEYSTORE"
 interface StorageProps {
-  encKeystore?: string
+  [STORAGE_KEY]?: string
 }
 
 const store = new Storage<StorageProps>({}, "L1")
 
 export async function existsL1() {
-  return Boolean(await store.getItem("encKeystore"))
+  return Boolean(await store.getItem(STORAGE_KEY))
 }
 
 export async function validatePassword(password: string) {
@@ -49,20 +50,32 @@ export function isUnlocked(): boolean {
 }
 
 async function getKeystore() {
-  const encKeystore = await store.getItem("encKeystore")
+  const encKeystore = await store.getItem(STORAGE_KEY)
   if (!encKeystore) {
     throw Error("No keystore exists")
   }
   const encKeystoreObj = JSON.parse(encKeystore)
   return JSON.stringify({
     ...encKeystoreObj,
-    wallets: encKeystoreObj["x-argentx"].accounts,
+    wallets: encKeystoreObj["x-argent"].accounts,
   })
 }
 
-export async function setKeystore(keystore: string) {
+async function setKeystore(keystore: string) {
   setRawWallet(undefined)
-  await store.setItem("encKeystore", keystore)
+  await store.setItem(STORAGE_KEY, keystore)
+}
+
+async function validateKeystore(keystore: string) {
+  const keystoreObj = JSON.parse(keystore)
+  if (keystoreObj["x-version"] !== 1) {
+    throw Error("Invalid Keystore file format")
+  }
+}
+
+export async function importKeystore(keystore: string) {
+  validateKeystore(keystore)
+  setKeystore(keystore)
 }
 
 async function recoverL1(password: string): Promise<ethers.Wallet> {
@@ -97,9 +110,7 @@ export async function getL1(password?: string): Promise<ethers.Wallet> {
       const recoveredWallet = await recoverPromise
       setRawWallet(recoveredWallet)
       sessionPassword = password
-      const encKeystore = JSON.parse(
-        (await store.getItem("encKeystore")) || "{}",
-      )
+      const encKeystore = JSON.parse((await store.getItem(STORAGE_KEY)) || "{}")
 
       if (
         (await selectedWalletStore.getItem("SELECTED_WALLET")).address === "" &&
@@ -141,7 +152,8 @@ async function getEncKeystore(
 
   const extendedBackup = {
     ...JSON.parse(backup),
-    "x-argentx": { version: 1, accounts: wallets },
+    "x-version": 1,
+    "x-argent": { accounts: wallets },
   }
   return JSON.stringify(extendedBackup, null, 2)
 }
@@ -175,7 +187,7 @@ export async function createAccount(networkId: string) {
   const index = getNextPathIndex(current_paths)
   const starkPair = getStarkPair(index, l1.privateKey)
   const starkPub = ec.getStarkKey(starkPair)
-  const seed = ec.getStarkKey(ec.genKeyPair())
+  const seed = starkPub //ec.getStarkKey(ec.genKeyPair())
 
   const provider = getProvider(networkId)
   const deployTransaction = await provider.deployContract(
@@ -193,18 +205,17 @@ export async function createAccount(networkId: string) {
     throw new Error("Deploy transaction failed")
   }
 
-  const signer = {
-    type: "local_secret",
-    derivation_path: getPathForIndex(index),
-  }
   const newWallet = {
     network: networkId,
     address: deployTransaction.address,
-    signer,
+    signer: {
+      type: "local_secret",
+      derivation_path: getPathForIndex(index),
+    },
   }
   const newWallets = [...wallets, newWallet]
   const encKeystore = await getEncKeystore(l1, sessionPassword, newWallets)
-  store.setItem("encKeystore", encKeystore)
+  store.setItem(STORAGE_KEY, encKeystore)
 
   return {
     wallet: newWallet,
@@ -214,7 +225,7 @@ export async function createAccount(networkId: string) {
 }
 
 export async function downloadBackupFile() {
-  const encKeystore = (await store.getItem("encKeystore")) ?? ""
+  const encKeystore = (await store.getItem(STORAGE_KEY)) ?? ""
   downloadTextFile(encKeystore, "starknet-backup.json")
 }
 
@@ -228,7 +239,11 @@ export const deleteAccount = async (account: string) => {
   const wallets = keystore.wallets.filter(
     ({ address }: any) => address !== account,
   )
-  const newKeystore = JSON.stringify({ ...keystore, wallets }, null, 2)
+  const newKeystore = JSON.stringify(
+    { ...keystore, "x-argent": { accounts: wallets } },
+    null,
+    2,
+  )
   await setKeystore(newKeystore)
   await getL1()
 }

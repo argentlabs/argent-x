@@ -1,23 +1,19 @@
 import { Signer } from "starknet"
 
+import { BackupWallet } from "../../shared/backup.model"
 import { getProvider } from "../../shared/networks"
+import { getStarkPair } from "../keys/keyDerivation"
+import { getL1 } from "../keys/l1"
 
-type GetSignerOptions = {
-  type: "LOCAL"
-  address: string
-  network: string
-  keyPair: string
-}
+export async function getSigner(wallet: BackupWallet): Promise<Signer> {
+  const provider = getProvider(wallet.network)
 
-export async function getSigner(options: GetSignerOptions): Promise<Signer> {
-  const { type, address, network, keyPair } = options
-
-  const provider = getProvider(network)
-
-  switch (type) {
-    case "LOCAL":
+  switch (wallet.signer.type) {
+    case "local_secret":
     default: {
-      return new Signer(provider, address, keyPair)
+      const l1 = await getL1()
+      const keyPair = getStarkPair(wallet.signer.derivation_path, l1.privateKey)
+      return new Signer(provider, wallet.address, keyPair)
     }
   }
 }

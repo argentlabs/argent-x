@@ -1,5 +1,5 @@
 import { compactDecrypt } from "jose"
-import { ec, encode } from "starknet"
+import { encode } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
@@ -19,12 +19,11 @@ import {
   deleteAccount,
   downloadBackupFile,
   existsL1,
-  getL1,
   getWallets,
+  importKeystore,
   isUnlocked,
   lockWallet,
   resetAll,
-  setKeystore,
   validatePassword,
 } from "./keys/l1"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
@@ -220,17 +219,10 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
             if (!isUnlocked()) {
               throw Error("you need an open session")
             }
-            const l1 = await getL1()
-            const keyPair = ec.getKeyPair(l1.privateKey)
             const selectedWallet = await selectedWalletStore.getItem(
               "SELECTED_WALLET",
             )
-            const signer = await getSigner({
-              type: "LOCAL",
-              address: selectedWallet.address,
-              keyPair,
-              network: selectedWallet.network,
-            })
+            const signer = await getSigner(selectedWallet)
 
             try {
               const nonce = await getNonce(signer)
@@ -263,17 +255,10 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
             if (!isUnlocked()) {
               throw Error("you need an open session")
             }
-            const l1 = await getL1()
-            const keyPair = ec.getKeyPair(l1.privateKey)
             const selectedWallet = await selectedWalletStore.getItem(
               "SELECTED_WALLET",
             )
-            const signer = await getSigner({
-              type: "LOCAL",
-              address: selectedWallet.address,
-              keyPair,
-              network: selectedWallet.network,
-            })
+            const signer = await getSigner(selectedWallet)
 
             const [r, s] = await signer.signMessage(typedData)
 
@@ -473,7 +458,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
       }
 
       case "RECOVER_KEYSTORE": {
-        await setKeystore(msg.data)
+        await importKeystore(msg.data)
         return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })
       }
       case "DOWNLOAD_BACKUP_FILE": {
