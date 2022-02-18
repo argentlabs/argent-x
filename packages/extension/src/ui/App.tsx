@@ -11,6 +11,7 @@ import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
+import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { DappsScreen } from "./screens/DappsScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
@@ -72,7 +73,6 @@ export const App: FC = () => (
 )
 
 const Screen: FC = () => {
-  // dummy edit, TODO: remove this
   useEntry()
   useActionsSubscription()
 
@@ -106,6 +106,10 @@ const Screen: FC = () => {
           <Route path={routes.tokenPath} element={<TokenScreen />} />
           <Route path={routes.hideTokenPath} element={<HideTokenScreen />} />
           <Route path={routes.settings} element={<SettingsScreen />} />
+          <Route
+            path={routes.backupDownload()}
+            element={<BackupDownloadScreen />}
+          />
         </>
       )}
     </Routes>

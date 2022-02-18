@@ -64,21 +64,12 @@ export const SettingsScreen: FC = () => {
         >
           Reset dapp connections
         </Button>
-        <Button
-          onClick={() => {
-            navigate(routes.dappConnections)
-          }}
-        >
+        <Button onClick={() => navigate(routes.dappConnections)}>
           View dapp connections
         </Button>
 
         <P>The backup file contains all your accounts, keep it secure.</P>
-        <Button
-          onClick={() => {
-            sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
-            navigate(-1)
-          }}
-        >
+        <Button onClick={() => navigate(routes.backupDownload(true))}>
           Download backup file
         </Button>
 

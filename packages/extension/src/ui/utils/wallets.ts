@@ -1,5 +1,6 @@
 import { localNetworkUrl } from "../../shared/networks"
 import { useAppState } from "../states/app"
+import { useBackupDownload } from "../states/backupDownload"
 import { Wallet } from "../Wallet"
 import { startSession } from "./messaging"
 
@@ -17,7 +18,7 @@ export const deployWallet = async (
   const network = localNetworkUrl(networkId, localhostPort)
   try {
     const wallet = await Wallet.fromDeploy(network)
-    useAppState.setState({ backupNeedsDownload: "force" })
+    useBackupDownload.setState({ isBackupDownloadRequired: true })
     return wallet
   } finally {
     useAppState.setState({ isLoading: false })
