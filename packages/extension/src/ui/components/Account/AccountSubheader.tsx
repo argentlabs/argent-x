@@ -8,8 +8,6 @@ import { formatAddress, truncateAddress } from "../../utils/addresses"
 import { WalletStatus } from "../../utils/wallets"
 import { CopyTooltip } from "../CopyTooltip"
 import { EditableHeader } from "../EditableHeader"
-import { InputText } from "../Input"
-import { H1 } from "../Typography"
 import {
   AccountAddressIconsWrapper,
   AccountAddressLink,
@@ -38,14 +36,14 @@ interface AccountSubheaderProps {
   accountNumber: number
   accountName?: string
   walletAddress: string
-  onChangeWalletName: (networkId: string, address: string, name: string) => void
+  onChangeName: (networkId: string, address: string, name: string) => void
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   networkId,
   status,
   walletAddress,
-  onChangeWalletName,
+  onChangeName,
   accountName,
 }) => (
   <>
@@ -58,8 +56,8 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
       >
         <AccountName
           value={accountName}
-          onChange={(e: any) =>
-            onChangeWalletName(networkId, walletAddress, e.target.value)
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onChangeName(networkId, walletAddress, e.target.value)
           }
         />
       </div>

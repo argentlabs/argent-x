@@ -26,6 +26,7 @@ export interface ConfirmPageProps {
   selectedAccount?: {
     accountNumber: number
     networkId: string
+    name?: string
   }
 }
 
@@ -65,7 +66,10 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       {selectedAccount && (
         <Header style={{ margin: "0 -32px 16px" }}>
           <ProfilePicture
-            src={getAccountImageUrl(undefined, selectedAccount.accountNumber)}
+            src={getAccountImageUrl(
+              selectedAccount.name,
+              selectedAccount.accountNumber,
+            )}
             disabled
           />
           <NetworkSwitcher disabled />

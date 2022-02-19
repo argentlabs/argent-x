@@ -9,19 +9,6 @@ const Container = styled.div`
   width: 100%;
 `
 
-const Label = styled.label`
-  color: #8f8e8c;
-  font-weight: normal;
-  font-size: 17px;
-  order: 1;
-  pointer-events: none;
-  text-shadow: none;
-  transform-origin: left top;
-  transform: scale(1) translate3d(0, 22px, 0);
-  transition: all 200ms ease-in-out;
-  text-align: start;
-`
-
 const Input = styled.input`
   border-radius: 0;
   display: flex;
@@ -35,7 +22,8 @@ const Input = styled.input`
   color: white;
 
   border: 0;
-  border-bottom: 0px;
+  // allocates space for bottom-border when focused
+  border-bottom: 1px solid transparent;
   padding: 2px 0 6px;
   flex: 1 1 auto;
   order: 2;
@@ -43,7 +31,6 @@ const Input = styled.input`
   outline: 0;
 
   &:hover {
-    border-bottom: 0px;
     outline: 0;
   }
 
@@ -86,7 +73,6 @@ export const EditableHeader = styled(
           disabled={disabled}
           {...props}
         />
-        <Label>{placeholder}</Label>
       </Container>
     )
   },

@@ -8,7 +8,7 @@ interface AccountStore {
   accountNames: Record<string, any>
   selectedWallet?: string
   addWallet: (newWallet: Wallet) => void
-  setWalletName: (netowrkId: string, address: string, name: string) => void
+  setAccountName: (netowrkId: string, address: string, name: string) => void
 }
 
 export const useAccount = create<AccountStore>(
@@ -24,13 +24,8 @@ export const useAccount = create<AccountStore>(
             [newWallet.address]: newWallet,
           },
         })),
-      setWalletName: (networkId: string, address: string, name?: string) =>
+      setAccountName: (networkId: string, address: string, name?: string) =>
         set((state) => {
-          console.log(
-            "setWalletName address: string, name?: string",
-            address,
-            name,
-          )
           const wallet: Wallet = state.wallets[address]
           wallet.name = name
             ? name
@@ -55,13 +50,13 @@ export const useAccount = create<AccountStore>(
         }),
     }),
     {
-      name: "accountNames", // name of item in the storage (must be unique)
-      getStorage: () => localStorage, // (optional) by default the 'localStorage' is used
+      name: "accountNames",
+      getStorage: () => localStorage,
       merge: (persistedState, currentState) => ({
         ...currentState,
-        ...persistedState,
         accountNames: {
           ...currentState.accountNames,
+          // only load state.accountNames from local storage
           ...persistedState.accountNames,
         },
       }),
@@ -76,8 +71,10 @@ const getAccountName = (
   return useAccount.getState().accountNames?.[networkId]?.[address]
 }
 
-export const setWalletsFromBackup = (wallets: Record<string, Wallet>) => {
-  console.log("start setWalletsFromBackup wallets", wallets)
+/**
+ * Sets account names saved in local storage or given a default name
+ */
+export const setAccountNamesFromBackup = (wallets: Record<string, Wallet>) => {
   Object.keys(wallets).forEach((address: string) => {
     const wallet = wallets[address]
     wallet.name = getAccountName(wallet.networkId, wallet.address)
@@ -85,7 +82,6 @@ export const setWalletsFromBackup = (wallets: Record<string, Wallet>) => {
       wallet.name = getDefaultAccountName(calcAccountNumber(wallets, address))
     }
   })
-  console.log("end setWalletsFromBackup wallets", wallets)
 }
 
 export const selectWallet = ({ wallets, selectedWallet }: AccountStore) => {
@@ -101,6 +97,10 @@ export const selectAccountNumber = ({
   wallets,
   selectedWallet,
 }: AccountStore) => calcAccountNumber(wallets, selectedWallet)
+
+export const selectAccount = ({ wallets, selectedWallet }: AccountStore) => {
+  return selectedWallet ? wallets[selectedWallet] : undefined
+}
 
 const calcAccountNumber = (
   wallets: Record<string, Wallet>,

@@ -64,7 +64,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
   const { switcherNetworkId, localhostPort } = useAppState()
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
-  const { setWalletName } = useAccount()
+  const { setAccountName } = useAccount()
 
   useEffect(() => {
     sendMessage({
@@ -109,7 +109,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
           accountNumber={accountNumber}
           accountName={wallet.name}
           walletAddress={wallet.address}
-          onChangeWalletName={setWalletName}
+          onChangeName={setAccountName}
         />
         {showPendingTransactions && (
           <>

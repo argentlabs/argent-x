@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../shared/messages"
 import { routes } from "../routes"
-import { selectAccountNumber, useAccount } from "../states/account"
+import {
+  selectAccount,
+  selectAccountNumber,
+  useAccount,
+} from "../states/account"
 import { useActions } from "../states/actions"
 import { useAppState } from "../states/app"
 import { AddTokenScreen } from "./AddTokenScreen"
@@ -17,6 +21,7 @@ export const ActionScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const accountNumber = useAccount(selectAccountNumber)
+  const account = useAccount(selectAccount)
   const { actions, approve, reject } = useActions()
 
   const [action] = actions
@@ -97,7 +102,11 @@ export const ActionScreen: FC = () => {
               window.close()
             }
           }}
-          selectedAccount={{ accountNumber, networkId: switcherNetworkId }}
+          selectedAccount={{
+            accountNumber,
+            networkId: switcherNetworkId,
+            name: account?.name,
+          }}
         />
       )
     case "SIGN":
@@ -122,7 +131,11 @@ export const ActionScreen: FC = () => {
               window.close()
             }
           }}
-          selectedAccount={{ accountNumber, networkId: switcherNetworkId }}
+          selectedAccount={{
+            accountNumber,
+            networkId: switcherNetworkId,
+            name: account?.name,
+          }}
         />
       )
   }
