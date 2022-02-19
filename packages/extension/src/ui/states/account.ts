@@ -50,7 +50,7 @@ export const useAccount = create<AccountStore>(
         }),
     }),
     {
-      name: "accountNames",
+      name: "account",
       getStorage: () => localStorage,
       merge: (persistedState, currentState) => ({
         ...currentState,
