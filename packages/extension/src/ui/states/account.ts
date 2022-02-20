@@ -51,6 +51,8 @@ export const useAccount = create<AccountStore>(
     }),
     {
       name: "account",
+      // only save state.accountNames to local storage
+      partialize: (state) => ({ accountNames: state.accountNames }),
       getStorage: () => localStorage,
       merge: (persistedState, currentState) => ({
         ...currentState,
