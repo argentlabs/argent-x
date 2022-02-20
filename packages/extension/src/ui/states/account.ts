@@ -16,14 +16,20 @@ export const useAccount = create<AccountStore>(
     (set, get) => ({
       wallets: {},
       accountNames: {},
-      addWallet: (newWallet: Wallet) =>
+      addWallet: (newWallet: Wallet) => {
+        if (newWallet.name === undefined) {
+          newWallet.name = getDefaultAccountName(
+            Object.keys(get().wallets).length + 1,
+          )
+        }
         set((state) => ({
           selectedWallet: newWallet.address,
           wallets: {
             ...state.wallets,
             [newWallet.address]: newWallet,
           },
-        })),
+        }))
+      },
       setAccountName: (networkId: string, address: string, name?: string) =>
         set((state) => {
           const wallet: Wallet = state.wallets[address]
