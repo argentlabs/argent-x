@@ -86,26 +86,26 @@ const Screen: FC = () => {
   return (
     <Routes>
       {/* Routes which need no unlocked keystore */}
-      <Route path={routes.welcome} element={<WelcomeScreen />} />
-      <Route path={routes.newWallet} element={<NewWalletScreen />} />
-      <Route path={routes.recoverBackup} element={<UploadKeystoreScreen />} />
-      <Route path={routes.password} element={<PasswordScreen />} />
-      <Route path={routes.reset} element={<ResetScreen />} />
-      <Route path={routes.disclaimer} element={<DisclaimerScreen />} />
-      <Route path={routes.error} element={<ErrorScreen />} />
+      <Route path={routes.welcome()} element={<WelcomeScreen />} />
+      <Route path={routes.newWallet()} element={<NewWalletScreen />} />
+      <Route path={routes.recoverBackup()} element={<UploadKeystoreScreen />} />
+      <Route path={routes.password()} element={<PasswordScreen />} />
+      <Route path={routes.reset()} element={<ResetScreen />} />
+      <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
+      <Route path={routes.error()} element={<ErrorScreen />} />
 
       {/* Routes which need an unlocked keystore and therefore can also sign actions */}
       {actions[0] ? (
         <Route path="*" element={<ActionScreen />} />
       ) : (
         <>
-          <Route path={routes.account} element={<AccountScreen />} />
-          <Route path={routes.accounts} element={<AccountListScreen />} />
-          <Route path={routes.newToken} element={<AddTokenScreen />} />
-          <Route path={routes.dappConnections} element={<DappsScreen />} />
-          <Route path={routes.tokenPath} element={<TokenScreen />} />
-          <Route path={routes.hideTokenPath} element={<HideTokenScreen />} />
-          <Route path={routes.settings} element={<SettingsScreen />} />
+          <Route path={routes.account()} element={<AccountScreen />} />
+          <Route path={routes.accounts()} element={<AccountListScreen />} />
+          <Route path={routes.newToken()} element={<AddTokenScreen />} />
+          <Route path={routes.dappConnections()} element={<DappsScreen />} />
+          <Route path={routes.tokenPath()} element={<TokenScreen />} />
+          <Route path={routes.hideTokenPath()} element={<HideTokenScreen />} />
+          <Route path={routes.settings()} element={<SettingsScreen />} />
           <Route
             path={routes.backupDownload()}
             element={<BackupDownloadScreen />}

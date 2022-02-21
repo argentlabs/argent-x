@@ -22,7 +22,7 @@ export const ResetScreen: FC = () => {
         localStorage.clear()
         useAppState.setState({ isFirstRender: true })
         useAccount.setState({ wallets: {}, selectedWallet: undefined })
-        navigate(routes.welcome)
+        navigate(routes.welcome())
       }}
     >
       <P>

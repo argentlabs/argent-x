@@ -50,7 +50,7 @@ export const AccountScreen: FC = () => {
 
   useEffect(() => {
     if (!wallet) {
-      navigate(routes.accounts)
+      navigate(routes.accounts())
     }
   }, [])
 
@@ -107,7 +107,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
     <AccountColumn>
       <Header>
         <ProfilePicture
-          {...makeClickable(() => navigate(routes.accounts))}
+          {...makeClickable(() => navigate(routes.accounts()))}
           src={getAccountImageUrl(wallet.name, accountNumber)}
         />
         <NetworkSwitcher />
@@ -146,7 +146,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
             walletAddress={wallet.address}
             canShowEmptyWalletAlert={!showPendingTransactions}
           />
-          <TokenWrapper {...makeClickable(() => navigate(routes.newToken))}>
+          <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
             <AddTokenIconButton size={40}>
               <AddIcon />
             </AddTokenIconButton>

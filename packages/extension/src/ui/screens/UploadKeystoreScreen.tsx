@@ -57,10 +57,10 @@ export const UploadKeystoreScreen: FC = () => {
     try {
       const data = await fileToString(acceptedFile)
       await recoverKeystore(data)
-      navigate(routes.password)
+      navigate(routes.password())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
-      navigate(routes.error)
+      navigate(routes.error())
     }
   }
 

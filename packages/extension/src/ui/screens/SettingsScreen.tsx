@@ -45,7 +45,7 @@ export const SettingsScreen: FC = () => {
         <Button
           onClick={() => {
             sendMessage({ type: "STOP_SESSION" })
-            navigate(routes.password)
+            navigate(routes.password())
           }}
         >
           Lock wallet
@@ -63,7 +63,7 @@ export const SettingsScreen: FC = () => {
         >
           Reset dapp connections
         </Button>
-        <Button onClick={() => navigate(routes.dappConnections)}>
+        <Button onClick={() => navigate(routes.dappConnections())}>
           View dapp connections
         </Button>
 
