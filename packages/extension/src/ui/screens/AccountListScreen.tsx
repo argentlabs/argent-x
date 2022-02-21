@@ -12,6 +12,7 @@ import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
+import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { deployWallet, getStatus } from "../utils/wallets"
 
@@ -45,7 +46,8 @@ const Paragraph = styled(P)`
 
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId, localhostPort } = useAppState()
+  const { switcherNetworkId } = useAppState()
+  const { localhostPort } = useLocalhostPort()
   const { wallets, selectedWallet, addWallet } = useAccount()
 
   const walletsList = Object.values(wallets)

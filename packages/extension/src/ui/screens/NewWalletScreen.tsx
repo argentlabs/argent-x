@@ -11,6 +11,7 @@ import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
+import { useLocalhostPort } from "../states/localhostPort"
 import { deployWallet } from "../utils/wallets"
 
 const NewWalletScreenWrapper = styled.div`
@@ -33,7 +34,8 @@ export function isValidPassword(password: string): boolean {
 export const NewWalletScreen: FC = () => {
   const navigate = useNavigate()
   const { addWallet } = useAccount()
-  const { switcherNetworkId, localhostPort } = useAppState()
+  const { switcherNetworkId } = useAppState()
+  const { localhostPort } = useLocalhostPort()
   const {
     control,
     handleSubmit,

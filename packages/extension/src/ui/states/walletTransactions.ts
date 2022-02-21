@@ -5,11 +5,11 @@ import { messageStream } from "../../shared/messages"
 import { TransactionStatus } from "../../shared/transactions.model"
 import { getTransactions } from "../utils/messaging"
 
-interface TransactionsStore {
+interface State {
   transactions: TransactionStatus[]
 }
 
-const useTransactionsStore = create<TransactionsStore>(() => ({
+const useTransactionsStore = create<State>(() => ({
   transactions: [],
 }))
 
