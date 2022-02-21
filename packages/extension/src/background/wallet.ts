@@ -4,13 +4,13 @@ import { Signer, compileCalldata, ec } from "starknet"
 
 import { getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
-import { IStorage } from "./interfaces"
 import {
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema.json"
+import { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"

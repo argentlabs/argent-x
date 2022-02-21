@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 
-import { IStorage } from "../src/background/interfaces"
+import { IStorage } from "../src/background/storage"
 import {
   SESSION_DURATION,
   Wallet,

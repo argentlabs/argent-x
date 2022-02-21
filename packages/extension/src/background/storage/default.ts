@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill"
 
-import { IStorage } from "./interfaces"
+import { IStorage } from "./interface"
 
 export async function getFromStorage<T, K extends string = string>(
   key: K,
