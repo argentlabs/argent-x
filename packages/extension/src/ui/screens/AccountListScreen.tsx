@@ -55,7 +55,7 @@ export const AccountListScreen: FC = () => {
       const newWallet = await deployWallet(switcherNetworkId, localhostPort)
       addWallet(newWallet)
       useAccount.setState({ selectedWallet: newWallet.address })
-      navigate(routes.account)
+      navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
       navigate(routes.error)

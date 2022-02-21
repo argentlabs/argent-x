@@ -56,7 +56,7 @@ export const NewWalletScreen: FC = () => {
       )
       addWallet(newWallet)
       useAccount.setState({ selectedWallet: newWallet.address })
-      navigate(routes.account)
+      navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error })
       navigate(routes.error)

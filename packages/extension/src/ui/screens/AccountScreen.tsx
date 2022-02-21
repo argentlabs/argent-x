@@ -43,8 +43,16 @@ const AccountContent = styled.div`
 `
 
 export const AccountScreen: FC = () => {
+  const navigate = useNavigate()
   const wallet = useAccount(selectWallet)
   const accountNumber = useAccount(selectAccountNumber)
+
+  useEffect(() => {
+    if (!wallet) {
+      navigate(routes.accounts)
+    }
+  }, [])
+
   if (!wallet) {
     return <></>
   }
