@@ -146,16 +146,16 @@ test("import backup file", async () => {
   expect(wallet.isSessionOpen()).toBe(false)
 })
 
-test.skip("import wront backup file", async () => {
+test("import wrong backup file", async () => {
   const storage = new MockStorage()
   const wallet = new Wallet(storage, compiledContract)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
 
-  expect(async () => {
-    await wallet.importBackup(backupWrongString)
-  }).toThrowError("invalid keystore")
+  await expect(wallet.importBackup(backupWrongString)).rejects.toThrow(
+    "invalid backup file",
+  )
 
   expect(wallet.isInitialized()).toBe(false)
 })
