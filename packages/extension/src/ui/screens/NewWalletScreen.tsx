@@ -61,7 +61,7 @@ export const NewWalletScreen: FC = () => {
       navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error })
-      navigate(routes.error)
+      navigate(routes.error())
     }
   }
 

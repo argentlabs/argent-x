@@ -23,7 +23,7 @@ export const DisclaimerScreen: FC = () => {
       singleButton
       onSubmit={() => {
         understandDisclaimer()
-        navigate(routes.welcome)
+        navigate(routes.welcome())
       }}
     >
       <SP>

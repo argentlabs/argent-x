@@ -63,7 +63,7 @@ export const PasswordScreen: FC = () => {
     setError("password", { message: error })
   }, [error])
 
-  const handleResetClick = () => navigate(routes.reset)
+  const handleResetClick = () => navigate(routes.reset())
 
   const verifyPassword = async (password: string) => {
     useAppState.setState({ error: undefined, isLoading: true })

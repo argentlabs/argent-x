@@ -60,7 +60,7 @@ export const AccountListScreen: FC = () => {
       navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
-      navigate(routes.error)
+      navigate(routes.error())
     }
   }
 
@@ -69,7 +69,7 @@ export const AccountListScreen: FC = () => {
       <Header>
         <IconButton
           size={36}
-          {...makeClickable(() => navigate(routes.settings), 99)}
+          {...makeClickable(() => navigate(routes.settings()), 99)}
         >
           <MoreVertIcon />
         </IconButton>

@@ -55,7 +55,7 @@ export const BackupDownloadScreen: FC = () => {
         </P>
         <DownloadButton onClick={handleDownload}>Download</DownloadButton>
         {!isBackupDownloadRequired && !isSettings && (
-          <ContinueButton onClick={() => navigate(routes.account)}>
+          <ContinueButton onClick={() => navigate(routes.account())}>
             Continue
           </ContinueButton>
         )}
