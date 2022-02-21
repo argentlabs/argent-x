@@ -1,6 +1,6 @@
 import { Provider } from "starknet"
 
-import { BackupWallet } from "./backup.model"
+import { WalletAccount } from "./wallet.model"
 
 export interface Network {
   id: string
@@ -33,7 +33,7 @@ export const getNetwork = (networkId: string): Network => {
   return networks.find(({ id }) => id === networkId) || defaultNetwork
 }
 
-export const networkWallets = (wallets: BackupWallet[], networkId: string) =>
+export const networkWallets = (wallets: WalletAccount[], networkId: string) =>
   wallets.filter(
     ({ network }) => localNetworkId(network) === localNetworkId(networkId),
   )

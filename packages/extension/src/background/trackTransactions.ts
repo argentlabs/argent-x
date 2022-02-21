@@ -1,11 +1,11 @@
 import { Provider } from "starknet"
 
-import { BackupWallet } from "../shared/backup.model"
 import { getProvider } from "../shared/networks"
 import {
   TransactionMeta,
   TransactionStatus,
 } from "../shared/transactions.model"
+import { WalletAccount } from "../shared/wallet.model"
 
 interface TransactionStatusWithProvider extends TransactionStatus {
   provider: Provider
@@ -38,7 +38,7 @@ export class TransactionTracker {
 
   public async trackTransaction(
     transactionHash: string,
-    wallet: BackupWallet,
+    wallet: WalletAccount,
     meta: TransactionMeta = {
       title: "Contract interaction",
     },
