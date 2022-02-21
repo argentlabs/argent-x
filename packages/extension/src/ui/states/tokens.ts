@@ -28,13 +28,13 @@ const parsedDefaultTokens = defaultTokens.map((token) => ({
   networkId: token.network,
 }))
 
-interface TokenState {
+interface State {
   tokens: TokenDetails[]
   addToken: (token: TokenDetails) => void
   removeToken: (token: TokenDetails) => void
 }
 
-export const useTokens = create<TokenState>(
+export const useTokens = create<State>(
   persist(
     (set, get) => ({
       tokens: parsedDefaultTokens,
@@ -102,9 +102,8 @@ export const removeToken = (token: TokenDetails) => {
   useTokens.getState().removeToken(token)
 }
 
-export const selectTokensByNetwork =
-  (networkId: string) => (state: TokenState) =>
-    state.tokens.filter((token) => token.networkId === networkId)
+export const selectTokensByNetwork = (networkId: string) => (state: State) =>
+  state.tokens.filter((token) => token.networkId === networkId)
 
 export interface TokenDetailsWithBalance extends TokenDetails {
   balance?: BigNumber

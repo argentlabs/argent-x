@@ -1,7 +1,6 @@
 export const routes = {
   welcome: "/index.html",
-  newAccount: "/accounts/new",
-  deployAccount: "/accounts/new/deploy",
+  newWallet: "/wallets/new",
   recoverBackup: "/recover",
   password: "/password",
   account: "/account",
@@ -14,6 +13,8 @@ export const routes = {
   reset: "/reset",
   disclaimer: "/disclaimer",
   settings: "/settings",
-  dappConnections: "/dappConnections",
+  backupDownload: (isFromSettings?: boolean) =>
+    `/backup-download${isFromSettings ? "?settings" : ""}`,
+  dappConnections: "/dapp-connections",
   error: "/error",
 }

@@ -11,12 +11,13 @@ import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
+import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { DappsScreen } from "./screens/DappsScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
-import { NewSeedScreen } from "./screens/NewSeedScreen"
+import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { PasswordScreen } from "./screens/PasswordScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
@@ -72,7 +73,6 @@ export const App: FC = () => (
 )
 
 const Screen: FC = () => {
-  // dummy edit, TODO: remove this
   useEntry()
   useActionsSubscription()
 
@@ -87,8 +87,7 @@ const Screen: FC = () => {
     <Routes>
       {/* Routes which need no unlocked keystore */}
       <Route path={routes.welcome} element={<WelcomeScreen />} />
-      <Route path={routes.newAccount} element={<NewSeedScreen />} />
-      <Route path={routes.deployAccount} element={<NewSeedScreen />} />
+      <Route path={routes.newWallet} element={<NewWalletScreen />} />
       <Route path={routes.recoverBackup} element={<UploadKeystoreScreen />} />
       <Route path={routes.password} element={<PasswordScreen />} />
       <Route path={routes.reset} element={<ResetScreen />} />
@@ -107,6 +106,10 @@ const Screen: FC = () => {
           <Route path={routes.tokenPath} element={<TokenScreen />} />
           <Route path={routes.hideTokenPath} element={<HideTokenScreen />} />
           <Route path={routes.settings} element={<SettingsScreen />} />
+          <Route
+            path={routes.backupDownload()}
+            element={<BackupDownloadScreen />}
+          />
         </>
       )}
     </Routes>

@@ -1,19 +1,16 @@
 import create from "zustand"
 
 import { defaultNetwork } from "../../shared/networks"
-import { getLocalhostPort } from "../utils/localhost"
 
-interface AppStore {
+interface State {
   switcherNetworkId: string
-  localhostPort: number
   error?: string
   isLoading: boolean
   isFirstRender: boolean
 }
 
-export const useAppState = create<AppStore>(() => ({
+export const useAppState = create<State>(() => ({
   switcherNetworkId: defaultNetwork.id,
-  localhostPort: getLocalhostPort(),
   isLoading: true,
   isFirstRender: true,
 }))
