@@ -1,0 +1,72 @@
+{
+  "$id": "ArgentXBackupSchema",
+  "title": "Argent X Backup file",
+  "description": "Argent X Backup file",
+  "type": "object",
+  "properties": {
+    "x-version": { "type": "integer" },
+    "address": { "type": "string" },
+    "version": { "type": "integer" },
+    "Crypto": {
+      "type": "object",
+      "properties": {
+        "cipher": { "type": "string" },
+        "ciphertext": { "type": "string" },
+        "kdf": { "type": "string" },
+        "mac": { "type": "string" },
+        "cipherparams": {
+          "type": "object",
+          "properties": {
+            "iv": { "type": "string" }
+          },
+          "required": ["iv"]
+        },
+        "kdfparams": {
+          "type": "object",
+          "properties": {
+            "salt": { "type": "string" },
+            "n": { "type": "number" },
+            "dklen": { "type": "number" },
+            "p": { "type": "number" },
+            "r": { "type": "number" }
+          },
+          "required": ["salt", "n", "dklen", "p", "r"]
+        }
+      },
+      "required": [
+        "cipher",
+        "ciphertext",
+        "kdf",
+        "mac",
+        "cipherparams",
+        "kdfparams"
+      ]
+    },
+    "x-argent": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "network": { "type": "string" },
+              "signer": {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string" },
+                  "derivation_path": { "type": "string" }
+                },
+                "required": ["type", "derivation_path"]
+              }
+            },
+            "required": ["address", "network", "signer"]
+          }
+        }
+      },
+      "required": ["accounts"]
+    }
+  },
+  "required": ["x-version", "Crypto", "x-argent", "address", "version"]
+}

@@ -1,9 +1,9 @@
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import { CompiledContract, Contract, json } from "starknet"
 
-import { BackupWalletSigner } from "../shared/backup.model"
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { getProvider } from "../shared/networks"
+import { WalletAccountSigner } from "../shared/wallet.model"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -12,14 +12,14 @@ const ArgentCompiledContractJson: CompiledContract = json.parse(
 export class Account {
   address: string
   networkId: string
-  signer: BackupWalletSigner
+  signer: WalletAccountSigner
   deployTransaction?: string
   contract: Contract
 
   constructor(
     address: string,
     networkId: string,
-    signer: BackupWalletSigner,
+    signer: WalletAccountSigner,
     deployTransaction?: string,
   ) {
     this.address = address
