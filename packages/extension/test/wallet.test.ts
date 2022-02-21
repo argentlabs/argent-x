@@ -1,12 +1,13 @@
 import fs from "fs"
 import path from "path"
 
-import { matchers } from "jest-json-schema"
-
 import { IStorage } from "../src/background/interfaces"
 import { Wallet, WalletStorageProps } from "../src/background/wallet"
+import backupWrong from "./backup_wrong.mock.json"
+import backup from "./backup.mock.json"
 
-expect.extend(matchers)
+const backupString = JSON.stringify(backup)
+const backupWrongString = JSON.stringify(backupWrong)
 
 export class MockStorage implements IStorage<WalletStorageProps> {
   public store: WalletStorageProps = {}
@@ -22,20 +23,6 @@ export class MockStorage implements IStorage<WalletStorageProps> {
 
 const compiledContract = fs.readFileSync(
   path.join(__dirname, "../src/contracts/ArgentAccount.txt"),
-  "utf8",
-)
-
-const backupSchema = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "./backup.schema.json"), "utf8"),
-)
-
-const backupString = fs.readFileSync(
-  path.join(__dirname, "./backup.mock.json"),
-  "utf8",
-)
-
-const backupWrongString = fs.readFileSync(
-  path.join(__dirname, "./backup_wrong.mock.json"),
   "utf8",
 )
 
@@ -60,7 +47,7 @@ test("create a new wallet", async () => {
 
   const backupWithoutAccount = await storage.getItem("BACKUP")
   expect(backupWithoutAccount).toBeDefined()
-  expect(JSON.parse(backupWithoutAccount as string)).toMatchSchema(backupSchema)
+  expect(Wallet.validateBackup(backupWithoutAccount as string)).toBe(true)
 
   const { txHash } = await wallet.addAccount(NETWORK)
   expect(txHash).toMatch(REGEX_HEXSTRING)
@@ -70,7 +57,7 @@ test("create a new wallet", async () => {
 
   const backupWithAccount = await storage.getItem("BACKUP")
   expect(backupWithAccount).toBeDefined()
-  expect(JSON.parse(backupWithAccount as string)).toMatchSchema(backupSchema)
+  expect(Wallet.validateBackup(backupWithAccount as string)).toBe(true)
 
   const selectedAccount = await wallet.getSelectedAccount()
   expect(selectedAccount).toBeDefined()
@@ -97,7 +84,7 @@ test("open existing wallet", async () => {
 
   const backupWithAccount = await storage.getItem("BACKUP")
   expect(backupWithAccount).toBeDefined()
-  expect(JSON.parse(backupWithAccount as string)).toMatchSchema(backupSchema)
+  expect(Wallet.validateBackup(backupWithAccount as string)).toBe(true)
 
   const selectedAccount = await wallet.getSelectedAccount()
   expect(selectedAccount).toBeDefined()

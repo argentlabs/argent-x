@@ -4,7 +4,7 @@
   "description": "Argent X Backup file",
   "type": "object",
   "properties": {
-    "x-version": { "type": "integer" },
+    "x-version": { "type": "integer", "minimum": 1, "maximum": 1 },
     "address": { "type": "string" },
     "version": { "type": "integer" },
     "Crypto": {

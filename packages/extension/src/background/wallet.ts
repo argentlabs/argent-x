@@ -1,19 +1,24 @@
+import Ajv from "ajv"
 import { ethers } from "ethers"
 import { Signer, compileCalldata, ec } from "starknet"
 
 import { getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
 import { IStorage } from "./interfaces"
-// import { Storage } from "../storage"
 import {
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
 } from "./keys/keyDerivation"
+import backupSchema from "./schema/backup.schema.json"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
 const isDevOrTest = isDev || isTest
+
+const CURRENT_BACKUP_VERSION = 1
+
+const ajv = new Ajv()
 
 interface WalletSession {
   secret: string
@@ -44,7 +49,6 @@ export class Wallet {
   }
 
   public isInitialized(): boolean {
-    console.log("isInitialized")
     return this.encryptedBackup !== undefined
   }
 
@@ -196,7 +200,9 @@ export class Wallet {
   }
 
   public async importBackup(backupString: string) {
-    // validate backup schema here !
+    if (!Wallet.validateBackup(backupString)) {
+      throw new Error("invalid backup file")
+    }
     await this.store.setItem("BACKUP", backupString)
     await this.setup()
   }
@@ -213,6 +219,15 @@ export class Wallet {
     return { url, filename }
   }
 
+  public static validateBackup(backupString: string): boolean {
+    try {
+      const backup = JSON.parse(backupString)
+      return ajv.validate(backupSchema, backup)
+    } catch (error) {
+      return false
+    }
+  }
+
   private setSession(secret: string, password: string) {
     this.session = { secret, password }
     if (!isTest) {
@@ -227,12 +242,15 @@ export class Wallet {
     if (this.encryptedBackup === undefined) {
       return
     }
-    const backup = JSON.parse(this.encryptedBackup)
-    // in the future, check version is compatible here
-    // and throw or migrate if not
-    if (backup["x-version"] !== 1) {
+
+    if (!Wallet.validateBackup(this.encryptedBackup)) {
       this.encryptedBackup = undefined
-      throw new Error("invalid keystore file format")
+      throw new Error("invalid backup file in local storage")
+    }
+
+    const backup = JSON.parse(this.encryptedBackup)
+    if (backup["x-version"] !== CURRENT_BACKUP_VERSION) {
+      // in the future, backup file migration will happen here
     }
 
     this.accounts = backup["x-argent"].accounts
@@ -245,7 +263,7 @@ export class Wallet {
     const backup = JSON.parse(this.encryptedBackup)
     const extendedBackup = {
       ...backup,
-      "x-version": 1,
+      "x-version": CURRENT_BACKUP_VERSION,
       "x-argent": {
         accounts: this.accounts,
       },
