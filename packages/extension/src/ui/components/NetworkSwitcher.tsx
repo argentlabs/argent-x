@@ -4,6 +4,7 @@ import styled, { css } from "styled-components"
 
 import { getNetwork, networks } from "../../shared/networks"
 import { useAppState } from "../states/app"
+import { useLocalhostPort } from "../states/localhostPort"
 import { recover } from "../utils/recovery"
 import { WalletStatusCode } from "../utils/wallets"
 
@@ -115,7 +116,8 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
   hidePort,
 }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId, localhostPort } = useAppState()
+  const { switcherNetworkId } = useAppState()
+  const { localhostPort } = useLocalhostPort()
   const currentNetwork = getNetwork(switcherNetworkId)
   const otherNetworks = networks.filter((network) => network !== currentNetwork)
 

@@ -28,7 +28,7 @@ export const ErrorScreen: FC = () => {
       onSubmit={() => navigate(-1)}
     >
       <SP>Something went wrong:</SP>
-      <WrappingPre>{error}</WrappingPre>
+      <WrappingPre>{`${error}`}</WrappingPre>
     </ConfirmScreen>
   )
 }

@@ -46,7 +46,7 @@ export const TokenDapp: FC = () => {
           add its address to this file:
         </p>
         <div>
-          <pre>packages/playground/src/token.service.ts</pre>
+          <pre>packages/dapp/src/token.service.ts</pre>
         </div>
       </>
     )
@@ -177,7 +177,7 @@ export const TokenDapp: FC = () => {
             onChange={(e) => setShortText(e.target.value)}
           />
 
-          <input type="submit" disabled={buttonsDisabled} value="Sign" />
+          <input type="submit" value="Sign" />
         </form>
         <form>
           <h2 className={styles.title}>Sign results</h2>

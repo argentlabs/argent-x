@@ -6,13 +6,13 @@ import { ExtActionItem } from "../../shared/actionQueue"
 import { messageStream, sendMessage } from "../../shared/messages"
 import { getActions } from "../utils/messaging"
 
-interface ActionsStore {
+interface State {
   actions: ExtActionItem[]
   approve: (action: ExtActionItem | string) => Promise<void>
   reject: (action: ExtActionItem | string) => Promise<void>
 }
 
-export const useActions = create<ActionsStore>(() => ({
+export const useActions = create<State>(() => ({
   actions: [],
   approve: (action) => {
     const actionHash = typeof action === "string" ? action : action.meta.hash

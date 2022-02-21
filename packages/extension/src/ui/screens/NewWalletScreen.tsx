@@ -11,9 +11,10 @@ import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
+import { useLocalhostPort } from "../states/localhostPort"
 import { deployWallet } from "../utils/wallets"
 
-const NewSeedScreenWrapper = styled.div`
+const NewWalletScreenWrapper = styled.div`
   padding: 48px 40px 24px;
   display: flex;
   flex-direction: column;
@@ -30,10 +31,11 @@ export function isValidPassword(password: string): boolean {
   return password.length > 5
 }
 
-export const NewSeedScreen: FC = () => {
+export const NewWalletScreen: FC = () => {
   const navigate = useNavigate()
   const { addWallet } = useAccount()
-  const { switcherNetworkId, localhostPort } = useAppState()
+  const { switcherNetworkId } = useAppState()
+  const { localhostPort } = useLocalhostPort()
   const {
     control,
     handleSubmit,
@@ -56,7 +58,7 @@ export const NewSeedScreen: FC = () => {
       )
       addWallet(newWallet)
       useAccount.setState({ selectedWallet: newWallet.address })
-      navigate(routes.account)
+      navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error })
       navigate(routes.error)
@@ -64,7 +66,7 @@ export const NewSeedScreen: FC = () => {
   }
 
   return (
-    <NewSeedScreenWrapper>
+    <NewWalletScreenWrapper>
       <BackButton />
       <H2>New password</H2>
       <P>Enter a password to protect your wallet</P>
@@ -111,6 +113,6 @@ export const NewSeedScreen: FC = () => {
         </Button>
       </form>
       <StickyArgentFooter />
-    </NewSeedScreenWrapper>
+    </NewWalletScreenWrapper>
   )
 }

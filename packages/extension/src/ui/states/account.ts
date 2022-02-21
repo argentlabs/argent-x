@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware"
 
 import { Wallet } from "../Wallet"
 
-interface AccountStore {
+interface State {
   wallets: Record<string, Wallet>
   accountNames: Record<string, any>
   selectedWallet?: string
@@ -11,7 +11,7 @@ interface AccountStore {
   setAccountName: (netowrkId: string, address: string, name: string) => void
 }
 
-export const useAccount = create<AccountStore>(
+export const useAccount = create<State>(
   persist(
     (set, get) => ({
       wallets: {},
@@ -92,7 +92,7 @@ export const setAccountNamesFromBackup = (wallets: Record<string, Wallet>) => {
   })
 }
 
-export const selectWallet = ({ wallets, selectedWallet }: AccountStore) => {
+export const selectWallet = ({ wallets, selectedWallet }: State) => {
   if (selectedWallet) {
     return wallets[selectedWallet]
   }
@@ -101,12 +101,10 @@ export const selectWallet = ({ wallets, selectedWallet }: AccountStore) => {
 const getDefaultAccountName = (accountNumber: number) =>
   `Account ${accountNumber}`
 
-export const selectAccountNumber = ({
-  wallets,
-  selectedWallet,
-}: AccountStore) => calcAccountNumber(wallets, selectedWallet)
+export const selectAccountNumber = ({ wallets, selectedWallet }: State) =>
+  calcAccountNumber(wallets, selectedWallet)
 
-export const selectAccount = ({ wallets, selectedWallet }: AccountStore) => {
+export const selectAccount = ({ wallets, selectedWallet }: State) => {
   return selectedWallet ? wallets[selectedWallet] : undefined
 }
 
