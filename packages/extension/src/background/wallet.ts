@@ -17,6 +17,7 @@ const isTest = process.env.NODE_ENV === "test"
 const isDevOrTest = isDev || isTest
 
 const CURRENT_BACKUP_VERSION = 1
+export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
 
 const ajv = new Ajv()
 
@@ -230,11 +231,10 @@ export class Wallet {
 
   private setSession(secret: string, password: string) {
     this.session = { secret, password }
-    if (!isTest) {
-      setTimeout(() => {
-        this.lock()
-      }, 15 * 60 * 60 * 1000)
-    }
+
+    setTimeout(() => {
+      this.lock()
+    }, SESSION_DURATION)
   }
 
   private async readBackup() {

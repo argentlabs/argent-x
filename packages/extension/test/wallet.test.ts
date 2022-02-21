@@ -2,7 +2,11 @@ import fs from "fs"
 import path from "path"
 
 import { IStorage } from "../src/background/interfaces"
-import { Wallet, WalletStorageProps } from "../src/background/wallet"
+import {
+  SESSION_DURATION,
+  Wallet,
+  WalletStorageProps,
+} from "../src/background/wallet"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
 
@@ -27,12 +31,19 @@ const compiledContract = fs.readFileSync(
 )
 
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
+const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
 
 const NETWORK = "http://localhost:5000" // "goerli-alpha"
 
 jest.setTimeout(999999)
 
+afterEach(() => {
+  jest.useRealTimers()
+})
+
 test("create a new wallet", async () => {
+  jest.useFakeTimers()
+
   const storage = new MockStorage()
   const wallet = new Wallet(storage, compiledContract)
   await wallet.setup()
@@ -61,9 +72,14 @@ test("create a new wallet", async () => {
 
   const selectedAccount = await wallet.getSelectedAccount()
   expect(selectedAccount).toBeDefined()
+
+  jest.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
+  expect(wallet.isSessionOpen()).toBe(false)
 })
 
 test("open existing wallet", async () => {
+  jest.useFakeTimers()
+
   const storage = new MockStorage()
   storage.setItem("BACKUP", backupString)
   const wallet = new Wallet(storage, compiledContract)
@@ -91,6 +107,9 @@ test("open existing wallet", async () => {
   expect(selectedAccount?.address).toBe(
     "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
   )
+
+  jest.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
+  expect(wallet.isSessionOpen()).toBe(false)
 })
 
 test("open existing wallet with wrong password", async () => {
@@ -107,6 +126,8 @@ test("open existing wallet with wrong password", async () => {
 })
 
 test("import backup file", async () => {
+  jest.useFakeTimers()
+
   const storage = new MockStorage()
   const wallet = new Wallet(storage, compiledContract)
   await wallet.setup()
@@ -120,6 +141,9 @@ test("import backup file", async () => {
   const isValid = await wallet.startSession("my_secret_password")
   expect(isValid).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
+
+  jest.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
+  expect(wallet.isSessionOpen()).toBe(false)
 })
 
 test.skip("import wront backup file", async () => {
