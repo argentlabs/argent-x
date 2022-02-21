@@ -33,14 +33,14 @@ const determineEntry = async (isBackupDownloadRequired: boolean) => {
   const initialized = await isInitialized()
   if (!initialized) {
     if (!isDisclaimerUnderstood()) {
-      return routes.disclaimer
+      return routes.disclaimer()
     }
-    return routes.welcome
+    return routes.welcome()
   }
 
   const hasSession = await hasActiveSession()
   if (hasSession) {
     return recover()
   }
-  return routes.password
+  return routes.password()
 }
