@@ -1,0 +1,30 @@
+name: Run Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      devnet:
+        image: shardlabs/starknet-devnet
+        ports:
+          - 5000:5000
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn --cwd packages/extension test
