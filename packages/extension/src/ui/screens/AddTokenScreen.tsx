@@ -148,7 +148,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                   networkId: compiledData.networkId,
                 })
                 onSubmit?.()
-                navigate(routes.account)
+                navigate(routes.account())
               } catch (e) {
                 setError("Token already exists")
               }

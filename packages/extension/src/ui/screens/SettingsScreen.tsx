@@ -9,8 +9,7 @@ import { Header } from "../components/Header"
 import { InputText } from "../components/Input"
 import { H2, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useAppState } from "../states/app"
-import { setLocalhostPort } from "../utils/localhost"
+import { useLocalhostPort } from "../states/localhostPort"
 
 const SettingsScreenWrapper = styled.div`
   display: flex;
@@ -34,7 +33,7 @@ const Footer = styled.div`
 
 export const SettingsScreen: FC = () => {
   const navigate = useNavigate()
-  const { localhostPort } = useAppState()
+  const { localhostPort } = useLocalhostPort()
 
   return (
     <>
@@ -46,7 +45,7 @@ export const SettingsScreen: FC = () => {
         <Button
           onClick={() => {
             sendMessage({ type: "STOP_SESSION" })
-            navigate(routes.password)
+            navigate(routes.password())
           }}
         >
           Lock wallet
@@ -64,21 +63,12 @@ export const SettingsScreen: FC = () => {
         >
           Reset dapp connections
         </Button>
-        <Button
-          onClick={() => {
-            navigate(routes.dappConnections)
-          }}
-        >
+        <Button onClick={() => navigate(routes.dappConnections())}>
           View dapp connections
         </Button>
 
         <P>The backup file contains all your accounts, keep it secure.</P>
-        <Button
-          onClick={() => {
-            sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
-            navigate(-1)
-          }}
-        >
+        <Button onClick={() => navigate(routes.backupDownload(true))}>
           Download backup file
         </Button>
 
@@ -92,8 +82,7 @@ export const SettingsScreen: FC = () => {
           type="number"
           value={localhostPort}
           onChange={(e: any) => {
-            setLocalhostPort(e.target.value)
-            useAppState.setState({ localhostPort: e.target.value })
+            useLocalhostPort.setState({ localhostPort: e.target.value })
           }}
         />
         <Footer>

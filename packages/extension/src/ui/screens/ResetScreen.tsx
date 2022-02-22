@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom"
 import { sendMessage } from "../../shared/messages"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
+import { useAccount } from "../states/account"
+import { useAppState } from "../states/app"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 export const ResetScreen: FC = () => {
@@ -18,7 +20,9 @@ export const ResetScreen: FC = () => {
       onSubmit={() => {
         sendMessage({ type: "RESET_ALL" })
         localStorage.clear()
-        navigate(routes.welcome)
+        useAppState.setState({ isFirstRender: true })
+        useAccount.setState({ wallets: {}, selectedWallet: undefined })
+        navigate(routes.welcome())
       }}
     >
       <P>

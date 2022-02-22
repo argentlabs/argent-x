@@ -30,6 +30,7 @@ import {
   useAccount,
 } from "../states/account"
 import { useAppState } from "../states/app"
+import { useLocalhostPort } from "../states/localhostPort"
 import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
 import { getAccountImageUrl } from "../utils/wallets"
@@ -43,8 +44,16 @@ const AccountContent = styled.div`
 `
 
 export const AccountScreen: FC = () => {
+  const navigate = useNavigate()
   const wallet = useAccount(selectWallet)
   const accountNumber = useAccount(selectAccountNumber)
+
+  useEffect(() => {
+    if (!wallet) {
+      navigate(routes.accounts())
+    }
+  }, [])
+
   if (!wallet) {
     return <></>
   }
@@ -61,7 +70,8 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
   accountNumber,
 }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId, localhostPort } = useAppState()
+  const { switcherNetworkId } = useAppState()
+  const { localhostPort } = useLocalhostPort()
   const status = useStatus(wallet)
   const transactions = useWalletTransactions(wallet.address)
 
@@ -77,7 +87,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
     try {
       const { hostname, port } = new URL(wallet.networkId)
       if (hostname === "localhost") {
-        useAppState.setState({ localhostPort: parseInt(port) })
+        useLocalhostPort.setState({ localhostPort: parseInt(port) })
       }
     } catch {
       // pass
@@ -97,7 +107,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
     <AccountColumn>
       <Header>
         <ProfilePicture
-          {...makeClickable(() => navigate(routes.accounts))}
+          {...makeClickable(() => navigate(routes.accounts()))}
           src={getAccountImageUrl(accountNumber)}
         />
         <NetworkSwitcher />
@@ -134,7 +144,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({
             walletAddress={wallet.address}
             canShowEmptyWalletAlert={!showPendingTransactions}
           />
-          <TokenWrapper {...makeClickable(() => navigate(routes.newToken))}>
+          <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
             <AddTokenIconButton size={40}>
               <AddIcon />
             </AddTokenIconButton>

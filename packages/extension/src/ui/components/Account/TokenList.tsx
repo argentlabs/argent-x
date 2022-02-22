@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { useTokensWithBalance } from "../../states/tokens"
-import { playgroundToken } from "../../utils/tokens"
+import { testDappToken } from "../../utils/tokens"
 import { TokenListItem } from "../Token"
 import { EmptyWalletAlert } from "./EmptyWalletAlert"
 import { SectionHeader } from "./SectionHeader"
@@ -31,7 +31,7 @@ export const TokenList: FC<TokenListProps> = ({
       {canShowEmptyWalletAlert && !hasBalance && (
         <EmptyWalletAlert
           walletAddress={walletAddress}
-          mintableAddress={playgroundToken(switcherNetworkId)?.address}
+          mintableAddress={testDappToken(switcherNetworkId)?.address}
         />
       )}
       <SectionHeader>Coins</SectionHeader>

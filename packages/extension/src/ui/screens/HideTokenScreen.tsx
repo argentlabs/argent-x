@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 
@@ -31,7 +30,7 @@ export const HideTokenScreen: FC = () => {
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   if (!token) {
-    return <Navigate to={routes.account} />
+    return <Navigate to={routes.account()} />
   }
 
   const { name } = toTokenView(token)
@@ -53,7 +52,7 @@ export const HideTokenScreen: FC = () => {
             e.preventDefault()
             try {
               removeToken(token)
-              navigate(routes.account)
+              navigate(routes.account())
             } catch (e) {
               setError("Token not hidden")
             }

@@ -83,7 +83,7 @@ export const ActionScreen: FC = () => {
                 error: `Sending transaction failed: ${result.error}`,
                 isLoading: false,
               })
-              navigate(routes.error)
+              navigate(routes.error())
             } else {
               if (isPopup && isLastAction) {
                 window.close()

@@ -13,7 +13,7 @@ import { useAppState } from "../states/app"
 import { makeClickable } from "../utils/a11y"
 import { startSession } from "../utils/messaging"
 import { recover } from "../utils/recovery"
-import { isValidPassword } from "./NewSeedScreen"
+import { isValidPassword } from "./NewWalletScreen"
 
 const PasswordScreenWrapper = styled.div`
   display: flex;
@@ -63,7 +63,7 @@ export const PasswordScreen: FC = () => {
     setError("password", { message: error })
   }, [error])
 
-  const handleResetClick = () => navigate(routes.reset)
+  const handleResetClick = () => navigate(routes.reset())
 
   const verifyPassword = async (password: string) => {
     useAppState.setState({ error: undefined, isLoading: true })

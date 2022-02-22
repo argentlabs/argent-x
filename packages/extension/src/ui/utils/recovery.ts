@@ -40,12 +40,12 @@ export const recover = async ({
     useAppState.setState({ switcherNetworkId: networkId })
 
     if (showAccountList || !selectedWallet) {
-      return routes.accounts
+      return routes.accounts()
     }
-    return routes.account
+    return routes.account()
   } catch (e: any) {
     console.error("Recovery error:", e)
     useAppState.setState({ error: `${e}` })
-    return routes.error
+    return routes.error()
   }
 }
