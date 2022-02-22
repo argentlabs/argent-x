@@ -36,7 +36,7 @@ function waitForMsgOfType<
   predicate: (x: T) => boolean = () => true,
 ): Promise<T extends { data: any } ? T["data"] : undefined> {
   return new Promise((resolve, reject) => {
-    const pid = setTimeout(() => reject("Timeout"), timeout)
+    const pid = setTimeout(() => reject(new Error("Timeout")), timeout)
     const handler = (event: MessageEvent<WindowMessageType>) => {
       if (event.data.type === type && predicate(event.data as any)) {
         clearTimeout(pid)
