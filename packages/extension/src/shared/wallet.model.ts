@@ -1,6 +1,6 @@
 export interface WalletAccountSigner {
   type: string
-  derivation_path: string
+  derivationPath: string
 }
 
 export interface WalletAccount {

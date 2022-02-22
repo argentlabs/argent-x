@@ -17,11 +17,10 @@ export class MockStorage implements IStorage<WalletStorageProps> {
   public store: WalletStorageProps = {}
 
   async getItem(key: keyof WalletStorageProps): Promise<string | undefined> {
-    return Promise.resolve(this.store[key] || undefined)
+    return Promise.resolve(this.store[key])
   }
   async setItem(key: keyof WalletStorageProps, value: string): Promise<void> {
     this.store[key] = value
-    return Promise.resolve()
   }
 }
 
@@ -56,7 +55,7 @@ test("create a new wallet", async () => {
   expect(wallet.isInitialized()).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
 
-  const backupWithoutAccount = await storage.getItem("BACKUP")
+  const backupWithoutAccount = await storage.getItem("backup")
   expect(backupWithoutAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithoutAccount as string)).toBe(true)
 
@@ -66,7 +65,7 @@ test("create a new wallet", async () => {
   const accounts = wallet.getAccounts()
   expect(accounts).toHaveLength(1)
 
-  const backupWithAccount = await storage.getItem("BACKUP")
+  const backupWithAccount = await storage.getItem("backup")
   expect(backupWithAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithAccount as string)).toBe(true)
 
@@ -81,7 +80,7 @@ test("open existing wallet", async () => {
   jest.useFakeTimers()
 
   const storage = new MockStorage()
-  storage.setItem("BACKUP", backupString)
+  storage.setItem("backup", backupString)
   const wallet = new Wallet(storage, compiledContract)
   await wallet.setup()
 
@@ -98,7 +97,7 @@ test("open existing wallet", async () => {
     "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
   )
 
-  const backupWithAccount = await storage.getItem("BACKUP")
+  const backupWithAccount = await storage.getItem("backup")
   expect(backupWithAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithAccount as string)).toBe(true)
 
@@ -114,7 +113,7 @@ test("open existing wallet", async () => {
 
 test("open existing wallet with wrong password", async () => {
   const storage = new MockStorage()
-  storage.setItem("BACKUP", backupString)
+  storage.setItem("backup", backupString)
   const wallet = new Wallet(storage, compiledContract)
   await wallet.setup()
 

@@ -27,15 +27,15 @@ interface WalletSession {
 }
 
 export interface WalletStorageProps {
-  BACKUP?: string
-  SELECTED?: string
+  backup?: string
+  selected?: string
 }
 
 export class Wallet {
   private accounts: WalletAccount[] = []
 
-  private encryptedBackup: string | undefined
-  private session: WalletSession | undefined
+  private encryptedBackup?: string
+  private session?: WalletSession
 
   private store: IStorage<WalletStorageProps>
   private compiledContract: string
@@ -57,20 +57,15 @@ export class Wallet {
     return this.session !== undefined
   }
 
-  private async generateNewLocalSecret(
-    password: string,
-    progressFn?: (progress: number) => void,
-  ) {
+  private async generateNewLocalSecret(password: string) {
     if (this.isInitialized()) {
       return
     }
     const N = isDevOrTest ? 64 : 32768
     const ethersWallet = ethers.Wallet.createRandom()
-    this.encryptedBackup = await ethersWallet.encrypt(
-      password,
-      { scrypt: { N } },
-      progressFn,
-    )
+    this.encryptedBackup = await ethersWallet.encrypt(password, {
+      scrypt: { N },
+    })
 
     await this.writeBackup()
     this.setSession(ethersWallet.privateKey, password)
@@ -109,12 +104,12 @@ export class Wallet {
 
     const current_paths = this.accounts
       .filter((account) => account.signer.type === "local_secret")
-      .map((account) => account.signer.derivation_path)
+      .map((account) => account.signer.derivationPath)
 
     const index = getNextPathIndex(current_paths)
     const starkPair = getStarkPair(index, this.session?.secret as string)
     const starkPub = ec.getStarkKey(starkPair)
-    const seed = starkPub //ec.getStarkKey(ec.genKeyPair())
+    const seed = starkPub
 
     const provider = getProvider(networkId)
     const deployTransaction = await provider.deployContract(
@@ -137,7 +132,7 @@ export class Wallet {
       address: deployTransaction.address,
       signer: {
         type: "local_secret",
-        derivation_path: getPathForIndex(index),
+        derivationPath: getPathForIndex(index),
       },
     }
 
@@ -161,7 +156,7 @@ export class Wallet {
     const account = await this.getSelectedAccount()
 
     const keyPair = getStarkPair(
-      account.signer.derivation_path,
+      account.signer.derivationPath,
       this.session?.secret as string,
     )
     const provider = getProvider(account.network)
@@ -173,7 +168,7 @@ export class Wallet {
       throw new Error("no accounts")
     }
 
-    const address = await this.store.getItem("SELECTED")
+    const address = await this.store.getItem("selected")
     const account = this.accounts.find((account) => account.address === address)
     return account ?? this.accounts[0]
   }
@@ -183,7 +178,7 @@ export class Wallet {
     if (account === undefined) {
       return
     }
-    await this.store.setItem("SELECTED", account.address)
+    await this.store.setItem("selected", account.address)
   }
 
   public async removeAccount(address: string) {
@@ -204,15 +199,15 @@ export class Wallet {
     if (!Wallet.validateBackup(backupString)) {
       throw new Error("invalid backup file")
     }
-    await this.store.setItem("BACKUP", backupString)
+    await this.store.setItem("backup", backupString)
     await this.setup()
   }
 
   public exportBackup(): { url: string; filename: string } {
-    if (!this.isInitialized()) {
+    if (this.encryptedBackup === undefined) {
       throw Error("no local backup")
     }
-    const blob = new Blob([this.encryptedBackup as string], {
+    const blob = new Blob([this.encryptedBackup], {
       type: "application/json",
     })
     const url = URL.createObjectURL(blob)
@@ -224,7 +219,7 @@ export class Wallet {
     try {
       const backup = JSON.parse(backupString)
       return ajv.validate(backupSchema, backup)
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -238,7 +233,7 @@ export class Wallet {
   }
 
   private async readBackup() {
-    this.encryptedBackup = await this.store.getItem("BACKUP")
+    this.encryptedBackup = await this.store.getItem("backup")
     if (this.encryptedBackup === undefined) {
       return
     }
@@ -269,7 +264,7 @@ export class Wallet {
       },
     }
     const backupString = JSON.stringify(extendedBackup)
-    await this.store.setItem("BACKUP", backupString)
+    await this.store.setItem("backup", backupString)
     this.encryptedBackup = backupString
   }
 }

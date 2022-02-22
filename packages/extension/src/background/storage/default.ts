@@ -21,7 +21,7 @@ export function removeFromStorage(key: string) {
 }
 
 export function clearStorage() {
-  return browser.storage.local.clear
+  return browser.storage.local.clear()
 }
 
 export class Storage<T> implements IStorage<T> {

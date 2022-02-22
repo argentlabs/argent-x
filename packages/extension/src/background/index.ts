@@ -31,7 +31,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
-  const storage = new Storage<WalletStorageProps>({}, "WALLET")
+  const storage = new Storage<WalletStorageProps>({}, "wallet")
   const wallet = new Wallet(storage, ArgentCompiledContract)
   await wallet.setup()
 

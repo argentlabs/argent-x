@@ -56,9 +56,9 @@
                 "type": "object",
                 "properties": {
                   "type": { "type": "string" },
-                  "derivation_path": { "type": "string" }
+                  "derivationPath": { "type": "string" }
                 },
-                "required": ["type", "derivation_path"]
+                "required": ["type", "derivationPath"]
               }
             },
             "required": ["address", "network", "signer"]
