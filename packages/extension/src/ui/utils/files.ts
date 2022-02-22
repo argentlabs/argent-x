@@ -6,7 +6,7 @@ export const fileToString = async (file: File): Promise<string> => {
       if (result) {
         resolve(result.toString())
       } else {
-        reject("Failed to read file")
+        reject(new Error("Failed to read file"))
       }
     }
     fileReader.onerror = reject
