@@ -17,8 +17,8 @@ export function getStarkPair(
   const path =
     typeof indexOrPath === "number" ? getPathForIndex(indexOrPath) : indexOrPath
   const childNode = masterNode.derivePath(path)
-  const grindedKey = grindKey(childNode.privateKey)
-  const starkPair = ec.getKeyPair(grindedKey)
+  const groundKey = grindKey(childNode.privateKey)
+  const starkPair = ec.getKeyPair(groundKey)
   return starkPair
 }
 
@@ -43,13 +43,13 @@ export function getNextPathIndex(paths: string[]) {
 }
 
 export function grindKey(keySeed: string) {
-  const keyValLimit = ec.ec.n
+  const keyValueLimit = ec.ec.n
   const sha256EcMaxDigest = number.toBN(
     "1 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000",
     16,
   )
   const maxAllowedVal = sha256EcMaxDigest.sub(
-    sha256EcMaxDigest.mod(keyValLimit),
+    sha256EcMaxDigest.mod(keyValueLimit),
   )
 
   // Make sure the produced key is devided by the Stark EC order,
@@ -61,7 +61,7 @@ export function grindKey(keySeed: string) {
     i++
   } while (!key.lt(maxAllowedVal))
 
-  return "0x" + key.umod(keyValLimit).toString("hex")
+  return "0x" + key.umod(keyValueLimit).toString("hex")
 }
 
 function hashKeyWithIndex(key: string, index: number) {

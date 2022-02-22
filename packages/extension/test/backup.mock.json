@@ -33,7 +33,7 @@
         "address": "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
         "signer": {
           "type": "local_secret",
-          "derivation_path": "m/2645'/1195502025'/1148870696'/0'/0'/0"
+          "derivationPath": "m/2645'/1195502025'/1148870696'/0'/0'/0"
         }
       }
     ]
