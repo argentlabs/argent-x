@@ -1,4 +1,3 @@
-import Ajv from "ajv"
 import { ethers } from "ethers"
 import { Signer, compileCalldata, ec } from "starknet"
 
@@ -9,7 +8,7 @@ import {
   getPathForIndex,
   getStarkPair,
 } from "./keys/keyDerivation"
-import backupSchema from "./schema/backup.schema.json"
+import backupSchema from "./schema/backup.schema"
 import { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -18,8 +17,6 @@ const isDevOrTest = isDev || isTest
 
 const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
-
-const ajv = new Ajv()
 
 interface WalletSession {
   secret: string
@@ -218,7 +215,7 @@ export class Wallet {
   public static validateBackup(backupString: string): boolean {
     try {
       const backup = JSON.parse(backupString)
-      return ajv.validate(backupSchema, backup)
+      return backupSchema.isValidSync(backup)
     } catch {
       return false
     }
@@ -244,11 +241,11 @@ export class Wallet {
     }
 
     const backup = JSON.parse(this.encryptedBackup)
-    if (backup["x-version"] !== CURRENT_BACKUP_VERSION) {
+    if (backup.argent.version !== CURRENT_BACKUP_VERSION) {
       // in the future, backup file migration will happen here
     }
 
-    this.accounts = backup["x-argent"].accounts
+    this.accounts = backup.argent.accounts
   }
 
   private async writeBackup() {
@@ -258,8 +255,8 @@ export class Wallet {
     const backup = JSON.parse(this.encryptedBackup)
     const extendedBackup = {
       ...backup,
-      "x-version": CURRENT_BACKUP_VERSION,
-      "x-argent": {
+      argent: {
+        version: CURRENT_BACKUP_VERSION,
         accounts: this.accounts,
       },
     }

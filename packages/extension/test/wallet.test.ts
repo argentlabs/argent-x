@@ -158,3 +158,13 @@ test("import wrong backup file", async () => {
 
   expect(wallet.isInitialized()).toBe(false)
 })
+
+test("schema validation should succeed", async () => {
+  const isValid = Wallet.validateBackup(backupString)
+  expect(isValid).toBe(true)
+})
+
+test("schema validation should fail", async () => {
+  const isValid = Wallet.validateBackup(backupWrongString)
+  expect(isValid).toBe(false)
+})

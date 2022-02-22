@@ -397,8 +397,6 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
             title: "Deploy wallet",
           })
 
-          await downloadFile(wallet.exportBackup())
-
           return sendToTabAndUi({
             type: "NEW_ACCOUNT_RES",
             data: {

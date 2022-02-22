@@ -44,7 +44,6 @@
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
     "@tippyjs/react": "^4.2.6",
-    "ajv": "^8.10.0",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",
     "object-hash": "^3.0.0",
@@ -60,6 +59,7 @@
     "styled-normalize": "^8.0.7",
     "swr": "^1.1.0",
     "webextension-polyfill": "^0.8.0",
+    "yup": "^0.32.11",
     "zustand": "^3.6.5"
   }
 }
