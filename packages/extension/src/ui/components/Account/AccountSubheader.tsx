@@ -4,8 +4,8 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { getNetwork } from "../../../shared/networks"
+import { AccountStatus } from "../../utils/accounts"
 import { formatAddress, truncateAddress } from "../../utils/addresses"
-import { WalletStatus } from "../../utils/wallets"
 import { CopyTooltip } from "../CopyTooltip"
 import { EditableHeader } from "../EditableHeader"
 import {
@@ -32,16 +32,16 @@ const AccountName = styled(EditableHeader)`
 
 interface AccountSubheaderProps {
   networkId: string
-  status: WalletStatus
+  status: AccountStatus
   accountName?: string
-  walletAddress: string
+  accountAddress: string
   onChangeName: (name: string) => void
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   networkId,
   status,
-  walletAddress,
+  accountAddress,
   onChangeName,
   accountName,
 }) => (
@@ -68,13 +68,13 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
     </div>
     <AccountAddressWrapper>
       <AccountAddressLink
-        href={`${getNetwork(networkId).explorerUrl}/contract/${walletAddress}`}
+        href={`${getNetwork(networkId).explorerUrl}/contract/${accountAddress}`}
         target="_blank"
       >
-        {truncateAddress(walletAddress)}
+        {truncateAddress(accountAddress)}
         <OpenInNewIcon style={{ fontSize: 10 }} />
       </AccountAddressLink>
-      <CopyTooltip copyValue={formatAddress(walletAddress)} message="Copied!">
+      <CopyTooltip copyValue={formatAddress(accountAddress)} message="Copied!">
         <AccountAddressIconsWrapper>
           <ContentCopyIcon style={{ fontSize: 12 }} />
         </AccountAddressIconsWrapper>

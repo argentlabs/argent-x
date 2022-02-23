@@ -2,10 +2,10 @@ import { ethers } from "ethers"
 
 import { sendMessage } from "../../shared/messages"
 import { localNetworkUrl } from "../../shared/networks"
+import { Account } from "../Account"
 import { useAppState } from "../states/app"
 import { useBackupDownload } from "../states/backupDownload"
 import { useLocalhostPort } from "../states/localhostPort"
-import { Wallet } from "../Wallet"
 import { startSession } from "./messaging"
 
 export const deployAccount = async (
@@ -21,16 +21,16 @@ export const deployAccount = async (
 
   const network = localNetworkUrl(networkId, localhostPort)
   try {
-    const wallet = await Wallet.fromDeploy(network)
+    const account = await Account.fromDeploy(network)
     useBackupDownload.setState({ isBackupDownloadRequired: true })
-    return wallet
+    return account
   } finally {
     useAppState.setState({ isLoading: false })
   }
 }
 
 export const connectAccount = async (
-  account: Wallet,
+  account: Account,
   switcherNetworkId: string,
   localhostPort: number,
 ) => {
@@ -73,26 +73,26 @@ export const getAccountImageUrl = (name: string, address: string) => {
   return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
 }
 
-export const isWalletDeployed = (wallet: Wallet): boolean =>
-  !wallet.deployTransaction
+export const isAccountDeployed = (account: Account): boolean =>
+  !account.deployTransaction
 
-export type WalletStatusCode = "CONNECTED" | "DEFAULT" | "DEPLOYING" | "ERROR"
+export type AccountStatusCode = "CONNECTED" | "DEFAULT" | "DEPLOYING" | "ERROR"
 
-export interface WalletStatus {
-  code: WalletStatusCode
+export interface AccountStatus {
+  code: AccountStatusCode
   text: string
 }
 
 export const getStatus = (
-  wallet: Wallet,
-  activeWalletAddress?: string,
+  account: Account,
+  activeAccountAddress?: string,
   forceDeployed = false,
-): WalletStatus => {
-  if (!isWalletDeployed(wallet) && !forceDeployed) {
+): AccountStatus => {
+  if (!isAccountDeployed(account) && !forceDeployed) {
     return { code: "DEPLOYING", text: "Deploying..." }
-  } else if (activeWalletAddress === wallet.address) {
-    return { code: "CONNECTED", text: "Active" }
-  } else {
-    return { code: "DEFAULT", text: "" }
   }
+  if (activeAccountAddress === account.address) {
+    return { code: "CONNECTED", text: "Active" }
+  }
+  return { code: "DEFAULT", text: "" }
 }

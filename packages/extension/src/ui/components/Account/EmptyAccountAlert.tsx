@@ -40,18 +40,18 @@ const AlertButton = styled(Button)`
   width: 100px;
 `
 
-interface EmptyWalletAlertProps {
+interface EmptyAccountAlertProps {
   mintableAddress?: string
-  walletAddress: string
+  accountAddress: string
 }
 
-export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
+export const EmptyAccountAlert: FC<EmptyAccountAlertProps> = ({
   mintableAddress,
-  walletAddress,
+  accountAddress,
 }) => {
-  const { selectedWallet } = useAccount()
+  const { selectedAccount } = useAccount()
   const handleMint = () => {
-    if (!selectedWallet || !mintableAddress) {
+    if (!selectedAccount || !mintableAddress) {
       return
     }
 
@@ -59,7 +59,7 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
       to: mintableAddress,
       method: "mint",
       calldata: {
-        recipient: selectedWallet,
+        recipient: selectedAccount,
         amount: getUint256CalldataFromBN(ethers.utils.parseUnits("1000", 18)),
       },
     })
@@ -73,8 +73,8 @@ export const EmptyWalletAlert: FC<EmptyWalletAlertProps> = ({
       </Paragraph>
       <Buttons>
         <CopyTooltip
-          copyValue={formatAddress(walletAddress)}
-          message="Wallet address copied!"
+          copyValue={formatAddress(accountAddress)}
+          message="Account address copied!"
         >
           <AlertButton>Receive</AlertButton>
         </CopyTooltip>

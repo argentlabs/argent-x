@@ -3,11 +3,11 @@ import {
   localNetworkId,
   networkWallets,
 } from "../../shared/networks"
+import { Account } from "../Account"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { setDefaultAccountNames } from "../states/accountMetadata"
 import { useAppState } from "../states/app"
-import { Wallet } from "../Wallet"
 import { getLastSelectedWallet, getWallets } from "./messaging"
 
 interface RecoveryOptions {
@@ -20,26 +20,26 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    const lastSelectedWallet = await getLastSelectedWallet().catch(() => null)
-    networkId ||= lastSelectedWallet
-      ? localNetworkId(lastSelectedWallet?.network)
+    const lastSelectedAccount = await getLastSelectedWallet().catch(() => null)
+    networkId ||= lastSelectedAccount
+      ? localNetworkId(lastSelectedAccount?.network)
       : defaultNetwork.id
 
     const backupWallets = networkWallets(await getWallets(), networkId)
 
-    const selectedWallet = backupWallets.find(
-      ({ address }) => address === lastSelectedWallet?.address,
+    const selectedAccount = backupWallets.find(
+      ({ address }) => address === lastSelectedAccount?.address,
     )?.address
 
-    const wallets = backupWallets
-      .map(({ address, network }) => new Wallet(address, network))
-      .reduce((acc, wallet) => ({ ...acc, [wallet.address]: wallet }), {})
+    const accounts = backupWallets
+      .map(({ address, network }) => new Account(address, network))
+      .reduce((acc, account) => ({ ...acc, [account.address]: account }), {})
 
-    setDefaultAccountNames(wallets)
-    useAccount.setState({ wallets, selectedWallet })
+    setDefaultAccountNames(accounts)
+    useAccount.setState({ accounts, selectedAccount })
     useAppState.setState({ switcherNetworkId: networkId })
 
-    if (showAccountList || !selectedWallet) {
+    if (showAccountList || !selectedAccount) {
       return routes.accounts()
     }
     return routes.account()

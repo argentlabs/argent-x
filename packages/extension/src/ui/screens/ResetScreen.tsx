@@ -21,7 +21,7 @@ export const ResetScreen: FC = () => {
         sendMessage({ type: "RESET_ALL" })
         localStorage.clear()
         useAppState.setState({ isFirstRender: true })
-        useAccount.setState({ wallets: {}, selectedWallet: undefined })
+        useAccount.setState({ accounts: {}, selectedAccount: undefined })
         navigate(routes.welcome())
       }}
     >

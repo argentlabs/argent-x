@@ -1,7 +1,7 @@
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-import type { Wallet } from "../Wallet"
+import type { Account } from "../Account"
 
 // account information that's not saved in the backup file, but persisted in the extension's localstorage
 interface State {
@@ -29,11 +29,11 @@ export const useAccountMetadata = create<State>(
 )
 
 export const getAccountName = (
-  { address, networkId }: Wallet,
+  { address, networkId }: Account,
   accountNames: Record<string, Record<string, string>>,
 ): string => accountNames[networkId]?.[address] || "Unnamed account"
 
-export const setDefaultAccountNames = (accounts: Record<string, Wallet>) => {
+export const setDefaultAccountNames = (accounts: Record<string, Account>) => {
   const { accountNames } = useAccountMetadata.getState()
   let names = accountNames
   for (const [address, account] of Object.entries(accounts)) {

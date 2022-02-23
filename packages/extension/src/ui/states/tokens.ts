@@ -131,7 +131,7 @@ interface UseTokens {
 
 export const useTokensWithBalance = (): UseTokens => {
   const { switcherNetworkId } = useAppState()
-  const { selectedWallet } = useAccount()
+  const { selectedAccount } = useAccount()
   const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
@@ -139,14 +139,14 @@ export const useTokensWithBalance = (): UseTokens => {
   )
 
   const { data, isValidating, error, mutate } = useSWR(
-    [selectedWallet, ...tokenAddresses],
-    async (walletAddress, ...tokenAddresses) => {
-      if (!walletAddress) {
+    [selectedAccount, ...tokenAddresses],
+    async (accountAddress, ...tokenAddresses) => {
+      if (!accountAddress) {
         return {}
       }
       const balances = await Promise.all(
         tokenAddresses.map(async (address) =>
-          fetchTokenBalance(address, walletAddress, switcherNetworkId).catch(
+          fetchTokenBalance(address, accountAddress, switcherNetworkId).catch(
             () => undefined,
           ),
         ),

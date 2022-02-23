@@ -1,27 +1,27 @@
 import create from "zustand"
 
-import { Wallet } from "../Wallet"
+import { Account } from "../Account"
 
 interface State {
-  wallets: Record<string, Wallet>
-  selectedWallet?: string
-  addWallet: (newWallet: Wallet) => void
+  accounts: Record<string, Account>
+  selectedAccount?: string
+  addAccount: (newAccount: Account) => void
 }
 
 export const useAccount = create<State>((set) => ({
-  wallets: {},
-  addWallet: (newWallet: Wallet) =>
+  accounts: {},
+  addAccount: (newAccount: Account) =>
     set((state) => ({
-      selectedWallet: newWallet.address,
-      wallets: {
-        ...state.wallets,
-        [newWallet.address]: newWallet,
+      selectedAccount: newAccount.address,
+      accounts: {
+        ...state.accounts,
+        [newAccount.address]: newAccount,
       },
     })),
 }))
 
-export const selectAccount = ({ wallets, selectedWallet }: State) => {
-  if (selectedWallet) {
-    return wallets[selectedWallet]
+export const selectAccount = ({ accounts, selectedAccount }: State) => {
+  if (selectedAccount) {
+    return accounts[selectedAccount]
   }
 }

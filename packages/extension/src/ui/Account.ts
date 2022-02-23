@@ -8,7 +8,7 @@ const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
 )
 
-export class Wallet {
+export class Account {
   address: string
   networkId: string
   deployTransaction?: string
@@ -24,16 +24,16 @@ export class Wallet {
       getProvider(networkId),
     )
 
+    const key = `deployTransaction:${address}`
     if (deployTransaction) {
-      localStorage.setItem(`walletTx:${address}`, deployTransaction)
-    } else if (localStorage.getItem(`walletTx:${address}`)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.deployTransaction = localStorage.getItem(`walletTx:${address}`)!
+      localStorage.setItem(key, deployTransaction)
+    } else if (localStorage.getItem(key)) {
+      this.deployTransaction = localStorage.getItem(key) ?? undefined
     }
   }
 
   public completeDeployTx(): void {
-    localStorage.removeItem(`walletTx:${this.address}`)
+    localStorage.removeItem(`deployTransaction:${this.address}`)
     this.deployTransaction = undefined
   }
 
@@ -42,7 +42,7 @@ export class Wallet {
     return nonce.toString()
   }
 
-  public static async fromDeploy(networkId: string): Promise<Wallet> {
+  public static async fromDeploy(networkId: string): Promise<Account> {
     sendMessage({ type: "NEW_ACCOUNT", data: networkId })
 
     const result = await Promise.race([
@@ -54,6 +54,6 @@ export class Wallet {
       throw new Error(result.error)
     }
 
-    return new Wallet(result.address, networkId, result.txHash)
+    return new Account(result.address, networkId, result.txHash)
   }
 }

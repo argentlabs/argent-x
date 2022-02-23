@@ -12,8 +12,8 @@ import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
+import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
-import { connectAccount, deployAccount } from "../utils/wallets"
 
 const NewWalletScreenWrapper = styled.div`
   padding: 48px 40px 24px;
@@ -34,7 +34,7 @@ export function isValidPassword(password: string): boolean {
 
 export const NewWalletScreen: FC = () => {
   const navigate = useNavigate()
-  const { addWallet } = useAccount()
+  const { addAccount } = useAccount()
   const { switcherNetworkId } = useAppState()
   const { localhostPort } = useLocalhostPort()
   const {
@@ -57,7 +57,7 @@ export const NewWalletScreen: FC = () => {
         localhostPort,
         password,
       )
-      addWallet(newAccount)
+      addAccount(newAccount)
       connectAccount(newAccount, switcherNetworkId, localhostPort)
       recover()
       navigate(routes.backupDownload())

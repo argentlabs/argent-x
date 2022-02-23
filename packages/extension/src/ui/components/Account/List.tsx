@@ -2,8 +2,8 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { makeClickable } from "../../utils/a11y"
+import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
-import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"
 import {
   NetworkStatusIndicator,
   NetworkStatusWrapper,
@@ -56,7 +56,7 @@ const AccountName = styled.h1`
 interface AccountListProps {
   accountName: string
   address: string
-  status: WalletStatus
+  status: AccountStatus
   onClick?: () => void
 }
 

@@ -15,8 +15,8 @@ import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
+import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
-import { connectAccount, deployAccount, getStatus } from "../utils/wallets"
 
 const AccountList = styled.div`
   display: flex;
@@ -50,15 +50,15 @@ export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { localhostPort } = useLocalhostPort()
-  const { wallets, selectedWallet, addWallet } = useAccount()
+  const { accounts, selectedAccount, addAccount } = useAccount()
   const { accountNames } = useAccountMetadata()
 
-  const walletsList = Object.values(wallets)
+  const accountsList = Object.values(accounts)
 
   const handleAddAccount = async () => {
     try {
       const newAccount = await deployAccount(switcherNetworkId, localhostPort)
-      addWallet(newAccount)
+      addAccount(newAccount)
       connectAccount(newAccount, switcherNetworkId, localhostPort)
       recover()
       navigate(routes.backupDownload())
@@ -81,17 +81,17 @@ export const AccountListScreen: FC = () => {
       </Header>
       <H1>Accounts</H1>
       <AccountList>
-        {walletsList.length === 0 && (
+        {accountsList.length === 0 && (
           <Paragraph>
-            No wallets on this network, click below to add one.
+            No accounts on this network, click below to add one.
           </Paragraph>
         )}
-        {walletsList.map((account) => (
+        {accountsList.map((account) => (
           <AccountListItem
             key={account.address}
             accountName={getAccountName(account, accountNames)}
             address={account.address}
-            status={getStatus(account, selectedWallet)}
+            status={getStatus(account, selectedAccount)}
             isDeleteable={switcherNetworkId === "localhost"}
           />
         ))}

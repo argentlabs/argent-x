@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { getNetwork } from "../../shared/networks"
+import { Account } from "../Account"
 import { AccountColumn } from "../components/Account/AccountColumn"
 import { AccountSubHeader } from "../components/Account/AccountSubheader"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
@@ -25,11 +26,10 @@ import { useStatus } from "../hooks/useStatus"
 import { routes } from "../routes"
 import { selectAccount, useAccount } from "../states/account"
 import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
+import { useAccountTransactions } from "../states/accountTransactions"
 import { useAppState } from "../states/app"
-import { useWalletTransactions } from "../states/walletTransactions"
 import { makeClickable } from "../utils/a11y"
-import { getAccountImageUrl } from "../utils/wallets"
-import { Wallet } from "../Wallet"
+import { getAccountImageUrl } from "../utils/accounts"
 
 const AccountContent = styled.div`
   display: flex;
@@ -55,14 +55,14 @@ export const AccountScreen: FC = () => {
 }
 
 interface AccountScreenContentProps {
-  account: Wallet
+  account: Account
 }
 
 const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const status = useStatus(account)
-  const transactions = useWalletTransactions(account.address)
+  const transactions = useAccountTransactions(account.address)
   const { accountNames, setAccountName } = useAccountMetadata()
   const pendingTransactions = useMemo(
     () =>
@@ -89,7 +89,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
           networkId={switcherNetworkId}
           status={status}
           accountName={accountName}
-          walletAddress={account.address}
+          accountAddress={account.address}
           onChangeName={(name) =>
             setAccountName(account.networkId, account.address, name)
           }
@@ -116,8 +116,8 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
         )}
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
-            walletAddress={account.address}
-            canShowEmptyWalletAlert={!showPendingTransactions}
+            accountAddress={account.address}
+            canShowEmptyAccountAlert={!showPendingTransactions}
           />
           <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
             <AddTokenIconButton size={40}>

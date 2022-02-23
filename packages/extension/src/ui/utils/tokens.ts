@@ -39,7 +39,7 @@ export const toTokenView = ({
 
 export const fetchTokenDetails = async (
   address: string,
-  walletAddress: string,
+  accountAddress: string,
   networkId: string,
 ): Promise<TokenDetailsWithBalance> => {
   const provider = getProvider(networkId)
@@ -56,7 +56,7 @@ export const fetchTokenDetails = async (
       )
       .catch(() => ""),
     tokenContract
-      .call("balanceOf", { user: walletAddress })
+      .call("balanceOf", { user: accountAddress })
       .then((x) =>
         BigNumber.from(uint256.uint256ToBN(x.balance as any).toString()),
       )
@@ -81,13 +81,13 @@ export const fetchTokenDetails = async (
 
 export const fetchTokenBalance = async (
   address: string,
-  walletAddress: string,
+  accountAddress: string,
   networkId: string,
 ): Promise<BigNumber> => {
   const provider = getProvider(networkId)
   const tokenContract = new Contract(parsedErc20Abi as Abi[], address, provider)
   const result = await tokenContract.call("balanceOf", {
-    user: walletAddress,
+    user: accountAddress,
   })
   return BigNumber.from(uint256.uint256ToBN(result.balance as any).toString())
 }
