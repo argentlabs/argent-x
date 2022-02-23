@@ -56,9 +56,7 @@ export const useStatus = (wallet: Wallet, activeWalletAddress?: string) => {
       ;(async () => {
         try {
           const code = await wallet.contract.provider.getCode(wallet.address)
-          if (code.bytecode.length === 0) {
-            setIsDeployed(false)
-          }
+          setIsDeployed(code.bytecode.length !== 0)
         } catch {
           // as api isnt very stable (especially this endpoint) lets do nothing if the request fails
         }
