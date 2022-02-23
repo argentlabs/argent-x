@@ -11,10 +11,12 @@ import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
+import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
-import { deployWallet, getStatus } from "../utils/wallets"
+import { recover } from "../utils/recovery"
+import { connectAccount, deployAccount, getStatus } from "../utils/wallets"
 
 const AccountList = styled.div`
   display: flex;
@@ -49,14 +51,16 @@ export const AccountListScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
   const { localhostPort } = useLocalhostPort()
   const { wallets, selectedWallet, addWallet } = useAccount()
+  const { accountNames } = useAccountMetadata()
 
   const walletsList = Object.values(wallets)
 
-  const handleAddWallet = async () => {
+  const handleAddAccount = async () => {
     try {
-      const newWallet = await deployWallet(switcherNetworkId, localhostPort)
-      addWallet(newWallet)
-      useAccount.setState({ selectedWallet: newWallet.address })
+      const newAccount = await deployAccount(switcherNetworkId, localhostPort)
+      addWallet(newAccount)
+      connectAccount(newAccount, switcherNetworkId, localhostPort)
+      recover()
       navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
@@ -82,17 +86,16 @@ export const AccountListScreen: FC = () => {
             No wallets on this network, click below to add one.
           </Paragraph>
         )}
-        {walletsList.map((wallet, index) => (
+        {walletsList.map((account) => (
           <AccountListItem
-            key={wallet.address}
-            accountName={wallet.name}
-            accountNumber={index + 1}
-            address={wallet.address}
-            status={getStatus(wallet, selectedWallet)}
+            key={account.address}
+            accountName={getAccountName(account, accountNames)}
+            address={account.address}
+            status={getStatus(account, selectedWallet)}
             isDeleteable={switcherNetworkId === "localhost"}
           />
         ))}
-        <IconButtonCenter size={48} {...makeClickable(handleAddWallet)}>
+        <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>
           <AddIcon fontSize="large" />
         </IconButtonCenter>
       </AccountList>

@@ -33,10 +33,9 @@ const AccountName = styled(EditableHeader)`
 interface AccountSubheaderProps {
   networkId: string
   status: WalletStatus
-  accountNumber: number
   accountName?: string
   walletAddress: string
-  onChangeName: (networkId: string, address: string, name: string) => void
+  onChangeName: (name: string) => void
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
@@ -57,7 +56,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
         <AccountName
           value={accountName}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            onChangeName(networkId, walletAddress, e.target.value)
+            onChangeName(e.target.value)
           }
         />
       </div>

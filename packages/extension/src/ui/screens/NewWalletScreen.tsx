@@ -5,14 +5,15 @@ import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
-import { InputText } from "../components/Input"
+import { InputText } from "../components/InputText"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
-import { deployWallet } from "../utils/wallets"
+import { recover } from "../utils/recovery"
+import { connectAccount, deployAccount } from "../utils/wallets"
 
 const NewWalletScreenWrapper = styled.div`
   padding: 48px 40px 24px;
@@ -51,13 +52,14 @@ export const NewWalletScreen: FC = () => {
 
   const handleDeploy = async (password?: string) => {
     try {
-      const newWallet = await deployWallet(
+      const newAccount = await deployAccount(
         switcherNetworkId,
         localhostPort,
         password,
       )
-      addWallet(newWallet)
-      useAccount.setState({ selectedWallet: newWallet.address })
+      addWallet(newAccount)
+      connectAccount(newAccount, switcherNetworkId, localhostPort)
+      recover()
       navigate(routes.backupDownload())
     } catch (error: any) {
       useAppState.setState({ error })

@@ -11,20 +11,13 @@ const ArgentCompiledContractJson: CompiledContract = json.parse(
 export class Wallet {
   address: string
   networkId: string
-  name?: string
   deployTransaction?: string
   contract: Contract
 
-  constructor(
-    address: string,
-    networkId: string,
-    deployTransaction?: string,
-    name?: string,
-  ) {
+  constructor(address: string, networkId: string, deployTransaction?: string) {
     this.address = address
-    this.deployTransaction = deployTransaction
     this.networkId = networkId
-    this.name = name
+    this.deployTransaction = deployTransaction
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,

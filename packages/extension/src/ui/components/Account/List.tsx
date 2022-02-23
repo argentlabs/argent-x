@@ -55,7 +55,6 @@ const AccountName = styled.h1`
 
 interface AccountListProps {
   accountName: string
-  accountNumber: number
   address: string
   status: WalletStatus
   onClick?: () => void
@@ -63,15 +62,13 @@ interface AccountListProps {
 
 export const AccountListItem: FC<AccountListProps> = ({
   accountName,
-  accountNumber,
   address,
   status,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onClick = () => {},
+  onClick,
 }) => {
   return (
     <AccountListItemWrapper {...makeClickable(onClick)}>
-      <ProfilePicture src={getAccountImageUrl(accountName, accountNumber)} />
+      <ProfilePicture src={getAccountImageUrl(accountName, address)} />
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountName}</AccountName>

@@ -4,7 +4,8 @@ import {
   networkWallets,
 } from "../../shared/networks"
 import { routes } from "../routes"
-import { setAccountNamesFromBackup, useAccount } from "../states/account"
+import { useAccount } from "../states/account"
+import { setDefaultAccountNames } from "../states/accountMetadata"
 import { useAppState } from "../states/app"
 import { Wallet } from "../Wallet"
 import { getLastSelectedWallet, getWallets } from "./messaging"
@@ -34,7 +35,7 @@ export const recover = async ({
       .map(({ address, network }) => new Wallet(address, network))
       .reduce((acc, wallet) => ({ ...acc, [wallet.address]: wallet }), {})
 
-    setAccountNamesFromBackup(wallets)
+    setDefaultAccountNames(wallets)
     useAccount.setState({ wallets, selectedWallet })
     useAppState.setState({ switcherNetworkId: networkId })
 

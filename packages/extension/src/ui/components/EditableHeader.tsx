@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-import { Container, InputText } from "./Input"
+import { Container, InputText } from "./InputText"
 
 const InputHeader = styled(InputText)`
   input {
