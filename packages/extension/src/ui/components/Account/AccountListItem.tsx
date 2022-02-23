@@ -67,7 +67,7 @@ const AccountName = styled.h1`
 `
 
 interface AccountListProps {
-  accountName: string | undefined
+  accountName?: string
   accountNumber: number
   address: string
   status: WalletStatus
