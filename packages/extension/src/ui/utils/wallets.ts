@@ -42,7 +42,7 @@ export const getAccountColor = (accountNumber: number, withPrefix = true) =>
   }`
 
 export const getAccountImageUrl = (
-  accountName: string | undefined,
+  accountName?: string,
   accountNumber: number,
 ) => {
   const urlAccountName = accountName ? accountName : `Account ${accountNumber}`
