@@ -6,7 +6,7 @@ import type { Wallet } from "../Wallet"
 // account information that's not saved in the backup file, but persisted in the extension's localstorage
 interface State {
   accountNames: Record<string, Record<string, string>>
-  setAccountName: (netowrkId: string, address: string, name: string) => void
+  setAccountName: (networkId: string, address: string, name: string) => void
 }
 
 export const useAccountMetadata = create<State>(
@@ -38,26 +38,13 @@ export const setDefaultAccountNames = (accounts: Record<string, Wallet>) => {
   let names = accountNames
   for (const [address, account] of Object.entries(accounts)) {
     const { networkId } = account
-    if (!accountNames?.[networkId]?.[address]) {
-      const name = getDefaultAccountName(account)
+    if (!names[networkId]?.[address]) {
+      const name = `Account ${Object.keys(accounts).indexOf(address) + 1}`
       names = {
         ...names,
         [networkId]: { ...names[networkId], [address]: name },
       }
     }
   }
-  if (names !== accountNames) {
-    useAccountMetadata.setState({ accountNames: names })
-  }
-}
-
-const getDefaultAccountName = (account: Wallet) => {
-  const names = Object.values(
-    useAccountMetadata.getState().accountNames[account.networkId] || {},
-  )
-  let index = 1
-  while (names.includes(`Account ${index}`)) {
-    index++
-  }
-  return `Account ${index}`
+  useAccountMetadata.setState({ accountNames: names })
 }
