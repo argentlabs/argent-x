@@ -16,6 +16,7 @@ import {
 } from "./activeTabs"
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
+import { exportLegacyBackup, hasLegacy } from "./legacy"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
 import {
   addToAlreadyShown,
@@ -374,9 +375,11 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         return wallet.lock()
       }
       case "IS_INITIALIZED": {
+        const initialized = await wallet.isInitialized()
+        const legacy = initialized ? false : await hasLegacy()
         return sendToTabAndUi({
           type: "IS_INITIALIZED_RES",
-          data: await wallet.isInitialized(),
+          data: { initialized, hasLegacy: legacy },
         })
       }
       case "GET_WALLETS": {
@@ -445,6 +448,11 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
       case "DOWNLOAD_BACKUP_FILE": {
         await downloadFile(wallet.exportBackup())
         return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
+      }
+
+      case "DOWNLOAD_LEGACY_BACKUP_FILE": {
+        await downloadFile(await exportLegacyBackup())
+        return sendToTabAndUi({ type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" })
       }
 
       case "DELETE_ACCOUNT": {

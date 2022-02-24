@@ -12,6 +12,7 @@ export const routes = {
   hideTokenPath: () => "/tokens/:tokenAddress/hide",
   reset: () => "/reset",
   disclaimer: () => "/disclaimer",
+  legacy: () => "/legacy",
   settings: () => "/settings",
   backupDownload: (isFromSettings?: boolean) =>
     `/backup-download${isFromSettings ? "?settings" : ""}`,

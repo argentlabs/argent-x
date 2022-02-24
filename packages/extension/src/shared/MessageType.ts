@@ -68,7 +68,10 @@ export type MessageType =
   | { type: "HAS_SESSION" }
   | { type: "HAS_SESSION_RES"; data: boolean }
   | { type: "IS_INITIALIZED" }
-  | { type: "IS_INITIALIZED_RES"; data: boolean }
+  | {
+      type: "IS_INITIALIZED_RES"
+      data: { initialized: boolean; hasLegacy: boolean }
+    }
   | { type: "GET_WALLETS" }
   | { type: "GET_WALLETS_RES"; data: WalletAccount[] }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
@@ -92,6 +95,8 @@ export type MessageType =
   | { type: "SUCCESS_SIGN"; data: { r: string; s: string; actionHash: string } }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
+  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE" }
+  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" }
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
   | { type: "DELETE_ACCOUNT"; data: string }

@@ -14,6 +14,7 @@ import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { DappsScreen } from "./screens/DappsScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
+import { LegacyScreen } from "./screens/LegacyScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
@@ -92,6 +93,7 @@ const Screen: FC = () => {
       <Route path={routes.password()} element={<PasswordScreen />} />
       <Route path={routes.reset()} element={<ResetScreen />} />
       <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
+      <Route path={routes.legacy()} element={<LegacyScreen />} />
       <Route path={routes.error()} element={<ErrorScreen />} />
 
       {/* Routes which need an unlocked keystore and therefore can also sign actions */}
