@@ -12,7 +12,6 @@ import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
-import { DappsScreen } from "./screens/DappsScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
@@ -20,6 +19,8 @@ import { LoadingScreen } from "./screens/LoadingScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { PasswordScreen } from "./screens/PasswordScreen"
 import { ResetScreen } from "./screens/ResetScreen"
+import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
+import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
@@ -102,10 +103,17 @@ const Screen: FC = () => {
           <Route path={routes.account()} element={<AccountScreen />} />
           <Route path={routes.accounts()} element={<AccountListScreen />} />
           <Route path={routes.newToken()} element={<AddTokenScreen />} />
-          <Route path={routes.dappConnections()} element={<DappsScreen />} />
           <Route path={routes.tokenPath()} element={<TokenScreen />} />
           <Route path={routes.hideTokenPath()} element={<HideTokenScreen />} />
           <Route path={routes.settings()} element={<SettingsScreen />} />
+          <Route
+            path={routes.settingsDappConnections()}
+            element={<SettingsDappConnectionsScreen />}
+          />
+          <Route
+            path={routes.settingsLocalhostPort()}
+            element={<SettingsLocalhostPortScreen />}
+          />
           <Route
             path={routes.backupDownload()}
             element={<BackupDownloadScreen />}

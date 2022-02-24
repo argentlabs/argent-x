@@ -1,3 +1,4 @@
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -6,22 +7,58 @@ import { sendMessage } from "../../shared/messages"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
-import { InputText } from "../components/InputText"
-import { H2, P } from "../components/Typography"
+import { H2 } from "../components/Typography"
 import { routes } from "../routes"
 import { useLocalhostPort } from "../states/localhostPort"
+
+const Title = styled.h3`
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+
+  svg {
+    color: #8f8e8c;
+    margin-left: auto;
+    font-size: 12px;
+  }
+`
+
+const P = styled.p`
+  font-size: 15px;
+  color: #8f8e8c;
+  margin-top: 16px;
+`
 
 const SettingsScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 32px 24px 32px;
+  padding: 0 0 24px 0;
 
-  ${P} {
-    margin: 16px 0;
+  ${H2} {
+    margin: 0 32px 32px 32px;
   }
 
   ${Button} {
     margin-top: 10px;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    background-color: #333332;
+  }
+`
+
+const SettingsItem = styled.div`
+  cursor: pointer;
+  padding: 24px 32px;
+
+  &:hover svg {
+    color: #ffffff;
   }
 `
 
@@ -29,11 +66,32 @@ const Footer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  p {
+    padding-bottom: 16px;
+  }
 `
 
 export const SettingsScreen: FC = () => {
   const navigate = useNavigate()
   const { localhostPort } = useLocalhostPort()
+
+  const handleLockClick = () => {
+    sendMessage({ type: "STOP_SESSION" })
+    navigate(routes.password())
+  }
+
+  const handleResetDappConnectionsClick = () => {
+    navigate(routes.settingsDappConnections())
+  }
+
+  const handleDownloadBackupClick = () => {
+    navigate(routes.backupDownload(true))
+  }
+
+  const handleLocalhostPortClick = () => {
+    navigate(routes.settingsLocalhostPort())
+  }
 
   return (
     <>
@@ -42,49 +100,39 @@ export const SettingsScreen: FC = () => {
       </Header>
       <SettingsScreenWrapper>
         <H2>Settings</H2>
-        <Button
-          onClick={() => {
-            sendMessage({ type: "STOP_SESSION" })
-            navigate(routes.password())
-          }}
-        >
-          Lock wallet
-        </Button>
-
-        <P>
-          Dapps you have previously connected to can auto-connect in the future.
-          Require all dapps to request a new connection to your wallet?
-        </P>
-        <Button
-          onClick={() => {
-            sendMessage({ type: "RESET_WHITELIST" })
-            navigate(-1)
-          }}
-        >
-          Reset dapp connections
-        </Button>
-        <Button onClick={() => navigate(routes.dappConnections())}>
-          View dapp connections
-        </Button>
-
-        <P>The backup file contains all your accounts, keep it secure.</P>
-        <Button onClick={() => navigate(routes.backupDownload(true))}>
-          Download backup file
-        </Button>
-
-        <P>
-          For developers only: the port number of your local node. Important
-          note: accounts created with a given port stay tied to that port, even
-          if you change this setting later.
-        </P>
-        <InputText
-          placeholder="Localhost port"
-          type="number"
-          value={localhostPort}
-          onChange={(e: any) => {
-            useLocalhostPort.setState({ localhostPort: e.target.value })
-          }}
-        />
+        <SettingsItem onClick={handleLockClick}>
+          <Title>
+            <span>Lock wallet</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+        </SettingsItem>
+        <hr />
+        <SettingsItem onClick={handleResetDappConnectionsClick}>
+          <Title>
+            <span>Reset dapp connections</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>
+            Dapps you have previously connected to can auto-connect in the
+            future.
+          </P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem onClick={handleDownloadBackupClick}>
+          <Title>
+            <span>Backup file</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>The backup file contains all your accounts. Keep it secure.</P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem onClick={handleLocalhostPortClick}>
+          <Title>
+            <span>Localhost port: {localhostPort}</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+        </SettingsItem>
+        <hr />
         <Footer>
           <P>Help, support &amp; suggestions:</P>
           <div>
