@@ -6,17 +6,17 @@ import { useAppState } from "../../states/app"
 import { useTokensWithBalance } from "../../states/tokens"
 import { testDappToken } from "../../utils/tokens"
 import { TokenListItem } from "../Token"
-import { EmptyWalletAlert } from "./EmptyWalletAlert"
+import { EmptyAccountAlert } from "./EmptyAccountAlert"
 import { SectionHeader } from "./SectionHeader"
 
 interface TokenListProps {
-  walletAddress: string
-  canShowEmptyWalletAlert?: boolean
+  accountAddress: string
+  canShowEmptyAccountAlert?: boolean
 }
 
 export const TokenList: FC<TokenListProps> = ({
-  walletAddress,
-  canShowEmptyWalletAlert = true,
+  accountAddress,
+  canShowEmptyAccountAlert = true,
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
@@ -28,9 +28,9 @@ export const TokenList: FC<TokenListProps> = ({
 
   return (
     <>
-      {canShowEmptyWalletAlert && !hasBalance && (
-        <EmptyWalletAlert
-          walletAddress={walletAddress}
+      {canShowEmptyAccountAlert && !hasBalance && (
+        <EmptyAccountAlert
+          accountAddress={accountAddress}
           mintableAddress={testDappToken(switcherNetworkId)?.address}
         />
       )}

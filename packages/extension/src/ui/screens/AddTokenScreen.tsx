@@ -67,7 +67,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { selectedWallet } = useAccount()
+  const { selectedAccount } = useAccount()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
   const [tokenName, setTokenName] = useState(defaultToken?.name || "")
   const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
@@ -94,8 +94,8 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }, [defaultToken, tokenAddress, tokenDetails])
 
   useEffect(() => {
-    if (loading && selectedWallet) {
-      fetchTokenDetails(tokenAddress, selectedWallet, switcherNetworkId)
+    if (loading && selectedAccount) {
+      fetchTokenDetails(tokenAddress, selectedAccount, switcherNetworkId)
         .then((details) => {
           setTokenDetails(details)
         })
@@ -112,7 +112,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
       prevValidAddress.current = tokenAddress
       setLoading(true)
     }
-  }, [loading, tokenAddress, selectedWallet])
+  }, [loading, tokenAddress, selectedAccount])
 
   const compiledData = {
     address: tokenAddress,

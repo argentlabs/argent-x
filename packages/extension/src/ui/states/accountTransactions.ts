@@ -13,9 +13,9 @@ const useTransactionsStore = create<State>(() => ({
   transactions: [],
 }))
 
-export const useWalletTransactions = (walletAddress: string) => {
+export const useAccountTransactions = (accountAddress: string) => {
   useEffect(() => {
-    getTransactions(walletAddress).then((transactions) => {
+    getTransactions(accountAddress).then((transactions) => {
       useTransactionsStore.setState({ transactions })
     })
 
@@ -23,7 +23,7 @@ export const useWalletTransactions = (walletAddress: string) => {
       if (message.type === "TRANSACTION_UPDATES") {
         useTransactionsStore.setState({
           transactions: message.data.filter(
-            ({ walletAddress: wa }) => wa === walletAddress,
+            ({ walletAddress: wa }) => wa === accountAddress,
           ),
         })
       }
@@ -36,5 +36,5 @@ export const useWalletTransactions = (walletAddress: string) => {
     }
   }, [])
 
-  return useTransactionsStore((x) => x.transactions)
+  return useTransactionsStore((state) => state.transactions)
 }

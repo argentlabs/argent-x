@@ -8,10 +8,10 @@ import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
+import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { recover } from "../../utils/recovery"
-import { WalletStatus, getAccountImageUrl } from "../../utils/wallets"
 import {
   NetworkStatusIndicator,
   NetworkStatusWrapper,
@@ -69,7 +69,7 @@ const AccountName = styled.h1`
 interface AccountListProps {
   accountName: string
   address: string
-  status: WalletStatus
+  status: AccountStatus
   isDeleteable?: boolean
 }
 
@@ -92,7 +92,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   return (
     <AccountListItemWrapper
       {...makeClickable(() => {
-        useAccount.setState({ selectedWallet: address })
+        useAccount.setState({ selectedAccount: address })
         navigate(routes.account())
       })}
       className={isDeleteable ? "deleteable" : ""}

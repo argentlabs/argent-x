@@ -5,8 +5,8 @@ import styled, { css } from "styled-components"
 import { getNetwork, networks } from "../../shared/networks"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
+import { AccountStatusCode } from "../utils/accounts"
 import { recover } from "../utils/recovery"
-import { WalletStatusCode } from "../utils/wallets"
 
 const NetworkName = styled.span`
   text-align: right;
@@ -92,7 +92,7 @@ export const NetworkStatusWrapper = styled.div`
 `
 
 export const NetworkStatusIndicator = styled.span<{
-  status?: WalletStatusCode
+  status?: AccountStatusCode
 }>`
   height: 8px;
   width: 8px;
