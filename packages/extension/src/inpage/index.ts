@@ -150,7 +150,7 @@ window.addEventListener(
   "message",
   ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
-    if (starknet && starknet.signer && data.type === "WALLET_CONNECTED") {
+    if (starknet && starknet.signer && data.type === "CONNECT_ACCOUNT") {
       const { address, network } = data.data
       if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address

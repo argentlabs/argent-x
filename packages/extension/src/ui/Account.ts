@@ -65,7 +65,7 @@ export class Account {
     return new Account(
       result.address,
       networkId,
-      result.wallet.signer,
+      result.account.signer,
       result.txHash,
     )
   }

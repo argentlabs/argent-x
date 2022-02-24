@@ -22,18 +22,21 @@ export const getTransactions = async (address: string) => {
   sendMessage({ type: "GET_TRANSACTIONS" })
   const allTransactions = await waitForMessage("GET_TRANSACTIONS_RES")
   return allTransactions.filter(
-    ({ walletAddress }) => walletAddress === address,
+    ({ accountAddress }) => accountAddress === address,
   )
 }
 
 export const getTransactionStatus = async (hash: string, network: string) => {
   sendMessage({ type: "GET_TRANSACTION", data: { hash, network } })
-  return waitForMessage("GET_TRANSACTION_RES", (x) => x.data.hash === hash)
+  return waitForMessage(
+    "GET_TRANSACTION_RES",
+    (status) => status.data.hash === hash,
+  )
 }
 
-export const getLastSelectedWallet = async () => {
-  sendMessage({ type: "GET_SELECTED_WALLET" })
-  return waitForMessage("GET_SELECTED_WALLET_RES")
+export const getLastSelectedAccount = async () => {
+  sendMessage({ type: "GET_SELECTED_ACCOUNT" })
+  return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
 export const getPublicKey = async () => {
@@ -59,9 +62,9 @@ export const hasActiveSession = async () => {
   return waitForMessage("HAS_SESSION_RES")
 }
 
-export const getWallets = async () => {
-  sendMessage({ type: "GET_WALLETS" })
-  return waitForMessage("GET_WALLETS_RES")
+export const getAccounts = async () => {
+  sendMessage({ type: "GET_ACCOUNTS" })
+  return waitForMessage("GET_ACCOUNTS_RES")
 }
 
 export const startSession = async (password: string): Promise<void> => {
