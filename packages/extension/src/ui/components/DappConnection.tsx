@@ -2,7 +2,7 @@ import RemoveIcon from "@mui/icons-material/Remove"
 import { FC } from "react"
 import styled from "styled-components"
 
-import { IconButton } from "../IconButton"
+import { IconButton } from "./IconButton"
 
 const DappWrapper = styled.div`
   display: flex;
@@ -53,7 +53,7 @@ interface DappListItemProps {
   onClick?: () => void
 }
 
-export const DappListItem: FC<DappListItemProps> = ({ host, onClick }) => {
+export const DappConnection: FC<DappListItemProps> = ({ host, onClick }) => {
   return (
     <DappWrapper>
       <DappDetailsWrapper>
