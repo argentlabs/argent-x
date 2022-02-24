@@ -20,11 +20,8 @@ export const useAccount = create<State>((set) => ({
     })),
 }))
 
-export const selectWallet = ({ wallets, selectedWallet }: State) => {
+export const selectAccount = ({ wallets, selectedWallet }: State) => {
   if (selectedWallet) {
     return wallets[selectedWallet]
   }
 }
-
-export const selectAccountNumber = ({ wallets, selectedWallet }: State) =>
-  Object.keys(wallets).findIndex((wallet) => wallet === selectedWallet) + 1

@@ -16,8 +16,8 @@ export class Wallet {
 
   constructor(address: string, networkId: string, deployTransaction?: string) {
     this.address = address
-    this.deployTransaction = deployTransaction
     this.networkId = networkId
+    this.deployTransaction = deployTransaction
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,

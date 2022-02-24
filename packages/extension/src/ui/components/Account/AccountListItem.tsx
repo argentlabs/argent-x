@@ -67,14 +67,14 @@ const AccountName = styled.h1`
 `
 
 interface AccountListProps {
-  accountNumber: number
+  accountName: string
   address: string
   status: WalletStatus
   isDeleteable?: boolean
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
-  accountNumber,
+  accountName,
   address,
   status,
   isDeleteable,
@@ -97,10 +97,10 @@ export const AccountListItem: FC<AccountListProps> = ({
       })}
       className={isDeleteable ? "deleteable" : ""}
     >
-      <ProfilePicture src={getAccountImageUrl(accountNumber)} />
+      <ProfilePicture src={getAccountImageUrl(accountName, address)} />
       <AccountRow>
         <AccountColumn>
-          <AccountName>Account {accountNumber}</AccountName>
+          <AccountName>{accountName}</AccountName>
           <p>{truncateAddress(address)}</p>
         </AccountColumn>
         <NetworkStatusWrapper>

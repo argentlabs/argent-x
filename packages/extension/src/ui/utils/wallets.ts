@@ -1,10 +1,14 @@
+import { ethers } from "ethers"
+
+import { sendMessage } from "../../shared/messages"
 import { localNetworkUrl } from "../../shared/networks"
 import { useAppState } from "../states/app"
 import { useBackupDownload } from "../states/backupDownload"
+import { useLocalhostPort } from "../states/localhostPort"
 import { Wallet } from "../Wallet"
 import { startSession } from "./messaging"
 
-export const deployWallet = async (
+export const deployAccount = async (
   networkId: string,
   localhostPort: number,
   password?: string,
@@ -25,6 +29,28 @@ export const deployWallet = async (
   }
 }
 
+export const connectAccount = async (
+  account: Wallet,
+  switcherNetworkId: string,
+  localhostPort: number,
+) => {
+  sendMessage({
+    type: "WALLET_CONNECTED",
+    data: {
+      address: account.address,
+      network: localNetworkUrl(switcherNetworkId, localhostPort),
+    },
+  })
+  try {
+    const { hostname, port } = new URL(account.networkId)
+    if (hostname === "localhost") {
+      useLocalhostPort.setState({ localhostPort: parseInt(port) })
+    }
+  } catch {
+    // pass
+  }
+}
+
 const argentColorsArray = [
   "02BBA8",
   "29C5FF",
@@ -36,19 +62,16 @@ const argentColorsArray = [
   "FF5C72",
 ]
 
-export const getAccountColor = (accountNumber: number, withPrefix = true) =>
-  `${withPrefix ? "#" : ""}${
-    argentColorsArray[(accountNumber % (argentColorsArray.length - 1)) + 1]
-  }`
+export const getColor = (name: string, isHex = false) => {
+  const hash = (isHex ? name : ethers.utils.id(name)).slice(-2)
+  const index = parseInt(hash, 16) % argentColorsArray.length
+  return argentColorsArray[index]
+}
 
-export const getAccountImageUrl = (accountNumber: number) =>
-  `https://eu.ui-avatars.com/api?name=Account+${accountNumber}&background=${getAccountColor(
-    accountNumber,
-    false,
-  )}&color=fff`
-
-export const getAccountName = (accountNumber: number) =>
-  `Account ${accountNumber}`
+export const getAccountImageUrl = (name: string, address: string) => {
+  const color = getColor(address, true)
+  return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
+}
 
 export const isWalletDeployed = (wallet: Wallet): boolean =>
   !wallet.deployTransaction

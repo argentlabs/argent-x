@@ -7,7 +7,9 @@ import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H2 } from "../components/Typography"
+import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { getAccountImageUrl } from "../utils/wallets"
+import { Wallet } from "../Wallet"
 
 const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`
   display: flex;
@@ -23,10 +25,7 @@ const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`
 export interface ConfirmPageProps {
   onSubmit?: () => void
   onReject?: () => void
-  selectedAccount?: {
-    accountNumber: number
-    networkId: string
-  }
+  selectedAccount?: Wallet
 }
 
 interface ConfirmScreenProps extends ConfirmPageProps {
@@ -58,6 +57,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   children,
 }) => {
   const navigate = useNavigate()
+  const { accountNames } = useAccountMetadata()
   onReject ??= () => navigate(-1)
 
   return (
@@ -65,7 +65,10 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       {selectedAccount && (
         <Header style={{ margin: "0 -32px 16px" }}>
           <ProfilePicture
-            src={getAccountImageUrl(selectedAccount.accountNumber)}
+            src={getAccountImageUrl(
+              getAccountName(selectedAccount, accountNames),
+              selectedAccount.address,
+            )}
             disabled
           />
           <NetworkSwitcher disabled />
