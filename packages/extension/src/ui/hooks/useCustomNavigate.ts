@@ -2,7 +2,7 @@ import { NavigateOptions, To, useNavigate } from "react-router-dom"
 import browser from "webextension-polyfill"
 
 const openExtensionInTab = () => {
-  const url = browser.runtime.getURL(`index.html`)
+  const url = browser.runtime.getURL("index.html")
   return browser.tabs.create({ url })
 }
 
