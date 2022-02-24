@@ -6,7 +6,7 @@ export interface TransactionMeta {
 
 export interface TransactionStatus {
   hash: string
-  walletAddress?: string
+  accountAddress?: string
   status: Status
   meta?: TransactionMeta
 }

@@ -33,8 +33,11 @@ export const getNetwork = (networkId: string): Network => {
   return networks.find(({ id }) => id === networkId) || defaultNetwork
 }
 
-export const networkWallets = (wallets: WalletAccount[], networkId: string) =>
-  wallets.filter(
+export const accountsOnNetwork = (
+  accounts: WalletAccount[],
+  networkId: string,
+) =>
+  accounts.filter(
     ({ network }) => localNetworkId(network) === localNetworkId(networkId),
   )
 

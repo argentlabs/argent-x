@@ -42,28 +42,28 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         data: transactions,
       })
 
-      for (const { hash, status, walletAddress, meta } of transactions) {
+      for (const { hash, status, accountAddress, meta } of transactions) {
         if (
           (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
           !(await hasShownNotification(hash))
         ) {
           addToAlreadyShown(hash)
           sentTransactionNotification(hash, status, meta)
-          if (walletAddress && status === "ACCEPTED_ON_L2") {
+          if (accountAddress && status === "ACCEPTED_ON_L2") {
             sendMessageToUi({
               type: "TRANSACTION_SUCCESS",
               data: {
                 hash,
                 status,
-                walletAddress,
+                accountAddress,
                 meta,
               },
             })
           }
         }
         // on error remove stored (increased) nonce
-        if (walletAddress && status === "REJECTED") {
-          resetStoredNonce(walletAddress)
+        if (accountAddress && status === "REJECTED") {
+          resetStoredNonce(accountAddress)
         }
       }
     }
@@ -142,17 +142,17 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         })
       }
 
-      case "GET_SELECTED_WALLET": {
-        const selectedWallet = await wallet.getSelectedAccount()
+      case "GET_SELECTED_ACCOUNT": {
+        const selectedAccount = await wallet.getSelectedAccount()
 
         return sendToTabAndUi({
-          type: "GET_SELECTED_WALLET_RES",
-          data: selectedWallet,
+          type: "GET_SELECTED_ACCOUNT_RES",
+          data: selectedAccount,
         })
       }
 
       case "CONNECT": {
-        const selectedWallet = await wallet.getSelectedAccount()
+        const selectedAccount = await wallet.getSelectedAccount()
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
         addTab(sender.tab?.id)
@@ -164,14 +164,14 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           })
         }
 
-        if (isWhitelisted && selectedWallet.address) {
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
+        if (isWhitelisted && selectedAccount.address) {
+          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedAccount })
         }
 
         return openUi()
       }
 
-      case "WALLET_CONNECTED": {
+      case "CONNECT_ACCOUNT": {
         return await wallet.selectAccount(msg.data.address)
       }
 
@@ -184,14 +184,14 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         switch (action.type) {
           case "CONNECT": {
             const { host } = action.payload
-            const selectedWallet = await wallet.getSelectedAccount()
+            const selectedAccount = await wallet.getSelectedAccount()
 
             await addToWhitelist(host)
 
-            if (selectedWallet) {
+            if (selectedAccount) {
               return sendToTabAndUi({
                 type: "CONNECT_RES",
-                data: selectedWallet,
+                data: selectedAccount,
               })
             }
             return openUi()
@@ -202,7 +202,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
-            const selectedWallet = await wallet.getSelectedAccount()
+            const selectedAccount = await wallet.getSelectedAccount()
             const signer = await wallet.getSelectedAccountSigner()
 
             try {
@@ -213,7 +213,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
               increaseStoredNonce(signer.address)
               transactionTracker.trackTransaction(
                 tx.transaction_hash,
-                selectedWallet,
+                selectedAccount,
               )
 
               return sendToTabAndUi({
@@ -376,13 +376,13 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
       case "IS_INITIALIZED": {
         return sendToTabAndUi({
           type: "IS_INITIALIZED_RES",
-          data: await wallet.isInitialized(),
+          data: wallet.isInitialized(),
         })
       }
-      case "GET_WALLETS": {
+      case "GET_ACCOUNTS": {
         return sendToTabAndUi({
-          type: "GET_WALLETS_RES",
-          data: await wallet.getAccounts(),
+          type: "GET_ACCOUNTS_RES",
+          data: wallet.getAccounts(),
         })
       }
       case "NEW_ACCOUNT": {
@@ -403,8 +403,8 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
               status: "ok",
               txHash,
               address: account.address,
-              wallet: account,
-              wallets: wallet.getAccounts(),
+              account: account,
+              accounts: wallet.getAccounts(),
             },
           })
         } catch (e: any) {

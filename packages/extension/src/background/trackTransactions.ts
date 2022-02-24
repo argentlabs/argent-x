@@ -13,7 +13,7 @@ interface TransactionStatusWithProvider extends TransactionStatus {
 
 type FetchedTransactionStatus = Omit<
   TransactionStatus,
-  "walletAddress" | "meta"
+  "accountAddress" | "meta"
 >
 
 type Listener = (transactions: TransactionStatus[]) => void
@@ -38,17 +38,17 @@ export class TransactionTracker {
 
   public async trackTransaction(
     transactionHash: string,
-    wallet: WalletAccount,
+    account: WalletAccount,
     meta: TransactionMeta = {
       title: "Contract interaction",
     },
   ): Promise<void> {
     try {
-      const provider = getProvider(wallet.network)
+      const provider = getProvider(account.network)
       this.transactions.push({
         hash: transactionHash,
         provider,
-        walletAddress: wallet.address,
+        accountAddress: account.address,
         status: "RECEIVED",
         meta,
       })
@@ -61,15 +61,15 @@ export class TransactionTracker {
     }
   }
 
-  public getAllTransactions(byWalletAddress?: string): TransactionStatus[] {
+  public getAllTransactions(byAccountAddress?: string): TransactionStatus[] {
     return this.transactions
       .filter(
         (transaction) =>
-          !byWalletAddress || transaction.walletAddress === byWalletAddress,
+          !byAccountAddress || transaction.accountAddress === byAccountAddress,
       )
-      .map(({ hash, walletAddress, meta }) => ({
+      .map(({ hash, accountAddress, meta }) => ({
         hash,
-        walletAddress,
+        accountAddress,
         status: this.getTransactionStatus(hash)?.status || "NOT_RECEIVED",
         meta,
       }))
@@ -82,21 +82,21 @@ export class TransactionTracker {
   private async checkTransactions(): Promise<void> {
     const transactionStatuses = await Promise.all(
       this.transactions.map(
-        async ({ hash, provider, walletAddress, meta, status }) => {
+        async ({ hash, provider, accountAddress, meta, status }) => {
           // TODO: We dont need to check for ACCEPTED_ON_L1 currently, as we just handle ACCEPTED_ON_L2 anyways. This may changes in the future.
           // if (status === "ACCEPTED_ON_L1" || status === "REJECTED") {
           if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
             return Promise.resolve({
               hash,
               provider,
-              walletAddress,
+              accountAddress,
               meta,
               status,
             })
           }
           return getTransactionStatus(provider, hash).then((status) => ({
             ...status,
-            walletAddress,
+            accountAddress,
             provider,
             meta,
           }))

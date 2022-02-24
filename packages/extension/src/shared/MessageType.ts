@@ -19,8 +19,8 @@ export type MessageType =
       type: "GET_ACTIONS_RES"
       data: ExtActionItem[]
     }
-  | { type: "GET_SELECTED_WALLET" }
-  | { type: "GET_SELECTED_WALLET_RES"; data: WalletAccount }
+  | { type: "GET_SELECTED_ACCOUNT" }
+  | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount }
   | { type: "CONNECT"; data: { host: string } }
   | { type: "CONNECT_RES"; data: WalletAccount }
   | {
@@ -47,7 +47,7 @@ export type MessageType =
   | { type: "IS_WHITELIST"; data: string }
   | { type: "IS_WHITELIST_RES"; data: boolean }
   | { type: "RESET_WHITELIST" }
-  | { type: "WALLET_CONNECTED"; data: WalletAccount }
+  | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "RESET_ALL" }
   | { type: "REQ_PUB" }
   | { type: "REQ_PUB_RES"; data: JWK }
@@ -59,8 +59,8 @@ export type MessageType =
         status: "ok"
         txHash: string
         address: string
-        wallet: WalletAccount
-        wallets: WalletAccount[]
+        account: WalletAccount
+        accounts: WalletAccount[]
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { status: "ko"; error: string } }
@@ -69,8 +69,8 @@ export type MessageType =
   | { type: "HAS_SESSION_RES"; data: boolean }
   | { type: "IS_INITIALIZED" }
   | { type: "IS_INITIALIZED_RES"; data: boolean }
-  | { type: "GET_WALLETS" }
-  | { type: "GET_WALLETS_RES"; data: WalletAccount[] }
+  | { type: "GET_ACCOUNTS" }
+  | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
   | { type: "START_SESSION_RES" }

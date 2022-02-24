@@ -35,7 +35,7 @@ export const connectAccount = async (
   localhostPort: number,
 ) => {
   sendMessage({
-    type: "WALLET_CONNECTED",
+    type: "CONNECT_ACCOUNT",
     data: {
       address: account.address,
       network: localNetworkUrl(switcherNetworkId, localhostPort),

@@ -1,14 +1,14 @@
 import {
+  accountsOnNetwork,
   defaultNetwork,
   localNetworkId,
-  networkWallets,
 } from "../../shared/networks"
 import { Account } from "../Account"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { setDefaultAccountNames } from "../states/accountMetadata"
 import { useAppState } from "../states/app"
-import { getLastSelectedWallet, getWallets } from "./messaging"
+import { getAccounts, getLastSelectedAccount } from "./messaging"
 
 interface RecoveryOptions {
   networkId?: string
@@ -20,12 +20,12 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    const lastSelectedAccount = await getLastSelectedWallet().catch(() => null)
+    const lastSelectedAccount = await getLastSelectedAccount().catch(() => null)
     networkId ||= lastSelectedAccount
       ? localNetworkId(lastSelectedAccount?.network)
       : defaultNetwork.id
 
-    const walletAccounts = networkWallets(await getWallets(), networkId)
+    const walletAccounts = accountsOnNetwork(await getAccounts(), networkId)
 
     const selectedAccount = walletAccounts.find(
       ({ address }) => address === lastSelectedAccount?.address,
