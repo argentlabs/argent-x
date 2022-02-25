@@ -44,12 +44,12 @@ export const getPublicKey = async () => {
   return waitForMessage("REQ_PUB_RES")
 }
 
-export const recoverKeystore = async (keystore: string) => {
+export const recoverBackup = async (backup: string) => {
   sendMessage({
-    type: "RECOVER_KEYSTORE",
-    data: keystore,
+    type: "RECOVER_BACKUP",
+    data: backup,
   })
-  return waitForMessage("RECOVER_KEYSTORE_RES")
+  return waitForMessage("RECOVER_BACKUP_RES")
 }
 
 export const isInitialized = async () => {

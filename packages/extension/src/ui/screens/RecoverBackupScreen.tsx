@@ -10,9 +10,9 @@ import { H2 } from "../components/Typography"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { fileToString } from "../utils/files"
-import { recoverKeystore } from "../utils/messaging"
+import { recoverBackup } from "../utils/messaging"
 
-const UploadKeystoreScreenWrapper = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -41,7 +41,7 @@ const DropZone = styled.div`
   }
 `
 
-export const UploadKeystoreScreen: FC = () => {
+export const RecoverBackupScreen: FC = () => {
   const navigate = useNavigate()
   const {
     acceptedFiles: [acceptedFile],
@@ -56,7 +56,7 @@ export const UploadKeystoreScreen: FC = () => {
   const handleRestoreClick = async () => {
     try {
       const data = await fileToString(acceptedFile)
-      await recoverKeystore(data)
+      await recoverBackup(data)
       navigate(routes.password())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
@@ -65,7 +65,7 @@ export const UploadKeystoreScreen: FC = () => {
   }
 
   return (
-    <UploadKeystoreScreenWrapper>
+    <Wrapper>
       <BackButton />
       <H2>Select backup</H2>
       <DropZone {...getRootProps()}>
@@ -83,6 +83,6 @@ export const UploadKeystoreScreen: FC = () => {
       <Button onClick={handleRestoreClick} disabled={disableSubmit}>
         Restore from backup
       </Button>
-    </UploadKeystoreScreenWrapper>
+    </Wrapper>
   )
 }

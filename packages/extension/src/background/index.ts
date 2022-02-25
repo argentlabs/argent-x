@@ -438,9 +438,9 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         })
       }
 
-      case "RECOVER_KEYSTORE": {
+      case "RECOVER_BACKUP": {
         await wallet.importBackup(msg.data)
-        return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })
+        return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
       }
       case "DOWNLOAD_BACKUP_FILE": {
         await downloadFile(wallet.exportBackup())
