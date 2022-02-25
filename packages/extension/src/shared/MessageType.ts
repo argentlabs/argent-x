@@ -38,42 +38,30 @@ export type MessageType =
   | { type: "GET_TRANSACTION"; data: { hash: string; network: string } }
   | { type: "GET_TRANSACTION_RES"; data: TransactionStatus }
   | {
-      type: "SUBMITTED_TX"
+      type: "TRANSACTION_SUBMITTED"
       data: {
         txHash: string
         actionHash: string
       }
     }
   | {
-      type: "FAILED_TX"
+      type: "TRANSACTION_FAILED"
       data: { actionHash: string; error?: string }
-    }
-  // ***** actions *****
-  | { type: "GET_ACTIONS" }
-  | {
-      type: "GET_ACTIONS_RES"
-      data: ExtActionItem[]
     }
   // ***** pre-authorizations *****
   | { type: "CONNECT_DAPP"; data: { host: string } }
   | { type: "CONNECT_DAPP_RES"; data: WalletAccount }
-  | { type: "ADD_WHITELIST"; data: string }
-  | { type: "APPROVE_WHITELIST"; data: { host: string; actionHash: string } }
-  | { type: "REJECT_WHITELIST"; data: { host: string; actionHash: string } }
-  | { type: "REMOVE_WHITELIST"; data: string }
-  | { type: "GET_PENDING_WHITELIST" }
-  | { type: "GET_PENDING_WHITELIST_RES"; data: string[] }
-  | { type: "IS_WHITELIST"; data: string }
-  | { type: "IS_WHITELIST_RES"; data: boolean }
-  | { type: "RESET_WHITELIST" }
-  // ***** tokens *****
-  | { type: "ADD_TOKEN"; data: AddToken }
-  | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }
-  | { type: "REJECT_ADD_TOKEN"; data: { actionHash: string } }
-  | { type: "APPROVE_ADD_TOKEN"; data: { actionHash: string } }
+  | { type: "PREAUTHORIZE"; data: string }
+  | {
+      type: "REJECT_PREAUTHORIZATION"
+      data: { host: string; actionHash: string }
+    }
+  | { type: "REMOVE_PREAUTHORIZATION"; data: string }
+  | { type: "IS_PREAUTHORIZED"; data: string }
+  | { type: "IS_PREAUTHORIZED_RES"; data: boolean }
+  | { type: "RESET_PREAUTHORIZATIONS" }
   // ***** sessions *****
   | { type: "STOP_SESSION" }
-  | { type: "REPORT_PROGRESS"; data: number }
   | { type: "HAS_SESSION" }
   | { type: "HAS_SESSION_RES"; data: boolean }
   | { type: "IS_INITIALIZED" }
@@ -86,26 +74,35 @@ export type MessageType =
   | { type: "RECOVER_BACKUP_RES" }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
+  // ***** tokens *****
+  | { type: "ADD_TOKEN"; data: AddToken }
+  | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }
+  | { type: "REJECT_ADD_TOKEN"; data: { actionHash: string } }
+  | { type: "APPROVE_ADD_TOKEN"; data: { actionHash: string } }
   // ***** actions *****
-  | { type: "ADD_SIGN"; data: typedData.TypedData }
-  | { type: "ADD_SIGN_RES"; data: { actionHash: string } }
+  | { type: "GET_ACTIONS" }
+  | {
+      type: "GET_ACTIONS_RES"
+      data: ExtActionItem[]
+    }
   | { type: "APPROVE_ACTION"; data: { actionHash: string } }
   | { type: "REJECT_ACTION"; data: { actionHash: string } }
   | {
       type: "ACTIONS_QUEUE_UPDATE"
       data: { actions: ExtActionItem[] }
     }
+  | { type: "SIGN_MESSAGE"; data: typedData.TypedData }
+  | { type: "SIGN_MESSAGE_RES"; data: { actionHash: string } }
+  | { type: "SIGNATURE_FAILURE"; data: { actionHash: string } }
   | {
-      type: "APPROVE_SIGN"
-      data: { typedData: typedData.TypedData; actionHash: string }
+      type: "SIGNATURE_SUCCESS"
+      data: { r: string; s: string; actionHash: string }
     }
-  | { type: "FAILED_SIGN"; data: { actionHash: string } }
-  | { type: "SUCCESS_SIGN"; data: { r: string; s: string; actionHash: string } }
   // ***** misc *****
   | { type: "OPEN_UI" }
   | { type: "RESET_ALL" }
-  | { type: "REQ_PUB" }
-  | { type: "REQ_PUB_RES"; data: JWK }
+  | { type: "GET_PUBLIC_KEY" }
+  | { type: "GET_PUBLIC_KEY_RES"; data: JWK }
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

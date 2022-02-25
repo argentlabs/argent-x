@@ -40,8 +40,8 @@ export const getLastSelectedAccount = async () => {
 }
 
 export const getPublicKey = async () => {
-  sendMessage({ type: "REQ_PUB" })
-  return waitForMessage("REQ_PUB_RES")
+  sendMessage({ type: "GET_PUBLIC_KEY" })
+  return waitForMessage("GET_PUBLIC_KEY_RES")
 }
 
 export const recoverBackup = async (backup: string) => {

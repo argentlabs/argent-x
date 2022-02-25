@@ -57,7 +57,7 @@ export const SettingsScreen: FC = () => {
         </P>
         <Button
           onClick={() => {
-            sendMessage({ type: "RESET_WHITELIST" })
+            sendMessage({ type: "RESET_PREAUTHORIZATIONS" })
             navigate(-1)
           }}
         >
