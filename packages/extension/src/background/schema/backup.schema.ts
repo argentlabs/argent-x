@@ -1,7 +1,7 @@
 import { array, number, object, string } from "yup"
 
 export default object({
-  // standard keystore file
+  // standard backup/keystore file
   address: string().required(),
   version: number().integer().required(),
   Crypto: object()

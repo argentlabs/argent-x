@@ -1,33 +1,33 @@
 import { FC, useCallback, useEffect, useState } from "react"
 
 import {
-  getWhitelist,
-  removeFromWhitelist,
-} from "../../../background/whitelist"
+  getPreAuthorizations,
+  removePreAuthorization,
+} from "../../../background/preAuthorizations"
 import { DappListItem } from "./Dapp"
 import { SectionHeader } from "./SectionHeader"
 
 export const DappsList: FC = () => {
-  const [dappsWhitelist, setDappsWhitelist] = useState<string[]>([])
+  const [preAuthorizations, setPreAuthorizations] = useState<string[]>([])
 
-  const getWhitelistDapps = useCallback(async () => {
-    setDappsWhitelist(await getWhitelist())
+  const requestPreAuthorizations = useCallback(async () => {
+    setPreAuthorizations(await getPreAuthorizations())
   }, [])
 
   useEffect(() => {
-    getWhitelistDapps()
+    requestPreAuthorizations()
   }, [])
 
   return (
     <>
       <SectionHeader>Dapps</SectionHeader>
-      {dappsWhitelist.map((dapp) => (
+      {preAuthorizations.map((dapp) => (
         <DappListItem
           key={dapp}
           host={dapp}
           onClick={async () => {
-            await removeFromWhitelist(dapp)
-            getWhitelistDapps()
+            await removePreAuthorization(dapp)
+            requestPreAuthorizations()
           }}
         />
       ))}

@@ -84,7 +84,7 @@ const starknetWindowObject: StarknetWindowObject = {
         )
           .then(() => "error" as const)
           .catch(() => {
-            sendMessage({ type: "FAILED_TX", data: { actionHash } })
+            sendMessage({ type: "TRANSACTION_FAILED", data: { actionHash } })
             return "timeout" as const
           }),
       ])
@@ -108,7 +108,7 @@ const starknetWindowObject: StarknetWindowObject = {
           return
         }
 
-        if (data.type === "CONNECT_RES" && data.data) {
+        if (data.type === "CONNECT_DAPP_RES" && data.data) {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
           starknet.provider = getProvider(network)
@@ -120,14 +120,17 @@ const starknetWindowObject: StarknetWindowObject = {
       }
       window.addEventListener("message", handleMessage)
 
-      sendMessage({ type: "CONNECT", data: { host: window.location.host } })
+      sendMessage({
+        type: "CONNECT_DAPP",
+        data: { host: window.location.host },
+      })
     }),
   isPreauthorized: async () => {
     sendMessage({
-      type: "IS_WHITELIST",
+      type: "IS_PREAUTHORIZED",
       data: window.location.host,
     })
-    return waitForMsgOfType("IS_WHITELIST_RES", 1000)
+    return waitForMsgOfType("IS_PREAUTHORIZED_RES", 1000)
   },
   on: (event, handleEvent) => {
     if (event !== "accountsChanged") {
@@ -191,18 +194,18 @@ export class WalletSigner extends Provider implements SignerInterface {
 
     const result = await Promise.race([
       waitForMsgOfType(
-        "SUBMITTED_TX",
+        "TRANSACTION_SUBMITTED",
         11 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
       waitForMsgOfType(
-        "FAILED_TX",
+        "TRANSACTION_FAILED",
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       )
         .then(() => "error" as const)
         .catch(() => {
-          sendMessage({ type: "FAILED_TX", data: { actionHash } })
+          sendMessage({ type: "TRANSACTION_FAILED", data: { actionHash } })
           return "timeout" as const
         }),
     ])
@@ -226,24 +229,24 @@ export class WalletSigner extends Provider implements SignerInterface {
   }
 
   public async signMessage(data: typedData.TypedData): Promise<Signature> {
-    sendMessage({ type: "ADD_SIGN", data })
-    const { actionHash } = await waitForMsgOfType("ADD_SIGN_RES", 1000)
+    sendMessage({ type: "SIGN_MESSAGE", data })
+    const { actionHash } = await waitForMsgOfType("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
       waitForMsgOfType(
-        "SUCCESS_SIGN",
+        "SIGNATURE_SUCCESS",
         11 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
       waitForMsgOfType(
-        "FAILED_SIGN",
+        "SIGNATURE_FAILURE",
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       )
         .then(() => "error" as const)
         .catch(() => {
-          sendMessage({ type: "FAILED_SIGN", data: { actionHash } })
+          sendMessage({ type: "SIGNATURE_FAILURE", data: { actionHash } })
           return "timeout" as const
         }),
     ])

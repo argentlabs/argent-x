@@ -23,10 +23,10 @@ import {
   sentTransactionNotification,
 } from "./notification"
 import { openUi } from "./openUi"
+import { isPreAuthorized, preAuthorize } from "./preAuthorizations"
 import { Storage, clearStorage, setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { Wallet, WalletStorageProps } from "./wallet"
-import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
@@ -151,21 +151,24 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         })
       }
 
-      case "CONNECT": {
+      case "CONNECT_DAPP": {
         const selectedAccount = await wallet.getSelectedAccount()
-        const isWhitelisted = await isOnWhitelist(msg.data.host)
+        const isAuthorized = await isPreAuthorized(msg.data.host)
 
         addTab(sender.tab?.id)
 
-        if (!isWhitelisted) {
+        if (!isAuthorized) {
           await actionQueue.push({
-            type: "CONNECT",
+            type: "CONNECT_DAPP",
             payload: { host: msg.data.host },
           })
         }
 
-        if (isWhitelisted && selectedAccount.address) {
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedAccount })
+        if (isAuthorized && selectedAccount.address) {
+          return sendToTabAndUi({
+            type: "CONNECT_DAPP_RES",
+            data: selectedAccount,
+          })
         }
 
         return openUi()
@@ -182,15 +185,15 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           throw new Error("Action not found")
         }
         switch (action.type) {
-          case "CONNECT": {
+          case "CONNECT_DAPP": {
             const { host } = action.payload
             const selectedAccount = await wallet.getSelectedAccount()
 
-            await addToWhitelist(host)
+            await preAuthorize(host)
 
             if (selectedAccount) {
               return sendToTabAndUi({
-                type: "CONNECT_RES",
+                type: "CONNECT_DAPP_RES",
                 data: selectedAccount,
               })
             }
@@ -217,7 +220,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
               )
 
               return sendToTabAndUi({
-                type: "SUBMITTED_TX",
+                type: "TRANSACTION_SUBMITTED",
                 data: {
                   txHash: tx.transaction_hash,
                   actionHash,
@@ -225,7 +228,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
               })
             } catch (error: any) {
               return sendToTabAndUi({
-                type: "FAILED_TX",
+                type: "TRANSACTION_FAILED",
                 data: { actionHash, error: `${error}` },
               })
             }
@@ -241,7 +244,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
             const [r, s] = await signer.signMessage(typedData)
 
             return sendToTabAndUi({
-              type: "SUCCESS_SIGN",
+              type: "SIGNATURE_SUCCESS",
               data: {
                 r: r.toString(),
                 s: s.toString(),
@@ -284,9 +287,9 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           throw new Error("Action not found")
         }
         switch (action.type) {
-          case "CONNECT": {
+          case "CONNECT_DAPP": {
             return sendToTabAndUi({
-              type: "REJECT_WHITELIST",
+              type: "REJECT_PREAUTHORIZATION",
               data: {
                 host: action.payload.host,
                 actionHash,
@@ -295,7 +298,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           }
           case "TRANSACTION": {
             return sendToTabAndUi({
-              type: "FAILED_TX",
+              type: "TRANSACTION_FAILED",
               data: {
                 actionHash,
               },
@@ -303,7 +306,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           }
           case "SIGN": {
             return sendToTabAndUi({
-              type: "FAILED_SIGN",
+              type: "SIGNATURE_FAILURE",
               data: {
                 actionHash,
               },
@@ -322,10 +325,10 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         }
       }
 
-      case "FAILED_SIGN":
-      case "REJECT_WHITELIST":
+      case "SIGNATURE_FAILURE":
+      case "REJECT_PREAUTHORIZATION":
       case "REJECT_ADD_TOKEN":
-      case "FAILED_TX": {
+      case "TRANSACTION_FAILED": {
         return await actionQueue.remove(msg.data.actionHash)
       }
 
@@ -334,23 +337,26 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         return wallet.lock()
       }
 
-      case "ADD_WHITELIST": {
+      case "PREAUTHORIZE": {
         return actionQueue.push({
-          type: "CONNECT",
+          type: "CONNECT_DAPP",
           payload: { host: msg.data },
         })
       }
-      case "IS_WHITELIST": {
-        const valid = await isOnWhitelist(msg.data)
-        return sendToTabAndUi({ type: "IS_WHITELIST_RES", data: valid })
+      case "IS_PREAUTHORIZED": {
+        const valid = await isPreAuthorized(msg.data)
+        return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
       }
-      case "RESET_WHITELIST": {
-        setToStorage(`WHITELIST:APPROVED`, [])
-        setToStorage(`WHITELIST:PENDING`, [])
+      case "RESET_PREAUTHORIZATIONS": {
+        setToStorage(`PREAUTHORIZATION:APPROVED`, [])
+        setToStorage(`PREAUTHORIZATION:PENDING`, [])
         return
       }
-      case "REQ_PUB": {
-        return sendToTabAndUi({ type: "REQ_PUB_RES", data: publicKeyJwk })
+      case "GET_PUBLIC_KEY": {
+        return sendToTabAndUi({
+          type: "GET_PUBLIC_KEY_RES",
+          data: publicKeyJwk,
+        })
       }
       case "START_SESSION": {
         const { secure, body } = msg.data
@@ -424,23 +430,23 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         }
       }
 
-      case "ADD_SIGN": {
+      case "SIGN_MESSAGE": {
         const { meta } = await actionQueue.push({
           type: "SIGN",
           payload: msg.data,
         })
 
         return sendToTabAndUi({
-          type: "ADD_SIGN_RES",
+          type: "SIGN_MESSAGE_RES",
           data: {
             actionHash: meta.hash,
           },
         })
       }
 
-      case "RECOVER_KEYSTORE": {
+      case "RECOVER_BACKUP": {
         await wallet.importBackup(msg.data)
-        return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })
+        return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
       }
       case "DOWNLOAD_BACKUP_FILE": {
         await downloadFile(wallet.exportBackup())
