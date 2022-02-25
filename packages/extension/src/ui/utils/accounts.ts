@@ -29,7 +29,7 @@ export const deployAccount = async (
   }
 }
 
-export const connectAccount = async (
+export const connectAccount = (
   account: Account,
   switcherNetworkId: string,
   localhostPort: number,

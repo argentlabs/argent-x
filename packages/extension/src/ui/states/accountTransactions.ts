@@ -19,7 +19,7 @@ export const useAccountTransactions = (accountAddress: string) => {
       useTransactionsStore.setState({ transactions })
     })
 
-    const listener = messageStream.subscribe(([message]) => {
+    const subscription = messageStream.subscribe(([message]) => {
       if (message.type === "TRANSACTION_UPDATES") {
         useTransactionsStore.setState({
           transactions: message.data.filter(
@@ -30,8 +30,8 @@ export const useAccountTransactions = (accountAddress: string) => {
     })
 
     return () => {
-      if (!listener.closed) {
-        listener.unsubscribe()
+      if (!subscription.closed) {
+        subscription.unsubscribe()
       }
     }
   }, [])
