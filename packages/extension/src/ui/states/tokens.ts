@@ -191,14 +191,14 @@ export const useTokensWithBalance = (): UseTokens => {
 
   // refetch balances on transaction success
   useEffect(() => {
-    const sub = messageStream.subscribe(([msg]) => {
+    const subscription = messageStream.subscribe(([msg]) => {
       if (msg.type === "TRANSACTION_SUCCESS") {
         mutate() // refetch balances
       }
     })
     return () => {
-      if (!sub.closed) {
-        sub.unsubscribe()
+      if (!subscription.closed) {
+        subscription.unsubscribe()
       }
     }
   }, [mutate])

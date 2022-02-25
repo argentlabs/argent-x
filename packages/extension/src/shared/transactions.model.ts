@@ -1,12 +1,22 @@
-import { Status } from "starknet"
+import { Provider, Status } from "starknet"
 
 export interface TransactionMeta {
   title: string
 }
 
-export interface TransactionStatus {
+export interface FetchedTransactionStatus {
   hash: string
-  walletAddress?: string
   status: Status
+  failureReason?: { code: string; error_message: string }
+}
+
+export interface TransactionStatus extends FetchedTransactionStatus {
+  walletAddress?: string
   meta?: TransactionMeta
 }
+
+export interface TransactionStatusWithProvider extends TransactionStatus {
+  provider: Provider
+}
+
+export type TransactionListener = (transactions: TransactionStatus[]) => void

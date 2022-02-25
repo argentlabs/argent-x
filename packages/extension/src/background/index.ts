@@ -51,23 +51,25 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           data: transactions,
         })
 
-        for (const { hash, status, walletAddress, meta } of transactions) {
+        for (const transaction of transactions) {
+          const { hash, status, walletAddress, meta } = transaction
           if (
             (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
             !(await hasShownNotification(hash))
           ) {
             addToAlreadyShown(hash)
             sentTransactionNotification(hash, status, meta)
-            if (walletAddress && status === "ACCEPTED_ON_L2") {
-              sendMessageToUi({
-                type: "TRANSACTION_SUCCESS",
-                data: {
-                  hash,
-                  status,
-                  walletAddress,
-                  meta,
-                },
-              })
+            if (walletAddress) {
+              const data = { hash, status, walletAddress, meta }
+              if (status === "ACCEPTED_ON_L2") {
+                sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
+              } else if (status === "REJECTED") {
+                const { failureReason } = transaction
+                sendMessageToUi({
+                  type: "TRANSACTION_FAILURE",
+                  data: { ...data, failureReason },
+                })
+              }
             }
           }
           // on error remove stored (increased) nonce

@@ -6,6 +6,7 @@ import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
 import { useEntry } from "./hooks/useEntry"
+import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
@@ -76,6 +77,7 @@ export const App: FC = () => (
 const Screen: FC = () => {
   useEntry()
   useActionsSubscription()
+  useTransactionErrorScreen()
 
   const { isLoading } = useAppState()
   const { actions } = useActions()

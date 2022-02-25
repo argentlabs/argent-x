@@ -12,6 +12,7 @@ export type MessageType =
   | { type: "ADD_TRANSACTION_RES"; data: { actionHash: string } }
   | { type: "TRANSACTION_UPDATES"; data: TransactionStatus[] }
   | { type: "TRANSACTION_SUCCESS"; data: TransactionStatus }
+  | { type: "TRANSACTION_FAILURE"; data: TransactionStatus }
   | { type: "GET_TRANSACTION"; data: { hash: string; network: string } }
   | { type: "GET_TRANSACTION_RES"; data: TransactionStatus }
   | { type: "GET_ACTIONS" }
