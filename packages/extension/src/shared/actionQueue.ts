@@ -4,7 +4,7 @@ import type { ExtQueueItem } from "../background/actionQueue"
 
 export type ActionItem =
   | {
-      type: "CONNECT"
+      type: "CONNECT_DAPP"
       payload: {
         host: string
       }

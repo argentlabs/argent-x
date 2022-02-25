@@ -108,7 +108,7 @@ const starknetWindowObject: StarknetWindowObject = {
           return
         }
 
-        if (data.type === "CONNECT_RES" && data.data) {
+        if (data.type === "CONNECT_DAPP_RES" && data.data) {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
           starknet.provider = getProvider(network)
@@ -120,7 +120,10 @@ const starknetWindowObject: StarknetWindowObject = {
       }
       window.addEventListener("message", handleMessage)
 
-      sendMessage({ type: "CONNECT", data: { host: window.location.host } })
+      sendMessage({
+        type: "CONNECT_DAPP",
+        data: { host: window.location.host },
+      })
     }),
   isPreauthorized: async () => {
     sendMessage({

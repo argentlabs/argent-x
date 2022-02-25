@@ -55,8 +55,8 @@ export type MessageType =
       data: ExtActionItem[]
     }
   // ***** pre-authorizations *****
-  | { type: "CONNECT"; data: { host: string } }
-  | { type: "CONNECT_RES"; data: WalletAccount }
+  | { type: "CONNECT_DAPP"; data: { host: string } }
+  | { type: "CONNECT_DAPP_RES"; data: WalletAccount }
   | { type: "ADD_WHITELIST"; data: string }
   | { type: "APPROVE_WHITELIST"; data: { host: string; actionHash: string } }
   | { type: "REJECT_WHITELIST"; data: { host: string; actionHash: string } }

@@ -151,7 +151,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         })
       }
 
-      case "CONNECT": {
+      case "CONNECT_DAPP": {
         const selectedAccount = await wallet.getSelectedAccount()
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
@@ -159,13 +159,16 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
         if (!isWhitelisted) {
           await actionQueue.push({
-            type: "CONNECT",
+            type: "CONNECT_DAPP",
             payload: { host: msg.data.host },
           })
         }
 
         if (isWhitelisted && selectedAccount.address) {
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedAccount })
+          return sendToTabAndUi({
+            type: "CONNECT_DAPP_RES",
+            data: selectedAccount,
+          })
         }
 
         return openUi()
@@ -182,7 +185,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           throw new Error("Action not found")
         }
         switch (action.type) {
-          case "CONNECT": {
+          case "CONNECT_DAPP": {
             const { host } = action.payload
             const selectedAccount = await wallet.getSelectedAccount()
 
@@ -190,7 +193,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
             if (selectedAccount) {
               return sendToTabAndUi({
-                type: "CONNECT_RES",
+                type: "CONNECT_DAPP_RES",
                 data: selectedAccount,
               })
             }
@@ -284,7 +287,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
           throw new Error("Action not found")
         }
         switch (action.type) {
-          case "CONNECT": {
+          case "CONNECT_DAPP": {
             return sendToTabAndUi({
               type: "REJECT_WHITELIST",
               data: {
@@ -336,7 +339,7 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
 
       case "ADD_WHITELIST": {
         return actionQueue.push({
-          type: "CONNECT",
+          type: "CONNECT_DAPP",
           payload: { host: msg.data },
         })
       }

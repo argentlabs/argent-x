@@ -21,7 +21,7 @@ export const ActionScreen: FC = () => {
   const [action] = actions
   const isLastAction = actions.length === 1
   switch (action.type) {
-    case "CONNECT":
+    case "CONNECT_DAPP":
       return (
         <ConnectScreen
           host={action.payload.host}
