@@ -25,6 +25,9 @@ export const TokenDapp: FC = () => {
   const [transactionStatus, setTransactionStatus] = useState<
     "idle" | "approve" | "pending" | "success"
   >("idle")
+  const [errorMessageOfAddERC20Token, setErrorMessageOfAddERC20Token] =
+    useState("")
+  const [errorMessageOfAddETHToken, setErrorMessageOfAddETHToken] = useState("")
 
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
 
@@ -207,7 +210,15 @@ export const TokenDapp: FC = () => {
         <button
           className="flat"
           style={{ marginLeft: ".6em" }}
-          onClick={() => addToken(tokenAddress)}
+          onClick={() => {
+            addToken(tokenAddress)
+              .then(() => {
+                setErrorMessageOfAddERC20Token("")
+              })
+              .catch((error) => {
+                setErrorMessageOfAddERC20Token(error.message)
+              })
+          }}
         >
           Add to wallet
         </button>
@@ -221,6 +232,7 @@ export const TokenDapp: FC = () => {
             {truncateAddress(tokenAddress)}
           </a>
         </code>
+        <span className="error-message">{errorMessageOfAddERC20Token}</span>
       </h3>
       {ethAddress && (
         <h3 style={{ margin: 0 }}>
@@ -228,7 +240,15 @@ export const TokenDapp: FC = () => {
           <button
             className="flat"
             style={{ marginLeft: ".6em" }}
-            onClick={() => addToken(ethAddress)}
+            onClick={() => {
+              addToken(ethAddress)
+                .then(() => {
+                  setErrorMessageOfAddETHToken("")
+                })
+                .catch((error) => {
+                  setErrorMessageOfAddETHToken(error.message)
+                })
+            }}
           >
             Add to wallet
           </button>
@@ -242,6 +262,7 @@ export const TokenDapp: FC = () => {
               {truncateAddress(ethAddress)}
             </a>
           </code>
+          <span className="error-message">{errorMessageOfAddETHToken}</span>
         </h3>
       )}
     </>
