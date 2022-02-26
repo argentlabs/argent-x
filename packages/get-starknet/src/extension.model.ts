@@ -23,6 +23,7 @@ type RpcMessage = {
 interface IStarketWindowObject {
   request: (call: RpcMessage) => Promise<void>
   enable: (options?: { showModal?: boolean }) => Promise<string[]>
+  disconnect: () => Promise<void>
   isPreauthorized: () => Promise<boolean>
   on: (event: "accountsChanged", handleEvent: EventHandler) => void
   off: (event: "accountsChanged", handleEvent: EventHandler) => void

@@ -122,6 +122,25 @@ const starknetWindowObject: StarknetWindowObject = {
 
       sendMessage({ type: "CONNECT", data: { host: window.location.host } })
     }),
+  disconnect: () =>
+    new Promise((resolve) => {
+      const handleMessage = ({ data }: MessageEvent<WindowMessageType>) => {
+        const { starknet } = window
+        if (!starknet) {
+          return
+        }
+
+        if (data.type === "DISCONNECT_RES") {
+          window.removeEventListener("message", handleMessage)
+          starknet.signer = undefined
+          starknet.selectedAddress = undefined
+          starknet.isConnected = false
+          resolve()
+        }
+      }
+      window.addEventListener("message", handleMessage)
+      sendMessage({ type: "DISCONNECT", data: { host: window.location.host } })
+    }),
   isPreauthorized: async () => {
     sendMessage({
       type: "IS_WHITELIST",
