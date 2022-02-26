@@ -7,6 +7,7 @@ import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
   connectWallet,
+  disconnectWallet,
   isPreauthorized,
   isWalletConnected,
   networkUrl,
@@ -38,6 +39,12 @@ const Home: NextPage = () => {
     setAddress(await walletAddress())
   }
 
+  const handleDisconnectClick = async () => {
+    await disconnectWallet()
+    setIsConnected(isWalletConnected())
+    setAddress("")
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -48,12 +55,18 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         {isConnected ? (
           <>
-            <h3 style={{ margin: 0 }}>
-              Wallet address: <code>{address && truncateAddress(address)}</code>
-            </h3>
-            <h3 style={{ margin: 0 }}>
-              Url: <code>{networkUrl()}</code>
-            </h3>
+            <div className="section-1">
+              <div>
+                <h3 style={{ margin: 0 }}>
+                  Wallet address:{" "}
+                  <code>{address && truncateAddress(address)}</code>
+                </h3>
+                <h3 style={{ margin: 0 }}>
+                  Url: <code>{networkUrl()}</code>
+                </h3>
+              </div>
+              <button onClick={handleDisconnectClick}>disconnect</button>
+            </div>
             <TokenDapp />
           </>
         ) : (
