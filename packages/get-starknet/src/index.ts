@@ -20,6 +20,7 @@ const defaultStarknetWindowObject: StarknetWindowObject = {
     }
     return fail()
   },
+  disconnect: async () => {},
   isPreauthorized: fail,
   on: fail,
   off: fail,
