@@ -9,6 +9,7 @@ import { getQueue } from "./actionQueue"
 import {
   addTab,
   hasTab,
+  removeTab,
   sendMessageToActiveTabs,
   sendMessageToActiveTabsAndUi,
   sendMessageToUi,
@@ -38,7 +39,7 @@ import { selectedWalletStore } from "./selectedWallet"
 import { getSigner } from "./signer"
 import { setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
-import { addToWhitelist, isOnWhitelist } from "./whitelist"
+import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
@@ -187,6 +188,21 @@ import { addToWhitelist, isOnWhitelist } from "./whitelist"
         }
 
         return openUi()
+      }
+
+      case "DISCONNECT": {
+        const { host } = msg.data
+        console.log("sender", sender)
+        console.log("host", host)
+
+        const isWhitelisted = await isOnWhitelist(host)
+
+        if (isWhitelisted) {
+          removeTab(sender.tab?.id)
+          await removeFromWhitelist(host)
+        }
+
+        return sendToTabAndUi({ type: "DISCONNECT_RES" })
       }
 
       case "WALLET_CONNECTED": {

@@ -11,6 +11,12 @@ export function addTab(tabId?: number) {
   }
 }
 
+export function removeTab(tabId?: number) {
+  if (tabId !== undefined && hasTab(tabId)) {
+    activeTabs.delete(tabId)
+  }
+}
+
 export function hasTab(tabId?: number) {
   if (tabId === undefined) {
     return false
