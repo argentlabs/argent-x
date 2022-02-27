@@ -171,7 +171,14 @@ window.addEventListener(
     const { starknet } = window
     if (starknet && starknet.signer && data.type === "WALLET_CONNECTED") {
       const { address, network } = data.data
-      if (address !== starknet.selectedAddress) {
+      if (!address && !network) {
+        starknet.selectedAddress = undefined
+        starknet.signer = undefined
+        starknet.isConnected = false
+        for (const handleEvent of userEventHandlers) {
+          handleEvent([])
+        }
+      } else if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
         starknet.signer = new WalletSigner(address, starknet.provider)
