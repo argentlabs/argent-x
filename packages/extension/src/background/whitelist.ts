@@ -1,4 +1,4 @@
-import { sendMessageToHost } from "./activeTabs"
+import { removeTabOfHost, sendMessageToHost } from "./activeTabs"
 import { getFromStorage, setToStorage } from "./storage"
 
 export async function addToWhitelist(host: string) {
@@ -23,6 +23,7 @@ export async function removeFromWhitelist(host: string) {
     },
     host,
   )
+  removeTabOfHost(host)
 }
 
 export async function isOnWhitelist(host: string) {

@@ -13,8 +13,11 @@ export function addTab(tab: Tab) {
 }
 
 export function removeTab(tabId?: number) {
-  if (tabId !== undefined && hasTab(tabId)) {
-    activeTabs.delete(tabId)
+  if (tabId !== undefined) {
+    activeTabs.splice(
+      activeTabs.findIndex((tab) => tab.id === tabId),
+      1,
+    )
   }
 }
 
@@ -26,20 +29,27 @@ export function hasTab(tabId?: number) {
 }
 
 browser.tabs.onRemoved.addListener((tabId) => {
-  activeTabs.splice(
-    activeTabs.findIndex((tab) => tab.id === tabId),
-    1,
-  )
+  removeTab(tabId)
 })
+
+export function getTabIdsOfHost(host: string) {
+  return activeTabs.filter((tab) => tab.host === host).map((tab) => tab.id)
+}
+
+export function removeTabOfHost(host: string) {
+  getTabIdsOfHost(host).forEach((tabId) => {
+    removeTab(tabId)
+  })
+}
 
 export async function sendMessageToHost(
   message: MessageType,
   host: string,
 ): Promise<void> {
-  const tabId = activeTabs.find((tab) => tab.host === host)?.id
-  if (tabId) {
-    await sendMessage(message, { tabId })
-  }
+  const tabIds = getTabIdsOfHost(host)
+  await Promise.allSettled(
+    tabIds.map((tabId) => sendMessage(message, { tabId })),
+  )
 }
 
 export async function sendMessageToActiveTabs(
