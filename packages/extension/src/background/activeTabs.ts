@@ -13,7 +13,7 @@ export function addTab(tab: Tab) {
 }
 
 export function removeTab(tabId?: number) {
-  if (tabId !== undefined) {
+  if (tabId !== undefined && hasTab(tabId)) {
     activeTabs.splice(
       activeTabs.findIndex((tab) => tab.id === tabId),
       1,
