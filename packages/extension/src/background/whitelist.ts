@@ -19,11 +19,7 @@ export async function removeFromWhitelist(host: string) {
   )
   await sendMessageToHost(
     {
-      type: "WALLET_CONNECTED",
-      data: {
-        address: "",
-        network: "",
-      },
+      type: "WALLET_DISCONNECTED",
     },
     host,
   )
