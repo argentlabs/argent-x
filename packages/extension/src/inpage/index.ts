@@ -169,21 +169,23 @@ window.addEventListener(
   "message",
   ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
-    if (starknet && starknet.signer && data.type === "WALLET_CONNECTED") {
-      const { address, network } = data.data
-      if (!address && !network) {
+    if (starknet && starknet.signer) {
+      if (data.type === "WALLET_CONNECTED") {
+        const { address, network } = data.data
+        if (address !== starknet.selectedAddress) {
+          starknet.selectedAddress = address
+          starknet.provider = getProvider(network)
+          starknet.signer = new WalletSigner(address, starknet.provider)
+          for (const handleEvent of userEventHandlers) {
+            handleEvent([address])
+          }
+        }
+      } else if (data.type === "WALLET_DISCONNECTED") {
         starknet.selectedAddress = undefined
         starknet.signer = undefined
         starknet.isConnected = false
         for (const handleEvent of userEventHandlers) {
           handleEvent([])
-        }
-      } else if (address !== starknet.selectedAddress) {
-        starknet.selectedAddress = address
-        starknet.provider = getProvider(network)
-        starknet.signer = new WalletSigner(address, starknet.provider)
-        for (const handleEvent of userEventHandlers) {
-          handleEvent([address])
         }
       }
     }
