@@ -3,7 +3,7 @@ import browser from "webextension-polyfill"
 import { sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 
-type Tab = { id: number; origin: string }
+type Tab = { id: number; host: string }
 const activeTabs: Tab[] = []
 
 export function addTab(tab: Tab) {
@@ -31,6 +31,16 @@ browser.tabs.onRemoved.addListener((tabId) => {
     1,
   )
 })
+
+export async function sendMessageToHost(
+  message: MessageType,
+  host: string,
+): Promise<void> {
+  const tabId = activeTabs.find((tab) => tab.host === host)?.id
+  if (tabId) {
+    await sendMessage(message, { tabId })
+  }
+}
 
 export async function sendMessageToActiveTabs(
   message: MessageType,

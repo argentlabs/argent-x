@@ -177,7 +177,7 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
         if (sender.tab?.id) {
           addTab({
             id: sender.tab?.id,
-            origin: msg.data.host,
+            host: msg.data.host,
           })
         }
 
