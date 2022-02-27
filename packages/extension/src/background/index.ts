@@ -10,8 +10,10 @@ import {
   addTab,
   hasTab,
   removeTab,
+  removeTabOfHost,
   sendMessageToActiveTabs,
   sendMessageToActiveTabsAndUi,
+  sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
 import { getKeyPair } from "./keys/communication"
@@ -197,17 +199,23 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
       case "DISCONNECT": {
         const { host } = msg.data
-        console.log("sender", sender)
-        console.log("host", host)
 
         const isWhitelisted = await isOnWhitelist(host)
 
         if (isWhitelisted) {
-          removeTab(sender.tab?.id)
           await removeFromWhitelist(host)
         }
 
-        return sendToTabAndUi({ type: "DISCONNECT_RES" })
+        await sendToTabAndUi({ type: "DISCONNECT_RES" })
+
+        await sendMessageToHost(
+          {
+            type: "WALLET_DISCONNECTED",
+          },
+          host,
+        )
+        removeTabOfHost(host)
+        break
       }
 
       case "WALLET_CONNECTED": {

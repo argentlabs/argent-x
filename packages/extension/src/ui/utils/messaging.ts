@@ -100,3 +100,13 @@ export const deleteAccount = async (address: string) => {
     throw Error("Could not delete account")
   }
 }
+
+export const removeFromWhitelist = async (host: string) => {
+  sendMessage({
+    type: "DISCONNECT",
+    data: {
+      host,
+    },
+  })
+  await waitForMessage("DISCONNECT_RES")
+}

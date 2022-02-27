@@ -2,13 +2,14 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { getWhitelist, removeFromWhitelist } from "../../background/whitelist"
+import { getWhitelist } from "../../background/whitelist"
 import { sendMessage } from "../../shared/messages"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { DappConnection } from "../components/DappConnection"
 import { Header } from "../components/Header"
 import { H2, P } from "../components/Typography"
+import { removeFromWhitelist } from "../utils/messaging"
 
 const Wrapper = styled.div`
   display: flex;

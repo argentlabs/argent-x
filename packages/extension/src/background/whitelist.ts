@@ -1,4 +1,3 @@
-import { removeTabOfHost, sendMessageToHost } from "./activeTabs"
 import { getFromStorage, setToStorage } from "./storage"
 
 export async function addToWhitelist(host: string) {
@@ -17,13 +16,6 @@ export async function removeFromWhitelist(host: string) {
     `WHITELIST:APPROVED`,
     (approved || []).filter((x) => x !== host),
   )
-  await sendMessageToHost(
-    {
-      type: "WALLET_DISCONNECTED",
-    },
-    host,
-  )
-  removeTabOfHost(host)
 }
 
 export async function isOnWhitelist(host: string) {
