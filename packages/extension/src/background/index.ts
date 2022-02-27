@@ -174,7 +174,12 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
         )
         const isWhitelisted = await isOnWhitelist(msg.data.host)
 
-        addTab(sender.tab?.id)
+        if (sender.tab?.id) {
+          addTab({
+            id: sender.tab?.id,
+            origin: msg.data.host,
+          })
+        }
 
         if (!isWhitelisted) {
           await actionQueue.push({
