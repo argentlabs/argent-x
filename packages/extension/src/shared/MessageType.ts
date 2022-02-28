@@ -23,8 +23,8 @@ export type MessageType =
   | { type: "GET_SELECTED_WALLET" }
   | { type: "GET_SELECTED_WALLET_RES"; data: BackupWallet }
   | { type: "CONNECT"; data: { host: string } }
-  | { type: "DISCONNECT"; data: { host: string } }
   | { type: "CONNECT_RES"; data: BackupWallet }
+  | { type: "DISCONNECT"; data: { host: string } }
   | { type: "DISCONNECT_RES" }
   | {
       type: "SUBMITTED_TX"

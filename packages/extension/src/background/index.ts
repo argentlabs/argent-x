@@ -192,9 +192,6 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
       case "DISCONNECT": {
         const { host } = msg.data
-        console.log("sender", sender)
-        console.log("host", host)
-
         const isWhitelisted = await isOnWhitelist(host)
 
         if (isWhitelisted) {
