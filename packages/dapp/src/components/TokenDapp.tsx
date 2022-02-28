@@ -26,7 +26,6 @@ export const TokenDapp: FC = () => {
     "idle" | "approve" | "pending" | "success"
   >("idle")
   const [addTokenError, setAddTokenError] = useState("")
-  const [addETHError, setAddETHError] = useState("")
 
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
 
@@ -230,7 +229,6 @@ export const TokenDapp: FC = () => {
             {truncateAddress(tokenAddress)}
           </a>
         </code>
-        <span className="error-message">{addTokenError}</span>
       </h3>
       {ethAddress && (
         <h3 style={{ margin: 0 }}>
@@ -241,9 +239,9 @@ export const TokenDapp: FC = () => {
             onClick={async () => {
               try {
                 await addToken(ethAddress)
-                setAddETHError("")
+                setAddTokenError("")
               } catch (error: any) {
-                setAddETHError(error.message)
+                setAddTokenError(error.message)
               }
             }}
           >
@@ -259,9 +257,9 @@ export const TokenDapp: FC = () => {
               {truncateAddress(ethAddress)}
             </a>
           </code>
-          <span className="error-message">{addETHError}</span>
         </h3>
       )}
+      <span className="error-message">{addTokenError}</span>
     </>
   )
 }
