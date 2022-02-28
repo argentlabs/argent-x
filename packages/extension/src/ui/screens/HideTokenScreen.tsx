@@ -26,11 +26,11 @@ export const HideTokenScreen: FC = () => {
 
   const { name } = toTokenView(token)
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     try {
       removeToken(token)
       navigate(routes.account())
-    } catch (e) {
+    } catch {
       setError("Token not hidden")
     }
   }
