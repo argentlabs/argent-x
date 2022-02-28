@@ -25,9 +25,8 @@ export const TokenDapp: FC = () => {
   const [transactionStatus, setTransactionStatus] = useState<
     "idle" | "approve" | "pending" | "success"
   >("idle")
-  const [errorMessageOfAddERC20Token, setErrorMessageOfAddERC20Token] =
-    useState("")
-  const [errorMessageOfAddETHToken, setErrorMessageOfAddETHToken] = useState("")
+  const [addTokenError, setAddTokenError] = useState("")
+  const [addETHError, setAddETHError] = useState("")
 
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
 
@@ -210,14 +209,13 @@ export const TokenDapp: FC = () => {
         <button
           className="flat"
           style={{ marginLeft: ".6em" }}
-          onClick={() => {
-            addToken(tokenAddress)
-              .then(() => {
-                setErrorMessageOfAddERC20Token("")
-              })
-              .catch((error) => {
-                setErrorMessageOfAddERC20Token(error.message)
-              })
+          onClick={async () => {
+            try {
+              await addToken(tokenAddress)
+              setAddTokenError("")
+            } catch (error: any) {
+              setAddTokenError(error.message)
+            }
           }}
         >
           Add to wallet
@@ -232,7 +230,7 @@ export const TokenDapp: FC = () => {
             {truncateAddress(tokenAddress)}
           </a>
         </code>
-        <span className="error-message">{errorMessageOfAddERC20Token}</span>
+        <span className="error-message">{addTokenError}</span>
       </h3>
       {ethAddress && (
         <h3 style={{ margin: 0 }}>
@@ -240,14 +238,13 @@ export const TokenDapp: FC = () => {
           <button
             className="flat"
             style={{ marginLeft: ".6em" }}
-            onClick={() => {
-              addToken(ethAddress)
-                .then(() => {
-                  setErrorMessageOfAddETHToken("")
-                })
-                .catch((error) => {
-                  setErrorMessageOfAddETHToken(error.message)
-                })
+            onClick={async () => {
+              try {
+                await addToken(ethAddress)
+                setAddETHError("")
+              } catch (error: any) {
+                setAddETHError(error.message)
+              }
             }}
           >
             Add to wallet
@@ -262,7 +259,7 @@ export const TokenDapp: FC = () => {
               {truncateAddress(ethAddress)}
             </a>
           </code>
-          <span className="error-message">{errorMessageOfAddETHToken}</span>
+          <span className="error-message">{addETHError}</span>
         </h3>
       )}
     </>
