@@ -48,12 +48,12 @@ const RemoveConnectionIconButton = styled(IconButton)`
   }
 `
 
-interface DappListItemProps {
+interface DappConnectionProps {
   host: string
   onClick?: () => void
 }
 
-export const DappConnection: FC<DappListItemProps> = ({ host, onClick }) => {
+export const DappConnection: FC<DappConnectionProps> = ({ host, onClick }) => {
   return (
     <DappWrapper>
       <DappDetailsWrapper>

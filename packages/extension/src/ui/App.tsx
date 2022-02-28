@@ -19,12 +19,12 @@ import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { PasswordScreen } from "./screens/PasswordScreen"
+import { RecoverBackupScreen } from "./screens/RecoverBackupScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
 import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
 import { TokenScreen } from "./screens/TokenScreen"
-import { UploadKeystoreScreen } from "./screens/UploadKeystoreScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
@@ -88,16 +88,16 @@ const Screen: FC = () => {
 
   return (
     <Routes>
-      {/* Routes which need no unlocked keystore */}
+      {/* Routes which need no unlocked backup */}
       <Route path={routes.welcome()} element={<WelcomeScreen />} />
       <Route path={routes.newWallet()} element={<NewWalletScreen />} />
-      <Route path={routes.recoverBackup()} element={<UploadKeystoreScreen />} />
+      <Route path={routes.recoverBackup()} element={<RecoverBackupScreen />} />
       <Route path={routes.password()} element={<PasswordScreen />} />
       <Route path={routes.reset()} element={<ResetScreen />} />
       <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
       <Route path={routes.error()} element={<ErrorScreen />} />
 
-      {/* Routes which need an unlocked keystore and therefore can also sign actions */}
+      {/* Routes which need an unlocked backup and therefore can also sign actions */}
       {actions[0] ? (
         <Route path="*" element={<ActionScreen />} />
       ) : (

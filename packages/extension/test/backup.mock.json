@@ -1,0 +1,41 @@
+{
+  "address": "d34a9147bb9d4293d548e6163f1d3b06fea3d9ef",
+  "id": "3369142b-b008-45b5-aae4-c5aba532831f",
+  "version": 3,
+  "Crypto": {
+    "cipher": "aes-128-ctr",
+    "cipherparams": { "iv": "30a5f17ff2392afaee4c0b4797bb6d60" },
+    "ciphertext": "c1675d661371e4b01e079bb181e7031f2d2f419621f20727b9d0f082f5c4a19f",
+    "kdf": "scrypt",
+    "kdfparams": {
+      "salt": "3f5b46d003fe6ef81eae075ad715f926c9df1a63e58eb810fdd5b67ca131393b",
+      "n": 64,
+      "dklen": 32,
+      "p": 1,
+      "r": 8
+    },
+    "mac": "f2df5f18fdca8a5f1a6be040f8f607057cc404bdf3d3db9a50fb32bfa8e4880d"
+  },
+  "x-ethers": {
+    "client": "ethers.js",
+    "gethFilename": "UTC--2022-02-21T09-22-13.0Z--d34a9147bb9d4293d548e6163f1d3b06fea3d9ef",
+    "mnemonicCounter": "bbabecfca8065212cf0fb9923f9376b8",
+    "mnemonicCiphertext": "90f8520d33b5b2d5797a86462f61032e",
+    "path": "m/44'/60'/0'/0/0",
+    "locale": "en",
+    "version": "0.1"
+  },
+  "argent": {
+    "version": 1,
+    "accounts": [
+      {
+        "network": "http://localhost:5000",
+        "address": "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
+        "signer": {
+          "type": "local_secret",
+          "derivationPath": "m/2645'/1195502025'/1148870696'/0'/0'/0"
+        }
+      }
+    ]
+  }
+}

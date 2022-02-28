@@ -3,6 +3,7 @@ import { CompiledContract, Contract, json } from "starknet"
 
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { getProvider } from "../shared/networks"
+import { WalletAccountSigner } from "../shared/wallet.model"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -11,12 +12,19 @@ const ArgentCompiledContractJson: CompiledContract = json.parse(
 export class Account {
   address: string
   networkId: string
+  signer: WalletAccountSigner
   deployTransaction?: string
   contract: Contract
 
-  constructor(address: string, networkId: string, deployTransaction?: string) {
+  constructor(
+    address: string,
+    networkId: string,
+    signer: WalletAccountSigner,
+    deployTransaction?: string,
+  ) {
     this.address = address
     this.networkId = networkId
+    this.signer = signer
     this.deployTransaction = deployTransaction
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
@@ -54,6 +62,11 @@ export class Account {
       throw new Error(result.error)
     }
 
-    return new Account(result.address, networkId, result.txHash)
+    return new Account(
+      result.address,
+      networkId,
+      result.account.signer,
+      result.txHash,
+    )
   }
 }

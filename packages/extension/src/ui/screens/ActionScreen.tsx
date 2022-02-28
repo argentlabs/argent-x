@@ -21,7 +21,7 @@ export const ActionScreen: FC = () => {
   const [action] = actions
   const isLastAction = actions.length === 1
   switch (action.type) {
-    case "CONNECT":
+    case "CONNECT_DAPP":
       return (
         <ConnectScreen
           host={action.payload.host}
@@ -68,11 +68,11 @@ export const ActionScreen: FC = () => {
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([
               waitForMessage(
-                "SUBMITTED_TX",
+                "TRANSACTION_SUBMITTED",
                 ({ data }) => data.actionHash === action.meta.hash,
               ),
               waitForMessage(
-                "FAILED_TX",
+                "TRANSACTION_FAILED",
                 ({ data }) => data.actionHash === action.meta.hash,
               ),
             ])
@@ -107,7 +107,7 @@ export const ActionScreen: FC = () => {
             await approve(action)
             useAppState.setState({ isLoading: true })
             await waitForMessage(
-              "SUCCESS_SIGN",
+              "SIGNATURE_SUCCESS",
               ({ data }) => data.actionHash === action.meta.hash,
             )
             if (isPopup && isLastAction) {

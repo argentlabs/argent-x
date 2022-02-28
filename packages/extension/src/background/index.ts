@@ -1,5 +1,6 @@
+import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import { compactDecrypt } from "jose"
-import { ec, encode } from "starknet"
+import { encode } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
@@ -14,20 +15,8 @@ import {
   sendMessageToActiveTabsAndUi,
   sendMessageToUi,
 } from "./activeTabs"
+import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
-import {
-  createAccount,
-  deleteAccount,
-  downloadBackupFile,
-  existsL1,
-  getL1,
-  getWallets,
-  isUnlocked,
-  lockWallet,
-  resetAll,
-  setKeystore,
-  validatePassword,
-} from "./keys/l1"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
 import {
   addToAlreadyShown,
@@ -35,54 +24,54 @@ import {
   sentTransactionNotification,
 } from "./notification"
 import { openUi } from "./openUi"
-import { selectedWalletStore } from "./selectedWallet"
-import { getSigner } from "./signer"
-import { setToStorage } from "./storage"
+import { isPreAuthorized, preAuthorize } from "./preAuthorizations"
+import { Storage, clearStorage, setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
+import { Wallet, WalletStorageProps } from "./wallet"
 
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
-  const transactionTracker = new TransactionTracker(
-    async (transactions) => {
-      if (transactions.length > 0) {
-        sendMessageToUi({
-          type: "TRANSACTION_UPDATES",
-          data: transactions,
-        })
+  const storage = new Storage<WalletStorageProps>({}, "wallet")
+  const wallet = new Wallet(storage, ArgentCompiledContract)
+  await wallet.setup()
 
-        for (const transaction of transactions) {
-          const { hash, status, walletAddress, meta } = transaction
-          if (
-            (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
-            !(await hasShownNotification(hash))
-          ) {
-            addToAlreadyShown(hash)
-            sentTransactionNotification(hash, status, meta)
-            if (walletAddress) {
-              const data = { hash, status, walletAddress, meta }
-              if (status === "ACCEPTED_ON_L2") {
-                sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
-              } else if (status === "REJECTED") {
-                const { failureReason } = transaction
-                sendMessageToUi({
-                  type: "TRANSACTION_FAILURE",
-                  data: { ...data, failureReason },
-                })
-              }
+  const transactionTracker = new TransactionTracker(async (transactions) => {
+    if (transactions.length > 0) {
+      sendMessageToUi({
+        type: "TRANSACTION_UPDATES",
+        data: transactions,
+      })
+
+      for (const transaction of transactions) {
+        const { hash, status, accountAddress, meta } = transaction
+        if (
+          (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
+          !(await hasShownNotification(hash))
+        ) {
+          addToAlreadyShown(hash)
+          sentTransactionNotification(hash, status, meta)
+          if (accountAddress) {
+            const data = { hash, status, accountAddress, meta }
+            if (status === "ACCEPTED_ON_L2") {
+              sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
+            } else if (status === "REJECTED") {
+              const { failureReason } = transaction
+              sendMessageToUi({
+                type: "TRANSACTION_FAILURE",
+                data: { ...data, failureReason },
+              })
             }
           }
-          // on error remove stored (increased) nonce
-          if (walletAddress && status === "REJECTED") {
-            resetStoredNonce(walletAddress)
-          }
+        }
+        // on error remove stored (increased) nonce
+        if (accountAddress && status === "REJECTED") {
+          resetStoredNonce(accountAddress)
         }
       }
-    },
-
-    30 * 1000,
-  )
+    }
+  }, 30 * 1000)
 
   messageStream.subscribe(async ([msg, sender]) => {
     const sendToTabAndUi = async (msg: MessageType) => {
@@ -157,34 +146,33 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
         })
       }
 
-      case "GET_SELECTED_WALLET": {
-        const selectedWallet = await selectedWalletStore.getItem(
-          "SELECTED_WALLET",
-        )
+      case "GET_SELECTED_ACCOUNT": {
+        const selectedAccount = await wallet.getSelectedAccount()
 
         return sendToTabAndUi({
-          type: "GET_SELECTED_WALLET_RES",
-          data: selectedWallet,
+          type: "GET_SELECTED_ACCOUNT_RES",
+          data: selectedAccount,
         })
       }
 
-      case "CONNECT": {
-        const selectedWallet = await selectedWalletStore.getItem(
-          "SELECTED_WALLET",
-        )
-        const isWhitelisted = await isOnWhitelist(msg.data.host)
+      case "CONNECT_DAPP": {
+        const selectedAccount = await wallet.getSelectedAccount()
+        const isAuthorized = await isPreAuthorized(msg.data.host)
 
         addTab(sender.tab?.id)
 
-        if (!isWhitelisted) {
+        if (!isAuthorized) {
           await actionQueue.push({
-            type: "CONNECT",
+            type: "CONNECT_DAPP",
             payload: { host: msg.data.host },
           })
         }
 
-        if (isWhitelisted && selectedWallet.address) {
-          return sendToTabAndUi({ type: "CONNECT_RES", data: selectedWallet })
+        if (isAuthorized && selectedAccount.address) {
+          return sendToTabAndUi({
+            type: "CONNECT_DAPP_RES",
+            data: selectedAccount,
+          })
         }
 
         return openUi()
@@ -204,6 +192,9 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
       case "WALLET_CONNECTED": {
         return selectedWalletStore.setItem("SELECTED_WALLET", msg.data)
+
+      case "CONNECT_ACCOUNT": {
+        return await wallet.selectAccount(msg.data.address)
       }
 
       case "APPROVE_ACTION": {
@@ -213,18 +204,16 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
           throw new Error("Action not found")
         }
         switch (action.type) {
-          case "CONNECT": {
+          case "CONNECT_DAPP": {
             const { host } = action.payload
-            const selectedWallet = await selectedWalletStore.getItem(
-              "SELECTED_WALLET",
-            )
+            const selectedAccount = await wallet.getSelectedAccount()
 
-            await addToWhitelist(host)
+            await preAuthorize(host)
 
-            if (selectedWallet) {
+            if (selectedAccount) {
               return sendToTabAndUi({
-                type: "CONNECT_RES",
-                data: selectedWallet,
+                type: "CONNECT_DAPP_RES",
+                data: selectedAccount,
               })
             }
             return openUi()
@@ -232,20 +221,11 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
           case "TRANSACTION": {
             const transaction = action.payload
-            if (!isUnlocked()) {
+            if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
-            const l1 = await getL1()
-            const keyPair = ec.getKeyPair(l1.privateKey)
-            const selectedWallet = await selectedWalletStore.getItem(
-              "SELECTED_WALLET",
-            )
-            const signer = await getSigner({
-              type: "LOCAL",
-              address: selectedWallet.address,
-              keyPair,
-              network: selectedWallet.network,
-            })
+            const selectedAccount = await wallet.getSelectedAccount()
+            const signer = await wallet.getSelectedAccountSigner()
 
             try {
               const nonce = await getNonce(signer)
@@ -255,11 +235,11 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
               increaseStoredNonce(signer.address)
               transactionTracker.trackTransaction(
                 tx.transaction_hash,
-                selectedWallet,
+                selectedAccount,
               )
 
               return sendToTabAndUi({
-                type: "SUBMITTED_TX",
+                type: "TRANSACTION_SUBMITTED",
                 data: {
                   txHash: tx.transaction_hash,
                   actionHash,
@@ -267,7 +247,7 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
               })
             } catch (error: any) {
               return sendToTabAndUi({
-                type: "FAILED_TX",
+                type: "TRANSACTION_FAILED",
                 data: { actionHash, error: `${error}` },
               })
             }
@@ -275,25 +255,15 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
 
           case "SIGN": {
             const typedData = action.payload
-            if (!isUnlocked()) {
+            if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
-            const l1 = await getL1()
-            const keyPair = ec.getKeyPair(l1.privateKey)
-            const selectedWallet = await selectedWalletStore.getItem(
-              "SELECTED_WALLET",
-            )
-            const signer = await getSigner({
-              type: "LOCAL",
-              address: selectedWallet.address,
-              keyPair,
-              network: selectedWallet.network,
-            })
+            const signer = await wallet.getSelectedAccountSigner()
 
             const [r, s] = await signer.signMessage(typedData)
 
             return sendToTabAndUi({
-              type: "SUCCESS_SIGN",
+              type: "SIGNATURE_SUCCESS",
               data: {
                 r: r.toString(),
                 s: s.toString(),
@@ -336,9 +306,9 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
           throw new Error("Action not found")
         }
         switch (action.type) {
-          case "CONNECT": {
+          case "CONNECT_DAPP": {
             return sendToTabAndUi({
-              type: "REJECT_WHITELIST",
+              type: "REJECT_PREAUTHORIZATION",
               data: {
                 host: action.payload.host,
                 actionHash,
@@ -347,7 +317,7 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
           }
           case "TRANSACTION": {
             return sendToTabAndUi({
-              type: "FAILED_TX",
+              type: "TRANSACTION_FAILED",
               data: {
                 actionHash,
               },
@@ -355,7 +325,7 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
           }
           case "SIGN": {
             return sendToTabAndUi({
-              type: "FAILED_SIGN",
+              type: "SIGNATURE_FAILURE",
               data: {
                 actionHash,
               },
@@ -374,34 +344,38 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
         }
       }
 
-      case "FAILED_SIGN":
-      case "REJECT_WHITELIST":
+      case "SIGNATURE_FAILURE":
+      case "REJECT_PREAUTHORIZATION":
       case "REJECT_ADD_TOKEN":
-      case "FAILED_TX": {
+      case "TRANSACTION_FAILED": {
         return await actionQueue.remove(msg.data.actionHash)
       }
 
       case "RESET_ALL": {
-        return resetAll()
+        clearStorage()
+        return wallet.lock()
       }
 
-      case "ADD_WHITELIST": {
+      case "PREAUTHORIZE": {
         return actionQueue.push({
-          type: "CONNECT",
+          type: "CONNECT_DAPP",
           payload: { host: msg.data },
         })
       }
-      case "IS_WHITELIST": {
-        const valid = await isOnWhitelist(msg.data)
-        return sendToTabAndUi({ type: "IS_WHITELIST_RES", data: valid })
+      case "IS_PREAUTHORIZED": {
+        const valid = await isPreAuthorized(msg.data)
+        return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
       }
-      case "RESET_WHITELIST": {
-        setToStorage(`WHITELIST:APPROVED`, [])
-        setToStorage(`WHITELIST:PENDING`, [])
+      case "RESET_PREAUTHORIZATIONS": {
+        setToStorage(`PREAUTHORIZATION:APPROVED`, [])
+        setToStorage(`PREAUTHORIZATION:PENDING`, [])
         return
       }
-      case "REQ_PUB": {
-        return sendToTabAndUi({ type: "REQ_PUB_RES", data: publicKeyJwk })
+      case "GET_PUBLIC_KEY": {
+        return sendToTabAndUi({
+          type: "GET_PUBLIC_KEY_RES",
+          data: publicKeyJwk,
+        })
       }
       case "START_SESSION": {
         const { secure, body } = msg.data
@@ -410,7 +384,7 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
         }
         const { plaintext } = await compactDecrypt(body, privateKey)
         const sessionPassword = encode.arrayBufferToString(plaintext)
-        if (await validatePassword(sessionPassword)) {
+        if (await wallet.startSession(sessionPassword)) {
           sendToTabAndUi({ type: "START_SESSION_RES" })
         }
         return sendToTabAndUi({ type: "START_SESSION_REJ" })
@@ -418,33 +392,46 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
       case "HAS_SESSION": {
         return sendToTabAndUi({
           type: "HAS_SESSION_RES",
-          data: isUnlocked(),
+          data: wallet.isSessionOpen(),
         })
       }
       case "STOP_SESSION": {
-        return lockWallet()
+        return wallet.lock()
       }
       case "IS_INITIALIZED": {
         return sendToTabAndUi({
           type: "IS_INITIALIZED_RES",
-          data: await existsL1(),
+          data: wallet.isInitialized(),
         })
       }
-      case "GET_WALLETS": {
+      case "GET_ACCOUNTS": {
         return sendToTabAndUi({
-          type: "GET_WALLETS_RES",
-          data: await getWallets(),
+          type: "GET_ACCOUNTS_RES",
+          data: wallet.getAccounts(),
         })
       }
       case "NEW_ACCOUNT": {
-        if (!isUnlocked()) {
+        if (!wallet.isSessionOpen()) {
           throw Error("you need an open session")
         }
 
         const network = msg.data
-        let newAccount
         try {
-          newAccount = await createAccount(network)
+          const { account, txHash } = await wallet.addAccount(network)
+          transactionTracker.trackTransaction(txHash, account, {
+            title: "Deploy wallet",
+          })
+
+          return sendToTabAndUi({
+            type: "NEW_ACCOUNT_RES",
+            data: {
+              status: "ok",
+              txHash,
+              address: account.address,
+              account: account,
+              accounts: wallet.getAccounts(),
+            },
+          })
         } catch (e: any) {
           let error = `${e}`
           if (network.includes("localhost")) {
@@ -460,45 +447,34 @@ import { addToWhitelist, isOnWhitelist, removeFromWhitelist } from "./whitelist"
             data: { status: "ko", error },
           })
         }
-
-        const wallet = { address: newAccount.address, network }
-        selectedWalletStore.setItem("SELECTED_WALLET", wallet)
-        transactionTracker.trackTransaction(newAccount.txHash, wallet, {
-          title: "Deploy wallet",
-        })
-
-        return sendToTabAndUi({
-          type: "NEW_ACCOUNT_RES",
-          data: { status: "ok", ...newAccount },
-        })
       }
 
-      case "ADD_SIGN": {
+      case "SIGN_MESSAGE": {
         const { meta } = await actionQueue.push({
           type: "SIGN",
           payload: msg.data,
         })
 
         return sendToTabAndUi({
-          type: "ADD_SIGN_RES",
+          type: "SIGN_MESSAGE_RES",
           data: {
             actionHash: meta.hash,
           },
         })
       }
 
-      case "RECOVER_KEYSTORE": {
-        await setKeystore(msg.data)
-        return sendToTabAndUi({ type: "RECOVER_KEYSTORE_RES" })
+      case "RECOVER_BACKUP": {
+        await wallet.importBackup(msg.data)
+        return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
       }
       case "DOWNLOAD_BACKUP_FILE": {
-        await downloadBackupFile()
+        await downloadFile(wallet.exportBackup())
         return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
       }
 
       case "DELETE_ACCOUNT": {
         try {
-          await deleteAccount(msg.data)
+          await wallet.removeAccount(msg.data)
           return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
         } catch {
           return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
