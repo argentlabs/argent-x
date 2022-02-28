@@ -2,37 +2,31 @@ import { Provider } from "starknet"
 
 import { getProvider } from "../shared/networks"
 import {
+  FetchedTransactionStatus,
+  TransactionListener,
   TransactionMeta,
   TransactionStatus,
+  TransactionStatusWithProvider,
 } from "../shared/transactions.model"
 import { WalletAccount } from "../shared/wallet.model"
-
-interface TransactionStatusWithProvider extends TransactionStatus {
-  provider: Provider
-}
-
-type FetchedTransactionStatus = Omit<
-  TransactionStatus,
-  "accountAddress" | "meta"
->
-
-type Listener = (transactions: TransactionStatus[]) => void
 
 export async function getTransactionStatus(
   provider: Provider,
   hash: string,
 ): Promise<FetchedTransactionStatus> {
-  const { tx_status } = await provider.getTransactionStatus(hash)
-  return { hash, status: tx_status }
+  // TODO: starknet.js hasn't typed `tx_failure_reason` yet, remove this ugly `any` when it's added
+  const { tx_status, tx_failure_reason }: any =
+    await provider.getTransactionStatus(hash)
+  return { hash, status: tx_status, failureReason: tx_failure_reason }
 }
 
 export class TransactionTracker {
   private transactions: TransactionStatusWithProvider[] = []
-  private listeners: Listener[] = []
+  private listeners: TransactionListener[] = []
   private interval: NodeJS.Timeout
 
-  constructor(listener: Listener, interval: number = 30 * 1000) {
-    this.listeners = [listener]
+  constructor(listen: TransactionListener, interval: number = 30 * 1000) {
+    this.listeners = [listen]
     this.interval = setInterval(() => this.checkTransactions(), interval)
   }
 
@@ -53,8 +47,8 @@ export class TransactionTracker {
         meta,
       })
 
-      this.listeners.forEach((listener) => {
-        listener(this.transactions)
+      this.listeners.forEach((listen) => {
+        listen(this.transactions)
       })
     } catch (e) {
       console.error("Failed to track transaction", e)
@@ -80,29 +74,33 @@ export class TransactionTracker {
   }
 
   private async checkTransactions(): Promise<void> {
-    const transactionStatuses = await Promise.all(
-      this.transactions.map(
-        async ({ hash, provider, accountAddress, meta, status }) => {
-          // TODO: We dont need to check for ACCEPTED_ON_L1 currently, as we just handle ACCEPTED_ON_L2 anyways. This may changes in the future.
-          // if (status === "ACCEPTED_ON_L1" || status === "REJECTED") {
-          if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
-            return Promise.resolve({
-              hash,
-              provider,
-              accountAddress,
-              meta,
-              status,
-            })
-          }
-          return getTransactionStatus(provider, hash).then((status) => ({
-            ...status,
-            accountAddress,
+    const promises = this.transactions.map(
+      async ({
+        hash,
+        provider,
+        accountAddress,
+        meta,
+        status,
+        failureReason,
+      }) => {
+        // TODO: We dont need to check for ACCEPTED_ON_L1 currently, as we just handle ACCEPTED_ON_L2 anyways. This may changes in the future.
+        // if (status === "ACCEPTED_ON_L1" || status === "REJECTED") {
+        if (status === "ACCEPTED_ON_L2" || status === "REJECTED") {
+          return {
+            hash,
             provider,
+            accountAddress,
             meta,
-          }))
-        },
-      ),
+            status,
+            failureReason,
+          }
+        }
+        const result = await getTransactionStatus(provider, hash)
+        return { ...result, accountAddress, provider, meta }
+      },
     )
+
+    const transactionStatuses = await Promise.all(promises)
     if (transactionStatuses.length > 0) {
       // add transactions that were added while we were fetching
       this.transactions = [
@@ -114,18 +112,18 @@ export class TransactionTracker {
             ),
         ),
       ]
-      this.listeners.forEach((listener) => {
-        listener(this.transactions)
+      this.listeners.forEach((listen) => {
+        listen(this.transactions)
       })
     }
   }
 
-  public addListener(listener: Listener): void {
-    this.listeners.push(listener)
+  public addListener(listen: TransactionListener): void {
+    this.listeners.push(listen)
   }
 
-  public removeListener(listener: Listener): void {
-    this.listeners = this.listeners.filter((l) => l !== listener)
+  public removeListener(listen: TransactionListener): void {
+    this.listeners = this.listeners.filter((other) => other !== listen)
   }
 
   public async stop(): Promise<void> {

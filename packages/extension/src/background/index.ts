@@ -42,23 +42,25 @@ import { Wallet, WalletStorageProps } from "./wallet"
         data: transactions,
       })
 
-      for (const { hash, status, accountAddress, meta } of transactions) {
+      for (const transaction of transactions) {
+        const { hash, status, accountAddress, meta } = transaction
         if (
           (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
           !(await hasShownNotification(hash))
         ) {
           addToAlreadyShown(hash)
           sentTransactionNotification(hash, status, meta)
-          if (accountAddress && status === "ACCEPTED_ON_L2") {
-            sendMessageToUi({
-              type: "TRANSACTION_SUCCESS",
-              data: {
-                hash,
-                status,
-                accountAddress,
-                meta,
-              },
-            })
+          if (accountAddress) {
+            const data = { hash, status, accountAddress, meta }
+            if (status === "ACCEPTED_ON_L2") {
+              sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
+            } else if (status === "REJECTED") {
+              const { failureReason } = transaction
+              sendMessageToUi({
+                type: "TRANSACTION_FAILURE",
+                data: { ...data, failureReason },
+              })
+            }
           }
         }
         // on error remove stored (increased) nonce

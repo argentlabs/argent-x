@@ -22,14 +22,15 @@ import {
   TokenTitle,
   TokenWrapper,
 } from "../components/Token"
-import { useStatus } from "../hooks/useStatus"
+import { useAccountStatus } from "../hooks/useAccountStatus"
 import { routes } from "../routes"
 import { selectAccount, useAccount } from "../states/account"
 import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { useAccountTransactions } from "../states/accountTransactions"
 import { useAppState } from "../states/app"
+import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
-import { getAccountImageUrl } from "../utils/accounts"
+import { connectAccount, getAccountImageUrl } from "../utils/accounts"
 
 const AccountContent = styled.div`
   display: flex;
@@ -51,6 +52,7 @@ export const AccountScreen: FC = () => {
   if (!account) {
     return <></>
   }
+
   return <AccountScreenContent account={account} />
 }
 
@@ -61,7 +63,8 @@ interface AccountScreenContentProps {
 const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const status = useStatus(account)
+  const { localhostPort } = useLocalhostPort()
+  const status = useAccountStatus(account)
   const transactions = useAccountTransactions(account.address)
   const { accountNames, setAccountName } = useAccountMetadata()
   const pendingTransactions = useMemo(
@@ -74,6 +77,10 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
+
+  useEffect(() => {
+    connectAccount(account, switcherNetworkId, localhostPort)
+  }, [account, switcherNetworkId, localhostPort])
 
   return (
     <AccountColumn>

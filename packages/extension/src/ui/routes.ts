@@ -13,8 +13,9 @@ export const routes = {
   reset: () => "/reset",
   disclaimer: () => "/disclaimer",
   settings: () => "/settings",
+  settingsLocalhostPort: () => "/settings/localhost-port",
+  settingsDappConnections: () => "/settings/dapp-connections",
   backupDownload: (isFromSettings?: boolean) =>
     `/backup-download${isFromSettings ? "?settings" : ""}`,
-  dappConnections: () => "/dapp-connections",
   error: () => "/error",
 }

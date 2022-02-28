@@ -40,15 +40,15 @@ export const useActionsSubscription = () => {
   useEffect(() => {
     useActions.setState({ actions })
 
-    const listener = messageStream.subscribe(([message]) => {
+    const subscription = messageStream.subscribe(([message]) => {
       if (message.type === "ACTIONS_QUEUE_UPDATE") {
         useActions.setState({ actions: message.data.actions })
       }
     })
 
     return () => {
-      if (!listener.closed) {
-        listener.unsubscribe()
+      if (!subscription.closed) {
+        subscription.unsubscribe()
       }
     }
   }, [])
