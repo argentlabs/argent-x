@@ -23,7 +23,7 @@ export const useAccountTransactions = (accountAddress: string) => {
       if (message.type === "TRANSACTION_UPDATES") {
         useTransactionsStore.setState({
           transactions: message.data.filter(
-            ({ accountAddress: wa }) => wa === accountAddress,
+            ({ accountAddress: address }) => address === accountAddress,
           ),
         })
       }
