@@ -1,12 +1,14 @@
-import ArgentCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
+import AccountCompiledContract from "!!raw-loader!../../contracts/ArgentAccount.txt"
+import ProxyCompiledContract from "!!raw-loader!../../contracts/Proxy.txt"
 import { ethers } from "ethers"
 import { compileCalldata, ec } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
-import { getProvider } from "../../shared/networks"
+import { getProvider, getNetwork } from "../../shared/networks"
 import { selectedWalletStore } from "../selectedWallet"
 import { Storage } from "../storage"
+import { getSelectorFromName } from "starknet/dist/utils/stark"
 
 const isDev = process.env.NODE_ENV === "development"
 
@@ -160,9 +162,10 @@ export async function createAccount(networkId: string) {
   const wallets = await getWallets()
 
   const provider = getProvider(networkId)
+  const implementation = "0x0243638d94e74836f3e73a10e6c90aedf48ae8daa0c586dca6698618471cf639" //getNetwork(networkId).accountImplementation
   const deployTransaction = await provider.deployContract(
-    ArgentCompiledContract,
-    compileCalldata({ signer: starkPub, guardian: "0" }),
+    ProxyCompiledContract,
+    compileCalldata({ implementation: implementation }),
     seed,
   )
 
@@ -173,6 +176,15 @@ export async function createAccount(networkId: string) {
     !deployTransaction.address
   ) {
     throw new Error("Deploy transaction failed")
+  }
+
+  const initTransaction = await provider.invokeFunction(
+    deployTransaction.address,
+    getSelectorFromName("initialize"),
+    compileCalldata({ signer: starkPub, guardian: "0" }),
+  )
+  if (initTransaction.code !== "TRANSACTION_RECEIVED" ) {
+    throw new Error("Init transaction failed")
   }
 
   const newWallet = { network: networkId, address: deployTransaction.address }
