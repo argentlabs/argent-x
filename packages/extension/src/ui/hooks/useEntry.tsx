@@ -30,8 +30,11 @@ const determineEntry = async (isBackupDownloadRequired: boolean) => {
     return routes.backupDownload()
   }
 
-  const initialized = await isInitialized()
+  const { initialized, hasLegacy } = await isInitialized()
   if (!initialized) {
+    if (hasLegacy) {
+      return routes.legacy()
+    }
     if (!isDisclaimerUnderstood()) {
       return routes.disclaimer()
     }

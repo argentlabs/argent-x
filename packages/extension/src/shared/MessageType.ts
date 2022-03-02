@@ -66,7 +66,10 @@ export type MessageType =
   | { type: "HAS_SESSION" }
   | { type: "HAS_SESSION_RES"; data: boolean }
   | { type: "IS_INITIALIZED" }
-  | { type: "IS_INITIALIZED_RES"; data: boolean }
+  | {
+      type: "IS_INITIALIZED_RES"
+      data: { initialized: boolean; hasLegacy: boolean }
+    }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
   | { type: "START_SESSION_RES" }
@@ -75,6 +78,8 @@ export type MessageType =
   | { type: "RECOVER_BACKUP_RES" }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
+  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE" }
+  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" }
   // ***** tokens *****
   | { type: "ADD_TOKEN"; data: AddToken }
   | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }

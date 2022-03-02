@@ -24,6 +24,10 @@ export function clearStorage() {
   return browser.storage.local.clear()
 }
 
+export function getAllStorage() {
+  return browser.storage.local.get()
+}
+
 export class Storage<T> implements IStorage<T> {
   private NS: string
   public defaults: T

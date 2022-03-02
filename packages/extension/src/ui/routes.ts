@@ -12,6 +12,7 @@ export const routes = {
   hideTokenPath: () => "/tokens/:tokenAddress/hide",
   reset: () => "/reset",
   disclaimer: () => "/disclaimer",
+  legacy: () => "/legacy",
   settings: () => "/settings",
   settingsLocalhostPort: () => "/settings/localhost-port",
   settingsDappConnections: () => "/settings/dapp-connections",
