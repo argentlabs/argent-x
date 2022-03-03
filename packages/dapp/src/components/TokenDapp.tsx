@@ -25,6 +25,7 @@ export const TokenDapp: FC = () => {
   const [transactionStatus, setTransactionStatus] = useState<
     "idle" | "approve" | "pending" | "success"
   >("idle")
+  const [addTokenError, setAddTokenError] = useState("")
 
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
 
@@ -207,7 +208,14 @@ export const TokenDapp: FC = () => {
         <button
           className="flat"
           style={{ marginLeft: ".6em" }}
-          onClick={() => addToken(tokenAddress)}
+          onClick={async () => {
+            try {
+              await addToken(tokenAddress)
+              setAddTokenError("")
+            } catch (error: any) {
+              setAddTokenError(error.message)
+            }
+          }}
         >
           Add to wallet
         </button>
@@ -228,7 +236,14 @@ export const TokenDapp: FC = () => {
           <button
             className="flat"
             style={{ marginLeft: ".6em" }}
-            onClick={() => addToken(ethAddress)}
+            onClick={async () => {
+              try {
+                await addToken(ethAddress)
+                setAddTokenError("")
+              } catch (error: any) {
+                setAddTokenError(error.message)
+              }
+            }}
           >
             Add to wallet
           </button>
@@ -244,6 +259,7 @@ export const TokenDapp: FC = () => {
           </code>
         </h3>
       )}
+      <span className="error-message">{addTokenError}</span>
     </>
   )
 }
