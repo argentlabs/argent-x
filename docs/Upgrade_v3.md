@@ -6,9 +6,10 @@
 * Accounts are now upgradable, i.e. every account is now a proxy account forwarding to a given implentation
 * Support for new account interface in Cairo (multicall, fees, ...)
 * New backup file structure
+* Small changes in `starknet` object injected in the browser (see below)
 
 ### in starknet.js
-* Redefinition of Signer and Account objects
+* Redefinition of [Signer](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts) and [Account](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts) objects
 * Support for new account interface in Cairo (multicall, fees, ...)
 
 ## What does it mean as an Argent X user?
@@ -29,19 +30,21 @@ As a user of Argent X 2.x, after upgrading to version 3.0.0, your extension will
 
 ## What does it mean as a Starknet Dapp developer?
 
-The `starknet` object (returned by `get-starknet`) will now expose an `account` object instead of a `signer` object
+The `starknet` object (returned by `get-starknet`) will now expose an `account` object instead of a `signer` object.
+This `account` object implements the [AccountInterface](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts), specifically it exposes the methods `execute()` and  `signMessage()`:
 
 ```
-public abstract execute(
-    transactions: Call | Call[],
-    abis?: Abi[],
-    transactionsDetail?: InvocationsDetails
-): Promise<AddTransactionResponse>;
+public abstract execute(transactions: Call | Call[], abis?: Abi[], transactionsDetail?: InvocationsDetails): Promise<AddTransactionResponse>;
 
 public abstract signMessage(typedData: TypedData): Promise<Signature>;
 ```
-
-
+where `Call` is defined by:
 ```
-isPreauthorized ?
+declare type Call = {
+    contractAddress: string;
+    entrypoint: string;
+    calldata?: BigNumberish[];
+}
 ```
+
+All transactions triggered by an account should go through the `execute` method. It supports multi calls, which means multiple contract interactions can be submitted in a single transactions (like bundling an approve ERC20 and a call to a contract). The property `entrypoint` is the actual name of the method (i.e. `mint`, `transfer`, ....). If ABIs are provided, the signature request will show an explicit definition of the transaction.

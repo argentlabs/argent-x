@@ -116,7 +116,7 @@ const starknetWindowObject: StarknetWindowObject = {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
           starknet.provider = getProvider(network)
-          starknet.account = new StarknetAccount(address, starknet.provider)
+          starknet.account = new ArgentXAccount(address, starknet.provider)
           starknet.selectedAddress = address
           starknet.isConnected = true
           resolve([address])
@@ -162,7 +162,7 @@ window.addEventListener(
       if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
-        starknet.account = new StarknetAccount(address, starknet.provider)
+        starknet.account = new ArgentXAccount(address, starknet.provider)
         for (const handleEvent of userEventHandlers) {
           handleEvent([address])
         }
@@ -171,11 +171,7 @@ window.addEventListener(
   },
 )
 
-// export class ArgentXSigner implements SignerInterface {
-
-// }
-
-export class StarknetAccount extends Account implements AccountInterface {
+export class ArgentXAccount extends Account implements AccountInterface {
   constructor(address: string, provider?: Provider) {
     // since account constructor is taking a KeyPair,
     // we set a dummy one (never used anyway)

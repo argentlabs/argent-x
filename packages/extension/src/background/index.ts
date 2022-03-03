@@ -5,7 +5,7 @@ import { encode } from "starknet"
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { accountsOnNetwork, getProvider } from "../shared/networks"
+import { getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -17,7 +17,7 @@ import {
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
-import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
+import { resetStoredNonce } from "./nonce"
 import {
   addToAlreadyShown,
   hasShownNotification,
