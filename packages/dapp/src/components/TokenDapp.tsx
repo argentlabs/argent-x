@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from "react"
-import { BigNumberish } from "starknet/dist/utils/number"
 
 import { truncateAddress } from "../services/address.service"
 import {
@@ -21,7 +20,7 @@ export const TokenDapp: FC = () => {
   const [transferTo, setTransferTo] = useState("")
   const [transferAmount, setTransferAmount] = useState("1")
   const [shortText, setShortText] = useState("")
-  const [lastSig, setLastSig] = useState<BigNumberish[]>([])
+  const [lastSig, setLastSig] = useState<string[]>([])
   const [lastTransactionHash, setLastTransactionHash] = useState("")
   const [transactionStatus, setTransactionStatus] = useState<
     "idle" | "approve" | "pending" | "success"
