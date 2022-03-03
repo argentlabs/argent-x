@@ -36,7 +36,11 @@ export const getTransactionStatus = async (hash: string, network: string) => {
 
 export const getLastSelectedAccount = async () => {
   sendMessage({ type: "GET_SELECTED_ACCOUNT" })
-  return waitForMessage("GET_SELECTED_ACCOUNT_RES")
+
+  return await Promise.race([
+    waitForMessage("GET_SELECTED_ACCOUNT_RES"),
+    waitForMessage("GET_SELECTED_ACCOUNT_REJ").then(() => undefined),
+  ])
 }
 
 export const getPublicKey = async () => {

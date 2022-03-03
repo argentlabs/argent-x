@@ -146,12 +146,18 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "GET_SELECTED_ACCOUNT": {
-        const selectedAccount = await wallet.getSelectedAccount()
-
-        return sendToTabAndUi({
-          type: "GET_SELECTED_ACCOUNT_RES",
-          data: selectedAccount,
-        })
+        try {
+          const selectedAccount = await wallet.getSelectedAccount()
+          return sendToTabAndUi({
+            type: "GET_SELECTED_ACCOUNT_RES",
+            data: selectedAccount,
+          })
+        } catch (error) {
+          return sendToTabAndUi({
+            type: "GET_SELECTED_ACCOUNT_REJ",
+            data: `${error}`,
+          })
+        }
       }
 
       case "CONNECT_DAPP": {
