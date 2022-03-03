@@ -43,7 +43,7 @@ export const fetchTokenDetails = async (
   networkId: string,
 ): Promise<TokenDetailsWithBalance> => {
   const provider = getProvider(networkId)
-  const tokenContract = new Contract(parsedErc20Abi as Abi[], address, provider)
+  const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
   const [decimals, name, balance, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
@@ -85,7 +85,7 @@ export const fetchTokenBalance = async (
   networkId: string,
 ): Promise<BigNumber> => {
   const provider = getProvider(networkId)
-  const tokenContract = new Contract(parsedErc20Abi as Abi[], address, provider)
+  const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
   const result = await tokenContract.call("balanceOf", {
     user: accountAddress,
   })

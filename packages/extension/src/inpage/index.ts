@@ -1,10 +1,14 @@
 import {
+  Abi,
+  Account,
+  AccountInterface,
   AddTransactionResponse,
+  Call,
+  InvocationsDetails,
   Provider,
   Signature,
-  SignerInterface,
-  Transaction,
   defaultProvider,
+  ec,
   typedData,
 } from "starknet"
 
@@ -52,7 +56,7 @@ function waitForMsgOfType<
 
 // window.ethereum like
 const starknetWindowObject: StarknetWindowObject = {
-  signer: undefined,
+  account: undefined,
   provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
@@ -112,7 +116,7 @@ const starknetWindowObject: StarknetWindowObject = {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
           starknet.provider = getProvider(network)
-          starknet.signer = new WalletSigner(address, starknet.provider)
+          starknet.account = new StarknetAccount(address, starknet.provider)
           starknet.selectedAddress = address
           starknet.isConnected = true
           resolve([address])
@@ -153,12 +157,12 @@ window.addEventListener(
   "message",
   ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
-    if (starknet && starknet.signer && data.type === "CONNECT_ACCOUNT") {
+    if (starknet && starknet.account && data.type === "CONNECT_ACCOUNT") {
       const { address, network } = data.data
       if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
-        starknet.signer = new WalletSigner(address, starknet.provider)
+        starknet.account = new StarknetAccount(address, starknet.provider)
         for (const handleEvent of userEventHandlers) {
           handleEvent([address])
         }
@@ -167,29 +171,31 @@ window.addEventListener(
   },
 )
 
-export class WalletSigner extends Provider implements SignerInterface {
-  public address: string
+// export class ArgentXSigner implements SignerInterface {
 
+// }
+
+export class StarknetAccount extends Account implements AccountInterface {
   constructor(address: string, provider?: Provider) {
-    super(provider || defaultProvider)
-    this.address = address
+    // since account constructor is taking a KeyPair,
+    // we set a dummy one (never used anyway)
+    const keyPair = ec.getKeyPair(0)
+    super(provider || defaultProvider, address, keyPair)
   }
 
-  public async addTransaction(
-    transaction: Transaction,
+  public override async execute(
+    transactions: Call | Call[],
+    abis?: Abi[],
+    transactionsDetail?: InvocationsDetails,
   ): Promise<AddTransactionResponse> {
-    if (transaction.type === "DEPLOY") {
-      return super.addTransaction(transaction)
-    }
-
-    if (transaction.signature?.length) {
-      throw Error(
-        "Adding signatures to a signer transaction currently isn't supported",
-      )
-    }
-
-    sendMessage({ type: "ADD_TRANSACTION", data: transaction })
-    const { actionHash } = await waitForMsgOfType("ADD_TRANSACTION_RES", 1000)
+    sendMessage({
+      type: "EXECUTE_TRANSACTION",
+      data: { transactions, abis, transactionsDetail },
+    })
+    const { actionHash } = await waitForMsgOfType(
+      "EXECUTE_TRANSACTION_RES",
+      1000,
+    )
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
@@ -219,16 +225,14 @@ export class WalletSigner extends Provider implements SignerInterface {
 
     return {
       code: "TRANSACTION_RECEIVED",
-      address: transaction.contract_address,
+      address: this.address,
       transaction_hash: result.txHash,
     }
   }
 
-  public async hashMessage(data: typedData.TypedData): Promise<string> {
-    return typedData.getMessageHash(data, this.address)
-  }
-
-  public async signMessage(data: typedData.TypedData): Promise<Signature> {
+  public override async signMessage(
+    data: typedData.TypedData,
+  ): Promise<Signature> {
     sendMessage({ type: "SIGN_MESSAGE", data })
     const { actionHash } = await waitForMsgOfType("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })

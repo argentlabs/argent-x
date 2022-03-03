@@ -1,11 +1,11 @@
-import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
+import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
 import { encode } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { getProvider } from "../shared/networks"
+import { accountsOnNetwork, getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -33,7 +33,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
-  const wallet = new Wallet(storage, ArgentCompiledContract)
+  const wallet = new Wallet(storage, ProxyCompiledContract)
   await wallet.setup()
 
   const transactionTracker = new TransactionTracker(async (transactions) => {
@@ -124,13 +124,13 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
 
-      case "ADD_TRANSACTION": {
+      case "EXECUTE_TRANSACTION": {
         const { meta } = await actionQueue.push({
           type: "TRANSACTION",
           payload: msg.data,
         })
         return sendToTabAndUi({
-          type: "ADD_TRANSACTION_RES",
+          type: "EXECUTE_TRANSACTION_RES",
           data: {
             actionHash: meta.hash,
           },
@@ -204,19 +204,23 @@ import { Wallet, WalletStorageProps } from "./wallet"
           }
 
           case "TRANSACTION": {
-            const transaction = action.payload
+            const { transactions, abis, transactionsDetail } = action.payload
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
             const selectedAccount = await wallet.getSelectedAccount()
-            const signer = await wallet.getSelectedAccountSigner()
+            const starknetAccount = await wallet.getSelectedStarknetAccount()
 
             try {
-              const nonce = await getNonce(signer)
+              // const nonce = await getNonce(starknetAccount)
 
-              const tx = await signer.addTransaction({ ...transaction, nonce })
+              const tx = await starknetAccount.execute(
+                transactions,
+                abis,
+                transactionsDetail,
+              )
 
-              increaseStoredNonce(signer.address)
+              // increaseStoredNonce(starknetAccount.address)
               transactionTracker.trackTransaction(
                 tx.transaction_hash,
                 selectedAccount,
@@ -242,9 +246,9 @@ import { Wallet, WalletStorageProps } from "./wallet"
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
-            const signer = await wallet.getSelectedAccountSigner()
+            const starknetAccount = await wallet.getSelectedStarknetAccount()
 
-            const [r, s] = await signer.signMessage(typedData)
+            const [r, s] = await starknetAccount.signMessage(typedData)
 
             return sendToTabAndUi({
               type: "SIGNATURE_SUCCESS",

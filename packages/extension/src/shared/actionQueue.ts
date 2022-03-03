@@ -1,4 +1,4 @@
-import type { InvokeFunctionTransaction, typedData } from "starknet"
+import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import type { ExtQueueItem } from "../background/actionQueue"
 
@@ -11,7 +11,11 @@ export type ActionItem =
     }
   | {
       type: "TRANSACTION"
-      payload: InvokeFunctionTransaction
+      payload: {
+        transactions: Call | Call[]
+        abis?: Abi[]
+        transactionsDetail?: InvocationsDetails
+      }
     }
   | {
       type: "SIGN"

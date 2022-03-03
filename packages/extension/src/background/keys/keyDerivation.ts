@@ -44,6 +44,9 @@ export function getNextPathIndex(paths: string[]) {
 
 export function grindKey(keySeed: string) {
   const keyValueLimit = ec.ec.n
+  if (!keyValueLimit) {
+    return keySeed
+  }
   const sha256EcMaxDigest = number.toBN(
     "1 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000",
     16,

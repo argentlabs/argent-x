@@ -4,10 +4,8 @@ import styled from "styled-components"
 
 import { sendMessage } from "../../shared/messages"
 import { Button } from "../components/Button"
-import { Header } from "../components/Header"
 import { H2, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useBackupDownload } from "../states/backupDownload"
 
 const DownloadButton = styled(Button)`
   margin-top: 20px;

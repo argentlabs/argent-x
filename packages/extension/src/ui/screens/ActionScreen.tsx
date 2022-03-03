@@ -62,7 +62,7 @@ export const ActionScreen: FC = () => {
     case "TRANSACTION":
       return (
         <ApproveTransactionScreen
-          transaction={action.payload}
+          transactions={action.payload.transactions}
           onSubmit={async () => {
             await approve(action)
             useAppState.setState({ isLoading: true })

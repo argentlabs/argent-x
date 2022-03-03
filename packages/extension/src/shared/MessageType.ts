@@ -1,5 +1,5 @@
 import type { JWK } from "jose"
-import type { InvokeFunctionTransaction, typedData } from "starknet"
+import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
 import { AddToken } from "./token.model"
@@ -31,8 +31,15 @@ export type MessageType =
   // ***** transactions *****
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
-  | { type: "ADD_TRANSACTION"; data: InvokeFunctionTransaction }
-  | { type: "ADD_TRANSACTION_RES"; data: { actionHash: string } }
+  | {
+      type: "EXECUTE_TRANSACTION"
+      data: {
+        transactions: Call | Call[]
+        abis?: Abi[]
+        transactionsDetail?: InvocationsDetails
+      }
+    }
+  | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }
   | { type: "TRANSACTION_UPDATES"; data: TransactionStatus[] }
   | { type: "TRANSACTION_SUCCESS"; data: TransactionStatus }
   | { type: "TRANSACTION_FAILURE"; data: TransactionStatus }
