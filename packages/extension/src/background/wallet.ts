@@ -9,6 +9,7 @@ import {
   getStarkPair,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
+import legacyBackupSchema from "./schema/legacyBackup.schema"
 import { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -211,6 +212,9 @@ export class Wallet {
 
   public async importBackup(backupString: string) {
     if (!Wallet.validateBackup(backupString)) {
+      if (Wallet.isLegacyBackup(backupString)) {
+        throw new Error("legacy backup file cannot be imported")
+      }
       throw new Error("invalid backup file")
     }
     await this.store.setItem("backup", backupString)
@@ -233,6 +237,15 @@ export class Wallet {
     try {
       const backup = JSON.parse(backupString)
       return backupSchema.isValidSync(backup)
+    } catch {
+      return false
+    }
+  }
+
+  public static isLegacyBackup(backupString: string): boolean {
+    try {
+      const backup = JSON.parse(backupString)
+      return legacyBackupSchema.isValidSync(backup)
     } catch {
       return false
     }

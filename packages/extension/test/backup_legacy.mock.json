@@ -1,0 +1,40 @@
+{
+  "address": "118e75402cd82a69747e853113b126a42be57cac",
+  "id": "97f06943-1758-47dc-97e5-19fcd3486302",
+  "version": 3,
+  "Crypto": {
+    "cipher": "aes-128-ctr",
+    "cipherparams": {
+      "iv": "b94616acc138f299cb1c6d4a08192315"
+    },
+    "ciphertext": "70bc7b5b8eac992bf5b8a62bcf981dd54435cc055405ec112482fc012185d952",
+    "kdf": "scrypt",
+    "kdfparams": {
+      "salt": "72999edf77f77938f514f6bdd6fd4b9aad43aa0c238e7cd7c2276c22a8995719",
+      "n": 64,
+      "dklen": 32,
+      "p": 1,
+      "r": 8
+    },
+    "mac": "88ac5a66aedf793a972466bc53ba26605f5ffdc00ff857e092b1d60c004f77e3"
+  },
+  "x-ethers": {
+    "client": "ethers.js",
+    "gethFilename": "UTC--2021-12-03T12-11-13.0Z--118e75402cd82a69747e853113b126a42be57cac",
+    "mnemonicCounter": "169827b07254ee36b927c297cf135925",
+    "mnemonicCiphertext": "0a30bb7be18dc15ee0715cbddb111d00",
+    "path": "m/44'/60'/0'/0/0",
+    "locale": "en",
+    "version": "0.1"
+  },
+  "wallets": [
+    {
+      "network": "goerli-alpha",
+      "address": "0x3971ad091725c08550755ad8b3b26224861a010dc4f41f6e84ff125746f5c09"
+    },
+    {
+      "network": "goerli-alpha",
+      "address": "0x1d780fcd405ce406afacd3a90c7e58c64b76c99290bb0b5c7ec5ff4977da013"
+    }
+  ]
+}
