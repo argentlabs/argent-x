@@ -1,4 +1,4 @@
-import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
+import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
 import { encode } from "starknet"
 
@@ -16,7 +16,8 @@ import {
 } from "./activeTabs"
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
-import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
+import { exportLegacyBackup, hasLegacy } from "./legacy"
+import { resetStoredNonce } from "./nonce"
 import {
   addToAlreadyShown,
   hasShownNotification,
@@ -32,7 +33,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
-  const wallet = new Wallet(storage, ArgentCompiledContract)
+  const wallet = new Wallet(storage, ProxyCompiledContract)
   await wallet.setup()
 
   const transactionTracker = new TransactionTracker(async (transactions) => {
@@ -123,13 +124,13 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
 
-      case "ADD_TRANSACTION": {
+      case "EXECUTE_TRANSACTION": {
         const { meta } = await actionQueue.push({
           type: "TRANSACTION",
           payload: msg.data,
         })
         return sendToTabAndUi({
-          type: "ADD_TRANSACTION_RES",
+          type: "EXECUTE_TRANSACTION_RES",
           data: {
             actionHash: meta.hash,
           },
@@ -146,7 +147,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
 
       case "GET_SELECTED_ACCOUNT": {
         const selectedAccount = await wallet.getSelectedAccount()
-
         return sendToTabAndUi({
           type: "GET_SELECTED_ACCOUNT_RES",
           data: selectedAccount,
@@ -166,7 +166,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         }
 
-        if (isAuthorized && selectedAccount.address) {
+        if (isAuthorized && selectedAccount?.address) {
           return sendToTabAndUi({
             type: "CONNECT_DAPP_RES",
             data: selectedAccount,
@@ -203,28 +203,32 @@ import { Wallet, WalletStorageProps } from "./wallet"
           }
 
           case "TRANSACTION": {
-            const transaction = action.payload
-            if (!wallet.isSessionOpen()) {
-              throw Error("you need an open session")
-            }
-            const selectedAccount = await wallet.getSelectedAccount()
-            const signer = await wallet.getSelectedAccountSigner()
-
             try {
-              const nonce = await getNonce(signer)
+              const { transactions, abis, transactionsDetail } = action.payload
+              if (!wallet.isSessionOpen()) {
+                throw Error("you need an open session")
+              }
+              const selectedAccount = await wallet.getSelectedAccount()
+              const starknetAccount = await wallet.getSelectedStarknetAccount()
+              if (!selectedAccount) {
+                throw Error("no accounts")
+              }
 
-              const tx = await signer.addTransaction({ ...transaction, nonce })
+              const transaction = await starknetAccount.execute(
+                transactions,
+                abis,
+                transactionsDetail,
+              )
 
-              increaseStoredNonce(signer.address)
               transactionTracker.trackTransaction(
-                tx.transaction_hash,
+                transaction.transaction_hash,
                 selectedAccount,
               )
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",
                 data: {
-                  txHash: tx.transaction_hash,
+                  txHash: transaction.transaction_hash,
                   actionHash,
                 },
               })
@@ -241,9 +245,9 @@ import { Wallet, WalletStorageProps } from "./wallet"
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
-            const signer = await wallet.getSelectedAccountSigner()
+            const starknetAccount = await wallet.getSelectedStarknetAccount()
 
-            const [r, s] = await signer.signMessage(typedData)
+            const [r, s] = await starknetAccount.signMessage(typedData)
 
             return sendToTabAndUi({
               type: "SIGNATURE_SUCCESS",
@@ -382,9 +386,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
         return wallet.lock()
       }
       case "IS_INITIALIZED": {
+        const initialized = await wallet.isInitialized()
+        const legacy = initialized ? false : await hasLegacy()
         return sendToTabAndUi({
           type: "IS_INITIALIZED_RES",
-          data: wallet.isInitialized(),
+          data: { initialized, hasLegacy: legacy },
         })
       }
       case "GET_ACCOUNTS": {
@@ -447,12 +453,24 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "RECOVER_BACKUP": {
-        await wallet.importBackup(msg.data)
-        return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
+        try {
+          await wallet.importBackup(msg.data)
+          return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
+        } catch (error) {
+          return sendToTabAndUi({
+            type: "RECOVER_BACKUP_REJ",
+            data: `${error}`,
+          })
+        }
       }
       case "DOWNLOAD_BACKUP_FILE": {
         await downloadFile(wallet.exportBackup())
         return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
+      }
+
+      case "DOWNLOAD_LEGACY_BACKUP_FILE": {
+        await downloadFile(await exportLegacyBackup())
+        return sendToTabAndUi({ type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" })
       }
 
       case "DELETE_ACCOUNT": {

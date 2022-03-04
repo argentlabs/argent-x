@@ -1,97 +1,22 @@
 {
-  "address": "118e75402cd82a69747e853113b126a42be57cac",
-  "id": "97f06943-1758-47dc-97e5-19fcd3486302",
-  "version": 3,
-  "Crypto": {
-    "cipher": "aes-128-ctr",
-    "cipherparams": {
-      "iv": "b94616acc138f299cb1c6d4a08192315"
-    },
-    "ciphertext": "70bc7b5b8eac992bf5b8a62bcf981dd54435cc055405ec112482fc012185d952",
-    "kdf": "scrypt",
-    "kdfparams": {
-      "salt": "72999edf77f77938f514f6bdd6fd4b9aad43aa0c238e7cd7c2276c22a8995719",
-      "n": 64,
-      "dklen": 32,
-      "p": 1,
-      "r": 8
-    },
-    "mac": "88ac5a66aedf793a972466bc53ba26605f5ffdc00ff857e092b1d60c004f77e3"
-  },
-  "x-ethers": {
-    "client": "ethers.js",
-    "gethFilename": "UTC--2021-12-03T12-11-13.0Z--118e75402cd82a69747e853113b126a42be57cac",
-    "mnemonicCounter": "169827b07254ee36b927c297cf135925",
-    "mnemonicCiphertext": "0a30bb7be18dc15ee0715cbddb111d00",
-    "path": "m/44'/60'/0'/0/0",
-    "locale": "en",
-    "version": "0.1"
-  },
-  "wallets": [
-    {
-      "network": "goerli-alpha",
-      "address": "0x3971ad091725c08550755ad8b3b26224861a010dc4f41f6e84ff125746f5c09"
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x1d780fcd405ce406afacd3a90c7e58c64b76c99290bb0b5c7ec5ff4977da013"
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x7996320c6d483f248d3bfaa3c2684cf3ae45f625f500ceb00cf8f7b32606fb3"
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x4e75b3096bf48895688df397390cd56351fc412571d98c4ab62b63b54ec4d76"
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0xf0ceecd4e48bb45bceb31665811371560447b74e68f4086e2602ab83c96546"
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x47f3f2db53c93c9178b1060416253eedd3da4607661ef43d405abe9df1298a6",
-      "type": 0
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x52fc9dda4c61cdf4cfba9b6cce5f8ec8eb471162aed5793b9f9eb440f4bed84",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x55e41fdfc8a9bb5494c6145ac8412bed8045d96766d8f0c7e692fc3590b067c",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x38e1e923860a2bc16b68c25d39972f9e05956f8894252ff61e8b42a81771bc",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x1475f89353c7b95faf510ab4852f080ddc76fd12fa6ff326c8955b78dc2fbc0",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x489aa864db26ce19d597984b31adea880c2198e637b276a0ee3357493f1d1a9",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x20019a823ecfca183894e16e748240d40c1b59799444bcebe35f30cc07ae06b",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x59e449776ef7962fc0f40136eb925d8864e4c0b8b7a4bfab58b71888ba5a29c",
-      "type": 1
-    },
-    {
-      "network": "goerli-alpha",
-      "address": "0x3e4bd8020473c60f2f89e2f15fba9c0ffe8f6df29823e80a2e52c7ae91921b5",
-      "type": 1
+  "glossary": {
+    "title": "example glossary",
+    "GlossDiv": {
+      "title": "S",
+      "GlossList": {
+        "GlossEntry": {
+          "ID": "SGML",
+          "SortAs": "SGML",
+          "GlossTerm": "Standard Generalized Markup Language",
+          "Acronym": "SGML",
+          "Abbrev": "ISO 8879:1986",
+          "GlossDef": {
+            "para": "A meta-markup language, used to create markup languages such as DocBook.",
+            "GlossSeeAlso": ["GML", "XML"]
+          },
+          "GlossSee": "markup"
+        }
+      }
     }
-  ]
+  }
 }

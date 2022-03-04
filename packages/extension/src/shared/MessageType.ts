@@ -1,5 +1,5 @@
 import type { JWK } from "jose"
-import type { InvokeFunctionTransaction, typedData } from "starknet"
+import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
 import { AddToken } from "./token.model"
@@ -24,15 +24,22 @@ export type MessageType =
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "GET_SELECTED_ACCOUNT" }
-  | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount }
+  | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount | undefined }
   | { type: "DELETE_ACCOUNT"; data: string }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
   // ***** transactions *****
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
-  | { type: "ADD_TRANSACTION"; data: InvokeFunctionTransaction }
-  | { type: "ADD_TRANSACTION_RES"; data: { actionHash: string } }
+  | {
+      type: "EXECUTE_TRANSACTION"
+      data: {
+        transactions: Call | Call[]
+        abis?: Abi[]
+        transactionsDetail?: InvocationsDetails
+      }
+    }
+  | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }
   | { type: "TRANSACTION_UPDATES"; data: TransactionStatus[] }
   | { type: "TRANSACTION_SUCCESS"; data: TransactionStatus }
   | { type: "TRANSACTION_FAILURE"; data: TransactionStatus }
@@ -66,15 +73,21 @@ export type MessageType =
   | { type: "HAS_SESSION" }
   | { type: "HAS_SESSION_RES"; data: boolean }
   | { type: "IS_INITIALIZED" }
-  | { type: "IS_INITIALIZED_RES"; data: boolean }
+  | {
+      type: "IS_INITIALIZED_RES"
+      data: { initialized: boolean; hasLegacy: boolean }
+    }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
   | { type: "START_SESSION_RES" }
   // ***** backup *****
   | { type: "RECOVER_BACKUP"; data: string }
   | { type: "RECOVER_BACKUP_RES" }
+  | { type: "RECOVER_BACKUP_REJ"; data: string }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
+  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE" }
+  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" }
   // ***** tokens *****
   | { type: "ADD_TOKEN"; data: AddToken }
   | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }

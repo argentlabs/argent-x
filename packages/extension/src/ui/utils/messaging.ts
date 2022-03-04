@@ -45,11 +45,14 @@ export const getPublicKey = async () => {
 }
 
 export const recoverBackup = async (backup: string) => {
-  sendMessage({
-    type: "RECOVER_BACKUP",
-    data: backup,
-  })
-  return waitForMessage("RECOVER_BACKUP_RES")
+  sendMessage({ type: "RECOVER_BACKUP", data: backup })
+
+  await Promise.race([
+    waitForMessage("RECOVER_BACKUP_RES"),
+    waitForMessage("RECOVER_BACKUP_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
 }
 
 export const isInitialized = async () => {

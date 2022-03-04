@@ -7,6 +7,7 @@ export interface Network {
   name: string
   baseUrl?: string
   explorerUrl?: string
+  accountImplementation?: string
 }
 
 export const networks: Network[] = [
@@ -19,6 +20,8 @@ export const networks: Network[] = [
     id: "goerli-alpha",
     name: "Goerli Testnet",
     explorerUrl: "https://goerli.voyager.online",
+    accountImplementation:
+      "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
   },
   {
     id: "localhost",

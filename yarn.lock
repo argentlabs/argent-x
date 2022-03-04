@@ -1107,7 +1107,7 @@
     core-js-pure "^3.19.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.10.2", "@babel/runtime@^7.15.4", "@babel/runtime@^7.16.3", "@babel/runtime@^7.17.0", "@babel/runtime@^7.17.2", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.10.2", "@babel/runtime@^7.15.4", "@babel/runtime@^7.16.3", "@babel/runtime@^7.17.2", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
   version "7.17.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.17.2.tgz#66f68591605e59da47523c631416b18508779941"
   integrity sha512-hzeyJyMA1YGdJTuWU0e/j4wKXrU4OMFvY2MSlaI9B7VQb0r5cxTE3EAIS2Q7Tn2RIcDkRvTA/v2JsAEhxe99uw==
@@ -9431,10 +9431,10 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@^2.5.0:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.5.1.tgz#894074db7882dc171da0db56661a86f71251dec7"
-  integrity sha512-OIAhbWStk62ErlWbXesHh3xqtMfrgyu0SLj+uxtIS89xR9gEruJP2WEiEwApWQY58fmjY7At6/zzNuc5Pn8ROA==
+starknet@next:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.2.0.tgz#fa6a3ad09bb720680a24ad45e1a6fa57ca6e22e5"
+  integrity sha512-U1nWdU0Ebka5WrZeHnh1E8Yr1Cj2UjSyJMmBW1F3qzNSBDjFM3hfKrpq6ra7NtoRJCfN68dLJ0dvWDrDdgEKQg==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"

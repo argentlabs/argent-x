@@ -58,9 +58,15 @@ export const RecoverBackupScreen: FC = () => {
       const data = await fileToString(acceptedFile)
       await recoverBackup(data)
       navigate(routes.password())
-    } catch (error: any) {
-      useAppState.setState({ error: `${error}` })
-      navigate(routes.error())
+    } catch (err: any) {
+      const error = `${err}`
+      const legacyError = "legacy backup file cannot be imported"
+      if (error.toLowerCase().includes(legacyError)) {
+        navigate(routes.legacy())
+      } else {
+        useAppState.setState({ error })
+        navigate(routes.error())
+      }
     }
   }
 

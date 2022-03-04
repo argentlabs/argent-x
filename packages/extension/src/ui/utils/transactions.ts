@@ -1,22 +1,23 @@
 import { BigNumber } from "ethers"
-import { Args, compileCalldata, stark, uint256 } from "starknet"
+import { RawArgs, stark, uint256 } from "starknet"
 
 import { sendMessage } from "../../shared/messages"
 
 interface TransactionRequest {
   to: string
   method: string
-  calldata: Args
+  calldata: RawArgs
 }
 
 export const sendTransaction = (data: TransactionRequest) => {
   sendMessage({
-    type: "ADD_TRANSACTION",
+    type: "EXECUTE_TRANSACTION",
     data: {
-      type: "INVOKE_FUNCTION",
-      contract_address: data.to,
-      entry_point_selector: stark.getSelectorFromName(data.method),
-      calldata: compileCalldata(data.calldata || {}),
+      transactions: {
+        contractAddress: data.to,
+        entrypoint: data.method,
+        calldata: stark.compileCalldata(data.calldata || {}),
+      },
     },
   })
 }

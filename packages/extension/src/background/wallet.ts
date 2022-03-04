@@ -1,7 +1,7 @@
 import { ethers } from "ethers"
-import { Signer, compileCalldata, ec } from "starknet"
+import { Account, ec, stark } from "starknet"
 
-import { getProvider } from "../shared/networks"
+import { getNetwork, getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
 import {
   getNextPathIndex,
@@ -9,6 +9,7 @@ import {
   getStarkPair,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
+import legacyBackupSchema from "./schema/legacyBackup.schema"
 import { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -94,6 +95,7 @@ export class Wallet {
 
   public async addAccount(
     networkId: string,
+    accountImplementation?: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
@@ -109,19 +111,35 @@ export class Wallet {
     const seed = starkPub
 
     const provider = getProvider(networkId)
-    const deployTransaction = await provider.deployContract(
-      this.compiledContract,
-      compileCalldata({ signer: starkPub, guardian: "0" }),
-      seed,
-    )
+    const network = getNetwork(networkId)
 
-    // TODO: register a L1 address with the wallet as soon as some registry is online
+    const implementation =
+      accountImplementation ?? network.accountImplementation
+    if (!implementation) {
+      throw new Error("Argent Account implementation is undefined")
+    }
+
+    const deployTransaction = await provider.deployContract({
+      contract: this.compiledContract,
+      constructorCalldata: stark.compileCalldata({ implementation }),
+      addressSalt: seed,
+    })
 
     if (
       deployTransaction.code !== "TRANSACTION_RECEIVED" ||
       !deployTransaction.address
     ) {
       throw new Error("Deploy transaction failed")
+    }
+
+    const initTransaction = await provider.invokeFunction({
+      contractAddress: deployTransaction.address,
+      entrypoint: "initialize",
+      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+    })
+
+    if (initTransaction.code !== "TRANSACTION_RECEIVED") {
+      throw new Error("Init transaction failed")
     }
 
     const account = {
@@ -138,31 +156,34 @@ export class Wallet {
     await this.writeBackup()
     await this.selectAccount(deployTransaction.address)
 
-    return { account, txHash: deployTransaction.transaction_hash }
+    return { account, txHash: initTransaction.transaction_hash }
   }
 
   public getAccounts(): WalletAccount[] {
     return this.accounts
   }
 
-  public async getSelectedAccountSigner(): Promise<Signer> {
+  public async getSelectedStarknetAccount(): Promise<Account> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
 
     const account = await this.getSelectedAccount()
+    if (!account) {
+      throw new Error("no selected account")
+    }
 
     const keyPair = getStarkPair(
       account.signer.derivationPath,
       this.session?.secret as string,
     )
     const provider = getProvider(account.network)
-    return new Signer(provider, account.address, keyPair)
+    return new Account(provider, account.address, keyPair)
   }
 
-  public async getSelectedAccount(): Promise<WalletAccount> {
+  public async getSelectedAccount(): Promise<WalletAccount | undefined> {
     if (this.accounts.length === 0) {
-      throw new Error("no accounts")
+      return
     }
 
     const address = await this.store.getItem("selected")
@@ -172,10 +193,9 @@ export class Wallet {
 
   public async selectAccount(address: string) {
     const account = this.accounts.find((account) => account.address === address)
-    if (account === undefined) {
-      return
+    if (account) {
+      await this.store.setItem("selected", account.address)
     }
-    await this.store.setItem("selected", account.address)
   }
 
   public async removeAccount(address: string) {
@@ -194,6 +214,9 @@ export class Wallet {
 
   public async importBackup(backupString: string) {
     if (!Wallet.validateBackup(backupString)) {
+      if (Wallet.isLegacyBackup(backupString)) {
+        throw new Error("legacy backup file cannot be imported")
+      }
       throw new Error("invalid backup file")
     }
     await this.store.setItem("backup", backupString)
@@ -216,6 +239,15 @@ export class Wallet {
     try {
       const backup = JSON.parse(backupString)
       return backupSchema.isValidSync(backup)
+    } catch {
+      return false
+    }
+  }
+
+  public static isLegacyBackup(backupString: string): boolean {
+    try {
+      const backup = JSON.parse(backupString)
+      return legacyBackupSchema.isValidSync(backup)
     } catch {
       return false
     }
