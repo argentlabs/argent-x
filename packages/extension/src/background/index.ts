@@ -212,15 +212,12 @@ import { Wallet, WalletStorageProps } from "./wallet"
             const starknetAccount = await wallet.getSelectedStarknetAccount()
 
             try {
-              // const nonce = await getNonce(starknetAccount)
-
               const tx = await starknetAccount.execute(
                 transactions,
                 abis,
                 transactionsDetail,
               )
 
-              // increaseStoredNonce(starknetAccount.address)
               transactionTracker.trackTransaction(
                 tx.transaction_hash,
                 selectedAccount,

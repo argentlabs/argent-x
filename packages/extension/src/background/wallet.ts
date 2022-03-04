@@ -143,7 +143,7 @@ export class Wallet {
     }
 
     const account = {
-      network: network.id,
+      network: networkId,
       address: deployTransaction.address,
       signer: {
         type: "local_secret",

@@ -171,7 +171,7 @@ window.addEventListener(
   },
 )
 
-export class ArgentXAccount extends Account implements AccountInterface {
+export class ArgentXAccount extends Account {
   constructor(address: string, provider?: Provider) {
     // since account constructor is taking a KeyPair,
     // we set a dummy one (never used anyway)
