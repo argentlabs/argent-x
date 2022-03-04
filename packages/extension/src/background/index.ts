@@ -146,18 +146,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "GET_SELECTED_ACCOUNT": {
-        try {
-          const selectedAccount = await wallet.getSelectedAccount()
-          return sendToTabAndUi({
-            type: "GET_SELECTED_ACCOUNT_RES",
-            data: selectedAccount,
-          })
-        } catch (error) {
-          return sendToTabAndUi({
-            type: "GET_SELECTED_ACCOUNT_REJ",
-            data: `${error}`,
-          })
-        }
+        const selectedAccount = await wallet.getSelectedAccount()
+        return sendToTabAndUi({
+          type: "GET_SELECTED_ACCOUNT_RES",
+          data: selectedAccount,
+        })
       }
 
       case "CONNECT_DAPP": {
@@ -173,7 +166,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         }
 
-        if (isAuthorized && selectedAccount.address) {
+        if (isAuthorized && selectedAccount?.address) {
           return sendToTabAndUi({
             type: "CONNECT_DAPP_RES",
             data: selectedAccount,
@@ -210,29 +203,32 @@ import { Wallet, WalletStorageProps } from "./wallet"
           }
 
           case "TRANSACTION": {
-            const { transactions, abis, transactionsDetail } = action.payload
-            if (!wallet.isSessionOpen()) {
-              throw Error("you need an open session")
-            }
-            const selectedAccount = await wallet.getSelectedAccount()
-            const starknetAccount = await wallet.getSelectedStarknetAccount()
-
             try {
-              const tx = await starknetAccount.execute(
+              const { transactions, abis, transactionsDetail } = action.payload
+              if (!wallet.isSessionOpen()) {
+                throw Error("you need an open session")
+              }
+              const selectedAccount = await wallet.getSelectedAccount()
+              const starknetAccount = await wallet.getSelectedStarknetAccount()
+              if (!selectedAccount) {
+                throw Error("no accounts")
+              }
+
+              const transaction = await starknetAccount.execute(
                 transactions,
                 abis,
                 transactionsDetail,
               )
 
               transactionTracker.trackTransaction(
-                tx.transaction_hash,
+                transaction.transaction_hash,
                 selectedAccount,
               )
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",
                 data: {
-                  txHash: tx.transaction_hash,
+                  txHash: transaction.transaction_hash,
                   actionHash,
                 },
               })
@@ -457,8 +453,15 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "RECOVER_BACKUP": {
-        await wallet.importBackup(msg.data)
-        return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
+        try {
+          await wallet.importBackup(msg.data)
+          return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
+        } catch (error) {
+          return sendToTabAndUi({
+            type: "RECOVER_BACKUP_REJ",
+            data: `${error}`,
+          })
+        }
       }
       case "DOWNLOAD_BACKUP_FILE": {
         await downloadFile(wallet.exportBackup())

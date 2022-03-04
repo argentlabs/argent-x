@@ -36,11 +36,7 @@ export const getTransactionStatus = async (hash: string, network: string) => {
 
 export const getLastSelectedAccount = async () => {
   sendMessage({ type: "GET_SELECTED_ACCOUNT" })
-
-  return await Promise.race([
-    waitForMessage("GET_SELECTED_ACCOUNT_RES"),
-    waitForMessage("GET_SELECTED_ACCOUNT_REJ").then(() => undefined),
-  ])
+  return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
 export const getPublicKey = async () => {
@@ -49,11 +45,14 @@ export const getPublicKey = async () => {
 }
 
 export const recoverBackup = async (backup: string) => {
-  sendMessage({
-    type: "RECOVER_BACKUP",
-    data: backup,
-  })
-  return waitForMessage("RECOVER_BACKUP_RES")
+  sendMessage({ type: "RECOVER_BACKUP", data: backup })
+
+  await Promise.race([
+    waitForMessage("RECOVER_BACKUP_RES"),
+    waitForMessage("RECOVER_BACKUP_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
 }
 
 export const isInitialized = async () => {

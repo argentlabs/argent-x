@@ -20,9 +20,7 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    const lastSelectedAccount = await getLastSelectedAccount().catch(
-      () => undefined,
-    )
+    const lastSelectedAccount = await getLastSelectedAccount()
     networkId ||= lastSelectedAccount
       ? localNetworkId(lastSelectedAccount?.network)
       : defaultNetwork.id

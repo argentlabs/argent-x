@@ -24,8 +24,7 @@ export type MessageType =
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "GET_SELECTED_ACCOUNT" }
-  | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount }
-  | { type: "GET_SELECTED_ACCOUNT_REJ"; data: string }
+  | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount | undefined }
   | { type: "DELETE_ACCOUNT"; data: string }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
@@ -84,6 +83,7 @@ export type MessageType =
   // ***** backup *****
   | { type: "RECOVER_BACKUP"; data: string }
   | { type: "RECOVER_BACKUP_RES" }
+  | { type: "RECOVER_BACKUP_REJ"; data: string }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
   | { type: "DOWNLOAD_LEGACY_BACKUP_FILE" }

@@ -1,7 +1,6 @@
 import {
   Abi,
   Account,
-  AccountInterface,
   AddTransactionResponse,
   Call,
   InvocationsDetails,

@@ -169,6 +169,9 @@ export class Wallet {
     }
 
     const account = await this.getSelectedAccount()
+    if (!account) {
+      throw new Error("no selected account")
+    }
 
     const keyPair = getStarkPair(
       account.signer.derivationPath,
@@ -178,9 +181,9 @@ export class Wallet {
     return new Account(provider, account.address, keyPair)
   }
 
-  public async getSelectedAccount(): Promise<WalletAccount> {
+  public async getSelectedAccount(): Promise<WalletAccount | undefined> {
     if (this.accounts.length === 0) {
-      throw new Error("no accounts")
+      return
     }
 
     const address = await this.store.getItem("selected")
@@ -190,10 +193,9 @@ export class Wallet {
 
   public async selectAccount(address: string) {
     const account = this.accounts.find((account) => account.address === address)
-    if (account === undefined) {
-      return
+    if (account) {
+      await this.store.setItem("selected", account.address)
     }
-    await this.store.setItem("selected", account.address)
   }
 
   public async removeAccount(address: string) {
