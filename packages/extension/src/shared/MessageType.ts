@@ -25,6 +25,7 @@ export type MessageType =
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "GET_SELECTED_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount }
+  | { type: "GET_SELECTED_ACCOUNT_REJ"; data: string }
   | { type: "DELETE_ACCOUNT"; data: string }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }

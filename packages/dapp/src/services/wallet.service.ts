@@ -67,7 +67,7 @@ export const signMessage = async (message: string) => {
     throw Error("message must be a short string")
   }
 
-  return starknet.signer.signMessage({
+  return starknet.account.signMessage({
     domain: {
       name: "Example DApp",
       chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
