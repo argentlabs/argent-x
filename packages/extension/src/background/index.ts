@@ -1,7 +1,7 @@
 import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
-import { encode, number } from "starknet"
+import { InvokeFunctionTransaction, encode, number } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
@@ -153,6 +153,19 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
 
+      case "EXECUTE_TRANSACTION_LEGACY": {
+        const { meta } = await actionQueue.push({
+          type: "TRANSACTION_LEGACY",
+          payload: msg.data,
+        })
+        return sendToTabAndUi({
+          type: "EXECUTE_TRANSACTION_LEGACY_RES",
+          data: {
+            actionHash: meta.hash,
+          },
+        })
+      }
+
       case "GET_ACTIONS": {
         const actions = await actionQueue.getAll()
         return sendToTabAndUi({
@@ -256,6 +269,45 @@ import { Wallet, WalletStorageProps } from "./wallet"
               if (!nonceWasProvidedByUI) {
                 increaseStoredNonce(selectedAccount.address)
               }
+
+              return sendToTabAndUi({
+                type: "TRANSACTION_SUBMITTED",
+                data: {
+                  txHash: transaction.transaction_hash,
+                  actionHash,
+                },
+              })
+            } catch (error: any) {
+              return sendToTabAndUi({
+                type: "TRANSACTION_FAILED",
+                data: { actionHash, error: `${error}` },
+              })
+            }
+          }
+
+          case "TRANSACTION_LEGACY": {
+            try {
+              if (!wallet.isSessionOpen()) {
+                throw Error("you need an open session")
+              }
+              const selectedAccount = await wallet.getSelectedAccount()
+              const starknetAccount = await wallet.getSelectedStarknetAccount()
+              if (!selectedAccount) {
+                throw Error("no accounts")
+              }
+
+              const invocation: InvokeFunctionTransaction = action.payload
+              const transaction = await starknetAccount.LEGACY_invokeFunction(
+                invocation.contract_address,
+                invocation.entry_point_selector,
+                invocation.calldata,
+                invocation.signature,
+              )
+
+              transactionTracker.trackTransaction(
+                transaction.transaction_hash,
+                selectedAccount,
+              )
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",

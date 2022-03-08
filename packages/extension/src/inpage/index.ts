@@ -13,6 +13,7 @@ import {
 
 import { MessageType, WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
+import { LEGACY_WalletSigner } from "./legacy"
 import { EventHandler, StarknetWindowObject } from "./model"
 
 const VERSION = `${process.env.VERSION}`
@@ -119,6 +120,7 @@ const starknetWindowObject: StarknetWindowObject = {
           const { address, network } = data.data
           starknet.provider = getProvider(network)
           starknet.account = new ArgentXAccount(address, starknet.provider)
+          starknet.signer = new LEGACY_WalletSigner(address, starknet.provider)
           starknet.selectedAddress = address
           starknet.isConnected = true
           resolve([address])
