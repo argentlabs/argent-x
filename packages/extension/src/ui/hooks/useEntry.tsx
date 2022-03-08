@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { useBackupDownload } from "../states/backupDownload"
-import { isDisclaimerUnderstood } from "../utils/disclaimer"
 import { hasActiveSession, isInitialized } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 
@@ -34,9 +33,6 @@ const determineEntry = async (isBackupDownloadRequired: boolean) => {
   if (!initialized) {
     if (hasLegacy) {
       return routes.legacy()
-    }
-    if (!isDisclaimerUnderstood()) {
-      return routes.disclaimer()
     }
     return routes.welcome()
   }

@@ -13,10 +13,9 @@ import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
-import { DisclaimerScreen } from "./screens/DisclaimerScreen"
-import { LegacyScreen } from "./screens/LegacyScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
+import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { PasswordScreen } from "./screens/PasswordScreen"
@@ -95,7 +94,6 @@ const Screen: FC = () => {
       <Route path={routes.recoverBackup()} element={<RecoverBackupScreen />} />
       <Route path={routes.password()} element={<PasswordScreen />} />
       <Route path={routes.reset()} element={<ResetScreen />} />
-      <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
       <Route path={routes.legacy()} element={<LegacyScreen />} />
       <Route path={routes.error()} element={<ErrorScreen />} />
 
