@@ -7,6 +7,7 @@ import type {
 } from "starknet"
 
 import type { ExtQueueItem } from "../background/actionQueue"
+import { StarkSignerType } from "./starkSigner"
 
 export type ActionItem =
   | {

@@ -7,6 +7,7 @@ import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
+import { StarkSignerType } from "../shared/starkSigner"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -321,7 +322,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           }
 
           case "SIGN": {
-            const typedData = action.payload
+            const data  = action.payload
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
@@ -332,8 +333,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
             return sendToTabAndUi({
               type: "SIGNATURE_SUCCESS",
               data: {
-                r: r.toString(),
-                s: s.toString(),
+                r: signature[0].toString(),
+                s: signature[1].toString(),
                 actionHash,
               },
             })
@@ -500,10 +501,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
         if (!wallet.isSessionOpen()) {
           throw Error("you need an open session")
         }
-
-        const network = msg.data
+        
+        const { networkId, type } = msg.data
         try {
-          const { account, txHash } = await wallet.addAccount(network)
+          const { account, txHash } = await wallet.addAccount(networkId, type)
           transactionTracker.trackTransaction(txHash, account, {
             title: "Deploy wallet",
           })
@@ -520,7 +521,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         } catch (e: any) {
           let error = `${e}`
-          if (network.includes("localhost")) {
+          if (networkId.includes("localhost")) {
             if (error.toLowerCase().includes("network error")) {
               error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
             }

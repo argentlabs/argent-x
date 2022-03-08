@@ -4,6 +4,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import LedgerLogo from "../../assets/ledger-logo.svg"
 import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
@@ -17,6 +18,7 @@ import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
+import { StarkSignerType } from "../../shared/starkSigner"
 
 const AccountList = styled.div`
   display: flex;
@@ -55,9 +57,10 @@ export const AccountListScreen: FC = () => {
 
   const accountsList = Object.values(accounts)
 
-  const handleAddAccount = async () => {
+  const handleAddAccount = async (type: StarkSignerType) => {
     try {
-      const newAccount = await deployAccount(switcherNetworkId, localhostPort)
+      console.warn("Create a new account")
+      const newAccount = await deployAccount(switcherNetworkId, localhostPort, type)
       addAccount(newAccount)
       connectAccount(newAccount, switcherNetworkId, localhostPort)
       navigate(await recover())
@@ -88,14 +91,18 @@ export const AccountListScreen: FC = () => {
         {accountsList.map((account) => (
           <AccountListItem
             key={account.address}
+            isLedger={account.signer.type === "ledger_nano"}
             accountName={getAccountName(account, accountNames)}
             address={account.address}
             status={getStatus(account, selectedAccount)}
             isDeleteable={switcherNetworkId === "localhost"}
           />
         ))}
-        <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>
+        <IconButtonCenter size={48} {...makeClickable(() => {handleAddAccount(StarkSignerType.Local)})}>
           <AddIcon fontSize="large" />
+        </IconButtonCenter>
+        <IconButtonCenter size={48} {...makeClickable(() => {handleAddAccount(StarkSignerType.Ledger)})}>
+          <LedgerLogo />
         </IconButtonCenter>
       </AccountList>
     </AccountListWrapper>

@@ -17,8 +17,15 @@
     "tabs",
     "storage",
     "notifications",
-    "http://localhost/*"
+    "http://localhost/*",
+    "unlimitedStorage",
+    "clipboardWrite",
+    "activeTab",
+    "webRequest"
   ],
+  "externally_connectable": {
+    "ids": [ "*" ]
+ },
   "icons": {
     "16": "assets/logo.png",
     "48": "assets/logo.png",

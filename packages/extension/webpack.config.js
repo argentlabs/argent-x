@@ -1,5 +1,6 @@
 const path = require("path")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
+const { ProvidePlugin } = require("webpack")
 const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin } = require("webpack")
 const ESLintPlugin = require("eslint-webpack-plugin")
@@ -63,6 +64,9 @@ module.exports = {
       "process.env.VERSION": JSON.stringify(process.env.npm_package_version),
     }),
     new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
+    new ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
+    }),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
