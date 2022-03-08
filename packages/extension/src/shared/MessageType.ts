@@ -23,6 +23,7 @@ export type MessageType =
   | { type: "GET_ACCOUNTS" }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
+  | { type: "DISCONNECT_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount | undefined }
   | { type: "DELETE_ACCOUNT"; data: string }
@@ -69,7 +70,6 @@ export type MessageType =
   | { type: "IS_PREAUTHORIZED"; data: string }
   | { type: "IS_PREAUTHORIZED_RES"; data: boolean }
   | { type: "RESET_PREAUTHORIZATIONS" }
-  | { type: "DAPP_UNAUTHORIZED" }
   // ***** sessions *****
   | { type: "STOP_SESSION" }
   | { type: "HAS_SESSION" }
@@ -81,7 +81,7 @@ export type MessageType =
     }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
-  | { type: "START_SESSION_RES" }
+  | { type: "START_SESSION_RES"; data?: WalletAccount }
   // ***** backup *****
   | { type: "RECOVER_BACKUP"; data: string }
   | { type: "RECOVER_BACKUP_RES" }

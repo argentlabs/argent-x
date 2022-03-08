@@ -175,6 +175,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
             type: "CONNECT_DAPP",
             payload: { host: msg.data.host },
           })
+          return openUi()
+        }
+
+        if (!wallet.isSessionOpen()) {
+          return openUi()
         }
 
         if (isAuthorized && selectedAccount?.address) {
@@ -184,7 +189,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         }
 
-        return openUi()
+        break
       }
 
       case "CONNECT_ACCOUNT": {
@@ -361,7 +366,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
       case "IS_PREAUTHORIZED": {
-        const valid = await isPreAuthorized(msg.data)
+        const valid =
+          wallet.isSessionOpen() && (await isPreAuthorized(msg.data))
         return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
       }
 
@@ -371,7 +377,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
         await sendToTabAndUi({ type: "REMOVE_PREAUTHORIZATION_RES" })
         await sendMessageToHost(
           {
-            type: "DAPP_UNAUTHORIZED",
+            type: "DISCONNECT_ACCOUNT",
           },
           host,
         )
@@ -397,7 +403,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
         const { plaintext } = await compactDecrypt(body, privateKey)
         const sessionPassword = encode.arrayBufferToString(plaintext)
         if (await wallet.startSession(sessionPassword)) {
-          sendToTabAndUi({ type: "START_SESSION_RES" })
+          const selectedAccount = await wallet.getSelectedAccount()
+          sendToTabAndUi({ type: "START_SESSION_RES", data: selectedAccount })
         }
         return sendToTabAndUi({ type: "START_SESSION_REJ" })
       }
@@ -408,7 +415,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
       case "STOP_SESSION": {
-        return wallet.lock()
+        wallet.lock()
+        return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "IS_INITIALIZED": {
         const initialized = await wallet.isInitialized()
