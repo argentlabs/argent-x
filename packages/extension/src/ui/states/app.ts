@@ -5,6 +5,7 @@ import { defaultNetwork } from "../../shared/networks"
 interface State {
   switcherNetworkId: string
   error?: string
+  passwordError?: string
   isLoading: boolean
   isFirstRender: boolean
 }

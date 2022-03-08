@@ -1,4 +1,4 @@
-import { FC, FormEventHandler } from "react"
+import { FC, FormEventHandler, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -25,16 +25,41 @@ const Container = styled.div`
   height: calc(100vh - 68px);
 `
 
+const Notice = styled.div`
+  padding-top: 20px;
+  display: flex;
+  margin: 0 auto;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
 export const BackupDownloadScreen: FC = () => {
   const navigate = useNavigate()
   const { search } = useLocation()
-  const { isBackupDownloadRequired } = useBackupDownload()
+  const [isDownloaded, setIsDownloaded] = useState(false)
 
   const isSettings = new URLSearchParams(search).has("settings")
 
-  const handleDownload: FormEventHandler = async () => {
+  const handleDownloadClick: FormEventHandler = async () => {
     sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
+    setIsDownloaded(true)
+  }
+
+  const handleContinueClick: FormEventHandler = async () => {
     useBackupDownload.setState({ isBackupDownloadRequired: false })
+    navigate(routes.account())
+  }
+
+  const handleDontShowClick: FormEventHandler = async () => {
+    useBackupDownload.setState({
+      isBackupDownloadRequired: false,
+      dontRemindUser: true,
+    })
+    navigate(routes.account())
   }
 
   return (
@@ -53,11 +78,16 @@ export const BackupDownloadScreen: FC = () => {
           Each time you add a new account, you&apos;ll be prompted to download
           an updated backup file for all your accounts.
         </P>
-        <DownloadButton onClick={handleDownload}>Download</DownloadButton>
-        {!isBackupDownloadRequired && !isSettings && (
-          <ContinueButton onClick={() => navigate(routes.account())}>
-            Continue
-          </ContinueButton>
+        <DownloadButton onClick={handleDownloadClick}>Download</DownloadButton>
+        {isDownloaded && !isSettings && (
+          <>
+            <ContinueButton onClick={handleContinueClick}>
+              Continue
+            </ContinueButton>
+            <Notice onClick={handleDontShowClick}>
+              Don&apos;t show this message again
+            </Notice>
+          </>
         )}
       </Container>
     </>

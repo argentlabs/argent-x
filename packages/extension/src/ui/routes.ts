@@ -1,8 +1,8 @@
 export const routes = {
   welcome: () => "/index.html",
   newWallet: () => "/wallets/new",
-  recoverBackup: () => "/recover",
-  password: () => "/password",
+  backupRecovery: () => "/recover",
+  lockScreen: () => "/lock-screen",
   account: () => "/account",
   accounts: () => "/accounts",
   newToken: () => "/tokens/new",

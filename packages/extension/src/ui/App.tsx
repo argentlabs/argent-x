@@ -13,13 +13,13 @@ import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
+import { BackupRecoveryScreen } from "./screens/BackupRecoveryScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
+import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
-import { PasswordScreen } from "./screens/PasswordScreen"
-import { RecoverBackupScreen } from "./screens/RecoverBackupScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
 import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
@@ -28,6 +28,7 @@ import { TokenScreen } from "./screens/TokenScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
+import { useBackupDownload } from "./states/backupDownload"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -81,9 +82,13 @@ const Screen: FC = () => {
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
+  const { isBackupDownloadRequired, dontRemindUser } = useBackupDownload()
 
   if (isLoading) {
     return <LoadingScreen />
+  }
+  if (isBackupDownloadRequired && !dontRemindUser) {
+    return <BackupDownloadScreen />
   }
 
   return (
@@ -91,8 +96,11 @@ const Screen: FC = () => {
       {/* Routes which need no unlocked backup */}
       <Route path={routes.welcome()} element={<WelcomeScreen />} />
       <Route path={routes.newWallet()} element={<NewWalletScreen />} />
-      <Route path={routes.recoverBackup()} element={<RecoverBackupScreen />} />
-      <Route path={routes.password()} element={<PasswordScreen />} />
+      <Route
+        path={routes.backupRecovery()}
+        element={<BackupRecoveryScreen />}
+      />
+      <Route path={routes.lockScreen()} element={<LockScreen />} />
       <Route path={routes.reset()} element={<ResetScreen />} />
       <Route path={routes.legacy()} element={<LegacyScreen />} />
       <Route path={routes.error()} element={<ErrorScreen />} />

@@ -60,8 +60,7 @@ export const AccountListScreen: FC = () => {
       const newAccount = await deployAccount(switcherNetworkId, localhostPort)
       addAccount(newAccount)
       connectAccount(newAccount, switcherNetworkId, localhostPort)
-      recover()
-      navigate(routes.backupDownload())
+      navigate(await recover())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
       navigate(routes.error())
