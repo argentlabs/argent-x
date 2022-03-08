@@ -166,6 +166,16 @@ window.addEventListener(
           handleEvent([address])
         }
       }
+    } else if (data.type === "DAPP_UNAUTHORIZED") {
+      if (!starknet) {
+        return
+      }
+      starknet.selectedAddress = undefined
+      starknet.account = undefined
+      starknet.isConnected = false
+      for (const handleEvent of userEventHandlers) {
+        handleEvent([])
+      }
     }
   },
 )

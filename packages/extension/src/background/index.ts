@@ -10,8 +10,10 @@ import { getQueue } from "./actionQueue"
 import {
   addTab,
   hasTab,
+  removeTabOfHost,
   sendMessageToActiveTabs,
   sendMessageToActiveTabsAndUi,
+  sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
 import { downloadFile } from "./download"
@@ -24,7 +26,11 @@ import {
   sentTransactionNotification,
 } from "./notification"
 import { openUi } from "./openUi"
-import { isPreAuthorized, preAuthorize } from "./preAuthorizations"
+import {
+  isPreAuthorized,
+  preAuthorize,
+  removePreAuthorization,
+} from "./preAuthorizations"
 import { Storage, clearStorage, setToStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { Wallet, WalletStorageProps } from "./wallet"
@@ -157,7 +163,12 @@ import { Wallet, WalletStorageProps } from "./wallet"
         const selectedAccount = await wallet.getSelectedAccount()
         const isAuthorized = await isPreAuthorized(msg.data.host)
 
-        addTab(sender.tab?.id)
+        if (sender.tab?.id) {
+          addTab({
+            id: sender.tab?.id,
+            host: msg.data.host,
+          })
+        }
 
         if (!isAuthorized) {
           await actionQueue.push({
@@ -352,6 +363,20 @@ import { Wallet, WalletStorageProps } from "./wallet"
       case "IS_PREAUTHORIZED": {
         const valid = await isPreAuthorized(msg.data)
         return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
+      }
+
+      case "REMOVE_PREAUTHORIZATION": {
+        const host = msg.data
+        await removePreAuthorization(host)
+        await sendToTabAndUi({ type: "REMOVE_PREAUTHORIZATION_RES" })
+        await sendMessageToHost(
+          {
+            type: "DAPP_UNAUTHORIZED",
+          },
+          host,
+        )
+        removeTabOfHost(host)
+        break
       }
       case "RESET_PREAUTHORIZATIONS": {
         setToStorage(`PREAUTHORIZATION:APPROVED`, [])

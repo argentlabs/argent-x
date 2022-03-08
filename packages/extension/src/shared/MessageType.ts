@@ -65,9 +65,11 @@ export type MessageType =
       data: { host: string; actionHash: string }
     }
   | { type: "REMOVE_PREAUTHORIZATION"; data: string }
+  | { type: "REMOVE_PREAUTHORIZATION_RES" }
   | { type: "IS_PREAUTHORIZED"; data: string }
   | { type: "IS_PREAUTHORIZED_RES"; data: boolean }
   | { type: "RESET_PREAUTHORIZATIONS" }
+  | { type: "DAPP_UNAUTHORIZED" }
   // ***** sessions *****
   | { type: "STOP_SESSION" }
   | { type: "HAS_SESSION" }
