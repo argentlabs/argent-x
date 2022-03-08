@@ -4,6 +4,7 @@ import { CompiledContract, Contract, json } from "starknet"
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { getProvider } from "../shared/networks"
 import { WalletAccountSigner } from "../shared/wallet.model"
+import { StarkSignerType } from "../shared/starkSigner"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -50,8 +51,8 @@ export class Account {
     return nonce.toString()
   }
 
-  public static async fromDeploy(networkId: string): Promise<Account> {
-    sendMessage({ type: "NEW_ACCOUNT", data: networkId })
+  public static async fromDeploy(networkId: string, type: StarkSignerType): Promise<Account> {
+    sendMessage({ type: "NEW_ACCOUNT", data: { networkId, type } })
 
     const result = await Promise.race([
       waitForMessage("NEW_ACCOUNT_RES"),

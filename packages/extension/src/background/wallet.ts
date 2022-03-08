@@ -2,7 +2,7 @@ import { ethers } from "ethers"
 import { Signer, compileCalldata, ec } from "starknet"
 
 import { getProvider } from "../shared/networks"
-import { WalletAccount } from "../shared/wallet.model"
+import { WalletAccount, WalletAccountSigner } from "../shared/wallet.model"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -10,6 +10,11 @@ import {
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 import { IStorage } from "./storage"
+import {
+  StarkSignerType,
+  LedgerSigner
+} from "../shared/starkSigner"
+import { string } from "yup/lib/locale"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -94,20 +99,38 @@ export class Wallet {
 
   public async addAccount(
     networkId: string,
+    type: StarkSignerType,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
 
-    const current_paths = this.accounts
+    let starkPub;
+    let signer: WalletAccountSigner;
+    if (type === StarkSignerType.Ledger) {
+      const ledgerSigner = new LedgerSigner()
+      await ledgerSigner.connect()
+      console.log("starkPub", ledgerSigner.starkPub)
+      starkPub = ledgerSigner.starkPub;
+      signer = {
+        type: "ledger_nano",
+        derivationPath: ledgerSigner.derivationPath,
+      }
+    }
+    else {
+      const current_paths = this.accounts
       .filter((account) => account.signer.type === "local_secret")
       .map((account) => account.signer.derivationPath)
-
-    const index = getNextPathIndex(current_paths)
-    const starkPair = getStarkPair(index, this.session?.secret as string)
-    const starkPub = ec.getStarkKey(starkPair)
+      const index = getNextPathIndex(current_paths)
+      const starkPair = getStarkPair(index, this.session?.secret as string)
+      starkPub = ec.getStarkKey(starkPair)
+      signer = {
+        type: "local_secret",
+        derivationPath: getPathForIndex(index),
+      }
+    }
+    
     const seed = starkPub
-
     const provider = getProvider(networkId)
     const deployTransaction = await provider.deployContract(
       this.compiledContract,
@@ -127,10 +150,7 @@ export class Wallet {
     const account = {
       network: networkId,
       address: deployTransaction.address,
-      signer: {
-        type: "local_secret",
-        derivationPath: getPathForIndex(index),
-      },
+      signer: signer
     }
 
     this.accounts.push(account)
@@ -158,6 +178,15 @@ export class Wallet {
     )
     const provider = getProvider(account.network)
     return new Signer(provider, account.address, keyPair)
+  }
+
+  public async getLedgerSigner(): Promise<LedgerSigner> {
+    if (!this.isSessionOpen()) {
+      throw Error("no open session")
+    }
+    const signer = new LedgerSigner()
+    await signer.connect()
+    return signer
   }
 
   public async getSelectedAccount(): Promise<WalletAccount> {

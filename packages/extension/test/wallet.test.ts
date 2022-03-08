@@ -59,7 +59,7 @@ test("create a new wallet", async () => {
   expect(backupWithoutAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithoutAccount as string)).toBe(true)
 
-  const { txHash } = await wallet.addAccount(NETWORK)
+  const { txHash } = await wallet.addAccount(NETWORK, 0)
   expect(txHash).toMatch(REGEX_HEXSTRING)
 
   const accounts = wallet.getAccounts()

@@ -20,6 +20,8 @@ import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
 
+import LedgerLogo from "../../../assets/ledger-logo.svg"
+
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;
 `
@@ -70,6 +72,7 @@ interface AccountListProps {
   accountName: string
   address: string
   status: AccountStatus
+  isLedger: boolean
   isDeleteable?: boolean
 }
 
@@ -77,6 +80,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   accountName,
   address,
   status,
+  isLedger,
   isDeleteable,
 }) => {
   const navigate = useNavigate()
@@ -97,7 +101,8 @@ export const AccountListItem: FC<AccountListProps> = ({
       })}
       className={isDeleteable ? "deleteable" : ""}
     >
-      <ProfilePicture src={getAccountImageUrl(accountName, address)} />
+      { !isLedger &&  <ProfilePicture src={getAccountImageUrl(accountName, address)} />}
+      { isLedger && <LedgerLogo /> }
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountName}</AccountName>

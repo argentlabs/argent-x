@@ -5,10 +5,11 @@ import { ExtActionItem } from "./actionQueue"
 import { AddToken } from "./token.model"
 import { TransactionStatus } from "./transactions.model"
 import { WalletAccount } from "./wallet.model"
+import { StarkSignerType } from "./starkSigner"
 
 export type MessageType =
   // ***** accounts *****
-  | { type: "NEW_ACCOUNT"; data: string }
+  | { type: "NEW_ACCOUNT"; data: { networkId: string; type: StarkSignerType } }
   | {
       type: "NEW_ACCOUNT_RES"
       data: {

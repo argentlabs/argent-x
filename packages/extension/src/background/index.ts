@@ -1,11 +1,14 @@
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
+import { BigNumber } from "ethers"
 import { compactDecrypt } from "jose"
-import { encode } from "starknet"
+import { encode, typedData, Signer } from "starknet"
+import { BigNumberish } from "starknet/dist/utils/number"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
+import { StarkSignerType } from "../shared/starkSigner"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -211,7 +214,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
             const signer = await wallet.getSelectedAccountSigner()
 
             try {
-              const nonce = await getNonce(signer)
+              const nonce = await getNonce(signer as Signer)
 
               const tx = await signer.addTransaction({ ...transaction, nonce })
 
@@ -237,19 +240,25 @@ import { Wallet, WalletStorageProps } from "./wallet"
           }
 
           case "SIGN": {
-            const typedData = action.payload
+            const data  = action.payload
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
-            const signer = await wallet.getSelectedAccountSigner()
-
-            const [r, s] = await signer.signMessage(typedData)
-
+            let signature: BigNumberish[]
+            const account = await wallet.getSelectedAccount()
+            if (account.signer.type === "local_secret") {
+              const signer = await wallet.getSelectedAccountSigner()
+              signature = await signer.signMessage(data)
+            }
+            else {
+              const signer = await wallet.getLedgerSigner()
+              signature = await signer.signMessage(data)
+            }
             return sendToTabAndUi({
               type: "SIGNATURE_SUCCESS",
               data: {
-                r: r.toString(),
-                s: s.toString(),
+                r: signature[0].toString(),
+                s: signature[1].toString(),
                 actionHash,
               },
             })
@@ -397,10 +406,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
         if (!wallet.isSessionOpen()) {
           throw Error("you need an open session")
         }
-
-        const network = msg.data
+        
+        const { networkId, type } = msg.data
         try {
-          const { account, txHash } = await wallet.addAccount(network)
+          const { account, txHash } = await wallet.addAccount(networkId, type)
           transactionTracker.trackTransaction(txHash, account, {
             title: "Deploy wallet",
           })
@@ -417,7 +426,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         } catch (e: any) {
           let error = `${e}`
-          if (network.includes("localhost")) {
+          if (networkId.includes("localhost")) {
             if (error.toLowerCase().includes("network error")) {
               error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
             }

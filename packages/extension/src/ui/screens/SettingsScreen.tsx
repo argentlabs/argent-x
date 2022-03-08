@@ -132,6 +132,11 @@ export const SettingsScreen: FC = () => {
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
         </SettingsItem>
+        <SettingsItem onClick={() => chrome.tabs.create({url: 'index.html'})}>
+          <Title>
+            <span>Expand view</span>
+          </Title>
+        </SettingsItem>
         <hr />
         <Footer>
           <P>Help, support &amp; suggestions:</P>

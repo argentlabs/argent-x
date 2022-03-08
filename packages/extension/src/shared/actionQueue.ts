@@ -1,6 +1,7 @@
 import type { InvokeFunctionTransaction, typedData } from "starknet"
 
 import type { ExtQueueItem } from "../background/actionQueue"
+import { StarkSignerType } from "./starkSigner"
 
 export type ActionItem =
   | {
