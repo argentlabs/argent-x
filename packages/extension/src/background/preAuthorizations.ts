@@ -22,3 +22,7 @@ export async function isPreAuthorized(host: string) {
   const approved = await getFromStorage<string[]>(`PREAUTHORIZATION:APPROVED`)
   return (approved || []).includes(host)
 }
+
+export async function resetPreAuthorizations() {
+  await setToStorage(`PREAUTHORIZATION:APPROVED`, [])
+}

@@ -30,8 +30,9 @@ import {
   isPreAuthorized,
   preAuthorize,
   removePreAuthorization,
+  resetPreAuthorizations,
 } from "./preAuthorizations"
-import { Storage, clearStorage, setToStorage } from "./storage"
+import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { Wallet, WalletStorageProps } from "./wallet"
 
@@ -384,9 +385,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
         break
       }
       case "RESET_PREAUTHORIZATIONS": {
-        setToStorage(`PREAUTHORIZATION:APPROVED`, [])
-        setToStorage(`PREAUTHORIZATION:PENDING`, [])
-        return
+        await resetPreAuthorizations()
+        return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "GET_PUBLIC_KEY": {
         return sendToTabAndUi({
