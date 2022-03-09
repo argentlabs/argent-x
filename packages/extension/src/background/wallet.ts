@@ -123,7 +123,7 @@ export class Wallet {
       const deployImplementationTransaction = await provider.deployContract({
         contract: this.argentAccountCompiledContract,
       })
-      this.assertTransactionReceived(deployImplementationTransaction, true)
+      assertTransactionReceived(deployImplementationTransaction, true)
       implementation = deployImplementationTransaction.address as string
     }
 
@@ -133,7 +133,7 @@ export class Wallet {
       addressSalt: seed,
     })
 
-    this.assertTransactionReceived(deployTransaction, true)
+    assertTransactionReceived(deployTransaction, true)
     const proxyAddress = deployTransaction.address as string
 
     const initTransaction = await provider.invokeFunction({
@@ -142,7 +142,7 @@ export class Wallet {
       calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
     })
 
-    this.assertTransactionReceived(initTransaction)
+    assertTransactionReceived(initTransaction)
 
     const account = {
       network: networkId,
@@ -159,22 +159,6 @@ export class Wallet {
     await this.selectAccount(account.address)
 
     return { account, txHash: initTransaction.transaction_hash }
-  }
-
-  private assertTransactionReceived(
-    transactionResponse: AddTransactionResponse,
-    deployContract = false,
-  ) {
-    if (transactionResponse.code !== "TRANSACTION_RECEIVED") {
-      throw new Error(
-        `Transaction not received: ${transactionResponse.transaction_hash}`,
-      )
-    }
-    if (deployContract && !transactionResponse.address) {
-      throw new Error(
-        `Contract not deployed: ${transactionResponse.transaction_hash}`,
-      )
-    }
   }
 
   public getAccounts(): WalletAccount[] {
@@ -313,5 +297,21 @@ export class Wallet {
     const backupString = JSON.stringify(extendedBackup)
     await this.store.setItem("backup", backupString)
     this.encryptedBackup = backupString
+  }
+}
+
+const assertTransactionReceived = (
+  transactionResponse: AddTransactionResponse,
+  deployContract = false,
+) => {
+  if (transactionResponse.code !== "TRANSACTION_RECEIVED") {
+    throw new Error(
+      `Transaction not received: ${transactionResponse.transaction_hash}`,
+    )
+  }
+  if (deployContract && !transactionResponse.address) {
+    throw new Error(
+      `Contract not deployed: ${transactionResponse.transaction_hash}`,
+    )
   }
 }
