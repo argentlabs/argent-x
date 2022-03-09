@@ -175,11 +175,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
             type: "CONNECT_DAPP",
             payload: { host: msg.data.host },
           })
-          return openUi()
-        }
-
-        if (!wallet.isSessionOpen()) {
-          return openUi()
         }
 
         if (isAuthorized && selectedAccount?.address) {
@@ -189,7 +184,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         }
 
-        break
+        return openUi()
       }
 
       case "CONNECT_ACCOUNT": {

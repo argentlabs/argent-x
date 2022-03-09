@@ -182,7 +182,7 @@ export class Wallet {
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
-    if (this.accounts.length === 0) {
+    if (this.accounts.length === 0 || !this.isSessionOpen()) {
       return
     }
 
