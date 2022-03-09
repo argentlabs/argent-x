@@ -3,7 +3,10 @@ import browser from "webextension-polyfill"
 import { sendMessage } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 
-type Tab = { id: number; host: string }
+interface Tab {
+  id: number
+  host: string
+}
 const activeTabs: Tab[] = []
 
 export function addTab(tab: Tab) {
@@ -28,7 +31,7 @@ export function hasTab(tabId?: number) {
   return activeTabs.some((tab) => tab.id === tabId)
 }
 
-browser.tabs.onRemoved.addListener((tabId) => {
+browser.tabs.onRemoved.addListener(removeTab)
   removeTab(tabId)
 })
 
