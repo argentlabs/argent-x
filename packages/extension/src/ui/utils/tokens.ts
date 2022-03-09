@@ -56,7 +56,7 @@ export const fetchTokenDetails = async (
       )
       .catch(() => ""),
     tokenContract
-      .call("balanceOf", { user: accountAddress })
+      .call("balanceOf", { account: accountAddress })
       .then((x) =>
         BigNumber.from(uint256.uint256ToBN(x.balance as any).toString()),
       )
@@ -87,7 +87,7 @@ export const fetchTokenBalance = async (
   const provider = getProvider(networkId)
   const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
   const result = await tokenContract.call("balanceOf", {
-    user: accountAddress,
+    account: accountAddress,
   })
   return BigNumber.from(uint256.uint256ToBN(result.balance as any).toString())
 }
