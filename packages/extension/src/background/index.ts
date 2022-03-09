@@ -356,7 +356,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
 
       case "RESET_ALL": {
         clearStorage()
-        return wallet.reset()
+        wallet.reset()
+        return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
 
       case "PREAUTHORIZE": {
