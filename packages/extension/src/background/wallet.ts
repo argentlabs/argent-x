@@ -1,3 +1,5 @@
+import { EventEmitter } from "events"
+
 import { ethers } from "ethers"
 import { Account, ec, stark } from "starknet"
 
@@ -29,7 +31,7 @@ export interface WalletStorageProps {
   selected?: string
 }
 
-export class Wallet {
+export class Wallet extends EventEmitter {
   private accounts: WalletAccount[] = []
 
   private encryptedBackup?: string
@@ -39,6 +41,7 @@ export class Wallet {
   private compiledContract: string
 
   constructor(store: IStorage<WalletStorageProps>, compiledContract: string) {
+    super()
     this.store = store
     this.compiledContract = compiledContract
   }
@@ -258,6 +261,7 @@ export class Wallet {
 
     setTimeout(() => {
       this.lock()
+      this.emit("autoLock")
     }, SESSION_DURATION)
   }
 

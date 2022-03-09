@@ -87,6 +87,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
       sendMessageToActiveTabs(msg)
     }
 
+    wallet.on("autoLock", async () => {
+      await sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
+    })
+
     const actionQueue = await getQueue<ActionItem>({
       onUpdate: (actions) => {
         sendToTabAndUi({
