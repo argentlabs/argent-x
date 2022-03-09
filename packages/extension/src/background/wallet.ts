@@ -212,6 +212,12 @@ export class Wallet {
     this.session = undefined
   }
 
+  public reset() {
+    this.accounts = []
+    this.encryptedBackup = undefined
+    this.session = undefined
+  }
+
   public async importBackup(backupString: string) {
     if (!Wallet.validateBackup(backupString)) {
       if (Wallet.isLegacyBackup(backupString)) {
