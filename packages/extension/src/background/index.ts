@@ -356,7 +356,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
 
       case "RESET_ALL": {
         clearStorage()
-        return wallet.lock()
+        return wallet.reset()
       }
 
       case "PREAUTHORIZE": {
