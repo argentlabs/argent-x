@@ -1,3 +1,5 @@
+import { EventEmitter } from "events"
+
 import { ethers } from "ethers"
 import { Account, AddTransactionResponse, ec, stark } from "starknet"
 
@@ -29,7 +31,7 @@ export interface WalletStorageProps {
   selected?: string
 }
 
-export class Wallet {
+export class Wallet extends EventEmitter {
   private accounts: WalletAccount[] = []
 
   private encryptedBackup?: string
@@ -44,6 +46,7 @@ export class Wallet {
     proxyCompiledContract: string,
     argentAccountCompiledContract: string,
   ) {
+    super()
     this.store = store
     this.proxyCompiledContract = proxyCompiledContract
     this.argentAccountCompiledContract = argentAccountCompiledContract
@@ -184,7 +187,7 @@ export class Wallet {
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
-    if (this.accounts.length === 0) {
+    if (this.accounts.length === 0 || !this.isSessionOpen()) {
       return
     }
 
@@ -211,6 +214,12 @@ export class Wallet {
   }
 
   public lock() {
+    this.session = undefined
+  }
+
+  public reset() {
+    this.accounts = []
+    this.encryptedBackup = undefined
     this.session = undefined
   }
 
@@ -260,6 +269,7 @@ export class Wallet {
 
     setTimeout(() => {
       this.lock()
+      this.emit("autoLock")
     }, SESSION_DURATION)
   }
 

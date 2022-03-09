@@ -5,6 +5,7 @@ import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
+import { Header } from "../components/Header"
 import { InputText } from "../components/InputText"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
@@ -15,7 +16,7 @@ import { useLocalhostPort } from "../states/localhostPort"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
 
-const NewWalletScreenWrapper = styled.div`
+const Container = styled.div`
   padding: 48px 40px 24px;
   display: flex;
   flex-direction: column;
@@ -59,8 +60,7 @@ export const NewWalletScreen: FC = () => {
       )
       addAccount(newAccount)
       connectAccount(newAccount, switcherNetworkId, localhostPort)
-      recover()
-      navigate(routes.backupDownload())
+      navigate(await recover())
     } catch (error: any) {
       useAppState.setState({ error })
       navigate(routes.error())
@@ -68,53 +68,57 @@ export const NewWalletScreen: FC = () => {
   }
 
   return (
-    <NewWalletScreenWrapper>
-      <BackButton />
-      <H2>New password</H2>
-      <P>Enter a password to protect your wallet</P>
-      <form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
-        <Controller
-          name="password"
-          control={control}
-          defaultValue=""
-          rules={{ required: true, validate: isValidPassword }}
-          render={({ field: { ref, ...field } }) => (
-            <InputText
-              autoFocus
-              type="password"
-              placeholder="Password"
-              {...field}
-            />
+    <>
+      <Header>
+        <BackButton to={routes.welcome()} />
+      </Header>
+      <Container>
+        <H2>New wallet</H2>
+        <P>Enter a password to protect your wallet</P>
+        <form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
+          <Controller
+            name="password"
+            control={control}
+            defaultValue=""
+            rules={{ required: true, validate: isValidPassword }}
+            render={({ field: { ref, ...field } }) => (
+              <InputText
+                autoFocus
+                type="password"
+                placeholder="Password"
+                {...field}
+              />
+            )}
+          />
+          {errors.password?.type === "required" && (
+            <FormError>A new password is required</FormError>
           )}
-        />
-        {errors.password?.type === "required" && (
-          <FormError>A new password is required</FormError>
-        )}
-        {errors.password?.type === "validate" && (
-          <FormError>Password is too short</FormError>
-        )}
-        <Controller
-          name="repeatPassword"
-          control={control}
-          rules={{ validate: (x) => x === password }}
-          defaultValue=""
-          render={({ field: { ref, ...field } }) => (
-            <InputText
-              type="password"
-              placeholder="Repeat password"
-              {...field}
-            />
+          {errors.password?.type === "validate" && (
+            <FormError>Password is too short</FormError>
           )}
-        />
-        {errors.repeatPassword?.type === "validate" && (
-          <FormError>Passwords do not match</FormError>
-        )}
+          <Controller
+            name="repeatPassword"
+            control={control}
+            rules={{ validate: (x) => x === password }}
+            defaultValue=""
+            render={({ field: { ref, ...field } }) => (
+              <InputText
+                type="password"
+                placeholder="Repeat password"
+                {...field}
+              />
+            )}
+          />
+          {errors.repeatPassword?.type === "validate" && (
+            <FormError>Passwords do not match</FormError>
+          )}
 
-        <Button type="submit" disabled={!isDirty}>
-          Create wallet
-        </Button>
-      </form>
-      <StickyArgentFooter />
-    </NewWalletScreenWrapper>
+          <Button type="submit" disabled={!isDirty}>
+            Create wallet
+          </Button>
+        </form>
+        <StickyArgentFooter />
+      </Container>
+    </>
   )
 }

@@ -111,7 +111,10 @@ const starknetWindowObject: StarknetWindowObject = {
           return
         }
 
-        if (data.type === "CONNECT_DAPP_RES" && data.data) {
+        if (
+          (data.type === "CONNECT_DAPP_RES" && data.data) ||
+          (data.type === "START_SESSION_RES" && data.data)
+        ) {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
           starknet.provider = getProvider(network)
@@ -165,6 +168,16 @@ window.addEventListener(
         for (const handleEvent of userEventHandlers) {
           handleEvent([address])
         }
+      }
+    } else if (data.type === "DISCONNECT_ACCOUNT") {
+      if (!starknet) {
+        return
+      }
+      starknet.selectedAddress = undefined
+      starknet.account = undefined
+      starknet.isConnected = false
+      for (const handleEvent of userEventHandlers) {
+        handleEvent([])
       }
     }
   },
