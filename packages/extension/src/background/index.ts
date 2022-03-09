@@ -10,8 +10,10 @@ import { getQueue } from "./actionQueue"
 import {
   addTab,
   hasTab,
+  removeTabOfHost,
   sendMessageToActiveTabs,
   sendMessageToActiveTabsAndUi,
+  sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
 import { downloadFile } from "./download"
@@ -24,8 +26,13 @@ import {
   sentTransactionNotification,
 } from "./notification"
 import { openUi } from "./openUi"
-import { isPreAuthorized, preAuthorize } from "./preAuthorizations"
-import { Storage, clearStorage, setToStorage } from "./storage"
+import {
+  isPreAuthorized,
+  preAuthorize,
+  removePreAuthorization,
+  resetPreAuthorizations,
+} from "./preAuthorizations"
+import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { Wallet, WalletStorageProps } from "./wallet"
 
@@ -80,6 +87,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
     if (!hasTab(sender.tab?.id)) {
       sendMessageToActiveTabs(msg)
     }
+
+    wallet.on("autoLock", async () => {
+      await sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
+    })
 
     const actionQueue = await getQueue<ActionItem>({
       onUpdate: (actions) => {
@@ -157,7 +168,12 @@ import { Wallet, WalletStorageProps } from "./wallet"
         const selectedAccount = await wallet.getSelectedAccount()
         const isAuthorized = await isPreAuthorized(msg.data.host)
 
-        addTab(sender.tab?.id)
+        if (sender.tab?.id) {
+          addTab({
+            id: sender.tab?.id,
+            host: msg.data.host,
+          })
+        }
 
         if (!isAuthorized) {
           await actionQueue.push({
@@ -340,7 +356,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
 
       case "RESET_ALL": {
         clearStorage()
-        return wallet.reset()
+        wallet.reset()
+        return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
 
       case "PREAUTHORIZE": {
@@ -350,13 +367,27 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
       case "IS_PREAUTHORIZED": {
-        const valid = await isPreAuthorized(msg.data)
+        const valid =
+          wallet.isSessionOpen() && (await isPreAuthorized(msg.data))
         return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
       }
+
+      case "REMOVE_PREAUTHORIZATION": {
+        const host = msg.data
+        await removePreAuthorization(host)
+        await sendToTabAndUi({ type: "REMOVE_PREAUTHORIZATION_RES" })
+        await sendMessageToHost(
+          {
+            type: "DISCONNECT_ACCOUNT",
+          },
+          host,
+        )
+        removeTabOfHost(host)
+        break
+      }
       case "RESET_PREAUTHORIZATIONS": {
-        setToStorage(`PREAUTHORIZATION:APPROVED`, [])
-        setToStorage(`PREAUTHORIZATION:PENDING`, [])
-        return
+        await resetPreAuthorizations()
+        return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "GET_PUBLIC_KEY": {
         return sendToTabAndUi({
@@ -372,7 +403,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
         const { plaintext } = await compactDecrypt(body, privateKey)
         const sessionPassword = encode.arrayBufferToString(plaintext)
         if (await wallet.startSession(sessionPassword)) {
-          sendToTabAndUi({ type: "START_SESSION_RES" })
+          const selectedAccount = await wallet.getSelectedAccount()
+          sendToTabAndUi({ type: "START_SESSION_RES", data: selectedAccount })
         }
         return sendToTabAndUi({ type: "START_SESSION_REJ" })
       }
@@ -383,7 +415,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
       case "STOP_SESSION": {
-        return wallet.lock()
+        wallet.lock()
+        return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "IS_INITIALIZED": {
         const initialized = await wallet.isInitialized()

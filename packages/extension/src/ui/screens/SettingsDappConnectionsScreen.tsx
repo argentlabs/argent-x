@@ -4,8 +4,8 @@ import styled from "styled-components"
 
 import {
   getPreAuthorizations,
-  removePreAuthorization,
 } from "../../background/preAuthorizations"
+import { removePreAuthorization } from "../utils/messaging"
 import { sendMessage } from "../../shared/messages"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"

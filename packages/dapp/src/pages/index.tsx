@@ -20,7 +20,12 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     addWalletChangeListener((accounts) => {
-      setAddress(accounts[0])
+      if (accounts.length > 0) {
+        setAddress(accounts[0])
+      } else {
+        setAddress("")
+        setIsConnected(false)
+      }
     })
   }, [])
 
