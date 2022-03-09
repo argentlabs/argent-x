@@ -32,8 +32,6 @@ export function hasTab(tabId?: number) {
 }
 
 browser.tabs.onRemoved.addListener(removeTab)
-  removeTab(tabId)
-})
 
 export function getTabIdsOfHost(host: string) {
   return activeTabs.filter((tab) => tab.host === host).map((tab) => tab.id)
