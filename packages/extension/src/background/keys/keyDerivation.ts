@@ -1,5 +1,5 @@
 import { BigNumber, BigNumberish, utils } from "ethers"
-import { ec, number } from "starknet"
+import { KeyPair, ec, number } from "starknet"
 
 // from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2645.md
 // m / purpose' / layer' / application' / eth_address_1' / eth_address_2' / index
@@ -11,7 +11,7 @@ const BASE_PATH = "m/2645'/1195502025'/1148870696'/0'/0'"
 export function getStarkPair(
   indexOrPath: number | string,
   secret: BigNumberish,
-) {
+): KeyPair {
   const masterNode = utils.HDNode.fromSeed(BigNumber.from(secret).toHexString())
 
   const path =
@@ -22,11 +22,11 @@ export function getStarkPair(
   return starkPair
 }
 
-export function getPathForIndex(index: number) {
+export function getPathForIndex(index: number): string {
   return `${BASE_PATH}/${index}`
 }
 
-export function getNextPathIndex(paths: string[]) {
+export function getNextPathIndex(paths: string[]): number {
   return (
     paths.reduce((prev, path) => {
       if (!path.startsWith(BASE_PATH)) {
@@ -42,7 +42,8 @@ export function getNextPathIndex(paths: string[]) {
   )
 }
 
-export function grindKey(keySeed: string) {
+// inspired/copied from https://github.com/authereum/starkware-monorepo/blob/51c5df19e7f98399a2f7e63d564210d761d138d1/packages/starkware-crypto/src/keyDerivation.ts#L85
+export function grindKey(keySeed: string): string {
   const keyValueLimit = ec.ec.n
   if (!keyValueLimit) {
     return keySeed
@@ -73,7 +74,7 @@ function hashKeyWithIndex(key: string, index: number) {
   return number.toBN(hash)
 }
 
-export function pathHash(name: string) {
+export function pathHash(name: string): number {
   return number
     .toBN(utils.sha256(utils.toUtf8Bytes(name)))
     .maskn(31)

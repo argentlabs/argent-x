@@ -1,6 +1,6 @@
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
-import { encode } from "starknet"
+import { encode, number } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
@@ -19,7 +19,7 @@ import {
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
-import { resetStoredNonce } from "./nonce"
+import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
 import {
   addToAlreadyShown,
   hasShownNotification,
@@ -230,16 +230,27 @@ import { Wallet, WalletStorageProps } from "./wallet"
                 throw Error("no accounts")
               }
 
+              // if nonce doesnt get provided by the UI, we can use the stored nonce to allow transaction queueing
+              const nonceWasProvidedByUI =
+                transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
+              const nonce = nonceWasProvidedByUI
+                ? number.toHex(number.toBN(transactionsDetail?.nonce))
+                : await getNonce(starknetAccount)
+
               const transaction = await starknetAccount.execute(
                 transactions,
                 abis,
-                transactionsDetail,
+                { ...transactionsDetail, nonce },
               )
 
               transactionTracker.trackTransaction(
                 transaction.transaction_hash,
                 selectedAccount,
               )
+
+              if (!nonceWasProvidedByUI) {
+                increaseStoredNonce(selectedAccount.address)
+              }
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",
