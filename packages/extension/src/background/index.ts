@@ -1,3 +1,4 @@
+import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
 import { encode } from "starknet"
@@ -40,7 +41,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
-  const wallet = new Wallet(storage, ProxyCompiledContract)
+  const wallet = new Wallet(
+    storage,
+    ProxyCompiledContract,
+    ArgentAccountCompiledContract,
+  )
   await wallet.setup()
 
   const transactionTracker = new TransactionTracker(async (transactions) => {

@@ -1,7 +1,7 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
-import { Account, ec, stark } from "starknet"
+import { Account, AddTransactionResponse, ec, stark } from "starknet"
 
 import { getNetwork, getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
@@ -38,12 +38,18 @@ export class Wallet extends EventEmitter {
   private session?: WalletSession
 
   private store: IStorage<WalletStorageProps>
-  private compiledContract: string
+  private proxyCompiledContract: string
+  private argentAccountCompiledContract: string
 
-  constructor(store: IStorage<WalletStorageProps>, compiledContract: string) {
+  constructor(
+    store: IStorage<WalletStorageProps>,
+    proxyCompiledContract: string,
+    argentAccountCompiledContract: string,
+  ) {
     super()
     this.store = store
-    this.compiledContract = compiledContract
+    this.proxyCompiledContract = proxyCompiledContract
+    this.argentAccountCompiledContract = argentAccountCompiledContract
   }
 
   public async setup() {
@@ -98,7 +104,6 @@ export class Wallet extends EventEmitter {
 
   public async addAccount(
     networkId: string,
-    accountImplementation?: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
@@ -116,38 +121,35 @@ export class Wallet extends EventEmitter {
     const provider = getProvider(networkId)
     const network = getNetwork(networkId)
 
-    const implementation =
-      accountImplementation ?? network.accountImplementation
+    let implementation = network.accountImplementation
     if (!implementation) {
-      throw new Error("Argent Account implementation is undefined")
+      const deployImplementationTransaction = await provider.deployContract({
+        contract: this.argentAccountCompiledContract,
+      })
+      assertTransactionReceived(deployImplementationTransaction, true)
+      implementation = deployImplementationTransaction.address as string
     }
 
     const deployTransaction = await provider.deployContract({
-      contract: this.compiledContract,
+      contract: this.proxyCompiledContract,
       constructorCalldata: stark.compileCalldata({ implementation }),
       addressSalt: seed,
     })
 
-    if (
-      deployTransaction.code !== "TRANSACTION_RECEIVED" ||
-      !deployTransaction.address
-    ) {
-      throw new Error("Deploy transaction failed")
-    }
+    assertTransactionReceived(deployTransaction, true)
+    const proxyAddress = deployTransaction.address as string
 
     const initTransaction = await provider.invokeFunction({
-      contractAddress: deployTransaction.address,
+      contractAddress: proxyAddress,
       entrypoint: "initialize",
       calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
     })
 
-    if (initTransaction.code !== "TRANSACTION_RECEIVED") {
-      throw new Error("Init transaction failed")
-    }
+    assertTransactionReceived(initTransaction)
 
     const account = {
       network: networkId,
-      address: deployTransaction.address,
+      address: proxyAddress,
       signer: {
         type: "local_secret",
         derivationPath: getPathForIndex(index),
@@ -157,7 +159,7 @@ export class Wallet extends EventEmitter {
     this.accounts.push(account)
 
     await this.writeBackup()
-    await this.selectAccount(deployTransaction.address)
+    await this.selectAccount(account.address)
 
     return { account, txHash: initTransaction.transaction_hash }
   }
@@ -305,5 +307,21 @@ export class Wallet extends EventEmitter {
     const backupString = JSON.stringify(extendedBackup)
     await this.store.setItem("backup", backupString)
     this.encryptedBackup = backupString
+  }
+}
+
+const assertTransactionReceived = (
+  transactionResponse: AddTransactionResponse,
+  deployContract = false,
+) => {
+  if (transactionResponse.code !== "TRANSACTION_RECEIVED") {
+    throw new Error(
+      `Transaction not received: ${transactionResponse.transaction_hash}`,
+    )
+  }
+  if (deployContract && !transactionResponse.address) {
+    throw new Error(
+      `Contract not deployed: ${transactionResponse.transaction_hash}`,
+    )
   }
 }
