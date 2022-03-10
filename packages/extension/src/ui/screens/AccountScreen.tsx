@@ -122,6 +122,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
         )}
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
+            showTitle={showPendingTransactions}
             accountAddress={account.address}
             canShowEmptyAccountAlert={!showPendingTransactions}
           />
