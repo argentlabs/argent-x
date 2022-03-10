@@ -153,6 +153,19 @@ import { Wallet, WalletStorageProps } from "./wallet"
         })
       }
 
+      case "EXECUTE_TRANSACTION_LEGACY": {
+        const { meta } = await actionQueue.push({
+          type: "TRANSACTION_LEGACY",
+          payload: msg.data,
+        })
+        return sendToTabAndUi({
+          type: "EXECUTE_TRANSACTION_LEGACY_RES",
+          data: {
+            actionHash: meta.hash,
+          },
+        })
+      }
+
       case "GET_ACTIONS": {
         const actions = await actionQueue.getAll()
         return sendToTabAndUi({
@@ -239,7 +252,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
               const nonceWasProvidedByUI =
                 transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
               const nonce = nonceWasProvidedByUI
-                ? number.toHex(number.toBN(transactionsDetail?.nonce))
+                ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
                 : await getNonce(starknetAccount)
 
               const transaction = await starknetAccount.execute(
@@ -256,6 +269,41 @@ import { Wallet, WalletStorageProps } from "./wallet"
               if (!nonceWasProvidedByUI) {
                 increaseStoredNonce(selectedAccount.address)
               }
+
+              return sendToTabAndUi({
+                type: "TRANSACTION_SUBMITTED",
+                data: {
+                  txHash: transaction.transaction_hash,
+                  actionHash,
+                },
+              })
+            } catch (error: any) {
+              return sendToTabAndUi({
+                type: "TRANSACTION_FAILED",
+                data: { actionHash, error: `${error}` },
+              })
+            }
+          }
+
+          case "TRANSACTION_LEGACY": {
+            try {
+              if (!wallet.isSessionOpen()) {
+                throw Error("you need an open session")
+              }
+              const selectedAccount = await wallet.getSelectedAccount()
+              const starknetAccount = await wallet.getSelectedStarknetAccount()
+              if (!selectedAccount) {
+                throw Error("no accounts")
+              }
+
+              const transaction = await starknetAccount.LEGACY_addTransaction(
+                action.payload,
+              )
+
+              transactionTracker.trackTransaction(
+                transaction.transaction_hash,
+                selectedAccount,
+              )
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",
@@ -435,7 +483,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
         return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "IS_INITIALIZED": {
-        const initialized = await wallet.isInitialized()
+        const initialized = wallet.isInitialized()
         const legacy = initialized ? false : await hasLegacy()
         return sendToTabAndUi({
           type: "IS_INITIALIZED_RES",

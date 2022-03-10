@@ -1,5 +1,5 @@
 import { FC } from "react"
-import type { Call } from "starknet"
+import type { Call, InvokeFunctionTransaction } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../components/Typography"
@@ -7,8 +7,8 @@ import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
-  transactions: Call | Call[]
-  onSubmit: (transactions: Call | Call[]) => void
+  transactions: Call | Call[] | InvokeFunctionTransaction // TODO: remove InvokeFunctionTransaction when removing legacy transaction support
+  onSubmit: (transactions: Call | Call[] | InvokeFunctionTransaction) => void
 }
 
 const Pre = styled.pre`
