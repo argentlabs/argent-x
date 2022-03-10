@@ -82,12 +82,12 @@ const Screen: FC = () => {
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
-  const { isBackupDownloadRequired, dontRemindUser } = useBackupDownload()
+  const { isBackupDownloadRequired } = useBackupDownload()
 
   if (isLoading) {
     return <LoadingScreen />
   }
-  if (isBackupDownloadRequired && !dontRemindUser) {
+  if (isBackupDownloadRequired) {
     return <BackupDownloadScreen />
   }
 
