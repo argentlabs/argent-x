@@ -35,8 +35,7 @@ import { connectAccount, getAccountImageUrl } from "../utils/accounts"
 const AccountContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  padding-top: 16px;
 `
 
 export const AccountScreen: FC = () => {

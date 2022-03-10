@@ -7,7 +7,6 @@ import { useTokensWithBalance } from "../../states/tokens"
 import { testDappToken } from "../../utils/tokens"
 import { TokenListItem } from "../Token"
 import { EmptyAccountAlert } from "./EmptyAccountAlert"
-import { SectionHeader } from "./SectionHeader"
 
 interface TokenListProps {
   accountAddress: string
@@ -34,7 +33,6 @@ export const TokenList: FC<TokenListProps> = ({
           mintableAddress={testDappToken(switcherNetworkId)?.address}
         />
       )}
-      <SectionHeader>Coins</SectionHeader>
       {tokenDetails.map((token) => (
         <TokenListItem
           key={token.address}

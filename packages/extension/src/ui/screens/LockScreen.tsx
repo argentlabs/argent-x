@@ -111,7 +111,7 @@ export const LockScreen: FC = () => {
           <FormError>{errors.password.message}</FormError>
         )}
 
-        <A {...makeClickable(handleResetClick)}>reset or import backup</A>
+        <A {...makeClickable(handleResetClick)}>reset or restore backup</A>
         <Button type="submit" disabled={!isDirty}>
           Unlock
         </Button>
