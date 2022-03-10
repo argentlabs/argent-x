@@ -15,6 +15,8 @@ export const networks: Network[] = [
     id: "mainnet-alpha",
     name: "Ethereum Mainnet",
     explorerUrl: "https://voyager.online",
+    accountImplementation:
+      "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
   },
   {
     id: "goerli-alpha",
