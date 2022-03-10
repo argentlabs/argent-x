@@ -9431,10 +9431,10 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.3.0.tgz#843927f863ba0257fca29d80aa71bdf76ffce51c"
-  integrity sha512-PsdrnD1dNIbMAePRU3yeDsY1d9m7CaZI6VYKxpgZX+tlb45Zntz4F98bMFo/vvoLCfuubkLmHbNZfc76bcgcRQ==
+starknet@3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.4.0.tgz#847c409d36338da9439b66ae6808ac5381ead217"
+  integrity sha512-M/BpD5DrZd6tIY7K6Cd2JTaGUMdqIhlMCjiol8MGCYQqEypgEruacjYEmGfXGqCPD0vGTjypLk85enzLzGg2qA==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"
