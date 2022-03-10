@@ -17,18 +17,16 @@ import { TokenIcon } from "../TokenIcon"
 export const TransactionsWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: #333332;
-  border-radius: 8px;
-  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
 `
 
 const TransactionWrapper = styled(TokenWrapper)`
-  background-color: #333332;
+  background-color: rgba(255, 255, 255, 0.05);
   cursor: auto;
 
   &:hover,
   &:focus {
-    background-color: #333332;
+    background-color: rgba(255, 255, 255, 0.1);
   }
 `
 

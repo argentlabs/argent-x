@@ -12,16 +12,15 @@ export const TokenWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px;
+  padding: 16px 24px;
   cursor: pointer;
-  border-radius: 4px;
 
   transition: all 200ms ease-in-out;
 
   &:hover,
   &:focus {
     outline: 0;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.05);
   }
 `
 
@@ -89,7 +88,7 @@ export const TokenBalance = styled.p<{
   ${({ isLoading }) =>
     isLoading &&
     css`
-      animation: ${PulseAnimation} 1.5s ease-in-out infinite;
+      animation: ${PulseAnimation} 1s ease-in-out infinite;
     `}
 `
 

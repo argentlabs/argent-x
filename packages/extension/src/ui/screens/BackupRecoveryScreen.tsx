@@ -91,7 +91,7 @@ export const BackupRecoveryScreen: FC = () => {
         </DropZone>
 
         <Button onClick={handleRestoreClick} disabled={disableSubmit}>
-          Restore from backup
+          Restore backup
         </Button>
       </Container>
     </>

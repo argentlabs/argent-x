@@ -35,8 +35,7 @@ import { connectAccount, getAccountImageUrl } from "../utils/accounts"
 const AccountContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  padding-top: 16px;
 `
 
 export const AccountScreen: FC = () => {
@@ -123,6 +122,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
         )}
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
+            showTitle={showPendingTransactions}
             accountAddress={account.address}
             canShowEmptyAccountAlert={!showPendingTransactions}
           />

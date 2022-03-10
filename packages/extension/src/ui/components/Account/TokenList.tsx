@@ -10,11 +10,13 @@ import { EmptyAccountAlert } from "./EmptyAccountAlert"
 import { SectionHeader } from "./SectionHeader"
 
 interface TokenListProps {
+  showTitle: boolean
   accountAddress: string
   canShowEmptyAccountAlert?: boolean
 }
 
 export const TokenList: FC<TokenListProps> = ({
+  showTitle,
   accountAddress,
   canShowEmptyAccountAlert = true,
 }) => {
@@ -34,7 +36,7 @@ export const TokenList: FC<TokenListProps> = ({
           mintableAddress={testDappToken(switcherNetworkId)?.address}
         />
       )}
-      <SectionHeader>Coins</SectionHeader>
+      {showTitle && <SectionHeader>Assets</SectionHeader>}
       {tokenDetails.map((token) => (
         <TokenListItem
           key={token.address}
