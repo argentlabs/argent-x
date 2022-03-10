@@ -167,6 +167,7 @@ window.addEventListener(
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
         starknet.account = new ArgentXAccount(address, starknet.provider)
+        starknet.signer = new LEGACY_WalletSigner(address, starknet.provider)
         for (const handleEvent of userEventHandlers) {
           handleEvent([address])
         }
@@ -177,6 +178,7 @@ window.addEventListener(
       }
       starknet.selectedAddress = undefined
       starknet.account = undefined
+      starknet.signer = undefined
       starknet.isConnected = false
       for (const handleEvent of userEventHandlers) {
         handleEvent([])

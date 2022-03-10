@@ -487,7 +487,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
         return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "IS_INITIALIZED": {
-        const initialized = await wallet.isInitialized()
+        const initialized = wallet.isInitialized()
         const legacy = initialized ? false : await hasLegacy()
         return sendToTabAndUi({
           type: "IS_INITIALIZED_RES",
