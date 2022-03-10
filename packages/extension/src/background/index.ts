@@ -1,7 +1,7 @@
 import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
-import { InvokeFunctionTransaction, encode, number } from "starknet"
+import { encode, number } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
@@ -252,7 +252,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
               const nonceWasProvidedByUI =
                 transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
               const nonce = nonceWasProvidedByUI
-                ? number.toHex(number.toBN(transactionsDetail?.nonce))
+                ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
                 : await getNonce(starknetAccount)
 
               const transaction = await starknetAccount.execute(
@@ -296,12 +296,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
                 throw Error("no accounts")
               }
 
-              const invocation: InvokeFunctionTransaction = action.payload
-              const transaction = await starknetAccount.LEGACY_invokeFunction(
-                invocation.contract_address,
-                invocation.entry_point_selector,
-                invocation.calldata,
-                invocation.signature,
+              const transaction = await starknetAccount.LEGACY_addTransaction(
+                action.payload,
               )
 
               transactionTracker.trackTransaction(
