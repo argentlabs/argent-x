@@ -1,11 +1,11 @@
 import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
-import { Abi, Contract, encode, shortString, uint256 } from "starknet"
+import { Abi, Contract, number, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import defaultTokens from "../../assets/default-tokens.json"
 import { getProvider } from "../../shared/networks"
-import { TokenDetailsWithBalance } from "../states/tokens"
+import { TokenDetails, TokenDetailsWithBalance } from "../states/tokens"
 
 export const testDappToken = (networkId: string) =>
   defaultTokens.find(
@@ -39,33 +39,22 @@ export const toTokenView = ({
 
 export const fetchTokenDetails = async (
   address: string,
-  accountAddress: string,
   networkId: string,
-): Promise<TokenDetailsWithBalance> => {
+): Promise<TokenDetails> => {
   const provider = getProvider(networkId)
   const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
-  const [decimals, name, balance, symbol] = await Promise.all([
+  const [decimals, name, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
-      .then((x) => x.decimals as string)
+      .then((x) => number.toHex(x.decimals))
       .catch(() => ""),
     tokenContract
       .call("name")
-      .then((x) =>
-        shortString.decodeShortString(encode.addHexPrefix(x.name as string)),
-      )
+      .then((x) => shortString.decodeShortString(number.toHex(x.name)))
       .catch(() => ""),
     tokenContract
-      .call("balanceOf", { account: accountAddress })
-      .then((x) =>
-        BigNumber.from(uint256.uint256ToBN(x.balance as any).toString()),
-      )
-      .catch(() => undefined),
-    tokenContract
       .call("symbol")
-      .then((x) =>
-        shortString.decodeShortString(encode.addHexPrefix(x.symbol as string)),
-      )
+      .then((x) => shortString.decodeShortString(number.toHex(x.symbol)))
       .catch(() => ""),
   ])
   const decimalsBigNumber = BigNumber.from(decimals || 0)
@@ -73,7 +62,6 @@ export const fetchTokenDetails = async (
     address,
     name,
     symbol,
-    balance,
     networkId,
     decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
   }
@@ -89,5 +77,5 @@ export const fetchTokenBalance = async (
   const result = await tokenContract.call("balanceOf", {
     account: accountAddress,
   })
-  return BigNumber.from(uint256.uint256ToBN(result.balance as any).toString())
+  return BigNumber.from(uint256.uint256ToBN(result.balance).toString())
 }
