@@ -35,8 +35,9 @@
     "start": "webpack",
     "dev": "webpack --color --watch",
     "test": "jest",
-    "version": "yarn run sync-manifest-version",
-    "sync-manifest-version": "node -p \"JSON.stringify({...require('./src/manifest.json'), version: '$npm_package_version'}, null, 2)\" > ./src/manifest.temp.json && prettier --write ./src/manifest.temp.json && mv ./src/manifest.temp.json ./src/manifest.json"
+    "version": "yarn run sync-manifest-version && yarn run commit-version-changes",
+    "sync-manifest-version": "node -p \"JSON.stringify({...require('./src/manifest.json'), version: '$npm_package_version'}, null, 2)\" > ./src/manifest.temp.json && prettier --write ./src/manifest.temp.json && mv ./src/manifest.temp.json ./src/manifest.json",
+    "commit-version-changes": "git add ./src/manifest.json && git commit -m \"chore(release): manifest v$npm_package_version\""
   },
   "dependencies": {
     "@extend-chrome/messages": "^1.2.2",
