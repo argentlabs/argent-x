@@ -7,12 +7,11 @@ import { useAppState } from "../states/app"
 import { useBackupDownload } from "../states/backupDownload"
 import { useLocalhostPort } from "../states/localhostPort"
 import { startSession } from "./messaging"
-import { LedgerSigner, StarkSignerType } from "../../shared/starkSigner"
 
 export const deployAccount = async (
   networkId: string,
   localhostPort: number,
-  signerType: StarkSignerType,
+  signerType: string,
   password?: string,
 ) => {
   useAppState.setState({ isLoading: true })
@@ -23,12 +22,6 @@ export const deployAccount = async (
 
   const network = localNetworkUrl(networkId, localhostPort)
   try {
-    
-    // trick to have permission handler
-    if (signerType === StarkSignerType.Ledger) {
-      await LedgerSigner.askPermissionIfNeeded()
-    }
-
     const account = await Account.fromDeploy(network, signerType)
     useBackupDownload.setState({ isBackupDownloadRequired: true })
     return account

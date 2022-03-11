@@ -7,7 +7,6 @@ import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
-import { StarkSignerType } from "../shared/starkSigner"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -326,6 +325,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
+            
             const starknetAccount = await wallet.getSelectedStarknetAccount()
 
             const [r, s] = await starknetAccount.signMessage(typedData)

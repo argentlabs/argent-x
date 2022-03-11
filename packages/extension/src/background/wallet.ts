@@ -14,10 +14,6 @@ import {
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
 import { IStorage } from "./storage"
-import {
-  StarkSignerType,
-  LedgerSigner
-} from "../shared/starkSigner"
 import { string } from "yup/lib/locale"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -117,11 +113,9 @@ export class Wallet extends EventEmitter {
 
     let starkPub;
     let signer: WalletAccountSigner;
-    if (type === StarkSignerType.Ledger) {
-      const ledgerSigner = new LedgerSigner()
-      await ledgerSigner.connect()
-      console.log("starkPub", ledgerSigner.starkPub)
-      starkPub = ledgerSigner.starkPub;
+    if (type === "ledger_nano") {
+      const ledgerSigner = new LedgerBlindSigner()
+      starkPub = await ledgerSigner.getPubKey()
       signer = {
         type: "ledger_nano",
         derivationPath: ledgerSigner.derivationPath,
@@ -201,12 +195,19 @@ export class Wallet extends EventEmitter {
       throw new Error("no selected account")
     }
 
-    const keyPair = getStarkPair(
-      account.signer.derivationPath,
-      this.session?.secret as string,
-    )
-    const provider = getProvider(account.network)
-    return new Account(provider, account.address, keyPair)
+    if (account.signer.type == "local_secret") {
+      const keyPair = getStarkPair(
+        account.signer.derivationPath,
+        this.session?.secret as string,
+      )
+      const provider = getProvider(account.network)
+      return new Account(provider, account.address, keyPair)
+    }
+    else {
+      const signer = new LedgerBlindSigner()
+      await signer.getPubKey()
+      return signer
+    }
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {

@@ -15,7 +15,6 @@ import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
-import { StarkSignerType } from "../../shared/starkSigner"
 
 const Container = styled.div`
   padding: 48px 40px 24px;
@@ -57,7 +56,7 @@ export const NewWalletScreen: FC = () => {
       const newAccount = await deployAccount(
         switcherNetworkId,
         localhostPort,
-        StarkSignerType.Local,
+        "local_secret",
         password,
       )
       addAccount(newAccount)

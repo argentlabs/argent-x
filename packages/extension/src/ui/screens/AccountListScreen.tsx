@@ -18,7 +18,6 @@ import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
-import { StarkSignerType } from "../../shared/starkSigner"
 
 const AccountList = styled.div`
   display: flex;
@@ -57,7 +56,7 @@ export const AccountListScreen: FC = () => {
 
   const accountsList = Object.values(accounts)
 
-  const handleAddAccount = async (type: StarkSignerType) => {
+  const handleAddAccount = async (type: string) => {
     try {
       console.warn("Create a new account")
       const newAccount = await deployAccount(switcherNetworkId, localhostPort, type)
@@ -98,10 +97,10 @@ export const AccountListScreen: FC = () => {
             isDeleteable={switcherNetworkId === "localhost"}
           />
         ))}
-        <IconButtonCenter size={48} {...makeClickable(() => {handleAddAccount(StarkSignerType.Local)})}>
+        <IconButtonCenter size={48} {...makeClickable(() => {handleAddAccount("local_secret")})}>
           <AddIcon fontSize="large" />
         </IconButtonCenter>
-        <IconButtonCenter size={48} {...makeClickable(() => {handleAddAccount(StarkSignerType.Ledger)})}>
+        <IconButtonCenter size={48} {...makeClickable(() => {handleAddAccount("ledger_nano")})}>
           <LedgerLogo />
         </IconButtonCenter>
       </AccountList>
