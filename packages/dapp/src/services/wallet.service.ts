@@ -89,7 +89,7 @@ export const signMessage = async (message: string) => {
 }
 
 export const waitForTransaction = async (hash: string) =>
-  await getStarknet().provider.waitForTx(hash)
+  await getStarknet().provider.waitForTransaction(hash)
 
 export const addWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
