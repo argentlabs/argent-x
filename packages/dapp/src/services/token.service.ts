@@ -1,6 +1,6 @@
 import { getStarknet } from "@argent/get-starknet"
 import { utils } from "ethers"
-import { Contract, number, uint256 } from "starknet"
+import { Abi, Contract, number, uint256 } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 
@@ -21,6 +21,10 @@ function getUint256CalldataFromBN(bn: number.BigNumberish) {
   return { type: "struct" as const, ...uint256.bnToUint256(bn) }
 }
 
+function parseInputAmountToUint256(input: string, decimals: number = 18) {
+  return getUint256CalldataFromBN(utils.parseUnits(input, decimals).toString())
+}
+
 export const mintToken = async (
   mintAmount: string,
   network: PublicNetwork,
@@ -33,17 +37,15 @@ export const mintToken = async (
   if (starknet.isConnected === false) {
     throw Error("starknet wallet not connected")
   }
-
-  console.log(starknet.account)
   const erc20Contract = new Contract(
-    Erc20Abi as any,
+    Erc20Abi as Abi,
     getErc20TokenAddress(network),
     starknet.account,
   )
 
   return erc20Contract.mint(
     activeAccount,
-    getUint256CalldataFromBN(utils.parseUnits(mintAmount, 18).toString()),
+    parseInputAmountToUint256(mintAmount),
   )
 }
 
@@ -69,6 +71,6 @@ export const transfer = async (
 
   return erc20Contract.transfer(
     transferTo,
-    getUint256CalldataFromBN(utils.parseUnits(transferAmount, 18).toString()),
+    parseInputAmountToUint256(transferAmount),
   )
 }
