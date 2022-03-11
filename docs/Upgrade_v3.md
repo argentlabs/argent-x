@@ -58,6 +58,10 @@ interface Call {
 
 All transactions triggered by an account should go through the `execute` method. It supports multi calls, which means multiple contract interactions can be submitted in a single transactions (like bundling an ERC20 `approve` followed by a call to a contract). The `entrypoint` property is the actual name of the method (i.e. `mint`, `transfer`, ...) instead of its selector. If ABIs are provided, the signature request will show an explicit definition of the transaction.
 
+## Backwards compatibility
+
+The `Signer` object is backwards compatible but the `Provider` is not, so dapps using the `Provider` injected by the extension should update their code as soon as possible.
+
 ## Code migration from starknet.js v2 to v3
 
 On the left: starknet.js v2, on the right: starknet.js v3
