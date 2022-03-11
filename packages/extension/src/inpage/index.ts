@@ -228,6 +228,8 @@ export class ArgentXAccount extends Account {
         }),
     ])
 
+    console.log(result)
+
     if (result === "error") {
       throw Error("User abort")
     }
