@@ -1,10 +1,10 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
-import { Account, AddTransactionResponse, ec, stark } from "starknet"
+import { Account, AddTransactionResponse, ec, stark, LedgerBlindSigner } from "starknet"
 
 import { getNetwork, getProvider } from "../shared/networks"
-import { WalletAccount } from "../shared/wallet.model"
+import { WalletAccount, WalletAccountSigner } from "../shared/wallet.model"
 
 import {
   getNextPathIndex,
@@ -106,6 +106,7 @@ export class Wallet extends EventEmitter {
 
   public async addAccount(
     networkId: string,
+    type: string
   ): Promise<{ account: WalletAccount; txHash: string }> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
@@ -167,10 +168,7 @@ export class Wallet extends EventEmitter {
     const account = {
       network: networkId,
       address: proxyAddress,
-      signer: {
-        type: "local_secret",
-        derivationPath: getPathForIndex(index),
-      },
+      signer: signer
     }
 
     this.accounts.push(account)

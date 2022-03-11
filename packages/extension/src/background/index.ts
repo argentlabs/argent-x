@@ -321,7 +321,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           }
 
           case "SIGN": {
-            const data  = action.payload
+            const typedData  = action.payload
             if (!wallet.isSessionOpen()) {
               throw Error("you need an open session")
             }
@@ -333,8 +333,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
             return sendToTabAndUi({
               type: "SIGNATURE_SUCCESS",
               data: {
-                r: signature[0].toString(),
-                s: signature[1].toString(),
+                r: r.toString(),
+                s: s.toString(),
                 actionHash,
               },
             })
