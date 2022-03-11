@@ -35,10 +35,11 @@ export const connectAccount = (
   localhostPort: number,
 ) => {
   sendMessage({
-    type: "WALLET_CONNECTED",
+    type: "CONNECT_ACCOUNT",
     data: {
       address: account.address,
       network: localNetworkUrl(switcherNetworkId, localhostPort),
+      signer: account.signer,
     },
   })
   try {

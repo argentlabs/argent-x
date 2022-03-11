@@ -1,18 +1,15 @@
-import { Signer, number, stark } from "starknet"
+import { Account, number } from "starknet"
 
 const nonceStore: Record<string, string> = {}
 
-export async function getNonce(signer: Signer): Promise<string> {
-  const { result } = await signer.callContract({
-    contract_address: signer.address,
-    entry_point_selector: stark.getSelectorFromName("get_nonce"),
-  })
-  const nonceBn = number.toBN(result[0])
-  const storedNonce = nonceStore[signer.address]
+export async function getNonce(account: Account): Promise<string> {
+  const result = await account.getNonce()
+  const nonceBn = number.toBN(result)
+  const storedNonce = nonceStore[account.address]
 
   // If there's no nonce stored or the fetched nonce is bigger than the stored one, store the fetched nonce
   if (!storedNonce || nonceBn.gt(number.toBN(storedNonce))) {
-    nonceStore[signer.address] = number.toHex(nonceBn)
+    nonceStore[account.address] = number.toHex(nonceBn)
   }
 
   // If the stored nonce is greater than the fetched nonce, use the stored nonce

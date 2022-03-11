@@ -15,7 +15,7 @@ import { startSession } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 import { isValidPassword } from "./NewWalletScreen"
 
-const PasswordScreenWrapper = styled.div`
+const LockScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,37 +49,39 @@ export const greetings = [
   "hi fren",
 ]
 
-export const PasswordScreen: FC = () => {
+export const LockScreen: FC = () => {
   const navigate = useNavigate()
-  const { error } = useAppState()
+  const { passwordError } = useAppState()
   const {
     control,
     formState: { errors, isDirty },
     handleSubmit,
     setError,
   } = useForm<{ password: string }>()
-
   useEffect(() => {
-    setError("password", { message: error })
-  }, [error])
+    setError("password", { message: passwordError })
+  }, [passwordError])
 
   const handleResetClick = () => navigate(routes.reset())
 
   const verifyPassword = async (password: string) => {
-    useAppState.setState({ error: undefined, isLoading: true })
+    useAppState.setState({ passwordError: undefined, isLoading: true })
     try {
       await startSession(password)
 
       const target = await recover()
-      useAppState.setState({ error: undefined, isLoading: false })
+      useAppState.setState({ passwordError: undefined, isLoading: false })
       navigate(target)
     } catch {
-      useAppState.setState({ error: "Wrong password", isLoading: false })
+      useAppState.setState({
+        passwordError: "Wrong password",
+        isLoading: false,
+      })
     }
   }
 
   return (
-    <PasswordScreenWrapper>
+    <LockScreenWrapper>
       <LogoSvg />
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
@@ -109,11 +111,11 @@ export const PasswordScreen: FC = () => {
           <FormError>{errors.password.message}</FormError>
         )}
 
-        <A {...makeClickable(handleResetClick)}>reset or import backup</A>
+        <A {...makeClickable(handleResetClick)}>reset or restore backup</A>
         <Button type="submit" disabled={!isDirty}>
           Unlock
         </Button>
       </form>
-    </PasswordScreenWrapper>
+    </LockScreenWrapper>
   )
 }

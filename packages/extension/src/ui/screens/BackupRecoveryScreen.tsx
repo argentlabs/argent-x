@@ -6,13 +6,14 @@ import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
+import { Header } from "../components/Header"
 import { H2 } from "../components/Typography"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { fileToString } from "../utils/files"
-import { recoverKeystore } from "../utils/messaging"
+import { recoverBackup } from "../utils/messaging"
 
-const UploadKeystoreScreenWrapper = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 48px 32px;
@@ -41,7 +42,7 @@ const DropZone = styled.div`
   }
 `
 
-export const UploadKeystoreScreen: FC = () => {
+export const BackupRecoveryScreen: FC = () => {
   const navigate = useNavigate()
   const {
     acceptedFiles: [acceptedFile],
@@ -56,33 +57,43 @@ export const UploadKeystoreScreen: FC = () => {
   const handleRestoreClick = async () => {
     try {
       const data = await fileToString(acceptedFile)
-      await recoverKeystore(data)
-      navigate(routes.password())
-    } catch (error: any) {
-      useAppState.setState({ error: `${error}` })
-      navigate(routes.error())
+      await recoverBackup(data)
+      navigate(routes.lockScreen())
+    } catch (err: any) {
+      const error = `${err}`
+      const legacyError = "legacy backup file cannot be imported"
+      if (error.toLowerCase().includes(legacyError)) {
+        navigate(routes.legacy())
+      } else {
+        useAppState.setState({ error })
+        navigate(routes.error())
+      }
     }
   }
 
   return (
-    <UploadKeystoreScreenWrapper>
-      <BackButton />
-      <H2>Select backup</H2>
-      <DropZone {...getRootProps()}>
-        <input {...getInputProps()} />
-        {disableSubmit ? (
-          <p>Drag &amp; drop your backup file here, or click to select it</p>
-        ) : (
-          <div>
-            <p>Backup selected:</p>
-            <code>{acceptedFile.name}</code>
-          </div>
-        )}
-      </DropZone>
+    <>
+      <Header>
+        <BackButton />
+      </Header>
+      <Container>
+        <H2>Select backup</H2>
+        <DropZone {...getRootProps()}>
+          <input {...getInputProps()} />
+          {disableSubmit ? (
+            <p>Drag &amp; drop your backup file here, or click to select it</p>
+          ) : (
+            <div>
+              <p>Backup selected:</p>
+              <code>{acceptedFile.name}</code>
+            </div>
+          )}
+        </DropZone>
 
-      <Button onClick={handleRestoreClick} disabled={disableSubmit}>
-        Restore from backup
-      </Button>
-    </UploadKeystoreScreenWrapper>
+        <Button onClick={handleRestoreClick} disabled={disableSubmit}>
+          Restore backup
+        </Button>
+      </Container>
+    </>
   )
 }

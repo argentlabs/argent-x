@@ -322,6 +322,12 @@ button.flat {
   padding: 0;
 }
 
+span.error-message {
+  color: red;
+  font-size: 16px;
+  margin-left: 0.6em;
+}
+
 button {
   font-family: var(--font-family);
 }

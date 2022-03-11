@@ -1,15 +1,19 @@
 import {
+  Abi,
+  Account,
   AddTransactionResponse,
+  Call,
+  InvocationsDetails,
   Provider,
   Signature,
-  SignerInterface,
-  Transaction,
   defaultProvider,
+  ec,
   typedData,
 } from "starknet"
 
 import { MessageType, WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
+import { LEGACY_WalletSigner } from "./legacy"
 import { EventHandler, StarknetWindowObject } from "./model"
 
 const VERSION = `${process.env.VERSION}`
@@ -52,7 +56,7 @@ function waitForMsgOfType<
 
 // window.ethereum like
 const starknetWindowObject: StarknetWindowObject = {
-  signer: undefined,
+  account: undefined,
   provider: defaultProvider,
   selectedAddress: undefined,
   isConnected: false,
@@ -84,7 +88,7 @@ const starknetWindowObject: StarknetWindowObject = {
         )
           .then(() => "error" as const)
           .catch(() => {
-            sendMessage({ type: "FAILED_TX", data: { actionHash } })
+            sendMessage({ type: "TRANSACTION_FAILED", data: { actionHash } })
             return "timeout" as const
           }),
       ])
@@ -108,11 +112,15 @@ const starknetWindowObject: StarknetWindowObject = {
           return
         }
 
-        if (data.type === "CONNECT_RES" && data.data) {
+        if (
+          (data.type === "CONNECT_DAPP_RES" && data.data) ||
+          (data.type === "START_SESSION_RES" && data.data)
+        ) {
           window.removeEventListener("message", handleMessage)
           const { address, network } = data.data
           starknet.provider = getProvider(network)
-          starknet.signer = new WalletSigner(address, starknet.provider)
+          starknet.account = new ArgentXAccount(address, starknet.provider)
+          starknet.signer = new LEGACY_WalletSigner(address, starknet.provider)
           starknet.selectedAddress = address
           starknet.isConnected = true
           resolve([address])
@@ -120,14 +128,17 @@ const starknetWindowObject: StarknetWindowObject = {
       }
       window.addEventListener("message", handleMessage)
 
-      sendMessage({ type: "CONNECT", data: { host: window.location.host } })
+      sendMessage({
+        type: "CONNECT_DAPP",
+        data: { host: window.location.host },
+      })
     }),
   isPreauthorized: async () => {
     sendMessage({
-      type: "IS_WHITELIST",
+      type: "IS_PREAUTHORIZED",
       data: window.location.host,
     })
-    return waitForMsgOfType("IS_WHITELIST_RES", 1000)
+    return waitForMsgOfType("IS_PREAUTHORIZED_RES", 1000)
   },
   on: (event, handleEvent) => {
     if (event !== "accountsChanged") {
@@ -150,59 +161,69 @@ window.addEventListener(
   "message",
   ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
-    if (starknet && starknet.signer && data.type === "WALLET_CONNECTED") {
+    if (starknet && starknet.account && data.type === "CONNECT_ACCOUNT") {
       const { address, network } = data.data
       if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
-        starknet.signer = new WalletSigner(address, starknet.provider)
+        starknet.account = new ArgentXAccount(address, starknet.provider)
+        starknet.signer = new LEGACY_WalletSigner(address, starknet.provider)
         for (const handleEvent of userEventHandlers) {
           handleEvent([address])
         }
+      }
+    } else if (data.type === "DISCONNECT_ACCOUNT") {
+      if (!starknet) {
+        return
+      }
+      starknet.selectedAddress = undefined
+      starknet.account = undefined
+      starknet.signer = undefined
+      starknet.isConnected = false
+      for (const handleEvent of userEventHandlers) {
+        handleEvent([])
       }
     }
   },
 )
 
-export class WalletSigner extends Provider implements SignerInterface {
-  public address: string
-
+export class ArgentXAccount extends Account {
   constructor(address: string, provider?: Provider) {
-    super(provider || defaultProvider)
-    this.address = address
+    // since account constructor is taking a KeyPair,
+    // we set a dummy one (never used anyway)
+    const keyPair = ec.getKeyPair(0)
+    super(provider || defaultProvider, address, keyPair)
   }
 
-  public async addTransaction(
-    transaction: Transaction,
+  public override async execute(
+    transactions: Call | Call[],
+    abis?: Abi[],
+    transactionsDetail?: InvocationsDetails,
   ): Promise<AddTransactionResponse> {
-    if (transaction.type === "DEPLOY") {
-      return super.addTransaction(transaction)
-    }
-
-    if (transaction.signature?.length) {
-      throw Error(
-        "Adding signatures to a signer transaction currently isn't supported",
-      )
-    }
-
-    sendMessage({ type: "ADD_TRANSACTION", data: transaction })
-    const { actionHash } = await waitForMsgOfType("ADD_TRANSACTION_RES", 1000)
+    sendMessage({
+      type: "EXECUTE_TRANSACTION",
+      data: { transactions, abis, transactionsDetail },
+    })
+    const { actionHash } = await waitForMsgOfType(
+      "EXECUTE_TRANSACTION_RES",
+      1000,
+    )
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
       waitForMsgOfType(
-        "SUBMITTED_TX",
+        "TRANSACTION_SUBMITTED",
         11 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
       waitForMsgOfType(
-        "FAILED_TX",
+        "TRANSACTION_FAILED",
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       )
         .then(() => "error" as const)
         .catch(() => {
-          sendMessage({ type: "FAILED_TX", data: { actionHash } })
+          sendMessage({ type: "TRANSACTION_FAILED", data: { actionHash } })
           return "timeout" as const
         }),
     ])
@@ -216,34 +237,32 @@ export class WalletSigner extends Provider implements SignerInterface {
 
     return {
       code: "TRANSACTION_RECEIVED",
-      address: transaction.contract_address,
+      address: this.address,
       transaction_hash: result.txHash,
     }
   }
 
-  public async hashMessage(data: typedData.TypedData): Promise<string> {
-    return typedData.getMessageHash(data, this.address)
-  }
-
-  public async signMessage(data: typedData.TypedData): Promise<Signature> {
-    sendMessage({ type: "ADD_SIGN", data })
-    const { actionHash } = await waitForMsgOfType("ADD_SIGN_RES", 1000)
+  public override async signMessage(
+    data: typedData.TypedData,
+  ): Promise<Signature> {
+    sendMessage({ type: "SIGN_MESSAGE", data })
+    const { actionHash } = await waitForMsgOfType("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
       waitForMsgOfType(
-        "SUCCESS_SIGN",
+        "SIGNATURE_SUCCESS",
         11 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
       waitForMsgOfType(
-        "FAILED_SIGN",
+        "SIGNATURE_FAILURE",
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       )
         .then(() => "error" as const)
         .catch(() => {
-          sendMessage({ type: "FAILED_SIGN", data: { actionHash } })
+          sendMessage({ type: "SIGNATURE_FAILURE", data: { actionHash } })
           return "timeout" as const
         }),
     ])

@@ -2,7 +2,10 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { getWhitelist, removeFromWhitelist } from "../../background/whitelist"
+import {
+  getPreAuthorizations,
+} from "../../background/preAuthorizations"
+import { removePreAuthorization } from "../utils/messaging"
 import { sendMessage } from "../../shared/messages"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
@@ -26,14 +29,14 @@ const Wrapper = styled.div`
 
 export const SettingsDappConnectionsScreen: FC = () => {
   const navigate = useNavigate()
-  const [dappsWhitelist, setDappsWhitelist] = useState<string[]>([])
+  const [preAuthorizations, setPreAuthorizations] = useState<string[]>([])
 
-  const getWhitelistDapps = useCallback(async () => {
-    setDappsWhitelist(await getWhitelist())
+  const requestPreAuthorizations = useCallback(async () => {
+    setPreAuthorizations(await getPreAuthorizations())
   }, [])
 
   useEffect(() => {
-    getWhitelistDapps()
+    requestPreAuthorizations()
   }, [])
 
   return (
@@ -43,17 +46,17 @@ export const SettingsDappConnectionsScreen: FC = () => {
       </Header>
       <Wrapper>
         <H2>Dapp connections</H2>
-        {dappsWhitelist.length === 0 ? (
+        {preAuthorizations.length === 0 ? (
           <P>You haven&apos;t connected to any dapp yet.</P>
         ) : (
           <>
-            {dappsWhitelist.map((dapp) => (
+            {preAuthorizations.map((dapp) => (
               <DappConnection
                 key={dapp}
                 host={dapp}
                 onClick={async () => {
-                  await removeFromWhitelist(dapp)
-                  getWhitelistDapps()
+                  await removePreAuthorization(dapp)
+                  requestPreAuthorizations()
                 }}
               />
             ))}
@@ -61,7 +64,7 @@ export const SettingsDappConnectionsScreen: FC = () => {
             <P>Require all dapps to request a new connection to your wallet?</P>
             <Button
               onClick={() => {
-                sendMessage({ type: "RESET_WHITELIST" })
+                sendMessage({ type: "RESET_PREAUTHORIZATIONS" })
                 navigate(-1)
               }}
             >

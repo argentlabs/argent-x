@@ -20,6 +20,10 @@ export const ErrorScreen: FC = () => {
   const navigate = useNavigate()
   const { error } = useAppState()
 
+  const message = error
+    ? error.replace(/^(error:\s*)+/gi, "")
+    : "No error message available"
+
   return (
     <ConfirmScreen
       title="Error"
@@ -28,7 +32,7 @@ export const ErrorScreen: FC = () => {
       onSubmit={() => navigate(-1)}
     >
       <SP>Something went wrong:</SP>
-      <WrappingPre>{`${error}`}</WrappingPre>
+      <WrappingPre>{message}</WrappingPre>
     </ConfirmScreen>
   )
 }

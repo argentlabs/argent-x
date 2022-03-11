@@ -11,10 +11,6 @@ import { routes } from "../routes"
 import { useBackupDownload } from "../states/backupDownload"
 
 const DownloadButton = styled(Button)`
-  margin-top: 20px;
-`
-
-const ContinueButton = styled(Button)`
   margin-top: auto;
 `
 
@@ -28,13 +24,13 @@ const Container = styled.div`
 export const BackupDownloadScreen: FC = () => {
   const navigate = useNavigate()
   const { search } = useLocation()
-  const { isBackupDownloadRequired } = useBackupDownload()
 
   const isSettings = new URLSearchParams(search).has("settings")
 
-  const handleDownload: FormEventHandler = async () => {
+  const handleDownloadClick: FormEventHandler = async () => {
     sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
     useBackupDownload.setState({ isBackupDownloadRequired: false })
+    navigate(isSettings ? routes.settings() : routes.account())
   }
 
   return (
@@ -47,18 +43,13 @@ export const BackupDownloadScreen: FC = () => {
         <H2>Download your backup</H2>
         <P>
           This is encrypted by your password and required if you need to restore
-          your account.
+          your accounts.
         </P>
         <P style={{ marginTop: 10 }}>
           Each time you add a new account, you&apos;ll be prompted to download
           an updated backup file for all your accounts.
         </P>
-        <DownloadButton onClick={handleDownload}>Download</DownloadButton>
-        {!isBackupDownloadRequired && !isSettings && (
-          <ContinueButton onClick={() => navigate(routes.account())}>
-            Continue
-          </ContinueButton>
-        )}
+        <DownloadButton onClick={handleDownloadClick}>Download</DownloadButton>
       </Container>
     </>
   )

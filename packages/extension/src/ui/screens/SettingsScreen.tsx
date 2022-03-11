@@ -78,7 +78,7 @@ export const SettingsScreen: FC = () => {
 
   const handleLockClick = () => {
     sendMessage({ type: "STOP_SESSION" })
-    navigate(routes.password())
+    navigate(routes.lockScreen())
   }
 
   const handleResetDappConnectionsClick = () => {

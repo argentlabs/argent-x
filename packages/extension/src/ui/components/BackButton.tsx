@@ -5,9 +5,13 @@ import { useNavigate } from "react-router-dom"
 import { makeClickable } from "../utils/a11y"
 import { IconButton } from "./IconButton"
 
-export const BackButton: FC = (props) => {
+interface BackButtonProps {
+  to?: string
+}
+
+export const BackButton: FC<BackButtonProps> = (props) => {
   const navigate = useNavigate()
-  const onClick = () => navigate(-1)
+  const onClick = () => (props.to ? navigate(props.to) : navigate(-1))
 
   return (
     <IconButton {...makeClickable(onClick, 99)} size={36} {...props}>

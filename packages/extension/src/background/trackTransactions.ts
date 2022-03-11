@@ -1,6 +1,5 @@
 import { Provider } from "starknet"
 
-import { BackupWallet } from "../shared/backup.model"
 import { getProvider } from "../shared/networks"
 import {
   FetchedTransactionStatus,
@@ -9,6 +8,7 @@ import {
   TransactionStatus,
   TransactionStatusWithProvider,
 } from "../shared/transactions.model"
+import { WalletAccount } from "../shared/wallet.model"
 
 export async function getTransactionStatus(
   provider: Provider,
@@ -32,17 +32,17 @@ export class TransactionTracker {
 
   public async trackTransaction(
     transactionHash: string,
-    wallet: BackupWallet,
+    account: WalletAccount,
     meta: TransactionMeta = {
       title: "Contract interaction",
     },
   ): Promise<void> {
     try {
-      const provider = getProvider(wallet.network)
+      const provider = getProvider(account.network)
       this.transactions.push({
         hash: transactionHash,
         provider,
-        walletAddress: wallet.address,
+        accountAddress: account.address,
         status: "RECEIVED",
         meta,
       })
@@ -55,15 +55,15 @@ export class TransactionTracker {
     }
   }
 
-  public getAllTransactions(byWalletAddress?: string): TransactionStatus[] {
+  public getAllTransactions(byAccountAddress?: string): TransactionStatus[] {
     return this.transactions
       .filter(
         (transaction) =>
-          !byWalletAddress || transaction.walletAddress === byWalletAddress,
+          !byAccountAddress || transaction.accountAddress === byAccountAddress,
       )
-      .map(({ hash, walletAddress, meta }) => ({
+      .map(({ hash, accountAddress, meta }) => ({
         hash,
-        walletAddress,
+        accountAddress,
         status: this.getTransactionStatus(hash)?.status || "NOT_RECEIVED",
         meta,
       }))
@@ -78,7 +78,7 @@ export class TransactionTracker {
       async ({
         hash,
         provider,
-        walletAddress,
+        accountAddress,
         meta,
         status,
         failureReason,
@@ -89,14 +89,14 @@ export class TransactionTracker {
           return {
             hash,
             provider,
-            walletAddress,
+            accountAddress,
             meta,
             status,
             failureReason,
           }
         }
         const result = await getTransactionStatus(provider, hash)
-        return { ...result, walletAddress, provider, meta }
+        return { ...result, accountAddress, provider, meta }
       },
     )
 

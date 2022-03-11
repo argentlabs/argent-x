@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware"
 
 import type { Account } from "../Account"
 
+export const defaultAccountName = "Unnamed account"
+
 // account information that's not saved in the backup file, but persisted in the extension's localstorage
 interface State {
   accountNames: Record<string, Record<string, string>>
@@ -31,7 +33,7 @@ export const useAccountMetadata = create<State>(
 export const getAccountName = (
   { address, networkId }: Account,
   accountNames: Record<string, Record<string, string>>,
-): string => accountNames[networkId]?.[address] || "Unnamed account"
+): string => accountNames[networkId]?.[address] || defaultAccountName
 
 export const setDefaultAccountNames = (accounts: Record<string, Account>) => {
   const { accountNames } = useAccountMetadata.getState()

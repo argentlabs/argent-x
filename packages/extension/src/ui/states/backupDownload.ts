@@ -1,11 +1,11 @@
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-interface State {
+export interface BackupState {
   isBackupDownloadRequired: boolean
 }
 
-export const useBackupDownload = create<State>(
+export const useBackupDownload = create<BackupState>(
   persist(
     (_set, _get) => ({
       isBackupDownloadRequired: false,

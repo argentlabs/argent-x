@@ -3,37 +3,29 @@ import { useNavigate } from "react-router-dom"
 
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
-import { useBackupDownload } from "../states/backupDownload"
-import { isDisclaimerUnderstood } from "../utils/disclaimer"
 import { hasActiveSession, isInitialized } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 
 export const useEntry = () => {
   const navigate = useNavigate()
   const { isFirstRender } = useAppState()
-  const { isBackupDownloadRequired } = useBackupDownload()
 
   useEffect(() => {
     ;(async () => {
-      if (!isFirstRender) {
-        return
+      if (isFirstRender) {
+        const entry = await determineEntry()
+        useAppState.setState({ isLoading: false, isFirstRender: false })
+        navigate(entry)
       }
-      const entry = await determineEntry(isBackupDownloadRequired)
-      useAppState.setState({ isLoading: false, isFirstRender: false })
-      navigate(entry)
     })()
-  }, [navigate, isBackupDownloadRequired])
+  }, [isFirstRender, navigate])
 }
 
-const determineEntry = async (isBackupDownloadRequired: boolean) => {
-  if (isBackupDownloadRequired) {
-    return routes.backupDownload()
-  }
-
-  const initialized = await isInitialized()
+const determineEntry = async () => {
+  const { initialized, hasLegacy } = await isInitialized()
   if (!initialized) {
-    if (!isDisclaimerUnderstood()) {
-      return routes.disclaimer()
+    if (hasLegacy) {
+      return routes.legacy()
     }
     return routes.welcome()
   }
@@ -42,5 +34,5 @@ const determineEntry = async (isBackupDownloadRequired: boolean) => {
   if (hasSession) {
     return recover()
   }
-  return routes.password()
+  return routes.lockScreen()
 }

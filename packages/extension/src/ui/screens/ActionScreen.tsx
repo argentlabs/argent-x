@@ -21,7 +21,7 @@ export const ActionScreen: FC = () => {
   const [action] = actions
   const isLastAction = actions.length === 1
   switch (action.type) {
-    case "CONNECT":
+    case "CONNECT_DAPP":
       return (
         <ConnectScreen
           host={action.payload.host}
@@ -39,6 +39,7 @@ export const ActionScreen: FC = () => {
           }}
         />
       )
+
     case "ADD_TOKEN":
       return (
         <AddTokenScreen
@@ -62,21 +63,20 @@ export const ActionScreen: FC = () => {
     case "TRANSACTION":
       return (
         <ApproveTransactionScreen
-          transaction={action.payload}
+          transactions={action.payload.transactions}
           onSubmit={async () => {
             await approve(action)
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([
               waitForMessage(
-                "SUBMITTED_TX",
+                "TRANSACTION_SUBMITTED",
                 ({ data }) => data.actionHash === action.meta.hash,
               ),
               waitForMessage(
-                "FAILED_TX",
+                "TRANSACTION_FAILED",
                 ({ data }) => data.actionHash === action.meta.hash,
               ),
             ])
-
             if ("error" in result) {
               useAppState.setState({
                 error: `Sending transaction failed: ${result.error}`,
@@ -99,6 +99,47 @@ export const ActionScreen: FC = () => {
           selectedAccount={account}
         />
       )
+
+    case "TRANSACTION_LEGACY":
+      return (
+        <ApproveTransactionScreen
+          transactions={action.payload}
+          onSubmit={async () => {
+            await approve(action)
+            useAppState.setState({ isLoading: true })
+            const result = await Promise.race([
+              waitForMessage(
+                "TRANSACTION_SUBMITTED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+              waitForMessage(
+                "TRANSACTION_FAILED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+            ])
+            if ("error" in result) {
+              useAppState.setState({
+                error: `Sending transaction failed: ${result.error}`,
+                isLoading: false,
+              })
+              navigate(routes.error())
+            } else {
+              if (isPopup && isLastAction) {
+                window.close()
+              }
+              useAppState.setState({ isLoading: false })
+            }
+          }}
+          onReject={async () => {
+            await reject(action)
+            if (isPopup && isLastAction) {
+              window.close()
+            }
+          }}
+          selectedAccount={account}
+        />
+      )
+
     case "SIGN":
       return (
         <ApproveSignScreen
@@ -107,7 +148,7 @@ export const ActionScreen: FC = () => {
             await approve(action)
             useAppState.setState({ isLoading: true })
             await waitForMessage(
-              "SUCCESS_SIGN",
+              "SIGNATURE_SUCCESS",
               ({ data }) => data.actionHash === action.meta.hash,
             )
             if (isPopup && isLastAction) {

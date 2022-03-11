@@ -1,4 +1,4 @@
-import type { Provider, SignerInterface } from "starknet"
+import type { AccountInterface, Provider, SignerInterface } from "starknet"
 
 export type EventHandler = (accounts: string[]) => void
 
@@ -26,7 +26,11 @@ interface IStarketWindowObject {
   isPreauthorized: () => Promise<boolean>
   on: (event: "accountsChanged", handleEvent: EventHandler) => void
   off: (event: "accountsChanged", handleEvent: EventHandler) => void
+  /**
+   * @deprecated use `account` instead
+   */
   signer?: SignerInterface
+  account?: AccountInterface
   provider: Provider
   selectedAddress?: string
   version: string
@@ -35,6 +39,7 @@ interface IStarketWindowObject {
 interface ConnectedStarketWindowObject extends IStarketWindowObject {
   isConnected: true
   signer: SignerInterface
+  account: AccountInterface
   selectedAddress: string
 }
 

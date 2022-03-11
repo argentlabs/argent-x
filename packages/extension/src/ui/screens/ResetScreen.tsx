@@ -5,7 +5,6 @@ import { sendMessage } from "../../shared/messages"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
-import { useAppState } from "../states/app"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 export const ResetScreen: FC = () => {
@@ -20,7 +19,6 @@ export const ResetScreen: FC = () => {
       onSubmit={() => {
         sendMessage({ type: "RESET_ALL" })
         localStorage.clear()
-        useAppState.setState({ isFirstRender: true })
         useAccount.setState({ accounts: {}, selectedAccount: undefined })
         navigate(routes.welcome())
       }}

@@ -1,12 +1,13 @@
 import { Provider } from "starknet"
 
-import { BackupWallet } from "./backup.model"
+import { WalletAccount } from "./wallet.model"
 
 export interface Network {
   id: string
   name: string
   baseUrl?: string
   explorerUrl?: string
+  accountImplementation?: string
 }
 
 export const networks: Network[] = [
@@ -14,11 +15,15 @@ export const networks: Network[] = [
     id: "mainnet-alpha",
     name: "Ethereum Mainnet",
     explorerUrl: "https://voyager.online",
+    accountImplementation:
+      "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
   },
   {
     id: "goerli-alpha",
     name: "Goerli Testnet",
     explorerUrl: "https://goerli.voyager.online",
+    accountImplementation:
+      "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
   },
   {
     id: "localhost",
@@ -33,8 +38,11 @@ export const getNetwork = (networkId: string): Network => {
   return networks.find(({ id }) => id === networkId) || defaultNetwork
 }
 
-export const networkWallets = (wallets: BackupWallet[], networkId: string) =>
-  wallets.filter(
+export const accountsOnNetwork = (
+  accounts: WalletAccount[],
+  networkId: string,
+) =>
+  accounts.filter(
     ({ network }) => localNetworkId(network) === localNetworkId(networkId),
   )
 

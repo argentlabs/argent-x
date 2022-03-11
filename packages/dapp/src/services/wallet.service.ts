@@ -67,7 +67,7 @@ export const signMessage = async (message: string) => {
     throw Error("message must be a short string")
   }
 
-  return starknet.signer.signMessage({
+  return starknet.account.signMessage({
     domain: {
       name: "Example DApp",
       chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
@@ -89,7 +89,7 @@ export const signMessage = async (message: string) => {
 }
 
 export const waitForTransaction = async (hash: string) =>
-  await getStarknet().provider.waitForTx(hash)
+  await getStarknet().provider.waitForTransaction(hash)
 
 export const addWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,

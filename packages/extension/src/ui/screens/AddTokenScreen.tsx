@@ -95,7 +95,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
   useEffect(() => {
     if (loading && selectedAccount) {
-      fetchTokenDetails(tokenAddress, selectedAccount, switcherNetworkId)
+      fetchTokenDetails(tokenAddress, switcherNetworkId)
         .then((details) => {
           setTokenDetails(details)
         })
@@ -132,7 +132,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
       </Header>
 
       <AddTokenScreenWrapper>
-        <H2>Add token</H2>
+        <H2>Add tokens</H2>
 
         <form
           onSubmit={(e: React.FormEvent) => {

@@ -11,7 +11,7 @@ export interface FetchedTransactionStatus {
 }
 
 export interface TransactionStatus extends FetchedTransactionStatus {
-  walletAddress?: string
+  accountAddress?: string
   meta?: TransactionMeta
 }
 
