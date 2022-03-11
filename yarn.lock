@@ -9229,10 +9229,10 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/starknet/-/starknet-3.5.0.tgz#3315e666feebc2e0edfa2ffbc5d36d895384d107"
-  integrity sha512-FCXbL3N0e+lbm5AkdP6WEJm2xaWlRMDHGfxi8YW+hTsklIBmC1owsg7HQqxKWKZR3igusLM61vwLLkg5E/0ccw==
+starknet@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.npmjs.org/starknet/-/starknet-3.5.1.tgz#b51fc89105235e14a71a576c60db5034e51d9734"
+  integrity sha512-iFmdx2FF16x1hItQysMVRvCQr2VYEp+WBfSk5c3VAyDI22HIa+5Zh3p9S6Q9YL2eLKJK8Ys/b2fRmeTPtnxHTw==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"
