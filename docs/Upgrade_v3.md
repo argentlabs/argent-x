@@ -28,7 +28,8 @@ As a user of Argent X 2.x, after upgrading to version 3.0.0, your extension will
 
    - Going to [chrome://extensions/](chrome://extensions/)
    - Enabling `Developer mode` (upper right)
-   - Clicking `Load unpacked` and chosing the previous zip file
+   - Unzipping the previously downloaded file
+   - Clicking `Load unpacked` and chosing the `dist` folder just unzipped
 
    Now you should have two versions of Argent X installed simultaneously!
 
