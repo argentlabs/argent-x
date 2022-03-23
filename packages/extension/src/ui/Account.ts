@@ -1,5 +1,6 @@
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
-import { CompiledContract, Contract, json } from "starknet"
+import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
+import { CompiledContract, Contract, json, number, stark } from "starknet"
 
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { getProvider } from "../shared/networks"
@@ -8,6 +9,9 @@ import { WalletAccountSigner } from "../shared/wallet.model"
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
 )
+const ProxyCompiledContractJson: CompiledContract = json.parse(
+  ProxyCompiledContract,
+)
 
 export class Account {
   address: string
@@ -15,6 +19,7 @@ export class Account {
   signer: WalletAccountSigner
   deployTransaction?: string
   contract: Contract
+  proxyContract: Contract
 
   constructor(
     address: string,
@@ -28,6 +33,11 @@ export class Account {
     this.deployTransaction = deployTransaction
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
+      address,
+      getProvider(networkId),
+    )
+    this.proxyContract = new Contract(
+      ProxyCompiledContractJson.abi,
       address,
       getProvider(networkId),
     )
@@ -48,6 +58,13 @@ export class Account {
   public async getCurrentNonce(): Promise<string> {
     const { nonce } = await this.contract.call("get_nonce")
     return nonce.toString()
+  }
+
+  public async getCurrentImplementation(): Promise<string> {
+    const { implementation } = await this.proxyContract.call(
+      "get_implementation",
+    )
+    return stark.makeAddress(number.toHex(implementation))
   }
 
   public static async fromDeploy(networkId: string): Promise<Account> {

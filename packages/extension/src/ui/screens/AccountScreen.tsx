@@ -2,6 +2,7 @@ import AddIcon from "@mui/icons-material/Add"
 import { FC, Suspense, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import useSWR from "swr"
 
 import { getNetwork } from "../../shared/networks"
 import { Account } from "../Account"
@@ -14,6 +15,7 @@ import {
   TransactionItem,
   TransactionsWrapper,
 } from "../components/Account/Transactions"
+import { UpdateBanner } from "../components/Account/UpdateBanner"
 import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { Spinner } from "../components/Spinner"
@@ -31,6 +33,8 @@ import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, getAccountImageUrl } from "../utils/accounts"
+import { sendTransaction } from "../utils/transactions"
+import { checkIfUpdateAvailable } from "../utils/upgrade"
 
 const AccountContent = styled.div`
   display: flex;
@@ -76,6 +80,17 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
+  const network = getNetwork(switcherNetworkId)
+
+  const { data: showUpdateBanner = false } = useSWR(
+    [account, network.accountImplementation],
+    checkIfUpdateAvailable,
+    {
+      suspense: false,
+    },
+  )
+
+  const canShowEmptyAccountAlert = !showPendingTransactions && !showUpdateBanner
 
   useEffect(() => {
     connectAccount(account, switcherNetworkId, localhostPort)
@@ -100,6 +115,21 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
             setAccountName(account.networkId, account.address, name)
           }
         />
+        {showUpdateBanner && !showPendingTransactions && (
+          <UpdateBanner
+            onClick={() => {
+              if (network.accountImplementation) {
+                sendTransaction({
+                  to: account.address,
+                  method: "upgrade",
+                  calldata: {
+                    implementation: network.accountImplementation,
+                  },
+                })
+              }
+            }}
+          />
+        )}
         {showPendingTransactions && (
           <>
             <SectionHeader>Pending transactions</SectionHeader>
@@ -122,9 +152,9 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
         )}
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <TokenList
-            showTitle={showPendingTransactions}
+            showTitle={!canShowEmptyAccountAlert}
             accountAddress={account.address}
-            canShowEmptyAccountAlert={!showPendingTransactions}
+            canShowEmptyAccountAlert={canShowEmptyAccountAlert}
           />
           <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
             <AddTokenIconButton size={40}>
