@@ -14,7 +14,6 @@ import {
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
 import { IStorage } from "./storage"
-import { string } from "yup/lib/locale"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -193,18 +192,18 @@ export class Wallet extends EventEmitter {
       throw new Error("no selected account")
     }
 
+    const provider = getProvider(account.network)
     if (account.signer.type == "local_secret") {
       const keyPair = getStarkPair(
         account.signer.derivationPath,
         this.session?.secret as string,
       )
-      const provider = getProvider(account.network)
       return new Account(provider, account.address, keyPair)
     }
     else {
       const signer = new LedgerBlindSigner()
       await signer.getPubKey()
-      return signer
+      return new Account(provider, account.address, signer)
     }
   }
 
