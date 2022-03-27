@@ -2381,9 +2381,9 @@
     prop-types "^15.7.2"
 
 "@mui/styled-engine-sc@^5.1.0":
-  version "5.4.2"
-  resolved "https://registry.npmjs.org/@mui/styled-engine-sc/-/styled-engine-sc-5.4.2.tgz#2683a960622f3616fa1a7d58e271d16311b374b8"
-  integrity sha512-t8h5AtHn899WzHkJXWjWcPkEG2NCmX0UZMIBEPv58rMHyJiByoYzFnA/kGVS1/oCSlDYbBlvFmfMaNalOLPp8g==
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.5.2.tgz#d35d3b226f79d051181bf098276a90ba718e474d"
+  integrity sha512-mFIaowtodHmrm4tLWJEWYxthQ4O9JxsN54u06kuf0DGYF08qPz2B9fQHN4Kwf0YM7F/bLkrGUYiF+/7TUk0LYA==
   dependencies:
     prop-types "^15.7.2"
 
