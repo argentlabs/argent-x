@@ -3,7 +3,9 @@ import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import useSWR from "swr"
 
+import { getNetwork } from "../../shared/networks"
 import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
@@ -17,6 +19,7 @@ import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
+import { checkIfUpdateAvailable } from "../utils/upgrade"
 
 const AccountList = styled.div`
   display: flex;
@@ -67,6 +70,37 @@ export const AccountListScreen: FC = () => {
     }
   }
 
+  const { data: accountUpdatesList = {} } = useSWR(
+    [
+      accountsList,
+      accountsList.map(
+        (account) => getNetwork(account.networkId).accountImplementation,
+      ),
+    ],
+    async (
+      accounts,
+      accountImplementations,
+    ): Promise<{
+      [account: string]: boolean
+    }> => {
+      const accountUpdates = await Promise.all(
+        accounts.map((account, index) => {
+          return checkIfUpdateAvailable(account, accountImplementations[index])
+        }),
+      )
+      return accounts.reduce(
+        (acc, account, index) => ({
+          ...acc,
+          [account.address]: accountUpdates[index],
+        }),
+        {},
+      )
+    },
+    {
+      suspense: false,
+    },
+  )
+
   return (
     <AccountListWrapper>
       <Header>
@@ -92,6 +126,7 @@ export const AccountListScreen: FC = () => {
             address={account.address}
             status={getStatus(account, selectedAccount)}
             isDeleteable={switcherNetworkId === "localhost"}
+            hasUpdate={accountUpdatesList[account.address] || false}
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>

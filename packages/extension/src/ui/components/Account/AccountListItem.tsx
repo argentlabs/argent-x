@@ -1,8 +1,9 @@
+import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown"
 import DeleteIcon from "@mui/icons-material/Delete"
 import { IconButton } from "@mui/material"
 import { FC, MouseEventHandler } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
@@ -12,23 +13,23 @@ import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { recover } from "../../utils/recovery"
-import {
-  NetworkStatusIndicator,
-  NetworkStatusWrapper,
-} from "../NetworkSwitcher"
+import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
+import { TransactionIndicator } from "./Transactions"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;
 `
 
-export const AccountListItemWrapper = styled.div`
+export const AccountListItemWrapper = styled.div<{
+  selected?: boolean
+}>`
   cursor: pointer;
   height: 76px;
   width: 256px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 20px 16px;
 
@@ -38,9 +39,17 @@ export const AccountListItemWrapper = styled.div`
 
   transition: all 200ms ease-in-out;
 
+   {
+    ${({ selected = false }) =>
+      selected &&
+      css`
+        border: 1px solid rgba(2, 187, 168, 0.5);
+      `}
+  }
+
   &:hover,
   &:focus {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
     outline: 0;
 
     &.deleteable ${NetworkStatusWrapper} {
@@ -71,6 +80,7 @@ interface AccountListProps {
   address: string
   status: AccountStatus
   isDeleteable?: boolean
+  hasUpdate?: boolean
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
@@ -78,6 +88,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   address,
   status,
   isDeleteable,
+  hasUpdate,
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
@@ -96,6 +107,7 @@ export const AccountListItem: FC<AccountListProps> = ({
         navigate(routes.account())
       })}
       className={isDeleteable ? "deleteable" : ""}
+      selected={status.code === "CONNECTED"}
     >
       <ProfilePicture src={getAccountImageUrl(accountName, address)} />
       <AccountRow>
@@ -103,10 +115,24 @@ export const AccountListItem: FC<AccountListProps> = ({
           <AccountName>{accountName}</AccountName>
           <p>{truncateAddress(address)}</p>
         </AccountColumn>
-        <NetworkStatusWrapper>
-          <NetworkStatusIndicator status={status.code} />
-          <AccountStatusText>{status.text}</AccountStatusText>
-        </NetworkStatusWrapper>
+        {status.code === "DEPLOYING" ? (
+          <NetworkStatusWrapper>
+            <TransactionIndicator status={"DEPLOYING"} />
+            <AccountStatusText>Deploying</AccountStatusText>
+          </NetworkStatusWrapper>
+        ) : (
+          hasUpdate && (
+            <NetworkStatusWrapper>
+              <ArrowCircleDownIcon
+                style={{
+                  maxHeight: "16px",
+                  maxWidth: "16px",
+                }}
+              />
+              <AccountStatusText>Update</AccountStatusText>
+            </NetworkStatusWrapper>
+          )
+        )}
         <DeleteAccountButton>
           <IconButton color="error" onClick={handleDeleteClick}>
             <DeleteIcon />
