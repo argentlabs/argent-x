@@ -2,8 +2,8 @@ import { SignerInterface } from "starknet"
 
 export interface WalletAccountSigner {
   type: string
-  derivationPath: string 
-  signer: any
+  derivationPath: string
+  signer: SignerInterface
 }
 
 export interface WalletAccount {

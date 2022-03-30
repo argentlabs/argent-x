@@ -1,7 +1,7 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
-import { Account, AddTransactionResponse, ec, stark, LedgerBlindSigner, SignerInterface } from "starknet"
+import { Account, AddTransactionResponse, ec, stark, Signer, LedgerBlindSigner} from "starknet"
 
 import { getNetwork, getProvider } from "../shared/networks"
 import { WalletAccount, WalletAccountSigner } from "../shared/wallet.model"
@@ -129,10 +129,11 @@ export class Wallet extends EventEmitter {
       const index = getNextPathIndex(current_paths)
       const starkPair = getStarkPair(index, this.session?.secret as string)
       starkPub = ec.getStarkKey(starkPair)
+      const localSigner = new Signer(starkPair);
       signer = {
         type: "local_secret",
         derivationPath: getPathForIndex(index),
-        signer: undefined
+        signer: localSigner
       }
     }
     
@@ -195,15 +196,7 @@ export class Wallet extends EventEmitter {
     }
 
     const provider = getProvider(account.network)
-    if (account.signer.type === "local_secret") {
-      const keyPair = getStarkPair(
-        account.signer.derivationPath,
-        this.session?.secret as string,
-      )
-      return new Account(provider, account.address, keyPair)
-    }
-    else 
-      {return new Account(provider, account.address, account.signer.signer as SignerInterface)}
+    return new Account(provider, account.address, account.signer.signer)
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
