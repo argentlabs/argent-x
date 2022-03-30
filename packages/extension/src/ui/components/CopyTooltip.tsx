@@ -9,6 +9,8 @@ export const Tooltip = styled.span`
   border-radius: 20px;
   color: black;
   padding: 5px 10px;
+  max-width: 300px;
+  text-align: center;
 `
 
 interface CopyTooltipProps {

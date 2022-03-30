@@ -3,11 +3,16 @@ import oHash from "object-hash"
 function objectHash(obj: object | null) {
   return oHash(obj, { unorderedArrays: true })
 }
+
+interface Overrides {
+  [key: string]: any
+}
 export interface QueueItem {
   meta: {
     hash: string
     expires: number
   }
+  override?: Overrides
 }
 
 export type ExtQueueItem<T> = QueueItem & T
@@ -54,6 +59,18 @@ export async function getQueue<T extends object>(config: QueueConfig<T> = {}) {
     return newItem
   }
 
+  async function override(
+    hash: string,
+    overrides: Overrides,
+  ): Promise<ExtQueueItem<T> | undefined> {
+    const item = globalQueue.find((item) => item.meta.hash === hash)
+    if (item) {
+      item.override = overrides
+      config.onUpdate?.(globalQueue)
+    }
+    return item
+  }
+
   async function remove(hash: string): Promise<ExtQueueItem<T> | null> {
     const hit = globalQueue.find((item) => item.meta.hash === hash)
     globalQueue = globalQueue.filter((item) => item.meta.hash !== hash)
@@ -64,6 +81,7 @@ export async function getQueue<T extends object>(config: QueueConfig<T> = {}) {
   return {
     getAll,
     push,
+    override,
     remove,
   }
 }

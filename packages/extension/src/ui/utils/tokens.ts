@@ -12,12 +12,20 @@ export const testDappToken = (networkId: string) =>
     ({ name, network }) => name === "Test Token" && network === networkId,
   )
 
+export const feeToken = (networkId: string) =>
+  defaultTokens.find(
+    ({ symbol, network }) => symbol === "ETH" && network === networkId,
+  )
+
 export interface TokenView {
   address: string
   name: string
   symbol: string
   decimals: number
   balance: string
+
+  image?: string
+  showAlways?: boolean
 }
 
 export const toTokenView = ({
@@ -76,4 +84,15 @@ export const fetchTokenBalance = async (
   const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
   const result = await tokenContract.balanceOf(accountAddress)
   return BigNumber.from(uint256.uint256ToBN(result.balance).toString())
+}
+
+export const fetchFeeTokenBalance = async (
+  accountAddress: string,
+  networkId: string,
+): Promise<BigNumber> => {
+  const token = feeToken(networkId)
+  if (!token) {
+    return BigNumber.from(0)
+  }
+  return fetchTokenBalance(token.address, accountAddress, networkId)
 }

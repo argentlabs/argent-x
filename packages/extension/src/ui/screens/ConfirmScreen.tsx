@@ -32,6 +32,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   title: string
   rejectButtonText?: string
   confirmButtonText?: string
+  disableConfirm?: boolean
   confirmButtonBgColor?: string
   singleButton?: boolean
 }
@@ -41,13 +42,14 @@ const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 0 48px;
+  padding: 16px 0 32px;
   background-color: #161616;
 `
 
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   title,
   confirmButtonText = "Confirm",
+  disableConfirm = false,
   rejectButtonText = "Reject",
   confirmButtonBgColor,
   onSubmit,
@@ -90,7 +92,11 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
             {rejectButtonText}
           </Button>
         )}
-        <Button style={{ backgroundColor: confirmButtonBgColor }} type="submit">
+        <Button
+          disabled={disableConfirm}
+          style={{ backgroundColor: confirmButtonBgColor }}
+          type="submit"
+        >
           {confirmButtonText}
         </Button>
       </StickyButtonGroupVertical>

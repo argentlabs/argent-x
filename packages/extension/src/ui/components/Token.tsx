@@ -116,10 +116,10 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   onClick,
   ...props
 }) => {
-  const { name, symbol, balance } = toTokenView(token)
+  const { name, symbol, balance, image } = toTokenView(token)
   return (
     <TokenWrapper {...makeClickable(onClick)} {...props}>
-      <TokenIcon name={name} />
+      <TokenIcon url={image} name={name} />
       <TokenDetailsWrapper>
         <TokenTextGroup>
           <TokenTitle>{symbol}</TokenTitle>

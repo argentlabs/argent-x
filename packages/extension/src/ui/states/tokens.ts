@@ -17,6 +17,8 @@ export interface TokenDetails {
   symbol?: string
   decimals?: BigNumber
   networkId: string
+  image?: string
+  showAlways?: boolean
 }
 
 const equalToken = (a: TokenDetails, b: TokenDetails) =>
@@ -42,10 +44,22 @@ export const useTokens = create<State>(
         if (!isValidAddress(token.address)) {
           throw Error("token address malformed")
         }
-        if (get().tokens.find((t) => equalToken(t, token))) {
+        const equalTokenHit = get().tokens.find((t) => equalToken(t, token))
+        // if token already exists, but was hidden without balance, show it
+        if (equalTokenHit) {
+          if (!equalTokenHit.showAlways) {
+            return set((state) => ({
+              ...state,
+              tokens: state.tokens.map((t) =>
+                equalToken(t, equalTokenHit) ? { ...t, showAlways: true } : t,
+              ),
+            }))
+          }
           throw Error("token already added")
         }
-        set((state) => ({ tokens: [...state.tokens, token] }))
+        set((state) => ({
+          tokens: [...state.tokens, { ...token, showAlways: true }],
+        }))
       },
       removeToken: (token: TokenDetails) => {
         set((state) => ({
@@ -204,10 +218,14 @@ export const useTokensWithBalance = (): UseTokens => {
   }, [mutate])
 
   const tokenDetails = useMemo(() => {
-    return tokensInNetwork.map((token) => ({
-      ...token,
-      balance: data?.[token.address],
-    }))
+    return tokensInNetwork
+      .map((token) => ({
+        ...token,
+        balance: data?.[token.address],
+      }))
+      .filter(
+        (token) => token.showAlways || (token.balance && token.balance.gt(0)),
+      )
   }, [tokenAddresses, data])
 
   return { tokenDetails, isValidating, error }

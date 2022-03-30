@@ -1,5 +1,5 @@
 import { CompactEncrypt, importJWK } from "jose"
-import { encode } from "starknet"
+import { Call, encode, number } from "starknet"
 
 import {
   messageStream,
@@ -68,6 +68,22 @@ export const hasActiveSession = async () => {
 export const getAccounts = async () => {
   sendMessage({ type: "GET_ACCOUNTS" })
   return waitForMessage("GET_ACCOUNTS_RES")
+}
+
+export const getEstimatedFee = async (call: Call | Call[]) => {
+  sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
+  return waitForMessage("ESTIMATE_TRANSACTION_FEE_RES")
+}
+
+export const updateTransactionFee = async (
+  actionHash: string,
+  maxFee: number.BigNumberish,
+) => {
+  sendMessage({ type: "UPDATE_TRANSACTION_FEE", data: { actionHash, maxFee } })
+  return waitForMessage(
+    "UPDATE_TRANSACTION_FEE_RES",
+    (x) => x.data.actionHash === actionHash,
+  )
 }
 
 export const startSession = async (password: string): Promise<void> => {
