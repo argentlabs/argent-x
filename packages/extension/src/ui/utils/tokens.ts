@@ -35,7 +35,7 @@ export const toTokenView = ({
   balance,
   ...rest
 }: TokenDetailsWithBalance): TokenView => {
-  const decimalsNumber = decimals?.toNumber() || 18
+  const decimalsNumber = decimals?.toNumber() || 0
   return {
     name: name || "Unknown token",
     symbol: symbol || "",
