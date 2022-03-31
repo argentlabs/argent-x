@@ -12,15 +12,20 @@ const Icon = styled.img<{ size: number }>`
 
 interface TokenIconProps {
   name: string
+  url?: string
   large?: boolean
 }
 
-export const TokenIcon: FC<TokenIconProps> = ({ name, large = false }) => {
+export const TokenIcon: FC<TokenIconProps> = ({ name, url, large = false }) => {
   const color = getColor(name)
   return (
     <Icon
       size={large ? 48 : 40}
-      src={`https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`}
+      alt={name}
+      src={
+        url ||
+        `https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`
+      }
     />
   )
 }

@@ -1,12 +1,18 @@
-import { FC } from "react"
-import type { Call, InvokeFunctionTransaction } from "starknet"
+import { BigNumber } from "ethers"
+import { FC, useState } from "react"
+import { Navigate } from "react-router-dom"
+import { Call, InvokeFunctionTransaction, encode } from "starknet"
 import styled from "styled-components"
 
+import { FeeEstimate } from "../components/FeeEstimate"
 import { P } from "../components/Typography"
+import { routes } from "../routes"
+import { updateTransactionFee } from "../utils/messaging"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
+  actionHash: string
   transactions: Call | Call[] | InvokeFunctionTransaction // TODO: remove InvokeFunctionTransaction when removing legacy transaction support
   onSubmit: (transactions: Call | Call[] | InvokeFunctionTransaction) => void
 }
@@ -22,18 +28,46 @@ const Pre = styled.pre`
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
+  selectedAccount,
+  actionHash,
   onSubmit,
   ...props
-}) => (
-  <ConfirmScreen
-    title="Send transaction"
-    confirmButtonText="Sign"
-    onSubmit={() => {
-      onSubmit(transactions)
-    }}
-    {...props}
-  >
-    <P>A dapp wants you to make this transaction:</P>
-    <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
-  </ConfirmScreen>
-)
+}) => {
+  const [disableConfirm, setDisableConfirm] = useState(false)
+
+  if (!selectedAccount) {
+    return <Navigate to={routes.accounts()} />
+  }
+
+  return (
+    <ConfirmScreen
+      title="Send transaction"
+      confirmButtonText="Sign"
+      disableConfirm={disableConfirm}
+      selectedAccount={selectedAccount}
+      onSubmit={() => {
+        onSubmit(transactions)
+      }}
+      {...props}
+    >
+      <P>A dapp wants you to make this transaction:</P>
+      <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
+      <FeeEstimate
+        onChange={async (x) => {
+          setDisableConfirm(true)
+          await updateTransactionFee(
+            actionHash,
+            encode.addHexPrefix(x.toHexString()),
+          )
+          setDisableConfirm(false)
+        }}
+        accountAddress={selectedAccount.address}
+        networkId={selectedAccount.networkId}
+        // if transactions is InvokeFunctionTransaction, we need to pass maxFee to the component. Otherwise, we can just pass transactions
+        {...("type" in transactions
+          ? { maxFee: BigNumber.from("0") }
+          : { transactions })}
+      />
+    </ConfirmScreen>
+  )
+}

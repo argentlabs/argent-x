@@ -64,6 +64,7 @@ export const ActionScreen: FC = () => {
       return (
         <ApproveTransactionScreen
           transactions={action.payload.transactions}
+          actionHash={action.meta.hash}
           onSubmit={async () => {
             await approve(action)
             useAppState.setState({ isLoading: true })
@@ -104,6 +105,7 @@ export const ActionScreen: FC = () => {
       return (
         <ApproveTransactionScreen
           transactions={action.payload}
+          actionHash={action.meta.hash}
           onSubmit={async () => {
             await approve(action)
             useAppState.setState({ isLoading: true })

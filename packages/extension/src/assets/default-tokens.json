@@ -1,23 +1,67 @@
 [
   {
-    "address": "0x2dd93e385742984bf2fc887cd5d8b5ec6917d80af09cf7a00a63710ad51ba53",
+    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
     "name": "Ether",
     "symbol": "ETH",
     "decimals": "18",
-    "network": "goerli-alpha"
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "showAlways": true
   },
   {
     "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
     "name": "Test Token",
     "symbol": "TEST",
     "decimals": "18",
-    "network": "goerli-alpha"
+    "network": "goerli-alpha",
+    "showAlways": true
   },
   {
     "address": "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
     "name": "Test Token",
     "symbol": "TEST",
     "decimals": "18",
-    "network": "mainnet-alpha"
+    "network": "mainnet-alpha",
+    "showAlways": true
+  },
+
+  {
+    "address": "0x12d537dc323c439dc65c976fad242d5610d27cfb5f31689a0a319b8be7f3d56",
+    "name": "Wrapped BTC",
+    "symbol": "WBTC",
+    "decimals": "8",
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
+  },
+  {
+    "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
+    "name": "Goerli USD Coin",
+    "symbol": "USDC",
+    "decimals": "6",
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
+  },
+  {
+    "address": "0x386e8d061177f19b3b485c20e31137e6f6bc497cc635ccdfcab96fadf5add6a",
+    "name": "Tether USD",
+    "symbol": "USDT",
+    "decimals": "6",
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
+  },
+  {
+    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+    "name": "DAI",
+    "symbol": "DAI",
+    "decimals": "18",
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
+  },
+  {
+    "address": "0x07a39a50bf689e9430fc81fba0f4d46e245e1657e77455548ed7e32c808cfc10",
+    "name": "SelfService",
+    "symbol": "SLF",
+    "decimals": "6",
+    "network": "goerli-alpha"
   }
 ]

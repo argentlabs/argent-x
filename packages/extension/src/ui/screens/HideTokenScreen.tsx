@@ -6,7 +6,7 @@ import { P } from "../components/Typography"
 import { FormError } from "../components/Typography"
 import { routes } from "../routes"
 import { removeToken } from "../states/tokens"
-import { useTokensWithBalance } from "../states/tokens"
+import { useTokens } from "../states/tokens"
 import { toTokenView } from "../utils/tokens"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { BalanceAlert, TokenName, TokenTitle } from "./TokenScreen"
@@ -16,15 +16,15 @@ export const HideTokenAlert = BalanceAlert
 export const HideTokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
-  const { tokenDetails } = useTokensWithBalance()
+  const { tokens } = useTokens()
   const [error, setError] = useState("")
 
-  const token = tokenDetails.find(({ address }) => address === tokenAddress)
+  const token = tokens.find(({ address }) => address === tokenAddress)
   if (!token) {
     return <Navigate to={routes.account()} />
   }
 
-  const { name } = toTokenView(token)
+  const { name, image } = toTokenView(token)
 
   const handleSubmit = () => {
     try {
@@ -43,7 +43,7 @@ export const HideTokenScreen: FC = () => {
       onSubmit={handleSubmit}
     >
       <TokenTitle>
-        <TokenIcon name={name} large />
+        <TokenIcon url={image} name={name} large />
         <TokenName>{name}</TokenName>
       </TokenTitle>
       {error && <FormError>{error}</FormError>}

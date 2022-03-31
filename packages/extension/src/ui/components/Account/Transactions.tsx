@@ -2,6 +2,7 @@ import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
 import { TransactionMeta as ITransactionMeta } from "../../../shared/transactions.model"
+import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import { CopyTooltip } from "../CopyTooltip"
 import { NetworkStatusIndicator } from "../NetworkSwitcher"
@@ -76,10 +77,7 @@ export const TransactionItem: FC<TransactionProps> = ({
   ...props
 }) => {
   return (
-    <TransactionWrapper
-      // {...makeClickable(onClick)} // TODO: can be reenabled once voyager supports pending transactions
-      {...props}
-    >
+    <TransactionWrapper {...makeClickable(onClick)} {...props}>
       <TokenIcon name={meta?.title || txHash.substring(2)} />
       <TokenDetailsWrapper>
         <TokenTextGroup>

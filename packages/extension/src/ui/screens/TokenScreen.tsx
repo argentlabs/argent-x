@@ -103,7 +103,7 @@ export const TokenScreen: FC = () => {
     return <></>
   }
 
-  const { address, name, symbol, balance, decimals } = toTokenView(token)
+  const { address, name, symbol, balance, decimals, image } = toTokenView(token)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -127,7 +127,7 @@ export const TokenScreen: FC = () => {
       </Header>
       <TokenScreenWrapper>
         <TokenTitle>
-          <TokenIcon name={name} large />
+          <TokenIcon url={image} name={name} large />
           <TokenName>{name}</TokenName>
         </TokenTitle>
         <TokenAddressWrapper>

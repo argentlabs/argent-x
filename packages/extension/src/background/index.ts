@@ -214,6 +214,37 @@ import { Wallet, WalletStorageProps } from "./wallet"
         return await wallet.selectAccount(msg.data.address)
       }
 
+      case "ESTIMATE_TRANSACTION_FEE": {
+        const selectedAccount = await wallet.getSelectedAccount()
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
+        if (!selectedAccount) {
+          throw Error("no accounts")
+        }
+        const { amount, unit } = await starknetAccount.estimateFee(msg.data)
+
+        return sendToTabAndUi({
+          type: "ESTIMATE_TRANSACTION_FEE_RES",
+          data: {
+            amount,
+            unit,
+          },
+        })
+      }
+
+      case "UPDATE_TRANSACTION_FEE": {
+        const { actionHash } = msg.data
+        await actionQueue.override(actionHash, {
+          maxFee: msg.data.maxFee,
+        })
+
+        return sendToTabAndUi({
+          type: "UPDATE_TRANSACTION_FEE_RES",
+          data: {
+            actionHash,
+          },
+        })
+      }
+
       case "APPROVE_ACTION": {
         const { actionHash } = msg.data
         const action = await actionQueue.remove(actionHash)
@@ -255,10 +286,18 @@ import { Wallet, WalletStorageProps } from "./wallet"
                 ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
                 : await getNonce(starknetAccount)
 
+              const { maxFee } = action.override || {}
+              const maxFeeOverrideExists =
+                maxFee !== undefined && maxFee !== null
+
               const transaction = await starknetAccount.execute(
                 transactions,
                 abis,
-                { ...transactionsDetail, nonce },
+                {
+                  ...transactionsDetail,
+                  nonce,
+                  ...(maxFeeOverrideExists && { maxFee }),
+                },
               )
 
               transactionTracker.trackTransaction(

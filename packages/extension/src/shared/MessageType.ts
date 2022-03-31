@@ -28,6 +28,14 @@ export type MessageType =
   | { type: "NEW_ACCOUNT_REJ"; data: { status: "ko"; error: string } }
   | { type: "GET_ACCOUNTS" }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
+  | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
+  | {
+      type: "ESTIMATE_TRANSACTION_FEE_RES"
+      data: {
+        amount: number
+        unit: string
+      }
+    }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "DISCONNECT_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT" }
@@ -67,6 +75,19 @@ export type MessageType =
   | {
       type: "TRANSACTION_FAILED"
       data: { actionHash: string; error?: string }
+    }
+  | {
+      type: "UPDATE_TRANSACTION_FEE"
+      data: {
+        actionHash: string
+        maxFee?: InvocationsDetails["maxFee"]
+      }
+    }
+  | {
+      type: "UPDATE_TRANSACTION_FEE_RES"
+      data: {
+        actionHash: string
+      }
     }
   // ***** pre-authorizations *****
   | { type: "CONNECT_DAPP"; data: { host: string } }
