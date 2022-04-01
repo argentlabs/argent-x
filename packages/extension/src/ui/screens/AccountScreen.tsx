@@ -71,10 +71,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
   const transactions = useAccountTransactions(account.address)
   const { accountNames, setAccountName } = useAccountMetadata()
   const pendingTransactions = useMemo(
-    () =>
-      transactions.filter(
-        ({ status }) => status === "PENDING" || status === "RECEIVED",
-      ),
+    () => transactions.filter(({ status }) => status === "RECEIVED"),
     [transactions],
   )
 

@@ -5,7 +5,7 @@ import { messageStream } from "../../shared/messages"
 import { getTransactionStatus } from "../utils/messaging"
 
 function transformStatus(status: StarkNetStatus): Status {
-  return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2"].includes(status)
+  return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)
     ? "SUCCESS"
     : status === "REJECTED"
     ? "ERROR"
