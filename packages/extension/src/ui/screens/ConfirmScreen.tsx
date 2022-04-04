@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react"
+import { FC, FormEvent, ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -33,9 +33,9 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   rejectButtonText?: string
   confirmButtonText?: string
   disableConfirm?: boolean
-  confirmButtonBgColor?: string
+  confirmButtonBackgroundColor?: string
   singleButton?: boolean
-  footerChildren?: ReactNode
+  footer?: ReactNode
 }
 
 const StickyGroup = styled.div`
@@ -55,12 +55,12 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonText = "Confirm",
   disableConfirm = false,
   rejectButtonText = "Reject",
-  confirmButtonBgColor,
+  confirmButtonBackgroundColor,
   onSubmit,
   onReject,
   selectedAccount,
   singleButton = false,
-  footerChildren,
+  footer,
   children,
 }) => {
   const navigate = useNavigate()
@@ -85,10 +85,10 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
 
       {children}
       <StickyGroup>
-        {footerChildren}
+        {footer}
         <ButtonGroupVertical
           as="form"
-          onSubmit={(e: any) => {
+          onSubmit={(e: FormEvent) => {
             e.preventDefault()
             return onSubmit?.()
           }}
@@ -100,7 +100,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           )}
           <Button
             disabled={disableConfirm}
-            style={{ backgroundColor: confirmButtonBgColor }}
+            style={{ backgroundColor: confirmButtonBackgroundColor }}
             type="submit"
           >
             {confirmButtonText}

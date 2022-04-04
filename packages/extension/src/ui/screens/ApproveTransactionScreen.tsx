@@ -47,7 +47,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       onSubmit={() => {
         onSubmit(transactions)
       }}
-      footerChildren={
+      footer={
         <FeeEstimate
           onChange={async (x) => {
             setDisableConfirm(true)
