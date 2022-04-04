@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
+import SettingsIcon from "@mui/icons-material/Settings"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -108,7 +108,7 @@ export const AccountListScreen: FC = () => {
           size={36}
           {...makeClickable(() => navigate(routes.settings()), 99)}
         >
-          <MoreVertIcon />
+          <SettingsIcon />
         </IconButton>
         <NetworkSwitcher hidePort />
       </Header>

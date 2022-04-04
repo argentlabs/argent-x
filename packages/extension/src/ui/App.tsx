@@ -38,7 +38,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-family: 'Barlow', sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-color: #161616;;
+    background-color: #161616;
     color: white;
 
     min-width: 320px;
