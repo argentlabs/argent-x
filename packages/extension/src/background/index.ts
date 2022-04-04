@@ -37,7 +37,7 @@ import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { Wallet, WalletStorageProps } from "./wallet"
 
-const successStatus = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
+const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
