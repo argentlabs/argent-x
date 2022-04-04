@@ -11,6 +11,7 @@ export const routes = {
   hideToken: (tokenAddress: string) => `/tokens/${tokenAddress}/hide`,
   hideTokenPath: () => "/tokens/:tokenAddress/hide",
   reset: () => "/reset",
+  disclaimer: () => "/disclaimer",
   legacy: () => "/legacy",
   settings: () => "/settings",
   settingsLocalhostPort: () => "/settings/localhost-port",
