@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, FormEvent, ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -33,17 +33,21 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   rejectButtonText?: string
   confirmButtonText?: string
   disableConfirm?: boolean
-  confirmButtonBgColor?: string
+  confirmButtonBackgroundColor?: string
   singleButton?: boolean
+  footer?: ReactNode
 }
 
-const StickyButtonGroupVertical = styled(ButtonGroupVertical)`
+const StickyGroup = styled.div`
   position: sticky;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 0 32px;
-  background-color: #161616;
+  padding: 16px 0 24px;
+
+  > * + * {
+    margin-top: 24px;
+  }
 `
 
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
@@ -51,11 +55,12 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonText = "Confirm",
   disableConfirm = false,
   rejectButtonText = "Reject",
-  confirmButtonBgColor,
+  confirmButtonBackgroundColor,
   onSubmit,
   onReject,
   selectedAccount,
   singleButton = false,
+  footer,
   children,
 }) => {
   const navigate = useNavigate()
@@ -79,27 +84,29 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       <H2>{title}</H2>
 
       {children}
-
-      <StickyButtonGroupVertical
-        as="form"
-        onSubmit={(e: any) => {
-          e.preventDefault()
-          return onSubmit?.()
-        }}
-      >
-        {!singleButton && (
-          <Button onClick={onReject} type="button">
-            {rejectButtonText}
-          </Button>
-        )}
-        <Button
-          disabled={disableConfirm}
-          style={{ backgroundColor: confirmButtonBgColor }}
-          type="submit"
+      <StickyGroup>
+        {footer}
+        <ButtonGroupVertical
+          as="form"
+          onSubmit={(e: FormEvent) => {
+            e.preventDefault()
+            return onSubmit?.()
+          }}
         >
-          {confirmButtonText}
-        </Button>
-      </StickyButtonGroupVertical>
+          {!singleButton && (
+            <Button onClick={onReject} type="button">
+              {rejectButtonText}
+            </Button>
+          )}
+          <Button
+            disabled={disableConfirm}
+            style={{ backgroundColor: confirmButtonBackgroundColor }}
+            type="submit"
+          >
+            {confirmButtonText}
+          </Button>
+        </ButtonGroupVertical>
+      </StickyGroup>
     </ConfirmScreenWrapper>
   )
 }

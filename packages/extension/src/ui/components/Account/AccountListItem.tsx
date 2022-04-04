@@ -43,7 +43,7 @@ export const AccountListItemWrapper = styled.div<{
     ${({ selected = false }) =>
       selected &&
       css`
-        border: 1px solid rgba(2, 187, 168, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.3);
       `}
   }
 
