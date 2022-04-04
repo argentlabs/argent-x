@@ -14,6 +14,7 @@ import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { BackupRecoveryScreen } from "./screens/BackupRecoveryScreen"
+import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LegacyScreen } from "./screens/LegacyScreen"
@@ -102,6 +103,7 @@ const Screen: FC = () => {
       />
       <Route path={routes.lockScreen()} element={<LockScreen />} />
       <Route path={routes.reset()} element={<ResetScreen />} />
+      <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
       <Route path={routes.legacy()} element={<LegacyScreen />} />
       <Route path={routes.error()} element={<ErrorScreen />} />
 
