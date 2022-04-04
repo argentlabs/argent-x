@@ -3,15 +3,8 @@ import { useNavigate } from "react-router-dom"
 
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
-import {
-  isDisclaimerUnderstood,
-  understandDisclaimer,
-} from "../utils/disclaimer"
-import {
-  getAccounts,
-  hasActiveSession,
-  isInitialized,
-} from "../utils/messaging"
+import { isDisclaimerUnderstood } from "../utils/disclaimer"
+import { hasActiveSession, isInitialized } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 
 export const useEntry = () => {
@@ -37,11 +30,6 @@ const determineEntry = async () => {
     }
 
     if (!isDisclaimerUnderstood()) {
-      const accounts = await getAccounts()
-      if (accounts.length > 0) {
-        understandDisclaimer()
-        return routes.welcome()
-      }
       return routes.disclaimer()
     }
 
