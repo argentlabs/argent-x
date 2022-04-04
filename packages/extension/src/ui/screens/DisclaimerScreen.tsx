@@ -19,7 +19,7 @@ export const DisclaimerScreen: FC = () => {
     <ConfirmScreen
       title="Disclaimer"
       confirmButtonText="I understand"
-      confirmButtonBgColor="#c12026"
+      confirmButtonBackgroundColor="#c12026"
       singleButton
       onSubmit={() => {
         understandDisclaimer()
