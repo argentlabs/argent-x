@@ -37,6 +37,8 @@ import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { Wallet, WalletStorageProps } from "./wallet"
 
+const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
+
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
@@ -58,14 +60,14 @@ import { Wallet, WalletStorageProps } from "./wallet"
       for (const transaction of transactions) {
         const { hash, status, accountAddress, meta } = transaction
         if (
-          (status === "ACCEPTED_ON_L2" || status === "REJECTED") &&
+          (successStatuses.includes(status) || status === "REJECTED") &&
           !(await hasShownNotification(hash))
         ) {
           addToAlreadyShown(hash)
           sentTransactionNotification(hash, status, meta)
           if (accountAddress) {
             const data = { hash, status, accountAddress, meta }
-            if (status === "ACCEPTED_ON_L2") {
+            if (successStatuses.includes(status)) {
               sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
             } else if (status === "REJECTED") {
               const { failureReason } = transaction
