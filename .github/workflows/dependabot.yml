@@ -17,13 +17,14 @@ jobs:
         with:
           github-token: ${{ secrets.PAT }}
           script: |-
-            github.pulls.createReview({
+            await github.pulls.createReview({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,
               pull_number: context.payload.pull_request.number,
               event: 'APPROVE'
             })
-            github.pulls.merge({
+            await exec.exec("sleep 2000")
+            await github.pulls.merge({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,
               pull_number: context.payload.pull_request.number,
