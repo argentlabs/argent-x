@@ -23,7 +23,7 @@ jobs:
               pull_number: context.payload.pull_request.number,
               event: 'APPROVE'
             })
-            await exec.exec("sleep 2000")
+            await exec.exec("sleep 2")
             await github.pulls.merge({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,
