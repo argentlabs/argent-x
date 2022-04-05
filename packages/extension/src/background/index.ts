@@ -298,7 +298,9 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
                 {
                   ...transactionsDetail,
                   nonce,
-                  ...(maxFeeOverrideExists && { maxFee }),
+                  // For now we want to set the maxFee to 0 in case the user has not provided a maxFee. This will change with the next release. The default behavior in starknet.js is to estimate the fee, so we need to pass 0 explicitly.
+                  // TODO: remove in next release
+                  maxFee: maxFeeOverrideExists ? maxFee : 0,
                 },
               )
 
