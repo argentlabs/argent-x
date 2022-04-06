@@ -35,7 +35,7 @@
   },
   {
     "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
-    "name": "Goerli USD Coin",
+    "name": "USD Coin",
     "symbol": "USDC",
     "decimals": "6",
     "network": "goerli-alpha",
