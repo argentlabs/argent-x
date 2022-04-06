@@ -109,11 +109,15 @@ export class Wallet extends EventEmitter {
       throw Error("no open session")
     }
 
-    const current_paths = this.accounts
-      .filter((account) => account.signer.type === "local_secret")
+    const currentPaths = this.accounts
+      .filter(
+        (account) =>
+          account.signer.type === "local_secret" &&
+          account.network === networkId,
+      )
       .map((account) => account.signer.derivationPath)
 
-    const index = getNextPathIndex(current_paths)
+    const index = getNextPathIndex(currentPaths)
     const starkPair = getStarkPair(index, this.session?.secret as string)
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
