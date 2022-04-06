@@ -42,7 +42,14 @@ const GlobalStyle = createGlobalStyle`
     color: white;
 
     min-width: 320px;
-    min-height: 568px;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  .root {
+    height: 568px;
   }
 
   * {
