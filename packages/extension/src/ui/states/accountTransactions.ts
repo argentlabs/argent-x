@@ -36,5 +36,9 @@ export const useAccountTransactions = (accountAddress: string) => {
     }
   }, [])
 
-  return useTransactionsStore((state) => state.transactions)
+  const transactions = useTransactionsStore((state) => state.transactions)
+  const pendingTransactions = transactions.filter(
+    ({ status }) => status === "RECEIVED",
+  )
+  return { transactions, pendingTransactions }
 }
