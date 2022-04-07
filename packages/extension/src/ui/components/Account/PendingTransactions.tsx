@@ -1,10 +1,10 @@
 import { FC } from "react"
 
-import { getNetwork } from "../../../shared/networks"
 import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
+import { openVoyagerTransaction } from "../../utils/voyager.service"
 import { SectionHeader } from "./SectionHeader"
-import { TransactionItem, TransactionsWrapper } from "./Transactions"
+import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
 
 interface PendingTransactionsProps {
   accountAddress: string
@@ -29,10 +29,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
             key={hash}
             txHash={hash}
             meta={meta}
-            onClick={() => {
-              const { explorerUrl } = getNetwork(switcherNetworkId)
-              window.open(`${explorerUrl}/tx/${hash}`, "_blank")?.focus()
-            }}
+            onClick={() => openVoyagerTransaction(hash, switcherNetworkId)}
           />
         ))}
       </TransactionsWrapper>

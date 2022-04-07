@@ -64,13 +64,13 @@ const TransactionMeta = styled(TokenMeta)`
   cursor: pointer;
 `
 
-interface TransactionProps {
+interface TransactionItemProps {
   txHash: string
   meta?: ITransactionMeta
   onClick?: () => void
 }
 
-export const TransactionItem: FC<TransactionProps> = ({
+export const TransactionItem: FC<TransactionItemProps> = ({
   txHash,
   meta,
   onClick,

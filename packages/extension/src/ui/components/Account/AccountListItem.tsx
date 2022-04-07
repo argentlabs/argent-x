@@ -17,7 +17,7 @@ import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
-import { TransactionIndicator } from "./Transactions"
+import { TransactionIndicator } from "./TransactionItem"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;
