@@ -1,7 +1,8 @@
 import { Provider, Status } from "starknet"
 
 export interface TransactionMeta {
-  title: string
+  title?: string
+  subTitle?: string
 }
 
 export interface FetchedTransactionStatus {

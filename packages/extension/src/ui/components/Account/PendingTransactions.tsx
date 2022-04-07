@@ -27,7 +27,9 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
         {pendingTransactions.map(({ hash, meta }) => (
           <TransactionItem
             key={hash}
-            txHash={hash}
+            hash={hash}
+            status="DEPLOYING"
+            highlighted
             meta={meta}
             onClick={() => openVoyagerTransaction(hash, switcherNetworkId)}
           />

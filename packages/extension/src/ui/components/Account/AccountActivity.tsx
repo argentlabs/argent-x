@@ -1,8 +1,9 @@
-import { FC, useEffect, useState } from "react"
+import { FC, Fragment, useEffect, useState } from "react"
 import styled from "styled-components"
 
 import { Account } from "../../Account"
 import { useAppState } from "../../states/app"
+import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
 import { DailyActivity } from "./accountActivity.model"
 import { fetchActivity } from "./accountActivity.service"
@@ -20,7 +21,7 @@ const Header = styled.h2`
   font-weight: 600;
   font-size: 32px;
   line-height: 38.4px;
-  margin: 25px;
+  margin-bottom: 25px;
   text-align: center;
 `
 
@@ -44,19 +45,20 @@ export const AccountActivity: FC<AccountActivityProps> = ({ account }) => {
     <Container>
       <Header>Activity</Header>
       <PendingTransactions accountAddress={account.address} />
-      {Object.entries(activity || {}).map(([date, transactions]) => (
-        <>
-          <SectionHeader>{date}</SectionHeader>
+      {Object.entries(activity || {}).map(([dateLabel, transactions]) => (
+        <Fragment key={dateLabel}>
+          <SectionHeader>{dateLabel}</SectionHeader>
           <TransactionsWrapper>
-            {transactions.map(({ hash }) => (
+            {transactions.map(({ hash, date }) => (
               <TransactionItem
                 key={hash}
-                txHash={hash}
+                hash={hash}
+                meta={{ subTitle: formatDateTime(date) }}
                 onClick={() => openVoyagerTransaction(hash, switcherNetworkId)}
               />
             ))}
           </TransactionsWrapper>
-        </>
+        </Fragment>
       ))}
     </Container>
   )
