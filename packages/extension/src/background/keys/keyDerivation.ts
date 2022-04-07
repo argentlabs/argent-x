@@ -27,19 +27,12 @@ export function getPathForIndex(index: number): string {
 }
 
 export function getNextPathIndex(paths: string[]): number {
-  return (
-    paths.reduce((prev, path) => {
-      if (!path.startsWith(BASE_PATH)) {
-        return prev
-      }
-      const stringIndex = path.replace(BASE_PATH + "/", "")
-      if (!stringIndex.match(/^\d*$/gm)) {
-        return prev
-      }
-      const index = parseInt(stringIndex)
-      return Math.max(prev, index)
-    }, -1) + 1
-  )
+  for (let index = 0; index < paths.length; index++) {
+    if (!paths.includes(getPathForIndex(index))) {
+      return index
+    }
+  }
+  return paths.length
 }
 
 // inspired/copied from https://github.com/authereum/starkware-monorepo/blob/51c5df19e7f98399a2f7e63d564210d761d138d1/packages/starkware-crypto/src/keyDerivation.ts#L85
