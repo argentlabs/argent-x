@@ -17,7 +17,7 @@ const BannerWrapper = styled.div<{
     `};
 `
 
-const UpdateTextWrapper = styled.div`
+const BannerTextWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 12px;
@@ -56,10 +56,10 @@ export const Banner: FC<BannerProps> = ({
   return (
     <BannerWrapper noMargins={noMargins} onClick={onClick}>
       {icon}
-      <UpdateTextWrapper>
+      <BannerTextWrapper>
         <BannerTitle>{title}</BannerTitle>
         <BannerDescription>{description}</BannerDescription>
-      </UpdateTextWrapper>
+      </BannerTextWrapper>
     </BannerWrapper>
   )
 }

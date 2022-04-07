@@ -1,6 +1,7 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { routes } from "../routes"
 import { Banner } from "./Banner"
 
 interface RecoveryBannerProps {
@@ -31,7 +32,7 @@ export const RecoveryBanner: FC<RecoveryBannerProps> = ({ noMargins }) => {
         </svg>
       }
       onClick={() => {
-        navigate("/recovery")
+        navigate(routes.setupRecovery())
       }}
     />
   )

@@ -2,6 +2,7 @@ export const routes = {
   welcome: () => "/index.html",
   newWallet: () => "/wallets/new",
   backupRecovery: () => "/recover",
+  setupRecovery: () => "/recovery",
   lockScreen: () => "/lock-screen",
   account: () => "/account",
   upgrade: () => "/account/upgrade",
