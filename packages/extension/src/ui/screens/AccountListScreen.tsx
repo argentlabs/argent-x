@@ -10,10 +10,12 @@ import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
+import { RecoveryBanner } from "../components/RecoveryBanner"
 import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
+import { useBackupRequired } from "../states/backupDownload"
 import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
@@ -52,6 +54,7 @@ export const AccountListScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
   const { localhostPort } = useLocalhostPort()
   const { accounts, selectedAccount, addAccount } = useAccount()
+  const { isBackupRequired } = useBackupRequired()
 
   const accountsList = Object.values(accounts)
 
@@ -82,6 +85,7 @@ export const AccountListScreen: FC = () => {
       </AccountHeader>
       <H1>Accounts</H1>
       <AccountList>
+        {isBackupRequired && <RecoveryBanner noMargins />}
         {accountsList.length === 0 && (
           <Paragraph>
             No accounts on this network, click below to add one.

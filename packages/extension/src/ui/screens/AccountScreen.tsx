@@ -12,9 +12,11 @@ import { AccountHeader } from "../components/Account/AccountHeader"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
+import { RecoveryBanner } from "../components/RecoveryBanner"
 import { routes } from "../routes"
 import { selectAccount, useAccount } from "../states/account"
 import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
+import { useBackupRequired } from "../states/backupDownload"
 import { makeClickable } from "../utils/a11y"
 import { getAccountImageUrl } from "../utils/accounts"
 
@@ -45,6 +47,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
   const navigate = useNavigate()
   const { accountNames } = useAccountMetadata()
   const [tab, setTab] = useState<AccountTab>("assets")
+  const { isBackupRequired } = useBackupRequired()
 
   const accountName = getAccountName(account, accountNames)
 
@@ -59,6 +62,8 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
           <NetworkSwitcher />
         </Header>
       </AccountHeader>
+
+      {isBackupRequired && <RecoveryBanner />}
 
       {tab === "assets" ? (
         <AccountAssets account={account} />
