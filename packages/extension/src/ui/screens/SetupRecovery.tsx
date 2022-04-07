@@ -1,33 +1,13 @@
 import { FC } from "react"
-import styled from "styled-components"
+import { useNavigate } from "react-router-dom"
 
 import { IconBarWithIcons } from "../components/Recovery/IconBar"
 import { Option, OptionsWrapper } from "../components/Recovery/Options"
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 18px 24px;
-`
-
-const Title = styled.h1`
-  font-weight: 700;
-  font-weight: 700;
-  font-size: 34px;
-  line-height: 41px;
-  margin: 0;
-  margin-bottom: 24px;
-`
-
-const Paragraph = styled.p`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 21px;
-  margin: 0;
-  margin-bottom: 40px;
-`
+import { PageWrapper, Paragraph, Title } from "../components/Recovery/Page"
+import { routes } from "../routes"
 
 export const SetupRecoveryPage: FC = () => {
+  const navigate = useNavigate()
   return (
     <>
       <IconBarWithIcons />
@@ -65,6 +45,9 @@ export const SetupRecoveryPage: FC = () => {
             title="Unencrypted"
             description="Save a backup phrase"
             backgroundColor="#C12026"
+            onClick={() => {
+              navigate(routes.setupSeedRecovery())
+            }}
             icon={
               <svg
                 width="32"

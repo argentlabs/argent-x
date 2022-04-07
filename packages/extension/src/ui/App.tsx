@@ -26,6 +26,7 @@ import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnections
 import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
 import { SetupRecoveryPage } from "./screens/SetupRecovery"
+import { SetupSeedRecoveryPage } from "./screens/SetupSeedRecovery"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
@@ -128,6 +129,7 @@ const Screen: FC = () => {
         <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
         <Route path={routes.legacy()} element={<LegacyScreen />} />
         <Route path={routes.error()} element={<ErrorScreen />} />
+
         {/* Routes which need an unlocked backup and therefore can also sign actions */}
         {actions[0] ? (
           <Route path="*" element={<ActionScreen />} />
@@ -136,6 +138,10 @@ const Screen: FC = () => {
             <Route path={routes.account()} element={<AccountScreen />} />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
+            <Route
+              path={routes.setupSeedRecovery()}
+              element={<SetupSeedRecoveryPage />}
+            />
             <Route
               path={routes.setupRecovery()}
               element={<SetupRecoveryPage />}
@@ -160,7 +166,7 @@ const Screen: FC = () => {
               element={<BackupDownloadScreen />}
             />
           </>
-        )}{" "}
+        )}
       </Route>
     </Routes>
   )
