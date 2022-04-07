@@ -4,7 +4,7 @@ import { sendMessage } from "../../shared/messages"
 import { localNetworkUrl } from "../../shared/networks"
 import { Account } from "../Account"
 import { useAppState } from "../states/app"
-import { useBackupDownload } from "../states/backupDownload"
+import { useBackupRequired } from "../states/backupDownload"
 import { useLocalhostPort } from "../states/localhostPort"
 import { startSession } from "./messaging"
 
@@ -22,7 +22,7 @@ export const deployAccount = async (
   const network = localNetworkUrl(networkId, localhostPort)
   try {
     const account = await Account.fromDeploy(network)
-    useBackupDownload.setState({ isBackupDownloadRequired: true })
+    useBackupRequired.setState({ isBackupRequired: true })
     return account
   } finally {
     useAppState.setState({ isLoading: false })

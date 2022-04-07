@@ -30,7 +30,6 @@ import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
-import { useBackupDownload } from "./states/backupDownload"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -102,13 +101,9 @@ const Screen: FC = () => {
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
-  const { isBackupDownloadRequired } = useBackupDownload()
 
   if (isLoading) {
     return <LoadingScreen />
-  }
-  if (isBackupDownloadRequired) {
-    return <BackupDownloadScreen />
   }
 
   return (
