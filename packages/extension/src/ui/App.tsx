@@ -14,6 +14,7 @@ import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { BackupRecoveryScreen } from "./screens/BackupRecoveryScreen"
+import { ConfirmSeedRecoveryPage } from "./screens/ConfirmSeedRecovery"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
@@ -138,6 +139,10 @@ const Screen: FC = () => {
             <Route path={routes.account()} element={<AccountScreen />} />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
+            <Route
+              path={routes.confirmSeedRecovery()}
+              element={<ConfirmSeedRecoveryPage />}
+            />
             <Route
               path={routes.setupSeedRecovery()}
               element={<SetupSeedRecoveryPage />}

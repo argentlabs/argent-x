@@ -72,7 +72,7 @@ export const SetupSeedRecoveryPage: FC = () => {
 
   return (
     <>
-      <IconBarWithIcons />
+      <IconBarWithIcons showBack />
       <PageWrapper>
         <Title>Recovery phrase</Title>
         <Paragraph>
