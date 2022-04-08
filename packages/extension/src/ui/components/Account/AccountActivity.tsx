@@ -15,6 +15,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding-top: 16px;
+  margin-bottom: 68px;
 `
 
 const Header = styled.h2`

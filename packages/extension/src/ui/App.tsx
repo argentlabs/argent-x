@@ -45,11 +45,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   html, body {
-    height: 100%;
-  }
-
-  .root {
-    height: 568px;
+    min-height: calc(600px - 68px);
+    overscroll-behavior: none;
   }
 
   * {
