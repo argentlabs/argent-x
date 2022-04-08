@@ -1,7 +1,7 @@
 import { FC, Suspense } from "react"
-import usePromise from "react-promise-suspense"
 import { useNavigate } from "react-router-dom"
 import styled, { keyframes } from "styled-components"
+import useSWRImmutable from "swr/immutable"
 
 import { Button } from "../components/Button"
 import { IconBarWithIcons } from "../components/Recovery/IconBar"
@@ -49,7 +49,14 @@ const LoadingSeedWordBadge = styled.div<{
 `
 
 const FetchedSeedPhrase: FC = () => {
-  const seedPhrase: string = usePromise(() => getSeedPhrase(), [0])
+  const { data: seedPhrase = "" } = useSWRImmutable(
+    // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage
+    "seedPhrase",
+    () => getSeedPhrase(),
+    {
+      suspense: true,
+    },
+  )
 
   return (
     <SeedPhraseGrid>

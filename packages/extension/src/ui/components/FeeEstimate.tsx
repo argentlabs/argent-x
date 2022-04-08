@@ -3,7 +3,6 @@ import DangerIcon from "@mui/icons-material/ReportGmailerrorredRounded"
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
 import { FC, Suspense, useEffect, useMemo, useState } from "react"
-import usePromise from "react-promise-suspense"
 import type { Call } from "starknet"
 import styled, { keyframes } from "styled-components"
 import useSWR from "swr"
@@ -71,18 +70,22 @@ type FeeEstimateProps = (
 }
 
 const FeeEstimateInput: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
-  const { amount }: { unit: string; amount: number } = usePromise(
+  const { data: { amount } = { unit: "wei", amount: 0 } } = useSWR(
+    [
+      "transactions" in props
+        ? props.transactions
+        : { maxFee: props.maxFee.toNumber() },
+    ],
     async (x) => {
       if ("maxFee" in x) {
         return { unit: "wei", amount: x.maxFee }
       }
       return getEstimatedFee(x)
     },
-    [
-      "transactions" in props
-        ? props.transactions
-        : { maxFee: props.maxFee.toNumber() },
-    ],
+    {
+      suspense: true,
+      refreshInterval: 20 * 1000, // 20 seconds
+    },
   )
 
   useEffect(() => {
