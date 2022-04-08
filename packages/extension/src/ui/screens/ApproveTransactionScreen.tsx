@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom"
 import { Call, InvokeFunctionTransaction, encode } from "starknet"
 import styled from "styled-components"
 
-import { FeeEstimate } from "../components/FeeEstimate"
+import { FeeEstimation } from "../components/FeeEstimation"
 import { routes } from "../routes"
 import { updateTransactionFee } from "../utils/messaging"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
@@ -48,7 +48,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         onSubmit(transactions)
       }}
       footer={
-        <FeeEstimate
+        <FeeEstimation
           onChange={async (x) => {
             setDisableConfirm(true)
             await updateTransactionFee(

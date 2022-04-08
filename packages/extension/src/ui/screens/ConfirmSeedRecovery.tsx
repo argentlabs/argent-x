@@ -73,9 +73,7 @@ const SelectableSeedWordBadge = styled(SeedWordBadge)<{
 `
 
 function getRandomWord(excludeWordlist: string[]): string {
-  const excludeIndexes = excludeWordlist.map((word) =>
-    wordlists.en.getWordIndex(word),
-  )
+  const excludeIndexes = excludeWordlist.map(wordlists.en.getWordIndex)
   const randomIndex = Math.floor(Math.random() * 2048)
   if (excludeIndexes.includes(randomIndex)) {
     return getRandomWord(excludeWordlist)
@@ -118,17 +116,13 @@ const ConfirmSeedPhrase: FC<{
     // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage
     "seedPhrase",
     () => getSeedPhrase(),
-    {
-      suspense: true,
-    },
+    { suspense: true },
   )
 
   const { data: confirmSeedPhrase = [] } = useSWRImmutable(
     "confirmSeedPhrase",
     () => createConfirmationWordlist(wordlists.en.split(seedPhrase)),
-    {
-      suspense: true,
-    },
+    { suspense: true },
   )
 
   const [selectedWords, setSelectedWords] = useState<string[]>([])
@@ -142,8 +136,6 @@ const ConfirmSeedPhrase: FC<{
     const expectedWords = wordlists.en
       .split(seedPhrase)
       .filter((word) => confirmSeedPhrase.includes(word))
-
-    console.log(expectedWords, updatedSelectedWords)
 
     onChange?.(
       updatedSelectedWords.length === expectedWords.length &&
@@ -219,7 +211,7 @@ export const ConfirmSeedRecoveryPage: FC = () => {
           {showError && (
             <FormError
               style={{
-                marginTop: "8px",
+                marginTop: 8,
                 textAlign: "center",
               }}
             >

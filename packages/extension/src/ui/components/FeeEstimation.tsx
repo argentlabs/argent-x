@@ -16,7 +16,7 @@ const Center = styled.div`
   align-items: center;
 `
 
-const FeeEstimateWrapper = styled(Center)`
+const FeeEstimationWrapper = styled(Center)`
   justify-content: space-between;
   margin-top: 16px;
   padding: 20px;
@@ -24,7 +24,7 @@ const FeeEstimateWrapper = styled(Center)`
   background: #333332;
 `
 
-const FeeEstimateText = styled.p`
+const FeeEstimationText = styled.p`
   display: flex;
   align-items: center;
   font-weight: 600;
@@ -33,7 +33,7 @@ const FeeEstimateText = styled.p`
   color: #8f8e8c;
 `
 
-const FeeEstimateValue = styled.p`
+const FeeEstimationValue = styled.p`
   font-weight: 600;
   font-size: 15px;
   line-height: 20px;
@@ -56,7 +56,7 @@ const InvisibleInput = styled.input`
   text-align: right;
 `
 
-type FeeEstimateProps = (
+type FeeEstimationProps = (
   | {
       maxFee: BigNumber
     }
@@ -69,7 +69,7 @@ type FeeEstimateProps = (
   networkId: string
 }
 
-const FeeEstimateInput: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
+const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
   const { data: { amount } = { unit: "wei", amount: 0 } } = useSWR(
     [
       "transactions" in props
@@ -154,7 +154,10 @@ const LoadingInput = styled.div`
   animation: ${pulseKeyframe} 1s alternate infinite;
 `
 
-export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
+export const FeeEstimation: FC<FeeEstimationProps> = ({
+  onChange,
+  ...props
+}) => {
   const [fee, setFee] = useState<BigNumber>()
 
   const { data: feeTokenBalance } = useSWR(
@@ -177,9 +180,9 @@ export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
   }, [firstFetchDone, enoughBalance])
 
   return (
-    <FeeEstimateWrapper>
+    <FeeEstimationWrapper>
       <span>
-        <FeeEstimateText>
+        <FeeEstimationText>
           Network fee
           <Tippy
             content={
@@ -214,11 +217,11 @@ export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
               />
             )}
           </Tippy>
-        </FeeEstimateText>
+        </FeeEstimationText>
       </span>
       <Center>
         <Suspense fallback={<LoadingInput />}>
-          <FeeEstimateInput
+          <FeeEstimationInput
             {...props}
             onChange={(fee) => {
               setFee(fee)
@@ -226,8 +229,8 @@ export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
             }}
           />
         </Suspense>
-        <FeeEstimateValue>ETH</FeeEstimateValue>
+        <FeeEstimationValue>ETH</FeeEstimationValue>
       </Center>
-    </FeeEstimateWrapper>
+    </FeeEstimationWrapper>
   )
 }

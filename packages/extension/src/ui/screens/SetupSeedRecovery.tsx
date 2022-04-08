@@ -76,7 +76,7 @@ const FetchedSeedPhrase: FC = () => {
   return (
     <SeedPhraseGrid>
       {seedPhrase.split(" ").map((word, index) => (
-        <SeedWordBadge key={index}>
+        <SeedWordBadge key={word + index}>
           <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
           {word}
         </SeedWordBadge>
