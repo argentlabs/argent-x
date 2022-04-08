@@ -1,4 +1,10 @@
-import { CompactEncrypt, importJWK } from "jose"
+import {
+  CompactEncrypt,
+  exportJWK,
+  generateSecret,
+  importJWK,
+  jwtDecrypt,
+} from "jose"
 import { Call, encode, number } from "starknet"
 
 import {
@@ -78,6 +84,37 @@ export const getAccounts = async () => {
 export const getEstimatedFee = async (call: Call | Call[]) => {
   sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
   return waitForMessage("ESTIMATE_TRANSACTION_FEE_RES")
+}
+
+export const getSeedPhrase = async (): Promise<string> => {
+  const otpKey = await generateSecret("A256GCM", { extractable: true })
+  const otpBuffer = encode.utf8ToArray(
+    JSON.stringify({
+      alg: "A256GCM",
+      ...(await exportJWK(otpKey)),
+    }),
+  )
+  const pubJwk = await getPublicKey()
+  const pubKey = await importJWK(pubJwk)
+
+  const encryptedSecret = await new CompactEncrypt(otpBuffer)
+    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
+    .encrypt(pubKey)
+
+  sendMessage({
+    type: "GET_ENCRYPTED_SEED_PHRASE",
+    data: {
+      encryptedSecret,
+    },
+  })
+
+  const { encryptedSeedPhrase } = await waitForMessage(
+    "GET_ENCRYPTED_SEED_PHRASE_RES",
+  )
+
+  const { payload } = await jwtDecrypt(encryptedSeedPhrase, otpKey)
+
+  return payload.seedPhrase as string
 }
 
 export const updateTransactionFee = async (

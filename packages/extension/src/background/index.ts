@@ -1,6 +1,6 @@
 import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
-import { compactDecrypt } from "jose"
+import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 import { encode, number, stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
@@ -485,9 +485,31 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "GET_PUBLIC_KEY": {
-        return sendToTabAndUi({
+        return sendMessageToUi({
           type: "GET_PUBLIC_KEY_RES",
           data: publicKeyJwk,
+        })
+      }
+      case "GET_ENCRYPTED_SEED_PHRASE": {
+        if (!wallet.isSessionOpen()) {
+          throw Error("you need an open session")
+        }
+        const { encryptedSecret } = msg.data
+        const { plaintext } = await compactDecrypt(encryptedSecret, privateKey)
+
+        const symmetricSecret = await importJWK(
+          JSON.parse(encode.arrayBufferToString(plaintext)),
+        )
+        const seedPhrase = await wallet.getSeedPhrase()
+        const encryptedSeedPhrase = await new EncryptJWT({
+          seedPhrase,
+        })
+          .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
+          .encrypt(symmetricSecret)
+
+        return sendMessageToUi({
+          type: "GET_ENCRYPTED_SEED_PHRASE_RES",
+          data: { encryptedSeedPhrase },
         })
       }
       case "START_SESSION": {

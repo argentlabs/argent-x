@@ -1,11 +1,13 @@
-import { FC } from "react"
+import { FC, Suspense } from "react"
+import usePromise from "react-promise-suspense"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
 
 import { Button } from "../components/Button"
 import { IconBarWithIcons } from "../components/Recovery/IconBar"
 import { PageWrapper, Paragraph, Title } from "../components/Recovery/Page"
 import { routes } from "../routes"
+import { getSeedPhrase } from "../utils/messaging"
 
 const SeedPhraseGrid = styled.div`
   display: grid;
@@ -26,8 +28,41 @@ const SeedWordBadge = styled.div`
   background-color: rgba(255, 255, 255, 0.1);
 `
 
+const pulseKeyframe = keyframes`
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+`
+
+const LoadingSeedWordBadge = styled.div<{
+  animationDelay?: number
+}>`
+  height: 26px;
+  width: 100%;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  animation: ${pulseKeyframe} 1s alternate infinite;
+  animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
+`
+
+const FetchedSeedPhrase: FC = () => {
+  const seedPhrase: string = usePromise(() => getSeedPhrase(), [0])
+
+  return (
+    <SeedPhraseGrid>
+      {seedPhrase.split(" ").map((word, index) => (
+        <SeedWordBadge key={index}>{word}</SeedWordBadge>
+      ))}
+    </SeedPhraseGrid>
+  )
+}
+
 export const SetupSeedRecoveryPage: FC = () => {
   const navigate = useNavigate()
+
   return (
     <>
       <IconBarWithIcons />
@@ -38,32 +73,30 @@ export const SetupSeedRecoveryPage: FC = () => {
           computer.
         </Paragraph>
 
-        <SeedPhraseGrid>
-          {[
-            "1. genre",
-            "2. summer",
-            "3. laptop",
-            "4. habit",
-            "5. ahead",
-            "6. quiz",
-            "7. sugar",
-            "8. juice",
-            "9. ring",
-            "10. dury",
-            "11. donate",
-            "12. gap",
-          ].map((word, i) => (
-            <SeedWordBadge key={word + i}>{word}</SeedWordBadge>
-          ))}
-        </SeedPhraseGrid>
-
-        <Button
-          onClick={() => {
-            navigate(routes.confirmSeedRecovery())
-          }}
+        <Suspense
+          fallback={
+            <>
+              <SeedPhraseGrid>
+                {[...Array(12)].map((_, index) => (
+                  <LoadingSeedWordBadge
+                    key={index}
+                    animationDelay={(index % 3) * 200}
+                  />
+                ))}
+              </SeedPhraseGrid>
+              <Button disabled>Continue</Button>
+            </>
+          }
         >
-          Continue
-        </Button>
+          <FetchedSeedPhrase />
+          <Button
+            onClick={() => {
+              navigate(routes.confirmSeedRecovery())
+            }}
+          >
+            Continue
+          </Button>
+        </Suspense>
       </PageWrapper>
     </>
   )

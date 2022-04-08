@@ -64,6 +64,18 @@ export class Wallet extends EventEmitter {
     return this.session !== undefined
   }
 
+  public async getSeedPhrase(): Promise<string> {
+    if (!this.isSessionOpen() || !this.session || !this.encryptedBackup) {
+      throw new Error("Session is not open")
+    }
+    const wallet = await ethers.Wallet.fromEncryptedJson(
+      this.encryptedBackup,
+      this.session.password,
+    )
+
+    return wallet.mnemonic.phrase
+  }
+
   private async generateNewLocalSecret(password: string) {
     if (this.isInitialized()) {
       return

@@ -146,6 +146,18 @@ export type MessageType =
   | { type: "RESET_ALL" }
   | { type: "GET_PUBLIC_KEY" }
   | { type: "GET_PUBLIC_KEY_RES"; data: JWK }
+  | {
+      type: "GET_ENCRYPTED_SEED_PHRASE"
+      data: {
+        encryptedSecret: string
+      }
+    }
+  | {
+      type: "GET_ENCRYPTED_SEED_PHRASE_RES"
+      data: {
+        encryptedSeedPhrase: string
+      }
+    }
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean
