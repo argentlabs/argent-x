@@ -9392,10 +9392,10 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@^3.8.0:
-  version "3.8.0"
-  resolved "https://registry.npmjs.org/starknet/-/starknet-3.8.0.tgz#a5bb99c46f6c25be82613d46f0a1b6849a9a39ce"
-  integrity sha512-di1jm9qaQuREk8nHt4mI1buaa23aW1iTx78Ro/+1BxlbJPa+uRQto2S6WxOG4H+GwAZTSWV6XPusGd/R7BGcng==
+starknet@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.npmjs.org/starknet/-/starknet-3.9.0.tgz#ee7a3d99effef0998b365d95dd85f9b01cdb463c"
+  integrity sha512-/sn3WHFX7f+A3vVf3I+Kamg2KIW6494vpCcZWA09IQ5RZXrozjaBtYWT41SoKKWZ3b0Xg8WF//SOkRVCTZOZkQ==
   dependencies:
     "@ledgerhq/hw-app-eth" "^6.26.0"
     "@ledgerhq/hw-transport" "^6.24.1"
