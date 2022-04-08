@@ -19,13 +19,28 @@ const SeedPhraseGrid = styled.div`
 `
 
 const SeedWordBadge = styled.div`
-  padding: 4px 10px;
+  padding: 4px 12px 4px 4px;
   border-radius: 20px;
   font-weight: 600;
   font-size: 13px;
   line-height: 18px;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const SeedWordBadgeNumber = styled.span`
+  font-weight: 600;
+  border-radius: 20px;
+  color: #161616;
+  background-color: #fafafa;
+  margin-right: 4px;
+  line-height: 18px;
+  width: 18px;
+  text-align: center;
+  font-size: 12px;
 `
 
 const pulseKeyframe = keyframes`
@@ -61,7 +76,10 @@ const FetchedSeedPhrase: FC = () => {
   return (
     <SeedPhraseGrid>
       {seedPhrase.split(" ").map((word, index) => (
-        <SeedWordBadge key={index}>{word}</SeedWordBadge>
+        <SeedWordBadge key={index}>
+          <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
+          {word}
+        </SeedWordBadge>
       ))}
     </SeedPhraseGrid>
   )
