@@ -39,13 +39,11 @@ export const AccountListItemWrapper = styled.div<{
 
   transition: all 200ms ease-in-out;
 
-   {
-    ${({ selected = false }) =>
-      selected &&
-      css`
-        border: 1px solid rgba(255, 255, 255, 0.3);
-      `}
-  }
+  ${({ selected = false }) =>
+    selected &&
+    css`
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    `}
 
   &:hover,
   &:focus {

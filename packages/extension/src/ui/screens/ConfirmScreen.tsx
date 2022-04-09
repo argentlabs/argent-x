@@ -36,6 +36,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   confirmButtonBackgroundColor?: string
   singleButton?: boolean
   footer?: ReactNode
+  children: ReactNode
 }
 
 const StickyGroup = styled.div`

@@ -102,7 +102,12 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "paths": {
       "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "typescript-styled-plugin"
+      }
+    ]
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

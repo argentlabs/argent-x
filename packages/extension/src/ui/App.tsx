@@ -60,6 +60,9 @@ const theme = createTheme({
 })
 
 export const App: FC = () => (
+  // TODO: remove this ts-ignore when SWR updates to React 18
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   <SWRConfig value={{ provider: () => swrCacheProvider }}>
     <ThemeProvider theme={theme}>
       <Suspense fallback={<LoadingScreen />}>
