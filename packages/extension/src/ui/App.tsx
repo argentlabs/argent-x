@@ -61,6 +61,7 @@ const theme = createTheme({
 
 export const App: FC = () => (
   // TODO: remove this ts-ignore when SWR updates to React 18
+  // this is already the case for SWRs main branch, but it's not released yet. So it should not take too long for them to release the update.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   <SWRConfig value={{ provider: () => swrCacheProvider }}>
