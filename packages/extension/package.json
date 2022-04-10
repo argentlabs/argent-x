@@ -8,7 +8,7 @@
     "@types/jest": "^27.4.0",
     "@types/jest-json-schema": "^6.1.0",
     "@types/object-hash": "^2.2.1",
-    "@types/react": "^17.0.34",
+    "@types/react": "^18.0.1",
     "@types/react-copy-to-clipboard": "^5.0.2",
     "@types/react-dom": "^18.0.0",
     "@types/styled-components": "^5.1.15",
