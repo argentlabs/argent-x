@@ -22,7 +22,7 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
-      - run: cp Readme.md ./packages/get-starknet/
+      - run: cp Readme.md ./packages/get-starknet/README.md
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
       - run: yarn --cwd packages/dapp export
