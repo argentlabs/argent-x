@@ -1,5 +1,5 @@
 import Tippy from "@tippyjs/react"
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, ReactNode, useEffect, useRef, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import styled from "styled-components"
 
@@ -17,6 +17,7 @@ interface CopyTooltipProps {
   copyValue: string
   message: string
   autoDismiss?: boolean
+  children: ReactNode
 }
 
 export const CopyTooltip: FC<CopyTooltipProps> = ({

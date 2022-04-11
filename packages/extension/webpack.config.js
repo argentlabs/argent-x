@@ -19,6 +19,9 @@ module.exports = {
     inpage: "./src/inpage",
     background: "./src/background",
   },
+  performance: {
+    hints: false,
+  },
   devtool: "inline-source-map",
   mode: isProd ? "production" : "development",
   module: {
