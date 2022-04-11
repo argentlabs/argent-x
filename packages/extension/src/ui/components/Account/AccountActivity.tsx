@@ -1,11 +1,11 @@
-import { FC, Fragment, useEffect, useState } from "react"
+import { FC, Fragment } from "react"
 import styled from "styled-components"
+import useSWR from "swr"
 
 import { Account } from "../../Account"
 import { useAppState } from "../../states/app"
 import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
-import { DailyActivity } from "./accountActivity.model"
 import { fetchActivity } from "./accountActivity.service"
 import { PendingTransactions } from "./PendingTransactions"
 import { SectionHeader } from "./SectionHeader"
@@ -32,21 +32,18 @@ interface AccountActivityProps {
 
 export const AccountActivity: FC<AccountActivityProps> = ({ account }) => {
   const { switcherNetworkId } = useAppState()
-  const [activity, setActivity] = useState<DailyActivity>()
 
-  useEffect(() => {
-    ;(async () => {
-      if (!activity) {
-        setActivity(await fetchActivity(account.address, switcherNetworkId))
-      }
-    })()
-  }, [activity])
+  const { data: activity = {} } = useSWR(
+    [account.address, switcherNetworkId],
+    fetchActivity,
+    { suspense: false },
+  )
 
   return (
     <Container>
       <Header>Activity</Header>
       <PendingTransactions accountAddress={account.address} />
-      {Object.entries(activity || {}).map(([dateLabel, transactions]) => (
+      {Object.entries(activity).map(([dateLabel, transactions]) => (
         <Fragment key={dateLabel}>
           <SectionHeader>{dateLabel}</SectionHeader>
           <TransactionsWrapper>
