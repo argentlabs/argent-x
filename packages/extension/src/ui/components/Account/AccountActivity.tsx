@@ -34,9 +34,9 @@ export const AccountActivity: FC<AccountActivityProps> = ({ account }) => {
   const { switcherNetworkId } = useAppState()
 
   const { data: activity = {} } = useSWR(
-    [account.address, switcherNetworkId],
+    [account.address, switcherNetworkId, "activity"],
     fetchActivity,
-    { suspense: false },
+    { refreshInterval: 60e3 /* 1 minute */ },
   )
 
   return (
