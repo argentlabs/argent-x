@@ -14,10 +14,12 @@ import {
 } from "../../states/accountMetadata"
 import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
+import { useBackupRequired } from "../../states/backupDownload"
 import { useLocalhostPort } from "../../states/localhostPort"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
+import { RecoveryBanner } from "../RecoveryBanner"
 import { Spinner } from "../Spinner"
 import { AddTokenIconButton, TokenTitle, TokenWrapper } from "../Token"
 import { AccountSubHeader } from "./AccountSubheader"
@@ -42,6 +44,7 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account.address)
   const { accountNames, setAccountName } = useAccountMetadata()
+  const { isBackupRequired } = useBackupRequired()
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
@@ -83,6 +86,7 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
           setAccountName(account.networkId, account.address, name)
         }
       />
+      {isBackupRequired && <RecoveryBanner />}
       {showUpgradeBanner && !showPendingTransactions && (
         <UpgradeBanner
           onClick={() => {
