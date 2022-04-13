@@ -43,7 +43,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   html, body {
-    width: 360px;
+    min-width: 360px;
+    min-height: 600px;
     
     overscroll-behavior: none;
     -ms-overflow-style: none;  /* IE and Edge */
@@ -80,8 +81,17 @@ export const App: FC = () => (
   </SWRConfig>
 )
 
-export const Page = styled.div`
-  min-height: 600px;
+export const ScrollBehaviour = styled.div`
+  height: 100vh;
+  overflow-y: auto;
+
+  overscroll-behavior: none;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    /* Chrome, Safari, Opera */
+    display: none;
+  }
 `
 
 const Screen: FC = () => {
@@ -104,9 +114,9 @@ const Screen: FC = () => {
     <Routes>
       <Route
         element={
-          <Page>
+          <ScrollBehaviour>
             <Outlet />
-          </Page>
+          </ScrollBehaviour>
         }
       >
         {/* Routes which need no unlocked backup */}
