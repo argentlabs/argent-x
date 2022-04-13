@@ -73,7 +73,9 @@ const SelectableSeedWordBadge = styled(SeedWordBadge)<{
 `
 
 function getRandomWord(excludeWordlist: string[]): string {
-  const excludeIndexes = excludeWordlist.map(wordlists.en.getWordIndex)
+  const excludeIndexes = excludeWordlist.map((x) =>
+    wordlists.en.getWordIndex(x),
+  )
   const randomIndex = Math.floor(Math.random() * 2048)
   if (excludeIndexes.includes(randomIndex)) {
     return getRandomWord(excludeWordlist)
