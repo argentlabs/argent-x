@@ -6,6 +6,8 @@ import styled from "styled-components"
 import useSWR from "swr"
 
 import { getNetwork } from "../../shared/networks"
+import { Container } from "../components/Account/AccountContainer"
+import { AccountHeader } from "../components/Account/AccountHeader"
 import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
@@ -28,7 +30,7 @@ const AccountList = styled.div`
   padding: 48px 32px;
 `
 
-const AccountListWrapper = styled.div`
+const AccountListWrapper = styled(Container)`
   display: flex;
   flex-direction: column;
 
@@ -102,16 +104,18 @@ export const AccountListScreen: FC = () => {
   )
 
   return (
-    <AccountListWrapper>
-      <Header>
-        <IconButton
-          size={36}
-          {...makeClickable(() => navigate(routes.settings()), 99)}
-        >
-          <SettingsIcon />
-        </IconButton>
-        <NetworkSwitcher hidePort />
-      </Header>
+    <AccountListWrapper header>
+      <AccountHeader>
+        <Header>
+          <IconButton
+            size={36}
+            {...makeClickable(() => navigate(routes.settings()), 99)}
+          >
+            <SettingsIcon />
+          </IconButton>
+          <NetworkSwitcher hidePort />
+        </Header>
+      </AccountHeader>
       <H1>Accounts</H1>
       <AccountList>
         {accountsList.length === 0 && (

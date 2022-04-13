@@ -1,14 +1,15 @@
+import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
-import { TransactionMeta as ITransactionMeta } from "../../../shared/transactions.model"
+import { TransactionMeta } from "../../../shared/transactions.model"
 import { makeClickable } from "../../utils/a11y"
+import { AccountStatusCode } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
-import { CopyTooltip } from "../CopyTooltip"
 import { NetworkStatusIndicator } from "../NetworkSwitcher"
 import {
   TokenDetailsWrapper,
-  TokenMeta,
+  TokenSubtitle,
   TokenTextGroup,
   TokenTitle,
   TokenWrapper,
@@ -18,16 +19,19 @@ import { TokenIcon } from "../TokenIcon"
 export const TransactionsWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.05);
 `
 
-const TransactionWrapper = styled(TokenWrapper)`
-  background-color: rgba(255, 255, 255, 0.05);
-  cursor: auto;
+const TransactionWrapper = styled(TokenWrapper)<{ highlighted?: boolean }>`
+  cursor: pointer;
 
-  &:hover,
-  &:focus {
-    background-color: rgba(255, 255, 255, 0.1);
+  ${({ highlighted }) =>
+    highlighted &&
+    css`
+      background-color: rgba(255, 255, 255, 0.1);
+    `}
+
+  &:hover, &:focus {
+    background-color: rgba(255, 255, 255, 0.15);
   }
 `
 
@@ -60,33 +64,42 @@ export const TransactionIndicator = styled(NetworkStatusIndicator)`
     `}
 `
 
-const TransactionMeta = styled(TokenMeta)`
-  cursor: pointer;
-`
+const TransactionSubtitle = styled(TokenSubtitle)``
 
-interface TransactionProps {
-  txHash: string
-  meta?: ITransactionMeta
+interface TransactionItemProps {
+  hash: string
+  status?: AccountStatusCode
+  highlighted?: boolean
+  meta?: TransactionMeta
   onClick?: () => void
 }
 
-export const TransactionItem: FC<TransactionProps> = ({
-  txHash,
+export const TransactionItem: FC<TransactionItemProps> = ({
+  hash,
+  status = "DEFAULT",
+  highlighted,
   meta,
   onClick,
   ...props
 }) => {
   return (
-    <TransactionWrapper {...makeClickable(onClick)} {...props}>
-      <TokenIcon name={meta?.title || txHash.substring(2)} />
+    <TransactionWrapper
+      {...makeClickable(onClick)}
+      highlighted={highlighted}
+      {...props}
+    >
+      <TokenIcon name={meta?.title || hash.substring(2)} />
       <TokenDetailsWrapper>
         <TokenTextGroup>
-          <TokenTitle>{meta?.title || truncateAddress(txHash)}</TokenTitle>
-          <CopyTooltip copyValue={txHash} message="Transaction hash copied!">
-            <TransactionMeta>{truncateAddress(txHash)}</TransactionMeta>
-          </CopyTooltip>
+          <TokenTitle>
+            {meta?.title || truncateAddress(hash)}
+            <OpenInNewIcon style={{ fontSize: "0.8rem", marginLeft: 5 }} />
+          </TokenTitle>
+          <TransactionSubtitle>
+            {meta?.subTitle || truncateAddress(hash)}
+          </TransactionSubtitle>
         </TokenTextGroup>
-        <TransactionIndicator status={"DEPLOYING"} />
+        <TransactionIndicator status={status} />
       </TokenDetailsWrapper>
     </TransactionWrapper>
   )

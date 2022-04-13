@@ -31,13 +31,16 @@ const Paragraph = styled.p`
   text-align: center;
 `
 
-const Buttons = styled.div`
+const Buttons = styled.div<{
+  buttonsAmount: number
+}>`
   display: flex;
+  width: 100%;
   gap: 16px;
-`
 
-const AlertButton = styled(Button)`
-  width: 100px;
+  & > * {
+    width: ${({ buttonsAmount }) => 100 / buttonsAmount}%;
+  }
 `
 
 interface EmptyAccountAlertProps {
@@ -71,15 +74,15 @@ export const EmptyAccountAlert: FC<EmptyAccountAlertProps> = ({
       <Paragraph>
         Or learn how to deploy a contract and mint some tokens
       </Paragraph>
-      <Buttons>
+      <Buttons buttonsAmount={mintableAddress ? 2 : 1}>
         <CopyTooltip
           copyValue={formatAddress(accountAddress)}
           message="Account address copied!"
         >
-          <AlertButton>Receive</AlertButton>
+          <Button>Receive</Button>
         </CopyTooltip>
         {mintableAddress && (
-          <AlertButton {...makeClickable(handleMint)}>Mint</AlertButton>
+          <Button {...makeClickable(handleMint)}>Mint</Button>
         )}
       </Buttons>
     </AlertWrapper>

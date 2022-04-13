@@ -40,15 +40,23 @@ interface ConfirmScreenProps extends ConfirmPageProps {
 }
 
 const StickyGroup = styled.div`
-  position: sticky;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 0 24px;
+  padding: 16px 32px 24px;
+
+  background-color: #161616;
+  z-index: 100;
 
   > * + * {
     margin-top: 24px;
   }
+`
+
+const Placeholder = styled.div`
+  height: 200px;
+  width: 100%;
 `
 
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
@@ -85,6 +93,8 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       <H2>{title}</H2>
 
       {children}
+
+      <Placeholder />
       <StickyGroup>
         {footer}
         <ButtonGroupVertical

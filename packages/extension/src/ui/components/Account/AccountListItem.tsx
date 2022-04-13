@@ -17,7 +17,7 @@ import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
-import { TransactionIndicator } from "./Transactions"
+import { TransactionIndicator } from "./TransactionItem"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;
@@ -27,8 +27,6 @@ export const AccountListItemWrapper = styled.div<{
   selected?: boolean
 }>`
   cursor: pointer;
-  height: 76px;
-  width: 256px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 20px 16px;
