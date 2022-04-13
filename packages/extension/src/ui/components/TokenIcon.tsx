@@ -8,6 +8,10 @@ const Icon = styled.img<{ size: number }>`
   width: ${({ size }) => size}px;
   border-radius: ${({ size }) => size}px;
   flex: 0;
+
+  /* add min values so it reserves the space while loading */
+  min-height: ${({ size }) => size}px;
+  min-width: ${({ size }) => size}px;
 `
 
 interface TokenIconProps {
