@@ -2,12 +2,13 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted"
 import { FC, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { Account } from "../Account"
 import { AccountActivity } from "../components/Account/AccountActivity"
 import { AccountAssets } from "../components/Account/AccountAssets"
-import { AccountColumn } from "../components/Account/AccountColumn"
+import { Container } from "../components/Account/AccountContainer"
+import { AccountFooter, FooterTab } from "../components/Account/AccountFooter"
+import { AccountHeader } from "../components/Account/AccountHeader"
 import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Header } from "../components/Header"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
@@ -18,53 +19,6 @@ import { makeClickable } from "../utils/a11y"
 import { getAccountImageUrl } from "../utils/accounts"
 
 type AccountTab = "assets" | "activity"
-
-const Container = styled(AccountColumn)`
-  margin-top: 68px;
-`
-
-const AccountHeader = styled.div`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: #161616;
-  height: 68px;
-  z-index: 100;
-`
-
-const AccountFooter = styled.div`
-  position: fixed;
-  display: flex;
-  bottom: 0;
-  width: 100%;
-  background: #161616;
-  height: 64px;
-`
-
-const FooterTab = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  width: 50%;
-
-  svg {
-    font-size: 1.8rem;
-  }
-
-  span {
-    margin-top: 3px;
-  }
-
-  transition: all 200ms ease-in-out;
-
-  &:hover,
-  &:focus {
-    outline: 0;
-    background: rgba(255, 255, 255, 0.05);
-  }
-`
 
 export const AccountScreen: FC = () => {
   const navigate = useNavigate()
@@ -95,7 +49,7 @@ const AccountScreenContent: FC<AccountScreenContentProps> = ({ account }) => {
   const accountName = getAccountName(account, accountNames)
 
   return (
-    <Container>
+    <Container header footer>
       <AccountHeader>
         <Header>
           <ProfilePicture

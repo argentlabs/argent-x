@@ -30,7 +30,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding-top: 16px;
-  margin-bottom: 68px;
 `
 
 interface AccountAssetsProps {

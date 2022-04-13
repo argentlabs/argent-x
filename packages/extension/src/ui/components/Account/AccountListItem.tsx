@@ -27,8 +27,6 @@ export const AccountListItemWrapper = styled.div<{
   selected?: boolean
 }>`
   cursor: pointer;
-  height: 76px;
-  width: 256px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 20px 16px;
@@ -39,13 +37,11 @@ export const AccountListItemWrapper = styled.div<{
 
   transition: all 200ms ease-in-out;
 
-   {
-    ${({ selected = false }) =>
-      selected &&
-      css`
-        border: 1px solid rgba(255, 255, 255, 0.3);
-      `}
-  }
+  ${({ selected = false }) =>
+    selected &&
+    css`
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    `}
 
   &:hover,
   &:focus {

@@ -1,7 +1,7 @@
 import { ThemeProvider, createTheme } from "@mui/material"
 import { FC, Suspense } from "react"
-import { Route, Routes } from "react-router-dom"
-import { createGlobalStyle } from "styled-components"
+import { Outlet, Route, Routes } from "react-router-dom"
+import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
@@ -40,13 +40,17 @@ const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     background-color: #161616;
     color: white;
-
-    min-width: 320px;
   }
 
   html, body {
-    min-height: calc(600px - 68px);
+    width: 360px;
+    
     overscroll-behavior: none;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    &::-webkit-scrollbar { /* Chrome, Safari, Opera */
+      display: none;
+    }
   }
 
   * {
@@ -76,6 +80,10 @@ export const App: FC = () => (
   </SWRConfig>
 )
 
+export const Page = styled.div`
+  min-height: 600px;
+`
+
 const Screen: FC = () => {
   useEntry()
   useActionsSubscription()
@@ -94,44 +102,55 @@ const Screen: FC = () => {
 
   return (
     <Routes>
-      {/* Routes which need no unlocked backup */}
-      <Route path={routes.welcome()} element={<WelcomeScreen />} />
-      <Route path={routes.newWallet()} element={<NewWalletScreen />} />
       <Route
-        path={routes.backupRecovery()}
-        element={<BackupRecoveryScreen />}
-      />
-      <Route path={routes.lockScreen()} element={<LockScreen />} />
-      <Route path={routes.reset()} element={<ResetScreen />} />
-      <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
-      <Route path={routes.legacy()} element={<LegacyScreen />} />
-      <Route path={routes.error()} element={<ErrorScreen />} />
+        element={
+          <Page>
+            <Outlet />
+          </Page>
+        }
+      >
+        {/* Routes which need no unlocked backup */}
+        <Route path={routes.welcome()} element={<WelcomeScreen />} />
+        <Route path={routes.newWallet()} element={<NewWalletScreen />} />
+        <Route
+          path={routes.backupRecovery()}
+          element={<BackupRecoveryScreen />}
+        />
+        <Route path={routes.lockScreen()} element={<LockScreen />} />
+        <Route path={routes.reset()} element={<ResetScreen />} />
+        <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
+        <Route path={routes.legacy()} element={<LegacyScreen />} />
+        <Route path={routes.error()} element={<ErrorScreen />} />
 
-      {/* Routes which need an unlocked backup and therefore can also sign actions */}
-      {actions[0] ? (
-        <Route path="*" element={<ActionScreen />} />
-      ) : (
-        <>
-          <Route path={routes.account()} element={<AccountScreen />} />
-          <Route path={routes.accounts()} element={<AccountListScreen />} />
-          <Route path={routes.newToken()} element={<AddTokenScreen />} />
-          <Route path={routes.tokenPath()} element={<TokenScreen />} />
-          <Route path={routes.hideTokenPath()} element={<HideTokenScreen />} />
-          <Route path={routes.settings()} element={<SettingsScreen />} />
-          <Route
-            path={routes.settingsDappConnections()}
-            element={<SettingsDappConnectionsScreen />}
-          />
-          <Route
-            path={routes.settingsLocalhostPort()}
-            element={<SettingsLocalhostPortScreen />}
-          />
-          <Route
-            path={routes.backupDownload()}
-            element={<BackupDownloadScreen />}
-          />
-        </>
-      )}
+        {/* Routes which need an unlocked backup and therefore can also sign actions */}
+        {actions[0] ? (
+          <Route path="*" element={<ActionScreen />} />
+        ) : (
+          <>
+            <Route path={routes.account()} element={<AccountScreen />} />
+            <Route path={routes.accounts()} element={<AccountListScreen />} />
+            <Route path={routes.newToken()} element={<AddTokenScreen />} />
+            <Route path={routes.tokenPath()} element={<TokenScreen />} />
+            <Route
+              path={routes.hideTokenPath()}
+              element={<HideTokenScreen />}
+            />
+            <Route path={routes.settings()} element={<SettingsScreen />} />
+            <Route
+              path={routes.settingsDappConnections()}
+              element={<SettingsDappConnectionsScreen />}
+            />
+            <Route
+              path={routes.settingsLocalhostPort()}
+              element={<SettingsLocalhostPortScreen />}
+            />
+            <Route
+              path={routes.backupDownload()}
+              element={<BackupDownloadScreen />}
+            />
+          </>
+        )}
+      </Route>
     </Routes>
   )
 }
