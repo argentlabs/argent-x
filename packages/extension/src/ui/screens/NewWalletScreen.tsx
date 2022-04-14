@@ -12,6 +12,7 @@ import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
+import { validatePassword } from "../states/seedRecover"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
 import { StickyGroup } from "./ConfirmScreen"
@@ -29,11 +30,11 @@ const Container = styled.div`
   }
 `
 
-export function isValidPassword(password: string): boolean {
-  return password.length > 5
-}
-
-export const NewWalletScreen: FC = () => {
+export const NewWalletScreen: FC<{
+  overrideSubmit?: (values: { password: string }) => void
+  overrideTitle?: string
+  overrideSubmitText?: string
+}> = ({ overrideSubmit, overrideTitle, overrideSubmitText }) => {
   const navigate = useNavigate()
   const { addAccount } = useAccount()
   const { switcherNetworkId } = useAppState()
@@ -52,6 +53,12 @@ export const NewWalletScreen: FC = () => {
   const password = watch("password")
 
   const handleDeploy = async (password?: string) => {
+    if (!password) {
+      return
+    }
+    if (overrideSubmit) {
+      return overrideSubmit({ password })
+    }
     try {
       const newAccount = await deployAccount(
         switcherNetworkId,
@@ -70,17 +77,17 @@ export const NewWalletScreen: FC = () => {
   return (
     <>
       <Header>
-        <BackButton to={routes.welcome()} />
+        <BackButton />
       </Header>
       <Container>
-        <H2>New wallet</H2>
+        <H2>{overrideTitle || "New wallet"}</H2>
         <P>Enter a password to protect your wallet</P>
         <form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
           <Controller
             name="password"
             control={control}
             defaultValue=""
-            rules={{ required: true, validate: isValidPassword }}
+            rules={{ required: true, validate: validatePassword }}
             render={({ field: { ref, ...field } }) => (
               <InputText
                 autoFocus
@@ -115,7 +122,7 @@ export const NewWalletScreen: FC = () => {
 
           <StickyGroup>
             <Button type="submit" disabled={!isDirty}>
-              Create wallet
+              {overrideSubmitText || "Create wallet"}
             </Button>
           </StickyGroup>
         </form>

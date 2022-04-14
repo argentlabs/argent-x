@@ -1,7 +1,9 @@
 export const routes = {
   welcome: () => "/index.html",
   newWallet: () => "/wallets/new",
-  backupRecovery: () => "/recover",
+  backupRecovery: () => "/recover/backup",
+  seedRecovery: () => "/recover/seed",
+  seedRecoveryPassword: () => "/recover/seed/password",
   setupRecovery: () => "/recovery",
   setupSeedRecovery: () => "/recovery/seed",
   confirmSeedRecovery: () => "/recovery/seed/confirm",

@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 export const Container = styled.div`
   display: flex;
@@ -21,7 +21,7 @@ const Label = styled.label`
   text-align: start;
 `
 
-const Input = styled.input`
+const InputCss = css`
   border-radius: 0;
   display: flex;
   font-size: 17px;
@@ -35,16 +35,11 @@ const Input = styled.input`
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   padding: 2px 0 6px;
   flex: 1 1 auto;
-  order: 2;
   transition: all 200ms ease-in-out;
 
   &:focus {
     border-bottom: 1px solid rgba(255, 255, 255, 1);
     outline: 0;
-  }
-
-  &::placeholder {
-    opacity: 0;
   }
 
   &:focus + ${Label} {
@@ -59,6 +54,15 @@ const Input = styled.input`
   &:disabled {
     color: #8f8e8c;
     border-bottom: 1px solid #8f8e8c;
+  }
+`
+
+const Input = styled.input`
+  ${InputCss}
+  order: 2;
+
+  &::placeholder {
+    opacity: 0;
   }
 `
 
@@ -96,3 +100,10 @@ export const InputText = styled(
     )
   },
 )``
+
+export const TextArea = styled.textarea`
+  ${InputCss}
+  resize: none;
+  min-height: 116px;
+  width: 100%;
+`

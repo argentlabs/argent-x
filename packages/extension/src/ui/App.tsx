@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from "@mui/material"
 import { FC, Suspense } from "react"
-import { Outlet, Route, Routes } from "react-router-dom"
+import { Outlet, Route, Routes, useNavigate } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -23,6 +23,7 @@ import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { ResetScreen } from "./screens/ResetScreen"
+import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
 import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
@@ -33,6 +34,12 @@ import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
+import {
+  useSeedRecover,
+  validateAndSetPassword,
+  validateSeedRecoverStateIsComplete,
+} from "./states/seedRecover"
+import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -105,6 +112,8 @@ const Screen: FC = () => {
   const { isLoading } = useAppState()
   const { actions } = useActions()
 
+  const navigate = useNavigate()
+
   if (isLoading) {
     return <LoadingScreen />
   }
@@ -124,6 +133,29 @@ const Screen: FC = () => {
         <Route
           path={routes.backupRecovery()}
           element={<BackupRecoveryScreen />}
+        />
+        <Route path={routes.seedRecovery()} element={<SeedRecoveryScreen />} />
+        <Route
+          path={routes.seedRecoveryPassword()}
+          element={
+            <NewWalletScreen
+              overrideTitle="New password"
+              overrideSubmitText="Continue"
+              overrideSubmit={async ({ password }) => {
+                useAppState.setState({ isLoading: true })
+                try {
+                  validateAndSetPassword(password)
+                  const state = useSeedRecover.getState()
+                  if (validateSeedRecoverStateIsComplete(state)) {
+                    navigate(await recover())
+                  }
+                } catch {
+                  console.error("password is invalid")
+                }
+                useAppState.setState({ isLoading: false })
+              }}
+            />
+          }
         />
         <Route path={routes.lockScreen()} element={<LockScreen />} />
         <Route path={routes.reset()} element={<ResetScreen />} />

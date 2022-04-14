@@ -10,11 +10,11 @@ import { InputText } from "../components/InputText"
 import { A, FormError, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
+import { validatePassword } from "../states/seedRecover"
 import { makeClickable } from "../utils/a11y"
 import { startSession } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 import { StickyGroup } from "./ConfirmScreen"
-import { isValidPassword } from "./NewWalletScreen"
 
 const LockScreenWrapper = styled.div`
   display: flex;
@@ -87,7 +87,7 @@ export const LockScreen: FC = () => {
         <Controller
           name="password"
           control={control}
-          rules={{ required: true, validate: isValidPassword }}
+          rules={{ required: true, validate: validatePassword }}
           defaultValue=""
           render={({ field: { ref, ...field } }) => (
             <InputText
