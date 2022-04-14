@@ -35,6 +35,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   disableConfirm?: boolean
   confirmButtonBackgroundColor?: string
   singleButton?: boolean
+  switchButtonOrder?: boolean
   footer?: ReactNode
   children: ReactNode
 }
@@ -69,15 +70,17 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   onReject,
   selectedAccount,
   singleButton = false,
+  switchButtonOrder = false,
   footer,
   children,
+  ...props
 }) => {
   const navigate = useNavigate()
   const { accountNames } = useAccountMetadata()
   onReject ??= () => navigate(-1)
 
   return (
-    <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)}>
+    <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)} {...props}>
       {selectedAccount && (
         <Header style={{ margin: "0 -32px 16px" }}>
           <ProfilePicture
@@ -103,6 +106,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
             e.preventDefault()
             return onSubmit?.()
           }}
+          switchButtonOrder={switchButtonOrder}
         >
           {!singleButton && (
             <Button onClick={onReject} type="button">

@@ -5,9 +5,10 @@ import useSWRImmutable from "swr/immutable"
 
 import { Button } from "../components/Button"
 import { IconBarWithIcons } from "../components/Recovery/IconBar"
-import { PageWrapper, Paragraph, Title } from "../components/Recovery/Page"
+import { Paragraph } from "../components/Recovery/Page"
 import { routes } from "../routes"
 import { getSeedPhrase } from "../utils/messaging"
+import { ConfirmScreen } from "./ConfirmScreen"
 
 const SeedPhraseGrid = styled.div`
   display: grid;
@@ -63,6 +64,10 @@ const LoadingSeedWordBadge = styled.div<{
   animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
 `
 
+const SConfirmScreen = styled(ConfirmScreen)`
+  padding-top: 18px;
+`
+
 const FetchedSeedPhrase: FC = () => {
   const { data: seedPhrase = "" } = useSWRImmutable(
     // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage
@@ -91,8 +96,12 @@ export const SetupSeedRecoveryPage: FC = () => {
   return (
     <>
       <IconBarWithIcons showBack />
-      <PageWrapper>
-        <Title>Recovery phrase</Title>
+      <SConfirmScreen
+        title="Recovery phrase"
+        singleButton
+        confirmButtonText="Continue"
+        onSubmit={() => navigate(routes.confirmSeedRecovery())}
+      >
         <Paragraph>
           Write these words down on paper. It is unsafe to save them on your
           computer.
@@ -114,15 +123,8 @@ export const SetupSeedRecoveryPage: FC = () => {
           }
         >
           <FetchedSeedPhrase />
-          <Button
-            onClick={() => {
-              navigate(routes.confirmSeedRecovery())
-            }}
-          >
-            Continue
-          </Button>
         </Suspense>
-      </PageWrapper>
+      </SConfirmScreen>
     </>
   )
 }

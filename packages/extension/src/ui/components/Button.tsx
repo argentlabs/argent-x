@@ -38,9 +38,12 @@ export const ButtonGroup = styled.div`
   width: 100%;
 `
 
-export const ButtonGroupVertical = styled.div`
+export const ButtonGroupVertical = styled.div<{
+  switchButtonOrder?: boolean
+}>`
   display: flex;
-  flex-direction: row;
+  flex-direction: ${({ switchButtonOrder = false }) =>
+    switchButtonOrder ? "row-reverse" : "row"};
   gap: 12px;
   width: 100%;
 `
