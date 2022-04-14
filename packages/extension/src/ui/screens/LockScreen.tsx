@@ -13,6 +13,7 @@ import { useAppState } from "../states/app"
 import { makeClickable } from "../utils/a11y"
 import { startSession } from "../utils/messaging"
 import { recover } from "../utils/recovery"
+import { StickyGroup } from "./ConfirmScreen"
 import { isValidPassword } from "./NewWalletScreen"
 
 const LockScreenWrapper = styled.div`
@@ -33,10 +34,6 @@ const LockScreenWrapper = styled.div`
 
   ${A} {
     margin-top: 16px;
-  }
-
-  ${Button} {
-    margin-top: 64px;
   }
 `
 
@@ -112,9 +109,12 @@ export const LockScreen: FC = () => {
         )}
 
         <A {...makeClickable(handleResetClick)}>reset or restore backup</A>
-        <Button type="submit" disabled={!isDirty}>
-          Unlock
-        </Button>
+
+        <StickyGroup>
+          <Button type="submit" disabled={!isDirty}>
+            Unlock
+          </Button>
+        </StickyGroup>
       </form>
     </LockScreenWrapper>
   )
