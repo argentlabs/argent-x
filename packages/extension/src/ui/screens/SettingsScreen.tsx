@@ -85,8 +85,8 @@ export const SettingsScreen: FC = () => {
     navigate(routes.settingsDappConnections())
   }
 
-  const handleDownloadBackupClick = () => {
-    navigate(routes.backupDownload(true))
+  const handleSeedBackupClick = () => {
+    navigate(routes.setupSeedRecovery())
   }
 
   const handleLocalhostPortClick = () => {
@@ -118,12 +118,15 @@ export const SettingsScreen: FC = () => {
           </P>
         </SettingsItem>
         <hr />
-        <SettingsItem onClick={handleDownloadBackupClick}>
+        <SettingsItem onClick={handleSeedBackupClick}>
           <Title>
-            <span>Backup file</span>
+            <span>Show backup phrase</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
-          <P>The backup file contains all your accounts. Keep it secure.</P>
+          <P>
+            Your backup phrase allows anyone to use your account. Keep it
+            secure.
+          </P>
         </SettingsItem>
         <hr />
         <SettingsItem onClick={handleLocalhostPortClick}>
