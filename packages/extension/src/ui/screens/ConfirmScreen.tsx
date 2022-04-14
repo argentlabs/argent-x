@@ -11,10 +11,14 @@ import { H2 } from "../components/Typography"
 import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { getAccountImageUrl } from "../utils/accounts"
 
-const ConfirmScreenWrapper = styled.div<{ accountShown: boolean }>`
+const ConfirmScreenWrapper = styled.div<{
+  accountShown: boolean
+  smallTopPadding: boolean
+}>`
   display: flex;
   flex-direction: column;
-  padding: 48px 32px 0;
+  padding: ${({ smallTopPadding }) => (smallTopPadding ? "16px" : "48px")} 32px
+    0;
   ${({ accountShown }) => (accountShown ? `padding-top: 0;` : ``)}
 
   > ${H2} {
@@ -36,11 +40,12 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   confirmButtonBackgroundColor?: string
   singleButton?: boolean
   switchButtonOrder?: boolean
+  smallTopPadding?: boolean
   footer?: ReactNode
   children: ReactNode
 }
 
-const StickyGroup = styled.div`
+export const StickyGroup = styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
@@ -71,6 +76,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   selectedAccount,
   singleButton = false,
   switchButtonOrder = false,
+  smallTopPadding = false,
   footer,
   children,
   ...props
@@ -80,7 +86,11 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   onReject ??= () => navigate(-1)
 
   return (
-    <ConfirmScreenWrapper accountShown={Boolean(selectedAccount)} {...props}>
+    <ConfirmScreenWrapper
+      smallTopPadding={smallTopPadding}
+      accountShown={Boolean(selectedAccount)}
+      {...props}
+    >
       {selectedAccount && (
         <Header style={{ margin: "0 -32px 16px" }}>
           <ProfilePicture

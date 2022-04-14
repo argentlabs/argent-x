@@ -7,7 +7,6 @@ import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/InputText"
-import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
@@ -15,6 +14,7 @@ import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
+import { StickyGroup } from "./ConfirmScreen"
 
 const Container = styled.div`
   padding: 48px 40px 24px;
@@ -113,11 +113,12 @@ export const NewWalletScreen: FC = () => {
             <FormError>Passwords do not match</FormError>
           )}
 
-          <Button type="submit" disabled={!isDirty}>
-            Create wallet
-          </Button>
+          <StickyGroup>
+            <Button type="submit" disabled={!isDirty}>
+              Create wallet
+            </Button>
+          </StickyGroup>
         </form>
-        <StickyArgentFooter />
       </Container>
     </>
   )

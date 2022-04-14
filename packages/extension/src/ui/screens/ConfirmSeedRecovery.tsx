@@ -1,6 +1,5 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { IconBarWithIcons } from "../components/Recovery/IconBar"
 import { P } from "../components/Typography"
@@ -8,16 +7,13 @@ import { routes } from "../routes"
 import { useBackupRequired } from "../states/backupDownload"
 import { ConfirmScreen } from "./ConfirmScreen"
 
-const StyledConfirmScreen = styled(ConfirmScreen)`
-  padding-top: 18px;
-`
-
 export const ConfirmSeedRecoveryPage: FC = () => {
   const navigate = useNavigate()
   return (
     <>
       <IconBarWithIcons showBack />
-      <StyledConfirmScreen
+      <ConfirmScreen
+        smallTopPadding
         title="Have you written down the recovery phrase?"
         switchButtonOrder
         rejectButtonText="No"
@@ -34,7 +30,7 @@ export const ConfirmSeedRecoveryPage: FC = () => {
           If you lose your recovery phrase or someone steals it, you will lose
           access to your funds.
         </P>
-      </StyledConfirmScreen>
+      </ConfirmScreen>
     </>
   )
 }

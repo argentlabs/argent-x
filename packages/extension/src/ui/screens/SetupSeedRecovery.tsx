@@ -63,10 +63,6 @@ const LoadingSeedWordBadge = styled.div<{
   animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
 `
 
-const StyledConfirmScreen = styled(ConfirmScreen)`
-  padding-top: 18px;
-`
-
 const FetchedSeedPhrase: FC = () => {
   const { data: seedPhrase = "" } = useSWRImmutable(
     // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage
@@ -95,7 +91,8 @@ export const SetupSeedRecoveryPage: FC = () => {
   return (
     <>
       <IconBarWithIcons showBack />
-      <StyledConfirmScreen
+      <ConfirmScreen
+        smallTopPadding
         title="Recovery phrase"
         singleButton
         confirmButtonText="Continue"
@@ -122,7 +119,7 @@ export const SetupSeedRecoveryPage: FC = () => {
         >
           <FetchedSeedPhrase />
         </Suspense>
-      </StyledConfirmScreen>
+      </ConfirmScreen>
     </>
   )
 }

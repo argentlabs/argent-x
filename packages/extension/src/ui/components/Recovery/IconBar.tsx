@@ -6,12 +6,16 @@ import { routes } from "../../routes"
 import { BackIcon } from "../Icons/Back"
 import { CloseIcon } from "../Icons/Close"
 
-const IconBar = styled.div`
+export const IconBar = styled.div`
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 18px;
+`
+
+const IconBarReverse = styled(IconBar)`
+  flex-direction: row-reverse;
 `
 
 export const IconBarWithIcons: FC<{
@@ -19,9 +23,9 @@ export const IconBarWithIcons: FC<{
 }> = ({ showBack = false }) => {
   const navigate = useNavigate()
   return (
-    <IconBar>
+    <IconBarReverse>
       <CloseIcon onClick={() => navigate(routes.account())} />
       {showBack && <BackIcon onClick={() => navigate(-1)} />}
-    </IconBar>
+    </IconBarReverse>
   )
 }
