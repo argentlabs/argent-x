@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import styled, { keyframes } from "styled-components"
 import useSWRImmutable from "swr/immutable"
 
-import { Button } from "../components/Button"
 import { IconBarWithIcons } from "../components/Recovery/IconBar"
 import { Paragraph } from "../components/Recovery/Page"
 import { routes } from "../routes"
@@ -64,7 +63,7 @@ const LoadingSeedWordBadge = styled.div<{
   animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
 `
 
-const SConfirmScreen = styled(ConfirmScreen)`
+const StyledConfirmScreen = styled(ConfirmScreen)`
   padding-top: 18px;
 `
 
@@ -96,7 +95,7 @@ export const SetupSeedRecoveryPage: FC = () => {
   return (
     <>
       <IconBarWithIcons showBack />
-      <SConfirmScreen
+      <StyledConfirmScreen
         title="Recovery phrase"
         singleButton
         confirmButtonText="Continue"
@@ -123,7 +122,7 @@ export const SetupSeedRecoveryPage: FC = () => {
         >
           <FetchedSeedPhrase />
         </Suspense>
-      </SConfirmScreen>
+      </StyledConfirmScreen>
     </>
   )
 }

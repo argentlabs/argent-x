@@ -8,7 +8,7 @@ import { routes } from "../routes"
 import { useBackupRequired } from "../states/backupDownload"
 import { ConfirmScreen } from "./ConfirmScreen"
 
-const SConfirmScreen = styled(ConfirmScreen)`
+const StyledConfirmScreen = styled(ConfirmScreen)`
   padding-top: 18px;
 `
 
@@ -17,7 +17,7 @@ export const ConfirmSeedRecoveryPage: FC = () => {
   return (
     <>
       <IconBarWithIcons showBack />
-      <SConfirmScreen
+      <StyledConfirmScreen
         title="Have you written down the recovery phrase?"
         switchButtonOrder
         rejectButtonText="No"
@@ -34,7 +34,7 @@ export const ConfirmSeedRecoveryPage: FC = () => {
           If you lose your recovery phrase or someone steals it, you will lose
           access to your funds.
         </P>
-      </SConfirmScreen>
+      </StyledConfirmScreen>
     </>
   )
 }
