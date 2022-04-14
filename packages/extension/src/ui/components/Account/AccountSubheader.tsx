@@ -54,7 +54,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
         </AccountStatusText>
       )}
     </div>
-    <AccountAddressWrapper style={{ margin: "16px 0 32px 0" }}>
+    <AccountAddressWrapper style={{ margin: "16px 0 18px 0" }}>
       <AccountAddressLink
         href={`${getNetwork(networkId).explorerUrl}/contract/${accountAddress}`}
         target="_blank"

@@ -50,14 +50,15 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const accountName = getAccountName(account, accountNames)
   const network = getNetwork(switcherNetworkId)
 
-  const { data: showUpgradeBanner = false, mutate } = useSWR(
+  const { data: needsUpgrade = false, mutate } = useSWR(
     [account, network.accountImplementation, "showUpgradeBanner"],
     checkIfUpgradeAvailable,
     { suspense: false },
   )
 
-  const canShowEmptyAccountAlert =
-    !showPendingTransactions && !showUpgradeBanner
+  const canShowEmptyAccountAlert = !showPendingTransactions && !needsUpgrade
+  const showUpgradeBanner = needsUpgrade && !showPendingTransactions
+  const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
@@ -86,8 +87,8 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
           setAccountName(account.networkId, account.address, name)
         }
       />
-      {isBackupRequired && <RecoveryBanner />}
-      {showUpgradeBanner && !showPendingTransactions && (
+      {showBackupBanner && <RecoveryBanner />}
+      {showUpgradeBanner && (
         <UpgradeBanner
           onClick={() => {
             if (network.accountImplementation) {
@@ -99,7 +100,7 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
       <PendingTransactions accountAddress={account.address} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <TokenList
-          showTitle={!canShowEmptyAccountAlert}
+          showTitle={showPendingTransactions}
           accountAddress={account.address}
           canShowEmptyAccountAlert={canShowEmptyAccountAlert}
         />

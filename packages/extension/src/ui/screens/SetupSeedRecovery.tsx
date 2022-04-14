@@ -118,7 +118,6 @@ export const SetupSeedRecoveryPage: FC = () => {
                   />
                 ))}
               </SeedPhraseGrid>
-              <Button disabled>Continue</Button>
             </>
           }
         >
