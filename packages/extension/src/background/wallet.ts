@@ -1,7 +1,15 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
-import { Account, AddTransactionResponse, ec, stark } from "starknet"
+import {
+  Account,
+  AddTransactionResponse,
+  ec,
+  shortString,
+  stark,
+} from "starknet"
+import { computeHashOnElements } from "starknet/dist/utils/hash"
+import { BigNumberish } from "starknet/dist/utils/number"
 
 import { getNetwork, getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
@@ -29,6 +37,29 @@ interface WalletSession {
 export interface WalletStorageProps {
   backup?: string
   selected?: string
+}
+
+/**
+ * Belongs into starknet.js
+ */
+function calculateContractAddress(
+  salt: BigNumberish,
+  contractHash: BigNumberish,
+  constructorCalldata: BigNumberish[],
+  callerAddress: BigNumberish = 0,
+): string {
+  const CONTRACT_ADDRESS_PREFIX = shortString.encodeShortString(
+    "STARKNET_CONTRACT_ADDRESS",
+  )
+  const constructorCalldataHash = computeHashOnElements(constructorCalldata)
+
+  return computeHashOnElements([
+    CONTRACT_ADDRESS_PREFIX,
+    callerAddress,
+    salt,
+    contractHash,
+    constructorCalldataHash,
+  ])
 }
 
 export class Wallet extends EventEmitter {
@@ -88,6 +119,99 @@ export class Wallet extends EventEmitter {
 
     await this.writeBackup()
     this.setSession(ethersWallet.privateKey, password)
+  }
+
+  public async restoreSeedPhrase(seedPhrase: string, newPassword: string) {
+    if (this.isInitialized() || this.session) {
+      throw new Error("Wallet is already initialized")
+    }
+    const ethersWallet = ethers.Wallet.fromMnemonic(seedPhrase)
+    const N = isDevOrTest ? 64 : 32768
+    const encryptedBackup = await ethersWallet.encrypt(newPassword, {
+      scrypt: { N },
+    })
+
+    const goerliAccounts = await this.restoreAccountsFromWallet(
+      ethersWallet,
+      "goerli-alpha",
+    )
+    const mainnetAccounts = await this.restoreAccountsFromWallet(
+      ethersWallet,
+      "mainnet-alpha",
+    )
+
+    const accounts = [...this.accounts, ...goerliAccounts, ...mainnetAccounts]
+
+    const extendedBackup = {
+      ...JSON.parse(encryptedBackup),
+      argent: {
+        version: CURRENT_BACKUP_VERSION,
+        accounts,
+      },
+    }
+
+    this.importBackup(extendedBackup)
+    this.setSession(ethersWallet.privateKey, newPassword)
+  }
+
+  private async restoreAccountsFromWallet(
+    wallet: ethers.Wallet,
+    networkId: "mainnet-alpha" | "goerli-alpha",
+  ) {
+    const CHECK_OFFSET = 10
+    const PROXY_CONTRACT_HASHES_TO_CHECK = [
+      "0x0000000000000000000000000000000000000001",
+    ]
+    const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
+      [n in typeof networkId]: string[]
+    } = {
+      "mainnet-alpha": [
+        "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
+      ],
+      "goerli-alpha": [
+        "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+      ],
+    }
+
+    const provider = getProvider(networkId)
+
+    const accounts: WalletAccount[] = []
+
+    PROXY_CONTRACT_HASHES_TO_CHECK.flatMap((contractHash) =>
+      VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId].map(
+        (implementation) => [contractHash, implementation],
+      ),
+    ).forEach(async ([contractHash, implementation]) => {
+      let lastHit = 0
+      let lastCheck = 0
+      while (lastHit + CHECK_OFFSET < lastCheck) {
+        const starkPair = getStarkPair(lastCheck, wallet.privateKey)
+        const starkPub = ec.getStarkKey(starkPair)
+        const seed = starkPub
+
+        const address = calculateContractAddress(
+          seed,
+          contractHash,
+          stark.compileCalldata({ implementation }),
+        )
+
+        const code = await provider.getCode(address)
+        if (code.bytecode.length > 0) {
+          lastHit = lastCheck
+          accounts.push({
+            address,
+            network: networkId,
+            signer: {
+              type: "local_signer",
+              derivationPath: getPathForIndex(lastCheck),
+            },
+          })
+        }
+        ++lastCheck
+      }
+    })
+
+    return accounts
   }
 
   public async startSession(password: string): Promise<boolean> {
