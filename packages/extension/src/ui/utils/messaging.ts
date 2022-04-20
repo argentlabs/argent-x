@@ -18,8 +18,8 @@ export const getActions = async () => {
   return waitForMessage("GET_ACTIONS_RES")
 }
 
-export const updateWallet = async (walletAddress: string) => {
-  sendMessage({ type: "UPDATE_ACCOUNT", data: { walletAddress } })
+export const upgradeAccount = async (walletAddress: string) => {
+  sendMessage({ type: "UPGRADE_ACCOUNT", data: { walletAddress } })
   return waitForMessage("TRANSACTION_UPDATES")
 }
 

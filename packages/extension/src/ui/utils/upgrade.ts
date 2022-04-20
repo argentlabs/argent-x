@@ -2,7 +2,7 @@ import { number } from "starknet"
 
 import { Account } from "../Account"
 
-export async function checkIfUpdateAvailable(
+export async function checkIfUpgradeAvailable(
   account: Account,
   targetImplementation?: string,
 ): Promise<boolean> {

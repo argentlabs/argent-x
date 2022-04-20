@@ -6,7 +6,7 @@ import { P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
-import { updateWallet } from "../utils/messaging"
+import { upgradeAccount } from "../utils/messaging"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 const StyledP = styled(P)`
@@ -30,12 +30,12 @@ export const UpgradeScreen: FC = () => {
 
   return (
     <ConfirmScreen
-      title="Update Wallet"
-      confirmButtonText="Update"
+      title="Upgrade Wallet"
+      confirmButtonText="Upgrade"
       rejectButtonText="Cancel"
       onSubmit={async () => {
         useAppState.setState({ isLoading: true })
-        await updateWallet(selectedAccount)
+        await upgradeAccount(selectedAccount)
         useAppState.setState({ isLoading: false })
         navigate(routes.account())
       }}
@@ -44,12 +44,13 @@ export const UpgradeScreen: FC = () => {
       }}
     >
       <StyledP>
-        You will update your wallet implementation to use the latest features
+        You will upgrade your wallet implementation to use the latest features
         and security.
       </StyledP>
       <StyledP>
-        This update is required due to network and account contract changes. We
-        expect these kind of updates to be less frequent as the network matures.
+        This upgrade is required due to network and account contract changes. We
+        expect these kind of upgrades to be less frequent as the network
+        matures.
       </StyledP>
     </ConfirmScreen>
   )

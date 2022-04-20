@@ -38,7 +38,7 @@ export type MessageType =
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
   | {
-      type: "UPDATE_ACCOUNT"
+      type: "UPGRADE_ACCOUNT"
       data: {
         walletAddress: string
       }

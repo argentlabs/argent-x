@@ -93,7 +93,7 @@ export const AccountListScreen: FC = () => {
             account={account}
             status={getStatus(account, selectedAccount)}
             isDeleteable={switcherNetworkId === "localhost"}
-            canShowUpdate
+            canShowUpgrade
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>

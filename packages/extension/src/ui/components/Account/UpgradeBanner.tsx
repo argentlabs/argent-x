@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-const UpdateBannerWrapper = styled.div`
+const UpgradeBannerWrapper = styled.div`
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -11,13 +11,13 @@ const UpdateBannerWrapper = styled.div`
   margin: 16px 20px;
 `
 
-const UpdateTextWrapper = styled.div`
+const UpgradeTextWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 12px;
 `
 
-const UpdateBannerTitle = styled.h1`
+const UpgradeBannerTitle = styled.h1`
   color: black;
   margin: 0;
   font-weight: 600;
@@ -25,20 +25,20 @@ const UpdateBannerTitle = styled.h1`
   line-height: 22px;
 `
 
-const UpdateBannerDescription = styled.p`
+const UpgradeBannerDescription = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 20px;
   color: #8f8e8c;
 `
 
-interface UpdateBannerProps {
+interface UpgradeBannerProps {
   onClick: () => void
 }
 
-export const UpdateBanner: FC<UpdateBannerProps> = ({ onClick }) => {
+export const UpgradeBanner: FC<UpgradeBannerProps> = ({ onClick }) => {
   return (
-    <UpdateBannerWrapper onClick={onClick}>
+    <UpgradeBannerWrapper onClick={onClick}>
       <svg
         width="24"
         height="24"
@@ -59,12 +59,12 @@ export const UpdateBanner: FC<UpdateBannerProps> = ({ onClick }) => {
         </defs>
       </svg>
 
-      <UpdateTextWrapper>
-        <UpdateBannerTitle>Update Available</UpdateBannerTitle>
-        <UpdateBannerDescription>
+      <UpgradeTextWrapper>
+        <UpgradeBannerTitle>Upgrade Available</UpgradeBannerTitle>
+        <UpgradeBannerDescription>
           This update is required to use this wallet.
-        </UpdateBannerDescription>
-      </UpdateTextWrapper>
-    </UpdateBannerWrapper>
+        </UpgradeBannerDescription>
+      </UpgradeTextWrapper>
+    </UpgradeBannerWrapper>
   )
 }

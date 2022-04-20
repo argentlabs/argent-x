@@ -20,7 +20,7 @@ import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { recover } from "../../utils/recovery"
-import { checkIfUpdateAvailable } from "../../utils/upgrade"
+import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
@@ -83,14 +83,14 @@ interface AccountListProps {
   account: Account
   status: AccountStatus
   isDeleteable?: boolean
-  canShowUpdate?: boolean
+  canShowUpgrade?: boolean
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
   account,
   status,
   isDeleteable,
-  canShowUpdate,
+  canShowUpgrade,
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
@@ -99,9 +99,9 @@ export const AccountListItem: FC<AccountListProps> = ({
   const accountName = getAccountName(account, accountNames)
   const { address } = account
 
-  const { data: showUpdateBanner = false } = useSWR(
-    [account, accountImplementation, "showUpdateBanner"],
-    checkIfUpdateAvailable,
+  const { data: showUpgradeBanner = false } = useSWR(
+    [account, accountImplementation, "showUpgradeBanner"],
+    checkIfUpgradeAvailable,
     { suspense: false },
   )
 
@@ -133,8 +133,8 @@ export const AccountListItem: FC<AccountListProps> = ({
             <AccountStatusText>Deploying</AccountStatusText>
           </NetworkStatusWrapper>
         ) : (
-          canShowUpdate &&
-          showUpdateBanner && (
+          canShowUpgrade &&
+          showUpgradeBanner && (
             <NetworkStatusWrapper>
               <ArrowCircleDownIcon
                 style={{
@@ -142,7 +142,7 @@ export const AccountListItem: FC<AccountListProps> = ({
                   maxWidth: "16px",
                 }}
               />
-              <AccountStatusText>Update</AccountStatusText>
+              <AccountStatusText>Upgrade</AccountStatusText>
             </NetworkStatusWrapper>
           )
         )}

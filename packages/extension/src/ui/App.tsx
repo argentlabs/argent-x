@@ -139,7 +139,7 @@ const Screen: FC = () => {
         ) : (
           <>
             <Route path={routes.account()} element={<AccountScreen />} />
-            <Route path={routes.update()} element={<UpgradeScreen />} />
+            <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
             <Route path={routes.newToken()} element={<AddTokenScreen />} />
             <Route path={routes.tokenPath()} element={<TokenScreen />} />

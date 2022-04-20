@@ -235,7 +235,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         })
       }
 
-      case "UPDATE_ACCOUNT": {
+      case "UPGRADE_ACCOUNT": {
         const { walletAddress } = msg.data
         const starknetAccount = await wallet.getStarknetAccountByAddress(
           walletAddress,
@@ -267,7 +267,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           updateTransaction.transaction_hash,
           account,
           {
-            title: "Updating account",
+            title: "Upgrading account",
           },
         )
       }
