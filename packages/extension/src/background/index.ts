@@ -1,12 +1,12 @@
 import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { compactDecrypt } from "jose"
-import { encode, number } from "starknet"
+import { encode, number, stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { getProvider } from "../shared/networks"
+import { getNetwork, getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -35,6 +35,7 @@ import {
 } from "./preAuthorizations"
 import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
+import { getImplementationUpgradePath } from "./upgrade"
 import { Wallet, WalletStorageProps } from "./wallet"
 
 const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
@@ -155,19 +156,6 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         })
       }
 
-      case "EXECUTE_TRANSACTION_LEGACY": {
-        const { meta } = await actionQueue.push({
-          type: "TRANSACTION_LEGACY",
-          payload: msg.data,
-        })
-        return sendToTabAndUi({
-          type: "EXECUTE_TRANSACTION_LEGACY_RES",
-          data: {
-            actionHash: meta.hash,
-          },
-        })
-      }
-
       case "GET_ACTIONS": {
         const actions = await actionQueue.getAll()
         return sendToTabAndUi({
@@ -247,6 +235,41 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         })
       }
 
+      case "UPGRADE_ACCOUNT": {
+        const { walletAddress } = msg.data
+        const starknetAccount = await wallet.getStarknetAccountByAddress(
+          walletAddress,
+        )
+
+        const account = wallet.getAccountByAddress(walletAddress)
+        const { accountImplementation: newImplementation } = getNetwork(
+          account.network,
+        )
+
+        const { result } = await starknetAccount.callContract({
+          contractAddress: account.address,
+          entrypoint: "get_implementation",
+        })
+        const currentImplementation = stark.makeAddress(number.toHex(result[0]))
+
+        const updateAccount = getImplementationUpgradePath(
+          currentImplementation,
+        )
+
+        const updateTransaction = await updateAccount(
+          newImplementation,
+          account.address,
+          starknetAccount, // Account extends Provider
+          wallet.getKeyPairByDerivationPath(account.signer.derivationPath), // signer is a private property of the account, this will be public in the future
+        )
+
+        return transactionTracker.trackTransaction(
+          updateTransaction.transaction_hash,
+          account,
+          { title: "Upgrading account" },
+        )
+      }
+
       case "APPROVE_ACTION": {
         const { actionHash } = msg.data
         const action = await actionQueue.remove(actionHash)
@@ -312,41 +335,6 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
               if (!nonceWasProvidedByUI) {
                 increaseStoredNonce(selectedAccount.address)
               }
-
-              return sendToTabAndUi({
-                type: "TRANSACTION_SUBMITTED",
-                data: {
-                  txHash: transaction.transaction_hash,
-                  actionHash,
-                },
-              })
-            } catch (error: any) {
-              return sendToTabAndUi({
-                type: "TRANSACTION_FAILED",
-                data: { actionHash, error: `${error}` },
-              })
-            }
-          }
-
-          case "TRANSACTION_LEGACY": {
-            try {
-              if (!wallet.isSessionOpen()) {
-                throw Error("you need an open session")
-              }
-              const selectedAccount = await wallet.getSelectedAccount()
-              const starknetAccount = await wallet.getSelectedStarknetAccount()
-              if (!selectedAccount) {
-                throw Error("no accounts")
-              }
-
-              const transaction = await starknetAccount.LEGACY_addTransaction(
-                action.payload,
-              )
-
-              transactionTracker.trackTransaction(
-                transaction.transaction_hash,
-                selectedAccount,
-              )
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",

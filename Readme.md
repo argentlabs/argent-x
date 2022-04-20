@@ -55,7 +55,7 @@ const [userWalletContractAddress] = await starknet.enable({ showModal: true })
 // Check if connection was successful
 if(starknet.isConnected) {
     // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kinds of requests through the user's wallet contract.
-    starknet.signer.invokeFunction({ ... })
+    starknet.account.execute({ ... })
 } else {
     // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
     starknet.provider.callContract( ... )

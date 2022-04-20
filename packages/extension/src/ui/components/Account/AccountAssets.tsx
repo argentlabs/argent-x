@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add"
-import { FC, Suspense, useEffect } from "react"
+import { FC, Suspense, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
@@ -17,14 +17,13 @@ import { useAppState } from "../../states/app"
 import { useLocalhostPort } from "../../states/localhostPort"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
-import { sendTransaction } from "../../utils/transactions"
-import { checkIfUpdateAvailable } from "../../utils/upgrade"
+import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { Spinner } from "../Spinner"
 import { AddTokenIconButton, TokenTitle, TokenWrapper } from "../Token"
 import { AccountSubHeader } from "./AccountSubheader"
 import { PendingTransactions } from "./PendingTransactions"
 import { TokenList } from "./TokenList"
-import { UpdateBanner } from "./UpdateBanner"
+import { UpgradeBanner } from "./UpgradeBanner"
 
 const Container = styled.div`
   display: flex;
@@ -48,13 +47,26 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const accountName = getAccountName(account, accountNames)
   const network = getNetwork(switcherNetworkId)
 
-  const { data: showUpdateBanner = false } = useSWR(
-    [account, network.accountImplementation],
-    checkIfUpdateAvailable,
+  const { data: showUpgradeBanner = false, mutate } = useSWR(
+    [account, network.accountImplementation, "showUpgradeBanner"],
+    checkIfUpgradeAvailable,
     { suspense: false },
   )
 
-  const canShowEmptyAccountAlert = !showPendingTransactions && !showUpdateBanner
+  const canShowEmptyAccountAlert =
+    !showPendingTransactions && !showUpgradeBanner
+
+  const hadPendingTransactions = useRef(false)
+  useEffect(() => {
+    if (showPendingTransactions) {
+      hadPendingTransactions.current = true
+    }
+    if (hadPendingTransactions.current && showPendingTransactions === false) {
+      // switched from true to false
+      hadPendingTransactions.current = false
+      mutate(false) // update upgrade banner
+    }
+  }, [showPendingTransactions])
 
   useEffect(() => {
     connectAccount(account, switcherNetworkId, localhostPort)
@@ -71,17 +83,11 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
           setAccountName(account.networkId, account.address, name)
         }
       />
-      {showUpdateBanner && !showPendingTransactions && (
-        <UpdateBanner
+      {showUpgradeBanner && !showPendingTransactions && (
+        <UpgradeBanner
           onClick={() => {
             if (network.accountImplementation) {
-              sendTransaction({
-                to: account.address,
-                method: "upgrade",
-                calldata: {
-                  implementation: network.accountImplementation,
-                },
-              })
+              navigate(routes.upgrade())
             }
           }}
         />

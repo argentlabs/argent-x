@@ -1,11 +1,5 @@
 import type { JWK } from "jose"
-import type {
-  Abi,
-  Call,
-  InvocationsDetails,
-  InvokeFunctionTransaction,
-  typedData,
-} from "starknet"
+import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
 import { AddToken } from "./token.model"
@@ -43,6 +37,12 @@ export type MessageType =
   | { type: "DELETE_ACCOUNT"; data: string }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
+  | {
+      type: "UPGRADE_ACCOUNT"
+      data: {
+        walletAddress: string
+      }
+    }
   // ***** transactions *****
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
@@ -55,11 +55,6 @@ export type MessageType =
       }
     }
   | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }
-  | {
-      type: "EXECUTE_TRANSACTION_LEGACY"
-      data: InvokeFunctionTransaction
-    }
-  | { type: "EXECUTE_TRANSACTION_LEGACY_RES"; data: { actionHash: string } }
   | { type: "TRANSACTION_UPDATES"; data: TransactionStatus[] }
   | { type: "TRANSACTION_SUCCESS"; data: TransactionStatus }
   | { type: "TRANSACTION_FAILURE"; data: TransactionStatus }

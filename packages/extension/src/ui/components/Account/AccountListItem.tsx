@@ -4,15 +4,23 @@ import { IconButton } from "@mui/material"
 import { FC, MouseEventHandler } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
+import useSWR from "swr"
 
+import { getNetwork } from "../../../shared/networks"
+import { Account } from "../../Account"
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
+import {
+  getAccountName,
+  useAccountMetadata,
+} from "../../states/accountMetadata"
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { recover } from "../../utils/recovery"
+import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
@@ -72,22 +80,30 @@ const AccountName = styled.h1`
 `
 
 interface AccountListProps {
-  accountName: string
-  address: string
+  account: Account
   status: AccountStatus
   isDeleteable?: boolean
-  hasUpdate?: boolean
+  canShowUpgrade?: boolean
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
-  accountName,
-  address,
+  account,
   status,
   isDeleteable,
-  hasUpdate,
+  canShowUpgrade,
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
+  const { accountImplementation } = getNetwork(switcherNetworkId)
+  const { accountNames } = useAccountMetadata()
+  const accountName = getAccountName(account, accountNames)
+  const { address } = account
+
+  const { data: showUpgradeBanner = false } = useSWR(
+    [account, accountImplementation, "showUpgradeBanner"],
+    checkIfUpgradeAvailable,
+    { suspense: false },
+  )
 
   const handleDeleteClick: MouseEventHandler = async (e) => {
     e.preventDefault()
@@ -117,7 +133,8 @@ export const AccountListItem: FC<AccountListProps> = ({
             <AccountStatusText>Deploying</AccountStatusText>
           </NetworkStatusWrapper>
         ) : (
-          hasUpdate && (
+          canShowUpgrade &&
+          showUpgradeBanner && (
             <NetworkStatusWrapper>
               <ArrowCircleDownIcon
                 style={{
@@ -125,7 +142,7 @@ export const AccountListItem: FC<AccountListProps> = ({
                   maxWidth: "16px",
                 }}
               />
-              <AccountStatusText>Update</AccountStatusText>
+              <AccountStatusText>Upgrade</AccountStatusText>
             </NetworkStatusWrapper>
           )
         )}

@@ -1,8 +1,8 @@
-import type { AccountInterface, Provider, SignerInterface } from "starknet"
+import type { AccountInterface, Provider } from "starknet"
 
 export type EventHandler = (accounts: string[]) => void
 
-// EIP-717:
+// EIP-747:
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-747.md
 interface WatchAssetParameters {
   type: "ERC20" // The asset's interface, e.g. 'ERC20'
@@ -26,10 +26,6 @@ interface IStarketWindowObject {
   isPreauthorized: () => Promise<boolean>
   on: (event: "accountsChanged", handleEvent: EventHandler) => void
   off: (event: "accountsChanged", handleEvent: EventHandler) => void
-  /**
-   * @deprecated use `account` instead
-   */
-  signer?: SignerInterface
   account?: AccountInterface
   provider: Provider
   selectedAddress?: string
@@ -38,7 +34,6 @@ interface IStarketWindowObject {
 
 interface ConnectedStarketWindowObject extends IStarketWindowObject {
   isConnected: true
-  signer: SignerInterface
   account: AccountInterface
   selectedAddress: string
 }

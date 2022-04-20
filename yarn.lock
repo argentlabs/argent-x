@@ -9408,10 +9408,29 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@^3.9.0:
+"starknet-390@npm:starknet@3.9.0":
   version "3.9.0"
   resolved "https://registry.npmjs.org/starknet/-/starknet-3.9.0.tgz#ee7a3d99effef0998b365d95dd85f9b01cdb463c"
   integrity sha512-/sn3WHFX7f+A3vVf3I+Kamg2KIW6494vpCcZWA09IQ5RZXrozjaBtYWT41SoKKWZ3b0Xg8WF//SOkRVCTZOZkQ==
+  dependencies:
+    "@ledgerhq/hw-app-eth" "^6.26.0"
+    "@ledgerhq/hw-transport" "^6.24.1"
+    "@ledgerhq/hw-transport-webhid" "^6.24.1"
+    axios "^0.23.0"
+    bn.js "^5.2.0"
+    elliptic "^6.5.4"
+    ethereum-cryptography "^0.2.0"
+    hash.js "^1.1.7"
+    json-bigint "^1.0.0"
+    minimalistic-assert "^1.0.1"
+    pako "^2.0.4"
+    superstruct "^0.15.3"
+    url-join "^4.0.1"
+
+starknet@^3.10.0:
+  version "3.10.0"
+  resolved "https://registry.npmjs.org/starknet/-/starknet-3.10.0.tgz#65daab70cbc750faf9e2c1762335bf7b11fd5377"
+  integrity sha512-wtztZMIDTNa8aCBPW6FbmwqACN9//Z1g5kPcsy6ff/vp2as8Hh/voum/nWCE7TFM0P0yVNsqFRzi+X0gI5T3Gg==
   dependencies:
     "@ledgerhq/hw-app-eth" "^6.26.0"
     "@ledgerhq/hw-transport" "^6.24.1"

@@ -101,47 +101,6 @@ export const ActionScreen: FC = () => {
         />
       )
 
-    case "TRANSACTION_LEGACY":
-      return (
-        <ApproveTransactionScreen
-          transactions={action.payload}
-          actionHash={action.meta.hash}
-          onSubmit={async () => {
-            await approve(action)
-            useAppState.setState({ isLoading: true })
-            const result = await Promise.race([
-              waitForMessage(
-                "TRANSACTION_SUBMITTED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-              waitForMessage(
-                "TRANSACTION_FAILED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-            ])
-            if ("error" in result) {
-              useAppState.setState({
-                error: `Sending transaction failed: ${result.error}`,
-                isLoading: false,
-              })
-              navigate(routes.error())
-            } else {
-              if (isPopup && isLastAction) {
-                window.close()
-              }
-              useAppState.setState({ isLoading: false })
-            }
-          }}
-          onReject={async () => {
-            await reject(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
-          selectedAccount={account}
-        />
-      )
-
     case "SIGN":
       return (
         <ApproveSignScreen

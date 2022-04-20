@@ -26,6 +26,7 @@ import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnections
 import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
 import { TokenScreen } from "./screens/TokenScreen"
+import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
@@ -138,6 +139,7 @@ const Screen: FC = () => {
         ) : (
           <>
             <Route path={routes.account()} element={<AccountScreen />} />
+            <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
             <Route path={routes.newToken()} element={<AddTokenScreen />} />
             <Route path={routes.tokenPath()} element={<TokenScreen />} />

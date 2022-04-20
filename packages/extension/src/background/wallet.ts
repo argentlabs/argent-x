@@ -172,6 +172,36 @@ export class Wallet extends EventEmitter {
     return this.accounts
   }
 
+  public getAccountByAddress(address: string): WalletAccount {
+    const hit = this.getAccounts().find(
+      (account) => account.address === address,
+    )
+    if (!hit) {
+      throw Error("account not found")
+    }
+    return hit
+  }
+
+  public getKeyPairByDerivationPath(derivationPath: string) {
+    return getStarkPair(derivationPath, this.session?.secret as string)
+  }
+
+  public async getStarknetAccountByAddress(address: string): Promise<Account> {
+    if (!this.isSessionOpen()) {
+      throw Error("no open session")
+    }
+    const account = this.getAccountByAddress(address)
+    if (!account) {
+      throw Error("account not found")
+    }
+
+    const keyPair = this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+    const provider = getProvider(account.network)
+    return new Account(provider, account.address, keyPair)
+  }
+
   public async getSelectedStarknetAccount(): Promise<Account> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
@@ -182,12 +212,7 @@ export class Wallet extends EventEmitter {
       throw new Error("no selected account")
     }
 
-    const keyPair = getStarkPair(
-      account.signer.derivationPath,
-      this.session?.secret as string,
-    )
-    const provider = getProvider(account.network)
-    return new Account(provider, account.address, keyPair)
+    return this.getStarknetAccountByAddress(account.address)
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
