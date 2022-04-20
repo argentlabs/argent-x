@@ -1,7 +1,7 @@
 import {
   AddTransactionResponse,
+  KeyPair,
   ProviderInterface,
-  SignerInterface,
   number,
 } from "starknet"
 import { Account as OldAccountV390, stark as starkV390 } from "starknet-390"
@@ -12,7 +12,7 @@ export const getImplementationUpgradePath = (
   newImplementation: number.BigNumberish,
   accountAddress: string,
   provider: ProviderInterface,
-  signer: SignerInterface,
+  keyPair: KeyPair,
 ) => Promise<AddTransactionResponse>) => {
   switch (true) {
     case number
@@ -22,12 +22,20 @@ export const getImplementationUpgradePath = (
           "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
         ),
       ):
-      return (newImplementation, accountAddress, provider, signer) => {
+      return (newImplementation, accountAddress, provider, keyPair) => {
         const oldAccount = new OldAccountV390(
           provider as any, // this is a bug in old starknet versions where Provider was used instead of ProviderInterface
           accountAddress,
-          signer,
+          keyPair,
         )
+
+        console.log({
+          contractAddress: accountAddress,
+          entrypoint: "upgrade",
+          calldata: starkV390.compileCalldata({
+            implementation: newImplementation,
+          }),
+        })
 
         return oldAccount.execute(
           {

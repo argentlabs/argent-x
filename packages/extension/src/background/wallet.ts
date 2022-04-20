@@ -182,6 +182,10 @@ export class Wallet extends EventEmitter {
     return hit
   }
 
+  public getKeyPairByDerivationPath(derivationPath: string) {
+    return getStarkPair(derivationPath, this.session?.secret as string)
+  }
+
   public async getStarknetAccountByAddress(address: string): Promise<Account> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
@@ -191,9 +195,8 @@ export class Wallet extends EventEmitter {
       throw Error("account not found")
     }
 
-    const keyPair = getStarkPair(
+    const keyPair = this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
-      this.session?.secret as string,
     )
     const provider = getProvider(account.network)
     return new Account(provider, account.address, keyPair)

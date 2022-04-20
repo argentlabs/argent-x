@@ -260,7 +260,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           newImplementation,
           account.address,
           starknetAccount, // Account extends Provider
-          (starknetAccount as any).signer, // signer is a private property of the account, this will be public in the future
+          wallet.getKeyPairByDerivationPath(account.signer.derivationPath), // signer is a private property of the account, this will be public in the future
         )
 
         return transactionTracker.trackTransaction(
