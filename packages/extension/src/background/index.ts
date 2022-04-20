@@ -266,9 +266,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         return transactionTracker.trackTransaction(
           updateTransaction.transaction_hash,
           account,
-          {
-            title: "Upgrading account",
-          },
+          { title: "Upgrading account" },
         )
       }
 
