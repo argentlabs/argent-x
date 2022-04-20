@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add"
-import { FC, Suspense, useEffect } from "react"
+import { FC, Suspense, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
@@ -47,16 +47,25 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const accountName = getAccountName(account, accountNames)
   const network = getNetwork(switcherNetworkId)
 
-  console.log(account, network.accountImplementation)
-  const { data: showUpdateBanner = false } = useSWR(
+  const { data: showUpdateBanner = false, mutate } = useSWR(
     [account, network.accountImplementation, "showUpdateBanner"],
     checkIfUpdateAvailable,
     { suspense: false },
   )
 
-  console.log(showUpdateBanner)
-
   const canShowEmptyAccountAlert = !showPendingTransactions && !showUpdateBanner
+
+  const hadPendingTransactions = useRef(false)
+  useEffect(() => {
+    if (showPendingTransactions) {
+      hadPendingTransactions.current = true
+    }
+    if (hadPendingTransactions.current && showPendingTransactions === false) {
+      // switched from true to false
+      hadPendingTransactions.current = false
+      mutate(false) // update update banner
+    }
+  }, [showPendingTransactions])
 
   useEffect(() => {
     connectAccount(account, switcherNetworkId, localhostPort)

@@ -19,7 +19,8 @@ export const getActions = async () => {
 }
 
 export const updateWallet = async (walletAddress: string) => {
-  return sendMessage({ type: "UPDATE_ACCOUNT", data: { walletAddress } })
+  sendMessage({ type: "UPDATE_ACCOUNT", data: { walletAddress } })
+  return waitForMessage("TRANSACTION_UPDATES")
 }
 
 export const getTransactions = async (address: string) => {

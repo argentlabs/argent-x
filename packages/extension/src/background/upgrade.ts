@@ -29,14 +29,6 @@ export const getImplementationUpgradePath = (
           keyPair,
         )
 
-        console.log({
-          contractAddress: accountAddress,
-          entrypoint: "upgrade",
-          calldata: starkV390.compileCalldata({
-            implementation: newImplementation,
-          }),
-        })
-
         return oldAccount.execute(
           {
             contractAddress: accountAddress,

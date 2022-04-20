@@ -6,6 +6,7 @@ import { Header } from "../components/Header"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
+import { useAppState } from "../states/app"
 import { updateWallet } from "../utils/messaging"
 import { ConfirmScreen } from "./ConfirmScreen"
 
@@ -33,7 +34,9 @@ export const UpgradeScreen: FC = () => {
         confirmButtonText="Update"
         rejectButtonText="Cancel"
         onSubmit={async () => {
+          useAppState.setState({ isLoading: true })
           await updateWallet(selectedAccount)
+          useAppState.setState({ isLoading: false })
           navigate(routes.account())
         }}
         onReject={() => {
