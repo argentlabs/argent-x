@@ -6,6 +6,15 @@ import {
 } from "starknet"
 import { Account as AccountV390, stark as starkV390 } from "starknet-390"
 
+function equalBigNumberish(
+  a: number.BigNumberish,
+  b: number.BigNumberish,
+): boolean {
+  const aBN = number.toBN(a)
+  const bBN = number.toBN(b)
+  return aBN.eq(bBN)
+}
+
 export const getImplementationUpgradePath = (
   oldImplementation: number.BigNumberish,
 ): ((
@@ -15,13 +24,10 @@ export const getImplementationUpgradePath = (
   keyPair: KeyPair,
 ) => Promise<AddTransactionResponse>) => {
   if (
-    number
-      .toBN(oldImplementation)
-      .eq(
-        number.toBN(
-          "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
-        ),
-      )
+    equalBigNumberish(
+      oldImplementation,
+      "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+    )
   ) {
     return (newImplementation, accountAddress, provider, keyPair) => {
       const oldAccount = new AccountV390(
