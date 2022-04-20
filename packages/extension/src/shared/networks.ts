@@ -23,7 +23,7 @@ export const networks: Network[] = [
     name: "Goerli Testnet",
     explorerUrl: "https://goerli.voyager.online",
     accountImplementation:
-      "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+      "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
   },
   {
     id: "localhost",

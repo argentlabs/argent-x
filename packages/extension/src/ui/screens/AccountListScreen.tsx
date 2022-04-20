@@ -3,9 +3,7 @@ import SettingsIcon from "@mui/icons-material/Settings"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import useSWR from "swr"
 
-import { getNetwork } from "../../shared/networks"
 import { Container } from "../components/Account/AccountContainer"
 import { AccountHeader } from "../components/Account/AccountHeader"
 import { AccountListItem } from "../components/Account/AccountListItem"
@@ -15,13 +13,11 @@ import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
-import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { useAppState } from "../states/app"
 import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
-import { checkIfUpdateAvailable } from "../utils/upgrade"
 
 const AccountList = styled.div`
   display: flex;
@@ -56,7 +52,6 @@ export const AccountListScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
   const { localhostPort } = useLocalhostPort()
   const { accounts, selectedAccount, addAccount } = useAccount()
-  const { accountNames } = useAccountMetadata()
 
   const accountsList = Object.values(accounts)
 
@@ -71,37 +66,6 @@ export const AccountListScreen: FC = () => {
       navigate(routes.error())
     }
   }
-
-  const { data: accountUpdatesList = {} } = useSWR(
-    [
-      accountsList,
-      accountsList.map(
-        (account) => getNetwork(account.networkId).accountImplementation,
-      ),
-    ],
-    async (
-      accounts,
-      accountImplementations,
-    ): Promise<{
-      [account: string]: boolean
-    }> => {
-      const accountUpdates = await Promise.all(
-        accounts.map((account, index) => {
-          return checkIfUpdateAvailable(account, accountImplementations[index])
-        }),
-      )
-      return accounts.reduce(
-        (acc, account, index) => ({
-          ...acc,
-          [account.address]: accountUpdates[index],
-        }),
-        {},
-      )
-    },
-    {
-      suspense: false,
-    },
-  )
 
   return (
     <AccountListWrapper header>
@@ -126,11 +90,10 @@ export const AccountListScreen: FC = () => {
         {accountsList.map((account) => (
           <AccountListItem
             key={account.address}
-            accountName={getAccountName(account, accountNames)}
-            address={account.address}
+            account={account}
             status={getStatus(account, selectedAccount)}
             isDeleteable={switcherNetworkId === "localhost"}
-            hasUpdate={accountUpdatesList[account.address] || false}
+            canShowUpdate
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>

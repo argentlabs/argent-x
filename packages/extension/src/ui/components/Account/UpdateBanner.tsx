@@ -62,7 +62,7 @@ export const UpdateBanner: FC<UpdateBannerProps> = ({ onClick }) => {
       <UpdateTextWrapper>
         <UpdateBannerTitle>Update Available</UpdateBannerTitle>
         <UpdateBannerDescription>
-          This may have breaking changes
+          This update is required to use this wallet.
         </UpdateBannerDescription>
       </UpdateTextWrapper>
     </UpdateBannerWrapper>

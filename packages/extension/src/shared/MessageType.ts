@@ -37,6 +37,12 @@ export type MessageType =
   | { type: "DELETE_ACCOUNT"; data: string }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
+  | {
+      type: "UPDATE_ACCOUNT"
+      data: {
+        walletAddress: string
+      }
+    }
   // ***** transactions *****
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }

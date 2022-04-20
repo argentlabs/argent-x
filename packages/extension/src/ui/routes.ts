@@ -4,6 +4,7 @@ export const routes = {
   backupRecovery: () => "/recover",
   lockScreen: () => "/lock-screen",
   account: () => "/account",
+  update: () => "/account/update",
   accounts: () => "/accounts",
   newToken: () => "/tokens/new",
   token: (tokenAddress: string) => `/tokens/${tokenAddress}`,

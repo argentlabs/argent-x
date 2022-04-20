@@ -17,7 +17,6 @@ import { useAppState } from "../../states/app"
 import { useLocalhostPort } from "../../states/localhostPort"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
-import { sendTransaction } from "../../utils/transactions"
 import { checkIfUpdateAvailable } from "../../utils/upgrade"
 import { Spinner } from "../Spinner"
 import { AddTokenIconButton, TokenTitle, TokenWrapper } from "../Token"
@@ -48,11 +47,14 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const accountName = getAccountName(account, accountNames)
   const network = getNetwork(switcherNetworkId)
 
+  console.log(account, network.accountImplementation)
   const { data: showUpdateBanner = false } = useSWR(
-    [account, network.accountImplementation],
+    [account, network.accountImplementation, "showUpdateBanner"],
     checkIfUpdateAvailable,
     { suspense: false },
   )
+
+  console.log(showUpdateBanner)
 
   const canShowEmptyAccountAlert = !showPendingTransactions && !showUpdateBanner
 
@@ -75,13 +77,7 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
         <UpdateBanner
           onClick={() => {
             if (network.accountImplementation) {
-              sendTransaction({
-                to: account.address,
-                method: "upgrade",
-                calldata: {
-                  implementation: network.accountImplementation,
-                },
-              })
+              navigate(routes.update())
             }
           }}
         />
