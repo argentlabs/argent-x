@@ -155,19 +155,6 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         })
       }
 
-      case "EXECUTE_TRANSACTION_LEGACY": {
-        const { meta } = await actionQueue.push({
-          type: "TRANSACTION_LEGACY",
-          payload: msg.data,
-        })
-        return sendToTabAndUi({
-          type: "EXECUTE_TRANSACTION_LEGACY_RES",
-          data: {
-            actionHash: meta.hash,
-          },
-        })
-      }
-
       case "GET_ACTIONS": {
         const actions = await actionQueue.getAll()
         return sendToTabAndUi({
@@ -312,41 +299,6 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
               if (!nonceWasProvidedByUI) {
                 increaseStoredNonce(selectedAccount.address)
               }
-
-              return sendToTabAndUi({
-                type: "TRANSACTION_SUBMITTED",
-                data: {
-                  txHash: transaction.transaction_hash,
-                  actionHash,
-                },
-              })
-            } catch (error: any) {
-              return sendToTabAndUi({
-                type: "TRANSACTION_FAILED",
-                data: { actionHash, error: `${error}` },
-              })
-            }
-          }
-
-          case "TRANSACTION_LEGACY": {
-            try {
-              if (!wallet.isSessionOpen()) {
-                throw Error("you need an open session")
-              }
-              const selectedAccount = await wallet.getSelectedAccount()
-              const starknetAccount = await wallet.getSelectedStarknetAccount()
-              if (!selectedAccount) {
-                throw Error("no accounts")
-              }
-
-              const transaction = await starknetAccount.LEGACY_addTransaction(
-                action.payload,
-              )
-
-              transactionTracker.trackTransaction(
-                transaction.transaction_hash,
-                selectedAccount,
-              )
 
               return sendToTabAndUi({
                 type: "TRANSACTION_SUBMITTED",
