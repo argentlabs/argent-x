@@ -39,6 +39,7 @@ import {
   validateAndSetPassword,
   validateSeedRecoverStateIsComplete,
 } from "./states/seedRecover"
+import { recoverBySeedPhrase } from "./utils/messaging"
 import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
 
@@ -147,6 +148,7 @@ const Screen: FC = () => {
                   validateAndSetPassword(password)
                   const state = useSeedRecover.getState()
                   if (validateSeedRecoverStateIsComplete(state)) {
+                    await recoverBySeedPhrase(state.seedPhrase, state.password)
                     navigate(await recover())
                   }
                 } catch {

@@ -512,6 +512,28 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           data: { encryptedSeedPhrase },
         })
       }
+      case "RECOVER_SEEDPHRASE": {
+        try {
+          const { secure, body } = msg.data
+          if (secure !== true) {
+            throw Error("session can only be started with encryption")
+          }
+          const { plaintext } = await compactDecrypt(body, privateKey)
+          const {
+            seedPhrase,
+            newPassword,
+          }: {
+            seedPhrase: string
+            newPassword: string
+          } = JSON.parse(encode.arrayBufferToString(plaintext))
+
+          await wallet.restoreSeedPhrase(seedPhrase, newPassword)
+
+          return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
+        } catch {
+          return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_REJ" })
+        }
+      }
       case "START_SESSION": {
         const { secure, body } = msg.data
         if (secure !== true) {

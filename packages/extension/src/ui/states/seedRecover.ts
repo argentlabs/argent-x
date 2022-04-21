@@ -43,7 +43,9 @@ export const validateAndSetPassword = (password: string): void => {
   return useSeedRecover.setState({ password })
 }
 
-export const validateSeedRecoverStateIsComplete = (state: State) => {
+export const validateSeedRecoverStateIsComplete = (
+  state: State,
+): state is Required<State> => {
   return Boolean(
     state.seedPhrase &&
       state.password &&

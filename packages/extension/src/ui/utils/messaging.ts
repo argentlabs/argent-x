@@ -117,6 +117,39 @@ export const getSeedPhrase = async (): Promise<string> => {
   return payload.seedPhrase as string
 }
 
+export const recoverBySeedPhrase = async (
+  seedPhrase: string,
+  newPassword: string,
+): Promise<void> => {
+  const pubJwk = await getPublicKey()
+  const pubKey = await importJWK(pubJwk)
+
+  const msgJson = JSON.stringify({
+    seedPhrase,
+    newPassword,
+  })
+
+  const encMsg = await new CompactEncrypt(encode.utf8ToArray(msgJson))
+    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
+    .encrypt(pubKey)
+
+  sendMessage({
+    type: "RECOVER_SEEDPHRASE",
+    data: { secure: true, body: encMsg },
+  })
+
+  const succeeded = await Promise.race([
+    waitForMessage("RECOVER_SEEDPHRASE_RES").then(() => true),
+    waitForMessage("RECOVER_SEEDPHRASE_REJ")
+      .then(() => false)
+      .catch(() => false),
+  ])
+
+  if (!succeeded) {
+    throw Error("Invalid Seed Phrase")
+  }
+}
+
 export const updateTransactionFee = async (
   actionHash: string,
   maxFee: number.BigNumberish,
