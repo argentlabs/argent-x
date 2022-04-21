@@ -11,7 +11,7 @@ import {
 import { computeHashOnElements } from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
-import { getNetwork, getProvider } from "../shared/networks"
+import { defaultNetwork, getNetwork, getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
 import {
   getNextPathIndex,
@@ -28,6 +28,23 @@ const isDevOrTest = isDev || isTest
 
 const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
+
+type KnownNetworkIds = "mainnet-alpha" | "goerli-alpha"
+const CHECK_OFFSET = 10
+const PROXY_CONTRACT_HASHES_TO_CHECK = [
+  "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
+]
+const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
+  [n in KnownNetworkIds]: string[]
+} = {
+  "mainnet-alpha": [
+    "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
+  ],
+  "goerli-alpha": [
+    "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+    "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
+  ],
+}
 
 interface WalletSession {
   secret: string
@@ -114,6 +131,18 @@ export class Wallet extends EventEmitter {
     return accounts || []
   }
 
+  private async setAccounts(accounts: WalletAccount[]) {
+    const oldAccounts = await this.getAccounts()
+
+    // combine accounts without duplicates
+    const newAccounts = [...oldAccounts, ...accounts].filter(
+      (account, index, self) =>
+        self.findIndex((a) => a.address === account.address) === index,
+    )
+
+    return this.store.setItem("accounts", newAccounts)
+  }
+
   private async pushAccount(account: WalletAccount) {
     const accounts = await this.getAccounts()
     const index = accounts.findIndex((a) => a.address === account.address)
@@ -170,38 +199,24 @@ export class Wallet extends EventEmitter {
       throw new Error("Wallet is not initialized")
     }
     const wallet = new ethers.Wallet(this.session?.secret)
+
     const networks = ["mainnet-alpha", "goerli-alpha"] as const
-    const promises: Promise<unknown>[] = networks.flatMap(async (networkId) => {
-      const accounts = await this.restoreAccountsFromWallet(wallet, networkId)
-      return accounts.map((account) => {
-        this.pushAccount(account)
-      })
-    })
+    const accountsResults = await Promise.all(
+      networks.map(async (networkId) => {
+        return this.restoreAccountsFromWallet(wallet, networkId)
+      }),
+    )
+    const accounts = accountsResults.flatMap((x) => x)
 
-    promises.push(this.store.setItem("discoveredOnce", true))
+    await this.setAccounts(accounts)
 
-    await Promise.all(promises)
+    this.store.setItem("discoveredOnce", true)
   }
 
   private async restoreAccountsFromWallet(
     wallet: ethers.Wallet,
-    networkId: "mainnet-alpha" | "goerli-alpha",
+    networkId: KnownNetworkIds,
   ) {
-    const CHECK_OFFSET = 10
-    const PROXY_CONTRACT_HASHES_TO_CHECK = [
-      "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
-    ]
-    const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
-      [n in typeof networkId]: string[]
-    } = {
-      "mainnet-alpha": [
-        "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
-      ],
-      "goerli-alpha": [
-        "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
-      ],
-    }
-
     const provider = getProvider(networkId)
 
     const accounts: WalletAccount[] = []
@@ -398,15 +413,16 @@ export class Wallet extends EventEmitter {
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
-    if ((await this.getAccounts()).length === 0 || !this.isSessionOpen()) {
+    if (!this.isSessionOpen()) {
       return
     }
-
+    const accounts = await this.getAccounts()
     const address = await this.store.getItem("selected")
-    const account = (await this.getAccounts()).find(
-      (account) => account.address === address,
+    const account = accounts.find((account) => account.address === address)
+    const defaultAccount = accounts.find(
+      (account) => account.network === defaultNetwork.id,
     )
-    return account ?? (await this.getAccounts())[0]
+    return account ?? defaultAccount ?? accounts[0]
   }
 
   public async selectAccount(address: string) {
@@ -490,7 +506,7 @@ export class Wallet extends EventEmitter {
     }
 
     const backup = JSON.parse(this.encryptedBackup)
-    if (backup.argent.version !== CURRENT_BACKUP_VERSION) {
+    if (backup.argent?.version !== CURRENT_BACKUP_VERSION) {
       // in the future, backup file migration will happen here
     }
 
@@ -499,10 +515,8 @@ export class Wallet extends EventEmitter {
 
   private async recoverAccountsFromBackupFile(backup: any): Promise<void> {
     const accounts = backup.argent?.accounts ?? []
-    const promises = accounts.map((account: WalletAccount) =>
-      this.pushAccount(account),
-    )
-    await Promise.all(promises)
+
+    await this.setAccounts(accounts)
   }
 
   private async writeBackup() {
