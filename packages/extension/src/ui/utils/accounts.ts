@@ -3,8 +3,6 @@ import { ethers } from "ethers"
 import { sendMessage } from "../../shared/messages"
 import { localNetworkUrl } from "../../shared/networks"
 import { Account } from "../Account"
-import { useAppState } from "../states/app"
-import { useBackupRequired } from "../states/backupDownload"
 import { useLocalhostPort } from "../states/localhostPort"
 import { startSession } from "./messaging"
 
@@ -13,20 +11,12 @@ export const deployAccount = async (
   localhostPort: number,
   password?: string,
 ) => {
-  useAppState.setState({ isLoading: true })
-
   if (password) {
     await startSession(password)
   }
 
   const network = localNetworkUrl(networkId, localhostPort)
-  try {
-    const account = await Account.fromDeploy(network)
-    useBackupRequired.setState({ isBackupRequired: true })
-    return account
-  } finally {
-    useAppState.setState({ isLoading: false })
-  }
+  return Account.fromDeploy(network)
 }
 
 export const connectAccount = (

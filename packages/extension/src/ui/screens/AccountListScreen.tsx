@@ -59,6 +59,7 @@ export const AccountListScreen: FC = () => {
   const accountsList = Object.values(accounts)
 
   const handleAddAccount = async () => {
+    useAppState.setState({ isLoading: true })
     try {
       const newAccount = await deployAccount(switcherNetworkId, localhostPort)
       addAccount(newAccount)
@@ -67,6 +68,8 @@ export const AccountListScreen: FC = () => {
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
       navigate(routes.error())
+    } finally {
+      useAppState.setState({ isLoading: false })
     }
   }
 
