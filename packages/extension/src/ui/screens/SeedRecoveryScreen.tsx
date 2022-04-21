@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react"
+import { FC, useMemo, useState, useRef } from "react"
 
 import { BackButton } from "../components/BackButton"
 import { TextArea } from "../components/InputText"
@@ -10,6 +10,7 @@ import { validateAndSetSeedPhrase } from "../states/seedRecover"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 export const SeedRecoveryScreen: FC = () => {
+  const textAreaElement = useRef<HTMLTextAreaElement>(null);
   const [seedPhraseInput, setSeedPhraseInput] = useState("")
   const [error, setError] = useState("")
   const customNavigate = useCustomNavigate()
@@ -21,6 +22,9 @@ export const SeedRecoveryScreen: FC = () => {
   const handleRestoreClick = async () => {
     try {
       validateAndSetSeedPhrase(seedPhraseInput)
+      if (textAreaElement.current !== null) {
+        textAreaElement.current.value = ""
+      }
       customNavigate(routes.seedRecoveryPassword())
     } catch {
       setError("Invalid seed phrase")
@@ -45,6 +49,7 @@ export const SeedRecoveryScreen: FC = () => {
           space
         </P>
         <TextArea
+          ref={textAreaElement}
           placeholder="Enter the 12 words"
           value={seedPhraseInput}
           onChange={(e: any) => {
@@ -54,6 +59,7 @@ export const SeedRecoveryScreen: FC = () => {
           style={{
             margin: "40px 0 8px",
           }}
+          autoComplete="off"
         />
         {error && <FormError>{error}</FormError>}
         <A
