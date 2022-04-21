@@ -241,7 +241,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           walletAddress,
         )
 
-        const account = wallet.getAccountByAddress(walletAddress)
+        const account = await wallet.getAccountByAddress(walletAddress)
         const { accountImplementation: newImplementation } = getNetwork(
           account.network,
         )
@@ -546,7 +546,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
       case "GET_ACCOUNTS": {
         return sendToTabAndUi({
           type: "GET_ACCOUNTS_RES",
-          data: wallet.getAccounts(),
+          data: await wallet.getAccounts(),
         })
       }
       case "NEW_ACCOUNT": {
@@ -568,7 +568,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
               txHash,
               address: account.address,
               account: account,
-              accounts: wallet.getAccounts(),
+              accounts: await wallet.getAccounts(),
             },
           })
         } catch (e: any) {

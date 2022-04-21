@@ -18,10 +18,15 @@ const legacyBackupString = JSON.stringify(legacyBackup)
 export class MockStorage implements IStorage<WalletStorageProps> {
   public store: WalletStorageProps = {}
 
-  async getItem(key: keyof WalletStorageProps): Promise<string | undefined> {
+  async getItem<K extends keyof WalletStorageProps>(
+    key: K,
+  ): Promise<WalletStorageProps[K]> {
     return Promise.resolve(this.store[key])
   }
-  async setItem(key: keyof WalletStorageProps, value: string): Promise<void> {
+  async setItem<K extends keyof WalletStorageProps>(
+    key: K,
+    value: WalletStorageProps[K],
+  ): Promise<void> {
     this.store[key] = value
   }
 }
@@ -105,7 +110,7 @@ test("open existing wallet", async () => {
   expect(isValid).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
 
-  const accounts = wallet.getAccounts()
+  const accounts = await wallet.getAccounts()
   expect(accounts).toHaveLength(1)
   const account = accounts[0]
   expect(account.address).toBe(

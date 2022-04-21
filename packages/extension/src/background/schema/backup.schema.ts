@@ -30,7 +30,7 @@ export default object({
   }),
   // argent additions
   argent: object()
-    .required()
+    .optional()
     .shape({
       version: number().integer().min(1).max(1).required(),
       accounts: array().of(

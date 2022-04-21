@@ -37,6 +37,8 @@ interface WalletSession {
 export interface WalletStorageProps {
   backup?: string
   selected?: string
+  accounts?: WalletAccount[]
+  discoveredOnce?: boolean
 }
 
 /**
@@ -63,8 +65,6 @@ function calculateContractAddress(
 }
 
 export class Wallet extends EventEmitter {
-  private accounts: WalletAccount[] = []
-
   private encryptedBackup?: string
   private session?: WalletSession
 
@@ -95,18 +95,6 @@ export class Wallet extends EventEmitter {
     return this.session !== undefined
   }
 
-  public async getSeedPhrase(): Promise<string> {
-    if (!this.isSessionOpen() || !this.session || !this.encryptedBackup) {
-      throw new Error("Session is not open")
-    }
-    const wallet = await ethers.Wallet.fromEncryptedJson(
-      this.encryptedBackup,
-      this.session.password,
-    )
-
-    return wallet.mnemonic.phrase
-  }
-
   private async generateNewLocalSecret(password: string) {
     if (this.isInitialized()) {
       return
@@ -121,6 +109,46 @@ export class Wallet extends EventEmitter {
     this.setSession(ethersWallet.privateKey, password)
   }
 
+  public async getAccounts(): Promise<WalletAccount[]> {
+    const accounts = await this.store.getItem("accounts")
+    return accounts || []
+  }
+
+  private async pushAccount(account: WalletAccount) {
+    const accounts = await this.getAccounts()
+    const index = accounts.findIndex((a) => a.address === account.address)
+    if (index === -1) {
+      accounts.push(account)
+    } else {
+      accounts[index] = account
+    }
+    return this.store.setItem("accounts", accounts)
+  }
+
+  public async removeAccount(address: string) {
+    const accounts = await this.getAccounts()
+    const newAccounts = accounts.filter(
+      (account) => account.address !== address,
+    )
+    return this.store.setItem("accounts", newAccounts)
+  }
+
+  private resetAccounts() {
+    return this.store.setItem("accounts", [])
+  }
+
+  public async getSeedPhrase(): Promise<string> {
+    if (!this.isSessionOpen() || !this.session || !this.encryptedBackup) {
+      throw new Error("Session is not open")
+    }
+    const wallet = await ethers.Wallet.fromEncryptedJson(
+      this.encryptedBackup,
+      this.session.password,
+    )
+
+    return wallet.mnemonic.phrase
+  }
+
   public async restoreSeedPhrase(seedPhrase: string, newPassword: string) {
     if (this.isInitialized() || this.session) {
       throw new Error("Wallet is already initialized")
@@ -131,27 +159,28 @@ export class Wallet extends EventEmitter {
       scrypt: { N },
     })
 
-    const goerliAccounts = await this.restoreAccountsFromWallet(
-      ethersWallet,
-      "goerli-alpha",
-    )
-    const mainnetAccounts = await this.restoreAccountsFromWallet(
-      ethersWallet,
-      "mainnet-alpha",
-    )
-
-    const accounts = [...this.accounts, ...goerliAccounts, ...mainnetAccounts]
-
-    const extendedBackup = {
-      ...JSON.parse(encryptedBackup),
-      argent: {
-        version: CURRENT_BACKUP_VERSION,
-        accounts,
-      },
-    }
-
-    this.importBackup(extendedBackup)
+    this.importBackup(encryptedBackup)
     this.setSession(ethersWallet.privateKey, newPassword)
+
+    await this.discoverAccounts()
+  }
+
+  public async discoverAccounts() {
+    if (!this.session?.secret) {
+      throw new Error("Wallet is not initialized")
+    }
+    const wallet = new ethers.Wallet(this.session?.secret)
+    const networks = ["mainnet-alpha", "goerli-alpha"] as const
+    const promises: Promise<unknown>[] = networks.flatMap(async (networkId) => {
+      const accounts = await this.restoreAccountsFromWallet(wallet, networkId)
+      return accounts.map((account) => {
+        this.pushAccount(account)
+      })
+    })
+
+    promises.push(this.store.setItem("discoveredOnce", true))
+
+    await Promise.all(promises)
   }
 
   private async restoreAccountsFromWallet(
@@ -160,7 +189,7 @@ export class Wallet extends EventEmitter {
   ) {
     const CHECK_OFFSET = 10
     const PROXY_CONTRACT_HASHES_TO_CHECK = [
-      "0x0000000000000000000000000000000000000001",
+      "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
     ]
     const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
       [n in typeof networkId]: string[]
@@ -177,39 +206,49 @@ export class Wallet extends EventEmitter {
 
     const accounts: WalletAccount[] = []
 
-    PROXY_CONTRACT_HASHES_TO_CHECK.flatMap((contractHash) =>
-      VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId].map(
-        (implementation) => [contractHash, implementation],
-      ),
-    ).forEach(async ([contractHash, implementation]) => {
-      let lastHit = 0
-      let lastCheck = 0
-      while (lastHit + CHECK_OFFSET < lastCheck) {
-        const starkPair = getStarkPair(lastCheck, wallet.privateKey)
-        const starkPub = ec.getStarkKey(starkPair)
-        const seed = starkPub
+    const contractHashAndImplementations2dArray =
+      PROXY_CONTRACT_HASHES_TO_CHECK.flatMap((contractHash) =>
+        VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId].map(
+          (implementation) => [contractHash, implementation],
+        ),
+      )
 
-        const address = calculateContractAddress(
-          seed,
-          contractHash,
-          stark.compileCalldata({ implementation }),
-        )
+    const promises = contractHashAndImplementations2dArray.map(
+      async ([contractHash, implementation]) => {
+        let lastHit = 0
+        let lastCheck = 0
 
-        const code = await provider.getCode(address)
-        if (code.bytecode.length > 0) {
-          lastHit = lastCheck
-          accounts.push({
-            address,
-            network: networkId,
-            signer: {
-              type: "local_signer",
-              derivationPath: getPathForIndex(lastCheck),
-            },
-          })
+        while (lastHit + CHECK_OFFSET > lastCheck) {
+          const starkPair = getStarkPair(lastCheck, wallet.privateKey)
+          const starkPub = ec.getStarkKey(starkPair)
+          const seed = starkPub
+
+          const address = calculateContractAddress(
+            seed,
+            contractHash,
+            stark.compileCalldata({ implementation }),
+          )
+
+          const code = await provider.getCode(address)
+
+          if (code.bytecode.length > 0) {
+            lastHit = lastCheck
+            accounts.push({
+              address,
+              network: networkId,
+              signer: {
+                type: "local_signer",
+                derivationPath: getPathForIndex(lastCheck),
+              },
+            })
+          }
+
+          ++lastCheck
         }
-        ++lastCheck
-      }
-    })
+      },
+    )
+
+    await Promise.all(promises)
 
     return accounts
   }
@@ -227,11 +266,19 @@ export class Wallet extends EventEmitter {
     }
 
     try {
-      const { privateKey: secret } = await ethers.Wallet.fromEncryptedJson(
+      const wallet = await ethers.Wallet.fromEncryptedJson(
         this.encryptedBackup as string,
         password,
       )
-      this.setSession(secret, password)
+
+      this.setSession(wallet.privateKey, password)
+
+      // if we have not yet discovered accounts, do it now. This only applies to wallets which got restored from a backup file, as we could not restore all accounts from onchain yet as the backup was locked until now.
+      const discoveredOnce = await this.store.getItem("discoveredOnce")
+      if (!discoveredOnce) {
+        await this.discoverAccounts()
+      }
+
       return true
     } catch (error) {
       return false
@@ -245,7 +292,10 @@ export class Wallet extends EventEmitter {
       throw Error("no open session")
     }
 
-    const currentPaths = this.accounts
+    // make sure we're aware of all accounts deployed so far
+    await this.discoverAccounts()
+
+    const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -296,7 +346,7 @@ export class Wallet extends EventEmitter {
       },
     }
 
-    this.accounts.push(account)
+    await this.pushAccount(account)
 
     await this.writeBackup()
     await this.selectAccount(account.address)
@@ -304,12 +354,8 @@ export class Wallet extends EventEmitter {
     return { account, txHash: initTransaction.transaction_hash }
   }
 
-  public getAccounts(): WalletAccount[] {
-    return this.accounts
-  }
-
-  public getAccountByAddress(address: string): WalletAccount {
-    const hit = this.getAccounts().find(
+  public async getAccountByAddress(address: string): Promise<WalletAccount> {
+    const hit = (await this.getAccounts()).find(
       (account) => account.address === address,
     )
     if (!hit) {
@@ -326,7 +372,7 @@ export class Wallet extends EventEmitter {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
-    const account = this.getAccountByAddress(address)
+    const account = await this.getAccountByAddress(address)
     if (!account) {
       throw Error("account not found")
     }
@@ -352,38 +398,32 @@ export class Wallet extends EventEmitter {
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
-    if (this.accounts.length === 0 || !this.isSessionOpen()) {
+    if ((await this.getAccounts()).length === 0 || !this.isSessionOpen()) {
       return
     }
 
     const address = await this.store.getItem("selected")
-    const account = this.accounts.find((account) => account.address === address)
-    return account ?? this.accounts[0]
+    const account = (await this.getAccounts()).find(
+      (account) => account.address === address,
+    )
+    return account ?? (await this.getAccounts())[0]
   }
 
   public async selectAccount(address: string) {
-    const account = this.accounts.find((account) => account.address === address)
+    const account = (await this.getAccounts()).find(
+      (account) => account.address === address,
+    )
     if (account) {
       await this.store.setItem("selected", account.address)
     }
-  }
-
-  public async removeAccount(address: string) {
-    if (!this.isSessionOpen()) {
-      throw Error("no open session")
-    }
-    this.accounts = this.accounts.filter(
-      (account) => account.address !== address,
-    )
-    await this.writeBackup()
   }
 
   public lock() {
     this.session = undefined
   }
 
-  public reset() {
-    this.accounts = []
+  public async reset() {
+    await this.resetAccounts()
     this.encryptedBackup = undefined
     this.session = undefined
   }
@@ -454,7 +494,15 @@ export class Wallet extends EventEmitter {
       // in the future, backup file migration will happen here
     }
 
-    this.accounts = backup.argent.accounts
+    await this.recoverAccountsFromBackupFile(backup)
+  }
+
+  private async recoverAccountsFromBackupFile(backup: any): Promise<void> {
+    const accounts = backup.argent?.accounts ?? []
+    const promises = accounts.map((account: WalletAccount) =>
+      this.pushAccount(account),
+    )
+    await Promise.all(promises)
   }
 
   private async writeBackup() {
@@ -466,7 +514,7 @@ export class Wallet extends EventEmitter {
       ...backup,
       argent: {
         version: CURRENT_BACKUP_VERSION,
-        accounts: this.accounts,
+        accounts: await this.getAccounts(),
       },
     }
     const backupString = JSON.stringify(extendedBackup)
