@@ -76,7 +76,7 @@ test("create a new wallet", async () => {
   const { txHash } = await wallet.addAccount(NETWORK)
   expect(txHash).toMatch(REGEX_HEXSTRING)
 
-  const accounts = wallet.getAccounts()
+  const accounts = await wallet.getAccounts()
   expect(accounts).toHaveLength(1)
 
   const backupWithAccount = await storage.getItem("backup")
