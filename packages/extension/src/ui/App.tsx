@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from "@mui/material"
 import { FC, Suspense } from "react"
-import { Outlet, Route, Routes, useNavigate } from "react-router-dom"
+import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -26,6 +26,8 @@ import { ResetScreen } from "./screens/ResetScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
 import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
+import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkForm"
+import { SettingsNetworksScreen } from "./screens/SettingsNetworks"
 import { SettingsScreen } from "./screens/SettingsScreen"
 import { SetupRecoveryPage } from "./screens/SetupRecovery"
 import { SetupSeedRecoveryPage } from "./screens/SetupSeedRecovery"
@@ -39,6 +41,7 @@ import {
   validateAndSetPassword,
   validateSeedRecoverStateIsComplete,
 } from "./states/seedRecover"
+import { useSelectedCustomNetwork } from "./states/selectedCustomNetwork"
 import { recoverBySeedPhrase } from "./utils/messaging"
 import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
@@ -112,6 +115,8 @@ const Screen: FC = () => {
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
+
+  const [selectedCustomNetwork] = useSelectedCustomNetwork()
 
   const navigate = useNavigate()
 
@@ -192,6 +197,27 @@ const Screen: FC = () => {
               element={<HideTokenScreen />}
             />
             <Route path={routes.settings()} element={<SettingsScreen />} />
+            <Route
+              path={routes.settingsNetworks()}
+              element={<SettingsNetworksScreen />}
+            />
+            <Route
+              path={routes.settingsAddCustomNetwork()}
+              element={<SettingsNetworkFormScreen mode="add" />}
+            />
+            <Route
+              path={routes.settingsEditCustomNetwork()}
+              element={
+                selectedCustomNetwork ? (
+                  <SettingsNetworkFormScreen
+                    mode="edit"
+                    network={selectedCustomNetwork}
+                  />
+                ) : (
+                  <Navigate to={routes.settingsNetworks()} />
+                )
+              }
+            />
             <Route
               path={routes.settingsDappConnections()}
               element={<SettingsDappConnectionsScreen />}

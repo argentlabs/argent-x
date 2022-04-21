@@ -7,6 +7,7 @@ import {
 } from "jose"
 import { Call, encode, number } from "starknet"
 
+import { CustomNetwork } from "../../shared/customNetworks"
 import {
   messageStream,
   sendMessage,
@@ -204,4 +205,19 @@ export const removePreAuthorization = async (host: string) => {
     data: host,
   })
   await waitForMessage("REMOVE_PREAUTHORIZATION_RES")
+}
+
+export const getCustomNetworks = async () => {
+  sendMessage({ type: "GET_CUSTOM_NETWORKS" })
+  return waitForMessage("GET_CUSTOM_NETWORKS_RES")
+}
+
+export const addCustomNetworks = async (networks: CustomNetwork[]) => {
+  sendMessage({ type: "ADD_CUSTOM_NETWORKS", data: networks })
+  return waitForMessage("ADD_CUSTOM_NETWORKS_RES")
+}
+
+export const removeCustomNetworks = async (networks: CustomNetwork["id"][]) => {
+  sendMessage({ type: "REMOVE_CUSTOM_NETWORKS", data: networks })
+  return waitForMessage("REMOVE_CUSTOM_NETWORKS_RES")
 }

@@ -8,9 +8,10 @@ const DappWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px;
+  padding: 8px 8px 8px 16px;
   cursor: pointer;
   border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 
   transition: all 200ms ease-in-out;
 
@@ -51,16 +52,28 @@ const RemoveConnectionIconButton = styled(IconButton)`
 interface DappConnectionProps {
   host: string
   onClick?: () => void
+  onRemoveClick?: () => void
 }
 
-export const DappConnection: FC<DappConnectionProps> = ({ host, onClick }) => {
+export const DappConnection: FC<DappConnectionProps> = ({
+  host,
+  onClick,
+  onRemoveClick,
+  ...props
+}) => {
   return (
-    <DappWrapper>
+    <DappWrapper {...props} onClick={onClick}>
       <DappDetailsWrapper>
         <DappTextGroup>
           <DappTitle>{host}</DappTitle>
         </DappTextGroup>
-        <RemoveConnectionIconButton size={40} onClick={onClick}>
+        <RemoveConnectionIconButton
+          size={40}
+          onClick={(e) => {
+            e.stopPropagation()
+            onRemoveClick?.()
+          }}
+        >
           <RemoveIcon />
         </RemoveConnectionIconButton>
       </DappDetailsWrapper>

@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { Controller } from "react-hook-form"
 import styled, { css } from "styled-components"
 
 export const Container = styled.div`
@@ -99,6 +100,20 @@ export const InputText = styled(
       </Container>
     )
   },
+)``
+
+export const ControlledInputText = styled(
+  ({ name, control, defaultValue, rules, ...props }) => (
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({ field: { ref, value, ...field } }) => (
+        <InputText {...props} value={value || ""} {...field} />
+      )}
+    />
+  ),
 )``
 
 export const TextArea = styled.textarea`

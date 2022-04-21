@@ -17,6 +17,11 @@ import {
   sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
+import {
+  addCustomNetworks,
+  getCustomNetworks,
+  removeCustomNetworks,
+} from "./customNetworks"
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
@@ -202,6 +207,28 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
       case "CONNECT_ACCOUNT": {
         return await wallet.selectAccount(msg.data.address)
+      }
+
+      case "GET_CUSTOM_NETWORKS": {
+        const networks = await getCustomNetworks()
+        return sendToTabAndUi({
+          type: "GET_CUSTOM_NETWORKS_RES",
+          data: networks,
+        })
+      }
+      case "ADD_CUSTOM_NETWORKS": {
+        const networks = msg.data
+        return sendToTabAndUi({
+          type: "ADD_CUSTOM_NETWORKS_RES",
+          data: await addCustomNetworks(networks),
+        })
+      }
+      case "REMOVE_CUSTOM_NETWORKS": {
+        const networks = msg.data
+        return sendToTabAndUi({
+          type: "REMOVE_CUSTOM_NETWORKS_RES",
+          data: await removeCustomNetworks(networks),
+        })
       }
 
       case "ESTIMATE_TRANSACTION_FEE": {

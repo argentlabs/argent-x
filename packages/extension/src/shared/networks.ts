@@ -5,6 +5,7 @@ import { WalletAccount } from "./wallet.model"
 export interface Network {
   id: string
   name: string
+  chainId: string
   baseUrl?: string
   explorerUrl?: string
   accountImplementation?: string
@@ -14,6 +15,7 @@ export const networks: Network[] = [
   {
     id: "mainnet-alpha",
     name: "Ethereum Mainnet",
+    chainId: "SN_MAIN",
     explorerUrl: "https://voyager.online",
     accountImplementation:
       "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
@@ -21,12 +23,14 @@ export const networks: Network[] = [
   {
     id: "goerli-alpha",
     name: "Goerli Testnet",
+    chainId: "SN_GOERLI",
     explorerUrl: "https://goerli.voyager.online",
     accountImplementation:
       "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
   },
   {
     id: "localhost",
+    chainId: "SN_GOERLI",
     name: "Localhost",
   },
 ]

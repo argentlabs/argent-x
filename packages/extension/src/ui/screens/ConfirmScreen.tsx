@@ -1,4 +1,5 @@
-import { FC, FormEvent, ReactNode } from "react"
+import { FC, FormEvent, ReactNode, useState } from "react"
+import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -11,7 +12,7 @@ import { H2 } from "../components/Typography"
 import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { getAccountImageUrl } from "../utils/accounts"
 
-const ConfirmScreenWrapper = styled.div<{
+const ConfirmScreenWrapper = styled.form<{
   accountShown: boolean
   smallTopPadding: boolean
 }>`
@@ -27,7 +28,7 @@ const ConfirmScreenWrapper = styled.div<{
 `
 
 export interface ConfirmPageProps {
-  onSubmit?: () => void
+  onSubmit?: (e: FormEvent<HTMLFormElement>) => void
   onReject?: () => void
   selectedAccount?: Account
 }
@@ -53,6 +54,9 @@ export const StickyGroup = styled.div`
   padding: 16px 32px 24px;
 
   background-color: #161616;
+  background: linear-gradient(180deg, rgba(16, 16, 16, 0.4) 0%, #161616 73.72%);
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
   z-index: 100;
 
   > * + * {
@@ -61,8 +65,8 @@ export const StickyGroup = styled.div`
 `
 
 const Placeholder = styled.div`
-  height: 200px;
   width: 100%;
+  margin-top: 8px;
 `
 
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
@@ -83,12 +87,17 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
 }) => {
   const navigate = useNavigate()
   const { accountNames } = useAccountMetadata()
+  const [placeholderHeight, setPlaceholderHeight] = useState(100)
   onReject ??= () => navigate(-1)
 
   return (
     <ConfirmScreenWrapper
       smallTopPadding={smallTopPadding}
       accountShown={Boolean(selectedAccount)}
+      onSubmit={(e) => {
+        e.preventDefault()
+        return onSubmit?.(e)
+      }}
       {...props}
     >
       {selectedAccount && (
@@ -107,31 +116,38 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
 
       {children}
 
-      <Placeholder />
-      <StickyGroup>
-        {footer}
-        <ButtonGroupVertical
-          as="form"
-          onSubmit={(e: FormEvent) => {
-            e.preventDefault()
-            return onSubmit?.()
-          }}
-          switchButtonOrder={switchButtonOrder}
-        >
-          {!singleButton && (
-            <Button onClick={onReject} type="button">
-              {rejectButtonText}
-            </Button>
-          )}
-          <Button
-            disabled={disableConfirm}
-            style={{ backgroundColor: confirmButtonBackgroundColor }}
-            type="submit"
-          >
-            {confirmButtonText}
-          </Button>
-        </ButtonGroupVertical>
-      </StickyGroup>
+      <Placeholder
+        style={{
+          height: placeholderHeight,
+        }}
+      />
+      <Measure
+        bounds
+        onResize={(contentRect) => {
+          const { height = 100 } = contentRect.bounds || {}
+          setPlaceholderHeight(height)
+        }}
+      >
+        {({ measureRef }) => (
+          <StickyGroup ref={measureRef}>
+            {footer}
+            <ButtonGroupVertical switchButtonOrder={switchButtonOrder}>
+              {!singleButton && (
+                <Button onClick={onReject} type="button">
+                  {rejectButtonText}
+                </Button>
+              )}
+              <Button
+                disabled={disableConfirm}
+                style={{ backgroundColor: confirmButtonBackgroundColor }}
+                type="submit"
+              >
+                {confirmButtonText}
+              </Button>
+            </ButtonGroupVertical>
+          </StickyGroup>
+        )}
+      </Measure>
     </ConfirmScreenWrapper>
   )
 }

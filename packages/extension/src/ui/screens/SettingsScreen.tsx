@@ -93,6 +93,10 @@ export const SettingsScreen: FC = () => {
     navigate(routes.settingsLocalhostPort())
   }
 
+  const handleNetworksClick = () => {
+    navigate(routes.settingsNetworks())
+  }
+
   return (
     <>
       <Header>
@@ -129,6 +133,14 @@ export const SettingsScreen: FC = () => {
           </P>
         </SettingsItem>
         <hr />
+        <SettingsItem onClick={handleNetworksClick}>
+          <Title>
+            <span>Manage Networks</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>Here you can add, edit and remove custom networks.</P>
+        </SettingsItem>
+        <hr />
         <SettingsItem onClick={handleLocalhostPortClick}>
           <Title>
             <span>Localhost port: {localhostPort}</span>
@@ -136,6 +148,7 @@ export const SettingsScreen: FC = () => {
           </Title>
         </SettingsItem>
         <hr />
+
         <Footer>
           <P>Help, support &amp; suggestions:</P>
           <div>
