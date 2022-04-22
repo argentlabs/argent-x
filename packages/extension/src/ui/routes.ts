@@ -20,7 +20,6 @@ export const routes = {
   disclaimer: () => "/disclaimer",
   legacy: () => "/legacy",
   settings: () => "/settings",
-  settingsLocalhostPort: () => "/settings/localhost-port",
   settingsNetworks: () => "/settings/networks",
   settingsAddCustomNetwork: () => "/settings/networks/add",
   settingsEditCustomNetwork: () => "/settings/networks/edit",

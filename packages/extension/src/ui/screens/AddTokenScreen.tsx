@@ -13,7 +13,7 @@ import { InputText } from "../components/InputText"
 import { Spinner } from "../components/Spinner"
 import { FormError, H2 } from "../components/Typography"
 import { routes } from "../routes"
-import { useAccount } from "../states/account"
+import { useSelectedAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { TokenDetails, addToken } from "../states/tokens"
 import { isValidAddress } from "../utils/addresses"
@@ -67,7 +67,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { selectedAccount } = useAccount()
+  const account = useSelectedAccount()
   const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
   const [tokenName, setTokenName] = useState(defaultToken?.name || "")
   const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
@@ -94,25 +94,27 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }, [defaultToken, tokenAddress, tokenDetails])
 
   useEffect(() => {
-    if (loading && selectedAccount) {
-      fetchTokenDetails(tokenAddress, switcherNetworkId)
-        .then((details) => {
-          setTokenDetails(details)
-        })
-        .catch(() => {
-          setTokenDetails(undefined)
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    } else if (
-      isValidAddress(tokenAddress) &&
-      tokenAddress !== prevValidAddress.current
-    ) {
-      prevValidAddress.current = tokenAddress
-      setLoading(true)
+    if (account) {
+      if (loading && account) {
+        fetchTokenDetails(tokenAddress, account)
+          .then((details) => {
+            setTokenDetails(details)
+          })
+          .catch(() => {
+            setTokenDetails(undefined)
+          })
+          .finally(() => {
+            setLoading(false)
+          })
+      } else if (
+        isValidAddress(tokenAddress) &&
+        tokenAddress !== prevValidAddress.current
+      ) {
+        prevValidAddress.current = tokenAddress
+        setLoading(true)
+      }
     }
-  }, [loading, tokenAddress, selectedAccount])
+  }, [loading, tokenAddress, account])
 
   const compiledData = {
     address: tokenAddress,

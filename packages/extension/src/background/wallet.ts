@@ -11,8 +11,13 @@ import {
 import { computeHashOnElements } from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
-import { defaultNetwork, getNetwork, getProvider } from "../shared/networks"
+import {
+  getProvider as getProviderUtil,
+  isKnownNetwork,
+} from "../shared/networks"
+import { defaultNetwork } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
+import { getNetwork } from "./customNetworks"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -21,6 +26,7 @@ import {
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
 import { IStorage } from "./storage"
+import { getProvider } from "./utils/getProvider"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -215,17 +221,26 @@ export class Wallet extends EventEmitter {
 
   private async restoreAccountsFromWallet(
     wallet: ethers.Wallet,
-    networkId: KnownNetworkIds,
+    networkId: string,
+    networkAccountImplementations?: string[],
+    offset: number = CHECK_OFFSET,
   ) {
-    const provider = getProvider(networkId)
+    const network = await getNetwork(networkId)
+    const provider = getProviderUtil(network)
 
     const accounts: WalletAccount[] = []
 
+    const implementations = isKnownNetwork(networkId)
+      ? VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId]
+      : networkAccountImplementations
+
+    if (!implementations) {
+      throw new Error(`No known implementations for network ${networkId}`)
+    }
+
     const contractHashAndImplementations2dArray =
       PROXY_CONTRACT_HASHES_TO_CHECK.flatMap((contractHash) =>
-        VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId].map(
-          (implementation) => [contractHash, implementation],
-        ),
+        implementations.map((implementation) => [contractHash, implementation]),
       )
 
     const promises = contractHashAndImplementations2dArray.map(
@@ -233,7 +248,7 @@ export class Wallet extends EventEmitter {
         let lastHit = 0
         let lastCheck = 0
 
-        while (lastHit + CHECK_OFFSET > lastCheck) {
+        while (lastHit + offset > lastCheck) {
           const starkPair = getStarkPair(lastCheck, wallet.privateKey)
           const starkPub = ec.getStarkKey(starkPair)
           const seed = starkPub
@@ -250,7 +265,7 @@ export class Wallet extends EventEmitter {
             lastHit = lastCheck
             accounts.push({
               address,
-              network: networkId,
+              network,
               signer: {
                 type: "local_signer",
                 derivationPath: getPathForIndex(lastCheck),
@@ -300,6 +315,31 @@ export class Wallet extends EventEmitter {
     }
   }
 
+  public async discoverAccountsForNetwork(
+    networkId: string,
+    offset: number = CHECK_OFFSET,
+  ) {
+    if (!this.isSessionOpen() || !this.session?.secret) {
+      throw new Error("Session is not open")
+    }
+    const wallet = new ethers.Wallet(this.session?.secret)
+    const network = await getNetwork(networkId)
+
+    if (!network.accountImplementation) {
+      // silent fail if no account implementation is defined for this network
+      return
+    }
+
+    const accounts = await this.restoreAccountsFromWallet(
+      wallet,
+      networkId,
+      [network.accountImplementation],
+      offset,
+    )
+
+    await this.setAccounts(accounts)
+  }
+
   public async addAccount(
     networkId: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
@@ -307,14 +347,11 @@ export class Wallet extends EventEmitter {
       throw Error("no open session")
     }
 
-    // make sure we're aware of all accounts deployed so far
-    await this.discoverAccounts()
-
     const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
-          account.network === networkId,
+          account.network.id === networkId,
       )
       .map((account) => account.signer.derivationPath)
 
@@ -323,8 +360,8 @@ export class Wallet extends EventEmitter {
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
-    const provider = getProvider(networkId)
-    const network = getNetwork(networkId)
+    const provider = await getProvider(networkId)
+    const network = await getNetwork(networkId)
 
     let implementation = network.accountImplementation
     if (!implementation) {
@@ -333,6 +370,9 @@ export class Wallet extends EventEmitter {
       })
       assertTransactionReceived(deployImplementationTransaction, true)
       implementation = deployImplementationTransaction.address as string
+    } else {
+      // if there is an implementation, we need to check if accounts were already deployed
+      this.discoverAccountsForNetwork(networkId)
     }
 
     const deployTransaction = await provider.deployContract({
@@ -353,7 +393,7 @@ export class Wallet extends EventEmitter {
     assertTransactionReceived(initTransaction)
 
     const account = {
-      network: networkId,
+      network,
       address: proxyAddress,
       signer: {
         type: "local_secret",
@@ -395,7 +435,7 @@ export class Wallet extends EventEmitter {
     const keyPair = this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
-    const provider = getProvider(account.network)
+    const provider = getProviderUtil(account.network)
     return new Account(provider, account.address, keyPair)
   }
 
@@ -420,7 +460,7 @@ export class Wallet extends EventEmitter {
     const address = await this.store.getItem("selected")
     const account = accounts.find((account) => account.address === address)
     const defaultAccount = accounts.find(
-      (account) => account.network === defaultNetwork.id,
+      (account) => account.network.id === defaultNetwork.id,
     )
     return account ?? defaultAccount ?? accounts[0]
   }

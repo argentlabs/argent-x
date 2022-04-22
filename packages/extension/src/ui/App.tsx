@@ -25,7 +25,6 @@ import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
-import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
 import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkForm"
 import { SettingsNetworksScreen } from "./screens/SettingsNetworks"
 import { SettingsScreen } from "./screens/SettingsScreen"
@@ -36,12 +35,13 @@ import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
+import { useBackupRequired } from "./states/backupDownload"
 import {
   useSeedRecover,
   validateAndSetPassword,
   validateSeedRecoverStateIsComplete,
 } from "./states/seedRecover"
-import { useSelectedCustomNetwork } from "./states/selectedCustomNetwork"
+import { useSelectedNetwork } from "./states/selectedNetwork"
 import { recoverBySeedPhrase } from "./utils/messaging"
 import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
@@ -116,7 +116,7 @@ const Screen: FC = () => {
   const { isLoading } = useAppState()
   const { actions } = useActions()
 
-  const [selectedCustomNetwork] = useSelectedCustomNetwork()
+  const [selectedCustomNetwork] = useSelectedNetwork()
 
   const navigate = useNavigate()
 
@@ -148,18 +148,17 @@ const Screen: FC = () => {
               overrideTitle="New password"
               overrideSubmitText="Continue"
               overrideSubmit={async ({ password }) => {
-                useAppState.setState({ isLoading: true })
                 try {
                   validateAndSetPassword(password)
                   const state = useSeedRecover.getState()
                   if (validateSeedRecoverStateIsComplete(state)) {
                     await recoverBySeedPhrase(state.seedPhrase, state.password)
+                    useBackupRequired.setState({ isBackupRequired: false }) // as the user recovered their seed, we can assume they have a backup
                     navigate(await recover())
                   }
                 } catch {
-                  console.error("password is invalid")
+                  console.error("seed phrase is invalid")
                 }
-                useAppState.setState({ isLoading: false })
               }}
             />
           }
@@ -221,10 +220,6 @@ const Screen: FC = () => {
             <Route
               path={routes.settingsDappConnections()}
               element={<SettingsDappConnectionsScreen />}
-            />
-            <Route
-              path={routes.settingsLocalhostPort()}
-              element={<SettingsLocalhostPortScreen />}
             />
             <Route
               path={routes.backupDownload()}

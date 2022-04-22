@@ -4,6 +4,7 @@ import styled from "styled-components"
 import useSWR from "swr"
 
 import { Account } from "../../Account"
+import { useNetwork } from "../../hooks/useNetworks"
 import { useAppState } from "../../states/app"
 import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
@@ -35,6 +36,7 @@ interface AccountActivityProps {
 
 const Activity: FC<AccountActivityProps> = ({ account }) => {
   const { switcherNetworkId } = useAppState()
+  const { network } = useNetwork(switcherNetworkId)
 
   const { data: activity = {} } = useSWR(
     [account.address, switcherNetworkId, "activity"],
@@ -56,7 +58,7 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
                 key={hash}
                 hash={hash}
                 meta={{ subTitle: formatDateTime(date) }}
-                onClick={() => openVoyagerTransaction(hash, switcherNetworkId)}
+                onClick={() => openVoyagerTransaction(hash, network)}
               />
             ))}
           </TransactionsWrapper>

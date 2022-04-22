@@ -25,3 +25,8 @@ export const selectAccount = ({ accounts, selectedAccount }: State) => {
     return accounts[selectedAccount]
   }
 }
+
+export const useSelectedAccount = () =>
+  useAccount(({ accounts, selectedAccount }) =>
+    selectedAccount ? accounts[selectedAccount] : undefined,
+  )

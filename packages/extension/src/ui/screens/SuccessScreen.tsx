@@ -1,9 +1,9 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { getNetwork } from "../../shared/networks"
 import { Spinner } from "../components/Spinner"
 import { A } from "../components/Typography"
+import { useNetwork } from "../hooks/useNetworks"
 
 const SuccessScreenWrapper = styled.div`
   display: flex;
@@ -29,7 +29,9 @@ export const SuccessScreen: FC<SuccessScreenProps> = ({
   networkId,
   txHash,
 }) => {
-  const { explorerUrl } = getNetwork(networkId)
+  const {
+    network: { explorerUrl },
+  } = useNetwork(networkId)
   return (
     <SuccessScreenWrapper>
       <Spinner size={92} />

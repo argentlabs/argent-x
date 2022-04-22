@@ -7,12 +7,12 @@ import {
 } from "jose"
 import { Call, encode, number } from "starknet"
 
-import { CustomNetwork } from "../../shared/customNetworks"
 import {
   messageStream,
   sendMessage,
   waitForMessage,
 } from "../../shared/messages"
+import { Network } from "../../shared/networks"
 
 if (process.env.NODE_ENV === "development") {
   messageStream.subscribe(([message]) => {
@@ -207,17 +207,24 @@ export const removePreAuthorization = async (host: string) => {
   await waitForMessage("REMOVE_PREAUTHORIZATION_RES")
 }
 
-export const getCustomNetworks = async () => {
+export const getNetworks = async () => {
   sendMessage({ type: "GET_CUSTOM_NETWORKS" })
   return waitForMessage("GET_CUSTOM_NETWORKS_RES")
 }
 
-export const addCustomNetworks = async (networks: CustomNetwork[]) => {
+export const getNetwork = async (
+  networkId: string,
+): Promise<Network | undefined> => {
+  const result = await getNetworks()
+  return result.find((x) => x.id === networkId)
+}
+
+export const addNetworks = async (networks: Network[]) => {
   sendMessage({ type: "ADD_CUSTOM_NETWORKS", data: networks })
   return waitForMessage("ADD_CUSTOM_NETWORKS_RES")
 }
 
-export const removeCustomNetworks = async (networks: CustomNetwork["id"][]) => {
+export const removeNetworks = async (networks: Network["id"][]) => {
   sendMessage({ type: "REMOVE_CUSTOM_NETWORKS", data: networks })
   return waitForMessage("REMOVE_CUSTOM_NETWORKS_RES")
 }

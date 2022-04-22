@@ -8,7 +8,7 @@ import defaultTokens from "../../assets/default-tokens.json"
 import { messageStream } from "../../shared/messages"
 import { isValidAddress } from "../utils/addresses"
 import { fetchTokenBalance } from "../utils/tokens"
-import { useAccount } from "./account"
+import { useSelectedAccount } from "./account"
 import { useAppState } from "./app"
 
 export interface TokenDetails {
@@ -145,7 +145,7 @@ interface UseTokens {
 
 export const useTokensWithBalance = (): UseTokens => {
   const { switcherNetworkId } = useAppState()
-  const { selectedAccount } = useAccount()
+  const selectedAccount = useSelectedAccount()
   const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
@@ -154,15 +154,13 @@ export const useTokensWithBalance = (): UseTokens => {
 
   const { data, isValidating, error, mutate } = useSWR(
     [selectedAccount, ...tokenAddresses],
-    async (accountAddress, ...tokenAddresses) => {
-      if (!accountAddress) {
+    async (selectedAccount, ...tokenAddresses) => {
+      if (!selectedAccount) {
         return {}
       }
       const balances = await Promise.all(
         tokenAddresses.map(async (address) =>
-          fetchTokenBalance(address, accountAddress, switcherNetworkId).catch(
-            () => undefined,
-          ),
+          fetchTokenBalance(address, selectedAccount).catch(() => undefined),
         ),
       )
       return balances.reduce((acc, balance, i) => {

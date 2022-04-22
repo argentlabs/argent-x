@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
-import { getNetwork } from "../../../shared/networks"
 import { Account } from "../../Account"
+import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
 import {
@@ -94,7 +94,9 @@ export const AccountListItem: FC<AccountListProps> = ({
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { accountImplementation } = getNetwork(switcherNetworkId)
+  const {
+    network: { accountImplementation },
+  } = useNetwork(switcherNetworkId)
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
   const { address } = account

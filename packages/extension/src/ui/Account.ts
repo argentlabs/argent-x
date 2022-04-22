@@ -1,10 +1,18 @@
 import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
-import { CompiledContract, Contract, json, number, stark } from "starknet"
+import {
+  CompiledContract,
+  Contract,
+  ProviderInterface,
+  json,
+  number,
+  stark,
+} from "starknet"
 
 import { sendMessage, waitForMessage } from "../shared/messages"
-import { getProvider } from "../shared/networks"
+import { Network, getProvider } from "../shared/networks"
 import { WalletAccountSigner } from "../shared/wallet.model"
+import { getNetwork } from "./utils/messaging"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
@@ -15,31 +23,35 @@ const ProxyCompiledContractJson: CompiledContract = json.parse(
 
 export class Account {
   address: string
+  network: Network
   networkId: string
   signer: WalletAccountSigner
   deployTransaction?: string
   contract: Contract
   proxyContract: Contract
+  provider: ProviderInterface
 
   constructor(
     address: string,
-    networkId: string,
+    network: Network,
     signer: WalletAccountSigner,
     deployTransaction?: string,
   ) {
     this.address = address
-    this.networkId = networkId
+    this.network = network
+    this.networkId = network.id
     this.signer = signer
     this.deployTransaction = deployTransaction
+    this.provider = getProvider(network)
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
       address,
-      getProvider(networkId),
+      this.provider,
     )
     this.proxyContract = new Contract(
       ProxyCompiledContractJson.abi,
       address,
-      getProvider(networkId),
+      this.provider,
     )
 
     const key = `deployTransaction:${address}`
@@ -79,9 +91,15 @@ export class Account {
       throw new Error(result.error)
     }
 
+    const network = await getNetwork(networkId)
+
+    if (!network) {
+      throw new Error(`Network ${networkId} not found`)
+    }
+
     return new Account(
       result.address,
-      networkId,
+      network,
       result.account.signer,
       result.txHash,
     )

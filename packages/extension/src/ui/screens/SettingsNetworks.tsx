@@ -2,24 +2,40 @@ import AddIcon from "@mui/icons-material/Add"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import useSWR from "swr"
 
+import { hackatonNetworks } from "../../shared/hackatonNetworks"
 import { BackButton } from "../components/BackButton"
 import { DappConnection } from "../components/DappConnection"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { Spinner } from "../components/Spinner"
 import { H2, P } from "../components/Typography"
+import { useNetworks } from "../hooks/useNetworks"
 import { routes } from "../routes"
-import { useSelectedCustomNetwork } from "../states/selectedCustomNetwork"
+import { useAppState } from "../states/app"
+import { useSelectedNetwork } from "../states/selectedNetwork"
 import { makeClickable } from "../utils/a11y"
-import { getCustomNetworksCacheKey } from "../utils/cacheKeys"
-import { getCustomNetworks, removeCustomNetworks } from "../utils/messaging"
+import { addNetworks, removeNetworks } from "../utils/messaging"
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 32px 24px 32px;
+  ${H2} {
+    margin: 0;
+  }
+`
+
+const HackatonIconButton = styled(IconButton)`
+  padding: 4px;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background-color: #161616;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
 `
 
 const IconButtonCenter = styled(IconButton)`
@@ -43,15 +59,19 @@ const List = styled.div`
 `
 
 export const SettingsNetworksScreen: FC = () => {
-  const { data, mutate } = useSWR(
-    getCustomNetworksCacheKey(),
-    getCustomNetworks,
-  )
+  const { allNetworks, mutate } = useNetworks()
   const navigate = useNavigate()
-  const [, setSelectedCustomNetwork] = useSelectedCustomNetwork()
+  const [, setSelectedCustomNetwork] = useSelectedNetwork()
 
   const handleAddCustomNetwork = () => {
     navigate(routes.settingsAddCustomNetwork())
+  }
+
+  const handleAddHackatonNetworks = async () => {
+    useAppState.setState({ isLoading: true })
+    await addNetworks(hackatonNetworks)
+    mutate((prevNetworks) => [...(prevNetworks || []), ...hackatonNetworks])
+    useAppState.setState({ isLoading: false })
   }
 
   return (
@@ -59,15 +79,26 @@ export const SettingsNetworksScreen: FC = () => {
       <Header>
         <BackButton />
       </Header>
+      <HackatonIconButton
+        size={92}
+        {...makeClickable(handleAddHackatonNetworks)}
+      >
+        <img
+          src="./assets/starkathon.png"
+          style={{
+            borderRadius: 200,
+          }}
+        />
+      </HackatonIconButton>
       <Wrapper>
         <H2>Networks</H2>
         <List>
-          {!data ? (
+          {!allNetworks ? (
             <Spinner />
-          ) : data.length === 0 ? (
+          ) : allNetworks.length === 0 ? (
             <P>No custom networks found</P>
           ) : (
-            data.map((network) => (
+            allNetworks.map((network) => (
               <DappConnection
                 key={network.id}
                 host={network.name}
@@ -75,9 +106,10 @@ export const SettingsNetworksScreen: FC = () => {
                   setSelectedCustomNetwork(network)
                   navigate(routes.settingsEditCustomNetwork())
                 }}
+                hideRemove={network.readonly}
                 onRemoveClick={async () => {
                   // navigate(routes.settingsRemoveCustomNetwork()) // intended behavior in the future, so we can get a confirmation
-                  await removeCustomNetworks([network.id])
+                  await removeNetworks([network.id])
 
                   // optimistic update
                   await mutate((prevData) =>
@@ -88,6 +120,7 @@ export const SettingsNetworksScreen: FC = () => {
             ))
           )}
         </List>
+
         <IconButtonCenter
           size={48}
           style={{ marginTop: "32px" }}

@@ -32,6 +32,7 @@ const DappDetailsWrapper = styled.div`
 const DappTextGroup = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 9px 0;
 `
 
 const DappTitle = styled.h3`
@@ -51,12 +52,14 @@ const RemoveConnectionIconButton = styled(IconButton)`
 
 interface DappConnectionProps {
   host: string
+  hideRemove?: boolean
   onClick?: () => void
   onRemoveClick?: () => void
 }
 
 export const DappConnection: FC<DappConnectionProps> = ({
   host,
+  hideRemove = false,
   onClick,
   onRemoveClick,
   ...props
@@ -67,15 +70,17 @@ export const DappConnection: FC<DappConnectionProps> = ({
         <DappTextGroup>
           <DappTitle>{host}</DappTitle>
         </DappTextGroup>
-        <RemoveConnectionIconButton
-          size={40}
-          onClick={(e) => {
-            e.stopPropagation()
-            onRemoveClick?.()
-          }}
-        >
-          <RemoveIcon />
-        </RemoveConnectionIconButton>
+        {!hideRemove && (
+          <RemoveConnectionIconButton
+            size={40}
+            onClick={(e) => {
+              e.stopPropagation()
+              onRemoveClick?.()
+            }}
+          >
+            <RemoveIcon />
+          </RemoveConnectionIconButton>
+        )}
       </DappDetailsWrapper>
     </DappWrapper>
   )

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { CustomNetwork, CustomNetworkSchema } from "../../shared/customNetworks"
+import { Network, NetworkSchema } from "../../shared/networks"
 import { BackButton } from "../components/BackButton"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
@@ -13,7 +13,7 @@ import { ControlledInputText } from "../components/InputText"
 import { A, FormError, P } from "../components/Typography"
 import { useAppState } from "../states/app"
 import { makeClickable } from "../utils/a11y"
-import { addCustomNetworks } from "../utils/messaging"
+import { addNetworks } from "../utils/messaging"
 import { useYupValidationResolver } from "../utils/useYupValidationResolver"
 import { ConfirmScreen } from "./ConfirmScreen"
 
@@ -41,13 +41,13 @@ type SettingsNetworkFormProps =
     }
   | {
       mode: "edit"
-      network: CustomNetwork
+      network: Network
     }
 
 export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
   props,
 ) => {
-  const defaultNetwork = useMemo<CustomNetwork>(() => {
+  const defaultNetwork = useMemo<Network>(() => {
     if (props.mode === "add") {
       return {
         id: "",
@@ -59,13 +59,12 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
     return props.network
   }, [props])
 
-  const yupSchemaValidator =
-    useYupValidationResolver<CustomNetwork>(CustomNetworkSchema)
+  const yupSchemaValidator = useYupValidationResolver<Network>(NetworkSchema)
   const {
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm<CustomNetwork>({
+  } = useForm<Network>({
     defaultValues: defaultNetwork,
     resolver: yupSchemaValidator,
   })
@@ -82,10 +81,11 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
         singleButton
         confirmButtonText={props.mode === "add" ? "Create" : "Save"}
         smallTopPadding
+        disableConfirm={defaultNetwork.readonly}
         onSubmit={handleSubmit(async (network) => {
           try {
             useAppState.setState({ isLoading: true })
-            await addCustomNetworks([network])
+            await addNetworks([network])
             navigate(-1)
           } finally {
             useAppState.setState({ isLoading: false })
@@ -101,6 +101,7 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
             placeholder="Network ID"
             name="id"
             type="text"
+            disabled={defaultNetwork.readonly}
           />
           <ControlledInputText
             autoComplete="off"
@@ -108,13 +109,16 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
             placeholder="Name"
             name="name"
             type="text"
+            disabled={defaultNetwork.readonly}
           />
           <ControlledInputText
             autoComplete="off"
             control={control}
             placeholder="Chain ID"
+            defaultValue="SN_GOERLI"
             name="chainId"
             type="text"
+            disabled={defaultNetwork.readonly}
           />
           <ControlledInputText
             autoComplete="off"
@@ -122,6 +126,7 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
             placeholder="Base URL"
             name="baseUrl"
             type="url"
+            disabled={defaultNetwork.readonly}
           />
           {/* collapseable area with some extra inputs */}
           <ExtendableControl
@@ -146,6 +151,7 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
               placeholder="Explorer URL"
               name="explorerUrl"
               type="url"
+              disabled={defaultNetwork.readonly}
             />
             <ControlledInputText
               autoComplete="off"
@@ -153,6 +159,7 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
               placeholder="Account Implementation Address"
               name="accountImplementation"
               type="text"
+              disabled={defaultNetwork.readonly}
             />
             <ControlledInputText
               autoComplete="off"
@@ -160,6 +167,7 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
               placeholder="RPC URL"
               name="rpcUrl"
               type="url"
+              disabled={defaultNetwork.readonly}
             />
           </Collapse>
 

@@ -31,20 +31,20 @@ export const useAccountMetadata = create<State>(
 )
 
 export const getAccountName = (
-  { address, networkId }: Account,
+  { address, network }: Account,
   accountNames: Record<string, Record<string, string>>,
-): string => accountNames[networkId]?.[address] || defaultAccountName
+): string => accountNames[network.id]?.[address] || defaultAccountName
 
 export const setDefaultAccountNames = (accounts: Record<string, Account>) => {
   const { accountNames } = useAccountMetadata.getState()
   let names = accountNames
   for (const [address, account] of Object.entries(accounts)) {
-    const { networkId } = account
-    if (!names[networkId]?.[address]) {
+    const { network } = account
+    if (!names[network.id]?.[address]) {
       const name = `Account ${Object.keys(accounts).indexOf(address) + 1}`
       names = {
         ...names,
-        [networkId]: { ...names[networkId], [address]: name },
+        [network.id]: { ...names[network.id], [address]: name },
       }
     }
   }

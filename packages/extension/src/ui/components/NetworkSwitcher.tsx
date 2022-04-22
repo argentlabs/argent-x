@@ -2,9 +2,9 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { getNetwork, networks } from "../../shared/networks"
+import { getNetwork } from "../../shared/networks"
+import { useNetworks } from "../hooks/useNetworks"
 import { useAppState } from "../states/app"
-import { useLocalhostPort } from "../states/localhostPort"
 import { AccountStatusCode } from "../utils/accounts"
 import { recover } from "../utils/recovery"
 
@@ -108,26 +108,21 @@ export const NetworkStatusIndicator = styled.span<{
 
 interface NetworkSwitcherProps {
   disabled?: boolean
-  hidePort?: boolean
 }
 
-export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
-  disabled,
-  hidePort,
-}) => {
+export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
-  const currentNetwork = getNetwork(switcherNetworkId)
-  const otherNetworks = networks.filter((network) => network !== currentNetwork)
-
-  const formatName = (name: string) =>
-    hidePort && name === "Localhost" ? `Localhost ${localhostPort}` : name
+  const { allNetworks } = useNetworks({ suspense: true })
+  const currentNetwork = getNetwork(switcherNetworkId, allNetworks)
+  const otherNetworks = allNetworks.filter(
+    (network) => network !== currentNetwork,
+  )
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
       <Network selected>
-        <NetworkName>{formatName(currentNetwork.name)}</NetworkName>
+        <NetworkName>{currentNetwork.name}</NetworkName>
         <NetworkStatusIndicator status="CONNECTED" />
       </Network>
       <NetworkList>
@@ -138,7 +133,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({
               navigate(await recover({ networkId: id, showAccountList: true }))
             }
           >
-            <NetworkName>{formatName(name)}</NetworkName>
+            <NetworkName>{name}</NetworkName>
             <NetworkStatusIndicator status="CONNECTED" />
           </Network>
         ))}
