@@ -22,7 +22,7 @@ export const defaultNetworks: Network[] = [
     baseUrl: "https://alpha-mainnet.starknet.io",
     explorerUrl: "https://voyager.online",
     accountImplementation:
-      "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
+      "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac",
     readonly: true,
   },
   {

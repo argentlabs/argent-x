@@ -27,6 +27,10 @@ export const getImplementationUpgradePath = (
     equalBigNumberish(
       oldImplementation,
       "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+    ) ||
+    equalBigNumberish(
+      oldImplementation,
+      "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
     )
   ) {
     return (newImplementation, accountAddress, provider, keyPair) => {

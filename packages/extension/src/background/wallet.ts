@@ -45,6 +45,7 @@ const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
 } = {
   "mainnet-alpha": [
     "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
+    "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac",
   ],
   "goerli-alpha": [
     "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
