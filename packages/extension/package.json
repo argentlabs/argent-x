@@ -38,10 +38,11 @@
     "start": "webpack",
     "dev": "webpack --color --watch",
     "test": "jest",
-    "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes",
+    "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes && yarn run push-release-branch",
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",
     "sync-manifest-version": "node -p \"JSON.stringify({...require('./src/manifest.json'), version: '$npm_package_version'}, null, 2)\" > ./src/manifest.temp.json && prettier --write ./src/manifest.temp.json && mv ./src/manifest.temp.json ./src/manifest.json",
-    "commit-version-changes": "git add ./src/manifest.json && git commit -m \"chore(release): manifest v$npm_package_version\""
+    "commit-version-changes": "git add ./src/manifest.json && git commit -m \"chore(release): manifest v$npm_package_version\"",
+    "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
     "@extend-chrome/messages": "^1.2.2",
