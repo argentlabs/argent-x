@@ -59,14 +59,13 @@ export const addNetworks = async (
     throw new Error("Network already exists")
   }
 
-  const newNetworks = [
-    ...networksArray.filter((newNetwork) => !newNetwork.readonly), // dont allow readonly networks to be added
-    ...prevNetworks,
-  ].filter(
-    // remove duplicates and keep new ones
-    (network, index, self) =>
-      self.findIndex((n) => n.id === network.id) === index,
-  )
+  const newNetworks = [...networksArray, ...prevNetworks]
+    .filter(
+      // remove duplicates and keep new ones
+      (network, index, self) =>
+        self.findIndex((n) => n.id === network.id) === index,
+    )
+    .filter((newNetwork) => !newNetwork.readonly) // dont allow readonly networks to be added
 
   await networksStore.setItem("networks", newNetworks)
 
