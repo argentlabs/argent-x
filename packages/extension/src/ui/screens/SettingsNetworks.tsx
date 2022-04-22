@@ -74,22 +74,27 @@ export const SettingsNetworksScreen: FC = () => {
     useAppState.setState({ isLoading: false })
   }
 
+  // set true if current time is before the hackaton end time (27.04.2022 00:00 GMT+1)
+  const isHackatonTime = new Date() < new Date("2022-04-27T00:00:00.000Z")
+
   return (
     <>
       <Header>
         <BackButton />
       </Header>
-      <HackatonIconButton
-        size={92}
-        {...makeClickable(handleAddHackatonNetworks)}
-      >
-        <img
-          src="./assets/starkathon.png"
-          style={{
-            borderRadius: 200,
-          }}
-        />
-      </HackatonIconButton>
+      {isHackatonTime && (
+        <HackatonIconButton
+          size={92}
+          {...makeClickable(handleAddHackatonNetworks)}
+        >
+          <img
+            src="./assets/starkathon.png"
+            style={{
+              borderRadius: 200,
+            }}
+          />
+        </HackatonIconButton>
+      )}
       <Wrapper>
         <H2>Networks</H2>
         <List>
