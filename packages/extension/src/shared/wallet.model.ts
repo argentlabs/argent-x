@@ -1,3 +1,5 @@
+import type { Network } from "./networks"
+
 export interface WalletAccountSigner {
   type: string
   derivationPath: string
@@ -5,6 +7,6 @@ export interface WalletAccountSigner {
 
 export interface WalletAccount {
   address: string
-  network: string
+  network: Network
   signer: WalletAccountSigner
 }

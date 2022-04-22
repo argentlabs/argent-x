@@ -9,7 +9,6 @@ import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { H2 } from "../components/Typography"
 import { routes } from "../routes"
-import { useLocalhostPort } from "../states/localhostPort"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -74,7 +73,6 @@ const Footer = styled.div`
 
 export const SettingsScreen: FC = () => {
   const navigate = useNavigate()
-  const { localhostPort } = useLocalhostPort()
 
   const handleLockClick = () => {
     sendMessage({ type: "STOP_SESSION" })
@@ -85,12 +83,12 @@ export const SettingsScreen: FC = () => {
     navigate(routes.settingsDappConnections())
   }
 
-  const handleDownloadBackupClick = () => {
-    navigate(routes.backupDownload(true))
+  const handleSeedBackupClick = () => {
+    navigate(routes.setupSeedRecovery())
   }
 
-  const handleLocalhostPortClick = () => {
-    navigate(routes.settingsLocalhostPort())
+  const handleNetworksClick = () => {
+    navigate(routes.settingsNetworks())
   }
 
   return (
@@ -118,21 +116,26 @@ export const SettingsScreen: FC = () => {
           </P>
         </SettingsItem>
         <hr />
-        <SettingsItem onClick={handleDownloadBackupClick}>
+        <SettingsItem onClick={handleSeedBackupClick}>
           <Title>
-            <span>Backup file</span>
+            <span>Show backup phrase</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
-          <P>The backup file contains all your accounts. Keep it secure.</P>
+          <P>
+            Your backup phrase allows anyone to use your account. Keep it
+            secure.
+          </P>
         </SettingsItem>
         <hr />
-        <SettingsItem onClick={handleLocalhostPortClick}>
+        <SettingsItem onClick={handleNetworksClick}>
           <Title>
-            <span>Localhost port: {localhostPort}</span>
+            <span>Manage Networks</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
+          <P>Here you can add, edit and remove custom networks.</P>
         </SettingsItem>
         <hr />
+
         <Footer>
           <P>Help, support &amp; suggestions:</P>
           <div>

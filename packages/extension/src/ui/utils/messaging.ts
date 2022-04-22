@@ -1,4 +1,10 @@
-import { CompactEncrypt, importJWK } from "jose"
+import {
+  CompactEncrypt,
+  exportJWK,
+  generateSecret,
+  importJWK,
+  jwtDecrypt,
+} from "jose"
 import { Call, encode, number } from "starknet"
 
 import {
@@ -6,6 +12,7 @@ import {
   sendMessage,
   waitForMessage,
 } from "../../shared/messages"
+import { Network } from "../../shared/networks"
 
 if (process.env.NODE_ENV === "development") {
   messageStream.subscribe(([message]) => {
@@ -80,6 +87,70 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
   return waitForMessage("ESTIMATE_TRANSACTION_FEE_RES")
 }
 
+export const getSeedPhrase = async (): Promise<string> => {
+  const otpKey = await generateSecret("A256GCM", { extractable: true })
+  const otpBuffer = encode.utf8ToArray(
+    JSON.stringify({
+      alg: "A256GCM",
+      ...(await exportJWK(otpKey)),
+    }),
+  )
+  const pubJwk = await getPublicKey()
+  const pubKey = await importJWK(pubJwk)
+
+  const encryptedSecret = await new CompactEncrypt(otpBuffer)
+    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
+    .encrypt(pubKey)
+
+  sendMessage({
+    type: "GET_ENCRYPTED_SEED_PHRASE",
+    data: {
+      encryptedSecret,
+    },
+  })
+
+  const { encryptedSeedPhrase } = await waitForMessage(
+    "GET_ENCRYPTED_SEED_PHRASE_RES",
+  )
+
+  const { payload } = await jwtDecrypt(encryptedSeedPhrase, otpKey)
+
+  return payload.seedPhrase as string
+}
+
+export const recoverBySeedPhrase = async (
+  seedPhrase: string,
+  newPassword: string,
+): Promise<void> => {
+  const pubJwk = await getPublicKey()
+  const pubKey = await importJWK(pubJwk)
+
+  const msgJson = JSON.stringify({
+    seedPhrase,
+    newPassword,
+  })
+
+  const encMsg = await new CompactEncrypt(encode.utf8ToArray(msgJson))
+    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
+    .encrypt(pubKey)
+
+  sendMessage({
+    type: "RECOVER_SEEDPHRASE",
+    data: { secure: true, body: encMsg },
+  })
+
+  const succeeded = await Promise.race([
+    waitForMessage("RECOVER_SEEDPHRASE_RES").then(() => true),
+    waitForMessage("RECOVER_SEEDPHRASE_REJ")
+      .then(() => false)
+      .catch(() => false),
+  ])
+
+  if (!succeeded) {
+    throw Error("Invalid Seed Phrase")
+  }
+}
+
 export const updateTransactionFee = async (
   actionHash: string,
   maxFee: number.BigNumberish,
@@ -134,4 +205,26 @@ export const removePreAuthorization = async (host: string) => {
     data: host,
   })
   await waitForMessage("REMOVE_PREAUTHORIZATION_RES")
+}
+
+export const getNetworks = async () => {
+  sendMessage({ type: "GET_CUSTOM_NETWORKS" })
+  return waitForMessage("GET_CUSTOM_NETWORKS_RES")
+}
+
+export const getNetwork = async (
+  networkId: string,
+): Promise<Network | undefined> => {
+  const result = await getNetworks()
+  return result.find((x) => x.id === networkId)
+}
+
+export const addNetworks = async (networks: Network[]) => {
+  sendMessage({ type: "ADD_CUSTOM_NETWORKS", data: networks })
+  return waitForMessage("ADD_CUSTOM_NETWORKS_RES")
+}
+
+export const removeNetworks = async (networks: Network["id"][]) => {
+  sendMessage({ type: "REMOVE_CUSTOM_NETWORKS", data: networks })
+  return waitForMessage("REMOVE_CUSTOM_NETWORKS_RES")
 }

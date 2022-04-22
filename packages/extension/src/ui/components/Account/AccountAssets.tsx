@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
-import { getNetwork } from "../../../shared/networks"
 import { Account } from "../../Account"
 import { useAccountStatus } from "../../hooks/useAccountStatus"
+import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import {
   getAccountName,
@@ -14,10 +14,11 @@ import {
 } from "../../states/accountMetadata"
 import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
-import { useLocalhostPort } from "../../states/localhostPort"
+import { useBackupRequired } from "../../states/backupDownload"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
+import { RecoveryBanner } from "../RecoveryBanner"
 import { Spinner } from "../Spinner"
 import { AddTokenIconButton, TokenTitle, TokenWrapper } from "../Token"
 import { AccountSubHeader } from "./AccountSubheader"
@@ -38,23 +39,24 @@ interface AccountAssetsProps {
 export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account.address)
   const { accountNames, setAccountName } = useAccountMetadata()
+  const { isBackupRequired } = useBackupRequired()
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
-  const network = getNetwork(switcherNetworkId)
+  const { network } = useNetwork(switcherNetworkId)
 
-  const { data: showUpgradeBanner = false, mutate } = useSWR(
+  const { data: needsUpgrade = false, mutate } = useSWR(
     [account, network.accountImplementation, "showUpgradeBanner"],
     checkIfUpgradeAvailable,
     { suspense: false },
   )
 
-  const canShowEmptyAccountAlert =
-    !showPendingTransactions && !showUpgradeBanner
+  const canShowEmptyAccountAlert = !showPendingTransactions && !needsUpgrade
+  const showUpgradeBanner = needsUpgrade && !showPendingTransactions
+  const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
@@ -69,8 +71,8 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   }, [showPendingTransactions])
 
   useEffect(() => {
-    connectAccount(account, switcherNetworkId, localhostPort)
-  }, [account, switcherNetworkId, localhostPort])
+    connectAccount(account)
+  }, [account])
 
   return (
     <Container>
@@ -83,7 +85,8 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
           setAccountName(account.networkId, account.address, name)
         }
       />
-      {showUpgradeBanner && !showPendingTransactions && (
+      {showBackupBanner && <RecoveryBanner />}
+      {showUpgradeBanner && (
         <UpgradeBanner
           onClick={() => {
             if (network.accountImplementation) {
@@ -95,7 +98,7 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
       <PendingTransactions accountAddress={account.address} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <TokenList
-          showTitle={!canShowEmptyAccountAlert}
+          showTitle={showPendingTransactions}
           accountAddress={account.address}
           canShowEmptyAccountAlert={canShowEmptyAccountAlert}
         />

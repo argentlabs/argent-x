@@ -10,11 +10,12 @@ import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
+import { RecoveryBanner } from "../components/RecoveryBanner"
 import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
-import { useLocalhostPort } from "../states/localhostPort"
+import { useBackupRequired } from "../states/backupDownload"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
@@ -50,20 +51,23 @@ const Paragraph = styled(P)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
   const { accounts, selectedAccount, addAccount } = useAccount()
+  const { isBackupRequired } = useBackupRequired()
 
   const accountsList = Object.values(accounts)
 
   const handleAddAccount = async () => {
+    useAppState.setState({ isLoading: true })
     try {
-      const newAccount = await deployAccount(switcherNetworkId, localhostPort)
+      const newAccount = await deployAccount(switcherNetworkId)
       addAccount(newAccount)
-      connectAccount(newAccount, switcherNetworkId, localhostPort)
+      connectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
       navigate(routes.error())
+    } finally {
+      useAppState.setState({ isLoading: false })
     }
   }
 
@@ -77,11 +81,12 @@ export const AccountListScreen: FC = () => {
           >
             <SettingsIcon />
           </IconButton>
-          <NetworkSwitcher hidePort />
+          <NetworkSwitcher />
         </Header>
       </AccountHeader>
       <H1>Accounts</H1>
       <AccountList>
+        {isBackupRequired && <RecoveryBanner noMargins />}
         {accountsList.length === 0 && (
           <Paragraph>
             No accounts on this network, click below to add one.

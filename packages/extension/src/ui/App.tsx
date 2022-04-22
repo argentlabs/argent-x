@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from "@mui/material"
 import { FC, Suspense } from "react"
-import { Outlet, Route, Routes } from "react-router-dom"
+import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -14,6 +14,7 @@ import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { BackupRecoveryScreen } from "./screens/BackupRecoveryScreen"
+import { ConfirmSeedRecoveryPage } from "./screens/ConfirmSeedRecovery"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
@@ -22,15 +23,27 @@ import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import { ResetScreen } from "./screens/ResetScreen"
+import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
-import { SettingsLocalhostPortScreen } from "./screens/SettingsLocalhostPortScreen"
+import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkForm"
+import { SettingsNetworksScreen } from "./screens/SettingsNetworks"
 import { SettingsScreen } from "./screens/SettingsScreen"
+import { SetupRecoveryPage } from "./screens/SetupRecovery"
+import { SetupSeedRecoveryPage } from "./screens/SetupSeedRecovery"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
-import { useBackupDownload } from "./states/backupDownload"
+import { useBackupRequired } from "./states/backupDownload"
+import {
+  useSeedRecover,
+  validateAndSetPassword,
+  validateSeedRecoverStateIsComplete,
+} from "./states/seedRecover"
+import { useSelectedNetwork } from "./states/selectedNetwork"
+import { recoverBySeedPhrase } from "./utils/messaging"
+import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -102,13 +115,13 @@ const Screen: FC = () => {
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
-  const { isBackupDownloadRequired } = useBackupDownload()
+
+  const [selectedCustomNetwork] = useSelectedNetwork()
+
+  const navigate = useNavigate()
 
   if (isLoading) {
     return <LoadingScreen />
-  }
-  if (isBackupDownloadRequired) {
-    return <BackupDownloadScreen />
   }
 
   return (
@@ -127,6 +140,29 @@ const Screen: FC = () => {
           path={routes.backupRecovery()}
           element={<BackupRecoveryScreen />}
         />
+        <Route path={routes.seedRecovery()} element={<SeedRecoveryScreen />} />
+        <Route
+          path={routes.seedRecoveryPassword()}
+          element={
+            <NewWalletScreen
+              overrideTitle="New password"
+              overrideSubmitText="Continue"
+              overrideSubmit={async ({ password }) => {
+                try {
+                  validateAndSetPassword(password)
+                  const state = useSeedRecover.getState()
+                  if (validateSeedRecoverStateIsComplete(state)) {
+                    await recoverBySeedPhrase(state.seedPhrase, state.password)
+                    useBackupRequired.setState({ isBackupRequired: false }) // as the user recovered their seed, we can assume they have a backup
+                    navigate(await recover())
+                  }
+                } catch {
+                  console.error("seed phrase is invalid")
+                }
+              }}
+            />
+          }
+        />
         <Route path={routes.lockScreen()} element={<LockScreen />} />
         <Route path={routes.reset()} element={<ResetScreen />} />
         <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
@@ -141,6 +177,18 @@ const Screen: FC = () => {
             <Route path={routes.account()} element={<AccountScreen />} />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
+            <Route
+              path={routes.confirmSeedRecovery()}
+              element={<ConfirmSeedRecoveryPage />}
+            />
+            <Route
+              path={routes.setupSeedRecovery()}
+              element={<SetupSeedRecoveryPage />}
+            />
+            <Route
+              path={routes.setupRecovery()}
+              element={<SetupRecoveryPage />}
+            />
             <Route path={routes.newToken()} element={<AddTokenScreen />} />
             <Route path={routes.tokenPath()} element={<TokenScreen />} />
             <Route
@@ -149,12 +197,29 @@ const Screen: FC = () => {
             />
             <Route path={routes.settings()} element={<SettingsScreen />} />
             <Route
-              path={routes.settingsDappConnections()}
-              element={<SettingsDappConnectionsScreen />}
+              path={routes.settingsNetworks()}
+              element={<SettingsNetworksScreen />}
             />
             <Route
-              path={routes.settingsLocalhostPort()}
-              element={<SettingsLocalhostPortScreen />}
+              path={routes.settingsAddCustomNetwork()}
+              element={<SettingsNetworkFormScreen mode="add" />}
+            />
+            <Route
+              path={routes.settingsEditCustomNetwork()}
+              element={
+                selectedCustomNetwork ? (
+                  <SettingsNetworkFormScreen
+                    mode="edit"
+                    network={selectedCustomNetwork}
+                  />
+                ) : (
+                  <Navigate to={routes.settingsNetworks()} />
+                )
+              }
+            />
+            <Route
+              path={routes.settingsDappConnections()}
+              element={<SettingsDappConnectionsScreen />}
             />
             <Route
               path={routes.backupDownload()}

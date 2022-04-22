@@ -5,19 +5,12 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { BackButton } from "../components/BackButton"
-import { Button } from "../components/Button"
-import { Header } from "../components/Header"
-import { H2 } from "../components/Typography"
+import { IconBar } from "../components/Recovery/IconBar"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { fileToString } from "../utils/files"
 import { recoverBackup } from "../utils/messaging"
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 48px 32px;
-`
+import { ConfirmScreen } from "./ConfirmScreen"
 
 const DropZone = styled.div`
   width: 100%;
@@ -30,7 +23,6 @@ const DropZone = styled.div`
   font-weight: bold;
   line-height: 24px;
   text-align: center;
-  margin: 32px 0 48px;
   cursor: pointer;
   border-radius: 8px;
   border: 2px dashed rgba(255, 255, 255, 0.5);
@@ -73,11 +65,17 @@ export const BackupRecoveryScreen: FC = () => {
 
   return (
     <>
-      <Header>
+      <IconBar>
         <BackButton />
-      </Header>
-      <Container>
-        <H2>Select backup</H2>
+      </IconBar>
+      <ConfirmScreen
+        title="Select backup"
+        confirmButtonText="Restore backup"
+        singleButton
+        disableConfirm={disableSubmit}
+        onSubmit={handleRestoreClick}
+        smallTopPadding
+      >
         <DropZone {...getRootProps()}>
           <input {...getInputProps()} />
           {disableSubmit ? (
@@ -89,11 +87,7 @@ export const BackupRecoveryScreen: FC = () => {
             </div>
           )}
         </DropZone>
-
-        <Button onClick={handleRestoreClick} disabled={disableSubmit}>
-          Restore backup
-        </Button>
-      </Container>
+      </ConfirmScreen>
     </>
   )
 }

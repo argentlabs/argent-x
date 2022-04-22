@@ -8,7 +8,7 @@ import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { H2, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useBackupDownload } from "../states/backupDownload"
+import { useBackupRequired } from "../states/backupDownload"
 
 const DownloadButton = styled(Button)`
   margin-top: auto;
@@ -29,7 +29,7 @@ export const BackupDownloadScreen: FC = () => {
 
   const handleDownloadClick: FormEventHandler = async () => {
     sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
-    useBackupDownload.setState({ isBackupDownloadRequired: false })
+    useBackupRequired.setState({ isBackupRequired: false })
     navigate(isSettings ? routes.settings() : routes.account())
   }
 

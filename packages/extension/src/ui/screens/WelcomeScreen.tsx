@@ -7,7 +7,6 @@ import { Button, ButtonGroup } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { P } from "../components/Typography"
-import { useCustomNavigate } from "../hooks/useCustomNavigate"
 import { routes } from "../routes"
 
 const WelcomeScreenWrapper = styled.div`
@@ -44,7 +43,6 @@ const greetings = [
 
 export const WelcomeScreen: FC = () => {
   const navigate = useNavigate()
-  const customNavigate = useCustomNavigate()
 
   return (
     <WelcomeScreenWrapper>
@@ -53,9 +51,7 @@ export const WelcomeScreen: FC = () => {
       <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
       <ButtonGroup>
         <Button onClick={() => navigate(routes.newWallet())}>New wallet</Button>
-        <Button
-          onClick={async () => await customNavigate(routes.backupRecovery())}
-        >
+        <Button onClick={() => navigate(routes.seedRecovery())}>
           Restore wallet
         </Button>
       </ButtonGroup>

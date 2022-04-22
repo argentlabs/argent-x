@@ -1,55 +1,26 @@
 import { ethers } from "ethers"
 
 import { sendMessage } from "../../shared/messages"
-import { localNetworkUrl } from "../../shared/networks"
 import { Account } from "../Account"
-import { useAppState } from "../states/app"
-import { useBackupDownload } from "../states/backupDownload"
-import { useLocalhostPort } from "../states/localhostPort"
 import { startSession } from "./messaging"
 
-export const deployAccount = async (
-  networkId: string,
-  localhostPort: number,
-  password?: string,
-) => {
-  useAppState.setState({ isLoading: true })
-
+export const deployAccount = async (networkId: string, password?: string) => {
   if (password) {
     await startSession(password)
   }
 
-  const network = localNetworkUrl(networkId, localhostPort)
-  try {
-    const account = await Account.fromDeploy(network)
-    useBackupDownload.setState({ isBackupDownloadRequired: true })
-    return account
-  } finally {
-    useAppState.setState({ isLoading: false })
-  }
+  return Account.fromDeploy(networkId)
 }
 
-export const connectAccount = (
-  account: Account,
-  switcherNetworkId: string,
-  localhostPort: number,
-) => {
+export const connectAccount = (account: Account) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
     data: {
       address: account.address,
-      network: localNetworkUrl(switcherNetworkId, localhostPort),
+      network: account.network,
       signer: account.signer,
     },
   })
-  try {
-    const { hostname, port } = new URL(account.networkId)
-    if (hostname === "localhost") {
-      useLocalhostPort.setState({ localhostPort: parseInt(port) })
-    }
-  } catch {
-    // pass
-  }
 }
 
 const argentColorsArray = [

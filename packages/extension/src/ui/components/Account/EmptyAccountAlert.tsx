@@ -15,7 +15,8 @@ import { CopyTooltip } from "../CopyTooltip"
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;
-  margin: 16px 20px;
+  padding: 18px 32px 26px;
+  margin: 0 20px 8px;
 `
 
 const Title = styled.h2`
@@ -26,14 +27,15 @@ const Title = styled.h2`
 `
 
 const Paragraph = styled.p`
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 13px;
+  line-height: 18px;
   text-align: center;
 `
 
 const Buttons = styled.div<{
   buttonsAmount: number
 }>`
+  margin-top: 8px;
   display: flex;
   width: 100%;
   gap: 16px;

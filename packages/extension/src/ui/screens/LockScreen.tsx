@@ -10,10 +10,11 @@ import { InputText } from "../components/InputText"
 import { A, FormError, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
+import { validatePassword } from "../states/seedRecover"
 import { makeClickable } from "../utils/a11y"
 import { startSession } from "../utils/messaging"
 import { recover } from "../utils/recovery"
-import { isValidPassword } from "./NewWalletScreen"
+import { StickyGroup } from "./ConfirmScreen"
 
 const LockScreenWrapper = styled.div`
   display: flex;
@@ -33,10 +34,6 @@ const LockScreenWrapper = styled.div`
 
   ${A} {
     margin-top: 16px;
-  }
-
-  ${Button} {
-    margin-top: 64px;
   }
 `
 
@@ -90,7 +87,7 @@ export const LockScreen: FC = () => {
         <Controller
           name="password"
           control={control}
-          rules={{ required: true, validate: isValidPassword }}
+          rules={{ required: true, validate: validatePassword }}
           defaultValue=""
           render={({ field: { ref, ...field } }) => (
             <InputText
@@ -112,9 +109,12 @@ export const LockScreen: FC = () => {
         )}
 
         <A {...makeClickable(handleResetClick)}>reset or restore backup</A>
-        <Button type="submit" disabled={!isDirty}>
-          Unlock
-        </Button>
+
+        <StickyGroup>
+          <Button type="submit" disabled={!isDirty}>
+            Unlock
+          </Button>
+        </StickyGroup>
       </form>
     </LockScreenWrapper>
   )

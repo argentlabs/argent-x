@@ -3,7 +3,6 @@ import DangerIcon from "@mui/icons-material/ReportGmailerrorredRounded"
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
 import { FC, Suspense, useEffect, useMemo, useState } from "react"
-import usePromise from "react-promise-suspense"
 import type { Call } from "starknet"
 import styled, { keyframes } from "styled-components"
 import useSWR from "swr"
@@ -17,7 +16,7 @@ const Center = styled.div`
   align-items: center;
 `
 
-const FeeEstimateWrapper = styled(Center)`
+const FeeEstimationWrapper = styled(Center)`
   justify-content: space-between;
   margin-top: 16px;
   padding: 20px;
@@ -25,7 +24,7 @@ const FeeEstimateWrapper = styled(Center)`
   background: #333332;
 `
 
-const FeeEstimateText = styled.p`
+const FeeEstimationText = styled.p`
   display: flex;
   align-items: center;
   font-weight: 600;
@@ -34,7 +33,7 @@ const FeeEstimateText = styled.p`
   color: #8f8e8c;
 `
 
-const FeeEstimateValue = styled.p`
+const FeeEstimationValue = styled.p`
   font-weight: 600;
   font-size: 15px;
   line-height: 20px;
@@ -57,7 +56,7 @@ const InvisibleInput = styled.input`
   text-align: right;
 `
 
-type FeeEstimateProps = (
+type FeeEstimationProps = (
   | {
       maxFee: BigNumber
     }
@@ -70,19 +69,23 @@ type FeeEstimateProps = (
   networkId: string
 }
 
-const FeeEstimateInput: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
-  const { amount }: { unit: string; amount: number } = usePromise(
+const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
+  const { data: { amount } = { unit: "wei", amount: 0 } } = useSWR(
+    [
+      "transactions" in props
+        ? props.transactions
+        : { maxFee: props.maxFee.toNumber() },
+    ],
     async (x) => {
       if ("maxFee" in x) {
         return { unit: "wei", amount: x.maxFee }
       }
       return getEstimatedFee(x)
     },
-    [
-      "transactions" in props
-        ? props.transactions
-        : { maxFee: props.maxFee.toNumber() },
-    ],
+    {
+      suspense: true,
+      refreshInterval: 20 * 1000, // 20 seconds
+    },
   )
 
   useEffect(() => {
@@ -151,7 +154,10 @@ const LoadingInput = styled.div`
   animation: ${pulseKeyframe} 1s alternate infinite;
 `
 
-export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
+export const FeeEstimation: FC<FeeEstimationProps> = ({
+  onChange,
+  ...props
+}) => {
   const [fee, setFee] = useState<BigNumber>()
 
   const { data: feeTokenBalance } = useSWR(
@@ -174,9 +180,9 @@ export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
   }, [firstFetchDone, enoughBalance])
 
   return (
-    <FeeEstimateWrapper>
+    <FeeEstimationWrapper>
       <span>
-        <FeeEstimateText>
+        <FeeEstimationText>
           Network fee
           <Tippy
             content={
@@ -211,11 +217,11 @@ export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
               />
             )}
           </Tippy>
-        </FeeEstimateText>
+        </FeeEstimationText>
       </span>
       <Center>
         <Suspense fallback={<LoadingInput />}>
-          <FeeEstimateInput
+          <FeeEstimationInput
             {...props}
             onChange={(fee) => {
               setFee(fee)
@@ -223,8 +229,8 @@ export const FeeEstimate: FC<FeeEstimateProps> = ({ onChange, ...props }) => {
             }}
           />
         </Suspense>
-        <FeeEstimateValue>ETH</FeeEstimateValue>
+        <FeeEstimationValue>ETH</FeeEstimationValue>
       </Center>
-    </FeeEstimateWrapper>
+    </FeeEstimationWrapper>
   )
 }

@@ -6,7 +6,7 @@ export const AccountFooter = styled.div`
   bottom: 0;
   width: 100%;
   height: 64px;
-  background: linear-gradient(180deg, rgba(22, 22, 22, 0.4) 0%, #000000 73.72%);
+  background: linear-gradient(180deg, rgba(16, 16, 16, 0.4) 0%, #161616 73.72%);
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
 `

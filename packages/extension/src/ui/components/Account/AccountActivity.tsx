@@ -1,15 +1,15 @@
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred"
 import { FC, Fragment, Suspense } from "react"
 import styled from "styled-components"
-import useSWR from "swr"
 
 import { Account } from "../../Account"
+import { useActivity } from "../../hooks/useActivity"
+import { useNetwork } from "../../hooks/useNetworks"
 import { useAppState } from "../../states/app"
 import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
 import { ErrorBoundary } from "../ErrorBoundary"
 import { Spinner } from "../Spinner"
-import { fetchActivity } from "./accountActivity.service"
 import { PendingTransactions } from "./PendingTransactions"
 import { SectionHeader } from "./SectionHeader"
 import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
@@ -35,15 +35,9 @@ interface AccountActivityProps {
 
 const Activity: FC<AccountActivityProps> = ({ account }) => {
   const { switcherNetworkId } = useAppState()
+  const { network } = useNetwork(switcherNetworkId)
 
-  const { data: activity = {} } = useSWR(
-    [account.address, switcherNetworkId, "activity"],
-    fetchActivity,
-    {
-      refreshInterval: 60e3 /* 1 minute */,
-      suspense: true,
-    },
-  )
+  const { activity } = useActivity(account.address, network)
 
   return (
     <>
@@ -56,7 +50,7 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
                 key={hash}
                 hash={hash}
                 meta={{ subTitle: formatDateTime(date) }}
-                onClick={() => openVoyagerTransaction(hash, switcherNetworkId)}
+                onClick={() => openVoyagerTransaction(hash, network)}
               />
             ))}
           </TransactionsWrapper>
@@ -68,9 +62,10 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
 
 const ActivityError: FC<AccountActivityProps> = ({ account }) => {
   const { switcherNetworkId } = useAppState()
+  const { network } = useNetwork(switcherNetworkId)
 
   // this is needed to keep swr mounted so it can retry the request
-  useSWR([account.address, switcherNetworkId, "activity"], fetchActivity, {
+  useActivity(account.address, network, {
     suspense: false,
     errorRetryInterval: 30e3 /* 30 seconds */,
   })

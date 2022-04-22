@@ -7,14 +7,14 @@ import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { InputText } from "../components/InputText"
-import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
-import { useLocalhostPort } from "../states/localhostPort"
+import { validatePassword } from "../states/seedRecover"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
+import { StickyGroup } from "./ConfirmScreen"
 
 const Container = styled.div`
   padding: 48px 40px 24px;
@@ -29,15 +29,14 @@ const Container = styled.div`
   }
 `
 
-export function isValidPassword(password: string): boolean {
-  return password.length > 5
-}
-
-export const NewWalletScreen: FC = () => {
+export const NewWalletScreen: FC<{
+  overrideSubmit?: (values: { password: string }) => void
+  overrideTitle?: string
+  overrideSubmitText?: string
+}> = ({ overrideSubmit, overrideTitle, overrideSubmitText }) => {
   const navigate = useNavigate()
   const { addAccount } = useAccount()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
   const {
     control,
     handleSubmit,
@@ -52,35 +51,41 @@ export const NewWalletScreen: FC = () => {
   const password = watch("password")
 
   const handleDeploy = async (password?: string) => {
-    try {
-      const newAccount = await deployAccount(
-        switcherNetworkId,
-        localhostPort,
-        password,
-      )
-      addAccount(newAccount)
-      connectAccount(newAccount, switcherNetworkId, localhostPort)
-      navigate(await recover())
-    } catch (error: any) {
-      useAppState.setState({ error })
-      navigate(routes.error())
+    if (!password) {
+      return
     }
+    useAppState.setState({ isLoading: true })
+
+    if (overrideSubmit) {
+      await overrideSubmit({ password })
+    } else {
+      try {
+        const newAccount = await deployAccount(switcherNetworkId, password)
+        addAccount(newAccount)
+        connectAccount(newAccount)
+        navigate(await recover())
+      } catch (error: any) {
+        useAppState.setState({ error })
+        navigate(routes.error())
+      }
+    }
+    useAppState.setState({ isLoading: false })
   }
 
   return (
     <>
       <Header>
-        <BackButton to={routes.welcome()} />
+        <BackButton />
       </Header>
       <Container>
-        <H2>New wallet</H2>
+        <H2>{overrideTitle || "New wallet"}</H2>
         <P>Enter a password to protect your wallet</P>
         <form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
           <Controller
             name="password"
             control={control}
             defaultValue=""
-            rules={{ required: true, validate: isValidPassword }}
+            rules={{ required: true, validate: validatePassword }}
             render={({ field: { ref, ...field } }) => (
               <InputText
                 autoFocus
@@ -113,11 +118,12 @@ export const NewWalletScreen: FC = () => {
             <FormError>Passwords do not match</FormError>
           )}
 
-          <Button type="submit" disabled={!isDirty}>
-            Create wallet
-          </Button>
+          <StickyGroup>
+            <Button type="submit" disabled={!isDirty}>
+              {overrideSubmitText || "Create wallet"}
+            </Button>
+          </StickyGroup>
         </form>
-        <StickyArgentFooter />
       </Container>
     </>
   )

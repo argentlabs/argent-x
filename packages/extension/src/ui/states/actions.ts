@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import usePromise from "react-promise-suspense"
+import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
 import { ExtActionItem } from "../../shared/actionQueue"
@@ -35,7 +35,11 @@ export const useActions = create<State>(() => ({
 }))
 
 export const useActionsSubscription = () => {
-  const actions: ExtActionItem[] = usePromise(() => getActions(), [])
+  const { data: actions = [] } = useSWRImmutable(
+    "actions",
+    () => getActions(),
+    { suspense: true },
+  )
 
   useEffect(() => {
     useActions.setState({ actions })

@@ -1,9 +1,22 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
-import { Account, AddTransactionResponse, ec, stark } from "starknet"
+import {
+  Account,
+  AddTransactionResponse,
+  ec,
+  shortString,
+  stark,
+} from "starknet"
+import { computeHashOnElements } from "starknet/dist/utils/hash"
+import { BigNumberish } from "starknet/dist/utils/number"
 
-import { getNetwork, getProvider } from "../shared/networks"
+import {
+  Network,
+  defaultNetwork,
+  getProvider,
+  isKnownNetwork,
+} from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
 import {
   getNextPathIndex,
@@ -12,7 +25,7 @@ import {
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
-import { IStorage } from "./storage"
+import type { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -20,6 +33,24 @@ const isDevOrTest = isDev || isTest
 
 const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
+
+type KnownNetworkIds = "mainnet-alpha" | "goerli-alpha"
+const CHECK_OFFSET = 10
+const PROXY_CONTRACT_HASHES_TO_CHECK = [
+  "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
+]
+const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
+  [n in KnownNetworkIds]: string[]
+} = {
+  "mainnet-alpha": [
+    "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
+    "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac",
+  ],
+  "goerli-alpha": [
+    "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+    "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
+  ],
+}
 
 interface WalletSession {
   secret: string
@@ -29,15 +60,39 @@ interface WalletSession {
 export interface WalletStorageProps {
   backup?: string
   selected?: string
+  accounts?: WalletAccount[]
+  discoveredOnce?: boolean
+}
+
+/**
+ * Belongs into starknet.js
+ */
+function calculateContractAddress(
+  salt: BigNumberish,
+  contractHash: BigNumberish,
+  constructorCalldata: BigNumberish[],
+  callerAddress: BigNumberish = 0,
+): string {
+  const CONTRACT_ADDRESS_PREFIX = shortString.encodeShortString(
+    "STARKNET_CONTRACT_ADDRESS",
+  )
+  const constructorCalldataHash = computeHashOnElements(constructorCalldata)
+
+  return computeHashOnElements([
+    CONTRACT_ADDRESS_PREFIX,
+    callerAddress,
+    salt,
+    contractHash,
+    constructorCalldataHash,
+  ])
 }
 
 export class Wallet extends EventEmitter {
-  private accounts: WalletAccount[] = []
-
   private encryptedBackup?: string
   private session?: WalletSession
 
   private store: IStorage<WalletStorageProps>
+  private getNetwork: (networkId: string) => Promise<Network>
   private proxyCompiledContract: string
   private argentAccountCompiledContract: string
 
@@ -45,9 +100,11 @@ export class Wallet extends EventEmitter {
     store: IStorage<WalletStorageProps>,
     proxyCompiledContract: string,
     argentAccountCompiledContract: string,
+    getNetwork: (networkId: string) => Promise<Network>,
   ) {
     super()
     this.store = store
+    this.getNetwork = getNetwork
     this.proxyCompiledContract = proxyCompiledContract
     this.argentAccountCompiledContract = argentAccountCompiledContract
   }
@@ -78,6 +135,157 @@ export class Wallet extends EventEmitter {
     this.setSession(ethersWallet.privateKey, password)
   }
 
+  public async getAccounts(): Promise<WalletAccount[]> {
+    const accounts = await this.store.getItem("accounts")
+    return accounts || []
+  }
+
+  private async setAccounts(accounts: WalletAccount[]) {
+    const oldAccounts = await this.getAccounts()
+
+    // combine accounts without duplicates
+    const newAccounts = [...oldAccounts, ...accounts].filter(
+      (account, index, self) =>
+        self.findIndex((a) => a.address === account.address) === index,
+    )
+
+    return this.store.setItem("accounts", newAccounts)
+  }
+
+  private async pushAccount(account: WalletAccount) {
+    const accounts = await this.getAccounts()
+    const index = accounts.findIndex((a) => a.address === account.address)
+    if (index === -1) {
+      accounts.push(account)
+    } else {
+      accounts[index] = account
+    }
+    return this.store.setItem("accounts", accounts)
+  }
+
+  public async removeAccount(address: string) {
+    const accounts = await this.getAccounts()
+    const newAccounts = accounts.filter(
+      (account) => account.address !== address,
+    )
+    return this.store.setItem("accounts", newAccounts)
+  }
+
+  private resetAccounts() {
+    return this.store.setItem("accounts", [])
+  }
+
+  public async getSeedPhrase(): Promise<string> {
+    if (!this.isSessionOpen() || !this.session || !this.encryptedBackup) {
+      throw new Error("Session is not open")
+    }
+    const wallet = await ethers.Wallet.fromEncryptedJson(
+      this.encryptedBackup,
+      this.session.password,
+    )
+
+    return wallet.mnemonic.phrase
+  }
+
+  public async restoreSeedPhrase(seedPhrase: string, newPassword: string) {
+    if (this.isInitialized() || this.session) {
+      throw new Error("Wallet is already initialized")
+    }
+    const ethersWallet = ethers.Wallet.fromMnemonic(seedPhrase)
+    const N = isDevOrTest ? 64 : 32768
+    const encryptedBackup = await ethersWallet.encrypt(newPassword, {
+      scrypt: { N },
+    })
+
+    this.importBackup(encryptedBackup)
+    this.setSession(ethersWallet.privateKey, newPassword)
+
+    await this.discoverAccounts()
+  }
+
+  public async discoverAccounts() {
+    if (!this.session?.secret) {
+      throw new Error("Wallet is not initialized")
+    }
+    const wallet = new ethers.Wallet(this.session?.secret)
+
+    const networks = ["mainnet-alpha", "goerli-alpha"] as const
+    const accountsResults = await Promise.all(
+      networks.map(async (networkId) => {
+        return this.restoreAccountsFromWallet(wallet, networkId)
+      }),
+    )
+    const accounts = accountsResults.flatMap((x) => x)
+
+    await this.setAccounts(accounts)
+
+    this.store.setItem("discoveredOnce", true)
+  }
+
+  private async restoreAccountsFromWallet(
+    wallet: ethers.Wallet,
+    networkId: string,
+    networkAccountImplementations?: string[],
+    offset: number = CHECK_OFFSET,
+  ) {
+    const network = await this.getNetwork(networkId)
+    const provider = getProvider(network)
+
+    const accounts: WalletAccount[] = []
+
+    const implementations = isKnownNetwork(networkId)
+      ? VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId]
+      : networkAccountImplementations
+
+    if (!implementations) {
+      throw new Error(`No known implementations for network ${networkId}`)
+    }
+
+    const contractHashAndImplementations2dArray =
+      PROXY_CONTRACT_HASHES_TO_CHECK.flatMap((contractHash) =>
+        implementations.map((implementation) => [contractHash, implementation]),
+      )
+
+    const promises = contractHashAndImplementations2dArray.map(
+      async ([contractHash, implementation]) => {
+        let lastHit = 0
+        let lastCheck = 0
+
+        while (lastHit + offset > lastCheck) {
+          const starkPair = getStarkPair(lastCheck, wallet.privateKey)
+          const starkPub = ec.getStarkKey(starkPair)
+          const seed = starkPub
+
+          const address = calculateContractAddress(
+            seed,
+            contractHash,
+            stark.compileCalldata({ implementation }),
+          )
+
+          const code = await provider.getCode(address)
+
+          if (code.bytecode.length > 0) {
+            lastHit = lastCheck
+            accounts.push({
+              address,
+              network,
+              signer: {
+                type: "local_signer",
+                derivationPath: getPathForIndex(lastCheck),
+              },
+            })
+          }
+
+          ++lastCheck
+        }
+      },
+    )
+
+    await Promise.all(promises)
+
+    return accounts
+  }
+
   public async startSession(password: string): Promise<boolean> {
     // session has already started
     if (this.session) {
@@ -91,15 +299,48 @@ export class Wallet extends EventEmitter {
     }
 
     try {
-      const { privateKey: secret } = await ethers.Wallet.fromEncryptedJson(
+      const wallet = await ethers.Wallet.fromEncryptedJson(
         this.encryptedBackup as string,
         password,
       )
-      this.setSession(secret, password)
+
+      this.setSession(wallet.privateKey, password)
+
+      // if we have not yet discovered accounts, do it now. This only applies to wallets which got restored from a backup file, as we could not restore all accounts from onchain yet as the backup was locked until now.
+      const discoveredOnce = await this.store.getItem("discoveredOnce")
+      if (!discoveredOnce) {
+        await this.discoverAccounts()
+      }
+
       return true
     } catch (error) {
       return false
     }
+  }
+
+  public async discoverAccountsForNetwork(
+    networkId: string,
+    offset: number = CHECK_OFFSET,
+  ) {
+    if (!this.isSessionOpen() || !this.session?.secret) {
+      throw new Error("Session is not open")
+    }
+    const wallet = new ethers.Wallet(this.session?.secret)
+    const network = await this.getNetwork(networkId)
+
+    if (!network.accountImplementation) {
+      // silent fail if no account implementation is defined for this network
+      return
+    }
+
+    const accounts = await this.restoreAccountsFromWallet(
+      wallet,
+      networkId,
+      [network.accountImplementation],
+      offset,
+    )
+
+    await this.setAccounts(accounts)
   }
 
   public async addAccount(
@@ -109,11 +350,11 @@ export class Wallet extends EventEmitter {
       throw Error("no open session")
     }
 
-    const currentPaths = this.accounts
+    const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
-          account.network === networkId,
+          account.network.id === networkId,
       )
       .map((account) => account.signer.derivationPath)
 
@@ -122,8 +363,8 @@ export class Wallet extends EventEmitter {
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
-    const provider = getProvider(networkId)
-    const network = getNetwork(networkId)
+    const network = await this.getNetwork(networkId)
+    const provider = getProvider(network)
 
     let implementation = network.accountImplementation
     if (!implementation) {
@@ -132,6 +373,9 @@ export class Wallet extends EventEmitter {
       })
       assertTransactionReceived(deployImplementationTransaction, true)
       implementation = deployImplementationTransaction.address as string
+    } else {
+      // if there is an implementation, we need to check if accounts were already deployed
+      this.discoverAccountsForNetwork(networkId)
     }
 
     const deployTransaction = await provider.deployContract({
@@ -152,7 +396,7 @@ export class Wallet extends EventEmitter {
     assertTransactionReceived(initTransaction)
 
     const account = {
-      network: networkId,
+      network,
       address: proxyAddress,
       signer: {
         type: "local_secret",
@@ -160,7 +404,7 @@ export class Wallet extends EventEmitter {
       },
     }
 
-    this.accounts.push(account)
+    await this.pushAccount(account)
 
     await this.writeBackup()
     await this.selectAccount(account.address)
@@ -168,12 +412,8 @@ export class Wallet extends EventEmitter {
     return { account, txHash: initTransaction.transaction_hash }
   }
 
-  public getAccounts(): WalletAccount[] {
-    return this.accounts
-  }
-
-  public getAccountByAddress(address: string): WalletAccount {
-    const hit = this.getAccounts().find(
+  public async getAccountByAddress(address: string): Promise<WalletAccount> {
+    const hit = (await this.getAccounts()).find(
       (account) => account.address === address,
     )
     if (!hit) {
@@ -190,7 +430,7 @@ export class Wallet extends EventEmitter {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
-    const account = this.getAccountByAddress(address)
+    const account = await this.getAccountByAddress(address)
     if (!account) {
       throw Error("account not found")
     }
@@ -216,38 +456,33 @@ export class Wallet extends EventEmitter {
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
-    if (this.accounts.length === 0 || !this.isSessionOpen()) {
+    if (!this.isSessionOpen()) {
       return
     }
-
+    const accounts = await this.getAccounts()
     const address = await this.store.getItem("selected")
-    const account = this.accounts.find((account) => account.address === address)
-    return account ?? this.accounts[0]
+    const account = accounts.find((account) => account.address === address)
+    const defaultAccount = accounts.find(
+      (account) => account.network.id === defaultNetwork.id,
+    )
+    return account ?? defaultAccount ?? accounts[0]
   }
 
   public async selectAccount(address: string) {
-    const account = this.accounts.find((account) => account.address === address)
+    const account = (await this.getAccounts()).find(
+      (account) => account.address === address,
+    )
     if (account) {
       await this.store.setItem("selected", account.address)
     }
-  }
-
-  public async removeAccount(address: string) {
-    if (!this.isSessionOpen()) {
-      throw Error("no open session")
-    }
-    this.accounts = this.accounts.filter(
-      (account) => account.address !== address,
-    )
-    await this.writeBackup()
   }
 
   public lock() {
     this.session = undefined
   }
 
-  public reset() {
-    this.accounts = []
+  public async reset() {
+    await this.resetAccounts()
     this.encryptedBackup = undefined
     this.session = undefined
   }
@@ -314,11 +549,25 @@ export class Wallet extends EventEmitter {
     }
 
     const backup = JSON.parse(this.encryptedBackup)
-    if (backup.argent.version !== CURRENT_BACKUP_VERSION) {
+    if (backup.argent?.version !== CURRENT_BACKUP_VERSION) {
       // in the future, backup file migration will happen here
     }
 
-    this.accounts = backup.argent.accounts
+    await this.recoverAccountsFromBackupFile(backup)
+  }
+
+  private async recoverAccountsFromBackupFile(backup: any): Promise<void> {
+    const accounts: WalletAccount[] = await Promise.all(
+      (backup.argent?.accounts ?? []).map(async (account: any) => {
+        const network = await this.getNetwork(account.network)
+        return {
+          ...account,
+          network,
+        }
+      }),
+    )
+
+    await this.setAccounts(accounts)
   }
 
   private async writeBackup() {
@@ -330,10 +579,19 @@ export class Wallet extends EventEmitter {
       ...backup,
       argent: {
         version: CURRENT_BACKUP_VERSION,
-        accounts: this.accounts,
+        accounts: (await this.getAccounts()).map((account) => ({
+          ...account,
+          network: account.network.id,
+        })),
       },
     }
     const backupString = JSON.stringify(extendedBackup)
+
+    if (!Wallet.validateBackup(backupString)) {
+      console.error(backupString)
+      throw new Error("invalid new backup file")
+    }
+
     await this.store.setItem("backup", backupString)
     this.encryptedBackup = backupString
   }

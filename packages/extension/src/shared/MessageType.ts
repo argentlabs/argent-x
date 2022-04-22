@@ -2,6 +2,7 @@ import type { JWK } from "jose"
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
+import { Network } from "./networks"
 import { AddToken } from "./token.model"
 import { TransactionStatus } from "./transactions.model"
 import { WalletAccount } from "./wallet.model"
@@ -113,6 +114,9 @@ export type MessageType =
   | { type: "RECOVER_BACKUP"; data: string }
   | { type: "RECOVER_BACKUP_RES" }
   | { type: "RECOVER_BACKUP_REJ"; data: string }
+  | { type: "RECOVER_SEEDPHRASE"; data: { secure: true; body: string } }
+  | { type: "RECOVER_SEEDPHRASE_RES" }
+  | { type: "RECOVER_SEEDPHRASE_REJ" }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
   | { type: "DOWNLOAD_LEGACY_BACKUP_FILE" }
@@ -122,6 +126,13 @@ export type MessageType =
   | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }
   | { type: "REJECT_ADD_TOKEN"; data: { actionHash: string } }
   | { type: "APPROVE_ADD_TOKEN"; data: { actionHash: string } }
+  // ***** custom networks *****
+  | { type: "GET_CUSTOM_NETWORKS" }
+  | { type: "GET_CUSTOM_NETWORKS_RES"; data: Network[] }
+  | { type: "ADD_CUSTOM_NETWORKS"; data: Network[] }
+  | { type: "ADD_CUSTOM_NETWORKS_RES"; data: Network[] }
+  | { type: "REMOVE_CUSTOM_NETWORKS"; data: Network["id"][] }
+  | { type: "REMOVE_CUSTOM_NETWORKS_RES"; data: Network[] }
   // ***** actions *****
   | { type: "GET_ACTIONS" }
   | {
@@ -146,6 +157,18 @@ export type MessageType =
   | { type: "RESET_ALL" }
   | { type: "GET_PUBLIC_KEY" }
   | { type: "GET_PUBLIC_KEY_RES"; data: JWK }
+  | {
+      type: "GET_ENCRYPTED_SEED_PHRASE"
+      data: {
+        encryptedSecret: string
+      }
+    }
+  | {
+      type: "GET_ENCRYPTED_SEED_PHRASE_RES"
+      data: {
+        encryptedSeedPhrase: string
+      }
+    }
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

@@ -1,12 +1,11 @@
 import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
-import { compactDecrypt } from "jose"
+import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 import { encode, number, stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { getNetwork, getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -17,6 +16,13 @@ import {
   sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
+import { getNetwork as getNetworkImplementation } from "./customNetworks"
+import {
+  addNetworks,
+  getNetwork,
+  getNetworks,
+  removeNetworks,
+} from "./customNetworks"
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
@@ -36,6 +42,7 @@ import {
 import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { getImplementationUpgradePath } from "./upgrade"
+import { getProvider } from "./utils/getProvider"
 import { Wallet, WalletStorageProps } from "./wallet"
 
 const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
@@ -48,6 +55,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
     storage,
     ProxyCompiledContract,
     ArgentAccountCompiledContract,
+    getNetworkImplementation,
   )
   await wallet.setup()
 
@@ -132,7 +140,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           })
         }
 
-        const provider = getProvider(msg.data.network)
+        const provider = await getProvider(msg.data.network)
         const fetchedStatus = await getTransactionStatus(
           provider,
           msg.data.hash,
@@ -204,6 +212,34 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         return await wallet.selectAccount(msg.data.address)
       }
 
+      case "GET_CUSTOM_NETWORKS": {
+        const networks = await getNetworks()
+        return sendToTabAndUi({
+          type: "GET_CUSTOM_NETWORKS_RES",
+          data: networks,
+        })
+      }
+      case "ADD_CUSTOM_NETWORKS": {
+        const networks = msg.data
+        const newNetworks = await addNetworks(networks)
+        await Promise.all(
+          newNetworks.map(
+            (network) => wallet.discoverAccountsForNetwork(network.id, 2), // just close gaps up to 1 blank space, as these networks are new and should be linked lists
+          ),
+        )
+        return sendToTabAndUi({
+          type: "ADD_CUSTOM_NETWORKS_RES",
+          data: newNetworks,
+        })
+      }
+      case "REMOVE_CUSTOM_NETWORKS": {
+        const networks = msg.data
+        return sendToTabAndUi({
+          type: "REMOVE_CUSTOM_NETWORKS_RES",
+          data: await removeNetworks(networks),
+        })
+      }
+
       case "ESTIMATE_TRANSACTION_FEE": {
         const selectedAccount = await wallet.getSelectedAccount()
         const starknetAccount = await wallet.getSelectedStarknetAccount()
@@ -241,9 +277,9 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           walletAddress,
         )
 
-        const account = wallet.getAccountByAddress(walletAddress)
-        const { accountImplementation: newImplementation } = getNetwork(
-          account.network,
+        const account = await wallet.getAccountByAddress(walletAddress)
+        const { accountImplementation: newImplementation } = await getNetwork(
+          account.network.id,
         )
 
         const { result } = await starknetAccount.callContract({
@@ -485,10 +521,54 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
       }
       case "GET_PUBLIC_KEY": {
-        return sendToTabAndUi({
+        return sendMessageToUi({
           type: "GET_PUBLIC_KEY_RES",
           data: publicKeyJwk,
         })
+      }
+      case "GET_ENCRYPTED_SEED_PHRASE": {
+        if (!wallet.isSessionOpen()) {
+          throw Error("you need an open session")
+        }
+        const { encryptedSecret } = msg.data
+        const { plaintext } = await compactDecrypt(encryptedSecret, privateKey)
+
+        const symmetricSecret = await importJWK(
+          JSON.parse(encode.arrayBufferToString(plaintext)),
+        )
+        const seedPhrase = await wallet.getSeedPhrase()
+        const encryptedSeedPhrase = await new EncryptJWT({
+          seedPhrase,
+        })
+          .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
+          .encrypt(symmetricSecret)
+
+        return sendMessageToUi({
+          type: "GET_ENCRYPTED_SEED_PHRASE_RES",
+          data: { encryptedSeedPhrase },
+        })
+      }
+      case "RECOVER_SEEDPHRASE": {
+        try {
+          const { secure, body } = msg.data
+          if (secure !== true) {
+            throw Error("session can only be started with encryption")
+          }
+          const { plaintext } = await compactDecrypt(body, privateKey)
+          const {
+            seedPhrase,
+            newPassword,
+          }: {
+            seedPhrase: string
+            newPassword: string
+          } = JSON.parse(encode.arrayBufferToString(plaintext))
+
+          await wallet.restoreSeedPhrase(seedPhrase, newPassword)
+
+          return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
+        } catch {
+          return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_REJ" })
+        }
       }
       case "START_SESSION": {
         const { secure, body } = msg.data
@@ -524,7 +604,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
       case "GET_ACCOUNTS": {
         return sendToTabAndUi({
           type: "GET_ACCOUNTS_RES",
-          data: wallet.getAccounts(),
+          data: await wallet.getAccounts(),
         })
       }
       case "NEW_ACCOUNT": {
@@ -546,7 +626,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
               txHash,
               address: account.address,
               account: account,
-              accounts: wallet.getAccounts(),
+              accounts: await wallet.getAccounts(),
             },
           })
         } catch (e: any) {

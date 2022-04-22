@@ -1,6 +1,8 @@
 import { NavigateOptions, To, useNavigate } from "react-router-dom"
 import browser from "webextension-polyfill"
 
+import { routes } from "../routes"
+
 const openExtensionInTab = () => {
   const url = browser.runtime.getURL("index.html")
   return browser.tabs.create({ url })
@@ -22,7 +24,7 @@ export const useCustomNavigate = () => {
     const isLinux = (await getPlatformOS()) === "linux"
     const isInTab = await isAlreadyInTab()
 
-    if (to === "/recover" && isLinux && !isInTab) {
+    if (to === routes.backupRecovery() && isLinux && !isInTab) {
       return openExtensionInTab()
     }
     return navigate(to, options)
