@@ -12,12 +12,12 @@ import { computeHashOnElements } from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
 import {
-  getProvider as getProviderUtil,
+  Network,
+  defaultNetwork,
+  getProvider,
   isKnownNetwork,
 } from "../shared/networks"
-import { defaultNetwork } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
-import { getNetwork } from "./customNetworks"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -25,8 +25,7 @@ import {
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
-import { IStorage } from "./storage"
-import { getProvider } from "./utils/getProvider"
+import type { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -93,6 +92,7 @@ export class Wallet extends EventEmitter {
   private session?: WalletSession
 
   private store: IStorage<WalletStorageProps>
+  private getNetwork: (networkId: string) => Promise<Network>
   private proxyCompiledContract: string
   private argentAccountCompiledContract: string
 
@@ -100,9 +100,11 @@ export class Wallet extends EventEmitter {
     store: IStorage<WalletStorageProps>,
     proxyCompiledContract: string,
     argentAccountCompiledContract: string,
+    getNetwork: (networkId: string) => Promise<Network>,
   ) {
     super()
     this.store = store
+    this.getNetwork = getNetwork
     this.proxyCompiledContract = proxyCompiledContract
     this.argentAccountCompiledContract = argentAccountCompiledContract
   }
@@ -226,8 +228,8 @@ export class Wallet extends EventEmitter {
     networkAccountImplementations?: string[],
     offset: number = CHECK_OFFSET,
   ) {
-    const network = await getNetwork(networkId)
-    const provider = getProviderUtil(network)
+    const network = await this.getNetwork(networkId)
+    const provider = getProvider(network)
 
     const accounts: WalletAccount[] = []
 
@@ -324,7 +326,7 @@ export class Wallet extends EventEmitter {
       throw new Error("Session is not open")
     }
     const wallet = new ethers.Wallet(this.session?.secret)
-    const network = await getNetwork(networkId)
+    const network = await this.getNetwork(networkId)
 
     if (!network.accountImplementation) {
       // silent fail if no account implementation is defined for this network
@@ -361,8 +363,8 @@ export class Wallet extends EventEmitter {
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
-    const provider = await getProvider(networkId)
-    const network = await getNetwork(networkId)
+    const network = await this.getNetwork(networkId)
+    const provider = getProvider(network)
 
     let implementation = network.accountImplementation
     if (!implementation) {
@@ -436,7 +438,7 @@ export class Wallet extends EventEmitter {
     const keyPair = this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
-    const provider = getProviderUtil(account.network)
+    const provider = getProvider(account.network)
     return new Account(provider, account.address, keyPair)
   }
 

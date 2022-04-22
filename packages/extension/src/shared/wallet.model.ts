@@ -1,4 +1,4 @@
-import { Network } from "./networks"
+import type { Network } from "./networks"
 
 export interface WalletAccountSigner {
   type: string

@@ -7,6 +7,7 @@ import {
   Wallet,
   WalletStorageProps,
 } from "../src/background/wallet"
+import type { Network } from "../src/shared/networks"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
 
@@ -42,7 +43,13 @@ const proxyCompiledContract = fs.readFileSync(
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
 
-const NETWORK = "http://localhost:5000" // "goerli-alpha"
+const NETWORK = "testnetwork"
+const getNetwork = async (): Promise<Network> => ({
+  id: NETWORK,
+  chainId: "SN_GOERLI",
+  baseUrl: "http://localhost:5001",
+  name: "Test Network",
+})
 
 jest.setTimeout(999999)
 
@@ -58,6 +65,7 @@ test("create a new wallet", async () => {
     storage,
     proxyCompiledContract,
     argentAccountCompiledContract,
+    getNetwork,
   )
   await wallet.setup()
 
@@ -99,6 +107,7 @@ test("open existing wallet", async () => {
     storage,
     proxyCompiledContract,
     argentAccountCompiledContract,
+    getNetwork,
   )
   await wallet.setup()
 
@@ -136,6 +145,7 @@ test("open existing wallet with wrong password", async () => {
     storage,
     proxyCompiledContract,
     argentAccountCompiledContract,
+    getNetwork,
   )
   await wallet.setup()
 
@@ -154,6 +164,7 @@ test("import backup file", async () => {
     storage,
     proxyCompiledContract,
     argentAccountCompiledContract,
+    getNetwork,
   )
   await wallet.setup()
 
@@ -177,6 +188,7 @@ test("import wrong backup file", async () => {
     storage,
     proxyCompiledContract,
     argentAccountCompiledContract,
+    getNetwork,
   )
   await wallet.setup()
 

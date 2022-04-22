@@ -16,6 +16,7 @@ import {
   sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
+import { getNetwork as getNetworkImplementation } from "./customNetworks"
 import {
   addNetworks,
   getNetwork,
@@ -54,6 +55,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
     storage,
     ProxyCompiledContract,
     ArgentAccountCompiledContract,
+    getNetworkImplementation,
   )
   await wallet.setup()
 
