@@ -12,15 +12,28 @@ interface NetworksState {
   networks: Network[]
 }
 
+const getNetworksByReadOnly = (
+  networks: Network[],
+  readonly = true,
+): Network[] => {
+  return networks.filter((network) =>
+    readonly ? network.readonly : !network.readonly,
+  )
+}
+
 const networksStore = new Storage<NetworksState>(
   {
-    networks: defaultNetworks,
+    networks: getNetworksByReadOnly(defaultNetworks, false), // persist only editable networks, as we want to keep full control about read only networks to upgrade implementations
   },
   "networks",
 )
 
-export const getNetworks = (): Promise<Network[]> =>
-  networksStore.getItem("networks")
+export const getNetworks = async (): Promise<Network[]> => {
+  const storedNetworks = await networksStore.getItem("networks")
+  const readOnlyNetworks = getNetworksByReadOnly(defaultNetworks, true)
+
+  return [...readOnlyNetworks, ...storedNetworks]
+}
 
 export const getNetwork = async (networkId: string): Promise<Network> => {
   const networks = await getNetworks()

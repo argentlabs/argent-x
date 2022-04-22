@@ -1,8 +1,10 @@
 import {
+  Account,
   AddTransactionResponse,
   KeyPair,
   ProviderInterface,
   number,
+  stark,
 } from "starknet"
 import { Account as AccountV390, stark as starkV390 } from "starknet-390"
 
@@ -56,5 +58,26 @@ export const getImplementationUpgradePath = (
     }
   }
 
-  throw new Error(`Unsupported implementation: ${oldImplementation}`)
+  // default to newest starknet.js implementation to allow custom networks to upgrade wallets aswell
+  return (newImplementation, accountAddress, provider, keyPair) => {
+    const account = new Account(
+      provider as any, // this is a bug in old starknet versions where Provider was used instead of ProviderInterface
+      accountAddress,
+      keyPair,
+    )
+
+    return account.execute(
+      {
+        contractAddress: accountAddress,
+        entrypoint: "upgrade",
+        calldata: stark.compileCalldata({
+          implementation: newImplementation,
+        }),
+      },
+      undefined,
+      {
+        maxFee: "0",
+      },
+    )
+  }
 }
