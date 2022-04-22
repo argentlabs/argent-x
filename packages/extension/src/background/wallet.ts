@@ -557,7 +557,15 @@ export class Wallet extends EventEmitter {
   }
 
   private async recoverAccountsFromBackupFile(backup: any): Promise<void> {
-    const accounts = backup.argent?.accounts ?? []
+    const accounts: WalletAccount[] = await Promise.all(
+      (backup.argent?.accounts ?? []).map(async (account: any) => {
+        const network = await this.getNetwork(account.network)
+        return {
+          ...account,
+          network,
+        }
+      }),
+    )
 
     await this.setAccounts(accounts)
   }
@@ -571,15 +579,19 @@ export class Wallet extends EventEmitter {
       ...backup,
       argent: {
         version: CURRENT_BACKUP_VERSION,
-        accounts: (await this.getAccounts()).map((account) => ({
-          ...account,
-          network: account.network.id,
-        })),
+        accounts: (await this.getAccounts()).map((account) => {
+          console.log(account)
+          return {
+            ...account,
+            network: account.network.id,
+          }
+        }),
       },
     }
     const backupString = JSON.stringify(extendedBackup)
 
     if (!Wallet.validateBackup(backupString)) {
+      console.error(backupString)
       throw new Error("invalid new backup file")
     }
 
