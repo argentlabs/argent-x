@@ -568,10 +568,18 @@ export class Wallet extends EventEmitter {
       ...backup,
       argent: {
         version: CURRENT_BACKUP_VERSION,
-        accounts: await this.getAccounts(),
+        accounts: (await this.getAccounts()).map((account) => ({
+          ...account,
+          network: account.network.id,
+        })),
       },
     }
     const backupString = JSON.stringify(extendedBackup)
+
+    if (!Wallet.validateBackup(backupString)) {
+      throw new Error("invalid new backup file")
+    }
+
     await this.store.setItem("backup", backupString)
     this.encryptedBackup = backupString
   }
