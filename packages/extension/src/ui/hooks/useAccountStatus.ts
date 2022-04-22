@@ -10,7 +10,7 @@ export const useAccountStatus = (
 ) => {
   const deployStatus = useTransactionStatus(
     account.deployTransaction,
-    account.networkId,
+    account.network.id,
   )
   const [isDeployed, setIsDeployed] = useState(true)
 

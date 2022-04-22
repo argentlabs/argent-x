@@ -4,7 +4,7 @@ import { Abi, Contract, number, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
 import defaultTokens from "../../assets/default-tokens.json"
-import { getProvider } from "../../shared/networks"
+import { Account } from "../Account"
 import { TokenDetails, TokenDetailsWithBalance } from "../states/tokens"
 
 export const testDappToken = (networkId: string) =>
@@ -47,10 +47,13 @@ export const toTokenView = ({
 
 export const fetchTokenDetails = async (
   address: string,
-  networkId: string,
+  account: Account,
 ): Promise<TokenDetails> => {
-  const provider = getProvider(networkId)
-  const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
+  const tokenContract = new Contract(
+    parsedErc20Abi as Abi,
+    address,
+    account.provider,
+  )
   const [decimals, name, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
@@ -70,29 +73,31 @@ export const fetchTokenDetails = async (
     address,
     name,
     symbol,
-    networkId,
+    networkId: account.networkId,
     decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
   }
 }
 
 export const fetchTokenBalance = async (
   address: string,
-  accountAddress: string,
-  networkId: string,
+  account: Account,
 ): Promise<BigNumber> => {
-  const provider = getProvider(networkId)
-  const tokenContract = new Contract(parsedErc20Abi as Abi, address, provider)
-  const result = await tokenContract.balanceOf(accountAddress)
+  const tokenContract = new Contract(
+    parsedErc20Abi as Abi,
+    address,
+    account.provider,
+  )
+  const result = await tokenContract.balanceOf(account.address)
   return BigNumber.from(uint256.uint256ToBN(result.balance).toString())
 }
 
 export const fetchFeeTokenBalance = async (
-  accountAddress: string,
+  account: Account,
   networkId: string,
 ): Promise<BigNumber> => {
   const token = feeToken(networkId)
   if (!token) {
     return BigNumber.from(0)
   }
-  return fetchTokenBalance(token.address, accountAddress, networkId)
+  return fetchTokenBalance(token.address, account)
 }

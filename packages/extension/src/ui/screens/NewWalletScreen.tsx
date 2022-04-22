@@ -11,7 +11,6 @@ import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
-import { useLocalhostPort } from "../states/localhostPort"
 import { validatePassword } from "../states/seedRecover"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
@@ -38,7 +37,6 @@ export const NewWalletScreen: FC<{
   const navigate = useNavigate()
   const { addAccount } = useAccount()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
   const {
     control,
     handleSubmit,
@@ -56,22 +54,22 @@ export const NewWalletScreen: FC<{
     if (!password) {
       return
     }
+    useAppState.setState({ isLoading: true })
+
     if (overrideSubmit) {
-      return overrideSubmit({ password })
+      await overrideSubmit({ password })
+    } else {
+      try {
+        const newAccount = await deployAccount(switcherNetworkId, password)
+        addAccount(newAccount)
+        connectAccount(newAccount)
+        navigate(await recover())
+      } catch (error: any) {
+        useAppState.setState({ error })
+        navigate(routes.error())
+      }
     }
-    try {
-      const newAccount = await deployAccount(
-        switcherNetworkId,
-        localhostPort,
-        password,
-      )
-      addAccount(newAccount)
-      connectAccount(newAccount, switcherNetworkId, localhostPort)
-      navigate(await recover())
-    } catch (error: any) {
-      useAppState.setState({ error })
-      navigate(routes.error())
-    }
+    useAppState.setState({ isLoading: false })
   }
 
   return (

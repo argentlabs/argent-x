@@ -20,7 +20,10 @@ export const routes = {
   disclaimer: () => "/disclaimer",
   legacy: () => "/legacy",
   settings: () => "/settings",
-  settingsLocalhostPort: () => "/settings/localhost-port",
+  settingsNetworks: () => "/settings/networks",
+  settingsAddCustomNetwork: () => "/settings/networks/add",
+  settingsEditCustomNetwork: () => "/settings/networks/edit",
+  settingsRemoveCustomNetwork: () => "/settings/networks/remove",
   settingsDappConnections: () => "/settings/dapp-connections",
   backupDownload: (isFromSettings?: boolean) =>
     `/backup-download${isFromSettings ? "?settings" : ""}`,

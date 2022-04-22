@@ -8,7 +8,7 @@ export interface BackupState {
 export const useBackupRequired = create<BackupState>(
   persist(
     (_set, _get) => ({
-      isBackupRequired: false,
+      isBackupRequired: true,
     }),
     { name: "backupDownload" },
   ),

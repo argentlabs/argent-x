@@ -1,5 +1,6 @@
 import { FC } from "react"
 
+import { useNetwork } from "../../hooks/useNetworks"
 import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
@@ -14,6 +15,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
   accountAddress,
 }) => {
   const { switcherNetworkId } = useAppState()
+  const { network } = useNetwork(switcherNetworkId)
   const { pendingTransactions } = useAccountTransactions(accountAddress)
 
   if (!pendingTransactions.length) {
@@ -31,7 +33,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
             status="DEPLOYING"
             highlighted
             meta={meta}
-            onClick={() => openVoyagerTransaction(hash, switcherNetworkId)}
+            onClick={() => openVoyagerTransaction(hash, network)}
           />
         ))}
       </TransactionsWrapper>

@@ -1,22 +1,43 @@
-import { getNetwork } from "../../shared/networks"
+import join from "url-join"
+
+import { Network } from "../../shared/networks"
 import { VoyagerTransaction } from "./voyager.model"
 
 export const fetchVoyagerTransactions = async (
   address: string,
-  networkId: string,
+  network: Network,
 ): Promise<VoyagerTransaction[]> => {
-  const { explorerUrl } = getNetwork(networkId)
+  const { explorerUrl } = network
   if (!explorerUrl) {
     return []
   }
-  const response = await fetch(`${explorerUrl}/api/txns?to=${address}`)
+  const response = await fetch(join(explorerUrl, "api/txns", `?to=${address}`))
   const { items } = await response.json()
   return items
 }
 
-export const openVoyagerTransaction = (hash: string, networkId: string) => {
-  const { explorerUrl } = getNetwork(networkId)
-  if (explorerUrl) {
-    window.open(`${explorerUrl}/tx/${hash}`, "_blank")?.focus()
+export const getVoyagerContractLink = (
+  address: string,
+  network: Network,
+): string => {
+  const { explorerUrl } = network
+  if (!explorerUrl) {
+    return ""
   }
+  return join(explorerUrl, "contract", address)
+}
+
+export const getVoyagerTransactionLink = (
+  hash: string,
+  network: Network,
+): string => {
+  const { explorerUrl } = network
+  if (!explorerUrl) {
+    return ""
+  }
+  return join(explorerUrl, "tx", hash)
+}
+
+export const openVoyagerTransaction = (hash: string, network: Network) => {
+  window.open(getVoyagerTransactionLink(hash, network), "_blank")?.focus()
 }

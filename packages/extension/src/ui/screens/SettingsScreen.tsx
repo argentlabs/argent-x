@@ -9,7 +9,6 @@ import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { H2 } from "../components/Typography"
 import { routes } from "../routes"
-import { useLocalhostPort } from "../states/localhostPort"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -74,7 +73,6 @@ const Footer = styled.div`
 
 export const SettingsScreen: FC = () => {
   const navigate = useNavigate()
-  const { localhostPort } = useLocalhostPort()
 
   const handleLockClick = () => {
     sendMessage({ type: "STOP_SESSION" })
@@ -89,8 +87,8 @@ export const SettingsScreen: FC = () => {
     navigate(routes.setupSeedRecovery())
   }
 
-  const handleLocalhostPortClick = () => {
-    navigate(routes.settingsLocalhostPort())
+  const handleNetworksClick = () => {
+    navigate(routes.settingsNetworks())
   }
 
   return (
@@ -129,13 +127,15 @@ export const SettingsScreen: FC = () => {
           </P>
         </SettingsItem>
         <hr />
-        <SettingsItem onClick={handleLocalhostPortClick}>
+        <SettingsItem onClick={handleNetworksClick}>
           <Title>
-            <span>Localhost port: {localhostPort}</span>
+            <span>Manage Networks</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
+          <P>Here you can add, edit and remove custom networks.</P>
         </SettingsItem>
         <hr />
+
         <Footer>
           <P>Help, support &amp; suggestions:</P>
           <div>

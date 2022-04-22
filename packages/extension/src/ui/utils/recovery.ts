@@ -1,8 +1,4 @@
-import {
-  accountsOnNetwork,
-  defaultNetwork,
-  localNetworkId,
-} from "../../shared/networks"
+import { accountsOnNetwork, defaultNetwork } from "../../shared/networks"
 import { Account } from "../Account"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
@@ -22,7 +18,7 @@ export const recover = async ({
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ||= lastSelectedAccount
-      ? localNetworkId(lastSelectedAccount?.network)
+      ? lastSelectedAccount?.network.id
       : defaultNetwork.id
 
     const walletAccounts = accountsOnNetwork(await getAccounts(), networkId)

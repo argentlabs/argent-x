@@ -1,4 +1,5 @@
-import { FC, Suspense } from "react"
+import { wordlists } from "ethers"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { keyframes } from "styled-components"
 import useSWRImmutable from "swr/immutable"
@@ -63,30 +64,13 @@ const LoadingSeedWordBadge = styled.div<{
   animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
 `
 
-const FetchedSeedPhrase: FC = () => {
-  const { data: seedPhrase = "" } = useSWRImmutable(
+export const SetupSeedRecoveryPage: FC = () => {
+  const navigate = useNavigate()
+  const { data: seedPhrase } = useSWRImmutable(
     // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage
     "seedPhrase",
     () => getSeedPhrase(),
-    {
-      suspense: true,
-    },
   )
-
-  return (
-    <SeedPhraseGrid>
-      {seedPhrase.split(" ").map((word, index) => (
-        <SeedWordBadge key={word + index}>
-          <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
-          {word}
-        </SeedWordBadge>
-      ))}
-    </SeedPhraseGrid>
-  )
-}
-
-export const SetupSeedRecoveryPage: FC = () => {
-  const navigate = useNavigate()
 
   return (
     <>
@@ -96,6 +80,7 @@ export const SetupSeedRecoveryPage: FC = () => {
         title="Recovery phrase"
         singleButton
         confirmButtonText="Continue"
+        disableConfirm={!seedPhrase}
         onSubmit={() => navigate(routes.confirmSeedRecovery())}
       >
         <Paragraph>
@@ -103,22 +88,25 @@ export const SetupSeedRecoveryPage: FC = () => {
           computer.
         </Paragraph>
 
-        <Suspense
-          fallback={
-            <>
-              <SeedPhraseGrid>
-                {[...Array(12)].map((_, index) => (
-                  <LoadingSeedWordBadge
-                    key={index}
-                    animationDelay={(index % 3) * 200}
-                  />
-                ))}
-              </SeedPhraseGrid>
-            </>
-          }
-        >
-          <FetchedSeedPhrase />
-        </Suspense>
+        {seedPhrase ? (
+          <SeedPhraseGrid>
+            {wordlists.en.split(seedPhrase).map((word, index) => (
+              <SeedWordBadge key={word + index}>
+                <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
+                {word}
+              </SeedWordBadge>
+            ))}
+          </SeedPhraseGrid>
+        ) : (
+          <SeedPhraseGrid>
+            {[...Array(12)].map((_, index) => (
+              <LoadingSeedWordBadge
+                key={index}
+                animationDelay={(index % 3) * 200}
+              />
+            ))}
+          </SeedPhraseGrid>
+        )}
       </ConfirmScreen>
     </>
   )

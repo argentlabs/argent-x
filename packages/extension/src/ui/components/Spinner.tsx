@@ -2,7 +2,7 @@ import { CircularProgress, CircularProgressProps } from "@mui/material"
 import { FC } from "react"
 
 interface SpinnerProps extends CircularProgressProps {
-  size: number
+  size?: number
   progress?: number
 }
 

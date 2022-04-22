@@ -1,45 +1,26 @@
 import { ethers } from "ethers"
 
 import { sendMessage } from "../../shared/messages"
-import { localNetworkUrl } from "../../shared/networks"
 import { Account } from "../Account"
-import { useLocalhostPort } from "../states/localhostPort"
 import { startSession } from "./messaging"
 
-export const deployAccount = async (
-  networkId: string,
-  localhostPort: number,
-  password?: string,
-) => {
+export const deployAccount = async (networkId: string, password?: string) => {
   if (password) {
     await startSession(password)
   }
 
-  const network = localNetworkUrl(networkId, localhostPort)
-  return Account.fromDeploy(network)
+  return Account.fromDeploy(networkId)
 }
 
-export const connectAccount = (
-  account: Account,
-  switcherNetworkId: string,
-  localhostPort: number,
-) => {
+export const connectAccount = (account: Account) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
     data: {
       address: account.address,
-      network: localNetworkUrl(switcherNetworkId, localhostPort),
+      network: account.network,
       signer: account.signer,
     },
   })
-  try {
-    const { hostname, port } = new URL(account.networkId)
-    if (hostname === "localhost") {
-      useLocalhostPort.setState({ localhostPort: parseInt(port) })
-    }
-  } catch {
-    // pass
-  }
 }
 
 const argentColorsArray = [

@@ -5,7 +5,6 @@ import React, { FC, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
-import { getNetwork } from "../../shared/networks"
 import {
   AccountAddressIconsWrapper,
   AccountAddressLink,
@@ -18,6 +17,7 @@ import { CopyTooltip } from "../components/CopyTooltip"
 import { Header } from "../components/Header"
 import { InputText } from "../components/InputText"
 import { TokenIcon } from "../components/TokenIcon"
+import { useNetwork } from "../hooks/useNetworks"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { useTokensWithBalance } from "../states/tokens"
@@ -27,6 +27,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../utils/transactions"
+import { getVoyagerTransactionLink } from "../utils/voyager.service"
 
 export const TokenScreenWrapper = styled.div`
   display: flex;
@@ -97,6 +98,7 @@ export const TokenScreen: FC = () => {
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
   const { switcherNetworkId } = useAppState()
+  const { network } = useNetwork(switcherNetworkId)
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   if (!token) {
@@ -132,9 +134,7 @@ export const TokenScreen: FC = () => {
         </TokenTitle>
         <TokenAddressWrapper>
           <AccountAddressLink
-            href={`${
-              getNetwork(switcherNetworkId).explorerUrl
-            }/contract/${address}`}
+            href={getVoyagerTransactionLink(address, network)}
             target="_blank"
           >
             {truncateAddress(address)}

@@ -1,6 +1,5 @@
 import { Provider } from "starknet"
 
-import { getProvider } from "../shared/networks"
 import {
   FetchedTransactionStatus,
   TransactionListener,
@@ -9,6 +8,7 @@ import {
   TransactionStatusWithProvider,
 } from "../shared/transactions.model"
 import { WalletAccount } from "../shared/wallet.model"
+import { getProvider } from "./utils/getProvider"
 
 export async function getTransactionStatus(
   provider: Provider,
@@ -38,7 +38,7 @@ export class TransactionTracker {
     },
   ): Promise<void> {
     try {
-      const provider = getProvider(account.network)
+      const provider = await getProvider(account.network.id)
       this.transactions.push({
         hash: transactionHash,
         provider,

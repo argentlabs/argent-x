@@ -6,7 +6,6 @@ import { encode, number, stark } from "starknet"
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
-import { getNetwork, getProvider } from "../shared/networks"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -17,6 +16,12 @@ import {
   sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
+import {
+  addNetworks,
+  getNetwork,
+  getNetworks,
+  removeNetworks,
+} from "./customNetworks"
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
@@ -36,6 +41,7 @@ import {
 import { Storage, clearStorage } from "./storage"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { getImplementationUpgradePath } from "./upgrade"
+import { getProvider } from "./utils/getProvider"
 import { Wallet, WalletStorageProps } from "./wallet"
 
 const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
@@ -132,7 +138,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           })
         }
 
-        const provider = getProvider(msg.data.network)
+        const provider = await getProvider(msg.data.network)
         const fetchedStatus = await getTransactionStatus(
           provider,
           msg.data.hash,
@@ -204,6 +210,34 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         return await wallet.selectAccount(msg.data.address)
       }
 
+      case "GET_CUSTOM_NETWORKS": {
+        const networks = await getNetworks()
+        return sendToTabAndUi({
+          type: "GET_CUSTOM_NETWORKS_RES",
+          data: networks,
+        })
+      }
+      case "ADD_CUSTOM_NETWORKS": {
+        const networks = msg.data
+        const newNetworks = await addNetworks(networks)
+        await Promise.all(
+          newNetworks.map(
+            (network) => wallet.discoverAccountsForNetwork(network.id, 2), // just close gaps up to 1 blank space, as these networks are new and should be linked lists
+          ),
+        )
+        return sendToTabAndUi({
+          type: "ADD_CUSTOM_NETWORKS_RES",
+          data: newNetworks,
+        })
+      }
+      case "REMOVE_CUSTOM_NETWORKS": {
+        const networks = msg.data
+        return sendToTabAndUi({
+          type: "REMOVE_CUSTOM_NETWORKS_RES",
+          data: await removeNetworks(networks),
+        })
+      }
+
       case "ESTIMATE_TRANSACTION_FEE": {
         const selectedAccount = await wallet.getSelectedAccount()
         const starknetAccount = await wallet.getSelectedStarknetAccount()
@@ -242,8 +276,8 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         )
 
         const account = await wallet.getAccountByAddress(walletAddress)
-        const { accountImplementation: newImplementation } = getNetwork(
-          account.network,
+        const { accountImplementation: newImplementation } = await getNetwork(
+          account.network.id,
         )
 
         const { result } = await starknetAccount.callContract({

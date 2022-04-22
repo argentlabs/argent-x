@@ -16,7 +16,6 @@ import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
 import { useBackupRequired } from "../states/backupDownload"
-import { useLocalhostPort } from "../states/localhostPort"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
@@ -52,7 +51,6 @@ const Paragraph = styled(P)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
   const { accounts, selectedAccount, addAccount } = useAccount()
   const { isBackupRequired } = useBackupRequired()
 
@@ -61,9 +59,9 @@ export const AccountListScreen: FC = () => {
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })
     try {
-      const newAccount = await deployAccount(switcherNetworkId, localhostPort)
+      const newAccount = await deployAccount(switcherNetworkId)
       addAccount(newAccount)
-      connectAccount(newAccount, switcherNetworkId, localhostPort)
+      connectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })
@@ -83,7 +81,7 @@ export const AccountListScreen: FC = () => {
           >
             <SettingsIcon />
           </IconButton>
-          <NetworkSwitcher hidePort />
+          <NetworkSwitcher />
         </Header>
       </AccountHeader>
       <H1>Accounts</H1>

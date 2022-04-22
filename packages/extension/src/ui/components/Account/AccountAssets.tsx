@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
-import { getNetwork } from "../../../shared/networks"
 import { Account } from "../../Account"
 import { useAccountStatus } from "../../hooks/useAccountStatus"
+import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import {
   getAccountName,
@@ -15,7 +15,6 @@ import {
 import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
 import { useBackupRequired } from "../../states/backupDownload"
-import { useLocalhostPort } from "../../states/localhostPort"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
@@ -40,7 +39,6 @@ interface AccountAssetsProps {
 export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { localhostPort } = useLocalhostPort()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account.address)
   const { accountNames, setAccountName } = useAccountMetadata()
@@ -48,7 +46,7 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
-  const network = getNetwork(switcherNetworkId)
+  const { network } = useNetwork(switcherNetworkId)
 
   const { data: needsUpgrade = false, mutate } = useSWR(
     [account, network.accountImplementation, "showUpgradeBanner"],
@@ -73,8 +71,8 @@ export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
   }, [showPendingTransactions])
 
   useEffect(() => {
-    connectAccount(account, switcherNetworkId, localhostPort)
-  }, [account, switcherNetworkId, localhostPort])
+    connectAccount(account)
+  }, [account])
 
   return (
     <Container>
