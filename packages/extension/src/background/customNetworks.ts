@@ -85,7 +85,7 @@ export const removeNetworks = async (
   const prevNetworks = await getNetworks()
   const newNetworks = prevNetworks.filter(
     (network) =>
-      !network.readonly || !networksArray.find((id) => id === network.id),
+      !network.readonly && !networksArray.find((id) => id === network.id),
   )
   await networksStore.setItem("networks", newNetworks)
 

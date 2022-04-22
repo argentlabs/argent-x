@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { useNetwork } from "../../hooks/useNetworks"
 import { AccountStatus } from "../../utils/accounts"
 import { formatAddress, truncateAddress } from "../../utils/addresses"
+import { getVoyagerContractLink } from "../../utils/voyager.service"
 import { CopyTooltip } from "../CopyTooltip"
 import { AccountName } from "./AccountName"
 import {
@@ -60,7 +61,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
       </div>
       <AccountAddressWrapper style={{ margin: "16px 0 18px 0" }}>
         <AccountAddressLink
-          href={`${network.explorerUrl}/contract/${accountAddress}`}
+          href={getVoyagerContractLink(accountAddress, network)}
           target="_blank"
         >
           {truncateAddress(accountAddress)}

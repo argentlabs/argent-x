@@ -7,5 +7,5 @@ export const hackatonNetworks: Network[] = Array(10)
     name: `Hackaton ${i}`,
     baseUrl: `https://hackathon-${i}.starknet.io`,
     chainId: `SN_GOERLI`,
-    explorerUrl: `https://hackathon-${i}.voyager.online/`,
+    explorerUrl: `https://hackathon-${i}.voyager.online`,
   }))

@@ -4,6 +4,7 @@ import styled from "styled-components"
 import { Spinner } from "../components/Spinner"
 import { A } from "../components/Typography"
 import { useNetwork } from "../hooks/useNetworks"
+import { getVoyagerTransactionLink } from "../utils/voyager.service"
 
 const SuccessScreenWrapper = styled.div`
   display: flex;
@@ -29,14 +30,15 @@ export const SuccessScreen: FC<SuccessScreenProps> = ({
   networkId,
   txHash,
 }) => {
-  const {
-    network: { explorerUrl },
-  } = useNetwork(networkId)
+  const { network } = useNetwork(networkId)
   return (
     <SuccessScreenWrapper>
       <Spinner size={92} />
-      {explorerUrl && (
-        <SuccessText href={`${explorerUrl}/tx/${txHash}`} target="_blank">
+      {network.explorerUrl && (
+        <SuccessText
+          href={getVoyagerTransactionLink(txHash, network)}
+          target="_blank"
+        >
           Transaction was submitted
         </SuccessText>
       )}

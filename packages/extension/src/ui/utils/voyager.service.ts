@@ -1,3 +1,5 @@
+import join from "url-join"
+
 import { Network } from "../../shared/networks"
 import { VoyagerTransaction } from "./voyager.model"
 
@@ -9,9 +11,20 @@ export const fetchVoyagerTransactions = async (
   if (!explorerUrl) {
     return []
   }
-  const response = await fetch(`${explorerUrl}/api/txns?to=${address}`)
+  const response = await fetch(join(explorerUrl, "api/txns", `?to=${address}`))
   const { items } = await response.json()
   return items
+}
+
+export const getVoyagerContractLink = (
+  address: string,
+  network: Network,
+): string => {
+  const { explorerUrl } = network
+  if (!explorerUrl) {
+    return ""
+  }
+  return join(explorerUrl, "contract", address)
 }
 
 export const getVoyagerTransactionLink = (
@@ -19,10 +32,10 @@ export const getVoyagerTransactionLink = (
   network: Network,
 ): string => {
   const { explorerUrl } = network
-  if (explorerUrl) {
-    return `${explorerUrl}/tx/${hash}`
+  if (!explorerUrl) {
+    return ""
   }
-  return ""
+  return join(explorerUrl, "tx", hash)
 }
 
 export const openVoyagerTransaction = (hash: string, network: Network) => {
