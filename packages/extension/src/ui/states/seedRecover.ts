@@ -1,4 +1,4 @@
-import { wordlists } from "ethers"
+import { ethers, wordlists } from "ethers"
 import create from "zustand"
 
 interface State {
@@ -16,6 +16,13 @@ export const validateSeedPhrase = (seedPhrase: string): boolean => {
   }
   // check every word is in the wordlist
   if (!words.every((word) => wordlists.en.getWordIndex(word) >= 0)) {
+    return false
+  }
+
+  // check if seedphrase is valid with HDNode
+  try {
+    ethers.utils.HDNode.fromMnemonic(seedPhrase)
+  } catch (e) {
     return false
   }
 
