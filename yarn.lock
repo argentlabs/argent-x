@@ -2407,9 +2407,9 @@
     react-is "^17.0.2"
 
 "@mui/icons-material@^5.3.1":
-  version "5.6.1"
-  resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-5.6.1.tgz#421e2b73992349abb07f8f03074d7e56e20bf7ba"
-  integrity sha512-I1x8u+FRLOmoJpRJASMx9UG+jZrSkNLyRQmBXivQQwXu3m3iasMoaKYhhI0J18t8+FWktbkNTp63oEUHE9Gw0Q==
+  version "5.6.2"
+  resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-5.6.2.tgz#239c40fc5841dc7c6af7d00e4e988550de170fcd"
+  integrity sha512-9QdI7axKuBAyaGz4mtdi7Uy1j73/thqFmEuxpJHxNC7O8ADEK1Da3t2veK2tgmsXsUlAHcAG63gg+GvWWeQNqQ==
   dependencies:
     "@babel/runtime" "^7.17.2"
 
