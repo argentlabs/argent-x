@@ -9448,9 +9448,9 @@ stack-utils@^2.0.3:
     url-join "^4.0.1"
 
 starknet@^3.10.0:
-  version "3.10.0"
-  resolved "https://registry.npmjs.org/starknet/-/starknet-3.10.0.tgz#65daab70cbc750faf9e2c1762335bf7b11fd5377"
-  integrity sha512-wtztZMIDTNa8aCBPW6FbmwqACN9//Z1g5kPcsy6ff/vp2as8Hh/voum/nWCE7TFM0P0yVNsqFRzi+X0gI5T3Gg==
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.10.1.tgz#d130c14b8ecd9bf059968f80006198ec23e9a044"
+  integrity sha512-1ZbBhYK77cX6aJz+zcp8U3s01iSN3Y18cHfN55Rn+98+D5LTnSr1cVFJ9Q0MYiThIpKy1XUhYjmbBqzutzyCZg==
   dependencies:
     "@ledgerhq/hw-app-eth" "^6.26.0"
     "@ledgerhq/hw-transport" "^6.24.1"
