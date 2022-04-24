@@ -153,7 +153,19 @@ const starknetWindowObject: StarknetWindowObject = {
     }
   },
 }
-window.starknet = starknetWindowObject
+
+function attach() {
+  window.starknet = starknetWindowObject
+  setTimeout(() => {
+    window.starknet = starknetWindowObject
+  }, 100)
+}
+
+// inject script
+attach()
+window.addEventListener("load", () => attach())
+document.addEventListener("DOMContentLoaded", () => attach())
+document.addEventListener("readystatechange", () => attach())
 
 window.addEventListener(
   "message",
