@@ -155,17 +155,32 @@ const starknetWindowObject: StarknetWindowObject = {
 }
 
 function attach() {
-  window.starknet = starknetWindowObject
-  setTimeout(() => {
+  // we need 2 different try catch blocks because we want to execute both even if one of them fails
+  try {
     window.starknet = starknetWindowObject
-  }, 100)
+  } catch {
+    // ignore
+  }
+  try {
+    // set read only property to window
+    Object.defineProperty(window, "starknet", {
+      value: starknetWindowObject,
+      writable: false,
+    })
+  } catch {
+    // ignore
+  }
 }
 
+function attachHandler() {
+  attach()
+  setTimeout(attach, 100)
+}
 // inject script
-attach()
-window.addEventListener("load", () => attach())
-document.addEventListener("DOMContentLoaded", () => attach())
-document.addEventListener("readystatechange", () => attach())
+attachHandler()
+window.addEventListener("load", () => attachHandler())
+document.addEventListener("DOMContentLoaded", () => attachHandler())
+document.addEventListener("readystatechange", () => attachHandler())
 
 window.addEventListener(
   "message",
