@@ -129,7 +129,7 @@ export const SettingsScreen: FC = () => {
         <hr />
         <SettingsItem onClick={handleNetworksClick}>
           <Title>
-            <span>Manage Networks</span>
+            <span>Manage networks</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
           <P>Here you can add, edit and remove custom networks.</P>

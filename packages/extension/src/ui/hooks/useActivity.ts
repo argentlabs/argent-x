@@ -3,7 +3,7 @@ import useSWR from "swr"
 import { Network } from "../../shared/networks"
 import { fetchActivity } from "../components/Account/accountActivity.service"
 
-interface SWRConfigCommon {
+export interface SWRConfigCommon {
   suspense?: boolean
   refreshInterval?: number
   errorRetryInterval?: number
