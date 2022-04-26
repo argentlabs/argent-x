@@ -24,7 +24,7 @@ export const IconBarWithIcons: FC<{
   const navigate = useNavigate()
   return (
     <IconBarReverse>
-      <CloseIcon onClick={() => navigate(routes.account())} />
+      <CloseIcon onClick={() => navigate(routes.accountTokens())} />
       {showBack && <BackIcon onClick={() => navigate(-1)} />}
     </IconBarReverse>
   )

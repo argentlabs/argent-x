@@ -178,7 +178,10 @@ const Screen: FC = () => {
         ) : (
           <>
             <Route path={routes.accountNftPath()} element={<NftScreen />} />
-            <Route path={routes.account()} element={<AccountTokensScreen />} />
+            <Route
+              path={routes.accountTokens()}
+              element={<AccountTokensScreen />}
+            />
             <Route
               path={routes.accountNfts()}
               element={<AccountNftsScreen />}

@@ -64,7 +64,7 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
       </AccountHeader>
       {children}
       <AccountFooter>
-        <FooterTab onClick={() => navigate(routes.account())}>
+        <FooterTab onClick={() => navigate(routes.accountTokens())}>
           <AccountBalanceWalletIcon />
           <span>Tokens</span>
         </FooterTab>

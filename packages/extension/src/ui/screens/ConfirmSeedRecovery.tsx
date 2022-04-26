@@ -16,7 +16,7 @@ export const ConfirmSeedRecoveryPage: FC = () => {
       confirmButtonText="Yes"
       onSubmit={() => {
         useBackupRequired.setState({ isBackupRequired: false })
-        navigate(routes.account())
+        navigate(routes.accountTokens())
       }}
       onReject={() => {
         navigate(-1)

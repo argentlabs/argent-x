@@ -118,7 +118,7 @@ export const AccountListItem: FC<AccountListProps> = ({
     <AccountListItemWrapper
       {...makeClickable(() => {
         useAccount.setState({ selectedAccount: address })
-        navigate(routes.account())
+        navigate(routes.accountTokens())
       })}
       className={isDeleteable ? "deleteable" : ""}
       selected={status.code === "CONNECTED"}

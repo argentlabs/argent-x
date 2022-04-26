@@ -119,7 +119,7 @@ export const TokenScreen: FC = () => {
         ),
       },
     })
-    navigate(routes.account())
+    navigate(routes.accountTokens())
   }
 
   return (
