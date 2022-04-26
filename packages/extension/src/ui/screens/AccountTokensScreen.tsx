@@ -1,7 +1,7 @@
 import { FC } from "react"
 
-import { AccountAssets } from "../components/Account/AccountAssets"
 import { AccountContainer } from "../components/Account/AccountContainer"
+import { AccountTokens } from "../components/Account/AccountTokens"
 import { useSelectedAccount } from "../states/account"
 
 export const AccountTokensScreen: FC = () => {
@@ -13,7 +13,7 @@ export const AccountTokensScreen: FC = () => {
 
   return (
     <AccountContainer>
-      <AccountAssets account={account} />
+      <AccountTokens account={account} />
     </AccountContainer>
   )
 }
