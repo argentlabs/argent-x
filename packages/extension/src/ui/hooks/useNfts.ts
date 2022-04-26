@@ -9,7 +9,7 @@ export const useNfts = (address: string, config?: SWRConfigCommon) => {
     fetchPlayOasisNfts,
     {
       refreshInterval: 60e3 /* 1 minute */,
-      suspense: false,
+      suspense: true,
       ...config,
     },
   )
