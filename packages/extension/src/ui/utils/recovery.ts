@@ -40,7 +40,7 @@ export const recover = async ({
     if (showAccountList || !selectedAccount) {
       return routes.accounts()
     }
-    return routes.account()
+    return routes.accountTokens()
   } catch (e: any) {
     console.error("Recovery error:", e)
     useAppState.setState({ error: `${e}` })

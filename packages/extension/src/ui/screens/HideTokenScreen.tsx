@@ -21,7 +21,7 @@ export const HideTokenScreen: FC = () => {
 
   const token = tokens.find(({ address }) => address === tokenAddress)
   if (!token) {
-    return <Navigate to={routes.account()} />
+    return <Navigate to={routes.accountTokens()} />
   }
 
   const { name, image } = toTokenView(token)
@@ -29,7 +29,7 @@ export const HideTokenScreen: FC = () => {
   const handleSubmit = () => {
     try {
       removeToken(token)
-      navigate(routes.account())
+      navigate(routes.accountTokens())
     } catch {
       setError("Token not hidden")
     }

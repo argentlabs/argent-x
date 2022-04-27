@@ -30,7 +30,7 @@ export const BackupDownloadScreen: FC = () => {
   const handleDownloadClick: FormEventHandler = async () => {
     sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
     useBackupRequired.setState({ isBackupRequired: false })
-    navigate(isSettings ? routes.settings() : routes.account())
+    navigate(isSettings ? routes.settings() : routes.accountTokens())
   }
 
   return (

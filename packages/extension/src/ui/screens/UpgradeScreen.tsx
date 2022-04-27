@@ -37,10 +37,10 @@ export const UpgradeScreen: FC = () => {
         useAppState.setState({ isLoading: true })
         await upgradeAccount(selectedAccount)
         useAppState.setState({ isLoading: false })
-        navigate(routes.account())
+        navigate(routes.accountTokens())
       }}
       onReject={() => {
-        navigate(routes.account())
+        navigate(routes.accountTokens())
       }}
     >
       <StyledP>

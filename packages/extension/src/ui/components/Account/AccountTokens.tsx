@@ -32,11 +32,11 @@ const Container = styled.div`
   padding-top: 16px;
 `
 
-interface AccountAssetsProps {
+interface AccountTokensProps {
   account: Account
 }
 
-export const AccountAssets: FC<AccountAssetsProps> = ({ account }) => {
+export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const status = useAccountStatus(account)

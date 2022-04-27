@@ -36,7 +36,7 @@ export const TokenList: FC<TokenListProps> = ({
           mintableAddress={testDappToken(switcherNetworkId)?.address}
         />
       )}
-      {showTitle && <SectionHeader>Assets</SectionHeader>}
+      {showTitle && <SectionHeader>Tokens</SectionHeader>}
       {tokenDetails.map((token) => (
         <TokenListItem
           key={token.address}

@@ -8,7 +8,12 @@ export const routes = {
   setupSeedRecovery: () => "/recovery/seed",
   confirmSeedRecovery: () => "/recovery/seed/confirm",
   lockScreen: () => "/lock-screen",
-  account: () => "/account",
+  accountTokens: () => "/account/tokens",
+  accountNfts: () => "/account/nfts",
+  accountActivity: () => "/account/activity",
+  accountNft: (contractAddress: string, tokenId: string) =>
+    `/account/nfts/${contractAddress}/${tokenId}`,
+  accountNftPath: () => `/account/nfts/:contractAddress/:tokenId`,
   upgrade: () => "/account/upgrade",
   accounts: () => "/accounts",
   newToken: () => "/tokens/new",

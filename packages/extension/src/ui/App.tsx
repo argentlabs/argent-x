@@ -8,8 +8,10 @@ import { SWRConfig } from "swr"
 import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
+import { AccountActivityScreen } from "./screens/AccountActivityScreen"
 import { AccountListScreen } from "./screens/AccountListScreen"
-import { AccountScreen } from "./screens/AccountScreen"
+import { AccountNftsScreen } from "./screens/AccountNftsScreen"
+import { AccountTokensScreen } from "./screens/AccountTokensScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
@@ -22,6 +24,7 @@ import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
+import { NftScreen } from "./screens/NftScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
@@ -174,7 +177,19 @@ const Screen: FC = () => {
           <Route path="*" element={<ActionScreen />} />
         ) : (
           <>
-            <Route path={routes.account()} element={<AccountScreen />} />
+            <Route path={routes.accountNftPath()} element={<NftScreen />} />
+            <Route
+              path={routes.accountTokens()}
+              element={<AccountTokensScreen />}
+            />
+            <Route
+              path={routes.accountNfts()}
+              element={<AccountNftsScreen />}
+            />
+            <Route
+              path={routes.accountActivity()}
+              element={<AccountActivityScreen />}
+            />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
             <Route

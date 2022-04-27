@@ -17,7 +17,7 @@ export const FooterTab = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: 50%;
+  width: 33.33%;
 
   svg {
     font-size: 1.8rem;
