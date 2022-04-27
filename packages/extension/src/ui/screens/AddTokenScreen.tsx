@@ -1,5 +1,4 @@
 import { BigNumber } from "@ethersproject/bignumber"
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { number } from "starknet"

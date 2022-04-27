@@ -76,7 +76,18 @@ export const NftScreen: FC = () => {
       </Header>
       <Container>
         <h3>{nft.name}</h3>
-        <img src={nft.copy_image_url} alt={nft.name} />
+        {nft.animation_url ? (
+          <model-viewer
+            src={nft.animation_url}
+            alt={`3D model of ${nft.name}`}
+            poster={nft.copy_image_url}
+            auto-rotate
+            camera-controls
+            poster-color="transparent"
+          />
+        ) : (
+          <img src={nft.copy_image_url} alt={nft.name} />
+        )}
         <p>{nft.description}</p>
         <Button
           onClick={() => openPlayOasisNft(nft.contract_address, nft.token_id)}
