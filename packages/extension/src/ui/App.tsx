@@ -8,10 +8,8 @@ import { SWRConfig } from "swr"
 import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
-import { AccountActivityScreen } from "./screens/AccountActivityScreen"
 import { AccountListScreen } from "./screens/AccountListScreen"
-import { AccountNftsScreen } from "./screens/AccountNftsScreen"
-import { AccountTokensScreen } from "./screens/AccountTokensScreen"
+import { AccountScreen } from "./screens/AccountTokensScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
@@ -152,15 +150,15 @@ const Screen: FC = () => {
             <Route path={routes.accountNftPath()} element={<NftScreen />} />
             <Route
               path={routes.accountTokens()}
-              element={<AccountTokensScreen />}
+              element={<AccountScreen tab="tokens" />}
             />
             <Route
               path={routes.accountNfts()}
-              element={<AccountNftsScreen />}
+              element={<AccountScreen tab="nfts" />}
             />
             <Route
               path={routes.accountActivity()}
-              element={<AccountActivityScreen />}
+              element={<AccountScreen tab="activity" />}
             />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
