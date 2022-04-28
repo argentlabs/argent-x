@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { Account } from "../../Account"
 import { useNfts } from "../../hooks/useNfts"
 import { routes } from "../../routes"
+import { getNftPicture } from "../../utils/playoasis.service"
 import { ErrorBoundary } from "../ErrorBoundary"
 import { Spinner } from "../Spinner"
 import { P } from "../Typography"
@@ -71,7 +72,7 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
             navigate(routes.accountNft(nft.contract_address, nft.token_id))
           }
         >
-          <img src={nft.copy_image_url} />
+          <img src={getNftPicture(nft)} />
           <figcaption>{nft.name}</figcaption>
         </NftItem>
       ))}

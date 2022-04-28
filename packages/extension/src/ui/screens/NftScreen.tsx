@@ -8,7 +8,7 @@ import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { useNfts } from "../hooks/useNfts"
 import { useSelectedAccount } from "../states/account"
-import { openPlayOasisNft } from "../utils/playoasis.service"
+import { getNftPicture, openPlayOasisNft } from "../utils/playoasis.service"
 
 export const Container = styled.div`
   margin: 0 24px;
@@ -80,7 +80,7 @@ export const NftScreen: FC = () => {
           <model-viewer
             src={nft.animation_url}
             alt={`3D model of ${nft.name}`}
-            poster={nft.copy_image_url}
+            poster={getNftPicture(nft)}
             auto-rotate
             camera-controls
             poster-color="transparent"
