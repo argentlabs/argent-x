@@ -25,11 +25,6 @@ jobs:
       - run: cp Readme.md ./packages/get-starknet/README.md
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
-      - run: |
-          node -p "JSON.stringify({...require('./packages/get-starknet/package.json'), name: 'get-starknet'}, null, 2)" > ./packages/get-starknet/package.temp.json
-          mv ./packages/get-starknet/package.temp.json ./packages/get-starknet/package.json
-      - run: yarn --cwd packages/get-starknet publish --access public
-        continue-on-error: true
       - run: yarn --cwd packages/dapp export
       - run: zip -r ${{ env.FILENAME }} packages/extension/dist/*
       - name: Release
