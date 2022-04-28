@@ -16,3 +16,18 @@ export const openPlayOasisNft = (contractAddress: string, tokenId: string) => {
   const url = `https://testnet.playoasis.xyz/asset/${contractAddress}/${tokenId}`
   window.open(url, "_blank")?.focus()
 }
+
+export const getNftPicture = ({ image_url, copy_image_url }: IPlayOasisNft) => {
+  if (image_url && copy_image_url) {
+    if (!copy_image_url.startsWith("ipfs://")) {
+      return copy_image_url
+    }
+    if (!image_url.startsWith("ipfs://")) {
+      return image_url
+    }
+  }
+  if (copy_image_url) {
+    return copy_image_url
+  }
+  return image_url
+}

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import PlayOasisSvg from "../../assets/playoasis.svg"
+import { NftModelViewer } from "../components/Account/NftModelViewer"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
@@ -55,7 +56,7 @@ export const Container = styled.div`
   }
 `
 
-export const NftScreen: FC = () => {
+const NftScreen: FC = () => {
   const { contractAddress, tokenId } = useParams()
   const account = useSelectedAccount()
 
@@ -76,7 +77,11 @@ export const NftScreen: FC = () => {
       </Header>
       <Container>
         <h3>{nft.name}</h3>
-        <img src={nft.copy_image_url} alt={nft.name} />
+        {nft.animation_url ? (
+          <NftModelViewer nft={nft} />
+        ) : (
+          <img src={nft.copy_image_url} alt={nft.name} />
+        )}
         <p>{nft.description}</p>
         <Button
           onClick={() => openPlayOasisNft(nft.contract_address, nft.token_id)}
@@ -87,3 +92,5 @@ export const NftScreen: FC = () => {
     </>
   )
 }
+
+export default NftScreen

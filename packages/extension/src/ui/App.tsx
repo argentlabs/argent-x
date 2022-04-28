@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from "@mui/material"
-import { FC, Suspense } from "react"
-import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom"
+import { FC, Suspense, lazy } from "react"
+import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -8,10 +8,8 @@ import { SWRConfig } from "swr"
 import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
-import { AccountActivityScreen } from "./screens/AccountActivityScreen"
 import { AccountListScreen } from "./screens/AccountListScreen"
-import { AccountNftsScreen } from "./screens/AccountNftsScreen"
-import { AccountTokensScreen } from "./screens/AccountTokensScreen"
+import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
@@ -24,8 +22,8 @@ import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
-import { NftScreen } from "./screens/NftScreen"
 import { ResetScreen } from "./screens/ResetScreen"
+import { SeedRecoveryPasswordScreen } from "./screens/SeedRecoveryPasswordScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
 import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkForm"
@@ -38,16 +36,10 @@ import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
-import { useBackupRequired } from "./states/backupDownload"
-import {
-  useSeedRecover,
-  validateAndSetPassword,
-  validateSeedRecoverStateIsComplete,
-} from "./states/seedRecover"
 import { useSelectedNetwork } from "./states/selectedNetwork"
-import { recoverBySeedPhrase } from "./utils/messaging"
-import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
+
+const LazyNftScreen = lazy(() => import("./screens/NftScreen"))
 
 const GlobalStyle = createGlobalStyle`
   ${normalize}
@@ -118,10 +110,7 @@ const Screen: FC = () => {
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
-
   const [selectedCustomNetwork] = useSelectedNetwork()
-
-  const navigate = useNavigate()
 
   if (isLoading) {
     return <LoadingScreen />
@@ -146,25 +135,7 @@ const Screen: FC = () => {
         <Route path={routes.seedRecovery()} element={<SeedRecoveryScreen />} />
         <Route
           path={routes.seedRecoveryPassword()}
-          element={
-            <NewWalletScreen
-              overrideTitle="New password"
-              overrideSubmitText="Continue"
-              overrideSubmit={async ({ password }) => {
-                try {
-                  validateAndSetPassword(password)
-                  const state = useSeedRecover.getState()
-                  if (validateSeedRecoverStateIsComplete(state)) {
-                    await recoverBySeedPhrase(state.seedPhrase, state.password)
-                    useBackupRequired.setState({ isBackupRequired: false }) // as the user recovered their seed, we can assume they have a backup
-                    navigate(await recover())
-                  }
-                } catch {
-                  console.error("seed phrase is invalid")
-                }
-              }}
-            />
-          }
+          element={<SeedRecoveryPasswordScreen />}
         />
         <Route path={routes.lockScreen()} element={<LockScreen />} />
         <Route path={routes.reset()} element={<ResetScreen />} />
@@ -177,18 +148,18 @@ const Screen: FC = () => {
           <Route path="*" element={<ActionScreen />} />
         ) : (
           <>
-            <Route path={routes.accountNftPath()} element={<NftScreen />} />
+            <Route path={routes.accountNftPath()} element={<LazyNftScreen />} />
             <Route
               path={routes.accountTokens()}
-              element={<AccountTokensScreen />}
+              element={<AccountScreen tab="tokens" />}
             />
             <Route
               path={routes.accountNfts()}
-              element={<AccountNftsScreen />}
+              element={<AccountScreen tab="nfts" />}
             />
             <Route
               path={routes.accountActivity()}
-              element={<AccountActivityScreen />}
+              element={<AccountScreen tab="activity" />}
             />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />

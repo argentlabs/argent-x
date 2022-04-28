@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { FC, useMemo } from "react"
 import { useDropzone } from "react-dropzone"
 import { useNavigate } from "react-router-dom"
