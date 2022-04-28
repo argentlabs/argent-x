@@ -1,7 +1,7 @@
 {
   "name": "Argent X",
   "description": "The security of Ethereum with the scale of StarkNet",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "manifest_version": 2,
   "browser_action": {
     "default_icon": {
