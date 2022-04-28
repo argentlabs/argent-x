@@ -3,12 +3,13 @@ import { useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import PlayOasisSvg from "../../assets/playoasis.svg"
+import { NftModelViewer } from "../components/Account/NftModelViewer"
 import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { useNfts } from "../hooks/useNfts"
 import { useSelectedAccount } from "../states/account"
-import { getNftPicture, openPlayOasisNft } from "../utils/playoasis.service"
+import { openPlayOasisNft } from "../utils/playoasis.service"
 
 export const Container = styled.div`
   margin: 0 24px;
@@ -55,7 +56,7 @@ export const Container = styled.div`
   }
 `
 
-export const NftScreen: FC = () => {
+const NftScreen: FC = () => {
   const { contractAddress, tokenId } = useParams()
   const account = useSelectedAccount()
 
@@ -77,14 +78,7 @@ export const NftScreen: FC = () => {
       <Container>
         <h3>{nft.name}</h3>
         {nft.animation_url ? (
-          <model-viewer
-            src={nft.animation_url}
-            alt={`3D model of ${nft.name}`}
-            poster={getNftPicture(nft)}
-            auto-rotate
-            camera-controls
-            poster-color="transparent"
-          />
+          <NftModelViewer nft={nft} />
         ) : (
           <img src={nft.copy_image_url} alt={nft.name} />
         )}
@@ -98,3 +92,5 @@ export const NftScreen: FC = () => {
     </>
   )
 }
+
+export default NftScreen

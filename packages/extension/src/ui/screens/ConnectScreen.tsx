@@ -18,7 +18,7 @@ export const ConnectScreen: FC<ConnectProps> = ({ host, ...props }) => (
   <ConfirmScreen title="Connect to dapp" confirmButtonText="Connect" {...props}>
     <P>
       <Code>{host}</Code> wants to connect to your wallet. If you allow this
-      request the website will be able to read you wallet addresses and request
+      request the website will be able to read your wallet addresses and request
       transactions, which you still need to sign.
     </P>
   </ConfirmScreen>
