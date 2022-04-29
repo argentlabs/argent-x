@@ -1,8 +1,8 @@
-import "@google/model-viewer"
+import "@google/model-viewer/lib/model-viewer"
 
 import { FC } from "react"
 
-import { IPlayOasisNft } from "../../utils/playoasis.model"
+import { PlayOasisNft } from "../../utils/playoasis.model"
 import { getNftPicture } from "../../utils/playoasis.service"
 
 /* eslint-disable @typescript-eslint/no-namespace */
@@ -15,10 +15,10 @@ declare global {
 }
 
 interface NftModelViewerProps {
-  nft: IPlayOasisNft
+  nft: PlayOasisNft
 }
 
-export const NftModelViewer: FC<NftModelViewerProps> = ({ nft }) => (
+const NftModelViewer: FC<NftModelViewerProps> = ({ nft }) => (
   <model-viewer
     src={nft.animation_url}
     alt={`3D model of ${nft.name}`}
@@ -30,3 +30,5 @@ export const NftModelViewer: FC<NftModelViewerProps> = ({ nft }) => (
     ar
   />
 )
+
+export default NftModelViewer

@@ -1,15 +1,25 @@
-import { FC } from "react"
-import { useParams } from "react-router-dom"
+import { BigNumber } from "ethers"
+import { FC, lazy, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import PlayOasisSvg from "../../assets/playoasis.svg"
-import { NftModelViewer } from "../components/Account/NftModelViewer"
 import { BackButton } from "../components/BackButton"
-import { Button } from "../components/Button"
+import { Button, ButtonGroup } from "../components/Button"
 import { Header } from "../components/Header"
+import { InputText } from "../components/InputText"
 import { useNfts } from "../hooks/useNfts"
+import { routes } from "../routes"
 import { useSelectedAccount } from "../states/account"
 import { openPlayOasisNft } from "../utils/playoasis.service"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../utils/transactions"
+
+const LazyNftModelViewer = lazy(
+  () => import("../components/Account/NftModelViewer"),
+)
 
 export const Container = styled.div`
   margin: 0 24px;
@@ -38,7 +48,7 @@ export const Container = styled.div`
     margin: 10px 0 15px 0;
   }
 
-  ${Button} {
+  .play-oasis {
     display: flex;
     align-items: center;
     width: inherit;
@@ -54,11 +64,17 @@ export const Container = styled.div`
       margin: 0 5px;
     }
   }
+
+  ${ButtonGroup} {
+    margin-top: 10px;
+  }
 `
 
 const NftScreen: FC = () => {
+  const navigate = useNavigate()
   const { contractAddress, tokenId } = useParams()
   const account = useSelectedAccount()
+  const [recipient, setRecipient] = useState("")
 
   const accountAddress = account?.address || ""
   const { nfts = [] } = useNfts(accountAddress)
@@ -66,8 +82,24 @@ const NftScreen: FC = () => {
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
   )
-  if (!account || !nft) {
+  if (!account || !nft || !contractAddress || !tokenId) {
     return <></>
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    sendTransaction({
+      to: contractAddress,
+      method: "transferFrom",
+      calldata: {
+        from_: accountAddress,
+        to: recipient,
+        tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+      },
+    })
+
+    navigate(routes.accountActivity())
   }
 
   return (
@@ -78,16 +110,26 @@ const NftScreen: FC = () => {
       <Container>
         <h3>{nft.name}</h3>
         {nft.animation_url ? (
-          <NftModelViewer nft={nft} />
+          <LazyNftModelViewer nft={nft} />
         ) : (
           <img src={nft.copy_image_url} alt={nft.name} />
         )}
         <p>{nft.description}</p>
         <Button
+          className="play-oasis"
           onClick={() => openPlayOasisNft(nft.contract_address, nft.token_id)}
         >
           <PlayOasisSvg /> <span>View on PlayOasis</span>
         </Button>
+
+        <ButtonGroup as="form" onSubmit={handleSubmit}>
+          <InputText
+            placeholder="Recipient"
+            value={recipient}
+            onChange={(e: any) => setRecipient(e.target.value)}
+          />
+          <Button type="submit">Send</Button>
+        </ButtonGroup>
       </Container>
     </>
   )

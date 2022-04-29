@@ -50,6 +50,11 @@ const NftItem = styled.figure`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    transform: scale(1.05);
+  }
 `
 
 interface AccountNftsProps {

@@ -27,7 +27,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../utils/transactions"
-import { getVoyagerTransactionLink } from "../utils/voyager.service"
+import { getVoyagerContractLink } from "../utils/voyager.service"
 
 export const TokenScreenWrapper = styled.div`
   display: flex;
@@ -60,6 +60,7 @@ export const TokenName = styled.h3`
   line-height: 20px;
   color: #ffffff;
 `
+
 const TokenAddressWrapper = styled(AccountAddressWrapper)`
   padding-top: 6px;
 `
@@ -134,7 +135,7 @@ export const TokenScreen: FC = () => {
         </TokenTitle>
         <TokenAddressWrapper>
           <AccountAddressLink
-            href={getVoyagerTransactionLink(address, network)}
+            href={getVoyagerContractLink(address, network)}
             target="_blank"
           >
             {truncateAddress(address)}
