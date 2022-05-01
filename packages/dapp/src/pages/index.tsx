@@ -21,8 +21,6 @@ const Home: NextPage = () => {
   useEffect(() => {
     ;(async () => {
       const wallet = await silentConnectWallet()
-      console.log("wallet")
-      console.log("wallet", !!wallet?.isConnected)
       setAddress(wallet?.selectedAddress)
       setConnected(!!wallet?.isConnected)
     })()

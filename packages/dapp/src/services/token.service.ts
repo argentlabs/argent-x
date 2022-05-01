@@ -30,7 +30,6 @@ export const mintToken = async (
   network: PublicNetwork,
 ): Promise<any> => {
   const starknet = getStarknet()
-  console.log("starknet", starknet)
   if (!starknet || starknet.isConnected === false) {
     throw Error("starknet wallet not connected")
   }
