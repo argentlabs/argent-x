@@ -41,7 +41,9 @@ export const BackupRecoveryScreen: FC = () => {
     getInputProps,
   } = useDropzone({
     maxFiles: 1,
-    accept: "application/json",
+    accept: {
+      "application/json": [".json"],
+    },
   })
 
   const disableSubmit = useMemo(() => !acceptedFile, [acceptedFile])
