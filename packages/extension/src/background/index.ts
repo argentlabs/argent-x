@@ -498,8 +498,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         })
       }
       case "IS_PREAUTHORIZED": {
-        const valid =
-          wallet.isSessionOpen() && (await isPreAuthorized(msg.data))
+        const valid = await isPreAuthorized(msg.data)
         return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
       }
 

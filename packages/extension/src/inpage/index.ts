@@ -187,6 +187,7 @@ window.addEventListener(
   "message",
   ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
+    console.log("message", data)
     if (starknet && starknet.account && data.type === "CONNECT_ACCOUNT") {
       const { address, network } = data.data
       if (address !== starknet.selectedAddress) {

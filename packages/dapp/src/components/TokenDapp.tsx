@@ -1,3 +1,4 @@
+import type { IStarknetWindowObject } from "@argent/get-starknet"
 import { FC, useEffect, useState } from "react"
 
 import { truncateAddress } from "../services/address.service"
@@ -15,7 +16,9 @@ import {
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
-export const TokenDapp: FC = () => {
+export const TokenDapp: FC<{
+  wallet: IStarknetWindowObject
+}> = ({ wallet }) => {
   const [mintAmount, setMintAmount] = useState("10")
   const [transferTo, setTransferTo] = useState("")
   const [transferAmount, setTransferAmount] = useState("1")
@@ -32,13 +35,13 @@ export const TokenDapp: FC = () => {
   useEffect(() => {
     ;(async () => {
       if (lastTransactionHash && transactionStatus === "pending") {
-        await waitForTransaction(lastTransactionHash)
+        await waitForTransaction(lastTransactionHash, wallet)
         setTransactionStatus("success")
       }
     })()
-  }, [transactionStatus, lastTransactionHash])
+  }, [transactionStatus, lastTransactionHash, wallet])
 
-  const network = networkId()
+  const network = networkId(wallet)
   if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
     return (
       <>
@@ -59,7 +62,7 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("approve")
 
       console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount, network)
+      const result = await mintToken(mintAmount, network, wallet)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -76,7 +79,7 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("approve")
 
       console.log("transfer", { transferTo, transferAmount })
-      const result = await transfer(transferTo, transferAmount, network)
+      const result = await transfer(transferTo, transferAmount, network, wallet)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -93,7 +96,7 @@ export const TokenDapp: FC = () => {
       setTransactionStatus("approve")
 
       console.log("sign", shortText)
-      const result = await signMessage(shortText)
+      const result = await signMessage(shortText, wallet)
       console.log(result)
 
       setLastSig(result)
@@ -104,9 +107,9 @@ export const TokenDapp: FC = () => {
     }
   }
 
-  const tokenAddress = getErc20TokenAddress(networkId() as any)
+  const tokenAddress = getErc20TokenAddress(network as any)
   const ethAddress =
-    networkId() === "goerli-alpha"
+    network === "goerli-alpha"
       ? "0x2dd93e385742984bf2fc887cd5d8b5ec6917d80af09cf7a00a63710ad51ba53"
       : undefined
 
@@ -117,7 +120,7 @@ export const TokenDapp: FC = () => {
       </h3>
       {lastTransactionHash && (
         <a
-          href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
+          href={`${getExplorerBaseUrl(wallet)}/tx/${lastTransactionHash}`}
           target="_blank"
           rel="noreferrer"
           style={{ color: "blue", margin: "0 0 1em" }}
@@ -223,7 +226,7 @@ export const TokenDapp: FC = () => {
         <code>
           <a
             target="_blank"
-            href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
+            href={`${getExplorerBaseUrl(wallet)}/contract/${tokenAddress}`}
             rel="noreferrer"
           >
             {truncateAddress(tokenAddress)}
@@ -251,7 +254,7 @@ export const TokenDapp: FC = () => {
           <code>
             <a
               target="_blank"
-              href={`${getExplorerBaseUrl()}/contract/${ethAddress}`}
+              href={`${getExplorerBaseUrl(wallet)}/contract/${ethAddress}`}
               rel="noreferrer"
             >
               {truncateAddress(ethAddress)}

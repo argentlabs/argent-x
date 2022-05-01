@@ -45,12 +45,17 @@ yarn add @argent/get-starknet starknet
 The package is a light wrapper around [starknet.js](https://github.com/seanjameshan/starknet.js) to interact with the wallet extension. You can then use it like the following:
 
 ```javascript
-import { getStarknet } from "@argent/get-starknet"
+import { connect } from "@argent/get-starknet"
 
-// Check if wallet extension is installed and initialized.
-const starknet = getStarknet()
-// May throw when no extension is detected, otherwise shows a modal prompting the user to download Argent X.
-const [userWalletContractAddress] = await starknet.enable({ showModal: true })
+// Let the user pick a wallet (on button click)
+const starknet = connect()
+
+// or try to connect to an approved wallet silently (on mount probably)
+const starknet = connect({ showList: false })
+
+if(!starknet) {
+  throw Error("User rejected wallet selection or silent connect found nothing")
+}
 
 // Check if connection was successful
 if(starknet.isConnected) {
