@@ -1,29 +1,32 @@
-import { IStarknetWindowObject, connect } from "@argent/get-starknet"
+import { connect, getStarknet } from "@argent/get-starknet"
 import { shortString } from "starknet"
 
 import { Network } from "./token.service"
 
 export const silentConnectWallet = async () => {
-  return connect({ showList: false })
+  const windowStarknetRef = await connect({ showList: false })
+  await windowStarknetRef?.enable()
+  return windowStarknetRef
 }
 
-export const connectWallet = async () =>
-  connect({
+export const connectWallet = async () => {
+  const windowStarknetRef = await connect({
     include: ["argentX"],
   })
+  await windowStarknetRef?.enable()
+  return windowStarknetRef
+}
 
-export const walletAddress = async (
-  starknet?: IStarknetWindowObject,
-): Promise<string | undefined> => {
+export const walletAddress = async (): Promise<string | undefined> => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     return
   }
   return starknet.selectedAddress
 }
 
-export const networkId = (
-  starknet?: IStarknetWindowObject,
-): Network | undefined => {
+export const networkId = (): Network | undefined => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     return
   }
@@ -39,10 +42,8 @@ export const networkId = (
   } catch {}
 }
 
-export const addToken = async (
-  address: string,
-  starknet?: IStarknetWindowObject,
-): Promise<void> => {
+export const addToken = async (address: string): Promise<void> => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     throw Error("starknet wallet not connected")
   }
@@ -57,10 +58,8 @@ export const addToken = async (
   })
 }
 
-export const getExplorerBaseUrl = (
-  starknet: IStarknetWindowObject,
-): string | undefined => {
-  const network = networkId(starknet)
+export const getExplorerBaseUrl = (): string | undefined => {
+  const network = networkId()
   if (network === "mainnet-alpha") {
     return "https://voyager.online"
   } else if (network === "goerli-alpha") {
@@ -68,9 +67,8 @@ export const getExplorerBaseUrl = (
   }
 }
 
-export const networkUrl = (
-  starknet?: IStarknetWindowObject,
-): string | undefined => {
+export const networkUrl = (): string | undefined => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     return
   }
@@ -79,10 +77,8 @@ export const networkUrl = (
   } catch {}
 }
 
-export const signMessage = async (
-  message: string,
-  starknet: IStarknetWindowObject,
-) => {
+export const signMessage = async (message: string) => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false)
     throw Error("starknet wallet not connected")
   if (!shortString.isShortString(message)) {
@@ -92,8 +88,7 @@ export const signMessage = async (
   return starknet.account.signMessage({
     domain: {
       name: "Example DApp",
-      chainId:
-        networkId(starknet) === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
+      chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
       version: "0.0.1",
     },
     types: {
@@ -111,10 +106,8 @@ export const signMessage = async (
   })
 }
 
-export const waitForTransaction = async (
-  hash: string,
-  starknet: IStarknetWindowObject,
-) => {
+export const waitForTransaction = async (hash: string) => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     return
   }
@@ -123,8 +116,8 @@ export const waitForTransaction = async (
 
 export const addWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
-  starknet?: IStarknetWindowObject,
 ) => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     return
   }
@@ -133,8 +126,8 @@ export const addWalletChangeListener = async (
 
 export const removeWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
-  starknet?: IStarknetWindowObject,
 ) => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     return
   }

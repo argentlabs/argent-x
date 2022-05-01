@@ -1,4 +1,4 @@
-import { IStarknetWindowObject, getStarknet } from "@argent/get-starknet"
+import { getStarknet } from "@argent/get-starknet"
 import { utils } from "ethers"
 import { Abi, Contract, number, uint256 } from "starknet"
 
@@ -28,8 +28,9 @@ function parseInputAmountToUint256(input: string, decimals: number = 18) {
 export const mintToken = async (
   mintAmount: string,
   network: PublicNetwork,
-  starknet: IStarknetWindowObject,
 ): Promise<any> => {
+  const starknet = getStarknet()
+  console.log("starknet", starknet)
   if (!starknet || starknet.isConnected === false) {
     throw Error("starknet wallet not connected")
   }
@@ -48,8 +49,8 @@ export const transfer = async (
   transferTo: string,
   transferAmount: string,
   network: PublicNetwork,
-  starknet: IStarknetWindowObject,
 ): Promise<any> => {
+  const starknet = getStarknet()
   if (!starknet || starknet.isConnected === false) {
     throw Error("starknet wallet not connected")
   }

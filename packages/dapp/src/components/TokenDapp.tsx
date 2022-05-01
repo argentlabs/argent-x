@@ -16,9 +16,7 @@ import {
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
-export const TokenDapp: FC<{
-  wallet: IStarknetWindowObject
-}> = ({ wallet }) => {
+export const TokenDapp: FC = () => {
   const [mintAmount, setMintAmount] = useState("10")
   const [transferTo, setTransferTo] = useState("")
   const [transferAmount, setTransferAmount] = useState("1")
@@ -35,13 +33,14 @@ export const TokenDapp: FC<{
   useEffect(() => {
     ;(async () => {
       if (lastTransactionHash && transactionStatus === "pending") {
-        await waitForTransaction(lastTransactionHash, wallet)
+        await waitForTransaction(lastTransactionHash)
         setTransactionStatus("success")
       }
     })()
-  }, [transactionStatus, lastTransactionHash, wallet])
+  }, [transactionStatus, lastTransactionHash])
 
-  const network = networkId(wallet)
+  const network = networkId()
+  console.log("network", network)
   if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
     return (
       <>
@@ -62,7 +61,7 @@ export const TokenDapp: FC<{
       setTransactionStatus("approve")
 
       console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount, network, wallet)
+      const result = await mintToken(mintAmount, network)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -79,7 +78,7 @@ export const TokenDapp: FC<{
       setTransactionStatus("approve")
 
       console.log("transfer", { transferTo, transferAmount })
-      const result = await transfer(transferTo, transferAmount, network, wallet)
+      const result = await transfer(transferTo, transferAmount, network)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -96,7 +95,7 @@ export const TokenDapp: FC<{
       setTransactionStatus("approve")
 
       console.log("sign", shortText)
-      const result = await signMessage(shortText, wallet)
+      const result = await signMessage(shortText)
       console.log(result)
 
       setLastSig(result)
@@ -120,7 +119,7 @@ export const TokenDapp: FC<{
       </h3>
       {lastTransactionHash && (
         <a
-          href={`${getExplorerBaseUrl(wallet)}/tx/${lastTransactionHash}`}
+          href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
           target="_blank"
           rel="noreferrer"
           style={{ color: "blue", margin: "0 0 1em" }}
@@ -226,7 +225,7 @@ export const TokenDapp: FC<{
         <code>
           <a
             target="_blank"
-            href={`${getExplorerBaseUrl(wallet)}/contract/${tokenAddress}`}
+            href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
             rel="noreferrer"
           >
             {truncateAddress(tokenAddress)}
@@ -254,7 +253,7 @@ export const TokenDapp: FC<{
           <code>
             <a
               target="_blank"
-              href={`${getExplorerBaseUrl(wallet)}/contract/${ethAddress}`}
+              href={`${getExplorerBaseUrl()}/contract/${ethAddress}`}
               rel="noreferrer"
             >
               {truncateAddress(ethAddress)}

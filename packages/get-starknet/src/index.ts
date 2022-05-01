@@ -27,13 +27,15 @@ export { disconnect } from "get-starknet"
  */
 export const getStarknet = (): IStarknetWindowObject => {
   const starknet = getStarknetCommunity()
-  return {
-    ...starknet,
-    enable: async (options?: { showModal?: boolean }): Promise<string[]> => {
-      const wallet = await connect({ showList: options?.showModal })
-      return wallet?.enable(options) || []
-    },
+
+  starknet.enable = async (options?: {
+    showModal?: boolean
+  }): Promise<string[]> => {
+    const wallet = await connect({ showList: options?.showModal })
+    return wallet?.enable(options) || []
   }
+
+  return starknet
 }
 
 /**

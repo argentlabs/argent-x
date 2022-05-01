@@ -1,4 +1,4 @@
-import type { IStarknetWindowObject } from "@argent/get-starknet"
+import { IStarknetWindowObject, getStarknet } from "@argent/get-starknet"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useEffect, useMemo, useState } from "react"
@@ -15,33 +15,33 @@ import {
 import styles from "../styles/Home.module.css"
 
 const Home: NextPage = () => {
-  const [wallet, setWallet] = useState<IStarknetWindowObject>()
-
-  const address = useMemo(() => wallet?.selectedAddress, [wallet])
-  const isConnected = useMemo(() => wallet?.isConnected ?? false, [wallet])
-
-  useEffect(() => {
-    const handler = async () => {
-      const wallet = await silentConnectWallet()
-      setWallet(wallet)
-    }
-    addWalletChangeListener(handler, wallet)
-    return () => {
-      removeWalletChangeListener(handler, wallet)
-    }
-  }, [wallet])
+  const [address, setAddress] = useState<string>()
+  const [isConnected, setConnected] = useState<boolean>(false)
 
   useEffect(() => {
     ;(async () => {
       const wallet = await silentConnectWallet()
-      console.log(wallet)
-      setWallet(wallet)
+      console.log("wallet")
+      console.log("wallet", !!wallet?.isConnected)
+      setAddress(wallet?.selectedAddress)
+      setConnected(!!wallet?.isConnected)
     })()
+
+    const handler = async () => {
+      const wallet = await silentConnectWallet()
+      setAddress(wallet?.selectedAddress)
+      setConnected(!!wallet?.isConnected)
+    }
+    addWalletChangeListener(handler)
+    return () => {
+      removeWalletChangeListener(handler)
+    }
   }, [])
 
   const handleConnectClick = async () => {
     const wallet = await connectWallet()
-    setWallet(wallet)
+    setAddress(wallet?.selectedAddress)
+    setConnected(!!wallet?.isConnected)
   }
 
   return (
@@ -52,15 +52,15 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        {isConnected && wallet ? (
+        {isConnected ? (
           <>
             <h3 style={{ margin: 0 }}>
               Wallet address: <code>{address && truncateAddress(address)}</code>
             </h3>
             <h3 style={{ margin: 0 }}>
-              Url: <code>{networkUrl(wallet)}</code>
+              Url: <code>{networkUrl()}</code>
             </h3>
-            <TokenDapp wallet={wallet} />
+            <TokenDapp />
           </>
         ) : (
           <>
