@@ -1,4 +1,3 @@
-import type { IStarknetWindowObject } from "@argent/get-starknet"
 import { FC, useEffect, useState } from "react"
 
 import { truncateAddress } from "../services/address.service"
