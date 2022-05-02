@@ -11,6 +11,8 @@ import { InputText } from "../components/InputText"
 import { useNfts } from "../hooks/useNfts"
 import { routes } from "../routes"
 import { useSelectedAccount } from "../states/account"
+import { useAppState } from "../states/app"
+import { isValidAddress } from "../utils/addresses"
 import { openPlayOasisNft } from "../utils/playoasis.service"
 import {
   getUint256CalldataFromBN,
@@ -89,12 +91,18 @@ const NftScreen: FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const to = recipient?.trim()
+    if (!isValidAddress(to)) {
+      useAppState.setState({ error: `Invalid recipient address: ${to}` })
+      navigate(routes.error())
+    }
+
     sendTransaction({
       to: contractAddress,
       method: "transferFrom",
       calldata: {
         from_: accountAddress,
-        to: recipient,
+        to,
         tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
       },
     })
