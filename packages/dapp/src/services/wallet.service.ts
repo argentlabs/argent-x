@@ -19,7 +19,7 @@ export const connectWallet = async () => {
 
 export const walletAddress = async (): Promise<string | undefined> => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     return
   }
   return starknet.selectedAddress
@@ -27,7 +27,7 @@ export const walletAddress = async (): Promise<string | undefined> => {
 
 export const networkId = (): Network | undefined => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     return
   }
   try {
@@ -44,7 +44,7 @@ export const networkId = (): Network | undefined => {
 
 export const addToken = async (address: string): Promise<void> => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")
   }
   await starknet.request({
@@ -69,7 +69,7 @@ export const getExplorerBaseUrl = (): string | undefined => {
 
 export const networkUrl = (): string | undefined => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     return
   }
   try {
@@ -79,8 +79,7 @@ export const networkUrl = (): string | undefined => {
 
 export const signMessage = async (message: string) => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false)
-    throw Error("starknet wallet not connected")
+  if (!starknet?.isConnected) throw Error("starknet wallet not connected")
   if (!shortString.isShortString(message)) {
     throw Error("message must be a short string")
   }
@@ -108,7 +107,7 @@ export const signMessage = async (message: string) => {
 
 export const waitForTransaction = async (hash: string) => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     return
   }
   return starknet.provider.waitForTransaction(hash)
@@ -118,7 +117,7 @@ export const addWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     return
   }
   starknet.on?.("accountsChanged", handleEvent)
@@ -128,7 +127,7 @@ export const removeWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     return
   }
   starknet.off?.("accountsChanged", handleEvent)

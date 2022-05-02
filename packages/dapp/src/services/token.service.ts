@@ -30,7 +30,7 @@ export const mintToken = async (
   network: PublicNetwork,
 ): Promise<any> => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")
   }
   const erc20Contract = new Contract(
@@ -50,7 +50,7 @@ export const transfer = async (
   network: PublicNetwork,
 ): Promise<any> => {
   const starknet = getStarknet()
-  if (!starknet || starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")
   }
 
