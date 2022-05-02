@@ -39,7 +39,6 @@ export const TokenDapp: FC = () => {
   }, [transactionStatus, lastTransactionHash])
 
   const network = networkId()
-  console.log("network", network)
   if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
     return (
       <>
