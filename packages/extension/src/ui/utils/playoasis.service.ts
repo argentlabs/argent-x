@@ -1,12 +1,12 @@
 import join from "url-join"
 
-import { IPlayOasisNft } from "./playoasis.model"
+import { PlayOasisNft } from "./playoasis.model"
 
 const baseUrl = "https://api-testnet.playoasisx.com/assets"
 
 export const fetchPlayOasisNfts = async (
   address: string,
-): Promise<IPlayOasisNft[]> => {
+): Promise<PlayOasisNft[]> => {
   const params = new URLSearchParams({ owner_address: address })
   const response = await fetch(join(baseUrl, `?${params}`))
   return await response.json()
@@ -17,7 +17,7 @@ export const openPlayOasisNft = (contractAddress: string, tokenId: string) => {
   window.open(url, "_blank")?.focus()
 }
 
-export const getNftPicture = ({ image_url, copy_image_url }: IPlayOasisNft) => {
+export const getNftPicture = ({ image_url, copy_image_url }: PlayOasisNft) => {
   if (image_url && copy_image_url) {
     if (!copy_image_url.startsWith("ipfs://")) {
       return copy_image_url

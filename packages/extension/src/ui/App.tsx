@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme } from "@mui/material"
-import { FC, Suspense, lazy } from "react"
+import { FC, Suspense } from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
@@ -22,6 +22,7 @@ import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
+import NftScreen from "./screens/NftScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SeedRecoveryPasswordScreen } from "./screens/SeedRecoveryPasswordScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
@@ -38,8 +39,6 @@ import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
 import { useSelectedNetwork } from "./states/selectedNetwork"
 import { swrCacheProvider } from "./utils/swrCache"
-
-const LazyNftScreen = lazy(() => import("./screens/NftScreen"))
 
 const GlobalStyle = createGlobalStyle`
   ${normalize}
@@ -148,7 +147,7 @@ const Screen: FC = () => {
           <Route path="*" element={<ActionScreen />} />
         ) : (
           <>
-            <Route path={routes.accountNftPath()} element={<LazyNftScreen />} />
+            <Route path={routes.accountNftPath()} element={<NftScreen />} />
             <Route
               path={routes.accountTokens()}
               element={<AccountScreen tab="tokens" />}

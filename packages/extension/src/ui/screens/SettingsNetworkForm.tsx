@@ -11,10 +11,10 @@ import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { ControlledInputText } from "../components/InputText"
 import { A, FormError, P } from "../components/Typography"
+import { useYupValidationResolver } from "../hooks/useYupValidationResolver"
 import { useAppState } from "../states/app"
 import { makeClickable } from "../utils/a11y"
 import { addNetworks } from "../utils/messaging"
-import { useYupValidationResolver } from "../utils/useYupValidationResolver"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 const ExtendableControl = styled.div`
