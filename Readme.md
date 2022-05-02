@@ -53,9 +53,12 @@ const starknet = connect()
 // or try to connect to an approved wallet silently (on mount probably)
 const starknet = connect({ showList: false })
 
-if(!starknet) {
+if (!starknet) {
   throw Error("User rejected wallet selection or silent connect found nothing")
 }
+
+// (optional) connect the wallet
+await starknet.enable()
 
 // Check if connection was successful
 if(starknet.isConnected) {
