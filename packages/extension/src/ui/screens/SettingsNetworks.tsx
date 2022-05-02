@@ -3,7 +3,6 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { hackatonNetworks } from "../../shared/hackatonNetworks"
 import { BackButton } from "../components/BackButton"
 import { DappConnection } from "../components/DappConnection"
 import { Header } from "../components/Header"
@@ -12,10 +11,9 @@ import { Spinner } from "../components/Spinner"
 import { H2, P } from "../components/Typography"
 import { useNetworks } from "../hooks/useNetworks"
 import { routes } from "../routes"
-import { useAppState } from "../states/app"
 import { useSelectedNetwork } from "../states/selectedNetwork"
 import { makeClickable } from "../utils/a11y"
-import { addNetworks, removeNetworks } from "../utils/messaging"
+import { removeNetworks } from "../utils/messaging"
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,18 +21,6 @@ const Wrapper = styled.div`
   padding: 0 32px 24px 32px;
   ${H2} {
     margin: 0;
-  }
-`
-
-const HackatonIconButton = styled(IconButton)`
-  padding: 4px;
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  background-color: #161616;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
   }
 `
 
@@ -67,34 +53,11 @@ export const SettingsNetworksScreen: FC = () => {
     navigate(routes.settingsAddCustomNetwork())
   }
 
-  const handleAddHackatonNetworks = async () => {
-    useAppState.setState({ isLoading: true })
-    await addNetworks(hackatonNetworks)
-    mutate((prevNetworks) => [...(prevNetworks || []), ...hackatonNetworks])
-    useAppState.setState({ isLoading: false })
-  }
-
-  // set true if current time is before the hackaton end time (27.04.2022 00:00 GMT+1)
-  const isHackatonTime = new Date() < new Date("2022-04-27T00:00:00.000Z")
-
   return (
     <>
       <Header>
         <BackButton />
       </Header>
-      {isHackatonTime && (
-        <HackatonIconButton
-          size={92}
-          {...makeClickable(handleAddHackatonNetworks)}
-        >
-          <img
-            src="./assets/starkathon.png"
-            style={{
-              borderRadius: 200,
-            }}
-          />
-        </HackatonIconButton>
-      )}
       <Wrapper>
         <H2>Networks</H2>
         <List>
