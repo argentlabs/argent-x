@@ -1,6 +1,7 @@
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
+import { NetworkStatus } from "../../shared/networks"
 import type { AccountStatusCode } from "../utils/accounts"
 import { NetworkWarning } from "./Icons/NetworkWarning"
 
@@ -22,6 +23,20 @@ export function mapAccountStatusCodeToColor(
       return "red"
     default:
       return "transparent"
+  }
+}
+
+export function mapNetworkStatusToColor(
+  status?: NetworkStatus,
+): StatusIndicatorStatus {
+  switch (status) {
+    case "error":
+      return "red"
+    case "degraded":
+      return "orange"
+    case "ok": // network status shows green by default and has no transparent state
+    default:
+      return "green"
   }
 }
 

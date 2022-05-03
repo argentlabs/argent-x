@@ -6,7 +6,10 @@ import { getNetwork } from "../../shared/networks"
 import { useNetworkStatuses, useNetworks } from "../hooks/useNetworks"
 import { useAppState } from "../states/app"
 import { recover } from "../utils/recovery"
-import { NetworkStatusIndicator } from "./StatusIndicator"
+import {
+  NetworkStatusIndicator,
+  mapNetworkStatusToColor,
+} from "./StatusIndicator"
 
 const NetworkName = styled.span`
   text-align: right;
@@ -104,14 +107,15 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
     (network) => network !== currentNetwork,
   )
 
-  const { networkStatuses, isValidating } = useNetworkStatuses()
-  console.log(isValidating, networkStatuses)
+  const { networkStatuses } = useNetworkStatuses()
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
       <Network selected>
         <NetworkName>{currentNetwork.name}</NetworkName>
-        <NetworkStatusIndicator status="orange" />
+        <NetworkStatusIndicator
+          status={mapNetworkStatusToColor(networkStatuses[currentNetwork.id])}
+        />
       </Network>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
@@ -122,7 +126,9 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
             }
           >
             <NetworkName>{name}</NetworkName>
-            <NetworkStatusIndicator status="green" />
+            <NetworkStatusIndicator
+              status={mapNetworkStatusToColor(networkStatuses[id])}
+            />
           </Network>
         ))}
       </NetworkList>

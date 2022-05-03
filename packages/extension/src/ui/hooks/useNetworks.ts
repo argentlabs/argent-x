@@ -27,7 +27,7 @@ export const useNetwork = (networkId: string, config?: SWRConfigCommon) => {
 }
 
 export const useNetworkStatuses = (config?: SWRConfigCommon) => {
-  const { data: networkStatuses, ...rest } = useSWR(
+  const { data: networkStatuses = {}, ...rest } = useSWR(
     "networkStatuses-all",
     () => getNetworkStatuses(),
     {
