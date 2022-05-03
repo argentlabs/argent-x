@@ -1,14 +1,12 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
-import useSWR from "swr"
 
 import { getNetwork } from "../../shared/networks"
-import { useNetworks } from "../hooks/useNetworks"
+import { useNetworkStatuses, useNetworks } from "../hooks/useNetworks"
 import { useAppState } from "../states/app"
-import { AccountStatusCode } from "../utils/accounts"
-import { getNetworkStatuses } from "../utils/messaging"
 import { recover } from "../utils/recovery"
+import { NetworkStatusIndicator } from "./StatusIndicator"
 
 const NetworkName = styled.span`
   text-align: right;
@@ -93,21 +91,6 @@ export const NetworkStatusWrapper = styled.div`
   gap: 4px;
 `
 
-export const NetworkStatusIndicator = styled.span<{
-  status?: AccountStatusCode
-}>`
-  height: 8px;
-  width: 8px;
-  border-radius: 8px;
-
-  background-color: ${({ status = "CONNECTED" }) =>
-    status === "CONNECTED"
-      ? "#02BBA8"
-      : status === "DEPLOYING"
-      ? "#ffa85c"
-      : "transparent"};
-`
-
 interface NetworkSwitcherProps {
   disabled?: boolean
 }
@@ -120,17 +103,15 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const otherNetworks = allNetworks.filter(
     (network) => network !== currentNetwork,
   )
-  const { data: networkStatuses, isValidating } = useSWR(
-    "networkStatuses-all",
-    () => getNetworkStatuses(),
-  )
+
+  const { networkStatuses, isValidating } = useNetworkStatuses()
   console.log(isValidating, networkStatuses)
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
       <Network selected>
         <NetworkName>{currentNetwork.name}</NetworkName>
-        <NetworkStatusIndicator status="CONNECTED" />
+        <NetworkStatusIndicator status="orange" />
       </Network>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
@@ -141,7 +122,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
             }
           >
             <NetworkName>{name}</NetworkName>
-            <NetworkStatusIndicator status="CONNECTED" />
+            <NetworkStatusIndicator status="green" />
           </Network>
         ))}
       </NetworkList>

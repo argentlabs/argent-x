@@ -22,10 +22,10 @@ import { deleteAccount } from "../../utils/messaging"
 import { recover } from "../../utils/recovery"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { NetworkStatusWrapper } from "../NetworkSwitcher"
+import { TransactionStatusIndicator } from "../StatusIndicator"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
-import { TransactionIndicator } from "./TransactionItem"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;
@@ -131,7 +131,7 @@ export const AccountListItem: FC<AccountListProps> = ({
         </AccountColumn>
         {status.code === "DEPLOYING" ? (
           <NetworkStatusWrapper>
-            <TransactionIndicator status={"DEPLOYING"} />
+            <TransactionStatusIndicator status="orange" />
             <AccountStatusText>Deploying</AccountStatusText>
           </NetworkStatusWrapper>
         ) : (

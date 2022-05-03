@@ -1,12 +1,14 @@
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { FC } from "react"
-import styled, { css, keyframes } from "styled-components"
+import styled, { css } from "styled-components"
 
 import { TransactionMeta } from "../../../shared/transactions.model"
 import { makeClickable } from "../../utils/a11y"
-import { AccountStatusCode } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
-import { NetworkStatusIndicator } from "../NetworkSwitcher"
+import {
+  StatusIndicatorStatus,
+  TransactionStatusIndicator,
+} from "../StatusIndicator"
 import {
   TokenDetailsWrapper,
   TokenSubtitle,
@@ -35,40 +37,11 @@ const TransactionWrapper = styled(TokenWrapper)<{ highlighted?: boolean }>`
   }
 `
 
-const PulseAnimation = keyframes`
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 168, 92, 0.7);
-  }
-
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(255, 168, 92, 0);
-  }
-
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 168, 92, 0);
-  }
-`
-
-export const TransactionIndicator = styled(NetworkStatusIndicator)`
-  margin-right: 8px;
-
-  ${({ status = "CONNECTED" }) =>
-    status === "DEPLOYING" &&
-    css`
-      box-shadow: 0 0 0 0 rgba(255, 168, 92, 1);
-      transform: scale(1);
-      animation: ${PulseAnimation} 1.5s infinite;
-    `}
-`
-
 const TransactionSubtitle = styled(TokenSubtitle)``
 
 interface TransactionItemProps {
   hash: string
-  status?: AccountStatusCode
+  status?: StatusIndicatorStatus
   highlighted?: boolean
   meta?: TransactionMeta
   onClick?: () => void
@@ -76,7 +49,7 @@ interface TransactionItemProps {
 
 export const TransactionItem: FC<TransactionItemProps> = ({
   hash,
-  status = "DEFAULT",
+  status = "transparent",
   highlighted,
   meta,
   onClick,
@@ -99,7 +72,7 @@ export const TransactionItem: FC<TransactionItemProps> = ({
             {meta?.subTitle || truncateAddress(hash)}
           </TransactionSubtitle>
         </TokenTextGroup>
-        <TransactionIndicator status={status} />
+        <TransactionStatusIndicator status={status} />
       </TokenDetailsWrapper>
     </TransactionWrapper>
   )

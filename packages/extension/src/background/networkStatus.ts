@@ -9,9 +9,10 @@ type SwrCacheKey = string
 
 const swrStorage = new Storage<Record<SwrCacheKey, any>>({}, "swrStore")
 
+// see: https://github.com/jperasmus/stale-while-revalidate-cache#configuration
 const swr = createStaleWhileRevalidateCache({
   storage: swrStorage, // can be any object with getItem and setItem methods
-  minTimeToStale: 30e3, // 30 seconds
+  minTimeToStale: 60e3, // 1 minute
   maxTimeToLive: 30 * 60e3, // 30 minutes
 })
 
