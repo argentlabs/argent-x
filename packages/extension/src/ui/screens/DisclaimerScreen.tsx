@@ -35,7 +35,9 @@ export const DisclaimerScreen: FC = () => {
       title="Disclaimer"
       confirmButtonText="Continue"
       confirmButtonBackgroundColor="#c12026"
-      disableConfirm={!conditions.lossOfFunds || !conditions.alphaVersion}
+      confirmButtonDisabled={
+        !conditions.lossOfFunds || !conditions.alphaVersion
+      }
       singleButton
       onSubmit={() => {
         understandDisclaimer()

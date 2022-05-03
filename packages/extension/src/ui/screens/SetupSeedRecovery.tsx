@@ -80,7 +80,7 @@ export const SetupSeedRecoveryPage: FC = () => {
         title="Recovery phrase"
         singleButton
         confirmButtonText="Continue"
-        disableConfirm={!seedPhrase}
+        confirmButtonDisabled={!seedPhrase}
         onSubmit={() => navigate(routes.confirmSeedRecovery())}
       >
         <Paragraph>

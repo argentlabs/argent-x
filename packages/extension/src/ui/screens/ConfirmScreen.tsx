@@ -37,7 +37,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   title: string
   rejectButtonText?: string
   confirmButtonText?: string
-  disableConfirm?: boolean
+  confirmButtonDisabled?: boolean
   confirmButtonBackgroundColor?: string
   singleButton?: boolean
   switchButtonOrder?: boolean
@@ -72,9 +72,9 @@ const Placeholder = styled.div`
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   title,
   confirmButtonText = "Confirm",
-  disableConfirm = false,
-  rejectButtonText = "Reject",
+  confirmButtonDisabled,
   confirmButtonBackgroundColor,
+  rejectButtonText = "Reject",
   onSubmit,
   onReject,
   selectedAccount,
@@ -138,7 +138,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                 </Button>
               )}
               <Button
-                disabled={disableConfirm}
+                disabled={confirmButtonDisabled}
                 style={{ backgroundColor: confirmButtonBackgroundColor }}
                 type="submit"
               >

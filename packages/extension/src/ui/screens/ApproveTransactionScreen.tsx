@@ -42,7 +42,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     <ConfirmScreen
       title="Send transaction"
       confirmButtonText="Sign"
-      disableConfirm={disableConfirm}
+      confirmButtonDisabled={disableConfirm}
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)

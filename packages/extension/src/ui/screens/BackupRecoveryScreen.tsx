@@ -72,8 +72,8 @@ export const BackupRecoveryScreen: FC = () => {
       <ConfirmScreen
         title="Select backup"
         confirmButtonText="Restore backup"
+        confirmButtonDisabled={disableSubmit}
         singleButton
-        disableConfirm={disableSubmit}
         onSubmit={handleRestoreClick}
         smallTopPadding
       >
