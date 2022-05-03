@@ -30,11 +30,7 @@ export const mintToken = async (
   network: PublicNetwork,
 ): Promise<any> => {
   const starknet = getStarknet()
-
-  const [activeAccount] = await starknet.enable()
-
-  // checks that enable succeeded
-  if (starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")
   }
   const erc20Contract = new Contract(
@@ -43,10 +39,9 @@ export const mintToken = async (
     starknet.account,
   )
 
-  return erc20Contract.mint(
-    activeAccount,
-    parseInputAmountToUint256(mintAmount),
-  )
+  const address = starknet.selectedAddress
+
+  return erc20Contract.mint(address, parseInputAmountToUint256(mintAmount))
 }
 
 export const transfer = async (
@@ -55,11 +50,7 @@ export const transfer = async (
   network: PublicNetwork,
 ): Promise<any> => {
   const starknet = getStarknet()
-
-  await starknet.enable()
-
-  // checks that enable succeeded
-  if (starknet.isConnected === false) {
+  if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")
   }
 

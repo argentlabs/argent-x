@@ -12,27 +12,18 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "dev": "rollup -c -w"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",
-    "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@rollup/plugin-typescript": "^8.0.0",
-    "@tsconfig/svelte": "^3.0.0",
     "rollup": "^2.3.4",
-    "rollup-plugin-svelte": "^7.0.0",
-    "rollup-plugin-svelte-svg": "^1.0.0-beta.5",
     "rollup-plugin-terser": "^7.0.0",
-    "starknet": "^3.10.0",
-    "svelte": "^3.0.0",
-    "svelte-check": "^2.0.0",
-    "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
     "typescript": "^4.0.0"
   },
-  "peerDependencies": {
-    "starknet": "^3.10.0"
+  "dependencies": {
+    "get-starknet": "^1.0.0"
   }
 }

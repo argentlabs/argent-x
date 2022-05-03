@@ -1,23 +1,37 @@
-import { getStarknet } from "@argent/get-starknet"
+import { connect, getStarknet } from "@argent/get-starknet"
 import { shortString } from "starknet"
 
 import { Network } from "./token.service"
 
-export const isWalletConnected = (): boolean => !!getStarknet()?.isConnected
+export const silentConnectWallet = async () => {
+  const windowStarknet = await connect({ showList: false })
+  await windowStarknet?.enable()
+  return windowStarknet
+}
 
-export const connectWallet = async () =>
-  await getStarknet().enable({ showModal: true })
+export const connectWallet = async () => {
+  const windowStarknet = await connect({
+    include: ["argentX"],
+  })
+  await windowStarknet?.enable()
+  return windowStarknet
+}
 
 export const walletAddress = async (): Promise<string | undefined> => {
-  try {
-    const [address] = await getStarknet().enable()
-    return address
-  } catch {}
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    return
+  }
+  return starknet.selectedAddress
 }
 
 export const networkId = (): Network | undefined => {
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    return
+  }
   try {
-    const { baseUrl } = getStarknet().provider
+    const { baseUrl } = starknet.provider
     if (baseUrl.includes("alpha-mainnet.starknet.io")) {
       return "mainnet-alpha"
     } else if (baseUrl.includes("alpha4.starknet.io")) {
@@ -30,7 +44,9 @@ export const networkId = (): Network | undefined => {
 
 export const addToken = async (address: string): Promise<void> => {
   const starknet = getStarknet()
-  await starknet.enable()
+  if (!starknet?.isConnected) {
+    throw Error("starknet wallet not connected")
+  }
   await starknet.request({
     type: "wallet_watchAsset",
     params: {
@@ -43,26 +59,27 @@ export const addToken = async (address: string): Promise<void> => {
 }
 
 export const getExplorerBaseUrl = (): string | undefined => {
-  if (networkId() === "mainnet-alpha") {
+  const network = networkId()
+  if (network === "mainnet-alpha") {
     return "https://voyager.online"
-  } else if (networkId() === "goerli-alpha") {
+  } else if (network === "goerli-alpha") {
     return "https://goerli.voyager.online"
   }
 }
 
 export const networkUrl = (): string | undefined => {
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    return
+  }
   try {
-    return getStarknet().provider.baseUrl
+    return starknet.provider.baseUrl
   } catch {}
 }
 
 export const signMessage = async (message: string) => {
   const starknet = getStarknet()
-  await starknet.enable()
-
-  // checks that enable succeeded
-  if (starknet.isConnected === false)
-    throw Error("starknet wallet not connected")
+  if (!starknet?.isConnected) throw Error("starknet wallet not connected")
   if (!shortString.isShortString(message)) {
     throw Error("message must be a short string")
   }
@@ -88,15 +105,30 @@ export const signMessage = async (message: string) => {
   })
 }
 
-export const waitForTransaction = async (hash: string) =>
-  await getStarknet().provider.waitForTransaction(hash)
+export const waitForTransaction = async (hash: string) => {
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    return
+  }
+  return starknet.provider.waitForTransaction(hash)
+}
 
 export const addWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
-  getStarknet().on("accountsChanged", handleEvent)
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    return
+  }
+  starknet.on("accountsChanged", handleEvent)
 }
 
-export const isPreauthorized = async (): Promise<boolean> => {
-  return getStarknet().isPreauthorized()
+export const removeWalletChangeListener = async (
+  handleEvent: (accounts: string[]) => void,
+) => {
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    return
+  }
+  starknet.off("accountsChanged", handleEvent)
 }

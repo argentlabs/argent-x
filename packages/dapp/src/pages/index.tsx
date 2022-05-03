@@ -1,46 +1,45 @@
+import { IStarknetWindowObject, getStarknet } from "@argent/get-starknet"
 import type { NextPage } from "next"
 import Head from "next/head"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
   connectWallet,
-  isPreauthorized,
-  isWalletConnected,
   networkUrl,
-  walletAddress,
+  removeWalletChangeListener,
+  silentConnectWallet,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
 const Home: NextPage = () => {
-  const [isConnected, setIsConnected] = useState(isWalletConnected())
   const [address, setAddress] = useState<string>()
-
-  useEffect(() => {
-    addWalletChangeListener((accounts) => {
-      if (accounts.length > 0) {
-        setAddress(accounts[0])
-      } else {
-        setAddress("")
-        setIsConnected(false)
-      }
-    })
-  }, [])
+  const [isConnected, setConnected] = useState(false)
 
   useEffect(() => {
     ;(async () => {
-      if (await isPreauthorized()) {
-        await handleConnectClick()
-      }
+      const wallet = await silentConnectWallet()
+      setAddress(wallet?.selectedAddress)
+      setConnected(!!wallet?.isConnected)
     })()
+
+    const handler = async () => {
+      const wallet = await silentConnectWallet()
+      setAddress(wallet?.selectedAddress)
+      setConnected(!!wallet?.isConnected)
+    }
+    addWalletChangeListener(handler)
+    return () => {
+      removeWalletChangeListener(handler)
+    }
   }, [])
 
   const handleConnectClick = async () => {
-    await connectWallet()
-    setIsConnected(isWalletConnected())
-    setAddress(await walletAddress())
+    const wallet = await connectWallet()
+    setAddress(wallet?.selectedAddress)
+    setConnected(!!wallet?.isConnected)
   }
 
   return (

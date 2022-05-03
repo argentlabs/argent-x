@@ -104,9 +104,9 @@ export const TokenDapp: FC = () => {
     }
   }
 
-  const tokenAddress = getErc20TokenAddress(networkId() as any)
+  const tokenAddress = getErc20TokenAddress(network as any)
   const ethAddress =
-    networkId() === "goerli-alpha"
+    network === "goerli-alpha"
       ? "0x2dd93e385742984bf2fc887cd5d8b5ec6917d80af09cf7a00a63710ad51ba53"
       : undefined
 

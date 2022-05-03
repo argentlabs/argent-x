@@ -1,35 +1,55 @@
-import { defaultProvider } from "starknet"
+import type {
+  GetStarknetWalletOptions,
+  IStarknetWindowObject,
+} from "get-starknet"
+import {
+  connect as connectCommunity,
+  getStarknet as getStarknetCommunity,
+} from "get-starknet"
 
-import App from "./App.svelte"
-import type { StarknetWindowObject } from "./extension.model"
+export type {
+  EventHandler,
+  EventType,
+  GetStarknetWalletOptions,
+  IGetStarknetWallet,
+  IStarknetWindowObject,
+  IStorageWrapper,
+  ModalOptions,
+  WalletProvider,
+} from "get-starknet"
+export { disconnect } from "get-starknet"
 
-// nextjs ie needs this to be typeof window !== "undefined" as it's replacing it in client bundles
-const IS_BROWSER = typeof window !== "undefined"
+/**
+ * Get the Starknet window object.
+ *
+ * @deprecated Please use the connect export and the returned wallet object instead.
+ * @returns {Promise<IStarknetWindowObject>}
+ */
+export const getStarknet = (): IStarknetWindowObject => {
+  const starknet = getStarknetCommunity()
 
-const fail = async () => {
-  throw Error("no starknet found in window")
-}
-
-const defaultStarknetWindowObject: StarknetWindowObject = {
-  request: fail,
-  isConnected: false,
-  provider: defaultProvider,
-  enable: ({ showModal } = {}) => {
-    if (IS_BROWSER && showModal) {
-      new App({ target: document.body })
-    }
-    return fail()
-  },
-  isPreauthorized: fail,
-  on: fail,
-  off: fail,
-  version: "uninstalled",
-}
-
-export const getStarknet = (): StarknetWindowObject => {
-  // if extension isnt installed (didnt populate window.starknet) polyfill it
-  if (!globalThis["starknet"]) {
-    globalThis["starknet"] = defaultStarknetWindowObject
+  starknet.enable = async (options?: {
+    showModal?: boolean
+  }): Promise<string[]> => {
+    const wallet = await connect({ showList: options?.showModal })
+    return wallet?.enable(options) || []
   }
-  return globalThis["starknet"]
+
+  return starknet
+}
+
+/**
+ * Connect to a Starknet wallet.
+ *
+ * @dev Use the community version `get-starknet` from npm instead.
+ * @param {GetStarknetWalletOptions} [options]
+ * @returns {Promise<IStarknetWindowObject>}
+ */
+export const connect = (
+  options?: GetStarknetWalletOptions,
+): Promise<IStarknetWindowObject | undefined> => {
+  return connectCommunity({
+    order: ["argentX"],
+    ...options,
+  })
 }
