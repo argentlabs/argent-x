@@ -8,6 +8,7 @@ import { routes } from "../routes"
 
 export const SetupRecoveryPage: FC = () => {
   const navigate = useNavigate()
+
   return (
     <>
       <IconBarWithIcons />
@@ -19,7 +20,7 @@ export const SetupRecoveryPage: FC = () => {
         </Paragraph>
         <OptionsWrapper>
           <Option
-            title="No-password restore"
+            title="High security"
             description="Coming soon"
             disabled
             icon={
@@ -42,7 +43,7 @@ export const SetupRecoveryPage: FC = () => {
             }
           />
           <Option
-            title="Unencrypted"
+            title="Low security"
             description="Save a backup phrase"
             backgroundColor="#C12026"
             onClick={() => {
