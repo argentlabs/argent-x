@@ -4,17 +4,17 @@ import { shortString } from "starknet"
 import { Network } from "./token.service"
 
 export const silentConnectWallet = async () => {
-  const windowStarknetRef = await connect({ showList: false })
-  await windowStarknetRef?.enable()
-  return windowStarknetRef
+  const windowStarknet = await connect({ showList: false })
+  await windowStarknet?.enable()
+  return windowStarknet
 }
 
 export const connectWallet = async () => {
-  const windowStarknetRef = await connect({
+  const windowStarknet = await connect({
     include: ["argentX"],
   })
-  await windowStarknetRef?.enable()
-  return windowStarknetRef
+  await windowStarknet?.enable()
+  return windowStarknet
 }
 
 export const walletAddress = async (): Promise<string | undefined> => {
@@ -120,7 +120,7 @@ export const addWalletChangeListener = async (
   if (!starknet?.isConnected) {
     return
   }
-  starknet.on?.("accountsChanged", handleEvent)
+  starknet.on("accountsChanged", handleEvent)
 }
 
 export const removeWalletChangeListener = async (
@@ -130,5 +130,5 @@ export const removeWalletChangeListener = async (
   if (!starknet?.isConnected) {
     return
   }
-  starknet.off?.("accountsChanged", handleEvent)
+  starknet.off("accountsChanged", handleEvent)
 }

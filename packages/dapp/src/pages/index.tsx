@@ -16,7 +16,7 @@ import styles from "../styles/Home.module.css"
 
 const Home: NextPage = () => {
   const [address, setAddress] = useState<string>()
-  const [isConnected, setConnected] = useState<boolean>(false)
+  const [isConnected, setConnected] = useState(false)
 
   useEffect(() => {
     ;(async () => {
