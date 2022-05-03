@@ -4999,11 +4999,6 @@ emittery@^0.8.1:
   resolved "https://registry.npmjs.org/emittery/-/emittery-0.8.1.tgz#bb23cc86d03b30aa75a7f734819dee2e1ba70860"
   integrity sha512-uDfvUjVrfGJJhymx/kz6prltenw1u7WrCg1oa94zYY8xxVpLLUu045LAT0dhDZdXG58/EpPL/5kA180fQ/qudg==
 
-emittery@^0.9.2:
-  version "0.9.2"
-  resolved "https://registry.npmjs.org/emittery/-/emittery-0.9.2.tgz#0a57c40773c6da380115c85bd67d381dd9e22f6f"
-  integrity sha512-sweWHu3j4dQm+NjLPu17pv+m5lCeK7g4Ov0NgfbRUEyzLc59DYDeRYXqlxEvuolaToI0VR3ThjFAghzl7Acjfw==
-
 emmet@^2.3.0:
   version "2.3.6"
   resolved "https://registry.npmjs.org/emmet/-/emmet-2.3.6.tgz#1d93c1ac03164da9ddf74864c1f341ed6ff6c336"
@@ -9453,13 +9448,6 @@ stack-utils@^2.0.3:
   integrity sha512-xrQcmYhOsn/1kX+Vraq+7j4oE2j/6BFscZ0etmYg81xuM8Gq0022Pxb8+IqgOFUIaxHs0KaSb7T1+OegiNrNFA==
   dependencies:
     escape-string-regexp "^2.0.0"
-
-stale-while-revalidate-cache@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.npmjs.org/stale-while-revalidate-cache/-/stale-while-revalidate-cache-1.2.0.tgz#a8b99f1a93cae3f6142b6321544da1acb325e436"
-  integrity sha512-9cpeOO2T+z6PVVkWl6PNTTXAWmweoeufDbkbjzOZO7zs2tK6F3u+JsWNADRk7x9fo5vTPI44WW7aseR1M5+QEA==
-  dependencies:
-    emittery "^0.9.2"
 
 "starknet-390@npm:starknet@3.9.0":
   version "3.9.0"

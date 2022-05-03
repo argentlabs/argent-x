@@ -14,6 +14,8 @@ export interface Network {
   readonly?: boolean
 }
 
+export type NetworkStatus = "ok" | "degraded" | "error" | "unknown"
+
 export const defaultNetworks: Network[] = [
   {
     id: "mainnet-alpha",

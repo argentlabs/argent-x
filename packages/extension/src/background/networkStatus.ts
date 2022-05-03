@@ -1,9 +1,9 @@
-import { createStaleWhileRevalidateCache } from "stale-while-revalidate-cache"
 import urljoin from "url-join"
 
-import { Network } from "../../shared/networks"
-import { fetchWithTimeout } from "../utils/fetchWithTimeout"
-import { Storage } from "./default"
+import { Network, NetworkStatus } from "../shared/networks"
+import { Storage } from "./storage/default"
+import { createStaleWhileRevalidateCache } from "./swr"
+import { fetchWithTimeout } from "./utils/fetchWithTimeout"
 
 type SwrCacheKey = string
 
@@ -13,11 +13,7 @@ const swr = createStaleWhileRevalidateCache({
   storage: swrStorage, // can be any object with getItem and setItem methods
   minTimeToStale: 30e3, // 30 seconds
   maxTimeToLive: 30 * 60e3, // 30 minutes
-  serialize: (v) => v, // serialize is done by underlying storage
-  deserialize: (v) => v, // deserialize is done by underlying storage
 })
-
-type NetworkStatus = "ok" | "degraded" | "error" | "unknown"
 
 const getChecklyNetworkStatus = async (
   network: Network,
@@ -90,11 +86,22 @@ export const getNetworkStatus = async (
     getGatewayNetworkStatus(network),
   ])
 
-  console.log("statuses", statuses)
-
   const degraded = statuses.some((s) => s === "degraded")
   const error = statuses.some((s) => s === "error")
   const unknown = statuses.every((s) => s === "unknown")
 
   return unknown ? "unknown" : error ? "error" : degraded ? "degraded" : "ok"
+}
+
+export const getNetworkStatuses = async (
+  networks: Network[],
+): Promise<Partial<Record<Network["id"], NetworkStatus>>> => {
+  const statuses = await Promise.all(
+    networks.map((network) => getNetworkStatus(network)),
+  )
+
+  return networks.reduce(
+    (acc, network, i) => ({ ...acc, [network.id]: statuses[i] }),
+    {},
+  )
 }
