@@ -1,11 +1,13 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
+import useSWR from "swr"
 
 import { getNetwork } from "../../shared/networks"
 import { useNetworks } from "../hooks/useNetworks"
 import { useAppState } from "../states/app"
 import { AccountStatusCode } from "../utils/accounts"
+import { getNetworkStatuses } from "../utils/messaging"
 import { recover } from "../utils/recovery"
 
 const NetworkName = styled.span`
@@ -118,6 +120,11 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const otherNetworks = allNetworks.filter(
     (network) => network !== currentNetwork,
   )
+  const { data: networkStatuses, isValidating } = useSWR(
+    "networkStatuses-all",
+    () => getNetworkStatuses(),
+  )
+  console.log(isValidating, networkStatuses)
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>

@@ -26,6 +26,7 @@ import {
 import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
+import { getNetworkStatuses } from "./networkStatus"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
 import {
   addToAlreadyShown,
@@ -237,6 +238,14 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
         return sendToTabAndUi({
           type: "REMOVE_CUSTOM_NETWORKS_RES",
           data: await removeNetworks(networks),
+        })
+      }
+      case "GET_NETWORK_STATUSES": {
+        const networks = msg.data?.length ? msg.data : await getNetworks()
+        const statuses = await getNetworkStatuses(networks)
+        return sendToTabAndUi({
+          type: "GET_NETWORK_STATUSES_RES",
+          data: statuses,
         })
       }
 
