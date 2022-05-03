@@ -21,6 +21,7 @@ import { HideTokenScreen } from "./screens/HideTokenScreen"
 import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
+import { NetworkWarningScreen } from "./screens/NetworkWarningScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import NftScreen from "./screens/NftScreen"
 import { ResetScreen } from "./screens/ResetScreen"
@@ -147,6 +148,10 @@ const Screen: FC = () => {
           <Route path="*" element={<ActionScreen />} />
         ) : (
           <>
+            <Route
+              path={routes.networkWarning()}
+              element={<NetworkWarningScreen />}
+            />
             <Route path={routes.accountNftPath()} element={<NftScreen />} />
             <Route
               path={routes.accountTokens()}

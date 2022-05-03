@@ -86,6 +86,7 @@ export const getNetworkStatus = async (
     getFeederGatewayNetworkStatus(network),
     getGatewayNetworkStatus(network),
   ])
+  console.log(statuses)
 
   const degraded = statuses.some((s) => s === "degraded")
   const error = statuses.some((s) => s === "error")

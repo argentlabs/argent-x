@@ -34,7 +34,7 @@ export interface ConfirmPageProps {
 }
 
 interface ConfirmScreenProps extends ConfirmPageProps {
-  title: string
+  title?: string
   rejectButtonText?: string
   confirmButtonText?: string
   disableConfirm?: boolean
@@ -112,7 +112,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           <NetworkSwitcher disabled />
         </Header>
       )}
-      <H2>{title}</H2>
+      {title && <H2>{title}</H2>}
 
       {children}
 

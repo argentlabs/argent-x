@@ -1,10 +1,12 @@
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
 import { getNetwork } from "../../shared/networks"
 import { useNetworkStatuses, useNetworks } from "../hooks/useNetworks"
+import { routes } from "../routes"
 import { useAppState } from "../states/app"
+import { useNeedsToShowNetworkStatusWarning } from "../states/seenNetworkStatusWarning"
 import { recover } from "../utils/recovery"
 import {
   NetworkStatusIndicator,
@@ -106,8 +108,18 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const otherNetworks = allNetworks.filter(
     (network) => network !== currentNetwork,
   )
-
   const { networkStatuses } = useNetworkStatuses()
+  const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
+
+  useEffect(() => {
+    if (
+      (networkStatuses[currentNetwork.id] === "degraded" ||
+        networkStatuses[currentNetwork.id] === "error") &&
+      needsToShowNetworkStatusWarning
+    ) {
+      navigate(routes.networkWarning())
+    }
+  }, [networkStatuses[currentNetwork.id]])
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>

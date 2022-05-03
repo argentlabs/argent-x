@@ -51,7 +51,7 @@ export const StatusIndicator = styled.span<StatusIndicatorProps>`
       : status === "orange"
       ? "#ffa85c"
       : status === "red"
-      ? "#ff4c4c"
+      ? "#C12026"
       : "transparent"};
 `
 
