@@ -10,15 +10,15 @@ import { AccountListItem } from "../components/Account/AccountListItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
-import { RecoveryBanner } from "../components/RecoveryBanner"
 import { H1, P } from "../components/Typography"
+import { useBackupRequired } from "../features/recovery/backupDownload.state"
+import { recover } from "../features/recovery/recovery.service"
+import { RecoveryBanner } from "../features/recovery/RecoveryBanner"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
-import { useBackupRequired } from "../states/backupDownload"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
-import { recover } from "../utils/recovery"
 
 const AccountList = styled.div`
   display: flex;

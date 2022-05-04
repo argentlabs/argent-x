@@ -1,15 +1,15 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useBackupRequired } from "../states/backupDownload"
+import { NewWalletScreen } from "../../screens/NewWalletScreen"
+import { recoverBySeedPhrase } from "../../utils/messaging"
+import { useBackupRequired } from "./backupDownload.state"
+import { recover } from "./recovery.service"
 import {
   useSeedRecover,
   validateAndSetPassword,
   validateSeedRecoverStateIsComplete,
-} from "../states/seedRecover"
-import { recoverBySeedPhrase } from "../utils/messaging"
-import { recover } from "../utils/recovery"
-import { NewWalletScreen } from "./NewWalletScreen"
+} from "./seedRecover.state"
 
 export const SeedRecoveryPasswordScreen: FC = () => {
   const navigate = useNavigate()

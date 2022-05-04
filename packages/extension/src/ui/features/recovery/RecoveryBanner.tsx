@@ -1,9 +1,9 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../routes"
-import { Banner } from "./Banner"
-import { DangerIcon } from "./Icons/Danger"
+import { Banner } from "../../components/Banner"
+import { DangerIcon } from "../../components/Icons/Danger"
+import { routes } from "../../routes"
 
 interface RecoveryBannerProps {
   noMargins?: boolean

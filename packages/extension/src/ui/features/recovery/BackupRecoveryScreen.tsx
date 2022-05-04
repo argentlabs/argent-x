@@ -3,13 +3,13 @@ import { useDropzone } from "react-dropzone"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { BackButton } from "../components/BackButton"
-import { IconBar } from "../components/Recovery/IconBar"
-import { routes } from "../routes"
-import { useAppState } from "../states/app"
-import { fileToString } from "../utils/files"
-import { recoverBackup } from "../utils/messaging"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { BackButton } from "../../components/BackButton"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { useAppState } from "../../states/app"
+import { fileToString } from "../../utils/files"
+import { recoverBackup } from "../../utils/messaging"
+import { IconBar } from "./IconBar"
 
 const DropZone = styled.div`
   width: 100%;

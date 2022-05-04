@@ -1,10 +1,10 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { P } from "../components/Typography"
-import { routes } from "../routes"
-import { useBackupRequired } from "../states/backupDownload"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { useBackupRequired } from "./backupDownload.state"
 
 export const SeedRecoveryConfirmScreen: FC = () => {
   const navigate = useNavigate()

@@ -2,9 +2,9 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { BackIcon } from "../../components/Icons/Back"
+import { CloseIcon } from "../../components/Icons/Close"
 import { routes } from "../../routes"
-import { BackIcon } from "../Icons/Back"
-import { CloseIcon } from "../Icons/Close"
 
 export const IconBar = styled.div`
   display: flex;

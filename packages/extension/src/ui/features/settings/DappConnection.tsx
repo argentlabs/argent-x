@@ -2,7 +2,7 @@ import RemoveIcon from "@mui/icons-material/Remove"
 import { FC } from "react"
 import styled from "styled-components"
 
-import { IconButton } from "./IconButton"
+import { IconButton } from "../../components/IconButton"
 
 const DappWrapper = styled.div`
   display: flex;

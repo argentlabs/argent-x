@@ -5,17 +5,17 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Network, NetworkSchema } from "../../shared/networks"
-import { BackButton } from "../components/BackButton"
-import { Header } from "../components/Header"
-import { IconButton } from "../components/IconButton"
-import { ControlledInputText } from "../components/InputText"
-import { A, FormError, P } from "../components/Typography"
-import { useYupValidationResolver } from "../hooks/useYupValidationResolver"
-import { useAppState } from "../states/app"
-import { makeClickable } from "../utils/a11y"
-import { addNetworks } from "../utils/messaging"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { Network, NetworkSchema } from "../../../shared/networks"
+import { BackButton } from "../../components/BackButton"
+import { Header } from "../../components/Header"
+import { IconButton } from "../../components/IconButton"
+import { ControlledInputText } from "../../components/InputText"
+import { A, FormError, P } from "../../components/Typography"
+import { useYupValidationResolver } from "../../hooks/useYupValidationResolver"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { useAppState } from "../../states/app"
+import { makeClickable } from "../../utils/a11y"
+import { addNetworks } from "../../utils/messaging"
 
 const ExtendableControl = styled.div`
   display: flex;
@@ -35,7 +35,7 @@ const Wrapper = styled.div`
   }
 `
 
-type SettingsNetworkFormProps =
+type NetworkSettingsFormScreenProps =
   | {
       mode: "add"
     }
@@ -44,7 +44,7 @@ type SettingsNetworkFormProps =
       network: Network
     }
 
-export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
+export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
   props,
 ) => {
   const defaultNetwork = useMemo<Network>(() => {

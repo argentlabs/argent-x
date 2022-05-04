@@ -3,12 +3,12 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { sendMessage } from "../../shared/messages"
-import { BackButton } from "../components/BackButton"
-import { Button } from "../components/Button"
-import { Header } from "../components/Header"
-import { H2 } from "../components/Typography"
-import { routes } from "../routes"
+import { sendMessage } from "../../../shared/messages"
+import { BackButton } from "../../components/BackButton"
+import { Button } from "../../components/Button"
+import { Header } from "../../components/Header"
+import { H2 } from "../../components/Typography"
+import { routes } from "../../routes"
 
 const Title = styled.h3`
   font-weight: 600;

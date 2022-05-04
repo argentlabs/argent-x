@@ -5,6 +5,17 @@ import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
+import NftScreen from "./features/accountNfts/NftScreen"
+import { BackupRecoveryScreen } from "./features/recovery/BackupRecoveryScreen"
+import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
+import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
+import { SeedRecoveryPasswordScreen } from "./features/recovery/SeedRecoveryPasswordScreen"
+import { SeedRecoveryScreen } from "./features/recovery/SeedRecoveryScreen"
+import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
+import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
+import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
+import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
+import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
@@ -13,7 +24,6 @@ import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
-import { BackupRecoveryScreen } from "./screens/BackupRecoveryScreen"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
@@ -22,17 +32,7 @@ import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NetworkWarningScreen } from "./screens/NetworkWarningScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
-import NftScreen from "./screens/NftScreen"
-import { RecoverySetupScreen } from "./screens/RecoverySetupScreen"
 import { ResetScreen } from "./screens/ResetScreen"
-import { SeedRecoveryConfirmScreen } from "./screens/SeedRecoveryConfirmScreen"
-import { SeedRecoveryPasswordScreen } from "./screens/SeedRecoveryPasswordScreen"
-import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
-import { SeedRecoverySetupScreen } from "./screens/SeedRecoverySetupScreen"
-import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
-import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkFormScreen"
-import { SettingsNetworksScreen } from "./screens/SettingsNetworksScreen"
-import { SettingsScreen } from "./screens/SettingsScreen"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
@@ -188,17 +188,17 @@ const Screen: FC = () => {
             <Route path={routes.settings()} element={<SettingsScreen />} />
             <Route
               path={routes.settingsNetworks()}
-              element={<SettingsNetworksScreen />}
+              element={<NetworkSettingsScreen />}
             />
             <Route
               path={routes.settingsAddCustomNetwork()}
-              element={<SettingsNetworkFormScreen mode="add" />}
+              element={<NetworkSettingsFormScreen mode="add" />}
             />
             <Route
               path={routes.settingsEditCustomNetwork()}
               element={
                 selectedCustomNetwork ? (
-                  <SettingsNetworkFormScreen
+                  <NetworkSettingsFormScreen
                     mode="edit"
                     network={selectedCustomNetwork}
                   />
@@ -209,7 +209,7 @@ const Screen: FC = () => {
             />
             <Route
               path={routes.settingsDappConnections()}
-              element={<SettingsDappConnectionsScreen />}
+              element={<DappConnectionsSettingsScreen />}
             />
             <Route
               path={routes.backupDownload()}

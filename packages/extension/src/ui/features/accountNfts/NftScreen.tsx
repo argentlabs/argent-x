@@ -3,25 +3,23 @@ import { FC, lazy, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
-import PlayOasisSvg from "../../assets/playoasis.svg"
-import { BackButton } from "../components/BackButton"
-import { Button, ButtonGroup } from "../components/Button"
-import { Header } from "../components/Header"
-import { InputText } from "../components/InputText"
-import { useNfts } from "../hooks/useNfts"
-import { routes } from "../routes"
-import { useSelectedAccount } from "../states/account"
-import { useAppState } from "../states/app"
-import { isValidAddress } from "../utils/addresses"
-import { openPlayOasisNft } from "../utils/playoasis.service"
+import PlayOasisSvg from "../../../assets/playoasis.svg"
+import { BackButton } from "../../components/BackButton"
+import { Button, ButtonGroup } from "../../components/Button"
+import { Header } from "../../components/Header"
+import { InputText } from "../../components/InputText"
+import { routes } from "../../routes"
+import { useSelectedAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
+import { isValidAddress } from "../../utils/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
-} from "../utils/transactions"
+} from "../../utils/transactions"
+import { openPlayOasisNft } from "./playoasis.service"
+import { useNfts } from "./useNfts"
 
-const LazyNftModelViewer = lazy(
-  () => import("../components/Account/NftModelViewer"),
-)
+const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
 
 export const Container = styled.div`
   margin: 0 24px;

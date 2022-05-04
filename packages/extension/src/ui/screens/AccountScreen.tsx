@@ -2,8 +2,8 @@ import { FC, ReactNode } from "react"
 
 import { AccountActivity } from "../components/Account/AccountActivity"
 import { AccountContainer } from "../components/Account/AccountContainer"
-import { AccountNfts } from "../components/Account/AccountNfts"
 import { AccountTokens } from "../components/Account/AccountTokens"
+import { AccountNfts } from "../features/accountNfts/AccountNfts"
 import { useSelectedAccount } from "../states/account"
 import { assertNever } from "../utils/assertNever"
 

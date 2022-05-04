@@ -2,8 +2,8 @@ import "@google/model-viewer/lib/model-viewer"
 
 import { FC } from "react"
 
-import { PlayOasisNft } from "../../utils/playoasis.model"
-import { getNftPicture } from "../../utils/playoasis.service"
+import { PlayOasisNft } from "./playoasis.model"
+import { getNftPicture } from "./playoasis.service"
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
