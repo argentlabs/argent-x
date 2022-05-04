@@ -1,4 +1,6 @@
-import { isFunction, isNil, parseConfig } from "./helpers"
+import { isFunction, isNil } from "lodash-es"
+
+import { parseConfig } from "./helpers"
 import { Config } from "./types"
 
 // modified from https://github.com/jperasmus/stale-while-revalidate-cache

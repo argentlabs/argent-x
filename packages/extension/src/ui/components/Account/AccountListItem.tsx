@@ -131,7 +131,7 @@ export const AccountListItem: FC<AccountListProps> = ({
         </AccountColumn>
         {status.code === "DEPLOYING" ? (
           <NetworkStatusWrapper>
-            <TransactionStatusIndicator status="orange" />
+            <TransactionStatusIndicator color="orange" />
             <AccountStatusText>Deploying</AccountStatusText>
           </NetworkStatusWrapper>
         ) : (

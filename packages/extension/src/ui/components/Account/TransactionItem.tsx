@@ -6,7 +6,7 @@ import { TransactionMeta } from "../../../shared/transactions.model"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
 import {
-  StatusIndicatorStatus,
+  StatusIndicatorColor,
   TransactionStatusIndicator,
 } from "../StatusIndicator"
 import {
@@ -41,7 +41,7 @@ const TransactionSubtitle = styled(TokenSubtitle)``
 
 interface TransactionItemProps {
   hash: string
-  status?: StatusIndicatorStatus
+  status?: StatusIndicatorColor
   highlighted?: boolean
   meta?: TransactionMeta
   onClick?: () => void
@@ -72,7 +72,7 @@ export const TransactionItem: FC<TransactionItemProps> = ({
             {meta?.subTitle || truncateAddress(hash)}
           </TransactionSubtitle>
         </TokenTextGroup>
-        <TransactionStatusIndicator status={status} />
+        <TransactionStatusIndicator color={status} />
       </TokenDetailsWrapper>
     </TransactionWrapper>
   )

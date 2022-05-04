@@ -22,8 +22,6 @@ const useSeenNetworkStatus = create<SeenNetworkStatusState>(
 export const useNeedsToShowNetworkStatusWarning = () => {
   const { lastSeen, updateLastSeen } = useSeenNetworkStatus()
 
-  console.log(lastSeen, Date.now())
-
   return [
     Date.now() - lastSeen > 1000 * 60 * 60 * 24, // 24 hours
     updateLastSeen,

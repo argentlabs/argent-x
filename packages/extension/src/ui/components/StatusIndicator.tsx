@@ -5,15 +5,15 @@ import { NetworkStatus } from "../../shared/networks"
 import type { AccountStatusCode } from "../utils/accounts"
 import { NetworkWarning } from "./Icons/NetworkWarning"
 
-export type StatusIndicatorStatus = "green" | "orange" | "red" | "transparent"
+export type StatusIndicatorColor = "green" | "orange" | "red" | "transparent"
 
 interface StatusIndicatorProps {
-  status?: StatusIndicatorStatus
+  color?: StatusIndicatorColor
 }
 
 export function mapAccountStatusCodeToColor(
   status: AccountStatusCode,
-): StatusIndicatorStatus {
+): StatusIndicatorColor {
   switch (status) {
     case "CONNECTED":
       return "green"
@@ -28,7 +28,7 @@ export function mapAccountStatusCodeToColor(
 
 export function mapNetworkStatusToColor(
   status?: NetworkStatus,
-): StatusIndicatorStatus {
+): StatusIndicatorColor {
   switch (status) {
     case "error":
       return "red"
@@ -45,8 +45,8 @@ export const StatusIndicator = styled.span<StatusIndicatorProps>`
   width: 8px;
   border-radius: 8px;
 
-  background-color: ${({ status = "transparent" }) =>
-    status === "green"
+  background-color: ${({ color = "transparent" }) =>
+    color === "green"
       ? "#02BBA8"
       : status === "orange"
       ? "#ffa85c"
@@ -56,12 +56,12 @@ export const StatusIndicator = styled.span<StatusIndicatorProps>`
 `
 
 export const NetworkStatusIndicator: FC<StatusIndicatorProps> = ({
-  status = "transparent",
+  color = "transparent",
 }) => {
-  if (status === "orange") {
+  if (color === "orange") {
     return <NetworkWarning />
   }
-  return <StatusIndicator status={status} />
+  return <StatusIndicator color={color} />
 }
 
 export const AccountStatusIndicator = styled(StatusIndicator)``
@@ -86,8 +86,8 @@ const PulseAnimation = keyframes`
 export const TransactionStatusIndicator = styled(StatusIndicator)`
   margin-right: 8px;
 
-  ${({ status = "CONNECTED" }) =>
-    status === "DEPLOYING" &&
+  ${({ color = "CONNECTED" }) =>
+    color === "DEPLOYING" &&
     css`
       box-shadow: 0 0 0 0 rgba(255, 168, 92, 1);
       transform: scale(1);

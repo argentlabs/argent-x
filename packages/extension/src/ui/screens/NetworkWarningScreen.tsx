@@ -47,8 +47,8 @@ export const NetworkWarningScreen: FC = () => {
         <Congestion />
         <H2>Network issues</H2>
         <CenterP>
-          StarkNet is in Alpha and is experiencing degraded network
-          performance.Your transactions may fail.
+          StarkNet is in Alpha and is experiencing degraded network performance.
+          Your transactions may fail.
         </CenterP>
       </Wrapper>
     </ConfirmScreen>

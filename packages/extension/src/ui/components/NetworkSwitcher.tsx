@@ -2,7 +2,7 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { getNetwork } from "../../shared/networks"
+import { NetworkStatus, getNetwork } from "../../shared/networks"
 import { useNetworkStatuses, useNetworks } from "../hooks/useNetworks"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
@@ -96,6 +96,8 @@ export const NetworkStatusWrapper = styled.div`
   gap: 4px;
 `
 
+const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
+
 interface NetworkSwitcherProps {
   disabled?: boolean
 }
@@ -111,22 +113,24 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const { networkStatuses } = useNetworkStatuses()
   const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
 
+  const currentNetworkStatus = networkStatuses[currentNetwork.id]
+
   useEffect(() => {
     if (
-      (networkStatuses[currentNetwork.id] === "degraded" ||
-        networkStatuses[currentNetwork.id] === "error") &&
+      currentNetworkStatus &&
+      valuesToShowNetwortWarning.includes(currentNetworkStatus) &&
       needsToShowNetworkStatusWarning
     ) {
       navigate(routes.networkWarning())
     }
-  }, [networkStatuses[currentNetwork.id]])
+  }, [currentNetworkStatus])
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
       <Network selected>
         <NetworkName>{currentNetwork.name}</NetworkName>
         <NetworkStatusIndicator
-          status={mapNetworkStatusToColor(networkStatuses[currentNetwork.id])}
+          color={mapNetworkStatusToColor(currentNetworkStatus)}
         />
       </Network>
       <NetworkList>
@@ -139,7 +143,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
           >
             <NetworkName>{name}</NetworkName>
             <NetworkStatusIndicator
-              status={mapNetworkStatusToColor(networkStatuses[id])}
+              color={mapNetworkStatusToColor(networkStatuses[id])}
             />
           </Network>
         ))}

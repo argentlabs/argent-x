@@ -77,7 +77,7 @@ export const AccountListItem: FC<AccountListProps> = ({
         </AccountColumn>
         <NetworkStatusWrapper>
           <AccountStatusIndicator
-            status={mapAccountStatusCodeToColor(status.code)}
+            color={mapAccountStatusCodeToColor(status.code)}
           />
           <AccountStatusText>{status.text}</AccountStatusText>
         </NetworkStatusWrapper>
