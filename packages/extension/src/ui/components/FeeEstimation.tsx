@@ -8,7 +8,10 @@ import useSWR from "swr"
 import { getEstimatedFee } from "../utils/messaging"
 import { fetchFeeTokenBalance } from "../utils/tokens"
 import { Tooltip } from "./CopyTooltip"
-import { DangerIcon, InfoIcon } from "./Icons/MuiIcons"
+import {
+  InfoRoundedIcon,
+  ReportGmailerrorredRoundedIcon,
+} from "./Icons/MuiIcons"
 
 const Center = styled.div`
   display: flex;
@@ -195,7 +198,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             }
           >
             {firstFetchDone && enoughBalance ? (
-              <InfoIcon
+              <InfoRoundedIcon
                 style={{
                   maxHeight: "16px",
                   maxWidth: "16px",
@@ -205,7 +208,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
                 }}
               />
             ) : (
-              <DangerIcon
+              <ReportGmailerrorredRoundedIcon
                 style={{
                   maxHeight: "16px",
                   maxWidth: "16px",

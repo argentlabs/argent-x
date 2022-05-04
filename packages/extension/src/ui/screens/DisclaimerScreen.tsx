@@ -9,8 +9,8 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import {
-  CircleCheckedFilled,
-  CircleUnchecked,
+  CheckCircleIcon,
+  RadioButtonUncheckedIcon,
 } from "../components/Icons/MuiIcons"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
@@ -55,8 +55,8 @@ export const DisclaimerScreen: FC = () => {
                 checked={conditions.lossOfFunds}
                 onChange={handleChange}
                 name="lossOfFunds"
-                icon={<CircleUnchecked />}
-                checkedIcon={<CircleCheckedFilled />}
+                icon={<RadioButtonUncheckedIcon />}
+                checkedIcon={<CheckCircleIcon />}
                 color="success"
               />
             }
@@ -69,8 +69,8 @@ export const DisclaimerScreen: FC = () => {
                 checked={conditions.alphaVersion}
                 onChange={handleChange}
                 name="alphaVersion"
-                icon={<CircleUnchecked />}
-                checkedIcon={<CircleCheckedFilled />}
+                icon={<RadioButtonUncheckedIcon />}
+                checkedIcon={<CheckCircleIcon />}
                 color="success"
               />
             }
