@@ -12,7 +12,6 @@ import styled from "styled-components"
 
 import { P } from "../components/Typography"
 import { routes } from "../routes"
-import { understandDisclaimer } from "../utils/disclaimer"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 const SP = styled(P)`
@@ -39,10 +38,7 @@ export const DisclaimerScreen: FC = () => {
         !conditions.lossOfFunds || !conditions.alphaVersion
       }
       singleButton
-      onSubmit={() => {
-        understandDisclaimer()
-        navigate(routes.newWallet())
-      }}
+      onSubmit={() => navigate(routes.newWallet())}
     >
       <SP>
         StarkNet is in Alpha and may experience technical issues or introduce
