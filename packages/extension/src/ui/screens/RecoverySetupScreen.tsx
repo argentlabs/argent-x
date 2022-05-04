@@ -6,7 +6,7 @@ import { Option, OptionsWrapper } from "../components/Recovery/Options"
 import { PageWrapper, Paragraph, Title } from "../components/Recovery/Page"
 import { routes } from "../routes"
 
-export const SetupRecoveryPage: FC = () => {
+export const RecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
 
   return (

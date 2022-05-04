@@ -6,8 +6,9 @@ import { routes } from "../routes"
 import { useBackupRequired } from "../states/backupDownload"
 import { ConfirmScreen } from "./ConfirmScreen"
 
-export const ConfirmSeedRecoveryPage: FC = () => {
+export const SeedRecoveryConfirmScreen: FC = () => {
   const navigate = useNavigate()
+
   return (
     <ConfirmScreen
       title="Have you written down the recovery phrase?"
