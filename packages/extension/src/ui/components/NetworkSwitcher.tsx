@@ -1,12 +1,17 @@
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { getNetwork } from "../../shared/networks"
-import { useNetworks } from "../hooks/useNetworks"
+import { NetworkStatus, getNetwork } from "../../shared/networks"
+import { useNetworkStatuses, useNetworks } from "../hooks/useNetworks"
+import { routes } from "../routes"
 import { useAppState } from "../states/app"
-import { AccountStatusCode } from "../utils/accounts"
+import { useNeedsToShowNetworkStatusWarning } from "../states/seenNetworkStatusWarning"
 import { recover } from "../utils/recovery"
+import {
+  NetworkStatusIndicator,
+  mapNetworkStatusToColor,
+} from "./StatusIndicator"
 
 const NetworkName = styled.span`
   text-align: right;
@@ -91,20 +96,7 @@ export const NetworkStatusWrapper = styled.div`
   gap: 4px;
 `
 
-export const NetworkStatusIndicator = styled.span<{
-  status?: AccountStatusCode
-}>`
-  height: 8px;
-  width: 8px;
-  border-radius: 8px;
-
-  background-color: ${({ status = "CONNECTED" }) =>
-    status === "CONNECTED"
-      ? "#02BBA8"
-      : status === "DEPLOYING"
-      ? "#ffa85c"
-      : "transparent"};
-`
+const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
 
 interface NetworkSwitcherProps {
   disabled?: boolean
@@ -118,12 +110,28 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const otherNetworks = allNetworks.filter(
     (network) => network !== currentNetwork,
   )
+  const { networkStatuses } = useNetworkStatuses()
+  const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
+
+  const currentNetworkStatus = networkStatuses[currentNetwork.id]
+
+  useEffect(() => {
+    if (
+      currentNetworkStatus &&
+      valuesToShowNetwortWarning.includes(currentNetworkStatus) &&
+      needsToShowNetworkStatusWarning
+    ) {
+      navigate(routes.networkWarning())
+    }
+  }, [currentNetworkStatus])
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
       <Network selected>
         <NetworkName>{currentNetwork.name}</NetworkName>
-        <NetworkStatusIndicator status="CONNECTED" />
+        <NetworkStatusIndicator
+          color={mapNetworkStatusToColor(currentNetworkStatus)}
+        />
       </Network>
       <NetworkList>
         {otherNetworks.map(({ id, name }) => (
@@ -134,7 +142,9 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
             }
           >
             <NetworkName>{name}</NetworkName>
-            <NetworkStatusIndicator status="CONNECTED" />
+            <NetworkStatusIndicator
+              color={mapNetworkStatusToColor(networkStatuses[id])}
+            />
           </Network>
         ))}
       </NetworkList>

@@ -4,10 +4,11 @@ import styled from "styled-components"
 import { makeClickable } from "../../utils/a11y"
 import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { truncateAddress } from "../../utils/addresses"
+import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import {
-  NetworkStatusIndicator,
-  NetworkStatusWrapper,
-} from "../NetworkSwitcher"
+  AccountStatusIndicator,
+  mapAccountStatusCodeToColor,
+} from "../StatusIndicator"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
 import { ProfilePicture } from "./ProfilePicture"
@@ -75,7 +76,9 @@ export const AccountListItem: FC<AccountListProps> = ({
           <p>{truncateAddress(address)}</p>
         </AccountColumn>
         <NetworkStatusWrapper>
-          <NetworkStatusIndicator status={status.code} />
+          <AccountStatusIndicator
+            color={mapAccountStatusCodeToColor(status.code)}
+          />
           <AccountStatusText>{status.text}</AccountStatusText>
         </NetworkStatusWrapper>
       </AccountRow>

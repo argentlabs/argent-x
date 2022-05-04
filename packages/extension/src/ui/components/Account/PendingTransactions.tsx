@@ -30,7 +30,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
           <TransactionItem
             key={hash}
             hash={hash}
-            status="DEPLOYING"
+            status="orange"
             highlighted
             meta={meta}
             onClick={() => openVoyagerTransaction(hash, network)}

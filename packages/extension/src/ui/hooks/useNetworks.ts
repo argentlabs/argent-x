@@ -1,18 +1,10 @@
 import useSWR from "swr"
-import type { FetcherResponse, PublicConfiguration } from "swr/dist/types"
 
-import { Network, getNetwork } from "../../shared/networks"
-import { getNetworks } from "../utils/messaging"
+import { getNetwork } from "../../shared/networks"
+import { getNetworkStatuses, getNetworks } from "../utils/messaging"
+import { SWRConfigCommon } from "./useActivity"
 
-export const useNetworks = (
-  config?: Partial<
-    PublicConfiguration<
-      Network[],
-      any,
-      (args_0: "customNetworks") => FetcherResponse<Network[]>
-    >
-  >,
-) => {
+export const useNetworks = (config?: SWRConfigCommon) => {
   const { data: allNetworks = [], ...rest } = useSWR(
     ["customNetworks"],
     getNetworks,
@@ -25,20 +17,26 @@ export const useNetworks = (
   }
 }
 
-export const useNetwork = (
-  networkId: string,
-  config?: Partial<
-    PublicConfiguration<
-      Network[],
-      any,
-      (args_0: "customNetworks") => FetcherResponse<Network[]>
-    >
-  >,
-) => {
+export const useNetwork = (networkId: string, config?: SWRConfigCommon) => {
   const { allNetworks, ...rest } = useNetworks(config)
 
   return {
     network: getNetwork(networkId, allNetworks),
+    ...rest,
+  }
+}
+
+export const useNetworkStatuses = (config?: SWRConfigCommon) => {
+  const { data: networkStatuses = {}, ...rest } = useSWR(
+    "networkStatuses-all",
+    () => getNetworkStatuses(),
+    {
+      refreshInterval: 15e3 /* 15 seconds */, // gets cached in background anyways, so we can refresh it as fast as we want/makes sense
+      ...config,
+    },
+  )
+  return {
+    networkStatuses,
     ...rest,
   }
 }

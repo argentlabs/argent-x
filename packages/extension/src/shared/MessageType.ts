@@ -2,7 +2,7 @@ import type { JWK } from "jose"
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import { ExtActionItem } from "./actionQueue"
-import { Network } from "./networks"
+import { Network, NetworkStatus } from "./networks"
 import { AddToken } from "./token.model"
 import { TransactionStatus } from "./transactions.model"
 import { WalletAccount } from "./wallet.model"
@@ -126,13 +126,18 @@ export type MessageType =
   | { type: "ADD_TOKEN_RES"; data: { actionHash: string } }
   | { type: "REJECT_ADD_TOKEN"; data: { actionHash: string } }
   | { type: "APPROVE_ADD_TOKEN"; data: { actionHash: string } }
-  // ***** custom networks *****
+  // ***** networks *****
   | { type: "GET_CUSTOM_NETWORKS" }
   | { type: "GET_CUSTOM_NETWORKS_RES"; data: Network[] }
   | { type: "ADD_CUSTOM_NETWORKS"; data: Network[] }
   | { type: "ADD_CUSTOM_NETWORKS_RES"; data: Network[] }
   | { type: "REMOVE_CUSTOM_NETWORKS"; data: Network["id"][] }
   | { type: "REMOVE_CUSTOM_NETWORKS_RES"; data: Network[] }
+  | { type: "GET_NETWORK_STATUSES"; data?: Network[] } // allows ui to get specific network statuses and defaults to all
+  | {
+      type: "GET_NETWORK_STATUSES_RES"
+      data: Partial<Record<Network["id"], NetworkStatus>>
+    }
   // ***** actions *****
   | { type: "GET_ACTIONS" }
   | {
