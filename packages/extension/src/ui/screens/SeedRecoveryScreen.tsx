@@ -1,4 +1,4 @@
-import { FC, useMemo, useState, useRef } from "react"
+import { FC, useMemo, useRef, useState } from "react"
 
 import { BackButton } from "../components/BackButton"
 import { TextArea } from "../components/InputText"
@@ -10,7 +10,7 @@ import { validateAndSetSeedPhrase } from "../states/seedRecover"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 export const SeedRecoveryScreen: FC = () => {
-  const textAreaElement = useRef<HTMLTextAreaElement>(null);
+  const textAreaElement = useRef<HTMLTextAreaElement>(null)
   const [seedPhraseInput, setSeedPhraseInput] = useState("")
   const [error, setError] = useState("")
   const customNavigate = useCustomNavigate()
@@ -40,7 +40,7 @@ export const SeedRecoveryScreen: FC = () => {
         title="Restore accounts"
         confirmButtonText="Continue"
         singleButton
-        disableConfirm={disableSubmit}
+        confirmButtonDisabled={disableSubmit}
         onSubmit={handleRestoreClick}
         smallTopPadding
       >

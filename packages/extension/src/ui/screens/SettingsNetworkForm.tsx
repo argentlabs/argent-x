@@ -81,7 +81,7 @@ export const SettingsNetworkFormScreen: FC<SettingsNetworkFormProps> = (
         singleButton
         confirmButtonText={props.mode === "add" ? "Create" : "Save"}
         smallTopPadding
-        disableConfirm={defaultNetwork.readonly}
+        confirmButtonDisabled={defaultNetwork.readonly}
         onSubmit={handleSubmit(async (network) => {
           try {
             useAppState.setState({ isLoading: true })

@@ -75,7 +75,7 @@ export const NewWalletScreen: FC<{
   return (
     <>
       <Header>
-        <BackButton />
+        <BackButton to={routes.welcome()} />
       </Header>
       <Container>
         <H2>{overrideTitle || "New wallet"}</H2>

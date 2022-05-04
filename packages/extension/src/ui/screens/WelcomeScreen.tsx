@@ -50,7 +50,9 @@ export const WelcomeScreen: FC = () => {
       <Greetings greetings={greetings} />
       <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
       <ButtonGroup>
-        <Button onClick={() => navigate(routes.newWallet())}>New wallet</Button>
+        <Button onClick={() => navigate(routes.disclaimer())}>
+          New wallet
+        </Button>
         <Button onClick={() => navigate(routes.seedRecovery())}>
           Restore wallet
         </Button>
