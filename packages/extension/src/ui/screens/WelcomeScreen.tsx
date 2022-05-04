@@ -8,6 +8,7 @@ import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
+import { isDisclaimerUnderstood } from "../utils/disclaimer"
 
 const WelcomeScreenWrapper = styled.div`
   padding: 70px 40px 24px;
@@ -44,13 +45,17 @@ const greetings = [
 export const WelcomeScreen: FC = () => {
   const navigate = useNavigate()
 
+  const nextRoute = isDisclaimerUnderstood()
+    ? routes.newWallet()
+    : routes.disclaimer()
+
   return (
     <WelcomeScreenWrapper>
       <LogoSvg />
       <Greetings greetings={greetings} />
       <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
       <ButtonGroup>
-        <Button onClick={() => navigate(routes.newWallet())}>New wallet</Button>
+        <Button onClick={() => navigate(nextRoute)}>New wallet</Button>
         <Button onClick={() => navigate(routes.seedRecovery())}>
           Restore wallet
         </Button>

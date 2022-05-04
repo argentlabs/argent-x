@@ -41,7 +41,7 @@ export const DisclaimerScreen: FC = () => {
       singleButton
       onSubmit={() => {
         understandDisclaimer()
-        navigate(routes.welcome())
+        navigate(routes.newWallet())
       }}
     >
       <SP>
@@ -63,7 +63,7 @@ export const DisclaimerScreen: FC = () => {
               />
             }
             label="I understand that StarkNet may introduce changes that make my existing account unusable and force to create new ones."
-            sx={{ mt: 4 }}
+            style={{ marginTop: 30 }}
           />
           <FormControlLabel
             control={
@@ -77,7 +77,7 @@ export const DisclaimerScreen: FC = () => {
               />
             }
             label="I understand that StarkNet may experience performance issues and my transactions may fail for various reasons."
-            sx={{ mt: 4 }}
+            style={{ marginTop: 30 }}
           />
         </FormGroup>
       </FormControl>

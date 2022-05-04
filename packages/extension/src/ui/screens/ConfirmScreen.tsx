@@ -139,7 +139,11 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               )}
               <Button
                 disabled={confirmButtonDisabled}
-                style={{ backgroundColor: confirmButtonBackgroundColor }}
+                style={{
+                  backgroundColor: confirmButtonDisabled
+                    ? undefined
+                    : confirmButtonBackgroundColor,
+                }}
                 type="submit"
               >
                 {confirmButtonText}
