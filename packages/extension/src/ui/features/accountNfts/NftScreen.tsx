@@ -70,7 +70,7 @@ export const Container = styled.div`
   }
 `
 
-const NftScreen: FC = () => {
+export const NftScreen: FC = () => {
   const navigate = useNavigate()
   const { contractAddress, tokenId } = useParams()
   const account = useSelectedAccount()
@@ -140,5 +140,3 @@ const NftScreen: FC = () => {
     </>
   )
 }
-
-export default NftScreen
