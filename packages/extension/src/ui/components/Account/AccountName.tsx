@@ -1,8 +1,8 @@
-import EditIcon from "@mui/icons-material/Edit"
 import { FC, InputHTMLAttributes, useState } from "react"
 import styled from "styled-components"
 
 import { defaultAccountName } from "../../states/accountMetadata"
+import { EditIcon } from "../Icons/MuiIcons"
 import { InputText } from "../InputText"
 
 const Form = styled.form`

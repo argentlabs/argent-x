@@ -1,10 +1,10 @@
-import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred"
 import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Account } from "../../Account"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
+import { ReportGmailerrorredIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"

@@ -1,9 +1,9 @@
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { makeClickable } from "../utils/a11y"
 import { IconButton } from "./IconButton"
+import { ArrowBackIosNewIcon } from "./Icons/MuiIcons"
 
 interface BackButtonProps {
   to?: string

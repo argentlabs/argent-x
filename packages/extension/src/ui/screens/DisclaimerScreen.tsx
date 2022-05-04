@@ -1,5 +1,3 @@
-import CircleCheckedFilled from "@mui/icons-material/CheckCircle"
-import CircleUnchecked from "@mui/icons-material/RadioButtonUnchecked"
 import {
   Checkbox,
   FormControl,
@@ -10,6 +8,10 @@ import { ChangeEventHandler, FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import {
+  CheckCircleIcon,
+  RadioButtonUncheckedIcon,
+} from "../components/Icons/MuiIcons"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
 import { ConfirmScreen } from "./ConfirmScreen"
@@ -53,8 +55,8 @@ export const DisclaimerScreen: FC = () => {
                 checked={conditions.lossOfFunds}
                 onChange={handleChange}
                 name="lossOfFunds"
-                icon={<CircleUnchecked />}
-                checkedIcon={<CircleCheckedFilled />}
+                icon={<RadioButtonUncheckedIcon />}
+                checkedIcon={<CheckCircleIcon />}
                 color="success"
               />
             }
@@ -67,8 +69,8 @@ export const DisclaimerScreen: FC = () => {
                 checked={conditions.alphaVersion}
                 onChange={handleChange}
                 name="alphaVersion"
-                icon={<CircleUnchecked />}
-                checkedIcon={<CircleCheckedFilled />}
+                icon={<RadioButtonUncheckedIcon />}
+                checkedIcon={<CheckCircleIcon />}
                 color="success"
               />
             }
