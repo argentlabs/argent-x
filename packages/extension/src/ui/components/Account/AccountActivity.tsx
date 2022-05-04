@@ -1,4 +1,3 @@
-import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred"
 import { FC, Fragment, Suspense } from "react"
 import styled from "styled-components"
 
@@ -9,6 +8,7 @@ import { useAppState } from "../../states/app"
 import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
 import { ErrorBoundary } from "../ErrorBoundary"
+import { ReportGmailerrorredIcon } from "../Icons/MuiIcons"
 import { Spinner } from "../Spinner"
 import { PendingTransactions } from "./PendingTransactions"
 import { SectionHeader } from "./SectionHeader"

@@ -1,6 +1,3 @@
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted"
-import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary"
 import { FC, ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
@@ -14,6 +11,11 @@ import {
 import { makeClickable } from "../../utils/a11y"
 import { getAccountImageUrl } from "../../utils/accounts"
 import { Header } from "../Header"
+import {
+  AccountBalanceWalletIcon,
+  FormatListBulletedIcon,
+  PhotoLibraryIcon,
+} from "../Icons/MuiIcons"
 import { NetworkSwitcher } from "../NetworkSwitcher"
 import { AccountFooter, FooterTab } from "./AccountFooter"
 import { AccountHeader } from "./AccountHeader"

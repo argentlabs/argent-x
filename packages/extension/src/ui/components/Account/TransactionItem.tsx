@@ -1,10 +1,10 @@
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { FC } from "react"
 import styled, { css } from "styled-components"
 
 import { TransactionMeta } from "../../../shared/transactions.model"
 import { makeClickable } from "../../utils/a11y"
 import { truncateAddress } from "../../utils/addresses"
+import { OpenInNewIcon } from "../Icons/MuiIcons"
 import {
   StatusIndicatorColor,
   TransactionStatusIndicator,

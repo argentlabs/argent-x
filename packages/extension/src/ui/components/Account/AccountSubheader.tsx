@@ -1,5 +1,3 @@
-import ContentCopyIcon from "@mui/icons-material/ContentCopy"
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { FC } from "react"
 import styled from "styled-components"
 
@@ -8,6 +6,7 @@ import { AccountStatus } from "../../utils/accounts"
 import { formatAddress, truncateAddress } from "../../utils/addresses"
 import { getVoyagerContractLink } from "../../utils/voyager.service"
 import { CopyTooltip } from "../CopyTooltip"
+import { ContentCopyIcon, OpenInNewIcon } from "../Icons/MuiIcons"
 import { AccountName } from "./AccountName"
 import {
   AccountAddressIconsWrapper,

@@ -1,5 +1,3 @@
-import InfoIcon from "@mui/icons-material/InfoRounded"
-import DangerIcon from "@mui/icons-material/ReportGmailerrorredRounded"
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
 import { FC, Suspense, useEffect, useMemo, useState } from "react"
@@ -10,6 +8,7 @@ import useSWR from "swr"
 import { getEstimatedFee } from "../utils/messaging"
 import { fetchFeeTokenBalance } from "../utils/tokens"
 import { Tooltip } from "./CopyTooltip"
+import { DangerIcon, InfoIcon } from "./Icons/MuiIcons"
 
 const Center = styled.div`
   display: flex;

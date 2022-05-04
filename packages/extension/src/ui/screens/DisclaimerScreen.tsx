@@ -1,5 +1,3 @@
-import CircleCheckedFilled from "@mui/icons-material/CheckCircle"
-import CircleUnchecked from "@mui/icons-material/RadioButtonUnchecked"
 import {
   Checkbox,
   FormControl,
@@ -10,6 +8,10 @@ import { ChangeEventHandler, FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import {
+  CircleCheckedFilled,
+  CircleUnchecked,
+} from "../components/Icons/MuiIcons"
 import { P } from "../components/Typography"
 import { routes } from "../routes"
 import { ConfirmScreen } from "./ConfirmScreen"
