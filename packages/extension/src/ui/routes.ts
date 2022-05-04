@@ -1,7 +1,7 @@
 import { isString } from "lodash-es"
 
 const route = <T extends (..._: any[]) => string>(
-  ...[value, path]: [string] | [T, string]
+  ...[value, path]: [routeAndPath: string] | [routeWithParams: T, path: string]
 ): T & { path: string } => {
   if (isString(value)) {
     return Object.defineProperty((() => value) as any, "path", { value })
