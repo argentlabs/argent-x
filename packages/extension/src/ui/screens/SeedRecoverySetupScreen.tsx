@@ -64,7 +64,7 @@ const LoadingSeedWordBadge = styled.div<{
   animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
 `
 
-export const SetupSeedRecoveryPage: FC = () => {
+export const SeedRecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
   const { data: seedPhrase } = useSWRImmutable(
     // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage

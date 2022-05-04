@@ -14,7 +14,6 @@ import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
 import { BackupRecoveryScreen } from "./screens/BackupRecoveryScreen"
-import { ConfirmSeedRecoveryPage } from "./screens/ConfirmSeedRecovery"
 import { DisclaimerScreen } from "./screens/DisclaimerScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { HideTokenScreen } from "./screens/HideTokenScreen"
@@ -24,15 +23,16 @@ import { LockScreen } from "./screens/LockScreen"
 import { NetworkWarningScreen } from "./screens/NetworkWarningScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
 import NftScreen from "./screens/NftScreen"
+import { RecoverySetupScreen } from "./screens/RecoverySetupScreen"
 import { ResetScreen } from "./screens/ResetScreen"
+import { SeedRecoveryConfirmScreen } from "./screens/SeedRecoveryConfirmScreen"
 import { SeedRecoveryPasswordScreen } from "./screens/SeedRecoveryPasswordScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
+import { SeedRecoverySetupScreen } from "./screens/SeedRecoverySetupScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
-import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkForm"
-import { SettingsNetworksScreen } from "./screens/SettingsNetworks"
+import { SettingsNetworkFormScreen } from "./screens/SettingsNetworkFormScreen"
+import { SettingsNetworksScreen } from "./screens/SettingsNetworksScreen"
 import { SettingsScreen } from "./screens/SettingsScreen"
-import { SetupRecoveryPage } from "./screens/SetupRecovery"
-import { SetupSeedRecoveryPage } from "./screens/SetupSeedRecovery"
 import { TokenScreen } from "./screens/TokenScreen"
 import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { WelcomeScreen } from "./screens/WelcomeScreen"
@@ -169,15 +169,15 @@ const Screen: FC = () => {
             <Route path={routes.accounts()} element={<AccountListScreen />} />
             <Route
               path={routes.confirmSeedRecovery()}
-              element={<ConfirmSeedRecoveryPage />}
+              element={<SeedRecoveryConfirmScreen />}
             />
             <Route
               path={routes.setupSeedRecovery()}
-              element={<SetupSeedRecoveryPage />}
+              element={<SeedRecoverySetupScreen />}
             />
             <Route
               path={routes.setupRecovery()}
-              element={<SetupRecoveryPage />}
+              element={<RecoverySetupScreen />}
             />
             <Route path={routes.newToken()} element={<AddTokenScreen />} />
             <Route path={routes.tokenPath()} element={<TokenScreen />} />
