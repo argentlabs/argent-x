@@ -2,14 +2,14 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { getPreAuthorizations } from "../../background/preAuthorizations"
-import { sendMessage } from "../../shared/messages"
-import { BackButton } from "../components/BackButton"
-import { Button } from "../components/Button"
-import { DappConnection } from "../components/DappConnection"
-import { Header } from "../components/Header"
-import { H2, P } from "../components/Typography"
-import { removePreAuthorization } from "../utils/messaging"
+import { getPreAuthorizations } from "../../../background/preAuthorizations"
+import { sendMessage } from "../../../shared/messages"
+import { BackButton } from "../../components/BackButton"
+import { Button } from "../../components/Button"
+import { Header } from "../../components/Header"
+import { H2, P } from "../../components/Typography"
+import { removePreAuthorization } from "../../utils/messaging"
+import { DappConnection } from "./DappConnection"
 
 const Wrapper = styled.div`
   display: flex;
@@ -29,7 +29,7 @@ const Wrapper = styled.div`
   }
 `
 
-export const SettingsDappConnectionsScreen: FC = () => {
+export const DappConnectionsSettingsScreen: FC = () => {
   const navigate = useNavigate()
   const [preAuthorizations, setPreAuthorizations] = useState<string[]>([])
 

@@ -3,17 +3,17 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { BackButton } from "../components/BackButton"
-import { DappConnection } from "../components/DappConnection"
-import { Header } from "../components/Header"
-import { IconButton } from "../components/IconButton"
-import { Spinner } from "../components/Spinner"
-import { H2, P } from "../components/Typography"
-import { useNetworks } from "../hooks/useNetworks"
-import { routes } from "../routes"
-import { useSelectedNetwork } from "../states/selectedNetwork"
-import { makeClickable } from "../utils/a11y"
-import { removeNetworks } from "../utils/messaging"
+import { BackButton } from "../../components/BackButton"
+import { Header } from "../../components/Header"
+import { IconButton } from "../../components/IconButton"
+import { Spinner } from "../../components/Spinner"
+import { H2, P } from "../../components/Typography"
+import { useNetworks } from "../../hooks/useNetworks"
+import { routes } from "../../routes"
+import { useSelectedNetwork } from "../../states/selectedNetwork"
+import { makeClickable } from "../../utils/a11y"
+import { removeNetworks } from "../../utils/messaging"
+import { DappConnection } from "./DappConnection"
 
 const Wrapper = styled.div`
   display: flex;
@@ -44,7 +44,7 @@ const List = styled.div`
   }
 `
 
-export const SettingsNetworksScreen: FC = () => {
+export const NetworkSettingsScreen: FC = () => {
   const { allNetworks, mutate } = useNetworks()
   const navigate = useNavigate()
   const [, setSelectedCustomNetwork] = useSelectedNetwork()

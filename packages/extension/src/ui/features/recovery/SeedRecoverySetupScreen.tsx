@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom"
 import styled, { keyframes } from "styled-components"
 import useSWRImmutable from "swr/immutable"
 
-import { IconBarWithIcons } from "../components/Recovery/IconBar"
-import { Paragraph } from "../components/Recovery/Page"
-import { routes } from "../routes"
-import { getSeedPhrase } from "../utils/messaging"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { getSeedPhrase } from "../../utils/messaging"
+import { IconBarWithIcons } from "./IconBar"
+import { Paragraph } from "./Page"
 
 const SeedPhraseGrid = styled.div`
   display: grid;

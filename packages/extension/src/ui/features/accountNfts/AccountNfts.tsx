@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Account } from "../../Account"
-import { useNfts } from "../../hooks/useNfts"
+import { ErrorBoundary } from "../../components/ErrorBoundary"
+import { Spinner } from "../../components/Spinner"
+import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { getNftPicture } from "../../utils/playoasis.service"
-import { ErrorBoundary } from "../ErrorBoundary"
-import { Spinner } from "../Spinner"
-import { P } from "../Typography"
+import { getNftPicture } from "./playoasis.service"
+import { useNfts } from "./useNfts"
 
 const Container = styled.div`
   display: flex;

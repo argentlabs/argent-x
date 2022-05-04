@@ -1,10 +1,10 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { recover } from "../features/recovery/recovery.service"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { hasActiveSession, isInitialized } from "../utils/messaging"
-import { recover } from "../utils/recovery"
 
 export const useEntry = () => {
   const navigate = useNavigate()

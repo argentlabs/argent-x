@@ -1,10 +1,10 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { IconBarWithIcons } from "../components/Recovery/IconBar"
-import { Option, OptionsWrapper } from "../components/Recovery/Options"
-import { PageWrapper, Paragraph, Title } from "../components/Recovery/Page"
-import { routes } from "../routes"
+import { routes } from "../../routes"
+import { IconBarWithIcons } from "./IconBar"
+import { Option, OptionsWrapper } from "./Options"
+import { PageWrapper, Paragraph, Title } from "./Page"
 
 export const RecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
