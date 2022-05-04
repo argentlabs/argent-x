@@ -3,6 +3,7 @@ import styled, { css, keyframes } from "styled-components"
 
 import { NetworkStatus } from "../../shared/networks"
 import type { AccountStatusCode } from "../utils/accounts"
+import { assertNeverStatic } from "../utils/assertNever"
 import { NetworkWarning } from "./Icons/NetworkWarning"
 
 export type StatusIndicatorColor = "green" | "orange" | "red" | "transparent"
@@ -21,7 +22,10 @@ export function mapAccountStatusCodeToColor(
       return "orange"
     case "ERROR":
       return "red"
-    default:
+    case "DEFAULT":
+      return "transparent"
+    default: // this should never happen so we can throw an type error for the developer to check. Should this ever happen in runtime (eg undefined passed) we dont throw an error and have a safe default
+      assertNeverStatic(status)
       return "transparent"
   }
 }
@@ -35,7 +39,11 @@ export function mapNetworkStatusToColor(
     case "degraded":
       return "orange"
     case "ok": // network status shows green by default and has no transparent state
-    default:
+    case "unknown":
+    case undefined:
+      return "green"
+    default: // this should never happen so we can throw an type error for the developer to check. Should this ever happen in runtime (eg undefined passed) we dont throw an error and have a safe default
+      assertNeverStatic(status)
       return "green"
   }
 }
