@@ -63,7 +63,7 @@ const starknetWindowObject: StarknetWindowObject = {
   request: async (call) => {
     if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
       sendMessage({
-        type: "ADD_TOKEN",
+        type: "REQUEST_TOKEN",
         data: {
           address: call.params.options.address,
           symbol: call.params.options.symbol,
@@ -71,23 +71,29 @@ const starknetWindowObject: StarknetWindowObject = {
           name: call.params.options.name,
         },
       })
-      const { actionHash } = await waitForMsgOfType("ADD_TOKEN_RES", 1000)
+      const { actionHash } = await waitForMsgOfType("REQUEST_TOKEN_RES", 1000)
+
+      if (!actionHash) {
+        // token already exists
+        return false
+      }
+
       sendMessage({ type: "OPEN_UI" })
 
       const result = await Promise.race([
         waitForMsgOfType(
-          "APPROVE_ADD_TOKEN",
+          "APPROVE_REQUEST_TOKEN",
           11 * 60 * 1000,
           (x) => x.data.actionHash === actionHash,
         ),
         waitForMsgOfType(
-          "REJECT_ADD_TOKEN",
+          "REJECT_REQUEST_TOKEN",
           10 * 60 * 1000,
           (x) => x.data.actionHash === actionHash,
         )
           .then(() => "error" as const)
           .catch(() => {
-            sendMessage({ type: "TRANSACTION_FAILED", data: { actionHash } })
+            sendMessage({ type: "REJECT_REQUEST_TOKEN", data: { actionHash } })
             return "timeout" as const
           }),
       ])
@@ -99,7 +105,7 @@ const starknetWindowObject: StarknetWindowObject = {
         throw Error("User action timed out")
       }
 
-      return
+      return true
     }
     throw Error("Not implemented")
   },

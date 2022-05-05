@@ -1,127 +1,123 @@
 import { BigNumber } from "ethers"
 import { useEffect, useMemo, useRef } from "react"
+import { number } from "starknet"
 import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 import create from "zustand"
-import { persist } from "zustand/middleware"
 
-import defaultTokens from "../../assets/default-tokens.json"
 import { messageStream } from "../../shared/messages"
+import { Token, equalToken, parsedDefaultTokens } from "../../shared/token"
 import { isValidAddress } from "../utils/addresses"
+import {
+  addToken as addTokenMsg,
+  getTokens,
+  removeToken as removeTokenMsg,
+} from "../utils/messaging"
 import { fetchTokenBalance } from "../utils/tokens"
 import { useSelectedAccount } from "./account"
 import { useAppState } from "./app"
 
-export interface TokenDetails {
-  address: string
-  name?: string
-  symbol?: string
+export interface TokenDetails
+  extends Pick<Token, "address" | "networkId">,
+    Partial<Omit<Token, "decimals" | "address" | "networkId">> {
   decimals?: BigNumber
-  networkId: string
-  image?: string
-  showAlways?: boolean
 }
-
-const equalToken = (a: TokenDetails, b: TokenDetails) =>
-  a.address === b.address && a.networkId === b.networkId
-
-const parsedDefaultTokens = defaultTokens.map((token) => ({
-  ...token,
-  decimals: BigNumber.from(token.decimals),
-  networkId: token.network,
-}))
-
-interface State {
-  tokens: TokenDetails[]
-  addToken: (token: TokenDetails) => void
-  removeToken: (token: TokenDetails) => void
-}
-
-export const useTokens = create<State>(
-  persist(
-    (set, get) => ({
-      tokens: parsedDefaultTokens,
-      addToken: (token: TokenDetails) => {
-        if (!isValidAddress(token.address)) {
-          throw Error("token address malformed")
-        }
-        const equalTokenHit = get().tokens.find((t) => equalToken(t, token))
-        // if token already exists, but was hidden without balance, show it
-        if (equalTokenHit) {
-          if (!equalTokenHit.showAlways) {
-            return set((state) => ({
-              ...state,
-              tokens: state.tokens.map((t) =>
-                equalToken(t, equalTokenHit) ? { ...t, showAlways: true } : t,
-              ),
-            }))
-          }
-          throw Error("token already added")
-        }
-        set((state) => ({
-          tokens: [...state.tokens, { ...token, showAlways: true }],
-        }))
-      },
-      removeToken: (token: TokenDetails) => {
-        set((state) => ({
-          tokens: state.tokens.filter((t) => t.address !== token.address),
-        }))
-      },
-    }),
-    {
-      name: "tokens", // name of item in the storage (must be unique)
-      getStorage: () => localStorage, // (optional) by default the 'localStorage' is used
-      merge: (persistedState, currentState) => ({
-        ...currentState,
-        ...persistedState,
-        tokens: [...currentState.tokens, ...persistedState.tokens],
-      }),
-      partialize: (state) =>
-        Object.fromEntries(
-          Object.entries(state).map(([key, value]) => {
-            if (key === "tokens") {
-              return [
-                key,
-                (value as TokenDetails[]).filter(
-                  (token) =>
-                    !parsedDefaultTokens.some((defaultToken) =>
-                      equalToken(token, defaultToken),
-                    ),
-                ),
-              ]
-            }
-            return [key, value]
-          }),
-        ),
-      deserialize: (str) =>
-        JSON.parse(str, (_, v) => {
-          if (
-            typeof v === "object" &&
-            "type" in v &&
-            "hex" in v &&
-            v.type === "BigNumber"
-          ) {
-            return BigNumber.from(v.hex)
-          }
-          return v
-        }),
-    },
-  ),
-)
-
-export const addToken = (token: TokenDetails) => {
-  useTokens.getState().addToken(token)
-}
-
-export const removeToken = (token: TokenDetails) => {
-  useTokens.getState().removeToken(token)
-}
-
-export const selectTokensByNetwork = (networkId: string) => (state: State) =>
-  state.tokens.filter((token) => token.networkId === networkId)
 
 export interface TokenDetailsWithBalance extends TokenDetails {
   balance?: BigNumber
 }
+
+interface State {
+  tokens: TokenDetails[]
+  addToken: (token: Required<TokenDetails>) => void
+  removeToken: (tokenAddress: TokenDetails["address"]) => void
+}
+
+const mapTokenToTokenDetails = (token: Token): TokenDetails => ({
+  ...token,
+  decimals: number.toBN(token.decimals),
+})
+
+const mapTokenDetailsToToken = (token: Required<TokenDetails>): Token => ({
+  ...token,
+  decimals: token.decimals.toString(),
+})
+
+export const useTokens = create<State>((set, get) => ({
+  tokens: [],
+  addToken: async (token: Required<TokenDetails>) => {
+    if (!isValidAddress(token.address)) {
+      throw Error("token address malformed")
+    }
+    const equalTokenHit = get().tokens.find((t) => equalToken(t, token))
+    if (equalTokenHit) {
+      // if token already exists, but was hidden without balance, show it
+      if (!equalTokenHit.showAlways) {
+        return set((state) => ({
+          ...state,
+          tokens: state.tokens.map((t) =>
+            equalToken(t, equalTokenHit) ? { ...t, showAlways: true } : t,
+          ),
+        }))
+      }
+      throw Error("token already added")
+    }
+    const newToken = { ...token, showAlways: true }
+    await addTokenMsg(mapTokenDetailsToToken(newToken))
+
+    // optimistic update
+    set((state) => ({
+      tokens: [...state.tokens, newToken],
+    }))
+  },
+  removeToken: async (tokenAddress: TokenDetails["address"]) => {
+    await removeTokenMsg(tokenAddress)
+
+    // optimistic update
+    set((state) => ({
+      tokens: state.tokens.filter((t) => t.address !== tokenAddress),
+    }))
+  },
+}))
+
+export const useTokensSubscription = () => {
+  const { data: tokens = [] } = useSWRImmutable("tokens", () => getTokens(), {
+    suspense: true,
+  })
+
+  useEffect(() => {
+    useTokens.setState({
+      tokens: parsedDefaultTokens.concat(tokens).map(mapTokenToTokenDetails),
+    })
+
+    const subscription = messageStream.subscribe(([message]) => {
+      if (message.type === "UPDATE_TOKENS") {
+        useTokens.setState({
+          tokens: parsedDefaultTokens
+            .concat(message.data)
+            .map(mapTokenToTokenDetails),
+        })
+      }
+    })
+
+    return () => {
+      if (!subscription.closed) {
+        subscription.unsubscribe()
+      }
+    }
+  }, [])
+}
+
+export const addToken = (token: Required<TokenDetails>) => {
+  useTokens.getState().addToken(token)
+}
+
+export const removeToken = (tokenAddress: TokenDetails["address"]) => {
+  useTokens.getState().removeToken(tokenAddress)
+}
+
+export const selectTokensByNetwork = (networkId: string) => (state: State) =>
+  state.tokens.filter((token) => token.networkId === networkId)
 
 type BalancesMap = Record<string, BigNumber | undefined>
 function mergeMaps(oldMap: BalancesMap, newMap: BalancesMap): BalancesMap {

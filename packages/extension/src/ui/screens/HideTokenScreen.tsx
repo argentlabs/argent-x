@@ -28,7 +28,7 @@ export const HideTokenScreen: FC = () => {
 
   const handleSubmit = () => {
     try {
-      removeToken(token)
+      removeToken(token.address)
       navigate(routes.accountTokens())
     } catch {
       setError("Token not hidden")

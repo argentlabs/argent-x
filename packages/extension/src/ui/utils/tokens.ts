@@ -3,19 +3,9 @@ import { ethers } from "ethers"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abi/ERC20.json"
-import defaultTokens from "../../assets/default-tokens.json"
+import { feeToken } from "../../shared/token"
 import { Account } from "../Account"
 import { TokenDetails, TokenDetailsWithBalance } from "../states/tokens"
-
-export const testDappToken = (networkId: string) =>
-  defaultTokens.find(
-    ({ name, network }) => name === "Test Token" && network === networkId,
-  )
-
-export const feeToken = (networkId: string) =>
-  defaultTokens.find(
-    ({ symbol, network }) => symbol === "ETH" && network === networkId,
-  )
 
 export interface TokenView {
   address: string

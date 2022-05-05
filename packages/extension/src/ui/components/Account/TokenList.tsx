@@ -1,10 +1,10 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { testDappToken } from "../../../shared/token"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { useTokensWithBalance } from "../../states/tokens"
-import { testDappToken } from "../../utils/tokens"
 import { TokenListItem } from "../Token"
 import { EmptyAccountAlert } from "./EmptyAccountAlert"
 import { SectionHeader } from "./SectionHeader"
