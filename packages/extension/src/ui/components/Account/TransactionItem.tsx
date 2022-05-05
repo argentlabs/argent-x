@@ -3,7 +3,7 @@ import styled, { css } from "styled-components"
 
 import { TransactionMeta } from "../../../shared/transactions.model"
 import { makeClickable } from "../../utils/a11y"
-import { truncateAddress } from "../../utils/addresses"
+import { formatTruncatedAddress } from "../../utils/addresses"
 import { OpenInNewIcon } from "../Icons/MuiIcons"
 import {
   StatusIndicatorColor,
@@ -65,11 +65,11 @@ export const TransactionItem: FC<TransactionItemProps> = ({
       <TokenDetailsWrapper>
         <TokenTextGroup>
           <TokenTitle>
-            {meta?.title || truncateAddress(hash)}
+            {meta?.title || formatTruncatedAddress(hash)}
             <OpenInNewIcon style={{ fontSize: "0.8rem", marginLeft: 5 }} />
           </TokenTitle>
           <TransactionSubtitle>
-            {meta?.subTitle || truncateAddress(hash)}
+            {meta?.subTitle || formatTruncatedAddress(hash)}
           </TransactionSubtitle>
         </TokenTextGroup>
         <TransactionStatusIndicator color={status} />

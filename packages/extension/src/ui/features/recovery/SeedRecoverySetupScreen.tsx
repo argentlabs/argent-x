@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom"
 import styled, { keyframes } from "styled-components"
 import useSWRImmutable from "swr/immutable"
 
+import { IconBar } from "../../components/IconBar"
+import { Paragraph } from "../../components/Page"
 import { routes } from "../../routes"
 import { ConfirmScreen } from "../../screens/ConfirmScreen"
 import { getSeedPhrase } from "../../utils/messaging"
-import { IconBarWithIcons } from "./IconBar"
-import { Paragraph } from "./Page"
 
 const SeedPhraseGrid = styled.div`
   display: grid;
@@ -74,7 +74,7 @@ export const SeedRecoverySetupScreen: FC = () => {
 
   return (
     <>
-      <IconBarWithIcons showBack />
+      <IconBar back close />
       <ConfirmScreen
         smallTopPadding
         title="Recovery phrase"

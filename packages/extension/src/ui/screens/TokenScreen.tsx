@@ -20,7 +20,7 @@ import { useNetwork } from "../hooks/useNetworks"
 import { routes } from "../routes"
 import { useAppState } from "../states/app"
 import { useTokensWithBalance } from "../states/tokens"
-import { formatAddress, truncateAddress } from "../utils/addresses"
+import { formatTruncatedAddress, normalizeAddress } from "../utils/addresses"
 import { toTokenView } from "../utils/tokens"
 import {
   getUint256CalldataFromBN,
@@ -137,10 +137,10 @@ export const TokenScreen: FC = () => {
             href={getVoyagerContractLink(address, network)}
             target="_blank"
           >
-            {truncateAddress(address)}
+            {formatTruncatedAddress(address)}
             <OpenInNewIcon style={{ fontSize: 10 }} />
           </AccountAddressLink>
-          <CopyTooltip copyValue={formatAddress(address)} message="Copied!">
+          <CopyTooltip copyValue={normalizeAddress(address)} message="Copied!">
             <AccountAddressIconsWrapper>
               <ContentCopyIcon style={{ fontSize: 12 }} />
             </AccountAddressIconsWrapper>

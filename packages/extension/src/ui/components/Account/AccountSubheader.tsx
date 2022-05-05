@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { useNetwork } from "../../hooks/useNetworks"
 import { AccountStatus } from "../../utils/accounts"
-import { formatAddress, truncateAddress } from "../../utils/addresses"
+import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
 import { getVoyagerContractLink } from "../../utils/voyager.service"
 import { CopyTooltip } from "../CopyTooltip"
 import { ContentCopyIcon, OpenInNewIcon } from "../Icons/MuiIcons"
@@ -63,11 +63,11 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
           href={getVoyagerContractLink(accountAddress, network)}
           target="_blank"
         >
-          {truncateAddress(accountAddress)}
+          {formatTruncatedAddress(accountAddress)}
           <OpenInNewIcon style={{ fontSize: 10 }} />
         </AccountAddressLink>
         <CopyTooltip
-          copyValue={formatAddress(accountAddress)}
+          copyValue={normalizeAddress(accountAddress)}
           message="Copied!"
         >
           <AccountAddressIconsWrapper>

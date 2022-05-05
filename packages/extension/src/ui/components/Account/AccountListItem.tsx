@@ -16,7 +16,7 @@ import {
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
-import { truncateAddress } from "../../utils/addresses"
+import { formatTruncatedAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { ArrowCircleDownIcon, DeleteIcon } from "../Icons/MuiIcons"
@@ -126,7 +126,7 @@ export const AccountListItem: FC<AccountListProps> = ({
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountName}</AccountName>
-          <p>{truncateAddress(address)}</p>
+          <p>{formatTruncatedAddress(address)}</p>
         </AccountColumn>
         {status.code === "DEPLOYING" ? (
           <NetworkStatusWrapper>

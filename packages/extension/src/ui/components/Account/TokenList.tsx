@@ -2,11 +2,11 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 
 import { testDappToken } from "../../../shared/token"
+import { EmptyAccountAlert } from "../../features/funding/EmptyAccountAlert"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { useTokensWithBalance } from "../../states/tokens"
 import { TokenListItem } from "../Token"
-import { EmptyAccountAlert } from "./EmptyAccountAlert"
 import { SectionHeader } from "./SectionHeader"
 
 interface TokenListProps {

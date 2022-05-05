@@ -30,6 +30,8 @@ export const routes = {
   upgrade: route("/account/upgrade"),
   accounts: route("/accounts"),
   newToken: route("/tokens/new"),
+  funding: route("/funding"),
+  fundingQrCode: route("/funding/qr-code"),
   token: route(
     (tokenAddress: string) => `/tokens/${tokenAddress}`,
     "/tokens/:tokenAddress",

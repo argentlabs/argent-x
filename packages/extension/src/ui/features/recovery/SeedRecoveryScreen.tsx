@@ -1,12 +1,11 @@
 import { FC, useMemo, useRef, useState } from "react"
 
-import { BackButton } from "../../components/BackButton"
+import { IconBar } from "../../components/IconBar"
 import { TextArea } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
 import { useCustomNavigate } from "../../hooks/useCustomNavigate"
 import { routes } from "../../routes"
 import { ConfirmScreen } from "../../screens/ConfirmScreen"
-import { IconBar } from "./IconBar"
 import { validateAndSetSeedPhrase } from "./seedRecover.state"
 
 export const SeedRecoveryScreen: FC = () => {
@@ -33,9 +32,7 @@ export const SeedRecoveryScreen: FC = () => {
 
   return (
     <>
-      <IconBar>
-        <BackButton />
-      </IconBar>
+      <IconBar back close />
       <ConfirmScreen
         title="Restore accounts"
         confirmButtonText="Continue"

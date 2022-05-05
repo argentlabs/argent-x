@@ -63,7 +63,9 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
           <NetworkSwitcher />
         </Header>
       </AccountHeader>
+
       {children}
+
       <AccountFooter>
         <FooterTab to={routes.accountTokens()}>
           <AccountBalanceWalletIcon />

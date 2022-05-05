@@ -24,6 +24,7 @@ import { AddTokenIconButton, TokenTitle, TokenWrapper } from "../Token"
 import { AccountSubHeader } from "./AccountSubheader"
 import { PendingTransactions } from "./PendingTransactions"
 import { TokenList } from "./TokenList"
+import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
 
 const Container = styled.div`
@@ -85,6 +86,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           setAccountName(account.networkId, account.address, name)
         }
       />
+      <TransferButtons />
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && network.accountImplementation && (
         <Link to={routes.upgrade()}>

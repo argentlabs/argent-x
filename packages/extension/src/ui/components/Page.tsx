@@ -8,7 +8,6 @@ export const PageWrapper = styled.div`
 
 export const Title = styled.h1`
   font-weight: 700;
-  font-weight: 700;
   font-size: 34px;
   line-height: 41px;
   margin: 0;
