@@ -75,13 +75,13 @@ export const useTokens = create<State>((set, get) => ({
 
     // optimistic update
     set((state) => ({
-      tokens: state.tokens.filter((t) => t.address !== tokenAddress),
+      tokens: state.tokens.filter((token) => token.address !== tokenAddress),
     }))
   },
 }))
 
 export const useTokensSubscription = () => {
-  const { data: tokens = [] } = useSWRImmutable("tokens", () => getTokens(), {
+  const { data: tokens = [] } = useSWRImmutable("tokens", getTokens, {
     suspense: true,
   })
 

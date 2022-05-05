@@ -506,6 +506,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           data: tokens,
         })
       }
+
       case "REMOVE_TOKEN": {
         const address = msg.data
         const { success, tokens } = await removeToken(address)
@@ -520,6 +521,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           data: success,
         })
       }
+
       case "ADD_TOKEN": {
         const token = msg.data
         try {

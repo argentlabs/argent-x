@@ -235,13 +235,6 @@ export const getNetworkStatuses = async (networks: Network[] = []) => {
   return waitForMessage("GET_NETWORK_STATUSES_RES")
 }
 
-//   | { type: "GET_TOKENS" }
-//   | { type: "GET_TOKENS_RES"; data: Token[] }
-//   | { type: "UPDATE_TOKENS"; data: Token[] }
-//   | { type: "REMOVE_TOKEN"; data: Token["address"] }
-//   | { type: "REMOVE_TOKEN_RES"; data: boolean }
-//   | { type: "ADD_TOKEN"; data: Required<Token> }
-//   | { type: "ADD_TOKEN_RES"; data: boolean }
 export const getTokens = async () => {
   sendMessage({ type: "GET_TOKENS" })
   return waitForMessage("GET_TOKENS_RES")

@@ -8,27 +8,21 @@ const tokenStore = new Storage<{
 }>({ tokens: [] }, "tokens")
 
 const validateToken = (token: Partial<Token>): token is Token => {
-  if (!token.address) {
-    return false
-  }
   try {
+    if (
+      !token.address ||
+      !token.networkId ||
+      !token.name ||
+      !token.symbol ||
+      !token.decimals
+    ) {
+      throw Error("token is missing required field")
+    }
     validateAndParseAddress(token.address)
+    return true
   } catch (e) {
     return false
   }
-  if (!token.networkId) {
-    return false
-  }
-  if (!token.name) {
-    return false
-  }
-  if (!token.symbol) {
-    return false
-  }
-  if (!token.decimals) {
-    return false
-  }
-  return true
 }
 
 export const getTokens = async (): Promise<Token[]> => {
@@ -40,11 +34,11 @@ export const hasToken = async (address: Token["address"]): Promise<boolean> => {
   return tokens.some((token) => token.address === address)
 }
 
-type MutateTokenRes =
+type TokenMutationResult =
   | { success: true; tokens: Token[] }
   | { success: false; tokens?: never }
 
-export const addToken = async (token: Token): Promise<MutateTokenRes> => {
+export const addToken = async (token: Token): Promise<TokenMutationResult> => {
   if (!validateToken(token)) {
     throw new Error("Invalid token")
   }
@@ -59,7 +53,7 @@ export const addToken = async (token: Token): Promise<MutateTokenRes> => {
 
 export const removeToken = async (
   tokenAddress: Token["address"],
-): Promise<MutateTokenRes> => {
+): Promise<TokenMutationResult> => {
   const tokens = await tokenStore.getItem("tokens")
   const index = tokens.findIndex(({ address }) => address === tokenAddress)
   if (index === -1) {
