@@ -30,7 +30,7 @@ export interface TokenDetailsWithBalance extends TokenDetails {
 interface State {
   tokens: TokenDetails[]
   addToken: (token: Required<TokenDetails>) => void
-  removeToken: (tokenAddress: TokenDetails["address"]) => void
+  removeToken: (tokenAddress: string) => void
 }
 
 const mapTokenToTokenDetails = (token: Token): TokenDetails => ({
@@ -70,7 +70,7 @@ export const useTokens = create<State>((set, get) => ({
       tokens: [...state.tokens, newToken],
     }))
   },
-  removeToken: async (tokenAddress: TokenDetails["address"]) => {
+  removeToken: async (tokenAddress: string) => {
     await removeTokenMsg(tokenAddress)
 
     // optimistic update
@@ -112,7 +112,7 @@ export const addToken = (token: Required<TokenDetails>) => {
   useTokens.getState().addToken(token)
 }
 
-export const removeToken = (tokenAddress: TokenDetails["address"]) => {
+export const removeToken = (tokenAddress: string) => {
   useTokens.getState().removeToken(tokenAddress)
 }
 
