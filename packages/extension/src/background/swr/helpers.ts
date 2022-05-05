@@ -1,4 +1,4 @@
-import { isFunction, isPlainObject } from "lodash-es"
+import { isFunction, isObjectLike, isPlainObject } from "lodash-es"
 
 import { Config } from "./types"
 
@@ -12,7 +12,7 @@ export function parseConfig(config: Config) {
   const storage = config.storage
 
   if (
-    !isPlainObject(storage) ||
+    !isObjectLike(storage) ||
     !isFunction(storage.getItem) ||
     !isFunction(storage.setItem)
   ) {
