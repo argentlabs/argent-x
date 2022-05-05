@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
@@ -20,7 +20,6 @@ export const TokenList: FC<TokenListProps> = ({
   accountAddress,
   canShowEmptyAccountAlert = true,
 }) => {
-  const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { isValidating, tokenDetails } = useTokensWithBalance()
 
@@ -38,12 +37,9 @@ export const TokenList: FC<TokenListProps> = ({
       )}
       {showTitle && <SectionHeader>Tokens</SectionHeader>}
       {tokenDetails.map((token) => (
-        <TokenListItem
-          key={token.address}
-          token={token}
-          onClick={() => navigate(routes.token(token.address))}
-          isLoading={isValidating}
-        />
+        <Link key={token.address} to={routes.token(token.address)}>
+          <TokenListItem token={token} isLoading={isValidating} />
+        </Link>
       ))}
     </>
   )

@@ -1,5 +1,5 @@
 import { FC, ReactNode } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import styled, { css } from "styled-components"
 
 import { routes } from "../../routes"
@@ -8,7 +8,6 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../../states/accountMetadata"
-import { makeClickable } from "../../utils/a11y"
 import { getAccountImageUrl } from "../../utils/accounts"
 import { Header } from "../Header"
 import {
@@ -44,7 +43,6 @@ interface AccountScreenContentProps {
 export const AccountContainer: FC<AccountScreenContentProps> = ({
   children,
 }) => {
-  const navigate = useNavigate()
   const { accountNames } = useAccountMetadata()
   const account = useSelectedAccount()
 
@@ -57,24 +55,25 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
     <Container header footer>
       <AccountHeader>
         <Header>
-          <ProfilePicture
-            {...makeClickable(() => navigate(routes.accounts()))}
-            src={getAccountImageUrl(accountName, account.address)}
-          />
+          <Link to={routes.accounts()}>
+            <ProfilePicture
+              src={getAccountImageUrl(accountName, account.address)}
+            />
+          </Link>
           <NetworkSwitcher />
         </Header>
       </AccountHeader>
       {children}
       <AccountFooter>
-        <FooterTab onClick={() => navigate(routes.accountTokens())}>
+        <FooterTab to={routes.accountTokens()}>
           <AccountBalanceWalletIcon />
           <span>Tokens</span>
         </FooterTab>
-        <FooterTab onClick={() => navigate(routes.accountNfts())}>
+        <FooterTab to={routes.accountNfts()}>
           <PhotoLibraryIcon />
           <span>Collectibles</span>
         </FooterTab>
-        <FooterTab onClick={() => navigate(routes.accountActivity())}>
+        <FooterTab to={routes.accountActivity()}>
           <FormatListBulletedIcon />
           <span>Activity</span>
         </FooterTab>

@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { BackButton } from "../../components/BackButton"
@@ -11,7 +11,6 @@ import { H2, P } from "../../components/Typography"
 import { useNetworks } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import { useSelectedNetwork } from "../../states/selectedNetwork"
-import { makeClickable } from "../../utils/a11y"
 import { removeNetworks } from "../../utils/messaging"
 import { DappConnection } from "./DappConnection"
 
@@ -49,10 +48,6 @@ export const NetworkSettingsScreen: FC = () => {
   const navigate = useNavigate()
   const [, setSelectedCustomNetwork] = useSelectedNetwork()
 
-  const handleAddCustomNetwork = () => {
-    navigate(routes.settingsAddCustomNetwork())
-  }
-
   return (
     <>
       <Header>
@@ -89,13 +84,11 @@ export const NetworkSettingsScreen: FC = () => {
           )}
         </List>
 
-        <IconButtonCenter
-          size={48}
-          style={{ marginTop: "32px" }}
-          {...makeClickable(handleAddCustomNetwork)}
-        >
-          <AddIcon fontSize="large" />
-        </IconButtonCenter>
+        <Link to={routes.settingsAddCustomNetwork()}>
+          <IconButtonCenter size={48} style={{ marginTop: "32px" }}>
+            <AddIcon fontSize="large" />
+          </IconButtonCenter>
+        </Link>
       </Wrapper>
     </>
   )

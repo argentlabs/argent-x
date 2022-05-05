@@ -69,6 +69,11 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     margin-block: 0;
   }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 `
 
 const theme = createTheme({ palette: { mode: "dark" } })

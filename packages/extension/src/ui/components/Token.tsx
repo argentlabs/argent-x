@@ -3,7 +3,6 @@ import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
 import { TokenDetailsWithBalance } from "../states/tokens"
-import { makeClickable } from "../utils/a11y"
 import { toTokenView } from "../utils/tokens"
 import { IconButton } from "./IconButton"
 import { TokenIcon } from "./TokenIcon"
@@ -107,18 +106,16 @@ export type TokenAction =
 interface TokenListItemProps {
   token: TokenDetailsWithBalance
   isLoading?: boolean
-  onClick?: () => void
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
   token,
   isLoading = false,
-  onClick,
   ...props
 }) => {
   const { name, symbol, balance, image } = toTokenView(token)
   return (
-    <TokenWrapper {...makeClickable(onClick)} {...props}>
+    <TokenWrapper {...props}>
       <TokenIcon url={image} name={name} />
       <TokenDetailsWrapper>
         <TokenTextGroup>
