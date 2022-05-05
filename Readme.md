@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/">
-    <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/packages/get-starknet/src/button-download.svg">
+    <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/assets/button-download.svg">
   </a>
 </p>
 
