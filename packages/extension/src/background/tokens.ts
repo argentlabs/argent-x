@@ -20,7 +20,7 @@ const validateToken = (token: Partial<Token>): token is Token => {
     }
     validateAndParseAddress(token.address)
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }
