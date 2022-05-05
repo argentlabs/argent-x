@@ -126,22 +126,25 @@ const Screen: FC = () => {
         }
       >
         {/* Routes which need no unlocked backup */}
-        <Route path={routes.welcome()} element={<WelcomeScreen />} />
-        <Route path={routes.newWallet()} element={<NewWalletScreen />} />
+        <Route path={routes.welcome.path} element={<WelcomeScreen />} />
+        <Route path={routes.newWallet.path} element={<NewWalletScreen />} />
         <Route
-          path={routes.backupRecovery()}
+          path={routes.backupRecovery.path}
           element={<BackupRecoveryScreen />}
         />
-        <Route path={routes.seedRecovery()} element={<SeedRecoveryScreen />} />
         <Route
-          path={routes.seedRecoveryPassword()}
+          path={routes.seedRecovery.path}
+          element={<SeedRecoveryScreen />}
+        />
+        <Route
+          path={routes.seedRecoveryPassword.path}
           element={<SeedRecoveryPasswordScreen />}
         />
-        <Route path={routes.lockScreen()} element={<LockScreen />} />
-        <Route path={routes.reset()} element={<ResetScreen />} />
-        <Route path={routes.disclaimer()} element={<DisclaimerScreen />} />
-        <Route path={routes.legacy()} element={<LegacyScreen />} />
-        <Route path={routes.error()} element={<ErrorScreen />} />
+        <Route path={routes.lockScreen.path} element={<LockScreen />} />
+        <Route path={routes.reset.path} element={<ResetScreen />} />
+        <Route path={routes.disclaimer.path} element={<DisclaimerScreen />} />
+        <Route path={routes.legacy.path} element={<LegacyScreen />} />
+        <Route path={routes.error.path} element={<ErrorScreen />} />
 
         {/* Routes which need an unlocked backup and therefore can also sign actions */}
         {actions[0] ? (
@@ -149,53 +152,53 @@ const Screen: FC = () => {
         ) : (
           <>
             <Route
-              path={routes.networkWarning()}
+              path={routes.networkWarning.path}
               element={<NetworkWarningScreen />}
             />
-            <Route path={routes.accountNftPath()} element={<NftScreen />} />
+            <Route path={routes.accountNft.path} element={<NftScreen />} />
             <Route
-              path={routes.accountTokens()}
+              path={routes.accountTokens.path}
               element={<AccountScreen tab="tokens" />}
             />
             <Route
-              path={routes.accountNfts()}
+              path={routes.accountNfts.path}
               element={<AccountScreen tab="nfts" />}
             />
             <Route
-              path={routes.accountActivity()}
+              path={routes.accountActivity.path}
               element={<AccountScreen tab="activity" />}
             />
-            <Route path={routes.upgrade()} element={<UpgradeScreen />} />
-            <Route path={routes.accounts()} element={<AccountListScreen />} />
+            <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
             <Route
-              path={routes.confirmSeedRecovery()}
+              path={routes.accounts.path}
+              element={<AccountListScreen />}
+            />
+            <Route
+              path={routes.confirmSeedRecovery.path}
               element={<SeedRecoveryConfirmScreen />}
             />
             <Route
-              path={routes.setupSeedRecovery()}
+              path={routes.setupSeedRecovery.path}
               element={<SeedRecoverySetupScreen />}
             />
             <Route
-              path={routes.setupRecovery()}
+              path={routes.setupRecovery.path}
               element={<RecoverySetupScreen />}
             />
-            <Route path={routes.newToken()} element={<AddTokenScreen />} />
-            <Route path={routes.tokenPath()} element={<TokenScreen />} />
+            <Route path={routes.newToken.path} element={<AddTokenScreen />} />
+            <Route path={routes.token.path} element={<TokenScreen />} />
+            <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
+            <Route path={routes.settings.path} element={<SettingsScreen />} />
             <Route
-              path={routes.hideTokenPath()}
-              element={<HideTokenScreen />}
-            />
-            <Route path={routes.settings()} element={<SettingsScreen />} />
-            <Route
-              path={routes.settingsNetworks()}
+              path={routes.settingsNetworks.path}
               element={<NetworkSettingsScreen />}
             />
             <Route
-              path={routes.settingsAddCustomNetwork()}
+              path={routes.settingsAddCustomNetwork.path}
               element={<NetworkSettingsFormScreen mode="add" />}
             />
             <Route
-              path={routes.settingsEditCustomNetwork()}
+              path={routes.settingsEditCustomNetwork.path}
               element={
                 selectedCustomNetwork ? (
                   <NetworkSettingsFormScreen
@@ -203,16 +206,16 @@ const Screen: FC = () => {
                     network={selectedCustomNetwork}
                   />
                 ) : (
-                  <Navigate to={routes.settingsNetworks()} />
+                  <Navigate to={routes.settingsNetworks.path} />
                 )
               }
             />
             <Route
-              path={routes.settingsDappConnections()}
+              path={routes.settingsDappConnections.path}
               element={<DappConnectionsSettingsScreen />}
             />
             <Route
-              path={routes.backupDownload()}
+              path={routes.backupDownload.path}
               element={<BackupDownloadScreen />}
             />
           </>
