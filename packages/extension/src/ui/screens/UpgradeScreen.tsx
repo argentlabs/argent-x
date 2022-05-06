@@ -24,6 +24,7 @@ export const UpgradeScreen: FC = () => {
       navigate(routes.accounts())
     }
   }, [])
+
   if (!selectedAccount) {
     return <></>
   }

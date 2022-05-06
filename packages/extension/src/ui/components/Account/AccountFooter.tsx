@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 export const AccountFooter = styled.div`
@@ -11,7 +12,7 @@ export const AccountFooter = styled.div`
   backdrop-filter: blur(10px);
 `
 
-export const FooterTab = styled.div`
+export const FooterTab = styled(Link)`
   display: flex;
   flex-direction: column;
   align-items: center;

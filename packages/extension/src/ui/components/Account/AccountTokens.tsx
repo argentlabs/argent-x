@@ -1,5 +1,5 @@
 import { FC, Suspense, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
@@ -86,14 +86,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         }
       />
       {showBackupBanner && <RecoveryBanner />}
-      {showUpgradeBanner && (
-        <UpgradeBanner
-          onClick={() => {
-            if (network.accountImplementation) {
-              navigate(routes.upgrade())
-            }
-          }}
-        />
+      {showUpgradeBanner && network.accountImplementation && (
+        <Link to={routes.upgrade()}>
+          <UpgradeBanner />
+        </Link>
       )}
       <PendingTransactions accountAddress={account.address} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>

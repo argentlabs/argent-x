@@ -42,7 +42,6 @@ export interface BannerProps {
   title: string
   description: string
   icon: ReactNode
-  onClick?: () => void
   noMargins?: boolean
 }
 
@@ -50,16 +49,13 @@ export const Banner: FC<BannerProps> = ({
   title,
   description,
   icon,
-  onClick,
   noMargins,
-}) => {
-  return (
-    <BannerWrapper noMargins={noMargins} onClick={onClick}>
-      {icon}
-      <BannerTextWrapper>
-        <BannerTitle>{title}</BannerTitle>
-        <BannerDescription>{description}</BannerDescription>
-      </BannerTextWrapper>
-    </BannerWrapper>
-  )
-}
+}) => (
+  <BannerWrapper noMargins={noMargins}>
+    {icon}
+    <BannerTextWrapper>
+      <BannerTitle>{title}</BannerTitle>
+      <BannerDescription>{description}</BannerDescription>
+    </BannerTextWrapper>
+  </BannerWrapper>
+)
