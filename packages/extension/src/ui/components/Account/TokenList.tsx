@@ -1,10 +1,7 @@
 import { FC } from "react"
 import { Link } from "react-router-dom"
 
-import { testDappToken } from "../../../shared/token"
-import { EmptyAccountAlert } from "../../features/funding/EmptyAccountAlert"
 import { routes } from "../../routes"
-import { useAppState } from "../../states/app"
 import { useTokensWithBalance } from "../../states/tokens"
 import { TokenListItem } from "../Token"
 import { SectionHeader } from "./SectionHeader"
@@ -15,26 +12,11 @@ interface TokenListProps {
   canShowEmptyAccountAlert?: boolean
 }
 
-export const TokenList: FC<TokenListProps> = ({
-  showTitle,
-  accountAddress,
-  canShowEmptyAccountAlert = true,
-}) => {
-  const { switcherNetworkId } = useAppState()
+export const TokenList: FC<TokenListProps> = ({ showTitle }) => {
   const { isValidating, tokenDetails } = useTokensWithBalance()
-
-  const hasBalance = tokenDetails.some(
-    ({ balance }) => balance && !balance.isZero(),
-  )
 
   return (
     <>
-      {canShowEmptyAccountAlert && !hasBalance && (
-        <EmptyAccountAlert
-          accountAddress={accountAddress}
-          mintableAddress={testDappToken(switcherNetworkId)?.address}
-        />
-      )}
       {showTitle && <SectionHeader>Tokens</SectionHeader>}
       {tokenDetails.map((token) => (
         <Link key={token.address} to={routes.token(token.address)}>
