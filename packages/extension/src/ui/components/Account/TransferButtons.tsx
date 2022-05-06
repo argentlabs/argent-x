@@ -2,9 +2,9 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
+import { feeToken } from "../../../shared/token"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
-import { feeToken } from "../../utils/tokens"
 import { IconButton } from "../IconButton"
 import { AddIcon, SendIcon } from "../Icons/MuiIcons"
 
