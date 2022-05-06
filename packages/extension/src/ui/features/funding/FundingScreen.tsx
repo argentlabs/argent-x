@@ -22,10 +22,10 @@ const Title = styled.h1`
 
 export const FundingScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
-  console.log(switcherNetworkId)
   const bridgeUrl =
     switcherNetworkId === "goerli-alpha" &&
     "https://goerli.starkgate.starknet.io"
+
   return (
     <>
       <IconBar close />
