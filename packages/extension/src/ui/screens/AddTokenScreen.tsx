@@ -35,8 +35,11 @@ const AddTokenScreenWrapper = styled.div`
   }
 `
 
-const isDataComplete = (data: TokenDetails): data is Required<TokenDetails> => {
+const isDataComplete = (
+  data: Partial<TokenDetails>,
+): data is Required<TokenDetails> => {
   if (
+    data.address &&
     isValidAddress(data.address) &&
     data.decimals?.toString() &&
     data.name &&

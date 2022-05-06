@@ -1,23 +1,21 @@
 import defaultTokens from "../assets/default-tokens.json"
 
-export interface Token {
+export interface RequestToken {
   address: string
-  networkId: string
-  name: string
-  symbol: string
-  decimals: string
+  networkId?: string
+  name?: string
+  symbol?: string
+  decimals?: string
+}
+
+export interface Token extends Required<RequestToken> {
   image?: string
   showAlways?: boolean
 }
 
-export type RequestToken = Partial<
-  Omit<Token, "image" | "showAlways" | "address">
-> &
-  Pick<Token, "address">
-
 export const equalToken = (
-  a: Pick<Token, "address" | "networkId">,
-  b: Pick<Token, "address" | "networkId">,
+  a: Pick<RequestToken, "address" | "networkId">,
+  b: Pick<RequestToken, "address" | "networkId">,
 ) => a.address === b.address && a.networkId === b.networkId
 
 export const parsedDefaultTokens: Token[] = defaultTokens.map((token) => ({

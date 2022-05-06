@@ -17,9 +17,7 @@ import { fetchTokenBalance } from "../utils/tokens"
 import { useSelectedAccount } from "./account"
 import { useAppState } from "./app"
 
-export interface TokenDetails
-  extends Pick<Token, "address" | "networkId">,
-    Partial<Omit<Token, "decimals" | "address" | "networkId">> {
+export interface TokenDetails extends Omit<Token, "decimals"> {
   decimals?: BigNumber
 }
 
