@@ -1,14 +1,15 @@
 import { ThemeProvider, createTheme } from "@mui/material"
-import { FC, Suspense } from "react"
+import { FC, Suspense, useEffect, useState } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
 import { AppRoutes } from "./AppRoutes"
+import { isInTab } from "./hooks/useCustomNavigate"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { swrCacheProvider } from "./utils/swrCache"
 
-const GlobalStyle = createGlobalStyle`
+const GlobalStyleWithFixedDimensions = createGlobalStyle`
   ${normalize}
 
   body {
@@ -19,8 +20,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   html, body {
-    min-width: 360px;
-    min-height: 600px;
+    width: 360px;
+    height: 600px;
     
     overscroll-behavior: none;
     -ms-overflow-style: none;  /* IE and Edge */
@@ -42,6 +43,28 @@ const GlobalStyle = createGlobalStyle`
     color: inherit;
   }
 `
+
+const OverwriteDimensionsToMinDimensions = createGlobalStyle`
+  html, body {
+    width: unset;
+    height: unset;
+    min-width: 360px;
+    min-height: 600px;
+  }
+`
+
+const GlobalStyle: FC = () => {
+  const [isTab, setIsTab] = useState(false)
+  useEffect(() => {
+    isInTab().then(setIsTab)
+  }, [])
+  return (
+    <>
+      <GlobalStyleWithFixedDimensions />
+      {isTab && <OverwriteDimensionsToMinDimensions />}
+    </>
+  )
+}
 
 const theme = createTheme({ palette: { mode: "dark" } })
 
