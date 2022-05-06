@@ -31,12 +31,14 @@ interface State {
   removeToken: (tokenAddress: string) => void
 }
 
-const mapTokenToTokenDetails = (token: Token): TokenDetails => ({
+export const mapTokenToTokenDetails = (token: Token): TokenDetails => ({
   ...token,
   decimals: number.toBN(token.decimals),
 })
 
-const mapTokenDetailsToToken = (token: Required<TokenDetails>): Token => ({
+export const mapTokenDetailsToToken = (
+  token: Required<TokenDetails>,
+): Token => ({
   ...token,
   decimals: token.decimals.toString(),
 })

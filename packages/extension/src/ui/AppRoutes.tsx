@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
@@ -39,6 +39,7 @@ import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
 import { useTokensSubscription } from "./states/tokens"
+import { migrateUiTokensToBackground } from "./states/tokens.legacy"
 
 export const ScrollBehaviour = styled.div`
   height: 100vh;
@@ -145,6 +146,10 @@ export const AppRoutes: FC = () => {
   useActionsSubscription()
   useTransactionErrorScreen()
   useTokensSubscription()
+
+  useEffect(() => {
+    migrateUiTokensToBackground()
+  }, [])
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
