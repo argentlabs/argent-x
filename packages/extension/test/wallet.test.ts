@@ -47,7 +47,7 @@ const NETWORK = "testnetwork"
 const getNetwork = async (): Promise<Network> => ({
   id: NETWORK,
   chainId: "SN_GOERLI",
-  baseUrl: "http://localhost:5000",
+  baseUrl: "http://localhost:5050",
   name: "Test Network",
 })
 
