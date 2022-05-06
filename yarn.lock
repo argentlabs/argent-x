@@ -9406,13 +9406,10 @@ stack-utils@^2.0.3:
     url-join "^4.0.1"
 
 starknet@^3.10.0:
-  version "3.10.2"
-  resolved "https://registry.npmjs.org/starknet/-/starknet-3.10.2.tgz#0d83ad5499d89637ce5c3b5ae37aa23f03dd6635"
-  integrity sha512-cjgLn/J86W9Fv6n+3ZbrQqyMUPSIv54f9Iwv/4oo02UQ7TixRablnts/FYhUD61TG+8QiZ8rObFi01oG+NlIEg==
+  version "3.10.3"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.10.3.tgz#e671c68a4c26ca104e8979b5539b96005b5443f7"
+  integrity sha512-KHaVRBCrXcXfW/JtS3QyC1wWEwZHXswbOoZJaMQWuNtYMKMNgNSCCjzqag0+BsHXbaQP6AYjZT5InhYEL/XLHQ==
   dependencies:
-    "@ledgerhq/hw-app-eth" "^6.26.0"
-    "@ledgerhq/hw-transport" "^6.24.1"
-    "@ledgerhq/hw-transport-webhid" "^6.24.1"
     axios "^0.23.0"
     bn.js "^5.2.0"
     elliptic "^6.5.4"
