@@ -6,7 +6,7 @@ import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { routes } from "../../routes"
-import { useSelectedNetwork } from "../../states/selectedNetwork"
+import { useAppState } from "../../states/app"
 import CardSvg from "./card.svg"
 import EthereumSvg from "./ethereum.svg"
 import StarkNetSvg from "./starknet.svg"
@@ -21,9 +21,11 @@ const Title = styled.h1`
 `
 
 export const FundingScreen: FC = () => {
-  const [network] = useSelectedNetwork()
+  const { switcherNetworkId } = useAppState()
+  console.log(switcherNetworkId)
   const bridgeUrl =
-    network?.id === "goerli-alpha" && "https://goerli.starkgate.starknet.io"
+    switcherNetworkId === "goerli-alpha" &&
+    "https://goerli.starkgate.starknet.io"
   return (
     <>
       <IconBar close />
