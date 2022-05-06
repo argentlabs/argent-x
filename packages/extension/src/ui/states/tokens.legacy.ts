@@ -3,9 +3,9 @@ import { BigNumber } from "ethers"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
+import { sendMessage } from "../../shared/messages"
 import { equalToken, parsedDefaultTokens } from "../../shared/token"
 import { isValidAddress } from "../utils/addresses"
-import { addToken } from "../utils/messaging"
 import {
   TokenDetails,
   mapTokenDetailsToToken,
@@ -92,7 +92,11 @@ export async function migrateUiTokensToBackground() {
     )
     const promises = customTokens.map(async (token) => {
       if (isDataComplete(token)) {
-        await addToken(mapTokenDetailsToToken(token))
+        await sendMessage({
+          // lets not use the helper, so we dont wait for response (less error prone)
+          type: "ADD_TOKEN",
+          data: mapTokenDetailsToToken(token),
+        })
       }
     })
 
