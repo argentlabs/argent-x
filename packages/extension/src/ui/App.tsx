@@ -39,6 +39,7 @@ import { WelcomeScreen } from "./screens/WelcomeScreen"
 import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
 import { useSelectedNetwork } from "./states/selectedNetwork"
+import { useTokensSubscription } from "./states/tokens"
 import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
@@ -107,6 +108,7 @@ const Screen: FC = () => {
   useEntry()
   useActionsSubscription()
   useTransactionErrorScreen()
+  useTokensSubscription()
 
   const { isLoading } = useAppState()
   const { actions } = useActions()

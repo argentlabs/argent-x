@@ -1,12 +1,6 @@
-import { BigNumber } from "ethers"
 import { Cache } from "swr"
 
-const revive = (key: string, value: any) => {
-  if (value?.type === "BigNumber" && "hex" in value) {
-    return BigNumber.from(value.hex)
-  }
-  return value
-}
+import { reviveJsonBigNumber } from "../../shared/json"
 
 export const swrCacheProvider: Cache = {
   set: (key: string, value: any) => {
@@ -18,7 +12,7 @@ export const swrCacheProvider: Cache = {
       return undefined
     }
     try {
-      return JSON.parse(value, revive) ?? undefined
+      return JSON.parse(value, reviveJsonBigNumber) ?? undefined
     } catch {
       return undefined
     }

@@ -22,7 +22,7 @@ export type ActionItem =
       payload: typedData.TypedData
     }
   | {
-      type: "ADD_TOKEN"
+      type: "REQUEST_TOKEN"
       payload: {
         address: string
         decimals?: string

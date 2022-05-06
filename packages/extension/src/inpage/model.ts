@@ -15,13 +15,22 @@ interface WatchAssetParameters {
   }
 }
 
-export type RpcMessage = {
-  type: "wallet_watchAsset"
-  params: WatchAssetParameters
-}
+export type RpcMessage =
+  | {
+      type: "wallet_watchAsset"
+      params: WatchAssetParameters
+      result: boolean
+    }
+  | {
+      type: string
+      params: any
+      result: never
+    }
 
 interface IStarketWindowObject {
-  request: (call: RpcMessage) => Promise<void>
+  request: <T extends RpcMessage>(
+    call: Omit<T, "result">,
+  ) => Promise<T["result"]>
   enable: (options?: { showModal?: boolean }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
   on: (event: "accountsChanged", handleEvent: EventHandler) => void

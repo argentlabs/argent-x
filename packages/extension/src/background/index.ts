@@ -41,6 +41,7 @@ import {
   resetPreAuthorizations,
 } from "./preAuthorizations"
 import { Storage, clearStorage } from "./storage"
+import { addToken, getTokens, hasToken, removeToken } from "./tokens"
 import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
 import { getImplementationUpgradePath } from "./upgrade"
 import { getProvider } from "./utils/getProvider"
@@ -415,9 +416,9 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
             })
           }
 
-          case "ADD_TOKEN": {
+          case "REQUEST_TOKEN": {
             return sendToTabAndUi({
-              type: "APPROVE_ADD_TOKEN",
+              type: "APPROVE_REQUEST_TOKEN",
               data: {
                 actionHash,
               },
@@ -427,19 +428,6 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
           default:
             return
         }
-      }
-
-      case "ADD_TOKEN": {
-        const { meta } = await actionQueue.push({
-          type: "ADD_TOKEN",
-          payload: msg.data,
-        })
-        return sendToTabAndUi({
-          type: "ADD_TOKEN_RES",
-          data: {
-            actionHash: meta.hash,
-          },
-        })
       }
 
       case "REJECT_ACTION": {
@@ -474,9 +462,9 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
               },
             })
           }
-          case "ADD_TOKEN": {
+          case "REQUEST_TOKEN": {
             return sendToTabAndUi({
-              type: "REJECT_ADD_TOKEN",
+              type: "REJECT_REQUEST_TOKEN",
               data: {
                 actionHash,
               },
@@ -489,9 +477,70 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
       case "SIGNATURE_FAILURE":
       case "REJECT_PREAUTHORIZATION":
-      case "REJECT_ADD_TOKEN":
+      case "REJECT_REQUEST_TOKEN":
       case "TRANSACTION_FAILED": {
         return await actionQueue.remove(msg.data.actionHash)
+      }
+
+      case "REQUEST_TOKEN": {
+        const exists = await hasToken(msg.data.address)
+        if (exists) {
+          return sendToTabAndUi({ type: "REQUEST_TOKEN_RES", data: {} })
+        }
+        const { meta } = await actionQueue.push({
+          type: "REQUEST_TOKEN",
+          payload: msg.data,
+        })
+        return sendToTabAndUi({
+          type: "REQUEST_TOKEN_RES",
+          data: {
+            actionHash: meta.hash,
+          },
+        })
+      }
+
+      case "GET_TOKENS": {
+        const tokens = await getTokens()
+        return sendToTabAndUi({
+          type: "GET_TOKENS_RES",
+          data: tokens,
+        })
+      }
+
+      case "REMOVE_TOKEN": {
+        const address = msg.data
+        const { success, tokens } = await removeToken(address)
+        if (success) {
+          return sendToTabAndUi({
+            type: "UPDATE_TOKENS",
+            data: tokens,
+          })
+        }
+        return sendToTabAndUi({
+          type: "REMOVE_TOKEN_RES",
+          data: success,
+        })
+      }
+
+      case "ADD_TOKEN": {
+        const token = msg.data
+        try {
+          const { success, tokens } = await addToken(token)
+          if (success) {
+            return sendToTabAndUi({
+              type: "UPDATE_TOKENS",
+              data: tokens,
+            })
+          }
+          return sendToTabAndUi({
+            type: "ADD_TOKEN_RES",
+            data: success,
+          })
+        } catch {
+          return sendToTabAndUi({
+            type: "ADD_TOKEN_REJ",
+          })
+        }
       }
 
       case "RESET_ALL": {

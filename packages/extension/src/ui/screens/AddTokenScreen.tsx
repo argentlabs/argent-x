@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { number } from "starknet"
 import styled from "styled-components"
 
-import { AddToken } from "../../shared/token.model"
+import { RequestToken } from "../../shared/token"
 import { BackButton } from "../components/BackButton"
 import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
@@ -35,8 +35,11 @@ const AddTokenScreenWrapper = styled.div`
   }
 `
 
-const isDataComplete = (data: TokenDetails): data is Required<TokenDetails> => {
+const isDataComplete = (
+  data: Partial<TokenDetails>,
+): data is Required<TokenDetails> => {
   if (
+    data.address &&
     isValidAddress(data.address) &&
     data.decimals?.toString() &&
     data.name &&
@@ -52,7 +55,7 @@ function addressFormat64Byte(address: number.BigNumberish): string {
 }
 
 interface AddTokenScreenProps {
-  defaultToken?: AddToken
+  defaultToken?: RequestToken
   hideBackButton?: boolean
   onSubmit?: () => void
   onReject?: () => void
@@ -141,13 +144,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             compiledData.address = addressFormat64Byte(compiledData.address)
             if (isDataComplete(compiledData)) {
               try {
-                addToken({
-                  address: compiledData.address,
-                  decimals: compiledData.decimals,
-                  name: compiledData.name,
-                  symbol: compiledData.symbol,
-                  networkId: compiledData.networkId,
-                })
+                addToken(compiledData)
                 onSubmit?.()
                 navigate(routes.accountTokens())
               } catch (e) {
