@@ -9,19 +9,19 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "friday"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/packages/extension" # Location of package manifests
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "friday"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/packages/get-starknet" # Location of package manifests
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "friday"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/packages/dapp" # Location of package manifests
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "friday"
