@@ -1,25 +1,11 @@
-import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
-import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
-import {
-  CompiledContract,
-  Contract,
-  ProviderInterface,
-  json,
-  number,
-  stark,
-} from "starknet"
+import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 
+import ArgentCompiledContractAbi from "../abi/ArgentAccount.json"
+import ProxyCompiledContractAbi from "../abi/Proxy.json"
 import { sendMessage, waitForMessage } from "../shared/messages"
 import { Network, getProvider } from "../shared/networks"
 import { WalletAccountSigner } from "../shared/wallet.model"
 import { getNetwork } from "./utils/messaging"
-
-const ArgentCompiledContractJson: CompiledContract = json.parse(
-  ArgentCompiledContract,
-)
-const ProxyCompiledContractJson: CompiledContract = json.parse(
-  ProxyCompiledContract,
-)
 
 export class Account {
   address: string
@@ -44,12 +30,12 @@ export class Account {
     this.deployTransaction = deployTransaction
     this.provider = getProvider(network)
     this.contract = new Contract(
-      ArgentCompiledContractJson.abi,
+      ArgentCompiledContractAbi as Abi,
       address,
       this.provider,
     )
     this.proxyContract = new Contract(
-      ProxyCompiledContractJson.abi,
+      ProxyCompiledContractAbi as Abi,
       address,
       this.provider,
     )

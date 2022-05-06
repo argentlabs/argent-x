@@ -22,7 +22,7 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: "inline-source-map",
+  devtool: isProd ? undefined : "inline-source-map",
   mode: isProd ? "production" : "development",
   module: {
     rules: [
@@ -36,7 +36,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpg|gif)$/i,
+        test: /\.(png|jpg|gif|txt)$/i,
         use: [
           {
             loader: "url-loader",
@@ -75,6 +75,12 @@ module.exports = {
     fallback: { buffer: require.resolve("buffer/") },
     alias: {
       "@mui/styled-engine": "@mui/styled-engine-sc",
+    },
+  },
+  optimization: {
+    minimize: true,
+    splitChunks: {
+      chunks: "async",
     },
   },
   output: {
