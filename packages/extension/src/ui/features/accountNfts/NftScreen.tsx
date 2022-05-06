@@ -3,7 +3,6 @@ import { FC, lazy, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
-import PlayOasisSvg from "../../../assets/playoasis.svg"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroup } from "../../components/Button"
 import { Header } from "../../components/Header"
@@ -17,6 +16,7 @@ import {
   sendTransaction,
 } from "../../utils/transactions"
 import { openPlayOasisNft } from "./playoasis.service"
+import PlayOasisSvg from "./playoasis.svg"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))

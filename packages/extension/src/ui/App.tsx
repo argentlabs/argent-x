@@ -6,6 +6,8 @@ import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
 import { NftScreen } from "./features/accountNfts/NftScreen"
+import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
+import { FundingScreen } from "./features/funding/FundingScreen"
 import { BackupRecoveryScreen } from "./features/recovery/BackupRecoveryScreen"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
 import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
@@ -179,6 +181,11 @@ const Screen: FC = () => {
             <Route
               path={routes.accounts.path}
               element={<AccountListScreen />}
+            />
+            <Route path={routes.funding.path} element={<FundingScreen />} />
+            <Route
+              path={routes.fundingQrCode.path}
+              element={<FundingQrCodeScreen />}
             />
             <Route
               path={routes.confirmSeedRecovery.path}

@@ -71,10 +71,11 @@ const OptionIcon: FC = () => {
 interface OptionProps {
   icon: ReactNode
   title: string
-  description: string
+  description?: string
   onClick?: () => void
   disabled?: boolean
   backgroundColor?: string
+  hideArrow?: boolean
 }
 
 export const Option: FC<OptionProps> = ({
@@ -84,21 +85,20 @@ export const Option: FC<OptionProps> = ({
   onClick,
   disabled,
   backgroundColor = "#5C5B59",
-}) => {
-  return (
-    <OptionWrapper
-      backgroundColor={backgroundColor}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      <Flex>
-        {icon}
-        <OptionTextWrapper>
-          <OptionTitle>{title}</OptionTitle>
-          <OptionDescription>{description}</OptionDescription>
-        </OptionTextWrapper>
-      </Flex>
-      <OptionIcon />
-    </OptionWrapper>
-  )
-}
+  hideArrow,
+}) => (
+  <OptionWrapper
+    backgroundColor={backgroundColor}
+    onClick={onClick}
+    disabled={disabled}
+  >
+    <Flex>
+      {icon}
+      <OptionTextWrapper>
+        <OptionTitle>{title}</OptionTitle>
+        {description && <OptionDescription>{description}</OptionDescription>}
+      </OptionTextWrapper>
+    </Flex>
+    {!hideArrow && <OptionIcon />}
+  </OptionWrapper>
+)

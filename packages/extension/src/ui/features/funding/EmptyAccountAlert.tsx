@@ -2,16 +2,16 @@ import { ethers } from "ethers"
 import { FC } from "react"
 import styled from "styled-components"
 
+import { Alert } from "../../components/Alert"
+import { Button } from "../../components/Button"
+import { CopyTooltip } from "../../components/CopyTooltip"
 import { useAccount } from "../../states/account"
 import { makeClickable } from "../../utils/a11y"
-import { formatAddress } from "../../utils/addresses"
+import { normalizeAddress } from "../../utils/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../utils/transactions"
-import { Alert } from "../Alert"
-import { Button } from "../Button"
-import { CopyTooltip } from "../CopyTooltip"
 
 const AlertWrapper = styled(Alert)`
   gap: 16px;
@@ -78,7 +78,7 @@ export const EmptyAccountAlert: FC<EmptyAccountAlertProps> = ({
       </Paragraph>
       <Buttons buttonsAmount={mintableAddress ? 2 : 1}>
         <CopyTooltip
-          copyValue={formatAddress(accountAddress)}
+          copyValue={normalizeAddress(accountAddress)}
           message="Account address copied!"
         >
           <Button>Receive</Button>

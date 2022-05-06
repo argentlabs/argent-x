@@ -3,13 +3,12 @@ import { useDropzone } from "react-dropzone"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { BackButton } from "../../components/BackButton"
+import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
 import { ConfirmScreen } from "../../screens/ConfirmScreen"
 import { useAppState } from "../../states/app"
 import { fileToString } from "../../utils/files"
 import { recoverBackup } from "../../utils/messaging"
-import { IconBar } from "./IconBar"
 
 const DropZone = styled.div`
   width: 100%;
@@ -66,9 +65,7 @@ export const BackupRecoveryScreen: FC = () => {
 
   return (
     <>
-      <IconBar>
-        <BackButton />
-      </IconBar>
+      <IconBar back />
       <ConfirmScreen
         title="Select backup"
         confirmButtonText="Restore backup"

@@ -15,4 +15,5 @@ export { default as RadioButtonUncheckedIcon } from "@mui/icons-material/RadioBu
 export { default as RemoveIcon } from "@mui/icons-material/Remove"
 export { default as ReportGmailerrorredIcon } from "@mui/icons-material/ReportGmailerrorred"
 export { default as ReportGmailerrorredRoundedIcon } from "@mui/icons-material/ReportGmailerrorredRounded"
+export { default as SendIcon } from "@mui/icons-material/Send"
 export { default as SettingsIcon } from "@mui/icons-material/Settings"
