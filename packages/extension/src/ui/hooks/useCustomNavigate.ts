@@ -8,7 +8,7 @@ const openExtensionInTab = () => {
   return browser.tabs.create({ url })
 }
 
-const isAlreadyInTab = async () => {
+export const isInTab = async () => {
   return Boolean(await browser.tabs.getCurrent())
 }
 
@@ -22,9 +22,9 @@ export const useCustomNavigate = () => {
 
   return async (to: To, options?: NavigateOptions) => {
     const isLinux = (await getPlatformOS()) === "linux"
-    const isInTab = await isAlreadyInTab()
+    const isAlreadyInTab = await isInTab()
 
-    if (to === routes.backupRecovery() && isLinux && !isInTab) {
+    if (to === routes.backupRecovery() && isLinux && !isAlreadyInTab) {
       return openExtensionInTab()
     }
     return navigate(to, options)
