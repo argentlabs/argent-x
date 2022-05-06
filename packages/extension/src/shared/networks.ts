@@ -40,8 +40,8 @@ export const defaultNetworks: Network[] = [
   {
     id: "localhost",
     chainId: "SN_GOERLI",
-    baseUrl: "http://localhost:5000",
-    name: "Localhost 5000",
+    baseUrl: "http://localhost:5050",
+    name: "Localhost 5050",
   },
 ]
 

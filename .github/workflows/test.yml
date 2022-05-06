@@ -13,7 +13,7 @@ jobs:
       devnet:
         image: shardlabs/starknet-devnet
         ports:
-          - 5000:5000
+          - 5050:5050
 
     steps:
       - name: Check out repository code
