@@ -5695,9 +5695,9 @@ get-port@^5.1.1:
   integrity sha512-g/Q1aTSDOxFpchXC4i8ZWvxA1lnPqx/JHqcpIw0/LX9T8x/GBbi6YnlN5nhaKIFkT8oFsscUKgDJYxfwfS6QsQ==
 
 get-starknet@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/get-starknet/-/get-starknet-1.0.0.tgz#42a14e598c880facf8e094c4b695a7278722eef2"
-  integrity sha512-LHeAfW8ubyHG6xwX5JtlYarzmGDrr4XucgfDytadJLQUEJDAfEfWqbGyeyjEH0SbIl+0w6TSNGnSqPyrbvnsdQ==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/get-starknet/-/get-starknet-1.2.0.tgz#2ddbeb63249e6958bd4826ee2d1c8ef8e3b9d7e8"
+  integrity sha512-+d3lI+qog04GwE67W3qEJMAMUS5qjxaJH/37qiEkn3AIqJBLF5t5rl6OB+ied6Fr9hPVP2Hr5OIi1e/ePemkWA==
   dependencies:
     bowser "^2.11.0"
 
