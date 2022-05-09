@@ -1,8 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { Greetings } from "../components/Greetings"
 import { Spinner } from "../components/Spinner"
+import { Greetings } from "../features/onboarding/Greetings"
 
 const LoadingScreenWrapper = styled.div`
   display: flex;

@@ -3,18 +3,18 @@ import { Controller, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { BackButton } from "../components/BackButton"
-import { Button } from "../components/Button"
-import { Header } from "../components/Header"
-import { InputText } from "../components/InputText"
-import { FormError, H2, P } from "../components/Typography"
-import { recover } from "../features/recovery/recovery.service"
-import { validatePassword } from "../features/recovery/seedRecover.state"
-import { routes } from "../routes"
-import { useAccount } from "../states/account"
-import { useAppState } from "../states/app"
-import { connectAccount, deployAccount } from "../utils/accounts"
-import { StickyGroup } from "./ConfirmScreen"
+import { BackButton } from "../../components/BackButton"
+import { Button } from "../../components/Button"
+import { Header } from "../../components/Header"
+import { InputText } from "../../components/InputText"
+import { FormError, H2, P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { StickyGroup } from "../../screens/ConfirmScreen"
+import { useAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
+import { connectAccount, deployAccount } from "../../utils/accounts"
+import { recover } from "../recovery/recovery.service"
+import { validatePassword } from "../recovery/seedRecover.state"
 
 const Container = styled.div`
   padding: 48px 40px 24px;
@@ -29,11 +29,17 @@ const Container = styled.div`
   }
 `
 
-export const NewWalletScreen: FC<{
-  overrideSubmit?: (values: { password: string }) => void
+interface NewWalletScreenProps {
+  overrideSubmit?: (values: { password: string }) => Promise<void>
   overrideTitle?: string
   overrideSubmitText?: string
-}> = ({ overrideSubmit, overrideTitle, overrideSubmitText }) => {
+}
+
+export const NewWalletScreen: FC<NewWalletScreenProps> = ({
+  overrideSubmit,
+  overrideTitle,
+  overrideSubmitText,
+}) => {
   const navigate = useNavigate()
   const { addAccount } = useAccount()
   const { switcherNetworkId } = useAppState()

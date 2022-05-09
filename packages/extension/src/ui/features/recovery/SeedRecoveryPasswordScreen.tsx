@@ -1,8 +1,8 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { NewWalletScreen } from "../../screens/NewWalletScreen"
 import { recoverBySeedPhrase } from "../../utils/messaging"
+import { NewWalletScreen } from "../onboarding/NewWalletScreen"
 import { useBackupRequired } from "./backupDownload.state"
 import { recover } from "./recovery.service"
 import {

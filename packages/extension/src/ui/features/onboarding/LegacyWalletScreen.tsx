@@ -2,10 +2,10 @@ import { FC, FormEventHandler } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { sendMessage } from "../../shared/messages"
-import { Button } from "../components/Button"
-import { H2, P } from "../components/Typography"
-import { routes } from "../routes"
+import { sendMessage } from "../../../shared/messages"
+import { Button } from "../../components/Button"
+import { H2, P } from "../../components/Typography"
+import { routes } from "../../routes"
 
 const ContinueButton = styled(Button)`
   margin-top: auto;

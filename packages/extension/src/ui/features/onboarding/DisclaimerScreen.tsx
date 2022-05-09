@@ -11,10 +11,10 @@ import styled from "styled-components"
 import {
   CheckCircleIcon,
   RadioButtonUncheckedIcon,
-} from "../components/Icons/MuiIcons"
-import { P } from "../components/Typography"
-import { routes } from "../routes"
-import { ConfirmScreen } from "./ConfirmScreen"
+} from "../../components/Icons/MuiIcons"
+import { P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
 
 const SP = styled(P)`
   font-size: 18px;

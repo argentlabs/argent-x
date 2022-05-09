@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react"
 import styled, { keyframes } from "styled-components"
 
-import { H2 } from "./Typography"
+import { H2 } from "../../components/Typography"
 
 export const GreetingsWrapper = styled.div`
   position: relative;
@@ -37,7 +37,7 @@ const FadeInAndOutText = styled(Text)`
   animation: ${FadeInAndOut} 3s ease-in-out forwards;
 `
 
-const useCarusel = (greetings: string[], delay = 3000): number => {
+const useCarousel = (greetings: string[], delay = 3000): number => {
   const [index, setState] = useState(0)
   const length = greetings.length
 
@@ -59,7 +59,7 @@ interface GreetingsProps {
 }
 
 export const Greetings: FC<GreetingsProps> = ({ greetings, ...props }) => {
-  const index = useCarusel(greetings)
+  const index = useCarousel(greetings)
   return (
     <GreetingsWrapper {...props}>
       <FadeInAndOutText key={index}>{greetings[index]}</FadeInAndOutText>

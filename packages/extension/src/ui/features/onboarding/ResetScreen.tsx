@@ -1,11 +1,11 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { sendMessage } from "../../shared/messages"
-import { P } from "../components/Typography"
-import { routes } from "../routes"
-import { useAccount } from "../states/account"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { sendMessage } from "../../../shared/messages"
+import { P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { useAccount } from "../../states/account"
 
 export const ResetScreen: FC = () => {
   const navigate = useNavigate()

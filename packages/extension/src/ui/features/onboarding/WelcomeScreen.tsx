@@ -2,12 +2,12 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import LogoSvg from "../../assets/logo.svg"
-import { Button, ButtonGroup } from "../components/Button"
-import { Greetings, GreetingsWrapper } from "../components/Greetings"
-import { StickyArgentFooter } from "../components/StickyArgentFooter"
-import { P } from "../components/Typography"
-import { routes } from "../routes"
+import { Button, ButtonGroup } from "../../components/Button"
+import { P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { Greetings, GreetingsWrapper } from "./Greetings"
+import LogoSvg from "./logo.svg"
+import { StickyArgentFooter } from "./StickyArgentFooter"
 
 const WelcomeScreenWrapper = styled.div`
   padding: 70px 40px 24px;
