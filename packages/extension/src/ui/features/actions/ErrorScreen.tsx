@@ -2,8 +2,8 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import { P } from "../../components/Typography"
-import { useAppState } from "../../states/app"
 import { Pre } from "./ApproveSignatureScreen"
 import { ConfirmScreen } from "./ConfirmScreen"
 

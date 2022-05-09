@@ -1,6 +1,6 @@
 import create from "zustand"
 
-import { defaultNetwork } from "../../shared/networks"
+import { defaultNetwork } from "../shared/networks"
 
 interface State {
   switcherNetworkId: string

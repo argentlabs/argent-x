@@ -2,6 +2,7 @@ import { FC, useEffect } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "./app.state"
 import { useTransactionErrorScreen } from "./features/accountActivity/useTransactionErrorScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
@@ -40,9 +41,8 @@ import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEd
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
-import { useEntry } from "./hooks/useEntry"
 import { routes } from "./routes"
-import { useAppState } from "./states/app"
+import { useEntryRoute } from "./useEntryRoute"
 
 export const ScrollBehaviour = styled.div`
   height: 100vh;
@@ -145,7 +145,7 @@ const walletRoutes = (
 )
 
 export const AppRoutes: FC = () => {
-  useEntry()
+  useEntryRoute()
   useActionsSubscription()
   useTransactionErrorScreen()
   useTokensSubscription()

@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
 import { NetworkStatus, getNetwork } from "../../../shared/networks"
+import { useAppState } from "../../app.state"
 import {
   NetworkStatusIndicator,
   mapNetworkStatusToColor,
 } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
-import { useAppState } from "../../states/app"
 import { recover } from "../recovery/recovery.service"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 import { useNetworkStatuses, useNetworks } from "./useNetworks"

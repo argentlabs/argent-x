@@ -3,6 +3,7 @@ import React, { FC, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroup } from "../../components/Button"
@@ -11,7 +12,6 @@ import { Header } from "../../components/Header"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import { useAppState } from "../../states/app"
 import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
 import {
   getUint256CalldataFromBN,

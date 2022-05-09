@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { useAppState } from "../../states/app"
+import { useAppState } from "../../app.state"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { SectionHeader } from "../accounts/SectionHeader"

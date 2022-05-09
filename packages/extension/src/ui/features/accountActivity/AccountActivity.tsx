@@ -1,10 +1,10 @@
 import { FC, Fragment, Suspense } from "react"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ReportGmailerrorredIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
-import { useAppState } from "../../states/app"
 import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
 import { Account } from "../accounts/Account"

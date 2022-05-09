@@ -1,6 +1,6 @@
 import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
+import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
-import { useAppState } from "../../states/app"
 import { getAccounts, getLastSelectedAccount } from "../../utils/messaging"
 import { Account } from "../accounts/Account"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"

@@ -2,8 +2,8 @@ import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { messageStream } from "../../../shared/messages"
+import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
-import { useAppState } from "../../states/app"
 
 export const useTransactionErrorScreen = () => {
   const navigate = useNavigate()

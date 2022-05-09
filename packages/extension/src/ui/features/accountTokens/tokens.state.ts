@@ -7,7 +7,7 @@ import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
 import { Token, equalToken, parsedDefaultTokens } from "../../../shared/token"
-import { useAppState } from "../../states/app"
+import { useAppState } from "../../app.state"
 import { isValidAddress } from "../../utils/addresses"
 import {
   addToken as addTokenMsg,

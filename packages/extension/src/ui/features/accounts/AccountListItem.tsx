@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
+import { useAppState } from "../../app.state"
 import {
   ArrowCircleDownIcon,
   DeleteIcon,
 } from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
-import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { formatTruncatedAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
