@@ -1,6 +1,6 @@
 import useSWR from "swr"
 
-import { SWRConfigCommon } from "../../hooks/useActivity"
+import { SWRConfigCommon } from "../accountActivity/useActivity"
 import { fetchPlayOasisNfts } from "./playoasis.service"
 
 export const useNfts = (address: string, config?: SWRConfigCommon) => {

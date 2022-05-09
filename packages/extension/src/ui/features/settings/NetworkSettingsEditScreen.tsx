@@ -2,8 +2,8 @@ import { FC } from "react"
 import { Navigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { useSelectedNetwork } from "../../states/selectedNetwork"
 import { NetworkSettingsFormScreen } from "./NetworkSettingsFormScreen"
+import { useSelectedNetwork } from "./selectedNetwork.state"
 
 export const NetworkSettingsEditScreen: FC = () => {
   const [selectedCustomNetwork] = useSelectedNetwork()

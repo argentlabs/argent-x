@@ -3,10 +3,10 @@ import { FC, useMemo, useRef, useState } from "react"
 import { IconBar } from "../../components/IconBar"
 import { TextArea } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
-import { useCustomNavigate } from "../../hooks/useCustomNavigate"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { validateAndSetSeedPhrase } from "./seedRecover.state"
+import { useCustomNavigate } from "./useCustomNavigate"
 
 export const SeedRecoveryScreen: FC = () => {
   const textAreaElement = useRef<HTMLTextAreaElement>(null)

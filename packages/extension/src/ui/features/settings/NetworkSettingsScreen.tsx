@@ -8,11 +8,11 @@ import { IconButton } from "../../components/IconButton"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { H2, P } from "../../components/Typography"
-import { useNetworks } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
-import { useSelectedNetwork } from "../../states/selectedNetwork"
-import { removeNetworks } from "../../utils/messaging"
+import { removeNetworks } from "../../services/messaging"
+import { useNetworks } from "../networks/useNetworks"
 import { DappConnection } from "./DappConnection"
+import { useSelectedNetwork } from "./selectedNetwork.state"
 
 const Wrapper = styled.div`
   display: flex;

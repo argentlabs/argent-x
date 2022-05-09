@@ -5,17 +5,17 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Network, NetworkSchema } from "../../../shared/networks"
+import { useAppState } from "../../app.state"
 import { BackButton } from "../../components/BackButton"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
 import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
-import { useYupValidationResolver } from "../../hooks/useYupValidationResolver"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
-import { useAppState } from "../../states/app"
-import { makeClickable } from "../../utils/a11y"
-import { addNetworks } from "../../utils/messaging"
+import { makeClickable } from "../../services/a11y"
+import { addNetworks } from "../../services/messaging"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { useYupValidationResolver } from "./useYupValidationResolver"
 
 const ExtendableControl = styled.div`
   display: flex;

@@ -1,7 +1,7 @@
 import type { JWK } from "jose"
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
-import { ExtActionItem } from "./actionQueue"
+import { ExtensionActionItem } from "./actionQueue"
 import { Network, NetworkStatus } from "./networks"
 import { RequestToken, Token } from "./token"
 import { TransactionStatus } from "./transactions.model"
@@ -151,13 +151,13 @@ export type MessageType =
   | { type: "GET_ACTIONS" }
   | {
       type: "GET_ACTIONS_RES"
-      data: ExtActionItem[]
+      data: ExtensionActionItem[]
     }
   | { type: "APPROVE_ACTION"; data: { actionHash: string } }
   | { type: "REJECT_ACTION"; data: { actionHash: string } }
   | {
       type: "ACTIONS_QUEUE_UPDATE"
-      data: { actions: ExtActionItem[] }
+      data: { actions: ExtensionActionItem[] }
     }
   | { type: "SIGN_MESSAGE"; data: typedData.TypedData }
   | { type: "SIGN_MESSAGE_RES"; data: { actionHash: string } }

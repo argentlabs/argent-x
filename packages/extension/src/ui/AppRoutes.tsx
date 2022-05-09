@@ -2,9 +2,34 @@ import { FC, useEffect } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "./app.state"
+import { useTransactionErrorScreen } from "./features/accountActivity/useTransactionErrorScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
+import { AccountListScreen } from "./features/accounts/AccountListScreen"
+import { AccountScreen } from "./features/accounts/AccountScreen"
+import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
+import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
+import { useTokensSubscription } from "./features/accountTokens/tokens.state"
+import { TokenScreen } from "./features/accountTokens/TokenScreen"
+import { migrateUiTokensToBackground } from "./features/accountTokens/tokensLegacy.service"
+import {
+  useActions,
+  useActionsSubscription,
+} from "./features/actions/actions.state"
+import { ActionScreen } from "./features/actions/ActionScreen"
+import { AddTokenScreen } from "./features/actions/AddTokenScreen"
+import { ErrorScreen } from "./features/actions/ErrorScreen"
+import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
+import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
+import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
+import { LegacyScreen } from "./features/onboarding/LegacyWalletScreen"
+import { LockScreen } from "./features/onboarding/LockScreen"
+import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
+import { ResetScreen } from "./features/onboarding/ResetScreen"
+import { WelcomeScreen } from "./features/onboarding/WelcomeScreen"
+import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
 import { BackupRecoveryScreen } from "./features/recovery/BackupRecoveryScreen"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
 import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
@@ -16,30 +41,8 @@ import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEd
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
-import { useEntry } from "./hooks/useEntry"
-import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
-import { AccountListScreen } from "./screens/AccountListScreen"
-import { AccountScreen } from "./screens/AccountScreen"
-import { ActionScreen } from "./screens/ActionScreen"
-import { AddTokenScreen } from "./screens/AddTokenScreen"
-import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
-import { DisclaimerScreen } from "./screens/DisclaimerScreen"
-import { ErrorScreen } from "./screens/ErrorScreen"
-import { HideTokenScreen } from "./screens/HideTokenScreen"
-import { LegacyScreen } from "./screens/LegacyScreen"
-import { LoadingScreen } from "./screens/LoadingScreen"
-import { LockScreen } from "./screens/LockScreen"
-import { NetworkWarningScreen } from "./screens/NetworkWarningScreen"
-import { NewWalletScreen } from "./screens/NewWalletScreen"
-import { ResetScreen } from "./screens/ResetScreen"
-import { TokenScreen } from "./screens/TokenScreen"
-import { UpgradeScreen } from "./screens/UpgradeScreen"
-import { WelcomeScreen } from "./screens/WelcomeScreen"
-import { useActions, useActionsSubscription } from "./states/actions"
-import { useAppState } from "./states/app"
-import { useTokensSubscription } from "./states/tokens"
-import { migrateUiTokensToBackground } from "./states/tokens.legacy"
+import { useEntryRoute } from "./useEntryRoute"
 
 export const ScrollBehaviour = styled.div`
   height: 100vh;
@@ -142,7 +145,7 @@ const walletRoutes = (
 )
 
 export const AppRoutes: FC = () => {
-  useEntry()
+  useEntryRoute()
   useActionsSubscription()
   useTransactionErrorScreen()
   useTokensSubscription()

@@ -3,18 +3,18 @@ import { FC, lazy, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroup } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import { useSelectedAccount } from "../../states/account"
-import { useAppState } from "../../states/app"
-import { isValidAddress } from "../../utils/addresses"
+import { isValidAddress } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
-} from "../../utils/transactions"
+} from "../../services/transactions"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { openPlayOasisNft } from "./playoasis.service"
 import PlayOasisSvg from "./playoasis.svg"
 import { useNfts } from "./useNfts"

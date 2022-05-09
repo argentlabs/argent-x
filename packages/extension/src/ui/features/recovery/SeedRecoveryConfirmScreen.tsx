@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useBackupRequired } from "./backupDownload.state"
 
 export const SeedRecoveryConfirmScreen: FC = () => {
