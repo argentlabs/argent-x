@@ -53,8 +53,11 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
   const { privateKey, publicKeyJwk } = await getKeyPair()
   const [ProxyCompiledContract, ArgentAccountCompiledContract] =
     await Promise.all(
-      [ProxyCompiledContractUrl, ArgentAccountCompiledContractUrl].map((url) =>
-        fetch(url).then((r) => r.text()),
+      [ProxyCompiledContractUrl, ArgentAccountCompiledContractUrl].map(
+        async (url) => {
+          const response = await fetch(url)
+          return response.text()
+        },
       ),
     )
 
