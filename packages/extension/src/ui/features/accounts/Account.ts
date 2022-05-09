@@ -1,7 +1,7 @@
 import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 
-import ArgentCompiledContractAbi from "../../../abi/ArgentAccount.json"
-import ProxyCompiledContractAbi from "../../../abi/Proxy.json"
+import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
+import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { sendMessage, waitForMessage } from "../../../shared/messages"
 import { Network, getProvider } from "../../../shared/networks"
 import { WalletAccountSigner } from "../../../shared/wallet.model"

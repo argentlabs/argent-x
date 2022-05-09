@@ -2,7 +2,7 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
 
-import parsedErc20Abi from "../../../abi/ERC20.json"
+import parsedErc20Abi from "../../../abis/ERC20.json"
 import { feeToken } from "../../../shared/token"
 import { Account } from "../accounts/Account"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"

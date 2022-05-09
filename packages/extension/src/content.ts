@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
 
-import { messageStream, sendMessage } from "../shared/messages"
-import { WindowMessageType } from "../shared/MessageType"
+import { messageStream, sendMessage } from "./shared/messages"
+import { WindowMessageType } from "./shared/MessageType"
 
 const container = document.head || document.documentElement
 const script = document.createElement("script")

@@ -11,9 +11,9 @@ import {
   typedData,
 } from "starknet"
 
-import { MessageType, WindowMessageType } from "../shared/MessageType"
-import { getProvider } from "../shared/networks"
-import { EventHandler, StarknetWindowObject } from "./model"
+import { EventHandler, StarknetWindowObject } from "./inpage.model"
+import { MessageType, WindowMessageType } from "./shared/MessageType"
+import { getProvider } from "./shared/networks"
 
 const VERSION = `${process.env.VERSION}`
 
