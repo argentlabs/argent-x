@@ -5,13 +5,13 @@ import type { Call } from "starknet"
 import styled, { keyframes } from "styled-components"
 import useSWR from "swr"
 
-import { fetchFeeTokenBalance } from "../features/accountTokens/tokens.service"
-import { getEstimatedFee } from "../utils/messaging"
-import { Tooltip } from "./CopyTooltip"
+import { Tooltip } from "../../components/CopyTooltip"
 import {
   InfoRoundedIcon,
   ReportGmailerrorredRoundedIcon,
-} from "./Icons/MuiIcons"
+} from "../../components/Icons/MuiIcons"
+import { getEstimatedFee } from "../../utils/messaging"
+import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
 const Center = styled.div`
   display: flex;

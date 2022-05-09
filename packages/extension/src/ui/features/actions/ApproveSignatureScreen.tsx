@@ -2,10 +2,11 @@ import { FC } from "react"
 import type { typedData } from "starknet"
 import styled from "styled-components"
 
-import { P } from "../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import { P } from "../../components/Typography"
+import { ConfirmPageProps, ConfirmScreen } from "../../screens/ConfirmScreen"
 
-interface ApproveSignScreenProps extends Omit<ConfirmPageProps, "onSubmit"> {
+interface ApproveSignatureScreenProps
+  extends Omit<ConfirmPageProps, "onSubmit"> {
   dataToSign: typedData.TypedData
   onSubmit: (data: typedData.TypedData) => void
 }
@@ -19,7 +20,7 @@ export const Pre = styled.pre`
   overflow: auto;
 `
 
-export const ApproveSignScreen: FC<ApproveSignScreenProps> = ({
+export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
   dataToSign,
   onSubmit,
   ...props

@@ -1,15 +1,16 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { waitForMessage } from "../../shared/messages"
-import { AddTokenScreen } from "../features/accountTokens/AddTokenScreen"
-import { routes } from "../routes"
-import { selectAccount, useAccount } from "../states/account"
-import { useActions } from "../states/actions"
-import { useAppState } from "../states/app"
-import { ApproveSignScreen } from "./ApproveSignScreen"
+import { waitForMessage } from "../../../shared/messages"
+import { routes } from "../../routes"
+import { selectAccount, useAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
+import { assertNever } from "../../utils/assertNever"
+import { useActions } from "./actions.state"
+import { AddTokenScreen } from "./AddTokenScreen"
+import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
-import { ConnectScreen } from "./ConnectScreen"
+import { ConnectDappScreen } from "./ConnectDappScreen"
 
 const isPopup = new URLSearchParams(window.location.search).has("popup")
 
@@ -23,7 +24,7 @@ export const ActionScreen: FC = () => {
   switch (action.type) {
     case "CONNECT_DAPP":
       return (
-        <ConnectScreen
+        <ConnectDappScreen
           host={action.payload.host}
           onReject={async () => {
             await reject(action)
@@ -103,7 +104,7 @@ export const ActionScreen: FC = () => {
 
     case "SIGN":
       return (
-        <ApproveSignScreen
+        <ApproveSignatureScreen
           dataToSign={action.payload}
           onSubmit={async () => {
             await approve(action)
@@ -126,5 +127,9 @@ export const ActionScreen: FC = () => {
           selectedAccount={account}
         />
       )
+
+    default:
+      assertNever(action)
+      return <></>
   }
 }

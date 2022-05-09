@@ -1,6 +1,6 @@
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
-import type { ExtQueueItem } from "../background/actionQueue"
+import type { ExtQueueItem as ExtensionQueueItem } from "../background/actionQueue"
 
 export type ActionItem =
   | {
@@ -32,4 +32,4 @@ export type ActionItem =
       }
     }
 
-export type ExtActionItem = ExtQueueItem<ActionItem>
+export type ExtensionActionItem = ExtensionQueueItem<ActionItem>

@@ -1,10 +1,10 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { P } from "../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import { P } from "../../components/Typography"
+import { ConfirmPageProps, ConfirmScreen } from "../../screens/ConfirmScreen"
 
-interface ConnectProps extends ConfirmPageProps {
+interface ConnectDappProps extends ConfirmPageProps {
   host: string
 }
 
@@ -14,7 +14,7 @@ const Code = styled.code`
   padding: 0 0.5em;
 `
 
-export const ConnectScreen: FC<ConnectProps> = ({ host, ...props }) => (
+export const ConnectDappScreen: FC<ConnectDappProps> = ({ host, ...props }) => (
   <ConfirmScreen title="Connect to dapp" confirmButtonText="Connect" {...props}>
     <P>
       <Code>{host}</Code> wants to connect to your wallet. If you allow this

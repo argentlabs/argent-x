@@ -2,14 +2,14 @@ import { useEffect } from "react"
 import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
-import { ExtActionItem } from "../../shared/actionQueue"
-import { messageStream, sendMessage } from "../../shared/messages"
-import { getActions } from "../utils/messaging"
+import { ExtensionActionItem } from "../../../shared/actionQueue"
+import { messageStream, sendMessage } from "../../../shared/messages"
+import { getActions } from "../../utils/messaging"
 
 interface State {
-  actions: ExtActionItem[]
-  approve: (action: ExtActionItem | string) => Promise<void>
-  reject: (action: ExtActionItem | string) => Promise<void>
+  actions: ExtensionActionItem[]
+  approve: (action: ExtensionActionItem | string) => Promise<void>
+  reject: (action: ExtensionActionItem | string) => Promise<void>
 }
 
 export const useActions = create<State>(() => ({

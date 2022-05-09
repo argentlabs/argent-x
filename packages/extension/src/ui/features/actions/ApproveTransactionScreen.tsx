@@ -4,10 +4,10 @@ import { Navigate } from "react-router-dom"
 import { Call, InvokeFunctionTransaction, encode } from "starknet"
 import styled from "styled-components"
 
-import { FeeEstimation } from "../components/FeeEstimation"
-import { routes } from "../routes"
-import { updateTransactionFee } from "../utils/messaging"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import { routes } from "../../routes"
+import { ConfirmPageProps, ConfirmScreen } from "../../screens/ConfirmScreen"
+import { updateTransactionFee } from "../../utils/messaging"
+import { FeeEstimation } from "./FeeEstimation"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {

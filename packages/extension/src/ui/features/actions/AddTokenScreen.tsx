@@ -15,8 +15,8 @@ import { routes } from "../../routes"
 import { useSelectedAccount } from "../../states/account"
 import { useAppState } from "../../states/app"
 import { isValidAddress } from "../../utils/addresses"
-import { fetchTokenDetails } from "./tokens.service"
-import { TokenDetails, addToken } from "./tokens.state"
+import { fetchTokenDetails } from "../accountTokens/tokens.service"
+import { TokenDetails, addToken } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;

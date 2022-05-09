@@ -4,11 +4,16 @@ import styled from "styled-components"
 
 import { AccountListScreen } from "./features/accountList/AccountListScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
-import { AddTokenScreen } from "./features/accountTokens/AddTokenScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import { migrateUiTokensToBackground } from "./features/accountTokens/tokensLegacy.service"
+import {
+  useActions,
+  useActionsSubscription,
+} from "./features/actions/actions.state"
+import { ActionScreen } from "./features/actions/ActionScreen"
+import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
@@ -33,12 +38,10 @@ import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
 import { AccountScreen } from "./screens/AccountScreen"
-import { ActionScreen } from "./screens/ActionScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { NetworkWarningScreen } from "./screens/NetworkWarningScreen"
 import { UpgradeScreen } from "./screens/UpgradeScreen"
-import { useActions, useActionsSubscription } from "./states/actions"
 import { useAppState } from "./states/app"
 
 export const ScrollBehaviour = styled.div`

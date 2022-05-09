@@ -2,7 +2,6 @@ import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
 import { NetworkStatus } from "../../shared/networks"
-import type { AccountStatusCode } from "../utils/accounts"
 import { assertNever } from "../utils/assertNever"
 import { NetworkWarning } from "./Icons/NetworkWarning"
 
@@ -10,24 +9,6 @@ export type StatusIndicatorColor = "green" | "orange" | "red" | "transparent"
 
 interface StatusIndicatorProps {
   color?: StatusIndicatorColor
-}
-
-export function mapAccountStatusCodeToColor(
-  status: AccountStatusCode,
-): StatusIndicatorColor {
-  switch (status) {
-    case "CONNECTED":
-      return "green"
-    case "DEPLOYING":
-      return "orange"
-    case "ERROR":
-      return "red"
-    case "DEFAULT":
-      return "transparent"
-    default:
-      assertNever(status)
-      return "transparent"
-  }
 }
 
 export function mapNetworkStatusToColor(
@@ -48,7 +29,7 @@ export function mapNetworkStatusToColor(
   }
 }
 
-export const StatusIndicator = styled.span<StatusIndicatorProps>`
+const StatusIndicator = styled.span<StatusIndicatorProps>`
   height: 8px;
   width: 8px;
   border-radius: 8px;
@@ -71,8 +52,6 @@ export const NetworkStatusIndicator: FC<StatusIndicatorProps> = ({
   }
   return <StatusIndicator color={color} />
 }
-
-export const AccountStatusIndicator = styled(StatusIndicator)``
 
 const PulseAnimation = keyframes`
   0% {
