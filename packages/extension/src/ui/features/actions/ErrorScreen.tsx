@@ -2,9 +2,9 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { P } from "../components/Typography"
-import { Pre } from "../features/actions/ApproveSignatureScreen"
-import { useAppState } from "../states/app"
+import { P } from "../../components/Typography"
+import { useAppState } from "../../states/app"
+import { Pre } from "./ApproveSignatureScreen"
 import { ConfirmScreen } from "./ConfirmScreen"
 
 const SP = styled(P)`

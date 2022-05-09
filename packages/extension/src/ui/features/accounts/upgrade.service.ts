@@ -1,6 +1,6 @@
 import { number } from "starknet"
 
-import { Account } from "../Account"
+import { Account } from "./Account"
 
 export async function checkIfUpgradeAvailable(
   account: Account,

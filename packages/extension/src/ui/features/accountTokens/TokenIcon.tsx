@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { getColor } from "../../utils/accounts"
+import { getColor } from "../accounts/accounts.service"
 
 const Icon = styled.img<{ size: number }>`
   height: ${({ size }) => size}px;

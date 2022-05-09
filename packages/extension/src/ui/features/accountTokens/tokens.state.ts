@@ -14,7 +14,7 @@ import {
   getTokens,
   removeToken as removeTokenMsg,
 } from "../../utils/messaging"
-import { useSelectedAccount } from "../accounts/accounts.service"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { fetchTokenBalance } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {

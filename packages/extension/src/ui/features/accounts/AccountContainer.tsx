@@ -9,12 +9,12 @@ import {
   PhotoLibraryIcon,
 } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
-import { getAccountImageUrl } from "../../utils/accounts"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { AccountFooter, FooterTab } from "./AccountFooter"
 import { AccountHeader } from "./AccountHeader"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useSelectedAccount } from "./accounts.service"
+import { getAccountImageUrl } from "./accounts.service"
+import { useSelectedAccount } from "./accounts.state"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const Container = styled.div<{

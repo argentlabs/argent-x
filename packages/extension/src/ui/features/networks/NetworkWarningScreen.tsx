@@ -4,7 +4,7 @@ import styled from "styled-components"
 
 import { H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { CongestionIcon } from "./CongestionIcon"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 

@@ -17,6 +17,8 @@ import {
 } from "./features/actions/actions.state"
 import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
+import { ErrorScreen } from "./features/actions/ErrorScreen"
+import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
@@ -40,8 +42,6 @@ import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { useEntry } from "./hooks/useEntry"
 import { routes } from "./routes"
-import { ErrorScreen } from "./screens/ErrorScreen"
-import { LoadingScreen } from "./screens/LoadingScreen"
 import { useAppState } from "./states/app"
 
 export const ScrollBehaviour = styled.div`

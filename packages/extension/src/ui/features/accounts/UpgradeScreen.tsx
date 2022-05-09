@@ -4,10 +4,10 @@ import styled from "styled-components"
 
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
 import { useAppState } from "../../states/app"
 import { upgradeAccount } from "../../utils/messaging"
-import { useAccount } from "./accounts.service"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { useAccount } from "./accounts.state"
 
 const StyledP = styled(P)`
   margin-bottom: 16px;

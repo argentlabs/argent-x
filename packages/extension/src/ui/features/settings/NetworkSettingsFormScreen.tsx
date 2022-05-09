@@ -11,10 +11,10 @@ import { IconButton } from "../../components/IconButton"
 import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { addNetworks } from "../../utils/messaging"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 
 const ExtendableControl = styled.div`

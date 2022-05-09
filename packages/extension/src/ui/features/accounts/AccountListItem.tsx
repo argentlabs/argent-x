@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
-import { Account } from "../../Account"
 import {
   ArrowCircleDownIcon,
   DeleteIcon,
@@ -13,18 +12,19 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
-import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { formatTruncatedAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
-import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { useNetwork } from "../networks/useNetworks"
 import { recover } from "../recovery/recovery.service"
+import { Account } from "./Account"
 import { AccountColumn } from "./AccountColumn"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { AccountRow } from "./AccountRow"
-import { useAccount } from "./accounts.service"
+import { AccountStatus, getAccountImageUrl } from "./accounts.service"
+import { useAccount } from "./accounts.state"
 import { ProfilePicture } from "./ProfilePicture"
+import { checkIfUpgradeAvailable } from "./upgrade.service"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;

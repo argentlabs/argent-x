@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { P } from "../../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ConnectDappProps extends ConfirmPageProps {
   host: string

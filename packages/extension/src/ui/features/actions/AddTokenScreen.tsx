@@ -14,7 +14,7 @@ import { FormError, H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { isValidAddress } from "../../utils/addresses"
-import { useSelectedAccount } from "../accounts/accounts.service"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { fetchTokenDetails } from "../accountTokens/tokens.service"
 import { TokenDetails, addToken } from "../accountTokens/tokens.state"
 

@@ -9,7 +9,6 @@ import { H1, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
-import { connectAccount, deployAccount, getStatus } from "../../utils/accounts"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
@@ -17,7 +16,8 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListItem } from "./AccountListItem"
-import { useAccount } from "./accounts.service"
+import { connectAccount, deployAccount, getStatus } from "./accounts.service"
+import { useAccount } from "./accounts.state"
 
 const AccountList = styled.div`
   display: flex;

@@ -5,8 +5,8 @@ import { Call, InvokeFunctionTransaction, encode } from "starknet"
 import styled from "styled-components"
 
 import { routes } from "../../routes"
-import { ConfirmPageProps, ConfirmScreen } from "../../screens/ConfirmScreen"
 import { updateTransactionFee } from "../../utils/messaging"
+import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
 
 interface ApproveTransactionScreenProps

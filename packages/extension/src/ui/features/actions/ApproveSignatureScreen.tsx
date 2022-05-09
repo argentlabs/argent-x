@@ -3,7 +3,7 @@ import type { typedData } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../../components/Typography"
-import { ConfirmPageProps, ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveSignatureScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {

@@ -14,7 +14,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../utils/transactions"
-import { useSelectedAccount } from "../accounts/accounts.service"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { openPlayOasisNft } from "./playoasis.service"
 import PlayOasisSvg from "./playoasis.svg"
 import { useNfts } from "./useNfts"

@@ -14,7 +14,7 @@ import {
 } from "../../components/Icons/MuiIcons"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const SP = styled(P)`
   font-size: 18px;

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom"
 import { sendMessage } from "../../../shared/messages"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
-import { useAccount } from "../accounts/accounts.service"
+import { useAccount } from "../accounts/accounts.state"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 export const ResetScreen: FC = () => {
   const navigate = useNavigate()

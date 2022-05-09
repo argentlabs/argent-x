@@ -3,17 +3,17 @@ import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Account } from "../Account"
-import { Button, ButtonGroupVertical } from "../components/Button"
-import { Header } from "../components/Header"
-import { H2 } from "../components/Typography"
+import { Button, ButtonGroupVertical } from "../../components/Button"
+import { Header } from "../../components/Header"
+import { H2 } from "../../components/Typography"
+import { Account } from "../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
-} from "../features/accounts/accountMetadata.state"
-import { ProfilePicture } from "../features/accounts/ProfilePicture"
-import { NetworkSwitcher } from "../features/networks/NetworkSwitcher"
-import { getAccountImageUrl } from "../utils/accounts"
+} from "../accounts/accountMetadata.state"
+import { getAccountImageUrl } from "../accounts/accounts.service"
+import { ProfilePicture } from "../accounts/ProfilePicture"
+import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 
 const ConfirmScreenWrapper = styled.form<{
   accountShown: boolean

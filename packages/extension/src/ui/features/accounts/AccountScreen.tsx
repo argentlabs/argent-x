@@ -5,7 +5,7 @@ import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { AccountContainer } from "./AccountContainer"
-import { useSelectedAccount } from "./accounts.service"
+import { useSelectedAccount } from "./accounts.state"
 
 interface AccountScreenProps {
   tab: "tokens" | "nfts" | "activity"

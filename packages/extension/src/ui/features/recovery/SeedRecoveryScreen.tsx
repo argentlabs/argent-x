@@ -4,7 +4,7 @@ import { IconBar } from "../../components/IconBar"
 import { TextArea } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { validateAndSetSeedPhrase } from "./seedRecover.state"
 import { useCustomNavigate } from "./useCustomNavigate"
 

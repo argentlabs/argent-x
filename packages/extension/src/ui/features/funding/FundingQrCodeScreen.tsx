@@ -8,7 +8,7 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
-import { useSelectedAccount } from "../accounts/accounts.service"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { QrCode } from "./QrCode"
 
 const Container = styled.div`

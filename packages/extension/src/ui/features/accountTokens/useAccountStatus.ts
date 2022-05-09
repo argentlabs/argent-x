@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
-import { Account } from "../../Account"
-import { getStatus } from "../../utils/accounts"
+import { Account } from "../accounts/Account"
+import { getStatus } from "../accounts/accounts.service"
 import { useTransactionStatus } from "./useTransactionStatus"
 
 export const useAccountStatus = (

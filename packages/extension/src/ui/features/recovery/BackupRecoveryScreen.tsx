@@ -5,10 +5,10 @@ import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
-import { ConfirmScreen } from "../../screens/ConfirmScreen"
 import { useAppState } from "../../states/app"
 import { fileToString } from "../../utils/files"
 import { recoverBackup } from "../../utils/messaging"
+import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const DropZone = styled.div`
   width: 100%;

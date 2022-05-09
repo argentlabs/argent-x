@@ -1,5 +1,5 @@
-import ArgentCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
-import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
+import ArgentCompiledContract from "!!raw-loader!../../../contracts/ArgentAccount.txt"
+import ProxyCompiledContract from "!!raw-loader!../../../contracts/Proxy.txt"
 import {
   CompiledContract,
   Contract,
@@ -9,10 +9,10 @@ import {
   stark,
 } from "starknet"
 
-import { sendMessage, waitForMessage } from "../shared/messages"
-import { Network, getProvider } from "../shared/networks"
-import { WalletAccountSigner } from "../shared/wallet.model"
-import { getNetwork } from "./utils/messaging"
+import { sendMessage, waitForMessage } from "../../../shared/messages"
+import { Network, getProvider } from "../../../shared/networks"
+import { WalletAccountSigner } from "../../../shared/wallet.model"
+import { getNetwork } from "../../utils/messaging"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,
