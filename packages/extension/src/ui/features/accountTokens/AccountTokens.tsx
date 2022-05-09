@@ -4,15 +4,8 @@ import styled from "styled-components"
 import useSWR from "swr"
 
 import { Account } from "../../Account"
-import { PendingTransactions } from "../../components/Account/PendingTransactions"
-import { UpgradeBanner } from "../../components/Account/UpgradeBanner"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
-import {
-  AddTokenIconButton,
-  TokenTitle,
-  TokenWrapper,
-} from "../../components/Token"
 import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import {
@@ -24,11 +17,14 @@ import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
+import { PendingTransactions } from "../accountActivity/PendingTransactions"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountSubHeader } from "./AccountSubheader"
 import { TokenList } from "./TokenList"
+import { AddTokenIconButton, TokenTitle, TokenWrapper } from "./TokenListItem"
 import { TransferButtons } from "./TransferButtons"
+import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountStatus } from "./useAccountStatus"
 
 const Container = styled.div`

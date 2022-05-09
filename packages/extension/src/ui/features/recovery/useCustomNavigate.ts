@@ -1,7 +1,7 @@
 import { NavigateOptions, To, useNavigate } from "react-router-dom"
 import browser from "webextension-polyfill"
 
-import { routes } from "../routes"
+import { routes } from "../../routes"
 
 const openExtensionInTab = () => {
   const url = browser.runtime.getURL("index.html")

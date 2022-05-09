@@ -1,6 +1,6 @@
 import create from "zustand"
 
-import { Network } from "../../shared/networks"
+import { Network } from "../../../shared/networks"
 
 interface State {
   selectedNetwork?: Network

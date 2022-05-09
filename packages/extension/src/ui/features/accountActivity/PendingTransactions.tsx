@@ -1,10 +1,10 @@
 import { FC } from "react"
 
+import { SectionHeader } from "../../components/Account/SectionHeader"
 import { useNetwork } from "../../hooks/useNetworks"
 import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
-import { SectionHeader } from "./SectionHeader"
 import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
 
 interface PendingTransactionsProps {

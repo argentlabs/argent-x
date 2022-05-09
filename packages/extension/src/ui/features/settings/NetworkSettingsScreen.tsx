@@ -10,9 +10,9 @@ import { Spinner } from "../../components/Spinner"
 import { H2, P } from "../../components/Typography"
 import { useNetworks } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
-import { useSelectedNetwork } from "../../states/selectedNetwork"
 import { removeNetworks } from "../../utils/messaging"
 import { DappConnection } from "./DappConnection"
+import { useSelectedNetwork } from "./selectedNetwork.state"
 
 const Wrapper = styled.div`
   display: flex;

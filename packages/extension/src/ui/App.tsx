@@ -5,7 +5,7 @@ import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
 import { AppRoutes } from "./AppRoutes"
-import { isInTab } from "./hooks/useCustomNavigate"
+import { isInTab } from "./features/recovery/useCustomNavigate"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { swrCacheProvider } from "./utils/swrCache"
 

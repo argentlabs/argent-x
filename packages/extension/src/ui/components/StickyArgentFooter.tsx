@@ -18,11 +18,9 @@ const EmojiWrapper = styled.span`
   margin-right: 0.5em;
 `
 
-export const StickyArgentFooter: FC = () => {
-  return (
-    <StickyArgentFooterP>
-      Built with <EmojiWrapper aria-label="heart">❤️</EmojiWrapper>
-      by Argent
-    </StickyArgentFooterP>
-  )
-}
+export const StickyArgentFooter: FC = () => (
+  <StickyArgentFooterP>
+    Built with <EmojiWrapper aria-label="heart">❤️</EmojiWrapper>
+    by Argent
+  </StickyArgentFooterP>
+)

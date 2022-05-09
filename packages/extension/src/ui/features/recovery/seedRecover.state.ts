@@ -6,7 +6,7 @@ interface State {
   password?: string
 }
 
-export const useSeedRecover = create<State>(() => ({}))
+export const useSeedRecovery = create<State>(() => ({}))
 
 export const validateSeedPhrase = (seedPhrase: string): boolean => {
   const words = wordlists.en.split(seedPhrase.trim())
@@ -22,7 +22,7 @@ export const validateSeedPhrase = (seedPhrase: string): boolean => {
   // check if seedphrase is valid with HDNode
   try {
     ethers.utils.HDNode.fromMnemonic(seedPhrase)
-  } catch (e) {
+  } catch {
     return false
   }
 
@@ -40,23 +40,22 @@ export const validateAndSetSeedPhrase = (seedPhrase: string): void => {
   if (!validateSeedPhrase(seedPhrase)) {
     throw new Error("Invalid seed phrase")
   }
-  return useSeedRecover.setState({ seedPhrase })
+  return useSeedRecovery.setState({ seedPhrase })
 }
 
 export const validateAndSetPassword = (password: string): void => {
   if (!validatePassword(password)) {
     throw new Error("Invalid password")
   }
-  return useSeedRecover.setState({ password })
+  return useSeedRecovery.setState({ password })
 }
 
-export const validateSeedRecoverStateIsComplete = (
+export const validateSeedRecoveryCompletion = (
   state: State,
-): state is Required<State> => {
-  return Boolean(
+): state is Required<State> =>
+  Boolean(
     state.seedPhrase &&
       state.password &&
       validateSeedPhrase(state.seedPhrase) &&
       validatePassword(state.password),
   )
-}

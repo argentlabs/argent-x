@@ -2,12 +2,7 @@ import { FC, Fragment, Suspense } from "react"
 import styled from "styled-components"
 
 import { Account } from "../../Account"
-import { PendingTransactions } from "../../components/Account/PendingTransactions"
 import { SectionHeader } from "../../components/Account/SectionHeader"
-import {
-  TransactionItem,
-  TransactionsWrapper,
-} from "../../components/Account/TransactionItem"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ReportGmailerrorredIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
@@ -15,6 +10,8 @@ import { useNetwork } from "../../hooks/useNetworks"
 import { useAppState } from "../../states/app"
 import { formatDateTime } from "../../utils/dates"
 import { openVoyagerTransaction } from "../../utils/voyager.service"
+import { PendingTransactions } from "./PendingTransactions"
+import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
 import { useActivity } from "./useActivity"
 
 const Container = styled.div`

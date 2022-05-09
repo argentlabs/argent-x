@@ -2,10 +2,10 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
-import { toTokenView } from "../features/accountTokens/tokens.service"
-import { TokenDetailsWithBalance } from "../features/accountTokens/tokens.state"
-import { IconButton } from "./IconButton"
+import { IconButton } from "../../components/IconButton"
 import { TokenIcon } from "./TokenIcon"
+import { toTokenView } from "./tokens.service"
+import { TokenDetailsWithBalance } from "./tokens.state"
 
 export const TokenWrapper = styled.div`
   display: flex;

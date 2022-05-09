@@ -10,7 +10,6 @@ import { CopyTooltip } from "../../components/CopyTooltip"
 import { Header } from "../../components/Header"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
-import { TokenIcon } from "../../components/TokenIcon"
 import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
@@ -25,6 +24,7 @@ import {
   AccountAddressLink,
   AccountAddressWrapper,
 } from "./Address"
+import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 
