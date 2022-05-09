@@ -219,7 +219,7 @@ export class Wallet extends EventEmitter {
 
     await this.setAccounts(accounts)
 
-    this.store.setItem("discoveredOnce", true)
+    return this.store.setItem("discoveredOnce", true)
   }
 
   private async restoreAccountsFromWallet(
@@ -314,6 +314,7 @@ export class Wallet extends EventEmitter {
 
       return true
     } catch (error) {
+      console.error(error)
       return false
     }
   }
