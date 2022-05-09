@@ -2,6 +2,7 @@ import { FC, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import styled, { css } from "styled-components"
 
+import { NetworkSwitcher } from "../../features/networks/NetworkSwitcher"
 import { routes } from "../../routes"
 import { useSelectedAccount } from "../../states/account"
 import {
@@ -15,7 +16,6 @@ import {
   FormatListBulletedIcon,
   PhotoLibraryIcon,
 } from "../Icons/MuiIcons"
-import { NetworkSwitcher } from "../NetworkSwitcher"
 import { AccountFooter, FooterTab } from "./AccountFooter"
 import { AccountHeader } from "./AccountHeader"
 import { ProfilePicture } from "./ProfilePicture"

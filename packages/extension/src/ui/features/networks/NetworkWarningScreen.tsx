@@ -2,11 +2,11 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Congestion } from "../components/Icons/Congestion"
-import { H2, P } from "../components/Typography"
-import { routes } from "../routes"
-import { useNeedsToShowNetworkStatusWarning } from "../states/seenNetworkStatusWarning"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { H2, P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { CongestionIcon } from "./CongestionIcon"
+import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 
 const Wrapper = styled.div`
   display: flex;
@@ -44,7 +44,7 @@ export const NetworkWarningScreen: FC = () => {
       }}
     >
       <Wrapper>
-        <Congestion />
+        <CongestionIcon />
         <H2>Network issues</H2>
         <CenterP>
           StarkNet is in Alpha and is experiencing degraded network performance.

@@ -1,8 +1,8 @@
 import useSWR from "swr"
 
-import { getNetwork } from "../../shared/networks"
-import { SWRConfigCommon } from "../features/accountActivity/useActivity"
-import { getNetworkStatuses, getNetworks } from "../utils/messaging"
+import { getNetwork } from "../../../shared/networks"
+import { getNetworkStatuses, getNetworks } from "../../utils/messaging"
+import { SWRConfigCommon } from "../accountActivity/useActivity"
 
 export const useNetworks = (config?: SWRConfigCommon) => {
   const { data: allNetworks = [], ...rest } = useSWR(

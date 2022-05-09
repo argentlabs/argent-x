@@ -3,10 +3,10 @@ import styled from "styled-components"
 
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
-import { useNetwork } from "../../hooks/useNetworks"
 import { AccountStatus } from "../../utils/accounts"
 import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
 import { getVoyagerContractLink } from "../../utils/voyager.service"
+import { useNetwork } from "../networks/useNetworks"
 import { AccountName } from "./AccountName"
 import {
   AccountAddressIconsWrapper,

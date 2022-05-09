@@ -2,16 +2,16 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { NetworkStatus, getNetwork } from "../../shared/networks"
-import { recover } from "../features/recovery/recovery.service"
-import { useNetworkStatuses, useNetworks } from "../hooks/useNetworks"
-import { routes } from "../routes"
-import { useAppState } from "../states/app"
-import { useNeedsToShowNetworkStatusWarning } from "../states/seenNetworkStatusWarning"
+import { NetworkStatus, getNetwork } from "../../../shared/networks"
 import {
   NetworkStatusIndicator,
   mapNetworkStatusToColor,
-} from "./StatusIndicator"
+} from "../../components/StatusIndicator"
+import { routes } from "../../routes"
+import { useAppState } from "../../states/app"
+import { recover } from "../recovery/recovery.service"
+import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
+import { useNetworkStatuses, useNetworks } from "./useNetworks"
 
 const NetworkName = styled.span`
   text-align: right;

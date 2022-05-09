@@ -10,9 +10,7 @@ import {
   ArrowCircleDownIcon,
   DeleteIcon,
 } from "../../components/Icons/MuiIcons"
-import { NetworkStatusWrapper } from "../../components/NetworkSwitcher"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
-import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
 import {
@@ -25,6 +23,8 @@ import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { formatTruncatedAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
+import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
+import { useNetwork } from "../networks/useNetworks"
 import { recover } from "../recovery/recovery.service"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"

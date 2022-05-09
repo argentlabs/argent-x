@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-export const Congestion: FC = () => (
+export const CongestionIcon: FC = () => (
   <svg
     width="220"
     height="220"

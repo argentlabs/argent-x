@@ -10,7 +10,6 @@ import { CopyTooltip } from "../../components/CopyTooltip"
 import { Header } from "../../components/Header"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
-import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import { useAppState } from "../../states/app"
 import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
@@ -19,6 +18,7 @@ import {
   sendTransaction,
 } from "../../utils/transactions"
 import { getVoyagerContractLink } from "../../utils/voyager.service"
+import { useNetwork } from "../networks/useNetworks"
 import {
   AccountAddressIconsWrapper,
   AccountAddressLink,
