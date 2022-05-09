@@ -1,7 +1,7 @@
 import useSWR from "swr"
 
-import { Network } from "../../shared/networks"
-import { fetchActivity } from "../components/Account/accountActivity.service"
+import { Network } from "../../../shared/networks"
+import { fetchActivity } from "./accountActivity.service"
 
 export interface SWRConfigCommon {
   suspense?: boolean

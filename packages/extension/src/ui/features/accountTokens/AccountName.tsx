@@ -1,9 +1,9 @@
 import { FC, InputHTMLAttributes, useState } from "react"
 import styled from "styled-components"
 
+import { EditIcon } from "../../components/Icons/MuiIcons"
+import { InputText } from "../../components/InputText"
 import { defaultAccountName } from "../../states/accountMetadata"
-import { EditIcon } from "../Icons/MuiIcons"
-import { InputText } from "../InputText"
 
 const Form = styled.form`
   display: flex;

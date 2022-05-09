@@ -5,8 +5,8 @@ import type { Call } from "starknet"
 import styled, { keyframes } from "styled-components"
 import useSWR from "swr"
 
+import { fetchFeeTokenBalance } from "../features/accountTokens/tokens.service"
 import { getEstimatedFee } from "../utils/messaging"
-import { fetchFeeTokenBalance } from "../utils/tokens"
 import { Tooltip } from "./CopyTooltip"
 import {
   InfoRoundedIcon,

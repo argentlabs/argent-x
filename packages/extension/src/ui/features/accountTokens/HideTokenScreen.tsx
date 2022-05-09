@@ -1,14 +1,14 @@
 import React, { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 
-import { TokenIcon } from "../components/TokenIcon"
-import { P } from "../components/Typography"
-import { FormError } from "../components/Typography"
-import { routes } from "../routes"
-import { removeToken } from "../states/tokens"
-import { useTokens } from "../states/tokens"
-import { toTokenView } from "../utils/tokens"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { TokenIcon } from "../../components/TokenIcon"
+import { P } from "../../components/Typography"
+import { FormError } from "../../components/Typography"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { toTokenView } from "./tokens.service"
+import { removeToken } from "./tokens.state"
+import { useTokens } from "./tokens.state"
 import { BalanceAlert, TokenName, TokenTitle } from "./TokenScreen"
 
 export const HideTokenAlert = BalanceAlert

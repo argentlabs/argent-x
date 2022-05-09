@@ -3,14 +3,14 @@ import { BigNumber } from "ethers"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-import { sendMessage } from "../../shared/messages"
-import { equalToken, parsedDefaultTokens } from "../../shared/token"
-import { isValidAddress } from "../utils/addresses"
+import { sendMessage } from "../../../shared/messages"
+import { equalToken, parsedDefaultTokens } from "../../../shared/token"
+import { isValidAddress } from "../../utils/addresses"
 import {
   TokenDetails,
   mapTokenDetailsToToken,
   mapTokenToTokenDetails,
-} from "./tokens"
+} from "./tokens.state"
 
 interface State {
   tokens: TokenDetails[]

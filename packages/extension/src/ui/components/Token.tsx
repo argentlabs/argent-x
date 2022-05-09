@@ -2,8 +2,8 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
-import { TokenDetailsWithBalance } from "../states/tokens"
-import { toTokenView } from "../utils/tokens"
+import { toTokenView } from "../features/accountTokens/tokens.service"
+import { TokenDetailsWithBalance } from "../features/accountTokens/tokens.state"
 import { IconButton } from "./IconButton"
 import { TokenIcon } from "./TokenIcon"
 

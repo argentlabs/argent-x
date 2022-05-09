@@ -5,7 +5,13 @@ import styled, { css } from "styled-components"
 import useSWR from "swr"
 
 import { Account } from "../../Account"
-import { recover } from "../../features/recovery/recovery.service"
+import { ProfilePicture } from "../../components/Account/ProfilePicture"
+import {
+  ArrowCircleDownIcon,
+  DeleteIcon,
+} from "../../components/Icons/MuiIcons"
+import { NetworkStatusWrapper } from "../../components/NetworkSwitcher"
+import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { useNetwork } from "../../hooks/useNetworks"
 import { routes } from "../../routes"
 import { useAccount } from "../../states/account"
@@ -19,12 +25,9 @@ import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
 import { formatTruncatedAddress } from "../../utils/addresses"
 import { deleteAccount } from "../../utils/messaging"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
-import { ArrowCircleDownIcon, DeleteIcon } from "../Icons/MuiIcons"
-import { NetworkStatusWrapper } from "../NetworkSwitcher"
-import { TransactionStatusIndicator } from "../StatusIndicator"
+import { recover } from "../recovery/recovery.service"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
-import { ProfilePicture } from "./ProfilePicture"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;

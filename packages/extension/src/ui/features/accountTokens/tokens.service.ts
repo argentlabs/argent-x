@@ -2,10 +2,10 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { ethers } from "ethers"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
 
-import parsedErc20Abi from "../../abi/ERC20.json"
-import { feeToken } from "../../shared/token"
-import { Account } from "../Account"
-import { TokenDetails, TokenDetailsWithBalance } from "../states/tokens"
+import parsedErc20Abi from "../../../abi/ERC20.json"
+import { feeToken } from "../../../shared/token"
+import { Account } from "../../Account"
+import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
 export interface TokenView {
   address: string

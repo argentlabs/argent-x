@@ -5,17 +5,17 @@ import useSWR from "swr"
 import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
-import { messageStream } from "../../shared/messages"
-import { Token, equalToken, parsedDefaultTokens } from "../../shared/token"
-import { isValidAddress } from "../utils/addresses"
+import { messageStream } from "../../../shared/messages"
+import { Token, equalToken, parsedDefaultTokens } from "../../../shared/token"
+import { useSelectedAccount } from "../../states/account"
+import { useAppState } from "../../states/app"
+import { isValidAddress } from "../../utils/addresses"
 import {
   addToken as addTokenMsg,
   getTokens,
   removeToken as removeTokenMsg,
-} from "../utils/messaging"
-import { fetchTokenBalance } from "../utils/tokens"
-import { useSelectedAccount } from "./account"
-import { useAppState } from "./app"
+} from "../../utils/messaging"
+import { fetchTokenBalance } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {
   decimals?: BigNumber

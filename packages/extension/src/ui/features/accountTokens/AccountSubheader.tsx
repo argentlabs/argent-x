@@ -1,12 +1,12 @@
 import { FC } from "react"
 import styled from "styled-components"
 
+import { CopyTooltip } from "../../components/CopyTooltip"
+import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { useNetwork } from "../../hooks/useNetworks"
 import { AccountStatus } from "../../utils/accounts"
 import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
 import { getVoyagerContractLink } from "../../utils/voyager.service"
-import { CopyTooltip } from "../CopyTooltip"
-import { ContentCopyIcon, OpenInNewIcon } from "../Icons/MuiIcons"
 import { AccountName } from "./AccountName"
 import {
   AccountAddressIconsWrapper,

@@ -3,30 +3,30 @@ import React, { FC, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { Alert } from "../../components/Alert"
+import { BackButton } from "../../components/BackButton"
+import { Button, ButtonGroup } from "../../components/Button"
+import { CopyTooltip } from "../../components/CopyTooltip"
+import { Header } from "../../components/Header"
+import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
+import { InputText } from "../../components/InputText"
+import { TokenIcon } from "../../components/TokenIcon"
+import { useNetwork } from "../../hooks/useNetworks"
+import { routes } from "../../routes"
+import { useAppState } from "../../states/app"
+import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../../utils/transactions"
+import { getVoyagerContractLink } from "../../utils/voyager.service"
 import {
   AccountAddressIconsWrapper,
   AccountAddressLink,
   AccountAddressWrapper,
-} from "../components/Account/Address"
-import { Alert } from "../components/Alert"
-import { BackButton } from "../components/BackButton"
-import { Button, ButtonGroup } from "../components/Button"
-import { CopyTooltip } from "../components/CopyTooltip"
-import { Header } from "../components/Header"
-import { ContentCopyIcon, OpenInNewIcon } from "../components/Icons/MuiIcons"
-import { InputText } from "../components/InputText"
-import { TokenIcon } from "../components/TokenIcon"
-import { useNetwork } from "../hooks/useNetworks"
-import { routes } from "../routes"
-import { useAppState } from "../states/app"
-import { useTokensWithBalance } from "../states/tokens"
-import { formatTruncatedAddress, normalizeAddress } from "../utils/addresses"
-import { toTokenView } from "../utils/tokens"
-import {
-  getUint256CalldataFromBN,
-  sendTransaction,
-} from "../utils/transactions"
-import { getVoyagerContractLink } from "../utils/voyager.service"
+} from "./Address"
+import { toTokenView } from "./tokens.service"
+import { useTokensWithBalance } from "./tokens.state"
 
 export const TokenScreenWrapper = styled.div`
   display: flex;
