@@ -1,4 +1,4 @@
 declare module "*.txt" {
-  const value: string
-  export default value
+  const url: string
+  export default url
 }

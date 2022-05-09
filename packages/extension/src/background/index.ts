@@ -1,8 +1,8 @@
-import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
-import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 import { encode, number, stark } from "starknet"
 
+import ArgentAccountCompiledContractUrl from "../contracts/ArgentAccount.txt"
+import ProxyCompiledContractUrl from "../contracts/Proxy.txt"
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
@@ -51,6 +51,15 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
+  const [ProxyCompiledContract, ArgentAccountCompiledContract] =
+    await Promise.all(
+      [ProxyCompiledContractUrl, ArgentAccountCompiledContractUrl].map(
+        async (url) => {
+          const response = await fetch(url)
+          return response.text()
+        },
+      ),
+    )
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
   const wallet = new Wallet(
