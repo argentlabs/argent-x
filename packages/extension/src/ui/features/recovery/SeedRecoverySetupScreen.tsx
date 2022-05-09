@@ -7,7 +7,7 @@ import useSWRImmutable from "swr/immutable"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
 import { routes } from "../../routes"
-import { getSeedPhrase } from "../../utils/messaging"
+import { getSeedPhrase } from "../../services/messaging"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const SeedPhraseGrid = styled.div`

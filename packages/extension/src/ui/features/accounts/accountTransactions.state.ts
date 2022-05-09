@@ -3,7 +3,7 @@ import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
 import { TransactionStatus } from "../../../shared/transactions.model"
-import { getTransactions } from "../../utils/messaging"
+import { getTransactions } from "../../services/messaging"
 
 interface State {
   transactions: TransactionStatus[]

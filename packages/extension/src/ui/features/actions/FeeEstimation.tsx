@@ -10,7 +10,7 @@ import {
   InfoRoundedIcon,
   ReportGmailerrorredRoundedIcon,
 } from "../../components/Icons/MuiIcons"
-import { getEstimatedFee } from "../../utils/messaging"
+import { getEstimatedFee } from "../../services/messaging"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
 const Center = styled.div`

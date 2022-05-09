@@ -6,8 +6,8 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
-import { fileToString } from "../../utils/files"
-import { recoverBackup } from "../../utils/messaging"
+import { fileToString } from "../../services/files"
+import { recoverBackup } from "../../services/messaging"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const DropZone = styled.div`

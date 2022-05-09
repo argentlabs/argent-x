@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { makeClickable } from "../utils/a11y"
+import { makeClickable } from "../services/a11y"
 import { IconButton } from "./IconButton"
 import { ArrowBackIosNewIcon } from "./Icons/MuiIcons"
 

@@ -7,8 +7,8 @@ import {
   StatusIndicatorColor,
   TransactionStatusIndicator,
 } from "../../components/StatusIndicator"
-import { makeClickable } from "../../utils/a11y"
-import { formatTruncatedAddress } from "../../utils/addresses"
+import { makeClickable } from "../../services/a11y"
+import { formatTruncatedAddress } from "../../services/addresses"
 import { TokenIcon } from "../accountTokens/TokenIcon"
 import {
   TokenDetailsWrapper,

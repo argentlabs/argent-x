@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { useAppState } from "./app.state"
 import { recover } from "./features/recovery/recovery.service"
 import { routes } from "./routes"
-import { hasActiveSession, isInitialized } from "./utils/messaging"
+import { hasActiveSession, isInitialized } from "./services/messaging"
 
 export const useEntryRoute = () => {
   const navigate = useNavigate()

@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
 
-import { assertNever } from "../../utils/assertNever"
+import { assertNever } from "../../services/assertNever"
 import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AccountTokens } from "../accountTokens/AccountTokens"

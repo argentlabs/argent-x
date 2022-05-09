@@ -7,7 +7,7 @@ import { SWRConfig } from "swr"
 import { AppRoutes } from "./AppRoutes"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { isInTab } from "./features/recovery/useCustomNavigate"
-import { swrCacheProvider } from "./utils/swrCache"
+import { swrCacheProvider } from "./services/swrCache"
 
 const GlobalStyleWithFixedDimensions = createGlobalStyle`
   ${normalize}

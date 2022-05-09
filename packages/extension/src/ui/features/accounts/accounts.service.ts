@@ -1,7 +1,7 @@
 import { ethers } from "ethers"
 
 import { sendMessage } from "../../../shared/messages"
-import { startSession } from "../../utils/messaging"
+import { startSession } from "../../services/messaging"
 import { Account } from "./Account"
 
 export const deployAccount = async (networkId: string, password?: string) => {

@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
 import { PageWrapper } from "../../components/Page"
-import { formatFullAddress } from "../../utils/addresses"
+import { formatFullAddress } from "../../services/addresses"
 import {
   getAccountName,
   useAccountMetadata,

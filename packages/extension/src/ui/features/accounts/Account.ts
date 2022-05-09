@@ -12,7 +12,7 @@ import {
 import { sendMessage, waitForMessage } from "../../../shared/messages"
 import { Network, getProvider } from "../../../shared/networks"
 import { WalletAccountSigner } from "../../../shared/wallet.model"
-import { getNetwork } from "../../utils/messaging"
+import { getNetwork } from "../../services/messaging"
 
 const ArgentCompiledContractJson: CompiledContract = json.parse(
   ArgentCompiledContract,

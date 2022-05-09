@@ -9,11 +9,11 @@ import { Button, ButtonGroup } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import { isValidAddress } from "../../utils/addresses"
+import { isValidAddress } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
-} from "../../utils/transactions"
+} from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { openPlayOasisNft } from "./playoasis.service"
 import PlayOasisSvg from "./playoasis.svg"

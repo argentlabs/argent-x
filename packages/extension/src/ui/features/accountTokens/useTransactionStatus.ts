@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Status as StarkNetStatus } from "starknet"
 
 import { messageStream } from "../../../shared/messages"
-import { getTransactionStatus } from "../../utils/messaging"
+import { getTransactionStatus } from "../../services/messaging"
 
 function transformStatus(status: StarkNetStatus): Status {
   return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)

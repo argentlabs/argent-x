@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware"
 
 import { sendMessage } from "../../../shared/messages"
 import { equalToken, parsedDefaultTokens } from "../../../shared/token"
-import { isValidAddress } from "../../utils/addresses"
+import { isValidAddress } from "../../services/addresses"
 import {
   TokenDetails,
   mapTokenDetailsToToken,

@@ -8,7 +8,7 @@ import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { H2, P } from "../../components/Typography"
-import { removePreAuthorization } from "../../utils/messaging"
+import { removePreAuthorization } from "../../services/messaging"
 import { DappConnection } from "./DappConnection"
 
 const Wrapper = styled.div`

@@ -1,6 +1,6 @@
 import { Network } from "../../../shared/networks"
-import { formatDate } from "../../utils/dates"
-import { fetchVoyagerTransactions } from "../../utils/voyager.service"
+import { formatDate } from "../../services/dates"
+import { fetchVoyagerTransactions } from "../../services/voyager.service"
 import { DailyActivity } from "./accountActivity.model"
 
 export const fetchActivity = async (address: string, network: Network) => {

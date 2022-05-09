@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
 import { NetworkStatus } from "../../shared/networks"
-import { assertNever } from "../utils/assertNever"
+import { assertNever } from "../services/assertNever"
 import { NetworkWarning } from "./Icons/NetworkWarning"
 
 export type StatusIndicatorColor = "green" | "orange" | "red" | "transparent"

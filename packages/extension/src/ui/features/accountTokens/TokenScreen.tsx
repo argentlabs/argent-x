@@ -12,12 +12,15 @@ import { Header } from "../../components/Header"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
+import {
+  formatTruncatedAddress,
+  normalizeAddress,
+} from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
-} from "../../utils/transactions"
-import { getVoyagerContractLink } from "../../utils/voyager.service"
+} from "../../services/transactions"
+import { getVoyagerContractLink } from "../../services/voyager.service"
 import { useNetwork } from "../networks/useNetworks"
 import {
   AccountAddressIconsWrapper,

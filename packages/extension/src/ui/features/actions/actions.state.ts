@@ -4,7 +4,7 @@ import create from "zustand"
 
 import { ExtensionActionItem } from "../../../shared/actionQueue"
 import { messageStream, sendMessage } from "../../../shared/messages"
-import { getActions } from "../../utils/messaging"
+import { getActions } from "../../services/messaging"
 
 interface State {
   actions: ExtensionActionItem[]

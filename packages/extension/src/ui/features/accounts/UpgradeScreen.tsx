@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { upgradeAccount } from "../../utils/messaging"
+import { upgradeAccount } from "../../services/messaging"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useAccount } from "./accounts.state"
 

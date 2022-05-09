@@ -7,7 +7,7 @@ import { useAppState } from "../../app.state"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { makeClickable } from "../../utils/a11y"
+import { makeClickable } from "../../services/a11y"
 import { PendingTransactions } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {

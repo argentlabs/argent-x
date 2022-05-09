@@ -3,8 +3,11 @@ import styled from "styled-components"
 
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
-import { formatTruncatedAddress, normalizeAddress } from "../../utils/addresses"
-import { getVoyagerContractLink } from "../../utils/voyager.service"
+import {
+  formatTruncatedAddress,
+  normalizeAddress,
+} from "../../services/addresses"
+import { getVoyagerContractLink } from "../../services/voyager.service"
 import { AccountStatus } from "../accounts/accounts.service"
 import { useNetwork } from "../networks/useNetworks"
 import { AccountName } from "./AccountName"
