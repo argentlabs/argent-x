@@ -1,10 +1,10 @@
 import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
 import { Account } from "../../Account"
 import { routes } from "../../routes"
-import { useAccount } from "../../states/account"
-import { setDefaultAccountNames } from "../../states/accountMetadata"
 import { useAppState } from "../../states/app"
 import { getAccounts, getLastSelectedAccount } from "../../utils/messaging"
+import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
+import { useAccount } from "../accounts/accounts.service"
 
 interface RecoveryOptions {
   networkId?: string

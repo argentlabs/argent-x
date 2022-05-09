@@ -3,12 +3,12 @@ import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
 import { PageWrapper } from "../../components/Page"
-import { useSelectedAccount } from "../../states/account"
+import { formatFullAddress } from "../../utils/addresses"
 import {
   getAccountName,
   useAccountMetadata,
-} from "../../states/accountMetadata"
-import { formatFullAddress } from "../../utils/addresses"
+} from "../accounts/accountMetadata.state"
+import { useSelectedAccount } from "../accounts/accounts.service"
 import { QrCode } from "./QrCode"
 
 const Container = styled.div`

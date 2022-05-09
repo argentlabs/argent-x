@@ -7,16 +7,16 @@ import { Account } from "../../Account"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../states/accountMetadata"
-import { useAccountTransactions } from "../../states/accountTransactions"
 import { useAppState } from "../../states/app"
 import { makeClickable } from "../../utils/a11y"
 import { connectAccount } from "../../utils/accounts"
 import { checkIfUpgradeAvailable } from "../../utils/upgrade"
 import { PendingTransactions } from "../accountActivity/PendingTransactions"
+import {
+  getAccountName,
+  useAccountMetadata,
+} from "../accounts/accountMetadata.state"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"

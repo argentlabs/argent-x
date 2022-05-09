@@ -21,11 +21,9 @@ const loadingTexts = [
   "Almost there…",
 ]
 
-export const LoadingScreen: FC = () => {
-  return (
-    <LoadingScreenWrapper>
-      <Spinner size={92} />
-      <Greetings greetings={loadingTexts} />
-    </LoadingScreenWrapper>
-  )
-}
+export const LoadingScreen: FC = () => (
+  <LoadingScreenWrapper>
+    <Spinner size={92} />
+    <Greetings greetings={loadingTexts} />
+  </LoadingScreenWrapper>
+)

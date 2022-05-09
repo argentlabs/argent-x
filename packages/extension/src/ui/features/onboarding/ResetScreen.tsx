@@ -5,7 +5,7 @@ import { sendMessage } from "../../../shared/messages"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { ConfirmScreen } from "../../screens/ConfirmScreen"
-import { useAccount } from "../../states/account"
+import { useAccount } from "../accounts/accounts.service"
 
 export const ResetScreen: FC = () => {
   const navigate = useNavigate()

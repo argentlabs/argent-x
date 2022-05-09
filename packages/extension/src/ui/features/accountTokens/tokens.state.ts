@@ -7,7 +7,6 @@ import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
 import { Token, equalToken, parsedDefaultTokens } from "../../../shared/token"
-import { useSelectedAccount } from "../../states/account"
 import { useAppState } from "../../states/app"
 import { isValidAddress } from "../../utils/addresses"
 import {
@@ -15,6 +14,7 @@ import {
   getTokens,
   removeToken as removeTokenMsg,
 } from "../../utils/messaging"
+import { useSelectedAccount } from "../accounts/accounts.service"
 import { fetchTokenBalance } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {

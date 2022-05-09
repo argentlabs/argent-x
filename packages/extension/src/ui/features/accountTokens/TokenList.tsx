@@ -1,8 +1,8 @@
 import { FC } from "react"
 import { Link } from "react-router-dom"
 
-import { SectionHeader } from "../../components/Account/SectionHeader"
 import { routes } from "../../routes"
+import { SectionHeader } from "../accounts/SectionHeader"
 import { TokenListItem } from "./TokenListItem"
 import { useTokensWithBalance } from "./tokens.state"
 

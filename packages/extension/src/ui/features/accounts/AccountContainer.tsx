@@ -2,22 +2,19 @@ import { FC, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { NetworkSwitcher } from "../../features/networks/NetworkSwitcher"
-import { routes } from "../../routes"
-import { useSelectedAccount } from "../../states/account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../states/accountMetadata"
-import { getAccountImageUrl } from "../../utils/accounts"
-import { Header } from "../Header"
+import { Header } from "../../components/Header"
 import {
   AccountBalanceWalletIcon,
   FormatListBulletedIcon,
   PhotoLibraryIcon,
-} from "../Icons/MuiIcons"
+} from "../../components/Icons/MuiIcons"
+import { routes } from "../../routes"
+import { getAccountImageUrl } from "../../utils/accounts"
+import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { AccountFooter, FooterTab } from "./AccountFooter"
 import { AccountHeader } from "./AccountHeader"
+import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
+import { useSelectedAccount } from "./accounts.service"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const Container = styled.div<{

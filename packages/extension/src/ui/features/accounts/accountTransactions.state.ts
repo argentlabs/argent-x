@@ -1,9 +1,9 @@
 import { useEffect } from "react"
 import create from "zustand"
 
-import { messageStream } from "../../shared/messages"
-import { TransactionStatus } from "../../shared/transactions.model"
-import { getTransactions } from "../utils/messaging"
+import { messageStream } from "../../../shared/messages"
+import { TransactionStatus } from "../../../shared/transactions.model"
+import { getTransactions } from "../../utils/messaging"
 
 interface State {
   transactions: TransactionStatus[]

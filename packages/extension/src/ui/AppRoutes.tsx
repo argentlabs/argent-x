@@ -3,8 +3,10 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useTransactionErrorScreen } from "./features/accountActivity/useTransactionErrorScreen"
-import { AccountListScreen } from "./features/accountList/AccountListScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
+import { AccountListScreen } from "./features/accounts/AccountListScreen"
+import { AccountScreen } from "./features/accounts/AccountScreen"
+import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
@@ -38,10 +40,8 @@ import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { useEntry } from "./hooks/useEntry"
 import { routes } from "./routes"
-import { AccountScreen } from "./screens/AccountScreen"
 import { ErrorScreen } from "./screens/ErrorScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
-import { UpgradeScreen } from "./screens/UpgradeScreen"
 import { useAppState } from "./states/app"
 
 export const ScrollBehaviour = styled.div`

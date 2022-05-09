@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { EditIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
-import { defaultAccountName } from "../../states/accountMetadata"
+import { defaultAccountName } from "../accounts/accountMetadata.state"
 
 const Form = styled.form`
   display: flex;

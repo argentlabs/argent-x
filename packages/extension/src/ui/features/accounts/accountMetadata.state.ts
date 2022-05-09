@@ -1,7 +1,7 @@
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-import type { Account } from "../Account"
+import type { Account } from "../../Account"
 
 export const defaultAccountName = "Unnamed account"
 

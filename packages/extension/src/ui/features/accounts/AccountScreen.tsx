@@ -1,11 +1,11 @@
 import { FC, ReactNode } from "react"
 
-import { AccountContainer } from "../components/Account/AccountContainer"
-import { AccountActivity } from "../features/accountActivity/AccountActivity"
-import { AccountNfts } from "../features/accountNfts/AccountNfts"
-import { AccountTokens } from "../features/accountTokens/AccountTokens"
-import { useSelectedAccount } from "../states/account"
-import { assertNever } from "../utils/assertNever"
+import { assertNever } from "../../utils/assertNever"
+import { AccountActivity } from "../accountActivity/AccountActivity"
+import { AccountNfts } from "../accountNfts/AccountNfts"
+import { AccountTokens } from "../accountTokens/AccountTokens"
+import { AccountContainer } from "./AccountContainer"
+import { useSelectedAccount } from "./accounts.service"
 
 interface AccountScreenProps {
   tab: "tokens" | "nfts" | "activity"

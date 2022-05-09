@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Account } from "../Account"
-import { ProfilePicture } from "../components/Account/ProfilePicture"
 import { Button, ButtonGroupVertical } from "../components/Button"
 import { Header } from "../components/Header"
 import { H2 } from "../components/Typography"
+import {
+  getAccountName,
+  useAccountMetadata,
+} from "../features/accounts/accountMetadata.state"
+import { ProfilePicture } from "../features/accounts/ProfilePicture"
 import { NetworkSwitcher } from "../features/networks/NetworkSwitcher"
-import { getAccountName, useAccountMetadata } from "../states/accountMetadata"
 import { getAccountImageUrl } from "../utils/accounts"
 
 const ConfirmScreenWrapper = styled.form<{

@@ -2,12 +2,12 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { P } from "../components/Typography"
-import { routes } from "../routes"
-import { useAccount } from "../states/account"
-import { useAppState } from "../states/app"
-import { upgradeAccount } from "../utils/messaging"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { ConfirmScreen } from "../../screens/ConfirmScreen"
+import { useAppState } from "../../states/app"
+import { upgradeAccount } from "../../utils/messaging"
+import { useAccount } from "./accounts.service"
 
 const StyledP = styled(P)`
   margin-bottom: 16px;

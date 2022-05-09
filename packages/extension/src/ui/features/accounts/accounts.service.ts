@@ -1,6 +1,6 @@
 import create from "zustand"
 
-import { Account } from "../Account"
+import { Account } from "../../Account"
 
 interface State {
   accounts: Record<string, Account>

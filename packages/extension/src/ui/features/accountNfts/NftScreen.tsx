@@ -8,13 +8,13 @@ import { Button, ButtonGroup } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import { useSelectedAccount } from "../../states/account"
 import { useAppState } from "../../states/app"
 import { isValidAddress } from "../../utils/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../utils/transactions"
+import { useSelectedAccount } from "../accounts/accounts.service"
 import { openPlayOasisNft } from "./playoasis.service"
 import PlayOasisSvg from "./playoasis.svg"
 import { useNfts } from "./useNfts"
