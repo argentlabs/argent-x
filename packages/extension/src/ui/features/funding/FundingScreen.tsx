@@ -23,8 +23,10 @@ const Title = styled.h1`
 export const FundingScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
   const bridgeUrl =
-    switcherNetworkId === "goerli-alpha" &&
-    "https://goerli.starkgate.starknet.io"
+    switcherNetworkId === "mainnet-alpha"
+      ? "https://starkgate.starknet.io"
+      : switcherNetworkId === "goerli-alpha" &&
+        "https://goerli.starkgate.starknet.io"
 
   return (
     <>
@@ -52,7 +54,7 @@ export const FundingScreen: FC = () => {
           ) : (
             <Option
               title="Bridge from Ethereum"
-              description="Not available for mainnet yet"
+              description="Not available for this network"
               icon={<EthereumSvg />}
               disabled
               hideArrow
