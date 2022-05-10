@@ -26,7 +26,12 @@ jobs:
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
       - run: yarn --cwd packages/dapp export
-      - run: zip -r ${{ env.FILENAME }} packages/extension/dist/*
+      - name: Create zip
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME }} ./*
+          mv ${{ env.FILENAME }} ../../../
+          cd ../../../
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
