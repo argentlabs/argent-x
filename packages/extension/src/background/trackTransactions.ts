@@ -8,7 +8,52 @@ import {
   TransactionStatusWithProvider,
 } from "../shared/transactions.model"
 import { WalletAccount } from "../shared/wallet.model"
+import { sendMessageToUi } from "./activeTabs"
+import { resetStoredNonce } from "./nonce"
+import {
+  addToAlreadyShown,
+  hasShownNotification,
+  sentTransactionNotification,
+} from "./notification"
 import { getProvider } from "./utils/getProvider"
+
+const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
+
+export const trackTransations: TransactionListener = async (transactions) => {
+  if (transactions.length > 0) {
+    sendMessageToUi({
+      type: "TRANSACTION_UPDATES",
+      data: transactions,
+    })
+
+    for (const transaction of transactions) {
+      const { hash, status, accountAddress, meta } = transaction
+      if (
+        (successStatuses.includes(status) || status === "REJECTED") &&
+        !(await hasShownNotification(hash))
+      ) {
+        addToAlreadyShown(hash)
+        sentTransactionNotification(hash, status, meta)
+        if (accountAddress) {
+          const data = { hash, status, accountAddress, meta }
+          if (successStatuses.includes(status)) {
+            sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
+          } else if (status === "REJECTED") {
+            const { failureReason } = transaction
+            sendMessageToUi({
+              type: "TRANSACTION_FAILURE",
+              data: { ...data, failureReason },
+            })
+          }
+        }
+      }
+      // on error remove stored (increased) nonce
+      if (accountAddress && status === "REJECTED") {
+        resetStoredNonce(accountAddress)
+      }
+    }
+  }
+}
 
 export async function getTransactionStatus(
   provider: Provider,

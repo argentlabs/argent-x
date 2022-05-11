@@ -1,11 +1,10 @@
 import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 import { encode, number, stark } from "starknet"
 
-import ArgentAccountCompiledContractUrl from "../contracts/ArgentAccount.txt"
-import ProxyCompiledContractUrl from "../contracts/Proxy.txt"
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
 import { MessageType } from "../shared/MessageType"
+import { loadContracts } from "./accounts"
 import { getQueue } from "./actionQueue"
 import {
   addTab,
@@ -27,12 +26,7 @@ import { downloadFile } from "./download"
 import { getKeyPair } from "./keys/communication"
 import { exportLegacyBackup, hasLegacy } from "./legacy"
 import { getNetworkStatuses } from "./networkStatus"
-import { getNonce, increaseStoredNonce, resetStoredNonce } from "./nonce"
-import {
-  addToAlreadyShown,
-  hasShownNotification,
-  sentTransactionNotification,
-} from "./notification"
+import { getNonce, increaseStoredNonce } from "./nonce"
 import { openUi } from "./openUi"
 import {
   isPreAuthorized,
@@ -42,69 +36,27 @@ import {
 } from "./preAuthorizations"
 import { Storage, clearStorage } from "./storage"
 import { addToken, getTokens, hasToken, removeToken } from "./tokens"
-import { TransactionTracker, getTransactionStatus } from "./trackTransactions"
+import {
+  TransactionTracker,
+  getTransactionStatus,
+  trackTransations,
+} from "./trackTransactions"
 import { getImplementationUpgradePath } from "./upgrade"
 import { getProvider } from "./utils/getProvider"
 import { Wallet, WalletStorageProps } from "./wallet"
 
-const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
-
 ;(async () => {
   const { privateKey, publicKeyJwk } = await getKeyPair()
-  const [ProxyCompiledContract, ArgentAccountCompiledContract] =
-    await Promise.all(
-      [ProxyCompiledContractUrl, ArgentAccountCompiledContractUrl].map(
-        async (url) => {
-          const response = await fetch(url)
-          return response.text()
-        },
-      ),
-    )
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
   const wallet = new Wallet(
     storage,
-    ProxyCompiledContract,
-    ArgentAccountCompiledContract,
+    ...(await loadContracts()),
     getNetworkImplementation,
   )
   await wallet.setup()
 
-  const transactionTracker = new TransactionTracker(async (transactions) => {
-    if (transactions.length > 0) {
-      sendMessageToUi({
-        type: "TRANSACTION_UPDATES",
-        data: transactions,
-      })
-
-      for (const transaction of transactions) {
-        const { hash, status, accountAddress, meta } = transaction
-        if (
-          (successStatuses.includes(status) || status === "REJECTED") &&
-          !(await hasShownNotification(hash))
-        ) {
-          addToAlreadyShown(hash)
-          sentTransactionNotification(hash, status, meta)
-          if (accountAddress) {
-            const data = { hash, status, accountAddress, meta }
-            if (successStatuses.includes(status)) {
-              sendMessageToUi({ type: "TRANSACTION_SUCCESS", data })
-            } else if (status === "REJECTED") {
-              const { failureReason } = transaction
-              sendMessageToUi({
-                type: "TRANSACTION_FAILURE",
-                data: { ...data, failureReason },
-              })
-            }
-          }
-        }
-        // on error remove stored (increased) nonce
-        if (accountAddress && status === "REJECTED") {
-          resetStoredNonce(accountAddress)
-        }
-      }
-    }
-  }, 30 * 1000)
+  const transactionTracker = new TransactionTracker(trackTransations)
 
   messageStream.subscribe(async ([msg, sender]) => {
     const sendToTabAndUi = async (msg: MessageType) => {
