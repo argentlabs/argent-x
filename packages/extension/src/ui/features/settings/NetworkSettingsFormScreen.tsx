@@ -6,8 +6,7 @@ import styled from "styled-components"
 
 import { Network, NetworkSchema } from "../../../shared/networks"
 import { useAppState } from "../../app.state"
-import { BackButton } from "../../components/BackButton"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
@@ -73,9 +72,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
 
   return (
     <>
-      <Header>
-        <BackButton />
-      </Header>
+      <IconBar back />
       <ConfirmScreen
         title={props.mode === "add" ? "Add Network" : "Edit Network"}
         singleButton

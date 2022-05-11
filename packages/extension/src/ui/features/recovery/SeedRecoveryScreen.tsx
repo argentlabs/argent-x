@@ -5,7 +5,7 @@ import { TextArea } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { validateAndSetSeedPhrase } from "./seedRecover.state"
+import { validateAndSetSeedPhrase } from "./seedRecovery.state"
 import { useCustomNavigate } from "./useCustomNavigate"
 
 export const SeedRecoveryScreen: FC = () => {

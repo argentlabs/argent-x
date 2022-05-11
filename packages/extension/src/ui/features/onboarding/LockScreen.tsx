@@ -12,7 +12,7 @@ import { makeClickable } from "../../services/a11y"
 import { startSession } from "../../services/messaging"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
-import { validatePassword } from "../recovery/seedRecover.state"
+import { validatePassword } from "../recovery/seedRecovery.state"
 import { Greetings, GreetingsWrapper } from "./Greetings"
 import LogoSvg from "./logo.svg"
 

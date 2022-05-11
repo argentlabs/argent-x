@@ -3,9 +3,8 @@ import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 import { sendMessage } from "../../../shared/messages"
-import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
@@ -73,9 +72,7 @@ const Footer = styled.div`
 
 export const SettingsScreen: FC = () => (
   <>
-    <Header>
-      <BackButton />
-    </Header>
+    <IconBar back />
     <SettingsScreenWrapper>
       <H2>Settings</H2>
       <SettingsItem

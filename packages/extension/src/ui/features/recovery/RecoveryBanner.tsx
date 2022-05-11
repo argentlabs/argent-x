@@ -2,7 +2,7 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 
 import { Banner } from "../../components/Banner"
-import { DangerIcon } from "../../components/Icons/Danger"
+import { DangerIcon } from "../../components/Icons/DangerIcon"
 import { routes } from "../../routes"
 
 interface RecoveryBannerProps {

@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
-import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { InputText } from "../../components/InputText"
 import { FormError, H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
@@ -14,7 +13,7 @@ import { connectAccount, deployAccount } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
-import { validatePassword } from "../recovery/seedRecover.state"
+import { validatePassword } from "../recovery/seedRecovery.state"
 
 const Container = styled.div`
   padding: 48px 40px 24px;
@@ -80,9 +79,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
 
   return (
     <>
-      <Header>
-        <BackButton to={routes.welcome()} />
-      </Header>
+      <IconBar back={routes.welcome()} />
       <Container>
         <H2>{overrideTitle || "New wallet"}</H2>
         <P>Enter a password to protect your wallet</P>

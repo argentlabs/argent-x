@@ -5,10 +5,9 @@ import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
-import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroup } from "../../components/Button"
 import { CopyTooltip } from "../../components/CopyTooltip"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
@@ -127,9 +126,7 @@ export const TokenScreen: FC = () => {
 
   return (
     <>
-      <Header>
-        <BackButton />
-      </Header>
+      <IconBar back />
       <TokenScreenWrapper>
         <TokenTitle>
           <TokenIcon url={image} name={name} large />

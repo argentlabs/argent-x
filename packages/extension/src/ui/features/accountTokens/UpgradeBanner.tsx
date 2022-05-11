@@ -1,7 +1,7 @@
 import { FC } from "react"
 
 import { Banner } from "../../components/Banner"
-import { UpdateIcon } from "../../components/Icons/Update"
+import { UpdateIcon } from "../../components/Icons/UpdateIcon"
 
 export const UpgradeBanner: FC = () => (
   <Banner
