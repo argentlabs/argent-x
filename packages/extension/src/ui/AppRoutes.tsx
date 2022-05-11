@@ -40,6 +40,7 @@ import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectio
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
+import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
@@ -121,6 +122,7 @@ const walletRoutes = (
     <Route path={routes.token.path} element={<TokenScreen />} />
     <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
     <Route path={routes.settings.path} element={<SettingsScreen />} />
+    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
     <Route
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreen />}

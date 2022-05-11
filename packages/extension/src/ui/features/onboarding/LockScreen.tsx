@@ -1,20 +1,15 @@
-import { FC, useEffect } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
-import { InputText } from "../../components/InputText"
-import { A, FormError, P } from "../../components/Typography"
+import { P, StyledLink } from "../../components/Typography"
 import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
-import { startSession } from "../../services/messaging"
 import { StickyGroup } from "../actions/ConfirmScreen"
-import { recover } from "../recovery/recovery.service"
-import { validatePassword } from "../recovery/seedRecovery.state"
 import { Greetings, GreetingsWrapper } from "./Greetings"
 import LogoSvg from "./logo.svg"
+import { PasswordForm } from "./PasswordForm"
 
 const LockScreenWrapper = styled.div`
   display: flex;
@@ -32,7 +27,7 @@ const LockScreenWrapper = styled.div`
     width: 100%;
   }
 
-  ${A} {
+  ${StyledLink} {
     margin-top: 16px;
   }
 `
@@ -48,34 +43,6 @@ export const greetings = [
 
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
-  const { passwordError } = useAppState()
-  const {
-    control,
-    formState: { errors, isDirty },
-    handleSubmit,
-    setError,
-  } = useForm<{ password: string }>()
-  useEffect(() => {
-    setError("password", { message: passwordError })
-  }, [passwordError])
-
-  const handleResetClick = () => navigate(routes.reset())
-
-  const verifyPassword = async (password: string) => {
-    useAppState.setState({ passwordError: undefined, isLoading: true })
-    try {
-      await startSession(password)
-
-      const target = await recover()
-      useAppState.setState({ passwordError: undefined, isLoading: false })
-      navigate(target)
-    } catch {
-      useAppState.setState({
-        passwordError: "Wrong password",
-        isLoading: false,
-      })
-    }
-  }
 
   return (
     <LockScreenWrapper>
@@ -83,39 +50,25 @@ export const LockScreen: FC = () => {
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 
-      <form onSubmit={handleSubmit(({ password }) => verifyPassword(password))}>
-        <Controller
-          name="password"
-          control={control}
-          rules={{ required: true, validate: validatePassword }}
-          defaultValue=""
-          render={({ field: { ref, ...field } }) => (
-            <InputText
-              autoFocus
-              placeholder="Password"
-              type="password"
-              {...field}
-            />
-          )}
-        />
-        {errors.password?.type === "validate" && (
-          <FormError>Password is too short</FormError>
+      <PasswordForm
+        onSubmit={() => useAppState.setState({ isLoading: true })}
+        onFailure={() => useAppState.setState({ isLoading: false })}
+        onSuccess={(target) => {
+          useAppState.setState({ isLoading: false })
+          navigate(target)
+        }}
+      >
+        {(isDirty) => (
+          <>
+            <StyledLink to={routes.reset()}>reset or restore backup</StyledLink>
+            <StickyGroup>
+              <Button type="submit" disabled={!isDirty}>
+                Unlock
+              </Button>
+            </StickyGroup>
+          </>
         )}
-        {errors.password?.type === "required" && (
-          <FormError>Password is required</FormError>
-        )}
-        {errors.password?.message && (
-          <FormError>{errors.password.message}</FormError>
-        )}
-
-        <A {...makeClickable(handleResetClick)}>reset or restore backup</A>
-
-        <StickyGroup>
-          <Button type="submit" disabled={!isDirty}>
-            Unlock
-          </Button>
-        </StickyGroup>
-      </form>
+      </PasswordForm>
     </LockScreenWrapper>
   )
 }
