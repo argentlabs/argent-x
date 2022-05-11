@@ -5,8 +5,8 @@ import styled from "styled-components"
 
 import { routes } from "../routes"
 import { BackLink } from "./BackLink"
-import { BackIcon } from "./Icons/Back"
-import { CloseIcon } from "./Icons/Close"
+import { BackIcon } from "./Icons/BackIcon"
+import { CloseIcon } from "./Icons/CloseIcon"
 
 const Bar = styled.div`
   display: flex;
@@ -14,28 +14,30 @@ const Bar = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 18px;
-`
 
-const IconBarReverse = styled(Bar)`
-  flex-direction: row-reverse;
+  hr {
+    margin: 0 auto;
+    visibility: hidden;
+  }
 `
 
 interface IconBarProps {
-  back?: boolean
+  back?: boolean | string
   close?: boolean | string
 }
 
 export const IconBar: FC<IconBarProps> = ({ back, close }) => (
-  <IconBarReverse>
-    {close && (
-      <Link to={isString(close) ? close : routes.accountTokens()}>
-        <CloseIcon />
-      </Link>
-    )}
+  <Bar>
     {back && (
       <BackLink>
         <BackIcon />
       </BackLink>
     )}
-  </IconBarReverse>
+    <hr />
+    {close && (
+      <Link to={isString(close) ? close : routes.accountTokens()}>
+        <CloseIcon />
+      </Link>
+    )}
+  </Bar>
 )

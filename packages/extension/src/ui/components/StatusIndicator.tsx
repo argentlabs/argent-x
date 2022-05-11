@@ -3,7 +3,7 @@ import styled, { css, keyframes } from "styled-components"
 
 import { NetworkStatus } from "../../shared/networks"
 import { assertNever } from "../services/assertNever"
-import { NetworkWarning } from "./Icons/NetworkWarning"
+import { NetworkWarningIcon } from "./Icons/NetworkWarningIcon"
 
 export type StatusIndicatorColor = "green" | "orange" | "red" | "transparent"
 
@@ -48,7 +48,7 @@ export const NetworkStatusIndicator: FC<StatusIndicatorProps> = ({
   color = "transparent",
 }) => {
   if (color === "orange") {
-    return <NetworkWarning />
+    return <NetworkWarningIcon />
   }
   return <StatusIndicator color={color} />
 }

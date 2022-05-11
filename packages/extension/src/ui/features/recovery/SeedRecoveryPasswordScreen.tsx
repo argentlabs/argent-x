@@ -9,7 +9,7 @@ import {
   useSeedRecovery,
   validateAndSetPassword,
   validateSeedRecoveryCompletion,
-} from "./seedRecover.state"
+} from "./seedRecovery.state"
 
 export const SeedRecoveryPasswordScreen: FC = () => {
   const navigate = useNavigate()

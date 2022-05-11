@@ -2,8 +2,7 @@ import { FC } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { BackButton } from "../../components/BackButton"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
@@ -50,9 +49,7 @@ export const NetworkSettingsScreen: FC = () => {
 
   return (
     <>
-      <Header>
-        <BackButton />
-      </Header>
+      <IconBar back />
       <Wrapper>
         <H2>Networks</H2>
         <List>

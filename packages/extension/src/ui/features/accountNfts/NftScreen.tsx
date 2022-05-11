@@ -4,9 +4,8 @@ import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
-import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroup } from "../../components/Button"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
 import { isValidAddress } from "../../services/addresses"
@@ -110,9 +109,7 @@ export const NftScreen: FC = () => {
 
   return (
     <>
-      <Header>
-        <BackButton />
-      </Header>
+      <IconBar back />
       <Container>
         <h3>{nft.name}</h3>
         {nft.animation_url ? (

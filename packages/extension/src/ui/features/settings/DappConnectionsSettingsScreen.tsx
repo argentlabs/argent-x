@@ -4,9 +4,8 @@ import styled from "styled-components"
 
 import { getPreAuthorizations } from "../../../background/preAuthorizations"
 import { sendMessage } from "../../../shared/messages"
-import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
-import { Header } from "../../components/Header"
+import { IconBar } from "../../components/IconBar"
 import { H2, P } from "../../components/Typography"
 import { removePreAuthorization } from "../../services/messaging"
 import { DappConnection } from "./DappConnection"
@@ -43,9 +42,7 @@ export const DappConnectionsSettingsScreen: FC = () => {
 
   return (
     <>
-      <Header>
-        <BackButton />
-      </Header>
+      <IconBar back />
       <Wrapper>
         <H2>Dapp connections</H2>
         {preAuthorizations.length === 0 ? (
