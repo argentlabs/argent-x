@@ -5,11 +5,11 @@ import {
   hasShownNotification,
   sentTransactionNotification,
 } from "../notification"
-import { TransactionUpdatesListener } from "./transactions"
+import { TransactionUpdateListener } from "./transactions"
 
 const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
-export const trackTransations: TransactionUpdatesListener = async (
+export const trackTransations: TransactionUpdateListener = async (
   transactions,
 ) => {
   if (transactions.length > 0) {

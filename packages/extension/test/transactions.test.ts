@@ -5,16 +5,16 @@ import waitForExpect from "wait-for-expect"
 
 import { ArrayStorage } from "../src/background/storage/array"
 import { getTransactionsStatusUpdate } from "../src/background/transactions/determineUpdates"
-import { nameTransaction } from "../src/background/transactions/nameTransaction"
-import { setAsyncInterval } from "../src/background/transactions/setAsyncInterval"
+import { setIntervalAsync } from "../src/background/transactions/setIntervalAsync"
+import { nameTransaction } from "../src/background/transactions/transactionNames"
 import {
-  TransactionsTracker,
+  TransactionTracker,
   getTransactionsTracker,
 } from "../src/background/transactions/transactions"
 import { defaultNetwork } from "../src/shared/networks"
-import { AddTransaction, Transaction } from "../src/shared/transactions"
+import { Transaction, TransactionRequest } from "../src/shared/transactions"
 import { WalletAccount } from "../src/shared/wallet.model"
-import { MockStorage } from "./utils"
+import { MockStorage } from "./mock"
 
 const wallet: WalletAccount = {
   address: "0x05e54edb59e1b1e398f9647e617276f6da0eb9ddfc0c02723269b9baa2489dce",
@@ -38,7 +38,7 @@ export const getTransactionsStore = (initialTransactions: Transaction[]) =>
   )
 
 describe("transactions", () => {
-  let txTracker: TransactionsTracker
+  let txTracker: TransactionTracker
   const fn = jest.fn()
   beforeEach(async () => {
     txTracker = await getTransactionsTracker(
@@ -67,7 +67,7 @@ describe("transactions", () => {
   test("should add a transaction", async () => {
     const transactionHash =
       "0x16d38d961a659b7565b596060ca812b863a39766accab5a8fd93ace56e6001a" // add a transaction which already exists onchain
-    const transaction: AddTransaction = {
+    const transaction: TransactionRequest = {
       account: wallet,
       hash: transactionHash,
       meta: {
@@ -186,7 +186,7 @@ describe("setAsyncInterval()", () => {
     const fn = jest.fn()
     const n = 100
 
-    const stop = setAsyncInterval(fn, n)
+    const stop = setIntervalAsync(fn, n)
     expect(fn).toHaveBeenCalledTimes(0)
     await wait(n)
     expect(fn).toHaveBeenCalledTimes(1)

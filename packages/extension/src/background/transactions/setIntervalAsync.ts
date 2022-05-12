@@ -1,5 +1,5 @@
 // behaves like native setInterval but waits for promise to resolve before calling next iteration
-export function setAsyncInterval(fn: () => Promise<any>, delay: number) {
+export function setIntervalAsync(fn: () => Promise<any>, delay: number) {
   let handle: NodeJS.Timeout | undefined
   const loop = async () => {
     await fn()

@@ -10,7 +10,7 @@ import {
 import type { Network } from "../src/shared/networks"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
-import { MockStorage } from "./utils"
+import { MockStorage } from "./mock"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)

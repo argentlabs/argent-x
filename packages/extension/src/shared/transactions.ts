@@ -7,13 +7,13 @@ export interface TransactionMeta {
   subTitle?: string
 }
 
-export interface AddTransaction {
+export interface TransactionRequest {
   hash: string
   account: WalletAccount
   meta?: TransactionMeta
 }
 
-export interface Transaction extends AddTransaction {
+export interface Transaction extends TransactionRequest {
   status: Status
   failureReason?: { code: string; error_message: string }
   timestamp: number

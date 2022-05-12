@@ -4,14 +4,11 @@ export function getTransactionsStatusUpdate(
   oldTransactions: Transaction[],
   newTransactions: Transaction[],
 ): Transaction[] {
-  return newTransactions.reduce((acc, settledPromise) => {
-    if (
-      settledPromise.status !==
-      oldTransactions.find((t) => t.hash === settledPromise.hash)?.status //  the status has changed
-    ) {
-      acc.push(settledPromise)
-      return acc
-    }
-    return acc
-  }, [] as Transaction[])
+  return newTransactions.filter((newTransaction) =>
+    oldTransactions.some(
+      (oldTransaction) =>
+        oldTransaction.hash === newTransaction.hash &&
+        oldTransaction.status !== newTransaction.status,
+    ),
+  )
 }

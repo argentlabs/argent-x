@@ -87,6 +87,11 @@ function calculateContractAddress(
   ])
 }
 
+export const equalAccount = (
+  a: Pick<WalletAccount, "address" | "network">,
+  b: Pick<WalletAccount, "address" | "network">,
+) => a.address === b.address && a.network.id === b.network.id
+
 export type GetNetworkFunction = (networkId: string) => Promise<Network>
 
 export class Wallet extends EventEmitter {

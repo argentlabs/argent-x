@@ -27,7 +27,7 @@ export const fetchVoyagerTransactions = async (
     return []
   }
   const response = await fetchWithTimeout(
-    join(explorerUrl, "api/txns", `?to=${address}`),
+    join(explorerUrl, `api/txns?to=${address}`),
   )
   const { items } = await response.json()
   return items

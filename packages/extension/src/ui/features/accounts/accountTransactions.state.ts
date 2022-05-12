@@ -1,3 +1,4 @@
+import { uniqBy } from "lodash-es"
 import { useEffect } from "react"
 import create from "zustand"
 
@@ -10,17 +11,11 @@ interface State {
   addTransactions: (transactions: Transaction[]) => void
 }
 
-function mergeTransactionsArrays(
+function mergeTransactionArrays(
   transactions: Transaction[],
   newTransactions: Transaction[],
 ): Transaction[] {
-  return [
-    ...transactions.filter(
-      (transaction) =>
-        !newTransactions.find((t) => t.hash === transaction.hash),
-    ),
-    ...newTransactions,
-  ]
+  return uniqBy([...newTransactions, ...transactions], "hash")
 }
 
 const useTransactionsStore = create<State>((set) => ({
@@ -28,7 +23,7 @@ const useTransactionsStore = create<State>((set) => ({
   addTransactions: (transactions: Transaction[]) => {
     set((state) => ({
       ...state,
-      transactions: mergeTransactionsArrays(state.transactions, transactions),
+      transactions: mergeTransactionArrays(state.transactions, transactions),
     }))
   },
 }))

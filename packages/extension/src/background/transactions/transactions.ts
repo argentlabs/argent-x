@@ -1,52 +1,52 @@
+import { uniqWith } from "lodash-es"
 import { Status } from "starknet"
 
-import { AddTransaction, Transaction } from "../../shared/transactions"
+import { Transaction, TransactionRequest } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
+import { equalAccount } from "../wallet"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
-import { setAsyncInterval } from "./setAsyncInterval"
+import { setIntervalAsync } from "./setIntervalAsync"
 import type { GetTransactionsStore } from "./store"
 import { getHistoryTransactionsForAccounts } from "./voyager"
 
-const timestampInS = (): number => Math.floor(Date.now() / 1000)
+const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
 
-export interface TransactionsTracker {
-  add: (transaction: AddTransaction) => Promise<void>
+export interface TransactionTracker {
+  add: (transaction: TransactionRequest) => Promise<void>
   addAccount: (
     account: WalletAccount,
-    transaction: AddTransaction,
+    transaction: TransactionRequest,
   ) => Promise<void>
   get: (transactionHash: string) => Promise<Transaction | null>
   getAll: (statusIn?: Status[]) => Promise<Transaction[]>
   stop: () => void
 }
 
-export type TransactionUpdatesListener = (updates: Transaction[]) => void
+export type TransactionUpdateListener = (updates: Transaction[]) => void
 
 type GetTransactionsTracker = (
   accountsToPopulate: WalletAccount[],
   getTransactionsStore: GetTransactionsStore,
-  onUpdate?: TransactionUpdatesListener,
+  onUpdate?: TransactionUpdateListener,
   updateInterval?: number,
-) => Promise<TransactionsTracker>
+) => Promise<TransactionTracker>
 
 export const getTransactionsTracker: GetTransactionsTracker = async (
   accountsToPopulate,
   getTransactionsStore,
   onUpdate,
-  updateInterval = 15 * 1000, // 15 seconds
+  updateInterval = 15e3, // 15 seconds
 ) => {
-  const accounts = new Set(accountsToPopulate)
-  const initialTransactions = await getHistoryTransactionsForAccounts(
-    Array.from(accounts),
-  )
+  const accounts = uniqWith(accountsToPopulate, equalAccount)
+  const initialTransactions = await getHistoryTransactionsForAccounts(accounts)
 
   const transactionsStore = getTransactionsStore(initialTransactions)
 
   const updateHandler = async () => {
     const allTransactions = await transactionsStore.getItems()
     const historyTransactions = await getHistoryTransactionsForAccounts(
-      Array.from(accounts),
+      accounts,
       allTransactions,
     )
     const pendingTransactions = await transactionsStore.getItems(
@@ -56,34 +56,44 @@ export const getTransactionsTracker: GetTransactionsTracker = async (
         ),
     )
 
-    const onchainUpdates = await getTransactionsUpdate(pendingTransactions)
+    const onChainUpdates = await getTransactionsUpdate(pendingTransactions)
 
     const historyUpdates = getTransactionsStatusUpdate(
       allTransactions,
       historyTransactions,
     )
 
-    const updates = [...onchainUpdates, ...historyUpdates]
+    const updates = [...onChainUpdates, ...historyUpdates]
 
-    onUpdate?.(updates)
+    try {
+      onUpdate?.(updates)
+    } catch {
+      // ignore
+    }
 
     return transactionsStore.addItems(updates)
   }
 
-  const clearUpdate = setAsyncInterval(updateHandler, updateInterval)
+  const clearUpdate = setIntervalAsync(updateHandler, updateInterval)
 
   return {
     add: (transaction) =>
       transactionsStore.addItem({
         status: "RECEIVED",
-        timestamp: timestampInS(),
+        timestamp: timestampInSeconds(),
         ...transaction,
       }),
     addAccount: async (account, transaction) => {
-      accounts.add(account)
+      if (
+        !accounts.find((existingAccount) =>
+          equalAccount(existingAccount, account),
+        )
+      ) {
+        accounts.push(account)
+      }
       await transactionsStore.addItem({
         status: "RECEIVED",
-        timestamp: timestampInS(),
+        timestamp: timestampInSeconds(),
         ...transaction,
       })
     },

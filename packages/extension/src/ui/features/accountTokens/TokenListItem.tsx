@@ -40,6 +40,11 @@ export const TokenTitle = styled.h3`
   font-size: 17px;
   line-height: 22px;
   margin: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
 `
 export const TokenSubtitleContainer = styled.div`
   overflow: hidden;

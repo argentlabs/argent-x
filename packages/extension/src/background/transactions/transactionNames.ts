@@ -4,7 +4,7 @@ import { Abi, Call } from "starknet"
 import { TransactionMeta } from "../../shared/transactions"
 
 function entryPointToHumanReadable(entryPoint: string): string {
-  return capitalize(entryPoint.split("_").join(" "))
+  return capitalize(entryPoint.replaceAll("_", " "))
 }
 
 export function nameTransaction(
