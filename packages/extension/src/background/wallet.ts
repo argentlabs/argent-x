@@ -87,12 +87,14 @@ function calculateContractAddress(
   ])
 }
 
+export type GetNetworkFunction = (networkId: string) => Promise<Network>
+
 export class Wallet extends EventEmitter {
   private encryptedBackup?: string
   private session?: WalletSession
 
   private store: IStorage<WalletStorageProps>
-  private getNetwork: (networkId: string) => Promise<Network>
+  private getNetwork: GetNetworkFunction
   private proxyCompiledContract: string
   private argentAccountCompiledContract: string
 
@@ -100,7 +102,7 @@ export class Wallet extends EventEmitter {
     store: IStorage<WalletStorageProps>,
     proxyCompiledContract: string,
     argentAccountCompiledContract: string,
-    getNetwork: (networkId: string) => Promise<Network>,
+    getNetwork: GetNetworkFunction,
   ) {
     super()
     this.store = store
@@ -227,8 +229,14 @@ export class Wallet extends EventEmitter {
     networkId: string,
     networkAccountImplementations?: string[],
     offset: number = CHECK_OFFSET,
-  ) {
+  ): Promise<WalletAccount[]> {
     const network = await this.getNetwork(networkId)
+
+    if (!network) {
+      // If network is not defined, we can't restore any accounts
+      return []
+    }
+
     const provider = getProvider(network)
 
     const accounts: WalletAccount[] = []

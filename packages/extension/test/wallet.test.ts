@@ -2,6 +2,7 @@ import fs from "fs"
 import path from "path"
 
 import {
+  GetNetworkFunction,
   SESSION_DURATION,
   Wallet,
   WalletStorageProps,
@@ -28,12 +29,14 @@ const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
 
 const NETWORK = "testnetwork"
-const getNetwork = async (): Promise<Network> => ({
-  id: NETWORK,
-  chainId: "SN_GOERLI",
-  baseUrl: "http://localhost:5050",
-  name: "Test Network",
-})
+// return a falsy value if network is not known. This is normally not allowed, but will skip the account discovery on the known networks (goerli and mainnet)
+const getNetwork: GetNetworkFunction = async (networkId) =>
+  (networkId === NETWORK && {
+    id: NETWORK,
+    chainId: "SN_GOERLI",
+    baseUrl: "http://localhost:5050",
+    name: "Test Network",
+  }) as any
 
 jest.setTimeout(999999)
 
