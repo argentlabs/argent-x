@@ -25,12 +25,14 @@ export class ArrayStorage<T> {
 
   async addItems(values: T[]): Promise<void> {
     const inner = await this.store.getItem("inner")
-    const uniqueValues = values.filter(
-      // remove duplicates from the array
-      (value, index) =>
-        index ===
-        [...values].reverse().findIndex((v) => this.compareFn(v, value)),
-    )
+    const uniqueValues = values
+      .reverse() // reverse so last element takes priority over first occurrence of same value
+      .filter(
+        // remove duplicates from the array
+        (value, index, array) =>
+          index === array.findIndex((v) => this.compareFn(v, value)),
+      )
+      .reverse() // reverse back to original order
     const newInner = [
       ...inner.filter(
         (item) => !uniqueValues.find((value) => this.compareFn(item, value)),
