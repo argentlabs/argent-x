@@ -1,7 +1,7 @@
 import { Status } from "starknet"
 import browser from "webextension-polyfill"
 
-import { TransactionMeta } from "../shared/transactions.model"
+import { TransactionMeta } from "../shared/transactions"
 import { Storage } from "./storage"
 
 const notificationsStorage = new Storage({

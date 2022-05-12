@@ -4,7 +4,7 @@ import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 import { ExtensionActionItem } from "./actionQueue"
 import { Network, NetworkStatus } from "./networks"
 import { RequestToken, Token } from "./token"
-import { TransactionStatus } from "./transactions.model"
+import { Transaction } from "./transactions"
 import { WalletAccount } from "./wallet.model"
 
 export type MessageType =
@@ -46,7 +46,7 @@ export type MessageType =
     }
   // ***** transactions *****
   | { type: "GET_TRANSACTIONS" }
-  | { type: "GET_TRANSACTIONS_RES"; data: TransactionStatus[] }
+  | { type: "GET_TRANSACTIONS_RES"; data: Transaction[] }
   | {
       type: "EXECUTE_TRANSACTION"
       data: {
@@ -56,11 +56,12 @@ export type MessageType =
       }
     }
   | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }
-  | { type: "TRANSACTION_UPDATES"; data: TransactionStatus[] }
-  | { type: "TRANSACTION_SUCCESS"; data: TransactionStatus }
-  | { type: "TRANSACTION_FAILURE"; data: TransactionStatus }
+  | { type: "TRANSACTION_UPDATES"; data: Transaction[] }
+  | { type: "TRANSACTION_SUCCESS"; data: Transaction }
+  | { type: "TRANSACTION_FAILURE"; data: Transaction }
   | { type: "GET_TRANSACTION"; data: { hash: string; network: string } }
-  | { type: "GET_TRANSACTION_RES"; data: TransactionStatus }
+  | { type: "GET_TRANSACTION_RES"; data: Transaction }
+  | { type: "GET_TRANSACTION_REJ" }
   | {
       type: "TRANSACTION_SUBMITTED"
       data: {

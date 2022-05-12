@@ -1,8 +1,8 @@
 import fs from "fs"
 import path from "path"
 
-import { IStorage } from "../src/background/storage"
 import {
+  GetNetwork,
   SESSION_DURATION,
   Wallet,
   WalletStorageProps,
@@ -10,25 +10,10 @@ import {
 import type { Network } from "../src/shared/networks"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
+import { MockStorage } from "./mock"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
-
-export class MockStorage implements IStorage<WalletStorageProps> {
-  public store: WalletStorageProps = {}
-
-  async getItem<K extends keyof WalletStorageProps>(
-    key: K,
-  ): Promise<WalletStorageProps[K]> {
-    return Promise.resolve(this.store[key])
-  }
-  async setItem<K extends keyof WalletStorageProps>(
-    key: K,
-    value: WalletStorageProps[K],
-  ): Promise<void> {
-    this.store[key] = value
-  }
-}
 
 const argentAccountCompiledContract = fs.readFileSync(
   path.join(__dirname, "../src/contracts/ArgentAccount.txt"),
@@ -44,12 +29,14 @@ const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
 
 const NETWORK = "testnetwork"
-const getNetwork = async (): Promise<Network> => ({
-  id: NETWORK,
-  chainId: "SN_GOERLI",
-  baseUrl: "http://localhost:5050",
-  name: "Test Network",
-})
+// return a falsy value if network is not known. This is normally not allowed, but will skip the account discovery on the known networks (goerli and mainnet)
+const getNetwork: GetNetwork = async (networkId) =>
+  (networkId === NETWORK && {
+    id: NETWORK,
+    chainId: "SN_GOERLI",
+    baseUrl: "http://localhost:5050",
+    name: "Test Network",
+  }) as any
 
 jest.setTimeout(999999)
 
@@ -60,7 +47,7 @@ afterEach(() => {
 test("create a new wallet", async () => {
   jest.useFakeTimers()
 
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(
     storage,
     proxyCompiledContract,
@@ -101,7 +88,7 @@ test("create a new wallet", async () => {
 test("open existing wallet", async () => {
   jest.useFakeTimers()
 
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
   const wallet = new Wallet(
     storage,
@@ -139,7 +126,7 @@ test("open existing wallet", async () => {
 })
 
 test("open existing wallet with wrong password", async () => {
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
   const wallet = new Wallet(
     storage,
@@ -159,7 +146,7 @@ test("open existing wallet with wrong password", async () => {
 test("import backup file", async () => {
   jest.useFakeTimers()
 
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(
     storage,
     proxyCompiledContract,
@@ -183,7 +170,7 @@ test("import backup file", async () => {
 })
 
 test("import wrong backup file", async () => {
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(
     storage,
     proxyCompiledContract,

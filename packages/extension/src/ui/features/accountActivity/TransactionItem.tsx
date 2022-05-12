@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled, { css } from "styled-components"
 
-import { TransactionMeta } from "../../../shared/transactions.model"
+import { TransactionMeta } from "../../../shared/transactions"
 import { OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import {
   StatusIndicatorColor,

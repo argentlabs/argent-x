@@ -34,9 +34,7 @@ export const upgradeAccount = async (walletAddress: string) => {
 export const getTransactions = async (address: string) => {
   sendMessage({ type: "GET_TRANSACTIONS" })
   const allTransactions = await waitForMessage("GET_TRANSACTIONS_RES")
-  return allTransactions.filter(
-    ({ accountAddress }) => accountAddress === address,
-  )
+  return allTransactions.filter(({ account }) => account.address === address)
 }
 
 export const getTransactionStatus = async (hash: string, network: string) => {
@@ -248,4 +246,13 @@ export const removeToken = async (address: string) => {
 export const addToken = async (token: Token) => {
   sendMessage({ type: "ADD_TOKEN", data: token })
   return waitForMessage("ADD_TOKEN_RES")
+}
+
+// for debugging purposes
+try {
+  ;(window as any).downloadBackup = () => {
+    sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
+  }
+} catch {
+  // ignore
 }

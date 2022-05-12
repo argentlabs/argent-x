@@ -1,14 +1,9 @@
 import { isFunction, isNil } from "lodash-es"
 
 import { parseConfig } from "./helpers"
-import { Config } from "./types"
+import { Config, StaleWhileRevalidateCache } from "./types"
 
 // modified from https://github.com/jperasmus/stale-while-revalidate-cache
-
-type StaleWhileRevalidateCache = <ReturnValue>(
-  cacheKey: string | (() => string),
-  fn: () => ReturnValue,
-) => Promise<ReturnValue>
 
 export function createStaleWhileRevalidateCache(
   config: Config,

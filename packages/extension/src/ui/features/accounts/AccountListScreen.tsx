@@ -16,7 +16,7 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListItem } from "./AccountListItem"
-import { connectAccount, deployAccount, getStatus } from "./accounts.service"
+import { connectAccount, deployAccount } from "./accounts.service"
 import { useAccount } from "./accounts.state"
 
 const AccountList = styled.div`
@@ -95,7 +95,7 @@ export const AccountListScreen: FC = () => {
           <AccountListItem
             key={account.address}
             account={account}
-            status={getStatus(account, selectedAccount)}
+            selectedAccount={selectedAccount}
             isDeleteable={switcherNetworkId === "localhost"}
             canShowUpgrade
           />

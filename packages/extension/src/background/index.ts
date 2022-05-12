@@ -36,13 +36,11 @@ import {
 } from "./preAuthorizations"
 import { Storage, clearStorage } from "./storage"
 import { addToken, getTokens, hasToken, removeToken } from "./tokens"
-import {
-  TransactionTracker,
-  getTransactionStatus,
-  trackTransations,
-} from "./trackTransactions"
+import { trackTransations } from "./transactions/notifications"
+import { getTransactionsStore } from "./transactions/store"
+import { nameTransaction } from "./transactions/transactionNames"
+import { getTransactionsTracker } from "./transactions/transactions"
 import { getImplementationUpgradePath } from "./upgrade"
-import { getProvider } from "./utils/getProvider"
 import { Wallet, WalletStorageProps } from "./wallet"
 
 ;(async () => {
@@ -56,7 +54,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
   )
   await wallet.setup()
 
-  const transactionTracker = new TransactionTracker(trackTransations)
+  const transactionTracker = await getTransactionsTracker(
+    await wallet.getAccounts(),
+    getTransactionsStore,
+    trackTransations,
+  )
 
   messageStream.subscribe(async ([msg, sender]) => {
     const sendToTabAndUi = async (msg: MessageType) => {
@@ -86,7 +88,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "GET_TRANSACTIONS": {
-        const transactions = transactionTracker.getAllTransactions()
+        const transactions = await transactionTracker.getAll()
 
         return sendToTabAndUi({
           type: "GET_TRANSACTIONS_RES",
@@ -95,22 +97,16 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "GET_TRANSACTION": {
-        const cached = transactionTracker.getTransactionStatus(msg.data.hash)
-        if (cached) {
+        const tracked = await transactionTracker.get(msg.data.hash)
+        if (tracked) {
           return sendToTabAndUi({
             type: "GET_TRANSACTION_RES",
-            data: cached,
+            data: tracked,
           })
         }
 
-        const provider = await getProvider(msg.data.network)
-        const fetchedStatus = await getTransactionStatus(
-          provider,
-          msg.data.hash,
-        )
         return sendToTabAndUi({
-          type: "GET_TRANSACTION_RES",
-          data: fetchedStatus,
+          type: "GET_TRANSACTION_REJ",
         })
       }
 
@@ -270,11 +266,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
           wallet.getKeyPairByDerivationPath(account.signer.derivationPath), // signer is a private property of the account, this will be public in the future
         )
 
-        return transactionTracker.trackTransaction(
-          updateTransaction.transaction_hash,
+        return transactionTracker.add({
+          hash: updateTransaction.transaction_hash,
           account,
-          { title: "Upgrading account" },
-        )
+          meta: { title: "Upgrading account" },
+        })
       }
 
       case "APPROVE_ACTION": {
@@ -334,10 +330,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
                 },
               )
 
-              transactionTracker.trackTransaction(
-                transaction.transaction_hash,
-                selectedAccount,
-              )
+              transactionTracker.add({
+                hash: transaction.transaction_hash,
+                account: selectedAccount,
+                meta: nameTransaction(transactions, abis),
+              })
 
               if (!nonceWasProvidedByUI) {
                 increaseStoredNonce(selectedAccount.address)
@@ -633,8 +630,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
         const network = msg.data
         try {
           const { account, txHash } = await wallet.addAccount(network)
-          transactionTracker.trackTransaction(txHash, account, {
-            title: "Deploy wallet",
+          transactionTracker.addAccount(account, {
+            hash: txHash,
+            account,
+            meta: { title: "Deploy wallet" },
           })
 
           return sendToTabAndUi({

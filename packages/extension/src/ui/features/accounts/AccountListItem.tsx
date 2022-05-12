@@ -14,6 +14,7 @@ import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { deleteAccount } from "../../services/messaging"
+import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { useNetwork } from "../networks/useNetworks"
 import { recover } from "../recovery/recovery.service"
@@ -21,7 +22,7 @@ import { Account } from "./Account"
 import { AccountColumn } from "./AccountColumn"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { AccountRow } from "./AccountRow"
-import { AccountStatus, getAccountImageUrl } from "./accounts.service"
+import { getAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
 import { ProfilePicture } from "./ProfilePicture"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
@@ -80,14 +81,14 @@ const AccountName = styled.h1`
 
 interface AccountListProps {
   account: Account
-  status: AccountStatus
+  selectedAccount?: string
   isDeleteable?: boolean
   canShowUpgrade?: boolean
 }
 
 export const AccountListItem: FC<AccountListProps> = ({
   account,
-  status,
+  selectedAccount,
   isDeleteable,
   canShowUpgrade,
 }) => {
@@ -96,6 +97,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   const {
     network: { accountImplementation },
   } = useNetwork(switcherNetworkId)
+  const status = useAccountStatus(account, selectedAccount)
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
   const { address } = account
