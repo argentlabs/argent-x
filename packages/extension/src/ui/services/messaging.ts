@@ -34,9 +34,7 @@ export const upgradeAccount = async (walletAddress: string) => {
 export const getTransactions = async (address: string) => {
   sendMessage({ type: "GET_TRANSACTIONS" })
   const allTransactions = await waitForMessage("GET_TRANSACTIONS_RES")
-  return allTransactions.filter(
-    ({ accountAddress }) => accountAddress === address,
-  )
+  return allTransactions.filter(({ account }) => account.address === address)
 }
 
 export const getTransactionStatus = async (hash: string, network: string) => {

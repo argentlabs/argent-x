@@ -2,6 +2,12 @@ import { Cache } from "swr"
 
 import { reviveJsonBigNumber } from "../../shared/json"
 
+export interface SWRConfigCommon {
+  suspense?: boolean
+  refreshInterval?: number
+  errorRetryInterval?: number
+}
+
 export const swrCacheProvider: Cache = {
   set: (key: string, value: any) => {
     localStorage.setItem(key, JSON.stringify(value))

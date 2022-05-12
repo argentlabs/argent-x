@@ -77,12 +77,14 @@ module.exports = {
       "@mui/styled-engine": "@mui/styled-engine-sc",
     },
   },
-  optimization: {
-    minimize: true,
-    splitChunks: {
-      chunks: "async",
-    },
-  },
+  optimization: isProd
+    ? {
+        minimize: true,
+        splitChunks: {
+          chunks: "async",
+        },
+      }
+    : undefined,
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),

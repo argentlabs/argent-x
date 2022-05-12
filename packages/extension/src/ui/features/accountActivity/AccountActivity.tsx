@@ -37,7 +37,7 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
   const { switcherNetworkId } = useAppState()
   const { network } = useNetwork(switcherNetworkId)
 
-  const { activity } = useActivity(account.address, network)
+  const activity = useActivity(account.address)
 
   return (
     <>
@@ -45,11 +45,11 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
         <Fragment key={dateLabel}>
           <SectionHeader>{dateLabel}</SectionHeader>
           <TransactionsWrapper>
-            {transactions.map(({ hash, date }) => (
+            {transactions.map(({ hash, date, meta }) => (
               <TransactionItem
                 key={hash}
                 hash={hash}
-                meta={{ subTitle: formatDateTime(date) }}
+                meta={{ subTitle: formatDateTime(date), ...meta }}
                 onClick={() => openVoyagerTransaction(hash, network)}
               />
             ))}
@@ -60,16 +60,7 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
   )
 }
 
-const ActivityError: FC<AccountActivityProps> = ({ account }) => {
-  const { switcherNetworkId } = useAppState()
-  const { network } = useNetwork(switcherNetworkId)
-
-  // this is needed to keep swr mounted so it can retry the request
-  useActivity(account.address, network, {
-    suspense: false,
-    errorRetryInterval: 30e3 /* 30 seconds */,
-  })
-
+const ActivityError: FC = () => {
   return (
     <div
       style={{
@@ -96,7 +87,7 @@ export const AccountActivity: FC<AccountActivityProps> = ({ account }) => {
     <Container>
       <Header>Activity</Header>
       <PendingTransactions accountAddress={account.address} />
-      <ErrorBoundary fallback={<ActivityError account={account} />}>
+      <ErrorBoundary fallback={<ActivityError />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <Activity account={account} />
         </Suspense>

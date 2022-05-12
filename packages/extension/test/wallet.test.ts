@@ -1,7 +1,6 @@
 import fs from "fs"
 import path from "path"
 
-import { IStorage } from "../src/background/storage"
 import {
   SESSION_DURATION,
   Wallet,
@@ -10,25 +9,10 @@ import {
 import type { Network } from "../src/shared/networks"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
+import { MockStorage } from "./utils"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
-
-export class MockStorage implements IStorage<WalletStorageProps> {
-  public store: WalletStorageProps = {}
-
-  async getItem<K extends keyof WalletStorageProps>(
-    key: K,
-  ): Promise<WalletStorageProps[K]> {
-    return Promise.resolve(this.store[key])
-  }
-  async setItem<K extends keyof WalletStorageProps>(
-    key: K,
-    value: WalletStorageProps[K],
-  ): Promise<void> {
-    this.store[key] = value
-  }
-}
 
 const argentAccountCompiledContract = fs.readFileSync(
   path.join(__dirname, "../src/contracts/ArgentAccount.txt"),
@@ -60,7 +44,7 @@ afterEach(() => {
 test("create a new wallet", async () => {
   jest.useFakeTimers()
 
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(
     storage,
     proxyCompiledContract,
@@ -101,7 +85,7 @@ test("create a new wallet", async () => {
 test("open existing wallet", async () => {
   jest.useFakeTimers()
 
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
   const wallet = new Wallet(
     storage,
@@ -139,7 +123,7 @@ test("open existing wallet", async () => {
 })
 
 test("open existing wallet with wrong password", async () => {
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
   const wallet = new Wallet(
     storage,
@@ -159,7 +143,7 @@ test("open existing wallet with wrong password", async () => {
 test("import backup file", async () => {
   jest.useFakeTimers()
 
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(
     storage,
     proxyCompiledContract,
@@ -183,7 +167,7 @@ test("import backup file", async () => {
 })
 
 test("import wrong backup file", async () => {
-  const storage = new MockStorage()
+  const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(
     storage,
     proxyCompiledContract,

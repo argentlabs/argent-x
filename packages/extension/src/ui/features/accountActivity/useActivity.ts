@@ -1,27 +1,26 @@
-import useSWR from "swr"
+import { TransactionMeta } from "../../../shared/transactions"
+import { formatDate } from "../../services/dates"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
 
-import { Network } from "../../../shared/networks"
-import { fetchActivity } from "./accountActivity.service"
-
-export interface SWRConfigCommon {
-  suspense?: boolean
-  refreshInterval?: number
-  errorRetryInterval?: number
+export interface ActivityTransaction {
+  hash: string
+  date: Date
+  meta?: TransactionMeta
 }
 
-export function useActivity(
-  address: string,
-  network: Network,
-  config?: SWRConfigCommon,
-) {
-  const { data: activity = {}, ...rest } = useSWR(
-    [address, network, "activity"],
-    fetchActivity,
-    {
-      refreshInterval: 60e3 /* 1 minute */,
-      suspense: true,
-      ...config,
-    },
-  )
-  return { activity, ...rest }
+export type DailyActivity = Record<string, ActivityTransaction[]>
+
+export function useActivity(address: string): DailyActivity {
+  const { transactions } = useAccountTransactions(address)
+  const activity: DailyActivity = {}
+  for (const { hash, timestamp, meta, status } of transactions) {
+    // RECEIVED transactions are already shown as pending
+    if (status !== "RECEIVED") {
+      const date = new Date(timestamp * 1000)
+      const dateLabel = formatDate(date)
+      activity[dateLabel] ||= []
+      activity[dateLabel].push({ hash, date, meta })
+    }
+  }
+  return activity
 }
