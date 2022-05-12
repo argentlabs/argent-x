@@ -105,8 +105,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
           })
         }
 
-        // lets keep this for easier debugging please
-        console.error("Transaction not found", msg.data.hash)
         return sendToTabAndUi({
           type: "GET_TRANSACTION_REJ",
         })

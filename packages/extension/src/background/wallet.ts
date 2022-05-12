@@ -92,14 +92,14 @@ export const equalAccount = (
   b: Pick<WalletAccount, "address" | "network">,
 ) => a.address === b.address && a.network.id === b.network.id
 
-export type GetNetworkFunction = (networkId: string) => Promise<Network>
+export type GetNetwork = (networkId: string) => Promise<Network>
 
 export class Wallet extends EventEmitter {
   private encryptedBackup?: string
   private session?: WalletSession
 
   private store: IStorage<WalletStorageProps>
-  private getNetwork: GetNetworkFunction
+  private getNetwork: GetNetwork
   private proxyCompiledContract: string
   private argentAccountCompiledContract: string
 
@@ -107,7 +107,7 @@ export class Wallet extends EventEmitter {
     store: IStorage<WalletStorageProps>,
     proxyCompiledContract: string,
     argentAccountCompiledContract: string,
-    getNetwork: GetNetworkFunction,
+    getNetwork: GetNetwork,
   ) {
     super()
     this.store = store

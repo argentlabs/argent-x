@@ -65,13 +65,8 @@ export const getTransactionsTracker: GetTransactionsTracker = async (
 
     const updates = [...onChainUpdates, ...historyUpdates]
 
-    try {
-      onUpdate?.(updates)
-    } catch {
-      // ignore
-    }
-
-    return transactionsStore.addItems(updates)
+    await transactionsStore.addItems(updates)
+    onUpdate?.(updates)
   }
 
   const clearUpdate = setIntervalAsync(updateHandler, updateInterval)

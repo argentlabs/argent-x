@@ -2,7 +2,7 @@ import fs from "fs"
 import path from "path"
 
 import {
-  GetNetworkFunction,
+  GetNetwork,
   SESSION_DURATION,
   Wallet,
   WalletStorageProps,
@@ -30,7 +30,7 @@ const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
 
 const NETWORK = "testnetwork"
 // return a falsy value if network is not known. This is normally not allowed, but will skip the account discovery on the known networks (goerli and mainnet)
-const getNetwork: GetNetworkFunction = async (networkId) =>
+const getNetwork: GetNetwork = async (networkId) =>
   (networkId === NETWORK && {
     id: NETWORK,
     chainId: "SN_GOERLI",
