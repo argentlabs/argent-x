@@ -247,3 +247,12 @@ export const addToken = async (token: Token) => {
   sendMessage({ type: "ADD_TOKEN", data: token })
   return waitForMessage("ADD_TOKEN_RES")
 }
+
+// for debugging purposes
+try {
+  ;(window as any).downloadBackup = () => {
+    sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
+  }
+} catch {
+  // ignore
+}
