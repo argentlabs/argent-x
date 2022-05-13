@@ -1160,7 +1160,7 @@
     "@ethersproject/logger" "^5.6.0"
     bn.js "^4.11.9"
 
-"@ethersproject/bytes@5.6.1", "@ethersproject/bytes@^5.6.0":
+"@ethersproject/bytes@5.6.1", "@ethersproject/bytes@^5.6.0", "@ethersproject/bytes@^5.6.1":
   version "5.6.1"
   resolved "https://registry.npmjs.org/@ethersproject/bytes/-/bytes-5.6.1.tgz#24f916e411f82a8a60412344bf4a813b917eefe7"
   integrity sha512-NwQt7cKn5+ZE4uDn+X5RAXLp46E1chXoaMmrxAyA0rblpxz8t58lVkrHXoRIn0lz1joQElQ8410GqhTqMOwc6g==
@@ -9342,10 +9342,11 @@ stack-utils@^2.0.3:
     url-join "^4.0.1"
 
 starknet@^3.10.0:
-  version "3.10.3"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.10.3.tgz#e671c68a4c26ca104e8979b5539b96005b5443f7"
-  integrity sha512-KHaVRBCrXcXfW/JtS3QyC1wWEwZHXswbOoZJaMQWuNtYMKMNgNSCCjzqag0+BsHXbaQP6AYjZT5InhYEL/XLHQ==
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.11.0.tgz#fff6411692eab8f1660ad0515705a0e633c8e763"
+  integrity sha512-+Qc3xuVseV74iKHbmiUJZx0zqH0qXoSbJJn/ZdDh9Rx/qbh6sqbmwxVlWAnYd5wsrZrEMiWttUd0OW+3ICGV/w==
   dependencies:
+    "@ethersproject/bytes" "^5.6.1"
     axios "^0.23.0"
     bn.js "^5.2.0"
     elliptic "^6.5.4"
