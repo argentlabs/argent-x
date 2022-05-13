@@ -5,6 +5,7 @@ import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
 import { P } from "../../components/Typography"
+import { checkPassword } from "../../services/messaging"
 import { PasswordForm } from "../onboarding/PasswordForm"
 import { SeedPhrase } from "../recovery/SeedPhrase"
 import { useSeedPhrase } from "../recovery/useSeedPhrase"
@@ -16,6 +17,10 @@ const Container = styled.div`
 
   form {
     padding-top: 16px;
+
+    ${Button} {
+      margin-top: 16px;
+    }
   }
 `
 
@@ -28,9 +33,9 @@ const Wrapper: FC<{ children: ReactNode }> = ({ children }) => (
 
 export const SeedSettingsScreen: FC = () => {
   const seedPhrase = useSeedPhrase()
-  const [passwordValidated, setPasswordValidated] = useState(false)
+  const [passwordIsValid, setPasswordIsValid] = useState(false)
 
-  if (!passwordValidated) {
+  if (!passwordIsValid) {
     return (
       <Wrapper>
         <Paragraph>DO NOT share this phrase with anyone!</Paragraph>
@@ -39,10 +44,16 @@ export const SeedSettingsScreen: FC = () => {
         </Paragraph>
         <P>Enter your password to continue:</P>
 
-        <PasswordForm onSuccess={() => setPasswordValidated(true)}>
+        <PasswordForm
+          verifyPassword={async (password) => {
+            const isValid = await checkPassword(password)
+            setPasswordIsValid(isValid)
+            return isValid
+          }}
+        >
           {(isDirty) => (
             <Button type="submit" disabled={!isDirty}>
-              Unlock
+              Continue
             </Button>
           )}
         </PasswordForm>

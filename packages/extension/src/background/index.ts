@@ -594,9 +594,21 @@ import { Wallet, WalletStorageProps } from "./wallet"
         const sessionPassword = encode.arrayBufferToString(plaintext)
         if (await wallet.startSession(sessionPassword)) {
           const selectedAccount = await wallet.getSelectedAccount()
-          sendToTabAndUi({ type: "START_SESSION_RES", data: selectedAccount })
+          return sendToTabAndUi({
+            type: "START_SESSION_RES",
+            data: selectedAccount,
+          })
         }
         return sendToTabAndUi({ type: "START_SESSION_REJ" })
+      }
+      case "CHECK_PASSWORD": {
+        const { body } = msg.data
+        const { plaintext } = await compactDecrypt(body, privateKey)
+        const password = encode.arrayBufferToString(plaintext)
+        if (wallet.checkPassword(password)) {
+          return sendToTabAndUi({ type: "CHECK_PASSWORD_RES" })
+        }
+        return sendToTabAndUi({ type: "CHECK_PASSWORD_REJ" })
       }
       case "HAS_SESSION": {
         return sendToTabAndUi({

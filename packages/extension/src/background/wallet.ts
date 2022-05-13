@@ -331,6 +331,10 @@ export class Wallet extends EventEmitter {
     }
   }
 
+  public checkPassword(password: string): boolean {
+    return this.session?.password === password
+  }
+
   public async discoverAccountsForNetwork(
     networkId: string,
     offset: number = CHECK_OFFSET,

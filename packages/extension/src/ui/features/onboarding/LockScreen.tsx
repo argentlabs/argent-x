@@ -6,7 +6,9 @@ import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { P, StyledLink } from "../../components/Typography"
 import { routes } from "../../routes"
+import { startSession } from "../../services/messaging"
 import { StickyGroup } from "../actions/ConfirmScreen"
+import { recover } from "../recovery/recovery.service"
 import { Greetings, GreetingsWrapper } from "./Greetings"
 import LogoSvg from "./logo.svg"
 import { PasswordForm } from "./PasswordForm"
@@ -51,11 +53,18 @@ export const LockScreen: FC = () => {
       <P>Unlock your wallet to continue.</P>
 
       <PasswordForm
-        onSubmit={() => useAppState.setState({ isLoading: true })}
-        onFailure={() => useAppState.setState({ isLoading: false })}
-        onSuccess={(target) => {
-          useAppState.setState({ isLoading: false })
-          navigate(target)
+        verifyPassword={async (password) => {
+          useAppState.setState({ isLoading: true })
+          try {
+            await startSession(password)
+            const target = await recover()
+            useAppState.setState({ isLoading: false })
+            navigate(target)
+            return true
+          } catch {
+            useAppState.setState({ isLoading: false })
+            return false
+          }
         }}
       >
         {(isDirty) => (

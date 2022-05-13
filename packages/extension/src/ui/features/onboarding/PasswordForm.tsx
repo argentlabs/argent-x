@@ -1,54 +1,40 @@
 import { FC, ReactNode, useEffect, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { InputText } from "../../components/InputText"
 import { FormError } from "../../components/Typography"
-import { startSession } from "../../services/messaging"
-import { recover } from "../recovery/recovery.service"
 import { validatePassword } from "../recovery/seedRecovery.state"
 
+interface FieldValues {
+  password: string
+}
+
 interface PasswordFormProps {
-  onSubmit?: () => void
-  onSuccess?: (target: string) => void
-  onFailure?: () => void
+  verifyPassword: (password: string) => Promise<boolean>
   children?: (isDirty: boolean) => ReactNode
 }
 
 export const PasswordForm: FC<PasswordFormProps> = ({
-  onSubmit,
-  onSuccess,
-  onFailure,
+  verifyPassword,
   children,
 }) => {
   const [passwordError, setPasswordError] = useState<string>()
-  const {
-    control,
-    formState: { errors, isDirty },
-    handleSubmit,
-    setError,
-  } = useForm<{ password: string }>()
+  const { control, formState, handleSubmit, setError } = useForm<FieldValues>()
+  const { errors, isDirty } = formState
+
   useEffect(() => {
     setError("password", { message: passwordError })
   }, [passwordError])
 
-  const verifyPassword = async (password: string) => {
-    onSubmit?.()
+  const handlePassword: SubmitHandler<FieldValues> = async ({ password }) => {
     setPasswordError(undefined)
-    try {
-      await startSession(password)
-
-      const target = await recover()
-      console.warn("target", target)
-      setPasswordError(undefined)
-      onSuccess?.(target)
-    } catch {
+    if (!(await verifyPassword(password))) {
       setPasswordError("Wrong password")
-      onFailure?.()
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(({ password }) => verifyPassword(password))}>
+    <form onSubmit={handleSubmit(handlePassword)}>
       <Controller
         name="password"
         control={control}

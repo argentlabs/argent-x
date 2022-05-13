@@ -1,10 +1,4 @@
-import {
-  CompactEncrypt,
-  exportJWK,
-  generateSecret,
-  importJWK,
-  jwtDecrypt,
-} from "jose"
+import { exportJWK, generateSecret, jwtDecrypt } from "jose"
 import { Call, encode, number } from "starknet"
 
 import {
@@ -14,6 +8,7 @@ import {
 } from "../../shared/messages"
 import { Network } from "../../shared/networks"
 import { Token } from "../../shared/token"
+import { encrypt } from "./crypto"
 
 if (process.env.NODE_ENV === "development") {
   messageStream.subscribe(([message]) => {
@@ -94,12 +89,7 @@ export const getSeedPhrase = async (): Promise<string> => {
       ...(await exportJWK(otpKey)),
     }),
   )
-  const pubJwk = await getPublicKey()
-  const pubKey = await importJWK(pubJwk)
-
-  const encryptedSecret = await new CompactEncrypt(otpBuffer)
-    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
-    .encrypt(pubKey)
+  const encryptedSecret = await encrypt(otpBuffer)
 
   sendMessage({
     type: "GET_ENCRYPTED_SEED_PHRASE",
@@ -121,21 +111,14 @@ export const recoverBySeedPhrase = async (
   seedPhrase: string,
   newPassword: string,
 ): Promise<void> => {
-  const pubJwk = await getPublicKey()
-  const pubKey = await importJWK(pubJwk)
-
   const msgJson = JSON.stringify({
     seedPhrase,
     newPassword,
   })
 
-  const encMsg = await new CompactEncrypt(encode.utf8ToArray(msgJson))
-    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
-    .encrypt(pubKey)
-
   sendMessage({
     type: "RECOVER_SEEDPHRASE",
-    data: { secure: true, body: encMsg },
+    data: { secure: true, body: await encrypt(msgJson) },
   })
 
   const succeeded = await Promise.race([
@@ -162,12 +145,7 @@ export const updateTransactionFee = async (
 }
 
 export const startSession = async (password: string): Promise<void> => {
-  const pubJwk = await getPublicKey()
-  const pubKey = await importJWK(pubJwk)
-
-  const encMsg = await new CompactEncrypt(encode.utf8ToArray(password))
-    .setProtectedHeader({ alg: "ECDH-ES", enc: "A256GCM" })
-    .encrypt(pubKey)
+  const encMsg = await encrypt(password)
 
   sendMessage({ type: "START_SESSION", data: { secure: true, body: encMsg } })
 
@@ -181,6 +159,19 @@ export const startSession = async (password: string): Promise<void> => {
   if (!succeeded) {
     throw Error("Wrong password")
   }
+}
+
+export const checkPassword = async (password: string): Promise<boolean> => {
+  const body = await encrypt(password)
+
+  sendMessage({ type: "CHECK_PASSWORD", data: { body } })
+
+  return await Promise.race([
+    waitForMessage("CHECK_PASSWORD_RES").then(() => true),
+    waitForMessage("CHECK_PASSWORD_REJ")
+      .then(() => false)
+      .catch(() => false),
+  ])
 }
 
 export const deleteAccount = async (address: string) => {
