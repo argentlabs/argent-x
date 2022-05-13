@@ -5,7 +5,7 @@ import { waitForMessage } from "../../../shared/messages"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
-import { selectAccount, useAccount } from "../accounts/accounts.state"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { useActions } from "./actions.state"
 import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
@@ -16,7 +16,7 @@ const isPopup = new URLSearchParams(window.location.search).has("popup")
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
-  const account = useAccount(selectAccount)
+  const account = useSelectedAccount()
   const { actions, approve, reject } = useActions()
 
   const [action] = actions

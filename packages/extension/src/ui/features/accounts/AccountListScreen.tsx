@@ -17,7 +17,7 @@ import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListItem } from "./AccountListItem"
 import { connectAccount, deployAccount } from "./accounts.service"
-import { useAccount } from "./accounts.state"
+import { useAccounts } from "./accounts.state"
 
 const AccountList = styled.div`
   display: flex;
@@ -50,7 +50,7 @@ const Paragraph = styled(P)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { accounts, selectedAccount, addAccount } = useAccount()
+  const { accounts, selectedAccount, addAccount } = useAccounts()
   const { isBackupRequired } = useBackupRequired()
 
   const accountsList = Object.values(accounts)

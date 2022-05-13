@@ -10,7 +10,7 @@ import { InputText } from "../../components/InputText"
 import { FormError, H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { connectAccount, deployAccount } from "../accounts/accounts.service"
-import { useAccount } from "../accounts/accounts.state"
+import { useAccounts } from "../accounts/accounts.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
 import { validatePassword } from "../recovery/seedRecovery.state"
@@ -40,7 +40,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
   overrideSubmitText,
 }) => {
   const navigate = useNavigate()
-  const { addAccount } = useAccount()
+  const { addAccount } = useAccounts()
   const { switcherNetworkId } = useAppState()
   const {
     control,

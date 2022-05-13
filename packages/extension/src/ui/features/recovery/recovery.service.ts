@@ -4,7 +4,7 @@ import { routes } from "../../routes"
 import { getAccounts, getLastSelectedAccount } from "../../services/messaging"
 import { Account } from "../accounts/Account"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
-import { useAccount } from "../accounts/accounts.state"
+import { useAccounts } from "../accounts/accounts.state"
 
 interface RecoveryOptions {
   networkId?: string
@@ -34,7 +34,7 @@ export const recover = async ({
       .reduce((acc, account) => ({ ...acc, [account.address]: account }), {})
 
     setDefaultAccountNames(accounts)
-    useAccount.setState({ accounts, selectedAccount })
+    useAccounts.setState({ accounts, selectedAccount })
     useAppState.setState({ switcherNetworkId: networkId })
 
     if (showAccountList || !selectedAccount) {
