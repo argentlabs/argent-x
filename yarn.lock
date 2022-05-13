@@ -2475,11 +2475,11 @@
     prop-types "^15.8.1"
 
 "@mui/styled-engine-sc@^5.1.0":
-  version "5.6.1"
-  resolved "https://registry.npmjs.org/@mui/styled-engine-sc/-/styled-engine-sc-5.6.1.tgz#d9505c005eeefa5c7d7ef9c03e63324db889ee09"
-  integrity sha512-BMY5Pb8YgOxvvwg9s6mPeDgzha4244/KgRmHvTVPBmvqypbiLPApR6SNyYON+1/3kLHt3TpmxrlRY3jPiZF2QQ==
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.7.0.tgz#31dee3068d38d50534548a38e69e7742f1ec813f"
+  integrity sha512-tQ4oResOj2ImcS7CH3GNdgJ95jM9uZZY8nV0ny27eZUYvCYkLwZvaEKGpf2LbnKjPTIzTo6zXPN0AgAA6sKGNw==
   dependencies:
-    prop-types "^15.7.2"
+    prop-types "^15.8.1"
 
 "@mui/styled-engine@^5.7.0":
   version "5.7.0"
@@ -8474,7 +8474,7 @@ promzard@^0.3.0:
   dependencies:
     read "1"
 
-prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15.6.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
