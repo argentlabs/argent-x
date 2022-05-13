@@ -27,7 +27,7 @@ export type MessageType =
   | {
       type: "ESTIMATE_TRANSACTION_FEE_RES"
       data: {
-        amount: number
+        amount: string
         unit: string
       }
     }

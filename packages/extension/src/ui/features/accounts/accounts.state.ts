@@ -8,7 +8,7 @@ interface State {
   addAccount: (newAccount: Account) => void
 }
 
-export const useAccount = create<State>((set) => ({
+export const useAccounts = create<State>((set) => ({
   accounts: {},
   addAccount: (newAccount: Account) =>
     set((state) => ({
@@ -20,13 +20,10 @@ export const useAccount = create<State>((set) => ({
     })),
 }))
 
-export const selectAccount = ({ accounts, selectedAccount }: State) => {
-  if (selectedAccount) {
-    return accounts[selectedAccount]
-  }
-}
+export const useAccount = (address: string): Account | undefined =>
+  useAccounts(({ accounts }) => accounts[address])
 
 export const useSelectedAccount = () =>
-  useAccount(({ accounts, selectedAccount }) =>
+  useAccounts(({ accounts, selectedAccount }) =>
     selectedAccount ? accounts[selectedAccount] : undefined,
   )

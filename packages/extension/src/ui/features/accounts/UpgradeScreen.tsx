@@ -7,7 +7,7 @@ import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/messaging"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { useAccount } from "./accounts.state"
+import { useAccounts } from "./accounts.state"
 
 const StyledP = styled(P)`
   margin-bottom: 16px;
@@ -16,7 +16,7 @@ const StyledP = styled(P)`
 
 export const UpgradeScreen: FC = () => {
   const navigate = useNavigate()
-  const { selectedAccount } = useAccount()
+  const { selectedAccount } = useAccounts()
 
   // If no account is selected, navigate to the account list screen. Dont show anything while doing so.
   useEffect(() => {

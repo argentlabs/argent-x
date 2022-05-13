@@ -23,7 +23,7 @@ import { AccountColumn } from "./AccountColumn"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { AccountRow } from "./AccountRow"
 import { getAccountImageUrl } from "./accounts.service"
-import { useAccount } from "./accounts.state"
+import { useAccounts } from "./accounts.state"
 import { ProfilePicture } from "./ProfilePicture"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
@@ -118,7 +118,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   return (
     <AccountListItemWrapper
       {...makeClickable(() => {
-        useAccount.setState({ selectedAccount: address })
+        useAccounts.setState({ selectedAccount: address })
         navigate(routes.accountTokens())
       })}
       className={isDeleteable ? "deleteable" : ""}

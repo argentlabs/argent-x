@@ -1,7 +1,7 @@
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
 import { FC, Suspense, useEffect, useMemo, useState } from "react"
-import type { Call } from "starknet"
+import { Call } from "starknet"
 import styled, { keyframes } from "styled-components"
 import useSWR from "swr"
 
@@ -11,6 +11,7 @@ import {
   ReportGmailerrorredRoundedIcon,
 } from "../../components/Icons/MuiIcons"
 import { getEstimatedFee } from "../../services/messaging"
+import { useAccount } from "../accounts/accounts.state"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
 const Center = styled.div`
@@ -72,34 +73,31 @@ type FeeEstimationProps = (
 }
 
 const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
-  const { data: { amount } = { unit: "wei", amount: 0 } } = useSWR(
-    [
-      "transactions" in props
-        ? props.transactions
-        : { maxFee: props.maxFee.toNumber() },
-    ],
-    async (x) => {
-      if ("maxFee" in x) {
-        return { unit: "wei", amount: x.maxFee }
-      }
-      return getEstimatedFee(x)
-    },
-    {
-      suspense: true,
-      refreshInterval: 20 * 1000, // 20 seconds
-    },
-  )
+  const { data: { amount } = { unit: "wei", amount: BigNumber.from(0) } } =
+    useSWR(
+      ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
+      async (x) => {
+        if ("maxFee" in x) {
+          return { unit: "wei", amount: x.maxFee }
+        }
+        const estimate = await getEstimatedFee(x)
+        return { ...estimate, amount: BigNumber.from(estimate.amount) }
+      },
+      {
+        suspense: true,
+        refreshInterval: 20 * 1000, // 20 seconds
+      },
+    )
 
   useEffect(() => {
     if ("transactions" in props) {
-      onChange(BigNumber.from(amount))
+      onChange(amount)
     }
   }, [])
 
-  const maxFee = BigNumber.from(amount)
-  const [fee, setFee] = useState(maxFee)
+  const [fee, setFee] = useState(amount)
   const [isFocused, setIsFocused] = useState(false)
-  const [feeInput, setFeeInput] = useState(utils.formatEther(maxFee))
+  const [feeInput, setFeeInput] = useState(utils.formatEther(amount))
   return (
     <InvisibleInput
       value={isFocused ? feeInput : utils.formatEther(fee)}
@@ -117,14 +115,14 @@ const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
         try {
           const value = e.currentTarget.value
             ? utils.parseEther(e.currentTarget.value)
-            : maxFee
-          setFeeInput(utils.formatEther(value) ?? utils.formatEther(maxFee))
+            : amount
+          setFeeInput(utils.formatEther(value) ?? utils.formatEther(amount))
           setFee(value)
           onChange(value)
         } catch {
-          setFeeInput(utils.formatEther(maxFee))
-          setFee(maxFee)
-          onChange(maxFee)
+          setFeeInput(utils.formatEther(amount))
+          setFee(amount)
+          onChange(amount)
         }
       }}
       // on enter blur
@@ -160,15 +158,20 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   onChange,
   ...props
 }) => {
+  const account = useAccount(props.accountAddress)
+  if (!account) {
+    throw new Error("Account not found")
+  }
+
   const [fee, setFee] = useState<BigNumber>()
 
   const { data: feeTokenBalance } = useSWR(
-    [props.accountAddress, props.networkId],
+    [account, props.networkId],
     fetchFeeTokenBalance,
     { suspense: false },
   )
 
-  const firstFetchDone = Boolean(fee)
+  const firstFetchDone = Boolean(fee?.gt(0))
   const enoughBalance = useMemo(
     () => Boolean(fee && feeTokenBalance?.gte(fee)),
     [fee, feeTokenBalance],

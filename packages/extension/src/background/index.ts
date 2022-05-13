@@ -218,7 +218,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
-            amount,
+            amount: number.toHex(amount),
             unit,
           },
         })
