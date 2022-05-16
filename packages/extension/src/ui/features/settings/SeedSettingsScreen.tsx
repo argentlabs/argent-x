@@ -4,8 +4,9 @@ import styled from "styled-components"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
-import { P } from "../../components/Typography"
+import { H2 } from "../../components/Typography"
 import { checkPassword } from "../../services/messaging"
+import { StickyGroup } from "../actions/ConfirmScreen"
 import { PasswordForm } from "../onboarding/PasswordForm"
 import { SeedPhrase } from "../recovery/SeedPhrase"
 import { useSeedPhrase } from "../recovery/useSeedPhrase"
@@ -27,7 +28,10 @@ const Container = styled.div`
 const Wrapper: FC<{ children: ReactNode }> = ({ children }) => (
   <>
     <IconBar back close />
-    <Container>{children}</Container>
+    <Container>
+      <H2>View recovery phrase</H2>
+      {children}
+    </Container>
   </>
 )
 
@@ -38,11 +42,7 @@ export const SeedSettingsScreen: FC = () => {
   if (!passwordIsValid) {
     return (
       <Wrapper>
-        <Paragraph>DO NOT share this phrase with anyone!</Paragraph>
-        <Paragraph>
-          These words can be used to steal all your accounts.
-        </Paragraph>
-        <P>Enter your password to continue:</P>
+        <Paragraph>Enter your password to view your recovery phrase.</Paragraph>
 
         <PasswordForm
           verifyPassword={async (password) => {
@@ -52,9 +52,11 @@ export const SeedSettingsScreen: FC = () => {
           }}
         >
           {(isDirty) => (
-            <Button type="submit" disabled={!isDirty}>
-              Continue
-            </Button>
+            <StickyGroup>
+              <Button type="submit" disabled={!isDirty}>
+                Continue
+              </Button>
+            </StickyGroup>
           )}
         </PasswordForm>
       </Wrapper>
