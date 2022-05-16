@@ -95,7 +95,7 @@ export const SettingsScreen: FC = () => (
         </P>
       </SettingsItem>
       <hr />
-      <SettingsItem to={routes.setupSeedRecovery()}>
+      <SettingsItem to={routes.settingsSeed()}>
         <Title>
           <span>Show backup phrase</span>
           <ArrowForwardIosIcon fontSize="inherit" />

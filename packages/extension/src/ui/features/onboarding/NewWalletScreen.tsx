@@ -28,6 +28,11 @@ const Container = styled.div`
   }
 `
 
+interface FieldValues {
+  password: string
+  repeatPassword: string
+}
+
 interface NewWalletScreenProps {
   overrideSubmit?: (values: { password: string }) => Promise<void>
   overrideTitle?: string
@@ -42,17 +47,11 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
   const navigate = useNavigate()
   const { addAccount } = useAccounts()
   const { switcherNetworkId } = useAppState()
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isDirty },
-    watch,
-  } = useForm<{
-    password: string
-    repeatPassword: string
-  }>({
+  const { control, handleSubmit, formState, watch } = useForm<FieldValues>({
     criteriaMode: "firstError",
   })
+  const { errors, isDirty } = formState
+
   const password = watch("password")
 
   const handleDeploy = async (password?: string) => {

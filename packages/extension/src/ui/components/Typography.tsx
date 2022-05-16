@@ -1,4 +1,5 @@
-import styled from "styled-components"
+import { Link } from "react-router-dom"
+import styled, { css } from "styled-components"
 
 export const H1 = styled.h1`
   font-weight: bold;
@@ -30,7 +31,7 @@ export const FormError = styled.p`
   text-align: left;
 `
 
-export const A = styled.a`
+const anchorCss = css`
   display: inline-block;
   text-decoration: none;
   color: #29c5ff;
@@ -54,4 +55,12 @@ export const A = styled.a`
     outline: 0;
     border: 0;
   }
+`
+
+export const A = styled.a`
+  ${anchorCss}
+`
+
+export const StyledLink = styled(Link)`
+  ${anchorCss}
 `

@@ -45,6 +45,7 @@ export const routes = {
   legacy: route("/legacy"),
   settings: route("/settings"),
   settingsNetworks: route("/settings/networks"),
+  settingsSeed: route("/settings/seed"),
   settingsAddCustomNetwork: route("/settings/networks/add"),
   settingsEditCustomNetwork: route("/settings/networks/edit"),
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
