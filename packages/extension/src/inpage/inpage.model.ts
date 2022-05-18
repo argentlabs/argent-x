@@ -4,7 +4,7 @@ export type EventHandler = (accounts: string[]) => void
 
 // EIP-747:
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-747.md
-interface WatchAssetParameters {
+export interface WatchAssetParameters {
   type: "ERC20" // The asset's interface, e.g. 'ERC20'
   options: {
     address: string // The hexadecimal StarkNet address of the token contract
