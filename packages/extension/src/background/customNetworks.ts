@@ -97,3 +97,9 @@ export const removeNetworks = async (
 
   return removedNetworks
 }
+
+export const hasNetwork = async (networkChainId: Network["chainId"]) => {
+  const networks = await getNetworks()
+
+  return networks.some((network) => network.chainId === networkChainId)
+}

@@ -11,7 +11,11 @@ import {
   typedData,
 } from "starknet"
 
-import { EventHandler, StarknetWindowObject } from "./inpage.model"
+import {
+  AddStarknetChainParameters,
+  EventHandler,
+  StarknetWindowObject,
+} from "./inpage.model"
 import { MessageType, WindowMessageType } from "./shared/MessageType"
 import { getProvider } from "./shared/networks"
 
@@ -94,6 +98,62 @@ const starknetWindowObject: StarknetWindowObject = {
           .then(() => "error" as const)
           .catch(() => {
             sendMessage({ type: "REJECT_REQUEST_TOKEN", data: { actionHash } })
+            return "timeout" as const
+          }),
+      ])
+
+      if (result === "error") {
+        throw Error("User abort")
+      }
+      if (result === "timeout") {
+        throw Error("User action timed out")
+      }
+
+      return true
+    } else if (call.type === "wallet_addStarknetChain") {
+      const callParams = call.params as AddStarknetChainParameters
+
+      sendMessage({
+        type: "REQUEST_CUSTOM_NETWORK",
+        data: {
+          id: callParams.id,
+          name: callParams.chainName,
+          chainId: callParams.chainId,
+          baseUrl: callParams.baseUrl,
+          rpcUrl: callParams.rpcUrl,
+          explorerUrl: callParams.blockExplorerUrl,
+          accountImplementation: callParams.accountImplementation,
+        },
+      })
+
+      const { actionHash } = await waitForMsgOfType(
+        "REQUEST_CUSTOM_NETWORK_RES",
+        1000,
+      )
+
+      if (!actionHash) {
+        return false
+      }
+
+      sendMessage({ type: "OPEN_UI" })
+
+      const result = await Promise.race([
+        waitForMsgOfType(
+          "APPROVE_REQUEST_CUSTOM_NETWORK",
+          11 * 60 * 1000,
+          (x) => x.data.actionHash === actionHash,
+        ),
+        waitForMsgOfType(
+          "REJECT_REQUEST_CUSTOM_NETWORK",
+          10 * 60 * 1000,
+          (x) => x.data.actionHash === actionHash,
+        )
+          .then(() => "error" as const)
+          .catch(() => {
+            sendMessage({
+              type: "REJECT_REQUEST_CUSTOM_NETWORK",
+              data: { actionHash },
+            })
             return "timeout" as const
           }),
       ])
