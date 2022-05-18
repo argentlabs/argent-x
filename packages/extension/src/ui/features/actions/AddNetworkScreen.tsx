@@ -55,7 +55,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
         <H2>Add Network</H2>
 
         <form
-          onSubmit={(e: React.FormEvent) => {
+          onSubmit={(e) => {
             e.preventDefault()
             if (requestedNetwork) {
               try {
