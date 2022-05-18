@@ -1,6 +1,5 @@
 import React, { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { number } from "starknet"
 import styled from "styled-components"
 
 import { addNetworks } from "../../../background/customNetworks"
@@ -11,8 +10,6 @@ import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { FormError, H2 } from "../../components/Typography"
 import { routes } from "../../routes"
-import { isValidAddress } from "../../services/addresses"
-import { TokenDetails } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -48,54 +45,6 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
 
   const [error, setError] = useState("")
 
-  //   const validAddress = useMemo(() => {
-  //     return isValidAddress(networkChainId)
-  //   }, [networkChainId])
-
-  //   useEffect(() => {
-  //     if (
-  //       requestedNetwork &&
-  //       requestedNetwork.chainId === networkChainId &&
-  //       !tokenDetails
-  //     ) {
-  //       setLoading(true)
-  //     }
-  //   }, [requestedNetwork, networkChainId, tokenDetails])
-
-  //   useEffect(() => {
-  //     if (account) {
-  //       if (loading && account) {
-  //         fetchTokenDetails(networkChainId, account)
-  //           .then((details) => {
-  //             setTokenDetails(details)
-  //           })
-  //           .catch(() => {
-  //             setTokenDetails(undefined)
-  //           })
-  //           .finally(() => {
-  //             setLoading(false)
-  //           })
-  //       } else if (
-  //         isValidAddress(networkChainId) &&
-  //         networkChainId !== prevValidAddress.current
-  //       ) {
-  //         prevValidAddress.current = networkChainId
-  //         setLoading(true)
-  //       }
-  //     }
-  //   }, [loading, networkChainId, account])
-
-  //   const compiledData = {
-  //     address: networkChainId,
-  //     ...(tokenDetails ?? {}),
-  //     ...(!tokenDetails?.name && { name: networkName }),
-  //     ...(!tokenDetails?.symbol && { symbol: networkBaseUrl }),
-  //     ...(!tokenDetails?.decimals && {
-  //       decimals: BigNumber.from(networkExplorerUrl || "0"),
-  //     }),
-  //     networkId: switcherNetworkId,
-  //   }
-
   return (
     <>
       <Header hide={hideBackButton}>
@@ -110,14 +59,10 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
             e.preventDefault()
             if (requestedNetwork) {
               try {
-                const networks = addNetworks(requestedNetwork)
-                console.log(
-                  "🚀 ~ file: AddNetworkScreen.tsx ~ line 139 ~ networks",
-                  networks,
-                )
+                addNetworks(requestedNetwork)
                 onSubmit?.()
                 navigate(routes.settingsNetworks())
-              } catch (e) {
+              } catch {
                 setError("Network already exists")
               }
             }

@@ -63,7 +63,6 @@ export const ActionScreen: FC = () => {
       )
 
     case "REQUEST_CUSTOM_NETWORK":
-      // action.payload
       return (
         <AddNetworkScreen
           requestedNetwork={action.payload}
