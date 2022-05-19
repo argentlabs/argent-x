@@ -74,13 +74,13 @@ interface IStarketWindowObject {
   ) => Promise<T["result"]>
   enable: (options?: { showModal?: boolean }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
-  on: <T extends WalletEvents>(
-    event: T["type"],
-    handleEvent: T["handler"],
+  on: (
+    event: WalletEvents["type"],
+    handleEvent: WalletEvents["handler"],
   ) => void
-  off: <T extends WalletEvents>(
-    event: T["type"],
-    handleEvent: T["handler"],
+  off: (
+    event: WalletEvents["type"],
+    handleEvent: WalletEvents["handler"],
   ) => void
   account?: AccountInterface
   provider: Provider
