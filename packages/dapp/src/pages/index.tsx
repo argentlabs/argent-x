@@ -1,7 +1,6 @@
-import { IStarknetWindowObject, getStarknet } from "@argent/get-starknet"
 import type { NextPage } from "next"
 import Head from "next/head"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
