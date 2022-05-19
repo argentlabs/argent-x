@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
-import { ReportGmailerrorredIcon } from "../../components/Icons/MuiIcons"
+import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
 import { Spinner } from "../../components/Spinner"
 import { formatDateTime } from "../../services/dates"
 import { openVoyagerTransaction } from "../../services/voyager.service"
@@ -45,10 +45,11 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
         <Fragment key={dateLabel}>
           <SectionHeader>{dateLabel}</SectionHeader>
           <TransactionsWrapper>
-            {transactions.map(({ hash, date, meta }) => (
+            {transactions.map(({ hash, date, meta, isRejected }) => (
               <TransactionItem
                 key={hash}
                 hash={hash}
+                status={isRejected ? "red" : undefined}
                 meta={{ subTitle: formatDateTime(date), ...meta }}
                 onClick={() => openVoyagerTransaction(hash, network)}
               />
@@ -60,38 +61,18 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
   )
 }
 
-const ActivityError: FC = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+export const AccountActivity: FC<AccountActivityProps> = ({ account }) => (
+  <Container>
+    <Header>Activity</Header>
+    <PendingTransactions accountAddress={account.address} />
+    <ErrorBoundary
+      fallback={
+        <ErrorBoundaryFallback title="Seems like Voyager API is down..." />
+      }
     >
-      <ReportGmailerrorredIcon
-        style={{
-          color: "red",
-          fontSize: "64px",
-          marginBottom: "16px",
-        }}
-      />
-      <h3>Seems like Voyager API is down...</h3>
-    </div>
-  )
-}
-
-export const AccountActivity: FC<AccountActivityProps> = ({ account }) => {
-  return (
-    <Container>
-      <Header>Activity</Header>
-      <PendingTransactions accountAddress={account.address} />
-      <ErrorBoundary fallback={<ActivityError />}>
-        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <Activity account={account} />
-        </Suspense>
-      </ErrorBoundary>
-    </Container>
-  )
-}
+      <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
+        <Activity account={account} />
+      </Suspense>
+    </ErrorBoundary>
+  </Container>
+)

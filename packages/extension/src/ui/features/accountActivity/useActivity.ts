@@ -6,6 +6,7 @@ export interface ActivityTransaction {
   hash: string
   date: Date
   meta?: TransactionMeta
+  isRejected?: boolean
 }
 
 export type DailyActivity = Record<string, ActivityTransaction[]>
@@ -18,8 +19,9 @@ export function useActivity(address: string): DailyActivity {
     if (status !== "RECEIVED") {
       const date = new Date(timestamp * 1000)
       const dateLabel = formatDate(date)
+      const isRejected = status === "REJECTED"
       activity[dateLabel] ||= []
-      activity[dateLabel].push({ hash, date, meta })
+      activity[dateLabel].push({ hash, date, meta, isRejected })
     }
   }
   return activity
