@@ -49,8 +49,10 @@ window.addEventListener(
         for (const userEvent of userEventHandlers) {
           if (userEvent.type === "accountsChanged") {
             userEvent.handler([address])
-          } else {
+          } else if (userEvent.type === "networkChanged") {
             userEvent.handler(network.chainId)
+          } else {
+            assertNever(userEvent)
           }
         }
       }
