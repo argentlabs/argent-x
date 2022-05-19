@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ReportGmailerrorredIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
-import { P } from "../../components/Typography"
+import { A, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { getNftPicture } from "./playoasis.service"
@@ -16,6 +16,10 @@ const Container = styled.div`
   flex-direction: column;
   padding-top: 16px;
   margin: 0 16px 0 16px;
+
+  ${P} {
+    text-align: center;
+  }
 `
 
 const Header = styled.h2`
@@ -68,7 +72,25 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
   return (
     <div>
       {nfts.length === 0 && (
-        <P style={{ textAlign: "center" }}>No collectibles to show</P>
+        <>
+          <P>No collectibles to show</P>
+          <P style={{ marginTop: 120 }}>
+            <small>
+              You can browse collectibles on
+              <A href="https://testnet.playoasis.xyz/" target="_blank">
+                PlayOasis
+              </A>
+            </small>
+          </P>
+          <P style={{ marginTop: 16 }}>
+            <small>
+              Or build your own 3D collectible on
+              <A href="https://briq.construction/" target="_blank">
+                briq
+              </A>
+            </small>
+          </P>
+        </>
       )}
       {nfts.map((nft) => (
         <NftItem
