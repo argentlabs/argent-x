@@ -113,7 +113,10 @@ window.addEventListener(
   "message",
   ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
-    if (starknet && starknet.account && data.type === "CONNECT_ACCOUNT") {
+    if (!starknet) {
+      return
+    }
+    if (starknet.account && data.type === "CONNECT_ACCOUNT") {
       const { address, network } = data.data
       if (address !== starknet.selectedAddress) {
         starknet.selectedAddress = address
@@ -124,9 +127,6 @@ window.addEventListener(
         }
       }
     } else if (data.type === "DISCONNECT_ACCOUNT") {
-      if (!starknet) {
-        return
-      }
       starknet.selectedAddress = undefined
       starknet.account = undefined
       starknet.isConnected = false
