@@ -19,6 +19,7 @@ export const starknetWindowObject: StarknetWindowObject = {
   account: undefined,
   provider: defaultProvider,
   selectedAddress: undefined,
+  chainId: undefined,
   isConnected: false,
   version: VERSION,
   request: async (call) => {
@@ -46,6 +47,7 @@ export const starknetWindowObject: StarknetWindowObject = {
           starknet.provider = getProvider(network)
           starknet.account = new ArgentXAccount(address, starknet.provider)
           starknet.selectedAddress = address
+          starknet.chainId = network.chainId
           starknet.isConnected = true
           resolve([address])
         }

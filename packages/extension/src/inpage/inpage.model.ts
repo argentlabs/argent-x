@@ -63,6 +63,7 @@ interface IStarketWindowObject {
   account?: AccountInterface
   provider: Provider
   selectedAddress?: string
+  chainId?: string
   version: string
 }
 
@@ -70,6 +71,7 @@ interface ConnectedStarketWindowObject extends IStarketWindowObject {
   isConnected: true
   account: AccountInterface
   selectedAddress: string
+  chainId: string
 }
 
 interface DisconnectedStarketWindowObject extends IStarketWindowObject {
