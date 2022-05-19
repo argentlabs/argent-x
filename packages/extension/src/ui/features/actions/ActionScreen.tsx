@@ -7,6 +7,7 @@ import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useActions } from "./actions.state"
+import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
@@ -45,6 +46,26 @@ export const ActionScreen: FC = () => {
       return (
         <AddTokenScreen
           defaultToken={action.payload}
+          hideBackButton
+          onSubmit={async () => {
+            await approve(action)
+            if (isPopup && isLastAction) {
+              window.close()
+            }
+          }}
+          onReject={async () => {
+            await reject(action)
+            if (isPopup && isLastAction) {
+              window.close()
+            }
+          }}
+        />
+      )
+
+    case "REQUEST_CUSTOM_NETWORK":
+      return (
+        <AddNetworkScreen
+          requestedNetwork={action.payload}
           hideBackButton
           onSubmit={async () => {
             await approve(action)

@@ -58,9 +58,9 @@ export const NetworkSchema: SchemaOf<Network> = object()
       .required()
       .min(2)
       .max(31) // max 31 characters as required by starknet short strings
-      .matches(/^[A-Z0-9_]+$/, {
+      .matches(/^[a-zA-Z0-9_]+$/, {
         message:
-          "${path} must be uppercase alphanumeric or underscore, like 'SN_GOERLI'",
+          "${path} must be hexadecimal string, uppercase alphanumeric or underscore, like 'SN_GOERLI'",
       }),
     baseUrl: string()
       .required()

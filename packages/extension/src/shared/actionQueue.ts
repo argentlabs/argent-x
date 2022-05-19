@@ -31,5 +31,17 @@ export type ActionItem =
         networkId?: string
       }
     }
+  | {
+      type: "REQUEST_CUSTOM_NETWORK"
+      payload: {
+        id: string
+        name: string
+        chainId: string // A 0x-prefixed hexadecimal string
+        baseUrl: string
+        explorerUrl?: string
+        accountImplementation?: string
+        rpcUrl?: string
+      }
+    }
 
 export type ExtensionActionItem = ExtensionQueueItem<ActionItem>

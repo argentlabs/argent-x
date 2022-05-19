@@ -139,6 +139,7 @@ export type MessageType =
   | { type: "REQUEST_TOKEN_RES"; data: { actionHash?: string } } // returns no actionHash if the token already exists
   | { type: "REJECT_REQUEST_TOKEN"; data: { actionHash: string } }
   | { type: "APPROVE_REQUEST_TOKEN"; data: { actionHash: string } }
+
   // ***** networks *****
   | { type: "GET_CUSTOM_NETWORKS" }
   | { type: "GET_CUSTOM_NETWORKS_RES"; data: Network[] }
@@ -151,6 +152,13 @@ export type MessageType =
       type: "GET_NETWORK_STATUSES_RES"
       data: Partial<Record<Network["id"], NetworkStatus>>
     }
+
+  // - used by dapps to request addition of custom network
+  | { type: "REQUEST_CUSTOM_NETWORK"; data: Network }
+  | { type: "REQUEST_CUSTOM_NETWORK_RES"; data: { actionHash?: string } }
+  | { type: "REJECT_REQUEST_CUSTOM_NETWORK"; data: { actionHash: string } }
+  | { type: "APPROVE_REQUEST_CUSTOM_NETWORK"; data: { actionHash: string } }
+
   // ***** actions *****
   | { type: "GET_ACTIONS" }
   | {

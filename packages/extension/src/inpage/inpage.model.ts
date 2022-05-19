@@ -4,7 +4,7 @@ export type EventHandler = (accounts: string[]) => void
 
 // EIP-747:
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-747.md
-interface WatchAssetParameters {
+export interface WatchAssetParameters {
   type: "ERC20" // The asset's interface, e.g. 'ERC20'
   options: {
     address: string // The hexadecimal StarkNet address of the token contract
@@ -15,10 +15,35 @@ interface WatchAssetParameters {
   }
 }
 
+// EIP-3085
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3085.md
+
+export interface AddStarknetChainParameters {
+  id: string
+  chainId: string // A 0x-prefixed hexadecimal string
+  chainName: string
+  baseUrl: string
+  rpcUrl?: string
+  blockExplorerUrl?: string
+  accountImplementation?: string
+
+  nativeCurrency?: {
+    name: string
+    symbol: string // 2-6 characters long
+    decimals: 18
+  } // Currently ignored.
+  iconUrls?: string[] // Currently ignored.
+}
+
 export type RpcMessage =
   | {
       type: "wallet_watchAsset"
       params: WatchAssetParameters
+      result: boolean
+    }
+  | {
+      type: "wallet_addStarknetChain"
+      params: AddStarknetChainParameters
       result: boolean
     }
   | {

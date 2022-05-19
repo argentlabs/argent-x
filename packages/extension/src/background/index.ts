@@ -15,7 +15,10 @@ import {
   sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
-import { getNetwork as getNetworkImplementation } from "./customNetworks"
+import {
+  getNetwork as getNetworkImplementation,
+  hasNetwork,
+} from "./customNetworks"
 import {
   addNetworks,
   getNetwork,
@@ -383,6 +386,15 @@ import { Wallet, WalletStorageProps } from "./wallet"
             })
           }
 
+          case "REQUEST_CUSTOM_NETWORK": {
+            return sendToTabAndUi({
+              type: "APPROVE_REQUEST_CUSTOM_NETWORK",
+              data: {
+                actionHash,
+              },
+            })
+          }
+
           default:
             return
         }
@@ -428,6 +440,16 @@ import { Wallet, WalletStorageProps } from "./wallet"
               },
             })
           }
+
+          case "REQUEST_CUSTOM_NETWORK": {
+            return sendToTabAndUi({
+              type: "REJECT_REQUEST_CUSTOM_NETWORK",
+              data: {
+                actionHash,
+              },
+            })
+          }
+
           default:
             return
         }
@@ -436,8 +458,32 @@ import { Wallet, WalletStorageProps } from "./wallet"
       case "SIGNATURE_FAILURE":
       case "REJECT_PREAUTHORIZATION":
       case "REJECT_REQUEST_TOKEN":
+      case "REJECT_REQUEST_CUSTOM_NETWORK":
       case "TRANSACTION_FAILED": {
         return await actionQueue.remove(msg.data.actionHash)
+      }
+
+      case "REQUEST_CUSTOM_NETWORK": {
+        const exists = await hasNetwork(msg.data.chainId)
+
+        if (exists) {
+          return sendToTabAndUi({
+            type: "REQUEST_CUSTOM_NETWORK_RES",
+            data: {},
+          })
+        }
+
+        const { meta } = await actionQueue.push({
+          type: "REQUEST_CUSTOM_NETWORK",
+          payload: msg.data,
+        })
+
+        return sendToTabAndUi({
+          type: "REQUEST_CUSTOM_NETWORK_RES",
+          data: {
+            actionHash: meta.hash,
+          },
+        })
       }
 
       case "REQUEST_TOKEN": {
