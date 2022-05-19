@@ -1,6 +1,22 @@
 import type { AccountInterface, Provider } from "starknet"
 
-export type EventHandler = (accounts: string[]) => void
+export type AccountChangeEventHandler = (accounts: string[]) => void
+
+export type NetworkChangeEventHandler = (network: string | undefined) => void
+
+export type WalletEventHandlers =
+  | AccountChangeEventHandler
+  | NetworkChangeEventHandler
+
+export type WalletEvents =
+  | {
+      type: "accountsChanged"
+      handler: AccountChangeEventHandler
+    }
+  | {
+      type: "networkChanged"
+      handler: NetworkChangeEventHandler
+    }
 
 // EIP-747:
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-747.md
@@ -58,8 +74,14 @@ interface IStarketWindowObject {
   ) => Promise<T["result"]>
   enable: (options?: { showModal?: boolean }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
-  on: (event: "accountsChanged", handleEvent: EventHandler) => void
-  off: (event: "accountsChanged", handleEvent: EventHandler) => void
+  on: <T extends WalletEvents>(
+    event: T["type"],
+    handleEvent: T["handler"],
+  ) => void
+  off: <T extends WalletEvents>(
+    event: T["type"],
+    handleEvent: T["handler"],
+  ) => void
   account?: AccountInterface
   provider: Provider
   selectedAddress?: string

@@ -45,16 +45,24 @@ window.addEventListener(
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
         starknet.account = new ArgentXAccount(address, starknet.provider)
-        for (const handleEvent of userEventHandlers) {
-          handleEvent([address])
+        for (const userEvent of userEventHandlers) {
+          if (userEvent.type === "accountsChanged") {
+            userEvent.handler([address])
+          } else {
+            userEvent.handler(network.chainId)
+          }
         }
       }
     } else if (data.type === "DISCONNECT_ACCOUNT") {
       starknet.selectedAddress = undefined
       starknet.account = undefined
       starknet.isConnected = false
-      for (const handleEvent of userEventHandlers) {
-        handleEvent([])
+      for (const userEvent of userEventHandlers) {
+        if (userEvent.type === "accountsChanged") {
+          userEvent.handler([])
+        } else {
+          userEvent.handler(undefined)
+        }
       }
     }
   },
