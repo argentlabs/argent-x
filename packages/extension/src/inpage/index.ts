@@ -1,3 +1,4 @@
+import { assertNever } from "./../ui/services/assertNever"
 import { WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { ArgentXAccount } from "./ArgentXAccount"
@@ -45,16 +46,28 @@ window.addEventListener(
         starknet.selectedAddress = address
         starknet.provider = getProvider(network)
         starknet.account = new ArgentXAccount(address, starknet.provider)
-        for (const handleEvent of userEventHandlers) {
-          handleEvent([address])
+        for (const userEvent of userEventHandlers) {
+          if (userEvent.type === "accountsChanged") {
+            userEvent.handler([address])
+          } else if (userEvent.type === "networkChanged") {
+            userEvent.handler(network.chainId)
+          } else {
+            assertNever(userEvent)
+          }
         }
       }
     } else if (data.type === "DISCONNECT_ACCOUNT") {
       starknet.selectedAddress = undefined
       starknet.account = undefined
       starknet.isConnected = false
-      for (const handleEvent of userEventHandlers) {
-        handleEvent([])
+      for (const userEvent of userEventHandlers) {
+        if (userEvent.type === "accountsChanged") {
+          userEvent.handler([])
+        } else if (userEvent.type === "networkChanged") {
+          userEvent.handler(undefined)
+        } else {
+          assertNever(userEvent)
+        }
       }
     }
   },

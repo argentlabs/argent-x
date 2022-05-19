@@ -1,9 +1,15 @@
 import { defaultProvider } from "starknet"
 
+import { assertNever } from "./../ui/services/assertNever"
 import { WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { ArgentXAccount } from "./ArgentXAccount"
-import { EventHandler, StarknetWindowObject } from "./inpage.model"
+import {
+  AccountChangeEventHandler,
+  NetworkChangeEventHandler,
+  StarknetWindowObject,
+  WalletEvents,
+} from "./inpage.model"
 import { sendMessage, waitForMessage } from "./messageActions"
 import {
   handleAddNetworkRequest,
@@ -12,13 +18,14 @@ import {
 
 const VERSION = `${process.env.VERSION}`
 
-export const userEventHandlers: EventHandler[] = []
+export const userEventHandlers: WalletEvents[] = []
 
 // window.ethereum like
 export const starknetWindowObject: StarknetWindowObject = {
   account: undefined,
   provider: defaultProvider,
   selectedAddress: undefined,
+  chainId: undefined,
   isConnected: false,
   version: VERSION,
   request: async (call) => {
@@ -46,6 +53,7 @@ export const starknetWindowObject: StarknetWindowObject = {
           starknet.provider = getProvider(network)
           starknet.account = new ArgentXAccount(address, starknet.provider)
           starknet.selectedAddress = address
+          starknet.chainId = network.chainId
           starknet.isConnected = true
           resolve([address])
         }
@@ -65,17 +73,34 @@ export const starknetWindowObject: StarknetWindowObject = {
     return waitForMessage("IS_PREAUTHORIZED_RES", 1000)
   },
   on: (event, handleEvent) => {
-    if (event !== "accountsChanged") {
+    if (event === "accountsChanged") {
+      userEventHandlers.push({
+        type: event,
+        handler: handleEvent as AccountChangeEventHandler,
+      })
+    } else if (event === "networkChanged") {
+      userEventHandlers.push({
+        type: event,
+        handler: handleEvent as NetworkChangeEventHandler,
+      })
+    } else {
+      assertNever(event)
       throw new Error(`Unknwown event: ${event}`)
     }
-    userEventHandlers.push(handleEvent)
   },
   off: (event, handleEvent) => {
-    if (event !== "accountsChanged") {
+    if (event !== "accountsChanged" && event !== "networkChanged") {
+      assertNever(event)
       throw new Error(`Unknwown event: ${event}`)
     }
-    if (userEventHandlers.includes(handleEvent)) {
-      userEventHandlers.splice(userEventHandlers.indexOf(handleEvent), 1)
+
+    const eventIndex = userEventHandlers.findIndex(
+      (userEvent) =>
+        userEvent.type === event && userEvent.handler === handleEvent,
+    )
+
+    if (eventIndex >= 0) {
+      userEventHandlers.splice(eventIndex, 1)
     }
   },
 }
