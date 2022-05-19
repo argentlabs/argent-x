@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { ErrorBoundary } from "../../components/ErrorBoundary"
-import { ReportGmailerrorredIcon } from "../../components/Icons/MuiIcons"
+import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
 import { Spinner } from "../../components/Spinner"
 import { A, P } from "../../components/Typography"
 import { routes } from "../../routes"
@@ -107,39 +107,21 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
   )
 }
 
-const NftsError: FC<AccountNftsProps> = ({ account }) => {
+const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
   // this is needed to keep swr mounted so it can retry the request
   useNfts(account.address, {
     suspense: false,
     errorRetryInterval: 30e3 /* 30 seconds */,
   })
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <ReportGmailerrorredIcon
-        style={{
-          color: "red",
-          fontSize: "64px",
-          marginBottom: "16px",
-        }}
-      />
-      <h3>Seems like Play Oasis API is down...</h3>
-    </div>
-  )
+  return <ErrorBoundaryFallback title="Seems like Play Oasis API is down..." />
 }
 
 export const AccountNfts: FC<AccountNftsProps> = ({ account }) => {
   return (
     <Container>
       <Header>Collectibles</Header>
-      <ErrorBoundary fallback={<NftsError account={account} />}>
+      <ErrorBoundary fallback={<NftsFallback account={account} />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <Nfts account={account} />
         </Suspense>

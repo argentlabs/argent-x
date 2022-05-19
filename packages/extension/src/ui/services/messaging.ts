@@ -145,9 +145,9 @@ export const updateTransactionFee = async (
 }
 
 export const startSession = async (password: string): Promise<void> => {
-  const encMsg = await encrypt(password)
+  const body = await encrypt(password)
 
-  sendMessage({ type: "START_SESSION", data: { secure: true, body: encMsg } })
+  sendMessage({ type: "START_SESSION", data: { secure: true, body } })
 
   const succeeded = await Promise.race([
     waitForMessage("START_SESSION_RES").then(() => true),
