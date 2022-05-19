@@ -3,11 +3,13 @@ import { encode } from "starknet"
 export const formatAddress = (address: string) =>
   encode.addHexPrefix(encode.removeHexPrefix(address).padStart(64, "0"))
 
-export const truncateAddress = (fullAddress: string) => {
-  const address = formatAddress(fullAddress)
+export const truncateAddress = (address: string) => {
+  return truncateHex(formatAddress(address))
+}
 
-  const hex = address.slice(0, 2)
-  const start = address.slice(2, 6)
-  const end = address.slice(-4)
+export const truncateHex = (value: string) => {
+  const hex = value.slice(0, 2)
+  const start = value.slice(2, 6)
+  const end = value.slice(-4)
   return `${hex} ${start} ... ${end}`
 }

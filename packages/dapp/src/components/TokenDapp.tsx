@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react"
 
-import { truncateAddress } from "../services/address.service"
+import { truncateAddress, truncateHex } from "../services/address.service"
 import {
   getErc20TokenAddress,
   mintToken,
@@ -15,6 +15,8 @@ import {
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
+type Status = "idle" | "approve" | "pending" | "success" | "failure"
+
 export const TokenDapp: FC = () => {
   const [mintAmount, setMintAmount] = useState("10")
   const [transferTo, setTransferTo] = useState("")
@@ -22,9 +24,8 @@ export const TokenDapp: FC = () => {
   const [shortText, setShortText] = useState("")
   const [lastSig, setLastSig] = useState<string[]>([])
   const [lastTransactionHash, setLastTransactionHash] = useState("")
-  const [transactionStatus, setTransactionStatus] = useState<
-    "idle" | "approve" | "pending" | "success"
-  >("idle")
+  const [transactionStatus, setTransactionStatus] = useState<Status>("idle")
+  const [transactionError, setTransactionError] = useState("")
   const [addTokenError, setAddTokenError] = useState("")
 
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
@@ -32,8 +33,18 @@ export const TokenDapp: FC = () => {
   useEffect(() => {
     ;(async () => {
       if (lastTransactionHash && transactionStatus === "pending") {
-        await waitForTransaction(lastTransactionHash)
-        setTransactionStatus("success")
+        setTransactionError("")
+        try {
+          await waitForTransaction(lastTransactionHash)
+          setTransactionStatus("success")
+        } catch (error: any) {
+          setTransactionStatus("failure")
+          let message = error ? `${error}` : "No further details"
+          if (error?.response) {
+            message = JSON.stringify(error.response, null, 2)
+          }
+          setTransactionError(message)
+        }
       }
     })()
   }, [transactionStatus, lastTransactionHash])
@@ -116,14 +127,27 @@ export const TokenDapp: FC = () => {
         Transaction status: <code>{transactionStatus}</code>
       </h3>
       {lastTransactionHash && (
-        <a
-          href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "blue", margin: "0 0 1em" }}
-        >
-          <code>{lastTransactionHash}</code>
-        </a>
+        <h3 style={{ margin: 0 }}>
+          Transaction hash:{" "}
+          <a
+            href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "blue", margin: "0 0 1em" }}
+          >
+            <code>{truncateHex(lastTransactionHash)}</code>
+          </a>
+        </h3>
+      )}
+      {transactionError && (
+        <h3 style={{ margin: 0 }}>
+          Transaction error:{" "}
+          <textarea
+            style={{ width: "100%", height: 100, background: "white" }}
+            value={transactionError}
+            readOnly
+          />
+        </h3>
       )}
       <div className="columns">
         <form onSubmit={handleMintSubmit}>
