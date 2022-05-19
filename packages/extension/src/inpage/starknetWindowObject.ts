@@ -1,5 +1,6 @@
 import { defaultProvider } from "starknet"
 
+import { assertNever } from "./../ui/services/assertNever"
 import { WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { ArgentXAccount } from "./ArgentXAccount"
@@ -17,7 +18,7 @@ import {
 
 const VERSION = `${process.env.VERSION}`
 
-export const userEventHandlers: Array<WalletEvents> = []
+export const userEventHandlers: WalletEvents[] = []
 
 // window.ethereum like
 export const starknetWindowObject: StarknetWindowObject = {
@@ -72,24 +73,24 @@ export const starknetWindowObject: StarknetWindowObject = {
     return waitForMessage("IS_PREAUTHORIZED_RES", 1000)
   },
   on: (event, handleEvent) => {
-    if (event !== "accountsChanged" && event !== "networkChanged") {
-      throw new Error(`Unknwown event: ${event}`)
-    }
-
     if (event === "accountsChanged") {
       userEventHandlers.push({
         type: event,
         handler: handleEvent as AccountChangeEventHandler,
       })
-    } else {
+    } else if (event === "networkChanged") {
       userEventHandlers.push({
         type: event,
         handler: handleEvent as NetworkChangeEventHandler,
       })
+    } else {
+      assertNever(event)
+      throw new Error(`Unknwown event: ${event}`)
     }
   },
   off: (event, handleEvent) => {
     if (event !== "accountsChanged" && event !== "networkChanged") {
+      assertNever(event)
       throw new Error(`Unknwown event: ${event}`)
     }
 

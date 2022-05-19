@@ -2,7 +2,7 @@ import type { AccountInterface, Provider } from "starknet"
 
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
-export type NetworkChangeEventHandler = (network: string | undefined) => void
+export type NetworkChangeEventHandler = (network?: string) => void
 
 export type WalletEventHandlers =
   | AccountChangeEventHandler

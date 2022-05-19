@@ -1,3 +1,4 @@
+import { assertNever } from "./../ui/services/assertNever"
 import { WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { ArgentXAccount } from "./ArgentXAccount"
@@ -60,8 +61,10 @@ window.addEventListener(
       for (const userEvent of userEventHandlers) {
         if (userEvent.type === "accountsChanged") {
           userEvent.handler([])
-        } else {
+        } else if (userEvent.type === "networkChanged") {
           userEvent.handler(undefined)
+        } else {
+          assertNever(userEvent)
         }
       }
     }
