@@ -4,7 +4,7 @@ import { WindowMessageType } from "../shared/MessageType"
 import { getProvider } from "../shared/networks"
 import { ArgentXAccount } from "./ArgentXAccount"
 import { EventHandler, StarknetWindowObject } from "./inpage.model"
-import { sendMessage, waitForMsgOfType } from "./messageActions"
+import { sendMessage, waitForMessage } from "./messageActions"
 import {
   handleAddNetworkRequest,
   handleAddTokenRequest,
@@ -62,7 +62,7 @@ export const starknetWindowObject: StarknetWindowObject = {
       type: "IS_PREAUTHORIZED",
       data: window.location.host,
     })
-    return waitForMsgOfType("IS_PREAUTHORIZED_RES", 1000)
+    return waitForMessage("IS_PREAUTHORIZED_RES", 1000)
   },
   on: (event, handleEvent) => {
     if (event !== "accountsChanged") {

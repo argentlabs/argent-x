@@ -1,17 +1,14 @@
 import { MessageType, WindowMessageType } from "../shared/MessageType"
 
-const extId = document
+const extensionId = document
   .getElementById("argent-x-extension")
   ?.getAttribute("data-extension-id")
 
 export function sendMessage(msg: MessageType): void {
-  return window.postMessage(
-    { ...msg, extensionId: extId },
-    window.location.origin,
-  )
+  return window.postMessage({ ...msg, extensionId }, window.location.origin)
 }
 
-export function waitForMsgOfType<
+export function waitForMessage<
   K extends MessageType["type"],
   T extends { type: K } & MessageType,
 >(

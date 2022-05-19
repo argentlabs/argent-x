@@ -11,7 +11,7 @@ import {
   typedData,
 } from "starknet"
 
-import { sendMessage, waitForMsgOfType } from "./messageActions"
+import { sendMessage, waitForMessage } from "./messageActions"
 
 export class ArgentXAccount extends Account {
   constructor(address: string, provider?: Provider) {
@@ -30,19 +30,16 @@ export class ArgentXAccount extends Account {
       type: "EXECUTE_TRANSACTION",
       data: { transactions, abis, transactionsDetail },
     })
-    const { actionHash } = await waitForMsgOfType(
-      "EXECUTE_TRANSACTION_RES",
-      1000,
-    )
+    const { actionHash } = await waitForMessage("EXECUTE_TRANSACTION_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
-      waitForMsgOfType(
+      waitForMessage(
         "TRANSACTION_SUBMITTED",
         11 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
-      waitForMsgOfType(
+      waitForMessage(
         "TRANSACTION_FAILED",
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
@@ -72,16 +69,16 @@ export class ArgentXAccount extends Account {
     data: typedData.TypedData,
   ): Promise<Signature> {
     sendMessage({ type: "SIGN_MESSAGE", data })
-    const { actionHash } = await waitForMsgOfType("SIGN_MESSAGE_RES", 1000)
+    const { actionHash } = await waitForMessage("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 
     const result = await Promise.race([
-      waitForMsgOfType(
+      waitForMessage(
         "SIGNATURE_SUCCESS",
         11 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
-      waitForMsgOfType(
+      waitForMessage(
         "SIGNATURE_FAILURE",
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,

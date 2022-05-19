@@ -2,7 +2,7 @@ import {
   AddStarknetChainParameters,
   WatchAssetParameters,
 } from "./inpage.model"
-import { sendMessage, waitForMsgOfType } from "./messageActions"
+import { sendMessage, waitForMessage } from "./messageActions"
 
 export async function handleAddTokenRequest(
   callParams: WatchAssetParameters,
@@ -16,7 +16,7 @@ export async function handleAddTokenRequest(
       name: callParams.options.name,
     },
   })
-  const { actionHash } = await waitForMsgOfType("REQUEST_TOKEN_RES", 1000)
+  const { actionHash } = await waitForMessage("REQUEST_TOKEN_RES", 1000)
 
   if (!actionHash) {
     // token already exists
@@ -26,12 +26,12 @@ export async function handleAddTokenRequest(
   sendMessage({ type: "OPEN_UI" })
 
   const result = await Promise.race([
-    waitForMsgOfType(
+    waitForMessage(
       "APPROVE_REQUEST_TOKEN",
       11 * 60 * 1000,
       (x) => x.data.actionHash === actionHash,
     ),
-    waitForMsgOfType(
+    waitForMessage(
       "REJECT_REQUEST_TOKEN",
       10 * 60 * 1000,
       (x) => x.data.actionHash === actionHash,
@@ -69,7 +69,7 @@ export async function handleAddNetworkRequest(
     },
   })
 
-  const { actionHash } = await waitForMsgOfType(
+  const { actionHash } = await waitForMessage(
     "REQUEST_CUSTOM_NETWORK_RES",
     1000,
   )
@@ -81,12 +81,12 @@ export async function handleAddNetworkRequest(
   sendMessage({ type: "OPEN_UI" })
 
   const result = await Promise.race([
-    waitForMsgOfType(
+    waitForMessage(
       "APPROVE_REQUEST_CUSTOM_NETWORK",
       11 * 60 * 1000,
       (x) => x.data.actionHash === actionHash,
     ),
-    waitForMsgOfType(
+    waitForMessage(
       "REJECT_REQUEST_CUSTOM_NETWORK",
       10 * 60 * 1000,
       (x) => x.data.actionHash === actionHash,
