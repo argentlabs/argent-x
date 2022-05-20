@@ -35,6 +35,7 @@ const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
 
 type KnownNetworkIds = "mainnet-alpha" | "goerli-alpha"
+export type ProgressCallback = (percent: number) => void
 const CHECK_OFFSET = 10
 const PROXY_CONTRACT_HASHES_TO_CHECK = [
   "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
@@ -299,7 +300,10 @@ export class Wallet extends EventEmitter {
     return accounts
   }
 
-  public async startSession(password: string): Promise<boolean> {
+  public async startSession(
+    password: string,
+    progressCallback?: ProgressCallback,
+  ): Promise<boolean> {
     // session has already started
     if (this.session) {
       return true
@@ -315,6 +319,7 @@ export class Wallet extends EventEmitter {
       const wallet = await ethers.Wallet.fromEncryptedJson(
         this.encryptedBackup as string,
         password,
+        progressCallback,
       )
 
       this.setSession(wallet.privateKey, password)

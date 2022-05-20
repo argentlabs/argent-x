@@ -638,7 +638,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
         }
         const { plaintext } = await compactDecrypt(body, privateKey)
         const sessionPassword = encode.arrayBufferToString(plaintext)
-        if (await wallet.startSession(sessionPassword)) {
+        const result = await wallet.startSession(sessionPassword, (percent) => {
+          sendToTabAndUi({ type: "LOADING_PROGRESS", data: percent })
+        })
+        if (result) {
           const selectedAccount = await wallet.getSelectedAccount()
           return sendToTabAndUi({
             type: "START_SESSION_RES",

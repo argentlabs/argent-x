@@ -111,6 +111,7 @@ export type MessageType =
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
   | { type: "START_SESSION_RES"; data?: WalletAccount }
+  | { type: "LOADING_PROGRESS"; data: number }
   | { type: "CHECK_PASSWORD"; data: { body: string } }
   | { type: "CHECK_PASSWORD_REJ" }
   | { type: "CHECK_PASSWORD_RES" }
