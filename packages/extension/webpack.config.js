@@ -3,6 +3,7 @@ const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin, ProvidePlugin } = require("webpack")
 const ESLintPlugin = require("eslint-webpack-plugin")
+const Dotenv = require("dotenv-webpack")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -69,6 +70,7 @@ module.exports = {
       Buffer: ["buffer", "Buffer"],
     }),
     new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
+    new Dotenv(),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],

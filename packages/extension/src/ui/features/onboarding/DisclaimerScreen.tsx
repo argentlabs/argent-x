@@ -14,6 +14,7 @@ import {
 } from "../../components/Icons/MuiIcons"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
+import { usePageTrack } from "../../services/analytics"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const SP = styled(P)`
@@ -22,6 +23,7 @@ const SP = styled(P)`
 `
 
 export const DisclaimerScreen: FC = () => {
+  usePageTrack("disclaimer")
   const navigate = useNavigate()
   const [conditions, setConditions] = useState({
     lossOfFunds: false,

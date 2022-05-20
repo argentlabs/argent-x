@@ -9,6 +9,7 @@ import { IconBar } from "../../components/IconBar"
 import { InputText } from "../../components/InputText"
 import { FormError, H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
+import { analytics, usePageTrack } from "../../services/analytics"
 import { connectAccount, deployAccount } from "../accounts/accounts.service"
 import { useAccounts } from "../accounts/accounts.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
@@ -44,6 +45,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
   overrideTitle,
   overrideSubmitText,
 }) => {
+  usePageTrack("createWallet")
   const navigate = useNavigate()
   const { addAccount } = useAccounts()
   const { switcherNetworkId } = useAppState()
@@ -67,9 +69,16 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
         const newAccount = await deployAccount(switcherNetworkId, password)
         addAccount(newAccount)
         connectAccount(newAccount)
+        analytics.track("createWallet", {
+          status: "success",
+        })
         navigate(await recover())
       } catch (error: any) {
         useAppState.setState({ error })
+        analytics.track("createWallet", {
+          status: "failure",
+          errorMessage: error.message,
+        })
         navigate(routes.error())
       }
     }
