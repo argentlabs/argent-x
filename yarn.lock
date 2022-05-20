@@ -2475,9 +2475,9 @@
     prop-types "^15.8.1"
 
 "@mui/styled-engine-sc@^5.1.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.7.0.tgz#31dee3068d38d50534548a38e69e7742f1ec813f"
-  integrity sha512-tQ4oResOj2ImcS7CH3GNdgJ95jM9uZZY8nV0ny27eZUYvCYkLwZvaEKGpf2LbnKjPTIzTo6zXPN0AgAA6sKGNw==
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.8.0.tgz#20bc536dce25739e38fcd2586f100e70fbf02065"
+  integrity sha512-46eRLWxjTF0d50Q1Q9tj96cgF41r7lesbXAy6kKocCdUfJ8rbIo36C4Ws8Pd7nfVsvaitTb7tmCbVQzDT3niJQ==
   dependencies:
     prop-types "^15.8.1"
 
