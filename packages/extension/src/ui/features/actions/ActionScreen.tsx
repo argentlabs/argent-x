@@ -86,7 +86,7 @@ export const ActionScreen: FC = () => {
       return (
         <AddNetworkScreen
           requestedNetwork={action.payload}
-          mode={"switch"}
+          mode="switch"
           hideBackButton
           onSubmit={async () => {
             await approve(action)
