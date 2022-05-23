@@ -62,10 +62,31 @@ export const ActionScreen: FC = () => {
         />
       )
 
-    case "REQUEST_CUSTOM_NETWORK":
+    case "REQUEST_ADD_CUSTOM_NETWORK":
       return (
         <AddNetworkScreen
           requestedNetwork={action.payload}
+          hideBackButton
+          onSubmit={async () => {
+            await approve(action)
+            if (isPopup && isLastAction) {
+              window.close()
+            }
+          }}
+          onReject={async () => {
+            await reject(action)
+            if (isPopup && isLastAction) {
+              window.close()
+            }
+          }}
+        />
+      )
+
+    case "REQUEST_SWITCH_CUSTOM_NETWORK":
+      return (
+        <AddNetworkScreen
+          requestedNetwork={action.payload}
+          mode={"switch"}
           hideBackButton
           onSubmit={async () => {
             await approve(action)

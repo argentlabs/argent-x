@@ -84,6 +84,13 @@ export const getNetwork = (
   return allNetworks.find(({ id }) => id === networkId) || defaultNetwork
 }
 
+export const getNetworkByChainId = (
+  chainId: string,
+  allNetworks: Network[],
+): Network | undefined => {
+  return allNetworks.find((network) => network.chainId === chainId)
+}
+
 export type KnownNetworksType = "mainnet-alpha" | "goerli-alpha"
 export const knownNetworks: KnownNetworksType[] = [
   "mainnet-alpha",
