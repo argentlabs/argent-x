@@ -41,11 +41,11 @@ interface Analytics {
 }
 
 const versionRegex = /(\d+[._]\d+)([._]\d+)*/g // https://regex101.com/r/TgejzT/1
-export function anonymizeUseragent(ua?: string): string {
-  if (!ua) {
+export function anonymizeUserAgent(userAgent?: string): string {
+  if (!userAgent) {
     return "unknown"
   }
-  return ua.replace(versionRegex, "$1")
+  return userAgent.replace(versionRegex, "$1")
 }
 
 export type Fetch = (url: string, init?: RequestInit) => Promise<unknown>
@@ -68,14 +68,17 @@ const headers = {
 }
 
 const isBrowser = typeof window !== "undefined"
-const defaultUa = isBrowser ? window.navigator.userAgent : "unknown"
+const defaultUserAgent = isBrowser ? window.navigator.userAgent : "unknown"
 
-export function getAnalytics(fetch: Fetch, ua = defaultUa): Analytics {
-  const prebuildPayload = {
+export function getAnalytics(
+  fetch: Fetch,
+  userAgent = defaultUserAgent,
+): Analytics {
+  const prebuiltPayload = {
     ...defaultPayload,
     context: {
       ...defaultPayload.context,
-      userAgent: anonymizeUseragent(ua),
+      userAgent: anonymizeUserAgent(userAgent),
     },
   }
   return {
@@ -84,7 +87,7 @@ export function getAnalytics(fetch: Fetch, ua = defaultUa): Analytics {
         return
       }
       const payload = {
-        ...prebuildPayload,
+        ...prebuiltPayload,
         event,
         properties: data,
         timestamp: new Date().toISOString(),
@@ -104,7 +107,7 @@ export function getAnalytics(fetch: Fetch, ua = defaultUa): Analytics {
         return
       }
       const payload = {
-        ...prebuildPayload,
+        ...prebuiltPayload,
         name,
         properties: data,
         timestamp: new Date().toISOString(),
