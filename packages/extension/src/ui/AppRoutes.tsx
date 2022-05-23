@@ -3,7 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "./app.state"
-import { TransactionDetail } from "./features/accountActivity/TransactionDetails"
+import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { useTransactionErrorScreen } from "./features/accountActivity/useTransactionErrorScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
