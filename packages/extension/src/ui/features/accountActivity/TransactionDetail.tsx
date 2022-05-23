@@ -14,6 +14,12 @@ import { useSelectedAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useNetwork } from "../networks/useNetworks"
 
+const HeadContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px 18px;
+`
+
 const CloseIconWrapper = styled.div`
   cursor: pointer;
 `
@@ -25,7 +31,7 @@ const Container = styled.div`
   margin-bottom: 68px;
 `
 
-const Header = styled.h2`
+const Title = styled.h2`
   font-weight: 700;
   font-size: 28px;
   line-height: 34px;
@@ -110,21 +116,15 @@ export const TransactionDetail: FC = () => {
 
   const dateLabel = formatDateTime(date)
 
-  return transaction ? (
+  return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "20px 18px",
-        }}
-      >
+      <HeadContainer>
         <CloseIconWrapper onClick={() => navigate(routes.accountActivity())}>
           <CloseIcon />
         </CloseIconWrapper>
-      </div>
+      </HeadContainer>
       <Container>
-        <Header>Transaction</Header>
+        <Title>Transaction</Title>
 
         <TransactionCard>
           <TransactionField>
@@ -169,7 +169,7 @@ export const TransactionDetail: FC = () => {
               </TransactionLogKey>
               <TransactionLogMessage style={{ color: "#8f8e8c" }}>
                 {getErrorMessageFromTupleString(
-                  transaction.failureReason?.error_message,
+                  transaction.failureReason?.error_message ?? "",
                 )}
               </TransactionLogMessage>
             </TransactionFailedField>
@@ -189,28 +189,16 @@ export const TransactionDetail: FC = () => {
         )}
       </Container>
     </>
-  ) : (
-    <Header>Error</Header>
   )
 }
 
-function getErrorMessageFromTupleString(str: string | undefined) {
-  if (!str) {
-    return ""
-  }
-
+function getErrorMessageFromTupleString(str: string) {
   try {
     const jsonStr = str.match(/{(?:[^{}]*|.)*}/gm)
-
     if (!jsonStr) {
-      return ""
+      throw Error("No JSON detected")
     }
-
-    const json = JSON.parse(jsonStr[1])
-    console.log(
-      "🚀 ~ file: TransactionDetails.tsx ~ line 207 ~ getErrorMessageFromTupleString ~ json",
-      json,
-    )
+    const json = JSON.parse(jsonStr[0])
     return JSON.stringify(json.message, null, 2)
   } catch {
     return str
