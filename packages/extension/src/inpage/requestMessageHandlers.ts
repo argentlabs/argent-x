@@ -126,7 +126,6 @@ export async function handleSwitchNetworkRequest(callParams: {
   )
 
   if (!actionHash) {
-    // return false
     throw Error(
       `Network with chainId ${callParams.chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
     )

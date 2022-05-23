@@ -3,9 +3,8 @@ import {
   Network,
   NetworkSchema,
   accountsOnNetwork,
+  defaultNetwork,
   defaultNetworks,
-  getNetworkByChainId as getNetworkByChainIdUtil,
-  getNetwork as getNetworkUtil,
 } from "../shared/networks"
 import { useAppState } from "../ui/app.state"
 import { Account } from "../ui/features/accounts/Account"
@@ -42,15 +41,15 @@ export const getNetworks = async (): Promise<Network[]> => {
 }
 
 export const getNetwork = async (networkId: string): Promise<Network> => {
-  const networks = await getNetworks()
-  return getNetworkUtil(networkId, networks)
+  const allNetworks = await getNetworks()
+  return allNetworks.find(({ id }) => id === networkId) || defaultNetwork
 }
 
 export const getNetworkByChainId = async (
   chainId: string,
 ): Promise<Network | undefined> => {
-  const networks = await getNetworks()
-  return getNetworkByChainIdUtil(chainId, networks)
+  const allNetworks = await getNetworks()
+  return allNetworks.find((network) => network.chainId === chainId)
 }
 
 export const addNetworks = async (

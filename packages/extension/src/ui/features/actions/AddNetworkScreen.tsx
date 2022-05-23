@@ -54,7 +54,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
       </Header>
 
       <AddTokenScreenWrapper>
-        {mode === "add" ? <H2>Add Network</H2> : <H2>Switch Network</H2>}
+        <H2>{mode === "add" ? "Add" : "Switch"} Network</H2>
 
         <form
           onSubmit={async (e) => {
