@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
+import { usePageTracking } from "../../services/analytics"
 import { fileToString } from "../../services/files"
 import { recoverBackup } from "../../services/messaging"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
@@ -33,6 +34,7 @@ const DropZone = styled.div`
 `
 
 export const BackupRecoveryScreen: FC = () => {
+  usePageTracking("restoreWalletWithFile")
   const navigate = useNavigate()
   const {
     acceptedFiles: [acceptedFile],
