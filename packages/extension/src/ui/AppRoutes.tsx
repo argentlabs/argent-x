@@ -3,6 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "./app.state"
+import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { useTransactionErrorScreen } from "./features/accountActivity/useTransactionErrorScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
@@ -104,6 +105,10 @@ const walletRoutes = (
     <Route
       path={routes.accountActivity.path}
       element={<AccountScreen tab="activity" />}
+    />
+    <Route
+      path={routes.transactionDetail.path}
+      element={<TransactionDetail />}
     />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
