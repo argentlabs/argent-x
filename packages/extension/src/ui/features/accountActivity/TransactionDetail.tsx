@@ -168,9 +168,7 @@ export const TransactionDetail: FC = () => {
                 </CopyTooltip>
               </TransactionLogKey>
               <TransactionLogMessage style={{ color: "#8f8e8c" }}>
-                {getErrorMessageFromTupleString(
-                  transaction.failureReason?.error_message ?? "",
-                )}
+                {transaction.failureReason?.error_message || "Unknown error"}
               </TransactionLogMessage>
             </TransactionFailedField>
           </TransactionCard>
@@ -190,17 +188,4 @@ export const TransactionDetail: FC = () => {
       </Container>
     </>
   )
-}
-
-function getErrorMessageFromTupleString(str: string) {
-  try {
-    const jsonStr = str.match(/{(?:[^{}]*|.)*}/gm)
-    if (!jsonStr) {
-      throw Error("No JSON detected")
-    }
-    const json = JSON.parse(jsonStr[0])
-    return JSON.stringify(json.message, null, 2)
-  } catch {
-    return str
-  }
 }
