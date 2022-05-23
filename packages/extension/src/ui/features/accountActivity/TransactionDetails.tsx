@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled, { css } from "styled-components"
 
 import { useAppState } from "../../app.state"
@@ -100,14 +100,15 @@ export const TransactionDetail: FC = () => {
 
   const transaction = transactions.find((tx) => tx.hash === txHash)
 
-  const isRejected = transaction?.status === "REJECTED"
+  if (!transaction) {
+    return <Navigate to={routes.accounts()} />
+  }
 
-  const date =
-    transaction &&
-    transaction.timestamp &&
-    new Date(transaction.timestamp * 1000)
+  const isRejected = transaction.status === "REJECTED"
 
-  const dateLabel = date && formatDateTime(date)
+  const date = transaction.timestamp && new Date(transaction.timestamp * 1000)
+
+  const dateLabel = formatDateTime(date)
 
   return transaction ? (
     <>
@@ -135,7 +136,9 @@ export const TransactionDetail: FC = () => {
           <Separator />
           <TransactionField>
             <TransactionFieldKey>Time</TransactionFieldKey>
-            <TransactionFieldValue>{dateLabel}</TransactionFieldValue>
+            {dateLabel && (
+              <TransactionFieldValue>{dateLabel}</TransactionFieldValue>
+            )}
           </TransactionField>
           <Separator />
 
@@ -165,7 +168,9 @@ export const TransactionDetail: FC = () => {
                 </CopyTooltip>
               </TransactionLogKey>
               <TransactionLogMessage style={{ color: "#8f8e8c" }}>
-                {transaction.failureReason?.error_message}
+                {getErrorMessageFromTupleString(
+                  transaction.failureReason?.error_message,
+                )}
               </TransactionLogMessage>
             </TransactionFailedField>
           </TransactionCard>
@@ -187,4 +192,27 @@ export const TransactionDetail: FC = () => {
   ) : (
     <Header>Error</Header>
   )
+}
+
+function getErrorMessageFromTupleString(str: string | undefined) {
+  if (!str) {
+    return ""
+  }
+
+  try {
+    const jsonStr = str.match(/{(?:[^{}]*|.)*}/gm)
+
+    if (!jsonStr) {
+      return ""
+    }
+
+    const json = JSON.parse(jsonStr[1])
+    console.log(
+      "🚀 ~ file: TransactionDetails.tsx ~ line 207 ~ getErrorMessageFromTupleString ~ json",
+      json,
+    )
+    return JSON.stringify(json.message, null, 2)
+  } catch {
+    return str
+  }
 }
