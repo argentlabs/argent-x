@@ -40,6 +40,14 @@ interface Analytics {
   ): Promise<unknown>
 }
 
+const versionRegex = /(\d+[._]\d+)([._]\d+)*/g // https://regex101.com/r/TgejzT/1
+export function anonymizeUseragent(ua?: string): string {
+  if (!ua) {
+    return "unknown"
+  }
+  return ua.replace(versionRegex, "$1")
+}
+
 export type Fetch = (url: string, init?: RequestInit) => Promise<unknown>
 
 const defaultPayload = {
@@ -59,14 +67,24 @@ const headers = {
   )}`,
 }
 
-export function getAnalytics(fetch: Fetch): Analytics {
+const isBrowser = typeof window !== "undefined"
+const defaultUa = isBrowser ? window.navigator.userAgent : "unknown"
+
+export function getAnalytics(fetch: Fetch, ua = defaultUa): Analytics {
+  const prebuildPayload = {
+    ...defaultPayload,
+    context: {
+      ...defaultPayload.context,
+      userAgent: anonymizeUseragent(ua),
+    },
+  }
   return {
     track: async (event, ...[data]) => {
       if (!SEGMENT_WRITE_KEY) {
         return
       }
       const payload = {
-        ...defaultPayload,
+        ...prebuildPayload,
         event,
         properties: data,
         timestamp: new Date().toISOString(),
@@ -86,7 +104,7 @@ export function getAnalytics(fetch: Fetch): Analytics {
         return
       }
       const payload = {
-        ...defaultPayload,
+        ...prebuildPayload,
         name,
         properties: data,
         timestamp: new Date().toISOString(),
