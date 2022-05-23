@@ -9,7 +9,7 @@ import { IconBar } from "../../components/IconBar"
 import { InputText } from "../../components/InputText"
 import { FormError, H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { analytics, usePageTrack } from "../../services/analytics"
+import { analytics, usePageTracking } from "../../services/analytics"
 import { connectAccount, deployAccount } from "../accounts/accounts.service"
 import { useAccounts } from "../accounts/accounts.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
@@ -45,7 +45,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
   overrideTitle,
   overrideSubmitText,
 }) => {
-  usePageTrack("createWallet")
+  usePageTracking("createWallet")
   const navigate = useNavigate()
   const { addAccount } = useAccounts()
   const { switcherNetworkId } = useAppState()

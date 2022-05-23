@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { Button, ButtonGroup } from "../../components/Button"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { usePageTrack } from "../../services/analytics"
+import { usePageTracking } from "../../services/analytics"
 import { Greetings, GreetingsWrapper } from "./Greetings"
 import LogoSvg from "./logo.svg"
 import { StickyArgentFooter } from "./StickyArgentFooter"
@@ -44,7 +44,7 @@ const greetings = [
 
 export const WelcomeScreen: FC = () => {
   const navigate = useNavigate()
-  usePageTrack("welcome")
+  usePageTracking("welcome")
 
   return (
     <WelcomeScreenWrapper>

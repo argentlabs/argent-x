@@ -40,27 +40,31 @@ interface Analytics {
   ): Promise<unknown>
 }
 
-export type Fetcher = (url: string, init?: RequestInit) => Promise<unknown>
+export type Fetch = (url: string, init?: RequestInit) => Promise<unknown>
 
-export function getAnalytics(fetch: Fetcher): Analytics {
-  const defaultPayload = {
-    anonymousId: "00000000-0000-0000-0000-000000000000",
-    context: {
-      ip: "0.0.0.0",
-      app: {
-        name: "Argent X",
-        version: VERSION,
-      },
+const defaultPayload = {
+  anonymousId: "00000000-0000-0000-0000-000000000000",
+  context: {
+    ip: "0.0.0.0",
+    app: {
+      name: "Argent X",
+      version: VERSION,
     },
-  }
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Basic ${base64.encode(
-      encode.utf8ToArray(`${SEGMENT_WRITE_KEY}:`),
-    )}`,
-  }
+  },
+}
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: `Basic ${base64.encode(
+    encode.utf8ToArray(`${SEGMENT_WRITE_KEY}:`),
+  )}`,
+}
+
+export function getAnalytics(fetch: Fetch): Analytics {
   return {
     track: async (event, ...[data]) => {
+      if (!SEGMENT_WRITE_KEY) {
+        return
+      }
       const payload = {
         ...defaultPayload,
         event,
@@ -78,6 +82,9 @@ export function getAnalytics(fetch: Fetcher): Analytics {
       }
     },
     page: async (name, ...[data]) => {
+      if (!SEGMENT_WRITE_KEY) {
+        return
+      }
       const payload = {
         ...defaultPayload,
         name,

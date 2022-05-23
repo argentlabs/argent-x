@@ -25,7 +25,7 @@ import { Pages, getAnalytics } from "../../shared/analytics"
 
 export const analytics = getAnalytics(fetch)
 
-export const usePageTrack = <T extends keyof Pages>(
+export const usePageTracking = <T extends keyof Pages>(
   name: T,
   ...rest: Pages[T] extends undefined ? [data?: Pages[T]] : [data: Pages[T]]
 ) => {
