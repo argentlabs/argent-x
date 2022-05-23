@@ -32,7 +32,19 @@ export type ActionItem =
       }
     }
   | {
-      type: "REQUEST_CUSTOM_NETWORK"
+      type: "REQUEST_ADD_CUSTOM_NETWORK"
+      payload: {
+        id: string
+        name: string
+        chainId: string // A 0x-prefixed hexadecimal string
+        baseUrl: string
+        explorerUrl?: string
+        accountImplementation?: string
+        rpcUrl?: string
+      }
+    }
+  | {
+      type: "REQUEST_SWITCH_CUSTOM_NETWORK"
       payload: {
         id: string
         name: string

@@ -1,9 +1,14 @@
+import { useAccounts } from "./../ui/features/accounts/accounts.state"
 import {
   Network,
   NetworkSchema,
+  accountsOnNetwork,
+  defaultNetwork,
   defaultNetworks,
-  getNetwork as getNetworkUtil,
 } from "../shared/networks"
+import { useAppState } from "../ui/app.state"
+import { Account } from "../ui/features/accounts/Account"
+import { getAccounts } from "../ui/services/messaging"
 import { Storage } from "./storage"
 
 type ArrayOfOrType<T> = T | T[]
@@ -36,8 +41,15 @@ export const getNetworks = async (): Promise<Network[]> => {
 }
 
 export const getNetwork = async (networkId: string): Promise<Network> => {
-  const networks = await getNetworks()
-  return getNetworkUtil(networkId, networks)
+  const allNetworks = await getNetworks()
+  return allNetworks.find(({ id }) => id === networkId) || defaultNetwork
+}
+
+export const getNetworkByChainId = async (
+  chainId: string,
+): Promise<Network | undefined> => {
+  const allNetworks = await getNetworks()
+  return allNetworks.find((network) => network.chainId === chainId)
 }
 
 export const addNetworks = async (
@@ -102,4 +114,17 @@ export const hasNetwork = async (networkChainId: Network["chainId"]) => {
   const networks = await getNetworks()
 
   return networks.some((network) => network.chainId === networkChainId)
+}
+
+export const switchNetwork = async (network: Network) => {
+  const walletAccounts = accountsOnNetwork(await getAccounts(), network.id)
+
+  const accounts = walletAccounts
+    .map(
+      ({ address, network, signer }) => new Account(address, network, signer),
+    )
+    .reduce((acc, account) => ({ ...acc, [account.address]: account }), {})
+
+  useAccounts.setState({ accounts, selectedAccount: walletAccounts[0].address })
+  useAppState.setState({ switcherNetworkId: network.id })
 }

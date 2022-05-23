@@ -16,6 +16,7 @@ import {
   sendMessageToUi,
 } from "./activeTabs"
 import {
+  getNetworkByChainId,
   getNetwork as getNetworkImplementation,
   hasNetwork,
 } from "./customNetworks"
@@ -386,9 +387,18 @@ import { Wallet, WalletStorageProps } from "./wallet"
             })
           }
 
-          case "REQUEST_CUSTOM_NETWORK": {
+          case "REQUEST_ADD_CUSTOM_NETWORK": {
             return sendToTabAndUi({
-              type: "APPROVE_REQUEST_CUSTOM_NETWORK",
+              type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
+              data: {
+                actionHash,
+              },
+            })
+          }
+
+          case "REQUEST_SWITCH_CUSTOM_NETWORK": {
+            return sendToTabAndUi({
+              type: "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
               data: {
                 actionHash,
               },
@@ -441,9 +451,18 @@ import { Wallet, WalletStorageProps } from "./wallet"
             })
           }
 
-          case "REQUEST_CUSTOM_NETWORK": {
+          case "REQUEST_ADD_CUSTOM_NETWORK": {
             return sendToTabAndUi({
-              type: "REJECT_REQUEST_CUSTOM_NETWORK",
+              type: "REJECT_REQUEST_ADD_CUSTOM_NETWORK",
+              data: {
+                actionHash,
+              },
+            })
+          }
+
+          case "REQUEST_SWITCH_CUSTOM_NETWORK": {
+            return sendToTabAndUi({
+              type: "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
               data: {
                 actionHash,
               },
@@ -458,28 +477,52 @@ import { Wallet, WalletStorageProps } from "./wallet"
       case "SIGNATURE_FAILURE":
       case "REJECT_PREAUTHORIZATION":
       case "REJECT_REQUEST_TOKEN":
-      case "REJECT_REQUEST_CUSTOM_NETWORK":
+      case "REJECT_REQUEST_ADD_CUSTOM_NETWORK":
+      case "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK":
       case "TRANSACTION_FAILED": {
         return await actionQueue.remove(msg.data.actionHash)
       }
 
-      case "REQUEST_CUSTOM_NETWORK": {
+      case "REQUEST_ADD_CUSTOM_NETWORK": {
         const exists = await hasNetwork(msg.data.chainId)
 
         if (exists) {
           return sendToTabAndUi({
-            type: "REQUEST_CUSTOM_NETWORK_RES",
+            type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
             data: {},
           })
         }
 
         const { meta } = await actionQueue.push({
-          type: "REQUEST_CUSTOM_NETWORK",
+          type: "REQUEST_ADD_CUSTOM_NETWORK",
           payload: msg.data,
         })
 
         return sendToTabAndUi({
-          type: "REQUEST_CUSTOM_NETWORK_RES",
+          type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
+          data: {
+            actionHash: meta.hash,
+          },
+        })
+      }
+
+      case "REQUEST_SWITCH_CUSTOM_NETWORK": {
+        const network = await getNetworkByChainId(msg.data.chainId)
+
+        if (!network) {
+          return sendToTabAndUi({
+            type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
+            data: {},
+          })
+        }
+
+        const { meta } = await actionQueue.push({
+          type: "REQUEST_SWITCH_CUSTOM_NETWORK",
+          payload: network,
+        })
+
+        return sendToTabAndUi({
+          type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
           data: {
             actionHash: meta.hash,
           },

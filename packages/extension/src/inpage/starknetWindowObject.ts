@@ -14,6 +14,7 @@ import { sendMessage, waitForMessage } from "./messageActions"
 import {
   handleAddNetworkRequest,
   handleAddTokenRequest,
+  handleSwitchNetworkRequest,
 } from "./requestMessageHandlers"
 
 const VERSION = `${process.env.VERSION}`
@@ -30,9 +31,11 @@ export const starknetWindowObject: StarknetWindowObject = {
   version: VERSION,
   request: async (call) => {
     if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
-      await handleAddTokenRequest(call.params)
+      return await handleAddTokenRequest(call.params)
     } else if (call.type === "wallet_addStarknetChain") {
-      await handleAddNetworkRequest(call.params)
+      return await handleAddNetworkRequest(call.params)
+    } else if (call.type === "wallet_switchStarknetChain") {
+      return await handleSwitchNetworkRequest(call.params)
     }
     throw Error("Not implemented")
   },
