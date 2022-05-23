@@ -1,5 +1,7 @@
 import type { AccountInterface, Provider } from "starknet"
 
+import type { Network } from "./../shared/networks"
+
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
 export type NetworkChangeEventHandler = (network?: string) => void
@@ -51,6 +53,10 @@ export interface AddStarknetChainParameters {
   iconUrls?: string[] // Currently ignored.
 }
 
+export interface SwitchStarknetChainParameter {
+  chainId: Network["chainId"] // A 0x-prefixed hexadecimal string
+}
+
 export type RpcMessage =
   | {
       type: "wallet_watchAsset"
@@ -60,6 +66,11 @@ export type RpcMessage =
   | {
       type: "wallet_addStarknetChain"
       params: AddStarknetChainParameters
+      result: boolean
+    }
+  | {
+      type: "wallet_switchStarknetChain"
+      params: SwitchStarknetChainParameter
       result: boolean
     }
   | {

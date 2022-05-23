@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
@@ -22,23 +22,28 @@ export const ActionScreen: FC = () => {
 
   const [action] = actions
   const isLastAction = actions.length === 1
+
+  const onSubmit = useCallback(async () => {
+    await approve(action)
+    if (isPopup && isLastAction) {
+      window.close()
+    }
+  }, [])
+
+  const onReject = useCallback(async () => {
+    await reject(action)
+    if (isPopup && isLastAction) {
+      window.close()
+    }
+  }, [])
+
   switch (action.type) {
     case "CONNECT_DAPP":
       return (
         <ConnectDappScreen
           host={action.payload.host}
-          onReject={async () => {
-            await reject(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
-          onSubmit={async () => {
-            await approve(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
+          onReject={onReject}
+          onSubmit={onSubmit}
         />
       )
 
@@ -47,38 +52,29 @@ export const ActionScreen: FC = () => {
         <AddTokenScreen
           defaultToken={action.payload}
           hideBackButton
-          onSubmit={async () => {
-            await approve(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
-          onReject={async () => {
-            await reject(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
+          onSubmit={onSubmit}
+          onReject={onReject}
         />
       )
 
-    case "REQUEST_CUSTOM_NETWORK":
+    case "REQUEST_ADD_CUSTOM_NETWORK":
       return (
         <AddNetworkScreen
           requestedNetwork={action.payload}
           hideBackButton
-          onSubmit={async () => {
-            await approve(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
-          onReject={async () => {
-            await reject(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
+          onSubmit={onSubmit}
+          onReject={onReject}
+        />
+      )
+
+    case "REQUEST_SWITCH_CUSTOM_NETWORK":
+      return (
+        <AddNetworkScreen
+          requestedNetwork={action.payload}
+          mode="switch"
+          hideBackButton
+          onSubmit={onSubmit}
+          onReject={onReject}
         />
       )
 
@@ -113,12 +109,7 @@ export const ActionScreen: FC = () => {
               useAppState.setState({ isLoading: false })
             }
           }}
-          onReject={async () => {
-            await reject(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
+          onReject={onReject}
           selectedAccount={account}
         />
       )
@@ -139,12 +130,7 @@ export const ActionScreen: FC = () => {
             }
             useAppState.setState({ isLoading: false })
           }}
-          onReject={async () => {
-            await reject(action)
-            if (isPopup && isLastAction) {
-              window.close()
-            }
-          }}
+          onReject={onReject}
           selectedAccount={account}
         />
       )

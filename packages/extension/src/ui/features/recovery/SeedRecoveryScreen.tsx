@@ -4,11 +4,13 @@ import { IconBar } from "../../components/IconBar"
 import { TextArea } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
 import { routes } from "../../routes"
+import { usePageTracking } from "../../services/analytics"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { validateAndSetSeedPhrase } from "./seedRecovery.state"
 import { useCustomNavigate } from "./useCustomNavigate"
 
 export const SeedRecoveryScreen: FC = () => {
+  usePageTracking("restoreWallet")
   const textAreaElement = useRef<HTMLTextAreaElement>(null)
   const [seedPhraseInput, setSeedPhraseInput] = useState("")
   const [error, setError] = useState("")

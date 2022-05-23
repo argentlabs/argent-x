@@ -27,6 +27,10 @@ export const routes = {
       `/account/nfts/${contractAddress}/${tokenId}`,
     `/account/nfts/:contractAddress/:tokenId`,
   ),
+  transactionDetail: route(
+    (txHash: string) => `/account/activity/transaction-detail/${txHash}`,
+    `/account/activity/transaction-detail/:txHash`,
+  ),
   upgrade: route("/account/upgrade"),
   accounts: route("/accounts"),
   newToken: route("/tokens/new"),

@@ -2,7 +2,7 @@ import React, { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { addNetworks } from "../../../background/customNetworks"
+import { addNetworks, switchNetwork } from "../../../background/customNetworks"
 import { Network } from "../../../shared/networks"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupVertical } from "../../components/Button"
@@ -33,6 +33,7 @@ interface AddNetworkScreenProps {
   hideBackButton?: boolean
   onSubmit?: () => void
   onReject?: () => void
+  mode?: "add" | "switch"
 }
 
 export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
@@ -40,6 +41,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
   hideBackButton,
   onSubmit,
   onReject,
+  mode = "add",
 }) => {
   const navigate = useNavigate()
 
@@ -52,16 +54,22 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
       </Header>
 
       <AddTokenScreenWrapper>
-        <H2>Add Network</H2>
+        <H2>{mode === "add" ? "Add" : "Switch"} Network</H2>
 
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault()
             if (requestedNetwork) {
               try {
-                addNetworks(requestedNetwork)
-                onSubmit?.()
-                navigate(routes.settingsNetworks())
+                if (mode === "add") {
+                  addNetworks(requestedNetwork)
+                  onSubmit?.()
+                  navigate(routes.settingsNetworks())
+                } else if (mode === "switch") {
+                  await switchNetwork(requestedNetwork)
+                  onSubmit?.()
+                  navigate(routes.accountTokens())
+                }
               } catch {
                 setError("Network already exists")
               }
@@ -127,7 +135,9 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
                 Reject
               </Button>
             )}
-            <Button type="submit">Add Network</Button>
+            <Button type="submit">
+              {mode === "add" ? "Add" : "Switch"} Network
+            </Button>
           </ButtonGroupVertical>
         </form>
       </AddTokenScreenWrapper>
