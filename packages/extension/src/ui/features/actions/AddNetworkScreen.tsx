@@ -66,7 +66,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
                   onSubmit?.()
                   navigate(routes.settingsNetworks())
                 } else if (mode === "switch") {
-                  switchNetwork(requestedNetwork)
+                  await switchNetwork(requestedNetwork)
                   onSubmit?.()
                   navigate(routes.accountTokens())
                 }
