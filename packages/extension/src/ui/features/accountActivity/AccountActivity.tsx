@@ -1,15 +1,14 @@
 import { FC, Fragment, Suspense } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
 import { Spinner } from "../../components/Spinner"
+import { routes } from "../../routes"
 import { formatDateTime } from "../../services/dates"
-import { openVoyagerTransaction } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
 import { SectionHeader } from "../accounts/SectionHeader"
-import { useNetwork } from "../networks/useNetworks"
 import { PendingTransactions } from "./PendingTransactions"
 import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
 import { useActivity } from "./useActivity"
@@ -34,8 +33,7 @@ interface AccountActivityProps {
 }
 
 const Activity: FC<AccountActivityProps> = ({ account }) => {
-  const { switcherNetworkId } = useAppState()
-  const { network } = useNetwork(switcherNetworkId)
+  const navigate = useNavigate()
 
   const activity = useActivity(account.address)
 
@@ -51,7 +49,7 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
                 hash={hash}
                 status={isRejected ? "red" : undefined}
                 meta={{ subTitle: formatDateTime(date), ...meta }}
-                onClick={() => openVoyagerTransaction(hash, network)}
+                onClick={() => navigate(routes.transactionDetail(hash))}
               />
             ))}
           </TransactionsWrapper>
