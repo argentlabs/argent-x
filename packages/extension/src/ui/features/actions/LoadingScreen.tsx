@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import styled from "styled-components"
 
 import { useLoadingProgress } from "../../app.state"
@@ -23,10 +23,14 @@ const loadingTexts = [
 ]
 
 export const LoadingScreen: FC = () => {
-  const progress = useLoadingProgress()
+  const { progress, clearProgress } = useLoadingProgress()
+
+  // reset to 'indeterminate' spinner type on unmount
+  useEffect(() => () => clearProgress(), [])
+
   return (
     <LoadingScreenWrapper>
-      <Spinner size={92} progress={progress} />
+      <Spinner size={92} value={progress} />
       <Greetings greetings={loadingTexts} />
     </LoadingScreenWrapper>
   )

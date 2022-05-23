@@ -1,6 +1,7 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
+import { ProgressCallback } from "ethers/lib/utils"
 import {
   Account,
   AddTransactionResponse,
@@ -35,7 +36,6 @@ const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
 
 type KnownNetworkIds = "mainnet-alpha" | "goerli-alpha"
-export type ProgressCallback = (percent: number) => void
 const CHECK_OFFSET = 10
 const PROXY_CONTRACT_HASHES_TO_CHECK = [
   "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
@@ -129,15 +129,20 @@ export class Wallet extends EventEmitter {
     return this.session !== undefined
   }
 
-  private async generateNewLocalSecret(password: string) {
+  private async generateNewLocalSecret(
+    password: string,
+    progressCallback?: ProgressCallback,
+  ) {
     if (this.isInitialized()) {
       return
     }
     const N = isDevOrTest ? 64 : 32768
     const ethersWallet = ethers.Wallet.createRandom()
-    this.encryptedBackup = await ethersWallet.encrypt(password, {
-      scrypt: { N },
-    })
+    this.encryptedBackup = await ethersWallet.encrypt(
+      password,
+      { scrypt: { N } },
+      progressCallback,
+    )
 
     await this.writeBackup()
     this.setSession(ethersWallet.privateKey, password)
@@ -311,7 +316,7 @@ export class Wallet extends EventEmitter {
 
     // wallet is not initialized: let's initialise it
     if (!this.isInitialized()) {
-      await this.generateNewLocalSecret(password)
+      await this.generateNewLocalSecret(password, progressCallback)
       return true
     }
 
@@ -331,7 +336,7 @@ export class Wallet extends EventEmitter {
       }
 
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }

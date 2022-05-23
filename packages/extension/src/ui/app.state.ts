@@ -17,16 +17,16 @@ export const useAppState = create<State>(() => ({
   isFirstRender: true,
 }))
 
-export const useLoadingProgress = (): number => {
-  const [progress, setProgress] = useState<number>(0)
+export const useLoadingProgress = () => {
+  const [progress, setProgress] = useState<number>()
 
   useEffect(() => {
     messageStream.subscribe(([message]) => {
       if (message.type === "LOADING_PROGRESS") {
-        setProgress(message.data)
+        setProgress(message.data >= 1 ? undefined : message.data)
       }
     })
   }, [])
 
-  return progress
+  return { progress, clearProgress: () => setProgress(undefined) }
 }

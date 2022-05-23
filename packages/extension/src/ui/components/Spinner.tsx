@@ -1,25 +1,16 @@
 import { CircularProgress, CircularProgressProps } from "@mui/material"
-import React, { FC } from "react"
-
-interface SpinnerProps extends CircularProgressProps {
-  size?: number
-  progress?: number
-}
+import { isNumber } from "lodash-es"
+import { FC } from "react"
 
 const defaultStyle = { color: "white", margin: "0 auto" }
 
-export const Spinner: FC<SpinnerProps> = ({ style, progress, ...props }) => {
-  if (progress !== undefined) { // in case progress = 0
-    const progressInt = 4 * Math.round(progress * 25)
-    return (
-      <CircularProgress
-        style={{ ...defaultStyle, ...style }}
-        variant="determinate"
-        value={progressInt}
-        {...props}
-      />
-    )
+export const Spinner: FC<CircularProgressProps> = (props) => {
+  if (isNumber(props.value)) {
+    const value = 4 * Math.round(props.value * 25)
+    props = { ...props, value, variant: "determinate" }
   }
 
-  return <CircularProgress style={{ ...defaultStyle, ...style }} {...props} />
+  return (
+    <CircularProgress {...props} style={{ ...defaultStyle, ...props.style }} />
+  )
 }
