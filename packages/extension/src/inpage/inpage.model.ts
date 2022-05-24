@@ -80,6 +80,7 @@ export type RpcMessage =
     }
 
 interface IStarketWindowObject {
+  id: "argent-x"
   request: <T extends RpcMessage>(
     call: Omit<T, "result">,
   ) => Promise<T["result"]>
