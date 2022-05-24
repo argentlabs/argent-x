@@ -72,12 +72,15 @@ export const getTransactionsTracker: GetTransactionsTracker = async (
   const clearUpdate = setIntervalAsync(updateHandler, updateInterval)
 
   return {
-    add: (transaction) =>
-      transactionsStore.addItem({
-        status: "RECEIVED",
+    add: (transaction) => {
+      const newTransaction = {
+        status: "RECEIVED" as const,
         timestamp: timestampInSeconds(),
         ...transaction,
-      }),
+      }
+      onUpdate?.([newTransaction])
+      return transactionsStore.addItem(newTransaction)
+    },
     addAccount: async (account, transaction) => {
       if (
         !accounts.find((existingAccount) =>
