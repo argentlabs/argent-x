@@ -83,17 +83,20 @@ describe("transactions", () => {
       status: "RECEIVED",
       timestamp: expect.any(Number),
     })
-    expect(fn).toBeCalledTimes(0)
+    expect(fn).toBeCalledTimes(1)
+    expect(fn).toBeCalledWith([
+      { ...transaction, status: "RECEIVED", timestamp: expect.any(Number) }, // after the update , the transaction should be accepted on L2
+    ])
 
     await waitForExpect(() => {
-      expect(fn).toBeCalledTimes(1)
+      expect(fn).toBeCalledTimes(2)
     }, 2000)
     expect(fn).toBeCalledWith([
       { ...transaction, status: "ACCEPTED_ON_L2", timestamp: 1652257464 }, // after the update , the transaction should be accepted on L2
     ])
 
     await waitForExpect(() => {
-      expect(fn).toBeCalledTimes(2)
+      expect(fn).toBeCalledTimes(3)
     }, 2000)
     expect(fn).toBeCalledWith([]) // no update this time, as ACCEPTED_ON_L2 us considered as final status
   })
