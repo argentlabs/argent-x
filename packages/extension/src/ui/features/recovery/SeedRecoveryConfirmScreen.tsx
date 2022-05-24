@@ -11,7 +11,7 @@ export const SeedRecoveryConfirmScreen: FC = () => {
 
   return (
     <ConfirmScreen
-      title="Have you written down the recovery phrase?"
+      title="Have you written down your recovery phrase?"
       switchButtonOrder
       rejectButtonText="No"
       confirmButtonText="Yes"
