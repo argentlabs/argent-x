@@ -4,7 +4,6 @@ import styled from "styled-components"
 
 import { useAppState } from "./app.state"
 import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
-import { useTransactionErrorScreen } from "./features/accountActivity/useTransactionErrorScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
@@ -154,7 +153,6 @@ const walletRoutes = (
 export const AppRoutes: FC = () => {
   useEntryRoute()
   useActionsSubscription()
-  useTransactionErrorScreen()
   useTokensSubscription()
 
   useEffect(() => {
