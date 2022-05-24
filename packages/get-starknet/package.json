@@ -1,6 +1,6 @@
 {
   "name": "@argent/get-starknet",
-  "version": "3.4.3",
+  "version": "3.5.0",
   "repository": "github:argentlabs/argent-x",
   "private": false,
   "main": "dist/",
