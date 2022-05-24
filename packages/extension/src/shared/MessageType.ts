@@ -7,6 +7,12 @@ import { RequestToken, Token } from "./token"
 import { Transaction } from "./transactions"
 import { WalletAccount } from "./wallet.model"
 
+export interface EstimateFeeResponse {
+  amount: string
+  unit: string
+  suggestedMaxFee: string
+}
+
 export type MessageType =
   // ***** accounts *****
   | { type: "NEW_ACCOUNT"; data: string }
@@ -23,15 +29,6 @@ export type MessageType =
   | { type: "NEW_ACCOUNT_REJ"; data: { status: "ko"; error: string } }
   | { type: "GET_ACCOUNTS" }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
-  | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
-  | { type: "ESTIMATE_TRANSACTION_FEE_REJ" }
-  | {
-      type: "ESTIMATE_TRANSACTION_FEE_RES"
-      data: {
-        amount: string
-        unit: string
-      }
-    }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "DISCONNECT_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT" }
@@ -73,6 +70,12 @@ export type MessageType =
   | {
       type: "TRANSACTION_FAILED"
       data: { actionHash: string; error?: string }
+    }
+  | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
+  | { type: "ESTIMATE_TRANSACTION_FEE_REJ" }
+  | {
+      type: "ESTIMATE_TRANSACTION_FEE_RES"
+      data: EstimateFeeResponse
     }
   | {
       type: "UPDATE_TRANSACTION_FEE"

@@ -220,13 +220,15 @@ import { Wallet, WalletStorageProps } from "./wallet"
           throw Error("no accounts")
         }
         try {
-          const { amount, unit } = await starknetAccount.estimateFee(msg.data)
+          const { amount, unit, suggestedMaxFee } =
+            await starknetAccount.estimateFee(msg.data)
 
           return sendToTabAndUi({
             type: "ESTIMATE_TRANSACTION_FEE_RES",
             data: {
               amount: number.toHex(amount),
               unit,
+              suggestedMaxFee: number.toHex(suggestedMaxFee),
             },
           })
         } catch {

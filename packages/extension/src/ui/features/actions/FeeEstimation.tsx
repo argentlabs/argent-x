@@ -67,31 +67,42 @@ type FeeEstimationProps = (
       transactions: Call | Call[]
     }
 ) & {
-  onChange: (fee: BigNumber) => void
+  onChange?: (fee: BigNumber) => void
   accountAddress: string
   networkId: string
 }
 
+const useMaxFeeEstimation = (props: FeeEstimationProps) => {
+  const {
+    // use suggestedMaxFee as amount value as we dont support showing actual fee vs max fee yet.
+    data: { suggestedMaxFee: amount } = {
+      unit: "wei",
+      amount: BigNumber.from(0),
+      suggestedMaxFee: BigNumber.from(0),
+    },
+  } = useSWR(
+    ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
+    async (x) => {
+      if ("maxFee" in x) {
+        return { unit: "wei", amount: x.maxFee, suggestedMaxFee: x.maxFee }
+      }
+      return getEstimatedFee(x)
+    },
+    {
+      suspense: true,
+      refreshInterval: 20 * 1000, // 20 seconds
+    },
+  )
+
+  return { amount }
+}
+
 const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
-  const { data: { amount } = { unit: "wei", amount: BigNumber.from(0) } } =
-    useSWR(
-      ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
-      async (x) => {
-        if ("maxFee" in x) {
-          return { unit: "wei", amount: x.maxFee }
-        }
-        const estimate = await getEstimatedFee(x)
-        return { ...estimate, amount: BigNumber.from(estimate.amount) }
-      },
-      {
-        suspense: true,
-        refreshInterval: 20 * 1000, // 20 seconds
-      },
-    )
+  const { amount } = useMaxFeeEstimation(props)
 
   useEffect(() => {
     if ("transactions" in props) {
-      onChange(amount)
+      onChange?.(amount)
     }
   }, [])
 
@@ -118,11 +129,11 @@ const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
             : amount
           setFeeInput(utils.formatEther(value) ?? utils.formatEther(amount))
           setFee(value)
-          onChange(value)
+          onChange?.(value)
         } catch {
           setFeeInput(utils.formatEther(amount))
           setFee(amount)
-          onChange(amount)
+          onChange?.(amount)
         }
       }}
       // on enter blur
@@ -180,7 +191,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   // this is just possible as long as starknet accepts 0 fee transactions
   useEffect(() => {
     if (firstFetchDone && !enoughBalance) {
-      onChange(BigNumber.from("0"))
+      onChange?.(BigNumber.from("0"))
     }
   }, [firstFetchDone, enoughBalance])
 
@@ -230,7 +241,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             {...props}
             onChange={(fee) => {
               setFee(fee)
-              onChange(fee)
+              onChange?.(fee)
             }}
           />
         </Suspense>

@@ -9415,10 +9415,10 @@ stack-utils@^2.0.3:
     superstruct "^0.15.3"
     url-join "^4.0.1"
 
-starknet@^3.10.0:
-  version "3.11.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.11.0.tgz#fff6411692eab8f1660ad0515705a0e633c8e763"
-  integrity sha512-+Qc3xuVseV74iKHbmiUJZx0zqH0qXoSbJJn/ZdDh9Rx/qbh6sqbmwxVlWAnYd5wsrZrEMiWttUd0OW+3ICGV/w==
+starknet@^3.12.1:
+  version "3.12.1"
+  resolved "https://registry.npmjs.org/starknet/-/starknet-3.12.1.tgz#a7d898aea38e715a47c7bfd4104d3c178d083ff1"
+  integrity sha512-gKjd5RzSgP21Gx84FEOMfoOwPEqqddWwA0awXOAB/iwVCw4lj/u556xMqipflO9tA5fMla3UxO+LHN+zM5T1mQ==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     axios "^0.23.0"
