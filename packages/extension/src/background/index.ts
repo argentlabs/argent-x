@@ -218,15 +218,21 @@ import { Wallet, WalletStorageProps } from "./wallet"
         if (!selectedAccount) {
           throw Error("no accounts")
         }
-        const { amount, unit } = await starknetAccount.estimateFee(msg.data)
+        try {
+          const { amount, unit } = await starknetAccount.estimateFee(msg.data)
 
-        return sendToTabAndUi({
-          type: "ESTIMATE_TRANSACTION_FEE_RES",
-          data: {
-            amount: number.toHex(amount),
-            unit,
-          },
-        })
+          return sendToTabAndUi({
+            type: "ESTIMATE_TRANSACTION_FEE_RES",
+            data: {
+              amount: number.toHex(amount),
+              unit,
+            },
+          })
+        } catch {
+          return sendToTabAndUi({
+            type: "ESTIMATE_TRANSACTION_FEE_REJ",
+          })
+        }
       }
 
       case "UPDATE_TRANSACTION_FEE": {

@@ -24,6 +24,7 @@ export type MessageType =
   | { type: "GET_ACCOUNTS" }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
+  | { type: "ESTIMATE_TRANSACTION_FEE_REJ" }
   | {
       type: "ESTIMATE_TRANSACTION_FEE_RES"
       data: {
