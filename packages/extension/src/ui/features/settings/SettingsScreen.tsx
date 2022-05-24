@@ -97,11 +97,12 @@ export const SettingsScreen: FC = () => (
       <hr />
       <SettingsItem to={routes.settingsSeed()}>
         <Title>
-          <span>Show backup phrase</span>
+          <span>Show recovery phrase</span>
           <ArrowForwardIosIcon fontSize="inherit" />
         </Title>
         <P>
-          Your backup phrase allows anyone to use your account. Keep it secure.
+          Your recovery phrase allows anyone to use your account. Keep it
+          secure.
         </P>
       </SettingsItem>
       <hr />

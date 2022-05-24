@@ -69,7 +69,7 @@ export const LockScreen: FC = () => {
       >
         {(isDirty) => (
           <>
-            <StyledLink to={routes.reset()}>reset or restore backup</StyledLink>
+            <StyledLink to={routes.reset()}>reset or recover</StyledLink>
             <StickyGroup>
               <Button type="submit" disabled={!isDirty}>
                 Unlock
