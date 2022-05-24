@@ -12,6 +12,4 @@ export const formatDateTime = (date: Date | string | number) =>
     day: "numeric",
     hour: "numeric",
     minute: "numeric",
-    timeZone: "UTC",
-    timeZoneName: "short",
   })
