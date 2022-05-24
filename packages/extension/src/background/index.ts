@@ -59,7 +59,8 @@ import { Wallet, WalletStorageProps } from "./wallet"
   )
   await wallet.setup()
 
-  const transactionTracker = await getTransactionsTracker(
+  // may get reassigned when a recovery happens
+  let transactionTracker = await getTransactionsTracker(
     await wallet.getAccounts(),
     getTransactionsStore,
     trackTransations,
@@ -678,6 +679,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
           } = JSON.parse(encode.arrayBufferToString(plaintext))
 
           await wallet.restoreSeedPhrase(seedPhrase, newPassword)
+          transactionTracker = await getTransactionsTracker(
+            await wallet.getAccounts(),
+            getTransactionsStore,
+            trackTransations,
+          )
 
           return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
         } catch {
