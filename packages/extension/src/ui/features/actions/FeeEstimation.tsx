@@ -67,12 +67,12 @@ type FeeEstimationProps = (
       transactions: Call | Call[]
     }
 ) & {
-  onChange: (fee: BigNumber) => void
+  onChange?: (fee: BigNumber) => void
   accountAddress: string
   networkId: string
 }
 
-const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
+const useMaxFeeEstimation = (props: FeeEstimationProps) => {
   const {
     // use suggestedMaxFee as amount value as we dont support showing actual fee vs max fee yet.
     data: { suggestedMaxFee: amount } = {
@@ -94,9 +94,15 @@ const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
     },
   )
 
+  return { amount }
+}
+
+const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
+  const { amount } = useMaxFeeEstimation(props)
+
   useEffect(() => {
     if ("transactions" in props) {
-      onChange(amount)
+      onChange?.(amount)
     }
   }, [])
 
@@ -123,11 +129,11 @@ const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
             : amount
           setFeeInput(utils.formatEther(value) ?? utils.formatEther(amount))
           setFee(value)
-          onChange(value)
+          onChange?.(value)
         } catch {
           setFeeInput(utils.formatEther(amount))
           setFee(amount)
-          onChange(amount)
+          onChange?.(amount)
         }
       }}
       // on enter blur
@@ -185,7 +191,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   // this is just possible as long as starknet accepts 0 fee transactions
   useEffect(() => {
     if (firstFetchDone && !enoughBalance) {
-      onChange(BigNumber.from("0"))
+      onChange?.(BigNumber.from("0"))
     }
   }, [firstFetchDone, enoughBalance])
 
@@ -235,7 +241,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             {...props}
             onChange={(fee) => {
               setFee(fee)
-              onChange(fee)
+              onChange?.(fee)
             }}
           />
         </Suspense>
