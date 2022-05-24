@@ -73,21 +73,26 @@ type FeeEstimationProps = (
 }
 
 const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
-  const { data: { amount } = { unit: "wei", amount: BigNumber.from(0) } } =
-    useSWR(
-      ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
-      async (x) => {
-        if ("maxFee" in x) {
-          return { unit: "wei", amount: x.maxFee }
-        }
-        const estimate = await getEstimatedFee(x)
-        return { ...estimate, amount: BigNumber.from(estimate.amount) }
-      },
-      {
-        suspense: true,
-        refreshInterval: 20 * 1000, // 20 seconds
-      },
-    )
+  const {
+    // use suggestedMaxFee as amount value as we dont support showing actual fee vs max fee yet.
+    data: { suggestedMaxFee: amount } = {
+      unit: "wei",
+      amount: BigNumber.from(0),
+      suggestedMaxFee: BigNumber.from(0),
+    },
+  } = useSWR(
+    ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
+    async (x) => {
+      if ("maxFee" in x) {
+        return { unit: "wei", amount: x.maxFee, suggestedMaxFee: x.maxFee }
+      }
+      return getEstimatedFee(x)
+    },
+    {
+      suspense: true,
+      refreshInterval: 20 * 1000, // 20 seconds
+    },
+  )
 
   useEffect(() => {
     if ("transactions" in props) {

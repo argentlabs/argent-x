@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers"
 import { exportJWK, generateSecret, jwtDecrypt } from "jose"
 import { Call, encode, number } from "starknet"
 
@@ -78,7 +79,12 @@ export const getAccounts = async () => {
 
 export const getEstimatedFee = async (call: Call | Call[]) => {
   sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
-  return waitForMessage("ESTIMATE_TRANSACTION_FEE_RES")
+  const response = await waitForMessage("ESTIMATE_TRANSACTION_FEE_RES")
+  return {
+    ...response,
+    amount: BigNumber.from(response.amount),
+    suggestedMaxFee: BigNumber.from(response.suggestedMaxFee),
+  }
 }
 
 export const getSeedPhrase = async (): Promise<string> => {

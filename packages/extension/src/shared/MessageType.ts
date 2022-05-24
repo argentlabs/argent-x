@@ -30,6 +30,7 @@ export type MessageType =
       data: {
         amount: string
         unit: string
+        suggestedMaxFee: string
       }
     }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
