@@ -1,6 +1,7 @@
 import { EventEmitter } from "events"
 
 import { ethers } from "ethers"
+import { ProgressCallback } from "ethers/lib/utils"
 import {
   Account,
   AddTransactionResponse,
@@ -128,15 +129,20 @@ export class Wallet extends EventEmitter {
     return this.session !== undefined
   }
 
-  private async generateNewLocalSecret(password: string) {
+  private async generateNewLocalSecret(
+    password: string,
+    progressCallback?: ProgressCallback,
+  ) {
     if (this.isInitialized()) {
       return
     }
     const N = isDevOrTest ? 64 : 32768
     const ethersWallet = ethers.Wallet.createRandom()
-    this.encryptedBackup = await ethersWallet.encrypt(password, {
-      scrypt: { N },
-    })
+    this.encryptedBackup = await ethersWallet.encrypt(
+      password,
+      { scrypt: { N } },
+      progressCallback,
+    )
 
     await this.writeBackup()
     this.setSession(ethersWallet.privateKey, password)
@@ -299,7 +305,10 @@ export class Wallet extends EventEmitter {
     return accounts
   }
 
-  public async startSession(password: string): Promise<boolean> {
+  public async startSession(
+    password: string,
+    progressCallback?: ProgressCallback,
+  ): Promise<boolean> {
     // session has already started
     if (this.session) {
       return true
@@ -307,7 +316,7 @@ export class Wallet extends EventEmitter {
 
     // wallet is not initialized: let's initialise it
     if (!this.isInitialized()) {
-      await this.generateNewLocalSecret(password)
+      await this.generateNewLocalSecret(password, progressCallback)
       return true
     }
 
@@ -315,6 +324,7 @@ export class Wallet extends EventEmitter {
       const wallet = await ethers.Wallet.fromEncryptedJson(
         this.encryptedBackup as string,
         password,
+        progressCallback,
       )
 
       this.setSession(wallet.privateKey, password)
@@ -326,7 +336,7 @@ export class Wallet extends EventEmitter {
       }
 
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }

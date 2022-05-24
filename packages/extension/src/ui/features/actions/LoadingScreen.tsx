@@ -1,6 +1,7 @@
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import styled from "styled-components"
 
+import { useLoadingProgress } from "../../app.state"
 import { Spinner } from "../../components/Spinner"
 import { Greetings } from "../onboarding/Greetings"
 
@@ -21,9 +22,16 @@ const loadingTexts = [
   "Almost there…",
 ]
 
-export const LoadingScreen: FC = () => (
-  <LoadingScreenWrapper>
-    <Spinner size={92} />
-    <Greetings greetings={loadingTexts} />
-  </LoadingScreenWrapper>
-)
+export const LoadingScreen: FC = () => {
+  const { progress, clearProgress } = useLoadingProgress()
+
+  // reset to 'indeterminate' spinner type on unmount
+  useEffect(() => () => clearProgress(), [])
+
+  return (
+    <LoadingScreenWrapper>
+      <Spinner size={92} value={progress} />
+      <Greetings greetings={loadingTexts} />
+    </LoadingScreenWrapper>
+  )
+}
