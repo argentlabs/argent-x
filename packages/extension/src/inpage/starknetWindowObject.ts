@@ -23,6 +23,7 @@ export const userEventHandlers: WalletEvents[] = []
 
 // window.ethereum like
 export const starknetWindowObject: StarknetWindowObject = {
+  id: "argent-x",
   account: undefined,
   provider: defaultProvider,
   selectedAddress: undefined,
