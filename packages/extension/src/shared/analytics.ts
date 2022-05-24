@@ -17,6 +17,9 @@ export interface Events {
         status: "failure"
         errorMessage: string
       }
+  preauthorizeDapp: {
+    host: string
+  }
 }
 
 export interface Pages {
