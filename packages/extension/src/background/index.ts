@@ -15,6 +15,7 @@ import {
   sendMessageToHost,
   sendMessageToUi,
 } from "./activeTabs"
+import { analytics } from "./analytics"
 import {
   getNetworkByChainId,
   getNetwork as getNetworkImplementation,
@@ -288,6 +289,9 @@ import { Wallet, WalletStorageProps } from "./wallet"
             const { host } = action.payload
             const selectedAccount = await wallet.getSelectedAccount()
 
+            analytics.track("preauthorizeDapp", {
+              host,
+            })
             await preAuthorize(host)
 
             if (selectedAccount) {
