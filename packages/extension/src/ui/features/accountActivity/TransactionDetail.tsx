@@ -157,7 +157,7 @@ export const TransactionDetail: FC = () => {
 
         {isRejected ? (
           <TransactionCard>
-            <TransactionFailedField clickable>
+            <TransactionFailedField>
               <TransactionLogKey>
                 <div>Transaction log</div>
                 <CopyTooltip
@@ -166,7 +166,9 @@ export const TransactionDetail: FC = () => {
                     transaction.failureReason?.error_message || transaction.hash
                   }
                 >
-                  <ContentCopyIcon style={{ fontSize: 12 }} />
+                  <ContentCopyIcon
+                    style={{ fontSize: 12, cursor: "pointer" }}
+                  />
                 </CopyTooltip>
               </TransactionLogKey>
               <TransactionLogMessage style={{ color: "#8f8e8c" }}>
