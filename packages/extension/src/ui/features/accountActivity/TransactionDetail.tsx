@@ -80,6 +80,7 @@ const TransactionFailedField = styled(TransactionField)`
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  overflow-x: scroll;
 `
 
 const TransactionLogMessage = styled(TransactionFieldValue)`
@@ -87,6 +88,7 @@ const TransactionLogMessage = styled(TransactionFieldValue)`
   font-weight: 400;
   font-size: 14px;
   line-height: 15px;
+  white-space: pre;
 `
 
 const TransactionLogKey = styled(TransactionFieldKey)`
