@@ -42,7 +42,7 @@ export const RecoverySetupScreen: FC = () => (
         <Link to={routes.setupSeedRecovery()}>
           <Option
             title="Low security"
-            description="Save a backup phrase"
+            description="Save a recovery phrase"
             backgroundColor="#C12026"
             icon={
               <svg
