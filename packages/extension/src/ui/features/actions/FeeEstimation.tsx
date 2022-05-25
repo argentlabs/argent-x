@@ -34,6 +34,13 @@ const FeeEstimationText = styled.p`
   font-size: 15px;
   line-height: 20px;
   color: #8f8e8c;
+
+  svg {
+    max-height: 16px;
+    max-width: 16px;
+    margin-left: 6px;
+    cursor: pointer;
+  }
 `
 
 const FeeEstimationValue = styled.p`
@@ -67,48 +74,56 @@ type FeeEstimationProps = (
       transactions: Call | Call[]
     }
 ) & {
-  onChange?: (fee: BigNumber) => void
+  onChange?: (fee: BigNumber, error?: unknown) => void
   accountAddress: string
   networkId: string
 }
 
 const useMaxFeeEstimation = (props: FeeEstimationProps) => {
-  const {
-    // use suggestedMaxFee as amount value as we dont support showing actual fee vs max fee yet.
-    data: { suggestedMaxFee: amount } = {
-      unit: "wei",
-      amount: BigNumber.from(0),
-      suggestedMaxFee: BigNumber.from(0),
-    },
-  } = useSWR(
+  const defaultData = {
+    unit: "wei",
+    amount: BigNumber.from(0),
+    suggestedMaxFee: BigNumber.from(0),
+    error: undefined,
+  }
+
+  const { data = defaultData } = useSWR(
     ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
     async (x) => {
       if ("maxFee" in x) {
         return { unit: "wei", amount: x.maxFee, suggestedMaxFee: x.maxFee }
       }
-      return getEstimatedFee(x)
+      try {
+        return await getEstimatedFee(x)
+      } catch (error) {
+        return { error, suggestedMaxFee: BigNumber.from(-1) }
+      }
     },
     {
       suspense: true,
       refreshInterval: 20 * 1000, // 20 seconds
     },
   )
-
-  return { amount }
+  // use suggestedMaxFee as amount value as we dont support showing actual fee vs max fee yet.
+  return {
+    amount: data.suggestedMaxFee,
+    error: data.error,
+  }
 }
 
 const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
-  const { amount } = useMaxFeeEstimation(props)
+  const { amount, error } = useMaxFeeEstimation(props)
 
   useEffect(() => {
     if ("transactions" in props) {
-      onChange?.(amount)
+      onChange?.(amount, error)
     }
   }, [])
 
   const [fee, setFee] = useState(amount)
   const [isFocused, setIsFocused] = useState(false)
   const [feeInput, setFeeInput] = useState(utils.formatEther(amount))
+
   return (
     <InvisibleInput
       value={isFocused ? feeInput : utils.formatEther(fee)}
@@ -129,16 +144,15 @@ const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
             : amount
           setFeeInput(utils.formatEther(value) ?? utils.formatEther(amount))
           setFee(value)
-          onChange?.(value)
+          onChange?.(value, error)
         } catch {
           setFeeInput(utils.formatEther(amount))
           setFee(amount)
-          onChange?.(amount)
+          onChange?.(amount, error)
         }
       }}
-      // on enter blur
       onKeyDown={(e) => {
-        if (e.keyCode === 13) {
+        if (e.key === "Enter") {
           e.currentTarget.blur()
         }
       }}
@@ -175,6 +189,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   }
 
   const [fee, setFee] = useState<BigNumber>()
+  const [estimationFailed, setEstimationFailed] = useState(false)
 
   const { data: feeTokenBalance } = useSWR(
     [account, props.networkId],
@@ -195,58 +210,59 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     }
   }, [firstFetchDone, enoughBalance])
 
+  const tooltip = estimationTooltip(
+    firstFetchDone,
+    enoughBalance,
+    estimationFailed,
+  )
+
   return (
     <FeeEstimationWrapper>
       <span>
         <FeeEstimationText>
           Network fee
-          <Tippy
-            content={
-              <Tooltip as="div">
-                {firstFetchDone
-                  ? enoughBalance
-                    ? "Network fees are paid to the network to include transactions in blocks"
-                    : "Insufficient balance to pay network fees. We'll try to include your transaction without a fee as long as possible"
-                  : "Network fee is still loading. We'll try to include your transaction without a fee as long as possible"}
-              </Tooltip>
-            }
-          >
-            {firstFetchDone && enoughBalance ? (
-              <InfoRoundedIcon
-                style={{
-                  maxHeight: "16px",
-                  maxWidth: "16px",
-                  marginLeft: "6px",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              />
+          <Tippy content={<Tooltip as="div">{tooltip}</Tooltip>}>
+            {firstFetchDone && enoughBalance && !estimationFailed ? (
+              <InfoRoundedIcon style={{ color: "white" }} />
             ) : (
-              <ReportGmailerrorredRoundedIcon
-                style={{
-                  maxHeight: "16px",
-                  maxWidth: "16px",
-                  marginLeft: "6px",
-                  color: "red",
-                  cursor: "pointer",
-                }}
-              />
+              <ReportGmailerrorredRoundedIcon style={{ color: "red" }} />
             )}
           </Tippy>
         </FeeEstimationText>
       </span>
-      <Center>
-        <Suspense fallback={<LoadingInput />}>
-          <FeeEstimationInput
-            {...props}
-            onChange={(fee) => {
-              setFee(fee)
-              onChange?.(fee)
-            }}
-          />
-        </Suspense>
-        <FeeEstimationValue>ETH</FeeEstimationValue>
-      </Center>
+      {estimationFailed ? (
+        <span>failed</span>
+      ) : (
+        <Center>
+          <Suspense fallback={<LoadingInput />}>
+            <FeeEstimationInput
+              {...props}
+              onChange={(fee, error) => {
+                setFee(fee)
+                setEstimationFailed(!!error)
+                onChange?.(fee)
+              }}
+            />
+          </Suspense>
+          <FeeEstimationValue>ETH</FeeEstimationValue>
+        </Center>
+      )}
     </FeeEstimationWrapper>
   )
+}
+
+const estimationTooltip = (
+  firstFetchDone: boolean,
+  enoughBalance: boolean,
+  estimationFailed: boolean,
+) => {
+  if (estimationFailed) {
+    return "Cannot estimate network fee, this means that the transaction will likely fail because it's invalid"
+  }
+  if (firstFetchDone) {
+    return enoughBalance
+      ? "Network fees are paid to the network to include transactions in blocks"
+      : "Insufficient balance to pay network fees. We'll try to include your transaction without a fee as long as possible"
+  }
+  return "Network fee is still loading. We'll try to include your transaction without a fee as long as possible"
 }

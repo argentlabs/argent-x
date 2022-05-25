@@ -231,9 +231,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
               suggestedMaxFee: number.toHex(suggestedMaxFee),
             },
           })
-        } catch {
+        } catch (error) {
           return sendToTabAndUi({
             type: "ESTIMATE_TRANSACTION_FEE_REJ",
+            data: `${error}`,
           })
         }
       }
