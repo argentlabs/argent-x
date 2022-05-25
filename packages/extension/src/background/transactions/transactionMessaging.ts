@@ -2,6 +2,7 @@ import { number } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { HandleMessage, UnhandledMessage } from "../background"
+import { determineFeePrice } from "./determineFeePrice"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -63,6 +64,11 @@ export const handleTransactionMessage: HandleMessage<
             amount: number.toHex(amount),
             unit,
             suggestedMaxFee: number.toHex(suggestedMaxFee),
+            usd: await determineFeePrice(
+              selectedAccount.network,
+              amount,
+              suggestedMaxFee,
+            ),
           },
         })
       } catch {

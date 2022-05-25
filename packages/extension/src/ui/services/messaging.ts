@@ -79,7 +79,16 @@ export const getAccounts = async () => {
 
 export const getEstimatedFee = async (call: Call | Call[]) => {
   sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
-  const response = await waitForMessage("ESTIMATE_TRANSACTION_FEE_RES")
+
+  const response = await Promise.race([
+    waitForMessage("ESTIMATE_TRANSACTION_FEE_RES"),
+    waitForMessage("ESTIMATE_TRANSACTION_FEE_REJ").then(() => "error" as const),
+  ])
+
+  if (response === "error") {
+    throw new Error("Failed to estimate fee")
+  }
+
   return {
     ...response,
     amount: BigNumber.from(response.amount),

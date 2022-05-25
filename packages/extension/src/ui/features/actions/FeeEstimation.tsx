@@ -1,11 +1,21 @@
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
-import { FC, Suspense, useEffect, useMemo, useState } from "react"
+import { FC, useEffect, useMemo } from "react"
 import { Call } from "starknet"
 import styled, { keyframes } from "styled-components"
 import useSWR from "swr"
 
 import { Tooltip } from "../../components/CopyTooltip"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldKey,
+  FieldKeyGroup,
+  FieldValue,
+  FieldValueGroup,
+  FieldValueMeta,
+} from "../../components/Fields"
 import {
   InfoRoundedIcon,
   ReportGmailerrorredRoundedIcon,
@@ -14,137 +24,26 @@ import { getEstimatedFee } from "../../services/messaging"
 import { useAccount } from "../accounts/accounts.state"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
-const Center = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const FeeEstimationWrapper = styled(Center)`
-  justify-content: space-between;
-  margin-top: 16px;
-  padding: 20px;
-  border-radius: 8px;
-  background: #333332;
-`
-
-const FeeEstimationText = styled.p`
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  color: #8f8e8c;
-`
-
 const FeeEstimationValue = styled.p`
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  color: #ffffff;
-
   * + & {
     margin-left: 0.3em;
   }
 `
 
-const InvisibleInput = styled.input`
+const InvisibleInput = styled.span`
   background: transparent;
   border: none;
   outline: none;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 20px;
-  color: #ffffff;
-  max-width: 80px;
+  color: inherit;
+  width: fit-content;
   text-align: right;
+  &:disabled {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: inherit;
+  }
 `
-
-type FeeEstimationProps = (
-  | {
-      maxFee: BigNumber
-    }
-  | {
-      transactions: Call | Call[]
-    }
-) & {
-  onChange?: (fee: BigNumber) => void
-  accountAddress: string
-  networkId: string
-}
-
-const useMaxFeeEstimation = (props: FeeEstimationProps) => {
-  const {
-    // use suggestedMaxFee as amount value as we dont support showing actual fee vs max fee yet.
-    data: { suggestedMaxFee: amount } = {
-      unit: "wei",
-      amount: BigNumber.from(0),
-      suggestedMaxFee: BigNumber.from(0),
-    },
-  } = useSWR(
-    ["transactions" in props ? props.transactions : { maxFee: props.maxFee }],
-    async (x) => {
-      if ("maxFee" in x) {
-        return { unit: "wei", amount: x.maxFee, suggestedMaxFee: x.maxFee }
-      }
-      return getEstimatedFee(x)
-    },
-    {
-      suspense: true,
-      refreshInterval: 20 * 1000, // 20 seconds
-    },
-  )
-
-  return { amount }
-}
-
-const FeeEstimationInput: FC<FeeEstimationProps> = ({ onChange, ...props }) => {
-  const { amount } = useMaxFeeEstimation(props)
-
-  useEffect(() => {
-    if ("transactions" in props) {
-      onChange?.(amount)
-    }
-  }, [])
-
-  const [fee, setFee] = useState(amount)
-  const [isFocused, setIsFocused] = useState(false)
-  const [feeInput, setFeeInput] = useState(utils.formatEther(amount))
-  return (
-    <InvisibleInput
-      value={isFocused ? feeInput : utils.formatEther(fee)}
-      onFocus={(e) => {
-        setIsFocused(true)
-        setTimeout(() => {
-          e.target.select()
-        }, 50)
-      }}
-      onChange={(e) => {
-        setFeeInput(e.target.value)
-      }}
-      onBlur={(e) => {
-        setIsFocused(false)
-        try {
-          const value = e.currentTarget.value
-            ? utils.parseEther(e.currentTarget.value)
-            : amount
-          setFeeInput(utils.formatEther(value) ?? utils.formatEther(amount))
-          setFee(value)
-          onChange?.(value)
-        } catch {
-          setFeeInput(utils.formatEther(amount))
-          setFee(amount)
-          onChange?.(amount)
-        }
-      }}
-      // on enter blur
-      onKeyDown={(e) => {
-        if (e.keyCode === 13) {
-          e.currentTarget.blur()
-        }
-      }}
-    />
-  )
-}
 
 const pulseKeyframe = keyframes`
   0% {
@@ -165,16 +64,49 @@ const LoadingInput = styled.div`
   animation: ${pulseKeyframe} 1s alternate infinite;
 `
 
+function displayEther(value: BigNumber) {
+  const formattedValue = utils.formatEther(value)
+  const [int, dec] = formattedValue.split(".")
+  const shortenedValue = `${int}.${dec.slice(0, 5)}`
+  return shortenedValue === formattedValue
+    ? formattedValue
+    : `~${shortenedValue}`
+}
+
+interface FeeEstimationProps {
+  transactions: Call | Call[]
+  defaultMaxFee?: BigNumber
+  onChange?: (fee: BigNumber) => void
+  onErrorChange?: (error: boolean) => void
+  accountAddress: string
+  networkId: string
+}
+
+export const useMaxFeeEstimation = (transactions: Call | Call[]) => {
+  const { data: fee, error } = useSWR(
+    [transactions, "feeEstimation"],
+    getEstimatedFee,
+    {
+      suspense: false,
+      refreshInterval: 20 * 1000, // 20 seconds
+      shouldRetryOnError: false,
+    },
+  )
+
+  return { fee, error }
+}
+
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   onChange,
+  accountAddress,
+  transactions,
+  onErrorChange,
   ...props
 }) => {
-  const account = useAccount(props.accountAddress)
+  const account = useAccount(accountAddress)
   if (!account) {
     throw new Error("Account not found")
   }
-
-  const [fee, setFee] = useState<BigNumber>()
 
   const { data: feeTokenBalance } = useSWR(
     [account, props.networkId],
@@ -182,71 +114,106 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     { suspense: false },
   )
 
-  const firstFetchDone = Boolean(fee?.gt(0))
+  const { fee, error } = useMaxFeeEstimation(transactions)
+
   const enoughBalance = useMemo(
-    () => Boolean(fee && feeTokenBalance?.gte(fee)),
+    () => Boolean(fee && feeTokenBalance?.gte(fee.suggestedMaxFee)),
     [fee, feeTokenBalance],
   )
 
-  // this is just possible as long as starknet accepts 0 fee transactions
+  const showFeeError = Boolean(fee && feeTokenBalance && !enoughBalance)
+  const showEstimateError = Boolean(error)
+  const showError = showFeeError || showEstimateError
+
   useEffect(() => {
-    if (firstFetchDone && !enoughBalance) {
-      onChange?.(BigNumber.from("0"))
-    }
-  }, [firstFetchDone, enoughBalance])
+    onErrorChange?.(!fee || !feeTokenBalance || !enoughBalance || showError)
+  }, [onErrorChange, showError, fee, feeTokenBalance, enoughBalance])
 
   return (
-    <FeeEstimationWrapper>
-      <span>
-        <FeeEstimationText>
-          Network fee
-          <Tippy
-            content={
-              <Tooltip as="div">
-                {firstFetchDone
-                  ? enoughBalance
-                    ? "Network fees are paid to the network to include transactions in blocks"
-                    : "Insufficient balance to pay network fees. We'll try to include your transaction without a fee as long as possible"
-                  : "Network fee is still loading. We'll try to include your transaction without a fee as long as possible"}
-              </Tooltip>
-            }
-          >
-            {firstFetchDone && enoughBalance ? (
-              <InfoRoundedIcon
-                style={{
-                  maxHeight: "16px",
-                  maxWidth: "16px",
-                  marginLeft: "6px",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              />
-            ) : (
-              <ReportGmailerrorredRoundedIcon
-                style={{
-                  maxHeight: "16px",
-                  maxWidth: "16px",
-                  marginLeft: "6px",
-                  color: "red",
-                  cursor: "pointer",
-                }}
-              />
-            )}
-          </Tippy>
-        </FeeEstimationText>
-      </span>
-      <Center>
-        <Suspense fallback={<LoadingInput />}>
-          <FeeEstimationInput
-            {...props}
-            onChange={(fee) => {
-              setFee(fee)
-              onChange?.(fee)
-            }}
-          />
-        </Suspense>
-        <FeeEstimationValue>ETH</FeeEstimationValue>
-      </Center>
-    </FeeEstimationWrapper>
+    <FieldGroup error={showError}>
+      <Field>
+        <FieldKeyGroup>
+          <FieldKey>
+            Network fee
+            <Tippy
+              content={
+                <Tooltip as="div">
+                  {fee && feeTokenBalance
+                    ? enoughBalance
+                      ? "Network fees are paid to the network to include transactions in blocks"
+                      : `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
+                          fee.suggestedMaxFee,
+                        )} ETH and your current balance is ${utils.formatEther(
+                          feeTokenBalance,
+                        )} ETH.`
+                    : "Network fee is still loading."}
+                </Tooltip>
+              }
+            >
+              {enoughBalance ? (
+                <InfoRoundedIcon
+                  style={{
+                    maxHeight: "16px",
+                    maxWidth: "16px",
+                    marginLeft: "6px",
+                    color: "#8f8e8c",
+                    cursor: "pointer",
+                  }}
+                />
+              ) : (
+                <ReportGmailerrorredRoundedIcon
+                  style={{
+                    maxHeight: "16px",
+                    maxWidth: "16px",
+                    marginLeft: "6px",
+                    color: "#8f8e8c",
+                    cursor: "pointer",
+                  }}
+                />
+              )}
+            </Tippy>
+          </FieldKey>
+        </FieldKeyGroup>
+        {fee ? (
+          <FieldValueGroup>
+            <FieldValue>
+              {fee.usd?.amount && <FeeEstimationValue>$</FeeEstimationValue>}
+              <InvisibleInput
+                role="textbox"
+                contentEditable={false} // disable editing for now
+              >
+                {fee.usd?.amount ?? displayEther(fee.amount)}
+              </InvisibleInput>
+              {!fee.usd?.amount && <FeeEstimationValue>ETH</FeeEstimationValue>}
+            </FieldValue>
+            <FieldValueMeta>
+              <FeeEstimationValue style={{ marginRight: "0.2em" }}>
+                Max
+              </FeeEstimationValue>
+              {fee.usd?.suggestedMaxFee && (
+                <FeeEstimationValue>$</FeeEstimationValue>
+              )}
+              <InvisibleInput
+                role="textbox"
+                contentEditable={false} // disable editing for now
+              >
+                {fee.usd?.suggestedMaxFee ?? displayEther(fee.suggestedMaxFee)}
+              </InvisibleInput>
+              {!fee.usd?.suggestedMaxFee && (
+                <FeeEstimationValue>ETH</FeeEstimationValue>
+              )}
+            </FieldValueMeta>
+          </FieldValueGroup>
+        ) : showEstimateError ? (
+          <InvisibleInput>Unknown</InvisibleInput>
+        ) : (
+          <LoadingInput />
+        )}
+      </Field>
+      {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
+      {showEstimateError && (
+        <FieldError>Transaction failure predicted</FieldError>
+      )}
+    </FieldGroup>
   )
 }

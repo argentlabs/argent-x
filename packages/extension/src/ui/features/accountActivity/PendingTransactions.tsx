@@ -33,6 +33,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
             status="orange"
             highlighted
             meta={meta}
+            showExternalOpenIcon
             onClick={() => openVoyagerTransaction(hash, network)}
           />
         ))}

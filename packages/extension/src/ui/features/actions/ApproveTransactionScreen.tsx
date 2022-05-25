@@ -1,19 +1,17 @@
-import { BigNumber } from "ethers"
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { Call, InvokeFunctionTransaction, encode } from "starknet"
+import { Call } from "starknet"
 import styled from "styled-components"
 
 import { routes } from "../../routes"
-import { updateTransactionFee } from "../../services/messaging"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
-  transactions: Call | Call[] | InvokeFunctionTransaction // TODO: remove InvokeFunctionTransaction when removing legacy transaction support
-  onSubmit: (transactions: Call | Call[] | InvokeFunctionTransaction) => void
+  transactions: Call | Call[]
+  onSubmit: (transactions: Call | Call[]) => void
 }
 
 const Pre = styled.pre`
@@ -32,7 +30,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   onSubmit,
   ...props
 }) => {
-  const [disableConfirm, setDisableConfirm] = useState(false)
+  const [disableConfirm, setDisableConfirm] = useState(true)
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
@@ -49,20 +47,16 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }}
       footer={
         <FeeEstimation
-          onChange={async (x) => {
-            setDisableConfirm(true)
-            await updateTransactionFee(
-              actionHash,
-              encode.addHexPrefix(x.toHexString()),
-            )
-            setDisableConfirm(false)
+          onErrorChange={(hasError) => {
+            if (hasError) {
+              setDisableConfirm(true)
+            } else {
+              setDisableConfirm(false)
+            }
           }}
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
-          // if transactions is InvokeFunctionTransaction, we need to pass maxFee to the component. Otherwise, we can just pass transactions
-          {...("type" in transactions
-            ? { maxFee: BigNumber.from("0") }
-            : { transactions })}
+          transactions={transactions}
         />
       }
       {...props}
