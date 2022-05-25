@@ -3,29 +3,15 @@ import React, { FC, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
-import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
-import { CopyTooltip } from "../../components/CopyTooltip"
 import { IconBar } from "../../components/IconBar"
-import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import {
-  formatTruncatedAddress,
-  normalizeAddress,
-} from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
-import { getVoyagerContractLink } from "../../services/voyager.service"
-import { useNetwork } from "../networks/useNetworks"
-import {
-  AccountAddressIconsWrapper,
-  AccountAddressLink,
-  AccountAddressWrapper,
-} from "./Address"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
@@ -62,10 +48,6 @@ export const TokenName = styled.h3`
   color: #ffffff;
 `
 
-const TokenAddressWrapper = styled(AccountAddressWrapper)`
-  padding-top: 6px;
-`
-
 export const BalanceAlert = styled(Alert)`
   padding-top: 32px;
   padding-bottom: 32px;
@@ -99,8 +81,6 @@ export const TokenScreen: FC = () => {
   const { tokenDetails } = useTokensWithBalance()
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
-  const { switcherNetworkId } = useAppState()
-  const { network } = useNetwork(switcherNetworkId)
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   if (!token) {
@@ -132,20 +112,6 @@ export const TokenScreen: FC = () => {
           <TokenIcon url={image} name={name} large />
           <TokenName>{name}</TokenName>
         </TokenTitle>
-        <TokenAddressWrapper>
-          <AccountAddressLink
-            href={getVoyagerContractLink(address, network)}
-            target="_blank"
-          >
-            {formatTruncatedAddress(address)}
-            <OpenInNewIcon style={{ fontSize: 10 }} />
-          </AccountAddressLink>
-          <CopyTooltip copyValue={normalizeAddress(address)} message="Copied!">
-            <AccountAddressIconsWrapper>
-              <ContentCopyIcon style={{ fontSize: 12 }} />
-            </AccountAddressIconsWrapper>
-          </CopyTooltip>
-        </TokenAddressWrapper>
         <BalanceAlert>
           <BalanceTitle>Your balance</BalanceTitle>
           <BalanceAmount>{balance}</BalanceAmount>
