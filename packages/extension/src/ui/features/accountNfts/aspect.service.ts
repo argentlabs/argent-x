@@ -1,23 +1,23 @@
 import join from "url-join"
 
-import { PlayOasisNft } from "./playoasis.model"
+import { AspectNft } from "./aspect.model"
 
 const baseUrl = "https://api-testnet.playoasisx.com/assets"
 
-export const fetchPlayOasisNfts = async (
+export const fetchAspectNfts = async (
   address: string,
-): Promise<PlayOasisNft[]> => {
+): Promise<AspectNft[]> => {
   const params = new URLSearchParams({ owner_address: address })
   const response = await fetch(join(baseUrl, `?${params}`))
   return await response.json()
 }
 
-export const openPlayOasisNft = (contractAddress: string, tokenId: string) => {
-  const url = `https://testnet.playoasis.xyz/asset/${contractAddress}/${tokenId}`
+export const openAspectNft = (contractAddress: string, tokenId: string) => {
+  const url = `https://testnet.aspect.co/asset/${contractAddress}/${tokenId}`
   window.open(url, "_blank")?.focus()
 }
 
-export const getNftPicture = ({ image_url, copy_image_url }: PlayOasisNft) => {
+export const getNftPicture = ({ image_url, copy_image_url }: AspectNft) => {
   if (image_url && copy_image_url) {
     if (!copy_image_url.startsWith("ipfs://")) {
       return copy_image_url

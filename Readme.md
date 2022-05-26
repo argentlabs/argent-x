@@ -42,7 +42,7 @@ If you want to use this StarkNet Wallet extension with your dapp, the easiest wa
 yarn add @argent/get-starknet starknet
 ```
 
-The package is a light wrapper around [starknet.js](https://github.com/seanjameshan/starknet.js) to interact with the wallet extension. You can then use it like the following:
+The package is a light wrapper around [starknet.js](https://github.com/0xs34n/starknet.js) to interact with the wallet extension. You can then use it like the following:
 
 ```javascript
 import { connect } from "@argent/get-starknet"
@@ -70,7 +70,7 @@ if(starknet.isConnected) {
 }
 ```
 
-Checkout [starknet.js](https://github.com/seanjameshan/starknet.js) to learn more about how to use `Provider` and `Signer`.
+Checkout [starknet.js](https://github.com/0xs34n/starknet.js) to learn more about how to use `Provider` and `Signer`.
 
 ## 🚀 Install from sources
 
@@ -118,7 +118,7 @@ Everyone is welcome to contribute. Please take a moment to review the [contribut
 
 ## ❤️ Family and friends
 
-Since this project would not have been possible without [starknet.js](https://github.com/seanjameshan/starknet.js), we would like to say a big thank you to all [starknet.js contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors) and [@seanjameshan](https://github.com/seanjameshan) for starting it.
+Since this project would not have been possible without [starknet.js](https://github.com/seanjameshan/starknet.js), we would like to say a big thank you to all [starknet.js contributors](https://github.com/0xs34n/starknet.js/graphs/contributors) and [@0xs34n](https://github.com/0xs34n) for starting it.
 
 One more thank you to the StarkWare Team.
 

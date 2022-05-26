@@ -1,4 +1,4 @@
-export interface PlayOasisNft {
+export interface AspectNft {
   contract_address: string
   token_id: string
   name?: string
