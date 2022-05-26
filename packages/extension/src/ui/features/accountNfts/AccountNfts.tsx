@@ -8,7 +8,7 @@ import { Spinner } from "../../components/Spinner"
 import { A, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
-import { getNftPicture } from "./playoasis.service"
+import { getNftPicture } from "./aspect.service"
 import { useNfts } from "./useNfts"
 
 const Container = styled.div`
@@ -77,8 +77,8 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
           <P style={{ marginTop: 120 }}>
             <small>
               You can browse collectibles on
-              <A href="https://testnet.playoasis.xyz/" target="_blank">
-                PlayOasis
+              <A href="https://testnet.aspect.co" target="_blank">
+                Aspect
               </A>
             </small>
           </P>
