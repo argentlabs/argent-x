@@ -31,6 +31,11 @@ export const Container = styled.div<{
     css`
       padding-bottom: 64px;
     `}
+
+  ${Header} > a {
+    width: 36px;
+    height: 36px;
+  }
 `
 
 interface AccountScreenContentProps {
