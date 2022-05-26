@@ -52,10 +52,13 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
+  const onAutoLock = () =>
+    sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
   const wallet = new Wallet(
     storage,
     ...(await loadContracts()),
     getNetworkImplementation,
+    onAutoLock,
   )
   await wallet.setup()
 
@@ -74,10 +77,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
     if (!hasTab(sender.tab?.id)) {
       sendMessageToActiveTabs(msg)
     }
-
-    wallet.on("autoLock", async () => {
-      await sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
-    })
 
     const actionQueue = await getQueue<ActionItem>({
       onUpdate: (actions) => {
