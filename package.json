@@ -6,7 +6,7 @@
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
     "import-sort-style-module": "^6.0.0",
-    "lerna": "^4.0.0",
+    "lerna": "^5.0.0",
     "prettier": ">=2",
     "prettier-plugin-import-sort": "^0.0.7"
   },
