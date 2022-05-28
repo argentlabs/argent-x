@@ -30,7 +30,7 @@ export const getPriceForToken: GetPriceForToken = async (
     return resultJson.ethereum[vsCurrency]
   }
 
-  throw new Error("Rate not found")
+  throw new Error("Price not found")
 }
 
 function countDecimals(num: number) {

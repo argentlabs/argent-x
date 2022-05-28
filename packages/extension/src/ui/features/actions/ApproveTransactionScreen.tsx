@@ -47,12 +47,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }}
       footer={
         <FeeEstimation
-          onErrorChange={(hasError) => {
-            if (hasError) {
-              setDisableConfirm(true)
-            } else {
-              setDisableConfirm(false)
-            }
+          onErrorChange={setDisableConfirm}
           }}
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
