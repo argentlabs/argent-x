@@ -1,4 +1,5 @@
 import { FC, ReactNode } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { sendMessage } from "../../../shared/messages"
@@ -37,11 +38,14 @@ const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
 }
 
 export const ExportPrivateKeyScreen: FC = () => {
+  const navigate = useNavigate()
+
   const handleVerifyPassword = async (password: any) => {
     const isValid = await checkPassword(password)
 
     if (isValid) {
-      sendMessage({ type: "EXPORT_PRIVATE_KEY" })
+      await sendMessage({ type: "EXPORT_PRIVATE_KEY" })
+      navigate(-1)
     }
 
     return isValid
