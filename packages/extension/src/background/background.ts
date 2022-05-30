@@ -8,11 +8,13 @@ import { Wallet } from "./wallet"
 export interface BackgroundService {
   wallet: Wallet
   transactionTracker: TransactionTracker
+  actionQueue: Queue<ActionItem>
 }
 
 export class UnhandledMessage extends Error {
   constructor() {
     super()
+    Object.setPrototypeOf(this, UnhandledMessage.prototype)
   }
 }
 
@@ -20,7 +22,6 @@ interface HandlerParams {
   msg: MessageType
   sender: chrome.runtime.MessageSender
   background: BackgroundService
-  actionQueue: Queue<ActionItem>
   keyPair: KeyPair
   sendToTabAndUi: (msg: MessageType) => Promise<void>
 }

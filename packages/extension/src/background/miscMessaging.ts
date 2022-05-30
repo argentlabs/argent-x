@@ -34,11 +34,10 @@ export const handleMiscMessage: HandleMessage = async ({
   msg,
   sender,
   background,
-  actionQueue,
   keyPair: { publicKeyJwk, privateKey },
   sendToTabAndUi,
 }) => {
-  const { wallet, transactionTracker } = background
+  const { wallet, transactionTracker, actionQueue } = background
 
   switch (msg.type) {
     case "OPEN_UI": {

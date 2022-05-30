@@ -2,8 +2,7 @@ import { HandleMessage, UnhandledMessage } from "../background"
 
 export const handleTransactionMessage: HandleMessage = async ({
   msg,
-  background: { transactionTracker },
-  actionQueue,
+  background: { transactionTracker, actionQueue },
   sendToTabAndUi,
 }) => {
   switch (msg.type) {
