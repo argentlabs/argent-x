@@ -28,6 +28,10 @@ export const openVoyagerTransaction = (hash: string, network: Network) => {
   window.open(getVoyagerTransactionLink(hash, network), "_blank")?.focus()
 }
 
-export const openVoyager = (network: Network) => {
-  window.open(network.explorerUrl, "_blank")?.focus()
+export const openVoyager = (network: Network, address?: string) => {
+  if (address) {
+    window.open(`${network.explorerUrl}/contract/${address}`, "_blank")?.focus()
+  } else {
+    window.open(network.explorerUrl, "_blank")?.focus()
+  }
 }

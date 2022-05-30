@@ -3,12 +3,14 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import { EditIcon } from "../../components/Icons/AccountMenu/EditIcon"
 import { ViewOnVoyagerIcon } from "../../components/Icons/AccountMenu/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/AccountMenu/WarningIcon"
-import useOnClickOutside from "../../hooks/useOnClickOutside"
 import { routes } from "../../routes"
+import useOnClickOutside from "../../services/useOnClickOutside"
 import { openVoyager } from "../../services/voyager.service"
+import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 
 const StyledMoreVert = styled(MoreVertSharp)`
@@ -72,6 +74,8 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const currentNetwork = useCurrentNetwork()
   const navigate = useNavigate()
 
+  const account = useSelectedAccount()
+
   useOnClickOutside(ref, () => setMenuOpen(false))
 
   const handleEditClick = () => {
@@ -84,7 +88,9 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
       <StyledMoreVert onClick={() => setMenuOpen(!isMenuOpen)} />
       {isMenuOpen && (
         <Menu>
-          <MenuItemWrapper onClick={() => openVoyager(currentNetwork)}>
+          <MenuItemWrapper
+            onClick={() => openVoyager(currentNetwork, account?.address)}
+          >
             <MenuItem>
               <ViewOnVoyagerIcon />
               View on Voyager

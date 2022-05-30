@@ -2,7 +2,7 @@ import { RefObject, useEffect, useRef } from "react"
 
 export default function useOnClickOutside<T extends HTMLElement>(
   node: RefObject<T | undefined>,
-  handler: undefined | (() => void),
+  handler?: () => void,
 ) {
   const handlerRef = useRef<undefined | (() => void)>(handler)
 
