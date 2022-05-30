@@ -1,10 +1,11 @@
 import { number, stark } from "starknet"
 
+import { AccountMessage } from "../shared/messages/AccountMessage"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { getNetwork } from "./customNetworks"
 import { getImplementationUpgradePath } from "./upgrade"
 
-export const handleAccountMessage: HandleMessage = async ({
+export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
   background: { wallet, transactionTracker },
   sendToTabAndUi,
@@ -101,6 +102,15 @@ export const handleAccountMessage: HandleMessage = async ({
         account,
         meta: { title: "Upgrading account" },
       })
+    }
+
+    case "DELETE_ACCOUNT": {
+      try {
+        await wallet.removeAccount(msg.data)
+        return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
+      } catch {
+        return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
+      }
     }
   }
 

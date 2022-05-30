@@ -3,7 +3,7 @@ import { getMessage } from "@extend-chrome/messages"
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
 import { BackupMessage } from "./BackupMessage"
-import { MiscenalleousMessage } from "./MiscenalleousMessage"
+import { MiscenalleousMessage } from "./MiscellaneousMessage"
 import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
 import { SessionMessage } from "./SessionMessage"
@@ -12,14 +12,14 @@ import { TransactionMessage } from "./TransactionMessage"
 
 export type MessageType =
   | AccountMessage
-  | TransactionMessage
+  | ActionMessage
+  | BackupMessage
+  | MiscenalleousMessage
+  | NetworkMessage
   | PreAuthorisationMessage
   | SessionMessage
-  | BackupMessage
   | TokenMessage
-  | NetworkMessage
-  | ActionMessage
-  | MiscenalleousMessage
+  | TransactionMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

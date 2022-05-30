@@ -18,12 +18,12 @@ export class UnhandledMessage extends Error {
   }
 }
 
-interface HandlerParams {
-  msg: MessageType
+interface HandlerParams<T> {
+  msg: T
   sender: chrome.runtime.MessageSender
   background: BackgroundService
   keyPair: KeyPair
   sendToTabAndUi: (msg: MessageType) => Promise<void>
 }
 
-export type HandleMessage = (params: HandlerParams) => Promise<unknown>
+export type HandleMessage<T> = (params: HandlerParams<T>) => Promise<unknown>

@@ -1,8 +1,13 @@
+import { number } from "starknet"
+
+import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { HandleMessage, UnhandledMessage } from "../background"
 
-export const handleTransactionMessage: HandleMessage = async ({
+export const handleTransactionMessage: HandleMessage<
+  TransactionMessage
+> = async ({
   msg,
-  background: { transactionTracker, actionQueue },
+  background: { wallet, transactionTracker, actionQueue },
   sendToTabAndUi,
 }) => {
   switch (msg.type) {
@@ -40,6 +45,49 @@ export const handleTransactionMessage: HandleMessage = async ({
           actionHash: meta.hash,
         },
       })
+    }
+
+    case "ESTIMATE_TRANSACTION_FEE": {
+      const selectedAccount = await wallet.getSelectedAccount()
+      const starknetAccount = await wallet.getSelectedStarknetAccount()
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+      try {
+        const { amount, unit, suggestedMaxFee } =
+          await starknetAccount.estimateFee(msg.data)
+
+        return sendToTabAndUi({
+          type: "ESTIMATE_TRANSACTION_FEE_RES",
+          data: {
+            amount: number.toHex(amount),
+            unit,
+            suggestedMaxFee: number.toHex(suggestedMaxFee),
+          },
+        })
+      } catch {
+        return sendToTabAndUi({
+          type: "ESTIMATE_TRANSACTION_FEE_REJ",
+        })
+      }
+    }
+
+    case "UPDATE_TRANSACTION_FEE": {
+      const { actionHash } = msg.data
+      await actionQueue.override(actionHash, {
+        maxFee: msg.data.maxFee,
+      })
+
+      return sendToTabAndUi({
+        type: "UPDATE_TRANSACTION_FEE_RES",
+        data: {
+          actionHash,
+        },
+      })
+    }
+
+    case "TRANSACTION_FAILED": {
+      return await actionQueue.remove(msg.data.actionHash)
     }
   }
 
