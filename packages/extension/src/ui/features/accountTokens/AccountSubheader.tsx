@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useRef } from "react"
 import styled from "styled-components"
 
 import { CopyTooltip } from "../../components/CopyTooltip"
@@ -10,6 +10,7 @@ import {
 import { getVoyagerContractLink } from "../../services/voyager.service"
 import { AccountStatus } from "../accounts/accounts.service"
 import { useNetwork } from "../networks/useNetworks"
+import { AccountMenu } from "./AccountMenu"
 import { AccountName } from "./AccountName"
 import {
   AccountAddressIconsWrapper,
@@ -24,6 +25,12 @@ const AccountStatusText = styled.p<{ color?: string }>`
   text-align: center;
   margin-top: 6px;
   color: ${({ color }) => color};
+`
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  width: 250px;
 `
 
 interface AccountSubheaderProps {
@@ -42,17 +49,31 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   accountName,
 }) => {
   const { network } = useNetwork(networkId)
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <div style={{ alignSelf: "center", width: 250 }}>
-          <AccountName
-            value={accountName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              onChangeName(e.target.value)
-            }
-          />
+        <div
+          style={{
+            alignSelf: "center",
+            width: 250,
+          }}
+        >
+          <Header>
+            <AccountName
+              value={accountName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChangeName(e.target.value)
+              }
+              inputRef={inputRef}
+            />
+
+            <AccountMenu onAccountNameEdit={() => inputRef.current?.focus()} />
+          </Header>
         </div>
+
         {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
           <AccountStatusText
             color={status.code === "ERROR" ? "red" : undefined}

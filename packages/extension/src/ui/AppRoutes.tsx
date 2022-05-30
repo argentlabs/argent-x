@@ -20,6 +20,7 @@ import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
+import { ExportPrivateKeyScreen } from "./features/exportPrivateKey"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
@@ -146,6 +147,10 @@ const walletRoutes = (
     <Route
       path={routes.backupDownload.path}
       element={<BackupDownloadScreen />}
+    />
+    <Route
+      path={routes.exportPrivateKey.path}
+      element={<ExportPrivateKeyScreen />}
     />
   </>
 )

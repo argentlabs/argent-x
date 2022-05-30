@@ -537,6 +537,19 @@ export class Wallet extends EventEmitter {
     return { url, filename }
   }
 
+  public exportPrivateKey(): { url: string; filename: string } {
+    if (!this.isSessionOpen() || !this.session?.secret) {
+      throw new Error("Session is not open")
+    }
+    const blob = new Blob([this.session.secret], {
+      type: "application/json",
+    })
+    const url = URL.createObjectURL(blob)
+    const filename = "argent-x-private-key.json"
+
+    return { url, filename }
+  }
+
   public static validateBackup(backupString: string): boolean {
     try {
       const backup = JSON.parse(backupString)

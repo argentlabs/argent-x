@@ -215,6 +215,10 @@ export type MessageType =
         encryptedSeedPhrase: string
       }
     }
+  | {
+      type: "EXPORT_PRIVATE_KEY"
+    }
+  | { type: "EXPORT_PRIVATE_KEY_RES" }
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean
