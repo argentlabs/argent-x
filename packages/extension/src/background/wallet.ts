@@ -7,7 +7,10 @@ import {
   shortString,
   stark,
 } from "starknet"
-import { computeHashOnElements } from "starknet/dist/utils/hash"
+import {
+  computeHashOnElements,
+  getSelectorFromName,
+} from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
 import {
@@ -395,20 +398,16 @@ export class Wallet {
 
     const deployTransaction = await provider.deployContract({
       contract: this.proxyCompiledContract,
-      constructorCalldata: stark.compileCalldata({ implementation }),
+      constructorCalldata: stark.compileCalldata({
+        implementation,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      }),
       addressSalt: seed,
     })
 
     assertTransactionReceived(deployTransaction, true)
     const proxyAddress = deployTransaction.address as string
-
-    const initTransaction = await provider.invokeFunction({
-      contractAddress: proxyAddress,
-      entrypoint: "initialize",
-      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-    })
-
-    assertTransactionReceived(initTransaction)
 
     const account = {
       network,
@@ -424,7 +423,7 @@ export class Wallet {
     await this.writeBackup()
     await this.selectAccount(account.address)
 
-    return { account, txHash: initTransaction.transaction_hash }
+    return { account, txHash: deployTransaction.transaction_hash }
   }
 
   public async getAccountByAddress(address: string): Promise<WalletAccount> {
