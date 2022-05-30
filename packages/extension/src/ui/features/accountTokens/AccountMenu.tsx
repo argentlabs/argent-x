@@ -40,7 +40,7 @@ const Separator = styled.div`
 const MenuItemWrapper = styled.div`
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   background-color: transparent;
   cursor: pointer;
@@ -53,7 +53,7 @@ const MenuItemWrapper = styled.div`
 const MenuItem = styled.div`
   display: flex;
   align-items: center;
-  padding: 5px 0 6px;
+  padding: 5px 0px 6px 10px;
   gap: 6px;
   font-weight: 400;
   font-size: 12px;
@@ -67,7 +67,7 @@ interface AccountNameProps {
 }
 
 export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
-  const [isMenuOpen, setMenuOpen] = useState<boolean>(false)
+  const [isMenuOpen, setMenuOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const currentNetwork = useCurrentNetwork()
   const navigate = useNavigate()
