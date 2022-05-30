@@ -30,7 +30,7 @@ const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
     <>
       <IconBar back close />
       <Container>
-        <H2>Export Private Key</H2>
+        <H2>Export private key</H2>
         {children}
       </Container>
     </>
