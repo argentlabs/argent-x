@@ -1,95 +1,17 @@
+import { getMessage } from "@extend-chrome/messages"
 import type { JWK } from "jose"
-import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
+import type { typedData } from "starknet"
 
-import { ExtensionActionItem } from "./actionQueue"
-import { Network, NetworkStatus } from "./networks"
-import { RequestToken, Token } from "./token"
-import { Transaction } from "./transactions"
-import { WalletAccount } from "./wallet.model"
-
-export interface EstimateFeeResponse {
-  amount: string
-  unit: string
-  suggestedMaxFee: string
-}
+import { ExtensionActionItem } from "../actionQueue"
+import { Network, NetworkStatus } from "../networks"
+import { RequestToken, Token } from "../token"
+import { WalletAccount } from "../wallet.model"
+import { AccountMessage } from "./AccountMessage"
+import { TransactionMessage } from "./TransactionMessage"
 
 export type MessageType =
-  // ***** accounts *****
-  | { type: "NEW_ACCOUNT"; data: string }
-  | {
-      type: "NEW_ACCOUNT_RES"
-      data: {
-        status: "ok"
-        txHash: string
-        address: string
-        account: WalletAccount
-        accounts: WalletAccount[]
-      }
-    }
-  | { type: "NEW_ACCOUNT_REJ"; data: { status: "ko"; error: string } }
-  | { type: "GET_ACCOUNTS" }
-  | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
-  | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
-  | { type: "DISCONNECT_ACCOUNT" }
-  | { type: "GET_SELECTED_ACCOUNT" }
-  | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount | undefined }
-  | { type: "DELETE_ACCOUNT"; data: string }
-  | { type: "DELETE_ACCOUNT_RES" }
-  | { type: "DELETE_ACCOUNT_REJ" }
-  | {
-      type: "UPGRADE_ACCOUNT"
-      data: {
-        walletAddress: string
-      }
-    }
-  // ***** transactions *****
-  | { type: "GET_TRANSACTIONS" }
-  | { type: "GET_TRANSACTIONS_RES"; data: Transaction[] }
-  | {
-      type: "EXECUTE_TRANSACTION"
-      data: {
-        transactions: Call | Call[]
-        abis?: Abi[]
-        transactionsDetail?: InvocationsDetails
-      }
-    }
-  | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }
-  | { type: "TRANSACTION_UPDATES"; data: Transaction[] }
-  | { type: "TRANSACTION_SUCCESS"; data: Transaction }
-  | { type: "TRANSACTION_FAILURE"; data: Transaction }
-  | { type: "GET_TRANSACTION"; data: { hash: string; network: string } }
-  | { type: "GET_TRANSACTION_RES"; data: Transaction }
-  | { type: "GET_TRANSACTION_REJ" }
-  | {
-      type: "TRANSACTION_SUBMITTED"
-      data: {
-        txHash: string
-        actionHash: string
-      }
-    }
-  | {
-      type: "TRANSACTION_FAILED"
-      data: { actionHash: string; error?: string }
-    }
-  | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
-  | { type: "ESTIMATE_TRANSACTION_FEE_REJ" }
-  | {
-      type: "ESTIMATE_TRANSACTION_FEE_RES"
-      data: EstimateFeeResponse
-    }
-  | {
-      type: "UPDATE_TRANSACTION_FEE"
-      data: {
-        actionHash: string
-        maxFee?: InvocationsDetails["maxFee"]
-      }
-    }
-  | {
-      type: "UPDATE_TRANSACTION_FEE_RES"
-      data: {
-        actionHash: string
-      }
-    }
+  | AccountMessage
+  | TransactionMessage
   // ***** pre-authorizations *****
   | { type: "CONNECT_DAPP"; data: { host: string } }
   | { type: "CONNECT_DAPP_RES"; data: WalletAccount }
@@ -219,4 +141,19 @@ export type MessageType =
 export type WindowMessageType = MessageType & {
   forwarded?: boolean
   extensionId: string
+}
+
+export const [sendMessage, messageStream, _waitForMessage] =
+  getMessage<MessageType>("ARGENTX")
+
+export async function waitForMessage<
+  K extends MessageType["type"],
+  T extends { type: K } & MessageType,
+>(
+  type: K,
+  predicate: (x: T) => boolean = () => true,
+): Promise<T extends { data: any } ? T["data"] : undefined> {
+  return _waitForMessage(
+    ([msg]: any) => msg.type === type && predicate(msg),
+  ).then(([msg]: any) => msg.data)
 }

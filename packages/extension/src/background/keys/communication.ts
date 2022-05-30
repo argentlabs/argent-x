@@ -1,7 +1,13 @@
 import { JWK, KeyLike, exportJWK, generateKeyPair, importJWK } from "jose"
 import browser from "webextension-polyfill"
 
-export async function getKeyPair() {
+export interface KeyPair {
+  privateKey: KeyLike
+  publicKey: KeyLike
+  publicKeyJwk: JWK
+}
+
+export async function getKeyPair(): Promise<KeyPair> {
   let privateKey: KeyLike
   let publicKey: KeyLike
   let publicKeyJwk: JWK

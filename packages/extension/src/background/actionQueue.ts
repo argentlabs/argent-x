@@ -4,9 +4,8 @@ function objectHash(obj: object | null) {
   return oHash(obj, { unorderedArrays: true })
 }
 
-interface Overrides {
-  [key: string]: any
-}
+type Overrides = Record<string, any>
+
 export interface QueueItem {
   meta: {
     hash: string
@@ -24,7 +23,19 @@ interface QueueConfig<T> {
 // in-memory queue is better than localStorage, because it's way faster and persistance is not required
 let globalQueue: ExtQueueItem<any>[] = []
 
-export async function getQueue<T extends object>(config: QueueConfig<T> = {}) {
+export interface Queue<T> {
+  getAll: () => Promise<ExtQueueItem<T>[]>
+  push: (item: T, expires?: number) => Promise<ExtQueueItem<T>>
+  override: (
+    hash: string,
+    overrides: Overrides,
+  ) => Promise<ExtQueueItem<T> | undefined>
+  remove: (hash: string) => Promise<ExtQueueItem<T> | null>
+}
+
+export async function getQueue<T extends object>(
+  config: QueueConfig<T> = {},
+): Promise<Queue<T>> {
   async function getAll(): Promise<ExtQueueItem<T>[]> {
     const notExpiredQueue = globalQueue.filter(
       (item) => item.meta.expires > Date.now(),

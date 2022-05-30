@@ -1,7 +1,7 @@
 import { defaultProvider } from "starknet"
 
 import { assertNever } from "./../ui/services/assertNever"
-import { WindowMessageType } from "../shared/MessageType"
+import { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/networks"
 import { ArgentXAccount } from "./ArgentXAccount"
 import {
