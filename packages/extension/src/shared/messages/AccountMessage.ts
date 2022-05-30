@@ -24,7 +24,5 @@ export type AccountMessage =
   | { type: "DELETE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"
-      data: {
-        walletAddress: string
-      }
+      data: { walletAddress: string }
     }

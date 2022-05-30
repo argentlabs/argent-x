@@ -7,13 +7,9 @@ export type MiscenalleousMessage =
   | { type: "GET_PUBLIC_KEY_RES"; data: JWK }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE"
-      data: {
-        encryptedSecret: string
-      }
+      data: { encryptedSecret: string }
     }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE_RES"
-      data: {
-        encryptedSeedPhrase: string
-      }
+      data: { encryptedSeedPhrase: string }
     }

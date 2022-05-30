@@ -45,14 +45,9 @@ export type TransactionMessage =
     }
   | {
       type: "UPDATE_TRANSACTION_FEE"
-      data: {
-        actionHash: string
-        maxFee?: InvocationsDetails["maxFee"]
-      }
+      data: { actionHash: string; maxFee?: InvocationsDetails["maxFee"] }
     }
   | {
       type: "UPDATE_TRANSACTION_FEE_RES"
-      data: {
-        actionHash: string
-      }
+      data: { actionHash: string }
     }

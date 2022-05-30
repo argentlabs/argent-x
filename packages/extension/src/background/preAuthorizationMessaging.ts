@@ -46,14 +46,6 @@ export const handlePreAuthorizationMessage: HandleMessage<
       return openUi()
     }
 
-    case "REJECT_PREAUTHORIZATION": {
-      // case "REJECT_REQUEST_TOKEN":
-      // case "REJECT_REQUEST_ADD_CUSTOM_NETWORK":
-      // case "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK":
-      // case "TRANSACTION_FAILED": {
-      return await actionQueue.remove(msg.data.actionHash)
-    }
-
     case "PREAUTHORIZE": {
       return actionQueue.push({
         type: "CONNECT_DAPP",
@@ -70,12 +62,7 @@ export const handlePreAuthorizationMessage: HandleMessage<
       const host = msg.data
       await removePreAuthorization(host)
       await sendToTabAndUi({ type: "REMOVE_PREAUTHORIZATION_RES" })
-      await sendMessageToHost(
-        {
-          type: "DISCONNECT_ACCOUNT",
-        },
-        host,
-      )
+      await sendMessageToHost({ type: "DISCONNECT_ACCOUNT" }, host)
       removeTabOfHost(host)
       break
     }
@@ -83,6 +70,10 @@ export const handlePreAuthorizationMessage: HandleMessage<
     case "RESET_PREAUTHORIZATIONS": {
       await resetPreAuthorizations()
       return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
+    }
+
+    case "REJECT_PREAUTHORIZATION": {
+      return await actionQueue.remove(msg.data.actionHash)
     }
   }
 
