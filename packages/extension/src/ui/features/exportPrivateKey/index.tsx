@@ -55,7 +55,7 @@ export const ExportPrivateKeyScreen: FC = () => {
         {(isDirty) => (
           <StickyGroup>
             <Button type="submit" disabled={!isDirty}>
-              Continue
+              Export
             </Button>
           </StickyGroup>
         )}
