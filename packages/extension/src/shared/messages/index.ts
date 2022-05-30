@@ -7,24 +7,13 @@ import { Network, NetworkStatus } from "../networks"
 import { RequestToken, Token } from "../token"
 import { WalletAccount } from "../wallet.model"
 import { AccountMessage } from "./AccountMessage"
+import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
 import { TransactionMessage } from "./TransactionMessage"
 
 export type MessageType =
   | AccountMessage
   | TransactionMessage
-  // ***** pre-authorizations *****
-  | { type: "CONNECT_DAPP"; data: { host: string } }
-  | { type: "CONNECT_DAPP_RES"; data: WalletAccount }
-  | { type: "PREAUTHORIZE"; data: string }
-  | {
-      type: "REJECT_PREAUTHORIZATION"
-      data: { host: string; actionHash: string }
-    }
-  | { type: "REMOVE_PREAUTHORIZATION"; data: string }
-  | { type: "REMOVE_PREAUTHORIZATION_RES" }
-  | { type: "IS_PREAUTHORIZED"; data: string }
-  | { type: "IS_PREAUTHORIZED_RES"; data: boolean }
-  | { type: "RESET_PREAUTHORIZATIONS" }
+  | PreAuthorisationMessage
   // ***** sessions *****
   | { type: "STOP_SESSION" }
   | { type: "HAS_SESSION" }
