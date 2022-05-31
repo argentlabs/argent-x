@@ -66,6 +66,10 @@ const BalanceAmount = styled.div`
   font-weight: bold;
   font-size: 34px;
   line-height: 41px;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const BalanceSymbol = styled.div`
