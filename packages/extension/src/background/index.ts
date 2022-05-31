@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers"
 import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 import { encode, number, stark } from "starknet"
 

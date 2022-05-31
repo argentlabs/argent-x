@@ -3,15 +3,12 @@ import { useCallback, useEffect, useState } from "react"
 import { getPrivateKey } from "../../services/messaging"
 
 export const usePrivateKey = () => {
-  const [privateKey, setPrivateKey] = useState<string | undefined>(undefined)
+  const [privateKey, setPrivateKey] = useState<string>()
 
-  const getPrivateKeyCallback = useCallback(
-    async () => await getPrivateKey(),
-    [],
-  )
+  const getPrivateKeyCallback = useCallback(getPrivateKey, [])
 
   useEffect(() => {
-    getPrivateKeyCallback().then((pk) => setPrivateKey(pk))
+    getPrivateKeyCallback().then(setPrivateKey)
   }, [])
 
   return privateKey

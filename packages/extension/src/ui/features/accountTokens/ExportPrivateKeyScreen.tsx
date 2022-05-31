@@ -34,6 +34,7 @@ const KeyContainer = styled.div`
   overflow-wrap: break-word;
   font-size: 16px;
   line-height: 140%;
+  cursor: pointer;
 `
 
 const WarningContainer = styled.div`

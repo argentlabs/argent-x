@@ -23,7 +23,6 @@ import {
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
-  grindKey,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
