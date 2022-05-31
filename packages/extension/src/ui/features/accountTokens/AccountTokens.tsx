@@ -78,7 +78,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   return (
     <Container>
       <AccountSubHeader
-        networkId={switcherNetworkId}
         status={status}
         accountName={accountName}
         accountAddress={account.address}

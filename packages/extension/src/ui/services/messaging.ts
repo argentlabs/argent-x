@@ -245,6 +245,14 @@ export const addToken = async (token: Token) => {
   return waitForMessage("ADD_TOKEN_RES")
 }
 
+export const getPrivateKey = async () => {
+  sendMessage({ type: "EXPORT_PRIVATE_KEY" })
+
+  const { privateKey } = await waitForMessage("EXPORT_PRIVATE_KEY_RES")
+
+  return privateKey
+}
+
 // for debugging purposes
 try {
   ;(window as any).downloadBackup = () => {

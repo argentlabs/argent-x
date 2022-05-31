@@ -1,21 +1,13 @@
-import { FC, InputHTMLAttributes, useState } from "react"
+import { FC, InputHTMLAttributes, RefObject, useState } from "react"
 import styled from "styled-components"
 
-import { EditIcon } from "../../components/Icons/MuiIcons"
 import { InputText } from "../../components/InputText"
 import { defaultAccountName } from "../accounts/accountMetadata.state"
 
 const Form = styled.form`
   display: flex;
   align-items: center;
-
-  svg {
-    visibility: hidden;
-  }
-
-  &:hover svg {
-    visibility: visible;
-  }
+  width: 250px;
 `
 
 const InputHeader = styled(InputText)`
@@ -45,8 +37,13 @@ const InputHeader = styled(InputText)`
   }
 `
 
-export const AccountName: FC<InputHTMLAttributes<HTMLInputElement>> = ({
+interface AccountNameProps extends InputHTMLAttributes<HTMLInputElement> {
+  inputRef: RefObject<HTMLInputElement>
+}
+
+export const AccountName: FC<AccountNameProps> = ({
   value,
+  inputRef,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false)
@@ -64,9 +61,9 @@ export const AccountName: FC<InputHTMLAttributes<HTMLInputElement>> = ({
         value={value}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        inputRef={inputRef}
         {...props}
       />
-      <EditIcon />
     </Form>
   )
 }

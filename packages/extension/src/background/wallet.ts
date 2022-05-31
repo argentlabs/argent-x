@@ -525,6 +525,24 @@ export class Wallet {
     return { url, filename }
   }
 
+  public async exportPrivateKey(): Promise<string> {
+    if (!this.isSessionOpen() || !this.session?.secret) {
+      throw new Error("Session is not open")
+    }
+
+    const account = await this.getSelectedAccount()
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = getStarkPair(
+      account.signer.derivationPath,
+      this.session.secret,
+    )
+
+    return starkPair.priv.toString()
+  }
+
   public static validateBackup(backupString: string): boolean {
     try {
       const backup = JSON.parse(backupString)

@@ -34,6 +34,15 @@ export const handleMiscellaneousMessage: HandleMessage<
       })
     }
 
+    case "EXPORT_PRIVATE_KEY": {
+      const privateKey = await wallet.exportPrivateKey()
+
+      return sendToTabAndUi({
+        type: "EXPORT_PRIVATE_KEY_RES",
+        data: { privateKey },
+      })
+    }
+
     case "GET_ENCRYPTED_SEED_PHRASE": {
       if (!wallet.isSessionOpen()) {
         throw Error("you need an open session")
