@@ -1,3 +1,4 @@
+import { LedgerSigner } from "@yogh/starknetjs-signer-ledger"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -5,6 +6,7 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
+import { LedgerIcon } from "../../components/Icons/LedgerIcon"
 import { AddIcon, SettingsIcon } from "../../components/Icons/MuiIcons"
 import { H1, P } from "../../components/Typography"
 import { routes } from "../../routes"
@@ -58,7 +60,23 @@ export const AccountListScreen: FC = () => {
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })
     try {
-      const newAccount = await deployAccount(switcherNetworkId)
+      const newAccount = await deployAccount(switcherNetworkId, "local_secret")
+      addAccount(newAccount)
+      connectAccount(newAccount)
+      navigate(await recover())
+    } catch (error: any) {
+      useAppState.setState({ error: `${error}` })
+      navigate(routes.error())
+    } finally {
+      useAppState.setState({ isLoading: false })
+    }
+  }
+
+  const handleAddLedgerAccount = async () => {
+    useAppState.setState({ isLoading: true })
+    try {
+      await LedgerSigner.askPermission()
+      const newAccount = await deployAccount(switcherNetworkId, "ledger_secret")
       addAccount(newAccount)
       connectAccount(newAccount)
       navigate(await recover())
@@ -102,6 +120,9 @@ export const AccountListScreen: FC = () => {
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>
           <AddIcon fontSize="large" />
+        </IconButtonCenter>
+        <IconButtonCenter size={48} {...makeClickable(handleAddLedgerAccount)}>
+          <LedgerIcon />
         </IconButtonCenter>
       </AccountList>
     </AccountListWrapper>

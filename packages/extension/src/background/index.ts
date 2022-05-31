@@ -320,7 +320,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
               const { maxFee } = action.override || {}
               const maxFeeOverrideExists =
                 maxFee !== undefined && maxFee !== null
-
               const transaction = await starknetAccount.execute(
                 transactions,
                 abis,
@@ -332,7 +331,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
                   maxFee: maxFeeOverrideExists ? maxFee : 0,
                 },
               )
-
               transactionTracker.add({
                 hash: transaction.transaction_hash,
                 account: selectedAccount,
@@ -685,9 +683,9 @@ import { Wallet, WalletStorageProps } from "./wallet"
           throw Error("you need an open session")
         }
 
-        const network = msg.data
+        const { networkId: network, type } = msg.data
         try {
-          const { account, txHash } = await wallet.addAccount(network)
+          const { account, txHash } = await wallet.addAccount(network, type)
           transactionTracker.addAccount(account, {
             hash: txHash,
             account,

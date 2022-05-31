@@ -50,10 +50,12 @@
   "dependencies": {
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^1.11.1",
+    "@ledgerhq/hw-transport-webusb": "^6.27.1",
     "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
     "@tippyjs/react": "^4.2.6",
+    "@yogh/starknetjs-signer-ledger": "^1.1.1",
     "buffer": "^6.0.3",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",

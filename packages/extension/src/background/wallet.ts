@@ -1,5 +1,6 @@
 import { EventEmitter } from "events"
 
+import { LedgerSigner } from "@yogh/starknetjs-signer-ledger"
 import { ethers } from "ethers"
 import {
   Account,
@@ -362,6 +363,7 @@ export class Wallet extends EventEmitter {
 
   public async addAccount(
     networkId: string,
+    signerType: string /* "local_secret" or "ledger_secret" */,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
@@ -370,15 +372,24 @@ export class Wallet extends EventEmitter {
     const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
-          account.signer.type === "local_secret" &&
+          account.signer.type === signerType &&
           account.network.id === networkId,
       )
       .map((account) => account.signer.derivationPath)
 
     const index = getNextPathIndex(currentPaths)
-    const starkPair = getStarkPair(index, this.session?.secret as string)
-    const starkPub = ec.getStarkKey(starkPair)
-    const seed = starkPub
+
+    let starkPub = ""
+    let seed = ""
+    if (signerType === "local_secret") {
+      const starkPair = getStarkPair(index, this.session?.secret as string)
+      starkPub = ec.getStarkKey(starkPair)
+      seed = starkPub
+    } else if (signerType === "ledger_secret") {
+      const ledger = new LedgerSigner(getPathForIndex(index))
+      starkPub = await ledger.getPubKey()
+      seed = starkPub
+    }
 
     const network = await this.getNetwork(networkId)
     const provider = getProvider(network)
@@ -416,7 +427,7 @@ export class Wallet extends EventEmitter {
       network,
       address: proxyAddress,
       signer: {
-        type: "local_secret",
+        type: signerType,
         derivationPath: getPathForIndex(index),
       },
     }
@@ -452,11 +463,15 @@ export class Wallet extends EventEmitter {
       throw Error("account not found")
     }
 
-    const keyPair = this.getKeyPairByDerivationPath(
-      account.signer.derivationPath,
-    )
+    let signer
+    if (account.signer.type === "local_secret") {
+      signer = this.getKeyPairByDerivationPath(account.signer.derivationPath)
+    } else {
+      signer = new LedgerSigner(account.signer.derivationPath)
+    }
+
     const provider = getProvider(account.network)
-    return new Account(provider, account.address, keyPair)
+    return new Account(provider, account.address, signer)
   }
 
   public async getSelectedStarknetAccount(): Promise<Account> {

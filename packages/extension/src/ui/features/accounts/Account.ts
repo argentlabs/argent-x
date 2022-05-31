@@ -65,8 +65,14 @@ export class Account {
     return stark.makeAddress(number.toHex(implementation))
   }
 
-  public static async fromDeploy(networkId: string): Promise<Account> {
-    sendMessage({ type: "NEW_ACCOUNT", data: networkId })
+  public static async fromDeploy(
+    networkId: string,
+    type: string,
+  ): Promise<Account> {
+    sendMessage({
+      type: "NEW_ACCOUNT",
+      data: { networkId: networkId, type: type },
+    })
 
     const result = await Promise.race([
       waitForMessage("NEW_ACCOUNT_RES"),

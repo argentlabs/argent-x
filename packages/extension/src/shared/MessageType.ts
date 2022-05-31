@@ -9,7 +9,7 @@ import { WalletAccount } from "./wallet.model"
 
 export type MessageType =
   // ***** accounts *****
-  | { type: "NEW_ACCOUNT"; data: string }
+  | { type: "NEW_ACCOUNT"; data: { networkId: string; type: string } }
   | {
       type: "NEW_ACCOUNT_RES"
       data: {

@@ -64,7 +64,11 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
       await overrideSubmit({ password })
     } else {
       try {
-        const newAccount = await deployAccount(switcherNetworkId, password)
+        const newAccount = await deployAccount(
+          switcherNetworkId,
+          "local_secret",
+          password,
+        )
         addAccount(newAccount)
         connectAccount(newAccount)
         navigate(await recover())

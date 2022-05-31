@@ -4,12 +4,16 @@ import { sendMessage } from "../../../shared/messages"
 import { startSession } from "../../services/messaging"
 import { Account } from "./Account"
 
-export const deployAccount = async (networkId: string, password?: string) => {
+export const deployAccount = async (
+  networkId: string,
+  type: string,
+  password?: string,
+) => {
   if (password) {
     await startSession(password)
   }
 
-  return Account.fromDeploy(networkId)
+  return Account.fromDeploy(networkId, type)
 }
 
 export const connectAccount = (account: Account) => {

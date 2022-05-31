@@ -113,6 +113,16 @@ export const SettingsScreen: FC = () => (
         <P>Here you can add, edit and remove custom networks.</P>
       </SettingsItem>
       <hr />
+      <SettingsItem
+        to={"index.html"}
+        onClick={() => chrome.tabs.create({ url: "index.html" })}
+      >
+        <Title>
+          <span>Connect HW Wallet</span>
+          <ArrowForwardIosIcon fontSize="inherit" />
+        </Title>
+      </SettingsItem>
+      <hr />
 
       <Footer>
         <P>Help, support &amp; suggestions:</P>
