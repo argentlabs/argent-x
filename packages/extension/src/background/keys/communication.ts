@@ -1,11 +1,4 @@
-import {
-  JWK,
-  KeyLike,
-  exportJWK,
-  exportPKCS8,
-  generateKeyPair,
-  importJWK,
-} from "jose"
+import { JWK, KeyLike, exportJWK, generateKeyPair, importJWK } from "jose"
 import browser from "webextension-polyfill"
 
 export async function getKeyPair() {
@@ -46,8 +39,4 @@ export async function getKeyPair() {
     publicKey,
     publicKeyJwk,
   }
-}
-
-export async function getPrivateKey(privateKey: KeyLike) {
-  return await exportPKCS8(privateKey)
 }

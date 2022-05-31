@@ -23,6 +23,7 @@ import {
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
+  grindKey,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
@@ -544,7 +545,9 @@ export class Wallet extends EventEmitter {
 
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    return wallet.privateKey
+    const privateKey = grindKey(wallet.privateKey)
+
+    return privateKey
   }
 
   public static validateBackup(backupString: string): boolean {
