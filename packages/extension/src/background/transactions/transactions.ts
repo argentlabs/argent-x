@@ -13,6 +13,7 @@ import { FetchTransactions, getTransactionHistory } from "./voyager"
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
 
 export interface TransactionTracker {
+  load: (accountsToPopulate: WalletAccount[]) => Promise<void>
   add: (transaction: TransactionRequest) => Promise<void>
   addAccount: (
     account: WalletAccount,
@@ -26,30 +27,22 @@ export interface TransactionTracker {
 export type TransactionUpdateListener = (updates: Transaction[]) => void
 
 type GetTransactionsTracker = (
-  accountsToPopulate: WalletAccount[],
   getTransactionsStore: GetTransactionsStore,
   fetchTransactions: FetchTransactions,
   onUpdate?: TransactionUpdateListener,
   updateInterval?: number,
-) => Promise<TransactionTracker>
+) => TransactionTracker
 
-export const getTransactionsTracker: GetTransactionsTracker = async (
-  accountsToPopulate,
+export const getTransactionsTracker: GetTransactionsTracker = (
   getTransactionsStore,
   fetchTransactions,
   onUpdate,
   updateInterval = 15e3, // 15 seconds
 ) => {
-  const accounts = uniqWith(accountsToPopulate, equalAccount)
-  const initialTransactions = await getTransactionHistory(
-    accounts,
-    [],
-    fetchTransactions,
-  )
+  const accounts: WalletAccount[] = []
+  const transactionsStore = getTransactionsStore()
 
-  const transactionsStore = getTransactionsStore(initialTransactions)
-
-  const updateHandler = async () => {
+  const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
     const historyTransactions = await getTransactionHistory(
       accounts,
@@ -76,9 +69,19 @@ export const getTransactionsTracker: GetTransactionsTracker = async (
     onUpdate?.(updates)
   }
 
-  const clearUpdate = setIntervalAsync(updateHandler, updateInterval)
+  const clearUpdate = setIntervalAsync(handleUpdate, updateInterval)
 
   return {
+    load: async (accountsToPopulate) => {
+      const initialAccounts = uniqWith(accountsToPopulate, equalAccount)
+      const initialTransactions = await getTransactionHistory(
+        initialAccounts,
+        [],
+        fetchTransactions,
+      )
+      transactionsStore.addItems(initialTransactions)
+      accounts.splice(0, accounts.length, ...initialAccounts)
+    },
     add: (transaction) => {
       const newTransaction = {
         status: "RECEIVED" as const,

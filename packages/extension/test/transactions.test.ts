@@ -29,12 +29,10 @@ const wallet: WalletAccount = {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const getTransactionsStore = (initialTransactions: Transaction[]) =>
+export const getTransactionsStore = () =>
   new ArrayStorage<Transaction>(
-    initialTransactions,
-    new MockStorage({
-      inner: initialTransactions,
-    }),
+    [],
+    new MockStorage({ inner: [] }),
     (a, b) =>
       a.hash === b.hash && a.account.network.id === a.account.network.id,
   )
@@ -46,13 +44,13 @@ describe("transactions", () => {
   let txTracker: TransactionTracker
   const fn = jest.fn()
   beforeEach(async () => {
-    txTracker = await getTransactionsTracker(
-      [wallet],
+    txTracker = getTransactionsTracker(
       getTransactionsStore,
       fetchMockTransactions,
       fn,
       1000,
     )
+    await txTracker.load([wallet])
   })
   afterEach(() => {
     fn.mockReset()
