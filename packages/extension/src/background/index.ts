@@ -819,6 +819,15 @@ import { Wallet, WalletStorageProps } from "./wallet"
         return sendToTabAndUi({ type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" })
       }
 
+      case "EXPORT_PRIVATE_KEY": {
+        const privateKey = await wallet.exportPrivateKey()
+
+        return sendToTabAndUi({
+          type: "EXPORT_PRIVATE_KEY_RES",
+          data: { privateKey },
+        })
+      }
+
       case "DELETE_ACCOUNT": {
         try {
           await wallet.removeAccount(msg.data)

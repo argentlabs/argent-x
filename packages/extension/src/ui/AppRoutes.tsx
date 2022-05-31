@@ -8,6 +8,7 @@ import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
+import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
@@ -146,6 +147,10 @@ const walletRoutes = (
     <Route
       path={routes.backupDownload.path}
       element={<BackupDownloadScreen />}
+    />
+    <Route
+      path={routes.exportPrivateKey.path}
+      element={<ExportPrivateKeyScreen />}
     />
   </>
 )
