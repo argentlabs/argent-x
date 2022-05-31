@@ -9,7 +9,7 @@ import { hasLegacy } from "./legacy"
 export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
   msg,
   background: { wallet },
-  keyPair: { privateKey },
+  messagingKeys: { privateKey },
   sendToTabAndUi,
 }) => {
   switch (msg.type) {

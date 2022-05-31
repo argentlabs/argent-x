@@ -1,7 +1,7 @@
 import { ActionItem } from "../shared/actionQueue"
 import { MessageType } from "../shared/messages"
 import { Queue } from "./actionQueue"
-import { KeyPair } from "./keys/communication"
+import { MessagingKeys } from "./keys/messagingKeys"
 import { TransactionTracker } from "./transactions/transactions"
 import { Wallet } from "./wallet"
 
@@ -22,7 +22,7 @@ interface HandlerParams<T> {
   msg: T
   sender: chrome.runtime.MessageSender
   background: BackgroundService
-  keyPair: KeyPair
+  messagingKeys: MessagingKeys
   sendToTabAndUi: (msg: MessageType) => Promise<void>
 }
 

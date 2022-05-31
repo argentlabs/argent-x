@@ -12,7 +12,7 @@ import { getTransactionsTracker } from "./transactions/transactions"
 
 export const handleBackupMessage: HandleMessage<BackupMessage> = async ({
   msg,
-  keyPair: { privateKey },
+  messagingKeys: { privateKey },
   background,
   sendToTabAndUi,
 }) => {

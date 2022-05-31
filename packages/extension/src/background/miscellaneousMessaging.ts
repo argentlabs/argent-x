@@ -13,7 +13,7 @@ export const handleMiscellaneousMessage: HandleMessage<
 > = async ({
   msg,
   background: { wallet },
-  keyPair: { publicKeyJwk, privateKey },
+  messagingKeys: { publicKeyJwk, privateKey },
   sendToTabAndUi,
 }) => {
   switch (msg.type) {

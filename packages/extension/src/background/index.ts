@@ -17,7 +17,7 @@ import {
 } from "./background"
 import { handleBackupMessage } from "./backupMessaging"
 import { getNetwork as getNetworkImplementation } from "./customNetworks"
-import { getKeyPair } from "./keys/communication"
+import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
@@ -30,9 +30,9 @@ import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { getTransactionsTracker } from "./transactions/transactions"
 import { Wallet, WalletStorageProps } from "./wallet"
 ;(async () => {
-  const keyPair = await getKeyPair()
-  const storage = new Storage<WalletStorageProps>({}, "wallet")
   const contracts = await loadContracts()
+  const messagingKeys = await getMessagingKeys()
+  const storage = new Storage<WalletStorageProps>({}, "wallet")
 
   const onAutoLock = () =>
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
@@ -95,7 +95,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           msg,
           sender,
           background,
-          keyPair,
+          messagingKeys,
           sendToTabAndUi,
         })
       } catch (error) {
