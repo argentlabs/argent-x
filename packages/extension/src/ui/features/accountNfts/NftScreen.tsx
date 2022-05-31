@@ -14,8 +14,8 @@ import {
   sendTransaction,
 } from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { openPlayOasisNft } from "./playoasis.service"
-import PlayOasisSvg from "./playoasis.svg"
+import { openAspectNft } from "./aspect.service"
+import AspectSvg from "./aspect.svg"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
@@ -47,7 +47,7 @@ export const Container = styled.div`
     margin: 10px 0 15px 0;
   }
 
-  .play-oasis {
+  .aspect {
     display: flex;
     align-items: center;
     width: inherit;
@@ -119,10 +119,10 @@ export const NftScreen: FC = () => {
         )}
         <p>{nft.description}</p>
         <Button
-          className="play-oasis"
-          onClick={() => openPlayOasisNft(nft.contract_address, nft.token_id)}
+          className="aspect"
+          onClick={() => openAspectNft(nft.contract_address, nft.token_id)}
         >
-          <PlayOasisSvg /> <span>View on PlayOasis</span>
+          <AspectSvg /> <span>View on Aspect</span>
         </Button>
 
         <ButtonGroup as="form" onSubmit={handleSubmit}>
