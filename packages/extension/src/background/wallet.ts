@@ -538,16 +538,22 @@ export class Wallet extends EventEmitter {
     return { url, filename }
   }
 
-  public exportPrivateKey(): string {
+  public async exportPrivateKey(): Promise<string> {
     if (!this.isSessionOpen() || !this.session?.secret) {
       throw new Error("Session is not open")
     }
 
-    const wallet = new ethers.Wallet(this.session?.secret)
+    const account = await this.getSelectedAccount()
+    if (!account) {
+      throw new Error("no selected account")
+    }
 
-    const privateKey = grindKey(wallet.privateKey)
+    const starkPair = getStarkPair(
+      account.signer.derivationPath,
+      this.session.secret,
+    )
 
-    return privateKey
+    return starkPair.priv.toString()
   }
 
   public static validateBackup(backupString: string): boolean {

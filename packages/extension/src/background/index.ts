@@ -822,13 +822,11 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "EXPORT_PRIVATE_KEY": {
-        const privateKey = wallet.exportPrivateKey()
-
-        const privateKeyBN = BigNumber.from(privateKey).toString()
+        const privateKey = await wallet.exportPrivateKey()
 
         return sendToTabAndUi({
           type: "EXPORT_PRIVATE_KEY_RES",
-          data: { privateKey: privateKeyBN },
+          data: { privateKey },
         })
       }
 
