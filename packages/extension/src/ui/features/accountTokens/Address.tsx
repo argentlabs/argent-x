@@ -21,18 +21,23 @@ export const AccountAddressIconsWrapper = styled.span`
   }
 `
 
-export const AccountAddressLink = styled.a`
-  font-size: 12px;
+export const Address = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
   line-height: 14px;
   max-width: 170px;
   text-overflow: ellipsis;
   overflow: hidden;
-  border: rgba(255, 255, 255, 0.15) solid 1px;
   border-radius: 12px;
   padding: 4px 10px;
   white-space: nowrap;
   color: white;
   text-decoration: none;
+
+  cursor: pointer;
 
   &:hover {
     background: rgba(255, 255, 255, 0.15);

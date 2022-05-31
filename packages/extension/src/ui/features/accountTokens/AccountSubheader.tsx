@@ -2,20 +2,14 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { CopyTooltip } from "../../components/CopyTooltip"
-import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
+import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
 import {
   formatTruncatedAddress,
   normalizeAddress,
 } from "../../services/addresses"
-import { getVoyagerContractLink } from "../../services/voyager.service"
 import { AccountStatus } from "../accounts/accounts.service"
-import { useNetwork } from "../networks/useNetworks"
 import { AccountName } from "./AccountName"
-import {
-  AccountAddressIconsWrapper,
-  AccountAddressLink,
-  AccountAddressWrapper,
-} from "./Address"
+import { AccountAddressWrapper, Address } from "./Address"
 
 const AccountStatusText = styled.p<{ color?: string }>`
   font-size: 12px;
@@ -27,7 +21,6 @@ const AccountStatusText = styled.p<{ color?: string }>`
 `
 
 interface AccountSubheaderProps {
-  networkId: string
   status: AccountStatus
   accountName?: string
   accountAddress: string
@@ -35,13 +28,11 @@ interface AccountSubheaderProps {
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
-  networkId,
   status,
   accountAddress,
   onChangeName,
   accountName,
 }) => {
-  const { network } = useNetwork(networkId)
   return (
     <>
       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -61,21 +52,15 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
           </AccountStatusText>
         )}
       </div>
-      <AccountAddressWrapper style={{ margin: "16px 0 18px 0" }}>
-        <AccountAddressLink
-          href={getVoyagerContractLink(accountAddress, network)}
-          target="_blank"
-        >
-          {formatTruncatedAddress(accountAddress)}
-          <OpenInNewIcon style={{ fontSize: 10 }} />
-        </AccountAddressLink>
+      <AccountAddressWrapper style={{ marginBottom: 18 }}>
         <CopyTooltip
           copyValue={normalizeAddress(accountAddress)}
           message="Copied!"
         >
-          <AccountAddressIconsWrapper>
+          <Address>
+            {formatTruncatedAddress(accountAddress)}
             <ContentCopyIcon style={{ fontSize: 12 }} />
-          </AccountAddressIconsWrapper>
+          </Address>
         </CopyTooltip>
       </AccountAddressWrapper>
     </>
