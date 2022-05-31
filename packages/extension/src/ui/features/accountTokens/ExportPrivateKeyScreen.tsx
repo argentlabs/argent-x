@@ -26,6 +26,26 @@ const Container = styled.div`
   }
 `
 
+const KeyContainer = styled.div`
+  background: #333332;
+  border: 1px solid #161616;
+  border-radius: 4px;
+  padding: 9px 13px 8px;
+  overflow-wrap: break-word;
+  font-size: 16px;
+  line-height: 140%;
+`
+
+const WarningContainer = styled.div`
+  margin-top: 15px;
+  border: 1px solid #333332;
+  padding: 9px 13px 8px;
+  overflow-wrap: break-word;
+  font-size: 14px;
+  line-height: 120%;
+  border-radius: 4px;
+`
+
 const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <>
@@ -37,16 +57,6 @@ const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
     </>
   )
 }
-
-const KeyContainer = styled.div`
-  background: #333332;
-  border: 1px solid #161616;
-  border-radius: 4px;
-  padding: 9px 13px 8px;
-  overflow-wrap: break-word;
-  font-size: 16px;
-  line-height: 140%;
-`
 
 export const ExportPrivateKeyScreen: FC = () => {
   const [isPasswordValid, setPasswordValid] = useState(false)
@@ -87,6 +97,12 @@ export const ExportPrivateKeyScreen: FC = () => {
           <KeyContainer>{privateKey}</KeyContainer>
         </CopyToClipboard>
       )}
+
+      <WarningContainer>
+        Warning: Never disclose this key. Anyone with your private keys can
+        steal any assets held in your account.
+      </WarningContainer>
+
       <StickyGroup>
         <Button onClick={() => navigate(-1)}>Done</Button>
       </StickyGroup>
