@@ -100,13 +100,13 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
           <Separator />
           <MenuItemWrapper onClick={handleEditClick}>
             <MenuItem>
-              <EditIcon /> Edit Name
+              <EditIcon /> Edit name
             </MenuItem>
           </MenuItemWrapper>
           <Separator />
           <MenuItemWrapper onClick={() => navigate(routes.exportPrivateKey())}>
             <MenuItem>
-              <WarningIcon /> Export Private Key
+              <WarningIcon /> Export private key
             </MenuItem>
           </MenuItemWrapper>
         </Menu>
