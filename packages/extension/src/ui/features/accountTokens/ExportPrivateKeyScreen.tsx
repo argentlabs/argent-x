@@ -1,8 +1,8 @@
-import { FC, ReactNode } from "react"
+import { FC, ReactNode, useState } from "react"
+import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { sendMessage } from "../../../shared/messages"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
@@ -10,6 +10,7 @@ import { H2 } from "../../components/Typography"
 import { checkPassword } from "../../services/messaging"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { PasswordForm } from "../onboarding/PasswordForm"
+import { usePrivateKey } from "./usePrivateKey"
 
 const Container = styled.div`
   display: flex;
@@ -37,33 +38,58 @@ const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
   )
 }
 
+const KeyContainer = styled.div`
+  background: #333332;
+  border: 1px solid #161616;
+  border-radius: 4px;
+  padding: 9px 13px 8px;
+  overflow-wrap: break-word;
+  font-size: 16px;
+  line-height: 140%;
+`
+
 export const ExportPrivateKeyScreen: FC = () => {
+  const [isPasswordValid, setPasswordValid] = useState(false)
+
   const navigate = useNavigate()
+
+  const privateKey = usePrivateKey()
 
   const handleVerifyPassword = async (password: any) => {
     const isValid = await checkPassword(password)
-
-    if (isValid) {
-      await sendMessage({ type: "EXPORT_PRIVATE_KEY" })
-      navigate(-1)
-    }
-
+    setPasswordValid(isValid)
     return isValid
+  }
+
+  if (!isPasswordValid) {
+    return (
+      <Wrapper>
+        <Paragraph>Enter your password to export your private key.</Paragraph>
+
+        <PasswordForm verifyPassword={handleVerifyPassword}>
+          {(isDirty) => (
+            <StickyGroup>
+              <Button type="submit" disabled={!isDirty}>
+                Export
+              </Button>
+            </StickyGroup>
+          )}
+        </PasswordForm>
+      </Wrapper>
+    )
   }
 
   return (
     <Wrapper>
-      <Paragraph>Enter your password to export your private key.</Paragraph>
-
-      <PasswordForm verifyPassword={handleVerifyPassword}>
-        {(isDirty) => (
-          <StickyGroup>
-            <Button type="submit" disabled={!isDirty}>
-              Export
-            </Button>
-          </StickyGroup>
-        )}
-      </PasswordForm>
+      <Paragraph>This is your private key (click to copy)</Paragraph>
+      {privateKey && (
+        <CopyToClipboard text={privateKey}>
+          <KeyContainer>{privateKey}</KeyContainer>
+        </CopyToClipboard>
+      )}
+      <StickyGroup>
+        <Button onClick={() => navigate(-1)}>Done</Button>
+      </StickyGroup>
     </Wrapper>
   )
 }

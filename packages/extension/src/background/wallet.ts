@@ -537,17 +537,14 @@ export class Wallet extends EventEmitter {
     return { url, filename }
   }
 
-  public exportPrivateKey(): { url: string; filename: string } {
+  public exportPrivateKey(): string {
     if (!this.isSessionOpen() || !this.session?.secret) {
       throw new Error("Session is not open")
     }
-    const blob = new Blob([this.session.secret], {
-      type: "application/json",
-    })
-    const url = URL.createObjectURL(blob)
-    const filename = "argent-x-private-key.json"
 
-    return { url, filename }
+    const wallet = new ethers.Wallet(this.session?.secret)
+
+    return wallet.privateKey
   }
 
   public static validateBackup(backupString: string): boolean {

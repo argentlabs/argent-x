@@ -216,7 +216,12 @@ export type MessageType =
       }
     }
   | { type: "EXPORT_PRIVATE_KEY" }
-  | { type: "EXPORT_PRIVATE_KEY_RES" }
+  | {
+      type: "EXPORT_PRIVATE_KEY_RES"
+      data: {
+        privateKey: string
+      }
+    }
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

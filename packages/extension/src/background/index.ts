@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers"
 import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 import { encode, number, stark } from "starknet"
 
@@ -821,8 +822,14 @@ import { Wallet, WalletStorageProps } from "./wallet"
       }
 
       case "EXPORT_PRIVATE_KEY": {
-        await downloadFile(wallet.exportPrivateKey())
-        return sendToTabAndUi({ type: "EXPORT_PRIVATE_KEY_RES" })
+        const privateKey = wallet.exportPrivateKey()
+
+        const privateKeyBN = BigNumber.from(privateKey).toString()
+
+        return sendToTabAndUi({
+          type: "EXPORT_PRIVATE_KEY_RES",
+          data: { privateKey: privateKeyBN },
+        })
       }
 
       case "DELETE_ACCOUNT": {
