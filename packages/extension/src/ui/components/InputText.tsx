@@ -81,6 +81,7 @@ export const InputText = styled(
     disabled,
     className,
     style,
+    inputRef,
     ...props
   }) => {
     const idRef = useRef(randomString())
@@ -94,6 +95,7 @@ export const InputText = styled(
           value={value}
           autoFocus={autoFocus}
           disabled={disabled}
+          ref={inputRef}
           {...props}
         />
         <Label>{placeholder}</Label>

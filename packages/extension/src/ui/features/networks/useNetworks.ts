@@ -1,6 +1,7 @@
 import useSWR from "swr"
 
 import { getNetwork } from "../../../shared/networks"
+import { useAppState } from "./../../app.state"
 import { getNetworkStatuses, getNetworks } from "../../services/messaging"
 import { SWRConfigCommon } from "../../services/swr"
 
@@ -39,4 +40,12 @@ export const useNetworkStatuses = (config?: SWRConfigCommon) => {
     networkStatuses,
     ...rest,
   }
+}
+
+export const useCurrentNetwork = () => {
+  const { switcherNetworkId } = useAppState()
+
+  const currentNetwork = useNetwork(switcherNetworkId)
+
+  return currentNetwork.network
 }

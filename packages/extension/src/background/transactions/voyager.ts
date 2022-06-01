@@ -8,11 +8,11 @@ import { mapVoyagerTransactionToTransaction } from "./transformers"
 
 export interface VoyagerTransaction {
   blockId: string
-  entry_point_type: string
-  globalIndex: number
+  entry_point_type: string | null
+  globalIndex?: number
   hash: string
   index: number
-  signature: string[]
+  signature: string[] | null
   timestamp: number
   to: string
   type: string
@@ -33,16 +33,19 @@ export const fetchVoyagerTransactions = async (
   return items
 }
 
-export async function getHistoryTransactionsForAccounts(
+export type FetchTransactions = typeof fetchVoyagerTransactions
+
+export async function getTransactionHistory(
   accountsToPopulate: WalletAccount[],
-  metadataTransactions: Transaction[] = [],
+  metadataTransactions: Transaction[],
+  fetchTransactions: FetchTransactions,
 ) {
   const accountsWithHistory = accountsToPopulate.filter((account) =>
     isKnownNetwork(account.network.id),
   )
   const transactionsPerAccount = await Promise.all(
     accountsWithHistory.map(async (account) => {
-      const voyagerTransactions = await fetchVoyagerTransactions(
+      const voyagerTransactions = await fetchTransactions(
         account.address,
         account.network,
       )

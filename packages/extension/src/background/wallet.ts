@@ -1,5 +1,3 @@
-import { EventEmitter } from "events"
-
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import {
@@ -95,27 +93,17 @@ export const equalAccount = (
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
-export class Wallet extends EventEmitter {
+export class Wallet {
   private encryptedBackup?: string
   private session?: WalletSession
 
-  private store: IStorage<WalletStorageProps>
-  private getNetwork: GetNetwork
-  private proxyCompiledContract: string
-  private argentAccountCompiledContract: string
-
   constructor(
-    store: IStorage<WalletStorageProps>,
-    proxyCompiledContract: string,
-    argentAccountCompiledContract: string,
-    getNetwork: GetNetwork,
-  ) {
-    super()
-    this.store = store
-    this.getNetwork = getNetwork
-    this.proxyCompiledContract = proxyCompiledContract
-    this.argentAccountCompiledContract = argentAccountCompiledContract
-  }
+    private store: IStorage<WalletStorageProps>,
+    private proxyCompiledContract: string,
+    private argentAccountCompiledContract: string,
+    private getNetwork: GetNetwork,
+    private onAutoLock?: () => Promise<void>,
+  ) {}
 
   public async setup() {
     await this.readBackup()
@@ -537,6 +525,24 @@ export class Wallet extends EventEmitter {
     return { url, filename }
   }
 
+  public async exportPrivateKey(): Promise<string> {
+    if (!this.isSessionOpen() || !this.session?.secret) {
+      throw new Error("Session is not open")
+    }
+
+    const account = await this.getSelectedAccount()
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = getStarkPair(
+      account.signer.derivationPath,
+      this.session.secret,
+    )
+
+    return starkPair.priv.toString()
+  }
+
   public static validateBackup(backupString: string): boolean {
     try {
       const backup = JSON.parse(backupString)
@@ -560,7 +566,7 @@ export class Wallet extends EventEmitter {
 
     setTimeout(() => {
       this.lock()
-      this.emit("autoLock")
+      this.onAutoLock?.()
     }, SESSION_DURATION)
   }
 

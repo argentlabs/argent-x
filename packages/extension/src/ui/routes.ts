@@ -35,6 +35,7 @@ export const routes = {
   accounts: route("/accounts"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
+  exportPrivateKey: route("/export-private-key"),
   fundingQrCode: route("/funding/qr-code"),
   token: route(
     (tokenAddress: string) => `/tokens/${tokenAddress}`,

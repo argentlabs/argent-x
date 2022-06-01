@@ -45,6 +45,7 @@ import { trackTransations } from "./transactions/notifications"
 import { getTransactionsStore } from "./transactions/store"
 import { nameTransaction } from "./transactions/transactionNames"
 import { getTransactionsTracker } from "./transactions/transactions"
+import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { getImplementationUpgradePath } from "./upgrade"
 import { Wallet, WalletStorageProps } from "./wallet"
 
@@ -52,10 +53,13 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const { privateKey, publicKeyJwk } = await getKeyPair()
 
   const storage = new Storage<WalletStorageProps>({}, "wallet")
+  const onAutoLock = () =>
+    sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
   const wallet = new Wallet(
     storage,
     ...(await loadContracts()),
     getNetworkImplementation,
+    onAutoLock,
   )
   await wallet.setup()
 
@@ -63,6 +67,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
   let transactionTracker = await getTransactionsTracker(
     await wallet.getAccounts(),
     getTransactionsStore,
+    fetchVoyagerTransactions,
     trackTransations,
   )
 
@@ -74,10 +79,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
     if (!hasTab(sender.tab?.id)) {
       sendMessageToActiveTabs(msg)
     }
-
-    wallet.on("autoLock", async () => {
-      await sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
-    })
 
     const actionQueue = await getQueue<ActionItem>({
       onUpdate: (actions) => {
@@ -684,6 +685,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           transactionTracker = await getTransactionsTracker(
             await wallet.getAccounts(),
             getTransactionsStore,
+            fetchVoyagerTransactions,
             trackTransations,
           )
 
@@ -818,6 +820,15 @@ import { Wallet, WalletStorageProps } from "./wallet"
       case "DOWNLOAD_LEGACY_BACKUP_FILE": {
         await downloadFile(await exportLegacyBackup())
         return sendToTabAndUi({ type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" })
+      }
+
+      case "EXPORT_PRIVATE_KEY": {
+        const privateKey = await wallet.exportPrivateKey()
+
+        return sendToTabAndUi({
+          type: "EXPORT_PRIVATE_KEY_RES",
+          data: { privateKey },
+        })
       }
 
       case "DELETE_ACCOUNT": {
