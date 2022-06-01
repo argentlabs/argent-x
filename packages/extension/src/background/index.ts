@@ -64,12 +64,12 @@ import { Wallet, WalletStorageProps } from "./wallet"
   await wallet.setup()
 
   // may get reassigned when a recovery happens
-  let transactionTracker = await getTransactionsTracker(
-    await wallet.getAccounts(),
+  const transactionTracker = getTransactionsTracker(
     getTransactionsStore,
     fetchVoyagerTransactions,
     trackTransations,
   )
+  transactionTracker.load(await wallet.getAccounts()) // no await here to defer loading
 
   messageStream.subscribe(async ([msg, sender]) => {
     const sendToTabAndUi = async (msg: MessageType) => {
@@ -682,12 +682,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           } = JSON.parse(encode.arrayBufferToString(plaintext))
 
           await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-          transactionTracker = await getTransactionsTracker(
-            await wallet.getAccounts(),
-            getTransactionsStore,
-            fetchVoyagerTransactions,
-            trackTransations,
-          )
+          await transactionTracker.load(await wallet.getAccounts())
 
           return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
         } catch {
