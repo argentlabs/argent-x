@@ -48,7 +48,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       footer={
         <FeeEstimation
           onErrorChange={setDisableConfirm}
-          }}
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
           transactions={transactions}
