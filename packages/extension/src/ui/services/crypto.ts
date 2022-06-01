@@ -2,10 +2,10 @@ import { CompactEncrypt, importJWK } from "jose"
 import { isString } from "lodash-es"
 import { encode } from "starknet"
 
-import { getPublicKey } from "./messaging"
+import { getMessagingPublicKey } from "./messaging"
 
 export const encrypt = async (value: string | Uint8Array) => {
-  const pubJwk = await getPublicKey()
+  const pubJwk = await getMessagingPublicKey()
   const pubKey = await importJWK(pubJwk)
 
   const plaintext = isString(value) ? encode.utf8ToArray(value) : value

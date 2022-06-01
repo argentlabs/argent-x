@@ -1,13 +1,16 @@
 import { number, stark } from "starknet"
 
 import { AccountMessage } from "../shared/messages/AccountMessage"
+import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
+import { encrypt } from "./crypto"
 import { getNetwork } from "./customNetworks"
 import { getImplementationUpgradePath } from "./upgrade"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
   background: { wallet, transactionTracker },
+  messagingKeys: { privateKey },
   sendToTabAndUi,
 }) => {
   switch (msg.type) {
@@ -111,6 +114,32 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       } catch {
         return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
       }
+    }
+
+    case "EXPORT_PRIVATE_KEY": {
+      const privateKey = await wallet.exportPrivateKey()
+
+      return sendToTabAndUi({
+        type: "EXPORT_PRIVATE_KEY_RES",
+        data: { privateKey },
+      })
+    }
+
+    case "GET_ENCRYPTED_SEED_PHRASE": {
+      if (!wallet.isSessionOpen()) {
+        throw Error("you need an open session")
+      }
+
+      const encryptedSeedPhrase = await encrypt(
+        await wallet.getSeedPhrase(),
+        msg.data.encryptedSecret,
+        privateKey,
+      )
+
+      return sendMessageToUi({
+        type: "GET_ENCRYPTED_SEED_PHRASE_RES",
+        data: { encryptedSeedPhrase },
+      })
     }
   }
 

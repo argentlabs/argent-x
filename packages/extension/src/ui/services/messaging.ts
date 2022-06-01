@@ -46,9 +46,9 @@ export const getLastSelectedAccount = async () => {
   return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
-export const getPublicKey = async () => {
-  sendMessage({ type: "GET_PUBLIC_KEY" })
-  return waitForMessage("GET_PUBLIC_KEY_RES")
+export const getMessagingPublicKey = async () => {
+  sendMessage({ type: "GET_MESSAGING_PUBLIC_KEY" })
+  return waitForMessage("GET_MESSAGING_PUBLIC_KEY_RES")
 }
 
 export const recoverBackup = async (backup: string) => {
@@ -110,7 +110,7 @@ export const getSeedPhrase = async (): Promise<string> => {
 
   const { payload } = await jwtDecrypt(encryptedSeedPhrase, otpKey)
 
-  return payload.seedPhrase as string
+  return payload.value as string
 }
 
 export const recoverBySeedPhrase = async (
