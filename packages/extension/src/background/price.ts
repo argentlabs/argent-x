@@ -5,11 +5,11 @@ import { Token, UniqueToken, equalToken, getFeeToken } from "../shared/token"
 import { StaleWhileRevalidateCache } from "./swr/types"
 import { fetchWithTimeout } from "./utils/fetchWithTimeout"
 
-type VsCorrency = "usd"
+type BaseCorrency = "usd"
 
 type GetPriceForToken = (
   token: UniqueToken,
-  vsCurrency?: VsCorrency,
+  baseCurrency?: BaseCorrency,
 ) => Promise<number>
 
 export const getPriceForToken: GetPriceForToken = async (
@@ -72,7 +72,7 @@ export class TokenPriceService {
 
   public async getPriceForToken(
     token: UniqueToken,
-    vsCurrency?: VsCorrency,
+    vsCurrency?: BaseCorrency,
   ): Promise<number> {
     const key = `${token.networkId}-${token.address}-${vsCurrency}`
     const result = await this.swrService(key, () =>
@@ -84,7 +84,7 @@ export class TokenPriceService {
   public async getPriceForTokenExact(
     token: Token,
     amount: number.BigNumberish,
-    vsCurrency?: VsCorrency,
+    vsCurrency?: BaseCorrency,
   ): Promise<number> {
     return getExactPriceForToken(
       token.decimals,

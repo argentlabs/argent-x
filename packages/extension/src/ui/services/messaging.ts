@@ -82,12 +82,10 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
 
   const response = await Promise.race([
     waitForMessage("ESTIMATE_TRANSACTION_FEE_RES"),
-    waitForMessage("ESTIMATE_TRANSACTION_FEE_REJ").then(() => "error" as const),
+    waitForMessage("ESTIMATE_TRANSACTION_FEE_REJ").then(() => {
+      throw new Error("Failed to estimate fee")
+    }),
   ])
-
-  if (response === "error") {
-    throw new Error("Failed to estimate fee")
-  }
 
   return {
     ...response,
