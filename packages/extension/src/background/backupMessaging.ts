@@ -13,11 +13,9 @@ import { getTransactionsTracker } from "./transactions/transactions"
 export const handleBackupMessage: HandleMessage<BackupMessage> = async ({
   msg,
   messagingKeys: { privateKey },
-  background,
+  background: { wallet, transactionTracker },
   sendToTabAndUi,
 }) => {
-  const { wallet } = background
-
   switch (msg.type) {
     case "RECOVER_BACKUP": {
       try {
@@ -57,11 +55,7 @@ export const handleBackupMessage: HandleMessage<BackupMessage> = async ({
         } = JSON.parse(encode.arrayBufferToString(plaintext))
 
         await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-        background.transactionTracker = await getTransactionsTracker(
-          await wallet.getAccounts(),
-          getTransactionsStore,
-          trackTransations,
-        )
+        transactionTracker.load(await wallet.getAccounts())
 
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
       } catch {

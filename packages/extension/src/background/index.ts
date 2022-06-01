@@ -1,6 +1,5 @@
 import { ActionItem } from "../shared/actionQueue"
-import { MessageType } from "../shared/messages"
-import { messageStream } from "../shared/messages"
+import { MessageType, messageStream } from "../shared/messages"
 import { handleAccountMessage } from "./accountMessaging"
 import { loadContracts } from "./accounts"
 import { handleActionMessage } from "./actionMessaging"
@@ -28,6 +27,7 @@ import { trackTransations } from "./transactions/notifications"
 import { getTransactionsStore } from "./transactions/store"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { getTransactionsTracker } from "./transactions/transactions"
+import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { Wallet, WalletStorageProps } from "./wallet"
 ;(async () => {
   const contracts = await loadContracts()
@@ -44,13 +44,13 @@ import { Wallet, WalletStorageProps } from "./wallet"
   )
   await wallet.setup()
 
-  const accounts = await wallet.getAccounts()
   // may get reassigned when a recovery happens
-  const transactionTracker = await getTransactionsTracker(
-    accounts,
+  const transactionTracker = getTransactionsTracker(
     getTransactionsStore,
+    fetchVoyagerTransactions,
     trackTransations,
   )
+  transactionTracker.load(await wallet.getAccounts()) // no await here to defer loading
 
   const actionQueue = await getQueue<ActionItem>({
     onUpdate: (actions) => {
