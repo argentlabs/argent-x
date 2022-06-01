@@ -45,6 +45,7 @@ import { trackTransations } from "./transactions/notifications"
 import { getTransactionsStore } from "./transactions/store"
 import { nameTransaction } from "./transactions/transactionNames"
 import { getTransactionsTracker } from "./transactions/transactions"
+import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { getImplementationUpgradePath } from "./upgrade"
 import { Wallet, WalletStorageProps } from "./wallet"
 
@@ -66,6 +67,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
   let transactionTracker = await getTransactionsTracker(
     await wallet.getAccounts(),
     getTransactionsStore,
+    fetchVoyagerTransactions,
     trackTransations,
   )
 
@@ -683,6 +685,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           transactionTracker = await getTransactionsTracker(
             await wallet.getAccounts(),
             getTransactionsStore,
+            fetchVoyagerTransactions,
             trackTransations,
           )
 
