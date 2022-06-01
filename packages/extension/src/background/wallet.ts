@@ -365,7 +365,7 @@ export class Wallet {
     networkId: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     // FIXME: delete this once Cairo 9 is on mainnet
-    if (networkId === "mainnet-alpha") {
+    if (networkId !== "goerli-alpha" || networkId !== "integration") {
       return this.addAccountPreCairo9(networkId)
     }
 
