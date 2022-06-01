@@ -96,6 +96,24 @@ export const useMaxFeeEstimation = (transactions: Call | Call[]) => {
   return { fee, error }
 }
 
+function getTooltipText(
+  suggestedMaxFee?: BigNumber,
+  feeTokenBalance?: BigNumber,
+) {
+  const enoughBalance = Boolean(
+    suggestedMaxFee && feeTokenBalance?.gte(suggestedMaxFee),
+  )
+  return suggestedMaxFee && feeTokenBalance
+    ? enoughBalance
+      ? "Network fees are paid to the network to include transactions in blocks"
+      : `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
+          suggestedMaxFee,
+        )} ETH and your current balance is ${utils.formatEther(
+          feeTokenBalance,
+        )} ETH.`
+    : "Network fee is still loading."
+}
+
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   onChange,
   accountAddress,
@@ -138,15 +156,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             <Tippy
               content={
                 <Tooltip as="div">
-                  {fee && feeTokenBalance
-                    ? enoughBalance
-                      ? "Network fees are paid to the network to include transactions in blocks"
-                      : `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-                          fee.suggestedMaxFee,
-                        )} ETH and your current balance is ${utils.formatEther(
-                          feeTokenBalance,
-                        )} ETH.`
-                    : "Network fee is still loading."}
+                  {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
                 </Tooltip>
               }
             >
