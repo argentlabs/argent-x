@@ -8,7 +8,7 @@ import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
 import { setIntervalAsync } from "./setIntervalAsync"
 import type { GetTransactionsStore } from "./store"
-import { getHistoryTransactionsForAccounts } from "./voyager"
+import { FetchTransactions, getTransactionHistory } from "./voyager"
 
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
 
@@ -28,6 +28,7 @@ export type TransactionUpdateListener = (updates: Transaction[]) => void
 type GetTransactionsTracker = (
   accountsToPopulate: WalletAccount[],
   getTransactionsStore: GetTransactionsStore,
+  fetchTransactions: FetchTransactions,
   onUpdate?: TransactionUpdateListener,
   updateInterval?: number,
 ) => Promise<TransactionTracker>
@@ -35,19 +36,25 @@ type GetTransactionsTracker = (
 export const getTransactionsTracker: GetTransactionsTracker = async (
   accountsToPopulate,
   getTransactionsStore,
+  fetchTransactions,
   onUpdate,
   updateInterval = 15e3, // 15 seconds
 ) => {
   const accounts = uniqWith(accountsToPopulate, equalAccount)
-  const initialTransactions = await getHistoryTransactionsForAccounts(accounts)
+  const initialTransactions = await getTransactionHistory(
+    accounts,
+    [],
+    fetchTransactions,
+  )
 
   const transactionsStore = getTransactionsStore(initialTransactions)
 
   const updateHandler = async () => {
     const allTransactions = await transactionsStore.getItems()
-    const historyTransactions = await getHistoryTransactionsForAccounts(
+    const historyTransactions = await getTransactionHistory(
       accounts,
       allTransactions,
+      fetchTransactions,
     )
     const pendingTransactions = await transactionsStore.getItems(
       ({ hash }) =>
