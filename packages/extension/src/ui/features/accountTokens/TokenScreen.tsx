@@ -1,5 +1,6 @@
 import { ethers } from "ethers"
 import React, { FC, useState } from "react"
+import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
@@ -66,6 +67,10 @@ const BalanceAmount = styled.div`
   font-weight: bold;
   font-size: 34px;
   line-height: 41px;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const BalanceSymbol = styled.div`
@@ -88,6 +93,8 @@ export const TokenScreen: FC = () => {
   }
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+
+  const formattedBalance = parseFloat(balance).toPrecision(8)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -114,7 +121,11 @@ export const TokenScreen: FC = () => {
         </TokenTitle>
         <BalanceAlert>
           <BalanceTitle>Your balance</BalanceTitle>
-          <BalanceAmount>{balance}</BalanceAmount>
+          <CopyToClipboard text={balance}>
+            <BalanceAmount>
+              {balance.length > 8 ? formattedBalance : balance}
+            </BalanceAmount>
+          </CopyToClipboard>
           <BalanceSymbol>{symbol}</BalanceSymbol>
         </BalanceAlert>
 
