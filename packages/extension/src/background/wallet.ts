@@ -364,6 +364,11 @@ export class Wallet {
   public async addAccount(
     networkId: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
+    // FIXME: delete this once Cairo 9 is on mainnet
+    if (networkId === "mainnet-alpha") {
+      return this.addAccountPreCairo9(networkId)
+    }
+
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
@@ -424,6 +429,76 @@ export class Wallet {
     await this.selectAccount(account.address)
 
     return { account, txHash: deployTransaction.transaction_hash }
+  }
+
+  // FIXME: delete this once Cairo 9 is on mainnet
+  public async addAccountPreCairo9(
+    networkId: string,
+  ): Promise<{ account: WalletAccount; txHash: string }> {
+    if (!this.isSessionOpen()) {
+      throw Error("no open session")
+    }
+
+    const currentPaths = (await this.getAccounts())
+      .filter(
+        (account) =>
+          account.signer.type === "local_secret" &&
+          account.network.id === networkId,
+      )
+      .map((account) => account.signer.derivationPath)
+
+    const index = getNextPathIndex(currentPaths)
+    const starkPair = getStarkPair(index, this.session?.secret as string)
+    const starkPub = ec.getStarkKey(starkPair)
+    const seed = starkPub
+
+    const network = await this.getNetwork(networkId)
+    const provider = getProvider(network)
+
+    let implementation = network.accountImplementation
+    if (!implementation) {
+      const deployImplementationTransaction = await provider.deployContract({
+        contract: this.argentAccountCompiledContract,
+      })
+      assertTransactionReceived(deployImplementationTransaction, true)
+      implementation = deployImplementationTransaction.address as string
+    } else {
+      // if there is an implementation, we need to check if accounts were already deployed
+      this.discoverAccountsForNetwork(networkId)
+    }
+
+    const deployTransaction = await provider.deployContract({
+      contract: this.proxyCompiledContract,
+      constructorCalldata: stark.compileCalldata({ implementation }),
+      addressSalt: seed,
+    })
+
+    assertTransactionReceived(deployTransaction, true)
+    const proxyAddress = deployTransaction.address as string
+
+    const initTransaction = await provider.invokeFunction({
+      contractAddress: proxyAddress,
+      entrypoint: "initialize",
+      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+    })
+
+    assertTransactionReceived(initTransaction)
+
+    const account = {
+      network,
+      address: proxyAddress,
+      signer: {
+        type: "local_secret",
+        derivationPath: getPathForIndex(index),
+      },
+    }
+
+    await this.pushAccount(account)
+
+    await this.writeBackup()
+    await this.selectAccount(account.address)
+
+    return { account, txHash: initTransaction.transaction_hash }
   }
 
   public async getAccountByAddress(address: string): Promise<WalletAccount> {
