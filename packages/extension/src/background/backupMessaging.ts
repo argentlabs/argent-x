@@ -6,9 +6,6 @@ import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { downloadFile } from "./download"
 import { exportLegacyBackup } from "./legacy"
-import { trackTransations } from "./transactions/notifications"
-import { getTransactionsStore } from "./transactions/store"
-import { getTransactionsTracker } from "./transactions/transactions"
 
 export const handleBackupMessage: HandleMessage<BackupMessage> = async ({
   msg,
