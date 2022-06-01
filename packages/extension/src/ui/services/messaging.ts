@@ -1,6 +1,5 @@
 import { BigNumber } from "ethers"
-import { exportJWK, generateSecret, jwtDecrypt } from "jose"
-import { Call, encode, number } from "starknet"
+import { Call, number } from "starknet"
 
 import {
   messageStream,
@@ -9,7 +8,11 @@ import {
 } from "../../shared/messages"
 import { Network } from "../../shared/networks"
 import { Token } from "../../shared/token"
-import { encrypt } from "./crypto"
+import {
+  decryptFromBackground,
+  encryptForBackground,
+  generateEncryptedSecret,
+} from "./crypto"
 
 if (process.env.NODE_ENV === "development") {
   messageStream.subscribe(([message]) => {
@@ -88,29 +91,17 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
 }
 
 export const getSeedPhrase = async (): Promise<string> => {
-  const otpKey = await generateSecret("A256GCM", { extractable: true })
-  const otpBuffer = encode.utf8ToArray(
-    JSON.stringify({
-      alg: "A256GCM",
-      ...(await exportJWK(otpKey)),
-    }),
-  )
-  const encryptedSecret = await encrypt(otpBuffer)
-
+  const { secret, encryptedSecret } = await generateEncryptedSecret()
   sendMessage({
     type: "GET_ENCRYPTED_SEED_PHRASE",
-    data: {
-      encryptedSecret,
-    },
+    data: { encryptedSecret },
   })
 
   const { encryptedSeedPhrase } = await waitForMessage(
     "GET_ENCRYPTED_SEED_PHRASE_RES",
   )
 
-  const { payload } = await jwtDecrypt(encryptedSeedPhrase, otpKey)
-
-  return payload.value as string
+  return await decryptFromBackground(encryptedSeedPhrase, secret)
 }
 
 export const recoverBySeedPhrase = async (
@@ -124,7 +115,7 @@ export const recoverBySeedPhrase = async (
 
   sendMessage({
     type: "RECOVER_SEEDPHRASE",
-    data: { secure: true, body: await encrypt(msgJson) },
+    data: { secure: true, body: await encryptForBackground(msgJson) },
   })
 
   const succeeded = await Promise.race([
@@ -151,7 +142,7 @@ export const updateTransactionFee = async (
 }
 
 export const startSession = async (password: string): Promise<void> => {
-  const body = await encrypt(password)
+  const body = await encryptForBackground(password)
 
   sendMessage({ type: "START_SESSION", data: { secure: true, body } })
 
@@ -168,7 +159,7 @@ export const startSession = async (password: string): Promise<void> => {
 }
 
 export const checkPassword = async (password: string): Promise<boolean> => {
-  const body = await encrypt(password)
+  const body = await encryptForBackground(password)
 
   sendMessage({ type: "CHECK_PASSWORD", data: { body } })
 
@@ -246,11 +237,17 @@ export const addToken = async (token: Token) => {
 }
 
 export const getPrivateKey = async () => {
-  sendMessage({ type: "EXPORT_PRIVATE_KEY" })
+  const { secret, encryptedSecret } = await generateEncryptedSecret()
+  sendMessage({
+    type: "GET_ENCRYPTED_PRIVATE_KEY",
+    data: { encryptedSecret },
+  })
 
-  const { privateKey } = await waitForMessage("EXPORT_PRIVATE_KEY_RES")
+  const { encryptedPrivateKey } = await waitForMessage(
+    "GET_ENCRYPTED_PRIVATE_KEY_RES",
+  )
 
-  return privateKey
+  return await decryptFromBackground(encryptedPrivateKey, secret)
 }
 
 // for debugging purposes

@@ -3,7 +3,7 @@ import { number, stark } from "starknet"
 import { AccountMessage } from "../shared/messages/AccountMessage"
 import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
-import { encrypt } from "./crypto"
+import { encryptForUi } from "./crypto"
 import { getNetwork } from "./customNetworks"
 import { getImplementationUpgradePath } from "./upgrade"
 
@@ -116,12 +116,20 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
-    case "EXPORT_PRIVATE_KEY": {
-      const privateKey = await wallet.exportPrivateKey()
+    case "GET_ENCRYPTED_PRIVATE_KEY": {
+      if (!wallet.isSessionOpen()) {
+        throw Error("you need an open session")
+      }
+
+      const encryptedPrivateKey = await encryptForUi(
+        await wallet.exportPrivateKey(),
+        msg.data.encryptedSecret,
+        privateKey,
+      )
 
       return sendToTabAndUi({
-        type: "EXPORT_PRIVATE_KEY_RES",
-        data: { privateKey },
+        type: "GET_ENCRYPTED_PRIVATE_KEY_RES",
+        data: { encryptedPrivateKey },
       })
     }
 
@@ -130,7 +138,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         throw Error("you need an open session")
       }
 
-      const encryptedSeedPhrase = await encrypt(
+      const encryptedSeedPhrase = await encryptForUi(
         await wallet.getSeedPhrase(),
         msg.data.encryptedSecret,
         privateKey,

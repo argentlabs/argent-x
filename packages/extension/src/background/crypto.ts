@@ -1,7 +1,7 @@
 import { EncryptJWT, KeyLike, compactDecrypt, importJWK } from "jose"
 import { encode } from "starknet"
 
-export const encrypt = async (
+export const encryptForUi = async (
   value: string,
   encryptedSecret: string,
   privateKey: KeyLike,
