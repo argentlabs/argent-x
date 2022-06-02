@@ -1,4 +1,4 @@
-import { MoreVertSharp } from "@mui/icons-material"
+import { MoreVertSharp, VisibilityOff } from "@mui/icons-material"
 import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -11,6 +11,7 @@ import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { useHideAccountCallback } from "./useHideAccountCallback"
 
 const StyledMoreVert = styled(MoreVertSharp)`
   cursor: pointer;
@@ -63,6 +64,12 @@ const MenuItem = styled.div`
   color: rgba(255, 255, 255, 0.7);
 `
 
+const IconWrapper = styled.div`
+  height: 13px;
+  width: 12px;
+  font-size: 12px;
+`
+
 interface AccountNameProps {
   onAccountNameEdit: () => void
 }
@@ -81,6 +88,8 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
     setMenuOpen(false)
     onAccountNameEdit()
   }
+
+  const hideAccount = useHideAccountCallback()
 
   return (
     <MenuContainer ref={ref}>
@@ -103,6 +112,17 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
               <EditIcon /> Edit name
             </MenuItem>
           </MenuItemWrapper>
+          <Separator />
+          {account && (
+            <MenuItemWrapper onClick={() => hideAccount(account)}>
+              <MenuItem>
+                <IconWrapper>
+                  <VisibilityOff fontSize={"inherit"} htmlColor={"white"} />
+                </IconWrapper>
+                Hide Account
+              </MenuItem>
+            </MenuItemWrapper>
+          )}
           <Separator />
           <MenuItemWrapper onClick={() => navigate(routes.exportPrivateKey())}>
             <MenuItem>

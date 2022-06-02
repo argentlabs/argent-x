@@ -3,9 +3,10 @@ import create from "zustand"
 import { Account } from "./Account"
 
 interface State {
-  accounts: Record<string, Account>
+  accounts: { [address: string]: Account }
   selectedAccount?: string
   addAccount: (newAccount: Account) => void
+  hideAccount: (account: Account) => void
 }
 
 export const useAccounts = create<State>((set) => ({
@@ -18,6 +19,16 @@ export const useAccounts = create<State>((set) => ({
         [newAccount.address]: newAccount,
       },
     })),
+  hideAccount: (accountToHide: Account) =>
+    set((state) => {
+      const updatedAccounts = Object.entries(state.accounts)
+        .filter(([address, _]) => address !== accountToHide.address)
+        .reduce((acc, [address, account]) => {
+          return { ...acc, [address]: account }
+        }, {})
+
+      return { accounts: updatedAccounts }
+    }),
 }))
 
 export const useAccount = (address: string): Account | undefined =>
