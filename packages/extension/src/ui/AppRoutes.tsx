@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
@@ -12,7 +12,6 @@ import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKe
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
-import { migrateUiTokensToBackground } from "./features/accountTokens/tokensLegacy.service"
 import {
   useActions,
   useActionsSubscription,
@@ -159,10 +158,6 @@ export const AppRoutes: FC = () => {
   useEntryRoute()
   useActionsSubscription()
   useTokensSubscription()
-
-  useEffect(() => {
-    migrateUiTokensToBackground()
-  }, [])
 
   const { isLoading } = useAppState()
   const { actions } = useActions()
