@@ -29,6 +29,10 @@ import { checkIfUpgradeAvailable } from "./upgrade.service"
 
 export const DeleteAccountButton = styled(NetworkStatusWrapper)`
   display: none;
+
+  button {
+    padding: 6px 8px;
+  }
 `
 
 export const AccountListItemWrapper = styled.div<{
@@ -140,10 +144,7 @@ export const AccountListItem: FC<AccountListProps> = ({
           showUpgradeBanner && (
             <NetworkStatusWrapper>
               <ArrowCircleDownIcon
-                style={{
-                  maxHeight: "16px",
-                  maxWidth: "16px",
-                }}
+                style={{ maxHeight: "16px", maxWidth: "16px" }}
               />
               <AccountStatusText>Upgrade</AccountStatusText>
             </NetworkStatusWrapper>
