@@ -156,11 +156,10 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   const showEstimateError = Boolean(error)
   const showError = showFeeError || showEstimateError
 
-  const onErrorChangeValue =
-    !fee || !feeTokenBalance || !enoughBalance || showError
+  const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
   useEffect(() => {
-    onErrorChange?.(onErrorChangeValue)
-  }, [onErrorChangeValue])
+    onErrorChange?.(hasError)
+  }, [hasError])
 
   return (
     <FieldGroup error={showError}>
