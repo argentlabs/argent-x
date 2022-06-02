@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash-es"
+import { some } from "lodash-es"
 
 import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
 import { hasLatestDerivationPath } from "../../../shared/wallet.service"
@@ -21,7 +21,7 @@ export const recover = async ({
   try {
     const allAccounts = await getAccounts()
     // FIXME: remove this if-statement when mainnet is on Cairo 9
-    if (!isEmpty(allAccounts) && !allAccounts.some(hasLatestDerivationPath)) {
+    if (some(allAccounts) && !allAccounts.some(hasLatestDerivationPath)) {
       return routes.migrationDisclaimer()
     }
 
