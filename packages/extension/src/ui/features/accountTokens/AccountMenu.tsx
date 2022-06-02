@@ -7,11 +7,12 @@ import { EditIcon } from "../../components/Icons/AccountMenu/EditIcon"
 import { ViewOnVoyagerIcon } from "../../components/Icons/AccountMenu/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/AccountMenu/WarningIcon"
 import { routes } from "../../routes"
+import { deleteAccount } from "../../services/messaging"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { Account } from "../accounts/Account"
+import { useAccounts, useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { useHideAccountCallback } from "./useHideAccountCallback"
 
 const StyledMoreVert = styled(MoreVertSharp)`
   cursor: pointer;
@@ -79,6 +80,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const ref = useRef<HTMLDivElement>(null)
   const currentNetwork = useCurrentNetwork()
   const navigate = useNavigate()
+  const { hideAccount } = useAccounts()
 
   const account = useSelectedAccount()
 
@@ -89,7 +91,11 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
     onAccountNameEdit()
   }
 
-  const hideAccount = useHideAccountCallback()
+  const handleHideAccount = async (account: Account) => {
+    hideAccount(account)
+    await deleteAccount(account.address)
+    navigate(routes.accounts())
+  }
 
   return (
     <MenuContainer ref={ref}>
@@ -114,7 +120,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
           </MenuItemWrapper>
           <Separator />
           {account && (
-            <MenuItemWrapper onClick={() => hideAccount(account)}>
+            <MenuItemWrapper onClick={() => handleHideAccount(account)}>
               <MenuItem>
                 <IconWrapper>
                   <VisibilityOff fontSize={"inherit"} htmlColor={"white"} />
