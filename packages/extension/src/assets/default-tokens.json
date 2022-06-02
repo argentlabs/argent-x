@@ -18,7 +18,7 @@
     "showAlways": true
   },
   {
-    "address": "0x001108cdbe5d82737b9057590adaf97d34e74b5452f0628161d237746b6fe69e",
+    "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
     "name": "DAI",
     "symbol": "DAI",
     "decimals": "18",
@@ -26,7 +26,7 @@
     "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
   },
   {
-    "address": "0x0278f24c3e74cbf7a375ec099df306289beb0605a346277d200b791a7f811a19",
+    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
     "name": "DAI",
     "symbol": "DAI",
     "decimals": "18",
