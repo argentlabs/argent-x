@@ -5,6 +5,7 @@
   "repository": "github:argentlabs/argent-x",
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
+    "bundlewatch": "^0.3.3",
     "import-sort-style-module": "^6.0.0",
     "lerna": "^5.0.0",
     "prettier": ">=2",
@@ -26,6 +27,14 @@
       "style": "module",
       "parser": "typescript"
     }
+  },
+  "bundlewatch": {
+    "files": [
+      {
+        "path": "packages/extension/dist/*.js",
+        "maxSize": "4mB"
+      }
+    ]
   },
   "license": "GPLV3"
 }
