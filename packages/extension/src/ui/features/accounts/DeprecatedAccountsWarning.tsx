@@ -1,3 +1,4 @@
+// FIXME: delete this file when Cairo 9 is on mainnet
 import { FC } from "react"
 import styled from "styled-components"
 
