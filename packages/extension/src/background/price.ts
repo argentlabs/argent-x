@@ -14,20 +14,20 @@ type GetPriceForToken = (
 
 export const getPriceForToken: GetPriceForToken = async (
   token,
-  vsCurrency = "usd",
+  baseCurrency = "usd",
 ) => {
   const feeTokenResult = getFeeToken(token.networkId ?? defaultNetwork.id)
 
   if (
     feeTokenResult &&
     equalToken(token, feeTokenResult) &&
-    vsCurrency === "usd"
+    baseCurrency === "usd"
   ) {
     const result = await fetchWithTimeout(
-      `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=${vsCurrency}`,
+      `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=${baseCurrency}`,
     )
     const resultJson = await result.json()
-    return resultJson.ethereum[vsCurrency]
+    return resultJson.ethereum[baseCurrency]
   }
 
   throw new Error("Price not found")
@@ -43,15 +43,15 @@ function countDecimals(num: number) {
 function getExactPriceForToken(
   decimals: string | number,
   amount: number.BigNumberish,
-  priceForOne: number,
+  price: number,
 ): number {
   const amountDecimals =
     typeof decimals === "number" ? decimals : parseInt(decimals)
-  const priceDecimals = countDecimals(priceForOne)
+  const priceDecimals = countDecimals(price)
   const minMultiplier = Math.pow(10, priceDecimals)
   const maxMultiplierBn = number.toBN(10).pow(number.toBN(amountDecimals))
 
-  const priceBn = number.toBN(priceForOne * minMultiplier)
+  const priceBn = number.toBN(price * minMultiplier)
   const amountBn = number.toBN(amount)
 
   const result = amountBn.mul(priceBn).div(maxMultiplierBn)
@@ -59,24 +59,18 @@ function getExactPriceForToken(
 }
 
 export class TokenPriceService {
-  private readonly getPriceForTokenImpl: GetPriceForToken
-  private readonly swrService: StaleWhileRevalidateCache
-
   constructor(
-    swrService: StaleWhileRevalidateCache,
-    getPriceForTokenImpl: GetPriceForToken = getPriceForToken,
-  ) {
-    this.getPriceForTokenImpl = getPriceForTokenImpl
-    this.swrService = swrService
-  }
+    private readonly swrService: StaleWhileRevalidateCache,
+    private readonly getPriceForTokenImpl: GetPriceForToken = getPriceForToken,
+  ) {}
 
   public async getPriceForToken(
     token: UniqueToken,
-    vsCurrency?: BaseCorrency,
+    baseCurrency?: BaseCorrency,
   ): Promise<number> {
-    const key = `${token.networkId}-${token.address}-${vsCurrency}`
+    const key = `${token.networkId}-${token.address}-${baseCurrency}`
     const result = await this.swrService(key, () =>
-      this.getPriceForTokenImpl(token, vsCurrency),
+      this.getPriceForTokenImpl(token, baseCurrency),
     )
     return result
   }

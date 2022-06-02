@@ -2,7 +2,7 @@ import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
 import { FC, useEffect, useMemo } from "react"
 import { Call } from "starknet"
-import styled, { keyframes } from "styled-components"
+import styled, { css, keyframes } from "styled-components"
 import useSWR from "swr"
 
 import { Tooltip } from "../../components/CopyTooltip"
@@ -100,19 +100,32 @@ function getTooltipText(
   suggestedMaxFee?: BigNumber,
   feeTokenBalance?: BigNumber,
 ) {
-  const enoughBalance = Boolean(
-    suggestedMaxFee && feeTokenBalance?.gte(suggestedMaxFee),
-  )
-  return suggestedMaxFee && feeTokenBalance
-    ? enoughBalance
-      ? "Network fees are paid to the network to include transactions in blocks"
-      : `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-          suggestedMaxFee,
-        )} ETH and your current balance is ${utils.formatEther(
-          feeTokenBalance,
-        )} ETH.`
-    : "Network fee is still loading."
+  if (!suggestedMaxFee || !feeTokenBalance) {
+    return "Network fee is still loading."
+  }
+  if (feeTokenBalance.gte(suggestedMaxFee)) {
+    return "Network fees are paid to the network to include transactions in blocks"
+  }
+  return `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
+    suggestedMaxFee.sub(feeTokenBalance),
+  )} ETH more.`
 }
+
+const StyledIconMixin = css`
+  max-height: 16px;
+  max-width: 16px;
+  margin-left: 6px;
+  color: #8f8e8c;
+  cursor: pointer;
+`
+const StyledInfoRoundedIcon = styled(InfoRoundedIcon)`
+  ${StyledIconMixin}
+`
+const StyledReportGmailerrorredRoundedIcon = styled(
+  ReportGmailerrorredRoundedIcon,
+)`
+  ${StyledIconMixin}
+`
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   onChange,
@@ -143,9 +156,11 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   const showEstimateError = Boolean(error)
   const showError = showFeeError || showEstimateError
 
+  const onErrorChangeValue =
+    !fee || !feeTokenBalance || !enoughBalance || showError
   useEffect(() => {
-    onErrorChange?.(!fee || !feeTokenBalance || !enoughBalance || showError)
-  }, [onErrorChange, showError, fee, feeTokenBalance, enoughBalance])
+    onErrorChange?.(onErrorChangeValue)
+  }, [onErrorChangeValue])
 
   return (
     <FieldGroup error={showError}>
@@ -161,25 +176,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
               }
             >
               {enoughBalance ? (
-                <InfoRoundedIcon
-                  style={{
-                    maxHeight: "16px",
-                    maxWidth: "16px",
-                    marginLeft: "6px",
-                    color: "#8f8e8c",
-                    cursor: "pointer",
-                  }}
-                />
+                <StyledInfoRoundedIcon />
               ) : (
-                <ReportGmailerrorredRoundedIcon
-                  style={{
-                    maxHeight: "16px",
-                    maxWidth: "16px",
-                    marginLeft: "6px",
-                    color: "#8f8e8c",
-                    cursor: "pointer",
-                  }}
-                />
+                <StyledReportGmailerrorredRoundedIcon />
               )}
             </Tippy>
           </FieldKey>
