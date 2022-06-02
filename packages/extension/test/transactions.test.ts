@@ -11,10 +11,12 @@ import {
   TransactionTracker,
   getTransactionsTracker,
 } from "../src/background/transactions/transactions"
+import { FetchTransactions } from "../src/background/transactions/voyager"
 import { defaultNetwork } from "../src/shared/networks"
 import { Transaction, TransactionRequest } from "../src/shared/transactions"
 import { WalletAccount } from "../src/shared/wallet.model"
 import { MockStorage } from "./mock"
+import transactionsMock from "./transactions.mock.json"
 
 const wallet: WalletAccount = {
   address: "0x05e54edb59e1b1e398f9647e617276f6da0eb9ddfc0c02723269b9baa2489dce",
@@ -27,26 +29,28 @@ const wallet: WalletAccount = {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const getTransactionsStore = (initialTransactions: Transaction[]) =>
+export const getTransactionsStore = () =>
   new ArrayStorage<Transaction>(
-    initialTransactions,
-    new MockStorage({
-      inner: initialTransactions,
-    }),
+    [],
+    new MockStorage({ inner: [] }),
     (a, b) =>
       a.hash === b.hash && a.account.network.id === a.account.network.id,
   )
+
+const fetchMockTransactions: FetchTransactions = async (_, __) =>
+  transactionsMock.items
 
 describe("transactions", () => {
   let txTracker: TransactionTracker
   const fn = jest.fn()
   beforeEach(async () => {
-    txTracker = await getTransactionsTracker(
-      [wallet],
+    txTracker = getTransactionsTracker(
       getTransactionsStore,
+      fetchMockTransactions,
       fn,
       1000,
     )
+    await txTracker.load([wallet])
   })
   afterEach(() => {
     fn.mockReset()

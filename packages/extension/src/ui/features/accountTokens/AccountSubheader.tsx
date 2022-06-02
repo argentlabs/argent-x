@@ -17,7 +17,7 @@ const AccountStatusText = styled.p<{ color?: string }>`
   font-weight: 600;
   line-height: 12px;
   text-align: center;
-  margin-top: 6px;
+  margin-bottom: 6px;
   color: ${({ color }) => color};
 `
 

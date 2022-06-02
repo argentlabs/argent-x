@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
 
+import { MessageType } from "../shared/messages"
 import { sendMessage } from "../shared/messages"
-import { MessageType } from "../shared/MessageType"
 
 interface Tab {
   id: number
