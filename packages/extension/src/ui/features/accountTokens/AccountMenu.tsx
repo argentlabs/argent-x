@@ -123,7 +123,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
             <MenuItemWrapper onClick={() => handleHideAccount(account)}>
               <MenuItem>
                 <IconWrapper>
-                  <VisibilityOff fontSize={"inherit"} htmlColor={"white"} />
+                  <VisibilityOff fontSize="inherit" htmlColor="white" />
                 </IconWrapper>
                 Hide Account
               </MenuItem>
