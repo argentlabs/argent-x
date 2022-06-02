@@ -6,7 +6,7 @@ import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
-import { Token, equalToken, parsedDefaultTokens } from "../../../shared/token"
+import { Token, equalToken } from "../../../shared/token"
 import { useAppState } from "../../app.state"
 import { isValidAddress } from "../../services/addresses"
 import {
@@ -87,15 +87,13 @@ export const useTokensSubscription = () => {
 
   useEffect(() => {
     useTokens.setState({
-      tokens: parsedDefaultTokens.concat(tokens).map(mapTokenToTokenDetails),
+      tokens: tokens.map(mapTokenToTokenDetails),
     })
 
     const subscription = messageStream.subscribe(([message]) => {
       if (message.type === "UPDATE_TOKENS") {
         useTokens.setState({
-          tokens: parsedDefaultTokens
-            .concat(message.data)
-            .map(mapTokenToTokenDetails),
+          tokens: message.data.map(mapTokenToTokenDetails),
         })
       }
     })

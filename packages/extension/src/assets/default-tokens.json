@@ -18,22 +18,21 @@
     "showAlways": true
   },
   {
-    "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-    "name": "Test Token",
-    "symbol": "TEST",
-    "decimals": "18",
-    "network": "goerli-alpha",
-    "showAlways": true
-  },
-  {
-    "address": "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
-    "name": "Test Token",
-    "symbol": "TEST",
+    "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+    "name": "DAI",
+    "symbol": "DAI",
     "decimals": "18",
     "network": "mainnet-alpha",
-    "showAlways": true
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
   },
-
+  {
+    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+    "name": "DAI",
+    "symbol": "DAI",
+    "decimals": "18",
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
+  },
   {
     "address": "0x12d537dc323c439dc65c976fad242d5610d27cfb5f31689a0a319b8be7f3d56",
     "name": "Wrapped BTC",
@@ -59,12 +58,18 @@
     "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
   },
   {
-    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
-    "name": "DAI",
-    "symbol": "DAI",
+    "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+    "name": "Test Token",
+    "symbol": "TEST",
     "decimals": "18",
-    "network": "goerli-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
+    "network": "goerli-alpha"
+  },
+  {
+    "address": "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
+    "name": "Test Token",
+    "symbol": "TEST",
+    "decimals": "18",
+    "network": "mainnet-alpha"
   },
   {
     "address": "0x07a39a50bf689e9430fc81fba0f4d46e245e1657e77455548ed7e32c808cfc10",
