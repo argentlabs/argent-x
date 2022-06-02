@@ -2,7 +2,7 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
-import { feeToken } from "../../../shared/token"
+import { getFeeToken } from "../../../shared/token"
 import { useAppState } from "../../app.state"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
@@ -44,7 +44,7 @@ const LabeledLink = styled(Link)`
 export const TransferButtons: FC = () => {
   const { switcherNetworkId } = useAppState()
 
-  const sendToken = feeToken(switcherNetworkId)
+  const sendToken = getFeeToken(switcherNetworkId)
 
   return (
     <Container>
