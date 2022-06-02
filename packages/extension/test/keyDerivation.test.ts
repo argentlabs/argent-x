@@ -75,6 +75,15 @@ describe("getNextPathIndex", () => {
     )
   })
 
+  test("legacy gets ignored", () => {
+    expect(
+      getNextPathIndex([
+        "m/2645'/1195502025'/1148870696'/0'/0'/0",
+        "m/2645'/1195502025'/1148870696'/0'/0'/1",
+      ]),
+    ).toBe(0)
+  })
+
   test("empty array", () => {
     expect(getNextPathIndex([])).toBe(0)
   })
