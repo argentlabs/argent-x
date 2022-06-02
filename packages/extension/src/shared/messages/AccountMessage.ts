@@ -26,3 +26,19 @@ export type AccountMessage =
       type: "UPGRADE_ACCOUNT"
       data: { walletAddress: string }
     }
+  | {
+      type: "GET_ENCRYPTED_PRIVATE_KEY"
+      data: { encryptedSecret: string }
+    }
+  | {
+      type: "GET_ENCRYPTED_PRIVATE_KEY_RES"
+      data: { encryptedPrivateKey: string }
+    }
+  | {
+      type: "GET_ENCRYPTED_SEED_PHRASE"
+      data: { encryptedSecret: string }
+    }
+  | {
+      type: "GET_ENCRYPTED_SEED_PHRASE_RES"
+      data: { encryptedSeedPhrase: string }
+    }
