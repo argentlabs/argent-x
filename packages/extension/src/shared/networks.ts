@@ -10,6 +10,7 @@ export interface Network {
   baseUrl: string
   explorerUrl?: string
   accountImplementation?: string
+  accountClassHash?: string
   rpcUrl?: string
   readonly?: boolean
 }
@@ -66,6 +67,7 @@ export const NetworkSchema: SchemaOf<Network> = object()
       .required()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
     accountImplementation: string().optional().matches(REGEX_HEXSTRING),
+    accountClassHash: string().optional().matches(REGEX_HEXSTRING),
     explorerUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),

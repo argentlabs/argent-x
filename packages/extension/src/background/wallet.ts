@@ -364,13 +364,14 @@ export class Wallet {
   public async addAccount(
     networkId: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
-    // FIXME: delete this once Cairo 9 is on mainnet
-    if (networkId !== "goerli-alpha" && networkId !== "integration") {
-      return this.addAccountPreCairo9(networkId)
-    }
-
     if (!this.isSessionOpen()) {
       throw Error("no open session")
+    }
+
+    // FIXME: delete this once Cairo 9 is on mainnet
+    const network = await this.getNetwork(networkId)
+    if (!network.accountClassHash) {
+      return await this.addAccountPreCairo9(networkId)
     }
 
     const currentPaths = (await this.getAccounts())
@@ -386,25 +387,12 @@ export class Wallet {
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
-    const network = await this.getNetwork(networkId)
     const provider = getProvider(network)
-
-    let implementation = network.accountImplementation
-    if (!implementation) {
-      const deployImplementationTransaction = await provider.deployContract({
-        contract: this.argentAccountCompiledContract,
-      })
-      assertTransactionReceived(deployImplementationTransaction, true)
-      implementation = deployImplementationTransaction.address as string
-    } else {
-      // if there is an implementation, we need to check if accounts were already deployed
-      this.discoverAccountsForNetwork(networkId)
-    }
 
     const deployTransaction = await provider.deployContract({
       contract: this.proxyCompiledContract,
       constructorCalldata: stark.compileCalldata({
-        implementation,
+        implementation: network.accountClassHash,
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
