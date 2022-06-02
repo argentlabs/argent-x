@@ -172,6 +172,21 @@ export class Wallet {
     return this.store.setItem("accounts", newAccounts)
   }
 
+  public async hideAccount(address: string) {
+    const accounts = await this.getAccounts()
+
+    const index = accounts.findIndex((account) => account.address === address)
+
+    if (index === -1) {
+      throw Error("Account to hide was not found")
+    }
+
+    accounts[index] = { ...accounts[index], hidden: true }
+    await this.store.setItem("accounts", accounts)
+
+    await this.writeBackup()
+  }
+
   private resetAccounts() {
     return this.store.setItem("accounts", [])
   }
@@ -280,6 +295,7 @@ export class Wallet {
                 type: "local_signer",
                 derivationPath: getPathForIndex(lastCheck),
               },
+              hidden: false,
             })
           }
 
@@ -417,6 +433,7 @@ export class Wallet {
         type: "local_secret",
         derivationPath: getPathForIndex(index),
       },
+      hidden: false,
     }
 
     await this.pushAccount(account)

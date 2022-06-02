@@ -17,7 +17,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     case "GET_ACCOUNTS": {
       return sendToTabAndUi({
         type: "GET_ACCOUNTS_RES",
-        data: await wallet.getAccounts(),
+        data: (await wallet.getAccounts()).filter((acc) => !acc.hidden),
       })
     }
 
@@ -113,6 +113,18 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
       } catch {
         return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
+      }
+    }
+
+    case "HIDE_ACCOUNT": {
+      try {
+        await wallet.hideAccount(msg.data)
+
+        console.log("Account Hide Successful")
+
+        return sendToTabAndUi({ type: "HIDE_ACCOUNT_RES" })
+      } catch (error) {
+        return sendToTabAndUi({ type: "HIDE_ACCOUNT_REJ" })
       }
     }
 

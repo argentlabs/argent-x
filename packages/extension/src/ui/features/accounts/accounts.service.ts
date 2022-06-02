@@ -19,6 +19,7 @@ export const connectAccount = (account: Account) => {
       address: account.address,
       network: account.network,
       signer: account.signer,
+      hidden: false,
     },
   })
 }

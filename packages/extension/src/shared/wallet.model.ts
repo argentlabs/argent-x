@@ -9,4 +9,5 @@ export interface WalletAccount {
   address: string
   network: Network
   signer: WalletAccountSigner
+  hidden?: boolean
 }

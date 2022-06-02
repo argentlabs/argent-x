@@ -6,6 +6,7 @@ interface State {
   accounts: Record<string, Account>
   selectedAccount?: string
   addAccount: (newAccount: Account) => void
+  hiddenAccounts: string[]
   hideAccount: (account: Account) => void
 }
 
@@ -19,16 +20,11 @@ export const useAccounts = create<State>((set) => ({
         [newAccount.address]: newAccount,
       },
     })),
-  hideAccount: (accountToHide: Account) =>
-    set((state) => {
-      const updatedAccounts = Object.entries(state.accounts)
-        .filter(([address, _]) => address !== accountToHide.address)
-        .reduce((acc, [address, account]) => {
-          return { ...acc, [address]: account }
-        }, {})
-
-      return { accounts: updatedAccounts }
-    }),
+  hiddenAccounts: [],
+  hideAccount: (account: Account) =>
+    set((state) => ({
+      hiddenAccounts: [...state.hiddenAccounts, account.address],
+    })),
 }))
 
 export const useAccount = (address: string): Account | undefined =>

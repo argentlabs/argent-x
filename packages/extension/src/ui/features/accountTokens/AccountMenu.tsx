@@ -7,7 +7,7 @@ import { EditIcon } from "../../components/Icons/AccountMenu/EditIcon"
 import { ViewOnVoyagerIcon } from "../../components/Icons/AccountMenu/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/AccountMenu/WarningIcon"
 import { routes } from "../../routes"
-import { deleteAccount } from "../../services/messaging"
+import { hideAccount } from "../../services/messaging"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
@@ -80,7 +80,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const ref = useRef<HTMLDivElement>(null)
   const currentNetwork = useCurrentNetwork()
   const navigate = useNavigate()
-  const { hideAccount } = useAccounts()
+  const { hideAccount: hideAccountState } = useAccounts()
 
   const account = useSelectedAccount()
 
@@ -92,8 +92,8 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   }
 
   const handleHideAccount = async (account: Account) => {
-    hideAccount(account)
-    await deleteAccount(account.address)
+    await hideAccount(account.address)
+    hideAccountState(account)
     navigate(routes.accounts())
   }
 

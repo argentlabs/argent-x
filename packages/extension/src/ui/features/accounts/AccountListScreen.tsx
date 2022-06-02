@@ -50,10 +50,13 @@ const Paragraph = styled(P)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { accounts, selectedAccount, addAccount } = useAccounts()
+  const { accounts, selectedAccount, addAccount, hiddenAccounts } =
+    useAccounts()
   const { isBackupRequired } = useBackupRequired()
 
-  const accountsList = Object.values(accounts)
+  const accountsList = Object.values(accounts).filter(
+    (account) => !hiddenAccounts.includes(account.address),
+  )
 
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })

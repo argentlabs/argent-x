@@ -186,6 +186,21 @@ export const deleteAccount = async (address: string) => {
   }
 }
 
+export const hideAccount = async (address: string) => {
+  sendMessage({ type: "HIDE_ACCOUNT", data: address })
+
+  try {
+    await Promise.race([
+      waitForMessage("HIDE_ACCOUNT_RES"),
+      waitForMessage("HIDE_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch (error) {
+    throw Error("Could not hide account")
+  }
+}
+
 export const removePreAuthorization = async (host: string) => {
   sendMessage({
     type: "REMOVE_PREAUTHORIZATION",
