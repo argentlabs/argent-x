@@ -3,7 +3,7 @@ import create from "zustand"
 import { Account } from "./Account"
 
 interface State {
-  accounts: { [address: string]: Account }
+  accounts: Record<string, Account>
   selectedAccount?: string
   addAccount: (newAccount: Account) => void
   hideAccount: (account: Account) => void
