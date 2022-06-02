@@ -66,7 +66,12 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
               ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
               : await getNonce(starknetAccount)
 
-            const { maxFee } = action.override || {}
+            // FIXME: mainnet hack to dont pay fees as long as possible
+            const { maxFee } =
+              selectedAccount.network.id === "mainnet-alpha"
+                ? { maxFee: "0x0" }
+                : action.override || {}
+
             const maxFeeOverrideExists = maxFee !== undefined && maxFee !== null
 
             const transaction = await starknetAccount.execute(

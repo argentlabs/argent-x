@@ -58,6 +58,22 @@ export const handleTransactionMessage: HandleMessage<
         const { amount, unit, suggestedMaxFee } =
           await starknetAccount.estimateFee(msg.data)
 
+        // FIXME: mainnet hack to dont pay fees as long as possible
+        if (selectedAccount.network.id === "mainnet-alpha") {
+          return sendToTabAndUi({
+            type: "ESTIMATE_TRANSACTION_FEE_RES",
+            data: {
+              amount: "0x0",
+              unit,
+              suggestedMaxFee: "0x0",
+              usd: {
+                amount: "0.0",
+                suggestedMaxFee: "0.0",
+              },
+            },
+          })
+        }
+
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {

@@ -51,9 +51,6 @@ export const getImplementationUpgradePath = (
           }),
         },
         undefined,
-        {
-          maxFee: "0",
-        },
       )
     }
   }
@@ -75,9 +72,6 @@ export const getImplementationUpgradePath = (
         }),
       },
       undefined,
-      {
-        maxFee: "0",
-      },
     )
   }
 }
