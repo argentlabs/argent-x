@@ -7,7 +7,10 @@ import {
   shortString,
   stark,
 } from "starknet"
-import { computeHashOnElements } from "starknet/dist/utils/hash"
+import {
+  computeHashOnElements,
+  getSelectorFromName,
+} from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
 import {
@@ -17,6 +20,11 @@ import {
   isKnownNetwork,
 } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
+import {
+  newBaseDerivationPath,
+  oldBaseDerivationPath,
+} from "../shared/wallet.service"
+import { LoadContracts } from "./accounts"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -99,8 +107,7 @@ export class Wallet {
 
   constructor(
     private store: IStorage<WalletStorageProps>,
-    private proxyCompiledContract: string,
-    private argentAccountCompiledContract: string,
+    private loadContracts: LoadContracts,
     private getNetwork: GetNetwork,
     private onAutoLock?: () => Promise<void>,
   ) {}
@@ -125,6 +132,7 @@ export class Wallet {
       return
     }
     const N = isDevOrTest ? 64 : 32768
+    this.store.setItem("discoveredOnce", true)
     const ethersWallet = ethers.Wallet.createRandom()
     this.encryptedBackup = await ethersWallet.encrypt(
       password,
@@ -259,7 +267,11 @@ export class Wallet {
         let lastCheck = 0
 
         while (lastHit + offset > lastCheck) {
-          const starkPair = getStarkPair(lastCheck, wallet.privateKey)
+          const starkPair = getStarkPair(
+            lastCheck,
+            wallet.privateKey,
+            newBaseDerivationPath,
+          )
           const starkPub = ec.getStarkKey(starkPair)
           const seed = starkPub
 
@@ -278,7 +290,10 @@ export class Wallet {
               network,
               signer: {
                 type: "local_signer",
-                derivationPath: getPathForIndex(lastCheck),
+                derivationPath: getPathForIndex(
+                  lastCheck,
+                  newBaseDerivationPath,
+                ),
               },
             })
           }
@@ -365,6 +380,12 @@ export class Wallet {
       throw Error("no open session")
     }
 
+    // FIXME: delete this once Cairo 9 is on mainnet
+    const network = await this.getNetwork(networkId)
+    if (!network.accountClassHash) {
+      return await this.addAccountPreCairo9(networkId)
+    }
+
     const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
@@ -373,8 +394,75 @@ export class Wallet {
       )
       .map((account) => account.signer.derivationPath)
 
-    const index = getNextPathIndex(currentPaths)
-    const starkPair = getStarkPair(index, this.session?.secret as string)
+    const index = getNextPathIndex(currentPaths, newBaseDerivationPath)
+    const starkPair = getStarkPair(
+      index,
+      this.session?.secret as string,
+      newBaseDerivationPath,
+    )
+    const starkPub = ec.getStarkKey(starkPair)
+    const seed = starkPub
+    const [proxyCompiledContract] = await this.loadContracts(
+      newBaseDerivationPath,
+    )
+
+    const provider = getProvider(network)
+
+    const deployTransaction = await provider.deployContract({
+      contract: proxyCompiledContract,
+      constructorCalldata: stark.compileCalldata({
+        implementation: network.accountClassHash,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      }),
+      addressSalt: seed,
+    })
+
+    assertTransactionReceived(deployTransaction, true)
+    const proxyAddress = deployTransaction.address as string
+
+    const account = {
+      network,
+      address: proxyAddress,
+      signer: {
+        type: "local_secret",
+        derivationPath: getPathForIndex(index, newBaseDerivationPath),
+      },
+    }
+
+    await this.pushAccount(account)
+
+    await this.writeBackup()
+    await this.selectAccount(account.address)
+
+    return { account, txHash: deployTransaction.transaction_hash }
+  }
+
+  // FIXME: delete this once Cairo 9 is on mainnet
+  public async addAccountPreCairo9(
+    networkId: string,
+  ): Promise<{ account: WalletAccount; txHash: string }> {
+    if (!this.isSessionOpen()) {
+      throw Error("no open session")
+    }
+
+    const currentPaths = (await this.getAccounts())
+      .filter(
+        (account) =>
+          account.signer.type === "local_secret" &&
+          account.network.id === networkId,
+      )
+      .map((account) => account.signer.derivationPath)
+
+    const [pre9proxyCompiledContract, pre9argentAccountCompiledContract] =
+      await this.loadContracts(oldBaseDerivationPath)
+
+    const index = getNextPathIndex(currentPaths, oldBaseDerivationPath)
+    const starkPair = getStarkPair(
+      index,
+      this.session?.secret as string,
+      oldBaseDerivationPath,
+    )
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
@@ -384,7 +472,7 @@ export class Wallet {
     let implementation = network.accountImplementation
     if (!implementation) {
       const deployImplementationTransaction = await provider.deployContract({
-        contract: this.argentAccountCompiledContract,
+        contract: pre9argentAccountCompiledContract,
       })
       assertTransactionReceived(deployImplementationTransaction, true)
       implementation = deployImplementationTransaction.address as string
@@ -394,7 +482,7 @@ export class Wallet {
     }
 
     const deployTransaction = await provider.deployContract({
-      contract: this.proxyCompiledContract,
+      contract: pre9proxyCompiledContract,
       constructorCalldata: stark.compileCalldata({ implementation }),
       addressSalt: seed,
     })
@@ -415,7 +503,7 @@ export class Wallet {
       address: proxyAddress,
       signer: {
         type: "local_secret",
-        derivationPath: getPathForIndex(index),
+        derivationPath: getPathForIndex(index, oldBaseDerivationPath),
       },
     }
 

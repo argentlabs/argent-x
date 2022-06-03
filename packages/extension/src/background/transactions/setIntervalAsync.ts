@@ -2,7 +2,11 @@
 export function setIntervalAsync(fn: () => Promise<any>, delay: number) {
   let handle: NodeJS.Timeout | undefined
   const loop = async () => {
-    await fn()
+    try {
+      await fn()
+    } catch {
+      // ignore
+    }
     handle = setTimeout(loop, delay)
   }
   handle = setTimeout(loop, delay)
