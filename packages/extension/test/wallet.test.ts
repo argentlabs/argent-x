@@ -16,12 +16,12 @@ const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
 
 const argentAccountCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/ArgentAccount.txt"),
+  path.join(__dirname, "../src/contracts/ArgentAccount-pre9.txt"),
   "utf8",
 )
 
 const proxyCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/Proxy.txt"),
+  path.join(__dirname, "../src/contracts/Proxy-pre9.txt"),
   "utf8",
 )
 
