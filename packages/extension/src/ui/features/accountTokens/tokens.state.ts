@@ -13,7 +13,7 @@ import {
   addToken as addTokenMsg,
   getTokens,
   removeToken as removeTokenMsg,
-} from "../../services/messaging"
+} from "../../services/backgroundTokens"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { fetchTokenBalance } from "./tokens.service"
 

@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react"
+import { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -9,7 +9,7 @@ import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { FormError, H2 } from "../../components/Typography"
 import { routes } from "../../routes"
-import { addNetworks } from "../../services/messaging"
+import { addNetworks } from "../../services/backgroundNetworks"
 import { useNetworks } from "../networks/useNetworks"
 import { recover } from "../recovery/recovery.service"
 

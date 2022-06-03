@@ -20,7 +20,7 @@ import {
   InfoRoundedIcon,
   ReportGmailerrorredRoundedIcon,
 } from "../../components/Icons/MuiIcons"
-import { getEstimatedFee } from "../../services/messaging"
+import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { useAccount } from "../accounts/accounts.state"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
