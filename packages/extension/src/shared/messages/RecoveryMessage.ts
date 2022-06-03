@@ -1,4 +1,4 @@
-export type BackupMessage =
+export type RecoveryMessage =
   | { type: "RECOVER_BACKUP"; data: string }
   | { type: "RECOVER_BACKUP_RES" }
   | { type: "RECOVER_BACKUP_REJ"; data: string }
