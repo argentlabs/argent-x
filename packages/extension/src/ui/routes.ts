@@ -47,6 +47,7 @@ export const routes = {
   ),
   reset: route("/reset"),
   disclaimer: route("/disclaimer"),
+  migrationDisclaimer: route("/migration-disclaimer"),
   legacy: route("/legacy"),
   settings: route("/settings"),
   settingsNetworks: route("/settings/networks"),

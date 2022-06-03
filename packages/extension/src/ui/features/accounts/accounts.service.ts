@@ -46,7 +46,7 @@ export const getAccountImageUrl = (name: string, address: string) => {
   return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
 }
 
-export const isAccountDeployed = (account: Account): boolean =>
+const isAccountDeployed = (account: Account): boolean =>
   !account.deployTransaction
 
 export type AccountStatusCode = "CONNECTED" | "DEFAULT" | "DEPLOYING" | "ERROR"

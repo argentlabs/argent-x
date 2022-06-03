@@ -1,12 +1,7 @@
 import { BigNumber, BigNumberish, utils } from "ethers"
 import { KeyPair, ec, number } from "starknet"
 
-// from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2645.md
-// m / purpose' / layer' / application' / eth_address_1' / eth_address_2' / index
-// layer = pathHash("starknet")
-// application = pathHash("argentx")
-
-const BASE_PATH = "m/44'/9004'/0'/0"
+import { baseDerivationPath } from "../../shared/wallet.service"
 
 export function getStarkPair(
   indexOrPath: number | string,
@@ -23,7 +18,7 @@ export function getStarkPair(
 }
 
 export function getPathForIndex(index: number): string {
-  return `${BASE_PATH}/${index}`
+  return `${baseDerivationPath}/${index}`
 }
 
 export function getNextPathIndex(paths: string[]): number {

@@ -1,7 +1,9 @@
+import { partition, some } from "lodash-es"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { hasLatestDerivationPath } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
@@ -18,6 +20,7 @@ import { AccountHeader } from "./AccountHeader"
 import { AccountListItem } from "./AccountListItem"
 import { connectAccount, deployAccount } from "./accounts.service"
 import { useAccounts } from "./accounts.state"
+import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 
 const AccountList = styled.div`
   display: flex;
@@ -58,6 +61,11 @@ export const AccountListScreen: FC = () => {
     (account) => !hiddenAccounts.includes(account.address),
   )
 
+  const [newAccounts, deprecatedAccounts] = partition(
+    accountsList,
+    hasLatestDerivationPath,
+  )
+
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })
     try {
@@ -94,7 +102,7 @@ export const AccountListScreen: FC = () => {
             No accounts on this network, click below to add one.
           </Paragraph>
         )}
-        {accountsList.map((account) => (
+        {newAccounts.map((account) => (
           <AccountListItem
             key={account.address}
             account={account}
@@ -103,6 +111,20 @@ export const AccountListScreen: FC = () => {
             canShowUpgrade
           />
         ))}
+        {some(deprecatedAccounts) && (
+          <>
+            <DeprecatedAccountsWarning />
+            {deprecatedAccounts.map((account) => (
+              <AccountListItem
+                key={account.address}
+                account={account}
+                selectedAccount={selectedAccount}
+                isDeleteable
+                canShowUpgrade
+              />
+            ))}
+          </>
+        )}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>
           <AddIcon fontSize="large" />
         </IconButtonCenter>

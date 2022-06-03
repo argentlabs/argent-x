@@ -1,0 +1,80 @@
+// FIXME: delete this file when Cairo 9 is on mainnet
+import { FC } from "react"
+import { useNavigate } from "react-router-dom"
+import styled from "styled-components"
+
+import { useAppState } from "../../app.state"
+import { Button } from "../../components/Button"
+import { OpenInNewIcon } from "../../components/Icons/MuiIcons"
+import { H2, P } from "../../components/Typography"
+import { routes } from "../../routes"
+import { connectAccount, deployAccount } from "../accounts/accounts.service"
+import { useAccounts } from "../accounts/accounts.state"
+import { recover } from "../recovery/recovery.service"
+
+const Container = styled.div`
+  padding: 88px 40px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 68px);
+
+  ${P} {
+    font-weight: 600;
+    margin-top: 15px;
+  }
+
+  a {
+    color: #ff875b;
+    text-decoration: none;
+  }
+`
+
+export const MigrationDisclaimerScreen: FC = () => {
+  const navigate = useNavigate()
+  const { addAccount } = useAccounts()
+  const { switcherNetworkId } = useAppState()
+
+  const handleAddAccount = async () => {
+    useAppState.setState({ isLoading: true })
+    try {
+      const newAccount = await deployAccount(switcherNetworkId)
+      addAccount(newAccount)
+      connectAccount(newAccount)
+      navigate(await recover())
+    } catch (error: any) {
+      useAppState.setState({ error: `${error}` })
+      navigate(routes.error())
+    } finally {
+      useAppState.setState({ isLoading: false })
+    }
+  }
+
+  return (
+    <Container>
+      <H2>Please migrate your funds</H2>
+      <P>
+        StarkNet is in Alpha and its testnet has made breaking changes. Mainnet
+        will follow soon.
+      </P>
+      <P>
+        Please create a new account and send all your assets from your old
+        account(s) to this new one. You may need to use a dapp to do this.
+      </P>
+      <P>
+        Old accounts will not be recoverable with your backup or seed phrase.
+      </P>
+      <P>
+        <a
+          href="https://github.com/argentlabs/argent-x/blob/develop/docs/Upgrade_v3.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Read more about this change <OpenInNewIcon style={{ fontSize: 14 }} />
+        </a>
+      </P>
+      <Button style={{ marginTop: 70 }} onClick={handleAddAccount}>
+        Create new account
+      </Button>
+    </Container>
+  )
+}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
+import { hasLatestDerivationPath } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
@@ -21,6 +22,7 @@ import { useNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountSubHeader } from "./AccountSubheader"
+import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { AddTokenIconButton, TokenTitle, TokenWrapper } from "./TokenListItem"
 import { TransferButtons } from "./TransferButtons"
@@ -86,6 +88,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         }
       />
       <TransferButtons />
+      {!hasLatestDerivationPath(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && network.accountImplementation && (
         <Link to={routes.upgrade()}>
