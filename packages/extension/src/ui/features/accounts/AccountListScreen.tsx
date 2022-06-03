@@ -3,7 +3,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { hasLatestDerivationPath } from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
@@ -60,10 +60,9 @@ export const AccountListScreen: FC = () => {
   const accountsList = Object.values(accounts).filter(
     (account) => !hiddenAccounts.includes(account.address),
   )
-
-  const [newAccounts, deprecatedAccounts] = partition(
+  const [deprecatedAccounts, newAccounts] = partition(
     accountsList,
-    hasLatestDerivationPath,
+    isDeprecated,
   )
 
   const handleAddAccount = async () => {

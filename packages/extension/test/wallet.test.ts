@@ -1,13 +1,13 @@
 import fs from "fs"
 import path from "path"
 
+import { LoadContracts } from "../src/background/accounts"
 import {
   GetNetwork,
   SESSION_DURATION,
   Wallet,
   WalletStorageProps,
 } from "../src/background/wallet"
-import type { Network } from "../src/shared/networks"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
 import { MockStorage } from "./mock"
@@ -16,14 +16,19 @@ const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
 
 const argentAccountCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/ArgentAccount.txt"),
+  path.join(__dirname, "../src/contracts/ArgentAccount-pre9.txt"),
   "utf8",
 )
 
 const proxyCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/Proxy.txt"),
+  path.join(__dirname, "../src/contracts/Proxy-pre9.txt"),
   "utf8",
 )
+
+const loadContracts: LoadContracts = async () => [
+  proxyCompiledContract,
+  argentAccountCompiledContract,
+]
 
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
@@ -48,12 +53,7 @@ test("create a new wallet", async () => {
   jest.useFakeTimers()
 
   const storage = new MockStorage<WalletStorageProps>()
-  const wallet = new Wallet(
-    storage,
-    proxyCompiledContract,
-    argentAccountCompiledContract,
-    getNetwork,
-  )
+  const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
@@ -90,12 +90,7 @@ test("open existing wallet", async () => {
 
   const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
-  const wallet = new Wallet(
-    storage,
-    proxyCompiledContract,
-    argentAccountCompiledContract,
-    getNetwork,
-  )
+  const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(true)
@@ -128,12 +123,7 @@ test("open existing wallet", async () => {
 test("open existing wallet with wrong password", async () => {
   const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
-  const wallet = new Wallet(
-    storage,
-    proxyCompiledContract,
-    argentAccountCompiledContract,
-    getNetwork,
-  )
+  const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(true)
@@ -147,12 +137,7 @@ test("import backup file", async () => {
   jest.useFakeTimers()
 
   const storage = new MockStorage<WalletStorageProps>()
-  const wallet = new Wallet(
-    storage,
-    proxyCompiledContract,
-    argentAccountCompiledContract,
-    getNetwork,
-  )
+  const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
@@ -171,12 +156,7 @@ test("import backup file", async () => {
 
 test("import wrong backup file", async () => {
   const storage = new MockStorage<WalletStorageProps>()
-  const wallet = new Wallet(
-    storage,
-    proxyCompiledContract,
-    argentAccountCompiledContract,
-    getNetwork,
-  )
+  const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)

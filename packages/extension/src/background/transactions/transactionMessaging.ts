@@ -82,12 +82,13 @@ export const handleTransactionMessage: HandleMessage<
             suggestedMaxFee: number.toHex(suggestedMaxFee),
             usd: await determineFeePrice(
               selectedAccount.network,
-              amount,
-              suggestedMaxFee,
+              number.toHex(amount),
+              number.toHex(suggestedMaxFee),
             ),
           },
         })
-      } catch {
+      } catch (e) {
+        console.error(e)
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_REJ",
         })

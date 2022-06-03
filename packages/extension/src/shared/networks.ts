@@ -10,11 +10,22 @@ export interface Network {
   baseUrl: string
   explorerUrl?: string
   accountImplementation?: string
+  accountClassHash?: string
   rpcUrl?: string
   readonly?: boolean
 }
 
 export type NetworkStatus = "ok" | "degraded" | "error" | "unknown"
+
+const isDev = process.env.NODE_ENV === "development"
+const integrationNetwork: Network = {
+  id: "integration",
+  name: "Integration",
+  chainId: "SN_GOERLI",
+  baseUrl: "https://external.integration.starknet.io",
+  accountClassHash:
+    "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
+}
 
 export const defaultNetworks: Network[] = [
   {
@@ -37,6 +48,7 @@ export const defaultNetworks: Network[] = [
       "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
     readonly: true,
   },
+  ...(isDev ? [integrationNetwork] : []),
   {
     id: "localhost",
     chainId: "SN_GOERLI",
@@ -66,6 +78,7 @@ export const NetworkSchema: SchemaOf<Network> = object()
       .required()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
     accountImplementation: string().optional().matches(REGEX_HEXSTRING),
+    accountClassHash: string().optional().matches(REGEX_HEXSTRING),
     explorerUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),

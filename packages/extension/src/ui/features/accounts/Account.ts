@@ -5,7 +5,7 @@ import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { sendMessage, waitForMessage } from "../../../shared/messages"
 import { Network, getProvider } from "../../../shared/networks"
 import { WalletAccountSigner } from "../../../shared/wallet.model"
-import { getNetwork } from "../../services/messaging"
+import { getNetwork } from "../../services/backgroundNetworks"
 
 export class Account {
   address: string

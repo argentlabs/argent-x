@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { getPrivateKey } from "../../services/messaging"
+import { getPrivateKey } from "../../services/backgroundAccounts"
 
 export const usePrivateKey = () => {
   const [privateKey, setPrivateKey] = useState<string>()

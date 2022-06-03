@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
-import { hasLatestDerivationPath } from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
@@ -88,7 +88,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         }
       />
       <TransferButtons />
-      {!hasLatestDerivationPath(account) && <MigrationBanner />}
+      {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && network.accountImplementation && (
         <Link to={routes.upgrade()}>
