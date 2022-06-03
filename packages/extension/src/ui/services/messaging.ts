@@ -203,7 +203,7 @@ export const hideAccount = async (address: string) => {
         throw new Error("Rejected")
       }),
     ])
-  } catch (error) {
+  } catch {
     throw Error("Could not hide account")
   }
 }
