@@ -4099,12 +4099,7 @@ bn.js@^4.11.9:
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
 
-bn.js@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.2.0.tgz#358860674396c6997771a9d051fcc1b57d4ae002"
-  integrity sha512-D7iWRBvnZE8ecXiLj/9wbxH7Tk79fAh8IHaTNq1RWRixsS02W+5qS+iE9yq6RYl0asXx5tw0bLhmT5pIfbSquw==
-
-bn.js@^5.2.1:
+bn.js@^5.2.0, bn.js@^5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.1.tgz#0bc527a6a0d18d0aa8d5b0538ce4a77dccfa7b70"
   integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
@@ -4748,6 +4743,13 @@ cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
     parse-json "^5.0.0"
     path-type "^4.0.0"
     yaml "^1.10.0"
+
+cross-fetch@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
+  integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
+  dependencies:
+    node-fetch "2.6.7"
 
 cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
@@ -5681,6 +5683,11 @@ fb-watchman@^2.0.0:
   integrity sha512-DkPJKQeY6kKwmuMretBhr7G6Vodr7bFwDYTXIkfG1gjvNpaxBTQV3PbXg6bR1c1UP4jPOX0jHUbbHANL9vRjVg==
   dependencies:
     bser "2.1.1"
+
+fetch-intercept@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/fetch-intercept/-/fetch-intercept-2.4.0.tgz#be8b0f17abaadeea6de52ecdb6e9ed081f03480a"
+  integrity sha512-BPZ2LM9Dh1ua2ovQf03N6rhWg1qxdVD5qK/G4llvcemt6M+jjxCuIDxJ+6IiG+uz//3UQmgfKEv0gOGvYIxZ7g==
 
 figures@^3.0.0:
   version "3.2.0"
@@ -7984,7 +7991,7 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-node-fetch@^2.6.1, node-fetch@^2.6.7:
+node-fetch@2.6.7, node-fetch@^2.6.1, node-fetch@^2.6.7:
   version "2.6.7"
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
@@ -9540,20 +9547,20 @@ stack-utils@^2.0.3:
     url-join "^4.0.1"
 
 starknet@^3.12.1:
-  version "3.12.1"
-  resolved "https://registry.npmjs.org/starknet/-/starknet-3.12.1.tgz#a7d898aea38e715a47c7bfd4104d3c178d083ff1"
-  integrity sha512-gKjd5RzSgP21Gx84FEOMfoOwPEqqddWwA0awXOAB/iwVCw4lj/u556xMqipflO9tA5fMla3UxO+LHN+zM5T1mQ==
+  version "3.12.3"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.12.3.tgz#16c22f6c4597aa91fd2c887019d3fc56f6f73474"
+  integrity sha512-FmWC+AgeqgPkOnp0FXcg9q/T00vg02JGgqTyWvWJgB/9L9vYdkFfIbnkLwKbAdzzGrYr4iL9EE94ZXoosOYnAg==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
-    axios "^0.23.0"
     bn.js "^5.2.0"
+    cross-fetch "^3.1.5"
     elliptic "^6.5.4"
     ethereum-cryptography "^0.2.0"
+    fetch-intercept "^2.4.0"
     hash.js "^1.1.7"
     json-bigint "^1.0.0"
     minimalistic-assert "^1.0.1"
     pako "^2.0.4"
-    superstruct "^0.15.3"
     url-join "^4.0.1"
 
 strict-uri-encode@^2.0.0:
