@@ -2,6 +2,7 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { hasLatestDerivationPath } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
@@ -84,6 +85,12 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
 
   const account = useSelectedAccount()
 
+  const isAccountDeprecated =
+    account &&
+    !hasLatestDerivationPath({
+      signer: account?.signer,
+    })
+
   useOnClickOutside(ref, () => setMenuOpen(false))
 
   const handleEditClick = () => {
@@ -119,7 +126,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
             </MenuItem>
           </MenuItemWrapper>
           <Separator />
-          {account && (
+          {isAccountDeprecated && (
             <MenuItemWrapper onClick={() => handleHideAccount(account)}>
               <MenuItem>
                 <IconWrapper>
