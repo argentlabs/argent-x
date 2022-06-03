@@ -24,7 +24,7 @@ import {
   newBaseDerivationPath,
   oldBaseDerivationPath,
 } from "../shared/wallet.service"
-import { loadPre9Contracts } from "./accounts"
+import { LoadContracts } from "./accounts"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -107,8 +107,7 @@ export class Wallet {
 
   constructor(
     private store: IStorage<WalletStorageProps>,
-    private proxyCompiledContract: string,
-    private argentAccountCompiledContract: string,
+    private loadContracts: LoadContracts,
     private getNetwork: GetNetwork,
     private onAutoLock?: () => Promise<void>,
   ) {}
@@ -402,11 +401,14 @@ export class Wallet {
     )
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
+    const [proxyCompiledContract] = await this.loadContracts(
+      newBaseDerivationPath,
+    )
 
     const provider = getProvider(network)
 
     const deployTransaction = await provider.deployContract({
-      contract: this.proxyCompiledContract,
+      contract: proxyCompiledContract,
       constructorCalldata: stark.compileCalldata({
         implementation: network.accountClassHash,
         selector: getSelectorFromName("initialize"),
@@ -452,7 +454,7 @@ export class Wallet {
       .map((account) => account.signer.derivationPath)
 
     const [pre9proxyCompiledContract, pre9argentAccountCompiledContract] =
-      await loadPre9Contracts()
+      await this.loadContracts(oldBaseDerivationPath)
 
     const index = getNextPathIndex(currentPaths, oldBaseDerivationPath)
     const starkPair = getStarkPair(

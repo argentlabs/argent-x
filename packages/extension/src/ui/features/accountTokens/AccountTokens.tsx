@@ -88,7 +88,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         }
       />
       <TransferButtons />
-      {!isDeprecated(account) && <MigrationBanner />}
+      {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && network.accountImplementation && (
         <Link to={routes.upgrade()}>

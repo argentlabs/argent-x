@@ -19,7 +19,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
 
   useEffect(() => {
     useAccounts.setState({
-      showMigrationScreen: account ? !isDeprecated(account) : false,
+      showMigrationScreen: account ? isDeprecated(account) : false,
     })
   }, [account])
 

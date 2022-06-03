@@ -6,13 +6,11 @@ import { WalletAccount } from "./wallet.model"
 export const newBaseDerivationPath = "m/44'/9004'/0'/0"
 export const oldBaseDerivationPath = "m/2645'/1195502025'/1148870696'/0'/0'"
 
+export const hasNewDerivationPath = (derivationPath?: string): boolean =>
+  Boolean(derivationPath?.startsWith(newBaseDerivationPath))
+
 export const isDeprecated = ({
   signer,
   network: { accountClassHash },
-}: WalletAccount): boolean => {
-  console.log(accountClassHash, signer.derivationPath)
-  return Boolean(
-    accountClassHash &&
-      signer.derivationPath?.startsWith(newBaseDerivationPath),
-  )
-}
+}: WalletAccount): boolean =>
+  Boolean(accountClassHash) && hasNewDerivationPath(signer.derivationPath)

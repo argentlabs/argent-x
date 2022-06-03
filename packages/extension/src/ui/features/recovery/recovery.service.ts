@@ -21,7 +21,7 @@ export const recover = async ({
   try {
     const allAccounts = await getAccounts()
     // FIXME: remove this if-statement when mainnet is on Cairo 9
-    if (some(allAccounts) && !allAccounts.some(isDeprecated)) {
+    if (some(allAccounts) && allAccounts.every(isDeprecated)) {
       return routes.migrationDisclaimer()
     }
 

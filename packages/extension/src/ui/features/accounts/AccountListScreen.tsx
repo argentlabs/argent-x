@@ -57,7 +57,7 @@ export const AccountListScreen: FC = () => {
   const { isBackupRequired } = useBackupRequired()
 
   const accountsList = Object.values(accounts)
-  const [newAccounts, deprecatedAccounts] = partition(
+  const [deprecatedAccounts, newAccounts] = partition(
     accountsList,
     isDeprecated,
   )
