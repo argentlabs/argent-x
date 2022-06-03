@@ -6,6 +6,7 @@ interface State {
   accounts: Record<string, Account>
   selectedAccount?: string
   addAccount: (newAccount: Account) => void
+  showMigrationScreen?: boolean // FIXME: remove this when Cairo 9 hits mainnet
 }
 
 export const useAccounts = create<State>((set) => ({
