@@ -6,18 +6,22 @@ import {
   grindKey,
   pathHash,
 } from "../src/background/keys/keyDerivation"
+import {
+  newBaseDerivationPath,
+  oldBaseDerivationPath,
+} from "../src/shared/wallet.service"
 
 test("generate Stark Pair", () => {
   // secret is an L1 private key (stored locally in a keystore file)
   const secret =
     "0xe6904d63affe7a13cd30345b000c9b1ffc087832332d7303cf237ffda8a177d0"
 
-  const starkPair5 = getStarkPair(5, secret)
+  const starkPair5 = getStarkPair(5, secret, newBaseDerivationPath)
   expect(ec.getStarkKey(starkPair5)).toBe(
     "0x05c7c65bfda7a85af0681c85c9c440f0aa6825feef6f9c96e55fb2ce08c8d4bc",
   )
 
-  const starkPair7 = getStarkPair(7, secret)
+  const starkPair7 = getStarkPair(7, secret, newBaseDerivationPath)
   expect(ec.getStarkKey(starkPair7)).toBe(
     "0x0605d5a0ece3b316f0d72221228acb7f01dcb34db74e0c02790db156741f5a86",
   )
@@ -41,50 +45,68 @@ test("pathHash", () => {
 describe("getNextPathIndex", () => {
   test("incrementing", () => {
     expect(
-      getNextPathIndex([
-        "m/44'/9004'/0'/0/0",
-        "m/44'/9004'/0'/0/1",
-        "m/44'/9004'/0'/0/2",
-      ]),
+      getNextPathIndex(
+        ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/1", "m/44'/9004'/0'/0/2"],
+        newBaseDerivationPath,
+      ),
     ).toBe(3)
   })
 
   test("fill incrementing gap", () => {
     expect(
-      getNextPathIndex([
-        "m/44'/9004'/0'/0/0",
-        "m/44'/9004'/0'/0/1",
-        "m/44'/9004'/0'/0/3",
-      ]),
+      getNextPathIndex(
+        ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/1", "m/44'/9004'/0'/0/3"],
+        newBaseDerivationPath,
+      ),
     ).toBe(2)
   })
 
   test("fill big gap", () => {
     expect(
-      getNextPathIndex([
-        "m/44'/9004'/0'/0/0",
-        "m/44'/9004'/0'/0/4",
-        "m/44'/9004'/0'/0/11",
-      ]),
+      getNextPathIndex(
+        ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/4", "m/44'/9004'/0'/0/11"],
+        newBaseDerivationPath,
+      ),
     ).toBe(1)
   })
 
   test("fill 0 gap", () => {
-    expect(getNextPathIndex(["m/44'/9004'/0'/0/3", "m/44'/9004'/0'/0/1"])).toBe(
-      0,
-    )
+    expect(
+      getNextPathIndex(
+        ["m/44'/9004'/0'/0/3", "m/44'/9004'/0'/0/1"],
+        newBaseDerivationPath,
+      ),
+    ).toBe(0)
   })
 
   test("legacy gets ignored", () => {
     expect(
-      getNextPathIndex([
-        "m/2645'/1195502025'/1148870696'/0'/0'/0",
-        "m/2645'/1195502025'/1148870696'/0'/0'/1",
-      ]),
+      getNextPathIndex(
+        [
+          "m/2645'/1195502025'/1148870696'/0'/0'/0",
+          "m/2645'/1195502025'/1148870696'/0'/0'/1",
+        ],
+        newBaseDerivationPath,
+      ),
     ).toBe(0)
   })
 
+  test("can still add legacy paths to mixed array", () => {
+    expect(
+      getNextPathIndex(
+        [
+          "m/2645'/1195502025'/1148870696'/0'/0'/0",
+          "m/2645'/1195502025'/1148870696'/0'/0'/1",
+          "m/44'/9004'/0'/0/0",
+          "m/44'/9004'/0'/0/1",
+          "m/44'/9004'/0'/0/2",
+        ],
+        oldBaseDerivationPath,
+      ),
+    ).toBe(2)
+  })
+
   test("empty array", () => {
-    expect(getNextPathIndex([])).toBe(0)
+    expect(getNextPathIndex([], newBaseDerivationPath)).toBe(0)
   })
 })

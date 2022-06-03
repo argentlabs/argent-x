@@ -20,6 +20,10 @@ import {
   isKnownNetwork,
 } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
+import {
+  newBaseDerivationPath,
+  oldBaseDerivationPath,
+} from "../shared/wallet.service"
 import { loadPre9Contracts } from "./accounts"
 import {
   getNextPathIndex,
@@ -263,7 +267,11 @@ export class Wallet {
         let lastCheck = 0
 
         while (lastHit + offset > lastCheck) {
-          const starkPair = getStarkPair(lastCheck, wallet.privateKey)
+          const starkPair = getStarkPair(
+            lastCheck,
+            wallet.privateKey,
+            newBaseDerivationPath,
+          )
           const starkPub = ec.getStarkKey(starkPair)
           const seed = starkPub
 
@@ -282,7 +290,10 @@ export class Wallet {
               network,
               signer: {
                 type: "local_signer",
-                derivationPath: getPathForIndex(lastCheck),
+                derivationPath: getPathForIndex(
+                  lastCheck,
+                  newBaseDerivationPath,
+                ),
               },
             })
           }
@@ -383,8 +394,12 @@ export class Wallet {
       )
       .map((account) => account.signer.derivationPath)
 
-    const index = getNextPathIndex(currentPaths)
-    const starkPair = getStarkPair(index, this.session?.secret as string)
+    const index = getNextPathIndex(currentPaths, newBaseDerivationPath)
+    const starkPair = getStarkPair(
+      index,
+      this.session?.secret as string,
+      newBaseDerivationPath,
+    )
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
@@ -408,7 +423,7 @@ export class Wallet {
       address: proxyAddress,
       signer: {
         type: "local_secret",
-        derivationPath: getPathForIndex(index),
+        derivationPath: getPathForIndex(index, newBaseDerivationPath),
       },
     }
 
@@ -439,8 +454,12 @@ export class Wallet {
     const [pre9proxyCompiledContract, pre9argentAccountCompiledContract] =
       await loadPre9Contracts()
 
-    const index = getNextPathIndex(currentPaths)
-    const starkPair = getStarkPair(index, this.session?.secret as string)
+    const index = getNextPathIndex(currentPaths, oldBaseDerivationPath)
+    const starkPair = getStarkPair(
+      index,
+      this.session?.secret as string,
+      oldBaseDerivationPath,
+    )
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
@@ -481,7 +500,7 @@ export class Wallet {
       address: proxyAddress,
       signer: {
         type: "local_secret",
-        derivationPath: getPathForIndex(index),
+        derivationPath: getPathForIndex(index, oldBaseDerivationPath),
       },
     }
 

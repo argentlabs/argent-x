@@ -1,7 +1,7 @@
 import { some } from "lodash-es"
 
 import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
-import { hasLatestDerivationPath } from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { getAccounts, getLastSelectedAccount } from "../../services/messaging"
@@ -21,7 +21,7 @@ export const recover = async ({
   try {
     const allAccounts = await getAccounts()
     // FIXME: remove this if-statement when mainnet is on Cairo 9
-    if (some(allAccounts) && !allAccounts.some(hasLatestDerivationPath)) {
+    if (some(allAccounts) && !allAccounts.some(isDeprecated)) {
       return routes.migrationDisclaimer()
     }
 
