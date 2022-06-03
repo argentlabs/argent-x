@@ -9,7 +9,7 @@ import {
 import { isString } from "lodash-es"
 import { encode } from "starknet"
 
-import { getMessagingPublicKey } from "./messaging"
+import { getMessagingPublicKey } from "./background"
 
 export const encryptForBackground = async (value: string | Uint8Array) => {
   const pubJwk = await getMessagingPublicKey()

@@ -15,10 +15,7 @@ export const getActions = async () => {
 }
 
 export const removePreAuthorization = async (host: string) => {
-  sendMessage({
-    type: "REMOVE_PREAUTHORIZATION",
-    data: host,
-  })
+  sendMessage({ type: "REMOVE_PREAUTHORIZATION", data: host })
   await waitForMessage("REMOVE_PREAUTHORIZATION_RES")
 }
 

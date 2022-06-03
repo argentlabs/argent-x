@@ -7,7 +7,7 @@ import { sendMessage } from "../../../shared/messages"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { H2, P } from "../../components/Typography"
-import { removePreAuthorization } from "../../services/messaging"
+import { removePreAuthorization } from "../../services/background"
 import { DappConnection } from "./DappConnection"
 
 const Wrapper = styled.div`

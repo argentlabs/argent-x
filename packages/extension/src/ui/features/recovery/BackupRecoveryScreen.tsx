@@ -7,7 +7,7 @@ import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
-import { recoverBackup } from "../../services/backgroundBackup"
+import { recoverBackup } from "../../services/backgroundRecovery"
 import { fileToString } from "../../services/files"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
