@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react"
 
 import { truncateAddress, truncateHex } from "../services/address.service"
 import {
+  erc20TokenAddressByNetwork,
   getErc20TokenAddress,
   mintToken,
   transfer,
@@ -50,7 +51,11 @@ export const TokenDapp: FC = () => {
   }, [transactionStatus, lastTransactionHash])
 
   const network = networkId()
-  if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
+  if (
+    !network ||
+    network === "localhost" ||
+    !(network in erc20TokenAddressByNetwork)
+  ) {
     return (
       <>
         <p>
