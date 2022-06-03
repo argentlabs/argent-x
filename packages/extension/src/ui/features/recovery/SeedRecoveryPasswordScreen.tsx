@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { recoverBySeedPhrase } from "../../services/messaging"
+import { recoverBySeedPhrase } from "../../services/backgroundBackup"
 import { NewWalletScreen } from "../onboarding/NewWalletScreen"
 import { useBackupRequired } from "./backupDownload.state"
 import { recover } from "./recovery.service"
