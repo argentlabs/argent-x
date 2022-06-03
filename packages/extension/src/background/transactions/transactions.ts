@@ -46,24 +46,29 @@ export const getTransactionsTracker: GetTransactionsTracker = (
   let updateCounter = 0
   const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
+    const needsHistoryUpdate = updateCounter === 0
 
-    const onChainUpdates = await getTransactionsUpdate(allTransactions)
+    const historyTransactions = needsHistoryUpdate
+      ? await getTransactionHistory(
+          accounts,
+          allTransactions,
+          fetchTransactions,
+        )
+      : []
+    const historyUpdates = getTransactionsStatusUpdate(
+      allTransactions,
+      historyTransactions,
+    )
 
-    const updates = onChainUpdates
+    const pendingTransactions = allTransactions.filter(
+      (tx) =>
+        historyTransactions.findIndex((tx2) => tx.hash === tx2.hash) === -1,
+    )
 
-    if (updateCounter === 0) {
-      const historyTransactions = await getTransactionHistory(
-        accounts,
-        allTransactions,
-        fetchTransactions,
-      )
-      const historyUpdates = getTransactionsStatusUpdate(
-        allTransactions,
-        historyTransactions,
-      )
+    const onChainUpdates = await getTransactionsUpdate(pendingTransactions)
 
-      updates.push(...historyUpdates)
-    }
+    const updates = [...onChainUpdates, ...historyUpdates]
+
     updateCounter = (updateCounter + 1) % checkHistory
 
     await transactionsStore.addItems(updates)
