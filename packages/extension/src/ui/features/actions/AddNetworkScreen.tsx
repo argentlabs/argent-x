@@ -2,7 +2,6 @@ import React, { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { addNetworks, switchNetwork } from "../../../background/customNetworks"
 import { Network } from "../../../shared/networks"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupVertical } from "../../components/Button"
@@ -10,6 +9,9 @@ import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { FormError, H2 } from "../../components/Typography"
 import { routes } from "../../routes"
+import { addNetworks } from "../../services/messaging"
+import { useNetworks } from "../networks/useNetworks"
+import { recover } from "../recovery/recovery.service"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -44,6 +46,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
   mode = "add",
 }) => {
   const navigate = useNavigate()
+  const { allNetworks } = useNetworks({ suspense: false })
 
   const [error, setError] = useState("")
 
@@ -62,13 +65,16 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
             if (requestedNetwork) {
               try {
                 if (mode === "add") {
-                  addNetworks(requestedNetwork)
+                  addNetworks([requestedNetwork])
                   onSubmit?.()
-                  navigate(routes.settingsNetworks())
+                  navigate(await recover({ networkId: requestedNetwork.id }))
                 } else if (mode === "switch") {
-                  await switchNetwork(requestedNetwork)
                   onSubmit?.()
-                  navigate(routes.accountTokens())
+                  if (allNetworks?.some((n) => n.id === requestedNetwork.id)) {
+                    navigate(await recover({ networkId: requestedNetwork.id }))
+                  } else {
+                    navigate(routes.accountTokens())
+                  }
                 }
               } catch {
                 setError("Network already exists")
@@ -116,6 +122,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
                   placeholder="Account Implementation Address"
                   type="text"
                   value={requestedNetwork.accountImplementation}
+                  readonly
                 />
               )}
               {requestedNetwork.rpcUrl && (
