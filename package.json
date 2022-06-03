@@ -31,8 +31,9 @@
   "bundlewatch": {
     "files": [
       {
-        "path": "packages/extension/dist/*.js",
-        "maxSize": "4mB"
+        "path": "packages/extension/dist/**/*.*",
+        "maxSize": "4mB",
+        "compression": "none"
       }
     ]
   },

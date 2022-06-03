@@ -18,6 +18,15 @@
     "showAlways": true
   },
   {
+    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": "18",
+    "network": "integration",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "showAlways": true
+  },
+  {
     "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
     "name": "DAI",
     "symbol": "DAI",

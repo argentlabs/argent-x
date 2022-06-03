@@ -30,7 +30,6 @@ import { getTransactionsTracker } from "./transactions/transactions"
 import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { Wallet, WalletStorageProps } from "./wallet"
 ;(async () => {
-  const contracts = await loadContracts()
   const messagingKeys = await getMessagingKeys()
   const storage = new Storage<WalletStorageProps>({}, "wallet")
 
@@ -38,7 +37,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
   const wallet = new Wallet(
     storage,
-    ...contracts,
+    loadContracts,
     getNetworkImplementation,
     onAutoLock,
   )

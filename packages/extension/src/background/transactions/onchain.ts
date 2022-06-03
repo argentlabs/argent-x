@@ -1,10 +1,18 @@
+import { Status } from "starknet"
+
 import { getProvider } from "../../shared/networks"
 import { Transaction } from "../../shared/transactions"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 
+const transactionStatusToCheck: Status[] = ["RECEIVED", "NOT_RECEIVED"]
+
 export async function getTransactionsUpdate(transactions: Transaction[]) {
+  const transactionsToCheck = transactions.filter(({ status }) =>
+    transactionStatusToCheck.includes(status),
+  )
+
   const fetchedTransactions = await Promise.allSettled(
-    transactions.map(async (transaction) => {
+    transactionsToCheck.map(async (transaction) => {
       const provider = getProvider(transaction.account.network)
       const status = await provider.getTransactionStatus(transaction.hash)
       return {

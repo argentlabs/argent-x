@@ -67,12 +67,8 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
               : await getNonce(starknetAccount)
 
             // FIXME: mainnet hack to dont pay fees as long as possible
-            const { maxFee } =
-              selectedAccount.network.id === "mainnet-alpha"
-                ? { maxFee: "0x0" }
-                : action.override || {}
-
-            const maxFeeOverrideExists = maxFee !== undefined && maxFee !== null
+            const maxFee =
+              selectedAccount.network.id === "mainnet-alpha" ? "0x0" : undefined
 
             const transaction = await starknetAccount.execute(
               transactions,
@@ -82,7 +78,7 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
                 nonce,
                 // For now we want to set the maxFee to 0 in case the user has not provided a maxFee. This will change with the next release. The default behavior in starknet.js is to estimate the fee, so we need to pass 0 explicitly.
                 // TODO: remove in next release
-                maxFee: maxFeeOverrideExists ? maxFee : 0,
+                ...(maxFee ? { maxFee } : {}),
               },
             )
 

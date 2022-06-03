@@ -1,5 +1,5 @@
 import { Collapse } from "@mui/material"
-import { FC, useMemo, useState } from "react"
+import { FC, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -14,6 +14,7 @@ import { A, FormError, P } from "../../components/Typography"
 import { makeClickable } from "../../services/a11y"
 import { addNetworks } from "../../services/backgroundNetworks"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { slugify } from "./slugify"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 
 const ExtendableControl = styled.div`
@@ -46,35 +47,41 @@ type NetworkSettingsFormScreenProps =
 export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
   props,
 ) => {
+  const navigate = useNavigate()
+  const [expanded, setExpanded] = useState(false)
   const defaultNetwork = useMemo<Network>(() => {
     if (props.mode === "add") {
-      return {
-        id: "",
-        name: "",
-        chainId: "",
-        baseUrl: "",
-      }
+      return { id: "", name: "", chainId: "", baseUrl: "" }
     }
     return props.network
-  }, [props])
+  }, [props.mode === "add" || props.network])
 
   const yupSchemaValidator = useYupValidationResolver<Network>(NetworkSchema)
   const {
     handleSubmit,
     formState: { errors },
     control,
+    watch,
+    setValue,
   } = useForm<Network>({
     defaultValues: defaultNetwork,
     resolver: yupSchemaValidator,
   })
-  const [expanded, setExpanded] = useState(false)
-  const navigate = useNavigate()
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (type === "change" && name === "name") {
+        setValue("id", slugify(value.name || ""))
+      }
+    })
+    return subscription.unsubscribe
+  }, [watch])
 
   return (
     <>
       <IconBar back />
       <ConfirmScreen
-        title={props.mode === "add" ? "Add Network" : "Edit Network"}
+        title={props.mode === "add" ? "Add network" : "Edit network"}
         singleButton
         confirmButtonText={props.mode === "add" ? "Create" : "Save"}
         smallTopPadding
@@ -95,15 +102,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             autoFocus
             autoComplete="off"
             control={control}
-            placeholder="Network ID"
-            name="id"
-            type="text"
-            disabled={defaultNetwork.readonly}
-          />
-          <ControlledInputText
-            autoComplete="off"
-            control={control}
-            placeholder="Name"
+            placeholder="Network name"
             name="name"
             type="text"
             disabled={defaultNetwork.readonly}
@@ -111,7 +110,15 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
           <ControlledInputText
             autoComplete="off"
             control={control}
-            placeholder="Chain ID"
+            placeholder="Internal ID"
+            name="id"
+            type="text"
+            disabled
+          />
+          <ControlledInputText
+            autoComplete="off"
+            control={control}
+            placeholder="Chain ID (e.g. SN_GOERLI)"
             defaultValue="SN_GOERLI"
             name="chainId"
             type="text"
@@ -153,8 +160,16 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             <ControlledInputText
               autoComplete="off"
               control={control}
-              placeholder="Account Implementation Address"
+              placeholder="Account implementation address"
               name="accountImplementation"
+              type="text"
+              disabled={defaultNetwork.readonly}
+            />
+            <ControlledInputText
+              autoComplete="off"
+              control={control}
+              placeholder="Account class hash"
+              name="accountClassHash"
               type="text"
               disabled={defaultNetwork.readonly}
             />
