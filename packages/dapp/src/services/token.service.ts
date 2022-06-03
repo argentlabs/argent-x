@@ -9,8 +9,6 @@ export const erc20TokenAddressByNetwork = {
     "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
   "mainnet-alpha":
     "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
-  integration:
-    "0x0683061a923bd11b825ef10a3c1d0fce00f2c0258d0a94f54dbfff6d5e8caf7e",
 }
 
 export type PublicNetwork = keyof typeof erc20TokenAddressByNetwork

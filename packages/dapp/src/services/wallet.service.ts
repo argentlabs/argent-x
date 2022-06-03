@@ -36,8 +36,6 @@ export const networkId = (): Network | undefined => {
       return "mainnet-alpha"
     } else if (baseUrl.includes("alpha4.starknet.io")) {
       return "goerli-alpha"
-    } else if (baseUrl.includes("external.integration.starknet.io")) {
-      return "integration"
     } else if (baseUrl.match(/^https?:\/\/localhost.*/)) {
       return "localhost"
     }
