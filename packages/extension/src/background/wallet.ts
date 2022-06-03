@@ -20,6 +20,7 @@ import {
   isKnownNetwork,
 } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
+import { loadPre9Contracts } from "./accounts"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -435,6 +436,9 @@ export class Wallet {
       )
       .map((account) => account.signer.derivationPath)
 
+    const [pre9proxyCompiledContract, pre9argentAccountCompiledContract] =
+      await loadPre9Contracts()
+
     const index = getNextPathIndex(currentPaths)
     const starkPair = getStarkPair(index, this.session?.secret as string)
     const starkPub = ec.getStarkKey(starkPair)
@@ -446,7 +450,7 @@ export class Wallet {
     let implementation = network.accountImplementation
     if (!implementation) {
       const deployImplementationTransaction = await provider.deployContract({
-        contract: this.argentAccountCompiledContract,
+        contract: pre9argentAccountCompiledContract,
       })
       assertTransactionReceived(deployImplementationTransaction, true)
       implementation = deployImplementationTransaction.address as string
@@ -456,7 +460,7 @@ export class Wallet {
     }
 
     const deployTransaction = await provider.deployContract({
-      contract: this.proxyCompiledContract,
+      contract: pre9proxyCompiledContract,
       constructorCalldata: stark.compileCalldata({ implementation }),
       addressSalt: seed,
     })
