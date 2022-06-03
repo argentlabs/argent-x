@@ -4,7 +4,10 @@ import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
 import { hasLatestDerivationPath } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
-import { getAccounts, getLastSelectedAccount } from "../../services/messaging"
+import {
+  getAccounts,
+  getLastSelectedAccount,
+} from "../../services/backgroundAccounts"
 import { Account } from "../accounts/Account"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
 import { useAccounts } from "../accounts/accounts.state"

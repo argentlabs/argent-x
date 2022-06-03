@@ -8,11 +8,7 @@ import {
 } from "../../shared/messages"
 import { Network } from "../../shared/networks"
 import { Token } from "../../shared/token"
-import {
-  decryptFromBackground,
-  encryptForBackground,
-  generateEncryptedSecret,
-} from "./crypto"
+import { encryptForBackground } from "./crypto"
 
 if (process.env.NODE_ENV === "development") {
   messageStream.subscribe(([message]) => {
@@ -23,11 +19,6 @@ if (process.env.NODE_ENV === "development") {
 export const getActions = async () => {
   sendMessage({ type: "GET_ACTIONS" })
   return waitForMessage("GET_ACTIONS_RES")
-}
-
-export const upgradeAccount = async (walletAddress: string) => {
-  sendMessage({ type: "UPGRADE_ACCOUNT", data: { walletAddress } })
-  return waitForMessage("TRANSACTION_UPDATES")
 }
 
 export const getTransactions = async (address: string) => {
@@ -42,11 +33,6 @@ export const getTransactionStatus = async (hash: string, network: string) => {
     "GET_TRANSACTION_RES",
     (status) => status.data.hash === hash,
   )
-}
-
-export const getLastSelectedAccount = async () => {
-  sendMessage({ type: "GET_SELECTED_ACCOUNT" })
-  return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
 export const getMessagingPublicKey = async () => {
@@ -75,11 +61,6 @@ export const hasActiveSession = async () => {
   return waitForMessage("HAS_SESSION_RES")
 }
 
-export const getAccounts = async () => {
-  sendMessage({ type: "GET_ACCOUNTS" })
-  return waitForMessage("GET_ACCOUNTS_RES")
-}
-
 export const getEstimatedFee = async (call: Call | Call[]) => {
   sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
 
@@ -95,20 +76,6 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
     amount: BigNumber.from(response.amount),
     suggestedMaxFee: BigNumber.from(response.suggestedMaxFee),
   }
-}
-
-export const getSeedPhrase = async (): Promise<string> => {
-  const { secret, encryptedSecret } = await generateEncryptedSecret()
-  sendMessage({
-    type: "GET_ENCRYPTED_SEED_PHRASE",
-    data: { encryptedSecret },
-  })
-
-  const { encryptedSeedPhrase } = await waitForMessage(
-    "GET_ENCRYPTED_SEED_PHRASE_RES",
-  )
-
-  return await decryptFromBackground(encryptedSeedPhrase, secret)
 }
 
 export const recoverBySeedPhrase = async (
@@ -178,21 +145,6 @@ export const checkPassword = async (password: string): Promise<boolean> => {
   ])
 }
 
-export const deleteAccount = async (address: string) => {
-  sendMessage({ type: "DELETE_ACCOUNT", data: address })
-
-  try {
-    await Promise.race([
-      waitForMessage("DELETE_ACCOUNT_RES"),
-      waitForMessage("DELETE_ACCOUNT_REJ").then(() => {
-        throw new Error("Rejected")
-      }),
-    ])
-  } catch (e) {
-    throw Error("Could not delete account")
-  }
-}
-
 export const removePreAuthorization = async (host: string) => {
   sendMessage({
     type: "REMOVE_PREAUTHORIZATION",
@@ -241,20 +193,6 @@ export const removeToken = async (address: string) => {
 export const addToken = async (token: Token) => {
   sendMessage({ type: "ADD_TOKEN", data: token })
   return waitForMessage("ADD_TOKEN_RES")
-}
-
-export const getPrivateKey = async () => {
-  const { secret, encryptedSecret } = await generateEncryptedSecret()
-  sendMessage({
-    type: "GET_ENCRYPTED_PRIVATE_KEY",
-    data: { encryptedSecret },
-  })
-
-  const { encryptedPrivateKey } = await waitForMessage(
-    "GET_ENCRYPTED_PRIVATE_KEY_RES",
-  )
-
-  return await decryptFromBackground(encryptedPrivateKey, secret)
 }
 
 // for debugging purposes
