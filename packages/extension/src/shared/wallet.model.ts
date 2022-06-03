@@ -5,9 +5,12 @@ export interface WalletAccountSigner {
   derivationPath: string
 }
 
-export interface WalletAccount {
+export interface WithSigner {
+  signer: WalletAccountSigner
+}
+
+export interface WalletAccount extends WithSigner {
   address: string
   network: Network
-  signer: WalletAccountSigner
   hidden?: boolean
 }
