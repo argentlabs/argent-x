@@ -3,43 +3,19 @@ import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
 import { ExtensionActionItem } from "../../../shared/actionQueue"
-import { messageStream, sendMessage } from "../../../shared/messages"
-import { getActions } from "../../services/background"
+import { messageStream } from "../../../shared/messages"
+import { getActions } from "../../services/backgroundActions"
 
 interface State {
   actions: ExtensionActionItem[]
-  approve: (action: ExtensionActionItem | string) => Promise<void>
-  reject: (action: ExtensionActionItem | string) => Promise<void>
 }
 
-export const useActions = create<State>(() => ({
-  actions: [],
-  approve: (action) => {
-    const actionHash = typeof action === "string" ? action : action.meta.hash
-    return sendMessage({
-      type: "APPROVE_ACTION",
-      data: {
-        actionHash,
-      },
-    })
-  },
-  reject: (action) => {
-    const actionHash = typeof action === "string" ? action : action.meta.hash
-    return sendMessage({
-      type: "REJECT_ACTION",
-      data: {
-        actionHash,
-      },
-    })
-  },
-}))
+export const useActions = create<State>(() => ({ actions: [] }))
 
 export const useActionsSubscription = () => {
-  const { data: actions = [] } = useSWRImmutable(
-    "actions",
-    () => getActions(),
-    { suspense: true },
-  )
+  const { data: actions = [] } = useSWRImmutable("actions", getActions, {
+    suspense: true,
+  })
 
   useEffect(() => {
     useActions.setState({ actions })

@@ -9,11 +9,6 @@ export const getMessagingPublicKey = async () => {
   return waitForMessage("GET_MESSAGING_PUBLIC_KEY_RES")
 }
 
-export const getActions = async () => {
-  sendMessage({ type: "GET_ACTIONS" })
-  return waitForMessage("GET_ACTIONS_RES")
-}
-
 export const removePreAuthorization = async (host: string) => {
   sendMessage({ type: "REMOVE_PREAUTHORIZATION", data: host })
   await waitForMessage("REMOVE_PREAUTHORIZATION_RES")
