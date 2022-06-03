@@ -38,32 +38,33 @@ export const getTransactionsTracker: GetTransactionsTracker = (
   fetchTransactions,
   onUpdate,
   updateInterval = 15e3, // 15 seconds
+  checkHistory = 4, // check history every 4 update cycles
 ) => {
   const accounts: WalletAccount[] = []
   const transactionsStore = getTransactionsStore()
 
+  let updateCounter = 0
   const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
-    const historyTransactions = await getTransactionHistory(
-      accounts,
-      allTransactions,
-      fetchTransactions,
-    )
-    const pendingTransactions = await transactionsStore.getItems(
-      ({ hash }) =>
-        !historyTransactions.some(
-          ({ hash: historyHash }) => hash === historyHash,
-        ),
-    )
 
-    const onChainUpdates = await getTransactionsUpdate(pendingTransactions)
+    const onChainUpdates = await getTransactionsUpdate(allTransactions)
 
-    const historyUpdates = getTransactionsStatusUpdate(
-      allTransactions,
-      historyTransactions,
-    )
+    const updates = onChainUpdates
 
-    const updates = [...onChainUpdates, ...historyUpdates]
+    if (updateCounter === 0) {
+      const historyTransactions = await getTransactionHistory(
+        accounts,
+        allTransactions,
+        fetchTransactions,
+      )
+      const historyUpdates = getTransactionsStatusUpdate(
+        allTransactions,
+        historyTransactions,
+      )
+
+      updates.push(...historyUpdates)
+    }
+    updateCounter = (updateCounter + 1) % checkHistory
 
     await transactionsStore.addItems(updates)
     onUpdate?.(updates)
