@@ -13,4 +13,4 @@ export const isDeprecated = ({
   signer,
   network: { accountClassHash },
 }: WalletAccount): boolean =>
-  Boolean(accountClassHash) && hasNewDerivationPath(signer.derivationPath)
+  Boolean(accountClassHash) && !hasNewDerivationPath(signer.derivationPath)
