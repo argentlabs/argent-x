@@ -42,6 +42,7 @@ const TransactionSubtitle = styled(TokenSubtitle)``
 interface TransactionItemProps {
   hash: string
   status?: StatusIndicatorColor
+  showExternalOpenIcon?: boolean
   highlighted?: boolean
   meta?: TransactionMeta
   onClick?: () => void
@@ -52,6 +53,7 @@ export const TransactionItem: FC<TransactionItemProps> = ({
   status = "transparent",
   highlighted,
   meta,
+  showExternalOpenIcon = false,
   onClick,
   ...props
 }) => (
@@ -65,7 +67,9 @@ export const TransactionItem: FC<TransactionItemProps> = ({
       <TokenTextGroup>
         <TokenTitle>
           {meta?.title || formatTruncatedAddress(hash)}
-          <OpenInNewIcon style={{ fontSize: "0.8rem", marginLeft: 5 }} />
+          {showExternalOpenIcon && (
+            <OpenInNewIcon style={{ fontSize: "0.8rem", marginLeft: 5 }} />
+          )}
         </TokenTitle>
         <TransactionSubtitle>
           {meta?.subTitle || formatTruncatedAddress(hash)}

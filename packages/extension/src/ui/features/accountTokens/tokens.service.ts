@@ -3,7 +3,7 @@ import { ethers } from "ethers"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import { feeToken } from "../../../shared/token"
+import { getFeeToken } from "../../../shared/token"
 import { Account } from "../accounts/Account"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
@@ -85,7 +85,7 @@ export const fetchFeeTokenBalance = async (
   account: Account,
   networkId: string,
 ): Promise<BigNumber> => {
-  const token = feeToken(networkId)
+  const token = getFeeToken(networkId)
   if (!token) {
     return BigNumber.from(0)
   }

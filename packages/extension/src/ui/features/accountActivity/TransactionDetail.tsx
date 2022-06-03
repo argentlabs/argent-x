@@ -1,12 +1,17 @@
 import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
-import styled, { css } from "styled-components"
+import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
-import { ChevronRight } from "../../components/Icons/ChevronRight"
+import {
+  Field,
+  FieldGroup,
+  FieldKey,
+  FieldValue,
+} from "../../components/Fields"
 import { CloseIcon } from "../../components/Icons/CloseIcon"
-import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
+import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 import { formatDateTime } from "../../services/dates"
 import { openVoyagerTransaction } from "../../services/voyager.service"
@@ -40,56 +45,20 @@ const Title = styled.h2`
   padding-left: 8px;
 `
 
-const TransactionCard = styled.section`
-  background: #333332;
-  border: 1px solid #161616;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-`
-
-const TransactionField = styled.div<{ clickable?: boolean }>`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 20px;
-
-  ${({ clickable }) =>
-    clickable &&
-    css`
-      cursor: pointer;
-    `}
-`
-
-const Separator = styled.div`
-  border-top: 1px solid #161616;
-  margin: 0;
-  padding: 0;
-`
-
-const TransactionFieldKey = styled.div`
-  color: #8f8e8c;
-`
-const TransactionFieldValue = styled.div``
-
-const TransactionFailedField = styled(TransactionField)`
+const TransactionFailedField = styled(Field)`
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
 `
 
-const TransactionLogMessage = styled(TransactionFieldValue)`
+const TransactionLogMessage = styled(FieldValue)`
   line-break: anywhere;
   font-weight: 400;
   font-size: 14px;
   line-height: 15px;
 `
 
-const TransactionLogKey = styled(TransactionFieldKey)`
+const TransactionLogKey = styled(FieldKey)`
   display: flex;
   align-items: center;
   gap: 7px;
@@ -126,21 +95,15 @@ export const TransactionDetail: FC = () => {
       <Container>
         <Title>Transaction</Title>
 
-        <TransactionCard>
-          <TransactionField>
-            <TransactionFieldKey>Status</TransactionFieldKey>
-            <TransactionFieldValue>
-              {isRejected ? "Failed" : "Complete"}
-            </TransactionFieldValue>
-          </TransactionField>
-          <Separator />
-          <TransactionField>
-            <TransactionFieldKey>Time</TransactionFieldKey>
-            {dateLabel && (
-              <TransactionFieldValue>{dateLabel}</TransactionFieldValue>
-            )}
-          </TransactionField>
-          <Separator />
+        <FieldGroup>
+          <Field>
+            <FieldKey>Status</FieldKey>
+            <FieldValue>{isRejected ? "Failed" : "Complete"}</FieldValue>
+          </Field>
+          <Field>
+            <FieldKey>Time</FieldKey>
+            {dateLabel && <FieldValue>{dateLabel}</FieldValue>}
+          </Field>
 
           {/* TODO: Add this back when we have a way to fetch Network Fee from
            txHash */}
@@ -151,10 +114,10 @@ export const TransactionDetail: FC = () => {
               <TransactionFieldValue>0.0012 ETH</TransactionFieldValue>
             </TransactionField>
           )} */}
-        </TransactionCard>
+        </FieldGroup>
 
         {isRejected ? (
-          <TransactionCard>
+          <FieldGroup>
             <TransactionFailedField clickable>
               <TransactionLogKey>
                 <div>Transaction log</div>
@@ -171,19 +134,19 @@ export const TransactionDetail: FC = () => {
                 {transaction.failureReason?.error_message || "Unknown error"}
               </TransactionLogMessage>
             </TransactionFailedField>
-          </TransactionCard>
+          </FieldGroup>
         ) : (
-          <TransactionCard>
-            <TransactionField
+          <FieldGroup>
+            <Field
               clickable
               onClick={() => openVoyagerTransaction(transaction.hash, network)}
             >
-              <TransactionFieldKey>View on Voyager</TransactionFieldKey>
-              <TransactionFieldValue>
-                <ChevronRight />
-              </TransactionFieldValue>
-            </TransactionField>
-          </TransactionCard>
+              <FieldKey>View on Voyager</FieldKey>
+              <FieldValue>
+                <OpenInNewIcon />
+              </FieldValue>
+            </Field>
+          </FieldGroup>
         )}
       </Container>
     </>
