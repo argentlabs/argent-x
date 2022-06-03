@@ -11,11 +11,11 @@ export function createStaleWhileRevalidateCache(
   const { storage, minTimeToStale, maxTimeToLive, serialize, deserialize } =
     parseConfig(config)
 
-  async function staleWhileRevalidate<ReturnValue>(
+  async function staleWhileRevalidate<TReturnValue>(
     cacheKey: string | (() => string),
-    fn: () => ReturnValue,
-  ): Promise<ReturnValue> {
-    const key = isFunction(cacheKey) ? String(cacheKey()) : String(cacheKey)
+    fn: () => TReturnValue,
+  ): Promise<TReturnValue> {
+    const key = String(isFunction(cacheKey) ? cacheKey() : cacheKey)
     const timeKey = `${key}_time`
 
     async function retrieveCachedValue() {
@@ -39,18 +39,18 @@ export function createStaleWhileRevalidateCache(
         }
 
         return { cachedValue: deserializedCachedValue, cachedAge }
-      } catch (error) {
+      } catch {
         return { cachedValue: null, cachedAge: 0 }
       }
     }
 
-    async function persistValue(result: ReturnValue) {
+    async function persistValue(result: TReturnValue) {
       try {
         await Promise.all([
           storage.setItem(key, serialize(result)),
           storage.setItem(timeKey, Date.now().toString()),
         ])
-      } catch (error) {
+      } catch {
         // Ignore
       }
     }
@@ -77,7 +77,7 @@ export function createStaleWhileRevalidateCache(
         })
       }
 
-      return cachedValue as ReturnValue
+      return cachedValue as TReturnValue
     }
 
     return revalidate()

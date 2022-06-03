@@ -1,4 +1,5 @@
 import { BigNumber, BigNumberish, utils } from "ethers"
+import { isNumber } from "lodash-es"
 import { KeyPair, ec, number } from "starknet"
 
 export function getStarkPair<T extends number | string>(
@@ -8,13 +9,11 @@ export function getStarkPair<T extends number | string>(
 ): KeyPair {
   const masterNode = utils.HDNode.fromSeed(BigNumber.from(secret).toHexString())
 
-  const path: string =
-    typeof indexOrPath === "number"
-      ? getPathForIndex(
-          indexOrPath,
-          baseDerivationPath ?? "", // will never be undefined because of the extends statement above, but somehow TS doesnt get this. As this will be removed in the near future I didnt bother
-        )
-      : indexOrPath
+  // baseDerivationPath will never be undefined because of the extends statement below,
+  // but somehow TS doesnt get this. As this will be removed in the near future I didnt bother
+  const path: string = isNumber(indexOrPath)
+    ? getPathForIndex(indexOrPath, baseDerivationPath ?? "")
+    : indexOrPath
   const childNode = masterNode.derivePath(path)
   const groundKey = grindKey(childNode.privateKey)
   const starkPair = ec.getKeyPair(groundKey)

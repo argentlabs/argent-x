@@ -32,7 +32,7 @@ export const determineFeePrice = async (
   ])
 
   return {
-    amount: amountUsd.toFixed(2).toString(),
-    suggestedMaxFee: suggestedMaxFeeUsd.toFixed(2).toString(),
+    amount: amountUsd.toFixed(2),
+    suggestedMaxFee: suggestedMaxFeeUsd.toFixed(2),
   }
 }
