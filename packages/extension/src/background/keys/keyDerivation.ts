@@ -6,7 +6,7 @@ import { KeyPair, ec, number } from "starknet"
 // layer = pathHash("starknet")
 // application = pathHash("argentx")
 
-const BASE_PATH = "m/2645'/1195502025'/1148870696'/0'/0'"
+const BASE_PATH = "m/44'/9004'/0'/0"
 
 export function getStarkPair(
   indexOrPath: number | string,
