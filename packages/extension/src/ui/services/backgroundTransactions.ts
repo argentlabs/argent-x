@@ -2,6 +2,7 @@ import { BigNumber } from "ethers"
 import { Call, number } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
+import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
 
 export const getTransactions = async (address: string) => {
   sendMessage({ type: "GET_TRANSACTIONS" })
@@ -15,6 +16,10 @@ export const getTransactionStatus = async (hash: string, network: string) => {
     "GET_TRANSACTION_RES",
     (status) => status.data.hash === hash,
   )
+}
+
+export const executeTransaction = (data: ExecuteTransactionRequest) => {
+  sendMessage({ type: "EXECUTE_TRANSACTION", data })
 }
 
 export const getEstimatedFee = async (call: Call | Call[]) => {

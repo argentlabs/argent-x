@@ -2,9 +2,9 @@ import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
-import { sendMessage, waitForMessage } from "../../../shared/messages"
 import { Network, getProvider } from "../../../shared/networks"
 import { WalletAccountSigner } from "../../../shared/wallet.model"
+import { createNewAccount } from "../../services/backgroundAccounts"
 import { getNetwork } from "../../services/backgroundNetworks"
 
 export class Account {
@@ -66,14 +66,8 @@ export class Account {
   }
 
   public static async fromDeploy(networkId: string): Promise<Account> {
-    sendMessage({ type: "NEW_ACCOUNT", data: networkId })
-
-    const result = await Promise.race([
-      waitForMessage("NEW_ACCOUNT_RES"),
-      waitForMessage("NEW_ACCOUNT_REJ"),
-    ])
-
-    if (result.status === "ko") {
+    const result = await createNewAccount(networkId)
+    if ("error" in result) {
       throw new Error(result.error)
     }
 
