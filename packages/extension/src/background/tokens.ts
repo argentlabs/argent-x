@@ -1,9 +1,9 @@
 import { validateAndParseAddress } from "starknet"
 
-import { Token } from "../shared/token"
+import { Token, parsedDefaultTokens } from "../shared/token"
 import { Storage } from "./storage"
 
-const tokenStore = new Storage<{
+const customTokenStore = new Storage<{
   tokens: Token[]
 }>({ tokens: [] }, "tokens")
 
@@ -26,7 +26,7 @@ const validateToken = (token: Partial<Token>): token is Token => {
 }
 
 export const getTokens = async (): Promise<Token[]> => {
-  return tokenStore.getItem("tokens")
+  return parsedDefaultTokens.concat(await customTokenStore.getItem("tokens"))
 }
 
 export const hasToken = async (address: Token["address"]): Promise<boolean> => {
@@ -42,24 +42,28 @@ export const addToken = async (token: Token): Promise<TokenMutationResult> => {
   if (!validateToken(token)) {
     throw new Error("Invalid token")
   }
-  const tokens = await tokenStore.getItem("tokens")
-  if (tokens.find(({ address }) => address === token.address)) {
+  const allTokens = await getTokens()
+  if (allTokens.find(({ address }) => address === token.address)) {
     return { success: false }
   }
-  tokens.push(token)
-  await tokenStore.setItem("tokens", tokens)
-  return { success: true, tokens }
+  const customTokens = await customTokenStore.getItem("tokens")
+  customTokens.push(token)
+  allTokens.push(token)
+  await customTokenStore.setItem("tokens", customTokens)
+  return { success: true, tokens: allTokens }
 }
 
 export const removeToken = async (
   tokenAddress: Token["address"],
 ): Promise<TokenMutationResult> => {
-  const tokens = await tokenStore.getItem("tokens")
-  const index = tokens.findIndex(({ address }) => address === tokenAddress)
+  const customTokens = await customTokenStore.getItem("tokens")
+  const index = customTokens.findIndex(
+    ({ address }) => address === tokenAddress,
+  )
   if (index === -1) {
     return { success: false }
   }
-  tokens.splice(index, 1)
-  await tokenStore.setItem("tokens", tokens)
-  return { success: true, tokens }
+  customTokens.splice(index, 1)
+  await customTokenStore.setItem("tokens", customTokens)
+  return { success: true, tokens: customTokens }
 }

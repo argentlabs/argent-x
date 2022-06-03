@@ -14,12 +14,12 @@ test("generate Stark Pair", () => {
 
   const starkPair5 = getStarkPair(5, secret)
   expect(ec.getStarkKey(starkPair5)).toBe(
-    "0x9be28603e0203db9adcac04302ba54f97f6d27abd8b801e3a80b20d25a7f21",
+    "0x05c7c65bfda7a85af0681c85c9c440f0aa6825feef6f9c96e55fb2ce08c8d4bc",
   )
 
   const starkPair7 = getStarkPair(7, secret)
   expect(ec.getStarkKey(starkPair7)).toBe(
-    "0x0420c619da34e3bf4b050ddb980d81d715d90bb14ff379024845111fbf9971c2",
+    "0x0605d5a0ece3b316f0d72221228acb7f01dcb34db74e0c02790db156741f5a86",
   )
 })
 
@@ -42,9 +42,9 @@ describe("getNextPathIndex", () => {
   test("incrementing", () => {
     expect(
       getNextPathIndex([
-        "m/2645'/1195502025'/1148870696'/0'/0'/0",
-        "m/2645'/1195502025'/1148870696'/0'/0'/1",
-        "m/2645'/1195502025'/1148870696'/0'/0'/2",
+        "m/44'/9004'/0'/0/0",
+        "m/44'/9004'/0'/0/1",
+        "m/44'/9004'/0'/0/2",
       ]),
     ).toBe(3)
   })
@@ -52,9 +52,9 @@ describe("getNextPathIndex", () => {
   test("fill incrementing gap", () => {
     expect(
       getNextPathIndex([
-        "m/2645'/1195502025'/1148870696'/0'/0'/0",
-        "m/2645'/1195502025'/1148870696'/0'/0'/1",
-        "m/2645'/1195502025'/1148870696'/0'/0'/3",
+        "m/44'/9004'/0'/0/0",
+        "m/44'/9004'/0'/0/1",
+        "m/44'/9004'/0'/0/3",
       ]),
     ).toBe(2)
   })
@@ -62,17 +62,23 @@ describe("getNextPathIndex", () => {
   test("fill big gap", () => {
     expect(
       getNextPathIndex([
-        "m/2645'/1195502025'/1148870696'/0'/0'/0",
-        "m/2645'/1195502025'/1148870696'/0'/0'/4",
-        "m/2645'/1195502025'/1148870696'/0'/0'/11",
+        "m/44'/9004'/0'/0/0",
+        "m/44'/9004'/0'/0/4",
+        "m/44'/9004'/0'/0/11",
       ]),
     ).toBe(1)
   })
 
   test("fill 0 gap", () => {
+    expect(getNextPathIndex(["m/44'/9004'/0'/0/3", "m/44'/9004'/0'/0/1"])).toBe(
+      0,
+    )
+  })
+
+  test("legacy gets ignored", () => {
     expect(
       getNextPathIndex([
-        "m/2645'/1195502025'/1148870696'/0'/0'/3",
+        "m/2645'/1195502025'/1148870696'/0'/0'/0",
         "m/2645'/1195502025'/1148870696'/0'/0'/1",
       ]),
     ).toBe(0)

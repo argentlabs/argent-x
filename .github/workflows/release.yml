@@ -27,6 +27,8 @@ jobs:
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
       - run: yarn --cwd packages/dapp export
+      - name: Check bundlesize
+        run: yarn run bundlewatch
       - name: Create zip
         run: |
           cd packages/extension/dist
