@@ -3,8 +3,12 @@ import { Transaction } from "../../shared/transactions"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 
 export async function getTransactionsUpdate(transactions: Transaction[]) {
+  const transactionsToCheck = transactions.filter(
+    ({ status }) => status === "RECEIVED",
+  )
+
   const fetchedTransactions = await Promise.allSettled(
-    transactions.map(async (transaction) => {
+    transactionsToCheck.map(async (transaction) => {
       const provider = getProvider(transaction.account.network)
       const status = await provider.getTransactionStatus(transaction.hash)
       return {
