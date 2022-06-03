@@ -295,7 +295,6 @@ export class Wallet {
                 type: "local_signer",
                 derivationPath: getPathForIndex(lastCheck),
               },
-              hidden: false,
             })
           }
 
@@ -433,7 +432,6 @@ export class Wallet {
         type: "local_secret",
         derivationPath: getPathForIndex(index),
       },
-      hidden: false,
     }
 
     await this.pushAccount(account)
