@@ -65,7 +65,7 @@ export const MigrationDisclaimerScreen: FC = () => {
       </P>
       <P>
         <a
-          href="https://github.com/argentlabs/argent-x/blob/develop/docs/Upgrade_v3.md"
+          href="https://starkware.notion.site/Contracts-As-Classes-641060360aef4d048f7cb172afd57866"
           target="_blank"
           rel="noreferrer"
         >
