@@ -50,34 +50,31 @@ export const MigrationDisclaimerScreen: FC = () => {
   }
 
   return (
-    <>
-      <Container>
-        <H2>Please migrate your funds</H2>
-        <P>
-          StarkNet is in Alpha and its testnet has made breaking changes.
-          Mainnet will follow soon.
-        </P>
-        <P>
-          Please create a new account and send all your assets from your old
-          account(s) to this new one. You may need to use a dapp to do this.
-        </P>
-        <P>
-          Old accounts will not be recoverable with your backup or seed phrase.
-        </P>
-        <P>
-          <a
-            href="https://github.com/argentlabs/argent-x/blob/develop/docs/Upgrade_v3.md"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Read more about this change{" "}
-            <OpenInNewIcon style={{ fontSize: 14 }} />
-          </a>
-        </P>
-        <Button style={{ marginTop: 70 }} onClick={handleAddAccount}>
-          Create new account
-        </Button>
-      </Container>
-    </>
+    <Container>
+      <H2>Please migrate your funds</H2>
+      <P>
+        StarkNet is in Alpha and its testnet has made breaking changes. Mainnet
+        will follow soon.
+      </P>
+      <P>
+        Please create a new account and send all your assets from your old
+        account(s) to this new one. You may need to use a dapp to do this.
+      </P>
+      <P>
+        Old accounts will not be recoverable with your backup or seed phrase.
+      </P>
+      <P>
+        <a
+          href="https://github.com/argentlabs/argent-x/blob/develop/docs/Upgrade_v3.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Read more about this change <OpenInNewIcon style={{ fontSize: 14 }} />
+        </a>
+      </P>
+      <Button style={{ marginTop: 70 }} onClick={handleAddAccount}>
+        Create new account
+      </Button>
+    </Container>
   )
 }
