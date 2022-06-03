@@ -36,11 +36,17 @@ export const recoverBySeedPhrase = async (
   }
 }
 
+export const downloadBackupFile = () => {
+  sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
+}
+
+export const downloadLegacyBackupFile = () => {
+  sendMessage({ type: "DOWNLOAD_LEGACY_BACKUP_FILE" })
+}
+
 // for debugging purposes
 try {
-  ;(window as any).downloadBackup = () => {
-    sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
-  }
+  ;(window as any).downloadBackup = downloadBackupFile
 } catch {
   // ignore
 }

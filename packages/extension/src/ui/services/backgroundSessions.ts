@@ -28,6 +28,10 @@ export const startSession = async (password: string): Promise<void> => {
   }
 }
 
+export const stopSession = () => {
+  sendMessage({ type: "STOP_SESSION" })
+}
+
 export const checkPassword = async (password: string): Promise<boolean> => {
   const body = await encryptForBackground(password)
 
