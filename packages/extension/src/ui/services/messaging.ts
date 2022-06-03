@@ -7,7 +7,6 @@ import {
   waitForMessage,
 } from "../../shared/messages"
 import { Network } from "../../shared/networks"
-import { Token } from "../../shared/token"
 import { encryptForBackground } from "./crypto"
 
 if (process.env.NODE_ENV === "development") {
@@ -178,21 +177,6 @@ export const removeNetworks = async (networks: Network["id"][]) => {
 export const getNetworkStatuses = async (networks: Network[] = []) => {
   sendMessage({ type: "GET_NETWORK_STATUSES", data: networks })
   return waitForMessage("GET_NETWORK_STATUSES_RES")
-}
-
-export const getTokens = async () => {
-  sendMessage({ type: "GET_TOKENS" })
-  return waitForMessage("GET_TOKENS_RES")
-}
-
-export const removeToken = async (address: string) => {
-  sendMessage({ type: "REMOVE_TOKEN", data: address })
-  return waitForMessage("REMOVE_TOKEN_RES")
-}
-
-export const addToken = async (token: Token) => {
-  sendMessage({ type: "ADD_TOKEN", data: token })
-  return waitForMessage("ADD_TOKEN_RES")
 }
 
 // for debugging purposes
