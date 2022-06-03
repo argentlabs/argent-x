@@ -26,6 +26,7 @@ import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
 import { LegacyScreen } from "./features/onboarding/LegacyWalletScreen"
 import { LockScreen } from "./features/onboarding/LockScreen"
+import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
 import { ResetScreen } from "./features/onboarding/ResetScreen"
 import { WelcomeScreen } from "./features/onboarding/WelcomeScreen"
@@ -80,6 +81,10 @@ const nonWalletRoutes = (
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route path={routes.disclaimer.path} element={<DisclaimerScreen />} />
+    <Route
+      path={routes.migrationDisclaimer.path}
+      element={<MigrationDisclaimerScreen />}
+    />
     <Route path={routes.legacy.path} element={<LegacyScreen />} />
     <Route path={routes.error.path} element={<ErrorScreen />} />
   </>

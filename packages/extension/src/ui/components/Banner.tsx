@@ -3,6 +3,7 @@ import styled, { css } from "styled-components"
 
 const BannerWrapper = styled.div<{
   noMargins?: boolean
+  theme?: "danger"
 }>`
   display: flex;
   cursor: pointer;
@@ -10,10 +11,22 @@ const BannerWrapper = styled.div<{
   padding: 16px;
   background-color: #ffffff;
   border-radius: 8px;
+
   ${({ noMargins = false }) =>
     !noMargins &&
     css`
       margin: 16px 20px;
+    `};
+
+  ${({ theme }) =>
+    theme === "danger" &&
+    css`
+      background-color: #c12026;
+
+      h1,
+      p {
+        color: white;
+      }
     `};
 `
 
@@ -43,6 +56,7 @@ export interface BannerProps {
   description: string
   icon: ReactNode
   noMargins?: boolean
+  theme?: "danger"
 }
 
 export const Banner: FC<BannerProps> = ({
@@ -50,8 +64,9 @@ export const Banner: FC<BannerProps> = ({
   description,
   icon,
   noMargins,
+  theme,
 }) => (
-  <BannerWrapper noMargins={noMargins}>
+  <BannerWrapper noMargins={noMargins} theme={theme}>
     {icon}
     <BannerTextWrapper>
       <BannerTitle>{title}</BannerTitle>

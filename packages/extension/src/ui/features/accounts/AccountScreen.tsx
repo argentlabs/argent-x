@@ -1,11 +1,13 @@
-import { FC, ReactNode } from "react"
+import { FC, ReactNode, useEffect } from "react"
 
+import { hasLatestDerivationPath } from "../../../shared/wallet.service"
 import { assertNever } from "../../services/assertNever"
 import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { AccountContainer } from "./AccountContainer"
-import { useSelectedAccount } from "./accounts.state"
+import { useAccounts, useSelectedAccount } from "./accounts.state"
+import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
 
 interface AccountScreenProps {
   tab: "tokens" | "nfts" | "activity"
@@ -13,10 +15,23 @@ interface AccountScreenProps {
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
+  const { showMigrationScreen } = useAccounts()
+
+  useEffect(() => {
+    useAccounts.setState({
+      showMigrationScreen: account ? !hasLatestDerivationPath(account) : false,
+    })
+  }, [account])
 
   let body: ReactNode
   if (!account) {
     body = <></>
+  } else if (showMigrationScreen) {
+    return (
+      <DeprecatedAccountScreen
+        onSubmit={() => useAccounts.setState({ showMigrationScreen: false })}
+      />
+    )
   } else if (tab === "tokens") {
     body = <AccountTokens account={account} />
   } else if (tab === "nfts") {
