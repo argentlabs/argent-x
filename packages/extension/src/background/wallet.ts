@@ -132,6 +132,7 @@ export class Wallet {
       return
     }
     const N = isDevOrTest ? 64 : 32768
+    this.store.setItem("discoveredOnce", true)
     const ethersWallet = ethers.Wallet.createRandom()
     this.encryptedBackup = await ethersWallet.encrypt(
       password,
