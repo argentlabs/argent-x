@@ -19,15 +19,18 @@ export const trackTransations: TransactionUpdateListener = async (
     })
 
     for (const transaction of transactions) {
-      const { hash, status, meta } = transaction
+      const { hash, status, meta, account } = transaction
       if (
         (successStatuses.includes(status) || status === "REJECTED") &&
         !(await hasShownNotification(hash))
       ) {
         addToAlreadyShown(hash)
-        sentTransactionNotification(hash, status, meta)
 
-        if (successStatuses.includes(status)) {
+        if (!account.hidden) {
+          sentTransactionNotification(hash, status, meta)
+        }
+
+        if (successStatuses.includes(status) && !account.hidden) {
           sendMessageToUi({ type: "TRANSACTION_SUCCESS", data: transaction })
         } else if (status === "REJECTED") {
           sendMessageToUi({
