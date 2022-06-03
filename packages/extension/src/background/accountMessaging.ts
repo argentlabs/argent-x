@@ -119,9 +119,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     case "HIDE_ACCOUNT": {
       try {
         await wallet.hideAccount(msg.data)
-
-        console.log("Account Hide Successful")
-
         return sendToTabAndUi({ type: "HIDE_ACCOUNT_RES" })
       } catch (error) {
         return sendToTabAndUi({ type: "HIDE_ACCOUNT_REJ" })
