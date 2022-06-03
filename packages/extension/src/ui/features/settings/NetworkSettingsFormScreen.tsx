@@ -12,7 +12,7 @@ import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { A, FormError, P } from "../../components/Typography"
 import { makeClickable } from "../../services/a11y"
-import { addNetworks } from "../../services/messaging"
+import { addNetworks } from "../../services/backgroundNetworks"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 
