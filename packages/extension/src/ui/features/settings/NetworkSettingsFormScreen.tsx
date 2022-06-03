@@ -54,7 +54,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
       return { id: "", name: "", chainId: "", baseUrl: "" }
     }
     return props.network
-  }, [props])
+  }, [props.network, props.mode])
 
   const yupSchemaValidator = useYupValidationResolver<Network>(NetworkSchema)
   const {
