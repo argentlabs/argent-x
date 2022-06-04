@@ -1,10 +1,10 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { sendMessage } from "../../../shared/messages"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
-import { useAccounts } from "../accounts/accounts.state"
+import { resetAll } from "../../services/background"
+import { initialState, useAccounts } from "../accounts/accounts.state"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 export const ResetScreen: FC = () => {
@@ -17,9 +17,9 @@ export const ResetScreen: FC = () => {
       confirmButtonBackgroundColor="#c12026"
       rejectButtonText="Cancel"
       onSubmit={() => {
-        sendMessage({ type: "RESET_ALL" })
+        resetAll()
         localStorage.clear()
-        useAccounts.setState({ accounts: {}, selectedAccount: undefined })
+        useAccounts.setState(initialState)
         navigate(routes.welcome())
       }}
     >

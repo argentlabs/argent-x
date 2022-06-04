@@ -9,13 +9,13 @@ import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
+import { connectAccount } from "../../services/backgroundAccounts"
 import { PendingTransactions } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
-import { connectAccount } from "../accounts/accounts.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
 import { useNetwork } from "../networks/useNetworks"

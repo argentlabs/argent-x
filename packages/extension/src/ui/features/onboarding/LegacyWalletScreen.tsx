@@ -2,10 +2,10 @@ import { FC, FormEventHandler } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { sendMessage } from "../../../shared/messages"
 import { Button } from "../../components/Button"
 import { H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
+import { downloadLegacyBackupFile } from "../../services/backgroundRecovery"
 
 const ContinueButton = styled(Button)`
   margin-top: auto;
@@ -33,7 +33,7 @@ export const LegacyScreen: FC = () => {
 
   const handleDownload: FormEventHandler = async (e) => {
     e.preventDefault()
-    sendMessage({ type: "DOWNLOAD_LEGACY_BACKUP_FILE" })
+    downloadLegacyBackupFile()
   }
 
   return (

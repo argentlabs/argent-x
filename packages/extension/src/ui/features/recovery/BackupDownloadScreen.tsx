@@ -2,12 +2,12 @@ import { FC, FormEventHandler } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { sendMessage } from "../../../shared/messages"
 import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
+import { downloadBackupFile } from "../../services/backgroundRecovery"
 import { useBackupRequired } from "./backupDownload.state"
 
 const DownloadButton = styled(Button)`
@@ -28,7 +28,7 @@ export const BackupDownloadScreen: FC = () => {
   const isSettings = new URLSearchParams(search).has("settings")
 
   const handleDownloadClick: FormEventHandler = async () => {
-    sendMessage({ type: "DOWNLOAD_BACKUP_FILE" })
+    downloadBackupFile()
     useBackupRequired.setState({ isBackupRequired: false })
     navigate(isSettings ? routes.settings() : routes.accountTokens())
   }

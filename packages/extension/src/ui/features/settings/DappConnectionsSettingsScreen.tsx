@@ -2,8 +2,10 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { getPreAuthorizations } from "../../../background/preAuthorizations"
-import { sendMessage } from "../../../shared/messages"
+import {
+  getPreAuthorizations,
+  resetPreAuthorizations,
+} from "../../../background/preAuthorizations"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { H2, P } from "../../components/Typography"
@@ -63,7 +65,7 @@ export const DappConnectionsSettingsScreen: FC = () => {
             <P>Require all dapps to request a new connection to your wallet?</P>
             <Button
               onClick={() => {
-                sendMessage({ type: "RESET_PREAUTHORIZATIONS" })
+                resetPreAuthorizations()
                 navigate(-1)
               }}
             >

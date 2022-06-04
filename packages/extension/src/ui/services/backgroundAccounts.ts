@@ -1,5 +1,14 @@
 import { sendMessage, waitForMessage } from "../../shared/messages"
+import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
+
+export const createNewAccount = async (networkId: string) => {
+  sendMessage({ type: "NEW_ACCOUNT", data: networkId })
+  return await Promise.race([
+    waitForMessage("NEW_ACCOUNT_RES"),
+    waitForMessage("NEW_ACCOUNT_REJ"),
+  ])
+}
 
 export const getLastSelectedAccount = async () => {
   sendMessage({ type: "GET_SELECTED_ACCOUNT" })
@@ -9,6 +18,10 @@ export const getLastSelectedAccount = async () => {
 export const getAccounts = async () => {
   sendMessage({ type: "GET_ACCOUNTS" })
   return waitForMessage("GET_ACCOUNTS_RES")
+}
+
+export const connectAccount = ({ address, network, signer }: Account) => {
+  sendMessage({ type: "CONNECT_ACCOUNT", data: { address, network, signer } })
 }
 
 export const deleteAccount = async (address: string) => {

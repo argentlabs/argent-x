@@ -42,7 +42,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_RES",
           data: {
-            status: "ok",
             txHash,
             address: account.address,
             account: account,
@@ -61,7 +60,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         }
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_REJ",
-          data: { status: "ko", error },
+          data: { error },
         })
       }
     }

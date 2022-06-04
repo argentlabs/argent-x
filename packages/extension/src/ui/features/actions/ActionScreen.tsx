@@ -5,6 +5,7 @@ import { waitForMessage } from "../../../shared/messages"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
+import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
@@ -18,20 +19,20 @@ const isPopup = new URLSearchParams(window.location.search).has("popup")
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
   const account = useSelectedAccount()
-  const { actions, approve, reject } = useActions()
+  const { actions } = useActions()
 
   const [action] = actions
   const isLastAction = actions.length === 1
 
   const onSubmit = useCallback(async () => {
-    await approve(action)
+    approveAction(action)
     if (isPopup && isLastAction) {
       window.close()
     }
   }, [])
 
   const onReject = useCallback(async () => {
-    await reject(action)
+    rejectAction(action)
     if (isPopup && isLastAction) {
       window.close()
     }
@@ -84,7 +85,7 @@ export const ActionScreen: FC = () => {
           transactions={action.payload.transactions}
           actionHash={action.meta.hash}
           onSubmit={async () => {
-            await approve(action)
+            approveAction(action)
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([
               waitForMessage(
@@ -119,7 +120,7 @@ export const ActionScreen: FC = () => {
         <ApproveSignatureScreen
           dataToSign={action.payload}
           onSubmit={async () => {
-            await approve(action)
+            approveAction(action)
             useAppState.setState({ isLoading: true })
             await waitForMessage(
               "SIGNATURE_SUCCESS",
