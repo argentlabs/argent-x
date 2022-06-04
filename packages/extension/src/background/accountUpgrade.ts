@@ -81,15 +81,15 @@ export const getImplementationUpgradePath = (
 }
 
 export const upgradeAccount = async (
-  walletAddress: string,
+  accountAddress: string,
   wallet: Wallet,
   transactionTracker: TransactionTracker,
 ) => {
   const starknetAccount = await wallet.getStarknetAccountByAddress(
-    walletAddress,
+    accountAddress,
   )
 
-  const account = await wallet.getAccountByAddress(walletAddress)
+  const account = await wallet.getAccountByAddress(accountAddress)
   const { accountImplementation: newImplementation } = await getNetwork(
     account.network.id,
   )

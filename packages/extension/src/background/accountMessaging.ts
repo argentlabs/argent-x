@@ -72,8 +72,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "UPGRADE_ACCOUNT": {
-      const { walletAddress } = msg.data
-      return await upgradeAccount(walletAddress, wallet, transactionTracker)
+      const { accountAddress } = msg.data
+      return await upgradeAccount(accountAddress, wallet, transactionTracker)
     }
 
     case "DELETE_ACCOUNT": {
