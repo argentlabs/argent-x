@@ -90,6 +90,7 @@ test("open existing wallet", async () => {
 
   const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
+  storage.setItem("discoveredOnce", true)
   const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
@@ -123,6 +124,7 @@ test("open existing wallet", async () => {
 test("open existing wallet with wrong password", async () => {
   const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
+  storage.setItem("discoveredOnce", true)
   const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 
@@ -137,6 +139,7 @@ test("import backup file", async () => {
   jest.useFakeTimers()
 
   const storage = new MockStorage<WalletStorageProps>()
+  storage.setItem("discoveredOnce", true)
   const wallet = new Wallet(storage, loadContracts, getNetwork)
   await wallet.setup()
 

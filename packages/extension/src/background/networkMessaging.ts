@@ -24,7 +24,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
       const newNetworks = await addNetworks(networks)
       await Promise.all(
         newNetworks.map(
-          (network) => wallet.discoverAccountsForNetwork(network.id, 2), // just close gaps up to 1 blank space, as these networks are new and should be linked lists
+          (network) => wallet.discoverAccountsForNetwork(network, 2), // just close gaps up to 1 blank space, as these networks are new and should be linked lists
         ),
       )
       return sendToTabAndUi({
