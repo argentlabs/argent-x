@@ -365,14 +365,13 @@ export class Wallet {
   }
 
   public async discoverAccountsForNetwork(
-    networkId: string,
+    network?: Network,
     offset: number = CHECK_OFFSET,
   ) {
     if (!this.isSessionOpen() || !this.session?.secret) {
       throw new Error("Session is not open")
     }
     const wallet = new ethers.Wallet(this.session?.secret)
-    const network = await this.getNetwork(networkId)
 
     if (!network?.accountImplementation) {
       // silent fail if no account implementation is defined for this network
@@ -495,7 +494,7 @@ export class Wallet {
       implementation = deployImplementationTransaction.address as string
     } else {
       // if there is an implementation, we need to check if accounts were already deployed
-      this.discoverAccountsForNetwork(networkId)
+      this.discoverAccountsForNetwork(network)
     }
 
     const deployTransaction = await provider.deployContract({
