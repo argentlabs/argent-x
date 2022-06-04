@@ -45,8 +45,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             accounts: await wallet.getAccounts(),
           },
         })
-      } catch (e: any) {
-        let error = `${e}`
+      } catch (exception: unknown) {
+        let error = `${exception}`
         if (network.includes("localhost")) {
           if (error.toLowerCase().includes("network error")) {
             error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`

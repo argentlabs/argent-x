@@ -106,10 +106,10 @@ export class Wallet {
   private session?: WalletSession
 
   constructor(
-    private store: IStorage<WalletStorageProps>,
-    private loadContracts: LoadContracts,
-    private getNetwork: GetNetwork,
-    private onAutoLock?: () => Promise<void>,
+    private readonly store: IStorage<WalletStorageProps>,
+    private readonly loadContracts: LoadContracts,
+    private readonly getNetwork: GetNetwork,
+    private readonly onAutoLock?: () => Promise<void>,
   ) {}
 
   public async setup() {
@@ -696,15 +696,13 @@ export class Wallet {
       return
     }
     const backup = JSON.parse(this.encryptedBackup)
+    const accounts = (await this.getAccounts()).map((account) => ({
+      ...account,
+      network: account.network.id,
+    }))
     const extendedBackup = {
       ...backup,
-      argent: {
-        version: CURRENT_BACKUP_VERSION,
-        accounts: (await this.getAccounts()).map((account) => ({
-          ...account,
-          network: account.network.id,
-        })),
-      },
+      argent: { version: CURRENT_BACKUP_VERSION, accounts },
     }
     const backupString = JSON.stringify(extendedBackup)
 
