@@ -55,7 +55,8 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
         transactionTracker.load(await wallet.getAccounts())
 
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
-      } catch {
+      } catch (e) {
+        console.error(e)
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_REJ" })
       }
     }

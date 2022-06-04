@@ -1,5 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
+import { union } from "lodash-es"
 import {
   Account,
   AddTransactionResponse,
@@ -13,7 +14,13 @@ import {
 } from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
-import { Network, defaultNetwork, getProvider } from "../shared/networks"
+import {
+  Network,
+  defaultNetwork,
+  defaultNetworks,
+  getProvider,
+  isKnownNetwork,
+} from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
 import {
   newBaseDerivationPath,
@@ -38,6 +45,7 @@ export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
 
 type KnownNetworkIds = "mainnet-alpha" | "goerli-alpha"
 const CHECK_OFFSET = 10
+// pre cairo 9
 const PROXY_CONTRACT_HASHES_TO_CHECK = [
   "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
 ]
@@ -53,6 +61,13 @@ const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
     "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
   ],
 }
+// post cairo 9
+const PROXY_CONTRACT_CLASS_HASHES = [
+  "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918",
+]
+const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
+  "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+]
 
 interface WalletSession {
   secret: string
@@ -213,23 +228,14 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    const networks = ["mainnet-alpha", "goerli-alpha"] as const
+    const networks = defaultNetworks.map((network) => network.id)
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)
         if (!network) {
           throw new Error(`Network ${networkId} not found`)
         }
-        const implementations =
-          VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId]
-        if (!implementations) {
-          throw new Error(`No implementations for network ${networkId}`)
-        }
-        return this.restoreAccountsFromWallet(
-          wallet.privateKey,
-          network,
-          implementations,
-        )
+        return this.restoreAccountsFromWallet(wallet.privateKey, network)
       }),
     )
     const accounts = accountsResults.flatMap((x) => x)
@@ -242,27 +248,98 @@ export class Wallet {
   private async restoreAccountsFromWallet(
     secret: string,
     network: Network,
-    accountImplementationAddresses: string[],
-    proxyContactHashes: string[] = PROXY_CONTRACT_HASHES_TO_CHECK,
     offset: number = CHECK_OFFSET,
   ): Promise<WalletAccount[]> {
     if (!network?.accountClassHash) {
+      const accountImplementationAddresses = union(
+        isKnownNetwork(network.id)
+          ? VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[network.id]
+          : [],
+        network?.accountImplementation ? [network.accountImplementation] : [],
+      )
+      const proxyContractHashes = PROXY_CONTRACT_HASHES_TO_CHECK
       return this.restoreAccountsFromWalletPre9(
         secret,
         network,
         accountImplementationAddresses,
-        proxyContactHashes,
+        proxyContractHashes,
         offset,
       )
     }
 
-    return this.restoreAccountsFromWalletPre9(
-      secret,
-      network,
-      accountImplementationAddresses,
-      proxyContactHashes,
-      offset,
+    const provider = getProvider(network)
+
+    const accounts: WalletAccount[] = []
+
+    const accountClassHashes = union(
+      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
+      network?.accountClassHash ? [network.accountClassHash] : [],
     )
+    const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
+
+    if (!accountClassHashes?.length) {
+      console.error(`No known account class hashes for network ${network.id}`)
+      return accounts
+    }
+
+    const proxyClassHashAndAccountClassHash2DMap = proxyClassHashes.flatMap(
+      (contractHash) =>
+        accountClassHashes.map(
+          (implementation) => [contractHash, implementation] as const,
+        ),
+    )
+
+    const promises = proxyClassHashAndAccountClassHash2DMap.map(
+      async ([contractClassHash, accountClassHash]) => {
+        let lastHit = 0
+        let lastCheck = 0
+
+        while (lastHit + offset > lastCheck) {
+          const starkPair = getStarkPair(
+            lastCheck,
+            secret,
+            newBaseDerivationPath,
+          )
+          const starkPub = ec.getStarkKey(starkPair)
+
+          const address = calculateContractAddress(
+            starkPub,
+            contractClassHash,
+            stark.compileCalldata({
+              implementation: accountClassHash,
+              selector: getSelectorFromName("initialize"),
+              calldata: stark.compileCalldata({
+                signer: starkPub,
+                guardian: "0",
+              }),
+            }),
+          )
+
+          const code = await provider.getCode(address)
+
+          if (code.bytecode.length > 0) {
+            lastHit = lastCheck
+            accounts.push({
+              address,
+              network,
+              signer: {
+                type: "local_signer",
+                derivationPath: getPathForIndex(
+                  lastCheck,
+                  newBaseDerivationPath,
+                ),
+              },
+            })
+          }
+
+          ++lastCheck
+        }
+      },
+    )
+
+    await Promise.all(promises)
+
+    return accounts
   }
 
   private async restoreAccountsFromWalletPre9(
@@ -276,8 +353,9 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    if (!accountImplementationAddresses) {
-      throw new Error(`No known implementations for network ${network.id}`)
+    if (!accountImplementationAddresses?.length) {
+      console.error(`No known implementations for network ${network.id}`)
+      return accounts
     }
 
     const contractHashAndImplementations2dArray = proxyContactHashes.flatMap(
@@ -383,7 +461,7 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    if (!network?.accountImplementation) {
+    if (!network?.accountImplementation && !network?.accountClassHash) {
       // silent fail if no account implementation is defined for this network
       return
     }
@@ -391,8 +469,6 @@ export class Wallet {
     const accounts = await this.restoreAccountsFromWallet(
       wallet.privateKey,
       network,
-      [network.accountImplementation],
-      PROXY_CONTRACT_HASHES_TO_CHECK,
       offset,
     )
 
@@ -427,7 +503,6 @@ export class Wallet {
       newBaseDerivationPath,
     )
     const starkPub = ec.getStarkKey(starkPair)
-    const seed = starkPub
     const [proxyCompiledContract] = await this.loadContracts(
       newBaseDerivationPath,
     )
@@ -441,7 +516,7 @@ export class Wallet {
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
-      addressSalt: seed,
+      addressSalt: starkPub,
     })
 
     assertTransactionReceived(deployTransaction, true)
