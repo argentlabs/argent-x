@@ -246,6 +246,16 @@ export class Wallet {
     proxyContactHashes: string[] = PROXY_CONTRACT_HASHES_TO_CHECK,
     offset: number = CHECK_OFFSET,
   ): Promise<WalletAccount[]> {
+    if (!network?.accountClassHash) {
+      return this.restoreAccountsFromWalletPre9(
+        secret,
+        network,
+        accountImplementationAddresses,
+        proxyContactHashes,
+        offset,
+      )
+    }
+
     return this.restoreAccountsFromWalletPre9(
       secret,
       network,
@@ -286,7 +296,7 @@ export class Wallet {
           const starkPair = getStarkPair(
             lastCheck,
             secret,
-            newBaseDerivationPath,
+            oldBaseDerivationPath,
           )
           const starkPub = ec.getStarkKey(starkPair)
           const seed = starkPub
@@ -308,7 +318,7 @@ export class Wallet {
                 type: "local_signer",
                 derivationPath: getPathForIndex(
                   lastCheck,
-                  newBaseDerivationPath,
+                  oldBaseDerivationPath,
                 ),
               },
             })
