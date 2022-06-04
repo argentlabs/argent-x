@@ -13,12 +13,7 @@ import {
 } from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
-import {
-  Network,
-  defaultNetwork,
-  getProvider,
-  isKnownNetwork,
-} from "../shared/networks"
+import { Network, defaultNetwork, getProvider } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
 import {
   newBaseDerivationPath,
@@ -221,7 +216,20 @@ export class Wallet {
     const networks = ["mainnet-alpha", "goerli-alpha"] as const
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
-        return this.restoreAccountsFromWallet(wallet, networkId)
+        const network = await this.getNetwork(networkId)
+        if (!network) {
+          throw new Error(`Network ${networkId} not found`)
+        }
+        const implementations =
+          VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId]
+        if (!implementations) {
+          throw new Error(`No implementations for network ${networkId}`)
+        }
+        return this.restoreAccountsFromWallet(
+          wallet.privateKey,
+          network,
+          implementations,
+        )
       }),
     )
     const accounts = accountsResults.flatMap((x) => x)
@@ -232,34 +240,42 @@ export class Wallet {
   }
 
   private async restoreAccountsFromWallet(
-    wallet: ethers.Wallet,
-    networkId: string,
-    networkAccountImplementations?: string[],
+    secret: string,
+    network: Network,
+    accountImplementationAddresses: string[],
+    proxyContactHashes: string[] = PROXY_CONTRACT_HASHES_TO_CHECK,
     offset: number = CHECK_OFFSET,
   ): Promise<WalletAccount[]> {
-    const network = await this.getNetwork(networkId)
+    return this.restoreAccountsFromWalletPre9(
+      secret,
+      network,
+      accountImplementationAddresses,
+      proxyContactHashes,
+      offset,
+    )
+  }
 
-    if (!network) {
-      // If network is not defined, we can't restore any accounts
-      return []
-    }
-
+  private async restoreAccountsFromWalletPre9(
+    secret: string,
+    network: Network,
+    accountImplementationAddresses: string[],
+    proxyContactHashes: string[] = PROXY_CONTRACT_HASHES_TO_CHECK,
+    offset: number = CHECK_OFFSET,
+  ): Promise<WalletAccount[]> {
     const provider = getProvider(network)
 
     const accounts: WalletAccount[] = []
 
-    const implementations = isKnownNetwork(networkId)
-      ? VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[networkId]
-      : networkAccountImplementations
-
-    if (!implementations) {
-      throw new Error(`No known implementations for network ${networkId}`)
+    if (!accountImplementationAddresses) {
+      throw new Error(`No known implementations for network ${network.id}`)
     }
 
-    const contractHashAndImplementations2dArray =
-      PROXY_CONTRACT_HASHES_TO_CHECK.flatMap((contractHash) =>
-        implementations.map((implementation) => [contractHash, implementation]),
-      )
+    const contractHashAndImplementations2dArray = proxyContactHashes.flatMap(
+      (contractHash) =>
+        accountImplementationAddresses.map(
+          (implementation) => [contractHash, implementation] as const,
+        ),
+    )
 
     const promises = contractHashAndImplementations2dArray.map(
       async ([contractHash, implementation]) => {
@@ -269,7 +285,7 @@ export class Wallet {
         while (lastHit + offset > lastCheck) {
           const starkPair = getStarkPair(
             lastCheck,
-            wallet.privateKey,
+            secret,
             newBaseDerivationPath,
           )
           const starkPub = ec.getStarkKey(starkPair)
@@ -358,15 +374,16 @@ export class Wallet {
     const wallet = new ethers.Wallet(this.session?.secret)
     const network = await this.getNetwork(networkId)
 
-    if (!network.accountImplementation) {
+    if (!network?.accountImplementation) {
       // silent fail if no account implementation is defined for this network
       return
     }
 
     const accounts = await this.restoreAccountsFromWallet(
-      wallet,
-      networkId,
+      wallet.privateKey,
+      network,
       [network.accountImplementation],
+      PROXY_CONTRACT_HASHES_TO_CHECK,
       offset,
     )
 
