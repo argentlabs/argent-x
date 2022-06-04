@@ -1,11 +1,8 @@
-import { number, stark } from "starknet"
-
 import { AccountMessage } from "../shared/messages/AccountMessage"
+import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
-import { getNetwork } from "./customNetworks"
-import { getImplementationUpgradePath } from "./upgrade"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
@@ -76,35 +73,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "UPGRADE_ACCOUNT": {
       const { walletAddress } = msg.data
-      const starknetAccount = await wallet.getStarknetAccountByAddress(
-        walletAddress,
-      )
-
-      const account = await wallet.getAccountByAddress(walletAddress)
-      const { accountImplementation: newImplementation } = await getNetwork(
-        account.network.id,
-      )
-
-      const { result } = await starknetAccount.callContract({
-        contractAddress: account.address,
-        entrypoint: "get_implementation",
-      })
-      const currentImplementation = stark.makeAddress(number.toHex(result[0]))
-
-      const updateAccount = getImplementationUpgradePath(currentImplementation)
-
-      const updateTransaction = await updateAccount(
-        newImplementation,
-        account.address,
-        starknetAccount, // Account extends Provider
-        wallet.getKeyPairByDerivationPath(account.signer.derivationPath), // signer is a private property of the account, this will be public in the future
-      )
-
-      return transactionTracker.add({
-        hash: updateTransaction.transaction_hash,
-        account,
-        meta: { title: "Upgrading account" },
-      })
+      return await upgradeAccount(walletAddress, wallet, transactionTracker)
     }
 
     case "DELETE_ACCOUNT": {
