@@ -250,6 +250,7 @@ export class Wallet {
     network: Network,
     offset: number = CHECK_OFFSET,
   ): Promise<WalletAccount[]> {
+    // FIXME: delete this once Cairo 9 is on mainnet
     if (!network?.accountClassHash) {
       const accountImplementationAddresses = union(
         isKnownNetwork(network.id)
@@ -485,7 +486,7 @@ export class Wallet {
     // FIXME: delete this once Cairo 9 is on mainnet
     const network = await this.getNetwork(networkId)
     if (!network.accountClassHash) {
-      return await this.addAccountPreCairo9(networkId)
+      return await this.addAccountPre9(networkId)
     }
 
     const currentPaths = (await this.getAccounts())
@@ -540,7 +541,7 @@ export class Wallet {
   }
 
   // FIXME: delete this once Cairo 9 is on mainnet
-  public async addAccountPreCairo9(
+  public async addAccountPre9(
     networkId: string,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     if (!this.isSessionOpen()) {
