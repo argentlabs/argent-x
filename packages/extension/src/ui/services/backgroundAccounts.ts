@@ -39,8 +39,8 @@ export const deleteAccount = async (address: string) => {
   }
 }
 
-export const upgradeAccount = async (walletAddress: string) => {
-  sendMessage({ type: "UPGRADE_ACCOUNT", data: { walletAddress } })
+export const upgradeAccount = async (accountAddress: string) => {
+  sendMessage({ type: "UPGRADE_ACCOUNT", data: { accountAddress } })
   return waitForMessage("TRANSACTION_UPDATES")
 }
 
