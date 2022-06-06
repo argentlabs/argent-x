@@ -1,13 +1,13 @@
 import { compactDecrypt } from "jose"
 import { encode } from "starknet"
 
-import { BackupMessage } from "../shared/messages/BackupMessage"
+import { RecoveryMessage } from "../shared/messages/RecoveryMessage"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { downloadFile } from "./download"
 import { exportLegacyBackup } from "./legacy"
 
-export const handleBackupMessage: HandleMessage<BackupMessage> = async ({
+export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
   msg,
   messagingKeys: { privateKey },
   background: { wallet, transactionTracker },
@@ -55,7 +55,8 @@ export const handleBackupMessage: HandleMessage<BackupMessage> = async ({
         transactionTracker.load(await wallet.getAccounts())
 
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
-      } catch {
+      } catch (error) {
+        console.error(error)
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_REJ" })
       }
     }

@@ -2,12 +2,12 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
-import { sendMessage } from "../../../shared/messages"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
+import { stopSession } from "../../services/backgroundSessions"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -75,10 +75,7 @@ export const SettingsScreen: FC = () => (
     <IconBar back />
     <SettingsScreenWrapper>
       <H2>Settings</H2>
-      <SettingsItem
-        to={routes.lockScreen()}
-        onClick={() => sendMessage({ type: "STOP_SESSION" })}
-      >
+      <SettingsItem to={routes.lockScreen()} onClick={stopSession}>
         <Title>
           <span>Lock wallet</span>
           <ArrowForwardIosIcon fontSize="inherit" />

@@ -38,35 +38,41 @@ export const getTransactionsTracker: GetTransactionsTracker = (
   fetchTransactions,
   onUpdate,
   updateInterval = 15e3, // 15 seconds
+  checkHistory = 4 * 5, // check history every 20 update cycles ~ 5 minutes when update interval is 15 seconds
 ) => {
   const accounts: WalletAccount[] = []
   const transactionsStore = getTransactionsStore()
 
+  let updateCounter = 0
   const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
-    const historyTransactions = await getTransactionHistory(
-      accounts,
-      allTransactions,
-      fetchTransactions,
-    )
-    const pendingTransactions = await transactionsStore.getItems(
-      ({ hash }) =>
-        !historyTransactions.some(
-          ({ hash: historyHash }) => hash === historyHash,
-        ),
-    )
+    const needsHistoryUpdate = updateCounter === 0
 
-    const onChainUpdates = await getTransactionsUpdate(pendingTransactions)
-
+    const historyTransactions = needsHistoryUpdate
+      ? await getTransactionHistory(
+          accounts,
+          allTransactions,
+          fetchTransactions,
+        )
+      : []
     const historyUpdates = getTransactionsStatusUpdate(
       allTransactions,
       historyTransactions,
     )
 
+    const pendingTransactions = allTransactions.filter(
+      (tx) =>
+        historyTransactions.findIndex((tx2) => tx.hash === tx2.hash) === -1,
+    )
+
+    const onChainUpdates = await getTransactionsUpdate(pendingTransactions)
+
     const updates = [...onChainUpdates, ...historyUpdates]
 
     await transactionsStore.addItems(updates)
     onUpdate?.(updates)
+
+    updateCounter = (updateCounter + 1) % checkHistory // as this is done at the very end, onerror it will not be incremented and therefore keep the history cycle refreshing at 15 seconds
   }
 
   const clearUpdate = setIntervalAsync(handleUpdate, updateInterval)

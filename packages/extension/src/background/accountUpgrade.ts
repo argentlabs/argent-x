@@ -8,6 +8,10 @@ import {
 } from "starknet"
 import { Account as AccountV390, stark as starkV390 } from "starknet-390"
 
+import { getNetwork } from "./customNetworks"
+import { TransactionTracker } from "./transactions/transactions"
+import { Wallet } from "./wallet"
+
 function equalBigNumberish(
   a: number.BigNumberish,
   b: number.BigNumberish,
@@ -74,4 +78,42 @@ export const getImplementationUpgradePath = (
       undefined,
     )
   }
+}
+
+export const upgradeAccount = async (
+  accountAddress: string,
+  wallet: Wallet,
+  transactionTracker: TransactionTracker,
+) => {
+  const starknetAccount = await wallet.getStarknetAccountByAddress(
+    accountAddress,
+  )
+
+  const account = await wallet.getAccountByAddress(accountAddress)
+  const { accountImplementation: newImplementation } = await getNetwork(
+    account.network.id,
+  )
+
+  const { result } = await starknetAccount.callContract({
+    contractAddress: account.address,
+    entrypoint: "get_implementation",
+  })
+  const currentImplementation = stark.makeAddress(number.toHex(result[0]))
+
+  const updateAccount = getImplementationUpgradePath(currentImplementation)
+
+  const updateTransaction = await updateAccount(
+    newImplementation,
+    account.address,
+    // Account extends Provider
+    starknetAccount,
+    // signer is a private property of the account, this will be public in the future
+    wallet.getKeyPairByDerivationPath(account.signer.derivationPath),
+  )
+
+  transactionTracker.add({
+    hash: updateTransaction.transaction_hash,
+    account,
+    meta: { title: "Upgrading account" },
+  })
 }

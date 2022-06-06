@@ -1,6 +1,6 @@
 import { FC, ReactNode, useEffect } from "react"
 
-import { hasLatestDerivationPath } from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { assertNever } from "../../services/assertNever"
 import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
@@ -19,7 +19,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
 
   useEffect(() => {
     useAccounts.setState({
-      showMigrationScreen: account ? !hasLatestDerivationPath(account) : false,
+      showMigrationScreen: account ? isDeprecated(account) : false,
     })
   }, [account])
 

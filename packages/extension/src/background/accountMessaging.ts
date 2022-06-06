@@ -1,11 +1,8 @@
-import { number, stark } from "starknet"
-
 import { AccountMessage } from "../shared/messages/AccountMessage"
+import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
-import { getNetwork } from "./customNetworks"
-import { getImplementationUpgradePath } from "./upgrade"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
@@ -42,15 +39,14 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_RES",
           data: {
-            status: "ok",
             txHash,
             address: account.address,
             account: account,
             accounts: await wallet.getAccounts(),
           },
         })
-      } catch (e: any) {
-        let error = `${e}`
+      } catch (exception: unknown) {
+        let error = `${exception}`
         if (network.includes("localhost")) {
           if (error.toLowerCase().includes("network error")) {
             error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
@@ -61,7 +57,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         }
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_REJ",
-          data: { status: "ko", error },
+          data: { error },
         })
       }
     }
@@ -75,36 +71,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "UPGRADE_ACCOUNT": {
-      const { walletAddress } = msg.data
-      const starknetAccount = await wallet.getStarknetAccountByAddress(
-        walletAddress,
-      )
-
-      const account = await wallet.getAccountByAddress(walletAddress)
-      const { accountImplementation: newImplementation } = await getNetwork(
-        account.network.id,
-      )
-
-      const { result } = await starknetAccount.callContract({
-        contractAddress: account.address,
-        entrypoint: "get_implementation",
-      })
-      const currentImplementation = stark.makeAddress(number.toHex(result[0]))
-
-      const updateAccount = getImplementationUpgradePath(currentImplementation)
-
-      const updateTransaction = await updateAccount(
-        newImplementation,
-        account.address,
-        starknetAccount, // Account extends Provider
-        wallet.getKeyPairByDerivationPath(account.signer.derivationPath), // signer is a private property of the account, this will be public in the future
-      )
-
-      return transactionTracker.add({
-        hash: updateTransaction.transaction_hash,
-        account,
-        meta: { title: "Upgrading account" },
-      })
+      const { accountAddress } = msg.data
+      return await upgradeAccount(accountAddress, wallet, transactionTracker)
     }
 
     case "DELETE_ACCOUNT": {

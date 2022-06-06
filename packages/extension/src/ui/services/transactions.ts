@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers"
 import { RawArgs, stark, uint256 } from "starknet"
 
-import { sendMessage } from "../../shared/messages"
+import { executeTransaction } from "./backgroundTransactions"
 
 interface TransactionRequest {
   to: string
@@ -10,14 +10,11 @@ interface TransactionRequest {
 }
 
 export const sendTransaction = (data: TransactionRequest) => {
-  sendMessage({
-    type: "EXECUTE_TRANSACTION",
-    data: {
-      transactions: {
-        contractAddress: data.to,
-        entrypoint: data.method,
-        calldata: stark.compileCalldata(data.calldata || {}),
-      },
+  executeTransaction({
+    transactions: {
+      contractAddress: data.to,
+      entrypoint: data.method,
+      calldata: stark.compileCalldata(data.calldata || {}),
     },
   })
 }

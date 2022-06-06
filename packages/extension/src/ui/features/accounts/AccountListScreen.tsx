@@ -3,7 +3,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { hasLatestDerivationPath } from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
@@ -11,6 +11,7 @@ import { AddIcon, SettingsIcon } from "../../components/Icons/MuiIcons"
 import { H1, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
+import { connectAccount } from "../../services/backgroundAccounts"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
@@ -18,7 +19,7 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListItem } from "./AccountListItem"
-import { connectAccount, deployAccount } from "./accounts.service"
+import { deployAccount } from "./accounts.service"
 import { useAccounts } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 
@@ -63,7 +64,7 @@ export const AccountListScreen: FC = () => {
 
   const [newAccounts, deprecatedAccounts] = partition(
     accountsList,
-    hasLatestDerivationPath,
+    isDeprecated,
   )
 
   const handleAddAccount = async () => {

@@ -11,8 +11,13 @@ interface State {
   showMigrationScreen?: boolean // FIXME: remove this when Cairo 9 hits mainnet
 }
 
-export const useAccounts = create<State>((set) => ({
+export const initialState = {
   accounts: {},
+  selectedAccount: undefined,
+}
+
+export const useAccounts = create<State>((set) => ({
+  ...initialState,
   addAccount: (newAccount: Account) =>
     set((state) => ({
       selectedAccount: newAccount.address,

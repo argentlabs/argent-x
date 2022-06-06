@@ -24,15 +24,10 @@ export const handleTransactionMessage: HandleMessage<
     case "GET_TRANSACTION": {
       const tracked = await transactionTracker.get(msg.data.hash)
       if (tracked) {
-        return sendToTabAndUi({
-          type: "GET_TRANSACTION_RES",
-          data: tracked,
-        })
+        return sendToTabAndUi({ type: "GET_TRANSACTION_RES", data: tracked })
       }
 
-      return sendToTabAndUi({
-        type: "GET_TRANSACTION_REJ",
-      })
+      return sendToTabAndUi({ type: "GET_TRANSACTION_REJ" })
     }
 
     case "EXECUTE_TRANSACTION": {
@@ -42,9 +37,7 @@ export const handleTransactionMessage: HandleMessage<
       })
       return sendToTabAndUi({
         type: "EXECUTE_TRANSACTION_RES",
-        data: {
-          actionHash: meta.hash,
-        },
+        data: { actionHash: meta.hash },
       })
     }
 
@@ -82,15 +75,14 @@ export const handleTransactionMessage: HandleMessage<
             suggestedMaxFee: number.toHex(suggestedMaxFee),
             usd: await determineFeePrice(
               selectedAccount.network,
-              amount,
-              suggestedMaxFee,
+              number.toHex(amount),
+              number.toHex(suggestedMaxFee),
             ),
           },
         })
-      } catch {
-        return sendToTabAndUi({
-          type: "ESTIMATE_TRANSACTION_FEE_REJ",
-        })
+      } catch (error) {
+        console.error(error)
+        return sendToTabAndUi({ type: "ESTIMATE_TRANSACTION_FEE_REJ" })
       }
     }
 
@@ -102,9 +94,7 @@ export const handleTransactionMessage: HandleMessage<
 
       return sendToTabAndUi({
         type: "UPDATE_TRANSACTION_FEE_RES",
-        data: {
-          actionHash,
-        },
+        data: { actionHash },
       })
     }
 

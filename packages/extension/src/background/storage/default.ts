@@ -7,7 +7,7 @@ export async function getFromStorage<T, K extends string = string>(
 ): Promise<T | null> {
   try {
     return JSON.parse((await browser.storage.local.get(key))[key]) ?? null
-  } catch (e) {
+  } catch {
     return null
   }
 }

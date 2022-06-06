@@ -2,7 +2,7 @@ import { isFunction, isObjectLike, isPlainObject } from "lodash-es"
 
 import { Config } from "./types"
 
-export const passThrough = (value: any) => value
+const identity = (value: unknown) => value
 
 export function parseConfig(config: Config) {
   if (!isPlainObject(config)) {
@@ -26,10 +26,10 @@ export function parseConfig(config: Config) {
     Math.min(config.maxTimeToLive ?? 0, Number.MAX_SAFE_INTEGER) || Infinity
   const serialize = isFunction(config.serialize)
     ? config.serialize
-    : passThrough
+    : identity
   const deserialize = isFunction(config.deserialize)
     ? config.deserialize
-    : passThrough
+    : identity
 
   if (minTimeToStale >= maxTimeToLive) {
     throw new Error("minTimeToStale must be less than maxTimeToLive")

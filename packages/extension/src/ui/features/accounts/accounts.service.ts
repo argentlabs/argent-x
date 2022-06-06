@@ -1,7 +1,6 @@
 import { ethers } from "ethers"
 
-import { sendMessage } from "../../../shared/messages"
-import { startSession } from "../../services/messaging"
+import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
 export const deployAccount = async (networkId: string, password?: string) => {
@@ -10,18 +9,6 @@ export const deployAccount = async (networkId: string, password?: string) => {
   }
 
   return Account.fromDeploy(networkId)
-}
-
-export const connectAccount = (account: Account) => {
-  sendMessage({
-    type: "CONNECT_ACCOUNT",
-    data: {
-      address: account.address,
-      network: account.network,
-      signer: account.signer,
-      hidden: false,
-    },
-  })
 }
 
 const argentColorsArray = [

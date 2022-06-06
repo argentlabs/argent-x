@@ -14,12 +14,12 @@ import {
   HandleMessage,
   UnhandledMessage,
 } from "./background"
-import { handleBackupMessage } from "./backupMessaging"
 import { getNetwork as getNetworkImplementation } from "./customNetworks"
 import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
+import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { Storage } from "./storage"
 import { handleTokenMessage } from "./tokenMessaging"
@@ -30,7 +30,6 @@ import { getTransactionsTracker } from "./transactions/transactions"
 import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { Wallet, WalletStorageProps } from "./wallet"
 ;(async () => {
-  const contracts = await loadContracts()
   const messagingKeys = await getMessagingKeys()
   const storage = new Storage<WalletStorageProps>({}, "wallet")
 
@@ -38,7 +37,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
   const wallet = new Wallet(
     storage,
-    ...contracts,
+    loadContracts,
     getNetworkImplementation,
     onAutoLock,
   )
@@ -70,10 +69,10 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const handlers = [
     handleAccountMessage,
     handleActionMessage,
-    handleBackupMessage,
     handleMiscellaneousMessage,
     handleNetworkMessage,
     handlePreAuthorizationMessage,
+    handleRecoveryMessage,
     handleSessionMessage,
     handleTokenMessage,
     handleTransactionMessage,

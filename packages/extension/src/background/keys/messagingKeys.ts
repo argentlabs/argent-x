@@ -7,42 +7,32 @@ export interface MessagingKeys {
   publicKeyJwk: JWK
 }
 
+const names = ["PRIVATE_KEY", "PUBLIC_KEY"]
+
 export async function getMessagingKeys(): Promise<MessagingKeys> {
-  let privateKey: KeyLike
-  let publicKey: KeyLike
-  let publicKeyJwk: JWK
+  const { PRIVATE_KEY, PUBLIC_KEY } = await browser.storage.local.get(names)
 
-  const { PRIVATE_KEY, PUBLIC_KEY } = (await browser.storage.local.get([
-    "PRIVATE_KEY",
-    "PUBLIC_KEY",
-  ])) as { PRIVATE_KEY?: string; PUBLIC_KEY?: string }
-  if (!(PRIVATE_KEY && PUBLIC_KEY)) {
-    const keypair = await generateKeyPair("ECDH-ES", { extractable: true })
-
-    publicKeyJwk = {
-      alg: "ECDH-ES",
-      ...(await exportJWK(keypair.publicKey)),
-    }
-
-    browser.storage.local.set({
-      PRIVATE_KEY: JSON.stringify({
-        alg: "ECDH-ES",
-        ...(await exportJWK(keypair.privateKey)),
-      }),
-      PUBLIC_KEY: JSON.stringify(publicKeyJwk),
-    })
-
-    privateKey = keypair.privateKey
-    publicKey = keypair.publicKey
-  } else {
-    publicKeyJwk = JSON.parse(PUBLIC_KEY)
-    privateKey = (await importJWK(JSON.parse(PRIVATE_KEY))) as KeyLike
-    publicKey = (await importJWK(publicKeyJwk)) as KeyLike
+  if (PRIVATE_KEY && PUBLIC_KEY) {
+    const privateKeyJwk = JSON.parse(PRIVATE_KEY)
+    const publicKeyJwk = JSON.parse(PUBLIC_KEY)
+    const privateKey = (await importJWK(privateKeyJwk)) as KeyLike
+    const publicKey = (await importJWK(publicKeyJwk)) as KeyLike
+    return { privateKey, publicKey, publicKeyJwk }
   }
 
-  return {
-    privateKey,
-    publicKey,
-    publicKeyJwk,
-  }
+  const options = { extractable: true }
+  const { privateKey, publicKey } = await generateKeyPair("ECDH-ES", options)
+
+  const exportedPrivateKey = await exportJWK(privateKey)
+  const exportedPublicKey = await exportJWK(publicKey)
+
+  const privateKeyJwk = { alg: "ECDH-ES", ...exportedPrivateKey }
+  const publicKeyJwk = { alg: "ECDH-ES", ...exportedPublicKey }
+
+  browser.storage.local.set({
+    PRIVATE_KEY: JSON.stringify(privateKeyJwk),
+    PUBLIC_KEY: JSON.stringify(publicKeyJwk),
+  })
+
+  return { privateKey, publicKey, publicKeyJwk }
 }

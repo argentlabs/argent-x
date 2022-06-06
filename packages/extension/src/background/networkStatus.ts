@@ -37,6 +37,16 @@ const getChecklyNetworkStatus = async (
     }
   })
 
+function determineStatusByRequestStatusCode(statusCode: number): NetworkStatus {
+  if (statusCode === 200) {
+    return "ok"
+  }
+  if (statusCode === 429) {
+    return "degraded"
+  }
+  return "error"
+}
+
 const getFeederGatewayNetworkStatus = async (
   network: Network,
 ): Promise<NetworkStatus> =>
@@ -47,9 +57,8 @@ const getFeederGatewayNetworkStatus = async (
         urljoin(network.baseUrl, "feeder_gateway/is_alive"),
         { timeout: 5000, method: "GET" },
       )
-      const isAlive = response.status === 200
 
-      return isAlive ? "ok" : "error"
+      return determineStatusByRequestStatusCode(response.status)
     } catch {
       return "error"
     }
@@ -65,9 +74,8 @@ const getGatewayNetworkStatus = async (
         urljoin(network.baseUrl, "gateway/is_alive"),
         { timeout: 5000, method: "GET" },
       )
-      const isAlive = response.status === 200
 
-      return isAlive ? "ok" : "error"
+      return determineStatusByRequestStatusCode(response.status)
     } catch {
       return "error"
     }

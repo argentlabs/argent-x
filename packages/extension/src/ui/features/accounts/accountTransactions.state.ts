@@ -4,7 +4,7 @@ import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
 import { Transaction } from "../../../shared/transactions"
-import { getTransactions } from "../../services/messaging"
+import { getTransactions } from "../../services/backgroundTransactions"
 
 interface State {
   transactions: Transaction[]

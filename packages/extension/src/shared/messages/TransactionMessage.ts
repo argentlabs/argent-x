@@ -12,16 +12,18 @@ export interface EstimateFeeResponse {
   }
 }
 
+export interface ExecuteTransactionRequest {
+  transactions: Call | Call[]
+  abis?: Abi[]
+  transactionsDetail?: InvocationsDetails
+}
+
 export type TransactionMessage =
   | { type: "GET_TRANSACTIONS" }
   | { type: "GET_TRANSACTIONS_RES"; data: Transaction[] }
   | {
       type: "EXECUTE_TRANSACTION"
-      data: {
-        transactions: Call | Call[]
-        abis?: Abi[]
-        transactionsDetail?: InvocationsDetails
-      }
+      data: ExecuteTransactionRequest
     }
   | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }
   | { type: "TRANSACTION_UPDATES"; data: Transaction[] }
@@ -32,10 +34,7 @@ export type TransactionMessage =
   | { type: "GET_TRANSACTION_REJ" }
   | {
       type: "TRANSACTION_SUBMITTED"
-      data: {
-        txHash: string
-        actionHash: string
-      }
+      data: { txHash: string; actionHash: string }
     }
   | {
       type: "TRANSACTION_FAILED"

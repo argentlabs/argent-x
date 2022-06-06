@@ -1,29 +1,38 @@
 import { BigNumber, BigNumberish, utils } from "ethers"
+import { isNumber } from "lodash-es"
 import { KeyPair, ec, number } from "starknet"
 
-import { baseDerivationPath } from "../../shared/wallet.service"
-
-export function getStarkPair(
-  indexOrPath: number | string,
+export function getStarkPair<T extends number | string>(
+  indexOrPath: T,
   secret: BigNumberish,
+  ...[baseDerivationPath]: T extends string ? [] : [string]
 ): KeyPair {
   const masterNode = utils.HDNode.fromSeed(BigNumber.from(secret).toHexString())
 
-  const path =
-    typeof indexOrPath === "number" ? getPathForIndex(indexOrPath) : indexOrPath
+  // baseDerivationPath will never be undefined because of the extends statement below,
+  // but somehow TS doesnt get this. As this will be removed in the near future I didnt bother
+  const path: string = isNumber(indexOrPath)
+    ? getPathForIndex(indexOrPath, baseDerivationPath ?? "")
+    : indexOrPath
   const childNode = masterNode.derivePath(path)
   const groundKey = grindKey(childNode.privateKey)
   const starkPair = ec.getKeyPair(groundKey)
   return starkPair
 }
 
-export function getPathForIndex(index: number): string {
+export function getPathForIndex(
+  index: number,
+  baseDerivationPath: string,
+): string {
   return `${baseDerivationPath}/${index}`
 }
 
-export function getNextPathIndex(paths: string[]): number {
+export function getNextPathIndex(
+  paths: string[],
+  baseDerivationPath: string,
+): number {
   for (let index = 0; index < paths.length; index++) {
-    if (!paths.includes(getPathForIndex(index))) {
+    if (!paths.includes(getPathForIndex(index, baseDerivationPath))) {
       return index
     }
   }

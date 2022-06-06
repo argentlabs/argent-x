@@ -2,10 +2,10 @@ import { getMessage } from "@extend-chrome/messages"
 
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
-import { BackupMessage } from "./BackupMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
 import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
+import { RecoveryMessage } from "./RecoveryMessage"
 import { SessionMessage } from "./SessionMessage"
 import { TokenMessage } from "./TokenMessage"
 import { TransactionMessage } from "./TransactionMessage"
@@ -13,10 +13,10 @@ import { TransactionMessage } from "./TransactionMessage"
 export type MessageType =
   | AccountMessage
   | ActionMessage
-  | BackupMessage
   | MiscenalleousMessage
   | NetworkMessage
   | PreAuthorisationMessage
+  | RecoveryMessage
   | SessionMessage
   | TokenMessage
   | TransactionMessage
