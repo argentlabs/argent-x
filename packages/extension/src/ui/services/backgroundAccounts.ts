@@ -15,8 +15,8 @@ export const getLastSelectedAccount = async () => {
   return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
-export const getAccounts = async () => {
-  sendMessage({ type: "GET_ACCOUNTS" })
+export const getAccounts = async (showHidden = false) => {
+  sendMessage({ type: "GET_ACCOUNTS", data: { showHidden } })
   return waitForMessage("GET_ACCOUNTS_RES")
 }
 

@@ -81,7 +81,6 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const ref = useRef<HTMLDivElement>(null)
   const currentNetwork = useCurrentNetwork()
   const navigate = useNavigate()
-  const { hideAccount: hideAccountState } = useAccounts()
 
   const account = useSelectedAccount()
 
@@ -96,7 +95,6 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
 
   const handleHideAccount = async (account: Account) => {
     await hideAccount(account.address)
-    hideAccountState(account)
     navigate(routes.accounts())
   }
 

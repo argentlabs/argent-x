@@ -154,13 +154,18 @@ export class Wallet {
     this.setSession(ethersWallet.privateKey, password)
   }
 
-  public async getAccounts(): Promise<WalletAccount[]> {
+  public async getAccounts(showHidden = false): Promise<WalletAccount[]> {
     const accounts = await this.store.getItem("accounts")
-    return accounts || []
+
+    if (showHidden) {
+      return accounts || []
+    }
+
+    return accounts?.filter((account) => !account.hidden) || []
   }
 
   private async setAccounts(accounts: WalletAccount[]) {
-    const oldAccounts = await this.getAccounts()
+    const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
     const newAccounts = [...oldAccounts, ...accounts].filter(
@@ -172,7 +177,7 @@ export class Wallet {
   }
 
   private async pushAccount(account: WalletAccount) {
-    const accounts = await this.getAccounts()
+    const accounts = await this.getAccounts(true)
     const index = accounts.findIndex((a) => a.address === account.address)
     if (index === -1) {
       accounts.push(account)
@@ -183,7 +188,7 @@ export class Wallet {
   }
 
   public async removeAccount(address: string) {
-    const accounts = await this.getAccounts()
+    const accounts = await this.getAccounts(true)
     const newAccounts = accounts.filter(
       (account) => account.address !== address,
     )
@@ -504,7 +509,7 @@ export class Wallet {
       return await this.addAccountPre9(networkId)
     }
 
-    const currentPaths = (await this.getAccounts())
+    const currentPaths = (await this.getAccounts(true))
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -563,7 +568,7 @@ export class Wallet {
       throw Error("no open session")
     }
 
-    const currentPaths = (await this.getAccounts())
+    const currentPaths = (await this.getAccounts(true))
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -633,7 +638,7 @@ export class Wallet {
   }
 
   public async getAccountByAddress(address: string): Promise<WalletAccount> {
-    const hit = (await this.getAccounts()).find(
+    const hit = (await this.getAccounts(true)).find(
       (account) => account.address === address,
     )
     if (!hit) {
@@ -679,7 +684,7 @@ export class Wallet {
     if (!this.isSessionOpen()) {
       return
     }
-    const accounts = await this.getAccounts()
+    const accounts = await this.getAccounts(true)
     const address = await this.store.getItem("selected")
     const account = accounts.find((account) => account.address === address)
     const defaultAccount = accounts.find(
@@ -813,7 +818,7 @@ export class Wallet {
       return
     }
     const backup = JSON.parse(this.encryptedBackup)
-    const accounts = (await this.getAccounts()).map((account) => ({
+    const accounts = (await this.getAccounts(true)).map((account) => ({
       ...account,
       network: account.network.id,
     }))

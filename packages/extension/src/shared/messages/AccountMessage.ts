@@ -12,7 +12,7 @@ export type AccountMessage =
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
-  | { type: "GET_ACCOUNTS" }
+  | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "DISCONNECT_ACCOUNT" }

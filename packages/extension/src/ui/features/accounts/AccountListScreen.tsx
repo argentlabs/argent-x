@@ -54,13 +54,11 @@ const Paragraph = styled(P)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { accounts, selectedAccount, addAccount, hiddenAccounts } =
-    useAccounts()
+  const { accounts, selectedAccount, addAccount } = useAccounts()
   const { isBackupRequired } = useBackupRequired()
 
-  const accountsList = Object.values(accounts).filter(
-    (account) => !hiddenAccounts.includes(account.address),
-  )
+  const accountsList = Object.values(accounts)
+
   const [deprecatedAccounts, newAccounts] = partition(accountsList, (account) =>
     isDeprecated(account),
   )

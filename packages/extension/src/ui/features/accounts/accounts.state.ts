@@ -6,8 +6,6 @@ interface State {
   accounts: Record<string, Account>
   selectedAccount?: string
   addAccount: (newAccount: Account) => void
-  hiddenAccounts: string[]
-  hideAccount: (account: Account) => void
   showMigrationScreen?: boolean // FIXME: remove this when Cairo 9 hits mainnet
 }
 
@@ -25,11 +23,6 @@ export const useAccounts = create<State>((set) => ({
         ...state.accounts,
         [newAccount.address]: newAccount,
       },
-    })),
-  hiddenAccounts: [],
-  hideAccount: (account: Account) =>
-    set((state) => ({
-      hiddenAccounts: [...state.hiddenAccounts, account.address],
     })),
 }))
 
