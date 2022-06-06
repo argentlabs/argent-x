@@ -2,13 +2,13 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { hasLatestDerivationPath } from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
-import { hideAccount } from "../../services/messaging"
+import { hideAccount } from "../../services/backgroundAccounts"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
@@ -85,11 +85,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
 
   const account = useSelectedAccount()
 
-  const isAccountDeprecated =
-    account &&
-    !hasLatestDerivationPath({
-      signer: account?.signer,
-    })
+  const isAccountDeprecated = account && isDeprecated(account)
 
   useOnClickOutside(ref, () => setMenuOpen(false))
 

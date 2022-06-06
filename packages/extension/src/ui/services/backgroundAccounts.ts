@@ -39,6 +39,21 @@ export const deleteAccount = async (address: string) => {
   }
 }
 
+export const hideAccount = async (address: string) => {
+  sendMessage({ type: "HIDE_ACCOUNT", data: address })
+
+  try {
+    await Promise.race([
+      waitForMessage("HIDE_ACCOUNT_RES"),
+      waitForMessage("HIDE_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could not hide account")
+  }
+}
+
 export const upgradeAccount = async (accountAddress: string) => {
   sendMessage({ type: "UPGRADE_ACCOUNT", data: { accountAddress } })
   return waitForMessage("TRANSACTION_UPDATES")

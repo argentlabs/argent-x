@@ -61,10 +61,8 @@ export const AccountListScreen: FC = () => {
   const accountsList = Object.values(accounts).filter(
     (account) => !hiddenAccounts.includes(account.address),
   )
-
-  const [newAccounts, deprecatedAccounts] = partition(
-    accountsList,
-    isDeprecated,
+  const [deprecatedAccounts, newAccounts] = partition(accountsList, (account) =>
+    isDeprecated(account),
   )
 
   const handleAddAccount = async () => {
