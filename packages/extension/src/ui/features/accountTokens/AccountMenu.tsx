@@ -14,6 +14,7 @@ import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { recover } from "../recovery/recovery.service"
 
 const StyledMoreVert = styled(MoreVertSharp)`
   cursor: pointer;
@@ -95,7 +96,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
 
   const handleHideAccount = async (account: Account) => {
     await hideAccount(account.address)
-    navigate(routes.accounts())
+    navigate(await recover({ showAccountList: true }))
   }
 
   return (

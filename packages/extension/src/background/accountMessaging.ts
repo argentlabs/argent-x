@@ -92,7 +92,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           type: "HIDE_ACCOUNT_RES",
           data: updatedAccounts,
         })
-      } catch (error) {
+      } catch {
         return sendToTabAndUi({ type: "HIDE_ACCOUNT_REJ" })
       }
     }
