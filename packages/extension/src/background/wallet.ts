@@ -684,7 +684,7 @@ export class Wallet {
     if (!this.isSessionOpen()) {
       return
     }
-    const accounts = await this.getAccounts(true)
+    const accounts = await this.getAccounts()
     const address = await this.store.getItem("selected")
     const account = accounts.find((account) => account.address === address)
     const defaultAccount = accounts.find(

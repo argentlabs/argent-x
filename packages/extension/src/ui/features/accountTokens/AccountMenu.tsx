@@ -12,7 +12,7 @@ import { hideAccount } from "../../services/backgroundAccounts"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
-import { useAccounts, useSelectedAccount } from "../accounts/accounts.state"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 
 const StyledMoreVert = styled(MoreVertSharp)`
@@ -120,7 +120,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
             </MenuItem>
           </MenuItemWrapper>
           <Separator />
-          {isAccountDeprecated && (
+          {account && (
             <MenuItemWrapper onClick={() => handleHideAccount(account)}>
               <MenuItem>
                 <IconWrapper>
