@@ -155,8 +155,18 @@ export class Wallet {
   }
 
   public async getAccounts(): Promise<WalletAccount[]> {
-    const accounts = await this.store.getItem("accounts")
-    return accounts || []
+    const accounts = (await this.store.getItem("accounts")) || []
+
+    // As we store the networks with the wallet on creation, we need to replace thos which are known by the extension
+    return Promise.all(
+      accounts.map(async (account) => {
+        const network = await this.getNetwork(account.network.id)
+        return {
+          ...account,
+          network,
+        }
+      }),
+    )
   }
 
   private async setAccounts(accounts: WalletAccount[]) {
@@ -168,6 +178,7 @@ export class Wallet {
         self.findIndex((a) => a.address === account.address) === index,
     )
 
+    // we store the network as it was at the creation date of the wallet. This may be useful in the future.
     return this.store.setItem("accounts", newAccounts)
   }
 

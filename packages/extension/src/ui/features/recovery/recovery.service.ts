@@ -22,18 +22,17 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    const allAccounts = await getAccounts()
-    // FIXME: remove this if-statement when mainnet is on Cairo 9
-    if (some(allAccounts) && allAccounts.every(isDeprecated)) {
-      return routes.migrationDisclaimer()
-    }
-
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ||= lastSelectedAccount
       ? lastSelectedAccount?.network.id
       : defaultNetwork.id
 
     const walletAccounts = accountsOnNetwork(await getAccounts(), networkId)
+
+    // shows deprication screen depending on selected network
+    if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
+      return routes.migrationDisclaimer()
+    }
 
     const selectedAccount = walletAccounts.find(
       ({ address }) => address === lastSelectedAccount?.address,
