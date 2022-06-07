@@ -29,7 +29,7 @@ export const recover = async ({
 
     const walletAccounts = accountsOnNetwork(await getAccounts(), networkId)
 
-    // shows deprication screen depending on selected network
+    // shows deprecation screen depending on selected network
     if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
       return routes.migrationDisclaimer()
     }
