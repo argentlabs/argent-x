@@ -17,7 +17,7 @@ Object {
   "account": Object {
     "address": "0x05e54edb59e1b1e398f9647e617276f6da0eb9ddfc0c02723269b9baa2489dce",
     "network": Object {
-      "accountImplementation": "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
+      "accountClassHash": "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
       "baseUrl": "https://alpha4.starknet.io",
       "chainId": "SN_GOERLI",
       "explorerUrl": "https://goerli.voyager.online",
