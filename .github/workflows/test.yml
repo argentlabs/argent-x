@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Check required env vars
+        run: |
+          [[ -z "${SEGMENT_WRITE_KEY}" ]] && exit 1
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
