@@ -156,12 +156,25 @@ export class Wallet {
 
   public async getAccounts(showHidden = false): Promise<WalletAccount[]> {
     const accounts = await this.store.getItem("accounts")
+    
+    const accountsWithNetwork = await Promise.all(
+      (accounts || []).map(async (account) => {
+        try {
+          const network = await this.getNetwork(account.network.id)
+          if (!network) {
+            throw new Error("Network not found")
+          }
+          return {
+            ...account,
+            network,
+          }
+        } catch {
+          return account
+        }
+      }),
+    )
 
-    if (showHidden) {
-      return accounts || []
-    }
-
-    return accounts?.filter((account) => !account.hidden) || []
+    return accountsWithNetwork.filter((account) => showHidden || !account.hidden)
   }
 
   private async setAccounts(accounts: WalletAccount[]) {
@@ -173,6 +186,7 @@ export class Wallet {
         self.findIndex((a) => a.address === account.address) === index,
     )
 
+    // we store the network as it was at the creation date of the wallet. This may be useful in the future.
     return this.store.setItem("accounts", newAccounts)
   }
 

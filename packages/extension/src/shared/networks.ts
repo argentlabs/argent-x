@@ -44,8 +44,8 @@ export const defaultNetworks: Network[] = [
     chainId: "SN_GOERLI",
     baseUrl: "https://alpha4.starknet.io",
     explorerUrl: "https://goerli.voyager.online",
-    accountImplementation:
-      "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
+    accountClassHash:
+      "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
     readonly: true,
   },
   ...(isDev ? [integrationNetwork] : []),
