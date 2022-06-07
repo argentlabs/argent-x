@@ -1,6 +1,7 @@
 import join from "url-join"
 
 import { Network } from "../../shared/networks"
+import { normalizeAddress } from "./addresses"
 
 export const getVoyagerContractLink = (
   address: string,
@@ -10,7 +11,7 @@ export const getVoyagerContractLink = (
   if (!explorerUrl) {
     return ""
   }
-  return join(explorerUrl, "contract", address)
+  return join(explorerUrl, "contract", normalizeAddress(address))
 }
 
 export const getVoyagerTransactionLink = (
