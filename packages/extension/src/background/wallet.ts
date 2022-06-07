@@ -160,10 +160,17 @@ export class Wallet {
     // As we store the networks with the wallet on creation, we need to replace thos which are known by the extension
     return Promise.all(
       accounts.map(async (account) => {
-        const network = await this.getNetwork(account.network.id)
-        return {
-          ...account,
-          network,
+        try {
+          const network = await this.getNetwork(account.network.id)
+          if (!network) {
+            throw new Error("Network not found")
+          }
+          return {
+            ...account,
+            network,
+          }
+        } catch {
+          return account
         }
       }),
     )
