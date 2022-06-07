@@ -41,12 +41,16 @@ export const DeprecatedAccountScreen: FC<DeprecatedAccountScreenProps> = ({
           need to use a dapp to do this.
         </li>
         <li>
-          When finished, hide the old account from view by clicking the three
-          dots on the right &gt; Hide account.
+          When finished, hide the old account from view by clicking the trash
+          can next to it when hovering.{" "}
+          <b>
+            You will not be able to restore these accounts, so make sure to send
+            out all funds first
+          </b>
         </li>
       </ol>
 
-      <Button style={{ marginTop: 70 }} onClick={onSubmit}>
+      <Button style={{ marginTop: 32 }} onClick={onSubmit}>
         I understand
       </Button>
     </Container>
