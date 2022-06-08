@@ -29,11 +29,6 @@ export const recover = async ({
 
     const walletAccounts = accountsOnNetwork(await getAccounts(), networkId)
 
-    // shows deprecation screen depending on selected network
-    if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
-      return routes.migrationDisclaimer()
-    }
-
     const selectedAccount = walletAccounts.find(
       ({ address }) => address === lastSelectedAccount?.address,
     )?.address
@@ -47,6 +42,12 @@ export const recover = async ({
     setDefaultAccountNames(accounts)
     useAccounts.setState({ accounts, selectedAccount })
     useAppState.setState({ switcherNetworkId: networkId })
+
+    // this needs to be after changing the state, otherwise the migration screen would deploy on the network that was selected before the switch
+    // shows deprecation screen depending on selected network
+    if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
+      return routes.migrationDisclaimer()
+    }
 
     if (showAccountList || !selectedAccount) {
       return routes.accounts()
