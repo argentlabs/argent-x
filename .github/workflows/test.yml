@@ -9,6 +9,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+      SAFE_ENV_VARS: true
+
     services:
       devnet:
         image: shardlabs/starknet-devnet
