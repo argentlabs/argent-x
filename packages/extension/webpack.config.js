@@ -70,7 +70,10 @@ module.exports = {
       Buffer: ["buffer", "Buffer"],
     }),
     new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
-    new Dotenv(),
+    new Dotenv({
+      systemvars: true,
+      safe: isProd,
+    }),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],

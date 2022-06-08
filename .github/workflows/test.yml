@@ -8,8 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
 
     services:
       devnet:
@@ -24,10 +22,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-
-      - name: Check required env vars
-        run: |
-          [[ -z "${SEGMENT_WRITE_KEY}" ]] && exit 1
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
