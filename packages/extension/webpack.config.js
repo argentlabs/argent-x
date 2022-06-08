@@ -14,6 +14,10 @@ const htmlPlugin = new HtmlWebPackPlugin({
 const isProd = process.env.NODE_ENV === "production"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
 
+if (safeEnvVars) {
+  console.log("Safe env vars enabled")
+}
+
 module.exports = {
   entry: {
     main: "./src/ui",
