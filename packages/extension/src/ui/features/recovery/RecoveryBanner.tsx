@@ -13,7 +13,7 @@ export const RecoveryBanner: FC<RecoveryBannerProps> = ({ noMargins }) => (
   <Link to={routes.setupRecovery()}>
     <Banner
       title="Set up account recovery"
-      description="All your funds are at risk"
+      description="Click here to secure your assets"
       noMargins={noMargins}
       icon={<DangerIcon />}
     />
