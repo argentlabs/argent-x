@@ -12,6 +12,11 @@ const htmlPlugin = new HtmlWebPackPlugin({
 })
 
 const isProd = process.env.NODE_ENV === "production"
+const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
+
+if (safeEnvVars) {
+  console.log("Safe env vars enabled")
+}
 
 module.exports = {
   entry: {
@@ -70,7 +75,10 @@ module.exports = {
       Buffer: ["buffer", "Buffer"],
     }),
     new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
-    new Dotenv(),
+    new Dotenv({
+      systemvars: true,
+      safe: safeEnvVars,
+    }),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
