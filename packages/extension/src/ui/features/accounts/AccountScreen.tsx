@@ -17,12 +17,6 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
   const { showMigrationScreen } = useAccounts()
 
-  useEffect(() => {
-    useAccounts.setState({
-      showMigrationScreen: account ? isDeprecated(account) : false,
-    })
-  }, [account])
-
   let body: ReactNode
   if (!account) {
     body = <></>
