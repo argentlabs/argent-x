@@ -5,8 +5,8 @@ const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
 // dont use destructuring here
-const SEGMENT_WRITE_KEY = `${process.env.SEGMENT_WRITE_KEY}`
-const VERSION = `${process.env.VERSION}`
+const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
+const VERSION = process.env.VERSION
 
 export interface Events {
   createWallet:

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
+import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import {
   ArrowCircleDownIcon,
@@ -122,7 +123,10 @@ export const AccountListItem: FC<AccountListProps> = ({
   return (
     <AccountListItemWrapper
       {...makeClickable(() => {
-        useAccounts.setState({ selectedAccount: address })
+        useAccounts.setState({
+          selectedAccount: address,
+          showMigrationScreen: account ? isDeprecated(account) : false,
+        })
         navigate(routes.accountTokens())
       })}
       className={isDeleteable ? "deleteable" : ""}

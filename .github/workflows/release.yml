@@ -14,6 +14,7 @@ jobs:
       NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       FILENAME: argent-extension-${{ github.ref_name }}.zip
       SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+      SAFE_ENV_VARS: true
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node

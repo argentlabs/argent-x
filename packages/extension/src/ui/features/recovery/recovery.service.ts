@@ -22,12 +22,6 @@ export const recover = async ({
   showAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    const allAccounts = await getAccounts()
-    // FIXME: remove this if-statement when mainnet is on Cairo 9
-    if (some(allAccounts) && allAccounts.every(isDeprecated)) {
-      return routes.migrationDisclaimer()
-    }
-
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ||= lastSelectedAccount
       ? lastSelectedAccount?.network.id
@@ -48,6 +42,12 @@ export const recover = async ({
     setDefaultAccountNames(accounts)
     useAccounts.setState({ accounts, selectedAccount })
     useAppState.setState({ switcherNetworkId: networkId })
+
+    // this needs to be after changing the state, otherwise the migration screen would deploy on the network that was selected before the switch
+    // shows deprecation screen depending on selected network
+    if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
+      return routes.migrationDisclaimer()
+    }
 
     if (showAccountList || !selectedAccount) {
       return routes.accounts()
