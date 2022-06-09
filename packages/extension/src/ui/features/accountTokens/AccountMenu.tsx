@@ -2,7 +2,6 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"

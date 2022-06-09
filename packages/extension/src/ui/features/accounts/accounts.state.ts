@@ -1,10 +1,6 @@
-import { useEffect } from "react"
-import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
-import { messageStream } from "../../../shared/messages"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { getAccounts } from "../../services/backgroundAccounts"
 import { Account } from "./Account"
 
 interface State {
