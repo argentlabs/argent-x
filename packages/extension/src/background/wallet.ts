@@ -155,11 +155,10 @@ export class Wallet {
   }
 
   public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
-    const accounts = (await this.store.getItem("accounts")) || []
+    const accounts = await this.store.getItem("accounts")
 
-    // As we store the networks with the wallet on creation, we need to replace those which are known by the extension
-    return Promise.all(
-      accounts.map(async (account) => {
+    const accountsWithNetwork = await Promise.all(
+      (accounts || []).map(async (account) => {
         try {
           const network = await this.getNetwork(account.network.id)
           if (!network) {
@@ -173,13 +172,11 @@ export class Wallet {
           return account
         }
       }),
-    ).then((walletAccounts) => {
-      if (includeHidden) {
-        return walletAccounts
-      }
+    )
 
-      return walletAccounts.filter((account) => !account.hidden)
-    })
+    return accountsWithNetwork.filter(
+      (account) => includeHidden || !account.hidden,
+    )
   }
 
   private async setAccounts(accounts: WalletAccount[]) {
