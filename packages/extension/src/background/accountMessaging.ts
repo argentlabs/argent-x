@@ -87,10 +87,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     case "HIDE_ACCOUNT": {
       try {
         await wallet.hideAccount(msg.data)
-        const updatedAccounts = await wallet.getAccounts()
         return sendToTabAndUi({
           type: "HIDE_ACCOUNT_RES",
-          data: updatedAccounts,
         })
       } catch {
         return sendToTabAndUi({ type: "HIDE_ACCOUNT_REJ" })

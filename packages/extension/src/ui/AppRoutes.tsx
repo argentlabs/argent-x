@@ -6,7 +6,6 @@ import { useAppState } from "./app.state"
 import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
-import { useAccountSubscription } from "./features/accounts/accounts.state"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
@@ -163,7 +162,6 @@ const walletRoutes = (
 export const AppRoutes: FC = () => {
   useEntryRoute()
   useActionsSubscription()
-  useAccountSubscription()
   useTokensSubscription()
 
   const { isLoading } = useAppState()

@@ -85,8 +85,6 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
 
   const account = useSelectedAccount()
 
-  const isAccountDeprecated = account && isDeprecated(account)
-
   useOnClickOutside(ref, () => setMenuOpen(false))
 
   const handleEditClick = () => {

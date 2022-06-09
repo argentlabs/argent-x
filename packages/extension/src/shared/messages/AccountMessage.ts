@@ -22,7 +22,7 @@ export type AccountMessage =
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
   | { type: "HIDE_ACCOUNT"; data: string }
-  | { type: "HIDE_ACCOUNT_RES"; data: WalletAccount[] }
+  | { type: "HIDE_ACCOUNT_RES" }
   | { type: "HIDE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"

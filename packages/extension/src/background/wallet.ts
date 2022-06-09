@@ -154,10 +154,10 @@ export class Wallet {
     this.setSession(ethersWallet.privateKey, password)
   }
 
-  public async getAccounts(showHidden = false): Promise<WalletAccount[]> {
+  public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
     const accounts = await this.store.getItem("accounts")
 
-    if (showHidden) {
+    if (includeHidden) {
       return accounts || []
     }
 

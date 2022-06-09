@@ -56,29 +56,3 @@ export const reduceWalletAccountsToAccounts = (
     {},
   )
 }
-
-export const useAccountSubscription = () => {
-  const { data: accounts = [] } = useSWRImmutable("accounts", getAccounts, {
-    suspense: true,
-  })
-
-  useEffect(() => {
-    useAccounts.setState({
-      accounts: reduceWalletAccountsToAccounts(accounts),
-    })
-
-    const subscription = messageStream.subscribe(([message]) => {
-      if (message.type === "HIDE_ACCOUNT_RES") {
-        useAccounts.setState({
-          accounts: reduceWalletAccountsToAccounts(message.data),
-        })
-      }
-
-      return () => {
-        if (!subscription.closed) {
-          subscription.unsubscribe()
-        }
-      }
-    })
-  }, [])
-}
