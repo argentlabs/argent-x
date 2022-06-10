@@ -80,12 +80,16 @@ interface FeeEstimationProps {
   onErrorChange?: (error: boolean) => void
   accountAddress: string
   networkId: string
+  actionHash: string
 }
 
-export const useMaxFeeEstimation = (transactions: Call | Call[]) => {
+export const useMaxFeeEstimation = (
+  transactions: Call | Call[],
+  actionHash: string,
+) => {
   const { data: fee, error } = useSWR(
-    [transactions, "feeEstimation"],
-    getEstimatedFee,
+    [actionHash, "feeEstimation"],
+    () => getEstimatedFee(transactions),
     {
       suspense: false,
       refreshInterval: 20 * 1000, // 20 seconds
@@ -131,6 +135,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   onChange,
   accountAddress,
   transactions,
+  actionHash,
   onErrorChange,
   ...props
 }) => {
@@ -145,7 +150,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     { suspense: false },
   )
 
-  const { fee, error } = useMaxFeeEstimation(transactions)
+  const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
 
   const enoughBalance = useMemo(
     () => Boolean(fee && feeTokenBalance?.gte(fee.suggestedMaxFee)),

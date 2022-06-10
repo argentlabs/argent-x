@@ -8,6 +8,7 @@ import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
 import { setIntervalAsync } from "./setIntervalAsync"
 import type { GetTransactionsStore } from "./store"
+import { checkTransactionHash } from "./transactionExecution"
 import { FetchTransactions, getTransactionHistory } from "./voyager"
 
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
@@ -77,6 +78,21 @@ export const getTransactionsTracker: GetTransactionsTracker = (
 
   const clearUpdate = setIntervalAsync(handleUpdate, updateInterval)
 
+  const add = async (transaction: TransactionRequest) => {
+    // sanity checks
+    if (!checkTransactionHash(transaction.hash)) {
+      return // dont throw
+    }
+
+    const newTransaction = {
+      status: "RECEIVED" as const,
+      timestamp: timestampInSeconds(),
+      ...transaction,
+    }
+    await transactionsStore.addItem(newTransaction)
+    onUpdate?.([newTransaction])
+  }
+
   return {
     load: async (accountsToPopulate) => {
       const initialAccounts = uniqWith(accountsToPopulate, equalAccount)
@@ -88,15 +104,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
       transactionsStore.addItems(initialTransactions)
       accounts.splice(0, accounts.length, ...initialAccounts)
     },
-    add: (transaction) => {
-      const newTransaction = {
-        status: "RECEIVED" as const,
-        timestamp: timestampInSeconds(),
-        ...transaction,
-      }
-      onUpdate?.([newTransaction])
-      return transactionsStore.addItem(newTransaction)
-    },
+    add,
     addAccount: async (account, transaction) => {
       if (
         !accounts.find((existingAccount) =>
@@ -105,11 +113,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
       ) {
         accounts.push(account)
       }
-      await transactionsStore.addItem({
-        status: "RECEIVED",
-        timestamp: timestampInSeconds(),
-        ...transaction,
-      })
+      await add(transaction)
     },
     get: (transactionHash) =>
       transactionsStore.getItem(

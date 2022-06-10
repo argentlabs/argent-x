@@ -54,7 +54,7 @@ export function anonymizeUserAgent(userAgent?: string): string {
 export type Fetch = (url: string, init?: RequestInit) => Promise<unknown>
 
 const defaultPayload = {
-  anonymousId: "00000000-0000-0000-0000-000000000000",
+  userId: "00000",
   context: {
     ip: "0.0.0.0",
     app: {

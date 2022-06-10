@@ -51,6 +51,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
           transactions={transactions}
+          actionHash={actionHash}
         />
       }
       {...props}

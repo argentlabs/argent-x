@@ -1,6 +1,5 @@
-import { FC, ReactNode, useEffect } from "react"
+import { FC, ReactNode } from "react"
 
-import { isDeprecated } from "../../../shared/wallet.service"
 import { assertNever } from "../../services/assertNever"
 import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
