@@ -31,9 +31,13 @@ export const executeTransaction = async (
     ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
     : await getNonce(starknetAccount)
 
+  // estimate fee with onchain nonce even tho transaction nonce may be different
+  const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
   // FIXME: mainnet hack to dont pay fees as long as possible
   const maxFee =
-    selectedAccount.network.id === "mainnet-alpha" ? "0x0" : undefined
+    selectedAccount.network.id === "mainnet-alpha"
+      ? "0x0"
+      : number.toHex(suggestedMaxFee)
 
   const transaction = await starknetAccount.execute(transactions, abis, {
     ...transactionsDetail,
