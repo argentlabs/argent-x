@@ -89,8 +89,8 @@ export const getTransactionsTracker: GetTransactionsTracker = (
       timestamp: timestampInSeconds(),
       ...transaction,
     }
+    await transactionsStore.addItem(newTransaction)
     onUpdate?.([newTransaction])
-    return transactionsStore.addItem(newTransaction)
   }
 
   return {
