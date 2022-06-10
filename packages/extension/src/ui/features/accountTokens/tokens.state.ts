@@ -147,8 +147,8 @@ export const useTokensWithBalance = (): UseTokens => {
   )
 
   const { data, isValidating, error, mutate } = useSWR(
-    [selectedAccount, ...tokenAddresses],
-    async (selectedAccount, ...tokenAddresses) => {
+    [selectedAccount?.address, "accountTokenBalances"],
+    async () => {
       if (!selectedAccount) {
         return {}
       }
