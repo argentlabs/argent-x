@@ -9,6 +9,7 @@ import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
+import { isValidAddress } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
@@ -98,17 +99,24 @@ export const TokenScreen: FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    sendTransaction({
-      to: address,
-      method: "transfer",
-      calldata: {
-        recipient,
-        amount: getUint256CalldataFromBN(
-          ethers.utils.parseUnits(amount, decimals),
-        ),
-      },
-    })
-    navigate(routes.accountTokens())
+    try {
+      if (!amount || !recipient || !isValidAddress(recipient)) {
+        throw new Error("Invalid input")
+      }
+      sendTransaction({
+        to: address,
+        method: "transfer",
+        calldata: {
+          recipient,
+          amount: getUint256CalldataFromBN(
+            ethers.utils.parseUnits(amount, decimals),
+          ),
+        },
+      })
+      navigate(routes.accountTokens())
+    } catch {
+      // do nothing
+    }
   }
 
   return (
