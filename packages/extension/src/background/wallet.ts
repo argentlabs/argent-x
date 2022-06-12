@@ -507,6 +507,8 @@ export class Wallet {
       return await this.addAccountPre9(networkId)
     }
 
+    await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
+
     const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
@@ -566,6 +568,12 @@ export class Wallet {
       throw Error("no open session")
     }
 
+    const network = await this.getNetwork(networkId)
+    let implementation = network.accountImplementation
+    if (implementation) {
+      await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
+    }
+
     const currentPaths = (await this.getAccounts())
       .filter(
         (account) =>
@@ -586,19 +594,14 @@ export class Wallet {
     const starkPub = ec.getStarkKey(starkPair)
     const seed = starkPub
 
-    const network = await this.getNetwork(networkId)
     const provider = getProvider(network)
 
-    let implementation = network.accountImplementation
     if (!implementation) {
       const deployImplementationTransaction = await provider.deployContract({
         contract: pre9argentAccountCompiledContract,
       })
       assertTransactionReceived(deployImplementationTransaction, true)
       implementation = deployImplementationTransaction.address as string
-    } else {
-      // if there is an implementation, we need to check if accounts were already deployed
-      this.discoverAccountsForNetwork(network)
     }
 
     const deployTransaction = await provider.deployContract({
