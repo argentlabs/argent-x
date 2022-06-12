@@ -13,6 +13,7 @@ import {
 import { CloseIcon } from "../../components/Icons/CloseIcon"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
+import { formatTruncatedAddress } from "../../services/addresses"
 import { formatDateTime } from "../../services/dates"
 import { openVoyagerTransaction } from "../../services/voyager.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
@@ -103,6 +104,25 @@ export const TransactionDetail: FC = () => {
           <Field>
             <FieldKey>Time</FieldKey>
             {dateLabel && <FieldValue>{dateLabel}</FieldValue>}
+          </Field>
+          <Field>
+            <FieldKey>
+              Hash
+              <CopyTooltip message="Copied" copyValue={transaction.hash}>
+                <ContentCopyIcon
+                  style={{
+                    fontSize: 12,
+                    cursor: "pointer",
+                    marginLeft: "0.5em",
+                  }}
+                />
+              </CopyTooltip>
+            </FieldKey>
+            {transaction.hash && (
+              <FieldValue>
+                {formatTruncatedAddress(transaction.hash)}
+              </FieldValue>
+            )}
           </Field>
 
           {/* TODO: Add this back when we have a way to fetch Network Fee from
