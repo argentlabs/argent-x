@@ -1,17 +1,16 @@
 import { BigNumber } from "ethers"
-import { FC, lazy, useState } from "react"
+import { FC, lazy } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
-import { useAppState } from "../../app.state"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { ControlledInputText, InputText } from "../../components/InputText"
+import { ControlledInputText } from "../../components/InputText"
 import { FormError } from "../../components/Typography"
 import { routes } from "../../routes"
-import { addressSchema, isValidAddress } from "../../services/addresses"
+import { addressSchema } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
