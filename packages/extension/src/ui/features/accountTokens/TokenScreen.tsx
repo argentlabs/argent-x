@@ -1,4 +1,3 @@
-import { ethers } from "ethers"
 import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useForm } from "react-hook-form"
