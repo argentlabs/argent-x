@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
@@ -11,7 +11,7 @@ import {
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
-import { isInTab, openExtensionInTab } from "../recovery/useCustomNavigate"
+import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -75,18 +75,8 @@ const Footer = styled.div`
 `
 
 export const SettingsScreen: FC = () => {
-  const onExtendedViewClick = useCallback(async (e: any) => {
-    e.preventDefault()
-    await openExtensionInTab()
-  }, [])
-  const [inTab, setInTab] = useState<boolean>(false)
-  useEffect(() => {
-    const checkIsInTab = async () => {
-      const inTab = await isInTab()
-      setInTab(inTab)
-    }
-    checkIsInTab()
-  }, [])
+  const openExtensionInTab = useOpenExtensionInTab()
+  const extensionIsInTab = useExtensionIsInTab()
   return (
     <>
       <IconBar back />
@@ -99,9 +89,9 @@ export const SettingsScreen: FC = () => {
           </Title>
         </SettingsItem>
         <hr />
-        {!inTab && (
+        {!extensionIsInTab && (
           <>
-            <SettingsItem to={routes.settings()} onClick={onExtendedViewClick}>
+            <SettingsItem to={routes.settings()} onClick={openExtensionInTab}>
               <Title>
                 <span>Extended view</span>
                 <OpenInFullIcon fontSize="inherit" />

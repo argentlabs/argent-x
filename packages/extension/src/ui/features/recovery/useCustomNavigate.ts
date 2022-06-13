@@ -2,16 +2,7 @@ import { NavigateOptions, To, useNavigate } from "react-router-dom"
 import browser from "webextension-polyfill"
 
 import { routes } from "../../routes"
-
-export const openExtensionInTab = async () => {
-  const url = browser.runtime.getURL("index.html")
-  const tab = await browser.tabs.create({ url })
-  return tab
-}
-
-export const isInTab = async () => {
-  return Boolean(await browser.tabs.getCurrent())
-}
+import { extensionIsInTab, openExtensionInTab } from "../browser/tabs"
 
 const getPlatformOS = async () => {
   const info = await browser.runtime.getPlatformInfo()
@@ -23,7 +14,7 @@ export const useCustomNavigate = () => {
 
   return async (to: To, options?: NavigateOptions) => {
     const isLinux = (await getPlatformOS()) === "linux"
-    const isAlreadyInTab = await isInTab()
+    const isAlreadyInTab = await extensionIsInTab()
 
     if (to === routes.backupRecovery() && isLinux && !isAlreadyInTab) {
       return openExtensionInTab()
