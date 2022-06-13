@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react"
+import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
@@ -7,6 +7,7 @@ import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
@@ -19,6 +20,7 @@ const isPopup = new URLSearchParams(window.location.search).has("popup")
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
   const account = useSelectedAccount()
+  const extensionIsInTab = useExtensionIsInTab()
   const { actions } = useActions()
 
   const [action] = actions
@@ -37,6 +39,16 @@ export const ActionScreen: FC = () => {
       window.close()
     }
   }, [])
+
+  /** Focus the extension if it is running in a tab  */
+  useEffect(() => {
+    const init = async () => {
+      if (extensionIsInTab) {
+        await focusExtensionTab()
+      }
+    }
+    init()
+  }, [extensionIsInTab, action.type])
 
   switch (action.type) {
     case "CONNECT_DAPP":
