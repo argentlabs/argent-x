@@ -7,8 +7,6 @@ import {
 } from "starknet"
 import * as yup from "yup"
 
-const validAddressRegex = /^0x[0-9a-fA-F]{63,64}$/
-
 export const normalizeAddress = (address: string) => getChecksumAddress(address)
 
 export const formatTruncatedAddress = (address: string) => {
@@ -37,24 +35,32 @@ const isChecksumAddress = (address: string) => {
 export const addressSchema = yup
   .string()
   .trim()
-  .required()
-  .test("isValidAddress", "Invalid address", (address?: string) => {
+  .required("Address is required")
+  .test((address, ctx) => {
     if (!address) {
-      return new yup.ValidationError("Address is required")
-    }
-    if (!validAddressRegex.test(address)) {
-      return new yup.ValidationError("Address should be hexadecimal")
+      return ctx.createError({ message: "Address is required" })
     }
     try {
+      if (!/^0x[0-9a-fA-F]+$/.test(address)) {
+        return ctx.createError({ message: "Address should be hexadecimal" })
+      }
+
+      if (!/^0x[0-9a-fA-F]{63,64}$/.test(address)) {
+        return ctx.createError({
+          message: "Address should be between 63 and 64 characters long",
+        })
+      }
+
       const parsedAddress = validateAndParseAddress(address)
       if (number.toBN(parsedAddress).eq(constants.ZERO)) {
-        return new yup.ValidationError("Zero address not allowed")
+        return ctx.createError({ message: "Zero address not allowed" })
+      }
+
+      if (isChecksumAddress(address) && !validateChecksumAddress(address)) {
+        return ctx.createError({ message: "Invalid checksum address" })
       }
     } catch {
-      return new yup.ValidationError("Invalid address")
-    }
-    if (isChecksumAddress(address) && !validateChecksumAddress(address)) {
-      return new yup.ValidationError("Invalid checksum address")
+      return ctx.createError({ message: "Invalid address" })
     }
 
     return true
