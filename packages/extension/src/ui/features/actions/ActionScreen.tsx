@@ -1,6 +1,5 @@
 import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import browser from "webextension-polyfill"
 
 import { waitForMessage } from "../../../shared/messages"
 import { useAppState } from "../../app.state"

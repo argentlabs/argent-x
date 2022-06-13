@@ -4,10 +4,7 @@ import styled from "styled-components"
 
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import {
-  ArrowForwardIosIcon,
-  OpenInFullIcon,
-} from "../../components/Icons/MuiIcons"
+import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
@@ -94,7 +91,7 @@ export const SettingsScreen: FC = () => {
             <SettingsItem to={routes.settings()} onClick={openExtensionInTab}>
               <Title>
                 <span>Extended view</span>
-                <OpenInFullIcon fontSize="inherit" />
+                <ArrowForwardIosIcon fontSize="inherit" />
               </Title>
             </SettingsItem>
             <hr />
