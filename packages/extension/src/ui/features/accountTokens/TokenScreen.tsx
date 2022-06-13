@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
-import { inputAmountSchema } from "../../../shared/token"
+import { inputAmountSchema, parseAmount } from "../../../shared/token"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
@@ -139,25 +139,17 @@ export const TokenScreen: FC = () => {
 
         <ButtonGroup
           as="form"
-          onSubmit={handleSubmit(
-            ({ amount, recipient }) => {
-              console.log("SUBMITTED")
-              sendTransaction({
-                to: address,
-                method: "transfer",
-                calldata: {
-                  recipient,
-                  amount: getUint256CalldataFromBN(
-                    ethers.utils.parseUnits(amount, decimals),
-                  ),
-                },
-              })
-              navigate(routes.accountTokens())
-            },
-            (e) => {
-              console.log("ERROR", e)
-            },
-          )}
+          onSubmit={handleSubmit(({ amount, recipient }) => {
+            sendTransaction({
+              to: address,
+              method: "transfer",
+              calldata: {
+                recipient,
+                amount: getUint256CalldataFromBN(parseAmount(amount, decimals)),
+              },
+            })
+            navigate(routes.accountTokens())
+          })}
         >
           <ControlledInputText
             autoComplete="off"
