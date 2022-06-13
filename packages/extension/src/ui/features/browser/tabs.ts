@@ -26,5 +26,6 @@ export const useExtensionIsInTab = () => {
 export const useOpenExtensionInTab = () => {
   return useCallback(async () => {
     await openExtensionInTab()
+    window.close()
   }, [])
 }

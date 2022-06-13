@@ -1,4 +1,3 @@
-import { Theme, ThemeOptions } from "@mui/material"
 import { FC } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
