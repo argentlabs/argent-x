@@ -1,6 +1,6 @@
 import { useCallback } from "react"
-import { FieldValues, Resolver } from "react-hook-form"
-import { BaseSchema, ValidationError } from "yup"
+import { Resolver } from "react-hook-form"
+import { InferType, Schema, ValidationError } from "yup"
 
 function deleteEmptyStringFields(
   obj: Record<string, string>,
@@ -10,13 +10,10 @@ function deleteEmptyStringFields(
   )
 }
 
-export const useYupValidationResolver = <
-  TFieldValues extends FieldValues = FieldValues,
-  TContext = any,
->(
-  validationSchema: BaseSchema,
+export const useYupValidationResolver = <S extends Schema>(
+  validationSchema: S,
 ) =>
-  useCallback<Resolver<TFieldValues, TContext>>(
+  useCallback<Resolver<InferType<S>>>(
     async (data) => {
       try {
         const values = await validationSchema.validate(

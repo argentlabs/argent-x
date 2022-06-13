@@ -75,7 +75,7 @@
     "swr": "^1.3.0",
     "url-join": "^5.0.0",
     "webextension-polyfill": "^0.9.0",
-    "yup": "^0.32.11",
+    "yup": "^1.0.0-beta.4",
     "zustand": "^3.6.5"
   }
 }

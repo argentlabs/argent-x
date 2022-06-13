@@ -1,18 +1,23 @@
-import { ethers } from "ethers"
-import React, { FC, useState } from "react"
+import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
+import { useForm } from "react-hook-form"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
+import { Schema, object } from "yup"
 
+import { inputAmountSchema, parseAmount } from "../../../shared/token"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { InputText } from "../../components/InputText"
+import { ControlledInputText } from "../../components/InputText"
+import { FormError } from "../../components/Typography"
 import { routes } from "../../routes"
+import { addressSchema } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
@@ -80,12 +85,33 @@ const BalanceSymbol = styled.div`
   line-height: 25px;
 `
 
+interface SendInput {
+  recipient: string
+  amount: string
+}
+const SendSchema: Schema<SendInput> = object().required().shape({
+  recipient: addressSchema,
+  amount: inputAmountSchema,
+})
+
 export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
   const { tokenDetails } = useTokensWithBalance()
-  const [amount, setAmount] = useState("")
-  const [recipient, setRecipient] = useState("")
+  const resolver = useYupValidationResolver(SendSchema)
+  const {
+    handleSubmit,
+    formState: { errors, isDirty, isSubmitting, submitCount },
+    control,
+  } = useForm<SendInput>({
+    defaultValues: {
+      recipient: "",
+      amount: "",
+    },
+    resolver,
+  })
+
+  const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   if (!token) {
@@ -93,23 +119,6 @@ export const TokenScreen: FC = () => {
   }
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
-
-  const formattedBalance = parseFloat(balance).toPrecision(8)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    sendTransaction({
-      to: address,
-      method: "transfer",
-      calldata: {
-        recipient,
-        amount: getUint256CalldataFromBN(
-          ethers.utils.parseUnits(amount, decimals),
-        ),
-      },
-    })
-    navigate(routes.accountTokens())
-  }
 
   return (
     <>
@@ -122,25 +131,46 @@ export const TokenScreen: FC = () => {
         <BalanceAlert>
           <BalanceTitle>Your balance</BalanceTitle>
           <CopyToClipboard text={balance}>
-            <BalanceAmount>
-              {balance.length > 8 ? formattedBalance : balance}
-            </BalanceAmount>
+            <BalanceAmount>{balance}</BalanceAmount>
           </CopyToClipboard>
           <BalanceSymbol>{symbol}</BalanceSymbol>
         </BalanceAlert>
 
-        <ButtonGroup as="form" onSubmit={handleSubmit}>
-          <InputText
+        <ButtonGroup
+          as="form"
+          onSubmit={handleSubmit(({ amount, recipient }) => {
+            sendTransaction({
+              to: address,
+              method: "transfer",
+              calldata: {
+                recipient,
+                amount: getUint256CalldataFromBN(parseAmount(amount, decimals)),
+              },
+            })
+            navigate(routes.accountTokens())
+          })}
+        >
+          <ControlledInputText
+            autoComplete="off"
+            control={control}
             placeholder="Amount"
-            value={amount}
-            onChange={(e: any) => setAmount(e.target.value)}
+            name="amount"
+            type="text"
           />
-          <InputText
+          {errors.amount && <FormError>{errors.amount.message}</FormError>}
+          <ControlledInputText
+            autoComplete="off"
+            control={control}
             placeholder="Recipient"
-            value={recipient}
-            onChange={(e: any) => setRecipient(e.target.value)}
+            name="recipient"
+            type="text"
           />
-          <Button type="submit">Send</Button>
+          {errors.recipient && (
+            <FormError>{errors.recipient.message}</FormError>
+          )}
+          <Button disabled={disableSubmit} type="submit">
+            Send
+          </Button>
           <Button onClick={() => navigate(routes.hideToken(token.address))}>
             Hide
           </Button>
