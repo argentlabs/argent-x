@@ -3,9 +3,10 @@ import browser from "webextension-polyfill"
 
 import { routes } from "../../routes"
 
-const openExtensionInTab = () => {
+export const openExtensionInTab = async () => {
   const url = browser.runtime.getURL("index.html")
-  return browser.tabs.create({ url })
+  const tab = await browser.tabs.create({ url })
+  return tab
 }
 
 export const isInTab = async () => {

@@ -1,13 +1,17 @@
-import { FC } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
+import {
+  ArrowForwardIosIcon,
+  OpenInFullIcon,
+} from "../../components/Icons/MuiIcons"
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
+import { isInTab, openExtensionInTab } from "../recovery/useCustomNavigate"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -70,75 +74,101 @@ const Footer = styled.div`
   }
 `
 
-export const SettingsScreen: FC = () => (
-  <>
-    <IconBar back />
-    <SettingsScreenWrapper>
-      <H2>Settings</H2>
-      <SettingsItem to={routes.lockScreen()} onClick={stopSession}>
-        <Title>
-          <span>Lock wallet</span>
-          <ArrowForwardIosIcon fontSize="inherit" />
-        </Title>
-      </SettingsItem>
-      <hr />
-      <SettingsItem to={routes.settingsDappConnections()}>
-        <Title>
-          <span>Reset dapp connections</span>
-          <ArrowForwardIosIcon fontSize="inherit" />
-        </Title>
-        <P>
-          Dapps you have previously connected to can auto-connect in the future.
-        </P>
-      </SettingsItem>
-      <hr />
-      <SettingsItem to={routes.settingsSeed()}>
-        <Title>
-          <span>Show recovery phrase</span>
-          <ArrowForwardIosIcon fontSize="inherit" />
-        </Title>
-        <P>
-          Your recovery phrase allows anyone to use your account. Keep it
-          secure.
-        </P>
-      </SettingsItem>
-      <hr />
-      <SettingsItem to={routes.settingsNetworks()}>
-        <Title>
-          <span>Manage networks</span>
-          <ArrowForwardIosIcon fontSize="inherit" />
-        </Title>
-        <P>Here you can add, edit and remove custom networks.</P>
-      </SettingsItem>
-      <hr />
+export const SettingsScreen: FC = () => {
+  const onExtendedViewClick = useCallback(async (e: any) => {
+    e.preventDefault()
+    await openExtensionInTab()
+  }, [])
+  const [inTab, setInTab] = useState<boolean>(false)
+  useEffect(() => {
+    const checkIsInTab = async () => {
+      const inTab = await isInTab()
+      setInTab(inTab)
+    }
+    checkIsInTab()
+  }, [])
+  return (
+    <>
+      <IconBar back />
+      <SettingsScreenWrapper>
+        <H2>Settings</H2>
+        <SettingsItem to={routes.lockScreen()} onClick={stopSession}>
+          <Title>
+            <span>Lock wallet</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+        </SettingsItem>
+        <hr />
+        {!inTab && (
+          <>
+            <SettingsItem to={routes.settings()} onClick={onExtendedViewClick}>
+              <Title>
+                <span>Extended view</span>
+                <OpenInFullIcon fontSize="inherit" />
+              </Title>
+            </SettingsItem>
+            <hr />
+          </>
+        )}
+        <SettingsItem to={routes.settingsDappConnections()}>
+          <Title>
+            <span>Reset dapp connections</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>
+            Dapps you have previously connected to can auto-connect in the
+            future.
+          </P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem to={routes.settingsSeed()}>
+          <Title>
+            <span>Show recovery phrase</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>
+            Your recovery phrase allows anyone to use your account. Keep it
+            secure.
+          </P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem to={routes.settingsNetworks()}>
+          <Title>
+            <span>Manage networks</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>Here you can add, edit and remove custom networks.</P>
+        </SettingsItem>
+        <hr />
 
-      <Footer>
-        <P>Help, support &amp; suggestions:</P>
-        <div>
-          <a
-            href="https://discord.com/channels/793094838509764618/908663762150645770"
-            title="Ask a question on the argent-extension channel on StarkNet Discord"
-            target="_blank"
-          >
-            <img
-              src="https://images.prismic.io/argentwebsite/76eac5a3-a4a3-4395-a82a-a3def2438ff0_icon-discord.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
-              alt="Argent Discord icon"
-            />
-          </a>
-          <a
-            href="https://github.com/argentlabs/argent-x/issues"
-            title="Post an issue on Argent X GitHub"
-            target="_blank"
-            style={{ marginLeft: 15 }}
-          >
-            <img
-              src="https://images.prismic.io/argentwebsite/460e2528-d9bb-4a47-9339-b72c287c243e_icon-github.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
-              alt="Argent Github icon"
-            />
-          </a>
-        </div>
-        <P>Version: v{process.env.VERSION}</P>
-      </Footer>
-    </SettingsScreenWrapper>
-  </>
-)
+        <Footer>
+          <P>Help, support &amp; suggestions:</P>
+          <div>
+            <a
+              href="https://discord.com/channels/793094838509764618/908663762150645770"
+              title="Ask a question on the argent-extension channel on StarkNet Discord"
+              target="_blank"
+            >
+              <img
+                src="https://images.prismic.io/argentwebsite/76eac5a3-a4a3-4395-a82a-a3def2438ff0_icon-discord.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
+                alt="Argent Discord icon"
+              />
+            </a>
+            <a
+              href="https://github.com/argentlabs/argent-x/issues"
+              title="Post an issue on Argent X GitHub"
+              target="_blank"
+              style={{ marginLeft: 15 }}
+            >
+              <img
+                src="https://images.prismic.io/argentwebsite/460e2528-d9bb-4a47-9339-b72c287c243e_icon-github.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
+                alt="Argent Github icon"
+              />
+            </a>
+          </div>
+          <P>Version: v{process.env.VERSION}</P>
+        </Footer>
+      </SettingsScreenWrapper>
+    </>
+  )
+}

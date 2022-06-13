@@ -5,11 +5,16 @@ export const AccountFooter = styled.div`
   position: fixed;
   display: flex;
   bottom: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
   height: 64px;
   background: linear-gradient(180deg, rgba(16, 16, 16, 0.4) 0%, #161616 73.72%);
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
+  ${(props) => props.theme.breakpoints.up("sm")} {
+    left: 10%;
+    right: 10%;
+  }
 `
 
 export const FooterTab = styled(Link)`

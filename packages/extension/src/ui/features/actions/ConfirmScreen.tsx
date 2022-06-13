@@ -65,6 +65,11 @@ export const StickyGroup = styled.div`
   > * + * {
     margin-top: 24px;
   }
+
+  ${(props) => props.theme.breakpoints.up("sm")} {
+    left: 10%;
+    right: 10%;
+  }
 `
 
 const Placeholder = styled.div`

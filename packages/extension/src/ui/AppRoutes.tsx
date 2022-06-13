@@ -1,3 +1,4 @@
+import { Theme, ThemeOptions } from "@mui/material"
 import { FC } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
@@ -58,9 +59,17 @@ export const ScrollBehaviour = styled.div`
   }
 `
 
+export const ResponsiveBehaviour = styled.div`
+  ${(props) => props.theme.breakpoints.up("sm")} {
+    margin: 0 10%;
+  }
+`
+
 const Viewport: FC = () => (
   <ScrollBehaviour>
-    <Outlet />
+    <ResponsiveBehaviour>
+      <Outlet />
+    </ResponsiveBehaviour>
   </ScrollBehaviour>
 )
 
