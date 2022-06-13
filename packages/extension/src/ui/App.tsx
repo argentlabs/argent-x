@@ -63,7 +63,15 @@ const GlobalStyle: FC = () => {
   )
 }
 
-const theme = createTheme({ palette: { mode: "dark" } })
+/** @see `./theme.d.ts` for adding additional variables to the theme */
+const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+  margin: {
+    extensionInTab: "10%",
+  },
+})
 
 export const App: FC = () => (
   <SWRConfig value={{ provider: () => swrCacheProvider }}>

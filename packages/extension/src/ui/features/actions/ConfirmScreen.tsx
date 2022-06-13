@@ -67,8 +67,8 @@ export const StickyGroup = styled.div`
   }
 
   ${(props) => props.theme.breakpoints.up("sm")} {
-    left: 10%;
-    right: 10%;
+    left: ${(props) => props.theme.margin.extensionInTab};
+    right: ${(props) => props.theme.margin.extensionInTab};
   }
 `
 
