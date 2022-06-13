@@ -56,7 +56,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
     return props.network
   }, [props.mode === "add" || props.network])
 
-  const yupSchemaValidator = useYupValidationResolver<Network>(NetworkSchema)
+  const yupSchemaValidator = useYupValidationResolver(NetworkSchema)
   const {
     handleSubmit,
     formState: { errors },

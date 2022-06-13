@@ -1,4 +1,3 @@
-import { ethers } from "ethers"
 import { number } from "starknet"
 
 import { defaultNetwork } from "../shared/networks"
