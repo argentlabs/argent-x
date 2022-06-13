@@ -37,6 +37,12 @@ const Container = styled.div`
   margin-bottom: 68px;
 `
 
+const StyledContentCopyIcon = styled(ContentCopyIcon)`
+  margin-left: 0.5em;
+  cursor: pointer;
+  font-size: 12px;
+`
+
 const Title = styled.h2`
   font-weight: 700;
   font-size: 28px;
@@ -109,13 +115,7 @@ export const TransactionDetail: FC = () => {
             <FieldKey>
               Hash
               <CopyTooltip message="Copied" copyValue={transaction.hash}>
-                <ContentCopyIcon
-                  style={{
-                    fontSize: 12,
-                    cursor: "pointer",
-                    marginLeft: "0.5em",
-                  }}
-                />
+                <StyledContentCopyIcon />
               </CopyTooltip>
             </FieldKey>
             {transaction.hash && (
