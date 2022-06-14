@@ -58,9 +58,17 @@ export const ScrollBehaviour = styled.div`
   }
 `
 
+export const ResponsiveBehaviour = styled.div`
+  ${(props) => props.theme.breakpoints.up("sm")} {
+    margin: 0 ${(props) => props.theme.margin.extensionInTab};
+  }
+`
+
 const Viewport: FC = () => (
   <ScrollBehaviour>
-    <Outlet />
+    <ResponsiveBehaviour>
+      <Outlet />
+    </ResponsiveBehaviour>
   </ScrollBehaviour>
 )
 

@@ -1,19 +1,22 @@
 import { BigNumber } from "ethers"
-import { FC, lazy, useState } from "react"
+import { FC, lazy } from "react"
+import { useForm } from "react-hook-form"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
+import { Schema, object } from "yup"
 
-import { useAppState } from "../../app.state"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { InputText } from "../../components/InputText"
+import { ControlledInputText } from "../../components/InputText"
+import { FormError } from "../../components/Typography"
 import { routes } from "../../routes"
-import { isValidAddress } from "../../services/addresses"
+import { addressSchema } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { openAspectNft } from "./aspect.service"
 import AspectSvg from "./aspect.svg"
 import { useNfts } from "./useNfts"
@@ -69,11 +72,17 @@ export const Container = styled.div`
   }
 `
 
+export interface SendNftInput {
+  recipient: string
+}
+export const SendNftSchema: Schema<SendNftInput> = object().required().shape({
+  recipient: addressSchema,
+})
+
 export const NftScreen: FC = () => {
   const navigate = useNavigate()
   const { contractAddress, tokenId } = useParams()
   const account = useSelectedAccount()
-  const [recipient, setRecipient] = useState("")
 
   const accountAddress = account?.address || ""
   const { nfts = [] } = useNfts(accountAddress)
@@ -85,21 +94,27 @@ export const NftScreen: FC = () => {
     return <></>
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const resolver = useYupValidationResolver(SendNftSchema)
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isDirty, isSubmitting, submitCount },
+  } = useForm<SendNftInput>({
+    resolver,
+    defaultValues: {
+      recipient: "",
+    },
+  })
 
-    const to = recipient?.trim()
-    if (!isValidAddress(to)) {
-      useAppState.setState({ error: `Invalid recipient address: ${to}` })
-      navigate(routes.error())
-    }
+  const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
+  const onSubmit = async ({ recipient }: SendNftInput) => {
     sendTransaction({
       to: contractAddress,
       method: "transferFrom",
       calldata: {
         from_: accountAddress,
-        to,
+        to: recipient,
         tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
       },
     })
@@ -125,13 +140,20 @@ export const NftScreen: FC = () => {
           <AspectSvg /> <span>View on Aspect</span>
         </Button>
 
-        <ButtonGroup as="form" onSubmit={handleSubmit}>
-          <InputText
+        <ButtonGroup as="form" onSubmit={handleSubmit(onSubmit)}>
+          <ControlledInputText
+            autoComplete="off"
+            control={control}
             placeholder="Recipient"
-            value={recipient}
-            onChange={(e: any) => setRecipient(e.target.value)}
+            name="recipient"
+            type="text"
           />
-          <Button type="submit">Send</Button>
+          {errors.recipient && (
+            <FormError>{errors.recipient.message}</FormError>
+          )}
+          <Button disabled={disableSubmit} type="submit">
+            Send
+          </Button>
         </ButtonGroup>
       </Container>
     </>

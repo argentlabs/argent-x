@@ -1,10 +1,13 @@
-import { encode } from "starknet"
+import {
+  constants,
+  getChecksumAddress,
+  number,
+  validateAndParseAddress,
+  validateChecksumAddress,
+} from "starknet"
+import * as yup from "yup"
 
-export const isValidAddress = (address: string): boolean =>
-  /^0x[0-9a-f]{1,64}$/.test(address)
-
-export const normalizeAddress = (address: string) =>
-  encode.addHexPrefix(encode.removeHexPrefix(address).padStart(64, "0"))
+export const normalizeAddress = (address: string) => getChecksumAddress(address)
 
 export const formatTruncatedAddress = (address: string) => {
   const normalized = normalizeAddress(address)
@@ -21,3 +24,47 @@ export const formatFullAddress = (address: string) => {
   const parts = rest.match(/.{1,4}/g) || []
   return `${hex} ${parts.join(" ")}`
 }
+
+const isChecksumAddress = (address: string) => {
+  if (/^0x[0-9a-f]{63,64}$/.test(address)) {
+    return false
+  }
+  return true
+}
+
+export const addressSchema = yup
+  .string()
+  .trim()
+  .required("Address is required")
+  .test((address, ctx) => {
+    if (!address) {
+      return ctx.createError({ message: "Address is required" })
+    }
+    try {
+      if (!/^0x[0-9a-fA-F]+$/.test(address)) {
+        return ctx.createError({ message: "Address should be hexadecimal" })
+      }
+
+      if (!/^0x[0-9a-fA-F]{63,64}$/.test(address)) {
+        return ctx.createError({
+          message: "Address should be between 63 and 64 characters long",
+        })
+      }
+
+      const parsedAddress = validateAndParseAddress(address)
+      if (number.toBN(parsedAddress).eq(constants.ZERO)) {
+        return ctx.createError({ message: "Zero address not allowed" })
+      }
+
+      if (isChecksumAddress(address) && !validateChecksumAddress(address)) {
+        return ctx.createError({ message: "Invalid checksum address" })
+      }
+    } catch {
+      return ctx.createError({ message: "Invalid address" })
+    }
+
+    return true
+  })
+
+export const isValidAddress = (address: string) =>
+  addressSchema.isValidSync(address)

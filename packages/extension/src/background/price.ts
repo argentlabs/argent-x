@@ -1,4 +1,3 @@
-import { ethers } from "ethers"
 import { number } from "starknet"
 
 import { defaultNetwork } from "../shared/networks"
@@ -56,8 +55,6 @@ function getExactPriceForToken(
   const amountBn = number.toBN(amount)
 
   const result = amountBn.mul(priceBn).div(maxMultiplierBn)
-  console.log(ethers.utils.formatUnits(amount, decimals), price)
-  console.log(result.toNumber() / minMultiplier)
   return result.toNumber() / minMultiplier
 }
 

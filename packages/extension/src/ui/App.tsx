@@ -1,12 +1,12 @@
 import { ThemeProvider, createTheme } from "@mui/material"
-import { FC, Suspense, useEffect, useState } from "react"
+import { FC, Suspense } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
 import { AppRoutes } from "./AppRoutes"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
-import { isInTab } from "./features/recovery/useCustomNavigate"
+import { useExtensionIsInTab } from "./features/browser/tabs"
 import { swrCacheProvider } from "./services/swr"
 
 const GlobalStyleWithFixedDimensions = createGlobalStyle`
@@ -54,19 +54,24 @@ const OverwriteDimensionsToMinDimensions = createGlobalStyle`
 `
 
 const GlobalStyle: FC = () => {
-  const [isTab, setIsTab] = useState(false)
-  useEffect(() => {
-    isInTab().then(setIsTab)
-  }, [])
+  const extensionIsInTab = useExtensionIsInTab()
   return (
     <>
       <GlobalStyleWithFixedDimensions />
-      {isTab && <OverwriteDimensionsToMinDimensions />}
+      {extensionIsInTab && <OverwriteDimensionsToMinDimensions />}
     </>
   )
 }
 
-const theme = createTheme({ palette: { mode: "dark" } })
+/** @see `./theme.d.ts` for adding additional variables to the theme */
+const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+  margin: {
+    extensionInTab: "10%",
+  },
+})
 
 export const App: FC = () => (
   <SWRConfig value={{ provider: () => swrCacheProvider }}>
