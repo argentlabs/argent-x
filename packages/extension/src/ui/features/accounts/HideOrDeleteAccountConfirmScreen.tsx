@@ -81,7 +81,7 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
       <StyledP>
         {mode === "hide"
           ? "You will be able to unhide the account by recovering your wallet. In the future you will also be able to unhide the account in the settings of the extension."
-          : "You will not be able to recover this account in future."}
+          : "You will not be able to recover this account in the future."}
       </StyledP>
     </ConfirmScreen>
   )
