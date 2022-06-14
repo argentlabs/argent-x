@@ -64,7 +64,7 @@ export const inputAmountSchema = string()
       if (bn.eq(0)) {
         return ctx.createError({ message: "Amount can not be zero" })
       }
-      if (bn.lte(constants.MaxUint256)) {
+      if (bn.gt(constants.MaxUint256)) {
         return ctx.createError({ message: "Amount is too big" })
       }
     } catch {
