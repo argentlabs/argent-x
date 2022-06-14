@@ -2,12 +2,13 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
-import { hideAccount } from "../../services/backgroundAccounts"
+import { deleteAccount, hideAccount } from "../../services/backgroundAccounts"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
@@ -91,8 +92,16 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
     onAccountNameEdit()
   }
 
-  const handleHideAccount = async (account: Account) => {
-    await hideAccount(account.address)
+  const showDelete =
+    account && (isDeprecated(account) || account.networkId === "localhost")
+
+  const handleHideOrDeleteAccount = async (account: Account) => {
+    if (showDelete) {
+      await deleteAccount(account.address)
+    } else {
+      await hideAccount(account.address)
+    }
+
     navigate(await recover({ showAccountList: true }))
   }
 
@@ -119,12 +128,12 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
           </MenuItemWrapper>
           <Separator />
           {account && (
-            <MenuItemWrapper onClick={() => handleHideAccount(account)}>
+            <MenuItemWrapper onClick={() => handleHideOrDeleteAccount(account)}>
               <MenuItem>
                 <IconWrapper>
                   <VisibilityOff fontSize="inherit" htmlColor="white" />
                 </IconWrapper>
-                Hide Account
+                {showDelete ? "Delete" : "Hide"} Account
               </MenuItem>
             </MenuItemWrapper>
           )}
