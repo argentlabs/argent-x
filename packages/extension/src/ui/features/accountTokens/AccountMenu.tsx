@@ -8,13 +8,11 @@ import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
-import { deleteAccount, hideAccount } from "../../services/backgroundAccounts"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { recover } from "../recovery/recovery.service"
 
 const StyledMoreVert = styled(MoreVertSharp)`
   cursor: pointer;
@@ -97,12 +95,10 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
 
   const handleHideOrDeleteAccount = async (account: Account) => {
     if (showDelete) {
-      await deleteAccount(account.address)
+      navigate(routes.accountDeleteConfirm(account.address))
     } else {
-      await hideAccount(account.address)
+      navigate(routes.accountHideConfirm(account.address))
     }
-
-    navigate(await recover({ showAccountList: true }))
   }
 
   return (

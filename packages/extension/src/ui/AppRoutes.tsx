@@ -7,6 +7,8 @@ import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
+import { DeleteAccountScreen } from "./features/accounts/DeleteAccountScreen"
+import { HideAccountScreen } from "./features/accounts/HideAccountScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
@@ -121,6 +123,14 @@ const walletRoutes = (
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetail />}
+    />
+    <Route
+      path={routes.accountHideConfirm.path}
+      element={<HideAccountScreen />}
+    />
+    <Route
+      path={routes.accountDeleteConfirm.path}
+      element={<DeleteAccountScreen />}
     />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
