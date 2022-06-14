@@ -18,13 +18,19 @@ interface TokenIconProps {
   name: string
   url?: string
   large?: boolean
+  small?: boolean
 }
 
-export const TokenIcon: FC<TokenIconProps> = ({ name, url, large = false }) => {
+export const TokenIcon: FC<TokenIconProps> = ({
+  name,
+  url,
+  large = false,
+  small = false,
+}) => {
   const color = getColor(name)
   return (
     <Icon
-      size={large ? 48 : 40}
+      size={large ? 48 : small ? 24 : 40}
       alt={name}
       src={
         url ||

@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import {
   Field,
   FieldGroup,
@@ -19,6 +20,8 @@ import {
 } from "../accounts/accountMetadata.state"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
+import { TokenIcon } from "../accountTokens/TokenIcon"
+import { selectTokensByNetwork, useTokens } from "../accountTokens/tokens.state"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
 
@@ -38,7 +41,7 @@ const Pre = styled.pre`
   background: #161616;
 `
 
-const AccountName = styled.div`
+const LeftPaddedField = styled.div`
   margin-left: 8px;
 `
 
@@ -51,8 +54,16 @@ export interface TransactionDetailProps {
 export const TransactionDetail: FC<TransactionDetailProps> = ({
   transaction,
 }) => {
-  const displayAddress = formatTruncatedAddress(transaction.contractAddress)
+  const { switcherNetworkId } = useAppState()
+  const tokensByNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
+  const token = tokensByNetwork.find(
+    ({ address }) => address === transaction.contractAddress,
+  )
   if (transaction.entrypoint === "transfer") {
+    /** recipient address is first entry in calldata array */
+    const displaySendAddress = transaction.calldata
+      ? formatTruncatedAddress(transaction.calldata[0])
+      : "–"
     /** amount is second entry in calldata array */
     const displayAmount = transaction.calldata
       ? formatTokenBalance(transaction.calldata[1])
@@ -61,11 +72,16 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
       <FieldGroup>
         <Field>
           <FieldKey>Send</FieldKey>
-          <FieldValue>{displayAmount}</FieldValue>
+          <FieldValue>
+            {token && <TokenIcon url={token.image} name={token.name} small />}
+            <LeftPaddedField>
+              {displayAmount} {token?.symbol}
+            </LeftPaddedField>
+          </FieldValue>
         </Field>
         <Field>
           <FieldKey>To</FieldKey>
-          <FieldValue>{displayAddress}</FieldValue>
+          <FieldValue>{displaySendAddress}</FieldValue>
         </Field>
       </FieldGroup>
     )
@@ -74,7 +90,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     <FieldGroup>
       <Field>
         <FieldKey>Contract</FieldKey>
-        <FieldValue>{displayAddress}</FieldValue>
+        <FieldValue>{transaction.contractAddress}</FieldValue>
       </Field>
       <Field>
         <FieldKey>Action</FieldKey>
@@ -142,6 +158,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       {...props}
     >
       <TransactionDetails transactions={transactions} />
+      <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
       <FieldGroup>
         <Field>
           <FieldKey>From</FieldKey>
@@ -151,7 +168,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
               small
               disabled
             />
-            <AccountName>{accountName}</AccountName>
+            <LeftPaddedField>{accountName}</LeftPaddedField>
           </FieldValue>
         </Field>
         <Field>
@@ -159,7 +176,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           <FieldValue>{selectedAccount.network.name}</FieldValue>
         </Field>
       </FieldGroup>
-      <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
     </ConfirmScreen>
   )
 }
