@@ -12,4 +12,5 @@ export interface WithSigner {
 export interface WalletAccount extends WithSigner {
   address: string
   network: Network
+  hidden?: boolean
 }

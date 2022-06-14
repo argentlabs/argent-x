@@ -1,5 +1,6 @@
 import create from "zustand"
 
+import { WalletAccount } from "../../../shared/wallet.model"
 import { Account } from "./Account"
 
 interface State {
@@ -33,3 +34,21 @@ export const useSelectedAccount = () =>
   useAccounts(({ accounts, selectedAccount }) =>
     selectedAccount ? accounts[selectedAccount] : undefined,
   )
+
+export const reduceWalletAccountsToAccounts = (
+  walletAccounts: WalletAccount[],
+) => {
+  return walletAccounts.reduce<State["accounts"]>(
+    (allAccounts, walletAccount) => {
+      return {
+        ...allAccounts,
+        [walletAccount.address]: new Account(
+          walletAccount.address,
+          walletAccount.network,
+          walletAccount.signer,
+        ),
+      }
+    },
+    {},
+  )
+}

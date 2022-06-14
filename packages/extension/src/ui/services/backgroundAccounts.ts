@@ -15,8 +15,8 @@ export const getLastSelectedAccount = async () => {
   return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
-export const getAccounts = async () => {
-  sendMessage({ type: "GET_ACCOUNTS" })
+export const getAccounts = async (showHidden = false) => {
+  sendMessage({ type: "GET_ACCOUNTS", data: { showHidden } })
   return waitForMessage("GET_ACCOUNTS_RES")
 }
 
@@ -37,6 +37,17 @@ export const deleteAccount = async (address: string) => {
   } catch {
     throw Error("Could not delete account")
   }
+}
+
+export const hideAccount = async (address: string) => {
+  sendMessage({ type: "HIDE_ACCOUNT", data: address })
+
+  await Promise.race([
+    waitForMessage("HIDE_ACCOUNT_RES"),
+    waitForMessage("HIDE_ACCOUNT_REJ").then(() => {
+      throw new Error("Rejected")
+    }),
+  ])
 }
 
 export const upgradeAccount = async (accountAddress: string) => {

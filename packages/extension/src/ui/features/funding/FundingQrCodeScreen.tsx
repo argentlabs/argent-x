@@ -1,6 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
+import { AccountAddress, AccountName } from "../../components/Address"
 import { IconBar } from "../../components/IconBar"
 import { PageWrapper } from "../../components/Page"
 import { formatFullAddress } from "../../services/addresses"
@@ -14,23 +15,6 @@ import { QrCode } from "./QrCode"
 const Container = styled.div`
   padding: 0 20px;
   text-align: center;
-`
-
-const AccountName = styled.h1`
-  font-style: normal;
-  font-weight: 700;
-  font-size: 22px;
-  line-height: 28px;
-  margin: 32px 0 16px 0;
-`
-
-const AccountAddress = styled.p`
-  font-style: normal;
-  font-weight: 400;
-  font-size: 17px;
-  line-height: 22px;
-  word-spacing: 5px;
-  color: #8f8e8c;
 `
 
 export const FundingQrCodeScreen: FC = () => {

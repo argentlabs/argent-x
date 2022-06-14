@@ -154,12 +154,11 @@ export class Wallet {
     this.setSession(ethersWallet.privateKey, password)
   }
 
-  public async getAccounts(): Promise<WalletAccount[]> {
-    const accounts = (await this.store.getItem("accounts")) || []
+  public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
+    const accounts = await this.store.getItem("accounts")
 
-    // As we store the networks with the wallet on creation, we need to replace thos which are known by the extension
-    return Promise.all(
-      accounts.map(async (account) => {
+    const accountsWithNetwork = await Promise.all(
+      (accounts || []).map(async (account) => {
         try {
           const network = await this.getNetwork(account.network.id)
           if (!network) {
@@ -174,10 +173,14 @@ export class Wallet {
         }
       }),
     )
+
+    return accountsWithNetwork.filter(
+      (account) => includeHidden || !account.hidden,
+    )
   }
 
   private async setAccounts(accounts: WalletAccount[]) {
-    const oldAccounts = await this.getAccounts()
+    const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
     const newAccounts = [...oldAccounts, ...accounts].filter(
@@ -190,7 +193,7 @@ export class Wallet {
   }
 
   private async pushAccount(account: WalletAccount) {
-    const accounts = await this.getAccounts()
+    const accounts = await this.getAccounts(true)
     const index = accounts.findIndex((a) => a.address === account.address)
     if (index === -1) {
       accounts.push(account)
@@ -201,11 +204,26 @@ export class Wallet {
   }
 
   public async removeAccount(address: string) {
-    const accounts = await this.getAccounts()
+    const accounts = await this.getAccounts(true)
     const newAccounts = accounts.filter(
       (account) => account.address !== address,
     )
     return this.store.setItem("accounts", newAccounts)
+  }
+
+  public async hideAccount(address: string) {
+    const accounts = await this.getAccounts()
+
+    const index = accounts.findIndex((account) => account.address === address)
+
+    if (index === -1) {
+      throw Error("Account to hide was not found")
+    }
+
+    accounts[index] = { ...accounts[index], hidden: true }
+    await this.store.setItem("accounts", accounts)
+
+    await this.writeBackup()
   }
 
   private resetAccounts() {
@@ -509,7 +527,7 @@ export class Wallet {
 
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
-    const currentPaths = (await this.getAccounts())
+    const currentPaths = (await this.getAccounts(true))
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -574,7 +592,7 @@ export class Wallet {
       await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
     }
 
-    const currentPaths = (await this.getAccounts())
+    const currentPaths = (await this.getAccounts(true))
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -639,7 +657,7 @@ export class Wallet {
   }
 
   public async getAccountByAddress(address: string): Promise<WalletAccount> {
-    const hit = (await this.getAccounts()).find(
+    const hit = (await this.getAccounts(true)).find(
       (account) => account.address === address,
     )
     if (!hit) {
@@ -819,7 +837,7 @@ export class Wallet {
       return
     }
     const backup = JSON.parse(this.encryptedBackup)
-    const accounts = (await this.getAccounts()).map((account) => ({
+    const accounts = (await this.getAccounts(true)).map((account) => ({
       ...account,
       network: account.network.id,
     }))

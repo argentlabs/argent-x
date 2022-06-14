@@ -2,13 +2,15 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
-import { MoreVertSharp } from "../../components/Icons/MuiIcons"
+import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
+import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 
@@ -63,6 +65,12 @@ const MenuItem = styled.div`
   color: rgba(255, 255, 255, 0.7);
 `
 
+const IconWrapper = styled.div`
+  height: 13px;
+  width: 12px;
+  font-size: 12px;
+`
+
 interface AccountNameProps {
   onAccountNameEdit: () => void
 }
@@ -80,6 +88,17 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const handleEditClick = () => {
     setMenuOpen(false)
     onAccountNameEdit()
+  }
+
+  const showDelete =
+    account && (isDeprecated(account) || account.networkId === "localhost")
+
+  const handleHideOrDeleteAccount = async (account: Account) => {
+    if (showDelete) {
+      navigate(routes.accountDeleteConfirm(account.address))
+    } else {
+      navigate(routes.accountHideConfirm(account.address))
+    }
   }
 
   return (
@@ -103,6 +122,17 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
               <EditIcon /> Edit name
             </MenuItem>
           </MenuItemWrapper>
+          <Separator />
+          {account && (
+            <MenuItemWrapper onClick={() => handleHideOrDeleteAccount(account)}>
+              <MenuItem>
+                <IconWrapper>
+                  <VisibilityOff fontSize="inherit" htmlColor="white" />
+                </IconWrapper>
+                {showDelete ? "Delete" : "Hide"} Account
+              </MenuItem>
+            </MenuItemWrapper>
+          )}
           <Separator />
           <MenuItemWrapper onClick={() => navigate(routes.exportPrivateKey())}>
             <MenuItem>

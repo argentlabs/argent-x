@@ -12,7 +12,7 @@ export type AccountMessage =
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
-  | { type: "GET_ACCOUNTS" }
+  | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
   | { type: "DISCONNECT_ACCOUNT" }
@@ -21,6 +21,9 @@ export type AccountMessage =
   | { type: "DELETE_ACCOUNT"; data: string }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
+  | { type: "HIDE_ACCOUNT"; data: string }
+  | { type: "HIDE_ACCOUNT_RES" }
+  | { type: "HIDE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"
       data: { accountAddress: string }

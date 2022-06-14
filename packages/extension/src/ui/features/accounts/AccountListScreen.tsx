@@ -58,9 +58,9 @@ export const AccountListScreen: FC = () => {
   const { isBackupRequired } = useBackupRequired()
 
   const accountsList = Object.values(accounts)
-  const [deprecatedAccounts, newAccounts] = partition(
-    accountsList,
-    isDeprecated,
+
+  const [deprecatedAccounts, newAccounts] = partition(accountsList, (account) =>
+    isDeprecated(account),
   )
 
   const handleAddAccount = async () => {
@@ -104,7 +104,6 @@ export const AccountListScreen: FC = () => {
             key={account.address}
             account={account}
             selectedAccount={selectedAccount}
-            isDeleteable={switcherNetworkId === "localhost"}
             canShowUpgrade
           />
         ))}
@@ -116,7 +115,6 @@ export const AccountListScreen: FC = () => {
                 key={account.address}
                 account={account}
                 selectedAccount={selectedAccount}
-                isDeleteable
                 canShowUpgrade
               />
             ))}
