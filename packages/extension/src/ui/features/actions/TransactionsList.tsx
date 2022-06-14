@@ -3,6 +3,7 @@ import { FC, useCallback, useState } from "react"
 import { Call } from "starknet"
 import styled from "styled-components"
 
+import { isERC20TransferCall } from "../../../shared/call"
 import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
@@ -24,7 +25,7 @@ const LeftPaddedField = styled.div`
   margin-left: 8px;
 `
 
-const DisclosureIcon = styled(ArrowForwardIosIcon)<{ expanded: boolean }>`
+const DisclosureIconContainer = styled.div<{ expanded: boolean }>`
   transition: transform 0.1s;
   transform: rotate(${({ expanded }) => (expanded ? "90deg" : "0deg")});
 `
@@ -73,15 +74,15 @@ export interface TransactionItemProps {
 /** Renders a single transaction */
 
 export const TransactionItem: FC<TransactionItemProps> = ({ transaction }) => {
-  if (transaction.entrypoint === "transfer") {
-    return <TransferTransactionDetails transaction={transaction} />
+  if (isERC20TransferCall(transaction)) {
+    return <ERC20TransferTransactionDetails transaction={transaction} />
   }
   return <DefaultTransactionDetails transaction={transaction} />
 }
 
-/** Renders a transfer transaction */
+/** Renders an ERC20 transfer transaction */
 
-export const TransferTransactionDetails: FC<TransactionItemProps> = ({
+export const ERC20TransferTransactionDetails: FC<TransactionItemProps> = ({
   transaction,
 }) => {
   const { switcherNetworkId } = useAppState()
@@ -89,15 +90,15 @@ export const TransferTransactionDetails: FC<TransactionItemProps> = ({
   const token = tokensByNetwork.find(
     ({ address }) => address === transaction.contractAddress,
   )
-  /** recipient address should be first entry in calldata array */
+  /** recipient address is first entry in calldata array */
   const displaySendAddress =
     transaction.calldata && transaction.calldata.length
       ? formatTruncatedAddress(transaction.calldata[0])
       : "Unknown sender"
   /** amount should be second entry in calldata array */
   const displayAmount =
-    transaction.calldata && transaction.calldata.length >= 1
-      ? formatTokenBalance(transaction.calldata[1])
+    token && transaction.calldata && transaction.calldata.length >= 1
+      ? formatTokenBalance(transaction.calldata[1], token?.decimals?.toNumber())
       : "Unknown address"
   return (
     <FieldGroup>
@@ -132,36 +133,36 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
   )
   const displayTransaction = JSON.stringify(transaction, null, 2)
   return (
-    <>
-      <FieldGroup>
-        <Field>
-          <FieldKey>Contract</FieldKey>
-          <FieldValue>{displayContractAddress}</FieldValue>
-        </Field>
-        <Field>
-          <FieldKey>Action</FieldKey>
-          <FieldValue>{transaction.entrypoint}</FieldValue>
-        </Field>
-        <Field clickable onClick={toggleExpanded}>
-          <FieldKey>View details</FieldKey>
+    <FieldGroup>
+      <Field>
+        <FieldKey>Contract</FieldKey>
+        <FieldValue>{displayContractAddress}</FieldValue>
+      </Field>
+      <Field>
+        <FieldKey>Action</FieldKey>
+        <FieldValue>{transaction.entrypoint}</FieldValue>
+      </Field>
+      <Field clickable onClick={toggleExpanded}>
+        <FieldKey>View details</FieldKey>
+        <FieldValue>
+          <DisclosureIconContainer expanded={expanded}>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </DisclosureIconContainer>
+        </FieldValue>
+      </Field>
+      {expanded && (
+        <TransactionDetailsField>
+          <TransactionDetailKey>
+            <div>Transaction details</div>
+            <CopyTooltip message="Copied" copyValue={displayTransaction}>
+              <ContentCopyIcon style={{ fontSize: 12 }} />
+            </CopyTooltip>
+          </TransactionDetailKey>
           <FieldValue>
-            <DisclosureIcon expanded={expanded} fontSize="inherit" />
+            <TransactionJson>{displayTransaction}</TransactionJson>
           </FieldValue>
-        </Field>
-        {expanded && (
-          <TransactionDetailsField>
-            <TransactionDetailKey>
-              <div>Transaction details</div>
-              <CopyTooltip message="Copied" copyValue={displayTransaction}>
-                <ContentCopyIcon style={{ fontSize: 12 }} />
-              </CopyTooltip>
-            </TransactionDetailKey>
-            <FieldValue>
-              <TransactionJson>{displayTransaction}</TransactionJson>
-            </FieldValue>
-          </TransactionDetailsField>
-        )}
-      </FieldGroup>
-    </>
+        </TransactionDetailsField>
+      )}
+    </FieldGroup>
   )
 }
