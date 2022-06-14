@@ -104,7 +104,6 @@ export const AccountListScreen: FC = () => {
             key={account.address}
             account={account}
             selectedAccount={selectedAccount}
-            isDeleteable={switcherNetworkId === "localhost"}
             canShowUpgrade
           />
         ))}
@@ -116,7 +115,6 @@ export const AccountListScreen: FC = () => {
                 key={account.address}
                 account={account}
                 selectedAccount={selectedAccount}
-                isDeleteable
                 canShowUpgrade
               />
             ))}
