@@ -1,4 +1,10 @@
-import { formatTokenBalance } from "../src/ui/features/accountTokens/tokens.service"
+import { number } from "starknet"
+
+import {
+  convertTokenBalanceToPrice,
+  countDecimals,
+  formatTokenBalance,
+} from "../src/ui/features/accountTokens/tokens.service"
 
 describe("format token balance", () => {
   test("should format token balance correctly", () => {
@@ -20,5 +26,36 @@ describe("format token balance", () => {
     expect(formatTokenBalance("99943222111234567890123456789", 18)).toBe(
       "99943222111",
     )
+  })
+})
+
+describe("countDecimals()", () => {
+  test("should count decimal places correctly", () => {
+    expect(countDecimals(1)).toEqual(0)
+    expect(countDecimals(1.12)).toEqual(2)
+    expect(countDecimals(1.1234)).toEqual(4)
+    expect(countDecimals(1.123456789)).toEqual(9)
+    /** strips the final 0 correctly */
+    expect(countDecimals("1.1234567890")).toEqual(9)
+  })
+})
+
+describe.only("convertTokenBalanceToPrice()", () => {
+  test("should convert token balance to price correctly", () => {
+    expect(
+      /** decimals may be of type BN in the wild */
+      convertTokenBalanceToPrice({
+        balance: "1000000000000000000",
+        decimals: number.toBN(18, 10),
+        price: 1.23,
+      }),
+    ).toEqual("1.23")
+    expect(
+      convertTokenBalanceToPrice({
+        balance: "1000000000000000000",
+        decimals: 18,
+        price: "1032.296954",
+      }),
+    ).toEqual("1032.296954")
   })
 })

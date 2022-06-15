@@ -1,6 +1,9 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
+import { formatUnits } from "ethers/lib/utils"
+import { useMemo } from "react"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
+import useSWR from "swr"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
 import { getFeeToken } from "../../../shared/token"
@@ -116,4 +119,128 @@ export const fetchFeeTokenBalance = async (
     return BigNumber.from(0)
   }
   return fetchTokenBalance(token.address, account)
+}
+
+export interface ApiTokenDetails {
+  id: number
+  address: string
+  pricingId: number
+}
+
+export interface ApiTokenDataResponse {
+  tokens: ApiTokenDetails[]
+}
+
+export interface ApiPriceDetails {
+  pricingId: number
+  ethValue: number
+  ccyValue: number
+  ethDayChange: number
+  ccyDayChange: number
+}
+
+export interface ApiPriceDataResponse {
+  prices: ApiPriceDetails[]
+}
+
+/** generic SWR json fetcher */
+
+export const fetcher = async (url: string) => {
+  const response = await fetch(url)
+  return await response.json()
+}
+
+export const lookupTokenPriceDetails = ({
+  token,
+  pricesData,
+  tokenData,
+}: {
+  token: TokenDetails
+  pricesData: ApiPriceDataResponse
+  tokenData: ApiTokenDataResponse
+}) => {
+  /** find token from tokenData by matching address */
+  const tokenInPriceData = tokenData.tokens.find(
+    ({ address }) => address.toLowerCase() === token.address.toLowerCase(),
+  )
+  if (tokenInPriceData) {
+    /** find token price details from pricesData by matching priceId */
+    const priceDetails = pricesData.prices.find(
+      ({ pricingId }) => pricingId === tokenInPriceData.pricingId,
+    )
+    return priceDetails
+  }
+}
+
+export const usePriceAndTokenData = () => {
+  const { data: pricesData } = useSWR<ApiPriceDataResponse>(
+    `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/prices?chain=starknet`,
+    fetcher,
+  )
+  /** TODO: implement currency? */
+  const { data: tokenData } = useSWR<ApiTokenDataResponse>(
+    `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/info?chain=starknet`,
+    fetcher,
+  )
+  return { pricesData, tokenData }
+}
+
+export const useTokenPricing = (token: TokenDetails) => {
+  const { pricesData, tokenData } = usePriceAndTokenData()
+  return useMemo(() => {
+    if (!pricesData || !tokenData) {
+      return
+    }
+    return lookupTokenPriceDetails({
+      token,
+      pricesData,
+      tokenData,
+    })
+  }, [token, pricesData, tokenData])
+}
+
+export const countDecimals = (value: number | string) => {
+  const numValue = Number(value)
+  /** check for whole number with no decimals */
+  if (Math.floor(numValue) === numValue) {
+    return 0
+  }
+  /** count decimals after conversion to string e.g. '12.34' */
+  return numValue.toString().split(".")[1].length || 0
+}
+
+export const convertTokenBalanceToPrice = ({
+  balance,
+  decimals,
+  price,
+}: {
+  balance: BigNumberish
+  decimals: number | string
+  price: number | string
+}) => {
+  /**
+   * BigNumber is only for integers, it does not support floating-point or fixed-point math
+   * @see https://github.com/ethers-io/ethers.js/issues/488#issuecomment-481944450
+   */
+
+  const decimalsNumber = Number(decimals)
+  const priceNumber = Number(price)
+
+  /** determine what we need to multiply by to make price into an integer */
+  const priceDecimals = countDecimals(priceNumber)
+  const priceToIntegerMultiplier = Math.pow(10, priceDecimals)
+
+  /** Math.round due to loss of precision */
+  const integerPrince = BigNumber.from(
+    Math.round(priceNumber * priceToIntegerMultiplier),
+  )
+
+  /** Multiply the integer price by balance, then divide down by the multiplier from above */
+  const priceWithDecimals = integerPrince
+    .mul(balance)
+    .div(priceToIntegerMultiplier)
+
+  /** Convert down using decimals */
+  const convertedPrice = formatUnits(priceWithDecimals, decimalsNumber)
+  return convertedPrice
 }
