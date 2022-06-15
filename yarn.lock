@@ -5910,9 +5910,9 @@ get-port@^5.1.1:
   integrity sha512-g/Q1aTSDOxFpchXC4i8ZWvxA1lnPqx/JHqcpIw0/LX9T8x/GBbi6YnlN5nhaKIFkT8oFsscUKgDJYxfwfS6QsQ==
 
 get-starknet@^1.0.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/get-starknet/-/get-starknet-1.4.1.tgz#ea6f19bb2038878ab192822c9e59e1dca86c7b4d"
-  integrity sha512-HyYH4wngdOekeNFbtD4Qw+USQOfs1k9mWAHhhxiQyk2AKpdmLiIDz+A7lbA/X7OEi7U4Ypl0+Z4h7djq/ues9A==
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/get-starknet/-/get-starknet-1.4.2.tgz#fc7aa13506d672229157b357632a3f9b77ecd9d9"
+  integrity sha512-rakk6s5zcE3tM4AJ8g/SLO4V0aPlJDSLbE3zx3mp6PDS5Y7/ndBMTCKehr+bK4lIoj+VQshLxkobpqkXrC2LMA==
   dependencies:
     bowser "^2.11.0"
 
