@@ -140,7 +140,11 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
   const displayContractAddress = formatTruncatedAddress(
     transaction.contractAddress,
   )
-  const displayTransaction = JSON.stringify(transaction, null, 2)
+  const displayTransactionDetails = JSON.stringify(
+    transaction.calldata,
+    null,
+    2,
+  )
   return (
     <FieldGroup>
       <Field>
@@ -163,12 +167,12 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
         <TransactionDetailsField>
           <TransactionDetailKey>
             <div>Transaction details</div>
-            <CopyTooltip message="Copied" copyValue={displayTransaction}>
+            <CopyTooltip message="Copied" copyValue={displayTransactionDetails}>
               <ContentCopyIcon style={{ fontSize: 12 }} />
             </CopyTooltip>
           </TransactionDetailKey>
           <FieldValue>
-            <TransactionJson>{displayTransaction}</TransactionJson>
+            <TransactionJson>{displayTransactionDetails}</TransactionJson>
           </FieldValue>
         </TransactionDetailsField>
       )}
