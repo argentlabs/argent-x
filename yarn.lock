@@ -2601,10 +2601,20 @@
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-12.1.6.tgz#a350caf42975e7197b24b495b8d764eec7e6a36e"
   integrity sha512-4ZEwiRuZEicXhXqmhw3+de8Z4EpOLQj/gp+D9fFWo6ii6W1kBkNNvvEx4A90ugppu+74pT1lIJnOuz3A9oQeJA==
 
+"@noble/hashes@1.1.1", "@noble/hashes@~1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.1.tgz#c056d9b7166c1e7387a7453c2aff199bf7d88e5f"
+  integrity sha512-Lkp9+NijmV7eSVZqiUvt3UCuuHeJpUVmRrvh430gyJjJiuJMqkeHf6/A9lQ/smmbWV/0spDeJscscPzyB4waZg==
+
 "@noble/hashes@^0.5.7":
   version "0.5.9"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-0.5.9.tgz#9f3051a4cc6f7c168022b3b7fbbe9fe2a35cccf0"
   integrity sha512-7lN1Qh6d8DUGmfN36XRsbN/WcGIPNtTGhkw26vWId/DlCIGsYJJootTtPGghTLcn/AaXPx2Q0b3cacrwXa7OVw==
+
+"@noble/secp256k1@1.6.0", "@noble/secp256k1@~1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.6.0.tgz#602afbbfcfb7e169210469b697365ef740d7e930"
+  integrity sha512-DWSsg8zMHOYMYBqIQi96BQuthZrp98LCeMNcUOaffCIVYQ5yxDbNikLF+H7jEnmNNmXbtVic46iCuVWzar+MgA==
 
 "@noble/secp256k1@^1.4.0":
   version "1.5.5"
@@ -2943,6 +2953,28 @@
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.3.tgz#6801033be7ff87a6b7cadaf5b337c9f366a3c4b0"
   integrity sha512-WiBSI6JBIhC6LRIsB2Kwh8DsGTlbBU+mLRxJmAe3LjHTdkDpwIbEOZgoXBbZilk/vlfjK8i6nKRAvIRn1XaIMw==
+
+"@scure/base@~1.1.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
+  integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
+
+"@scure/bip32@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@scure/bip32/-/bip32-1.1.0.tgz#dea45875e7fbc720c2b4560325f1cf5d2246d95b"
+  integrity sha512-ftTW3kKX54YXLCxH6BB7oEEoJfoE2pIgw7MINKAs5PsS6nqKPuKk1haTF/EuHmYqG330t5GSrdmtRuHaY1a62Q==
+  dependencies:
+    "@noble/hashes" "~1.1.1"
+    "@noble/secp256k1" "~1.6.0"
+    "@scure/base" "~1.1.0"
+
+"@scure/bip39@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@scure/bip39/-/bip39-1.1.0.tgz#92f11d095bae025f166bef3defcc5bf4945d419a"
+  integrity sha512-pwrPOS16VeTKg98dYXQyIjJEcWfz7/1YJIwxUEPFfQPtc86Ym/1sVgQ2RLoD43AazMk2l/unK4ITySSpW2+82w==
+  dependencies:
+    "@noble/hashes" "~1.1.1"
+    "@scure/base" "~1.1.0"
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
@@ -5563,6 +5595,16 @@ ethereum-cryptography@^0.2.0:
     "@noble/hashes" "^0.5.7"
     "@noble/secp256k1" "^1.4.0"
     micro-base "^0.10.1"
+
+ethereum-cryptography@^1.0.3:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ethereum-cryptography/-/ethereum-cryptography-1.1.0.tgz#7048d184ff365a5255ced5cc9eb7682a273c4db7"
+  integrity sha512-wyNVTBR4wIR2yoXdMv4Qt44mTVBpPgSW/DQCTmNO6nQluwpyrAIvmL4mxPbziFuc6VWJQa3rwUxn0nUFU03nyQ==
+  dependencies:
+    "@noble/hashes" "1.1.1"
+    "@noble/secp256k1" "1.6.0"
+    "@scure/bip32" "1.1.0"
+    "@scure/bip39" "1.1.0"
 
 ethers@^5.5.1:
   version "5.6.8"
@@ -9496,15 +9538,15 @@ stack-utils@^2.0.3:
     url-join "^4.0.1"
 
 starknet@^3.12.1:
-  version "3.12.3"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.12.3.tgz#16c22f6c4597aa91fd2c887019d3fc56f6f73474"
-  integrity sha512-FmWC+AgeqgPkOnp0FXcg9q/T00vg02JGgqTyWvWJgB/9L9vYdkFfIbnkLwKbAdzzGrYr4iL9EE94ZXoosOYnAg==
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.14.0.tgz#7e57eeb41746d0ace4544cc00da65abf2b3399a6"
+  integrity sha512-vjawtJDSVUjzbgTWss9hednLcRqRVFdnI/RUybB6Fr/ytobPK14rh57DTt27AntrX7yL2cvQY3WIRslDlxh3ag==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
-    bn.js "^5.2.0"
+    bn.js "^5.2.1"
     cross-fetch "^3.1.5"
     elliptic "^6.5.4"
-    ethereum-cryptography "^0.2.0"
+    ethereum-cryptography "^1.0.3"
     fetch-intercept "^2.4.0"
     hash.js "^1.1.7"
     json-bigint "^1.0.0"
