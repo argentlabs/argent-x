@@ -3,7 +3,11 @@ import { FC, useCallback, useState } from "react"
 import { Call } from "starknet"
 import styled from "styled-components"
 
-import { isERC20TransferCall } from "../../../shared/call"
+import {
+  Erc20TransferCall,
+  isErc20TransferCall,
+  parseErc20TransferCall,
+} from "../../../shared/call"
 import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
@@ -71,35 +75,40 @@ export interface TransactionItemProps {
   transaction: Call
 }
 
+export interface Erc20TransferCallTransactionItemProps {
+  transaction: Erc20TransferCall
+}
+
 /** Renders a single transaction */
 
 export const TransactionItem: FC<TransactionItemProps> = ({ transaction }) => {
-  if (isERC20TransferCall(transaction)) {
-    return <ERC20TransferTransactionDetails transaction={transaction} />
+  if (isErc20TransferCall(transaction)) {
+    return (
+      <ERC20TransferTransactionDetails
+        transaction={transaction as Erc20TransferCall}
+      />
+    )
   }
   return <DefaultTransactionDetails transaction={transaction} />
 }
 
 /** Renders an ERC20 transfer transaction */
 
-export const ERC20TransferTransactionDetails: FC<TransactionItemProps> = ({
-  transaction,
-}) => {
+export const ERC20TransferTransactionDetails: FC<
+  Erc20TransferCallTransactionItemProps
+> = ({ transaction }) => {
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
+  if (!isErc20TransferCall(transaction)) {
+    return <DefaultTransactionDetails transaction={transaction} />
+  }
+  const { contractAddress, recipientAddress, amount } =
+    parseErc20TransferCall(transaction)
   const token = tokensByNetwork.find(
-    ({ address }) => address === transaction.contractAddress,
+    ({ address }) => address.toLowerCase() === contractAddress.toLowerCase(),
   )
-  /** recipient address is first entry in calldata array */
-  const displaySendAddress =
-    transaction.calldata && transaction.calldata.length
-      ? formatTruncatedAddress(transaction.calldata[0])
-      : "Unknown sender"
-  /** amount should be second entry in calldata array */
-  const displayAmount =
-    token && transaction.calldata && transaction.calldata.length >= 1
-      ? formatTokenBalance(transaction.calldata[1], token?.decimals?.toNumber())
-      : "Unknown address"
+  const displaySendAddress = formatTruncatedAddress(recipientAddress)
+  const displayAmount = formatTokenBalance(amount, token?.decimals?.toNumber())
   return (
     <FieldGroup>
       <Field>

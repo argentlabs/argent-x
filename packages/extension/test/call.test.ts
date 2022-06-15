@@ -1,6 +1,14 @@
-import { isERC20TransferCall } from "../src/shared/call"
+import { Call } from "starknet"
 
-const ERC20TransferCall = {
+import {
+  Erc20TransferCall,
+  isErc20TransferCall,
+  parseErc20TransferCall,
+} from "../src/shared/call"
+
+/** Typical transfer call - no secrets */
+
+const Erc20TransferCallValid: Erc20TransferCall = {
   contractAddress:
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   entrypoint: "transfer",
@@ -11,7 +19,9 @@ const ERC20TransferCall = {
   ],
 }
 
-const ERC20TransferCallInvalidAddress = {
+/** The following are invalid variations of the above */
+
+const Erc20TransferCallInvalidAddress: Call = {
   contractAddress: "INVALID",
   entrypoint: "transfer",
   calldata: [
@@ -21,7 +31,7 @@ const ERC20TransferCallInvalidAddress = {
   ],
 }
 
-const ERC20TransferCallInvalidCalldataLength = {
+const Erc20TransferCallInvalidCalldataLength: Call = {
   contractAddress:
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   entrypoint: "transfer",
@@ -31,14 +41,14 @@ const ERC20TransferCallInvalidCalldataLength = {
   ],
 }
 
-const ERC20TransferCallInvalidRecipientAddress = {
+const Erc20TransferCallInvalidRecipientAddress: Call = {
   contractAddress:
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   entrypoint: "transfer",
   calldata: ["INVALID", "10000000000000", "0"],
 }
 
-const ERC20TransferCallInvalidAmount = {
+const Erc20TransferCallInvalidAmount: Call = {
   contractAddress:
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   entrypoint: "transfer",
@@ -49,29 +59,66 @@ const ERC20TransferCallInvalidAmount = {
   ],
 }
 
+const Erc20TransferCallInvalidEntrypoint: Call = {
+  contractAddress:
+    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+  entrypoint: "approve",
+  calldata: [
+    "2007141710004580612847837172790366058109710402280793820610123055421682225678",
+    "0",
+  ],
+}
+
 describe("call", () => {
-  describe("isERC20TransferCall()", () => {
+  describe("isErc20TransferCall()", () => {
     describe("when valid", () => {
       test("returns true when Call is ERC20 transfer", () => {
-        expect(isERC20TransferCall(ERC20TransferCall)).toBeTruthy()
+        expect(isErc20TransferCall(Erc20TransferCallValid)).toBeTruthy()
       })
     })
     describe("when invalid", () => {
       test("returns false when contract address is invalid", () => {
-        expect(isERC20TransferCall(ERC20TransferCallInvalidAddress)).toBeFalsy()
+        expect(isErc20TransferCall(Erc20TransferCallInvalidAddress)).toBeFalsy()
       })
       test("returns false when calldata is wrong length", () => {
         expect(
-          isERC20TransferCall(ERC20TransferCallInvalidCalldataLength),
+          isErc20TransferCall(Erc20TransferCallInvalidCalldataLength),
         ).toBeFalsy()
       })
       test("returns false when recipient address is invalid", () => {
         expect(
-          isERC20TransferCall(ERC20TransferCallInvalidRecipientAddress),
+          isErc20TransferCall(Erc20TransferCallInvalidRecipientAddress),
         ).toBeFalsy()
       })
       test("returns false when amount is invalid", () => {
-        expect(isERC20TransferCall(ERC20TransferCallInvalidAmount)).toBeFalsy()
+        expect(isErc20TransferCall(Erc20TransferCallInvalidAmount)).toBeFalsy()
+      })
+      test("returns false when method is invalid", () => {
+        expect(
+          isErc20TransferCall(Erc20TransferCallInvalidEntrypoint),
+        ).toBeFalsy()
+      })
+    })
+  })
+  describe("parseErc20TransferCall()", () => {
+    describe("when valid", () => {
+      test("parses contractAddress, recipientAddress, and amount", () => {
+        expect(parseErc20TransferCall(Erc20TransferCallValid)).toEqual({
+          contractAddress:
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          recipientAddress:
+            "0x0470007fc2b04C3bB560a55f70F3eA005A4c1D46f970B9561428553cf6D6120E",
+          amount: "10000000000000",
+        })
+      })
+    })
+    describe("when invalid", () => {
+      test("throws error", () => {
+        expect(() =>
+          parseErc20TransferCall(
+            Erc20TransferCallInvalidEntrypoint as Erc20TransferCall,
+          ),
+        ).toThrow()
       })
     })
   })
