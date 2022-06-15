@@ -24,7 +24,7 @@ export interface Erc20TransferCall extends Call {
  * @returns true if the call passes validation
  */
 
-export const isErc20TransferCall = (call: Call): boolean => {
+export const isErc20TransferCall = (call: Call): call is Erc20TransferCall => {
   try {
     if (
       call &&
@@ -44,10 +44,9 @@ export const isErc20TransferCall = (call: Call): boolean => {
         high: amountHighFelt,
       }
       const amount = uint256ToBN(amountUnit256)
-      if (isUint256(amount)) {
-        if (toBN(amount).gt(toBN(0))) {
-          return true
-        }
+      /** final check for valid Unit256 that is > 0 */
+      if (isUint256(amount) && toBN(amount).gt(toBN(0))) {
+        return true
       }
     }
   } catch (e) {
