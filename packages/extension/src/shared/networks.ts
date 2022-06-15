@@ -9,7 +9,6 @@ export interface Network {
   chainId: string
   baseUrl: string
   explorerUrl?: string
-  accountImplementation?: string
   accountClassHash?: string
   rpcUrl?: string
   readonly?: boolean
@@ -34,8 +33,8 @@ export const defaultNetworks: Network[] = [
     chainId: "SN_MAIN",
     baseUrl: "https://alpha-mainnet.starknet.io",
     explorerUrl: "https://voyager.online",
-    accountImplementation:
-      "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac",
+    accountClassHash:
+      "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
     readonly: true,
   },
   {

@@ -19,13 +19,9 @@ import {
   defaultNetwork,
   defaultNetworks,
   getProvider,
-  isKnownNetwork,
 } from "../shared/networks"
 import { WalletAccount } from "../shared/wallet.model"
-import {
-  newBaseDerivationPath,
-  oldBaseDerivationPath,
-} from "../shared/wallet.service"
+import { baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
   getNextPathIndex,
@@ -43,25 +39,8 @@ const isDevOrTest = isDev || isTest
 const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = 15 * 60 * 60 * 1000 // 15 hours
 
-type KnownNetworkIds = "mainnet-alpha" | "goerli-alpha"
 const CHECK_OFFSET = 10
-// pre cairo 9
-const PROXY_CONTRACT_HASHES_TO_CHECK = [
-  "0x71c3c99f5cf76fc19945d4b8b7d34c7c5528f22730d56192b50c6bbfd338a64",
-]
-const VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK: {
-  [n in KnownNetworkIds]: string[]
-} = {
-  "mainnet-alpha": [
-    "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
-    "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac",
-  ],
-  "goerli-alpha": [
-    "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
-    "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30",
-  ],
-}
-// post cairo 9
+
 const PROXY_CONTRACT_CLASS_HASHES = [
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918",
 ]
@@ -328,11 +307,7 @@ export class Wallet {
         let lastCheck = 0
 
         while (lastHit + offset > lastCheck) {
-          const starkPair = getStarkPair(
-            lastCheck,
-            secret,
-            newBaseDerivationPath,
-          )
+          const starkPair = getStarkPair(lastCheck, secret, baseDerivationPath)
           const starkPub = ec.getStarkKey(starkPair)
 
           const address = calculateContractAddress(
@@ -357,10 +332,7 @@ export class Wallet {
               network,
               signer: {
                 type: "local_signer",
-                derivationPath: getPathForIndex(
-                  lastCheck,
-                  newBaseDerivationPath,
-                ),
+                derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
             })
           }
@@ -424,7 +396,7 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    if (!network?.accountImplementation && !network?.accountClassHash) {
+    if (!network?.accountClassHash) {
       // silent fail if no account implementation is defined for this network
       return
     }
@@ -457,16 +429,14 @@ export class Wallet {
       )
       .map((account) => account.signer.derivationPath)
 
-    const index = getNextPathIndex(currentPaths, newBaseDerivationPath)
+    const index = getNextPathIndex(currentPaths, baseDerivationPath)
     const starkPair = getStarkPair(
       index,
       this.session?.secret as string,
-      newBaseDerivationPath,
+      baseDerivationPath,
     )
     const starkPub = ec.getStarkKey(starkPair)
-    const [proxyCompiledContract] = await this.loadContracts(
-      newBaseDerivationPath,
-    )
+    const [proxyCompiledContract] = await this.loadContracts(baseDerivationPath)
 
     const provider = getProvider(network)
 
@@ -490,7 +460,7 @@ export class Wallet {
       address: proxyAddress,
       signer: {
         type: "local_secret",
-        derivationPath: getPathForIndex(index, newBaseDerivationPath),
+        derivationPath: getPathForIndex(index, baseDerivationPath),
       },
     }
 

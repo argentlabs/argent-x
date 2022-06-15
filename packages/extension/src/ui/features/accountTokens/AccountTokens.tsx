@@ -52,7 +52,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { network } = useNetwork(switcherNetworkId)
 
   const { data: needsUpgrade = false, mutate } = useSWR(
-    [account, network.accountImplementation, "showUpgradeBanner"],
+    [account, network.accountClassHash, "showUpgradeBanner"],
     checkIfUpgradeAvailable,
     { suspense: false },
   )
@@ -90,7 +90,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       <TransferButtons />
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
-      {showUpgradeBanner && network.accountImplementation && (
+      {showUpgradeBanner && network.accountClassHash && (
         <Link to={routes.upgrade()}>
           <UpgradeBanner />
         </Link>
