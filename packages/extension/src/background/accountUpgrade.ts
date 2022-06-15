@@ -3,6 +3,7 @@ import {
   AddTransactionResponse,
   KeyPair,
   ProviderInterface,
+  constants,
   number,
   stark,
 } from "starknet"
@@ -55,17 +56,20 @@ export const getImplementationUpgradePath = (
           }),
         },
         undefined,
+        // FIXME: this is just possible as long as mainnet does not require fees
+        {
+          maxFee:
+            provider.chainId === constants.StarknetChainId.MAINNET
+              ? "0x0"
+              : undefined,
+        },
       )
     }
   }
 
   // default to newest starknet.js implementation to allow custom networks to upgrade wallets aswell
   return (newImplementation, accountAddress, provider, keyPair) => {
-    const account = new Account(
-      provider as any, // this is a bug in old starknet versions where Provider was used instead of ProviderInterface
-      accountAddress,
-      keyPair,
-    )
+    const account = new Account(provider, accountAddress, keyPair)
 
     return account.execute(
       {
@@ -107,7 +111,6 @@ export const upgradeAccount = async (
     account.address,
     // Account extends Provider
     starknetAccount,
-    // signer is a private property of the account, this will be public in the future
     wallet.getKeyPairByDerivationPath(account.signer.derivationPath),
   )
 
