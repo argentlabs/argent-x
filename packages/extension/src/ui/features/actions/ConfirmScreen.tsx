@@ -45,6 +45,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   singleButton?: boolean
   switchButtonOrder?: boolean
   smallTopPadding?: boolean
+  showHeader?: boolean
   footer?: ReactNode
   children: ReactNode
 }
@@ -89,6 +90,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   singleButton = false,
   switchButtonOrder = false,
   smallTopPadding = false,
+  showHeader = true,
   footer,
   children,
   ...props
@@ -101,14 +103,14 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   return (
     <ConfirmScreenWrapper
       smallTopPadding={smallTopPadding}
-      accountShown={Boolean(selectedAccount)}
+      accountShown={Boolean(showHeader && selectedAccount)}
       onSubmit={(e) => {
         e.preventDefault()
         return onSubmit?.(e)
       }}
       {...props}
     >
-      {selectedAccount && (
+      {showHeader && selectedAccount && (
         <Header style={{ margin: "0 -32px 16px" }}>
           <ProfilePicture
             src={getAccountImageUrl(

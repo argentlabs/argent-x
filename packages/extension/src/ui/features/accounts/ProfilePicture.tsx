@@ -1,13 +1,19 @@
 import styled, { css } from "styled-components"
 
-export const ProfilePicture = styled.img<{
+export interface ProfilePictureProps {
   disabled?: boolean
-}>`
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
+  small?: boolean
+}
+
+const sizeAttribute = ({ small }: ProfilePictureProps) =>
+  small ? "24px" : "36px"
+
+export const ProfilePicture = styled.img<ProfilePictureProps>`
+  width: ${sizeAttribute};
+  height: ${sizeAttribute};
+  flex: 0 0 ${sizeAttribute};
   border-radius: 50%;
-  border: 2px solid transparent;
+  border: ${({ small }) => (small ? "none" : "2px solid transparent")};
 
   ${({ disabled }) =>
     !disabled &&

@@ -3,9 +3,22 @@ import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 import styled from "styled-components"
 
+import {
+  Field,
+  FieldGroup,
+  FieldKey,
+  FieldValue,
+} from "../../components/Fields"
 import { routes } from "../../routes"
+import {
+  getAccountName,
+  useAccountMetadata,
+} from "../accounts/accountMetadata.state"
+import { getAccountImageUrl } from "../accounts/accounts.service"
+import { ProfilePicture } from "../accounts/ProfilePicture"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
+import { TransactionsList } from "./TransactionsList"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -23,6 +36,12 @@ const Pre = styled.pre`
   background: #161616;
 `
 
+const LeftPaddedField = styled.div`
+  margin-left: 8px;
+`
+
+const DISPLAY_RAW_TRANSACTION = false
+
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
   selectedAccount,
@@ -31,10 +50,13 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   ...props
 }) => {
   const [disableConfirm, setDisableConfirm] = useState(true)
+  const { accountNames } = useAccountMetadata()
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
+
+  const accountName = getAccountName(selectedAccount, accountNames)
 
   return (
     <ConfirmScreen
@@ -45,6 +67,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       onSubmit={() => {
         onSubmit(transactions)
       }}
+      showHeader={false}
       footer={
         <FeeEstimation
           onErrorChange={setDisableConfirm}
@@ -56,7 +79,27 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }
       {...props}
     >
-      <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
+      <TransactionsList transactions={transactions} />
+      {DISPLAY_RAW_TRANSACTION && (
+        <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
+      )}
+      <FieldGroup>
+        <Field>
+          <FieldKey>From</FieldKey>
+          <FieldValue>
+            <ProfilePicture
+              src={getAccountImageUrl(accountName, selectedAccount.address)}
+              small
+              disabled
+            />
+            <LeftPaddedField>{accountName}</LeftPaddedField>
+          </FieldValue>
+        </Field>
+        <Field>
+          <FieldKey>Network</FieldKey>
+          <FieldValue>{selectedAccount.network.name}</FieldValue>
+        </Field>
+      </FieldGroup>
     </ConfirmScreen>
   )
 }
