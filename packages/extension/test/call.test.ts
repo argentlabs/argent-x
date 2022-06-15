@@ -14,8 +14,8 @@ const Erc20TransferCallValid: Erc20TransferCall = {
   entrypoint: "transfer",
   calldata: [
     "2007141710004580612847837172790366058109710402280793820610123055421682225678",
-    "10000000000000",
-    "0",
+    "123",
+    "456",
   ],
 }
 
@@ -26,8 +26,8 @@ const Erc20TransferCallInvalidAddress: Call = {
   entrypoint: "transfer",
   calldata: [
     "2007141710004580612847837172790366058109710402280793820610123055421682225678",
-    "10000000000000",
-    "0",
+    "123",
+    "456",
   ],
 }
 
@@ -37,7 +37,7 @@ const Erc20TransferCallInvalidCalldataLength: Call = {
   entrypoint: "transfer",
   calldata: [
     "2007141710004580612847837172790366058109710402280793820610123055421682225678",
-    "10000000000000",
+    "123",
   ],
 }
 
@@ -45,17 +45,28 @@ const Erc20TransferCallInvalidRecipientAddress: Call = {
   contractAddress:
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   entrypoint: "transfer",
-  calldata: ["INVALID", "10000000000000", "0"],
+  calldata: ["INVALID", "123", "456"],
 }
 
-const Erc20TransferCallInvalidAmount: Call = {
+const Erc20TransferCallInvalidAmountTooSmall: Call = {
   contractAddress:
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   entrypoint: "transfer",
   calldata: [
     "2007141710004580612847837172790366058109710402280793820610123055421682225678",
-    "-1",
     "0",
+    "0",
+  ],
+}
+
+const Erc20TransferCallInvalidAmountTooLarge: Call = {
+  contractAddress:
+    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+  entrypoint: "transfer",
+  calldata: [
+    "2007141710004580612847837172790366058109710402280793820610123055421682225678",
+    "0xfffffffffffffffffffffffffffffffff",
+    "0xfffffffffffffffffffffffffffffffff",
   ],
 }
 
@@ -65,7 +76,8 @@ const Erc20TransferCallInvalidEntrypoint: Call = {
   entrypoint: "approve",
   calldata: [
     "2007141710004580612847837172790366058109710402280793820610123055421682225678",
-    "0",
+    "123",
+    "456",
   ],
 }
 
@@ -91,7 +103,14 @@ describe("call", () => {
         ).toBeFalsy()
       })
       test("returns false when amount is invalid", () => {
-        expect(isErc20TransferCall(Erc20TransferCallInvalidAmount)).toBeFalsy()
+        expect(
+          isErc20TransferCall(Erc20TransferCallInvalidAmountTooSmall),
+        ).toBeFalsy()
+      })
+      test("returns false when amount is too large", () => {
+        expect(
+          isErc20TransferCall(Erc20TransferCallInvalidAmountTooLarge),
+        ).toBeFalsy()
       })
       test("returns false when method is invalid", () => {
         expect(
@@ -108,7 +127,7 @@ describe("call", () => {
             "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
           recipientAddress:
             "0x0470007fc2b04C3bB560a55f70F3eA005A4c1D46f970B9561428553cf6D6120E",
-          amount: "10000000000000",
+          amount: "155168759315947939339298820988886304424059",
         })
       })
     })
