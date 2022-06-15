@@ -8,6 +8,7 @@ import {
   Wallet,
   WalletStorageProps,
 } from "../src/background/wallet"
+import { Network } from "../src/shared/networks"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
 import { MockStorage } from "./mock"
@@ -16,12 +17,12 @@ const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
 
 const argentAccountCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/ArgentAccount-pre9.txt"),
+  path.join(__dirname, "../src/contracts/ArgentAccount.txt"),
   "utf8",
 )
 
 const proxyCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/Proxy-pre9.txt"),
+  path.join(__dirname, "../src/contracts/Proxy.txt"),
   "utf8",
 )
 
@@ -39,9 +40,9 @@ const getNetwork: GetNetwork = async (networkId) =>
   (networkId === NETWORK && {
     id: NETWORK,
     chainId: "SN_GOERLI",
-    baseUrl: "http://localhost:5050",
+    baseUrl: "http://127.0.0.1:5050/",
     name: "Test Network",
-  }) as any
+  }) as Network
 
 jest.setTimeout(999999)
 

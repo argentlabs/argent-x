@@ -281,29 +281,25 @@ export class Wallet {
     this.store.setItem("discoveredOnce", true)
   }
 
+  private async getAccountClassHashForNetwork(
+    network: Network,
+  ): Promise<string> {
+    if (network?.accountClassHash) {
+      return network.accountClassHash
+    }
+    const [, accountContract] = await this.loadContracts(network.id)
+    const provider = getProvider(network)
+    const declareResponse = await provider.declareContract({
+      contract: accountContract,
+    })
+    return declareResponse.class_hash || ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
+  }
+
   private async restoreAccountsFromWallet(
     secret: string,
     network: Network,
     offset: number = CHECK_OFFSET,
   ): Promise<WalletAccount[]> {
-    // FIXME: delete this once Cairo 9 is on mainnet
-    if (!network?.accountClassHash) {
-      const accountImplementationAddresses = union(
-        isKnownNetwork(network.id)
-          ? VALID_ACCOUNT_IMPLEMENTATIONS_BY_NETWORK[network.id]
-          : [],
-        network?.accountImplementation ? [network.accountImplementation] : [],
-      )
-      const proxyContractHashes = PROXY_CONTRACT_HASHES_TO_CHECK
-      return this.restoreAccountsFromWalletPre9(
-        secret,
-        network,
-        accountImplementationAddresses,
-        proxyContractHashes,
-        offset,
-      )
-    }
-
     const provider = getProvider(network)
 
     const accounts: WalletAccount[] = []
@@ -364,76 +360,6 @@ export class Wallet {
                 derivationPath: getPathForIndex(
                   lastCheck,
                   newBaseDerivationPath,
-                ),
-              },
-            })
-          }
-
-          ++lastCheck
-        }
-      },
-    )
-
-    await Promise.all(promises)
-
-    return accounts
-  }
-
-  private async restoreAccountsFromWalletPre9(
-    secret: string,
-    network: Network,
-    accountImplementationAddresses: string[],
-    proxyContactHashes: string[] = PROXY_CONTRACT_HASHES_TO_CHECK,
-    offset: number = CHECK_OFFSET,
-  ): Promise<WalletAccount[]> {
-    const provider = getProvider(network)
-
-    const accounts: WalletAccount[] = []
-
-    if (!accountImplementationAddresses?.length) {
-      console.error(`No known implementations for network ${network.id}`)
-      return accounts
-    }
-
-    const contractHashAndImplementations2dArray = proxyContactHashes.flatMap(
-      (contractHash) =>
-        accountImplementationAddresses.map(
-          (implementation) => [contractHash, implementation] as const,
-        ),
-    )
-
-    const promises = contractHashAndImplementations2dArray.map(
-      async ([contractHash, implementation]) => {
-        let lastHit = 0
-        let lastCheck = 0
-
-        while (lastHit + offset > lastCheck) {
-          const starkPair = getStarkPair(
-            lastCheck,
-            secret,
-            oldBaseDerivationPath,
-          )
-          const starkPub = ec.getStarkKey(starkPair)
-          const seed = starkPub
-
-          const address = calculateContractAddress(
-            seed,
-            contractHash,
-            stark.compileCalldata({ implementation }),
-          )
-
-          const code = await provider.getCode(address)
-
-          if (code.bytecode.length > 0) {
-            lastHit = lastCheck
-            accounts.push({
-              address,
-              network,
-              signer: {
-                type: "local_signer",
-                derivationPath: getPathForIndex(
-                  lastCheck,
-                  oldBaseDerivationPath,
                 ),
               },
             })
@@ -519,11 +445,7 @@ export class Wallet {
       throw Error("no open session")
     }
 
-    // FIXME: delete this once Cairo 9 is on mainnet
     const network = await this.getNetwork(networkId)
-    if (!network.accountClassHash) {
-      return await this.addAccountPre9(networkId)
-    }
 
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
@@ -548,10 +470,12 @@ export class Wallet {
 
     const provider = getProvider(network)
 
+    const accountClassHash = await this.getAccountClassHashForNetwork(network)
+
     const deployTransaction = await provider.deployContract({
       contract: proxyCompiledContract,
       constructorCalldata: stark.compileCalldata({
-        implementation: network.accountClassHash,
+        implementation: accountClassHash,
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
@@ -576,84 +500,6 @@ export class Wallet {
     await this.selectAccount(account.address)
 
     return { account, txHash: deployTransaction.transaction_hash }
-  }
-
-  // FIXME: delete this once Cairo 9 is on mainnet
-  public async addAccountPre9(
-    networkId: string,
-  ): Promise<{ account: WalletAccount; txHash: string }> {
-    if (!this.isSessionOpen()) {
-      throw Error("no open session")
-    }
-
-    const network = await this.getNetwork(networkId)
-    let implementation = network.accountImplementation
-    if (implementation) {
-      await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
-    }
-
-    const currentPaths = (await this.getAccounts(true))
-      .filter(
-        (account) =>
-          account.signer.type === "local_secret" &&
-          account.network.id === networkId,
-      )
-      .map((account) => account.signer.derivationPath)
-
-    const [pre9proxyCompiledContract, pre9argentAccountCompiledContract] =
-      await this.loadContracts(oldBaseDerivationPath)
-
-    const index = getNextPathIndex(currentPaths, oldBaseDerivationPath)
-    const starkPair = getStarkPair(
-      index,
-      this.session?.secret as string,
-      oldBaseDerivationPath,
-    )
-    const starkPub = ec.getStarkKey(starkPair)
-    const seed = starkPub
-
-    const provider = getProvider(network)
-
-    if (!implementation) {
-      const deployImplementationTransaction = await provider.deployContract({
-        contract: pre9argentAccountCompiledContract,
-      })
-      assertTransactionReceived(deployImplementationTransaction, true)
-      implementation = deployImplementationTransaction.address as string
-    }
-
-    const deployTransaction = await provider.deployContract({
-      contract: pre9proxyCompiledContract,
-      constructorCalldata: stark.compileCalldata({ implementation }),
-      addressSalt: seed,
-    })
-
-    assertTransactionReceived(deployTransaction, true)
-    const proxyAddress = deployTransaction.address as string
-
-    const initTransaction = await provider.invokeFunction({
-      contractAddress: proxyAddress,
-      entrypoint: "initialize",
-      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-    })
-
-    assertTransactionReceived(initTransaction)
-
-    const account = {
-      network,
-      address: proxyAddress,
-      signer: {
-        type: "local_secret",
-        derivationPath: getPathForIndex(index, oldBaseDerivationPath),
-      },
-    }
-
-    await this.pushAccount(account)
-
-    await this.writeBackup()
-    await this.selectAccount(account.address)
-
-    return { account, txHash: initTransaction.transaction_hash }
   }
 
   public async getAccountByAddress(address: string): Promise<WalletAccount> {
