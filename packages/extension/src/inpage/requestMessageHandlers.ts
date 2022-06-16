@@ -66,7 +66,7 @@ export async function handleAddNetworkRequest(
       baseUrl: callParams.baseUrl,
       rpcUrl: callParams.rpcUrl,
       explorerUrl: callParams.blockExplorerUrl,
-      accountImplementation: callParams.accountImplementation,
+      accountClassHash: callParams.accountImplementation,
     },
   })
 

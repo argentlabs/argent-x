@@ -50,18 +50,13 @@ export const executeTransaction = async (
 
   // estimate fee with onchain nonce even tho transaction nonce may be different
   const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
-  // FIXME: mainnet hack to dont pay fees as long as possible
-  const maxFee =
-    selectedAccount.network.id === "mainnet-alpha"
-      ? "0x0"
-      : number.toHex(suggestedMaxFee)
+
+  const maxFee = number.toHex(suggestedMaxFee)
 
   const transaction = await starknetAccount.execute(transactions, abis, {
     ...transactionsDetail,
     nonce,
-    // For now we want to set the maxFee to 0 in case the user has not provided a maxFee. This will change with the next release. The default behavior in starknet.js is to estimate the fee, so we need to pass 0 explicitly.
-    // TODO: remove in next release
-    ...(maxFee ? { maxFee } : {}),
+    maxFee,
   })
 
   if (!checkTransactionHash(transaction.transaction_hash)) {
