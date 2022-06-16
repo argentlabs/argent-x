@@ -212,14 +212,14 @@ export const countDecimals = (value: number | string) => {
   return numValue.toString().split(".")[1].length || 0
 }
 
-export const convertTokenBalanceToPrice = ({
-  balance,
+export const convertTokenAmountToCurrencyValue = ({
+  amount,
   decimals,
-  price,
+  unitCurrencyValue,
 }: {
-  balance: BigNumberish
-  decimals: number | string
-  price: number | string
+  amount: BigNumberish
+  decimals: BigNumberish
+  unitCurrencyValue: number | string
 }) => {
   /**
    * BigNumber is only for integers, it does not support floating-point or fixed-point math
@@ -227,20 +227,20 @@ export const convertTokenBalanceToPrice = ({
    */
 
   const decimalsNumber = Number(decimals)
-  const priceNumber = Number(price)
+  const unitCurrencyValueNumber = Number(unitCurrencyValue)
 
   /** determine what we need to multiply by to make price into an integer */
-  const priceDecimals = countDecimals(priceNumber)
+  const priceDecimals = countDecimals(unitCurrencyValueNumber)
   const priceToIntegerMultiplier = Math.pow(10, priceDecimals)
 
   /** Math.round due to loss of precision */
   const integerPrince = BigNumber.from(
-    Math.round(priceNumber * priceToIntegerMultiplier),
+    Math.round(unitCurrencyValueNumber * priceToIntegerMultiplier),
   )
 
   /** Multiply the integer price by balance, then divide down by the multiplier from above */
   const priceWithDecimals = integerPrince
-    .mul(balance)
+    .mul(amount)
     .div(priceToIntegerMultiplier)
 
   /** Convert down using decimals */

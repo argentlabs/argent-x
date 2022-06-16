@@ -1,12 +1,28 @@
+import { BigNumber } from "ethers"
 import { number } from "starknet"
 
 import {
-  convertTokenBalanceToPrice,
+  convertTokenAmountToCurrencyValue,
   countDecimals,
   formatTokenBalance,
+  lookupTokenPriceDetails,
 } from "../src/ui/features/accountTokens/tokens.service"
+import {
+  TokenDetails,
+  TokenDetailsWithBalance,
+} from "../src/ui/features/accountTokens/tokens.state"
 import mockApiPricesData from "./argent-api-prices.mock.json"
 import mockApiTokenData from "./argent-api-tokens.mock.json"
+import mockTokensWithBalanceRaw from "./tokens-with-balance.mock.json"
+
+/** convert to expected types - a mix of BN and BigNumber */
+const mockTokensWithBalance = mockTokensWithBalanceRaw.map((token) => {
+  return {
+    ...token,
+    decimals: number.toBN(token.decimals),
+    balance: BigNumber.from(token.balance),
+  }
+})
 
 describe("format token balance", () => {
   test("should format token balance correctly", () => {
@@ -42,41 +58,62 @@ describe("countDecimals()", () => {
   })
 })
 
-describe("convertTokenBalanceToPrice()", () => {
-  test("should convert token balance to price correctly", () => {
+describe("convertTokenAmountToCurrencyValue()", () => {
+  test("should convert token balance to currency value correctly", () => {
     expect(
       /** decimals may be of type BN in the wild */
-      convertTokenBalanceToPrice({
-        balance: "1000000000000000000",
+      convertTokenAmountToCurrencyValue({
+        amount: "1000000000000000000",
         decimals: number.toBN(18, 10),
-        price: 1.23,
+        unitCurrencyValue: 1.23,
       }),
     ).toEqual("1.23")
     expect(
-      convertTokenBalanceToPrice({
-        balance: "1000000000000000000",
+      convertTokenAmountToCurrencyValue({
+        amount: "1000000000000000000",
         decimals: 18,
-        price: "1032.296954",
+        unitCurrencyValue: "1032.296954",
       }),
     ).toEqual("1032.296954")
     expect(
-      convertTokenBalanceToPrice({
-        balance: "20000000000000",
+      convertTokenAmountToCurrencyValue({
+        amount: "20000000000000",
         decimals: 13,
-        price: "1032.296954",
+        unitCurrencyValue: "1032.296954",
       }),
     ).toEqual("2064.593908")
     /** In pure JS this would lose precision - 1032.296954 * 3 = 3096.8908619999997 */
     expect(
-      convertTokenBalanceToPrice({
-        balance: "30000000000",
+      convertTokenAmountToCurrencyValue({
+        amount: "30000000000",
         decimals: 10,
-        price: "1032.296954",
+        unitCurrencyValue: "1032.296954",
       }),
     ).toEqual("3096.890862")
   })
 })
 
 describe("lookupTokenPriceDetails()", () => {
-  test("should find token price details in API response", () => {})
+  test("should find token price details in API response", () => {
+    const token = mockTokensWithBalance[0] as TokenDetailsWithBalance
+    const price = lookupTokenPriceDetails({
+      token,
+      pricesData: mockApiPricesData,
+      tokenData: mockApiTokenData,
+    })
+    expect(price).toEqual({
+      ccyDayChange: -0.008568,
+      ccyValue: 1032.296954,
+      ethDayChange: 0,
+      ethValue: 1,
+      pricingId: 1,
+    })
+    expect(
+      convertTokenAmountToCurrencyValue({
+        amount: token.balance || 0,
+        decimals: token.decimals || 0,
+        unitCurrencyValue: price?.ccyValue || 0,
+      }),
+    ).toEqual("1032.296954")
+  })
 })
