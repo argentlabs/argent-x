@@ -1,9 +1,19 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
-import { Abi, Contract, number, shortString, uint256 } from "starknet"
+import { useCallback } from "react"
+import {
+  Abi,
+  Contract,
+  hash,
+  number,
+  shortString,
+  stark,
+  uint256,
+} from "starknet"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
 import { getFeeToken } from "../../../shared/token"
+import { useMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
@@ -105,6 +115,56 @@ export const fetchTokenBalance = async (
   )
   const result = await tokenContract.balanceOf(account.address)
   return BigNumber.from(uint256.uint256ToBN(result.balance).toString())
+}
+
+export type BalancesMap = Record<string, BigNumber | undefined>
+
+export const useFetchAllTokenBalances = () => {
+  const multicallContract = useMulticallContract()
+
+  return useCallback(
+    async (tokenAddresses: string[], accountAddress: string) => {
+      if (!multicallContract) {
+        return
+      }
+
+      const compiledCalldata = stark.compileCalldata({
+        address: accountAddress,
+      })
+
+      const calls = tokenAddresses.flatMap((address) => [
+        address,
+        hash.getSelectorFromName("balanceOf"),
+        compiledCalldata.length,
+        ...compiledCalldata,
+      ])
+
+      const response = await multicallContract.aggregate(calls)
+
+      const results: string[] = response.result.map((res: any) =>
+        number.toHex(res),
+      )
+
+      const resultsIterator = results.flat()[Symbol.iterator]()
+
+      return tokenAddresses.reduce<BalancesMap>((acc, tokenAddress) => {
+        const uint256Balance: uint256.Uint256 = {
+          low: resultsIterator.next().value,
+          high: resultsIterator.next().value,
+        }
+
+        const balance = BigNumber.from(
+          uint256.uint256ToBN(uint256Balance).toString(),
+        )
+
+        return {
+          ...acc,
+          [tokenAddress]: balance,
+        }
+      }, {})
+    },
+    [],
+  )
 }
 
 export const fetchFeeTokenBalance = async (

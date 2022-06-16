@@ -9502,10 +9502,10 @@ stack-utils@^2.0.3:
     superstruct "^0.15.3"
     url-join "^4.0.1"
 
-starknet@^3.12.1:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.14.0.tgz#7e57eeb41746d0ace4544cc00da65abf2b3399a6"
-  integrity sha512-vjawtJDSVUjzbgTWss9hednLcRqRVFdnI/RUybB6Fr/ytobPK14rh57DTt27AntrX7yL2cvQY3WIRslDlxh3ag==
+starknet@^3.14.0:
+  version "3.14.1"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.14.1.tgz#6df29777857fb4981f6e1c8003252a11dbe67efb"
+  integrity sha512-vC7yBX1lUUuGWqJ2An1iixks7a0j6PeOPTioV0Gy3bhe1hrK6e2NjuqJ5PNr8IfH+J4+X3MlptZpHECb+m6dYw==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     bn.js "^5.2.1"
