@@ -40,7 +40,7 @@ describe("countDecimals()", () => {
   })
 })
 
-describe.only("convertTokenBalanceToPrice()", () => {
+describe("convertTokenBalanceToPrice()", () => {
   test("should convert token balance to price correctly", () => {
     expect(
       /** decimals may be of type BN in the wild */
@@ -57,5 +57,19 @@ describe.only("convertTokenBalanceToPrice()", () => {
         price: "1032.296954",
       }),
     ).toEqual("1032.296954")
+    expect(
+      convertTokenBalanceToPrice({
+        balance: "20000000000000",
+        decimals: 13,
+        price: "1032.296954",
+      }),
+    ).toEqual("2064.593908")
+    expect(
+      convertTokenBalanceToPrice({
+        balance: "30000000000",
+        decimals: 10,
+        price: "1032.296954",
+      }),
+    ).toEqual("3096.890862")
   })
 })
