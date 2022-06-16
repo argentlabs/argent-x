@@ -49,10 +49,10 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
 
   const handleSubmit = async () => {
     if (mode === "hide") {
-      await hideAccount(accountAddress)
+      await hideAccount(accountAddress, switcherNetworkId)
     }
     if (mode === "delete") {
-      await deleteAccount(accountAddress)
+      await deleteAccount(accountAddress, switcherNetworkId)
     }
 
     navigate(

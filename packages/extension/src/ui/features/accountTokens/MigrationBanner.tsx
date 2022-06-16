@@ -1,4 +1,4 @@
-// FIXME: delete this file when Cairo 9 is on mainnet
+// FIXME: remove when depricated accounts do not longer work
 import { FC } from "react"
 import { Link } from "react-router-dom"
 

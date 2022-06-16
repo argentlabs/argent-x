@@ -117,14 +117,6 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
                   readonly
                 />
               )}
-              {requestedNetwork.accountImplementation && (
-                <InputText
-                  placeholder="Account Implementation Address"
-                  type="text"
-                  value={requestedNetwork.accountImplementation}
-                  readonly
-                />
-              )}
               {requestedNetwork.rpcUrl && (
                 <InputText
                   placeholder="RPC URL"

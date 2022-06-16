@@ -77,7 +77,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const {
-    network: { accountImplementation },
+    network: { accountClassHash },
   } = useNetwork(switcherNetworkId)
   const status = useAccountStatus(account, selectedAccount)
   const { accountNames } = useAccountMetadata()
@@ -85,7 +85,7 @@ export const AccountListItem: FC<AccountListProps> = ({
   const { address } = account
 
   const { data: showUpgradeBanner = false } = useSWR(
-    [account, accountImplementation, "showUpgradeBanner"],
+    [account, accountClassHash, "showUpgradeBanner"],
     checkIfUpgradeAvailable,
     { suspense: false },
   )
