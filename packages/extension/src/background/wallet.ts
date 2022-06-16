@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { union } from "lodash-es"
+import { differenceWith, find, union, uniqWith } from "lodash-es"
 import {
   Account,
   AddTransactionResponse,
@@ -20,7 +20,7 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/networks"
-import { WalletAccount } from "../shared/wallet.model"
+import { UniqAccount, WalletAccount } from "../shared/wallet.model"
 import { baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
@@ -83,10 +83,8 @@ function calculateContractAddress(
   ])
 }
 
-export const equalAccount = (
-  a: Pick<WalletAccount, "address" | "network">,
-  b: Pick<WalletAccount, "address" | "network">,
-) => a.address === b.address && a.network.id === b.network.id
+export const equalAccount = (a: UniqAccount, b: UniqAccount) =>
+  a.address === b.address && a.network.id === b.network.id
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -162,9 +160,9 @@ export class Wallet {
     const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
-    const newAccounts = [...oldAccounts, ...accounts].filter(
-      (account, index, self) =>
-        self.findIndex((a) => a.address === account.address) === index,
+    const newAccounts = uniqWith(
+      [...oldAccounts, ...accounts].reverse(), // reverse as only first occurence is kept
+      equalAccount,
     )
 
     // we store the network as it was at the creation date of the wallet. This may be useful in the future.
@@ -172,35 +170,35 @@ export class Wallet {
   }
 
   private async pushAccount(account: WalletAccount) {
-    const accounts = await this.getAccounts(true)
-    const index = accounts.findIndex((a) => a.address === account.address)
-    if (index === -1) {
-      accounts.push(account)
-    } else {
-      accounts[index] = account
-    }
-    return this.store.setItem("accounts", accounts)
+    return this.setAccounts([account])
   }
 
-  public async removeAccount(address: string) {
+  public async removeAccount(account: UniqAccount) {
     const accounts = await this.getAccounts(true)
-    const newAccounts = accounts.filter(
-      (account) => account.address !== address,
-    )
+    const newAccounts = differenceWith(accounts, [account], equalAccount)
     return this.store.setItem("accounts", newAccounts)
   }
 
-  public async hideAccount(address: string) {
+  public async hideAccount(account: UniqAccount) {
     const accounts = await this.getAccounts()
 
-    const index = accounts.findIndex((account) => account.address === address)
+    const fullAccount = find(accounts, (a) => equalAccount(a, account))
 
-    if (index === -1) {
-      throw Error("Account to hide was not found")
+    if (!fullAccount) {
+      return
     }
 
-    accounts[index] = { ...accounts[index], hidden: true }
-    await this.store.setItem("accounts", accounts)
+    const hiddenAccount: WalletAccount = {
+      ...fullAccount,
+      hidden: true,
+    }
+
+    const newAccounts = uniqWith(
+      [...accounts, hiddenAccount].reverse(), // reverse as only first occurence is kept
+      equalAccount,
+    )
+
+    await this.store.setItem("accounts", newAccounts)
 
     await this.writeBackup()
   }

@@ -1,4 +1,4 @@
-import { WalletAccount } from "../wallet.model"
+import { UniqAccount, WalletAccount } from "../wallet.model"
 
 export type AccountMessage =
   | { type: "NEW_ACCOUNT"; data: string }
@@ -18,10 +18,10 @@ export type AccountMessage =
   | { type: "DISCONNECT_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount | undefined }
-  | { type: "DELETE_ACCOUNT"; data: string }
+  | { type: "DELETE_ACCOUNT"; data: UniqAccount }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
-  | { type: "HIDE_ACCOUNT"; data: string }
+  | { type: "HIDE_ACCOUNT"; data: UniqAccount }
   | { type: "HIDE_ACCOUNT_RES" }
   | { type: "HIDE_ACCOUNT_REJ" }
   | {
