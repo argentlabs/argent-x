@@ -24,8 +24,11 @@ export const connectAccount = ({ address, network, signer }: Account) => {
   sendMessage({ type: "CONNECT_ACCOUNT", data: { address, network, signer } })
 }
 
-export const deleteAccount = async (address: string) => {
-  sendMessage({ type: "DELETE_ACCOUNT", data: address })
+export const deleteAccount = async (address: string, networkId: string) => {
+  sendMessage({
+    type: "DELETE_ACCOUNT",
+    data: { address, network: { id: networkId } },
+  })
 
   try {
     await Promise.race([
@@ -39,8 +42,11 @@ export const deleteAccount = async (address: string) => {
   }
 }
 
-export const hideAccount = async (address: string) => {
-  sendMessage({ type: "HIDE_ACCOUNT", data: address })
+export const hideAccount = async (address: string, networkId: string) => {
+  sendMessage({
+    type: "HIDE_ACCOUNT",
+    data: { address, network: { id: networkId } },
+  })
 
   await Promise.race([
     waitForMessage("HIDE_ACCOUNT_RES"),

@@ -27,7 +27,8 @@ export const recover = async ({
       ? lastSelectedAccount?.network.id
       : defaultNetwork.id
 
-    const walletAccounts = accountsOnNetwork(await getAccounts(), networkId)
+    const allAccounts = await getAccounts()
+    const walletAccounts = accountsOnNetwork(allAccounts, networkId)
 
     const selectedAccount = walletAccounts.find(
       ({ address }) => address === lastSelectedAccount?.address,
