@@ -4,7 +4,10 @@ import { Link } from "react-router-dom"
 import { routes } from "../../routes"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { TokenListItem } from "./TokenListItem"
-import { useTokenPricing } from "./tokens.service"
+import {
+  prettifyCurrencyValue,
+  useSumTokenBalancesToCurrencyValue,
+} from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 
 interface TokenListProps {
@@ -15,15 +18,15 @@ interface TokenListProps {
 
 export const TokenList: FC<TokenListProps> = ({ showTitle }) => {
   const { isValidating, tokenDetails } = useTokensWithBalance()
-  console.log({ tokenDetails })
-  console.log(JSON.stringify(tokenDetails, null, 2))
-  // const testing = useTokenPricing(tokenDetails[0])
-  // console.log({ testing })
-
+  const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
   return (
     <>
-      {/* {<pre>{JSON.stringify(tokenDetails, null, 2)}</pre>} */}
       {showTitle && <SectionHeader>Tokens</SectionHeader>}
+      {sumCurrencyValue && (
+        <SectionHeader>
+          Total {prettifyCurrencyValue(sumCurrencyValue)}
+        </SectionHeader>
+      )}
       {tokenDetails.map((token) => (
         <Link key={token.address} to={routes.token(token.address)}>
           <TokenListItem token={token} isLoading={isValidating} />

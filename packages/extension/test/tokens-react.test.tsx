@@ -5,6 +5,7 @@
 import { renderHook } from "@testing-library/react"
 
 import {
+  useSumTokenBalancesToCurrencyValue,
   useTokenBalanceToCurrencyValue,
   useTokenPriceDetails,
 } from "../src/ui/features/accountTokens/tokens.service"
@@ -38,11 +39,41 @@ describe("tokens-react", () => {
   })
 
   describe("useTokenAmountToCurrencyValue()", () => {
-    test("should convert token balance to currency", () => {
+    test("should convert token balance to currency 0", () => {
       const { result } = renderHook(() =>
         useTokenBalanceToCurrencyValue(token, usePriceAndTokenDataImpl),
       )
       expect(result.current).toEqual("1032.296954")
+    })
+    test("should convert token balance to currency 1", () => {
+      const { result } = renderHook(() =>
+        useTokenBalanceToCurrencyValue(
+          mockTokensWithBalance[1],
+          usePriceAndTokenDataImpl,
+        ),
+      )
+      expect(result.current).toEqual("0.999132")
+    })
+    test("should convert token balance to currency 2", () => {
+      const { result } = renderHook(() =>
+        useTokenBalanceToCurrencyValue(
+          mockTokensWithBalance[2],
+          usePriceAndTokenDataImpl,
+        ),
+      )
+      expect(result.current).toEqual("1.002")
+    })
+  })
+
+  describe("useSumTokenBalancesToCurrencyValue()", () => {
+    test("should convert and sum token balances to currency", () => {
+      const { result } = renderHook(() =>
+        useSumTokenBalancesToCurrencyValue(
+          mockTokensWithBalance,
+          usePriceAndTokenDataImpl,
+        ),
+      )
+      expect(result.current).toEqual("1034.2980859999998")
     })
   })
 })

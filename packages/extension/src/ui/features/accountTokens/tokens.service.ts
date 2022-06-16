@@ -223,6 +223,40 @@ export const useTokenBalanceToCurrencyValue = (
   }, [priceDetails, token])
 }
 
+export const useSumTokenBalancesToCurrencyValue = (
+  tokens: TokenDetailsWithBalance[],
+  usePriceAndTokenDataImpl = usePriceAndTokenData,
+) => {
+  const { pricesData, tokenData } = usePriceAndTokenDataImpl()
+  return useMemo(() => {
+    if (!tokens || !pricesData || !tokenData) {
+      return
+    }
+    let sumTokenBalance = 0
+    tokens.forEach((token) => {
+      const priceDetails = lookupTokenPriceDetails({
+        token,
+        pricesData,
+        tokenData,
+      })
+      if (!priceDetails || !token.balance || !token.decimals) {
+        // missing data - don't add it
+      } else {
+        const currencyValue = convertTokenAmountToCurrencyValue({
+          amount: token.balance,
+          decimals: token.decimals,
+          unitCurrencyValue: priceDetails.ccyValue,
+        })
+        if (currencyValue) {
+          sumTokenBalance += Number(currencyValue)
+        }
+      }
+    })
+    /** convert to string for consistency with `convertTokenAmountToCurrencyValue()` */
+    return String(sumTokenBalance)
+  }, [pricesData, tokenData, tokens])
+}
+
 export const countDecimals = (value: number | string) => {
   const numValue = Number(value)
   /** check for whole number with no decimals */
@@ -272,7 +306,7 @@ export const convertTokenAmountToCurrencyValue = ({
 
 export const prettifyCurrencyValue = (currencyValue: string | number) => {
   const prettyValue = Number(currencyValue).toFixed(2)
-  /** TODO: implement currency? */
+  /** TODO: implement currency? thousands separators etc.? */
   const symbol = "$"
   return `${symbol}${prettyValue}`
 }
