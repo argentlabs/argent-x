@@ -205,7 +205,7 @@ export const useTokenPriceDetails = (
   }, [token, pricesData, tokenData])
 }
 
-export const useTokenAmountToCurrencyValue = (
+export const useTokenBalanceToCurrencyValue = (
   token: TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
@@ -241,6 +241,7 @@ export const convertTokenAmountToCurrencyValue = ({
   amount: BigNumberish
   decimals: BigNumberish
   unitCurrencyValue: number | string
+  unformatted?: boolean
 }) => {
   /**
    * BigNumber is only for integers, it does not support floating-point or fixed-point math
@@ -267,4 +268,11 @@ export const convertTokenAmountToCurrencyValue = ({
   /** Convert down using decimals */
   const convertedPrice = formatUnits(priceWithDecimals, decimalsNumber)
   return convertedPrice
+}
+
+export const prettifyCurrencyValue = (currencyValue: string | number) => {
+  const prettyValue = Number(currencyValue).toFixed(2)
+  /** TODO: implement currency? */
+  const symbol = "$"
+  return `${symbol}${prettyValue}`
 }

@@ -5,7 +5,7 @@
 import { renderHook } from "@testing-library/react"
 
 import {
-  useTokenAmountToCurrencyValue,
+  useTokenBalanceToCurrencyValue,
   useTokenPriceDetails,
 } from "../src/ui/features/accountTokens/tokens.service"
 import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
@@ -40,7 +40,7 @@ describe("tokens-react", () => {
   describe("useTokenAmountToCurrencyValue()", () => {
     test("should convert token balance to currency", () => {
       const { result } = renderHook(() =>
-        useTokenAmountToCurrencyValue(token, usePriceAndTokenDataImpl),
+        useTokenBalanceToCurrencyValue(token, usePriceAndTokenDataImpl),
       )
       expect(result.current).toEqual("1032.296954")
     })
