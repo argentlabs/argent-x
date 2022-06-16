@@ -185,8 +185,11 @@ export const usePriceAndTokenData = () => {
   return { pricesData, tokenData }
 }
 
-export const useTokenPricing = (token: TokenDetails) => {
-  const { pricesData, tokenData } = usePriceAndTokenData()
+export const useTokenPricing = (
+  token: TokenDetails,
+  usePriceAndTokenDataImpl = usePriceAndTokenData,
+) => {
+  const { pricesData, tokenData } = usePriceAndTokenDataImpl()
   return useMemo(() => {
     if (!pricesData || !tokenData) {
       return

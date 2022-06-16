@@ -4,7 +4,11 @@ import styled, { css, keyframes } from "styled-components"
 
 import { IconButton } from "../../components/IconButton"
 import { TokenIcon } from "./TokenIcon"
-import { toTokenView } from "./tokens.service"
+import {
+  convertTokenBalanceToPrice,
+  toTokenView,
+  useTokenPricing,
+} from "./tokens.service"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
 export const TokenWrapper = styled.div`
@@ -119,6 +123,20 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   ...props
 }) => {
   const { name, symbol, balance, image } = toTokenView(token)
+  const pricing = useTokenPricing(token)
+
+  if (pricing) {
+    // console.log({ token, pricing })
+    // const displayFiatValue =
+    //   pricing && balance
+    //     ? convertTokenBalanceToPrice({
+    //         balance: token.balance || 0,
+    //         decimals: token.decimals || 0,
+    //         price: pricing.ccyValue,
+    //       })
+    //     : "–"
+    // console.log({ displayFiatValue })
+  }
   return (
     <TokenWrapper {...props}>
       <TokenIcon url={image} name={name} />
@@ -130,6 +148,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
           </TokenSubtitleContainer>
         </TokenTextGroup>
         <TokenBalance isLoading={isLoading}>{balance}</TokenBalance>
+        (unit ${pricing?.ccyValue})
       </TokenDetailsWrapper>
     </TokenWrapper>
   )

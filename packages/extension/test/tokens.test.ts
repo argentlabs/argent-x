@@ -5,6 +5,8 @@ import {
   countDecimals,
   formatTokenBalance,
 } from "../src/ui/features/accountTokens/tokens.service"
+import mockApiPricesData from "./argent-api-prices.mock.json"
+import mockApiTokenData from "./argent-api-tokens.mock.json"
 
 describe("format token balance", () => {
   test("should format token balance correctly", () => {
@@ -64,6 +66,7 @@ describe("convertTokenBalanceToPrice()", () => {
         price: "1032.296954",
       }),
     ).toEqual("2064.593908")
+    /** In pure JS this would lose precision - 1032.296954 * 3 = 3096.8908619999997 */
     expect(
       convertTokenBalanceToPrice({
         balance: "30000000000",
@@ -72,4 +75,8 @@ describe("convertTokenBalanceToPrice()", () => {
       }),
     ).toEqual("3096.890862")
   })
+})
+
+describe("lookupTokenPriceDetails()", () => {
+  test("should find token price details in API response", () => {})
 })

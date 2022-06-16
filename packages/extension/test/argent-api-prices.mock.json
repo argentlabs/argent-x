@@ -1,0 +1,39 @@
+{
+  "prices": [
+    {
+      "pricingId": 1,
+      "ethValue": 1,
+      "ccyValue": 1032.296954,
+      "ethDayChange": 0,
+      "ccyDayChange": -0.008568
+    },
+    {
+      "pricingId": 2,
+      "ethValue": 0.000968084873098261,
+      "ccyValue": 0.999132444706,
+      "ethDayChange": 0.008894090408580677,
+      "ccyDayChange": 0.000757
+    },
+    {
+      "pricingId": 3,
+      "ethValue": 0.00096735,
+      "ccyValue": 0.998695,
+      "ethDayChange": 0.006345258148518244,
+      "ccyDayChange": -0.001451
+    },
+    {
+      "pricingId": 8,
+      "ethValue": 0.00096871,
+      "ccyValue": 1.002,
+      "ethDayChange": 0.007622518070483597,
+      "ccyDayChange": 0.001718
+    },
+    {
+      "pricingId": 13,
+      "ethValue": 19.494081,
+      "ccyValue": 20426,
+      "ethDayChange": 0,
+      "ccyDayChange": 0
+    }
+  ]
+}
