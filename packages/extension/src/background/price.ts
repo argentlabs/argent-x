@@ -2,6 +2,15 @@ import { number } from "starknet"
 
 import { defaultNetwork } from "../shared/networks"
 import { Token, UniqueToken, equalToken, getFeeToken } from "../shared/token"
+import {
+  ARGENT_API_TOKENS_INFO_URL,
+  ARGENT_API_TOKENS_PRICES_URL,
+  ApiPriceDataResponse,
+  ApiTokenDataResponse,
+  convertTokenAmountToCurrencyValue,
+  fetcher,
+  lookupTokenPriceDetails,
+} from "../ui/features/accountTokens/tokens.service"
 import { StaleWhileRevalidateCache } from "./swr/types"
 import { fetchWithTimeout } from "./utils/fetchWithTimeout"
 
@@ -72,7 +81,26 @@ export class TokenPriceService {
     const result = await this.swrService(key, () =>
       this.getPriceForTokenImpl(token, baseCurrency),
     )
+    console.log({ result })
     return result
+  }
+
+  public async getPriceForTokenNew(token: UniqueToken): Promise<number> {
+    const pricesData: ApiPriceDataResponse = await this.swrService(
+      ARGENT_API_TOKENS_PRICES_URL,
+      () => fetcher(ARGENT_API_TOKENS_PRICES_URL),
+    )
+    const tokenData: ApiTokenDataResponse = await this.swrService(
+      ARGENT_API_TOKENS_INFO_URL,
+      () => fetcher(ARGENT_API_TOKENS_INFO_URL),
+    )
+    const priceDetails = lookupTokenPriceDetails({
+      token,
+      pricesData,
+      tokenData,
+    })
+    console.log({ pricesData, tokenData, priceDetails })
+    return priceDetails?.ccyValue || 0
   }
 
   public async getPriceForTokenExact(
@@ -80,10 +108,22 @@ export class TokenPriceService {
     amount: number.BigNumberish,
     baseCurrency?: BaseCurrency,
   ): Promise<number> {
-    return getExactPriceForToken(
+    const unitCurrencyValue = await this.getPriceForTokenNew(token)
+    const priceNew = convertTokenAmountToCurrencyValue({
+      amount,
+      decimals: token.decimals,
+      unitCurrencyValue,
+    })
+    console.log({ priceNew })
+    const priceForToken = await this.getPriceForToken(token, baseCurrency)
+    console.log({ priceForToken })
+    const exactPriceForToken = getExactPriceForToken(
       token.decimals,
       amount,
-      await this.getPriceForToken(token, baseCurrency),
+      priceForToken,
     )
+    console.log({ exactPriceForToken })
+    // return exactPriceForToken
+    return Number(priceNew)
   }
 }

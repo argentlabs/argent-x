@@ -6,7 +6,7 @@ import { Abi, Contract, number, shortString, uint256 } from "starknet"
 import useSWR from "swr"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import { getFeeToken } from "../../../shared/token"
+import { UniqueToken, getFeeToken } from "../../../shared/token"
 import { Account } from "../accounts/Account"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
@@ -155,7 +155,7 @@ export const lookupTokenPriceDetails = ({
   pricesData,
   tokenData,
 }: {
-  token: TokenDetails
+  token: UniqueToken
   pricesData: ApiPriceDataResponse
   tokenData: ApiTokenDataResponse
 }) => {
@@ -172,15 +172,24 @@ export const lookupTokenPriceDetails = ({
   }
 }
 
+export const ARGENT_API_TOKENS_PRICES_URL = `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/prices?chain=starknet`
+export const ARGENT_API_TOKENS_INFO_URL = `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/info?chain=starknet`
+
+/** TODO: implement currency? */
 export const usePriceAndTokenData = () => {
   const { data: pricesData } = useSWR<ApiPriceDataResponse>(
-    `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/prices?chain=starknet`,
+    `${ARGENT_API_TOKENS_PRICES_URL}`,
     fetcher,
+    {
+      refreshInterval: 60 * 1000 /** 60 seconds */,
+    },
   )
-  /** TODO: implement currency? */
   const { data: tokenData } = useSWR<ApiTokenDataResponse>(
-    `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/info?chain=starknet`,
+    `${ARGENT_API_TOKENS_INFO_URL}`,
     fetcher,
+    {
+      refreshInterval: 5 * 60 * 1000 /** 5 minutes */,
+    },
   )
   return {
     pricesData,
