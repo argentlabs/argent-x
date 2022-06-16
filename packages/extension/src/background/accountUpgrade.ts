@@ -6,37 +6,74 @@ import {
   number,
   stark,
 } from "starknet"
+import { Account as AccountV390, stark as starkV390 } from "starknet-390"
 
+import { hasNewDerivationPath } from "../shared/wallet.service"
 import { getNetwork } from "./customNetworks"
 import { TransactionTracker } from "./transactions/transactions"
 import { Wallet } from "./wallet"
 
+function equalBigNumberish(
+  a: number.BigNumberish,
+  b: number.BigNumberish,
+): boolean {
+  const aBN = number.toBN(a)
+  const bBN = number.toBN(b)
+  return aBN.eq(bBN)
+}
+
+// FIXME: remove when we dont want to support old accounts anymore
+const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS =
+  "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac"
+
 export const getImplementationUpgradePath = (
-  _oldImplementation: number.BigNumberish,
+  oldImplementation: number.BigNumberish,
+  derivationPath: string,
 ): ((
-  newImplementation: number.BigNumberish,
+  _newImplementation: number.BigNumberish,
   accountAddress: string,
   provider: ProviderInterface,
   keyPair: KeyPair,
 ) => Promise<AddTransactionResponse>) => {
-  // default to newest starknet.js implementation to allow custom networks to upgrade wallets aswell
-  return (newImplementation, accountAddress, provider, keyPair) => {
-    const account = new Account(
-      provider as any, // this is a bug in old starknet versions where Provider was used instead of ProviderInterface
-      accountAddress,
-      keyPair,
-    )
+  if (
+    !hasNewDerivationPath(derivationPath) &&
+    (equalBigNumberish(
+      oldImplementation,
+      "0x0090aa7a9203bff78bfb24f0753c180a33d4bad95b1f4f510b36b00993815704",
+    ) ||
+      equalBigNumberish(
+        oldImplementation,
+        "0x05f28c66afd8a6799ddbe1933bce2c144625031aafa881fa38fa830790eff204",
+      ))
+  ) {
+    return (newImplementation, accountAddress, provider, keyPair) => {
+      const oldAccount = new AccountV390(
+        provider as any, // this is a bug in old starknet versions where Provider was used instead of ProviderInterface
+        accountAddress,
+        keyPair,
+      )
 
-    return account.execute(
-      {
+      return oldAccount.execute({
         contractAddress: accountAddress,
         entrypoint: "upgrade",
-        calldata: stark.compileCalldata({
+        calldata: starkV390.compileCalldata({
           implementation: newImplementation,
         }),
-      },
-      undefined,
-    )
+      })
+    }
+  }
+
+  // default to newest starknet.js implementation to allow custom networks to upgrade wallets aswell
+  return (newImplementation, accountAddress, provider, keyPair) => {
+    const account = new Account(provider, accountAddress, keyPair)
+
+    return account.execute({
+      contractAddress: accountAddress,
+      entrypoint: "upgrade",
+      calldata: stark.compileCalldata({
+        implementation: LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS,
+      }),
+    })
   }
 }
 
@@ -60,7 +97,10 @@ export const upgradeAccount = async (
   })
   const currentImplementation = stark.makeAddress(number.toHex(result[0]))
 
-  const updateAccount = getImplementationUpgradePath(currentImplementation)
+  const updateAccount = getImplementationUpgradePath(
+    currentImplementation,
+    account.signer.derivationPath,
+  )
 
   const updateTransaction = await updateAccount(
     newImplementation,
