@@ -14,8 +14,9 @@ import {
   getTokens,
   removeToken as removeTokenMsg,
 } from "../../services/backgroundTokens"
+import { useCurrentNetwork } from "./../networks/useNetworks"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { BalancesMap, useFetchAllTokenBalances } from "./tokens.service"
+import { BalancesMap, fetchAllTokenBalances } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {
   decimals?: BigNumber
@@ -139,13 +140,12 @@ interface UseTokens {
 export const useTokensWithBalance = (): UseTokens => {
   const { switcherNetworkId } = useAppState()
   const selectedAccount = useSelectedAccount()
+  const currentNetwork = useCurrentNetwork()
   const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
     [tokensInNetwork],
   )
-
-  const fetchAllTokensBalance = useFetchAllTokenBalances()
 
   const { data, isValidating, error, mutate } = useSWR(
     [
@@ -158,9 +158,10 @@ export const useTokensWithBalance = (): UseTokens => {
         return {}
       }
 
-      const balances = await fetchAllTokensBalance(
+      const balances = await fetchAllTokenBalances(
         tokenAddresses,
-        selectedAccount.address,
+        selectedAccount,
+        currentNetwork,
       )
 
       return balances ?? {}
