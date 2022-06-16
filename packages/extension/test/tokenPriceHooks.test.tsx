@@ -8,10 +8,10 @@ import {
   useSumTokenBalancesToCurrencyValue,
   useTokenBalanceToCurrencyValue,
   useTokenPriceDetails,
-} from "../src/ui/features/accountTokens/tokens.service"
-import mockApiPricesData from "./argent-api-prices.mock.json"
-import mockApiTokenData from "./argent-api-tokens.mock.json"
-import { mockTokensWithBalance } from "./tokens.test"
+} from "../src/ui/features/accountTokens/tokenPriceHooks"
+import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"
+import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
+import { mockTokensWithBalance } from "./tokenPrice.test"
 
 describe("tokens-react", () => {
   describe("when API data is available", () => {

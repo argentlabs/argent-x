@@ -3,12 +3,10 @@ import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
 import { IconButton } from "../../components/IconButton"
+import { prettifyCurrencyValue } from "./ApiTokenDetails"
 import { TokenIcon } from "./TokenIcon"
-import {
-  prettifyCurrencyValue,
-  toTokenView,
-  useTokenBalanceToCurrencyValue,
-} from "./tokens.service"
+import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
+import { toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
 export const TokenWrapper = styled.div`

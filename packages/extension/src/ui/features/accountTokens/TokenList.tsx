@@ -4,11 +4,9 @@ import styled from "styled-components"
 
 import { routes } from "../../routes"
 import { SectionHeader } from "../accounts/SectionHeader"
+import { prettifyCurrencyValue } from "./ApiTokenDetails"
 import { TokenListItem } from "./TokenListItem"
-import {
-  prettifyCurrencyValue,
-  useSumTokenBalancesToCurrencyValue,
-} from "./tokens.service"
+import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
 
 interface TokenListProps {

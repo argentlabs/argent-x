@@ -1,5 +1,6 @@
 import { number } from "starknet"
 
+import { fetcher } from "../shared/fetcher"
 import { defaultNetwork } from "../shared/networks"
 import { Token, UniqueToken, equalToken, getFeeToken } from "../shared/token"
 import {
@@ -8,9 +9,8 @@ import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
   convertTokenAmountToCurrencyValue,
-  fetcher,
   lookupTokenPriceDetails,
-} from "../ui/features/accountTokens/tokens.service"
+} from "../shared/tokenPrice.service"
 import { StaleWhileRevalidateCache } from "./swr/types"
 
 type BaseCurrency = "usd"
