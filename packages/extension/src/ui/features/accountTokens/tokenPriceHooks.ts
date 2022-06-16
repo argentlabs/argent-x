@@ -1,7 +1,6 @@
 import { useMemo } from "react"
 import useSWR from "swr"
 
-import { fetcher } from "../../../shared/fetcher"
 import {
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
@@ -10,6 +9,7 @@ import {
   convertTokenAmountToCurrencyValue,
   lookupTokenPriceDetails,
 } from "../../../shared/tokenPrice.service"
+import { fetcher } from "../../../shared/utils/fetcher"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
 /** TODO: implement currency? */

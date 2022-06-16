@@ -5439,11 +5439,6 @@ eslint-plugin-react-hooks@^4.5.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.5.0.tgz#5f762dfedf8b2cf431c689f533c9d3fa5dcf25ad"
   integrity sha512-8k1gRt7D7h03kd+SAAlzXkQwWK22BnK6GKZG+FJA6BAGy22CFvl8kCIXKpVux0cCxMWDQUPqSok0LKaZ0aOcCw==
 
-eslint-plugin-react-hooks@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.6.0.tgz#4c3e697ad95b77e93f8646aaa1630c1ba607edd3"
-  integrity sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==
-
 eslint-plugin-react@^7.28.0, eslint-plugin-react@^7.29.4:
   version "7.30.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.30.0.tgz#8e7b1b2934b8426ac067a0febade1b13bd7064e3"
@@ -9557,10 +9552,10 @@ stack-utils@^2.0.3:
     superstruct "^0.15.3"
     url-join "^4.0.1"
 
-starknet@^3.12.1:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.14.0.tgz#7e57eeb41746d0ace4544cc00da65abf2b3399a6"
-  integrity sha512-vjawtJDSVUjzbgTWss9hednLcRqRVFdnI/RUybB6Fr/ytobPK14rh57DTt27AntrX7yL2cvQY3WIRslDlxh3ag==
+starknet@^3.14.0:
+  version "3.15.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.15.0.tgz#3f9ab20c6d6a094b33272f971f01fc5fa9b92c2a"
+  integrity sha512-+wqAHky7ffTpyJGGSLkzVt8c2FrMyu/8R1cAB3n++VyuBuTTS9+qD8SLXhXWJiBxCzlznP8KkdWQC9N0SCTokw==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     bn.js "^5.2.1"
