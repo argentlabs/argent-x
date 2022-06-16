@@ -89,6 +89,7 @@ export const NetworkSchema: Schema<Network> = object()
     rpcUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
+    multicallAddress: string().optional().matches(REGEX_HEXSTRING),
     readonly: boolean().optional(),
   })
 
