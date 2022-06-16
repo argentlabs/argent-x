@@ -182,11 +182,14 @@ export const usePriceAndTokenData = () => {
     `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/info?chain=starknet`,
     fetcher,
   )
-  return { pricesData, tokenData }
+  return {
+    pricesData,
+    tokenData,
+  }
 }
 
-export const useTokenPricing = (
-  token: TokenDetails,
+export const useTokenPriceDetails = (
+  token: TokenDetails | TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const { pricesData, tokenData } = usePriceAndTokenDataImpl()
@@ -200,6 +203,24 @@ export const useTokenPricing = (
       tokenData,
     })
   }, [token, pricesData, tokenData])
+}
+
+export const useTokenAmountToCurrencyValue = (
+  token: TokenDetailsWithBalance,
+  usePriceAndTokenDataImpl = usePriceAndTokenData,
+) => {
+  const priceDetails = useTokenPriceDetails(token, usePriceAndTokenDataImpl)
+  return useMemo(() => {
+    if (!token || !priceDetails || !token.balance || !token.decimals) {
+      return
+    }
+    const currencyValue = convertTokenAmountToCurrencyValue({
+      amount: token.balance,
+      decimals: token.decimals,
+      unitCurrencyValue: priceDetails.ccyValue,
+    })
+    return currencyValue
+  }, [priceDetails, token])
 }
 
 export const countDecimals = (value: number | string) => {

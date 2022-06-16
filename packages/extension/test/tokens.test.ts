@@ -7,16 +7,13 @@ import {
   formatTokenBalance,
   lookupTokenPriceDetails,
 } from "../src/ui/features/accountTokens/tokens.service"
-import {
-  TokenDetails,
-  TokenDetailsWithBalance,
-} from "../src/ui/features/accountTokens/tokens.state"
+import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
 import mockApiPricesData from "./argent-api-prices.mock.json"
 import mockApiTokenData from "./argent-api-tokens.mock.json"
 import mockTokensWithBalanceRaw from "./tokens-with-balance.mock.json"
 
 /** convert to expected types - a mix of BN and BigNumber */
-const mockTokensWithBalance = mockTokensWithBalanceRaw.map((token) => {
+export const mockTokensWithBalance = mockTokensWithBalanceRaw.map((token) => {
   return {
     ...token,
     decimals: number.toBN(token.decimals),
