@@ -9,7 +9,6 @@ export const hasNewDerivationPath = (derivationPath?: string): boolean =>
   Boolean(derivationPath?.startsWith(baseDerivationPath))
 
 export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
-  console.log("isDeprecated", signer.derivationPath)
   return (
     Boolean(network.accountClassHash) &&
     !hasNewDerivationPath(signer.derivationPath)
