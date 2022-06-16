@@ -3,7 +3,7 @@ import { Status } from "starknet"
 
 import { Transaction, TransactionRequest } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
-import { equalAccount } from "../wallet"
+import { accountsEqual } from "../wallet"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
 import { setIntervalAsync } from "./setIntervalAsync"
@@ -95,7 +95,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
 
   return {
     load: async (accountsToPopulate) => {
-      const initialAccounts = uniqWith(accountsToPopulate, equalAccount)
+      const initialAccounts = uniqWith(accountsToPopulate, accountsEqual)
       const initialTransactions = await getTransactionHistory(
         initialAccounts,
         [],
@@ -108,7 +108,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
     addAccount: async (account, transaction) => {
       if (
         !accounts.find((existingAccount) =>
-          equalAccount(existingAccount, account),
+          accountsEqual(existingAccount, account),
         )
       ) {
         accounts.push(account)

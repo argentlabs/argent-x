@@ -5,7 +5,7 @@ import { fetchAspectNfts } from "./aspect.service"
 
 export const useNfts = (address: string, config?: SWRConfigCommon) => {
   const { data: nfts = [], ...rest } = useSWR(
-    [address, "testnet", "nfts"],
+    [address, "goerli-alpha", "nfts"],
     fetchAspectNfts,
     {
       refreshInterval: 60e3 /* 1 minute */,
