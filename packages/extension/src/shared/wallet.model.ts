@@ -9,14 +9,14 @@ export interface WithSigner {
   signer: WalletAccountSigner
 }
 
-export interface UniqAccount {
+export interface BaseWalletAccount {
   address: string
   network: {
     id: string
   }
 }
 
-export interface WalletAccount extends UniqAccount, WithSigner {
+export interface WalletAccount extends BaseWalletAccount, WithSigner {
   address: string
   network: Network
   hidden?: boolean

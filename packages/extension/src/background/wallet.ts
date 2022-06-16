@@ -20,7 +20,7 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/networks"
-import { UniqAccount, WalletAccount } from "../shared/wallet.model"
+import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
@@ -83,7 +83,7 @@ function calculateContractAddress(
   ])
 }
 
-export const equalAccount = (a: UniqAccount, b: UniqAccount) =>
+export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) =>
   a.address === b.address && a.network.id === b.network.id
 
 export type GetNetwork = (networkId: string) => Promise<Network>
@@ -156,33 +156,33 @@ export class Wallet {
     )
   }
 
-  private async setAccounts(accounts: WalletAccount[]) {
+  private async addWalletAccounts(accounts: WalletAccount[]) {
     const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
     const newAccounts = uniqWith(
       [...oldAccounts, ...accounts].reverse(), // reverse as only first occurence is kept
-      equalAccount,
+      accountsEqual,
     )
 
     // we store the network as it was at the creation date of the wallet. This may be useful in the future.
     return this.store.setItem("accounts", newAccounts)
   }
 
-  private async pushAccount(account: WalletAccount) {
-    return this.setAccounts([account])
+  private async addWalletAccount(account: WalletAccount) {
+    return this.addWalletAccounts([account])
   }
 
-  public async removeAccount(account: UniqAccount) {
+  public async removeAccount(account: BaseWalletAccount) {
     const accounts = await this.getAccounts(true)
-    const newAccounts = differenceWith(accounts, [account], equalAccount)
+    const newAccounts = differenceWith(accounts, [account], accountsEqual)
     return this.store.setItem("accounts", newAccounts)
   }
 
-  public async hideAccount(account: UniqAccount) {
+  public async hideAccount(account: BaseWalletAccount) {
     const accounts = await this.getAccounts()
 
-    const fullAccount = find(accounts, (a) => equalAccount(a, account))
+    const fullAccount = find(accounts, (a) => accountsEqual(a, account))
 
     if (!fullAccount) {
       return
@@ -195,7 +195,7 @@ export class Wallet {
 
     const newAccounts = uniqWith(
       [...accounts, hiddenAccount].reverse(), // reverse as only first occurence is kept
-      equalAccount,
+      accountsEqual,
     )
 
     await this.store.setItem("accounts", newAccounts)
@@ -253,7 +253,7 @@ export class Wallet {
     )
     const accounts = accountsResults.flatMap((x) => x)
 
-    await this.setAccounts(accounts)
+    await this.addWalletAccounts(accounts)
 
     this.store.setItem("discoveredOnce", true)
   }
@@ -405,7 +405,7 @@ export class Wallet {
       offset,
     )
 
-    await this.setAccounts(accounts)
+    await this.addWalletAccounts(accounts)
   }
 
   public async addAccount(
@@ -462,7 +462,7 @@ export class Wallet {
       },
     }
 
-    await this.pushAccount(account)
+    await this.addWalletAccount(account)
 
     await this.writeBackup()
     await this.selectAccount(account.address)
@@ -643,7 +643,7 @@ export class Wallet {
       }),
     )
 
-    await this.setAccounts(accounts)
+    await this.addWalletAccounts(accounts)
   }
 
   private async writeBackup() {
