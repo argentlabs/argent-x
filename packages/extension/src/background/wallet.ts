@@ -455,7 +455,6 @@ export class Wallet {
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.getAccounts(true)
-    console.log(accounts)
     const currentPaths = accounts
       .filter(
         (account) =>
@@ -464,10 +463,7 @@ export class Wallet {
       )
       .map((account) => account.signer.derivationPath)
 
-    console.log(currentPaths)
-
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
-    console.log(index)
     const starkPair = getStarkPair(
       index,
       this.session?.secret as string,
