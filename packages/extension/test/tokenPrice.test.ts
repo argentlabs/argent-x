@@ -3,7 +3,6 @@ import { number } from "starknet"
 
 import {
   convertTokenAmountToCurrencyValue,
-  countDecimals,
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
 } from "../src/shared/tokenPrice.service"
@@ -19,17 +18,6 @@ export const mockTokensWithBalance = mockTokensWithBalanceRaw.map((token) => {
     decimals: number.toBN(token.decimals),
     balance: BigNumber.from(token.balance),
   }
-})
-
-describe("countDecimals()", () => {
-  test("should count decimal places correctly", () => {
-    expect(countDecimals(1)).toEqual(0)
-    expect(countDecimals(1.12)).toEqual(2)
-    expect(countDecimals(1.1234)).toEqual(4)
-    expect(countDecimals(1.123456789)).toEqual(9)
-    /** strips the final 0 correctly */
-    expect(countDecimals("1.1234567890")).toEqual(9)
-  })
 })
 
 describe("convertTokenAmountToCurrencyValue()", () => {
@@ -99,6 +87,6 @@ describe("sumTokenBalancesToCurrencyValue()", () => {
       pricesData: mockApiPricesData,
       tokenData: mockApiTokenData,
     })
-    expect(result).toEqual("1034.2980859999998")
+    expect(result).toEqual("1034.298086444706")
   })
 })

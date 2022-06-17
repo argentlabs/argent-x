@@ -41,7 +41,7 @@ describe("tokens-react", () => {
     })
 
     describe("useTokenAmountToCurrencyValue()", () => {
-      test("should convert token balance to currency 0", () => {
+      test("should convert token[0] balance to currency", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[0],
@@ -50,16 +50,16 @@ describe("tokens-react", () => {
         )
         expect(result.current).toEqual("1032.296954")
       })
-      test("should convert token balance to currency 1", () => {
+      test("should convert token[1] balance to currency", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[1],
             useMockPriceAndTokenData,
           ),
         )
-        expect(result.current).toEqual("0.999132")
+        expect(result.current).toEqual("0.999132444706")
       })
-      test("should convert token balance to currency 2", () => {
+      test("should convert token[2] balance to currency", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[2],
@@ -78,7 +78,7 @@ describe("tokens-react", () => {
             useMockPriceAndTokenData,
           ),
         )
-        expect(result.current).toEqual("1034.2980859999998")
+        expect(result.current).toEqual("1034.298086444706")
       })
     })
   })

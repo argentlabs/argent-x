@@ -1,5 +1,5 @@
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
-import { formatUnits } from "ethers/lib/utils"
+import { BigNumberish } from "@ethersproject/bignumber"
+import { BigNumber as BigDecimalNumber } from "bignumber.js"
 
 import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
 import { UniqueToken } from "./token"
@@ -76,7 +76,7 @@ export const sumTokenBalancesToCurrencyValue = ({
   pricesData,
   tokenData,
 }: ISumTokenBalancesToCurrencyValue) => {
-  let sumTokenBalance = 0
+  let sumTokenBalance = new BigDecimalNumber(0)
   tokens.forEach((token) => {
     const priceDetails = lookupTokenPriceDetails({
       token,
@@ -92,26 +92,12 @@ export const sumTokenBalancesToCurrencyValue = ({
         unitCurrencyValue: priceDetails.ccyValue,
       })
       if (currencyValue) {
-        sumTokenBalance += Number(currencyValue)
+        sumTokenBalance = sumTokenBalance.plus(currencyValue)
       }
     }
   })
-  /** convert to string for consistency with `convertTokenAmountToCurrencyValue()` */
-  return String(sumTokenBalance)
-}
-
-/**
- * Count the decimals in the provided `value`, e.g. 1.123 has 3 decimals
- */
-
-export const countDecimals = (value: number | string) => {
-  const numValue = Number(value)
-  /** check for whole number with no decimals */
-  if (Math.floor(numValue) === numValue) {
-    return 0
-  }
-  /** count decimals after conversion to string e.g. '12.34' */
-  return numValue.toString().split(".")[1].length || 0
+  /** keep as string to avoid loss of precision elsewhere */
+  return sumTokenBalance.toString()
 }
 
 export interface IConvertTokenAmountToCurrencyValue {
@@ -132,42 +118,32 @@ export const convertTokenAmountToCurrencyValue = ({
   decimals,
   unitCurrencyValue,
 }: IConvertTokenAmountToCurrencyValue) => {
-  /**
-   * BigNumber is only for integers, it does not support floating-point or fixed-point math
-   * @see https://github.com/ethers-io/ethers.js/issues/488#issuecomment-481944450
-   */
   const decimalsNumber = Number(decimals)
-  const unitCurrencyValueNumber = Number(unitCurrencyValue)
-
-  /** determine what we need to multiply by to make price into an integer */
-  const priceDecimals = countDecimals(unitCurrencyValueNumber)
-  const priceToIntegerMultiplier = Math.pow(10, priceDecimals)
-
-  /** Math.round due to loss of precision */
-  const integerPrince = BigNumber.from(
-    Math.round(unitCurrencyValueNumber * priceToIntegerMultiplier),
+  /** amount to divide by to take amount to unit value */
+  const unitDivideBy = Math.pow(10, decimalsNumber)
+  /** take amount to unit value */
+  const amountDecimal = new BigDecimalNumber(amount.toString()).dividedBy(
+    unitDivideBy,
   )
-
-  /** Multiply the integer price by balance, then divide down by the multiplier from above */
-  const priceWithDecimals = integerPrince
-    .mul(amount)
-    .div(priceToIntegerMultiplier)
-
-  /** Convert down using decimals */
-  const convertedPrice = formatUnits(priceWithDecimals, decimalsNumber)
-  return convertedPrice
+  /** multiply to convert to currency */
+  const currencyValue = amountDecimal.multipliedBy(
+    new BigDecimalNumber(unitCurrencyValue),
+  )
+  /** keep as string to avoid loss of precision elsewhere */
+  return currencyValue.toString()
 }
 
 /**
  * Prettify a raw currency string value e.g. '1.23456' => '$1.23'
  */
 
-export const prettifyCurrencyValue = (currencyValue?: string | number) => {
+export const prettifyCurrencyValue = (
+  currencyValue?: string | number,
+  currencySymbol = "$",
+) => {
   if (currencyValue === undefined) {
     return null
   }
   const prettyValue = Number(currencyValue).toFixed(2)
-  /** TODO: implement currency? thousands separators etc.? */
-  const symbol = "$"
-  return `${symbol}${prettyValue}`
+  return `${currencySymbol}${prettyValue}`
 }
