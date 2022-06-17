@@ -4,7 +4,10 @@ import styled, { css } from "styled-components"
 import useSWR from "swr"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { isDeprecated } from "../../../shared/wallet.service"
+import {
+  getAccountIdentifier,
+  isDeprecated,
+} from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ArrowCircleDownIcon } from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
@@ -82,18 +85,21 @@ export const AccountListItem: FC<AccountListProps> = ({
     network: { accountClassHash },
   } = useNetwork(switcherNetworkId)
   const status = useAccountStatus(account, selectedAccount)
+  if (status.code === "DEPLOYING") {
+    console.log("DEPLOYING", account)
+  }
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
 
   const { data: feeTokenBalance } = useSWR(
-    [account, switcherNetworkId],
-    fetchFeeTokenBalance,
+    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, switcherNetworkId),
     { suspense: false },
   )
 
   const { data: needsUpgrade = false } = useSWR(
-    [account, accountClassHash, "showUpgradeBanner"],
-    checkIfUpgradeAvailable,
+    [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
+    () => checkIfUpgradeAvailable(account, accountClassHash),
     { suspense: false },
   )
 

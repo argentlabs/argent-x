@@ -144,8 +144,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   }
 
   const { data: feeTokenBalance } = useSWR(
-    [account, networkId],
-    fetchFeeTokenBalance,
+    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, switcherNetworkId),
     { suspense: false },
   )
 
