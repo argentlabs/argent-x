@@ -78,7 +78,11 @@ export const TransactionDetail: FC = () => {
 
   const account = useSelectedAccount()
 
-  const { transactions } = useAccountTransactions(account?.address ?? "")
+  if (!account) {
+    return <Navigate to={routes.accounts()} />
+  }
+
+  const { transactions } = useAccountTransactions(account)
 
   const transaction = transactions.find((tx) => tx.hash === txHash)
 

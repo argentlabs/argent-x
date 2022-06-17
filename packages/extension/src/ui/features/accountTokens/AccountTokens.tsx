@@ -44,7 +44,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const status = useAccountStatus(account)
-  const { pendingTransactions } = useAccountTransactions(account.address)
+  const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
 
@@ -105,7 +105,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         </Link>
       )}
       {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
-      <PendingTransactions accountAddress={account.address} />
+      <PendingTransactions account={account} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <TokenList
           showTitle={showPendingTransactions}

@@ -1,5 +1,6 @@
 import { FC } from "react"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useAppState } from "../../app.state"
 import { openVoyagerTransaction } from "../../services/voyager.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
@@ -8,15 +9,15 @@ import { useNetwork } from "../networks/useNetworks"
 import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
 
 interface PendingTransactionsProps {
-  accountAddress: string
+  account: BaseWalletAccount
 }
 
 export const PendingTransactions: FC<PendingTransactionsProps> = ({
-  accountAddress,
+  account,
 }) => {
   const { switcherNetworkId } = useAppState()
   const { network } = useNetwork(switcherNetworkId)
-  const { pendingTransactions } = useAccountTransactions(accountAddress)
+  const { pendingTransactions } = useAccountTransactions(account)
 
   if (!pendingTransactions.length) {
     return <></>

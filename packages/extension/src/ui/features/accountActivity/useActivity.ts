@@ -1,4 +1,5 @@
 import { TransactionMeta } from "../../../shared/transactions"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { formatDate } from "../../services/dates"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 
@@ -11,8 +12,8 @@ export interface ActivityTransaction {
 
 export type DailyActivity = Record<string, ActivityTransaction[]>
 
-export function useActivity(address: string): DailyActivity {
-  const { transactions } = useAccountTransactions(address)
+export function useActivity(account: BaseWalletAccount): DailyActivity {
+  const { transactions } = useAccountTransactions(account)
   const activity: DailyActivity = {}
   for (const { hash, timestamp, meta, status } of transactions) {
     // RECEIVED transactions are already shown as pending
