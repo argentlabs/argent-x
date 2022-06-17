@@ -17,3 +17,6 @@ export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
 
 export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) =>
   a.address === b.address && a.networkId === b.networkId
+
+export const getAccountIdentifier = (account: BaseWalletAccount) =>
+  `${account.networkId}::${account.address}`
