@@ -1,11 +1,8 @@
-import find from "lodash-es/find"
+import { find } from "lodash-es"
 import create from "zustand"
 
-import {
-  BaseWalletAccount,
-  WalletAccount,
-  accountsEqual,
-} from "../../../shared/wallet.model"
+import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import { accountsEqual } from "../../../shared/wallet.service"
 import { Account } from "./Account"
 
 interface State {
@@ -38,7 +35,7 @@ export const useAccount = (address: string): Account | undefined =>
 export const useSelectedAccount = () =>
   useAccounts(({ accounts, selectedAccount }) =>
     selectedAccount
-      ? find(accounts, (x) => accountsEqual(x, selectedAccount))
+      ? find(accounts, (account) => accountsEqual(account, selectedAccount))
       : undefined,
   )
 

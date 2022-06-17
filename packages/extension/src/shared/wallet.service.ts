@@ -1,4 +1,4 @@
-import { WalletAccount } from "./wallet.model"
+import { BaseWalletAccount, WalletAccount } from "./wallet.model"
 
 // from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2645.md
 // m / purpose' / layer' / application' / eth_address_1' / eth_address_2' / index
@@ -14,3 +14,6 @@ export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
     !hasNewDerivationPath(signer.derivationPath)
   )
 }
+
+export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) =>
+  a.address === b.address && a.networkId === b.networkId

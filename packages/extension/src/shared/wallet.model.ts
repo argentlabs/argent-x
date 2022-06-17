@@ -18,6 +18,3 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
   network: Network
   hidden?: boolean
 }
-
-export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) =>
-  a.address === b.address && a.networkId === b.networkId

@@ -1,8 +1,7 @@
 import { some } from "lodash-es"
 
 import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
-import { accountsEqual } from "../../../shared/wallet.model"
-import { isDeprecated } from "../../../shared/wallet.service"
+import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import {

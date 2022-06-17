@@ -20,12 +20,8 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/networks"
-import {
-  BaseWalletAccount,
-  WalletAccount,
-  accountsEqual,
-} from "../shared/wallet.model"
-import { baseDerivationPath } from "../shared/wallet.service"
+import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
+import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
   getNextPathIndex,
@@ -165,7 +161,15 @@ export class Wallet {
             }
 
             if (needsWrite) {
-              await this.addWalletAccounts([account], accounts) // migration from stored network to only networkId
+              // migration from stored network to only networkId
+
+              // combine accounts without duplicates
+              const newAccounts = uniqWith(
+                [...accounts, ...accounts].reverse(), // reverse as only first occurence is kept
+                accountsEqual,
+              )
+              // we store the network as it was at the creation date of the wallet. This may be useful in the future.
+              await this.store.setItem("accounts", newAccounts)
             }
           } catch {
             // noop
@@ -186,11 +190,8 @@ export class Wallet {
     )
   }
 
-  private async addWalletAccounts(
-    accounts: WalletAccount[],
-    overwriteWith?: WalletAccount[],
-  ) {
-    const oldAccounts = overwriteWith ?? (await this.getAccounts(true))
+  private async addWalletAccounts(accounts: WalletAccount[]) {
+    const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
     const newAccounts = uniqWith(
