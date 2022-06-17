@@ -42,7 +42,7 @@ export const setDefaultAccountNames = (accounts: Account[]) => {
     const { network } = account
     if (!names[network.id]?.[account.address]) {
       const name = `Account ${
-        Object.keys(accounts).indexOf(account.address) + 1
+        accounts.map((a) => a.address).indexOf(account.address) + 1
       }`
       names = {
         ...names,
