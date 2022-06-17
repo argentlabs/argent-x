@@ -124,7 +124,10 @@ export const convertTokenAmountToCurrencyValue = ({
  * Prettify a raw currency string value e.g. '1.23456' => '$1.23'
  */
 
-export const prettifyCurrencyValue = (currencyValue: string | number) => {
+export const prettifyCurrencyValue = (currencyValue?: string | number) => {
+  if (currencyValue === undefined) {
+    return null
+  }
   const prettyValue = Number(currencyValue).toFixed(2)
   /** TODO: implement currency? thousands separators etc.? */
   const symbol = "$"

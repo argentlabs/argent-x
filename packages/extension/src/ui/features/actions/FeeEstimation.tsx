@@ -5,6 +5,8 @@ import { Call } from "starknet"
 import styled, { css, keyframes } from "styled-components"
 import useSWR from "swr"
 
+import { getFeeToken } from "../../../shared/token"
+import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -22,6 +24,7 @@ import {
 } from "../../components/Icons/MuiIcons"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { useAccount } from "../accounts/accounts.state"
+import { useTokenAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
 const FeeEstimationValue = styled.p`
@@ -166,6 +169,16 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     onErrorChange?.(hasError)
   }, [hasError])
 
+  const feeToken = getFeeToken(props.networkId)
+  const amountCurrencyValue = useTokenAmountToCurrencyValue(
+    feeToken,
+    fee?.amount,
+  )
+  const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
+    feeToken,
+    fee?.suggestedMaxFee,
+  )
+
   return (
     <FieldGroup error={showError}>
       <Field>
@@ -190,31 +203,41 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
         {fee ? (
           <FieldValueGroup>
             <FieldValue>
-              {fee.usd?.amount && <FeeEstimationValue>$</FeeEstimationValue>}
               <InvisibleInput
                 role="textbox"
                 contentEditable={false} // disable editing for now
               >
-                {fee.usd?.amount ?? displayEther(fee.amount)}
+                {amountCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    {prettifyCurrencyValue(amountCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <>
+                    {displayEther(fee.amount)}
+                    <FeeEstimationValue>ETH</FeeEstimationValue>
+                  </>
+                )}
               </InvisibleInput>
-              {!fee.usd?.amount && <FeeEstimationValue>ETH</FeeEstimationValue>}
             </FieldValue>
             <FieldValueMeta>
               <FeeEstimationValue style={{ marginRight: "0.2em" }}>
                 Max
               </FeeEstimationValue>
-              {fee.usd?.suggestedMaxFee && (
-                <FeeEstimationValue>$</FeeEstimationValue>
-              )}
               <InvisibleInput
                 role="textbox"
                 contentEditable={false} // disable editing for now
               >
-                {fee.usd?.suggestedMaxFee ?? displayEther(fee.suggestedMaxFee)}
+                {suggestedMaxFeeCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <>
+                    {displayEther(fee.suggestedMaxFee)}
+                    <FeeEstimationValue>ETH</FeeEstimationValue>
+                  </>
+                )}
               </InvisibleInput>
-              {!fee.usd?.suggestedMaxFee && (
-                <FeeEstimationValue>ETH</FeeEstimationValue>
-              )}
             </FieldValueMeta>
           </FieldValueGroup>
         ) : showEstimateError ? (

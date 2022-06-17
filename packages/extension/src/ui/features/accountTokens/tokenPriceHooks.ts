@@ -1,6 +1,8 @@
+import { BigNumber, BigNumberish } from "ethers"
 import { useMemo } from "react"
 import useSWR from "swr"
 
+import { Token } from "../../../shared/token"
 import {
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
@@ -36,12 +38,12 @@ export const usePriceAndTokenData = () => {
 }
 
 export const useTokenPriceDetails = (
-  token: TokenDetails | TokenDetailsWithBalance,
+  token?: Token | TokenDetails | TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const { pricesData, tokenData } = usePriceAndTokenDataImpl()
   return useMemo(() => {
-    if (!pricesData || !tokenData) {
+    if (!token || !pricesData || !tokenData) {
       return
     }
     return lookupTokenPriceDetails({
@@ -52,22 +54,34 @@ export const useTokenPriceDetails = (
   }, [token, pricesData, tokenData])
 }
 
-export const useTokenBalanceToCurrencyValue = (
-  token: TokenDetailsWithBalance,
+export const useTokenAmountToCurrencyValue = (
+  token?: Token | TokenDetails | TokenDetailsWithBalance,
+  amount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const priceDetails = useTokenPriceDetails(token, usePriceAndTokenDataImpl)
   return useMemo(() => {
-    if (!token || !priceDetails || !token.balance || !token.decimals) {
+    if (!token || !priceDetails || amount === undefined || !token.decimals) {
       return
     }
     const currencyValue = convertTokenAmountToCurrencyValue({
-      amount: token.balance,
+      amount,
       decimals: token.decimals,
       unitCurrencyValue: priceDetails.ccyValue,
     })
     return currencyValue
   }, [priceDetails, token])
+}
+
+export const useTokenBalanceToCurrencyValue = (
+  token: TokenDetailsWithBalance,
+  usePriceAndTokenDataImpl = usePriceAndTokenData,
+) => {
+  return useTokenAmountToCurrencyValue(
+    token,
+    token.balance,
+    usePriceAndTokenDataImpl,
+  )
 }
 
 export const useSumTokenBalancesToCurrencyValue = (
