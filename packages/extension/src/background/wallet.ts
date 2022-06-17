@@ -269,7 +269,9 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    const networks = defaultNetworks.map((network) => network.id)
+    const networks = defaultNetworks
+      .map((network) => network.id)
+      .filter((networkId) => networkId !== "localhost")
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)
