@@ -35,16 +35,18 @@ export const getAccountName = (
   accountNames: Record<string, Record<string, string>>,
 ): string => accountNames[network.id]?.[address] || defaultAccountName
 
-export const setDefaultAccountNames = (accounts: Record<string, Account>) => {
+export const setDefaultAccountNames = (accounts: Account[]) => {
   const { accountNames } = useAccountMetadata.getState()
   let names = accountNames
-  for (const [address, account] of Object.entries(accounts)) {
+  for (const account of accounts) {
     const { network } = account
-    if (!names[network.id]?.[address]) {
-      const name = `Account ${Object.keys(accounts).indexOf(address) + 1}`
+    if (!names[network.id]?.[account.address]) {
+      const name = `Account ${
+        Object.keys(accounts).indexOf(account.address) + 1
+      }`
       names = {
         ...names,
-        [network.id]: { ...names[network.id], [address]: name },
+        [network.id]: { ...names[network.id], [account.address]: name },
       }
     }
   }

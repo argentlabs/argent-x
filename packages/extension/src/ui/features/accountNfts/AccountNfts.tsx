@@ -65,6 +65,7 @@ interface AccountNftsProps {
   account: Account
 }
 
+// FIXME: as soon as aspect is on mainnet this needs to be network aware
 const Nfts: FC<AccountNftsProps> = ({ account }) => {
   const navigate = useNavigate()
   const { nfts = [] } = useNfts(account.address)

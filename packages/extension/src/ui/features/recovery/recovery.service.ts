@@ -8,9 +8,11 @@ import {
   getAccounts,
   getLastSelectedAccount,
 } from "../../services/backgroundAccounts"
-import { Account } from "../accounts/Account"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
-import { useAccounts } from "../accounts/accounts.state"
+import {
+  mapWalletAccountsToAccounts,
+  useAccounts,
+} from "../accounts/accounts.state"
 
 interface RecoveryOptions {
   networkId?: string
@@ -35,11 +37,7 @@ export const recover = async ({
         lastSelectedAccount && accountsEqual(account, lastSelectedAccount),
     )
 
-    const accounts = walletAccounts
-      .map(
-        ({ address, network, signer }) => new Account(address, network, signer),
-      )
-      .reduce((acc, account) => ({ ...acc, [account.address]: account }), {})
+    const accounts = mapWalletAccountsToAccounts(walletAccounts)
 
     setDefaultAccountNames(accounts)
     useAccounts.setState({ accounts, selectedAccount })

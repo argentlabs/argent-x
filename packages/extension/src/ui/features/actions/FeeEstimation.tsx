@@ -132,20 +132,19 @@ const StyledReportGmailerrorredRoundedIcon = styled(
 `
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
-  onChange,
   accountAddress,
   transactions,
   actionHash,
   onErrorChange,
-  ...props
+  networkId,
 }) => {
-  const account = useAccount(accountAddress)
+  const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
   const { data: feeTokenBalance } = useSWR(
-    [account, props.networkId],
+    [account, networkId],
     fetchFeeTokenBalance,
     { suspense: false },
   )

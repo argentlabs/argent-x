@@ -40,7 +40,7 @@ export const trackTransations: TransactionUpdateListener = async (
         }
       }
       // on error remove stored (increased) nonce
-      if (transaction.account.address && status === "REJECTED") {
+      if (transaction.account && status === "REJECTED") {
         resetStoredNonce(transaction.account)
       }
     }

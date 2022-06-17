@@ -6,14 +6,14 @@ import { accountsEqual } from "../../../shared/wallet.service"
 import { Account } from "./Account"
 
 interface State {
-  accounts: Record<string, Account>
+  accounts: Account[]
   selectedAccount?: BaseWalletAccount
   addAccount: (newAccount: Account) => void
   showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
 }
 
 export const initialState = {
-  accounts: {},
+  accounts: [],
   selectedAccount: undefined,
 }
 
@@ -22,15 +22,14 @@ export const useAccounts = create<State>((set) => ({
   addAccount: (newAccount: Account) =>
     set((state) => ({
       selectedAccount: newAccount,
-      accounts: {
-        ...state.accounts,
-        [newAccount.address]: newAccount,
-      },
+      accounts: [...state.accounts, newAccount],
     })),
 }))
 
-export const useAccount = (address: string): Account | undefined =>
-  useAccounts(({ accounts }) => accounts[address])
+export const useAccount = (account: BaseWalletAccount): Account | undefined =>
+  useAccounts(({ accounts }) =>
+    find(accounts, (a) => accountsEqual(a, account)),
+  )
 
 export const useSelectedAccount = () =>
   useAccounts(({ accounts, selectedAccount }) =>
@@ -39,20 +38,15 @@ export const useSelectedAccount = () =>
       : undefined,
   )
 
-export const reduceWalletAccountsToAccounts = (
+export const mapWalletAccountsToAccounts = (
   walletAccounts: WalletAccount[],
-) => {
-  return walletAccounts.reduce<State["accounts"]>(
-    (allAccounts, walletAccount) => {
-      return {
-        ...allAccounts,
-        [walletAccount.address]: new Account(
-          walletAccount.address,
-          walletAccount.network,
-          walletAccount.signer,
-        ),
-      }
-    },
-    {},
+): State["accounts"] => {
+  return walletAccounts.map(
+    (walletAccount) =>
+      new Account(
+        walletAccount.address,
+        walletAccount.network,
+        walletAccount.signer,
+      ),
   )
 }
