@@ -22,6 +22,7 @@ Object {
       "chainId": "SN_GOERLI",
       "explorerUrl": "https://goerli.voyager.online",
       "id": "goerli-alpha",
+      "multicallAddress": "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
       "name": "Goerli Testnet",
       "readonly": true,
     },
