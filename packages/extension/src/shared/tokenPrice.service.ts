@@ -1,5 +1,6 @@
 import { BigNumberish } from "@ethersproject/bignumber"
 import { BigNumber as BigDecimalNumber } from "bignumber.js"
+import numeral from "numeral"
 
 import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
 import { UniqueToken } from "./token"
@@ -144,6 +145,6 @@ export const prettifyCurrencyValue = (
   if (currencyValue === undefined) {
     return null
   }
-  const prettyValue = Number(currencyValue).toFixed(2)
-  return `${currencySymbol}${prettyValue}`
+  const prettyValue = numeral(currencyValue).format(`${currencySymbol}0,0.00`)
+  return prettyValue
 }

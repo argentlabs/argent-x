@@ -4,6 +4,7 @@ import { number } from "starknet"
 import {
   convertTokenAmountToCurrencyValue,
   lookupTokenPriceDetails,
+  prettifyCurrencyValue,
   sumTokenBalancesToCurrencyValue,
 } from "../src/shared/tokenPrice.service"
 import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
@@ -88,5 +89,24 @@ describe("sumTokenBalancesToCurrencyValue()", () => {
       tokenData: mockApiTokenData,
     })
     expect(result).toEqual("1034.298086444706")
+  })
+})
+
+describe("prettifyCurrencyValue()", () => {
+  describe("when valid", () => {
+    test("should return pretty currency value", () => {
+      expect(prettifyCurrencyValue(0)).toEqual("$0.00")
+      expect(prettifyCurrencyValue("0")).toEqual("$0.00")
+      expect(prettifyCurrencyValue("1.23456")).toEqual("$1.23")
+    })
+    test("should round as expected", () => {
+      expect(prettifyCurrencyValue("1.504")).toEqual("$1.50")
+      expect(prettifyCurrencyValue("1.505")).toEqual("$1.51")
+    })
+  })
+  describe("when invalid", () => {
+    test("should return null", () => {
+      expect(prettifyCurrencyValue()).toBeNull()
+    })
   })
 })
