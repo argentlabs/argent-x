@@ -11,6 +11,7 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { formatTruncatedAddress } from "../../services/addresses"
+import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { useNetwork } from "../networks/useNetworks"
@@ -84,11 +85,19 @@ export const AccountListItem: FC<AccountListProps> = ({
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
 
-  const { data: showUpgradeBanner = false } = useSWR(
+  const { data: feeTokenBalance } = useSWR(
+    [account, switcherNetworkId],
+    fetchFeeTokenBalance,
+    { suspense: false },
+  )
+
+  const { data: needsUpgrade = false } = useSWR(
     [account, accountClassHash, "showUpgradeBanner"],
     checkIfUpgradeAvailable,
     { suspense: false },
   )
+
+  const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   return (
     <AccountListItemWrapper

@@ -165,7 +165,7 @@ export class Wallet {
 
               // combine accounts without duplicates
               const newAccounts = uniqWith(
-                [...accounts, ...accounts].reverse(), // reverse as only first occurence is kept
+                [account, ...accounts],
                 accountsEqual,
               )
               // we store the network as it was at the creation date of the wallet. This may be useful in the future.
@@ -194,10 +194,7 @@ export class Wallet {
     const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
-    const newAccounts = uniqWith(
-      [...oldAccounts, ...accounts].reverse(), // reverse as only first occurence is kept
-      accountsEqual,
-    )
+    const newAccounts = uniqWith([...accounts, ...oldAccounts], accountsEqual)
 
     // we store the network as it was at the creation date of the wallet. This may be useful in the future.
     return this.store.setItem("accounts", newAccounts)
@@ -227,10 +224,7 @@ export class Wallet {
       hidden: true,
     }
 
-    const newAccounts = uniqWith(
-      [...accounts, hiddenAccount].reverse(), // reverse as only first occurence is kept
-      accountsEqual,
-    )
+    const newAccounts = uniqWith([hiddenAccount, ...accounts], accountsEqual)
 
     await this.store.setItem("accounts", newAccounts)
 

@@ -3,6 +3,7 @@ import {
   AddTransactionResponse,
   KeyPair,
   ProviderInterface,
+  constants,
   number,
   stark,
 } from "starknet"
@@ -24,8 +25,10 @@ function equalBigNumberish(
 }
 
 // FIXME: remove when we dont want to support old accounts anymore
-const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS =
+const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_MAINNET =
   "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac"
+const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_GOERLI =
+  "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30"
 
 export const getImplementationUpgradePath = (
   oldImplementation: number.BigNumberish,
@@ -58,7 +61,10 @@ export const getImplementationUpgradePath = (
         contractAddress: accountAddress,
         entrypoint: "upgrade",
         calldata: starkV390.compileCalldata({
-          implementation: newImplementation,
+          implementation:
+            provider.chainId === constants.StarknetChainId.TESTNET
+              ? LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_GOERLI
+              : LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_MAINNET,
         }),
       })
     }
@@ -72,7 +78,7 @@ export const getImplementationUpgradePath = (
       contractAddress: accountAddress,
       entrypoint: "upgrade",
       calldata: stark.compileCalldata({
-        implementation: LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS,
+        implementation: newImplementation,
       }),
     })
   }
