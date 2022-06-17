@@ -45,7 +45,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
         unitCurrencyValue: "1032.296954",
       }),
     ).toEqual("2064.593908")
-    /** In pure JS this would lose precision - 1032.296954 * 3 = 3096.8908619999997 */
+    /** In pure JS the following case would lose precision - 1032.296954 * 3 = 3096.8908619999997 */
     expect(
       convertTokenAmountToCurrencyValue({
         amount: "30000000000",

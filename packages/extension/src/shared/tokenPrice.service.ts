@@ -1,5 +1,5 @@
 import { BigNumberish } from "@ethersproject/bignumber"
-import { BigNumber as BigDecimalNumber } from "bignumber.js"
+import CurrencyConversionNumber from "bignumber.js"
 import numeral from "numeral"
 
 import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
@@ -77,7 +77,7 @@ export const sumTokenBalancesToCurrencyValue = ({
   pricesData,
   tokenData,
 }: ISumTokenBalancesToCurrencyValue) => {
-  let sumTokenBalance = new BigDecimalNumber(0)
+  let sumTokenBalance = new CurrencyConversionNumber(0)
   tokens.forEach((token) => {
     const priceDetails = lookupTokenPriceDetails({
       token,
@@ -123,12 +123,12 @@ export const convertTokenAmountToCurrencyValue = ({
   /** amount to divide by to take amount to unit value */
   const unitDivideBy = Math.pow(10, decimalsNumber)
   /** take amount to unit value */
-  const amountDecimal = new BigDecimalNumber(amount.toString()).dividedBy(
-    unitDivideBy,
-  )
+  const amountDecimal = new CurrencyConversionNumber(
+    amount.toString(),
+  ).dividedBy(unitDivideBy)
   /** multiply to convert to currency */
   const currencyValue = amountDecimal.multipliedBy(
-    new BigDecimalNumber(unitCurrencyValue),
+    new CurrencyConversionNumber(unitCurrencyValue),
   )
   /** keep as string to avoid loss of precision elsewhere */
   return currencyValue.toString()
