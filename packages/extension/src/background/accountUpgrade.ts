@@ -8,7 +8,7 @@ import {
 } from "starknet"
 import { Account as AccountV390, stark as starkV390 } from "starknet-390"
 
-import { UniqueAccount } from "../shared/wallet.model"
+import { BaseWalletAccount } from "../shared/wallet.model"
 import { hasNewDerivationPath } from "../shared/wallet.service"
 import { getNetwork } from "./customNetworks"
 import { TransactionTracker } from "./transactions/transactions"
@@ -79,7 +79,7 @@ export const getImplementationUpgradePath = (
 }
 
 export const upgradeAccount = async (
-  account: UniqueAccount,
+  account: BaseWalletAccount,
   wallet: Wallet,
   transactionTracker: TransactionTracker,
 ) => {

@@ -21,7 +21,7 @@ import {
   getProvider,
 } from "../shared/networks"
 import {
-  UniqueAccount,
+  BaseWalletAccount,
   WalletAccount,
   accountsEqual,
 } from "../shared/wallet.model"
@@ -59,7 +59,7 @@ interface WalletSession {
 
 export interface WalletStorageProps {
   backup?: string
-  selected?: UniqueAccount
+  selected?: BaseWalletAccount
   accounts?: WalletAccount[]
   discoveredOnce?: boolean
 }
@@ -194,13 +194,13 @@ export class Wallet {
     return this.addWalletAccounts([account])
   }
 
-  public async removeAccount(account: UniqueAccount) {
+  public async removeAccount(account: BaseWalletAccount) {
     const accounts = await this.getAccounts(true)
     const newAccounts = differenceWith(accounts, [account], accountsEqual)
     return this.store.setItem("accounts", newAccounts)
   }
 
-  public async hideAccount(account: UniqueAccount) {
+  public async hideAccount(account: BaseWalletAccount) {
     const accounts = await this.getAccounts()
 
     const fullAccount = find(accounts, (a) => accountsEqual(a, account))
@@ -493,7 +493,7 @@ export class Wallet {
     return { account, txHash: deployTransaction.transaction_hash }
   }
 
-  public async getAccount(selector: UniqueAccount): Promise<WalletAccount> {
+  public async getAccount(selector: BaseWalletAccount): Promise<WalletAccount> {
     const accounts = await this.getAccounts()
     const hit = find(accounts, (account) => accountsEqual(account, selector))
     if (!hit) {
@@ -506,7 +506,9 @@ export class Wallet {
     return getStarkPair(derivationPath, this.session?.secret as string)
   }
 
-  public async getStarknetAccount(selector: UniqueAccount): Promise<Account> {
+  public async getStarknetAccount(
+    selector: BaseWalletAccount,
+  ): Promise<Account> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
@@ -553,7 +555,7 @@ export class Wallet {
     return account ?? defaultAccount
   }
 
-  public async selectAccount(accountIdentifier: UniqueAccount) {
+  public async selectAccount(accountIdentifier: BaseWalletAccount) {
     const accounts = await this.getAccounts()
     const account = find(accounts, (account) =>
       accountsEqual(account, accountIdentifier),

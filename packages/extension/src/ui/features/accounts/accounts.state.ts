@@ -2,7 +2,7 @@ import find from "lodash-es/find"
 import create from "zustand"
 
 import {
-  UniqueAccount,
+  BaseWalletAccount,
   WalletAccount,
   accountsEqual,
 } from "../../../shared/wallet.model"
@@ -10,7 +10,7 @@ import { Account } from "./Account"
 
 interface State {
   accounts: Record<string, Account>
-  selectedAccount?: UniqueAccount
+  selectedAccount?: BaseWalletAccount
   addAccount: (newAccount: Account) => void
   showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
 }

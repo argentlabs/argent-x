@@ -1,5 +1,5 @@
 import { sendMessage, waitForMessage } from "../../shared/messages"
-import { UniqueAccount } from "../../shared/wallet.model"
+import { BaseWalletAccount } from "../../shared/wallet.model"
 import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
@@ -65,7 +65,7 @@ export const hideAccount = async (address: string, networkId: string) => {
   ])
 }
 
-export const upgradeAccount = async (data: UniqueAccount) => {
+export const upgradeAccount = async (data: BaseWalletAccount) => {
   sendMessage({ type: "UPGRADE_ACCOUNT", data })
   return waitForMessage("TRANSACTION_UPDATES")
 }

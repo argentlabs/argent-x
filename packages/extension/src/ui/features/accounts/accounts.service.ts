@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 
-import { UniqueAccount } from "../../../shared/wallet.model"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
@@ -29,7 +29,10 @@ export const getColor = (name: string) => {
   return argentColorsArray[index]
 }
 
-export const getAccountImageUrl = (name: string, account: UniqueAccount) => {
+export const getAccountImageUrl = (
+  name: string,
+  account: BaseWalletAccount,
+) => {
   const color = getColor(`${account.address}::${account.networkId}`)
   return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
 }

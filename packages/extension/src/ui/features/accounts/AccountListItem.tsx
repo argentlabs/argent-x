@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
-import { UniqueAccount } from "../../../shared/wallet.model"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ArrowCircleDownIcon } from "../../components/Icons/MuiIcons"
@@ -66,7 +66,7 @@ const AccountName = styled.h1`
 
 interface AccountListProps {
   account: Account
-  selectedAccount?: UniqueAccount
+  selectedAccount?: BaseWalletAccount
   canShowUpgrade?: boolean
 }
 

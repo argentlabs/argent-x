@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 
-import { UniqueAccount } from "../../../shared/wallet.model"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { Account } from "../accounts/Account"
 import { getStatus } from "../accounts/accounts.service"
 import { useTransactionStatus } from "./useTransactionStatus"
 
 export const useAccountStatus = (
   account: Account,
-  activeAccount?: UniqueAccount,
+  activeAccount?: BaseWalletAccount,
 ) => {
   const deployStatus = useTransactionStatus(
     account.deployTransaction,
