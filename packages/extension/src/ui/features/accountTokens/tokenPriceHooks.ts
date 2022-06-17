@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from "ethers"
+import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 import useSWR from "swr"
 
@@ -10,11 +10,12 @@ import {
   ApiTokenDataResponse,
   convertTokenAmountToCurrencyValue,
   lookupTokenPriceDetails,
+  sumTokenBalancesToCurrencyValue,
 } from "../../../shared/tokenPrice.service"
 import { fetcher } from "../../../shared/utils/fetcher"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
-/** TODO: implement currency? */
+/** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenData = () => {
   const { data: pricesData } = useSWR<ApiPriceDataResponse>(
@@ -37,6 +38,8 @@ export const usePriceAndTokenData = () => {
   }
 }
 
+/** @returns individual price details for the token */
+
 export const useTokenPriceDetails = (
   token?: Token | TokenDetails | TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
@@ -53,6 +56,12 @@ export const useTokenPriceDetails = (
     })
   }, [token, pricesData, tokenData])
 }
+
+/**
+ * Converts the amount of token into currecy value
+ *
+ * @returns currency value
+ */
 
 export const useTokenAmountToCurrencyValue = (
   token?: Token | TokenDetails | TokenDetailsWithBalance,
@@ -73,6 +82,12 @@ export const useTokenAmountToCurrencyValue = (
   }, [priceDetails, token])
 }
 
+/**
+ * Converts token and token.balance into currecy value
+ *
+ * @returns currency value
+ */
+
 export const useTokenBalanceToCurrencyValue = (
   token: TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
@@ -84,6 +99,12 @@ export const useTokenBalanceToCurrencyValue = (
   )
 }
 
+/**
+ * Sums an array of tokens into currency value
+ *
+ * @returns currency value
+ */
+
 export const useSumTokenBalancesToCurrencyValue = (
   tokens: TokenDetailsWithBalance[],
   usePriceAndTokenDataImpl = usePriceAndTokenData,
@@ -93,27 +114,10 @@ export const useSumTokenBalancesToCurrencyValue = (
     if (!tokens || !pricesData || !tokenData) {
       return
     }
-    let sumTokenBalance = 0
-    tokens.forEach((token) => {
-      const priceDetails = lookupTokenPriceDetails({
-        token,
-        pricesData,
-        tokenData,
-      })
-      if (!priceDetails || !token.balance || !token.decimals) {
-        // missing data - don't add it
-      } else {
-        const currencyValue = convertTokenAmountToCurrencyValue({
-          amount: token.balance,
-          decimals: token.decimals,
-          unitCurrencyValue: priceDetails.ccyValue,
-        })
-        if (currencyValue) {
-          sumTokenBalance += Number(currencyValue)
-        }
-      }
+    return sumTokenBalancesToCurrencyValue({
+      tokens,
+      pricesData,
+      tokenData,
     })
-    /** convert to string for consistency with `convertTokenAmountToCurrencyValue()` */
-    return String(sumTokenBalance)
   }, [pricesData, tokenData, tokens])
 }

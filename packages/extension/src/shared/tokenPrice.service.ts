@@ -1,9 +1,9 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { formatUnits } from "ethers/lib/utils"
 
+import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
 import { UniqueToken } from "./token"
 
-/** TODO: implement currency? */
 export const ARGENT_API_TOKENS_PRICES_URL = `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/prices?chain=starknet`
 export const ARGENT_API_TOKENS_INFO_URL = `${process.env.REACT_APP_ARGENT_API_BASE_URL}/tokens/info?chain=starknet`
 
@@ -60,6 +60,44 @@ export const lookupTokenPriceDetails = ({
     )
     return priceDetails
   }
+}
+
+export interface ISumTokenBalancesToCurrencyValue {
+  /** the tokens to sum */
+  tokens: TokenDetailsWithBalance[]
+  /** reponse from `/tokens/prices` endpoint */
+  pricesData: ApiPriceDataResponse
+  /** reponse from `/tokens/info` endpoint */
+  tokenData: ApiTokenDataResponse
+}
+
+export const sumTokenBalancesToCurrencyValue = ({
+  tokens,
+  pricesData,
+  tokenData,
+}: ISumTokenBalancesToCurrencyValue) => {
+  let sumTokenBalance = 0
+  tokens.forEach((token) => {
+    const priceDetails = lookupTokenPriceDetails({
+      token,
+      pricesData,
+      tokenData,
+    })
+    if (!priceDetails || !token.balance || !token.decimals) {
+      // missing data - don't add it
+    } else {
+      const currencyValue = convertTokenAmountToCurrencyValue({
+        amount: token.balance,
+        decimals: token.decimals,
+        unitCurrencyValue: priceDetails.ccyValue,
+      })
+      if (currencyValue) {
+        sumTokenBalance += Number(currencyValue)
+      }
+    }
+  })
+  /** convert to string for consistency with `convertTokenAmountToCurrencyValue()` */
+  return String(sumTokenBalance)
 }
 
 /**

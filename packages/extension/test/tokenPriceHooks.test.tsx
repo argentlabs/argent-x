@@ -15,7 +15,7 @@ import { mockTokensWithBalance } from "./tokenPrice.test"
 
 describe("tokens-react", () => {
   describe("when API data is available", () => {
-    const usePriceAndTokenDataImpl = () => {
+    const useMockPriceAndTokenData = () => {
       return {
         pricesData: mockApiPricesData,
         tokenData: mockApiTokenData,
@@ -27,7 +27,7 @@ describe("tokens-react", () => {
         const { result } = renderHook(() =>
           useTokenPriceDetails(
             mockTokensWithBalance[0],
-            usePriceAndTokenDataImpl,
+            useMockPriceAndTokenData,
           ),
         )
         expect(result.current).toEqual({
@@ -45,7 +45,7 @@ describe("tokens-react", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[0],
-            usePriceAndTokenDataImpl,
+            useMockPriceAndTokenData,
           ),
         )
         expect(result.current).toEqual("1032.296954")
@@ -54,7 +54,7 @@ describe("tokens-react", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[1],
-            usePriceAndTokenDataImpl,
+            useMockPriceAndTokenData,
           ),
         )
         expect(result.current).toEqual("0.999132")
@@ -63,7 +63,7 @@ describe("tokens-react", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[2],
-            usePriceAndTokenDataImpl,
+            useMockPriceAndTokenData,
           ),
         )
         expect(result.current).toEqual("1.002")
@@ -75,7 +75,7 @@ describe("tokens-react", () => {
         const { result } = renderHook(() =>
           useSumTokenBalancesToCurrencyValue(
             mockTokensWithBalance,
-            usePriceAndTokenDataImpl,
+            useMockPriceAndTokenData,
           ),
         )
         expect(result.current).toEqual("1034.2980859999998")

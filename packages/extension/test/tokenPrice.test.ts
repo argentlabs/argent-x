@@ -5,6 +5,7 @@ import {
   convertTokenAmountToCurrencyValue,
   countDecimals,
   lookupTokenPriceDetails,
+  sumTokenBalancesToCurrencyValue,
 } from "../src/shared/tokenPrice.service"
 import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
 import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"
@@ -30,6 +31,7 @@ describe("countDecimals()", () => {
     expect(countDecimals("1.1234567890")).toEqual(9)
   })
 })
+
 describe("convertTokenAmountToCurrencyValue()", () => {
   test("should convert token balance to currency value correctly", () => {
     expect(
@@ -64,6 +66,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
     ).toEqual("3096.890862")
   })
 })
+
 describe("lookupTokenPriceDetails()", () => {
   test("should find token price details in API response", () => {
     const token = mockTokensWithBalance[0] as TokenDetailsWithBalance
@@ -86,5 +89,16 @@ describe("lookupTokenPriceDetails()", () => {
         unitCurrencyValue: price?.ccyValue || 0,
       }),
     ).toEqual("1032.296954")
+  })
+})
+
+describe("sumTokenBalancesToCurrencyValue()", () => {
+  test("should sum an array of tokens to currency value", () => {
+    const result = sumTokenBalancesToCurrencyValue({
+      tokens: mockTokensWithBalance,
+      pricesData: mockApiPricesData,
+      tokenData: mockApiTokenData,
+    })
+    expect(result).toEqual("1034.2980859999998")
   })
 })
