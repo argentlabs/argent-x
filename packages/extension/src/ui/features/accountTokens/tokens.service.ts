@@ -146,22 +146,26 @@ export const fetchAllTokensBalance = async (
 
   const results: string[] = response.result.map((res: any) => number.toHex(res))
 
-  const resultsIterator = results.flat()[Symbol.iterator]()
+  return results.reduce<BalancesMap>((acc, result, i) => {
+    if (i % 2 === 0) {
+      const uint256Balance: uint256.Uint256 = {
+        low: results[i],
+        high: results[i + 1],
+      }
 
-  return tokenAddresses.reduce<BalancesMap>((acc, tokenAddress) => {
-    const uint256Balance: uint256.Uint256 = {
-      low: resultsIterator.next().value,
-      high: resultsIterator.next().value,
+      const balance = BigNumber.from(
+        uint256.uint256ToBN(uint256Balance).toString(),
+      )
+
+      const tokenAddress = tokenAddresses[i / 2]
+
+      return {
+        ...acc,
+        [tokenAddress]: balance,
+      }
     }
 
-    const balance = BigNumber.from(
-      uint256.uint256ToBN(uint256Balance).toString(),
-    )
-
-    return {
-      ...acc,
-      [tokenAddress]: balance,
-    }
+    return acc
   }, {})
 }
 
