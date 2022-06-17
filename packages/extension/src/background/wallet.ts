@@ -148,12 +148,24 @@ export class Wallet {
           }
 
           try {
+            let needsWrite = false
             if (account.network?.id) {
               account.networkId = account.network.id
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               delete account.network
-              await this.addWalletAccounts([account], accounts) // non blocking migration from stored network to only networkId
+
+              needsWrite = true
+            }
+            // migrate signer.type local_signer to local_secret
+            if ((account.signer.type as any) !== "local_secret") {
+              // currently there is just one type of signer
+              account.signer.type = "local_secret"
+              needsWrite = true
+            }
+
+            if (needsWrite) {
+              await this.addWalletAccounts([account], accounts) // migration from stored network to only networkId
             }
           } catch {
             // noop
@@ -351,7 +363,7 @@ export class Wallet {
               networkId: network.id,
               network,
               signer: {
-                type: "local_signer",
+                type: "local_secret",
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
             })
@@ -441,7 +453,9 @@ export class Wallet {
 
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
-    const currentPaths = (await this.getAccounts(true))
+    const accounts = await this.getAccounts(true)
+    console.log(accounts)
+    const currentPaths = accounts
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -449,7 +463,10 @@ export class Wallet {
       )
       .map((account) => account.signer.derivationPath)
 
+    console.log(currentPaths)
+
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
+    console.log(index)
     const starkPair = getStarkPair(
       index,
       this.session?.secret as string,
@@ -480,7 +497,7 @@ export class Wallet {
       networkId: network.id,
       address: proxyAddress,
       signer: {
-        type: "local_secret",
+        type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
     }

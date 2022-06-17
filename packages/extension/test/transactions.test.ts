@@ -24,7 +24,7 @@ const wallet: WalletAccount = {
   network: defaultNetwork,
   signer: {
     derivationPath: "0",
-    type: "local_signer",
+    type: "local_secret",
   },
 }
 

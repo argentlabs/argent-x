@@ -1,7 +1,7 @@
 import type { Network } from "./networks"
 
 export interface WalletAccountSigner {
-  type: string
+  type: "local_secret"
   derivationPath: string
 }
 
