@@ -5,6 +5,7 @@ import { Call } from "starknet"
 import styled, { css, keyframes } from "styled-components"
 import useSWR from "swr"
 
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -144,8 +145,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   }
 
   const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, switcherNetworkId),
+    [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, account.networkId),
     { suspense: false },
   )
 

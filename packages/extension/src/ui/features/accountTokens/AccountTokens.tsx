@@ -61,7 +61,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     { suspense: false },
   )
 
-  const { data: needsUpgrade = false } = useSWR(
+  const { data: needsUpgrade = false, mutate } = useSWR(
     [
       getAccountIdentifier(account),
       network.accountClassHash,
