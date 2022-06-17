@@ -11,13 +11,14 @@ export async function getNonce(
   wallet: Wallet,
 ): Promise<string> {
   const account = await wallet.getStarknetAccount(baseWallet)
+  const storageAddress = getAccountIdentifier(baseWallet)
   const result = await account.getNonce()
   const nonceBn = number.toBN(result)
-  const storedNonce = nonceStore[account.address]
+  const storedNonce = nonceStore[storageAddress]
 
   // If there's no nonce stored or the fetched nonce is bigger than the stored one, store the fetched nonce
   if (!storedNonce || nonceBn.gt(number.toBN(storedNonce))) {
-    nonceStore[account.address] = number.toHex(nonceBn)
+    nonceStore[storageAddress] = number.toHex(nonceBn)
   }
 
   // If the stored nonce is greater than the fetched nonce, use the stored nonce
