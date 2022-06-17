@@ -16,7 +16,7 @@ import {
 } from "../../services/backgroundTokens"
 import { useCurrentNetwork } from "./../networks/useNetworks"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { BalancesMap, fetchAllTokenBalances } from "./tokens.service"
+import { BalancesMap, fetchAllTokensBalance } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {
   decimals?: BigNumber
@@ -158,7 +158,7 @@ export const useTokensWithBalance = (): UseTokens => {
         return {}
       }
 
-      const balances = await fetchAllTokenBalances(
+      const balances = await fetchAllTokensBalance(
         tokenAddresses,
         selectedAccount,
         currentNetwork,

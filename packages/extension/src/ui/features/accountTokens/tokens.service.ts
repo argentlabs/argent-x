@@ -119,7 +119,7 @@ export const fetchTokenBalance = async (
 
 export type BalancesMap = Record<string, BigNumber | undefined>
 
-export const fetchAllTokenBalances = async (
+export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
   account: Account,
   network: Network,
@@ -127,20 +127,8 @@ export const fetchAllTokenBalances = async (
   const multicallContract = getMulticallContract(account, network)
 
   if (!multicallContract) {
-    // if no multicall contract is found, fallback to Promises.all
-
-    const balances = await Promise.all(
-      tokenAddresses.map(async (address) =>
-        fetchTokenBalance(address, account).catch(() => undefined),
-      ),
-    )
-
-    return balances.reduce<BalancesMap>((acc, balance, i) => {
-      return {
-        ...acc,
-        [tokenAddresses[i]]: balance,
-      }
-    }, {})
+    // if no multicall contract is found, fallback to Promises
+    return fetchTokensBalanceWithPromises(tokenAddresses, account)
   }
 
   const compiledCalldata = stark.compileCalldata({
@@ -173,6 +161,24 @@ export const fetchAllTokenBalances = async (
     return {
       ...acc,
       [tokenAddress]: balance,
+    }
+  }, {})
+}
+
+export const fetchTokensBalanceWithPromises = async (
+  tokenAddresses: string[],
+  account: Account,
+): Promise<BalancesMap> => {
+  const balances = await Promise.all(
+    tokenAddresses.map(async (address) =>
+      fetchTokenBalance(address, account).catch(() => undefined),
+    ),
+  )
+
+  return balances.reduce<BalancesMap>((acc, balance, i) => {
+    return {
+      ...acc,
+      [tokenAddresses[i]]: balance,
     }
   }, {})
 }
