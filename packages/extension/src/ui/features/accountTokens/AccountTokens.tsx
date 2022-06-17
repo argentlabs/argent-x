@@ -67,6 +67,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showUpgradeBanner = Boolean(
     needsUpgrade && !showPendingTransactions && feeTokenBalance?.gt(0),
   )
+  const showNoBalanceForUpgrade = !showUpgradeBanner && needsUpgrade
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
@@ -98,11 +99,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       <TransferButtons />
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
-      {showUpgradeBanner && network.accountClassHash && (
+      {showUpgradeBanner && (
         <Link to={routes.upgrade()}>
           <UpgradeBanner />
         </Link>
       )}
+      {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
       <PendingTransactions accountAddress={account.address} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <TokenList
