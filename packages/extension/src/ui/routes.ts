@@ -28,11 +28,11 @@ export const routes = {
     `/account/nfts/:contractAddress/:tokenId`,
   ),
   accountHideConfirm: route(
-    (accountAddress) => `/account/hide-confirm/${accountAddress}`,
+    (accountAddress: string) => `/account/hide-confirm/${accountAddress}`,
     `/account/hide-confirm/:accountAddress`,
   ),
   accountDeleteConfirm: route(
-    (accountAddress) => `/account/delete-confirm/${accountAddress}`,
+    (accountAddress: string) => `/account/delete-confirm/${accountAddress}`,
     `/account/delete-confirm/:accountAddress`,
   ),
   transactionDetail: route(

@@ -3,7 +3,10 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
-import { isDeprecated } from "../../../shared/wallet.service"
+import {
+  getAccountIdentifier,
+  isDeprecated,
+} from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
@@ -44,7 +47,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const status = useAccountStatus(account)
-  const { pendingTransactions } = useAccountTransactions(account.address)
+  const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
 
@@ -53,13 +56,18 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { network } = useNetwork(switcherNetworkId)
 
   const { data: feeTokenBalance } = useSWR(
-    [account, switcherNetworkId],
-    fetchFeeTokenBalance,
+    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, switcherNetworkId),
     { suspense: false },
   )
+
   const { data: needsUpgrade = false, mutate } = useSWR(
-    [account, network.accountClassHash, "showUpgradeBanner"],
-    checkIfUpgradeAvailable,
+    [
+      getAccountIdentifier(account),
+      network.accountClassHash,
+      "showUpgradeBanner",
+    ],
+    () => checkIfUpgradeAvailable(account, network.accountClassHash),
     { suspense: false },
   )
 
@@ -105,7 +113,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         </Link>
       )}
       {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
-      <PendingTransactions accountAddress={account.address} />
+      <PendingTransactions account={account} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <TokenList
           showTitle={showPendingTransactions}

@@ -38,5 +38,5 @@ export const useAccountStatus = (
     return { code: "ERROR" as const, text: "Undeployed" }
   }
 
-  return getStatus(account, activeAccount?.address, deployStatus === "SUCCESS")
+  return getStatus(account, activeAccount, deployStatus === "SUCCESS")
 }

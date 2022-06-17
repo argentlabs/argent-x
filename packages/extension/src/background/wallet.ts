@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { differenceWith, find, union, uniqWith } from "lodash-es"
+import { differenceWith, find, union } from "lodash-es"
 import {
   Account,
   AddTransactionResponse,
@@ -47,6 +47,23 @@ const PROXY_CONTRACT_CLASS_HASHES = [
 const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
   "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
 ]
+
+function mergeArrayStableWith<T>(
+  array: T[],
+  other: T[],
+  compareFn: (a: T, b: T) => boolean,
+): T[] {
+  const result = [...array]
+  for (const element of other) {
+    const index = result.findIndex((e) => compareFn(e, element))
+    if (index === -1) {
+      result.push(element)
+    } else {
+      result[index] = element
+    }
+  }
+  return result
+}
 
 interface WalletSession {
   secret: string
@@ -164,8 +181,9 @@ export class Wallet {
               // migration from stored network to only networkId
 
               // combine accounts without duplicates
-              const newAccounts = uniqWith(
-                [account, ...accounts],
+              const newAccounts = mergeArrayStableWith(
+                accounts,
+                [account],
                 accountsEqual,
               )
               // we store the network as it was at the creation date of the wallet. This may be useful in the future.
@@ -194,7 +212,11 @@ export class Wallet {
     const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
-    const newAccounts = uniqWith([...accounts, ...oldAccounts], accountsEqual)
+    const newAccounts = mergeArrayStableWith(
+      oldAccounts,
+      accounts,
+      accountsEqual,
+    )
 
     // we store the network as it was at the creation date of the wallet. This may be useful in the future.
     return this.store.setItem("accounts", newAccounts)
@@ -224,7 +246,11 @@ export class Wallet {
       hidden: true,
     }
 
-    const newAccounts = uniqWith([hiddenAccount, ...accounts], accountsEqual)
+    const newAccounts = mergeArrayStableWith(
+      accounts,
+      [hiddenAccount],
+      accountsEqual,
+    )
 
     await this.store.setItem("accounts", newAccounts)
 
@@ -269,7 +295,9 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    const networks = defaultNetworks.map((network) => network.id)
+    const networks = defaultNetworks
+      .map((network) => network.id)
+      .filter((networkId) => networkId !== "localhost")
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)

@@ -37,11 +37,14 @@ const AddressWrapper = styled.span`
 export const HideOrDeleteAccountConfirmScreen: FC<{
   mode: "hide" | "delete"
 }> = ({ mode }) => {
-  const { accountAddress } = useParams<{ accountAddress: string }>()
+  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { accountNames } = useAccountMetadata()
-  const account = useAccount(accountAddress ?? "")
+  const account = useAccount({
+    address: accountAddress,
+    networkId: switcherNetworkId,
+  })
 
   if (!accountAddress || !account) {
     return <></>
