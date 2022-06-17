@@ -20,6 +20,7 @@ import transactionsMock from "./transactions.mock.json"
 
 const wallet: WalletAccount = {
   address: "0x05e54edb59e1b1e398f9647e617276f6da0eb9ddfc0c02723269b9baa2489dce",
+  networkId: defaultNetwork.id,
   network: defaultNetwork,
   signer: {
     derivationPath: "0",

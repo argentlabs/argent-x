@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
+import { UniqueAccount } from "../../../shared/wallet.model"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ArrowCircleDownIcon } from "../../components/Icons/MuiIcons"
@@ -65,7 +66,7 @@ const AccountName = styled.h1`
 
 interface AccountListProps {
   account: Account
-  selectedAccount?: string
+  selectedAccount?: UniqueAccount
   canShowUpgrade?: boolean
 }
 
@@ -82,7 +83,6 @@ export const AccountListItem: FC<AccountListProps> = ({
   const status = useAccountStatus(account, selectedAccount)
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
-  const { address } = account
 
   const { data: showUpgradeBanner = false } = useSWR(
     [account, accountClassHash, "showUpgradeBanner"],
@@ -94,18 +94,18 @@ export const AccountListItem: FC<AccountListProps> = ({
     <AccountListItemWrapper
       {...makeClickable(() => {
         useAccounts.setState({
-          selectedAccount: address,
+          selectedAccount: account,
           showMigrationScreen: account ? isDeprecated(account) : false,
         })
         navigate(routes.accountTokens())
       })}
       selected={status.code === "CONNECTED"}
     >
-      <ProfilePicture src={getAccountImageUrl(accountName, address)} />
+      <ProfilePicture src={getAccountImageUrl(accountName, account)} />
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountName}</AccountName>
-          <p>{formatTruncatedAddress(address)}</p>
+          <p>{formatTruncatedAddress(account.address)}</p>
         </AccountColumn>
         {status.code === "DEPLOYING" ? (
           <NetworkStatusWrapper>

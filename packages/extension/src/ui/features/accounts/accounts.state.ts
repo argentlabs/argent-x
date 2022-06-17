@@ -1,11 +1,16 @@
+import find from "lodash-es/find"
 import create from "zustand"
 
-import { WalletAccount } from "../../../shared/wallet.model"
+import {
+  UniqueAccount,
+  WalletAccount,
+  accountsEqual,
+} from "../../../shared/wallet.model"
 import { Account } from "./Account"
 
 interface State {
   accounts: Record<string, Account>
-  selectedAccount?: string
+  selectedAccount?: UniqueAccount
   addAccount: (newAccount: Account) => void
   showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
 }
@@ -19,7 +24,7 @@ export const useAccounts = create<State>((set) => ({
   ...initialState,
   addAccount: (newAccount: Account) =>
     set((state) => ({
-      selectedAccount: newAccount.address,
+      selectedAccount: newAccount,
       accounts: {
         ...state.accounts,
         [newAccount.address]: newAccount,
@@ -32,7 +37,9 @@ export const useAccount = (address: string): Account | undefined =>
 
 export const useSelectedAccount = () =>
   useAccounts(({ accounts, selectedAccount }) =>
-    selectedAccount ? accounts[selectedAccount] : undefined,
+    selectedAccount
+      ? find(accounts, (x) => accountsEqual(x, selectedAccount))
+      : undefined,
   )
 
 export const reduceWalletAccountsToAccounts = (

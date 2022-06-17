@@ -20,7 +20,11 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/networks"
-import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
+import {
+  UniqueAccount,
+  WalletAccount,
+  accountsEqual,
+} from "../shared/wallet.model"
 import { baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
@@ -55,7 +59,7 @@ interface WalletSession {
 
 export interface WalletStorageProps {
   backup?: string
-  selected?: string
+  selected?: UniqueAccount
   accounts?: WalletAccount[]
   discoveredOnce?: boolean
 }
@@ -82,9 +86,6 @@ function calculateContractAddress(
     constructorCalldataHash,
   ])
 }
-
-export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) =>
-  a.address === b.address && a.network.id === b.network.id
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -132,15 +133,32 @@ export class Wallet {
   }
 
   public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
-    const accounts = await this.store.getItem("accounts")
+    const accounts = (await this.store.getItem("accounts")) || []
 
+    // migrate from storing network to just storing networkId
+    // populate network back from networkId
     const accountsWithNetwork = await Promise.all(
-      (accounts || []).map(async (account) => {
+      accounts.map(async (account) => {
         try {
-          const network = await this.getNetwork(account.network.id)
+          const network = await this.getNetwork(
+            account.networkId || account.network?.id,
+          )
           if (!network) {
             throw new Error("Network not found")
           }
+
+          try {
+            if (account.network?.id) {
+              account.networkId = account.network.id
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              delete account.network
+              await this.addWalletAccounts([account], accounts) // non blocking migration from stored network to only networkId
+            }
+          } catch {
+            // noop
+          }
+
           return {
             ...account,
             network,
@@ -156,8 +174,11 @@ export class Wallet {
     )
   }
 
-  private async addWalletAccounts(accounts: WalletAccount[]) {
-    const oldAccounts = await this.getAccounts(true)
+  private async addWalletAccounts(
+    accounts: WalletAccount[],
+    overwriteWith?: WalletAccount[],
+  ) {
+    const oldAccounts = overwriteWith ?? (await this.getAccounts(true))
 
     // combine accounts without duplicates
     const newAccounts = uniqWith(
@@ -173,13 +194,13 @@ export class Wallet {
     return this.addWalletAccounts([account])
   }
 
-  public async removeAccount(account: BaseWalletAccount) {
+  public async removeAccount(account: UniqueAccount) {
     const accounts = await this.getAccounts(true)
     const newAccounts = differenceWith(accounts, [account], accountsEqual)
     return this.store.setItem("accounts", newAccounts)
   }
 
-  public async hideAccount(account: BaseWalletAccount) {
+  public async hideAccount(account: UniqueAccount) {
     const accounts = await this.getAccounts()
 
     const fullAccount = find(accounts, (a) => accountsEqual(a, account))
@@ -327,6 +348,7 @@ export class Wallet {
             lastHit = lastCheck
             accounts.push({
               address,
+              networkId: network.id,
               network,
               signer: {
                 type: "local_signer",
@@ -455,6 +477,7 @@ export class Wallet {
 
     const account = {
       network,
+      networkId: network.id,
       address: proxyAddress,
       signer: {
         type: "local_secret",
@@ -465,15 +488,14 @@ export class Wallet {
     await this.addWalletAccount(account)
 
     await this.writeBackup()
-    await this.selectAccount(account.address)
+    await this.selectAccount(account)
 
     return { account, txHash: deployTransaction.transaction_hash }
   }
 
-  public async getAccountByAddress(address: string): Promise<WalletAccount> {
-    const hit = (await this.getAccounts(true)).find(
-      (account) => account.address === address,
-    )
+  public async getAccount(selector: UniqueAccount): Promise<WalletAccount> {
+    const accounts = await this.getAccounts()
+    const hit = find(accounts, (account) => accountsEqual(account, selector))
     if (!hit) {
       throw Error("account not found")
     }
@@ -484,11 +506,11 @@ export class Wallet {
     return getStarkPair(derivationPath, this.session?.secret as string)
   }
 
-  public async getStarknetAccountByAddress(address: string): Promise<Account> {
+  public async getStarknetAccount(selector: UniqueAccount): Promise<Account> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
-    const account = await this.getAccountByAddress(address)
+    const account = await this.getAccount(selector)
     if (!account) {
       throw Error("account not found")
     }
@@ -510,7 +532,7 @@ export class Wallet {
       throw new Error("no selected account")
     }
 
-    return this.getStarknetAccountByAddress(account.address)
+    return this.getStarknetAccount(account)
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
@@ -518,20 +540,28 @@ export class Wallet {
       return
     }
     const accounts = await this.getAccounts()
-    const address = await this.store.getItem("selected")
-    const account = accounts.find((account) => account.address === address)
-    const defaultAccount = accounts.find(
-      (account) => account.network.id === defaultNetwork.id,
+    const selectedAccount = await this.store.getItem("selected")
+    const defaultAccount =
+      accounts.find((account) => account.networkId === defaultNetwork.id) ??
+      accounts[0]
+    if (!selectedAccount) {
+      return defaultAccount
+    }
+    const account = find(accounts, (account) =>
+      accountsEqual(selectedAccount, account),
     )
-    return account ?? defaultAccount ?? accounts[0]
+    return account ?? defaultAccount
   }
 
-  public async selectAccount(address: string) {
-    const account = (await this.getAccounts()).find(
-      (account) => account.address === address,
+  public async selectAccount(accountIdentifier: UniqueAccount) {
+    const accounts = await this.getAccounts()
+    const account = find(accounts, (account) =>
+      accountsEqual(account, accountIdentifier),
     )
+
     if (account) {
-      await this.store.setItem("selected", account.address)
+      const { address, networkId } = account // makes sure to strip away unused properties
+      await this.store.setItem("selected", { address, networkId })
     }
   }
 

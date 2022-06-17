@@ -9,15 +9,15 @@ export interface WithSigner {
   signer: WalletAccountSigner
 }
 
-export interface BaseWalletAccount {
+export interface UniqueAccount {
   address: string
-  network: {
-    id: string
-  }
+  networkId: string
 }
 
-export interface WalletAccount extends BaseWalletAccount, WithSigner {
-  address: string
+export interface WalletAccount extends UniqueAccount, WithSigner {
   network: Network
   hidden?: boolean
 }
+
+export const accountsEqual = (a: UniqueAccount, b: UniqueAccount) =>
+  a.address === b.address && a.networkId === b.networkId
