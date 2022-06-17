@@ -58,9 +58,7 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
       <AccountHeader>
         <Header>
           <Link to={routes.accounts()}>
-            <ProfilePicture
-              src={getAccountImageUrl(accountName, account.address)}
-            />
+            <ProfilePicture src={getAccountImageUrl(accountName, account)} />
           </Link>
           <NetworkSwitcher />
         </Header>

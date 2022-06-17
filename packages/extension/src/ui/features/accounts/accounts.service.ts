@@ -1,5 +1,6 @@
 import { ethers } from "ethers"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
@@ -22,14 +23,17 @@ const argentColorsArray = [
   "FF5C72",
 ]
 
-export const getColor = (name: string, isHex = false) => {
-  const hash = (isHex ? name : ethers.utils.id(name)).slice(-2)
+export const getColor = (name: string) => {
+  const hash = ethers.utils.id(name).slice(-2)
   const index = parseInt(hash, 16) % argentColorsArray.length
   return argentColorsArray[index]
 }
 
-export const getAccountImageUrl = (name: string, address: string) => {
-  const color = getColor(address, true)
+export const getAccountImageUrl = (
+  name: string,
+  account: BaseWalletAccount,
+) => {
+  const color = getColor(`${account.address}::${account.networkId}`)
   return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
 }
 

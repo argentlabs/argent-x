@@ -1,7 +1,7 @@
 import type { Network } from "./networks"
 
 export interface WalletAccountSigner {
-  type: string
+  type: "local_secret"
   derivationPath: string
 }
 
@@ -11,13 +11,10 @@ export interface WithSigner {
 
 export interface BaseWalletAccount {
   address: string
-  network: {
-    id: string
-  }
+  networkId: string
 }
 
 export interface WalletAccount extends BaseWalletAccount, WithSigner {
-  address: string
   network: Network
   hidden?: boolean
 }

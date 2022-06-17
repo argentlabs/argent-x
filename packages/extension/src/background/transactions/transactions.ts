@@ -3,7 +3,7 @@ import { Status } from "starknet"
 
 import { Transaction, TransactionRequest } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
-import { accountsEqual } from "../wallet"
+import { accountsEqual } from "../../shared/wallet.service"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
 import { setIntervalAsync } from "./setIntervalAsync"

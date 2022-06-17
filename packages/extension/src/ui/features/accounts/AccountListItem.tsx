@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 import useSWR from "swr"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ArrowCircleDownIcon } from "../../components/Icons/MuiIcons"
@@ -10,6 +11,7 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { formatTruncatedAddress } from "../../services/addresses"
+import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { useNetwork } from "../networks/useNetworks"
@@ -65,7 +67,7 @@ const AccountName = styled.h1`
 
 interface AccountListProps {
   account: Account
-  selectedAccount?: string
+  selectedAccount?: BaseWalletAccount
   canShowUpgrade?: boolean
 }
 
@@ -82,30 +84,37 @@ export const AccountListItem: FC<AccountListProps> = ({
   const status = useAccountStatus(account, selectedAccount)
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
-  const { address } = account
 
-  const { data: showUpgradeBanner = false } = useSWR(
+  const { data: feeTokenBalance } = useSWR(
+    [account, switcherNetworkId],
+    fetchFeeTokenBalance,
+    { suspense: false },
+  )
+
+  const { data: needsUpgrade = false } = useSWR(
     [account, accountClassHash, "showUpgradeBanner"],
     checkIfUpgradeAvailable,
     { suspense: false },
   )
 
+  const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
+
   return (
     <AccountListItemWrapper
       {...makeClickable(() => {
         useAccounts.setState({
-          selectedAccount: address,
+          selectedAccount: account,
           showMigrationScreen: account ? isDeprecated(account) : false,
         })
         navigate(routes.accountTokens())
       })}
       selected={status.code === "CONNECTED"}
     >
-      <ProfilePicture src={getAccountImageUrl(accountName, address)} />
+      <ProfilePicture src={getAccountImageUrl(accountName, account)} />
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountName}</AccountName>
-          <p>{formatTruncatedAddress(address)}</p>
+          <p>{formatTruncatedAddress(account.address)}</p>
         </AccountColumn>
         {status.code === "DEPLOYING" ? (
           <NetworkStatusWrapper>

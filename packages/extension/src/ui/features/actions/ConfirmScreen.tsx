@@ -115,7 +115,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           <ProfilePicture
             src={getAccountImageUrl(
               getAccountName(selectedAccount, accountNames),
-              selectedAccount.address,
+              selectedAccount,
             )}
             disabled
           />

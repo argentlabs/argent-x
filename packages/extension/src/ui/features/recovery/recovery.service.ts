@@ -1,7 +1,7 @@
 import { some } from "lodash-es"
 
 import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
-import { isDeprecated } from "../../../shared/wallet.service"
+import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import {
@@ -24,15 +24,16 @@ export const recover = async ({
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ||= lastSelectedAccount
-      ? lastSelectedAccount?.network.id
+      ? lastSelectedAccount.network.id
       : defaultNetwork.id
 
     const allAccounts = await getAccounts()
     const walletAccounts = accountsOnNetwork(allAccounts, networkId)
 
     const selectedAccount = walletAccounts.find(
-      ({ address }) => address === lastSelectedAccount?.address,
-    )?.address
+      (account) =>
+        lastSelectedAccount && accountsEqual(account, lastSelectedAccount),
+    )
 
     const accounts = walletAccounts
       .map(
