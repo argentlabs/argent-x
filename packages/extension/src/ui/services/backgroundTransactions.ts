@@ -1,13 +1,18 @@
 import { BigNumber } from "ethers"
+import { filter } from "lodash-es"
 import { Call, number } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
+import { BaseWalletAccount } from "../../shared/wallet.model"
+import { accountsEqual } from "../../shared/wallet.service"
 
-export const getTransactions = async (address: string) => {
+export const getTransactions = async (account: BaseWalletAccount) => {
   sendMessage({ type: "GET_TRANSACTIONS" })
   const allTransactions = await waitForMessage("GET_TRANSACTIONS_RES")
-  return allTransactions.filter(({ account }) => account.address === address)
+  return filter(allTransactions, (transaction) =>
+    accountsEqual(transaction.account, account),
+  )
 }
 
 export const getTransactionStatus = async (hash: string, network: string) => {

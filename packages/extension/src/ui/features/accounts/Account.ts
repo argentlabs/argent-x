@@ -4,6 +4,7 @@ import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { Network, getProvider } from "../../../shared/networks"
 import { WalletAccountSigner } from "../../../shared/wallet.model"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { createNewAccount } from "../../services/backgroundAccounts"
 import { getNetwork } from "../../services/backgroundNetworks"
 
@@ -40,7 +41,7 @@ export class Account {
       this.provider,
     )
 
-    const key = `deployTransaction:${address}`
+    const key = `deployTransaction:${getAccountIdentifier(this)}`
     if (deployTransaction) {
       localStorage.setItem(key, deployTransaction)
     } else if (localStorage.getItem(key)) {

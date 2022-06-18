@@ -34,7 +34,7 @@ export const SeedRecoveryScreen: FC = () => {
 
   return (
     <>
-      <IconBar back close />
+      <IconBar back />
       <ConfirmScreen
         title="Restore accounts"
         confirmButtonText="Continue"

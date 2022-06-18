@@ -3,7 +3,10 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
-import { isDeprecated } from "../../../shared/wallet.service"
+import {
+  getAccountIdentifier,
+  isDeprecated,
+} from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
@@ -25,6 +28,7 @@ import { AccountSubHeader } from "./AccountSubheader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { AddTokenIconButton, TokenTitle, TokenWrapper } from "./TokenListItem"
+import { fetchFeeTokenBalance } from "./tokens.service"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountStatus } from "./useAccountStatus"
@@ -43,7 +47,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const status = useAccountStatus(account)
-  const { pendingTransactions } = useAccountTransactions(account.address)
+  const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
 
@@ -51,14 +55,27 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const accountName = getAccountName(account, accountNames)
   const { network } = useNetwork(switcherNetworkId)
 
+  const { data: feeTokenBalance } = useSWR(
+    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, switcherNetworkId),
+    { suspense: false },
+  )
+
   const { data: needsUpgrade = false, mutate } = useSWR(
-    [account, network.accountClassHash, "showUpgradeBanner"],
-    checkIfUpgradeAvailable,
+    [
+      getAccountIdentifier(account),
+      network.accountClassHash,
+      "showUpgradeBanner",
+    ],
+    () => checkIfUpgradeAvailable(account, network.accountClassHash),
     { suspense: false },
   )
 
   const canShowEmptyAccountAlert = !showPendingTransactions && !needsUpgrade
-  const showUpgradeBanner = needsUpgrade && !showPendingTransactions
+  const showUpgradeBanner = Boolean(
+    needsUpgrade && !showPendingTransactions && feeTokenBalance?.gt(0),
+  )
+  const showNoBalanceForUpgrade = !showUpgradeBanner && needsUpgrade
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
@@ -90,12 +107,13 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       <TransferButtons />
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
-      {showUpgradeBanner && network.accountClassHash && (
+      {showUpgradeBanner && (
         <Link to={routes.upgrade()}>
           <UpgradeBanner />
         </Link>
       )}
-      <PendingTransactions accountAddress={account.address} />
+      {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
+      <PendingTransactions account={account} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <TokenList
           showTitle={showPendingTransactions}

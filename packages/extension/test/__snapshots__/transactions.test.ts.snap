@@ -25,9 +25,10 @@ Object {
       "name": "Goerli Testnet",
       "readonly": true,
     },
+    "networkId": "goerli-alpha",
     "signer": Object {
       "derivationPath": "0",
-      "type": "local_signer",
+      "type": "local_secret",
     },
   },
   "hash": "0x16d38d961a659b7565b596060ca812b863a39766accab5a8fd93ace56e6001a",

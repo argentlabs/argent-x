@@ -1,5 +1,10 @@
 import { ethers } from "ethers"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
+import {
+  accountsEqual,
+  getAccountIdentifier,
+} from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
@@ -22,14 +27,17 @@ const argentColorsArray = [
   "FF5C72",
 ]
 
-export const getColor = (name: string, isHex = false) => {
-  const hash = (isHex ? name : ethers.utils.id(name)).slice(-2)
+export const getColor = (name: string) => {
+  const hash = ethers.utils.id(name).slice(-2)
   const index = parseInt(hash, 16) % argentColorsArray.length
   return argentColorsArray[index]
 }
 
-export const getAccountImageUrl = (name: string, address: string) => {
-  const color = getColor(address, true)
+export const getAccountImageUrl = (
+  name: string,
+  account: BaseWalletAccount,
+) => {
+  const color = getColor(getAccountIdentifier(account))
   return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
 }
 
@@ -45,13 +53,13 @@ export interface AccountStatus {
 
 export const getStatus = (
   account: Account,
-  activeAccountAddress?: string,
+  activeAccount?: BaseWalletAccount,
   forceDeployed = false,
 ): AccountStatus => {
   if (!isAccountDeployed(account) && !forceDeployed) {
     return { code: "DEPLOYING", text: "Deploying..." }
   }
-  if (activeAccountAddress === account.address) {
+  if (activeAccount && accountsEqual(account, activeAccount)) {
     return { code: "CONNECTED", text: "Active" }
   }
   return { code: "DEFAULT", text: "" }

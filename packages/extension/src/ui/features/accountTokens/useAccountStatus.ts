@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { Account } from "../accounts/Account"
 import { getStatus } from "../accounts/accounts.service"
 import { useTransactionStatus } from "./useTransactionStatus"
 
 export const useAccountStatus = (
   account: Account,
-  activeAccountAddress?: string,
+  activeAccount?: BaseWalletAccount,
 ) => {
   const deployStatus = useTransactionStatus(
     account.deployTransaction,
@@ -37,5 +38,5 @@ export const useAccountStatus = (
     return { code: "ERROR" as const, text: "Undeployed" }
   }
 
-  return getStatus(account, activeAccountAddress, deployStatus === "SUCCESS")
+  return getStatus(account, activeAccount, deployStatus === "SUCCESS")
 }

@@ -7,6 +7,7 @@ import useSWR from "swr"
 
 import { getFeeToken } from "../../../shared/token"
 import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -135,21 +136,20 @@ const StyledReportGmailerrorredRoundedIcon = styled(
 `
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
-  onChange,
   accountAddress,
   transactions,
   actionHash,
   onErrorChange,
-  ...props
+  networkId,
 }) => {
-  const account = useAccount(accountAddress)
+  const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
   const { data: feeTokenBalance } = useSWR(
-    [account, props.networkId],
-    fetchFeeTokenBalance,
+    [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, account.networkId),
     { suspense: false },
   )
 
@@ -169,7 +169,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     onErrorChange?.(hasError)
   }, [hasError])
 
-  const feeToken = getFeeToken(props.networkId)
+  const feeToken = getFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
     fee?.amount,

@@ -26,7 +26,7 @@ export type AccountMessage =
   | { type: "HIDE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"
-      data: { accountAddress: string }
+      data: BaseWalletAccount
     }
   | {
       type: "GET_ENCRYPTED_PRIVATE_KEY"

@@ -46,7 +46,7 @@ export const executeTransaction = async (
   const nonceWasProvidedByUI = transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
   const nonce = nonceWasProvidedByUI
     ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
-    : await getNonce(starknetAccount)
+    : await getNonce(selectedAccount, wallet)
 
   // estimate fee with onchain nonce even tho transaction nonce may be different
   const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
@@ -70,7 +70,7 @@ export const executeTransaction = async (
   })
 
   if (!nonceWasProvidedByUI) {
-    increaseStoredNonce(selectedAccount.address)
+    increaseStoredNonce(selectedAccount)
   }
   return transaction
 }

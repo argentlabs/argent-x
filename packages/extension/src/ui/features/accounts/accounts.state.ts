@@ -1,17 +1,19 @@
+import { find } from "lodash-es"
 import create from "zustand"
 
-import { WalletAccount } from "../../../shared/wallet.model"
+import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import { accountsEqual } from "../../../shared/wallet.service"
 import { Account } from "./Account"
 
 interface State {
-  accounts: Record<string, Account>
-  selectedAccount?: string
+  accounts: Account[]
+  selectedAccount?: BaseWalletAccount
   addAccount: (newAccount: Account) => void
   showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
 }
 
 export const initialState = {
-  accounts: {},
+  accounts: [],
   selectedAccount: undefined,
 }
 
@@ -19,36 +21,32 @@ export const useAccounts = create<State>((set) => ({
   ...initialState,
   addAccount: (newAccount: Account) =>
     set((state) => ({
-      selectedAccount: newAccount.address,
-      accounts: {
-        ...state.accounts,
-        [newAccount.address]: newAccount,
-      },
+      selectedAccount: newAccount,
+      accounts: [...state.accounts, newAccount],
     })),
 }))
 
-export const useAccount = (address: string): Account | undefined =>
-  useAccounts(({ accounts }) => accounts[address])
+export const useAccount = (account: BaseWalletAccount): Account | undefined =>
+  useAccounts(({ accounts }) =>
+    find(accounts, (a) => accountsEqual(a, account)),
+  )
 
 export const useSelectedAccount = () =>
   useAccounts(({ accounts, selectedAccount }) =>
-    selectedAccount ? accounts[selectedAccount] : undefined,
+    selectedAccount
+      ? find(accounts, (account) => accountsEqual(account, selectedAccount))
+      : undefined,
   )
 
-export const reduceWalletAccountsToAccounts = (
+export const mapWalletAccountsToAccounts = (
   walletAccounts: WalletAccount[],
-) => {
-  return walletAccounts.reduce<State["accounts"]>(
-    (allAccounts, walletAccount) => {
-      return {
-        ...allAccounts,
-        [walletAccount.address]: new Account(
-          walletAccount.address,
-          walletAccount.network,
-          walletAccount.signer,
-        ),
-      }
-    },
-    {},
+): State["accounts"] => {
+  return walletAccounts.map(
+    (walletAccount) =>
+      new Account(
+        walletAccount.address,
+        walletAccount.network,
+        walletAccount.signer,
+      ),
   )
 }
