@@ -1,5 +1,6 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
+import { chunk } from "lodash"
 import {
   Abi,
   Contract,
@@ -146,26 +147,17 @@ export const fetchAllTokensBalance = async (
 
   const results: string[] = response.result.map((res: any) => number.toHex(res))
 
-  return results.reduce<BalancesMap>((acc, result, i) => {
-    if (i % 2 === 0) {
-      const uint256Balance: uint256.Uint256 = {
-        low: results[i],
-        high: results[i + 1],
-      }
+  const resultChunks = chunk(results, 2)
 
-      const balance = BigNumber.from(
-        uint256.uint256ToBN(uint256Balance).toString(),
-      )
+  return resultChunks.reduce<BalancesMap>((acc, result, i) => {
+    const balance = BigNumber.from(
+      uint256.uint256ToBN({ low: result[0], high: result[1] }).toString(),
+    )
 
-      const tokenAddress = tokenAddresses[i / 2]
-
-      return {
-        ...acc,
-        [tokenAddress]: balance,
-      }
+    return {
+      ...acc,
+      [tokenAddresses[i]]: balance,
     }
-
-    return acc
   }, {})
 }
 
