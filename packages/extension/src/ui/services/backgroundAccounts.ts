@@ -1,4 +1,5 @@
 import { sendMessage, waitForMessage } from "../../shared/messages"
+import { BaseWalletAccount } from "../../shared/wallet.model"
 import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
@@ -20,14 +21,22 @@ export const getAccounts = async (showHidden = false) => {
   return waitForMessage("GET_ACCOUNTS_RES")
 }
 
-export const connectAccount = ({ address, network, signer }: Account) => {
-  sendMessage({ type: "CONNECT_ACCOUNT", data: { address, network, signer } })
+export const connectAccount = ({
+  address,
+  network,
+  networkId,
+  signer,
+}: Account) => {
+  sendMessage({
+    type: "CONNECT_ACCOUNT",
+    data: { address, network, networkId, signer },
+  })
 }
 
 export const deleteAccount = async (address: string, networkId: string) => {
   sendMessage({
     type: "DELETE_ACCOUNT",
-    data: { address, network: { id: networkId } },
+    data: { address, networkId },
   })
 
   try {
@@ -45,7 +54,7 @@ export const deleteAccount = async (address: string, networkId: string) => {
 export const hideAccount = async (address: string, networkId: string) => {
   sendMessage({
     type: "HIDE_ACCOUNT",
-    data: { address, network: { id: networkId } },
+    data: { address, networkId },
   })
 
   await Promise.race([
@@ -56,8 +65,8 @@ export const hideAccount = async (address: string, networkId: string) => {
   ])
 }
 
-export const upgradeAccount = async (accountAddress: string) => {
-  sendMessage({ type: "UPGRADE_ACCOUNT", data: { accountAddress } })
+export const upgradeAccount = async (data: BaseWalletAccount) => {
+  sendMessage({ type: "UPGRADE_ACCOUNT", data })
   return waitForMessage("TRANSACTION_UPDATES")
 }
 

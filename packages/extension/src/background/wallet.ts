@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { differenceWith, find, union, uniqWith } from "lodash-es"
+import { differenceWith, find, union } from "lodash-es"
 import {
   Account,
   AddTransactionResponse,
@@ -21,7 +21,7 @@ import {
   getProvider,
 } from "../shared/networks"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
-import { baseDerivationPath } from "../shared/wallet.service"
+import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
   getNextPathIndex,
@@ -48,6 +48,23 @@ const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
   "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
 ]
 
+function mergeArrayStableWith<T>(
+  array: T[],
+  other: T[],
+  compareFn: (a: T, b: T) => boolean,
+): T[] {
+  const result = [...array]
+  for (const element of other) {
+    const index = result.findIndex((e) => compareFn(e, element))
+    if (index === -1) {
+      result.push(element)
+    } else {
+      result[index] = element
+    }
+  }
+  return result
+}
+
 interface WalletSession {
   secret: string
   password: string
@@ -55,7 +72,7 @@ interface WalletSession {
 
 export interface WalletStorageProps {
   backup?: string
-  selected?: string
+  selected?: BaseWalletAccount
   accounts?: WalletAccount[]
   discoveredOnce?: boolean
 }
@@ -82,9 +99,6 @@ function calculateContractAddress(
     constructorCalldataHash,
   ])
 }
-
-export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) =>
-  a.address === b.address && a.network.id === b.network.id
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -132,15 +146,53 @@ export class Wallet {
   }
 
   public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
-    const accounts = await this.store.getItem("accounts")
+    const accounts = (await this.store.getItem("accounts")) || []
 
+    // migrate from storing network to just storing networkId
+    // populate network back from networkId
     const accountsWithNetwork = await Promise.all(
-      (accounts || []).map(async (account) => {
+      accounts.map(async (account) => {
         try {
-          const network = await this.getNetwork(account.network.id)
+          const network = await this.getNetwork(
+            account.networkId || account.network?.id,
+          )
           if (!network) {
             throw new Error("Network not found")
           }
+
+          try {
+            let needsWrite = false
+            if (account.network?.id) {
+              account.networkId = account.network.id
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              delete account.network
+
+              needsWrite = true
+            }
+            // migrate signer.type local_signer to local_secret
+            if ((account.signer.type as any) !== "local_secret") {
+              // currently there is just one type of signer
+              account.signer.type = "local_secret"
+              needsWrite = true
+            }
+
+            if (needsWrite) {
+              // migration from stored network to only networkId
+
+              // combine accounts without duplicates
+              const newAccounts = mergeArrayStableWith(
+                accounts,
+                [account],
+                accountsEqual,
+              )
+              // we store the network as it was at the creation date of the wallet. This may be useful in the future.
+              await this.store.setItem("accounts", newAccounts)
+            }
+          } catch {
+            // noop
+          }
+
           return {
             ...account,
             network,
@@ -160,8 +212,9 @@ export class Wallet {
     const oldAccounts = await this.getAccounts(true)
 
     // combine accounts without duplicates
-    const newAccounts = uniqWith(
-      [...oldAccounts, ...accounts].reverse(), // reverse as only first occurence is kept
+    const newAccounts = mergeArrayStableWith(
+      oldAccounts,
+      accounts,
       accountsEqual,
     )
 
@@ -193,8 +246,9 @@ export class Wallet {
       hidden: true,
     }
 
-    const newAccounts = uniqWith(
-      [...accounts, hiddenAccount].reverse(), // reverse as only first occurence is kept
+    const newAccounts = mergeArrayStableWith(
+      accounts,
+      [hiddenAccount],
       accountsEqual,
     )
 
@@ -241,7 +295,9 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(this.session?.secret)
 
-    const networks = defaultNetworks.map((network) => network.id)
+    const networks = defaultNetworks
+      .map((network) => network.id)
+      .filter((networkId) => networkId !== "localhost")
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)
@@ -327,9 +383,10 @@ export class Wallet {
             lastHit = lastCheck
             accounts.push({
               address,
+              networkId: network.id,
               network,
               signer: {
-                type: "local_signer",
+                type: "local_secret",
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
             })
@@ -419,7 +476,8 @@ export class Wallet {
 
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
-    const currentPaths = (await this.getAccounts(true))
+    const accounts = await this.getAccounts(true)
+    const currentPaths = accounts
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
@@ -455,9 +513,10 @@ export class Wallet {
 
     const account = {
       network,
+      networkId: network.id,
       address: proxyAddress,
       signer: {
-        type: "local_secret",
+        type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
     }
@@ -465,15 +524,14 @@ export class Wallet {
     await this.addWalletAccount(account)
 
     await this.writeBackup()
-    await this.selectAccount(account.address)
+    await this.selectAccount(account)
 
     return { account, txHash: deployTransaction.transaction_hash }
   }
 
-  public async getAccountByAddress(address: string): Promise<WalletAccount> {
-    const hit = (await this.getAccounts(true)).find(
-      (account) => account.address === address,
-    )
+  public async getAccount(selector: BaseWalletAccount): Promise<WalletAccount> {
+    const accounts = await this.getAccounts()
+    const hit = find(accounts, (account) => accountsEqual(account, selector))
     if (!hit) {
       throw Error("account not found")
     }
@@ -484,11 +542,13 @@ export class Wallet {
     return getStarkPair(derivationPath, this.session?.secret as string)
   }
 
-  public async getStarknetAccountByAddress(address: string): Promise<Account> {
+  public async getStarknetAccount(
+    selector: BaseWalletAccount,
+  ): Promise<Account> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
-    const account = await this.getAccountByAddress(address)
+    const account = await this.getAccount(selector)
     if (!account) {
       throw Error("account not found")
     }
@@ -510,7 +570,7 @@ export class Wallet {
       throw new Error("no selected account")
     }
 
-    return this.getStarknetAccountByAddress(account.address)
+    return this.getStarknetAccount(account)
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
@@ -518,20 +578,28 @@ export class Wallet {
       return
     }
     const accounts = await this.getAccounts()
-    const address = await this.store.getItem("selected")
-    const account = accounts.find((account) => account.address === address)
-    const defaultAccount = accounts.find(
-      (account) => account.network.id === defaultNetwork.id,
+    const selectedAccount = await this.store.getItem("selected")
+    const defaultAccount =
+      accounts.find((account) => account.networkId === defaultNetwork.id) ??
+      accounts[0]
+    if (!selectedAccount) {
+      return defaultAccount
+    }
+    const account = find(accounts, (account) =>
+      accountsEqual(selectedAccount, account),
     )
-    return account ?? defaultAccount ?? accounts[0]
+    return account ?? defaultAccount
   }
 
-  public async selectAccount(address: string) {
-    const account = (await this.getAccounts()).find(
-      (account) => account.address === address,
+  public async selectAccount(accountIdentifier: BaseWalletAccount) {
+    const accounts = await this.getAccounts()
+    const account = find(accounts, (account) =>
+      accountsEqual(account, accountIdentifier),
     )
+
     if (account) {
-      await this.store.setItem("selected", account.address)
+      const { address, networkId } = account // makes sure to strip away unused properties
+      await this.store.setItem("selected", { address, networkId })
     }
   }
 

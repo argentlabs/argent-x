@@ -1,9 +1,11 @@
-import { uniqBy } from "lodash-es"
+import { filter, uniqBy } from "lodash-es"
 import { useEffect } from "react"
 import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
 import { Transaction } from "../../../shared/transactions"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
+import { accountsEqual } from "../../../shared/wallet.service"
 import { getTransactions } from "../../services/backgroundTransactions"
 
 interface State {
@@ -28,9 +30,9 @@ const useTransactionsStore = create<State>((set) => ({
   },
 }))
 
-export const useAccountTransactions = (accountAddress: string) => {
+export const useAccountTransactions = (account: BaseWalletAccount) => {
   useEffect(() => {
-    getTransactions(accountAddress).then((transactions) => {
+    getTransactions(account).then((transactions) => {
       useTransactionsStore.setState({ transactions })
     })
 
@@ -39,8 +41,8 @@ export const useAccountTransactions = (accountAddress: string) => {
         useTransactionsStore
           .getState()
           .addTransactions(
-            message.data.filter(
-              ({ account }) => account.address === accountAddress,
+            filter(message.data, (transaction) =>
+              accountsEqual(transaction.account, account),
             ),
           )
       }

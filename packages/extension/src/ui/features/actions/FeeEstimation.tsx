@@ -5,6 +5,7 @@ import { Call } from "starknet"
 import styled, { css, keyframes } from "styled-components"
 import useSWR from "swr"
 
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -132,21 +133,20 @@ const StyledReportGmailerrorredRoundedIcon = styled(
 `
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
-  onChange,
   accountAddress,
   transactions,
   actionHash,
   onErrorChange,
-  ...props
+  networkId,
 }) => {
-  const account = useAccount(accountAddress)
+  const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
   const { data: feeTokenBalance } = useSWR(
-    [account, props.networkId],
-    fetchFeeTokenBalance,
+    [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, account.networkId),
     { suspense: false },
   )
 

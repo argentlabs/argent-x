@@ -35,7 +35,7 @@ interface AccountActivityProps {
 const Activity: FC<AccountActivityProps> = ({ account }) => {
   const navigate = useNavigate()
 
-  const activity = useActivity(account.address)
+  const activity = useActivity(account)
 
   return (
     <>
@@ -62,7 +62,7 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
 export const AccountActivity: FC<AccountActivityProps> = ({ account }) => (
   <Container>
     <Header>Activity</Header>
-    <PendingTransactions accountAddress={account.address} />
+    <PendingTransactions account={account} />
     <ErrorBoundary
       fallback={
         <ErrorBoundaryFallback title="Seems like Voyager API is down..." />

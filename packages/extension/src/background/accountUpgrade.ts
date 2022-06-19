@@ -3,11 +3,13 @@ import {
   AddTransactionResponse,
   KeyPair,
   ProviderInterface,
+  constants,
   number,
   stark,
 } from "starknet"
 import { Account as AccountV390, stark as starkV390 } from "starknet-390"
 
+import { BaseWalletAccount } from "../shared/wallet.model"
 import { hasNewDerivationPath } from "../shared/wallet.service"
 import { getNetwork } from "./customNetworks"
 import { TransactionTracker } from "./transactions/transactions"
@@ -23,8 +25,10 @@ function equalBigNumberish(
 }
 
 // FIXME: remove when we dont want to support old accounts anymore
-const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS =
+const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_MAINNET =
   "0x01bd7ca87f139693e6681be2042194cf631c4e8d77027bf0ea9e6d55fc6018ac"
+const LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_GOERLI =
+  "0x070a61892f03b34f88894f0fb9bb4ae0c63a53f5042f79997862d1dffb8d6a30"
 
 export const getImplementationUpgradePath = (
   oldImplementation: number.BigNumberish,
@@ -57,7 +61,10 @@ export const getImplementationUpgradePath = (
         contractAddress: accountAddress,
         entrypoint: "upgrade",
         calldata: starkV390.compileCalldata({
-          implementation: newImplementation,
+          implementation:
+            provider.chainId === constants.StarknetChainId.TESTNET
+              ? LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_GOERLI
+              : LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS_MAINNET,
         }),
       })
     }
@@ -71,49 +78,47 @@ export const getImplementationUpgradePath = (
       contractAddress: accountAddress,
       entrypoint: "upgrade",
       calldata: stark.compileCalldata({
-        implementation: LATEST_ACCOUNT_IMPLEMENTATION_ADDRESS,
+        implementation: newImplementation,
       }),
     })
   }
 }
 
 export const upgradeAccount = async (
-  accountAddress: string,
+  account: BaseWalletAccount,
   wallet: Wallet,
   transactionTracker: TransactionTracker,
 ) => {
-  const starknetAccount = await wallet.getStarknetAccountByAddress(
-    accountAddress,
-  )
+  const starknetAccount = await wallet.getStarknetAccount(account)
+  const fullAccount = await wallet.getAccount(account)
 
-  const account = await wallet.getAccountByAddress(accountAddress)
   const { accountClassHash: newImplementation } = await getNetwork(
-    account.network.id,
+    fullAccount.network.id,
   )
 
   const { result } = await starknetAccount.callContract({
-    contractAddress: account.address,
+    contractAddress: fullAccount.address,
     entrypoint: "get_implementation",
   })
   const currentImplementation = stark.makeAddress(number.toHex(result[0]))
 
   const updateAccount = getImplementationUpgradePath(
     currentImplementation,
-    account.signer.derivationPath,
+    fullAccount.signer.derivationPath,
   )
 
   const updateTransaction = await updateAccount(
     newImplementation,
-    account.address,
+    fullAccount.address,
     // Account extends Provider
     starknetAccount,
     // signer is a private property of the account, this will be public in the future
-    wallet.getKeyPairByDerivationPath(account.signer.derivationPath),
+    wallet.getKeyPairByDerivationPath(fullAccount.signer.derivationPath),
   )
 
   transactionTracker.add({
     hash: updateTransaction.transaction_hash,
-    account,
+    account: fullAccount,
     meta: { title: "Upgrading account" },
   })
 }
