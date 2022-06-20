@@ -85,9 +85,7 @@ export const AccountListItem: FC<AccountListProps> = ({
     network: { accountClassHash },
   } = useNetwork(switcherNetworkId)
   const status = useAccountStatus(account, selectedAccount)
-  if (status.code === "DEPLOYING") {
-    console.log("DEPLOYING", account)
-  }
+
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
 

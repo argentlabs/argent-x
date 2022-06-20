@@ -150,62 +150,76 @@ export class Wallet {
 
     // migrate from storing network to just storing networkId
     // populate network back from networkId
-    const accountsWithNetwork = await Promise.all(
-      accounts.map(async (account) => {
-        try {
-          const network = await this.getNetwork(
-            account.networkId || account.network?.id,
-          )
-          if (!network) {
-            throw new Error("Network not found")
-          }
-
+    const accountsWithNetworkAndMigrationStatus = await Promise.all(
+      accounts.map(
+        async (
+          account,
+        ): Promise<{
+          needMigration: boolean
+          account: WalletAccount
+        }> => {
+          let needMigration = false
           try {
-            let needsWrite = false
-            if (account.network?.id) {
-              account.networkId = account.network.id
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              delete account.network
-
-              needsWrite = true
-            }
-            // migrate signer.type local_signer to local_secret
-            if ((account.signer.type as any) !== "local_secret") {
-              // currently there is just one type of signer
-              account.signer.type = "local_secret"
-              needsWrite = true
+            const network = await this.getNetwork(
+              account.networkId || account.network?.id,
+            )
+            if (!network) {
+              throw new Error("Network not found")
             }
 
-            if (needsWrite) {
-              // migration from stored network to only networkId
+            // migrations needed
+            try {
+              if (account.network?.id) {
+                account.networkId = account.network.id
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                delete account.network
 
-              // combine accounts without duplicates
-              const newAccounts = mergeArrayStableWith(
-                accounts,
-                [account],
-                accountsEqual,
-              )
-              // we store the network as it was at the creation date of the wallet. This may be useful in the future.
-              await this.store.setItem("accounts", newAccounts)
+                needMigration = true
+              }
+              // migrate signer.type local_signer to local_secret
+              if ((account.signer.type as any) !== "local_secret") {
+                // currently there is just one type of signer
+                account.signer.type = "local_secret"
+                needMigration = true
+              }
+            } catch {
+              // noop
+            }
+
+            return {
+              account: {
+                ...account,
+                network,
+              },
+              needMigration,
             }
           } catch {
-            // noop
+            return { account, needMigration }
           }
-
-          return {
-            ...account,
-            network,
-          }
-        } catch {
-          return account
-        }
-      }),
+        },
+      ),
     )
 
-    return uniqWith(accountsWithNetwork, accountsEqual).filter(
-      (account) => includeHidden || !account.hidden,
+    const accountsWithNetwork = accountsWithNetworkAndMigrationStatus.map(
+      (a) => a.account,
     )
+
+    // combine accounts without duplicates
+    const uniqueAccounts = uniqWith(accountsWithNetwork, accountsEqual)
+
+    const needsWrite =
+      accountsWithNetworkAndMigrationStatus.some(
+        // some account requests migration
+        (account) => account.needMigration,
+      ) || accountsWithNetwork.length !== uniqueAccounts.length // some accounts were duplicated
+
+    if (needsWrite) {
+      // we store the network as it was at the creation date of the wallet. This may be useful in the future.
+      await this.store.setItem("accounts", uniqueAccounts)
+    }
+
+    return uniqueAccounts.filter((account) => includeHidden || !account.hidden)
   }
 
   private async addWalletAccounts(accounts: WalletAccount[]) {
@@ -707,6 +721,7 @@ export class Wallet {
         return {
           ...account,
           network,
+          networkId: network.id,
         }
       }),
     )
