@@ -23,8 +23,7 @@ const Bar = styled.div`
 
 interface IconBarProps {
   back?: boolean | string
-  /** close={-1} will navigate 'back' to previous route */
-  close?: boolean | string | -1
+  close?: boolean | string
 }
 
 export const IconBar: FC<IconBarProps> = ({ back, close }) => (
@@ -36,7 +35,7 @@ export const IconBar: FC<IconBarProps> = ({ back, close }) => (
     )}
     <hr />
     {close && (
-      <Link to={close !== undefined ? (close as any) : routes.accountTokens()}>
+      <Link to={isString(close) ? close : routes.accountTokens()}>
         <CloseIcon />
       </Link>
     )}

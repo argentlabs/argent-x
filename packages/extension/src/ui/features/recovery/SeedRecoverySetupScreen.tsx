@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { SeedPhrase } from "./SeedPhrase"
 import { useSeedPhrase } from "./useSeedPhrase"
@@ -11,17 +11,17 @@ import { useSeedPhrase } from "./useSeedPhrase"
 export const SeedRecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
   const seedPhrase = useSeedPhrase()
-
+  const returnTo = useReturnTo()
   return (
     <>
-      <IconBar back close />
+      <IconBar back close={returnTo} />
       <ConfirmScreen
         smallTopPadding
         title="Recovery phrase"
         singleButton
         confirmButtonText="Continue"
         confirmButtonDisabled={!seedPhrase}
-        onSubmit={() => navigate(routes.confirmSeedRecovery())}
+        onSubmit={() => navigate(routes.confirmSeedRecovery(returnTo))}
       >
         <Paragraph>
           Write these words down on paper. It is unsafe to save them on your

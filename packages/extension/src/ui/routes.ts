@@ -1,4 +1,6 @@
 import { isString } from "lodash-es"
+import { useMemo } from "react"
+import { useLocation } from "react-router-dom"
 
 const route = <T extends (..._: any[]) => string>(
   ...[value, path]: [routeAndPath: string] | [routeWithParams: T, path: string]
@@ -9,15 +11,38 @@ const route = <T extends (..._: any[]) => string>(
   return Object.defineProperty(value as any, "path", { value: path })
 }
 
+/** a route function with a `returnTo` query parameter */
+
+export const routeWithReturnTo = (route: string) => {
+  const returnTo = (returnTo?: string) =>
+    returnTo ? `${route}?returnTo=${encodeURIComponent(returnTo)}` : route
+  returnTo.path = route
+  return returnTo
+}
+
+/** hook that builds on useLocation to parse query string */
+
+export const useQuery = () => {
+  const { search } = useLocation()
+  return useMemo(() => new URLSearchParams(search), [search])
+}
+
+/** hook to get the `returnTo` query parameter */
+
+export const useReturnTo = () => {
+  /** get() returns null for missing value, cleaner to return undefined */
+  return useQuery().get("returnTo") || undefined
+}
+
 export const routes = {
   welcome: route("/index.html"),
   newWallet: route("/wallets/new"),
   backupRecovery: route("/recover/backup"),
   seedRecovery: route("/recover/seed"),
   seedRecoveryPassword: route("/recover/seed/password"),
-  setupRecovery: route("/recovery"),
-  setupSeedRecovery: route("/recovery/seed"),
-  confirmSeedRecovery: route("/recovery/seed/confirm"),
+  setupRecovery: routeWithReturnTo("/recovery"),
+  setupSeedRecovery: routeWithReturnTo("/recovery/seed"),
+  confirmSeedRecovery: routeWithReturnTo("/recovery/seed/confirm"),
   lockScreen: route("/lock-screen"),
   accountTokens: route("/account/tokens"),
   accountNfts: route("/account/nfts"),
