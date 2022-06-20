@@ -4,6 +4,7 @@ import useSWR from "swr"
 
 import { Token } from "../../../shared/token"
 import {
+  ARGENT_API_ENABLED,
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
   ApiPriceDataResponse,
@@ -17,7 +18,7 @@ import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
-export const usePriceAndTokenData = () => {
+export const usePriceAndTokenDataFromApi = () => {
   const { data: pricesData } = useSWR<ApiPriceDataResponse>(
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     fetcher,
@@ -37,6 +38,17 @@ export const usePriceAndTokenData = () => {
     tokenData,
   }
 }
+
+export const usePriceAndTokenDataDisabled = () => {
+  return {
+    pricesData: undefined,
+    tokenData: undefined,
+  }
+}
+
+export const usePriceAndTokenData = ARGENT_API_ENABLED
+  ? usePriceAndTokenDataFromApi
+  : usePriceAndTokenDataDisabled
 
 /** @returns individual price details for the token */
 
