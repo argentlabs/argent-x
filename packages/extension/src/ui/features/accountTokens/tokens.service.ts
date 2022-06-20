@@ -1,9 +1,20 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
-import { Abi, Contract, number, shortString, uint256 } from "starknet"
+import { chunk } from "lodash"
+import {
+  Abi,
+  Contract,
+  hash,
+  number,
+  shortString,
+  stark,
+  uint256,
+} from "starknet"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
+import { Network } from "../../../shared/networks"
 import { getFeeToken } from "../../../shared/token"
+import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
@@ -105,6 +116,67 @@ export const fetchTokenBalance = async (
   )
   const result = await tokenContract.balanceOf(account.address)
   return BigNumber.from(uint256.uint256ToBN(result.balance).toString())
+}
+
+export type BalancesMap = Record<string, BigNumber | undefined>
+
+export const fetchAllTokensBalance = async (
+  tokenAddresses: string[],
+  account: Account,
+  network: Network,
+) => {
+  const multicallContract = getMulticallContract(account, network)
+
+  if (!multicallContract) {
+    // if no multicall contract is found, fallback to Promises
+    return fetchTokenBalancesWithoutMulticall(tokenAddresses, account)
+  }
+
+  const compiledCalldata = stark.compileCalldata({
+    address: account.address,
+  })
+
+  const calls = tokenAddresses.flatMap((address) => [
+    address,
+    hash.getSelectorFromName("balanceOf"),
+    compiledCalldata.length,
+    ...compiledCalldata,
+  ])
+
+  const response = await multicallContract.aggregate(calls)
+
+  const results: string[] = response.result.map((res: any) => number.toHex(res))
+
+  const resultChunks = chunk(results, 2)
+
+  return resultChunks.reduce<BalancesMap>((acc, result, i) => {
+    const balance = BigNumber.from(
+      uint256.uint256ToBN({ low: result[0], high: result[1] }).toString(),
+    )
+
+    return {
+      ...acc,
+      [tokenAddresses[i]]: balance,
+    }
+  }, {})
+}
+
+export const fetchTokenBalancesWithoutMulticall = async (
+  tokenAddresses: string[],
+  account: Account,
+): Promise<BalancesMap> => {
+  const balances = await Promise.all(
+    tokenAddresses.map(async (address) =>
+      fetchTokenBalance(address, account).catch(() => undefined),
+    ),
+  )
+
+  return balances.reduce<BalancesMap>((acc, balance, i) => {
+    return {
+      ...acc,
+      [tokenAddresses[i]]: balance,
+    }
+  }, {})
 }
 
 export const fetchFeeTokenBalance = async (

@@ -14,8 +14,9 @@ import {
   getTokens,
   removeToken as removeTokenMsg,
 } from "../../services/backgroundTokens"
+import { useCurrentNetwork } from "./../networks/useNetworks"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { fetchTokenBalance } from "./tokens.service"
+import { BalancesMap, fetchAllTokensBalance } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {
   decimals?: BigNumber
@@ -117,7 +118,6 @@ export const removeToken = (tokenAddress: string) => {
 export const selectTokensByNetwork = (networkId: string) => (state: State) =>
   state.tokens.filter((token) => token.networkId === networkId)
 
-type BalancesMap = Record<string, BigNumber | undefined>
 function mergeMaps(oldMap: BalancesMap, newMap: BalancesMap): BalancesMap {
   return Object.fromEntries([
     ...Object.entries(oldMap).map(([key, value]) => [
@@ -140,6 +140,7 @@ interface UseTokens {
 export const useTokensWithBalance = (): UseTokens => {
   const { switcherNetworkId } = useAppState()
   const selectedAccount = useSelectedAccount()
+  const currentNetwork = useCurrentNetwork()
   const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
@@ -156,17 +157,14 @@ export const useTokensWithBalance = (): UseTokens => {
       if (!selectedAccount) {
         return {}
       }
-      const balances = await Promise.all(
-        tokenAddresses.map(async (address) =>
-          fetchTokenBalance(address, selectedAccount).catch(() => undefined),
-        ),
+
+      const balances = await fetchAllTokensBalance(
+        tokenAddresses,
+        selectedAccount,
+        currentNetwork,
       )
-      return balances.reduce((acc, balance, i) => {
-        return {
-          ...acc,
-          [tokenAddresses[i]]: balance,
-        }
-      }, {} as BalancesMap)
+
+      return balances ?? {}
     },
     {
       suspense: true,

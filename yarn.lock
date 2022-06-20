@@ -9502,9 +9502,9 @@ stack-utils@^2.0.3:
     superstruct "^0.15.3"
     url-join "^4.0.1"
 
-starknet@^3.14.0:
+starknet@^3.15.0:
   version "3.15.0"
-  resolved "https://registry.npmjs.org/starknet/-/starknet-3.15.0.tgz#3f9ab20c6d6a094b33272f971f01fc5fa9b92c2a"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.15.0.tgz#3f9ab20c6d6a094b33272f971f01fc5fa9b92c2a"
   integrity sha512-+wqAHky7ffTpyJGGSLkzVt8c2FrMyu/8R1cAB3n++VyuBuTTS9+qD8SLXhXWJiBxCzlznP8KkdWQC9N0SCTokw==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
