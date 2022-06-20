@@ -68,7 +68,7 @@ interface AccountNftsProps {
 // FIXME: as soon as aspect is on mainnet this needs to be network aware
 const Nfts: FC<AccountNftsProps> = ({ account }) => {
   const navigate = useNavigate()
-  const { nfts = [] } = useNfts(account.address)
+  const { nfts = [] } = useNfts(account)
 
   return (
     <div>
@@ -110,7 +110,7 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
 
 const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
   // this is needed to keep swr mounted so it can retry the request
-  useNfts(account.address, {
+  useNfts(account, {
     suspense: false,
     errorRetryInterval: 30e3 /* 30 seconds */,
   })
