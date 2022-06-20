@@ -1,9 +1,9 @@
 import { FC, ReactNode, useState } from "react"
-import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
+import { CopyTooltip } from "../../components/CopyTooltip"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
 import { H2 } from "../../components/Typography"
@@ -94,9 +94,9 @@ export const ExportPrivateKeyScreen: FC = () => {
     <Wrapper>
       <Paragraph>This is your private key (click to copy)</Paragraph>
       {privateKey && (
-        <CopyToClipboard text={privateKey}>
+        <CopyTooltip copyValue={privateKey} message="Copied">
           <KeyContainer>{privateKey}</KeyContainer>
-        </CopyToClipboard>
+        </CopyTooltip>
       )}
 
       <WarningContainer>

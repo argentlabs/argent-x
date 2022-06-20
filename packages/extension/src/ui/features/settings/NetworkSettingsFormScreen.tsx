@@ -181,6 +181,14 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
               type="url"
               disabled={defaultNetwork.readonly}
             />
+            <ControlledInputText
+              autoComplete="off"
+              control={control}
+              placeholder="Multicall Address"
+              name="multicallAddress"
+              type="text"
+              disabled={defaultNetwork.readonly}
+            />
           </Collapse>
 
           {Object.keys(errors).length > 0 && (

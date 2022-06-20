@@ -12,6 +12,7 @@ export interface Network {
   accountClassHash?: string
   rpcUrl?: string
   readonly?: boolean
+  multicallAddress?: string
 }
 
 export type NetworkStatus = "ok" | "degraded" | "error" | "unknown"
@@ -35,6 +36,8 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://voyager.online",
     accountClassHash:
       "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+    multicallAddress:
+      "0x0740a7a14618bb7e4688d10059bc42104d22c315bb647130630c77d3b6d3ee50",
     readonly: true,
   },
   {
@@ -45,6 +48,8 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://goerli.voyager.online",
     accountClassHash:
       "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+    multicallAddress:
+      "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
     readonly: true,
   },
   ...(isDev ? [integrationNetwork] : []),
@@ -84,6 +89,7 @@ export const NetworkSchema: Schema<Network> = object()
     rpcUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
+    multicallAddress: string().optional().matches(REGEX_HEXSTRING),
     readonly: boolean().optional(),
   })
 
