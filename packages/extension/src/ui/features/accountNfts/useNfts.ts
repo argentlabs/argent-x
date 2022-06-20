@@ -10,7 +10,7 @@ export const useNfts = (
   config?: SWRConfigCommon,
 ) => {
   const { data: nfts = [], ...rest } = useSWR(
-    [account && getAccountIdentifier(account), "nfts"],
+    account && [(getAccountIdentifier(account), "nfts")],
     () => account && fetchAspectNfts(account),
     {
       refreshInterval: 60e3 /* 1 minute */,
