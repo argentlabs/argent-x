@@ -1,15 +1,19 @@
 import join from "url-join"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AspectNft } from "./aspect.model"
 
 const baseUrl = "https://api-testnet.playoasisx.com/assets"
 
 export const fetchAspectNfts = async (
-  address: string,
+  account: BaseWalletAccount,
 ): Promise<AspectNft[]> => {
-  const params = new URLSearchParams({ owner_address: address })
-  const response = await fetch(join(baseUrl, `?${params}`))
-  return await response.json()
+  if (account.networkId === "goerli-alpha") {
+    const params = new URLSearchParams({ owner_address: account.address })
+    const response = await fetch(join(baseUrl, `?${params}`))
+    return await response.json()
+  }
+  return []
 }
 
 export const openAspectNft = (contractAddress: string, tokenId: string) => {

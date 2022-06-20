@@ -84,8 +84,7 @@ export const NftScreen: FC = () => {
   const { contractAddress, tokenId } = useParams()
   const account = useSelectedAccount()
 
-  const accountAddress = account?.address || ""
-  const { nfts = [] } = useNfts(accountAddress)
+  const { nfts = [] } = useNfts(account)
   const nft = nfts.find(
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
@@ -113,7 +112,7 @@ export const NftScreen: FC = () => {
       to: contractAddress,
       method: "transferFrom",
       calldata: {
-        from_: accountAddress,
+        from_: account.address,
         to: recipient,
         tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
       },

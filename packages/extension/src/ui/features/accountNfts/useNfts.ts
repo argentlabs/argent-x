@@ -1,12 +1,17 @@
 import useSWR from "swr"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { SWRConfigCommon } from "../../services/swr"
 import { fetchAspectNfts } from "./aspect.service"
 
-export const useNfts = (address: string, config?: SWRConfigCommon) => {
+export const useNfts = (
+  account?: BaseWalletAccount,
+  config?: SWRConfigCommon,
+) => {
   const { data: nfts = [], ...rest } = useSWR(
-    [address, "goerli-alpha", "nfts"],
-    fetchAspectNfts,
+    account && [(getAccountIdentifier(account), "nfts")],
+    () => account && fetchAspectNfts(account),
     {
       refreshInterval: 60e3 /* 1 minute */,
       suspense: true,
