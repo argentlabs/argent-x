@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { differenceWith, find, union } from "lodash-es"
+import { differenceWith, find, union, uniqWith } from "lodash-es"
 import {
   Account,
   AddTransactionResponse,
@@ -203,7 +203,7 @@ export class Wallet {
       }),
     )
 
-    return accountsWithNetwork.filter(
+    return uniqWith(accountsWithNetwork, accountsEqual).filter(
       (account) => includeHidden || !account.hidden,
     )
   }
