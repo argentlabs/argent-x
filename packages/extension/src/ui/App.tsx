@@ -9,7 +9,11 @@ import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { useExtensionIsInTab } from "./features/browser/tabs"
 import { swrCacheProvider } from "./services/swr"
 
-const GlobalStyleWithFixedDimensions = createGlobalStyle`
+export interface GlobalStyleProps {
+  extensionIsInTab: boolean
+}
+
+const GlobalStyle = createGlobalStyle<GlobalStyleProps>`
   ${normalize}
 
   body {
@@ -20,8 +24,11 @@ const GlobalStyleWithFixedDimensions = createGlobalStyle`
   }
 
   html, body {
-    width: 360px;
-    height: 600px;
+    min-width: 360px;
+    min-height: 600px;
+
+    width: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "360px")};
+    height: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "600px")};
     
     overscroll-behavior: none;
     -ms-overflow-style: none;  /* IE and Edge */
@@ -44,25 +51,6 @@ const GlobalStyleWithFixedDimensions = createGlobalStyle`
   }
 `
 
-const OverwriteDimensionsToMinDimensions = createGlobalStyle`
-  html, body {
-    width: unset;
-    height: unset;
-    min-width: 360px;
-    min-height: 600px;
-  }
-`
-
-const GlobalStyle: FC = () => {
-  const extensionIsInTab = useExtensionIsInTab()
-  return (
-    <>
-      <GlobalStyleWithFixedDimensions />
-      {extensionIsInTab && <OverwriteDimensionsToMinDimensions />}
-    </>
-  )
-}
-
 /** @see `./theme.d.ts` for adding additional variables to the theme */
 const theme = createTheme({
   palette: {
@@ -73,19 +61,22 @@ const theme = createTheme({
   },
 })
 
-export const App: FC = () => (
-  <SWRConfig value={{ provider: () => swrCacheProvider }}>
-    <ThemeProvider theme={theme}>
-      <Suspense fallback={<LoadingScreen />}>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
-          rel="stylesheet"
-        />
-        <GlobalStyle />
-        <AppRoutes />
-      </Suspense>
-    </ThemeProvider>
-  </SWRConfig>
-)
+export const App: FC = () => {
+  const extensionIsInTab = useExtensionIsInTab()
+  return (
+    <SWRConfig value={{ provider: () => swrCacheProvider }}>
+      <ThemeProvider theme={theme}>
+        <Suspense fallback={<LoadingScreen />}>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+            rel="stylesheet"
+          />
+          <GlobalStyle extensionIsInTab={extensionIsInTab} />
+          <AppRoutes />
+        </Suspense>
+      </ThemeProvider>
+    </SWRConfig>
+  )
+}
