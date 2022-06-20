@@ -8,7 +8,7 @@ import { routes } from "../../routes"
 
 export const RecoverySetupScreen: FC = () => (
   <>
-    <IconBar close />
+    <IconBar close={-1} />
     <PageWrapper>
       <Title>Set up account recovery</Title>
       <Paragraph>
