@@ -3241,9 +3241,9 @@
     "@types/istanbul-lib-report" "*"
 
 "@types/jest-json-schema@^6.1.0":
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/@types/jest-json-schema/-/jest-json-schema-6.1.0.tgz#99ee02d022d62dc94a2a5ace34e94841cffb6eb1"
-  integrity sha512-8e9qbbrXbDCxLQTLca84AF2oWTxa/Vd3tiOLq7cblsY6zgtk7JgZ7nsfYxqLQEWjXF3IC4sqOHsA84R/hr555Q==
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@types/jest-json-schema/-/jest-json-schema-6.1.1.tgz#1471204581549da636d2bc956c1d352ae17ecb2c"
+  integrity sha512-tb+4AHBx+EwV3xSlZHMLE10MvitNGFpnQIZSTzZOPg15rXBdqig63BBE+pNAIN1226lP2L7zaVUcbvAsqMFluA==
   dependencies:
     "@types/jest" "*"
     ajv "^6.10.2"
