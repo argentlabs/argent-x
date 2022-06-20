@@ -129,7 +129,7 @@ export const fetchAllTokensBalance = async (
 
   if (!multicallContract) {
     // if no multicall contract is found, fallback to Promises
-    return fetchTokensBalanceWithPromises(tokenAddresses, account)
+    return fetchTokenBalancesWithoutMulticall(tokenAddresses, account)
   }
 
   const compiledCalldata = stark.compileCalldata({
@@ -161,7 +161,7 @@ export const fetchAllTokensBalance = async (
   }, {})
 }
 
-export const fetchTokensBalanceWithPromises = async (
+export const fetchTokenBalancesWithoutMulticall = async (
   tokenAddresses: string[],
   account: Account,
 ): Promise<BalancesMap> => {
