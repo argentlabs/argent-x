@@ -83,8 +83,7 @@ const FeeErrorContainer = styled.div`
   border: 1px solid #333332;
   border-radius: 8px;
   padding: 16px 20px;
-  overflow-y: scroll;
-  line-break: anywhere;
+  overflow: auto;
   cursor: pointer;
 `
 
@@ -278,7 +277,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
                 message="Copied"
               >
                 <FeeErrorContainer>
-                  {parsedFeeEstimationError}
+                  <pre style={{ whiteSpace: "pre-wrap" }}>
+                    {parsedFeeEstimationError}
+                  </pre>
                 </FeeErrorContainer>
               </CopyTooltip>
             )}
