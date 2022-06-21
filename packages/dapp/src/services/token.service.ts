@@ -36,7 +36,7 @@ export const mintToken = async (
   const erc20Contract = new Contract(
     Erc20Abi as Abi,
     getErc20TokenAddress(network),
-    starknet.account,
+    starknet.account as any,
   )
 
   const address = starknet.selectedAddress
@@ -57,7 +57,7 @@ export const transfer = async (
   const erc20Contract = new Contract(
     Erc20Abi as any,
     getErc20TokenAddress(network),
-    starknet.account,
+    starknet.account as any,
   )
 
   return erc20Contract.transfer(
