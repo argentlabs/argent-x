@@ -2,8 +2,10 @@ import { BigNumber } from "@ethersproject/bignumber"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
+import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { IconButton } from "../../components/IconButton"
 import { TokenIcon } from "./TokenIcon"
+import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
@@ -63,6 +65,20 @@ export const TokenSubtitle = styled.p`
   margin: 0;
 `
 
+export const TokenCurencyValue = styled.div<{
+  isLoading?: boolean
+}>`
+  font-size: 13px;
+  line-height: 18px;
+  color: #8f8e8c;
+  align-self: flex-end;
+  ${({ isLoading }) =>
+    isLoading &&
+    css`
+      animation: ${PulseAnimation} 1s ease-in-out infinite;
+    `}
+`
+
 const PulseAnimation = keyframes`
   0% {
     opacity: 1;
@@ -119,6 +135,8 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   ...props
 }) => {
   const { name, symbol, balance, image } = toTokenView(token)
+  const currencyValue = useTokenBalanceToCurrencyValue(token)
+
   return (
     <TokenWrapper {...props}>
       <TokenIcon url={image} name={name} />
@@ -129,7 +147,14 @@ export const TokenListItem: FC<TokenListItemProps> = ({
             <TokenSubtitle>{name}</TokenSubtitle>
           </TokenSubtitleContainer>
         </TokenTextGroup>
-        <TokenBalance isLoading={isLoading}>{balance}</TokenBalance>
+        <TokenTextGroup>
+          <TokenBalance isLoading={isLoading}>{balance}</TokenBalance>
+          {currencyValue !== undefined && (
+            <TokenCurencyValue isLoading={isLoading}>
+              {prettifyCurrencyValue(currencyValue)}
+            </TokenCurencyValue>
+          )}
+        </TokenTextGroup>
       </TokenDetailsWrapper>
     </TokenWrapper>
   )

@@ -1,6 +1,7 @@
 import { FC, useRef } from "react"
 import styled from "styled-components"
 
+import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
 import {
@@ -11,6 +12,8 @@ import { AccountStatus } from "../accounts/accounts.service"
 import { AccountMenu } from "./AccountMenu"
 import { AccountName } from "./AccountName"
 import { AccountAddressWrapper, Address } from "./Address"
+import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
+import { useTokensWithBalance } from "./tokens.state"
 
 const AccountStatusText = styled.p<{ color?: string }>`
   font-size: 12px;
@@ -27,6 +30,14 @@ const Header = styled.div`
   width: 250px;
 `
 
+const AccountBalance = styled.div`
+  font-weight: 600;
+  font-size: 17px;
+  text-align: center;
+  color: #8f8e8c;
+  margin-bottom: 8px;
+`
+
 interface AccountSubheaderProps {
   status: AccountStatus
   accountName?: string
@@ -41,6 +52,8 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   accountName,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
+  const { tokenDetails } = useTokensWithBalance()
+  const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
 
   return (
     <>
@@ -72,6 +85,11 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
           </AccountStatusText>
         )}
       </div>
+      {sumCurrencyValue !== undefined && (
+        <AccountBalance>
+          {prettifyCurrencyValue(sumCurrencyValue)}
+        </AccountBalance>
+      )}
       <AccountAddressWrapper style={{ marginBottom: 18 }}>
         <CopyTooltip
           copyValue={normalizeAddress(accountAddress)}

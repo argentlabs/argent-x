@@ -14,7 +14,6 @@ interface TokenListProps {
 
 export const TokenList: FC<TokenListProps> = ({ showTitle }) => {
   const { isValidating, tokenDetails } = useTokensWithBalance()
-
   return (
     <>
       {showTitle && <SectionHeader>Tokens</SectionHeader>}
