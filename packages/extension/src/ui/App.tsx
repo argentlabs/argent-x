@@ -63,6 +63,8 @@ const theme = createTheme({
   },
 })
 
+const isDev = process.env.NODE_ENV === "development"
+
 const Thrower: FC = () => {
   const [shouldThrow, setShouldThrow] = useState(false)
   const throwClicked = useCallback(() => {
@@ -91,7 +93,7 @@ export const App: FC = () => {
         <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
           <Suspense fallback={<LoadingScreen />}>
             <>
-              <Thrower />
+              {isDev && <Thrower />}
               <AppRoutes />
             </>
           </Suspense>
