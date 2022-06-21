@@ -7,7 +7,7 @@ import styled, { css, keyframes } from "styled-components"
 import useSWR from "swr"
 
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { Tooltip } from "../../components/CopyTooltip"
+import { CopyTooltip, Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
   FieldError,
@@ -85,6 +85,7 @@ const FeeErrorContainer = styled.div`
   padding: 16px 20px;
   overflow-y: scroll;
   line-break: anywhere;
+  cursor: pointer;
 `
 
 function displayEther(value: BigNumber) {
@@ -189,6 +190,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     onErrorChange?.(hasError)
   }, [hasError])
 
+  const parsedFeeEstimationError = showEstimateError && getParsedError(error)
+
   return (
     <FieldGroup error={showError}>
       <Field>
@@ -269,7 +272,16 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
           </FieldError>
 
           <Collapse in={feeEstimateExpanded} timeout="auto">
-            <FeeErrorContainer> {getParsedError(error)} </FeeErrorContainer>
+            {parsedFeeEstimationError && (
+              <CopyTooltip
+                copyValue={parsedFeeEstimationError}
+                message="Copied"
+              >
+                <FeeErrorContainer>
+                  {parsedFeeEstimationError}
+                </FeeErrorContainer>
+              </CopyTooltip>
+            )}
           </Collapse>
         </>
       )}
