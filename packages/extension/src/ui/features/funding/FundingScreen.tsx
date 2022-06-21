@@ -45,9 +45,10 @@ export const FundingScreen: FC = () => {
         <OptionsWrapper>
           {allowFiatPurchase ? (
             <a
-              href={`http://argentx.banxa.com/?walletAddress=${normalizeAddress(
+              href={`https://argentx.banxa.com/?walletAddress=${normalizeAddress(
                 account.address,
               )}`}
+              rel="noopener noreferrer"
               target="_blank"
             >
               <Option
