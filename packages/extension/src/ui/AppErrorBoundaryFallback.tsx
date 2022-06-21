@@ -76,12 +76,8 @@ const AppErrorBoundaryFallback: FC<ErrorBoundaryState> = ({
 
   const errorPayload = useMemo(() => {
     try {
-      const displayError =
-        error && error.toString ? error.toString() : "Unknown error"
-      const displayStack =
-        errorInfo && errorInfo?.componentStack
-          ? errorInfo.componentStack
-          : "No stack trace"
+      const displayError = error?.toString?.() || "Unknown error"
+      const displayStack = errorInfo.componentStack || "No stack trace"
       return `v${version}
 
 ${displayError}
