@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme } from "@mui/material"
-import { FC, Suspense, useCallback, useEffect, useState } from "react"
+import { FC, Suspense } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
@@ -63,21 +63,6 @@ const theme = createTheme({
   },
 })
 
-const isDev = process.env.NODE_ENV === "development"
-
-const Thrower: FC = () => {
-  const [shouldThrow, setShouldThrow] = useState(false)
-  const throwClicked = useCallback(() => {
-    setShouldThrow((shouldThrow) => !shouldThrow)
-  }, [])
-  useEffect(() => {
-    if (shouldThrow) {
-      throw "Threw a manual exception"
-    }
-  }, [shouldThrow])
-  return <button onClick={throwClicked}>Throw</button>
-}
-
 export const App: FC = () => {
   const extensionIsInTab = useExtensionIsInTab()
   return (
@@ -92,10 +77,7 @@ export const App: FC = () => {
         <GlobalStyle extensionIsInTab={extensionIsInTab} />
         <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
           <Suspense fallback={<LoadingScreen />}>
-            <>
-              {isDev && <Thrower />}
-              <AppRoutes />
-            </>
+            <AppRoutes />
           </Suspense>
         </ErrorBoundary>
       </ThemeProvider>
