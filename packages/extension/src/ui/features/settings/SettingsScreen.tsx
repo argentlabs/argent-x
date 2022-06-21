@@ -71,6 +71,36 @@ const Footer = styled.div`
   }
 `
 
+export const SupportFooter: FC = () => (
+  <Footer>
+    <P>Help, support &amp; suggestions:</P>
+    <div>
+      <a
+        href="https://discord.com/channels/793094838509764618/908663762150645770"
+        title="Ask a question on the argent-extension channel on StarkNet Discord"
+        target="_blank"
+      >
+        <img
+          src="https://images.prismic.io/argentwebsite/76eac5a3-a4a3-4395-a82a-a3def2438ff0_icon-discord.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
+          alt="Argent Discord icon"
+        />
+      </a>
+      <a
+        href="https://github.com/argentlabs/argent-x/issues"
+        title="Post an issue on Argent X GitHub"
+        target="_blank"
+        style={{ marginLeft: 15 }}
+      >
+        <img
+          src="https://images.prismic.io/argentwebsite/460e2528-d9bb-4a47-9339-b72c287c243e_icon-github.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
+          alt="Argent Github icon"
+        />
+      </a>
+    </div>
+    <P>Version: v{process.env.VERSION}</P>
+  </Footer>
+)
+
 export const SettingsScreen: FC = () => {
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
@@ -128,33 +158,7 @@ export const SettingsScreen: FC = () => {
         </SettingsItem>
         <hr />
 
-        <Footer>
-          <P>Help, support &amp; suggestions:</P>
-          <div>
-            <a
-              href="https://discord.com/channels/793094838509764618/908663762150645770"
-              title="Ask a question on the argent-extension channel on StarkNet Discord"
-              target="_blank"
-            >
-              <img
-                src="https://images.prismic.io/argentwebsite/76eac5a3-a4a3-4395-a82a-a3def2438ff0_icon-discord.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
-                alt="Argent Discord icon"
-              />
-            </a>
-            <a
-              href="https://github.com/argentlabs/argent-x/issues"
-              title="Post an issue on Argent X GitHub"
-              target="_blank"
-              style={{ marginLeft: 15 }}
-            >
-              <img
-                src="https://images.prismic.io/argentwebsite/460e2528-d9bb-4a47-9339-b72c287c243e_icon-github.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
-                alt="Argent Github icon"
-              />
-            </a>
-          </div>
-          <P>Version: v{process.env.VERSION}</P>
-        </Footer>
+        <SupportFooter />
       </SettingsScreenWrapper>
     </>
   )
