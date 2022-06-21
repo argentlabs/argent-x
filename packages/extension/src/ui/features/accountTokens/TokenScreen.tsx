@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { Schema, object } from "yup"
 
 import { inputAmountSchema, parseAmount } from "../../../shared/token"
+import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
@@ -19,6 +20,7 @@ import {
 } from "../../services/transactions"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
+import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 
@@ -83,6 +85,20 @@ const BalanceSymbol = styled.div`
   font-weight: bold;
   font-size: 20px;
   line-height: 25px;
+  margin-left: 5px;
+`
+
+const InlineBalanceAndSymbol = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+`
+
+const TokenBalance = styled.div`
+  font-size: 17px;
+  text-align: center;
+  color: #ffffff;
+  margin-top: 8px;
 `
 
 interface SendInput {
@@ -119,6 +135,7 @@ export const TokenScreen: FC = () => {
   }
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+  const currencyValue = useTokenBalanceToCurrencyValue(token)
 
   return (
     <>
@@ -130,10 +147,15 @@ export const TokenScreen: FC = () => {
         </TokenTitle>
         <BalanceAlert>
           <BalanceTitle>Your balance</BalanceTitle>
-          <CopyToClipboard text={balance}>
-            <BalanceAmount>{balance}</BalanceAmount>
-          </CopyToClipboard>
-          <BalanceSymbol>{symbol}</BalanceSymbol>
+          <InlineBalanceAndSymbol>
+            <CopyToClipboard text={balance}>
+              <BalanceAmount>{balance}</BalanceAmount>
+            </CopyToClipboard>
+            <BalanceSymbol>{symbol}</BalanceSymbol>
+          </InlineBalanceAndSymbol>
+          {currencyValue !== undefined && (
+            <TokenBalance>{prettifyCurrencyValue(currencyValue)}</TokenBalance>
+          )}
         </BalanceAlert>
 
         <ButtonGroup

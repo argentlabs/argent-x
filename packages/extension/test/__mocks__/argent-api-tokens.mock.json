@@ -1,0 +1,163 @@
+{
+  "tokens": [
+    {
+      "id": 1,
+      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "name": "Ether",
+      "tradable": false,
+      "symbol": "ETH",
+      "decimals": 18,
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+      "sendable": true,
+      "displayDecimals": 4,
+      "brandColor": "#627EEA",
+      "description": "Test description\nWith a line break\nFrom the admin dashboard",
+      "category": "currencies",
+      "marketData": {
+        "marketCap": 126681630479,
+        "marketCap24hChange": -14.61912,
+        "dailyVolume": 24672841243,
+        "rank": 2
+      },
+      "links": [
+        {
+          "position": 1,
+          "name": "Website",
+          "url": "https://ethereum.org/"
+        },
+        {
+          "position": 2,
+          "name": "Twitter",
+          "url": "https://twitter.com/ethereum"
+        }
+      ],
+      "popular": true,
+      "tags": [],
+      "pricingId": 1
+    },
+    {
+      "id": 5,
+      "address": "0x386e8d061177f19b3b485c20e31137e6f6bc497cc635ccdfcab96fadf5add6a",
+      "name": "Tether USD",
+      "tradable": false,
+      "symbol": "USDT",
+      "decimals": 6,
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png",
+      "sendable": true,
+      "category": "currencies",
+      "marketData": {
+        "marketCap": 71216076803,
+        "marketCap24hChange": -0.45754,
+        "dailyVolume": 63531229425,
+        "rank": 1
+      },
+      "links": [
+        {
+          "position": 1,
+          "name": "Website",
+          "url": "https://tether.to/"
+        },
+        {
+          "position": 2,
+          "name": "Twitter",
+          "url": "https://twitter.com/Tether_to"
+        }
+      ],
+      "popular": false,
+      "tags": ["stablecoin"],
+      "pricingId": 2
+    },
+    {
+      "id": 6,
+      "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+      "name": "DAI",
+      "tradable": false,
+      "symbol": "DAI",
+      "decimals": 18,
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png",
+      "sendable": true,
+      "description": "Dummy token description",
+      "category": "currencies",
+      "marketData": {
+        "marketCap": 6401871625,
+        "marketCap24hChange": 0.48556,
+        "dailyVolume": 734256889,
+        "rank": 5
+      },
+      "links": [
+        {
+          "position": 1,
+          "name": "Website",
+          "url": "https://makerdao.com/"
+        },
+        {
+          "position": 2,
+          "name": "Twitter",
+          "url": "https://twitter.com/MakerDAO"
+        }
+      ],
+      "popular": true,
+      "tags": ["stablecoin"],
+      "pricingId": 8
+    },
+    {
+      "id": 4,
+      "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
+      "name": "USD Coin",
+      "tradable": false,
+      "symbol": "USDC",
+      "decimals": 6,
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
+      "sendable": true,
+      "category": "currencies",
+      "marketData": {
+        "marketCap": 54269870918,
+        "marketCap24hChange": 0.1428,
+        "dailyVolume": 7351348729,
+        "rank": 3
+      },
+      "links": [
+        {
+          "position": 1,
+          "name": "Website",
+          "url": "https://www.circle.com/en/usdc"
+        }
+      ],
+      "popular": false,
+      "tags": ["stablecoin"],
+      "pricingId": 3
+    },
+    {
+      "id": 7,
+      "address": "0x12d537dc323c439dc65c976fad242d5610d27cfb5f31689a0a319b8be7f3d56",
+      "name": "Bitcoin",
+      "tradable": false,
+      "symbol": "WBTC",
+      "decimals": 8,
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png",
+      "sendable": true,
+      "brandColor": "#F09242",
+      "category": "tokens",
+      "marketData": {
+        "marketCap": 5528825975,
+        "marketCap24hChange": -10.32817,
+        "dailyVolume": 679865601,
+        "rank": 6
+      },
+      "links": [
+        {
+          "position": 1,
+          "name": "Website",
+          "url": "https://www.wbtc.network/"
+        },
+        {
+          "position": 2,
+          "name": "Twitter",
+          "url": "https://twitter.com/WrappedBTC"
+        }
+      ],
+      "popular": false,
+      "pricingId": 13
+    }
+  ]
+}
