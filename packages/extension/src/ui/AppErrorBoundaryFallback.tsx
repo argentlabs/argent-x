@@ -60,10 +60,10 @@ const StyledContentCopyIcon = styled(ContentCopyIcon)`
 `
 
 const version = process.env.VERSION
-const fallbackErrorPayload = JSON.stringify({
-  version,
-  error: "Unable to parse error",
-})
+const fallbackErrorPayload = `v${version}
+
+Unable to parse error
+`
 
 const AppErrorBoundaryFallback: FC<ErrorBoundaryState> = ({
   error,
@@ -82,12 +82,11 @@ const AppErrorBoundaryFallback: FC<ErrorBoundaryState> = ({
         errorInfo && errorInfo?.componentStack
           ? errorInfo.componentStack
           : "No stack trace"
-      const payload = {
-        version,
-        error: displayError,
-        stackTrace: displayStack,
-      }
-      return JSON.stringify(payload, null, 2)
+      return `v${version}
+
+${displayError}
+${displayStack}
+      `
     } catch (e) {
       // ignore error
     }
