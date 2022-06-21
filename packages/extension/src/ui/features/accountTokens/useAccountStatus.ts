@@ -25,7 +25,7 @@ export const useAccountStatus = (
     if (deployStatus !== "PENDING") {
       ;(async () => {
         try {
-          const code = await account.contract.provider.getCode(account.address)
+          const code = await account.provider.getCode(account.address)
           setIsDeployed(code.bytecode.length !== 0)
         } catch {
           // as api isnt very stable (especially this endpoint) lets do nothing if the request fails
