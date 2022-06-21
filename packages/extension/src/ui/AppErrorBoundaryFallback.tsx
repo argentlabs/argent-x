@@ -99,7 +99,7 @@ const AppErrorBoundaryFallback: FC<ErrorBoundaryState> = ({
       <MessageContainer>
         <ErrorIcon />
         <ErrorMessageContainer>
-          <P>Sorry, an error ocurred</P>
+          <P>Sorry, an error occurred</P>
         </ErrorMessageContainer>
         <CopyTooltip message="Copied" copyValue={errorPayload}>
           <CopyDetailsContainer>
