@@ -13,7 +13,8 @@ import {
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
 } from "../../../shared/tokenPrice.service"
-import { fetcher } from "../../../shared/utils/fetcher"
+import { argentServicesFetcher } from "../../../shared/utils/fetcher"
+import { useSettingsValue } from "../settings/useSettingsValue"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
@@ -21,22 +22,31 @@ import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 export const usePriceAndTokenDataFromApi = () => {
   const { data: pricesData } = useSWR<ApiPriceDataResponse>(
     `${ARGENT_API_TOKENS_PRICES_URL}`,
-    fetcher,
+    argentServicesFetcher,
     {
       refreshInterval: 60 * 1000 /** 60 seconds */,
     },
   )
   const { data: tokenData } = useSWR<ApiTokenDataResponse>(
     `${ARGENT_API_TOKENS_INFO_URL}`,
-    fetcher,
+    argentServicesFetcher,
     {
       refreshInterval: 5 * 60 * 1000 /** 5 minutes */,
     },
   )
-  return {
-    pricesData,
-    tokenData,
-  }
+  /** don't return any data unless Argent services are enabled */
+  const { value: privacyUseArgentServicesValue } = useSettingsValue(
+    "privacyUseArgentServices",
+  )
+  return privacyUseArgentServicesValue
+    ? {
+        pricesData,
+        tokenData,
+      }
+    : {
+        pricesData: undefined,
+        tokenData: undefined,
+      }
 }
 
 export const usePriceAndTokenDataDisabled = () => {

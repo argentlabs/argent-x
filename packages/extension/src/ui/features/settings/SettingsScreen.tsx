@@ -10,7 +10,7 @@ import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 
-const Title = styled.h3`
+export const Title = styled.h3`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
@@ -18,21 +18,21 @@ const Title = styled.h3`
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   svg {
     color: #8f8e8c;
-    margin-left: auto;
     font-size: 12px;
   }
 `
 
-const P = styled.p`
+export const P = styled.p`
   font-size: 15px;
   color: #8f8e8c;
   margin-top: 16px;
 `
 
-const SettingsScreenWrapper = styled.div`
+export const SettingsScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 0 24px 0;
@@ -52,7 +52,11 @@ const SettingsScreenWrapper = styled.div`
   }
 `
 
-const SettingsItem = styled(Link)`
+export const SettingsItem = styled.div`
+  padding: 24px 32px;
+`
+
+export const SettingsLinkItem = styled(Link)`
   cursor: pointer;
   padding: 24px 32px;
 
@@ -61,7 +65,7 @@ const SettingsItem = styled(Link)`
   }
 `
 
-const Footer = styled.div`
+export const Footer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -109,25 +113,28 @@ export const SettingsScreen: FC = () => {
       <IconBar back />
       <SettingsScreenWrapper>
         <H2>Settings</H2>
-        <SettingsItem to={routes.lockScreen()} onClick={stopSession}>
+        <SettingsLinkItem to={routes.lockScreen()} onClick={stopSession}>
           <Title>
             <span>Lock wallet</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
-        </SettingsItem>
+        </SettingsLinkItem>
         <hr />
         {!extensionIsInTab && (
           <>
-            <SettingsItem to={routes.settings()} onClick={openExtensionInTab}>
+            <SettingsLinkItem
+              to={routes.settings()}
+              onClick={openExtensionInTab}
+            >
               <Title>
                 <span>Extended view</span>
                 <ArrowForwardIosIcon fontSize="inherit" />
               </Title>
-            </SettingsItem>
+            </SettingsLinkItem>
             <hr />
           </>
         )}
-        <SettingsItem to={routes.settingsDappConnections()}>
+        <SettingsLinkItem to={routes.settingsDappConnections()}>
           <Title>
             <span>Reset dapp connections</span>
             <ArrowForwardIosIcon fontSize="inherit" />
@@ -136,9 +143,9 @@ export const SettingsScreen: FC = () => {
             Dapps you have previously connected to can auto-connect in the
             future.
           </P>
-        </SettingsItem>
+        </SettingsLinkItem>
         <hr />
-        <SettingsItem to={routes.settingsSeed()}>
+        <SettingsLinkItem to={routes.settingsSeed()}>
           <Title>
             <span>Show recovery phrase</span>
             <ArrowForwardIosIcon fontSize="inherit" />
@@ -147,15 +154,22 @@ export const SettingsScreen: FC = () => {
             Your recovery phrase allows anyone to use your account. Keep it
             secure.
           </P>
-        </SettingsItem>
+        </SettingsLinkItem>
         <hr />
-        <SettingsItem to={routes.settingsNetworks()}>
+        <SettingsLinkItem to={routes.settingsNetworks()}>
           <Title>
             <span>Manage networks</span>
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
           <P>Here you can add, edit and remove custom networks.</P>
-        </SettingsItem>
+        </SettingsLinkItem>
+        <hr />
+        <SettingsLinkItem to={routes.settingsPrivacy()}>
+          <Title>
+            <span>Privacy</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+        </SettingsLinkItem>
         <hr />
 
         <SupportFooter />
