@@ -1,25 +1,41 @@
-import { Component } from "react"
+import { Component, cloneElement } from "react"
 
 interface ErrorBoundaryProps {
-  fallback: React.ReactNode
+  fallback: React.ReactElement
   children: React.ReactNode
 }
 
-interface ErrorBoundaryState {
-  hasError: boolean
+export interface ErrorBoundaryState {
+  error?: any
+  errorInfo?: any
 }
 
 export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  state = { hasError: false }
+  state = { error: null, errorInfo: null }
 
-  static getDerivedStateFromError(_error: unknown) {
-    return { hasError: true }
+  /** server-side error */
+  static getDerivedStateFromError(error: unknown) {
+    return {
+      error,
+    }
+  }
+
+  /** client-side error with info */
+  componentDidCatch(error: any, errorInfo: any) {
+    this.setState({
+      error: error,
+      errorInfo: errorInfo,
+    })
   }
 
   render() {
-    return this.state.hasError ? this.props.fallback : this.props.children
+    if (this.state.error) {
+      const { error, errorInfo } = this.state
+      return cloneElement(this.props.fallback, { error, errorInfo })
+    }
+    return <>{this.props.children}</>
   }
 }
