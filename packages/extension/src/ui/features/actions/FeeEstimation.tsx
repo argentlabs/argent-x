@@ -290,9 +290,11 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
 }
 
 const getParsedError = (errorTxt: string) => {
-  const regex = new RegExp("Error in the called contract", "g")
-
-  const matchAll = [...errorTxt.matchAll(regex)]
-
-  return matchAll[1] ? errorTxt.slice(matchAll[1].index) : errorTxt
+  try {
+    const regex = new RegExp("Error in the called contract", "g")
+    const matchAll = [...errorTxt.matchAll(regex)]
+    return errorTxt.slice(matchAll[1].index)
+  } catch {
+    return errorTxt
+  }
 }
