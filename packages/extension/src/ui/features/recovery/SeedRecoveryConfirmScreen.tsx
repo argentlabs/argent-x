@@ -2,13 +2,13 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { P } from "../../components/Typography"
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useBackupRequired } from "./backupDownload.state"
 
 export const SeedRecoveryConfirmScreen: FC = () => {
   const navigate = useNavigate()
-
+  const returnTo = useReturnTo()
   return (
     <ConfirmScreen
       title="Have you written down your recovery phrase?"
@@ -17,7 +17,7 @@ export const SeedRecoveryConfirmScreen: FC = () => {
       confirmButtonText="Yes"
       onSubmit={() => {
         useBackupRequired.setState({ isBackupRequired: false })
-        navigate(routes.accountTokens())
+        navigate(returnTo || routes.accountTokens())
       }}
       onReject={() => {
         navigate(-1)
