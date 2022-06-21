@@ -294,5 +294,5 @@ const getParsedError = (errorTxt: string) => {
 
   const matchAll = [...errorTxt.matchAll(regex)]
 
-  return errorTxt.slice(matchAll[1].index)
+  return matchAll[1] ? errorTxt.slice(matchAll[1].index) : errorTxt
 }
