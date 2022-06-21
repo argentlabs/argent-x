@@ -1,9 +1,10 @@
-import { BigNumber } from "@ethersproject/bignumber"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
-import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
-import { IconButton } from "../../components/IconButton"
+import {
+  prettifyCurrencyValue,
+  prettifyTokenBalance,
+} from "../../../shared/tokenPrice.service"
 import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
@@ -48,36 +49,18 @@ export const TokenTitle = styled.h3`
   text-overflow: ellipsis;
   max-width: 250px;
 `
-export const TokenSubtitleContainer = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* number of lines to show */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-`
 
-export const TokenSubtitle = styled.p`
-  font-size: 13px;
-  line-height: 18px;
-  color: #8f8e8c;
-  margin: 0;
-`
-
-export const TokenCurencyValue = styled.div<{
+interface IIsLoading {
   isLoading?: boolean
-}>`
-  font-size: 13px;
-  line-height: 18px;
-  color: #8f8e8c;
-  align-self: flex-end;
-  ${({ isLoading }) =>
-    isLoading &&
-    css`
+}
+
+const isLoadingPulse = ({ isLoading }: IIsLoading) => {
+  if (isLoading) {
+    return css`
       animation: ${PulseAnimation} 1s ease-in-out infinite;
-    `}
-`
+    `
+  }
+}
 
 const PulseAnimation = keyframes`
   0% {
@@ -91,69 +74,75 @@ const PulseAnimation = keyframes`
   }
 `
 
-export const TokenBalance = styled.p<{
-  isLoading?: boolean
-}>`
+const TokenBalance = styled.div<IIsLoading>`
+  font-size: 13px;
+  line-height: 18px;
+  color: #8f8e8c;
+  ${isLoadingPulse}
+`
+
+const TokenCurrencyValue = styled.div<IIsLoading>`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
   text-align: right;
-  max-width: 64px;
-  min-width: 52px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-
   opacity: 1;
-  ${({ isLoading }) =>
-    isLoading &&
-    css`
-      animation: ${PulseAnimation} 1s ease-in-out infinite;
-    `}
+  ${isLoadingPulse}
 `
 
-export const AddTokenIconButton = styled(IconButton)`
-  &:hover,
-  &:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-    outline: 0;
-  }
-`
-
-export type TokenAction =
-  | { type: "MINT"; amount: BigNumber }
-  | { type: "TRANSFER"; to: string; amount: BigNumber }
-
-interface TokenListItemProps {
+interface ITokenListItemContainer {
   token: TokenDetailsWithBalance
-  isLoading?: boolean
+  // ...rest
+  [x: string]: any
 }
 
-export const TokenListItem: FC<TokenListItemProps> = ({
+export const TokenListItemContainer: FC<ITokenListItemContainer> = ({
   token,
-  isLoading = false,
-  ...props
+  ...rest
 }) => {
-  const { name, symbol, balance, image } = toTokenView(token)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
+  return <TokenListItem token={token} currencyValue={currencyValue} {...rest} />
+}
 
+export type TokenListItemVariant = "default" | "no-currency"
+
+interface ITokenListItem {
+  token: TokenDetailsWithBalance
+  variant?: TokenListItemVariant
+  isLoading?: boolean
+  currencyValue: string | undefined
+  // ...rest
+  [x: string]: any
+}
+
+export const TokenListItem: FC<ITokenListItem> = ({
+  token,
+  variant,
+  isLoading = false,
+  currencyValue,
+  ...rest
+}) => {
+  const { name, image } = toTokenView(token)
+  const displayBalance = prettifyTokenBalance(token)
+  const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
+  const isNoCurrencyVariant = variant === "no-currency"
   return (
-    <TokenWrapper {...props}>
+    <TokenWrapper {...rest}>
       <TokenIcon url={image} name={name} />
       <TokenDetailsWrapper>
         <TokenTextGroup>
-          <TokenTitle>{symbol}</TokenTitle>
-          <TokenSubtitleContainer>
-            <TokenSubtitle>{name}</TokenSubtitle>
-          </TokenSubtitleContainer>
+          <TokenTitle>{name}</TokenTitle>
+          {!isNoCurrencyVariant && (
+            <TokenBalance isLoading={isLoading}>{displayBalance}</TokenBalance>
+          )}
         </TokenTextGroup>
         <TokenTextGroup>
-          <TokenBalance isLoading={isLoading}>{balance}</TokenBalance>
-          {currencyValue !== undefined && (
-            <TokenCurencyValue isLoading={isLoading}>
-              {prettifyCurrencyValue(currencyValue)}
-            </TokenCurencyValue>
-          )}
+          <TokenCurrencyValue isLoading={isLoading}>
+            {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
+          </TokenCurrencyValue>
         </TokenTextGroup>
       </TokenDetailsWrapper>
     </TokenWrapper>
