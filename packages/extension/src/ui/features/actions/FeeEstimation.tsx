@@ -1,6 +1,7 @@
+import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
-import { FC, useEffect, useMemo } from "react"
+import { FC, useEffect, useMemo, useState } from "react"
 import { Call } from "starknet"
 import styled, { css, keyframes } from "styled-components"
 import useSWR from "swr"
@@ -8,7 +9,7 @@ import useSWR from "swr"
 import { getFeeToken } from "../../../shared/token"
 import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { Tooltip } from "../../components/CopyTooltip"
+import { CopyTooltip, Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
   FieldError,
@@ -19,10 +20,12 @@ import {
   FieldValueGroup,
   FieldValueMeta,
 } from "../../components/Fields"
+import { KeyboardArrowDownRounded } from "../../components/Icons/MuiIcons"
 import {
   InfoRoundedIcon,
   ReportGmailerrorredRoundedIcon,
 } from "../../components/Icons/MuiIcons"
+import { makeClickable } from "../../services/a11y"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { useAccount } from "../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
@@ -32,6 +35,13 @@ const FeeEstimationValue = styled.p`
   * + & {
     margin-left: 0.3em;
   }
+`
+
+const ExtendableControl = styled.div`
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+  gap: 4px;
 `
 
 const InvisibleInput = styled.span`
@@ -47,6 +57,10 @@ const InvisibleInput = styled.span`
     outline: none;
     color: inherit;
   }
+`
+const DetailsText = styled.span`
+  opacity: 0.5;
+  color: white;
 `
 
 const pulseKeyframe = keyframes`
@@ -66,6 +80,14 @@ const LoadingInput = styled.div`
   border-radius: 2px;
   background: #8f8e8c;
   animation: ${pulseKeyframe} 1s alternate infinite;
+`
+
+const FeeErrorContainer = styled.div`
+  border: 1px solid #333332;
+  border-radius: 8px;
+  padding: 16px 20px;
+  overflow: auto;
+  cursor: pointer;
 `
 
 function displayEther(value: BigNumber) {
@@ -100,7 +122,6 @@ export const useMaxFeeEstimation = (
       shouldRetryOnError: false,
     },
   )
-
   return { fee, error }
 }
 
@@ -147,6 +168,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     throw new Error("Account not found")
   }
 
+  const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
+
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
     () => fetchFeeTokenBalance(account, account.networkId),
@@ -169,6 +192,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     onErrorChange?.(hasError)
   }, [hasError])
 
+  const parsedFeeEstimationError = showEstimateError && getParsedError(error)
   const feeToken = getFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
@@ -241,15 +265,59 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             </FieldValueMeta>
           </FieldValueGroup>
         ) : showEstimateError ? (
-          <InvisibleInput>Unknown</InvisibleInput>
+          <InvisibleInput>Error</InvisibleInput>
         ) : (
           <LoadingInput />
         )}
       </Field>
       {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
       {showEstimateError && (
-        <FieldError>Transaction failure predicted</FieldError>
+        <>
+          <FieldError justify="space-between">
+            Transaction failure predicted
+            <ExtendableControl
+              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), 100)}
+            >
+              <DetailsText>Details</DetailsText>
+              <KeyboardArrowDownRounded
+                style={{
+                  transition: "transform 0.2s ease-in-out",
+                  transform: feeEstimateExpanded
+                    ? "rotate(-180deg)"
+                    : "rotate(0deg)",
+                  height: 13,
+                  width: 13,
+                }}
+              />
+            </ExtendableControl>
+          </FieldError>
+
+          <Collapse in={feeEstimateExpanded} timeout="auto">
+            {parsedFeeEstimationError && (
+              <CopyTooltip
+                copyValue={parsedFeeEstimationError}
+                message="Copied"
+              >
+                <FeeErrorContainer>
+                  <pre style={{ whiteSpace: "pre-wrap" }}>
+                    {parsedFeeEstimationError}
+                  </pre>
+                </FeeErrorContainer>
+              </CopyTooltip>
+            )}
+          </Collapse>
+        </>
       )}
     </FieldGroup>
   )
+}
+
+const getParsedError = (errorTxt: string) => {
+  try {
+    const regex = new RegExp("Error in the called contract", "g")
+    const matchAll = [...errorTxt.matchAll(regex)]
+    return errorTxt.slice(matchAll[1].index)
+  } catch {
+    return errorTxt
+  }
 }
