@@ -26,9 +26,14 @@ export const useAccounts = create<State>((set) => ({
     })),
 }))
 
-export const useAccount = (account: BaseWalletAccount): Account | undefined =>
+export const useAccount = (account?: BaseWalletAccount): Account | undefined =>
   useAccounts(({ accounts }) =>
-    find(accounts, (a) => accountsEqual(a, account)),
+    find(accounts, (a) => {
+      if (!account) {
+        return false
+      }
+      return accountsEqual(a, account)
+    }),
   )
 
 export const useSelectedAccount = () =>

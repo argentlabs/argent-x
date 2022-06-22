@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo } from "react"
 import { number } from "starknet"
 import useSWR from "swr"
 import useSWRImmutable from "swr/immutable"
@@ -7,16 +7,16 @@ import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
 import { Token, equalToken } from "../../../shared/token"
-import { useAppState } from "../../app.state"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { isValidAddress } from "../../services/addresses"
 import {
   addToken as addTokenMsg,
   getTokens,
   removeToken as removeTokenMsg,
 } from "../../services/backgroundTokens"
-import { useCurrentNetwork } from "./../networks/useNetworks"
-import { useSelectedAccount } from "../accounts/accounts.state"
-import { BalancesMap, fetchAllTokensBalance } from "./tokens.service"
+import { useAccount } from "../accounts/accounts.state"
+import { fetchAllTokensBalance } from "./tokens.service"
 
 export interface TokenDetails extends Omit<Token, "decimals"> {
   decimals?: BigNumber
@@ -118,39 +118,24 @@ export const removeToken = (tokenAddress: string) => {
 export const selectTokensByNetwork = (networkId: string) => (state: State) =>
   state.tokens.filter((token) => token.networkId === networkId)
 
-function mergeMaps(oldMap: BalancesMap, newMap: BalancesMap): BalancesMap {
-  return Object.fromEntries([
-    ...Object.entries(oldMap).map(([key, value]) => [
-      key,
-      newMap[key] ?? value,
-    ]),
-    ...Object.entries(newMap).map(([key, value]) => [
-      key,
-      value ?? oldMap[key],
-    ]),
-  ])
-}
-
 interface UseTokens {
   tokenDetails: TokenDetailsWithBalance[]
   isValidating: boolean
   error?: any
 }
 
-export const useTokensWithBalance = (): UseTokens => {
-  const { switcherNetworkId } = useAppState()
-  const selectedAccount = useSelectedAccount()
-  const currentNetwork = useCurrentNetwork()
-  const tokensInNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
-  const tokenAddresses = useMemo(
-    () => tokensInNetwork.map((t) => t.address),
-    [tokensInNetwork],
+export const useTokensWithBalance = (
+  account?: BaseWalletAccount,
+): UseTokens => {
+  const selectedAccount = useAccount(account)
+  const tokensInNetwork = useTokens(
+    selectTokensByNetwork(selectedAccount?.networkId ?? ""),
   )
 
   const { data, isValidating, error, mutate } = useSWR(
-    [
-      selectedAccount?.address,
-      selectedAccount?.network?.id,
+    // skip if no account selected
+    selectedAccount && [
+      getAccountIdentifier(selectedAccount),
       "accountTokenBalances",
     ],
     async () => {
@@ -159,9 +144,8 @@ export const useTokensWithBalance = (): UseTokens => {
       }
 
       const balances = await fetchAllTokensBalance(
-        tokenAddresses,
+        tokensInNetwork.map((t) => t.address),
         selectedAccount,
-        currentNetwork,
       )
 
       return balances ?? {}
@@ -169,31 +153,6 @@ export const useTokensWithBalance = (): UseTokens => {
     {
       suspense: true,
       refreshInterval: 30000,
-      use: [
-        (useSWRNext) => {
-          return (key, fetcher, config) => {
-            const prevResultRef = useRef<any>()
-
-            const swr = useSWRNext(key, fetcher, config)
-
-            const data =
-              swr.data && prevResultRef.current
-                ? (mergeMaps(prevResultRef.current, swr.data as any) as any)
-                : swr.data
-
-            useEffect(() => {
-              if (swr.data !== undefined) {
-                prevResultRef.current = data
-              }
-            }, [data])
-
-            return {
-              ...(swr as any),
-              data,
-            }
-          }
-        },
-      ],
     },
   )
 
@@ -209,7 +168,7 @@ export const useTokensWithBalance = (): UseTokens => {
         subscription.unsubscribe()
       }
     }
-  }, [mutate])
+  }, [])
 
   const tokenDetails = useMemo(() => {
     return tokensInNetwork
@@ -220,7 +179,7 @@ export const useTokensWithBalance = (): UseTokens => {
       .filter(
         (token) => token.showAlways || (token.balance && token.balance.gt(0)),
       )
-  }, [tokenAddresses, data])
+  }, [tokensInNetwork, data])
 
   return { tokenDetails, isValidating, error }
 }
