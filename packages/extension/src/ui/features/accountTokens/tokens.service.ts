@@ -12,7 +12,6 @@ import {
 } from "starknet"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import { Network } from "../../../shared/networks"
 import { getFeeToken } from "../../../shared/token"
 import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
@@ -123,9 +122,8 @@ export type BalancesMap = Record<string, BigNumber | undefined>
 export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
   account: Account,
-  network: Network,
 ) => {
-  const multicallContract = getMulticallContract(account, network)
+  const multicallContract = getMulticallContract(account)
 
   if (!multicallContract) {
     // if no multicall contract is found, fallback to Promises

@@ -1,0 +1,32 @@
+[
+  {
+    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": 18,
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "networkId": "goerli-alpha",
+    "balance": "1000000000000000000"
+  },
+  {
+    "address": "0x386e8d061177f19b3b485c20e31137e6f6bc497cc635ccdfcab96fadf5add6a",
+    "name": "Tether USD",
+    "symbol": "USDT",
+    "decimals": 6,
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png",
+    "networkId": "goerli-alpha",
+    "balance": "1000000"
+  },
+  {
+    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+    "name": "DAI",
+    "symbol": "DAI",
+    "decimals": 18,
+    "network": "goerli-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png",
+    "networkId": "goerli-alpha",
+    "balance": "1000000000000000000"
+  }
+]

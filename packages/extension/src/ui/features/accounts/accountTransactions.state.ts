@@ -30,27 +30,29 @@ const useTransactionsStore = create<State>((set) => ({
   },
 }))
 
-export const useAccountTransactions = (account: BaseWalletAccount) => {
+export const useAccountTransactions = (account?: BaseWalletAccount) => {
   useEffect(() => {
-    getTransactions(account).then((transactions) => {
-      useTransactionsStore.setState({ transactions })
-    })
+    if (account) {
+      getTransactions(account).then((transactions) => {
+        useTransactionsStore.setState({ transactions })
+      })
 
-    const subscription = messageStream.subscribe(([message]) => {
-      if (message.type === "TRANSACTION_UPDATES") {
-        useTransactionsStore
-          .getState()
-          .addTransactions(
-            filter(message.data, (transaction) =>
-              accountsEqual(transaction.account, account),
-            ),
-          )
-      }
-    })
+      const subscription = messageStream.subscribe(([message]) => {
+        if (message.type === "TRANSACTION_UPDATES") {
+          useTransactionsStore
+            .getState()
+            .addTransactions(
+              filter(message.data, (transaction) =>
+                accountsEqual(transaction.account, account),
+              ),
+            )
+        }
+      })
 
-    return () => {
-      if (!subscription.closed) {
-        subscription.unsubscribe()
+      return () => {
+        if (!subscription.closed) {
+          subscription.unsubscribe()
+        }
       }
     }
   }, [])
@@ -59,7 +61,8 @@ export const useAccountTransactions = (account: BaseWalletAccount) => {
     state.transactions.sort((a, b) => b.timestamp - a.timestamp),
   )
   const pendingTransactions = transactions.filter(
-    ({ status }) => status === "RECEIVED",
+    ({ status, account: a }) =>
+      status === "RECEIVED" && account && accountsEqual(a, account),
   )
   return { transactions, pendingTransactions }
 }
