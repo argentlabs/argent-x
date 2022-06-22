@@ -58,12 +58,15 @@ export const handleTransactionMessage: HandleMessage<
             suggestedMaxFee: number.toHex(suggestedMaxFee),
           },
         })
-      } catch (error: any) {
+      } catch (error) {
         console.error(error)
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_REJ",
           data: {
-            error: error.message,
+            error:
+              (error as any)?.message?.toString?.() ??
+              (error as any)?.toString?.() ??
+              "Unkown error",
           },
         })
       }
