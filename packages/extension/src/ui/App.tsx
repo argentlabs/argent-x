@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme } from "@mui/material"
-import { FC, Suspense } from "react"
+import { FC, Suspense, useEffect } from "react"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
