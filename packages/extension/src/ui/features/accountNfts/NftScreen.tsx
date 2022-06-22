@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers"
 import { FC, lazy } from "react"
 import { useForm } from "react-hook-form"
-import { useNavigate, useParams } from "react-router-dom"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
@@ -89,10 +89,6 @@ export const NftScreen: FC = () => {
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
   )
-  if (!account || !nft || !contractAddress || !tokenId) {
-    return <></>
-  }
-
   const resolver = useYupValidationResolver(SendNftSchema)
   const {
     control,
@@ -104,6 +100,10 @@ export const NftScreen: FC = () => {
       recipient: "",
     },
   })
+
+  if (!account || !nft || !contractAddress || !tokenId) {
+    return <Navigate to={routes.accounts()} />
+  }
 
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 

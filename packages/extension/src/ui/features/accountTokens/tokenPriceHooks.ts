@@ -101,12 +101,12 @@ export const useTokenAmountToCurrencyValue = (
  */
 
 export const useTokenBalanceToCurrencyValue = (
-  token: TokenDetailsWithBalance,
+  token?: TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   return useTokenAmountToCurrencyValue(
     token,
-    token.balance,
+    token?.balance,
     usePriceAndTokenDataImpl,
   )
 }
