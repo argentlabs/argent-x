@@ -71,7 +71,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     { suspense: false },
   )
 
-  const canShowEmptyAccountAlert = !showPendingTransactions && !needsUpgrade
   const showUpgradeBanner = Boolean(
     needsUpgrade && !showPendingTransactions && feeTokenBalance?.gt(0),
   )
@@ -116,11 +115,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       <PendingTransactions account={account} />
       <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
         <>
-          <TokenList
-            showTitle={showPendingTransactions}
-            accountAddress={account.address}
-            canShowEmptyAccountAlert={canShowEmptyAccountAlert}
-          />
+          <TokenList showTitle={showPendingTransactions} account={account} />
           <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
             <AddTokenIconButton size={40}>
               <AddIcon />

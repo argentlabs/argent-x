@@ -1,7 +1,7 @@
 import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useForm } from "react-hook-form"
-import { useNavigate, useParams } from "react-router-dom"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
@@ -18,6 +18,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
@@ -113,7 +114,8 @@ const SendSchema: Schema<SendInput> = object().required().shape({
 export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
-  const { tokenDetails } = useTokensWithBalance()
+  const account = useSelectedAccount()
+  const { tokenDetails } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
   const {
     handleSubmit,
@@ -130,12 +132,13 @@ export const TokenScreen: FC = () => {
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
+  const currencyValue = useTokenBalanceToCurrencyValue(token)
+
   if (!token) {
-    return <></>
+    return <Navigate to={routes.accounts()} />
   }
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
-  const currencyValue = useTokenBalanceToCurrencyValue(token)
 
   return (
     <>

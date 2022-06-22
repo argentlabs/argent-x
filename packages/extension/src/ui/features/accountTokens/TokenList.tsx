@@ -1,6 +1,7 @@
 import { FC } from "react"
 import { Link } from "react-router-dom"
 
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { routes } from "../../routes"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { TokenListItem } from "./TokenListItem"
@@ -8,12 +9,11 @@ import { useTokensWithBalance } from "./tokens.state"
 
 interface TokenListProps {
   showTitle: boolean
-  accountAddress: string
-  canShowEmptyAccountAlert?: boolean
+  account: BaseWalletAccount
 }
 
-export const TokenList: FC<TokenListProps> = ({ showTitle }) => {
-  const { isValidating, tokenDetails } = useTokensWithBalance()
+export const TokenList: FC<TokenListProps> = ({ showTitle, account }) => {
+  const { isValidating, tokenDetails } = useTokensWithBalance(account)
   return (
     <>
       {showTitle && <SectionHeader>Tokens</SectionHeader>}

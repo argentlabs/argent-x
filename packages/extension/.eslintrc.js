@@ -17,10 +17,12 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint"],
+  plugins: ["react", "react-hooks", "@typescript-eslint"],
   rules: {
     "react/jsx-no-target-blank": "off",
     "react/react-in-jsx-scope": "off",
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "off", // Checks effect dependencies
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-extra-semi": "off",
     "@typescript-eslint/no-unused-vars": [
