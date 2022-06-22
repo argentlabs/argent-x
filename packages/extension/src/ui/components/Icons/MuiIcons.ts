@@ -5,6 +5,7 @@ export { default as ArrowCircleDownIcon } from "@mui/icons-material/ArrowCircleD
 export { default as ArrowForwardIosIcon } from "@mui/icons-material/ArrowForwardIos"
 export { default as KeyboardArrowDownRounded } from "@mui/icons-material/KeyboardArrowDownRounded"
 export { default as CheckCircleIcon } from "@mui/icons-material/CheckCircle"
+export { default as CheckCircleOutlineIcon } from "@mui/icons-material/CheckCircleOutline"
 export { default as ContentCopyIcon } from "@mui/icons-material/ContentCopy"
 export { default as DeleteIcon } from "@mui/icons-material/Delete"
 export { default as EditIcon } from "@mui/icons-material/Edit"

@@ -65,6 +65,7 @@
     "@tippyjs/react": "^4.2.6",
     "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
+    "colord": "^2.9.2",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",
     "lodash-es": "^4.17.21",

@@ -1,0 +1,34 @@
+{
+  "assessment": "neutral",
+  "reviews": [
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x71faa7d6c3ddb081395574c5a6904f4458ff648b66e2123b877555d9ae0260e"
+      },
+      "activity": {
+        "value": {
+          "token": {
+            "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+            "name": "-unknown-",
+            "symbol": "-unknown-",
+            "decimals": 18,
+            "unknown": true,
+            "type": "ERC20"
+          },
+          "amount": "100000000000000000000",
+          "usd": 0,
+          "slippage": "equal"
+        },
+        "spender": "0x071faa7d6c3ddb081395574c5a6904f4458ff648b66e2123b877555d9ae0260e",
+        "type": "approve"
+      }
+    },
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x71faa7d6c3ddb081395574c5a6904f4458ff648b66e2123b877555d9ae0260e"
+      }
+    }
+  ]
+}

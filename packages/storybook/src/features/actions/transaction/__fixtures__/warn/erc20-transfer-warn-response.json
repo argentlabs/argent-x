@@ -1,0 +1,28 @@
+{
+  "assessment": "warn",
+  "reviews": [
+    {
+      "assessment": "warn",
+      "assessmentDetails": {
+        "contract_address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+      },
+      "activity": {
+        "value": {
+          "token": {
+            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "name": "Ether",
+            "symbol": "ETH",
+            "decimals": 18,
+            "unknown": false,
+            "type": "ERC20"
+          },
+          "amount": "1000000000000000000",
+          "usd": 1208.77,
+          "slippage": "equal"
+        },
+        "recipient": "0x0470007fc2b04c3bb560a55f70f3ea005a4c1d46f970b9561428553cf6d6120e",
+        "type": "transfer"
+      }
+    }
+  ]
+}

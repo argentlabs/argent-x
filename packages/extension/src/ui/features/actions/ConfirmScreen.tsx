@@ -3,7 +3,11 @@ import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Button, ButtonGroupVertical } from "../../components/Button"
+import {
+  Button,
+  ButtonGroupVertical,
+  ButtonVariant,
+} from "../../components/Button"
 import { Header } from "../../components/Header"
 import { H2 } from "../../components/Typography"
 import { Account } from "../accounts/Account"
@@ -42,6 +46,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   confirmButtonText?: string
   confirmButtonDisabled?: boolean
   confirmButtonBackgroundColor?: string
+  confirmButtonVariant?: ButtonVariant
   singleButton?: boolean
   switchButtonOrder?: boolean
   smallTopPadding?: boolean
@@ -83,6 +88,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonText = "Confirm",
   confirmButtonDisabled,
   confirmButtonBackgroundColor,
+  confirmButtonVariant,
   rejectButtonText = "Reject",
   onSubmit,
   onReject,
@@ -154,6 +160,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                     ? undefined
                     : confirmButtonBackgroundColor,
                 }}
+                variant={confirmButtonVariant}
                 type="submit"
               >
                 {confirmButtonText}
