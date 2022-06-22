@@ -34,8 +34,9 @@ export const FundingScreen: FC = () => {
     : account.networkId === "goerli-alpha" &&
       "https://goerli.starkgate.starknet.io"
 
+  const isBanxaEnabled = (process.env.FEATURE_BANXA || "false") === "true"
   const isDeprecatedAccount = false // isDeprecated(account) // Allow purchases on deprecated accounts as some people may want to buy some eth to transfer funds out of their wallet
-  const allowFiatPurchase = isMainnet && !isDeprecatedAccount
+  const allowFiatPurchase = isBanxaEnabled && isMainnet && !isDeprecatedAccount
 
   return (
     <>
@@ -55,13 +56,16 @@ export const FundingScreen: FC = () => {
                 title="Buy with card or bank transfer"
                 description={"Purchase using fiat via Banxa"}
                 icon={<CardSvg />}
+                hideArrow
               />
             </a>
           ) : (
             <Option
               title="Buy with card or bank transfer"
               description={
-                !isMainnet
+                isBanxaEnabled
+                  ? "Coming soon!"
+                  : !isMainnet
                   ? "Only available on Mainnet"
                   : "Only available for new accounts"
               }
@@ -74,11 +78,16 @@ export const FundingScreen: FC = () => {
             <Option
               title="From another StarkNet account"
               icon={<StarkNetSvg />}
+              hideArrow
             />
           </Link>
           {bridgeUrl ? (
             <a href={bridgeUrl} target="_blank">
-              <Option title="Bridge from Ethereum" icon={<EthereumSvg />} />
+              <Option
+                title="Bridge from Ethereum"
+                icon={<EthereumSvg />}
+                hideArrow
+              />
             </a>
           ) : (
             <Option

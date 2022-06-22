@@ -84,7 +84,7 @@ export const Option: FC<OptionProps> = ({
   description,
   onClick,
   disabled,
-  backgroundColor = "#5C5B59",
+  backgroundColor = "#333332",
   hideArrow,
 }) => (
   <OptionWrapper
