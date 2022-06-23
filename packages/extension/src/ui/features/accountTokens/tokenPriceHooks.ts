@@ -1,6 +1,5 @@
 import { BigNumberish } from "ethers"
 import { useMemo } from "react"
-import useSWR from "swr"
 
 import { Token } from "../../../shared/token"
 import {
@@ -13,40 +12,37 @@ import {
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
 } from "../../../shared/tokenPrice.service"
-import { argentServicesFetcher } from "../../../shared/utils/fetcher"
-import { useSettingsValue } from "../settings/useSettingsValue"
+import { fetcher } from "../../../shared/utils/fetcher"
+import { useConditionallyEnabledSWR } from "../../services/swr"
+import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
-  const { data: pricesData } = useSWR<ApiPriceDataResponse>(
+  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
+    "privacyUseArgentServices",
+  )
+  const { data: pricesData } = useConditionallyEnabledSWR<ApiPriceDataResponse>(
+    privacyUseArgentServicesEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
-    argentServicesFetcher,
+    fetcher,
     {
       refreshInterval: 60 * 1000 /** 60 seconds */,
     },
   )
-  const { data: tokenData } = useSWR<ApiTokenDataResponse>(
+  const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
+    privacyUseArgentServicesEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
-    argentServicesFetcher,
+    fetcher,
     {
       refreshInterval: 5 * 60 * 1000 /** 5 minutes */,
     },
   )
-  /** don't return any data unless Argent services are enabled */
-  const { value: privacyUseArgentServicesValue } = useSettingsValue(
-    "privacyUseArgentServices",
-  )
-  return privacyUseArgentServicesValue
-    ? {
-        pricesData,
-        tokenData,
-      }
-    : {
-        pricesData: undefined,
-        tokenData: undefined,
-      }
+  return {
+    pricesData,
+    tokenData,
+  }
 }
 
 export const usePriceAndTokenDataDisabled = () => {

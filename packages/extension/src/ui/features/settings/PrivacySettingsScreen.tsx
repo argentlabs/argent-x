@@ -3,8 +3,8 @@ import { FC } from "react"
 import { IconBar } from "../../components/IconBar"
 import { LazyInitialisedIOSSwitch } from "../../components/IOSSwitch"
 import { H2 } from "../../components/Typography"
+import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
-import { useSettingsValue } from "./useSettingsValue"
 
 const ANALYTICS_UI_ENABLED = false
 
@@ -13,13 +13,13 @@ export const PrivacySettingsScreen: FC = () => {
     initialised: privacyUseArgentServicesInitialised,
     value: privacyUseArgentServicesValue,
     setValue: setPrivacyUseArgentServicesValue,
-  } = useSettingsValue("privacyUseArgentServices")
+  } = useBackgroundSettingsValue("privacyUseArgentServices")
 
   const {
     initialised: privacyShareAnalyticsDataInitialised,
     value: privacyShareAnalyticsDataValue,
     setValue: setPrivacyShareAnalyticsDataValue,
-  } = useSettingsValue("privacyShareAnalyticsData")
+  } = useBackgroundSettingsValue("privacyShareAnalyticsData")
 
   return (
     <>

@@ -36,10 +36,6 @@ export class Storage<T> implements IStorage<T> {
     this.defaults = defaults
   }
 
-  storageKeyForKey(key: keyof T) {
-    return this.NS + ":" + key.toString()
-  }
-
   async getItem<K extends keyof T>(key: K): Promise<T[K]> {
     return (
       (await getFromStorage<T[K]>(this.NS + ":" + key.toString())) ??
