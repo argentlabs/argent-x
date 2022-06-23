@@ -37,7 +37,7 @@ export type TransactionMessage =
       data: { actionHash: string; error?: string }
     }
   | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
-  | { type: "ESTIMATE_TRANSACTION_FEE_REJ"; data: { error: string } }
+  | { type: "ESTIMATE_TRANSACTION_FEE_REJ" }
   | {
       type: "ESTIMATE_TRANSACTION_FEE_RES"
       data: EstimateFeeResponse

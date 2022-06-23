@@ -3,7 +3,6 @@ export { default as ArrowBackIosNewIcon } from "@mui/icons-material/ArrowBackIos
 export { default as AccountBalanceWalletIcon } from "@mui/icons-material/AccountBalanceWallet"
 export { default as ArrowCircleDownIcon } from "@mui/icons-material/ArrowCircleDown"
 export { default as ArrowForwardIosIcon } from "@mui/icons-material/ArrowForwardIos"
-export { default as KeyboardArrowDownRounded } from "@mui/icons-material/KeyboardArrowDownRounded"
 export { default as CheckCircleIcon } from "@mui/icons-material/CheckCircle"
 export { default as ContentCopyIcon } from "@mui/icons-material/ContentCopy"
 export { default as DeleteIcon } from "@mui/icons-material/Delete"

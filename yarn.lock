@@ -9567,16 +9567,17 @@ stack-utils@^2.0.3:
     superstruct "^0.15.3"
     url-join "^4.0.1"
 
-starknet@^3.15.4:
-  version "3.15.4"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.15.4.tgz#342ce80890e3993eb03216829b669064a135e49a"
-  integrity sha512-VWGu/8PzSBZ5Un1S51j9ML+Sdij90/kgtPBZwgsibhV2sE+ljjqb7BkSayi9yGogxpgjDBFf6t25Y14Bvb/A5Q==
+starknet@^3.15.0:
+  version "3.15.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.15.0.tgz#3f9ab20c6d6a094b33272f971f01fc5fa9b92c2a"
+  integrity sha512-+wqAHky7ffTpyJGGSLkzVt8c2FrMyu/8R1cAB3n++VyuBuTTS9+qD8SLXhXWJiBxCzlznP8KkdWQC9N0SCTokw==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     bn.js "^5.2.1"
     cross-fetch "^3.1.5"
     elliptic "^6.5.4"
     ethereum-cryptography "^1.0.3"
+    fetch-intercept "^2.4.0"
     hash.js "^1.1.7"
     json-bigint "^1.0.0"
     minimalistic-assert "^1.0.1"

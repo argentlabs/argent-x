@@ -16,11 +16,11 @@ export const Field = styled.div<{ clickable?: boolean }>`
     `}
 `
 
-export const FieldError = styled.div<{ justify?: string }>`
+export const FieldError = styled.div`
   color: white;
   background-color: #c12026;
   display: flex;
-  justify-content: ${({ justify }) => (justify ? justify : "center")};
+  justify-content: center;
   align-items: center;
 
   padding: 8px 10px;
