@@ -99,8 +99,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     <Container>
       <AccountSubHeader
         status={status}
+        account={account}
         accountName={accountName}
-        accountAddress={account.address}
         onChangeName={(name) =>
           setAccountName(account.networkId, account.address, name)
         }
