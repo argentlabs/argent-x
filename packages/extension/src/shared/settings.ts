@@ -4,3 +4,5 @@ export interface ISettingsStorage {
 }
 
 export type SettingsStorageKey = keyof ISettingsStorage
+
+export type SettingsStorageValue = ISettingsStorage[SettingsStorageKey]
