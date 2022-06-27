@@ -1,9 +1,15 @@
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import styled from "styled-components"
+import browser from "webextension-polyfill"
 
+import { useBackupRequired } from "../features/recovery/backupDownload.state"
 import { CopyTooltip } from "./CopyTooltip"
 import { ErrorBoundaryState } from "./ErrorBoundary"
-import { ContentCopyIcon, ReportGmailerrorredIcon } from "./Icons/MuiIcons"
+import {
+  ContentCopyIcon,
+  RefreshIcon,
+  ReportGmailerrorredIcon,
+} from "./Icons/MuiIcons"
 import { P } from "./Typography"
 
 const MessageContainer = styled.div`
@@ -24,8 +30,18 @@ const ErrorMessageContainer = styled.div`
   margin-bottom: 16px;
 `
 
-const CopyDetailsContainer = styled.div`
+const ActionsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+`
+
+const ActionContainer = styled.div`
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 100px;
   padding: 8px 12px;
@@ -36,12 +52,16 @@ const CopyDetailsContainer = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.25);
   }
-`
 
-const StyledContentCopyIcon = styled(ContentCopyIcon)`
-  margin-left: 0.5em;
-  cursor: pointer;
-  font-size: 12px;
+  > svg {
+    font-size: 12px;
+  }
+  > svg:first-child {
+    margin-right: 0.5em;
+  }
+  > svg:last-child {
+    margin-left: 0.5em;
+  }
 `
 
 const version = process.env.VERSION
@@ -86,18 +106,38 @@ ${displayStack}
     return fallbackErrorPayload
   }, [error, errorInfo])
 
+  const onReload = useCallback(() => {
+    const url = browser.runtime.getURL("index.html")
+
+    // reset cache
+    const backupState = useBackupRequired.getState()
+    localStorage.clear()
+    useBackupRequired.setState(backupState)
+
+    setTimeout(() => {
+      // ensure state got persisted before reloading
+      window.location.href = url
+    }, 100)
+  }, [])
+
   return (
     <MessageContainer>
       <ErrorIcon />
       <ErrorMessageContainer>
         <P>{message}</P>
       </ErrorMessageContainer>
-      <CopyTooltip message="Copied" copyValue={errorPayload}>
-        <CopyDetailsContainer>
-          Copy error details
-          <StyledContentCopyIcon />
-        </CopyDetailsContainer>
-      </CopyTooltip>
+      <ActionsWrapper>
+        <ActionContainer onClick={onReload}>
+          <RefreshIcon />
+          <span>Retry</span>
+        </ActionContainer>
+        <CopyTooltip message="Copied" copyValue={errorPayload}>
+          <ActionContainer>
+            <ContentCopyIcon />
+            <span>Copy error details</span>
+          </ActionContainer>
+        </CopyTooltip>
+      </ActionsWrapper>
     </MessageContainer>
   )
 }
