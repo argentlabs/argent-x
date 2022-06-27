@@ -2,6 +2,7 @@ import { FC, useRef } from "react"
 import styled from "styled-components"
 
 import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
 import {
@@ -40,20 +41,21 @@ const AccountBalance = styled.div`
 
 interface AccountSubheaderProps {
   status: AccountStatus
+  account: BaseWalletAccount
   accountName?: string
-  accountAddress: string
   onChangeName: (name: string) => void
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   status,
-  accountAddress,
+  account,
   onChangeName,
   accountName,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const { tokenDetails } = useTokensWithBalance()
+  const { tokenDetails } = useTokensWithBalance(account)
   const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
+  const accountAddress = account.address
 
   return (
     <>
