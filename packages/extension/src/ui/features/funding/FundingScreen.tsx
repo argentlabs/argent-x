@@ -63,7 +63,7 @@ export const FundingScreen: FC = () => {
             <Option
               title="Buy with card or bank transfer"
               description={
-                isBanxaEnabled
+                !isBanxaEnabled
                   ? "Coming soon!"
                   : !isMainnet
                   ? "Only available on Mainnet"
