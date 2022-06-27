@@ -20,7 +20,8 @@
     "dev": "lerna run dev --parallel",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build",
-    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build"
+    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build",
+    "storybook": "cd packages/storybook && yarn storybook"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
