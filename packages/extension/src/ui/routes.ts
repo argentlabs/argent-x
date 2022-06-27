@@ -89,6 +89,7 @@ export const routes = {
   settingsEditCustomNetwork: route("/settings/networks/edit"),
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
   settingsDappConnections: route("/settings/dapp-connections"),
+  settingsPrivacy: route("/settings/privacy"),
   networkWarning: route("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>

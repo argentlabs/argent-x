@@ -42,6 +42,7 @@ import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectio
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
+import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { routes } from "./routes"
@@ -172,6 +173,10 @@ const walletRoutes = (
     <Route
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
+    />
+    <Route
+      path={routes.settingsPrivacy.path}
+      element={<PrivacySettingsScreen />}
     />
   </>
 )

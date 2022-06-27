@@ -13,7 +13,7 @@ import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"
 import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
 import { mockTokensWithBalance } from "./tokenPrice.test"
 
-describe("tokens-react", () => {
+describe("tokenPriceHooks", () => {
   describe("when API data is available", () => {
     const useMockPriceAndTokenData = () => {
       return {
