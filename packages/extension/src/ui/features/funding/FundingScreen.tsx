@@ -9,6 +9,7 @@ import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import CardSvg from "./card.svg"
+import CoinbaseSvg from "./coinbase.svg"
 import EthereumSvg from "./ethereum.svg"
 import StarkNetSvg from "./starknet.svg"
 
@@ -35,8 +36,11 @@ export const FundingScreen: FC = () => {
       "https://goerli.starkgate.starknet.io"
 
   const isBanxaEnabled = (process.env.FEATURE_BANXA || "false") === "true"
+  const isLayerswapEnabled =
+    (process.env.FEATURE_LAYERSWAP || "false") === "true"
   const isDeprecatedAccount = false // isDeprecated(account) // Allow purchases on deprecated accounts as some people may want to buy some eth to transfer funds out of their wallet
   const allowFiatPurchase = isBanxaEnabled && isMainnet && !isDeprecatedAccount
+  const allowLayerswap = isLayerswapEnabled && isMainnet && !isDeprecatedAccount
 
   return (
     <>
@@ -54,7 +58,7 @@ export const FundingScreen: FC = () => {
             >
               <Option
                 title="Buy with card or bank transfer"
-                description={"Purchase using fiat via Banxa"}
+                description={"Provided by Banxa"}
                 icon={<CardSvg />}
                 hideArrow
               />
@@ -81,6 +85,22 @@ export const FundingScreen: FC = () => {
               hideArrow
             />
           </Link>
+          {allowLayerswap && (
+            <a
+              href={`https://www.layerswap.io/?destNetwork=STARKNET_MAINNET&destAddress=${normalizeAddress(
+                account.address,
+              )}&lockNetwork=true&lockAddress=true&addressSource=argentx`}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <Option
+                title="From an exchange"
+                description={"Coinbase, Binance, etc"}
+                icon={<CoinbaseSvg />}
+                hideArrow
+              />
+            </a>
+          )}
           {bridgeUrl ? (
             <a href={bridgeUrl} target="_blank">
               <Option
