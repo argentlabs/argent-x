@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  FEATURE_BANXA: "true"
+
 jobs:
   build:
     runs-on: ubuntu-latest
