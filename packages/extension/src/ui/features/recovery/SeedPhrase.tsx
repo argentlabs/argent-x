@@ -8,7 +8,7 @@ const SeedPhraseGrid = styled.div`
   grid-template-rows: repeat(4, 1fr);
   grid-gap: 12px;
 
-  margin-bottom: 75px;
+  margin-bottom: 35px;
 `
 
 const SeedWordBadge = styled.div`
