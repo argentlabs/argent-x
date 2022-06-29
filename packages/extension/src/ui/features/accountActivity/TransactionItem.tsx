@@ -12,7 +12,6 @@ import { formatTruncatedAddress } from "../../services/addresses"
 import { TokenIcon } from "../accountTokens/TokenIcon"
 import {
   TokenDetailsWrapper,
-  TokenSubtitle,
   TokenTextGroup,
   TokenTitle,
   TokenWrapper,
@@ -37,7 +36,12 @@ const TransactionWrapper = styled(TokenWrapper)<{ highlighted?: boolean }>`
   }
 `
 
-const TransactionSubtitle = styled(TokenSubtitle)``
+const TransactionSubtitle = styled.p`
+  font-size: 13px;
+  line-height: 18px;
+  color: #8f8e8c;
+  margin: 0;
+`
 
 interface TransactionItemProps {
   hash: string
