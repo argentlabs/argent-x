@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
-import { chunk } from "lodash"
+import { chunk } from "lodash-es"
 import {
   Abi,
   Contract,
