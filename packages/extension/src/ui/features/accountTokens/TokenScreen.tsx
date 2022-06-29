@@ -234,8 +234,6 @@ export const TokenScreen: FC = () => {
   const inputAmount = formValues.amount
   const inputRecipient = formValues.recipient
 
-  const inputAmountBN = BigNumber.from(inputAmount)
-
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
 
@@ -318,7 +316,7 @@ export const TokenScreen: FC = () => {
           >
             <InputGroupAfter>
               <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
-              {token.balance && !inputAmountBN.eq(token.balance) && (
+              {!inputAmount && (
                 <StyledMaxButton type="button" onClick={handleMaxClick}>
                   {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
                 </StyledMaxButton>
