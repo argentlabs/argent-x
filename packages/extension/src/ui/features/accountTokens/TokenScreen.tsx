@@ -1,8 +1,11 @@
+import { BigNumber, utils } from "ethers"
 import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { Call, stark } from "starknet"
 import styled from "styled-components"
+import useSWR from "swr"
 import { Schema, object } from "yup"
 
 import { inputAmountSchema, parseAmount } from "../../../shared/token"
@@ -10,14 +13,18 @@ import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { ControlledInputText } from "../../components/InputText"
+import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
+import { StyledControlledInput } from "../../components/InputText"
+import { Spinner } from "../../components/Spinner"
 import { FormError } from "../../components/Typography"
 import { routes } from "../../routes"
 import { addressSchema } from "../../services/addresses"
+import { getEstimatedFee } from "../../services/backgroundTransactions"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
@@ -102,6 +109,39 @@ const TokenBalance = styled.div`
   margin-top: 8px;
 `
 
+const InputGroupAfter = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+`
+
+const StyledMaxButton = styled(Button)`
+  border-radius: 100px;
+  background-color: #5c5b59;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+  margin-top: 0 !important;
+  padding: 4px 8px;
+`
+
+const InputTokenSymbol = styled.span`
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+  color: #8f8e8c;
+`
+
 interface SendInput {
   recipient: string
   amount: string
@@ -110,6 +150,64 @@ const SendSchema: Schema<SendInput> = object().required().shape({
   recipient: addressSchema,
   amount: inputAmountSchema,
 })
+
+export const useMaxFeeEstimateForTransfer = (
+  tokenAddress?: string,
+  balance?: BigNumber,
+  account?: Account,
+): {
+  maxFee?: BigNumber
+  error?: any
+  loading: boolean
+} => {
+  if (!account || !balance || !tokenAddress) {
+    throw new Error("Account, TokenAddress and Balance are required")
+  }
+
+  const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
+
+  const call: Call = {
+    contractAddress: tokenAddress ?? "",
+    entrypoint: "transfer",
+    calldata: compileCalldata({
+      recipient: account?.address ?? "0",
+      amount: getUint256CalldataFromBN(balance ?? BigNumber.from(0)),
+    }),
+  }
+
+  const {
+    data: estimatedFee,
+    error,
+    isValidating,
+  } = useSWR(
+    [
+      "maxEthTransferEstimate",
+      Math.floor(Date.now() / 60e3),
+      account.networkId,
+    ],
+    () => getEstimatedFee(call),
+    {
+      suspense: false,
+      refreshInterval: 15 * 1000,
+      shouldRetryOnError: false,
+    },
+  )
+
+  if (error) {
+    return { maxFee: undefined, error, loading: false }
+  }
+
+  // Add Overhead to estimatedFee
+  if (estimatedFee) {
+    const maxFee = addOverheadToFee(
+      estimatedFee.suggestedMaxFee.toString(),
+      0.2,
+    )
+    return { maxFee, error: undefined, loading: false }
+  }
+
+  return { maxFee: undefined, error: undefined, loading: isValidating }
+}
 
 export const TokenScreen: FC = () => {
   const navigate = useNavigate()
@@ -121,6 +219,8 @@ export const TokenScreen: FC = () => {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
     control,
+    setValue,
+    watch,
   } = useForm<SendInput>({
     defaultValues: {
       recipient: "",
@@ -129,16 +229,50 @@ export const TokenScreen: FC = () => {
     resolver,
   })
 
-  const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
+  const formValues = watch()
+
+  const inputAmount = formValues.amount
+  const inputRecipient = formValues.recipient
+
+  const inputAmountBN = BigNumber.from(inputAmount)
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
+
+  const {
+    maxFee,
+    error: maxFeeError,
+    loading: maxFeeLoading,
+  } = useMaxFeeEstimateForTransfer(token?.address, token?.balance, account)
 
   if (!token) {
     return <Navigate to={routes.accounts()} />
   }
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+
+  const handleMaxClick = async () => {
+    if (token.balance && maxFee) {
+      const balanceBn = token.balance
+
+      const maxAmount = balanceBn.sub(maxFee.toString())
+
+      const formattedMaxAmount = utils.formatUnits(
+        maxAmount.toString(),
+        decimals,
+      )
+
+      setValue("amount", formattedMaxAmount)
+    }
+  }
+
+  const disableSubmit =
+    isSubmitting ||
+    (submitCount > 0 && !isDirty) ||
+    !inputAmount ||
+    !inputRecipient ||
+    inputAmount > balance ||
+    parseFloat(inputAmount) < 0
 
   return (
     <>
@@ -175,21 +309,37 @@ export const TokenScreen: FC = () => {
             navigate(routes.accountTokens())
           })}
         >
-          <ControlledInputText
+          <StyledControlledInput
             autoComplete="off"
-            control={control}
+            control={control as any}
             placeholder="Amount"
             name="amount"
             type="text"
-          />
+          >
+            <InputGroupAfter>
+              <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
+              {token.balance && !inputAmountBN.eq(token.balance) && (
+                <StyledMaxButton type="button" onClick={handleMaxClick}>
+                  {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
+                </StyledMaxButton>
+              )}
+            </InputGroupAfter>
+          </StyledControlledInput>
+          {maxFeeError && <FormError>{maxFeeError.message}</FormError>}
           {errors.amount && <FormError>{errors.amount.message}</FormError>}
-          <ControlledInputText
+          <StyledControlledInput
             autoComplete="off"
             control={control}
             placeholder="Recipient"
             name="recipient"
             type="text"
-          />
+          >
+            {!inputRecipient && (
+              <InputGroupAfter>
+                <AtTheRateIcon />
+              </InputGroupAfter>
+            )}
+          </StyledControlledInput>
           {errors.recipient && (
             <FormError>{errors.recipient.message}</FormError>
           )}
