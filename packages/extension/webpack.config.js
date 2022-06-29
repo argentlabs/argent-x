@@ -32,7 +32,7 @@ module.exports = {
   },
   devtool: isProd
     ? genSourceMaps
-      ? "source-map"
+      ? "hidden-source-map"
       : undefined
     : "inline-source-map",
   mode: isProd ? "production" : "development",
