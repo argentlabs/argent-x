@@ -17,9 +17,9 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.0.6",
-    "@rollup/plugin-typescript": "^8.0.0",
     "rollup": "^2.3.4",
-    "rollup-plugin-terser": "^7.0.0",
+    "rollup-plugin-esbuild": "^4.9.1",
+    "rollup-plugin-generate-declarations": "^1.1.1",
     "starknet": "^3.15.4",
     "tslib": "^2.0.0",
     "typescript": "^4.0.0"

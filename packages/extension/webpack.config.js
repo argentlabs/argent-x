@@ -4,6 +4,7 @@ const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin, ProvidePlugin } = require("webpack")
 const ESLintPlugin = require("eslint-webpack-plugin")
 const Dotenv = require("dotenv-webpack")
+const { ESBuildMinifyPlugin } = require("esbuild-loader")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -54,8 +55,11 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
-        exclude: /node_modules/,
+        loader: "esbuild-loader",
+        options: {
+          loader: "tsx", // Or 'ts' if you don't need tsx
+          target: "es2015",
+        },
       },
     ],
   },
@@ -90,6 +94,11 @@ module.exports = {
   optimization: isProd
     ? {
         minimize: true,
+        minimizer: [
+          new ESBuildMinifyPlugin({
+            target: "es2015", // Syntax to compile to (see options below for possible values)
+          }),
+        ],
         splitChunks: {
           chunks: "async",
         },
