@@ -77,6 +77,7 @@ module.exports = {
     }),
     new ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
+      React: "react",
     }),
     new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
     new Dotenv({
