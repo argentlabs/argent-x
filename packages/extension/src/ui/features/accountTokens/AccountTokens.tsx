@@ -1,4 +1,4 @@
-import { FC, Suspense, useEffect, useMemo, useRef } from "react"
+import { FC, Suspense, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
@@ -16,7 +16,6 @@ import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { connectAccount } from "../../services/backgroundAccounts"
-import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { PendingTransactions } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {
@@ -32,6 +31,7 @@ import { AccountSubHeader } from "./AccountSubheader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { TokenTitle, TokenWrapper } from "./TokenListItem"
+import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { fetchFeeTokenBalance } from "./tokens.service"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
@@ -62,6 +62,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
+  const currencyDisplayEnabled = useCurrencyDisplayEnabled()
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
@@ -105,13 +106,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     connectAccount(account)
   }, [account])
 
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
-    "privacyUseArgentServices",
-  )
-  const tokenListVariant = useMemo(
-    () => (privacyUseArgentServicesEnabled ? "default" : "no-currency"),
-    [privacyUseArgentServicesEnabled],
-  )
+  const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
 
   return (
     <Container>

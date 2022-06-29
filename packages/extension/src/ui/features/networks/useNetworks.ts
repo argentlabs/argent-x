@@ -52,3 +52,9 @@ export const useCurrentNetwork = () => {
 
   return currentNetwork.network
 }
+
+export const useIsMainnet = () => {
+  const { switcherNetworkId } = useAppState()
+  const isMainnet = switcherNetworkId === "mainnet-alpha"
+  return isMainnet
+}
