@@ -15,16 +15,25 @@ import {
 import { fetcher } from "../../../shared/utils/fetcher"
 import { useConditionallyEnabledSWR } from "../../services/swr"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
+import { useIsMainnet } from "../networks/useNetworks"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
+
+/** @returns true if app is on mainnet and the user has enabled Argent services */
+
+export const useCurrencyDisplayEnabled = () => {
+  const isMainnet = useIsMainnet()
+  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
+    "privacyUseArgentServices",
+  )
+  return isMainnet && privacyUseArgentServicesEnabled
+}
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
-    "privacyUseArgentServices",
-  )
+  const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const { data: pricesData } = useConditionallyEnabledSWR<ApiPriceDataResponse>(
-    privacyUseArgentServicesEnabled,
+    currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     fetcher,
     {
@@ -32,7 +41,7 @@ export const usePriceAndTokenDataFromApi = () => {
     },
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
-    privacyUseArgentServicesEnabled,
+    currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
     fetcher,
     {
