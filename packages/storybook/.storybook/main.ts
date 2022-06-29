@@ -10,15 +10,4 @@ module.exports = {
     builder: "@storybook/builder-webpack5",
     disableTelemetry: true,
   },
-  webpackFinal: async (config) => {
-    /**
-     * Use Mui with styled-components
-     * @see https://mui.com/material-ui/guides/styled-engine/
-     */
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@mui/styled-engine": "@mui/styled-engine-sc",
-    }
-    return config
-  },
 }

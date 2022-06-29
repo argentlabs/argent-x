@@ -20,7 +20,12 @@
     "react-dom": "^18.0.0",
     "typescript": "^4.6.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+  },
+  "resolutions": {
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+  },
   "scripts": {
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
