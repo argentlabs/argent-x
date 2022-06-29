@@ -1,7 +1,7 @@
 import commonjs from "@rollup/plugin-commonjs"
 import resolve from "@rollup/plugin-node-resolve"
-import typescript from "@rollup/plugin-typescript"
-import { terser } from "rollup-plugin-terser"
+import esbuild from "rollup-plugin-esbuild"
+import generateDeclarations from "rollup-plugin-generate-declarations"
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -20,14 +20,10 @@ export default {
       preferBuiltins: true,
     }),
     commonjs(),
-    typescript({
-      sourceMap: !production,
-      inlineSources: !production,
+    esbuild({
+      minify: production,
     }),
-
-    // If we're building for production (npm run build
-    // instead of npm run dev), minify
-    production && terser(),
+    generateDeclarations(),
   ],
   watch: {
     clearScreen: false,

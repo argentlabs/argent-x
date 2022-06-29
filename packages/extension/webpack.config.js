@@ -4,6 +4,7 @@ const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin, ProvidePlugin } = require("webpack")
 const ESLintPlugin = require("eslint-webpack-plugin")
 const Dotenv = require("dotenv-webpack")
+const { ESBuildMinifyPlugin } = require("esbuild-loader")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -13,6 +14,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 
 const isProd = process.env.NODE_ENV === "production"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
+const genSourceMaps = process.env.GEN_SOURCE_MAPS === "true"
 
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
@@ -28,7 +30,11 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: isProd ? undefined : "inline-source-map",
+  devtool: isProd
+    ? genSourceMaps
+      ? "hidden-source-map"
+      : undefined
+    : "inline-source-map",
   mode: isProd ? "production" : "development",
   module: {
     rules: [
@@ -54,8 +60,11 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
-        exclude: /node_modules/,
+        loader: "esbuild-loader",
+        options: {
+          loader: "tsx", // Or 'ts' if you don't need tsx
+          target: "es2015",
+        },
       },
     ],
   },
@@ -73,6 +82,7 @@ module.exports = {
     }),
     new ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
+      React: "react",
     }),
     new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
     new Dotenv({
@@ -90,6 +100,11 @@ module.exports = {
   optimization: isProd
     ? {
         minimize: true,
+        minimizer: [
+          new ESBuildMinifyPlugin({
+            target: "es2015", // Syntax to compile to (see options below for possible values)
+          }),
+        ],
         splitChunks: {
           chunks: "async",
         },
@@ -98,5 +113,6 @@ module.exports = {
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
+    sourceMapFilename: "../sourcemaps/[file].map",
   },
 }
