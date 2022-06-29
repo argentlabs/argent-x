@@ -1,3 +1,5 @@
+import { expect, test } from "vitest"
+
 import backupSchema from "../src/background/schema/backup.schema"
 import { Wallet } from "../src/background/wallet"
 import legacyBackup from "./backup_legacy.mock.json"

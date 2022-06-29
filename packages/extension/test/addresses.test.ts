@@ -1,3 +1,5 @@
+import { describe, expect, test } from "vitest"
+
 import { addressSchema } from "../src/ui/services/addresses"
 
 describe("address input", () => {

@@ -1,22 +1,22 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`nameTransaction() should return right metadata for 1 transaction 1`] = `
-Object {
+exports[`nameTransaction() > should return right metadata for 1 transaction 1`] = `
+{
   "title": "Transfer from",
 }
 `;
 
-exports[`nameTransaction() should return right metadata for 2 transactions 1`] = `
-Object {
+exports[`nameTransaction() > should return right metadata for 2 transactions 1`] = `
+{
   "title": "Approve and Transfer",
 }
 `;
 
-exports[`transactions should get a transaction by hash 1`] = `
-Object {
-  "account": Object {
+exports[`transactions > should get a transaction by hash 1`] = `
+{
+  "account": {
     "address": "0x05e54edb59e1b1e398f9647e617276f6da0eb9ddfc0c02723269b9baa2489dce",
-    "network": Object {
+    "network": {
       "accountClassHash": "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
       "baseUrl": "https://alpha4.starknet.io",
       "chainId": "SN_GOERLI",
@@ -27,7 +27,7 @@ Object {
       "readonly": true,
     },
     "networkId": "goerli-alpha",
-    "signer": Object {
+    "signer": {
       "derivationPath": "0",
       "type": "local_secret",
     },

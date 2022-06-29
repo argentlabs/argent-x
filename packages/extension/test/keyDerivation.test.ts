@@ -1,4 +1,5 @@
 import { ec } from "starknet"
+import { describe, expect, test } from "vitest"
 
 import {
   getNextPathIndex,

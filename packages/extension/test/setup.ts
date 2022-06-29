@@ -4,8 +4,6 @@ import { register } from "fetch-intercept"
 
 global.fetch = fetch
 
-jest.setTimeout(50 * 60 * 1000)
-
 if (process.env.DEBUG === "true") {
   register({
     request(url, config) {
