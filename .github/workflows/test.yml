@@ -32,8 +32,9 @@ jobs:
       - name: Run tests
         run: yarn test
 
+      - run: sudo apt-get install xvfb
       - name: Run e2e tests
-        run: yarn test:e2e
+        run: xvfb-run --auto-servernum yarn test:e2e
 
       - name: Check bundlesize
         run: yarn run bundlewatch
