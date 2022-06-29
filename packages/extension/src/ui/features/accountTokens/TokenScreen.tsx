@@ -351,6 +351,9 @@ export const TokenScreen: FC = () => {
             placeholder="Amount"
             name="amount"
             type="text"
+            onKeyDown={() => {
+              setMaxClicked(false)
+            }}
           >
             <InputGroupAfter>
               <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
