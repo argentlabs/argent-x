@@ -26,7 +26,7 @@
     "test": "lerna run test",
     "test:watch": "yarn --cwd packages/extension run test",
     "test:e2e": "lerna run test:e2e",
-    "prepare": "yarn --cwd packages/get-starknet build && husky install",
+    "prepare": "yarn --cwd packages/get-starknet build && husky install && playwright install chromium",
     "storybook": "cd packages/storybook && yarn storybook"
   },
   "importSort": {
