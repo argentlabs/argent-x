@@ -1,4 +1,4 @@
-import { FC, Suspense, useEffect, useRef } from "react"
+import { FC, Suspense, useEffect, useMemo, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
@@ -10,11 +10,13 @@ import {
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
+import { IconButton } from "../../components/IconButton"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { connectAccount } from "../../services/backgroundAccounts"
+import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { PendingTransactions } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {
@@ -29,7 +31,7 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountSubHeader } from "./AccountSubheader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
-import { AddTokenIconButton, TokenTitle, TokenWrapper } from "./TokenListItem"
+import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { fetchFeeTokenBalance } from "./tokens.service"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
@@ -39,6 +41,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding-top: 16px;
+`
+
+export const AddTokenIconButton = styled(IconButton)`
+  &:hover,
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    outline: 0;
+  }
 `
 
 interface AccountTokensProps {
@@ -95,6 +105,14 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     connectAccount(account)
   }, [account])
 
+  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
+    "privacyUseArgentServices",
+  )
+  const tokenListVariant = useMemo(
+    () => (privacyUseArgentServicesEnabled ? "default" : "no-currency"),
+    [privacyUseArgentServicesEnabled],
+  )
+
   return (
     <Container>
       <AccountSubHeader
@@ -124,7 +142,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       >
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <>
-            <TokenList showTitle={showPendingTransactions} account={account} />
+            <TokenList
+              showTitle={showPendingTransactions}
+              account={account}
+              variant={tokenListVariant}
+            />
             <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
               <AddTokenIconButton size={40}>
                 <AddIcon />
