@@ -1,5 +1,5 @@
 import { BigNumber, utils } from "ethers"
-import { FC } from "react"
+import { FC, useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
@@ -29,8 +29,8 @@ import { useSelectedAccount } from "../accounts/accounts.state"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
-import { toTokenView } from "./tokens.service"
-import { useTokensWithBalance } from "./tokens.state"
+import { formatTokenBalance, toTokenView } from "./tokens.service"
+import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
 
 export const TokenScreenWrapper = styled.div`
   display: flex;
@@ -215,6 +215,9 @@ export const TokenScreen: FC = () => {
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
+
+  const [maxClicked, setMaxClicked] = useState(false)
+
   const {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
@@ -243,13 +246,19 @@ export const TokenScreen: FC = () => {
     loading: maxFeeLoading,
   } = useMaxFeeEstimateForTransfer(token?.address, token?.balance, account)
 
-  if (!token) {
-    return <Navigate to={routes.accounts()} />
-  }
+  useEffect(() => {
+    if (maxClicked && maxFee && token) {
+      setMaxInputAmount(token, maxFee)
+    }
+  }, [maxClicked, maxFee?.toString(), token?.address, token?.networkId])
 
-  const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+  const setMaxInputAmount = (
+    token: TokenDetailsWithBalance,
+    maxFee?: BigNumber,
+  ) => {
+    const tokenDecimals = token.decimals?.toNumber() || 18
+    const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
 
-  const handleMaxClick = async () => {
     if (token.balance && maxFee) {
       const balanceBn = token.balance
 
@@ -257,11 +266,21 @@ export const TokenScreen: FC = () => {
 
       const formattedMaxAmount = utils.formatUnits(
         maxAmount.toString(),
-        decimals,
+        tokenDecimals,
       )
-
-      setValue("amount", formattedMaxAmount)
+      setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
     }
+  }
+
+  if (!token) {
+    return <Navigate to={routes.accounts()} />
+  }
+
+  const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+
+  const handleMaxClick = async () => {
+    setMaxClicked(true)
+    setMaxInputAmount(token, maxFee)
   }
 
   const disableSubmit =
