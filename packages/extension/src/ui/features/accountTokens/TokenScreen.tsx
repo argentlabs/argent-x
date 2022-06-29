@@ -8,7 +8,11 @@ import styled from "styled-components"
 import useSWR from "swr"
 import { Schema, object } from "yup"
 
-import { inputAmountSchema, parseAmount } from "../../../shared/token"
+import {
+  getFeeToken,
+  inputAmountSchema,
+  parseAmount,
+} from "../../../shared/token"
 import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
@@ -31,6 +35,8 @@ import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
+
+const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
 
 export const TokenScreenWrapper = styled.div`
   display: flex;
@@ -164,14 +170,12 @@ export const useMaxFeeEstimateForTransfer = (
     throw new Error("Account, TokenAddress and Balance are required")
   }
 
-  const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
-
   const call: Call = {
-    contractAddress: tokenAddress ?? "",
+    contractAddress: tokenAddress,
     entrypoint: "transfer",
     calldata: compileCalldata({
-      recipient: account?.address ?? "0",
-      amount: getUint256CalldataFromBN(balance ?? BigNumber.from(0)),
+      recipient: account.address,
+      amount: getUint256CalldataFromBN(balance),
     }),
   }
 
@@ -185,10 +189,22 @@ export const useMaxFeeEstimateForTransfer = (
       Math.floor(Date.now() / 60e3),
       account.networkId,
     ],
-    () => getEstimatedFee(call),
+    async () => {
+      const feeToken = getFeeToken(account.networkId)
+
+      if (feeToken?.address !== tokenAddress) {
+        return {
+          amount: BigNumber.from(0),
+          suggestedMaxFee: BigNumber.from(0),
+          unit: "wei",
+        }
+      }
+
+      return await getEstimatedFee(call)
+    },
     {
       suspense: false,
-      refreshInterval: 15 * 1000,
+      refreshInterval: 15e3,
       shouldRetryOnError: false,
     },
   )
@@ -284,12 +300,7 @@ export const TokenScreen: FC = () => {
   }
 
   const disableSubmit =
-    isSubmitting ||
-    (submitCount > 0 && !isDirty) ||
-    !inputAmount ||
-    !inputRecipient ||
-    inputAmount > balance ||
-    parseFloat(inputAmount) < 0
+    isSubmitting || (submitCount > 0 && !isDirty) || inputAmount > balance
 
   return (
     <>
@@ -328,7 +339,7 @@ export const TokenScreen: FC = () => {
         >
           <StyledControlledInput
             autoComplete="off"
-            control={control as any}
+            control={control}
             placeholder="Amount"
             name="amount"
             type="text"
