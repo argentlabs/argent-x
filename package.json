@@ -18,7 +18,6 @@
   ],
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
-    "posttest": "npm run format",
     "dev": "lerna run dev --parallel",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build",
