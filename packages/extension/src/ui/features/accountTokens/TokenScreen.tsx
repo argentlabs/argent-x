@@ -231,6 +231,7 @@ export const TokenScreen: FC = () => {
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
+  const feeToken = account && getFeeToken(account.networkId)
 
   const [maxClicked, setMaxClicked] = useState(false)
 
@@ -294,13 +295,20 @@ export const TokenScreen: FC = () => {
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
 
+  const parsedInputAmount = inputAmount
+    ? parseAmount(inputAmount, decimals)
+    : parseAmount("0", decimals)
+
   const handleMaxClick = async () => {
     setMaxClicked(true)
     setMaxInputAmount(token, maxFee)
   }
 
   const disableSubmit =
-    isSubmitting || (submitCount > 0 && !isDirty) || inputAmount > balance
+    isSubmitting ||
+    (submitCount > 0 && !isDirty) ||
+    parsedInputAmount.gt(token.balance?.toString() ?? 0) ||
+    (feeToken?.address === token.address && inputAmount === balance)
 
   return (
     <>
@@ -353,6 +361,9 @@ export const TokenScreen: FC = () => {
               )}
             </InputGroupAfter>
           </StyledControlledInput>
+          {feeToken?.address === token.address && inputAmount === balance && (
+            <FormError>Not enough balance to pay for fees</FormError>
+          )}
           {maxFeeError && <FormError>{maxFeeError.message}</FormError>}
           {errors.amount && <FormError>{errors.amount.message}</FormError>}
           <StyledControlledInput
