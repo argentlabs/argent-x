@@ -40,8 +40,7 @@
     "url-loader": "^4.1.1",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
-    "webpack-cli": "^4.9.1",
-    "husky": "^8.0.0"
+    "webpack-cli": "^4.9.1"
   },
   "scripts": {
     "prebuild": "tsc --noEmit",
@@ -54,8 +53,7 @@
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",
     "sync-manifest-version": "node -p \"JSON.stringify({...require('./src/manifest.json'), version: '$npm_package_version'}, null, 2)\" > ./src/manifest.temp.json && prettier --write ./src/manifest.temp.json && mv ./src/manifest.temp.json ./src/manifest.json",
     "commit-version-changes": "git add ./src/manifest.json && git commit -m \"chore(release): manifest v$npm_package_version\"",
-    "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags",
-    "prepare": "husky install"
+    "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
     "@extend-chrome/messages": "^1.2.2",
