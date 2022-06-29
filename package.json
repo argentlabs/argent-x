@@ -20,7 +20,9 @@
     "dev": "lerna run dev --parallel",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build",
-    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build",
+    "test": "lerna run test",
+    "test:e2e": "lerna run test:e2e",
+    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build && playwright install chromium",
     "storybook": "cd packages/storybook && yarn storybook"
   },
   "importSort": {

@@ -30,7 +30,10 @@ jobs:
         run: yarn build
 
       - name: Run tests
-        run: yarn --cwd packages/extension test
+        run: yarn test
+
+      - name: Run e2e tests
+        run: yarn test:e2e
 
       - name: Check bundlesize
         run: yarn run bundlewatch
