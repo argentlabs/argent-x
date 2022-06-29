@@ -8,6 +8,7 @@ import { H2 } from "../../components/Typography"
 import { checkPassword } from "../../services/backgroundSessions"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { PasswordForm } from "../onboarding/PasswordForm"
+import { CopySeedPhrase } from "../recovery/CopySeedPhrase"
 import { SeedPhrase } from "../recovery/SeedPhrase"
 import { useSeedPhrase } from "../recovery/useSeedPhrase"
 
@@ -71,6 +72,8 @@ export const SeedSettingsScreen: FC = () => {
       </Paragraph>
 
       <SeedPhrase seedPhrase={seedPhrase} />
+
+      <CopySeedPhrase seedPhrase={seedPhrase} />
     </Wrapper>
   )
 }
