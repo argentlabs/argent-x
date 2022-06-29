@@ -4,7 +4,11 @@ import styled from "styled-components"
 
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
+import { DiscordIcon } from "../../components/Icons/DiscordIcon"
+import { GithubIcon } from "../../components/Icons/GithubIcon"
 import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
+import { SupportIcon } from "../../components/Icons/SupportIcon"
+import { RowCentered } from "../../components/Row"
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
@@ -75,32 +79,56 @@ export const Footer = styled.div`
   }
 `
 
+const IconWrapper = styled(RowCentered)`
+  padding: 8px 10px 8px 8px;
+  background: #333332;
+  border-radius: 100px;
+  gap: 8px;
+`
+
+const IconText = styled.span`
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  color: #ffffff;
+`
+
 export const SupportFooter: FC = () => (
   <Footer>
     <P>Help, support &amp; suggestions:</P>
-    <div>
+    <RowCentered gap="10px">
+      <a
+        href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
+        title="Get ArgentX Support"
+        target="_blank"
+      >
+        <IconWrapper>
+          <SupportIcon />
+          <IconText>Support</IconText>
+        </IconWrapper>
+      </a>
       <a
         href="https://discord.com/channels/793094838509764618/908663762150645770"
         title="Ask a question on the argent-extension channel on StarkNet Discord"
         target="_blank"
       >
-        <img
-          src="https://images.prismic.io/argentwebsite/76eac5a3-a4a3-4395-a82a-a3def2438ff0_icon-discord.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
-          alt="Argent Discord icon"
-        />
+        <IconWrapper>
+          <DiscordIcon />
+          <IconText>Discord</IconText>
+        </IconWrapper>
       </a>
       <a
         href="https://github.com/argentlabs/argent-x/issues"
         title="Post an issue on Argent X GitHub"
         target="_blank"
-        style={{ marginLeft: 15 }}
       >
-        <img
-          src="https://images.prismic.io/argentwebsite/460e2528-d9bb-4a47-9339-b72c287c243e_icon-github.svg?auto=format%2Ccompress&amp;fit=max&amp;q=50"
-          alt="Argent Github icon"
-        />
+        <IconWrapper>
+          <GithubIcon />
+          <IconText>Github</IconText>
+        </IconWrapper>
       </a>
-    </div>
+    </RowCentered>
     <P>Version: v{process.env.VERSION}</P>
   </Footer>
 )
