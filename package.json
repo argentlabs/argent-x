@@ -22,6 +22,7 @@
     "dev": "lerna run dev --parallel",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build",
+    "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
     "prepare": "yarn --cwd packages/get-starknet build && husky install",
     "storybook": "cd packages/storybook && yarn storybook"
   },

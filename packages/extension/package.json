@@ -46,6 +46,7 @@
   "scripts": {
     "prebuild": "tsc --noEmit",
     "build": "NODE_ENV=production webpack",
+    "build:sourcemaps": "NODE_ENV=production GEN_SOURCE_MAPS=true webpack",
     "start": "webpack",
     "dev": "webpack --color --watch",
     "test": "jest",

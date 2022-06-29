@@ -14,6 +14,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 
 const isProd = process.env.NODE_ENV === "production"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
+const genSourceMaps = process.env.GEN_SOURCE_MAPS === "true"
 
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
@@ -29,7 +30,11 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: isProd ? undefined : "inline-source-map",
+  devtool: isProd
+    ? genSourceMaps
+      ? "source-map"
+      : undefined
+    : "inline-source-map",
   mode: isProd ? "production" : "development",
   module: {
     rules: [
@@ -108,5 +113,6 @@ module.exports = {
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
+    sourceMapFilename: "../sourcemaps/[file].map",
   },
 }
