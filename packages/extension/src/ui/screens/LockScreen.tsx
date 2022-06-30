@@ -3,7 +3,6 @@ import { Controller, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import LogoSvg from "../../assets/logo.svg"
 import { Button } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { InputText } from "../components/InputText"
@@ -82,7 +81,8 @@ export const LockScreen: FC = () => {
 
   return (
     <LockScreenWrapper>
-      <LogoSvg />
+  
+      <img src="../../assets/logo.png" width="112" height="112"/>
       <Greetings greetings={greetings} />
       <P>Unlock your wallet to continue.</P>
 

@@ -2,7 +2,6 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import LogoSvg from "../../assets/logo.svg"
 import { Button, ButtonGroup } from "../components/Button"
 import { Greetings, GreetingsWrapper } from "../components/Greetings"
 import { StickyArgentFooter } from "../components/StickyArgentFooter"
@@ -48,7 +47,7 @@ export const WelcomeScreen: FC = () => {
 
   return (
     <WelcomeScreenWrapper>
-      <LogoSvg />
+      <img width="112" height="112" src='../../assets/logo.png' />
       <Greetings greetings={greetings} />
       <P>Enjoy the security of Ethereum with the scale of StarkNet</P>
       <ButtonGroup>
