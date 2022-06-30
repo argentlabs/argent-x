@@ -299,6 +299,8 @@ export const TokenScreen: FC = () => {
     ? parseAmount(inputAmount, decimals)
     : parseAmount("0", decimals)
 
+  const parsedTokenBalance = token.balance || parseAmount("0", decimals)
+
   const handleMaxClick = async () => {
     setMaxClicked(true)
     setMaxInputAmount(token, maxFee)
@@ -308,7 +310,9 @@ export const TokenScreen: FC = () => {
     isSubmitting ||
     (submitCount > 0 && !isDirty) ||
     parsedInputAmount.gt(token.balance?.toString() ?? 0) ||
-    (feeToken?.address === token.address && inputAmount === balance)
+    (feeToken?.address === token.address &&
+      (inputAmount === balance ||
+        parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance))) // Balance: 1234, maxInput: 1231, , maxFee: 3, updatedInput: 1233
 
   return (
     <>
