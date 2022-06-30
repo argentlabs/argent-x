@@ -1,6 +1,7 @@
 import { useRef } from "react"
 import { Controller } from "react-hook-form"
 import styled, { css } from "styled-components"
+import { isNumeric } from "../../shared/utils/number"
 
 export const Container = styled.div`
   display: flex;
@@ -187,19 +188,45 @@ export const ControlledInputText = styled(
 )``
 
 export const ControlledInputTextAlt = styled(
-  ({ name, control, defaultValue, rules, children, ...props }) => (
+  ({ name, control, defaultValue, rules, onlyNumeric, children, ...props }) => (
     <Controller
       name={name}
       control={control}
       defaultValue={defaultValue}
       rules={rules}
-      render={({ field: { ref, value, ...field } }) => (
+      render={({
+        field: { ref, value, onChange: onValueChange, ...field },
+      }) => (
         <InputTextAlt
           style={{ position: "relative" }}
           {...props}
           value={value || ""}
           {...field}
           inputRef={ref}
+          inputMode="decimal"
+          type="text"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            console.log(
+              "🚀 ~ file: InputText.tsx ~ line 218 ~ e",
+              e.target.value,
+            )
+
+            const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
+            if (onlyNumeric) {
+              if (e.target.value === "") {
+                return onValueChange(e)
+              }
+
+              return (
+                numericalRegex.test(e.target.value) &&
+                // just being double sure
+                isNumeric(e.target.value) &&
+                onValueChange(e)
+              )
+            } else {
+              return onValueChange(e)
+            }
+          }}
         >
           {children}
         </InputTextAlt>

@@ -354,6 +354,7 @@ export const TokenScreen: FC = () => {
             onKeyDown={() => {
               setMaxClicked(false)
             }}
+            onlyNumeric
           >
             <InputGroupAfter>
               <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
