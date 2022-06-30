@@ -21,6 +21,7 @@
 - [🌐 Usage with your dapp](#-usage-with-your-dapp)
 - [🚀 Install from sources](#-install-from-sources)
 - [👩🏾‍💻 Development](#-development)
+- [🧪 Testing](#-testing)
 - [✏️ Contributing](#️-contributing)
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
@@ -111,6 +112,33 @@ This project contains 3 packages:
 | dapp | example dapp for testing purposes and example for dapps how to use `get-starknet` |
 
 To test changes made to the `extension` package you need to load the local unpacked extension into Chrome as [described above](#install-fromsources). Changes are shown after reopening the extension. Changes to `background.js` are just shown after a complete restart of the Chrome process.
+
+## 🧪 Testing
+
+### Setup
+
+Some tests require [`starknet-devnet`](https://github.com/Shard-Labs/starknet-devnet) to be available at http://127.0.0.1:5050/. If tests are run without then you may see errors including `connect ECONNREFUSED 127.0.0.1:5050`.
+
+For convenience this service can be started with Docker, note if successful there will be no message displayed;
+
+- For ARM computers (e.g. Mac computers with Apple silicon)
+
+  ```bash
+  docker run -p 5050:5050 shardlabs/starknet-devnet:latest-arm
+  ```
+
+- Otherwise
+
+  ```bash
+  docker run -p 5050:5050 shardlabs/starknet-devnet:latest
+  ```
+
+### Run tests
+
+```bash
+yarn test      # run unit tests for all packages
+yarn test:e2e  # run end-to-end tests for all packages
+```
 
 ## ✏️ Contributing
 
