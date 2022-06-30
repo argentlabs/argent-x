@@ -8,5 +8,5 @@
     "**/.{idea,git,cache,output,temp}/**"
   ],
   "vitest.enable": true,
-  "vitest.commandLine": "yarn vitest -c packages/extension/vite.config.ts"
+  "vitest.commandLine": "npx vitest -r packages/extension/"
 }
