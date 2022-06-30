@@ -5,6 +5,7 @@ import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
 import { H2 } from "../../components/Typography"
+import { useReturnTo } from "../../routes"
 import { checkPassword } from "../../services/backgroundSessions"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { PasswordForm } from "../onboarding/PasswordForm"
@@ -26,15 +27,18 @@ const Container = styled.div`
   }
 `
 
-const Wrapper: FC<{ children: ReactNode }> = ({ children }) => (
-  <>
-    <IconBar back close />
-    <Container>
-      <H2>View recovery phrase</H2>
-      {children}
-    </Container>
-  </>
-)
+const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
+  const returnTo = useReturnTo()
+  return (
+    <>
+      <IconBar back close={returnTo} />
+      <Container>
+        <H2>View recovery phrase</H2>
+        {children}
+      </Container>
+    </>
+  )
+}
 
 export const SeedSettingsScreen: FC = () => {
   const seedPhrase = useSeedPhrase()
