@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
@@ -136,6 +136,7 @@ export const SupportFooter: FC = () => (
 export const SettingsScreen: FC = () => {
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
+  const { pathname: returnTo } = useLocation()
   return (
     <>
       <IconBar back />
@@ -173,7 +174,7 @@ export const SettingsScreen: FC = () => {
           </P>
         </SettingsLinkItem>
         <hr />
-        <SettingsLinkItem to={routes.settingsSeed()}>
+        <SettingsLinkItem to={routes.settingsSeed(returnTo)}>
           <Title>
             <span>Show recovery phrase</span>
             <ArrowForwardIosIcon fontSize="inherit" />
