@@ -12,6 +12,10 @@ const Container = styled.div`
 const PrivacyStatementText = styled.span`
   font-size: 16px;
   line-height: 21px;
+
+  > ${A} {
+    padding: 0;
+  }
 `
 
 export const PrivacyStatementScreen: FC = () => {
@@ -32,7 +36,7 @@ export const PrivacyStatementScreen: FC = () => {
           data processed as part of its services. On top of this Argent has
           robust information security policies and procedures in place to make
           sure any processing complies with applicable laws. If you would like
-          to know more or have any questions then please visit our website at
+          to know more or have any questions then please visit our website at{" "}
           <A href="https://www.argent.xyz/" target="_blank">
             https://www.argent.xyz/
           </A>
