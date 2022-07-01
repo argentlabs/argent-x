@@ -84,16 +84,18 @@ export const routes = {
   legacy: route("/legacy"),
   settings: route("/settings"),
   settingsNetworks: route("/settings/networks"),
-  settingsSeed: route("/settings/seed"),
+  settingsSeed: routeWithReturnTo("/settings/seed"),
   settingsAddCustomNetwork: route("/settings/networks/add"),
   settingsEditCustomNetwork: route("/settings/networks/edit"),
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
   settingsDappConnections: route("/settings/dapp-connections"),
+  settingsPrivacy: route("/settings/privacy"),
   networkWarning: route("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>
       `/backup-download${isFromSettings ? "?settings" : ""}`,
     "/backup-download",
   ),
+  privacyStatement: route("/privacy-statement"),
   error: route("/error"),
 }

@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/dapp",
-  "version": "4.1.8",
+  "version": "4.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,12 +10,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@argent/get-starknet": "^4.1.8",
+    "@argent/get-starknet": "^4.2.0",
     "ethers": "^5.5.1",
     "next": "^12.1.4",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "starknet": "^3.15.0"
+    "starknet": "^3.15.4"
   },
   "devDependencies": {
     "@types/node": "18.0.0",

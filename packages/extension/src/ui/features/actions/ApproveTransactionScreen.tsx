@@ -1,8 +1,11 @@
-import { FC, useState } from "react"
+import { isArray } from "lodash-es"
+import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 import styled from "styled-components"
 
+import { isErc20TransferCall } from "../../../shared/call"
+import { useAppState } from "../../app.state"
 import {
   Field,
   FieldGroup,
@@ -10,15 +13,18 @@ import {
   FieldValue,
 } from "../../components/Fields"
 import { routes } from "../../routes"
+import { usePageTracking } from "../../services/analytics"
 import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
+import { selectTokensByNetwork, useTokens } from "../accountTokens/tokens.state"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
-import { TransactionsList } from "./TransactionsList"
+import { TransactionsList } from "./transaction/TransactionsList"
+import { useTransactionReview } from "./transaction/useTransactionReview"
 
 interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -27,20 +33,17 @@ interface ApproveTransactionScreenProps
   onSubmit: (transactions: Call | Call[]) => void
 }
 
-const Pre = styled.pre`
-  padding: 8px;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.15);
-  max-width: calc(100vw - 64px);
-  overflow: auto;
-  background: #161616;
-`
-
 const LeftPaddedField = styled.div`
   margin-left: 8px;
 `
 
-const DISPLAY_RAW_TRANSACTION = false
+export const titleForTransactions = (transactions: Call | Call[] = []) => {
+  const transactionsArray: Call[] = isArray(transactions)
+    ? transactions
+    : [transactions]
+  const hasErc20Transfer = transactionsArray.some(isErc20TransferCall)
+  return hasErc20Transfer ? "Review send" : "Check transactions"
+}
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
@@ -49,20 +52,38 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   onSubmit,
   ...props
 }) => {
+  usePageTracking("signTransaction", {
+    networkId: selectedAccount?.networkId || "unknown",
+  })
   const [disableConfirm, setDisableConfirm] = useState(true)
   const { accountNames } = useAccountMetadata()
+  const { switcherNetworkId } = useAppState()
+  const tokensByNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
+
+  const { data: transactionReview } = useTransactionReview({
+    account: selectedAccount,
+    transactions,
+    actionHash,
+  })
+
+  const title = useMemo(() => {
+    return titleForTransactions(transactions)
+  }, [transactions])
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
 
   const accountName = getAccountName(selectedAccount, accountNames)
+  const confirmButtonVariant =
+    transactionReview?.assessment === "warn" ? "warn" : undefined
 
   return (
     <ConfirmScreen
-      title="Send transaction"
-      confirmButtonText="Sign"
+      title={title}
+      confirmButtonText="Approve"
       confirmButtonDisabled={disableConfirm}
+      confirmButtonVariant={confirmButtonVariant}
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
@@ -79,10 +100,11 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }
       {...props}
     >
-      <TransactionsList transactions={transactions} />
-      {DISPLAY_RAW_TRANSACTION && (
-        <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
-      )}
+      <TransactionsList
+        transactions={transactions}
+        transactionReview={transactionReview}
+        tokensByNetwork={tokensByNetwork}
+      />
       <FieldGroup>
         <Field>
           <FieldKey>From</FieldKey>

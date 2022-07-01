@@ -1,0 +1,12 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "vitest.exclude": [
+    "**/e2e/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/cypress/**",
+    "**/.{idea,git,cache,output,temp}/**"
+  ],
+  "vitest.enable": true,
+  "vitest.commandLine": "npx vitest -r packages/extension/"
+}

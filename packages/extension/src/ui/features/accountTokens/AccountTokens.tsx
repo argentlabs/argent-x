@@ -10,6 +10,7 @@ import {
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
+import { IconButton } from "../../components/IconButton"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
@@ -29,7 +30,8 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountSubHeader } from "./AccountSubheader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
-import { AddTokenIconButton, TokenTitle, TokenWrapper } from "./TokenListItem"
+import { TokenTitle, TokenWrapper } from "./TokenListItem"
+import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { fetchFeeTokenBalance } from "./tokens.service"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
@@ -39,6 +41,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding-top: 16px;
+`
+
+export const AddTokenIconButton = styled(IconButton)`
+  &:hover,
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    outline: 0;
+  }
 `
 
 interface AccountTokensProps {
@@ -52,6 +62,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
+  const currencyDisplayEnabled = useCurrencyDisplayEnabled()
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
@@ -95,12 +106,14 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     connectAccount(account)
   }, [account])
 
+  const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
+
   return (
     <Container>
       <AccountSubHeader
         status={status}
+        account={account}
         accountName={accountName}
-        accountAddress={account.address}
         onChangeName={(name) =>
           setAccountName(account.networkId, account.address, name)
         }
@@ -124,7 +137,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       >
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <>
-            <TokenList showTitle={showPendingTransactions} account={account} />
+            <TokenList
+              showTitle={showPendingTransactions}
+              account={account}
+              variant={tokenListVariant}
+            />
             <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
               <AddTokenIconButton size={40}>
                 <AddIcon />

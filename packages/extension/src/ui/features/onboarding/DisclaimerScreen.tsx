@@ -12,14 +12,21 @@ import {
   CheckCircleIcon,
   RadioButtonUncheckedIcon,
 } from "../../components/Icons/MuiIcons"
+import { PrivacyStatement } from "../../components/PrivacyStatement"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const SP = styled(P)`
-  font-size: 18px;
-  line-height: 24px;
+  font-family: "Barlow", sans-serif; // explicit, as applied to MUI
+  font-size: 16px;
+  line-height: 20px;
+`
+
+const StyledPrivacyStatement = styled(PrivacyStatement)`
+  display: block;
+  text-align: center;
 `
 
 export const DisclaimerScreen: FC = () => {
@@ -43,6 +50,7 @@ export const DisclaimerScreen: FC = () => {
       }
       singleButton
       onSubmit={() => navigate(routes.newWallet())}
+      footer={<StyledPrivacyStatement />}
     >
       <SP>
         StarkNet is in Alpha and may experience technical issues or introduce
@@ -62,7 +70,12 @@ export const DisclaimerScreen: FC = () => {
                 color="success"
               />
             }
-            label="I understand that StarkNet may introduce changes that make my existing account unusable and force to create new ones."
+            label={
+              <SP>
+                I understand that StarkNet may introduce changes that make my
+                existing account unusable and force to create new ones.
+              </SP>
+            }
             style={{ marginTop: 30 }}
           />
           <FormControlLabel
@@ -76,7 +89,12 @@ export const DisclaimerScreen: FC = () => {
                 color="success"
               />
             }
-            label="I understand that StarkNet may experience performance issues and my transactions may fail for various reasons."
+            label={
+              <SP>
+                I understand that StarkNet may experience performance issues and
+                my transactions may fail for various reasons.
+              </SP>
+            }
             style={{ marginTop: 30 }}
           />
         </FormGroup>

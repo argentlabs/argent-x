@@ -29,6 +29,7 @@ import { LegacyScreen } from "./features/onboarding/LegacyWalletScreen"
 import { LockScreen } from "./features/onboarding/LockScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
+import { PrivacyStatementScreen } from "./features/onboarding/PrivacyStatementScreen"
 import { ResetScreen } from "./features/onboarding/ResetScreen"
 import { WelcomeScreen } from "./features/onboarding/WelcomeScreen"
 import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
@@ -42,6 +43,7 @@ import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectio
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
+import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { routes } from "./routes"
@@ -172,6 +174,14 @@ const walletRoutes = (
     <Route
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
+    />
+    <Route
+      path={routes.settingsPrivacy.path}
+      element={<PrivacySettingsScreen />}
+    />
+    <Route
+      path={routes.privacyStatement.path}
+      element={<PrivacyStatementScreen />}
     />
   </>
 )

@@ -1,6 +1,7 @@
 import "isomorphic-fetch"
 
 import { Call } from "starknet"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import waitForExpect from "wait-for-expect"
 
 import { ArrayStorage } from "../src/background/storage/array"
@@ -43,7 +44,7 @@ const fetchMockTransactions: FetchTransactions = async (_, __) =>
 
 describe("transactions", () => {
   let txTracker: TransactionTracker
-  const fn = jest.fn()
+  const fn = vi.fn()
   beforeEach(async () => {
     txTracker = getTransactionsTracker(
       getTransactionsStore,
@@ -191,7 +192,7 @@ describe("getTransactionsStatusUpdate()", () => {
 
 describe("setAsyncInterval()", () => {
   test("should run fn every n seconds", async () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
     const n = 100
 
     const stop = setIntervalAsync(fn, n)

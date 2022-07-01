@@ -1,10 +1,12 @@
 import { BigNumber } from "ethers"
 import { number } from "starknet"
+import { describe, expect, test } from "vitest"
 
 import {
   convertTokenAmountToCurrencyValue,
   lookupTokenPriceDetails,
   prettifyCurrencyValue,
+  prettifyTokenAmount,
   sumTokenBalancesToCurrencyValue,
 } from "../src/shared/tokenPrice.service"
 import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
@@ -98,8 +100,17 @@ describe("prettifyCurrencyValue()", () => {
       expect(prettifyCurrencyValue(0)).toEqual("$0.00")
       expect(prettifyCurrencyValue("0")).toEqual("$0.00")
       expect(prettifyCurrencyValue("1.23456")).toEqual("$1.23")
-    })
-    test("should round as expected", () => {
+      expect(prettifyCurrencyValue("123456.12")).toEqual("$123,456.12")
+      expect(prettifyCurrencyValue("123456.123456")).toEqual("$123,456.12")
+      expect(prettifyCurrencyValue("0.12")).toEqual("$0.12")
+      expect(prettifyCurrencyValue("0.123456")).toEqual("$0.12")
+      expect(prettifyCurrencyValue("0.0123456")).toEqual("$0.012")
+      expect(prettifyCurrencyValue("0.00123456")).toEqual("$0.0012")
+      expect(prettifyCurrencyValue("0.000123456")).toEqual("$0.00012")
+      expect(prettifyCurrencyValue("0.00000123")).toEqual("$0.0000012")
+      expect(prettifyCurrencyValue("0.0008923088")).toEqual("$0.00089")
+      expect(prettifyCurrencyValue("0.000885")).toEqual("$0.00089")
+      expect(prettifyCurrencyValue("0.0000001")).toEqual("$0.0000001")
       expect(prettifyCurrencyValue("1.504")).toEqual("$1.50")
       expect(prettifyCurrencyValue("1.505")).toEqual("$1.51")
     })
@@ -107,6 +118,70 @@ describe("prettifyCurrencyValue()", () => {
   describe("when invalid", () => {
     test("should return null", () => {
       expect(prettifyCurrencyValue()).toBeNull()
+      expect(prettifyCurrencyValue("foo")).toBeNull()
+    })
+  })
+})
+
+describe("prettifyTokenAmount()", () => {
+  describe("when valid", () => {
+    test("should return pretty token value", () => {
+      expect(
+        prettifyTokenAmount({
+          amount: 0,
+          decimals: 18,
+          symbol: "ETH",
+        }),
+      ).toEqual("0.0 ETH")
+      expect(
+        prettifyTokenAmount({
+          amount: "1000000000000000000",
+          decimals: 18,
+          symbol: "ETH",
+        }),
+      ).toEqual("1.0 ETH")
+      expect(
+        prettifyTokenAmount({
+          amount: "123456789000000000000000000",
+          decimals: 18,
+          symbol: "ETH",
+        }),
+      ).toEqual("123,456,789.0 ETH")
+      expect(
+        prettifyTokenAmount({
+          amount: "123456789012345690000000000",
+          decimals: 18,
+          symbol: "ETH",
+        }),
+      ).toEqual("123,456,789.0123 ETH")
+      expect(
+        prettifyTokenAmount({
+          amount: "12345678901234569000",
+          decimals: 18,
+          symbol: "ETH",
+        }),
+      ).toEqual("12.3457 ETH")
+      expect(
+        prettifyTokenAmount({
+          amount: "12345678901234569",
+          decimals: 18,
+          symbol: "ETH",
+        }),
+      ).toEqual("0.0123 ETH")
+      expect(
+        prettifyTokenAmount({
+          amount: "123456789000000000000000000",
+          decimals: 18,
+        }),
+      ).toEqual("123,456,789.0")
+    })
+  })
+  describe("when invalid", () => {
+    test("should return null", () => {
+      /** allow us to pass invalid arguments for testing purposes */
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expect(prettifyTokenAmount({})).toBeNull()
     })
   })
 })

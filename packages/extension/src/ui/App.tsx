@@ -1,7 +1,5 @@
-import { ThemeProvider, createTheme } from "@mui/material"
+import { ThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
-import { createGlobalStyle } from "styled-components"
-import { normalize } from "styled-normalize"
 import { SWRConfig } from "swr"
 
 import AppErrorBoundaryFallback from "./AppErrorBoundaryFallback"
@@ -9,61 +7,12 @@ import { AppRoutes } from "./AppRoutes"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { useExtensionIsInTab } from "./features/browser/tabs"
+import { useOpenedExtensionTodayTracking } from "./services/analytics"
 import { swrCacheProvider } from "./services/swr"
-
-export interface GlobalStyleProps {
-  extensionIsInTab: boolean
-}
-
-const GlobalStyle = createGlobalStyle<GlobalStyleProps>`
-  ${normalize}
-
-  body {
-    font-family: 'Barlow', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    background-color: #161616;
-    color: white;
-  }
-
-  html, body {
-    min-width: 360px;
-    min-height: 600px;
-
-    width: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "360px")};
-    height: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "600px")};
-    
-    overscroll-behavior: none;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    &::-webkit-scrollbar { /* Chrome, Safari, Opera */
-      display: none;
-    }
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    margin-block: 0;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-`
-
-/** @see `./theme.d.ts` for adding additional variables to the theme */
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-  margin: {
-    extensionInTab: "10%",
-  },
-})
+import { GlobalStyle, theme } from "./theme"
 
 export const App: FC = () => {
+  useOpenedExtensionTodayTracking()
   const extensionIsInTab = useExtensionIsInTab()
   return (
     <SWRConfig value={{ provider: () => swrCacheProvider }}>

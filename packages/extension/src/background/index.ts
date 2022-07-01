@@ -21,6 +21,7 @@ import { handleNetworkMessage } from "./networkMessaging"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
+import { handleSettingsMessage } from "./settingsMessaging"
 import { Storage } from "./storage"
 import { handleTokenMessage } from "./tokenMessaging"
 import { trackTransations } from "./transactions/notifications"
@@ -74,6 +75,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
     handlePreAuthorizationMessage,
     handleRecoveryMessage,
     handleSessionMessage,
+    handleSettingsMessage,
     handleTokenMessage,
     handleTransactionMessage,
   ] as Array<HandleMessage<MessageType>>

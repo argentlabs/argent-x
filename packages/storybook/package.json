@@ -1,0 +1,34 @@
+{
+  "name": "@argent-x/storybook",
+  "version": "4.2.0",
+  "private": true,
+  "devDependencies": {
+    "@babel/core": "^7.18.5",
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-interactions": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/builder-webpack5": "^6.5.9",
+    "@storybook/manager-webpack5": "^6.5.9",
+    "@storybook/react": "^6.5.9",
+    "@storybook/testing-library": "^0.0.13",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "eslint": "^8.7.0",
+    "eslint-plugin-storybook": "^0.5.12",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+  },
+  "resolutions": {
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+  },
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "build-storybook": "build-storybook"
+  }
+}

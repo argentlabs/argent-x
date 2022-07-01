@@ -6,21 +6,28 @@
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
     "bundlewatch": "^0.3.3",
+    "husky": "^8.0.0",
     "import-sort-style-module": "^6.0.0",
     "lerna": "^5.0.0",
+    "lint-staged": ">=10",
     "prettier": ">=2",
-    "prettier-plugin-import-sort": "^0.0.7"
+    "prettier-plugin-import-sort": "^0.0.7",
+    "typescript": "^4.7.4"
   },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
-    "posttest": "npm run format",
     "dev": "lerna run dev --parallel",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build",
-    "prepare": "lerna bootstrap && yarn --cwd packages/get-starknet build"
+    "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
+    "lint": "lerna run lint --stream",
+    "test": "lerna run test --stream",
+    "test:e2e": "lerna run test:e2e --stream",
+    "prepare": "yarn --cwd packages/get-starknet build && husky install",
+    "storybook": "cd packages/storybook && yarn storybook"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
@@ -37,5 +44,9 @@
       }
     ]
   },
-  "license": "GPLV3"
+  "license": "GPLV3",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,md,yml,json}": "prettier --write",
+    "*.{ts,tsx}": "eslint --cache --ext .ts,.tsx"
+  }
 }

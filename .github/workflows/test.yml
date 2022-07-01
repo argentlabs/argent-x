@@ -22,15 +22,23 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
 
       - name: Build
         run: yarn build
 
       - name: Run tests
-        run: yarn --cwd packages/extension test
+        run: yarn test
+
+      - run: sudo apt-get install xvfb
+      - name: Run e2e tests
+        run: xvfb-run --auto-servernum yarn test:e2e
 
       - name: Check bundlesize
         run: yarn run bundlewatch

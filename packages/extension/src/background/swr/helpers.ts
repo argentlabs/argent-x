@@ -24,9 +24,7 @@ export function parseConfig(config: Config) {
   const minTimeToStale = config.minTimeToStale || 0
   const maxTimeToLive =
     Math.min(config.maxTimeToLive ?? 0, Number.MAX_SAFE_INTEGER) || Infinity
-  const serialize = isFunction(config.serialize)
-    ? config.serialize
-    : identity
+  const serialize = isFunction(config.serialize) ? config.serialize : identity
   const deserialize = isFunction(config.deserialize)
     ? config.deserialize
     : identity

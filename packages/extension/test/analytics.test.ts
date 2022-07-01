@@ -1,3 +1,5 @@
+import { describe, expect, test } from "vitest"
+
 import { anonymizeUserAgent } from "../src/shared/analytics"
 
 describe("anonymizeUseragent()", () => {

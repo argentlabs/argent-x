@@ -60,7 +60,15 @@ export const handleTransactionMessage: HandleMessage<
         })
       } catch (error) {
         console.error(error)
-        return sendToTabAndUi({ type: "ESTIMATE_TRANSACTION_FEE_REJ" })
+        return sendToTabAndUi({
+          type: "ESTIMATE_TRANSACTION_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString?.() ??
+              (error as any)?.toString?.() ??
+              "Unkown error",
+          },
+        })
       }
     }
 

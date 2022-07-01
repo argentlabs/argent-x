@@ -72,6 +72,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
         connectAccount(newAccount)
         analytics.track("createWallet", {
           status: "success",
+          networkId: newAccount.networkId,
         })
         navigate(await recover())
       } catch (error: any) {
@@ -79,6 +80,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
         analytics.track("createWallet", {
           status: "failure",
           errorMessage: error.message,
+          networkId: switcherNetworkId,
         })
         navigate(routes.error())
       }

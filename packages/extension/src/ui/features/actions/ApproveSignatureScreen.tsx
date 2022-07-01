@@ -3,6 +3,7 @@ import type { typedData } from "starknet"
 import styled from "styled-components"
 
 import { P } from "../../components/Typography"
+import { usePageTracking } from "../../services/analytics"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveSignatureScreenProps
@@ -24,16 +25,19 @@ export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
   dataToSign,
   onSubmit,
   ...props
-}) => (
-  <ConfirmScreen
-    title="Sign message"
-    confirmButtonText="Sign"
-    onSubmit={() => {
-      onSubmit(dataToSign)
-    }}
-    {...props}
-  >
-    <P>A dapp wants you to sign this message:</P>
-    <Pre>{JSON.stringify(dataToSign, null, 2)}</Pre>
-  </ConfirmScreen>
-)
+}) => {
+  usePageTracking("signMessage")
+  return (
+    <ConfirmScreen
+      title="Sign message"
+      confirmButtonText="Sign"
+      onSubmit={() => {
+        onSubmit(dataToSign)
+      }}
+      {...props}
+    >
+      <P>A dapp wants you to sign this message:</P>
+      <Pre>{JSON.stringify(dataToSign, null, 2)}</Pre>
+    </ConfirmScreen>
+  )
+}

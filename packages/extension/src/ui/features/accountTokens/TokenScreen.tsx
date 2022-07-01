@@ -1,29 +1,42 @@
-import { FC } from "react"
+import { BigNumber, utils } from "ethers"
+import { FC, useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { Call, stark } from "starknet"
 import styled from "styled-components"
+import useSWR from "swr"
 import { Schema, object } from "yup"
 
-import { inputAmountSchema, parseAmount } from "../../../shared/token"
+import {
+  getFeeToken,
+  inputAmountSchema,
+  parseAmount,
+} from "../../../shared/token"
 import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
 import { Alert } from "../../components/Alert"
 import { Button, ButtonGroup } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { ControlledInputText } from "../../components/InputText"
+import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
+import { StyledControlledInput } from "../../components/InputText"
+import { Spinner } from "../../components/Spinner"
 import { FormError } from "../../components/Typography"
 import { routes } from "../../routes"
 import { addressSchema } from "../../services/addresses"
+import { getEstimatedFee } from "../../services/backgroundTransactions"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
-import { toTokenView } from "./tokens.service"
-import { useTokensWithBalance } from "./tokens.state"
+import { formatTokenBalance, toTokenView } from "./tokens.service"
+import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
+
+const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
 
 export const TokenScreenWrapper = styled.div`
   display: flex;
@@ -102,6 +115,39 @@ const TokenBalance = styled.div`
   margin-top: 8px;
 `
 
+const InputGroupAfter = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+`
+
+const StyledMaxButton = styled(Button)`
+  border-radius: 100px;
+  background-color: #5c5b59;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+  margin-top: 0 !important;
+  padding: 4px 8px;
+`
+
+const InputTokenSymbol = styled.span`
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+  color: #8f8e8c;
+`
+
 interface SendInput {
   recipient: string
   amount: string
@@ -111,16 +157,90 @@ const SendSchema: Schema<SendInput> = object().required().shape({
   amount: inputAmountSchema,
 })
 
+export const useMaxFeeEstimateForTransfer = (
+  tokenAddress?: string,
+  balance?: BigNumber,
+  account?: Account,
+): {
+  maxFee?: BigNumber
+  error?: any
+  loading: boolean
+} => {
+  if (!account || !balance || !tokenAddress) {
+    throw new Error("Account, TokenAddress and Balance are required")
+  }
+
+  const call: Call = {
+    contractAddress: tokenAddress,
+    entrypoint: "transfer",
+    calldata: compileCalldata({
+      recipient: account.address,
+      amount: getUint256CalldataFromBN(balance),
+    }),
+  }
+
+  const {
+    data: estimatedFee,
+    error,
+    isValidating,
+  } = useSWR(
+    [
+      "maxEthTransferEstimate",
+      Math.floor(Date.now() / 60e3),
+      account.networkId,
+    ],
+    async () => {
+      const feeToken = getFeeToken(account.networkId)
+
+      if (feeToken?.address !== tokenAddress) {
+        return {
+          amount: BigNumber.from(0),
+          suggestedMaxFee: BigNumber.from(0),
+          unit: "wei",
+        }
+      }
+
+      return await getEstimatedFee(call)
+    },
+    {
+      suspense: false,
+      refreshInterval: 15e3,
+      shouldRetryOnError: false,
+    },
+  )
+
+  if (error) {
+    return { maxFee: undefined, error, loading: false }
+  }
+
+  // Add Overhead to estimatedFee
+  if (estimatedFee) {
+    const maxFee = addOverheadToFee(
+      estimatedFee.suggestedMaxFee.toString(),
+      0.2,
+    )
+    return { maxFee, error: undefined, loading: false }
+  }
+
+  return { maxFee: undefined, error: undefined, loading: isValidating }
+}
+
 export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
+  const feeToken = account && getFeeToken(account.networkId)
+
+  const [maxClicked, setMaxClicked] = useState(false)
+
   const {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
     control,
+    setValue,
+    watch,
   } = useForm<SendInput>({
     defaultValues: {
       recipient: "",
@@ -129,16 +249,70 @@ export const TokenScreen: FC = () => {
     resolver,
   })
 
-  const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
+  const formValues = watch()
+
+  const inputAmount = formValues.amount
+  const inputRecipient = formValues.recipient
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
+
+  const {
+    maxFee,
+    error: maxFeeError,
+    loading: maxFeeLoading,
+  } = useMaxFeeEstimateForTransfer(token?.address, token?.balance, account)
+
+  useEffect(() => {
+    if (maxClicked && maxFee && token) {
+      setMaxInputAmount(token, maxFee)
+    }
+  }, [maxClicked, maxFee?.toString(), token?.address, token?.networkId])
+
+  const setMaxInputAmount = (
+    token: TokenDetailsWithBalance,
+    maxFee?: BigNumber,
+  ) => {
+    const tokenDecimals = token.decimals?.toNumber() || 18
+    const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
+
+    if (token.balance && maxFee) {
+      const balanceBn = token.balance
+
+      const maxAmount = balanceBn.sub(maxFee.toString())
+
+      const formattedMaxAmount = utils.formatUnits(
+        maxAmount.toString(),
+        tokenDecimals,
+      )
+      setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
+    }
+  }
 
   if (!token) {
     return <Navigate to={routes.accounts()} />
   }
 
   const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+
+  const parsedInputAmount = inputAmount
+    ? parseAmount(inputAmount, decimals)
+    : parseAmount("0", decimals)
+
+  const parsedTokenBalance = token.balance || parseAmount("0", decimals)
+
+  const handleMaxClick = async () => {
+    setMaxClicked(true)
+    setMaxInputAmount(token, maxFee)
+  }
+
+  const disableSubmit =
+    isSubmitting ||
+    (submitCount > 0 && !isDirty) ||
+    parsedInputAmount.gt(token.balance?.toString() ?? 0) ||
+    (feeToken?.address === token.address &&
+      (inputAmount === balance ||
+        parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance))) // Balance: 1234, maxInput: 1231, , maxFee: 3, updatedInput: 1233
 
   return (
     <>
@@ -175,21 +349,44 @@ export const TokenScreen: FC = () => {
             navigate(routes.accountTokens())
           })}
         >
-          <ControlledInputText
+          <StyledControlledInput
             autoComplete="off"
             control={control}
             placeholder="Amount"
             name="amount"
             type="text"
-          />
+            onKeyDown={() => {
+              setMaxClicked(false)
+            }}
+            onlyNumeric
+          >
+            <InputGroupAfter>
+              <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
+              {!inputAmount && (
+                <StyledMaxButton type="button" onClick={handleMaxClick}>
+                  {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
+                </StyledMaxButton>
+              )}
+            </InputGroupAfter>
+          </StyledControlledInput>
+          {feeToken?.address === token.address && inputAmount === balance && (
+            <FormError>Not enough balance to pay for fees</FormError>
+          )}
+          {maxFeeError && <FormError>{maxFeeError.message}</FormError>}
           {errors.amount && <FormError>{errors.amount.message}</FormError>}
-          <ControlledInputText
+          <StyledControlledInput
             autoComplete="off"
             control={control}
             placeholder="Recipient"
             name="recipient"
             type="text"
-          />
+          >
+            {!inputRecipient && (
+              <InputGroupAfter>
+                <AtTheRateIcon />
+              </InputGroupAfter>
+            )}
+          </StyledControlledInput>
           {errors.recipient && (
             <FormError>{errors.recipient.message}</FormError>
           )}

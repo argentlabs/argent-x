@@ -1,11 +1,15 @@
-import { BigNumberish } from "@ethersproject/bignumber"
 import CurrencyConversionNumber from "bignumber.js"
+import { BigNumber, BigNumberish, utils } from "ethers"
 import { isString } from "lodash-es"
-import numeral from "numeral"
 import urlJoin from "url-join"
 
 import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
 import { UniqueToken } from "./token"
+import {
+  isNumeric,
+  prettifyCurrencyNumber,
+  prettifyTokenNumber,
+} from "./utils/number"
 
 const REACT_APP_ARGENT_API_BASE_URL = process.env
   .REACT_APP_ARGENT_API_BASE_URL as string
@@ -156,9 +160,50 @@ export const prettifyCurrencyValue = (
   currencyValue?: string | number,
   currencySymbol = "$",
 ) => {
-  if (currencyValue === undefined) {
+  if (currencyValue === undefined || !isNumeric(currencyValue)) {
     return null
   }
-  const prettyValue = numeral(currencyValue).format(`${currencySymbol}0,0.00`)
-  return prettyValue
+  const prettyValue = prettifyCurrencyNumber(currencyValue)
+  const prettyValueWithSymbol = [currencySymbol, prettyValue]
+    .filter(Boolean)
+    .join("")
+  return prettyValueWithSymbol
+}
+
+/**
+ * Returns a string of token balance with symbol if available e.g.
+ */
+
+export const prettifyTokenBalance = (token: TokenDetailsWithBalance) => {
+  const { balance, decimals, symbol } = token
+  if (balance === undefined || decimals === undefined) {
+    return null
+  }
+  return prettifyTokenAmount({
+    amount: balance,
+    decimals,
+    symbol,
+  })
+}
+
+export interface IPrettifyTokenAmount {
+  amount: BigNumberish
+  decimals: BigNumberish
+  symbol?: string
+}
+
+export const prettifyTokenAmount = ({
+  amount,
+  decimals,
+  symbol,
+}: IPrettifyTokenAmount) => {
+  if (!isNumeric(amount)) {
+    return null
+  }
+  const decimalsNumber = Number(decimals)
+  const balanceBn = BigNumber.from(amount)
+  const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
+  const prettyValue = prettifyTokenNumber(balanceFullString)
+  const prettyValueWithSymbol = [prettyValue, symbol].filter(Boolean).join(" ")
+  return prettyValueWithSymbol
 }

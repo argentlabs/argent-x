@@ -5,6 +5,7 @@ import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { CopySeedPhrase } from "./CopySeedPhrase"
 import { SeedPhrase } from "./SeedPhrase"
 import { useSeedPhrase } from "./useSeedPhrase"
 
@@ -12,6 +13,7 @@ export const SeedRecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
   const seedPhrase = useSeedPhrase()
   const returnTo = useReturnTo()
+
   return (
     <>
       <IconBar back close={returnTo} />
@@ -29,6 +31,8 @@ export const SeedRecoverySetupScreen: FC = () => {
         </Paragraph>
 
         <SeedPhrase seedPhrase={seedPhrase} />
+
+        <CopySeedPhrase seedPhrase={seedPhrase} />
       </ConfirmScreen>
     </>
   )

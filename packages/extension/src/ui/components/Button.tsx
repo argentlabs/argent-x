@@ -1,6 +1,37 @@
+import { colord } from "colord"
 import styled from "styled-components"
 
-export const Button = styled.button`
+export type ButtonVariant = "default" | "primary" | "warn" | "danger"
+
+interface IButton {
+  variant?: ButtonVariant
+}
+
+/** TODO: move colour tokens into theme */
+
+export const getVariantColor =
+  ({ hover = false, disabled = false }) =>
+  ({ variant }: IButton) => {
+    switch (variant) {
+      case "warn":
+        return hover
+          ? colord("#f36a3d").saturate(1).lighten(0.075).toRgbString()
+          : disabled
+          ? colord("#f36a3d").alpha(0.5).toRgbString()
+          : "#f36a3d"
+      case "danger":
+        return hover
+          ? colord("#c12026").lighten(0.075).toRgbString()
+          : disabled
+          ? colord("#c12026").alpha(0.5).toRgbString()
+          : "#c12026"
+    }
+    return hover && !disabled
+      ? `rgba(255, 255, 255, 0.25)`
+      : `rgba(255, 255, 255, 0.15);`
+  }
+
+export const Button = styled.button<IButton>`
   margin: 0;
   padding: 13.5px;
   font-weight: 600;
@@ -8,7 +39,7 @@ export const Button = styled.button`
   line-height: 21px;
   text-align: center;
 
-  background: rgba(255, 255, 255, 0.15);
+  background-color: ${getVariantColor({ hover: false })};
   border-radius: 100px;
   width: 100%;
   outline: none;
@@ -20,14 +51,14 @@ export const Button = styled.button`
   &:hover,
   &:focus {
     outline: 0;
-    background: rgba(255, 255, 255, 0.25);
+    background-color: ${getVariantColor({ hover: true })};
   }
 
   &:disabled {
-    color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.15);
     cursor: auto;
     cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.5);
+    background-color: ${getVariantColor({ disabled: true })};
   }
 `
 

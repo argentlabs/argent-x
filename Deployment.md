@@ -1,5 +1,4 @@
-Deployment
-=== 
+# Deployment
 
 We automated some parts of the release process to make things easier. This file lists the nessisary steps to release the latest version of the application:
 

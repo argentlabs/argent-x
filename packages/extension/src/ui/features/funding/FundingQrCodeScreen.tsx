@@ -5,6 +5,7 @@ import { AccountAddress, AccountName } from "../../components/Address"
 import { IconBar } from "../../components/IconBar"
 import { PageWrapper } from "../../components/Page"
 import { formatFullAddress } from "../../services/addresses"
+import { usePageTracking } from "../../services/analytics"
 import {
   getAccountName,
   useAccountMetadata,
@@ -19,6 +20,9 @@ const Container = styled.div`
 
 export const FundingQrCodeScreen: FC = () => {
   const account = useSelectedAccount()
+  usePageTracking("addFundsFromOtherAccount", {
+    networkId: account?.networkId || "unknown",
+  })
   const { accountNames } = useAccountMetadata()
 
   return (
