@@ -95,5 +95,14 @@
     "symbol": "SLF",
     "decimals": "6",
     "network": "goerli-alpha"
+  },
+  {
+    "address": "0x6a7a6243f92a347c03c935ce4834c47cbd2a951536c10319168866db9d57983",
+    "name": "Devnet Ether",
+    "symbol": "ETH",
+    "decimals": "18",
+    "network": "localhost",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "showAlways": true
   }
 ]

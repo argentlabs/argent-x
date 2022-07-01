@@ -28,6 +28,8 @@ export type AccountMessage =
       type: "UPGRADE_ACCOUNT"
       data: BaseWalletAccount
     }
+  | { type: "UPGRADE_ACCOUNT_RES" }
+  | { type: "UPGRADE_ACCOUNT_REJ" }
   | {
       type: "GET_ENCRYPTED_PRIVATE_KEY"
       data: { encryptedSecret: string }
