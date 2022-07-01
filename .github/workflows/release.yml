@@ -24,6 +24,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "16"
+          cache: "yarn"
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
