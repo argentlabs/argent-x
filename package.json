@@ -9,6 +9,7 @@
     "husky": "^8.0.0",
     "import-sort-style-module": "^6.0.0",
     "lerna": "^5.0.0",
+    "lint-staged": ">=10",
     "prettier": ">=2",
     "prettier-plugin-import-sort": "^0.0.7",
     "typescript": "^4.7.4"
@@ -22,6 +23,7 @@
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build",
     "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
+    "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
     "test:e2e": "lerna run test:e2e --stream",
     "prepare": "yarn --cwd packages/get-starknet build && husky install",
@@ -42,5 +44,9 @@
       }
     ]
   },
-  "license": "GPLV3"
+  "license": "GPLV3",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,md,yml,json}": "prettier --write",
+    "*.{ts,tsx}": "eslint --cache --ext .ts,.tsx"
+  }
 }

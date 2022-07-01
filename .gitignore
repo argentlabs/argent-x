@@ -6,6 +6,7 @@ Thumbs.db
 *.log
 package-lock.json
 pnpm-lock.yaml
+.eslintcache
 
 **/node_modules/
 **/dist/
