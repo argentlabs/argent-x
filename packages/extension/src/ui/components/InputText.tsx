@@ -1,6 +1,7 @@
 import { useRef } from "react"
 import { Controller } from "react-hook-form"
 import styled, { css } from "styled-components"
+
 import { isNumeric } from "../../shared/utils/number"
 
 export const Container = styled.div`
@@ -206,11 +207,6 @@ export const ControlledInputTextAlt = styled(
           inputMode="decimal"
           type="text"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            console.log(
-              "🚀 ~ file: InputText.tsx ~ line 218 ~ e",
-              e.target.value,
-            )
-
             const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
             if (onlyNumeric) {
               if (e.target.value === "") {
