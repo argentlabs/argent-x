@@ -9,6 +9,8 @@ const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
 const VERSION = process.env.VERSION
 
 export interface Events {
+  openedExtensionToday: undefined
+  unlockedExtensionToday: undefined
   createWallet:
     | {
         status: "success"
@@ -23,8 +25,16 @@ export interface Events {
     host: string
     networkId: string
   }
-  openedExtensionToday: undefined
-  unlockedExtensionToday: undefined
+  signedTransaction: {
+    networkId: string
+  }
+  sentTransaction: {
+    success: boolean
+    networkId: string
+  }
+  signedMessage: {
+    networkId: string
+  }
 }
 
 export interface Pages {
@@ -33,6 +43,8 @@ export interface Pages {
   createWallet: undefined
   restoreWallet: undefined
   restoreWalletWithFile: undefined
+  signTransaction: undefined
+  signMessage: undefined
 }
 
 interface Analytics {
