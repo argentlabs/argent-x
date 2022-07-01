@@ -12,13 +12,16 @@ export interface Events {
   createWallet:
     | {
         status: "success"
+        networkId: string
       }
     | {
         status: "failure"
         errorMessage: string
+        networkId: string
       }
   preauthorizeDapp: {
     host: string
+    networkId: string
   }
 }
 
