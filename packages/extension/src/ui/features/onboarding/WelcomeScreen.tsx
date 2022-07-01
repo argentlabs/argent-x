@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button, ButtonGroup } from "../../components/Button"
-import { PrivacyStatement } from "../../components/PrivacyStatement"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
@@ -30,13 +29,6 @@ const WelcomeScreenWrapper = styled.div`
   > ${ButtonGroup} {
     margin-top: 64px;
   }
-`
-
-const StyledPrivacyStatement = styled(PrivacyStatement)`
-  position: absolute;
-  bottom: 24px;
-  left: 0;
-  right: 0;
 `
 
 const greetings = [
@@ -68,7 +60,6 @@ export const WelcomeScreen: FC = () => {
         </Button>
       </ButtonGroup>
       <StickyArgentFooter />
-      <StyledPrivacyStatement />
     </WelcomeScreenWrapper>
   )
 }
