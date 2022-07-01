@@ -7,7 +7,9 @@ import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
+import { trackAddFundsService, usePageTracking } from "../../services/analytics"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import A from "tracking-link"
 import CardSvg from "./card.svg"
 import CoinbaseSvg from "./coinbase.svg"
 import EthereumSvg from "./ethereum.svg"
@@ -24,6 +26,9 @@ const Title = styled.h1`
 
 export const FundingScreen: FC = () => {
   const account = useSelectedAccount()
+  usePageTracking("addFunds", {
+    networkId: account?.networkId || "unknown",
+  })
 
   if (!account) {
     return <Navigate to={routes.accounts()} />
@@ -49,12 +54,12 @@ export const FundingScreen: FC = () => {
         <Title>How would you like to fund your account?</Title>
         <OptionsWrapper>
           {allowFiatPurchase ? (
-            <a
+            <A
               href={`https://argentx.banxa.com/?walletAddress=${normalizeAddress(
                 account.address,
               )}`}
-              rel="noopener noreferrer"
-              target="_blank"
+              targetBlank
+              onClick={trackAddFundsService("banxa", account.networkId)}
             >
               <Option
                 title="Buy with card or bank transfer"
@@ -62,7 +67,7 @@ export const FundingScreen: FC = () => {
                 icon={<CardSvg />}
                 hideArrow
               />
-            </a>
+            </A>
           ) : (
             <Option
               title="Buy with card or bank transfer"
@@ -86,12 +91,12 @@ export const FundingScreen: FC = () => {
             />
           </Link>
           {allowLayerswap && (
-            <a
+            <A
               href={`https://www.layerswap.io/?destNetwork=STARKNET_MAINNET&destAddress=${normalizeAddress(
                 account.address,
               )}&lockNetwork=true&lockAddress=true&addressSource=argentx`}
-              rel="noopener noreferrer"
-              target="_blank"
+              targetBlank
+              onClick={trackAddFundsService("layerswap", account.networkId)}
             >
               <Option
                 title="From an exchange"
@@ -99,16 +104,20 @@ export const FundingScreen: FC = () => {
                 icon={<CoinbaseSvg />}
                 hideArrow
               />
-            </a>
+            </A>
           )}
           {bridgeUrl ? (
-            <a href={bridgeUrl} target="_blank">
+            <A
+              href={bridgeUrl}
+              targetBlank
+              onClick={trackAddFundsService("starkgate", account.networkId)}
+            >
               <Option
                 title="Bridge from Ethereum"
                 icon={<EthereumSvg />}
                 hideArrow
               />
-            </a>
+            </A>
           ) : (
             <Option
               title="Bridge from Ethereum"

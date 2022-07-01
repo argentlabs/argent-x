@@ -20,14 +20,18 @@ export const handleActionApproval = async (
       const { host } = action.payload
       const selectedAccount = await wallet.getSelectedAccount()
 
-      analytics.track("preauthorizeDapp", { host })
+      if (!selectedAccount) {
+        openUi()
+        return
+      }
+
+      analytics.track("preauthorizeDapp", {
+        host,
+        networkId: selectedAccount.networkId,
+      })
       await preAuthorize(host)
 
-      if (selectedAccount) {
-        return { type: "CONNECT_DAPP_RES", data: selectedAccount }
-      }
-      openUi()
-      return
+      return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }
 
     case "TRANSACTION": {

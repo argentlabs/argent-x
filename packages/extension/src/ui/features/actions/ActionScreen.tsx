@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { waitForMessage } from "../../../shared/messages"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
+import { analytics } from "../../services/analytics"
 import { assertNever } from "../../services/assertNever"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { useSelectedAccount } from "../accounts/accounts.state"
@@ -97,6 +98,9 @@ export const ActionScreen: FC = () => {
           transactions={action.payload.transactions}
           actionHash={action.meta.hash}
           onSubmit={async () => {
+            analytics.track("signedTransaction", {
+              networkId: account?.networkId || "unknown",
+            })
             approveAction(action)
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([
@@ -109,6 +113,11 @@ export const ActionScreen: FC = () => {
                 ({ data }) => data.actionHash === action.meta.hash,
               ),
             ])
+            // (await) blocking as the window may closes afterwards
+            await analytics.track("sentTransaction", {
+              success: !("error" in result),
+              networkId: account?.networkId || "unknown",
+            })
             if ("error" in result) {
               useAppState.setState({
                 error: `Sending transaction failed: ${result.error}`,

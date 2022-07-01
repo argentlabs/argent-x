@@ -3,6 +3,7 @@ import join from "url-join"
 import { Network, isKnownNetwork } from "../../shared/networks"
 import { Transaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
+import { analytics } from "../analytics"
 import { fetchWithTimeout } from "../utils/fetchWithTimeout"
 import { mapVoyagerTransactionToTransaction } from "./transformers"
 
@@ -26,6 +27,7 @@ export const fetchVoyagerTransactions = async (
   if (!explorerUrl) {
     return []
   }
+  analytics.track("voyagerCalled", { endpoint: "txns", networkId: network.id })
   const response = await fetchWithTimeout(
     join(explorerUrl, `api/txns?to=${address}`),
   )

@@ -10,6 +10,7 @@ import {
   FieldValue,
 } from "../../components/Fields"
 import { routes } from "../../routes"
+import { usePageTracking } from "../../services/analytics"
 import {
   getAccountName,
   useAccountMetadata,
@@ -49,6 +50,9 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   onSubmit,
   ...props
 }) => {
+  usePageTracking("signTransaction", {
+    networkId: selectedAccount?.networkId || "unknown",
+  })
   const [disableConfirm, setDisableConfirm] = useState(true)
   const { accountNames } = useAccountMetadata()
 

@@ -6,6 +6,7 @@ import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { P, StyledLink } from "../../components/Typography"
 import { routes } from "../../routes"
+import { unlockedExtensionTodayTracking } from "../../services/analytics"
 import { startSession } from "../../services/backgroundSessions"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
@@ -57,6 +58,7 @@ export const LockScreen: FC = () => {
           useAppState.setState({ isLoading: true })
           try {
             await startSession(password)
+            unlockedExtensionTodayTracking()
             const target = await recover()
             useAppState.setState({ isLoading: false })
             navigate(target)

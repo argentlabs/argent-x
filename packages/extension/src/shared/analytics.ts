@@ -8,17 +8,42 @@ const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
 const VERSION = process.env.VERSION
 
+export type AddFundsServices = "banxa" | "layerswap" | "starkgate"
+
 export interface Events {
+  openedExtensionToday: undefined
+  unlockedExtensionToday: undefined
+  voyagerCalled: {
+    networkId: string
+    endpoint: "txns"
+  }
   createWallet:
     | {
         status: "success"
+        networkId: string
       }
     | {
         status: "failure"
         errorMessage: string
+        networkId: string
       }
   preauthorizeDapp: {
     host: string
+    networkId: string
+  }
+  signedTransaction: {
+    networkId: string
+  }
+  sentTransaction: {
+    success: boolean
+    networkId: string
+  }
+  signedMessage: {
+    networkId: string
+  }
+  addFunds: {
+    networkId: string
+    service: AddFundsServices
   }
 }
 
@@ -28,6 +53,16 @@ export interface Pages {
   createWallet: undefined
   restoreWallet: undefined
   restoreWalletWithFile: undefined
+  signMessage: undefined
+  signTransaction: {
+    networkId: string
+  }
+  addFunds: {
+    networkId: string
+  }
+  addFundsFromOtherAccount: {
+    networkId: string
+  }
 }
 
 interface Analytics {

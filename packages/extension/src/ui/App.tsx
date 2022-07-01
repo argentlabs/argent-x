@@ -7,10 +7,12 @@ import { AppRoutes } from "./AppRoutes"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { useExtensionIsInTab } from "./features/browser/tabs"
+import { useOpenedExtensionTodayTracking } from "./services/analytics"
 import { swrCacheProvider } from "./services/swr"
 import { GlobalStyle, theme } from "./theme"
 
 export const App: FC = () => {
+  useOpenedExtensionTodayTracking()
   const extensionIsInTab = useExtensionIsInTab()
   return (
     <SWRConfig value={{ provider: () => swrCacheProvider }}>
