@@ -1,16 +1,13 @@
-/**
- * @jest-environment jsdom
- */
-
 import { fireEvent, render, screen } from "@testing-library/react"
 import { useState } from "react"
+import { describe, expect, test, vi } from "vitest"
 
 import { useConditionallyEnabledSWR } from "../src/ui/services/swr"
 
 describe("swr", () => {
   describe("useConditionallyEnabledSWR()", () => {
     test("should use the fetcher and return data when enabled, set data to undefined when disabled", async () => {
-      const fetcher = jest.fn(() => "foo")
+      const fetcher = vi.fn(() => "foo")
 
       function Component() {
         const [enabled, setEnabled] = useState(true)

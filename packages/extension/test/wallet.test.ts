@@ -1,6 +1,8 @@
 import fs from "fs"
 import path from "path"
 
+import { afterEach, expect, test, vi } from "vitest"
+
 import { LoadContracts } from "../src/background/accounts"
 import {
   GetNetwork,
@@ -44,14 +46,12 @@ const getNetwork: GetNetwork = async (networkId) =>
     name: "Test Network",
   }) as Network
 
-jest.setTimeout(999999)
-
 afterEach(() => {
-  jest.useRealTimers()
+  vi.useRealTimers()
 })
 
 test("create a new wallet", async () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   const storage = new MockStorage<WalletStorageProps>()
   const wallet = new Wallet(storage, loadContracts, getNetwork)
@@ -82,12 +82,12 @@ test("create a new wallet", async () => {
   const selectedAccount = await wallet.getSelectedAccount()
   expect(selectedAccount).toBeDefined()
 
-  jest.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
+  vi.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
   expect(wallet.isSessionOpen()).toBe(false)
 })
 
 test("open existing wallet", async () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("backup", backupString)
@@ -118,7 +118,7 @@ test("open existing wallet", async () => {
     "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
   )
 
-  jest.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
+  vi.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
   expect(wallet.isSessionOpen()).toBe(false)
 })
 
@@ -137,7 +137,7 @@ test("open existing wallet with wrong password", async () => {
 })
 
 test("import backup file", async () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   const storage = new MockStorage<WalletStorageProps>()
   storage.setItem("discoveredOnce", true)
@@ -154,7 +154,7 @@ test("import backup file", async () => {
   expect(isValid).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
 
-  jest.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
+  vi.advanceTimersByTime(SESSION_DURATION_PLUS_ONE_SEC)
   expect(wallet.isSessionOpen()).toBe(false)
 })
 

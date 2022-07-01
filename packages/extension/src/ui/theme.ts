@@ -1,6 +1,6 @@
+import { createTheme } from "@mui/material/styles"
 import { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
-import { createTheme } from "@mui/material/styles"
 
 /**
  * Adds additional variables to the theme
