@@ -11,6 +11,10 @@ const VERSION = process.env.VERSION
 export interface Events {
   openedExtensionToday: undefined
   unlockedExtensionToday: undefined
+  voyagerCalled: {
+    networkId: string
+    endpoint: "txns"
+  }
   createWallet:
     | {
         status: "success"
