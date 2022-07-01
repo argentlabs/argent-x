@@ -1,0 +1,29 @@
+{
+  "assessment": "neutral",
+  "reviews": [
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x01ca5dedf1612b1ffb035e838ac09d70e500d22cf9cd0de4bebcef8553506fdb"
+      }
+    },
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x01ca5dedf1612b1ffb035e838ac09d70e500d22cf9cd0de4bebcef8553506fdb"
+      }
+    },
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x01ca5dedf1612b1ffb035e838ac09d70e500d22cf9cd0de4bebcef8553506fdb"
+      }
+    },
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x01ca5dedf1612b1ffb035e838ac09d70e500d22cf9cd0de4bebcef8553506fdb"
+      }
+    }
+  ]
+}
