@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 const StickyArgentFooterP = styled.p`
   position: fixed;
-  bottom: 24px;
+  bottom: 50px;
   left: 0;
   right: 0;
 

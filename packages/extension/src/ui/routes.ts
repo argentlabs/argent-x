@@ -96,5 +96,6 @@ export const routes = {
       `/backup-download${isFromSettings ? "?settings" : ""}`,
     "/backup-download",
   ),
+  privacyStatement: route("/privacy-statement"),
   error: route("/error"),
 }

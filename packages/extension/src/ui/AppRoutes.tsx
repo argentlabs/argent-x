@@ -29,6 +29,7 @@ import { LegacyScreen } from "./features/onboarding/LegacyWalletScreen"
 import { LockScreen } from "./features/onboarding/LockScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
+import { PrivacyStatementScreen } from "./features/onboarding/PrivacyStatementScreen"
 import { ResetScreen } from "./features/onboarding/ResetScreen"
 import { WelcomeScreen } from "./features/onboarding/WelcomeScreen"
 import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
@@ -177,6 +178,10 @@ const walletRoutes = (
     <Route
       path={routes.settingsPrivacy.path}
       element={<PrivacySettingsScreen />}
+    />
+    <Route
+      path={routes.privacyStatement.path}
+      element={<PrivacyStatementScreen />}
     />
   </>
 )
