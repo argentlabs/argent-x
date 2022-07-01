@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { persist } from "zustand/middleware"
-import create from "zustand/react"
+import create from "zustand"
 
 import { Pages, getAnalytics, AddFundsServices } from "../../shared/analytics"
 
