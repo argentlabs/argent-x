@@ -23,7 +23,7 @@
     "build": "lerna run build",
     "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
     "test": "lerna run test --stream",
-    "test:e2e": "lerna run test:e2e",
+    "test:e2e": "lerna run test:e2e --stream",
     "prepare": "yarn --cwd packages/get-starknet build && husky install",
     "storybook": "cd packages/storybook && yarn storybook"
   },

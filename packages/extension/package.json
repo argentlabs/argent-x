@@ -48,7 +48,7 @@
     "start": "webpack",
     "dev": "webpack --color --watch",
     "test": "vitest run",
-    "pretest:e2e": "playwright install chromium && ([ -d dist ] || yarn build)",
+    "pretest:e2e": "playwright install chromium && ([ -d dist ] || yarn build) && sleep 5",
     "test:e2e": "playwright test",
     "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes && yarn run push-release-branch",
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",
