@@ -60,6 +60,9 @@ export interface Pages {
   addFunds: {
     networkId: string
   }
+  addFundsFromOtherAccount: {
+    networkId: string
+  }
 }
 
 interface Analytics {
