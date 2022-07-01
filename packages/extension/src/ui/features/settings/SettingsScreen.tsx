@@ -8,6 +8,7 @@ import { DiscordIcon } from "../../components/Icons/DiscordIcon"
 import { GithubIcon } from "../../components/Icons/GithubIcon"
 import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { SupportIcon } from "../../components/Icons/SupportIcon"
+import { PrivacyStatement } from "../../components/PrivacyStatement"
 import { RowCentered } from "../../components/Row"
 import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
@@ -94,6 +95,10 @@ const IconText = styled.span`
   color: #ffffff;
 `
 
+const StyledPrivacyStatement = styled(PrivacyStatement)`
+  margin-top: 20px;
+`
+
 export const SupportFooter: FC = () => (
   <Footer>
     <P>Help, support &amp; suggestions:</P>
@@ -129,7 +134,8 @@ export const SupportFooter: FC = () => (
         </IconWrapper>
       </a>
     </RowCentered>
-    <P>Version: v{process.env.VERSION}</P>
+    <StyledPrivacyStatement />
+    <P style={{ marginTop: "8px" }}>Version: v{process.env.VERSION}</P>
   </Footer>
 )
 
