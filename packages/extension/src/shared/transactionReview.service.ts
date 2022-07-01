@@ -80,7 +80,7 @@ export const fetchTransactionReview = ({
   transactions,
 }: IFetchTransactionReview) => {
   if (!ARGENT_TRANSACTION_REVIEW_STARKNET_URL) {
-    return
+    throw "Transaction review endpoint is not defined"
   }
   const calls = isArray(transactions) ? transactions : [transactions]
   const body: ApiTransactionReviewRequestBody = {

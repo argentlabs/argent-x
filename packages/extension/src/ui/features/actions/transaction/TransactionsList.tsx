@@ -10,8 +10,8 @@ import { TransactionItem } from "./TransactionItem"
 
 export interface ITransactionsList {
   transactions: Call | Call[]
-  transactionReview: ApiTransactionReviewResponse | undefined
-  tokensByNetwork: TokenDetails[] | undefined
+  transactionReview?: ApiTransactionReviewResponse
+  tokensByNetwork?: TokenDetails[]
 }
 
 /** Renders one or more transactions with review if available */

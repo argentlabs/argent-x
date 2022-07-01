@@ -33,22 +33,9 @@ interface ApproveTransactionScreenProps
   onSubmit: (transactions: Call | Call[]) => void
 }
 
-const Pre = styled.pre`
-  padding: 8px;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.15);
-  max-width: calc(100vw - 64px);
-  overflow: auto;
-  background: #161616;
-`
-
 const LeftPaddedField = styled.div`
   margin-left: 8px;
 `
-
-const isDev = process.env.NODE_ENV === "development"
-
-const DISPLAY_RAW_TRANSACTION = true
 
 export const titleForTransactions = (transactions: Call | Call[] = []) => {
   const transactionsArray: Call[] = isArray(transactions)
@@ -73,11 +60,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
 
-  const {
-    data: transactionReview,
-    error,
-    isValidating,
-  } = useTransactionReview({
+  const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
     transactions,
     actionHash,
@@ -139,20 +122,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           <FieldValue>{selectedAccount.network.name}</FieldValue>
         </Field>
       </FieldGroup>
-      {isDev && DISPLAY_RAW_TRANSACTION && (
-        <Pre>
-          {JSON.stringify(
-            {
-              isValidating,
-              error,
-              transactionReview,
-              transactions,
-            },
-            null,
-            2,
-          )}
-        </Pre>
-      )}
     </ConfirmScreen>
   )
 }

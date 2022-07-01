@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react"
+import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -6,6 +6,7 @@ import { useAppState } from "../../app.state"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
+import { executeTransaction } from "../../services/backgroundTransactions"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useAccounts } from "./accounts.state"
 
@@ -25,6 +26,21 @@ export const UpgradeScreen: FC = () => {
     }
   }, [])
 
+  const test = useCallback(async () => {
+    await executeTransaction({
+      transactions: {
+        contractAddress:
+          "0x6a7a6243f92a347c03c935ce4834c47cbd2a951536c10319168866db9d57983",
+        entrypoint: "transfer",
+        calldata: [
+          "2650693541979826037787345793241568095729089735202478624863150922418593968070",
+          "1000000000000000",
+          "0",
+        ],
+      },
+    })
+  }, [])
+
   if (!selectedAccount) {
     return <></>
   }
@@ -35,9 +51,10 @@ export const UpgradeScreen: FC = () => {
       confirmButtonText="Upgrade"
       rejectButtonText="Cancel"
       onSubmit={async () => {
-        useAppState.setState({ isLoading: true })
-        await upgradeAccount(selectedAccount)
-        useAppState.setState({ isLoading: false })
+        // useAppState.setState({ isLoading: true })
+        // await upgradeAccount(selectedAccount)
+        // useAppState.setState({ isLoading: false })
+        await test()
         navigate(routes.accountTokens())
       }}
       onReject={() => {
