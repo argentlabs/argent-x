@@ -23,6 +23,8 @@ export interface Events {
     host: string
     networkId: string
   }
+  openedExtensionToday: undefined
+  unlockedExtensionToday: undefined
 }
 
 export interface Pages {
