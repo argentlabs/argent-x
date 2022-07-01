@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { persist } from "zustand/middleware"
 import create from "zustand/react"
 
-import { Pages, getAnalytics } from "../../shared/analytics"
+import { Pages, getAnalytics, AddFundsServices } from "../../shared/analytics"
 
 /**
  * Lets switch to this analytics implementation once sendBeacon supports Authorization headers:
@@ -88,4 +88,11 @@ export function unlockedExtensionTodayTracking() {
   } catch (e) {
     // nothing of this should be blocking
   }
+}
+
+export function trackAddFundsService(
+  service: AddFundsServices,
+  networkId: string,
+) {
+  return () => analytics.track("addFunds", { service, networkId })
 }
