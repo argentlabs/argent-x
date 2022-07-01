@@ -1,8 +1,8 @@
 import { useEffect } from "react"
-import { persist } from "zustand/middleware"
 import create from "zustand"
+import { persist } from "zustand/middleware"
 
-import { Pages, getAnalytics, AddFundsServices } from "../../shared/analytics"
+import { AddFundsServices, Pages, getAnalytics } from "../../shared/analytics"
 
 /**
  * Lets switch to this analytics implementation once sendBeacon supports Authorization headers:
