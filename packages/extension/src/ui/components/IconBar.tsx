@@ -29,13 +29,16 @@ interface IconBarProps {
 export const IconBar: FC<IconBarProps> = ({ back, close }) => (
   <Bar>
     {back && (
-      <BackLink>
+      <BackLink aria-label="Back">
         <BackIcon />
       </BackLink>
     )}
     <hr />
     {close && (
-      <Link to={isString(close) ? close : routes.accountTokens()}>
+      <Link
+        to={isString(close) ? close : routes.accountTokens()}
+        aria-label="Close"
+      >
         <CloseIcon />
       </Link>
     )}

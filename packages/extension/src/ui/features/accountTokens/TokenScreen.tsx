@@ -326,7 +326,9 @@ export const TokenScreen: FC = () => {
           <BalanceTitle>Your balance</BalanceTitle>
           <InlineBalanceAndSymbol>
             <CopyToClipboard text={balance}>
-              <BalanceAmount>{balance}</BalanceAmount>
+              <BalanceAmount data-testid="tokenBalance">
+                {balance}
+              </BalanceAmount>
             </CopyToClipboard>
             <BalanceSymbol>{symbol}</BalanceSymbol>
           </InlineBalanceAndSymbol>
