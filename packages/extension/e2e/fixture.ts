@@ -1,3 +1,5 @@
+import "isomorphic-fetch"
+
 import path from "path"
 
 import { test as base, chromium, firefox, webkit } from "@playwright/test"
