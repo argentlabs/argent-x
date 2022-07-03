@@ -1,7 +1,15 @@
-import useSWRImmutable from "swr/immutable"
+import { useEffect, useState } from "react"
 
 import { getSeedPhrase } from "../../services/backgroundAccounts"
 
-export const useSeedPhrase = () =>
-  // always use useSWRImmutable and not useSWR otherwise the seedphrase will get cached unencrypted in localstorage
-  useSWRImmutable("seedPhrase", getSeedPhrase).data
+export const useSeedPhrase = () => {
+  const [seedPhrase, setSeedPhrase] = useState<string>()
+  useEffect(() => {
+    ;(async () => {
+      const seedPhrase = await getSeedPhrase()
+      setSeedPhrase(seedPhrase)
+    })()
+  }, [])
+
+  return seedPhrase
+}
