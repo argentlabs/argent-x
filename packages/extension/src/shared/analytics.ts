@@ -1,8 +1,8 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
 
-const SEGMENT_TRACK_URL = "https://eo2ii7iriq8p1xx.m.pipedream.net/track"
-const SEGMENT_PAGE_URL = "https://eo2ii7iriq8p1xx.m.pipedream.net/page"
+const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
+const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
 // dont use destructuring here
 const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
