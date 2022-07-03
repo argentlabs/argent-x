@@ -1,8 +1,8 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
 
-const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
-const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
+const SEGMENT_TRACK_URL = "https://eo2ii7iriq8p1xx.m.pipedream.net/track"
+const SEGMENT_PAGE_URL = "https://eo2ii7iriq8p1xx.m.pipedream.net/page"
 
 // dont use destructuring here
 const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
@@ -11,6 +11,7 @@ const VERSION = process.env.VERSION
 export type AddFundsServices = "banxa" | "layerswap" | "starkgate"
 
 export interface Events {
+  sessionStart: undefined
   openedExtensionToday: undefined
   unlockedExtensionToday: undefined
   voyagerCalled: {
@@ -130,6 +131,7 @@ export function getAnalytics(
         properties: data,
         timestamp: new Date().toISOString(),
       }
+
       try {
         return await fetch(SEGMENT_TRACK_URL, {
           method: "POST",
@@ -150,6 +152,10 @@ export function getAnalytics(
         properties: data,
         timestamp: new Date().toISOString(),
       }
+      console.log(
+        "🚀 ~ file: analytics.ts ~ line 150 ~ page: ~ payload",
+        payload,
+      )
       try {
         return await fetch(SEGMENT_PAGE_URL, {
           method: "POST",
