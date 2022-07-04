@@ -1,6 +1,7 @@
 import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 
+import { isPrivacySettingsEnabled } from "../../../shared/settings"
 import { Token } from "../../../shared/token"
 import {
   ARGENT_API_ENABLED,
@@ -18,14 +19,18 @@ import { useBackgroundSettingsValue } from "../../services/useBackgroundSettings
 import { useIsMainnet } from "../networks/useNetworks"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
 
-/** @returns true if app is on mainnet and the user has enabled Argent services */
+/** @returns true if API is enabled, app is on mainnet and the user has enabled Argent services */
 
 export const useCurrencyDisplayEnabled = () => {
   const isMainnet = useIsMainnet()
   const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
     "privacyUseArgentServices",
   )
-  return isMainnet && privacyUseArgentServicesEnabled
+  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
+  if (!isPrivacySettingsEnabled) {
+    return ARGENT_API_ENABLED && isMainnet
+  }
+  return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServicesEnabled
 }
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
