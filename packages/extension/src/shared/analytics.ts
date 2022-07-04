@@ -152,10 +152,6 @@ export function getAnalytics(
         properties: data,
         timestamp: new Date().toISOString(),
       }
-      console.log(
-        "🚀 ~ file: analytics.ts ~ line 150 ~ page: ~ payload",
-        payload,
-      )
       try {
         return await fetch(SEGMENT_PAGE_URL, {
           method: "POST",
