@@ -31,5 +31,5 @@ export async function newWallet(page: Page) {
     await page.click("I understand")
   }
 
-  expect(await (await deployingText).isVisible()).toBe(true)
+  expect((await deployingText).isVisible()).resolves.toBe(true)
 }
