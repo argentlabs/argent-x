@@ -35,9 +35,7 @@ export const UpgradeScreen: FC = () => {
       confirmButtonText="Upgrade"
       rejectButtonText="Cancel"
       onSubmit={async () => {
-        useAppState.setState({ isLoading: true })
         await upgradeAccount(selectedAccount)
-        useAppState.setState({ isLoading: false })
         navigate(routes.accountTokens())
       }}
       onReject={() => {

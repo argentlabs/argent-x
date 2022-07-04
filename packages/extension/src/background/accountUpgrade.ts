@@ -1,4 +1,4 @@
-import { stark } from "starknet/src"
+import { stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
 import { BaseWalletAccount } from "../shared/wallet.model"
@@ -11,12 +11,6 @@ export interface IUpgradeAccount {
   wallet: Wallet
   actionQueue: Queue<ActionItem>
 }
-
-/* TODO: remove
-contract class hashes
-0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328
-0x2dd6540d2f692de21cea9e842672f6fdf70063dd801ccd8d354ede601156d58
-*/
 
 export const upgradeAccount = async ({
   account,

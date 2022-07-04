@@ -121,13 +121,13 @@ To test changes made to the `extension` package you need to load the local unpac
 
 Some tests require [`starknet-devnet`](https://github.com/Shard-Labs/starknet-devnet) to be available at http://127.0.0.1:5050/. If tests are run without then you may see errors including `connect ECONNREFUSED 127.0.0.1:5050`.
 
-For convenience this service can be started with Docker, note if successful there will be no message displayed;
+### Run devnet locally
 
-- For ARM computers (e.g. Mac computers with Apple silicon)
+For convenience this service can be started with [Docker desktop](https://www.docker.com/get-started/) running;
 
-  ```bash
-  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
-  ```
+```bash
+docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
+```
 
 - Otherwise
 
@@ -141,6 +141,10 @@ For convenience this service can be started with Docker, note if successful ther
 yarn test      # run unit tests for all packages
 yarn test:e2e  # run end-to-end tests for all packages
 ```
+
+### Tools to help with testing
+
+See also [/docs/tools-for-local-testing.md](/docs/tools-for-local-testing.md)
 
 ## ✏️ Contributing
 
