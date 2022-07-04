@@ -3822,12 +3822,12 @@
     "@octokit/openapi-types" "^11.2.0"
 
 "@playwright/test@^1.23.0":
-  version "1.23.0"
-  resolved "https://registry.npmjs.org/@playwright/test/-/test-1.23.0.tgz#5d07ace37e1598a4a1a785b07856620b4e26fc43"
-  integrity sha512-RPWI8AHBVBiDyfTuxi1BhOaY3yaVy3S5ZsGKkSGGeWpZtSgN4SerInCYvgh9+EunIAK4RJQo+bzupbAn5pVqHQ==
+  version "1.23.1"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.23.1.tgz#209cceb81c579d1cd2835f15c2bb3a8345103d60"
+  integrity sha512-dKplLPSYPZgnsBk1xxOophhpx3ZVg8DveoNJgLPe096lDCfmaIIreLsYF+4hqzy3PG61IP+aEnG5VAOjC3bhbA==
   dependencies:
     "@types/node" "*"
-    playwright-core "1.23.0"
+    playwright-core "1.23.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
   version "0.5.7"
@@ -13569,10 +13569,10 @@ pkg-dir@^5.0.0:
   dependencies:
     find-up "^5.0.0"
 
-playwright-core@1.23.0:
-  version "1.23.0"
-  resolved "https://registry.npmjs.org/playwright-core/-/playwright-core-1.23.0.tgz#51e24121b3a5bbe759d79738d8eff7a63156293c"
-  integrity sha512-Zzhyr5RZGoJ1ek2sgfJCt2076kdOg8hnNwFBqAYeLySiutXyxSQk93vZ5gbnFiWV1sHvueCcwla9n35acUTxtA==
+playwright-core@1.23.1:
+  version "1.23.1"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.23.1.tgz#af02bd7568af1017e477433b1b003ba84e1eb312"
+  integrity sha512-9CXsE0gawph4KXl6oUaa0ehHRySZjHvly4TybcBXDvzK3N3o6L/eZ8Q6iVWUiMn0LLS5bRFxo1qEtOETlYJxjw==
 
 pnp-webpack-plugin@1.6.4:
   version "1.6.4"
