@@ -43,6 +43,7 @@ export const usePageTracking = <T extends keyof Pages>(
 interface ActiveStoreValues {
   lastOpened: number
   lastUnlocked: number
+  lastSession: number
 }
 interface ActiveStore extends ActiveStoreValues {
   update: (key: keyof ActiveStoreValues) => void
@@ -52,6 +53,7 @@ const activeStore = create<ActiveStore>(
     (set) => ({
       lastOpened: 0, // defaults to tracking once when no value set yet
       lastUnlocked: 0, // defaults to tracking once when no value set yet
+      lastSession: 0, // defaults to tracking once when no value set yet
       update: (key) => set((state) => ({ ...state, [key]: Date.now() })),
     }),
     {
@@ -61,6 +63,7 @@ const activeStore = create<ActiveStore>(
 )
 
 const N_24_HOURS = 24 * 60 * 60 * 1000
+const N_5_MINUTES = 5 * 60 * 1000
 
 function openedExtensionTodayTracking() {
   try {
@@ -72,19 +75,26 @@ function openedExtensionTodayTracking() {
     // nothing of this should be blocking
   }
 }
-export const useOpenedExtensionTodayTracking = () => {
-  useEffect(() => {
-    openedExtensionTodayTracking()
-  }, [])
-}
 
 export function unlockedExtensionTodayTracking() {
   try {
     // track once every 24h
-    if (Date.now() - activeStore.getState().lastOpened > N_24_HOURS) {
+    if (Date.now() - activeStore.getState().lastUnlocked > N_24_HOURS) {
       activeStore.getState().update("lastUnlocked")
       analytics.track("unlockedExtensionToday")
     }
+  } catch (e) {
+    // nothing of this should be blocking
+  }
+}
+
+export function sessionStartTracking() {
+  try {
+    // track once every 5 minutes
+    if (Date.now() - activeStore.getState().lastSession > N_5_MINUTES) {
+      analytics.track("sessionStart")
+    }
+    activeStore.getState().update("lastSession")
   } catch (e) {
     // nothing of this should be blocking
   }
@@ -95,4 +105,11 @@ export function trackAddFundsService(
   networkId: string,
 ) {
   return () => analytics.track("addFunds", { service, networkId })
+}
+
+export const useTracking = () => {
+  useEffect(() => {
+    sessionStartTracking()
+    openedExtensionTodayTracking()
+  }, [])
 }

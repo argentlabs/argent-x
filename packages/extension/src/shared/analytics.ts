@@ -11,6 +11,7 @@ const VERSION = process.env.VERSION
 export type AddFundsServices = "banxa" | "layerswap" | "starkgate"
 
 export interface Events {
+  sessionStart: undefined
   openedExtensionToday: undefined
   unlockedExtensionToday: undefined
   voyagerCalled: {
@@ -130,6 +131,7 @@ export function getAnalytics(
         properties: data,
         timestamp: new Date().toISOString(),
       }
+
       try {
         return await fetch(SEGMENT_TRACK_URL, {
           method: "POST",
