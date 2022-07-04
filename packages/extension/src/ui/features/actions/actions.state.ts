@@ -1,5 +1,4 @@
 import { useEffect } from "react"
-import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
 import { ExtensionActionItem } from "../../../shared/actionQueue"
@@ -13,12 +12,11 @@ interface State {
 export const useActions = create<State>(() => ({ actions: [] }))
 
 export const useActionsSubscription = () => {
-  const { data: actions = [] } = useSWRImmutable("actions", getActions, {
-    suspense: true,
-  })
-
   useEffect(() => {
-    useActions.setState({ actions })
+    ;(async () => {
+      const actions = await getActions()
+      useActions.setState({ actions })
+    })()
 
     const subscription = messageStream.subscribe(([message]) => {
       if (message.type === "ACTIONS_QUEUE_UPDATE") {

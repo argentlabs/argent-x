@@ -2,7 +2,6 @@ import { BigNumber } from "ethers"
 import { useEffect, useMemo } from "react"
 import { number } from "starknet"
 import useSWR from "swr"
-import useSWRImmutable from "swr/immutable"
 import create from "zustand"
 
 import { messageStream } from "../../../shared/messages"
@@ -82,14 +81,11 @@ export const useTokens = create<State>((set, get) => ({
 }))
 
 export const useTokensSubscription = () => {
-  const { data: tokens = [] } = useSWRImmutable("tokens", getTokens, {
-    suspense: true,
-  })
-
   useEffect(() => {
-    useTokens.setState({
-      tokens: tokens.map(mapTokenToTokenDetails),
-    })
+    ;(async () => {
+      const tokens = await getTokens()
+      useTokens.setState({ tokens: tokens.map(mapTokenToTokenDetails) })
+    })()
 
     const subscription = messageStream.subscribe(([message]) => {
       if (message.type === "UPDATE_TOKENS") {

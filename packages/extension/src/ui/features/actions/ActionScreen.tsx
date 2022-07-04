@@ -147,6 +147,9 @@ export const ActionScreen: FC = () => {
               "SIGNATURE_SUCCESS",
               ({ data }) => data.actionHash === action.meta.hash,
             )
+            await analytics.track("signedMessage", {
+              networkId: account?.networkId || "unknown",
+            })
             if (isPopup && isLastAction) {
               window.close()
             }

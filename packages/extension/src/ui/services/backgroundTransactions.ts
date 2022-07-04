@@ -35,8 +35,6 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
     waitForMessage("ESTIMATE_TRANSACTION_FEE_REJ"),
   ])
 
-  console.log(response)
-
   if ("error" in response) {
     throw response.error
   }
