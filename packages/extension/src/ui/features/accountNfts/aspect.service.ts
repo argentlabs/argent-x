@@ -11,7 +11,7 @@ export const fetchAspectNfts = async (
 ): Promise<AspectNft[]> => {
   if (account.networkId === "goerli-alpha") {
     const params = new URLSearchParams({ owner_address: account.address })
-    const response = await fetch(join(url, `?${params}`))
+    const response = await fetch(join(url, `?${params}`, "&limit=50"))
     const data = await response.json()
 
     if (data.next_url) {
