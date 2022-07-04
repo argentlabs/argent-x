@@ -24,12 +24,9 @@ export const ResetScreen: FC = () => {
       }}
     >
       <P>
-        If you forgot your password, your only option for recovery is to reset
-        the extension and load your previously downloaded backup.
-      </P>
-      <P style={{ marginTop: 32 }}>
-        The backup downloads automatically each time you add an account to your
-        wallet.
+        If you reset your wallet, the only way to recover it is with your
+        12-word seed phrase. Make sure to back it up from the Argent X settings
+        and save it somewhere securely before resetting the extension
       </P>
     </ConfirmScreen>
   )
