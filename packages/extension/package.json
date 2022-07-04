@@ -36,7 +36,7 @@
     "typescript": "^4.6.3",
     "typescript-styled-plugin": "^0.18.2",
     "url-loader": "^4.1.1",
-    "vitest": "^0.16.0",
+    "vitest": "^0.17.0",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
     "webpack-cli": "^4.9.1"
