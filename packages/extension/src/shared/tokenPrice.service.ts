@@ -38,10 +38,10 @@ export interface ApiTokenDataResponse {
 /** shape of individual entity in the /tokens/prices endpoint */
 export interface ApiPriceDetails {
   pricingId: number
-  ethValue: number
-  ccyValue: number
-  ethDayChange: number
-  ccyDayChange: number
+  ethValue: string
+  ccyValue: string
+  ethDayChange: string
+  ccyDayChange: string
 }
 
 export interface ApiPriceDataResponse {
