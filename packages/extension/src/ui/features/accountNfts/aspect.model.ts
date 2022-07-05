@@ -11,5 +11,5 @@ export interface AspectNft {
 }
 
 interface AspectNftOwner {
-  owner_address: string
+  account_address: string
 }
