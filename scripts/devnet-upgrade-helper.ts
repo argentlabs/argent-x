@@ -1,7 +1,7 @@
+import { declareUpgradeContract } from "@argent-x/extension/e2e/apis/declareUpgradeContract"
+import { sendDevnetEthToAccount } from "@argent-x/extension/e2e/apis/sendDevnetEthToAccount"
 import { validateAndParseAddress } from "starknet"
 
-import { declareUpgradeContract } from "../packages/extension/e2e/apis/declareUpgradeContract"
-import { sendDevnetEthToAccount } from "../packages/extension/e2e/apis/sendDevnetEthToAccount"
 import prompt from "./utils/prompt"
 
 ;(async () => {
