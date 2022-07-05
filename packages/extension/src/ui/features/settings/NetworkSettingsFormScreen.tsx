@@ -133,9 +133,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             disabled={defaultNetwork.readonly}
           />
           {/* collapseable area with some extra inputs */}
-          <ExtendableControl
-            {...makeClickable(() => setExpanded((x) => !x), 99)}
-          >
+          <ExtendableControl {...makeClickable(() => setExpanded((x) => !x))}>
             <IconButton size={18}>
               <ArrowBackIosNewIcon
                 style={{

@@ -276,7 +276,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
           <FieldError justify="space-between">
             Transaction failure predicted
             <ExtendableControl
-              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), 100)}
+              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+                label: "Show error details",
+              })}
             >
               <DetailsText>Details</DetailsText>
               <KeyboardArrowDownRounded

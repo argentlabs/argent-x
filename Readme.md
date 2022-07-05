@@ -22,6 +22,8 @@
 - [🚀 Install from sources](#-install-from-sources)
 - [👩🏾‍💻 Development](#-development)
 - [🧪 Testing](#-testing)
+  - [Setup](#setup)
+  - [Run tests](#run-tests)
 - [✏️ Contributing](#️-contributing)
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
@@ -124,13 +126,13 @@ For convenience this service can be started with Docker, note if successful ther
 - For ARM computers (e.g. Mac computers with Apple silicon)
 
   ```bash
-  docker run -p 5050:5050 shardlabs/starknet-devnet:latest-arm
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
   ```
 
 - Otherwise
 
   ```bash
-  docker run -p 5050:5050 shardlabs/starknet-devnet:latest
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
   ```
 
 ### Run tests

@@ -11,7 +11,7 @@ jobs:
 
     services:
       devnet:
-        image: shardlabs/starknet-devnet
+        image: janek2601/starknet-devnet-patched
         ports:
           - 5050:5050
 
@@ -36,7 +36,6 @@ jobs:
       - name: Run tests
         run: yarn test
 
-      - run: sudo apt-get install xvfb
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
 

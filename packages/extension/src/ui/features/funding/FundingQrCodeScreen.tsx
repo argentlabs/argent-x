@@ -33,7 +33,7 @@ export const FundingQrCodeScreen: FC = () => {
           <Container>
             <QrCode size={220} data={account?.address} />
             <AccountName>{getAccountName(account, accountNames)}</AccountName>
-            <AccountAddress>
+            <AccountAddress aria-label="Full account address">
               {formatFullAddress(account.address)}
             </AccountAddress>
           </Container>

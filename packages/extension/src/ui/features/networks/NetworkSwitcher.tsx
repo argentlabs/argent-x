@@ -127,7 +127,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>
-      <Network selected>
+      <Network selected role="button" aria-label="Selected network">
         <NetworkName>{currentNetwork.name}</NetworkName>
         <NetworkStatusIndicator
           color={mapNetworkStatusToColor(currentNetworkStatus)}
