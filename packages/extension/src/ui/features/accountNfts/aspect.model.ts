@@ -5,7 +5,11 @@ export interface AspectNft {
   description?: string
   image_uri?: string
   image_url_copy?: string
-  animation_url?: string
-  external_url?: string
-  owner_address?: string
+  animation_uri?: string
+  external_uri?: string
+  owner?: AspectNftOwner
+}
+
+interface AspectNftOwner {
+  owner_address: string
 }
