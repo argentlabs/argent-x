@@ -126,7 +126,7 @@ For convenience this service can be started with Docker, note if successful ther
 - For ARM computers (e.g. Mac computers with Apple silicon)
 
   ```bash
-  docker run -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
   ```
 
 - Otherwise
