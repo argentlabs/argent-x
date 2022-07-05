@@ -132,7 +132,7 @@ For convenience this service can be started with Docker, note if successful ther
 - Otherwise
 
   ```bash
-  docker run -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
   ```
 
 ### Run tests
