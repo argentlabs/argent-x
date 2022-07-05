@@ -3,8 +3,8 @@ export interface AspectNft {
   token_id: string
   name?: string
   description?: string
-  image_url?: string
-  copy_image_url?: string
+  image_uri?: string
+  image_url_copy?: string
   animation_url?: string
   external_url?: string
   owner_address?: string
