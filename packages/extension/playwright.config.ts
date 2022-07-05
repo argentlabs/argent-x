@@ -4,6 +4,10 @@ import { devices } from "@playwright/test"
 
 const config: PlaywrightTestConfig = {
   timeout: 5 * 60e3, // 5 minutes
+  reportSlowTests: {
+    threshold: 1 * 60e3, // 1 minutes
+    max: 5,
+  },
   forbidOnly: !!process.env.CI,
   testDir: "./e2e",
   retries: process.env.CI ? 2 : 0,
