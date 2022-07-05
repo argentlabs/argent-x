@@ -1,4 +1,9 @@
+import CurrencyConversionNumber from "bignumber.js"
+import { BigNumber } from "ethers"
+import { toBN } from "starknet/dist/utils/number"
+
 import {
+  isNumeric,
   prettifyCurrencyNumber,
   prettifyNumber,
   prettifyTokenNumber,
@@ -59,6 +64,31 @@ describe("prettifyNumber()", () => {
       // @ts-ignore
       expect(prettifyNumber()).toBeNull()
       expect(prettifyNumber("foo")).toBeNull()
+    })
+  })
+})
+
+describe("isNumeric()", () => {
+  describe("when valid", () => {
+    test("should return true", () => {
+      expect(isNumeric(0)).toBeTruthy()
+      expect(isNumeric("123")).toBeTruthy()
+      expect(isNumeric(BigNumber.from(123))).toBeTruthy()
+      expect(isNumeric(new CurrencyConversionNumber("1.23"))).toBeTruthy()
+      expect(isNumeric(toBN(123))).toBeTruthy()
+    })
+  })
+  describe("when invalid", () => {
+    test("should return false", () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expect(isNumeric()).toBeFalsy()
+      expect(isNumeric("")).toBeFalsy()
+      expect(isNumeric({})).toBeFalsy()
+      expect(isNumeric(null)).toBeFalsy()
+      expect(isNumeric(true)).toBeFalsy()
+      expect(isNumeric(false)).toBeFalsy()
+      expect(isNumeric(NaN)).toBeFalsy()
     })
   })
 })
