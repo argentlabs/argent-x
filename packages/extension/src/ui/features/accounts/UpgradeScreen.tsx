@@ -2,7 +2,6 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { useAppState } from "../../app.state"
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"

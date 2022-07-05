@@ -125,9 +125,11 @@ Some tests require [`starknet-devnet`](https://github.com/Shard-Labs/starknet-de
 
 For convenience this service can be started with [Docker desktop](https://www.docker.com/get-started/) running;
 
-```bash
-docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
-```
+- For ARM computers (e.g. Mac computers with Apple silicon)
+
+  ```bash
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
+  ```
 
 - Otherwise
 

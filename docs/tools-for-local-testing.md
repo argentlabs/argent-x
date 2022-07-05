@@ -1,18 +1,10 @@
-# 🧪 Tools for local testing only
+# 🧪 Tools for local testing
 
 ## ⬆️ Contract upgrades
 
-To help test contract upgrades there is a simple script which will declare an upgradable contract to a locally running devnet and allow you to transfer funds to a local wallet.
+To help test contract upgrades there is a simple script which will declare an upgradable contract on the locally running devnet and allow you to transfer funds to a local wallet.
 
-- Make sure you have devnet running locally (see above)
-
-  ```bash
-  # For ARM computers (e.g. Mac computers with Apple silicon)
-  yarn devnet:start:arm
-
-  # otherwise
-  yarn devnet:start
-  ```
+- Make sure you have devnet running locally (see [Readme](../Readme.md#setup))
 
 - Start the tool and declare the contract (make note of the contract class hash for later)
 
