@@ -1,13 +1,10 @@
-import prompt from "prompt"
 import { validateAndParseAddress } from "starknet"
 
 import { declareUpgradeContract } from "../packages/extension/e2e/apis/declareUpgradeContract"
 import { sendDevnetEthToAccount } from "../packages/extension/e2e/apis/sendDevnetEthToAccount"
+import prompt from "./utils/prompt"
 
 ;(async () => {
-  /** clear default 'prompt' message */
-  prompt.message = ""
-
   console.log("Declaring upgrade contract...")
 
   const classHash = await declareUpgradeContract()
@@ -26,35 +23,19 @@ import { sendDevnetEthToAccount } from "../packages/extension/e2e/apis/sendDevne
     previousAddress &&
       previousAddress.length &&
       console.log(`(Leave empty to use ${previousAddress}`)
+    const address = ((await prompt("Address: ")) as string) || previousAddress
+    let addressIsValid
     try {
-      const result = await prompt.get([
-        {
-          name: "address",
-          description: "Address",
-          type: "string",
-        },
-      ])
-      const address: string = (result.address as string) || previousAddress
-      let addressIsValid
-      try {
-        addressIsValid = address && validateAndParseAddress(address)
-      } catch (e) {
-        // ignore validateAndParseAddress error
-      }
-      if (addressIsValid) {
-        previousAddress = address
-        console.log(`Transferring Ξ1 to ${address}`)
-        await sendDevnetEthToAccount(address)
-      } else {
-        console.log(`"${address}" is not valid wallet address`)
-      }
+      addressIsValid = address && validateAndParseAddress(address)
     } catch (e) {
-      if (e instanceof Error && e.message === "canceled") {
-        // consume 'cancel' error from 'prompt', just cleanly stop
-        keepAsking = false
-      } else {
-        throw e
-      }
+      // ignore validateAndParseAddress error
+    }
+    if (addressIsValid) {
+      previousAddress = address
+      console.log(`Transferring Ξ1 to ${address}`)
+      await sendDevnetEthToAccount(address)
+    } else {
+      console.log(`"${address}" is not valid wallet address`)
     }
   }
 })()
