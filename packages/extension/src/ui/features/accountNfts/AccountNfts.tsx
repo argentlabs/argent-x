@@ -115,7 +115,7 @@ const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
     errorRetryInterval: 30e3 /* 30 seconds */,
   })
 
-  return <ErrorBoundaryFallback title="Seems like Play Oasis API is down..." />
+  return <ErrorBoundaryFallback title="Seems like Aspect API is down..." />
 }
 
 export const AccountNfts: FC<AccountNftsProps> = ({ account }) => {
