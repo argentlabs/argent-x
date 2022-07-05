@@ -12,6 +12,7 @@ describe("useObjectStorage()", () => {
       "ui-test",
       chromeStorageMock,
     )
+
     function Component() {
       const data = useObjectStorage(store)
       return (
@@ -28,10 +29,9 @@ describe("useObjectStorage()", () => {
       )
     }
     render(<Component />)
+
     await screen.findByText("Hello World!")
-    // Change to disabled
     fireEvent.click(screen.getByText("change value"))
-    // Should reset the data and not call fetcher() again
     await screen.findByText("Bye World!")
   })
 })
