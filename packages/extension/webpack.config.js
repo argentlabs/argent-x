@@ -88,7 +88,13 @@ module.exports = {
     }),
 
     ...(!isProd // eslint should run before the build starts
-      ? [new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true })]
+      ? [
+          new ESLintPlugin({
+            extensions: ["ts", "tsx"],
+            fix: true,
+            threads: true,
+          }),
+        ]
       : []),
 
     new ForkTsCheckerWebpackPlugin(), // does the type checking in a separate process (non-blocking in dev) as esbuild is skipping type checking
