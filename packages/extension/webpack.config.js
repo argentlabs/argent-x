@@ -87,22 +87,19 @@ module.exports = {
       React: "react",
     }),
 
-    ...(!isProd // eslint should run before the build starts
-      ? [
-          new ESLintPlugin({
-            extensions: ["ts", "tsx"],
-            fix: true,
-            threads: true,
-          }),
-        ]
-      : []),
+    !isProd && // eslint should run before the build starts
+      new ESLintPlugin({
+        extensions: ["ts", "tsx"],
+        fix: true,
+        threads: true,
+      }),
 
     new ForkTsCheckerWebpackPlugin(), // does the type checking in a separate process (non-blocking in dev) as esbuild is skipping type checking
     new Dotenv({
       systemvars: true,
       safe: safeEnvVars,
     }),
-  ],
+  ].filter(Boolean),
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     fallback: { buffer: require.resolve("buffer/") },
