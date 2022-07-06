@@ -1,0 +1,17 @@
+{
+  "assessment": "warn",
+  "reason": "account_upgrade_to_unknown_implementation",
+  "reviews": [
+    {
+      "assessment": "warn",
+      "assessmentReason": "account_upgrade_to_unknown_implementation",
+      "assessmentDetails": {
+        "contract_address": "0x04a9b8d3ee98986dd9d22e0628c137d43d84d6903ee99c4c5cf1126a1802635c"
+      },
+      "activity": {
+        "implementation": "1295797722517184046140297379174439418430912202486135286006052012786363755864",
+        "type": "account-upgrade"
+      }
+    }
+  ]
+}

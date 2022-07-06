@@ -1,10 +1,10 @@
 {
   "assessment": "warn",
-  "reason": "recipientIsTokenAddress",
+  "reason": "recipient_is_token_address",
   "reviews": [
     {
       "assessment": "warn",
-      "assessmentReason": "recipientIsTokenAddress",
+      "assessmentReason": "recipient_is_token_address",
       "assessmentDetails": {
         "contract_address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
       },
@@ -19,7 +19,7 @@
             "type": "ERC20"
           },
           "amount": "1000000000000000000",
-          "usd": 1211.07,
+          "usd": 1142.25,
           "slippage": "equal"
         },
         "recipient": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",

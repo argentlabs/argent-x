@@ -2,7 +2,10 @@ import { isArray } from "lodash-es"
 import { FC, useMemo } from "react"
 import { Call } from "starknet"
 
-import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
+import {
+  ApiTransactionReviewResponse,
+  getDisplayWarnAndReasonForTransactionReview,
+} from "../../../../shared/transactionReview.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
 import { TokenDetails } from "../../accountTokens/tokens.state"
 import { TransactionBanner } from "./TransactionBanner"
@@ -25,18 +28,15 @@ export const TransactionsList: FC<ITransactionsList> = ({
     () => (isArray(transactions) ? transactions : [transactions]),
     [transactions],
   )
-  const transactionReviewWarn = transactionReview?.assessment === "warn"
-  const transactionReviewWarnAssessment =
-    transactionReview?.reason === "recipientIsTokenAddress"
-      ? "You are sending tokens to their own address. This is likely to burn them."
-      : "This transaction has been flagged as dangerous. We recommend you reject this transaction unless you are sure."
+  const { warn, reason } =
+    getDisplayWarnAndReasonForTransactionReview(transactionReview)
   return (
     <>
-      {transactionReviewWarn && (
+      {warn && (
         <TransactionBanner
           variant={transactionReview?.assessment}
           icon={WarningIcon}
-          message={transactionReviewWarnAssessment}
+          message={reason}
         />
       )}
       {transactionsArray.map((transaction, index) => (
