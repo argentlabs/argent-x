@@ -3,6 +3,7 @@ import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { compareTransactions } from "../../../background/transactions/store"
 import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
@@ -89,10 +90,23 @@ export const TransactionDetail: FC = () => {
 
   const { transactions } = useAccountTransactions(account)
 
-  const transaction = transactions.find((tx) => tx.hash === txHash)
-
-  if (!transaction || !account) {
+  if (!account) {
     return <Navigate to={routes.accounts()} />
+  } else if (!txHash) {
+    return <Navigate to={routes.accountTokens()} />
+  }
+
+  const transaction = transactions.find((tx) =>
+    compareTransactions(tx, {
+      hash: txHash,
+      account: {
+        networkId: network.id,
+      },
+    }),
+  )
+
+  if (!transaction) {
+    return <Navigate to={routes.accountTokens()} />
   }
 
   const isRejected = transaction.status === "REJECTED"

@@ -1,4 +1,5 @@
 import { Transaction } from "../../shared/transactions"
+import { compareTransactions } from "./store"
 
 export function getTransactionsStatusUpdate(
   oldTransactions: Transaction[],
@@ -6,8 +7,8 @@ export function getTransactionsStatusUpdate(
 ): Transaction[] {
   return newTransactions.filter(
     (newTransaction) =>
-      oldTransactions.find(
-        (oldTransaction) => oldTransaction.hash === newTransaction.hash,
+      oldTransactions.find((oldTransaction) =>
+        compareTransactions(oldTransaction, newTransaction),
       )?.status !== newTransaction.status,
   )
 }

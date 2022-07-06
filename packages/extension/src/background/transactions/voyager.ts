@@ -5,6 +5,7 @@ import { Transaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { analytics } from "../analytics"
 import { fetchWithTimeout } from "../utils/fetchWithTimeout"
+import { compareTransactions } from "./store"
 import { mapVoyagerTransactionToTransaction } from "./transformers"
 
 export interface VoyagerTransaction {
@@ -51,13 +52,21 @@ export async function getTransactionHistory(
         account.address,
         account.network,
       )
-      return voyagerTransactions.map((transaction) =>
+      const x = voyagerTransactions.map((transaction) =>
         mapVoyagerTransactionToTransaction(
           transaction,
           account,
-          metadataTransactions.find((tx) => tx.hash === transaction.hash)?.meta,
+          metadataTransactions.find((tx) =>
+            compareTransactions(tx, {
+              hash: transaction.hash,
+              account: { networkId: account.networkId },
+            }),
+          )?.meta,
         ),
       )
+
+      console.log("x", x)
+      return x
     }),
   )
   return transactionsPerAccount.flat()

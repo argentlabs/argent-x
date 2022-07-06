@@ -8,8 +8,14 @@ export interface TransactionMeta {
   subTitle?: string
 }
 
-export interface TransactionRequest {
+export interface TransactionBase {
   hash: string
+  account: {
+    networkId: string
+  }
+}
+
+export interface TransactionRequest extends TransactionBase {
   account: WalletAccount
   meta?: TransactionMeta
 }
