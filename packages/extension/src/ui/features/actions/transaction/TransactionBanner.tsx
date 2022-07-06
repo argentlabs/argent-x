@@ -41,7 +41,7 @@ const IconContainer = styled.div`
 export interface ITransactionBanner {
   variant: Variant
   icon: FC
-  message: string
+  message?: string
 }
 
 export const TransactionBanner: FC<ITransactionBanner> = ({
