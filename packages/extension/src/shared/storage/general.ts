@@ -29,10 +29,15 @@ export interface IStorage<T extends Record<string, any> = Record<string, any>>
   ): () => void
 }
 
-export type Implementations = Record<
-  browser.storage.AreaName,
-  browser.storage.StorageArea
-> & { onChange: browser.storage.StorageChangedEvent }
+type OnChange = Pick<
+  browser.storage.StorageChangedEvent,
+  "addListener" | "removeListener"
+>
+type StorageArea = Pick<browser.storage.StorageArea, "get" | "set" | "remove">
+
+export type Implementations = Record<browser.storage.AreaName, StorageArea> & {
+  onChange: OnChange
+}
 export function getDefaultImplementations() {
   return merge(browser.storage, {
     onChange: browser.storage.onChanged, // somehow this is not available in the object
@@ -65,7 +70,7 @@ export function getOptionsWithDefaults<T extends StorageOptionsOrNameSpace>(
   }
 }
 export class Storage<T> implements IStorage<T> {
-  private storageImplementation: browser.storage.StorageArea
+  private storageImplementation: StorageArea
   public namespace: string
   public areaName: browser.storage.AreaName
 
