@@ -2,6 +2,8 @@ import { isFunction } from "lodash-es"
 import mitt, { WildcardHandler } from "mitt"
 import chrome from "webextension-polyfill"
 
+import { Implementations, OnChange, StorageArea } from "../implementations"
+
 type Events = Record<
   chrome.storage.AreaName,
   Record<string, chrome.storage.StorageChange>
@@ -19,46 +21,10 @@ function getChangeMap(
   return changeMap
 }
 
-class TestStore implements chrome.storage.StorageArea {
+class TestStore implements StorageArea {
   private store = new Map()
 
   constructor(private readonly area: chrome.storage.AreaName) {}
-
-  getBytesInUse(callback: (bytesInUse: number) => void): void
-  getBytesInUse(keys?: string | string[] | null | undefined): Promise<number>
-  getBytesInUse(
-    keys: string | string[] | null,
-    callback: (bytesInUse: number) => void,
-  ): void
-  getBytesInUse(keys?: unknown, callback?: unknown): void | Promise<number> {
-    if (isFunction(keys)) {
-      callback = keys as (bytesInUse: number) => void
-      keys = undefined
-    }
-    if (isFunction(callback)) {
-      return callback(0)
-    }
-    return Promise.resolve(0)
-  }
-
-  clear(): Promise<void>
-  clear(callback?: (() => void) | undefined): void
-  clear(callback?: unknown): void | Promise<void> {
-    emitter.emit(
-      this.area,
-      Object.fromEntries(
-        Array.from(this.store.entries()).map(([key]) => [
-          key,
-          getChangeMap(this.store.get(key), undefined),
-        ]),
-      ),
-    )
-    this.store.clear()
-    if (isFunction(callback)) {
-      return callback()
-    }
-    return Promise.resolve()
-  }
 
   remove(keys: string | string[]): Promise<void>
   remove(keys: string | string[], callback?: (() => void) | undefined): void
@@ -146,7 +112,7 @@ type Callback = (
   areaName: "sync" | "local" | "managed" | "session",
 ) => void
 const listenersSet = new Map<Callback, WildcardHandler<Events>>()
-const onStorageChange: chrome.storage.StorageChangedEvent = {
+const onStorageChange: OnChange = {
   addListener(callback) {
     const handler: WildcardHandler<Events> = (type, event) => {
       callback(event, type)
@@ -160,40 +126,9 @@ const onStorageChange: chrome.storage.StorageChangedEvent = {
       emitter.off("*", handler)
     }
   },
-  hasListener(callback) {
-    const result = listenersSet.has(callback)
-    if (isFunction(callback)) {
-      return callback(result)
-    }
-    return Promise.resolve(result)
-  },
-  hasListeners() {
-    return listenersSet.size > 0
-  },
-  getRules(callback?) {
-    if (isFunction(callback)) {
-      return callback([])
-    }
-    return Promise.resolve([])
-  },
-  addRules(rules, callback?) {
-    if (isFunction(callback)) {
-      return callback([])
-    }
-    return Promise.resolve([])
-  },
-  removeRules(rules, callback?) {
-    if (isFunction(callback)) {
-      return callback()
-    }
-    return Promise.resolve()
-  },
 }
 
-export const chromeStorageMock: Record<
-  chrome.storage.AreaName,
-  chrome.storage.StorageArea
-> & { onChange: chrome.storage.StorageChangedEvent } = {
+export const chromeStorageMock: Implementations = {
   local: new TestStore("local"),
   sync: new TestStore("sync"),
   managed: new TestStore("managed"),

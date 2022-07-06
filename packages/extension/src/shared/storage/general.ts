@@ -1,22 +1,12 @@
-import { merge } from "lodash-es"
 import browser from "webextension-polyfill"
 
-type AllowPromise<T> = T | Promise<T>
-type OptionalPropertiesOf<T extends object> = Exclude<
-  {
-    [K in keyof T]: T extends Record<K, T[K]> ? never : K
-  }[keyof T],
-  undefined
->
-type OnlyOptionalPropertiesOf<T extends object> = Required<
-  Pick<T, OptionalPropertiesOf<T>>
->
-
-export interface BaseStorage<T> {
-  defaults: T
-  namespace: string
-  areaName: browser.storage.AreaName
-}
+import {
+  Implementations,
+  StorageArea,
+  getDefaultImplementations,
+} from "./implementations"
+import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
+import { AllowPromise, BaseStorage } from "./types"
 
 export interface IStorage<T extends Record<string, any> = Record<string, any>>
   extends BaseStorage<T> {
@@ -29,46 +19,6 @@ export interface IStorage<T extends Record<string, any> = Record<string, any>>
   ): () => void
 }
 
-type OnChange = Pick<
-  browser.storage.StorageChangedEvent,
-  "addListener" | "removeListener"
->
-type StorageArea = Pick<browser.storage.StorageArea, "get" | "set" | "remove">
-
-export type Implementations = Record<browser.storage.AreaName, StorageArea> & {
-  onChange: OnChange
-}
-export function getDefaultImplementations() {
-  return merge(browser.storage, {
-    onChange: browser.storage.onChanged, // somehow this is not available in the object
-  })
-}
-
-export interface StorageOptions {
-  namespace: string
-  areaName?: browser.storage.AreaName
-}
-export type StorageOptionsOrNameSpace<
-  T extends StorageOptions = StorageOptions,
-> = string | T
-
-export function getOptionsWithDefaults<T extends StorageOptionsOrNameSpace>(
-  options: T,
-): Required<StorageOptions> {
-  const defaultOptions: OnlyOptionalPropertiesOf<StorageOptions> = {
-    areaName: "session",
-  }
-  if (typeof options === "string") {
-    return {
-      ...defaultOptions,
-      namespace: options,
-    }
-  }
-  return {
-    ...defaultOptions,
-    ...options,
-  }
-}
 export class Storage<T> implements IStorage<T> {
   private storageImplementation: StorageArea
   public namespace: string

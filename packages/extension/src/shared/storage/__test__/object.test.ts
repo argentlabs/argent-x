@@ -1,9 +1,9 @@
-import { ObjectStorage, ObjectStorage } from "../object"
-import { chromeStorageMock } from "./chrome-storage-mock"
+import { IObjectStorage, ObjectStorage } from "../object"
+import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("full storage flow with object", () => {
   const defaults = { foo: "bar" }
-  let store: ObjectStorage<{
+  let store: IObjectStorage<{
     foo: string
   }>
   beforeAll(() => {
@@ -52,6 +52,11 @@ describe("full storage flow with object and parsing", () => {
     await store.set({ foo: "baz" })
     const value = await store.get()
     expect(value).toEqual({ foo: "baz" })
+  })
+  test("should write using selector", async () => {
+    await store.set((value) => ({ ...value, baz: "foo" }))
+    const value = await store.get()
+    expect(value).toEqual({ foo: "baz", baz: "foo" })
   })
 })
 

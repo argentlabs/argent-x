@@ -1,17 +1,13 @@
-import { isObject, merge } from "lodash-es"
+import { isPlainObject, merge } from "lodash-es"
 
-import {
-  BaseStorage,
-  Implementations,
-  Storage,
-  StorageOptions,
-  StorageOptionsOrNameSpace,
-  getDefaultImplementations,
-} from "./general"
+import { Storage } from "./general"
+import { Implementations, getDefaultImplementations } from "./implementations"
+import { StorageOptions, StorageOptionsOrNameSpace } from "./options"
+import { BaseStorage } from "./types"
 
 type AllowPromise<T> = T | Promise<T>
 
-interface ObjectStorageOptions<T> extends StorageOptions {
+export interface ObjectStorageOptions<T> extends StorageOptions {
   serialize?: (value: T) => any
   deserialize?: (value: any) => T
   merge?: (oldValue: T, newValue: T) => T
@@ -19,13 +15,13 @@ interface ObjectStorageOptions<T> extends StorageOptions {
 
 type SetterFn<T> = (value: T) => Partial<T>
 
-export interface ObjectStorage<T> extends BaseStorage<T> {
+export interface IObjectStorage<T> extends BaseStorage<T> {
   get(): Promise<T>
   set(value: Partial<T> | SetterFn<T>): Promise<void>
   subscribe(callback: (value: T) => AllowPromise<void>): () => void
 }
 
-export class ObjectStorage<T> implements ObjectStorage<T> {
+export class ObjectStorage<T> implements IObjectStorage<T> {
   public namespace: string
   public areaName: chrome.storage.AreaName
 
@@ -41,12 +37,12 @@ export class ObjectStorage<T> implements ObjectStorage<T> {
   ) {
     const passThrough = (value: any) => value
     function defaultMerge(oldValue: T, newValue: T) {
-      if (isObject(oldValue)) {
+      if (isPlainObject(oldValue)) {
         return merge(oldValue, newValue)
       }
       return newValue
     }
-    if (isObject(optionsOrNamespace)) {
+    if (isPlainObject(optionsOrNamespace)) {
       const options = optionsOrNamespace as ObjectStorageOptions<T>
       this.serialize = options.serialize ?? passThrough
       this.deserialize = options.deserialize ?? passThrough

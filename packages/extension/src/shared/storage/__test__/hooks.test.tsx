@@ -3,7 +3,7 @@ import { describe, test } from "vitest"
 
 import { useObjectStorage } from "../hooks"
 import { ObjectStorage } from "../object"
-import { chromeStorageMock } from "./chrome-storage-mock"
+import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("useObjectStorage()", () => {
   test("should render with storage values", async () => {

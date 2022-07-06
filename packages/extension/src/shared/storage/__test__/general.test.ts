@@ -1,5 +1,5 @@
 import { IStorage, Storage } from "../general"
-import { chromeStorageMock } from "./chrome-storage-mock"
+import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("full storage flow", () => {
   let store: IStorage<{
@@ -11,6 +11,15 @@ describe("full storage flow", () => {
       { namespace: "test", areaName: "local" },
       chromeStorageMock,
     )
+  })
+  test("throw when storage area is invalid", () => {
+    expect(() => {
+      new Storage<{ foo: string }>(
+        { foo: "bar" },
+        { namespace: "test", areaName: "invalid" as any },
+        chromeStorageMock,
+      )
+    }).toThrowErrorMatchingInlineSnapshot('"Unknown storage area: invalid"')
   })
   test("should return defaults", async () => {
     const value = await store.getItem("foo")
