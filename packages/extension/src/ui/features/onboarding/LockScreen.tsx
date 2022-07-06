@@ -73,16 +73,19 @@ export const LockScreen: FC = () => {
             navigate(target)
             return true
           } catch {
-            useAppState.setState({ isLoading: false })
+            useAppState.setState({
+              isLoading: false,
+              error: "Incorrect password",
+            })
             return false
           }
         }}
       >
-        {(isDirty) => (
+        {({ isDirty, isSubmitting }) => (
           <>
             <StyledLink to={routes.reset()}>reset or recover</StyledLink>
             <StickyGroup>
-              <Button type="submit" disabled={!isDirty}>
+              <Button type="submit" disabled={!isDirty || isSubmitting}>
                 Unlock
               </Button>
             </StickyGroup>
