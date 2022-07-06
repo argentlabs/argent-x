@@ -25,6 +25,14 @@ export const H3 = styled.h3`
   color: #ffffff;
 `
 
+export const H4 = styled.h4`
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 25px;
+  text-align: center;
+  color: #ffffff;
+`
+
 export const P = styled.p`
   font-size: 16px;
   line-height: 19px;

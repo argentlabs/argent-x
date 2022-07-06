@@ -11,6 +11,7 @@ import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDele
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
+import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import {
@@ -136,7 +137,7 @@ const walletRoutes = (
     />
 
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
-
+    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route path={routes.funding.path} element={<FundingScreen />} />

@@ -1,5 +1,5 @@
 import { isString } from "lodash-es"
-import { FC } from "react"
+import { FC, HTMLProps } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
@@ -28,11 +28,18 @@ const Bar = styled.div`
 interface IconBarProps {
   back?: boolean | string
   close?: boolean | string
+  childAfter?: React.ReactNode
   children?: React.ReactNode
 }
 
-export const IconBar: FC<IconBarProps> = ({ back, close, children }) => (
-  <Bar>
+export const IconBar: FC<IconBarProps> = ({
+  back,
+  close,
+  childAfter,
+  children,
+  ...rest
+}) => (
+  <Bar {...rest}>
     {back ? (
       <BackLink>
         <BackIcon />
@@ -43,7 +50,9 @@ export const IconBar: FC<IconBarProps> = ({ back, close, children }) => (
 
     {children}
 
-    {close ? (
+    {childAfter ? (
+      <>{childAfter}</>
+    ) : close ? (
       <Link
         to={isString(close) ? close : routes.accountTokens()}
         style={{ textAlign: "right" }}

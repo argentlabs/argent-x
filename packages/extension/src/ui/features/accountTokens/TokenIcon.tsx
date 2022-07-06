@@ -19,6 +19,7 @@ interface TokenIconProps {
   url?: string
   large?: boolean
   small?: boolean
+  size?: number
 }
 
 export const TokenIcon: FC<TokenIconProps> = ({
@@ -26,11 +27,12 @@ export const TokenIcon: FC<TokenIconProps> = ({
   url,
   large = false,
   small = false,
+  size,
 }) => {
   const color = getColor(name)
   return (
     <Icon
-      size={large ? 48 : small ? 24 : 40}
+      size={size ? size : large ? 48 : small ? 24 : 40}
       alt={name}
       src={
         url ||

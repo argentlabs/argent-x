@@ -61,6 +61,10 @@ export const routes = {
     `/account/delete-confirm/:accountAddress`,
   ),
   sendScreen: route("/send"),
+  sendToken: route(
+    (tokenAddress: string) => `/send-token/${tokenAddress}`,
+    "/send-token/:tokenAddress",
+  ),
   transactionDetail: route(
     (txHash: string) => `/account/activity/transaction-detail/${txHash}`,
     `/account/activity/transaction-detail/:txHash`,
