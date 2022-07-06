@@ -1,11 +1,10 @@
 import join from "url-join"
 
 import { Network, isKnownNetwork } from "../../shared/networks"
-import { Transaction } from "../../shared/transactions"
+import { Transaction, compareTransactions } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { analytics } from "../analytics"
 import { fetchWithTimeout } from "../utils/fetchWithTimeout"
-import { compareTransactions } from "./store"
 import { mapVoyagerTransactionToTransaction } from "./transformers"
 
 export interface VoyagerTransaction {

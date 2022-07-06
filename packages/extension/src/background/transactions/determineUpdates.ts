@@ -1,5 +1,4 @@
-import { Transaction } from "../../shared/transactions"
-import { compareTransactions } from "./store"
+import { Transaction, compareTransactions } from "../../shared/transactions"
 
 export function getTransactionsStatusUpdate(
   oldTransactions: Transaction[],

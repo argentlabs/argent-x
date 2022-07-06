@@ -3,7 +3,7 @@ import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
-import { compareTransactions } from "../../../background/transactions/store"
+import { compareTransactions } from "../../../shared/transactions"
 import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {

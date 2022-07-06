@@ -7,7 +7,6 @@ import waitForExpect from "wait-for-expect"
 import { ArrayStorage } from "../src/background/storage/array"
 import { getTransactionsStatusUpdate } from "../src/background/transactions/determineUpdates"
 import { setIntervalAsync } from "../src/background/transactions/setIntervalAsync"
-import { compareTransactions } from "../src/background/transactions/store"
 import { nameTransaction } from "../src/background/transactions/transactionNames"
 import {
   TransactionTracker,
@@ -15,7 +14,11 @@ import {
 } from "../src/background/transactions/transactions"
 import { FetchTransactions } from "../src/background/transactions/voyager"
 import { defaultNetwork } from "../src/shared/networks"
-import { Transaction, TransactionRequest } from "../src/shared/transactions"
+import {
+  Transaction,
+  TransactionRequest,
+  compareTransactions,
+} from "../src/shared/transactions"
 import { WalletAccount } from "../src/shared/wallet.model"
 import { MockStorage } from "./mock"
 import transactionsMock from "./transactions.mock.json"

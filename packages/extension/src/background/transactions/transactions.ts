@@ -5,13 +5,14 @@ import {
   Transaction,
   TransactionBase,
   TransactionRequest,
+  compareTransactions,
 } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/wallet.service"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
 import { setIntervalAsync } from "./setIntervalAsync"
-import { GetTransactionsStore, compareTransactions } from "./store"
+import { GetTransactionsStore } from "./store"
 import { checkTransactionHash } from "./transactionExecution"
 import { FetchTransactions, getTransactionHistory } from "./voyager"
 

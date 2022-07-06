@@ -26,6 +26,11 @@ export interface Transaction extends TransactionRequest {
   timestamp: number
 }
 
+export const compareTransactions = (
+  a: TransactionBase,
+  b: TransactionBase,
+): boolean => a.hash === b.hash && a.account.networkId === a.account.networkId
+
 export function entryPointToHumanReadable(entryPoint: string): string {
   try {
     return capitalize(entryPoint.replaceAll("_", " "))
