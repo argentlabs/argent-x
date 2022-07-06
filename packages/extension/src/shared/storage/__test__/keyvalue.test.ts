@@ -1,12 +1,12 @@
-import { IStorage, Storage } from "../general"
+import { IKeyValueStorage, KeyValueStorage } from "../keyvalue"
 import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("full storage flow", () => {
-  let store: IStorage<{
+  let store: IKeyValueStorage<{
     foo: string
   }>
   beforeAll(() => {
-    store = new Storage<{ foo: string }>(
+    store = new KeyValueStorage<{ foo: string }>(
       { foo: "bar" },
       { namespace: "test", areaName: "local" },
       chromeStorageMock,
@@ -14,7 +14,7 @@ describe("full storage flow", () => {
   })
   test("throw when storage area is invalid", () => {
     expect(() => {
-      new Storage<{ foo: string }>(
+      new KeyValueStorage<{ foo: string }>(
         { foo: "bar" },
         { namespace: "test", areaName: "invalid" as any },
         chromeStorageMock,
@@ -38,11 +38,11 @@ describe("full storage flow", () => {
 })
 
 describe("full storage flow with subscription", () => {
-  let store: IStorage<{
+  let store: IKeyValueStorage<{
     foo: string
   }>
   beforeAll(() => {
-    store = new Storage<{ foo: string }>(
+    store = new KeyValueStorage<{ foo: string }>(
       { foo: "bar" },
       { namespace: "test", areaName: "local" },
       chromeStorageMock,

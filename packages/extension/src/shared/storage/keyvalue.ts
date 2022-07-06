@@ -8,8 +8,9 @@ import {
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
 import { AllowPromise, BaseStorage } from "./types"
 
-export interface IStorage<T extends Record<string, any> = Record<string, any>>
-  extends BaseStorage<T> {
+export interface IKeyValueStorage<
+  T extends Record<string, any> = Record<string, any>,
+> extends BaseStorage<T> {
   getItem<K extends keyof T>(key: K): Promise<T[K]>
   setItem<K extends keyof T>(key: K, value: T[K]): Promise<void>
   removeItem<K extends keyof T>(key: K): Promise<void>
@@ -19,7 +20,10 @@ export interface IStorage<T extends Record<string, any> = Record<string, any>>
   ): () => void
 }
 
-export class Storage<T> implements IStorage<T> {
+export class KeyValueStorage<
+  T extends Record<string, any> = Record<string, any>,
+> implements IKeyValueStorage<T>
+{
   private storageImplementation: StorageArea
   public namespace: string
   public areaName: browser.storage.AreaName

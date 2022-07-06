@@ -1,7 +1,7 @@
 import { isPlainObject, merge } from "lodash-es"
 
-import { Storage } from "./general"
 import { Implementations, getDefaultImplementations } from "./implementations"
+import { KeyValueStorage } from "./keyvalue"
 import { StorageOptions, StorageOptionsOrNameSpace } from "./options"
 import { BaseStorage } from "./types"
 
@@ -25,7 +25,7 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   public namespace: string
   public areaName: chrome.storage.AreaName
 
-  private storageImplementation: Storage<{ inner: T }>
+  private storageImplementation: KeyValueStorage<{ inner: T }>
   private serialize: (value: T) => any
   private deserialize: (value: any) => T
   private merge: (oldValue: T, newValue: T) => T
@@ -53,7 +53,7 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
       this.merge = defaultMerge
     }
 
-    this.storageImplementation = new Storage<{
+    this.storageImplementation = new KeyValueStorage<{
       inner: T
     }>(
       {
