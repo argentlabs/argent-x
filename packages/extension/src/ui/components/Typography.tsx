@@ -17,6 +17,14 @@ export const H2 = styled.h2`
   margin: 0 0 16px 0;
 `
 
+export const H3 = styled.h3`
+  font-weight: bold;
+  font-size: 22px;
+  line-height: 28px;
+  text-align: center;
+  color: #ffffff;
+`
+
 export const P = styled.p`
   font-size: 16px;
   line-height: 19px;

@@ -60,6 +60,7 @@ export const routes = {
     (accountAddress: string) => `/account/delete-confirm/${accountAddress}`,
     `/account/delete-confirm/:accountAddress`,
   ),
+  sendScreen: route("/send"),
   transactionDetail: route(
     (txHash: string) => `/account/activity/transaction-detail/${txHash}`,
     `/account/activity/transaction-detail/:txHash`,

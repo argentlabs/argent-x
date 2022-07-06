@@ -1,33 +1,40 @@
 import { FC } from "react"
 import { Link } from "react-router-dom"
 
-import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { routes } from "../../routes"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { TokenListItemContainer, TokenListItemVariant } from "./TokenListItem"
-import { useTokensWithBalance } from "./tokens.state"
+import { TokenDetailsWithBalance } from "./tokens.state"
 
 interface TokenListProps {
-  showTitle: boolean
-  account: BaseWalletAccount
+  showTitle?: boolean
+  showTokenSymbol?: boolean
   variant?: TokenListItemVariant
+  tokenList: TokenDetailsWithBalance[]
+  isValidating: boolean
 }
 
 export const TokenList: FC<TokenListProps> = ({
-  showTitle,
-  account,
+  showTitle = false,
+  showTokenSymbol = false,
+  isValidating,
   variant,
+  tokenList,
 }) => {
-  const { isValidating, tokenDetails } = useTokensWithBalance(account)
+  if (!tokenList) {
+    return <></>
+  }
+
   return (
     <>
       {showTitle && <SectionHeader>Tokens</SectionHeader>}
-      {tokenDetails.map((token) => (
+      {tokenList.map((token) => (
         <Link key={token.address} to={routes.token(token.address)}>
           <TokenListItemContainer
             token={token}
             isLoading={isValidating}
             variant={variant}
+            showTokenSymbol={showTokenSymbol}
           />
         </Link>
       ))}

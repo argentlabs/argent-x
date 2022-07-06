@@ -39,6 +39,7 @@ import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfi
 import { SeedRecoveryPasswordScreen } from "./features/recovery/SeedRecoveryPasswordScreen"
 import { SeedRecoveryScreen } from "./features/recovery/SeedRecoveryScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
+import { SendScreen } from "./features/send/SendScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
@@ -133,6 +134,9 @@ const walletRoutes = (
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
     />
+
+    <Route path={routes.sendScreen.path} element={<SendScreen />} />
+
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route path={routes.funding.path} element={<FundingScreen />} />

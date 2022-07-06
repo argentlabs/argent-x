@@ -12,32 +12,46 @@ const Bar = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   padding: 18px;
+
+  a {
+    flex: 1;
+  }
 
   hr {
     margin: 0 auto;
     visibility: hidden;
+    flex: 1;
   }
 `
 
 interface IconBarProps {
   back?: boolean | string
   close?: boolean | string
+  children?: React.ReactNode
 }
 
-export const IconBar: FC<IconBarProps> = ({ back, close }) => (
+export const IconBar: FC<IconBarProps> = ({ back, close, children }) => (
   <Bar>
-    {back && (
+    {back ? (
       <BackLink>
         <BackIcon />
       </BackLink>
+    ) : (
+      <hr />
     )}
-    <hr />
-    {close && (
-      <Link to={isString(close) ? close : routes.accountTokens()}>
+
+    {children}
+
+    {close ? (
+      <Link
+        to={isString(close) ? close : routes.accountTokens()}
+        style={{ textAlign: "right" }}
+      >
         <CloseIcon />
       </Link>
+    ) : (
+      <hr />
     )}
   </Bar>
 )

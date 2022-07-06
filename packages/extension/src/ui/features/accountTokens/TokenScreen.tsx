@@ -1,5 +1,5 @@
 import { BigNumber, utils } from "ethers"
-import { FC, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
@@ -148,10 +148,11 @@ const InputTokenSymbol = styled.span`
   color: #8f8e8c;
 `
 
-interface SendInput {
+export interface SendInput {
   recipient: string
   amount: string
 }
+
 const SendSchema: Schema<SendInput> = object().required().shape({
   recipient: addressSchema,
   amount: inputAmountSchema,
@@ -263,31 +264,38 @@ export const TokenScreen: FC = () => {
     loading: maxFeeLoading,
   } = useMaxFeeEstimateForTransfer(token?.address, token?.balance, account)
 
+  const setMaxInputAmount = useCallback(
+    (token: TokenDetailsWithBalance, maxFee?: BigNumber) => {
+      const tokenDecimals = token.decimals?.toNumber() || 18
+      const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
+
+      if (token.balance && maxFee) {
+        const balanceBn = token.balance
+
+        const maxAmount = balanceBn.sub(maxFee.toString())
+
+        const formattedMaxAmount = utils.formatUnits(
+          maxAmount.toString(),
+          tokenDecimals,
+        )
+        setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
+      }
+    },
+    [setValue],
+  )
+
   useEffect(() => {
     if (maxClicked && maxFee && token) {
       setMaxInputAmount(token, maxFee)
     }
-  }, [maxClicked, maxFee?.toString(), token?.address, token?.networkId])
-
-  const setMaxInputAmount = (
-    token: TokenDetailsWithBalance,
-    maxFee?: BigNumber,
-  ) => {
-    const tokenDecimals = token.decimals?.toNumber() || 18
-    const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
-
-    if (token.balance && maxFee) {
-      const balanceBn = token.balance
-
-      const maxAmount = balanceBn.sub(maxFee.toString())
-
-      const formattedMaxAmount = utils.formatUnits(
-        maxAmount.toString(),
-        tokenDecimals,
-      )
-      setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
-    }
-  }
+  }, [
+    maxClicked,
+    maxFee,
+    setMaxInputAmount,
+    token,
+    token?.address,
+    token?.networkId,
+  ])
 
   if (!token) {
     return <Navigate to={routes.accounts()} />
