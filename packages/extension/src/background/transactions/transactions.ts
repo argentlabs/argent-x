@@ -52,7 +52,6 @@ export const getTransactionsTracker: GetTransactionsTracker = (
   const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
     const needsHistoryUpdate = updateCounter === 0
-    console.log(allTransactions)
     const historyTransactions = needsHistoryUpdate
       ? await getTransactionHistory(
           accounts,

@@ -52,7 +52,7 @@ export async function getTransactionHistory(
         account.address,
         account.network,
       )
-      const x = voyagerTransactions.map((transaction) =>
+      return voyagerTransactions.map((transaction) =>
         mapVoyagerTransactionToTransaction(
           transaction,
           account,
@@ -64,9 +64,6 @@ export async function getTransactionHistory(
           )?.meta,
         ),
       )
-
-      console.log("x", x)
-      return x
     }),
   )
   return transactionsPerAccount.flat()
