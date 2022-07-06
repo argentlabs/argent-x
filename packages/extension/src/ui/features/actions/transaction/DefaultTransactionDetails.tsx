@@ -1,6 +1,8 @@
 import { FC, useCallback, useState } from "react"
+import { Call } from "starknet"
 import styled from "styled-components"
 
+import { knownContracts } from "../../../../shared/contracts"
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
 import { CopyTooltip } from "../../../components/CopyTooltip"
 import { ExpandableHeightBox } from "../../../components/ExpandableHeightBox"
@@ -41,6 +43,44 @@ const TransactionJson = styled.pre`
   color: ${({ theme }) => theme.text2};
 `
 
+export interface IContractIconContainer {
+  fileName: string
+}
+
+export const ContractIconContainer = styled.div<IContractIconContainer>`
+  background-image: ${(props) =>
+    `url(../../../../../assets/contract-icons/${props.fileName})`};
+  background-size: cover;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+`
+
+const LeftPaddedField = styled.div`
+  margin-left: 8px;
+  text-align: right;
+`
+
+export const ContractField: FC<Pick<Call, "contractAddress">> = ({
+  contractAddress,
+}) => {
+  const knownContract = knownContracts[contractAddress]
+  if (!knownContract) {
+    return null
+  }
+  return (
+    <Field>
+      <FieldKey>Dapp</FieldKey>
+      <FieldValue>
+        <ContractIconContainer
+          fileName={knownContract.iconFileName}
+        ></ContractIconContainer>
+        <LeftPaddedField>{knownContract.name}</LeftPaddedField>
+      </FieldValue>
+    </Field>
+  )
+}
+
 export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
   transaction,
 }) => {
@@ -69,6 +109,7 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
         </FieldKey>
         <FieldValue>{displayContractAddress}</FieldValue>
       </Field>
+      <ContractField contractAddress={transaction.contractAddress} />
       <Field>
         <FieldKey>Action</FieldKey>
         <FieldValue>
