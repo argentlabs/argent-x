@@ -126,7 +126,7 @@ export const NftScreen: FC = () => {
       <IconBar back />
       <Container>
         <h3>{nft.name}</h3>
-        {nft.animation_url ? (
+        {nft.animation_uri ? (
           <LazyNftModelViewer nft={nft} />
         ) : (
           <img src={nft.image_url_copy} alt={nft.name} />
