@@ -1,4 +1,9 @@
 module.exports = {
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   env: {
     browser: true,
     es2021: true,
@@ -22,7 +27,7 @@ module.exports = {
     "react/jsx-no-target-blank": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-hooks/exhaustive-deps": "off", // Checks effect dependencies
+    "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-extra-semi": "off",
     "@typescript-eslint/no-unused-vars": [
