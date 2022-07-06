@@ -41,7 +41,7 @@ export class Account {
       this.provider,
     )
 
-    const key = `deployTransaction:${getAccountIdentifier(this)}`
+    const key = this.getDeployTransactionStorageKey()
     if (deployTransaction) {
       localStorage.setItem(key, deployTransaction)
     } else if (localStorage.getItem(key)) {
@@ -49,8 +49,14 @@ export class Account {
     }
   }
 
+  public getDeployTransactionStorageKey(): string {
+    const key = `deployTransaction:${getAccountIdentifier(this)}`
+    return key
+  }
+
   public completeDeployTx(): void {
-    localStorage.removeItem(`deployTransaction:${this.address}`)
+    const key = this.getDeployTransactionStorageKey()
+    localStorage.removeItem(key)
     this.deployTransaction = undefined
   }
 
