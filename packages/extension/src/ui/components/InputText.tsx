@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { Controller } from "react-hook-form"
+import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import styled, { css } from "styled-components"
 
 import { isNumeric } from "../../shared/utils/number"
@@ -137,6 +137,11 @@ export const InputText = styled(
   },
 )``
 
+export type InputFieldProps = Omit<
+  React.HTMLProps<HTMLInputElement>,
+  "ref" | "as"
+>
+
 export const InputTextAlt = styled(
   ({
     placeholder,
@@ -150,10 +155,7 @@ export const InputTextAlt = styled(
     inputRef,
     children,
     ...props
-  }: { inputRef: any } & Omit<
-    React.HTMLProps<HTMLInputElement>,
-    "ref" | "as"
-  >) => {
+  }: { inputRef: any } & InputFieldProps) => {
     const idRef = useRef(randomString())
     return (
       <Container className={className} style={style}>
@@ -188,50 +190,67 @@ export const ControlledInputText = styled(
   ),
 )``
 
-export const ControlledInputTextAlt = styled(
-  ({ name, control, defaultValue, rules, onlyNumeric, children, ...props }) => (
-    <Controller
-      name={name}
-      control={control}
-      defaultValue={defaultValue}
-      rules={rules}
-      render={({
-        field: { ref, value, onChange: onValueChange, ...field },
-      }) => (
-        <InputTextAlt
-          style={{ position: "relative" }}
-          {...props}
-          value={value || ""}
-          {...field}
-          inputRef={ref}
-          inputMode="decimal"
-          type="text"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
-            if (onlyNumeric) {
-              if (e.target.value === "") {
-                return onValueChange(e)
-              }
+interface AdditionalControlledInputProps {
+  onlyNumeric?: boolean
+  children?: React.ReactNode
+}
 
-              return (
-                numericalRegex.test(e.target.value) &&
-                // just being double sure
-                isNumeric(e.target.value) &&
-                onValueChange(e)
-              )
-            } else {
+export type ControlledInputProps<T extends FieldValues> = InputFieldProps &
+  Omit<ControllerProps<T>, "render"> &
+  AdditionalControlledInputProps
+
+export const ControlledInputTextAlt = <T extends FieldValues>({
+  name,
+  control,
+  defaultValue,
+  rules,
+  onlyNumeric,
+  children,
+  ...props
+}: ControlledInputProps<T>) => (
+  <Controller
+    name={name}
+    control={control}
+    defaultValue={defaultValue}
+    rules={rules}
+    render={({ field: { ref, value, onChange: onValueChange, ...field } }) => (
+      <InputTextAlt
+        style={{ position: "relative" }}
+        {...props}
+        value={value || ""}
+        {...field}
+        inputRef={ref}
+        inputMode="decimal"
+        type="text"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
+          if (onlyNumeric) {
+            if (e.target.value === "") {
               return onValueChange(e)
             }
-          }}
-        >
-          {children}
-        </InputTextAlt>
-      )}
-    />
-  ),
-)``
 
-export const StyledControlledInput = styled(ControlledInputTextAlt)`
+            return (
+              numericalRegex.test(e.target.value) &&
+              // just being double sure
+              isNumeric(e.target.value) &&
+              onValueChange(e)
+            )
+          } else {
+            return onValueChange(e)
+          }
+        }}
+      >
+        {children}
+      </InputTextAlt>
+    )}
+  />
+)
+
+export type ControlledInputType = typeof ControlledInputTextAlt
+
+export const StyledControlledInput: ControlledInputType = styled(
+  ControlledInputTextAlt,
+)`
   padding: 12px 16px;
   border: 1px solid #333332;
   border-radius: 8px;
