@@ -6,7 +6,9 @@ import {
   useTokenBalanceToCurrencyValue,
   useTokenPriceDetails,
 } from "../src/ui/features/accountTokens/tokenPriceHooks"
+import mockApiPricesDataInvalid from "./__mocks__/argent-api-prices-invalid.mock.json"
 import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"
+import mockApiTokenDataInvalid from "./__mocks__/argent-api-tokens-invalid.mock.json"
 import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
 import { mockTokensWithBalance } from "./tokenPrice.test"
 
@@ -28,10 +30,10 @@ describe("tokenPriceHooks", () => {
           ),
         )
         expect(result.current).toEqual({
-          ccyDayChange: -0.008568,
-          ccyValue: 1032.296954,
-          ethDayChange: 0,
-          ethValue: 1,
+          ccyDayChange: "0.001484",
+          ccyValue: "1102.594564",
+          ethDayChange: "0",
+          ethValue: "1",
           pricingId: 1,
         })
       })
@@ -45,21 +47,12 @@ describe("tokenPriceHooks", () => {
             useMockPriceAndTokenData,
           ),
         )
-        expect(result.current).toEqual("1032.296954")
+        expect(result.current).toEqual("1102.594564")
       })
       test("should convert token[1] balance to currency", () => {
         const { result } = renderHook(() =>
           useTokenBalanceToCurrencyValue(
             mockTokensWithBalance[1],
-            useMockPriceAndTokenData,
-          ),
-        )
-        expect(result.current).toEqual("0.999132444706")
-      })
-      test("should convert token[2] balance to currency", () => {
-        const { result } = renderHook(() =>
-          useTokenBalanceToCurrencyValue(
-            mockTokensWithBalance[2],
             useMockPriceAndTokenData,
           ),
         )
@@ -75,12 +68,11 @@ describe("tokenPriceHooks", () => {
             useMockPriceAndTokenData,
           ),
         )
-        expect(result.current).toEqual("1034.298086444706")
+        expect(result.current).toEqual("1103.596564")
       })
     })
   })
 
-  /** TODO: as we are using SWR, the API data may previously be cached - so the value would simply be stale rather than undefined */
   describe("when API data is not available", () => {
     const usePriceAndTokenDataImpl = () => {
       return {
@@ -104,6 +96,41 @@ describe("tokenPriceHooks", () => {
         const { result } = renderHook(() =>
           useSumTokenBalancesToCurrencyValue(
             mockTokensWithBalance,
+            usePriceAndTokenDataImpl,
+          ),
+        )
+        expect(result.current).toBeUndefined()
+      })
+    })
+  })
+
+  describe("when API data is invalid", () => {
+    const usePriceAndTokenDataImpl = () => {
+      return {
+        pricesData: mockApiPricesDataInvalid,
+        tokenData: mockApiTokenDataInvalid,
+      }
+    }
+    describe("useTokenPriceDetails()", () => {
+      test("should return undefined without throwing", () => {
+        const { result } = renderHook(() =>
+          useTokenPriceDetails(
+            mockTokensWithBalance[0],
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            usePriceAndTokenDataImpl,
+          ),
+        )
+        expect(result.current).toBeUndefined()
+      })
+    })
+    describe("useSumTokenBalancesToCurrencyValue()", () => {
+      test("should return undefined without throwing", () => {
+        const { result } = renderHook(() =>
+          useSumTokenBalancesToCurrencyValue(
+            mockTokensWithBalance,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             usePriceAndTokenDataImpl,
           ),
         )
