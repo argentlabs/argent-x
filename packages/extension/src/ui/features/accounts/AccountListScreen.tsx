@@ -84,7 +84,10 @@ export const AccountListScreen: FC = () => {
         <Header>
           <IconButton
             size={36}
-            {...makeClickable(() => navigate(routes.settings()), 99)}
+            {...makeClickable(() => navigate(routes.settings()), {
+              label: "Settings",
+              tabIndex: 99,
+            })}
           >
             <SettingsIcon />
           </IconButton>
@@ -120,7 +123,10 @@ export const AccountListScreen: FC = () => {
             ))}
           </>
         )}
-        <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>
+        <IconButtonCenter
+          size={48}
+          {...makeClickable(handleAddAccount, { label: "Create new wallet" })}
+        >
           <AddIcon fontSize="large" />
         </IconButtonCenter>
       </AccountList>

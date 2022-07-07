@@ -39,7 +39,7 @@ export const IconBar: FC<IconBarProps> = ({
   children,
   ...rest
 }) => (
-  <Bar {...rest}>
+  <Bar aria-label="Back" {...rest}>
     {back ? (
       <BackLink>
         <BackIcon />
@@ -55,6 +55,7 @@ export const IconBar: FC<IconBarProps> = ({
     ) : close ? (
       <Link
         to={isString(close) ? close : routes.accountTokens()}
+        aria-label="Close"
         style={{ textAlign: "right" }}
       >
         <CloseIcon />

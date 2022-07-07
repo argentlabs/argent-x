@@ -8,6 +8,7 @@ import { P, StyledLink } from "../../components/Typography"
 import { routes } from "../../routes"
 import { unlockedExtensionTodayTracking } from "../../services/analytics"
 import { startSession } from "../../services/backgroundSessions"
+import { useActions } from "../actions/actions.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
 import { Greetings, GreetingsWrapper } from "./Greetings"
@@ -44,6 +45,8 @@ export const greetings = [
   "hi fren",
 ]
 
+const isPopup = new URLSearchParams(window.location.search).has("popup")
+
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
 
@@ -60,20 +63,29 @@ export const LockScreen: FC = () => {
             await startSession(password)
             unlockedExtensionTodayTracking()
             const target = await recover()
+
+            // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close
+            if (isPopup && !useActions.getState().actions.length) {
+              window.close()
+            }
+
             useAppState.setState({ isLoading: false })
             navigate(target)
             return true
           } catch {
-            useAppState.setState({ isLoading: false })
+            useAppState.setState({
+              isLoading: false,
+              error: "Incorrect password",
+            })
             return false
           }
         }}
       >
-        {(isDirty) => (
+        {({ isDirty, isSubmitting }) => (
           <>
             <StyledLink to={routes.reset()}>reset or recover</StyledLink>
             <StickyGroup>
-              <Button type="submit" disabled={!isDirty}>
+              <Button type="submit" disabled={!isDirty || isSubmitting}>
                 Unlock
               </Button>
             </StickyGroup>

@@ -1,6 +1,8 @@
-import { FC, ReactNode, useEffect, useState } from "react"
+import { isString } from "lodash-es"
+import { FC, ReactNode, useEffect } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
+import { useAppState } from "../../app.state"
 import { InputText } from "../../components/InputText"
 import { FormError } from "../../components/Typography"
 import { validatePassword } from "../recovery/seedRecovery.state"
@@ -11,26 +13,28 @@ interface FieldValues {
 
 interface PasswordFormProps {
   verifyPassword: (password: string) => Promise<boolean>
-  children?: (isDirty: boolean) => ReactNode
+  children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
 }
 
 export const PasswordForm: FC<PasswordFormProps> = ({
   verifyPassword,
   children,
 }) => {
-  const [passwordError, setPasswordError] = useState<string>()
-  const { control, formState, handleSubmit, setError } = useForm<FieldValues>()
-  const { errors, isDirty } = formState
+  const { control, formState, handleSubmit, clearErrors, setError } =
+    useForm<FieldValues>()
+  const { errors, isDirty, isSubmitting } = formState
 
+  const { error } = useAppState() // FIXME: as a hack we need to use global storage here, as the password form unmounts for the loading screen
   useEffect(() => {
-    setError("password", { message: passwordError })
-  }, [passwordError])
+    if (isString(error)) {
+      setError("password", { message: error })
+      useAppState.setState({ error: undefined }) // reset error string once we picked it up
+    }
+  }, [error, setError])
 
   const handlePassword: SubmitHandler<FieldValues> = async ({ password }) => {
-    setPasswordError(undefined)
-    if (!(await verifyPassword(password))) {
-      setPasswordError("Wrong password")
-    }
+    clearErrors("password")
+    await verifyPassword(password)
   }
 
   return (
@@ -58,7 +62,7 @@ export const PasswordForm: FC<PasswordFormProps> = ({
       {errors.password?.message && (
         <FormError>{errors.password.message}</FormError>
       )}
-      {children?.(isDirty)}
+      {children?.({ isDirty, isSubmitting })}
     </form>
   )
 }

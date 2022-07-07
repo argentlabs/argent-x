@@ -32,8 +32,10 @@ import { useTokenAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 
 const FeeEstimationValue = styled.p`
-  * + & {
-    margin-left: 0.3em;
+  display: inline-block;
+  margin-inline-start: 0.3em;
+  &:not(:last-child) {
+    margin-inline-end: 0.3em;
   }
 `
 
@@ -44,20 +46,6 @@ const ExtendableControl = styled.div`
   gap: 4px;
 `
 
-const InvisibleInput = styled.span`
-  background: transparent;
-  border: none;
-  outline: none;
-  color: inherit;
-  width: fit-content;
-  text-align: right;
-  &:disabled {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: inherit;
-  }
-`
 const DetailsText = styled.span`
   opacity: 0.5;
   color: white;
@@ -227,45 +215,30 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
         {fee ? (
           <FieldValueGroup>
             <FieldValue>
-              <InvisibleInput
-                role="textbox"
-                contentEditable={false} // disable editing for now
-              >
-                {amountCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    {prettifyCurrencyValue(amountCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <>
-                    {displayEther(fee.amount)}
-                    <FeeEstimationValue>ETH</FeeEstimationValue>
-                  </>
-                )}
-              </InvisibleInput>
+              {amountCurrencyValue !== undefined ? (
+                <FeeEstimationValue>
+                  {prettifyCurrencyValue(amountCurrencyValue)}
+                </FeeEstimationValue>
+              ) : (
+                <FeeEstimationValue>
+                  {displayEther(fee.amount)} ETH
+                </FeeEstimationValue>
+              )}
             </FieldValue>
             <FieldValueMeta>
-              <FeeEstimationValue style={{ marginRight: "0.2em" }}>
-                Max
-              </FeeEstimationValue>
-              <InvisibleInput
-                role="textbox"
-                contentEditable={false} // disable editing for now
-              >
-                {suggestedMaxFeeCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <>
-                    {displayEther(fee.suggestedMaxFee)}
-                    <FeeEstimationValue>ETH</FeeEstimationValue>
-                  </>
-                )}
-              </InvisibleInput>
+              {suggestedMaxFeeCurrencyValue !== undefined ? (
+                <FeeEstimationValue>
+                  Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
+                </FeeEstimationValue>
+              ) : (
+                <FeeEstimationValue>
+                  Max {displayEther(fee.suggestedMaxFee)} ETH
+                </FeeEstimationValue>
+              )}
             </FieldValueMeta>
           </FieldValueGroup>
         ) : showEstimateError ? (
-          <InvisibleInput>Error</InvisibleInput>
+          <FeeEstimationValue>Error</FeeEstimationValue>
         ) : (
           <LoadingInput />
         )}
@@ -276,7 +249,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
           <FieldError justify="space-between">
             Transaction failure predicted
             <ExtendableControl
-              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), 100)}
+              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+                label: "Show error details",
+              })}
             >
               <DetailsText>Details</DetailsText>
               <KeyboardArrowDownRounded

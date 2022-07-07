@@ -62,7 +62,7 @@ interface IIsLoading {
   isLoading?: boolean
 }
 
-const isLoadingPulse = ({ isLoading }: IIsLoading) => {
+export const isLoadingPulse = ({ isLoading }: IIsLoading) => {
   if (isLoading) {
     return css`
       animation: ${PulseAnimation} 1s ease-in-out infinite;

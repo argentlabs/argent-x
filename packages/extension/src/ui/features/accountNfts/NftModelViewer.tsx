@@ -20,7 +20,7 @@ interface NftModelViewerProps {
 
 const NftModelViewer: FC<NftModelViewerProps> = ({ nft }) => (
   <model-viewer
-    src={nft.animation_url}
+    src={nft.animation_uri}
     alt={`3D model of ${nft.name}`}
     poster={getNftPicture(nft)}
     auto-rotate

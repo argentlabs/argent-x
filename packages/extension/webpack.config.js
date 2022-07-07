@@ -2,9 +2,11 @@ const path = require("path")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin, ProvidePlugin } = require("webpack")
-const ESLintPlugin = require("eslint-webpack-plugin")
 const Dotenv = require("dotenv-webpack")
 const { ESBuildMinifyPlugin } = require("esbuild-loader")
+
+const ESLintPlugin = require("eslint-webpack-plugin")
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -84,12 +86,20 @@ module.exports = {
       Buffer: ["buffer", "Buffer"],
       React: "react",
     }),
-    new ESLintPlugin({ extensions: ["ts", "tsx"], fix: true }),
+
+    !isProd && // eslint should run before the build starts
+      new ESLintPlugin({
+        extensions: ["ts", "tsx"],
+        fix: true,
+        threads: true,
+      }),
+
+    new ForkTsCheckerWebpackPlugin(), // does the type checking in a separate process (non-blocking in dev) as esbuild is skipping type checking
     new Dotenv({
       systemvars: true,
       safe: safeEnvVars,
     }),
-  ],
+  ].filter(Boolean),
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     fallback: { buffer: require.resolve("buffer/") },

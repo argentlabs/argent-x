@@ -67,7 +67,16 @@ export const hideAccount = async (address: string, networkId: string) => {
 
 export const upgradeAccount = async (data: BaseWalletAccount) => {
   sendMessage({ type: "UPGRADE_ACCOUNT", data })
-  return waitForMessage("TRANSACTION_UPDATES")
+  try {
+    await Promise.race([
+      waitForMessage("UPGRADE_ACCOUNT_RES"),
+      waitForMessage("UPGRADE_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could not upgrade account")
+  }
 }
 
 export const getPrivateKey = async () => {

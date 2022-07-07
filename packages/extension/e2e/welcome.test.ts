@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 
 import { test } from "./fixture"
-import { openExtension } from "./steps/open-extension"
+import { openExtension } from "./steps/openExtension"
 
 test("Welcome page is shown correctly", async ({ page, context }) => {
   await openExtension(page, context)

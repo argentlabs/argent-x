@@ -97,6 +97,10 @@ const defaultPayload = {
       name: "Argent X",
       version: VERSION,
     },
+    library: {
+      name: "argent-x",
+      version: VERSION,
+    },
   },
 }
 const headers = {

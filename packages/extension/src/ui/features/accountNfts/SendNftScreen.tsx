@@ -112,10 +112,10 @@ export const SendNftScreen: FC = () => {
           <ColumnCenter>
             <RowCentered>
               <NftImageContainer>
-                {nft.animation_url ? (
+                {nft.animation_uri ? (
                   <LazyNftModelViewer nft={nft} />
                 ) : (
-                  <img src={nft.copy_image_url} alt={nft.name} />
+                  <img src={nft.image_url_copy} alt={nft.name} />
                 )}
               </NftImageContainer>
             </RowCentered>

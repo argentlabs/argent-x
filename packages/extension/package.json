@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "4.2.1",
+  "version": "4.2.3",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -29,6 +29,7 @@
     "eslint-webpack-plugin": "^3.1.1",
     "fetch-intercept": "^2.4.0",
     "file-loader": "^6.2.0",
+    "fork-ts-checker-webpack-plugin": "^7.2.11",
     "html-webpack-plugin": "^5.5.0",
     "isomorphic-fetch": "^3.0.0",
     "jsdom": "^20.0.0",
@@ -42,14 +43,13 @@
     "webpack-cli": "^4.9.1"
   },
   "scripts": {
-    "prebuild": "tsc --noEmit",
     "build": "NODE_ENV=production webpack",
     "build:sourcemaps": "NODE_ENV=production GEN_SOURCE_MAPS=true webpack",
     "start": "webpack",
     "dev": "webpack --color --watch",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "test": "vitest run",
-    "pretest:e2e": "playwright install chromium && ([ -d dist ] || yarn build) && sleep 5",
+    "pretest:e2e": "playwright install chromium && ([ -d dist ] || yarn build)",
     "test:e2e": "playwright test",
     "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes && yarn run push-release-branch",
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",

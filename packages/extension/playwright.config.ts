@@ -3,6 +3,11 @@ import type { PlaywrightTestConfig } from "@playwright/test"
 import { devices } from "@playwright/test"
 
 const config: PlaywrightTestConfig = {
+  timeout: 5 * 60e3, // 5 minutes
+  reportSlowTests: {
+    threshold: 1 * 60e3, // 1 minutes
+    max: 5,
+  },
   forbidOnly: !!process.env.CI,
   testDir: "./e2e",
   retries: process.env.CI ? 2 : 0,
@@ -11,11 +16,7 @@ const config: PlaywrightTestConfig = {
   },
   projects: [
     {
-      name: "Extended view",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "Extended view",
+      name: "Plugin view",
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 360, height: 600 },
