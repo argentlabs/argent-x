@@ -23,11 +23,15 @@ import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useNetwork } from "../networks/useNetworks"
 
 function getErrorMessageFromErrorDump(errorDump?: string) {
-  if (!isString(errorDump)) {
+  try {
+    if (!isString(errorDump)) {
+      return undefined
+    }
+    const errorCode = errorDump.match(/^Error message: (.+)$/im)
+    return errorCode?.[1] ?? undefined
+  } catch {
     return undefined
   }
-  const errorCode = errorDump.match(/^Error message: (.+)$/im)
-  return errorCode?.[1] ?? undefined
 }
 
 const HeadContainer = styled.div`
