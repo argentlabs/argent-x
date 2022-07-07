@@ -1,12 +1,12 @@
 import { uniqWith } from "lodash-es"
 import { Status } from "starknet"
 
+import { KeyValueStorage } from "../../shared/storage/keyvalue"
 import { Transaction, TransactionRequest } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/wallet.service"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
-import { setIntervalAsync } from "./setIntervalAsync"
 import type { GetTransactionsStore } from "./store"
 import { checkTransactionHash } from "./transactionExecution"
 import { FetchTransactions, getTransactionHistory } from "./voyager"
@@ -22,7 +22,7 @@ export interface TransactionTracker {
   ) => Promise<void>
   get: (transactionHash: string) => Promise<Transaction | null>
   getAll: (statusIn?: Status[]) => Promise<Transaction[]>
-  stop: () => void
+  handleUpdate: () => Promise<void>
 }
 
 export type TransactionUpdateListener = (updates: Transaction[]) => void
@@ -31,20 +31,28 @@ type GetTransactionsTracker = (
   getTransactionsStore: GetTransactionsStore,
   fetchTransactions: FetchTransactions,
   onUpdate?: TransactionUpdateListener,
-  updateInterval?: number,
-) => TransactionTracker
+) => Promise<TransactionTracker>
 
-export const getTransactionsTracker: GetTransactionsTracker = (
+const transactionTrackerMemoryStore = new KeyValueStorage(
+  {
+    accounts: [] as WalletAccount[],
+    updateCounter: 0,
+  },
+  "transactionTracker",
+)
+
+export const getTransactionsTracker: GetTransactionsTracker = async (
   getTransactionsStore,
   fetchTransactions,
   onUpdate,
-  updateInterval = 15e3, // 15 seconds
   checkHistory = 4 * 5, // check history every 20 update cycles ~ 5 minutes when update interval is 15 seconds
 ) => {
-  const accounts: WalletAccount[] = []
+  const accounts = await transactionTrackerMemoryStore.getItem("accounts")
   const transactionsStore = getTransactionsStore()
 
-  let updateCounter = 0
+  const updateCounter = await transactionTrackerMemoryStore.getItem(
+    "updateCounter",
+  )
   const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
     const needsHistoryUpdate = updateCounter === 0
@@ -73,10 +81,11 @@ export const getTransactionsTracker: GetTransactionsTracker = (
     await transactionsStore.addItems(updates)
     onUpdate?.(updates)
 
-    updateCounter = (updateCounter + 1) % checkHistory // as this is done at the very end, onerror it will not be incremented and therefore keep the history cycle refreshing at 15 seconds
+    await transactionTrackerMemoryStore.setItem(
+      "updateCounter",
+      (updateCounter + 1) % checkHistory,
+    ) // as this is done at the very end, onerror it will not be incremented and therefore keep the history cycle refreshing at 15 seconds
   }
-
-  const clearUpdate = setIntervalAsync(handleUpdate, updateInterval)
 
   const add = async (transaction: TransactionRequest) => {
     // sanity checks
@@ -96,13 +105,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
   return {
     load: async (accountsToPopulate) => {
       const initialAccounts = uniqWith(accountsToPopulate, accountsEqual)
-      const initialTransactions = await getTransactionHistory(
-        initialAccounts,
-        [],
-        fetchTransactions,
-      )
-      transactionsStore.addItems(initialTransactions)
-      accounts.splice(0, accounts.length, ...initialAccounts)
+      return transactionTrackerMemoryStore.setItem("accounts", initialAccounts)
     },
     add,
     addAccount: async (account, transaction) => {
@@ -111,7 +114,10 @@ export const getTransactionsTracker: GetTransactionsTracker = (
           accountsEqual(existingAccount, account),
         )
       ) {
-        accounts.push(account)
+        return transactionTrackerMemoryStore.setItem("accounts", [
+          ...accounts,
+          account,
+        ])
       }
       await add(transaction)
     },
@@ -125,6 +131,6 @@ export const getTransactionsTracker: GetTransactionsTracker = (
           ? (transaction) => statusIn.includes(transaction.status)
           : undefined,
       ),
-    stop: clearUpdate,
+    handleUpdate,
   }
 }

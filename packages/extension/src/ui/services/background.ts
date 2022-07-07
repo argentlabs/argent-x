@@ -1,8 +1,4 @@
-import {
-  messageStream,
-  sendMessage,
-  waitForMessage,
-} from "../../shared/messages"
+import { sendMessage, waitForMessage } from "../../shared/messages"
 
 export const getMessagingPublicKey = async () => {
   sendMessage({ type: "GET_MESSAGING_PUBLIC_KEY" })
@@ -20,10 +16,4 @@ export const removePreAuthorization = async (host: string) => {
 
 export const resetPreAuthorizatinos = () => {
   sendMessage({ type: "RESET_PREAUTHORIZATIONS" })
-}
-
-if (process.env.NODE_ENV === "development") {
-  messageStream.subscribe(([message]) => {
-    console.log("Received message", message)
-  })
 }

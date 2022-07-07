@@ -24,42 +24,50 @@ import { handleSessionMessage } from "./sessionMessaging"
 import { handleSettingsMessage } from "./settingsMessaging"
 import { Storage } from "./storage"
 import { handleTokenMessage } from "./tokenMessaging"
+import { onAlarm, setAlarm } from "./transactions/alarm"
 import { trackTransations } from "./transactions/notifications"
 import { getTransactionsStore } from "./transactions/store"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { getTransactionsTracker } from "./transactions/transactions"
 import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { Wallet, WalletStorageProps } from "./wallet"
+
+const storage = new Storage<WalletStorageProps>({}, "wallet")
+const wallet = new Wallet(
+  storage,
+  loadContracts,
+  getNetworkImplementation,
+  () => sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" }),
+)
+
+setAlarm("background_check_transactions", {
+  periodInMinutes: 1,
+})
 ;(async () => {
-  const messagingKeys = await getMessagingKeys()
-  const storage = new Storage<WalletStorageProps>({}, "wallet")
+  // parallelise the loading of the injected services
+  const [messagingKeys, transactionTracker, actionQueue] = await Promise.all([
+    getMessagingKeys(),
+    getTransactionsTracker(
+      getTransactionsStore,
+      fetchVoyagerTransactions,
+      trackTransations,
+    ),
+    getQueue<ActionItem>({
+      onUpdate: (actions) => {
+        sendMessageToActiveTabsAndUi({
+          type: "ACTIONS_QUEUE_UPDATE",
+          data: { actions },
+        })
+      },
+    }),
+    wallet.setup(), // ignore result, just make sure it completes
+  ])
 
-  const onAutoLock = () =>
-    sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
-  const wallet = new Wallet(
-    storage,
-    loadContracts,
-    getNetworkImplementation,
-    onAutoLock,
-  )
-  await wallet.setup()
-
-  // may get reassigned when a recovery happens
-  const transactionTracker = getTransactionsTracker(
-    getTransactionsStore,
-    fetchVoyagerTransactions,
-    trackTransations,
-  )
-  transactionTracker.load(await wallet.getAccounts()) // no await here to defer loading
-
-  const actionQueue = await getQueue<ActionItem>({
-    onUpdate: (actions) => {
-      sendMessageToActiveTabsAndUi({
-        type: "ACTIONS_QUEUE_UPDATE",
-        data: { actions },
-      })
-    },
+  onAlarm("background_check_transactions", async () => {
+    await transactionTracker.handleUpdate()
   })
+
+  transactionTracker.load(await wallet.getAccounts())
 
   const background: BackgroundService = {
     wallet,
@@ -81,10 +89,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
   ] as Array<HandleMessage<MessageType>>
 
   messageStream.subscribe(async ([msg, sender]) => {
-    const sendToTabAndUi = async (msg: MessageType) => {
-      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
-    }
-
     // forward UI messages to rest of the tabs
     if (!hasTab(sender.tab?.id)) {
       sendMessageToActiveTabs(msg)
@@ -97,7 +101,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
           sender,
           background,
           messagingKeys,
-          sendToTabAndUi,
+          sendToTabAndUi: sendMessageToActiveTabsAndUi,
         })
       } catch (error) {
         if (error instanceof UnhandledMessage) {

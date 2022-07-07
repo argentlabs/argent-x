@@ -16,6 +16,7 @@
   "permissions": [
     "downloads",
     "tabs",
+    "alarms",
     "storage",
     "notifications",
     "http://localhost/*"

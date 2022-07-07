@@ -1,12 +1,11 @@
 import "isomorphic-fetch"
 
 import { Call } from "starknet"
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import waitForExpect from "wait-for-expect"
 
 import { ArrayStorage } from "../src/background/storage/array"
 import { getTransactionsStatusUpdate } from "../src/background/transactions/determineUpdates"
-import { setIntervalAsync } from "../src/background/transactions/setIntervalAsync"
 import { nameTransaction } from "../src/background/transactions/transactionNames"
 import {
   TransactionTracker,
@@ -46,17 +45,12 @@ describe("transactions", () => {
   let txTracker: TransactionTracker
   const fn = vi.fn()
   beforeEach(async () => {
-    txTracker = getTransactionsTracker(
+    txTracker = await getTransactionsTracker(
       getTransactionsStore,
       fetchMockTransactions,
       fn,
-      1000,
     )
     await txTracker.load([wallet])
-  })
-  afterEach(() => {
-    fn.mockReset()
-    txTracker.stop()
   })
   test("should get all transactions when initializing", async () => {
     const transactions = await txTracker.getAll()
@@ -187,26 +181,6 @@ describe("getTransactionsStatusUpdate()", () => {
     )
 
     expect(change.length).toBe(2)
-  })
-})
-
-describe("setAsyncInterval()", () => {
-  test("should run fn every n seconds", async () => {
-    const fn = vi.fn()
-    const n = 100
-
-    const stop = setIntervalAsync(fn, n)
-    expect(fn).toHaveBeenCalledTimes(0)
-    await wait(n)
-    expect(fn).toHaveBeenCalledTimes(1)
-    await wait(n / 2)
-    expect(fn).toHaveBeenCalledTimes(1)
-    await wait(n / 2)
-    expect(fn).toHaveBeenCalledTimes(2)
-
-    stop()
-    await wait(n * 2)
-    expect(fn).toHaveBeenCalledTimes(2)
   })
 })
 

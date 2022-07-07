@@ -1,4 +1,5 @@
 import { getMessage } from "@extend-chrome/messages"
+import { SendOptions } from "@extend-chrome/messages/types/types"
 
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
@@ -28,8 +29,28 @@ export type WindowMessageType = MessageType & {
   extensionId: string
 }
 
-export const [sendMessage, messageStream, _waitForMessage] =
+export const [_sendMessage, messageStream, _waitForMessage] =
   getMessage<MessageType>("ARGENTX")
+
+if (
+  process.env.NODE_ENV === "development" &&
+  process.env.DEBUG_MESSAGING === "true"
+) {
+  messageStream.subscribe(([message]) => {
+    console.log("Received message", message)
+  })
+}
+
+export const sendMessage = (message: MessageType, options?: SendOptions) => {
+  const x = _sendMessage(message, options)
+  if (
+    process.env.NODE_ENV === "development" &&
+    process.env.DEBUG_MESSAGING === "true"
+  ) {
+    console.log("Sending message", message)
+  }
+  return x
+}
 
 export async function waitForMessage<
   K extends MessageType["type"],
