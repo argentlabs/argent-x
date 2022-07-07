@@ -5,7 +5,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
-import { ColumnCenter } from "../../components/Column"
+import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
 import { StyledControlledInput } from "../../components/InputText"
@@ -109,7 +109,7 @@ export const SendNftScreen: FC = () => {
 
       <ColumnCenter>
         <StyledForm onSubmit={handleSubmit(onSubmit)}>
-          <ColumnCenter>
+          <Column gap="12px">
             <RowCentered>
               <NftImageContainer>
                 {nft.animation_uri ? (
@@ -136,7 +136,7 @@ export const SendNftScreen: FC = () => {
                 <FormError>{errors.recipient.message}</FormError>
               )}
             </div>
-          </ColumnCenter>
+          </Column>
           <NextButton type="submit" disabled={disableSubmit}>
             Next
           </NextButton>
