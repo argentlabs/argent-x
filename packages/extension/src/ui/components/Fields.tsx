@@ -83,3 +83,8 @@ export const FieldKeyMeta = styled(FieldKey)`
 `
 
 export const FieldValueMeta = styled(FieldKeyMeta)``
+
+export const LeftPaddedField = styled.div`
+  margin-left: 8px;
+  text-align: right;
+`

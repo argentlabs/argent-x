@@ -12,6 +12,7 @@ import { TransactionBanner } from "./TransactionBanner"
 import { TransactionItem } from "./TransactionItem"
 
 export interface ITransactionsList {
+  networkId: string
   transactions: Call | Call[]
   transactionReview?: ApiTransactionReviewResponse
   tokensByNetwork?: TokenDetails[]
@@ -20,6 +21,7 @@ export interface ITransactionsList {
 /** Renders one or more transactions with review if available */
 
 export const TransactionsList: FC<ITransactionsList> = ({
+  networkId,
   transactions,
   transactionReview,
   tokensByNetwork = [],
@@ -42,6 +44,7 @@ export const TransactionsList: FC<ITransactionsList> = ({
       {transactionsArray.map((transaction, index) => (
         <TransactionItem
           key={index}
+          networkId={networkId}
           transaction={transaction}
           tokensByNetwork={tokensByNetwork}
         />
