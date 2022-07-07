@@ -129,7 +129,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
                 <IconWrapper>
                   <VisibilityOff fontSize="inherit" htmlColor="white" />
                 </IconWrapper>
-                {showDelete ? "Delete" : "Hide"} Account
+                {showDelete ? "Delete" : "Hide"} account
               </MenuItem>
             </MenuItemWrapper>
           )}
