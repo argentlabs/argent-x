@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { useAppState } from "./app.state"
 import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { NftScreen } from "./features/accountNfts/NftScreen"
+import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
@@ -138,6 +139,7 @@ const walletRoutes = (
 
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
+    <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route path={routes.funding.path} element={<FundingScreen />} />

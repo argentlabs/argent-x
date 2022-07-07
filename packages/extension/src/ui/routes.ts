@@ -65,6 +65,11 @@ export const routes = {
     (tokenAddress: string) => `/send-token/${tokenAddress}`,
     "/send-token/:tokenAddress",
   ),
+  sendNft: route(
+    (contractAddress: string, tokenId: string) =>
+      `/account/send-nft/${contractAddress}/${tokenId}`,
+    `/account/send-nft/:contractAddress/:tokenId`,
+  ),
   transactionDetail: route(
     (txHash: string) => `/account/activity/transaction-detail/${txHash}`,
     `/account/activity/transaction-detail/:txHash`,

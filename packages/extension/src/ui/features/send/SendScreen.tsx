@@ -14,6 +14,7 @@ import { Spinner } from "../../components/Spinner"
 import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
+import { AccountNfts } from "../accountNfts/AccountNfts"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddTokenIconButton } from "../accountTokens/AccountTokens"
 import { TokenList } from "../accountTokens/TokenList"
@@ -64,7 +65,11 @@ const Tab = styled.div<{ active: boolean }>`
 `
 
 const TabView = styled.div`
-  margin: 32px -24px 0;
+  margin: 24px -24px 0;
+`
+
+const StyledAccountNfts = styled(AccountNfts)`
+  padding-top: 0;
 `
 
 type SendAssetTab = "tokens" | "nfts"
@@ -147,7 +152,7 @@ export const SendScreen: FC = () => {
                 </TokenWrapper>
               </>
             ) : (
-              <div></div>
+              <StyledAccountNfts account={account} withHeader={false} />
             )}
           </Suspense>
         </TabView>

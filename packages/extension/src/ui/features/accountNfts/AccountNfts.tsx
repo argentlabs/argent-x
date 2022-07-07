@@ -63,6 +63,7 @@ const NftItem = styled.figure`
 
 interface AccountNftsProps {
   account: Account
+  withHeader?: boolean
 }
 
 // FIXME: as soon as aspect is on mainnet this needs to be network aware
@@ -118,10 +119,14 @@ const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
   return <ErrorBoundaryFallback title="Seems like Play Oasis API is down..." />
 }
 
-export const AccountNfts: FC<AccountNftsProps> = ({ account }) => {
+export const AccountNfts: FC<AccountNftsProps> = ({
+  account,
+  withHeader = true,
+  ...rest
+}) => {
   return (
-    <Container>
-      <Header>Collectibles</Header>
+    <Container {...rest}>
+      {withHeader && <Header>Collectibles</Header>}
       <ErrorBoundary fallback={<NftsFallback account={account} />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <Nfts account={account} />
