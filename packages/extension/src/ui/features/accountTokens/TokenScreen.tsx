@@ -32,6 +32,7 @@ import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
+import { isLoadingPulse } from "./TokenListItem"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
@@ -102,10 +103,14 @@ const BalanceSymbol = styled.div`
   margin-left: 5px;
 `
 
-const InlineBalanceAndSymbol = styled.div`
+const InlineBalanceAndSymbol = styled.div<{
+  isLoading?: boolean
+}>`
   display: flex;
   flex-direction: row;
   align-items: baseline;
+
+  ${isLoadingPulse}
 `
 
 const TokenBalance = styled.div`
@@ -229,7 +234,7 @@ export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
   const account = useSelectedAccount()
-  const { tokenDetails } = useTokensWithBalance(account)
+  const { tokenDetails, isValidating } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = account && getFeeToken(account.networkId)
 
@@ -324,13 +329,15 @@ export const TokenScreen: FC = () => {
         </TokenTitle>
         <BalanceAlert>
           <BalanceTitle>Your balance</BalanceTitle>
-          <InlineBalanceAndSymbol>
+          <InlineBalanceAndSymbol isLoading={isValidating}>
             <CopyToClipboard text={balance}>
-              <BalanceAmount data-testid="tokenBalance">
-                {balance}
-              </BalanceAmount>
+              <>
+                <BalanceAmount data-testid="tokenBalance">
+                  {balance}
+                </BalanceAmount>
+                <BalanceSymbol>{symbol}</BalanceSymbol>
+              </>
             </CopyToClipboard>
-            <BalanceSymbol>{symbol}</BalanceSymbol>
           </InlineBalanceAndSymbol>
           {currencyValue !== undefined && (
             <TokenBalance>{prettifyCurrencyValue(currencyValue)}</TokenBalance>

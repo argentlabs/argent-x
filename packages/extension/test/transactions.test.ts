@@ -14,7 +14,11 @@ import {
 } from "../src/background/transactions/transactions"
 import { FetchTransactions } from "../src/background/transactions/voyager"
 import { defaultNetwork } from "../src/shared/networks"
-import { Transaction, TransactionRequest } from "../src/shared/transactions"
+import {
+  Transaction,
+  TransactionRequest,
+  compareTransactions,
+} from "../src/shared/transactions"
 import { WalletAccount } from "../src/shared/wallet.model"
 import { MockStorage } from "./mock"
 import transactionsMock from "./transactions.mock.json"
@@ -35,8 +39,7 @@ export const getTransactionsStore = () =>
   new ArrayStorage<Transaction>(
     [],
     new MockStorage({ inner: [] }),
-    (a, b) =>
-      a.hash === b.hash && a.account.network.id === a.account.network.id,
+    compareTransactions,
   )
 
 const fetchMockTransactions: FetchTransactions = async (_, __) =>
@@ -64,9 +67,12 @@ describe("transactions", () => {
     expect(fn).toBeCalledTimes(0)
   })
   test("should get a transaction by hash", async () => {
-    const transaction = await txTracker.get(
-      "0x16d38d961a659b7565b596060ca812b863a39766accab5a8fd93ace56e6001a",
-    )
+    const transaction = await txTracker.get({
+      hash: "0x16d38d961a659b7565b596060ca812b863a39766accab5a8fd93ace56e6001a",
+      account: {
+        networkId: wallet.networkId,
+      },
+    })
     expect(transaction).toMatchSnapshot()
     expect(fn).toBeCalledTimes(0)
   })
@@ -82,7 +88,10 @@ describe("transactions", () => {
       },
     }
     await txTracker.add(transaction)
-    const transactions = await txTracker.get(transactionHash)
+    const transactions = await txTracker.get({
+      hash: transactionHash,
+      account: { networkId: wallet.networkId },
+    })
     expect(transactions).toMatchObject({
       // after being added, the transaction should be in the store with the default status
       ...transaction,

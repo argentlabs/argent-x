@@ -23,12 +23,15 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
     }),
   )
 
-  const updatedTransactions = fetchedTransactions.reduce((acc, transaction) => {
-    if (transaction.status === "fulfilled") {
-      acc.push(transaction.value)
-    }
-    return acc
-  }, [] as Transaction[])
+  const updatedTransactions = fetchedTransactions.reduce<Transaction[]>(
+    (acc, transaction) => {
+      if (transaction.status === "fulfilled") {
+        acc.push(transaction.value)
+      }
+      return acc
+    },
+    [],
+  )
 
   return getTransactionsStatusUpdate(transactions, updatedTransactions) // filter out transactions that have not changed
 }

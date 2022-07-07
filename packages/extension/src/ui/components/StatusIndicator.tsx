@@ -73,8 +73,8 @@ const PulseAnimation = keyframes`
 export const TransactionStatusIndicator = styled(StatusIndicator)`
   margin-right: 8px;
 
-  ${({ color = "CONNECTED" }) =>
-    color === "DEPLOYING" &&
+  ${({ color }) =>
+    color === "orange" &&
     css`
       box-shadow: 0 0 0 0 rgba(255, 168, 92, 1);
       transform: scale(1);

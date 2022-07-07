@@ -64,19 +64,9 @@ export const useTokens = create<State>((set, get) => ({
     }
     const newToken = { ...token, showAlways: true }
     await addTokenMsg(mapTokenDetailsToToken(newToken))
-
-    // optimistic update
-    set((state) => ({
-      tokens: [...state.tokens, newToken],
-    }))
   },
   removeToken: async (tokenAddress: string) => {
     await removeTokenMsg(tokenAddress)
-
-    // optimistic update
-    set((state) => ({
-      tokens: state.tokens.filter((token) => token.address !== tokenAddress),
-    }))
   },
 }))
 
@@ -127,6 +117,10 @@ export const useTokensWithBalance = (
   const tokensInNetwork = useTokens(
     selectTokensByNetwork(selectedAccount?.networkId ?? ""),
   )
+  const tokenAddresses = useMemo(
+    () => tokensInNetwork.map((t) => t.address),
+    [tokensInNetwork],
+  )
 
   const { data, isValidating, error, mutate } = useSWR(
     // skip if no account selected
@@ -140,7 +134,7 @@ export const useTokensWithBalance = (
       }
 
       const balances = await fetchAllTokensBalance(
-        tokensInNetwork.map((t) => t.address),
+        tokenAddresses,
         selectedAccount,
       )
 
@@ -152,8 +146,9 @@ export const useTokensWithBalance = (
     },
   )
 
-  // refetch balances on transaction success
+  // refetch balances on transaction success or token edit (token was added or removed)
   useEffect(() => {
+    mutate()
     const subscription = messageStream.subscribe(([msg]) => {
       if (msg.type === "TRANSACTION_SUCCESS") {
         mutate() // refetch balances
@@ -164,18 +159,18 @@ export const useTokensWithBalance = (
         subscription.unsubscribe()
       }
     }
-  }, [])
+  }, [tokenAddresses.join(":")])
 
   const tokenDetails = useMemo(() => {
     return tokensInNetwork
       .map((token) => ({
         ...token,
-        balance: data?.[token.address],
+        balance: data?.[token.address] ?? BigNumber.from(0),
       }))
       .filter(
         (token) => token.showAlways || (token.balance && token.balance.gt(0)),
       )
-  }, [tokensInNetwork, data])
+  }, [tokenAddresses, data])
 
   return { tokenDetails, isValidating, error }
 }

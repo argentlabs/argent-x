@@ -25,8 +25,11 @@ const validateToken = (token: Partial<Token>): token is Token => {
   }
 }
 
+const extendByDefaultTokens = (tokens: Token[]): Token[] =>
+  parsedDefaultTokens.concat(tokens)
+
 export const getTokens = async (): Promise<Token[]> => {
-  return parsedDefaultTokens.concat(await customTokenStore.getItem("tokens"))
+  return extendByDefaultTokens(await customTokenStore.getItem("tokens"))
 }
 
 export const hasToken = async (address: Token["address"]): Promise<boolean> => {
@@ -65,5 +68,5 @@ export const removeToken = async (
   }
   customTokens.splice(index, 1)
   await customTokenStore.setItem("tokens", customTokens)
-  return { success: true, tokens: customTokens }
+  return { success: true, tokens: extendByDefaultTokens(customTokens) }
 }

@@ -1,6 +1,7 @@
 import { FC, useCallback, useState } from "react"
 import styled from "styled-components"
 
+import { entryPointToHumanReadable } from "../../../../shared/transactions"
 import { CopyTooltip } from "../../../components/CopyTooltip"
 import { ExpandableHeightBox } from "../../../components/ExpandableHeightBox"
 import {
@@ -63,7 +64,9 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
       </Field>
       <Field>
         <FieldKey>Action</FieldKey>
-        <FieldValue>{transaction.entrypoint}</FieldValue>
+        <FieldValue>
+          {entryPointToHumanReadable(transaction.entrypoint)}
+        </FieldValue>
       </Field>
       <Field clickable onClick={toggleExpanded}>
         <FieldKey>View details</FieldKey>

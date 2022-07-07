@@ -1,7 +1,9 @@
+import { isString } from "lodash-es"
 import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { compareTransactions } from "../../../shared/transactions"
 import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
@@ -20,6 +22,18 @@ import { useSelectedAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useNetwork } from "../networks/useNetworks"
 
+function getErrorMessageFromErrorDump(errorDump?: string) {
+  try {
+    if (!isString(errorDump)) {
+      return undefined
+    }
+    const errorCode = errorDump.match(/^Error message: (.+)$/im)
+    return errorCode?.[1] ?? undefined
+  } catch {
+    return undefined
+  }
+}
+
 const HeadContainer = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -33,8 +47,8 @@ const CloseIconWrapper = styled.div`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 9px 16px 0px;
-  margin-bottom: 68px;
+  padding: 0 16px 0px;
+  margin-bottom: 24px;
 `
 
 const StyledContentCopyIcon = styled(ContentCopyIcon)`
@@ -80,13 +94,30 @@ export const TransactionDetail: FC = () => {
 
   const { transactions } = useAccountTransactions(account)
 
-  const transaction = transactions.find((tx) => tx.hash === txHash)
-
-  if (!transaction || !account) {
+  if (!account) {
     return <Navigate to={routes.accounts()} />
+  } else if (!txHash) {
+    return <Navigate to={routes.accountTokens()} />
+  }
+
+  const transaction = transactions.find((tx) =>
+    compareTransactions(tx, {
+      hash: txHash,
+      account: {
+        networkId: network.id,
+      },
+    }),
+  )
+
+  if (!transaction) {
+    return <Navigate to={routes.accountTokens()} />
   }
 
   const isRejected = transaction.status === "REJECTED"
+
+  const errorMessage =
+    isRejected &&
+    getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
 
   const date = transaction.timestamp && new Date(transaction.timestamp * 1000)
 
@@ -107,6 +138,12 @@ export const TransactionDetail: FC = () => {
             <FieldKey>Status</FieldKey>
             <FieldValue>{isRejected ? "Failed" : "Complete"}</FieldValue>
           </Field>
+          {errorMessage && (
+            <Field>
+              <FieldKey>Reason</FieldKey>
+              <FieldValue>{errorMessage}</FieldValue>
+            </Field>
+          )}
           <Field>
             <FieldKey>Time</FieldKey>
             {dateLabel && <FieldValue>{dateLabel}</FieldValue>}
