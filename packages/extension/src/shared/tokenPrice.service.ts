@@ -1,7 +1,5 @@
 import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber, BigNumberish, utils } from "ethers"
-import { isString } from "lodash-es"
-import urlJoin from "url-join"
 
 import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
 import { UniqueToken } from "./token"
@@ -10,19 +8,6 @@ import {
   prettifyCurrencyNumber,
   prettifyTokenNumber,
 } from "./utils/number"
-
-const ARGENT_API_BASE_URL = process.env.ARGENT_API_BASE_URL as string
-
-export const ARGENT_API_ENABLED =
-  isString(ARGENT_API_BASE_URL) && ARGENT_API_BASE_URL.length > 0
-
-export const ARGENT_API_TOKENS_PRICES_URL = ARGENT_API_ENABLED
-  ? urlJoin(ARGENT_API_BASE_URL, "tokens/prices?chain=starknet")
-  : undefined
-
-export const ARGENT_API_TOKENS_INFO_URL = ARGENT_API_ENABLED
-  ? urlJoin(ARGENT_API_BASE_URL, "tokens/info?chain=starknet")
-  : undefined
 
 /** shape of individual entity in the /tokens/info endpoint */
 export interface ApiTokenDetails {

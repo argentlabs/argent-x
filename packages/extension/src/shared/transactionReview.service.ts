@@ -1,23 +1,8 @@
-import { isArray, isString } from "lodash-es"
+import { isArray } from "lodash-es"
 import { Call } from "starknet"
-import urlJoin from "url-join"
 
-import { fetcher } from "./utils/fetcher"
-
-const ARGENT_TRANSACTION_REVIEW_API_BASE_URL = process.env
-  .ARGENT_TRANSACTION_REVIEW_API_BASE_URL as string
-
-export const ARGENT_TRANSACTION_REVIEW_API_ENABLED =
-  isString(ARGENT_TRANSACTION_REVIEW_API_BASE_URL) &&
-  ARGENT_TRANSACTION_REVIEW_API_BASE_URL.length > 0
-
-export const ARGENT_TRANSACTION_REVIEW_STARKNET_URL =
-  ARGENT_TRANSACTION_REVIEW_API_ENABLED
-    ? urlJoin(
-        ARGENT_TRANSACTION_REVIEW_API_BASE_URL,
-        "transactions/review/starknet",
-      )
-    : undefined
+import { ARGENT_TRANSACTION_REVIEW_STARKNET_URL } from "./api/constants"
+import { Fetcher, fetcher } from "./api/fetcher"
 
 export type ApiTransactionReviewAssessment =
   | "warn"
@@ -93,12 +78,14 @@ export interface IFetchTransactionReview {
   network: ApiTransactionReviewNetwork
   accountAddress: string
   transactions: Call | Call[]
+  fetcher?: Fetcher
 }
 
 export const fetchTransactionReview = ({
   network,
   accountAddress,
   transactions,
+  fetcher: fetcherImpl = fetcher,
 }: IFetchTransactionReview) => {
   if (!ARGENT_TRANSACTION_REVIEW_STARKNET_URL) {
     throw "Transaction review endpoint is not defined"
@@ -109,7 +96,7 @@ export const fetchTransactionReview = ({
     account: accountAddress,
     calls,
   }
-  return fetcher(ARGENT_TRANSACTION_REVIEW_STARKNET_URL, {
+  return fetcherImpl(ARGENT_TRANSACTION_REVIEW_STARKNET_URL, {
     method: "POST",
     headers: {
       Accept: "application/json",
