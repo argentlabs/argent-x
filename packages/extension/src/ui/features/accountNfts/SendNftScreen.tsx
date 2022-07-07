@@ -5,7 +5,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
-import { ButtonGroup } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
@@ -19,42 +18,20 @@ import {
   sendTransaction,
 } from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import {
+  FormError,
+  InputGroupAfter,
+  NextButton,
+} from "../accountTokens/SendTokenScreen"
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
 
-const StyledIconBar = styled(IconBar)`
-  align-items: flex-start;
-`
-
-const FormContainer = styled(ColumnCenter)`
-  padding: 24px;
-`
-
-const InputGroupAfter = styled.div`
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-`
-
-export const FormError = styled.p`
-  margin-top: 2px;
-  font-size: 12px;
-  line-height: 16px;
-  color: #ff675c;
-  text-align: left;
-`
-
 export const NftImageContainer = styled.div`
   width: 96px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 
   img {
     width: 100%;
@@ -62,7 +39,15 @@ export const NftImageContainer = styled.div`
     border-radius: 8px;
   }
 `
-
+export const StyledForm = styled.form`
+  padding: 24px;
+  height: 87vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+`
 export interface SendNftInput {
   recipient: string
 }
@@ -115,41 +100,47 @@ export const SendNftScreen: FC = () => {
 
   return (
     <>
-      <StyledIconBar
+      <IconBar
         back
         childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
       >
         <H3>{nft.name}</H3>
-      </StyledIconBar>
+      </IconBar>
 
-      <FormContainer>
-        <RowCentered>
-          <NftImageContainer>
-            {nft.animation_url ? (
-              <LazyNftModelViewer nft={nft} />
-            ) : (
-              <img src={nft.copy_image_url} alt={nft.name} />
-            )}
-          </NftImageContainer>
-        </RowCentered>
-
-        <ButtonGroup as="form" onSubmit={handleSubmit(onSubmit)}>
-          <StyledControlledInput
-            autoComplete="off"
-            control={control}
-            placeholder="Recipient's address"
-            name="recipient"
-            type="text"
-          >
-            <InputGroupAfter>
-              <AtTheRateIcon />
-            </InputGroupAfter>
-          </StyledControlledInput>
-          {errors.recipient && (
-            <FormError>{errors.recipient.message}</FormError>
-          )}
-        </ButtonGroup>
-      </FormContainer>
+      <ColumnCenter>
+        <StyledForm onSubmit={handleSubmit(onSubmit)}>
+          <ColumnCenter>
+            <RowCentered>
+              <NftImageContainer>
+                {nft.animation_url ? (
+                  <LazyNftModelViewer nft={nft} />
+                ) : (
+                  <img src={nft.copy_image_url} alt={nft.name} />
+                )}
+              </NftImageContainer>
+            </RowCentered>
+            <div>
+              <StyledControlledInput
+                autoComplete="off"
+                control={control}
+                placeholder="Recipient's address"
+                name="recipient"
+                type="text"
+              >
+                <InputGroupAfter>
+                  <AtTheRateIcon />
+                </InputGroupAfter>
+              </StyledControlledInput>
+              {errors.recipient && (
+                <FormError>{errors.recipient.message}</FormError>
+              )}
+            </div>
+          </ColumnCenter>
+          <NextButton type="submit" disabled={disableSubmit}>
+            Next
+          </NextButton>
+        </StyledForm>
+      </ColumnCenter>
     </>
   )
 }

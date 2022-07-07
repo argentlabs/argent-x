@@ -10,8 +10,8 @@ import {
   inputAmountSchema,
   parseAmount,
 } from "../../../shared/token"
-import { Button, ButtonGroup } from "../../components/Button"
-import { ColumnCenter } from "../../components/Column"
+import { Button } from "../../components/Button"
+import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
 import { StyledControlledInput } from "../../components/InputText"
@@ -32,7 +32,7 @@ import { formatTokenBalance, toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
 import { useMaxFeeEstimateForTransfer } from "./useMaxFeeForTransfer"
 
-const BalanceText = styled.div`
+export const BalanceText = styled.div`
   font-weight: 600;
   font-size: 15px;
   line-height: 20px;
@@ -40,15 +40,21 @@ const BalanceText = styled.div`
   color: #8f8e8c;
 `
 
-const StyledIconBar = styled(IconBar)`
+export const StyledIconBar = styled(IconBar)`
   align-items: flex-start;
 `
 
-const FormContainer = styled(ColumnCenter)`
+export const StyledForm = styled.form`
   padding: 24px;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
 `
 
-const InputGroupAfter = styled.div`
+export const InputGroupAfter = styled.div`
   position: absolute;
   top: 50%;
   right: 16px;
@@ -59,12 +65,12 @@ const InputGroupAfter = styled.div`
   justify-content: center;
 `
 
-const InputGroupBefore = styled(InputGroupAfter)`
+export const InputGroupBefore = styled(InputGroupAfter)`
   right: unset;
   left: 16px;
 `
 
-const StyledMaxButton = styled(Button)`
+export const StyledMaxButton = styled(Button)`
   border-radius: 100px;
   background-color: #5c5b59;
   display: flex;
@@ -78,7 +84,7 @@ const StyledMaxButton = styled(Button)`
   padding: 4px 8px;
 `
 
-const InputTokenSymbol = styled.span`
+export const InputTokenSymbol = styled.span`
   text-transform: uppercase;
   font-weight: 600;
   font-size: 17px;
@@ -87,16 +93,20 @@ const InputTokenSymbol = styled.span`
 `
 
 export const FormError = styled.p`
-  margin-top: 2px;
-  font-size: 12px;
-  line-height: 16px;
-  color: #ff675c;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #c12026;
+  margin-top: 8px;
+  margin-left: 8px;
   text-align: left;
 `
 
 export const CurrencyValueText = styled(InputTokenSymbol)`
   font-weight: 400;
 `
+
+export const NextButton = styled(Button)``
 
 export interface SendInput {
   recipient: string
@@ -190,21 +200,25 @@ export const SendTokenScreen: FC = () => {
 
   const parsedTokenBalance = token.balance || parseAmount("0", decimals)
 
+  const isInputAmountGtBalance =
+    parsedInputAmount.gt(token.balance?.toString() ?? 0) ||
+    (feeToken?.address === token.address &&
+      (inputAmount === balance ||
+        parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance)))
+
   const handleMaxClick = async () => {
     setMaxClicked(true)
     setMaxInputAmount(token, maxFee)
   }
 
   const disableSubmit =
+    !isDirty ||
     isSubmitting ||
     (submitCount > 0 && !isDirty) ||
-    parsedInputAmount.gt(token.balance?.toString() ?? 0) ||
-    (feeToken?.address === token.address &&
-      (inputAmount === balance ||
-        parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance))) // Balance: 1234, maxInput: 1231, , maxFee: 3, updatedInput: 1233
+    isInputAmountGtBalance // Balance: 1234, maxInput: 1231, , maxFee: 3, updatedInput: 1233
 
   return (
-    <>
+    <div style={{ position: "relative" }}>
       <StyledIconBar back childAfter={<TokenMenu tokenAddress={address} />}>
         <ColumnCenter>
           <H3>Send {symbol}</H3>
@@ -212,9 +226,8 @@ export const SendTokenScreen: FC = () => {
         </ColumnCenter>
       </StyledIconBar>
 
-      <FormContainer>
-        <ButtonGroup
-          as="form"
+      <ColumnCenter>
+        <StyledForm
           onSubmit={handleSubmit(({ amount, recipient }) => {
             sendTransaction({
               to: address,
@@ -227,57 +240,68 @@ export const SendTokenScreen: FC = () => {
             navigate(routes.accountTokens())
           })}
         >
-          <StyledControlledInput
-            autoComplete="off"
-            control={control}
-            placeholder="Amount"
-            name="amount"
-            type="text"
-            onKeyDown={() => {
-              setMaxClicked(false)
-            }}
-            onlyNumeric
-            style={{ padding: "17px 16px 17px 57px" }}
-          >
-            <InputGroupBefore>
-              <TokenIcon name={name} url={image} size={32} />
-            </InputGroupBefore>
-            <InputGroupAfter>
-              {inputAmount ? (
-                <CurrencyValueText>{currencyValue}</CurrencyValueText>
-              ) : (
-                <>
-                  <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
-                  <StyledMaxButton type="button" onClick={handleMaxClick}>
-                    {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
-                  </StyledMaxButton>
-                </>
+          <Column gap="12px">
+            <div>
+              <StyledControlledInput
+                autoComplete="off"
+                control={control}
+                placeholder="Amount"
+                name="amount"
+                type="text"
+                onKeyDown={() => {
+                  setMaxClicked(false)
+                }}
+                onlyNumeric
+                style={{ padding: "17px 16px 17px 57px" }}
+              >
+                <InputGroupBefore>
+                  <TokenIcon name={name} url={image} size={32} />
+                </InputGroupBefore>
+                <InputGroupAfter>
+                  {inputAmount ? (
+                    <CurrencyValueText>{currencyValue}</CurrencyValueText>
+                  ) : (
+                    <>
+                      <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
+                      <StyledMaxButton type="button" onClick={handleMaxClick}>
+                        {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
+                      </StyledMaxButton>
+                    </>
+                  )}
+                </InputGroupAfter>
+              </StyledControlledInput>
+              {inputAmount && isInputAmountGtBalance && (
+                <FormError>Insufficient balance</FormError>
               )}
-            </InputGroupAfter>
-          </StyledControlledInput>
-          {feeToken?.address === token.address && inputAmount === balance && (
-            <FormError>Not enough balance to pay for fees</FormError>
-          )}
-          {maxFeeError && <FormError>{maxFeeError.message}</FormError>}
-          {errors.amount && <FormError>{errors.amount.message}</FormError>}
-          <StyledControlledInput
-            autoComplete="off"
-            control={control}
-            placeholder="Recipient's address"
-            name="recipient"
-            type="text"
-          >
-            {!inputRecipient && (
-              <InputGroupAfter>
-                <AtTheRateIcon />
-              </InputGroupAfter>
-            )}
-          </StyledControlledInput>
-          {errors.recipient && (
-            <FormError>{errors.recipient.message}</FormError>
-          )}
-        </ButtonGroup>
-      </FormContainer>
-    </>
+              {maxFeeError && <FormError>{maxFeeError.message}</FormError>}
+              {errors.amount && <FormError>{errors.amount.message}</FormError>}
+            </div>
+
+            <div>
+              <StyledControlledInput
+                autoComplete="off"
+                control={control}
+                placeholder="Recipient's address"
+                name="recipient"
+                type="text"
+              >
+                {!inputRecipient && (
+                  <InputGroupAfter>
+                    <AtTheRateIcon />
+                  </InputGroupAfter>
+                )}
+              </StyledControlledInput>
+              {errors.recipient && (
+                <FormError>{errors.recipient.message}</FormError>
+              )}
+            </div>
+          </Column>
+
+          <NextButton disabled={disableSubmit} type="submit">
+            Next
+          </NextButton>
+        </StyledForm>
+      </ColumnCenter>
+    </div>
   )
 }
