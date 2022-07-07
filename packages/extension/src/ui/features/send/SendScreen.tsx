@@ -15,6 +15,8 @@ import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { AccountNfts } from "../accountNfts/AccountNfts"
+import { AspectNft } from "../accountNfts/aspect.model"
+import { useNfts } from "../accountNfts/useNfts"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddTokenIconButton } from "../accountTokens/AccountTokens"
 import { TokenList } from "../accountTokens/TokenList"
@@ -91,6 +93,10 @@ export const SendScreen: FC = () => {
 
   const tokenList = useCustomTokenList(tokenDetails, currentQueryValue)
 
+  const { nfts = [] } = useNfts(account)
+
+  const customNftList = useCustomNftList(nfts, currentQueryValue)
+
   if (!account) {
     return <></>
   }
@@ -152,7 +158,11 @@ export const SendScreen: FC = () => {
                 </TokenWrapper>
               </>
             ) : (
-              <StyledAccountNfts account={account} withHeader={false} />
+              <StyledAccountNfts
+                account={account}
+                withHeader={false}
+                customList={customNftList}
+              />
             )}
           </Suspense>
         </TabView>
@@ -177,4 +187,20 @@ const useCustomTokenList = (
         token.symbol.includes(query),
     )
   }, [query, tokenDetails])
+}
+
+const useCustomNftList = (nfts: AspectNft[], query?: string) => {
+  return useMemo(() => {
+    if (!query) {
+      return nfts
+    }
+
+    return nfts.filter(
+      (nft) =>
+        nft.name?.includes(query) ||
+        nft.token_id.includes(query) ||
+        nft.contract_address.includes(query) ||
+        nft.description?.includes(query),
+    )
+  }, [nfts, query])
 }

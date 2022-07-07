@@ -8,6 +8,7 @@ import { Spinner } from "../../components/Spinner"
 import { A, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
+import { AspectNft } from "./aspect.model"
 import { getNftPicture } from "./aspect.service"
 import { useNfts } from "./useNfts"
 
@@ -64,10 +65,11 @@ const NftItem = styled.figure`
 interface AccountNftsProps {
   account: Account
   withHeader?: boolean
+  customList?: AspectNft[]
 }
 
 // FIXME: as soon as aspect is on mainnet this needs to be network aware
-const Nfts: FC<AccountNftsProps> = ({ account }) => {
+const Nfts: FC<AccountNftsProps> = ({ account, customList }) => {
   const navigate = useNavigate()
   const { nfts = [] } = useNfts(account)
 
@@ -94,7 +96,7 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
           </P>
         </>
       )}
-      {nfts.map((nft) => (
+      {(customList || nfts).map((nft) => (
         <NftItem
           key={`${nft.contract_address}-${nft.token_id}`}
           onClick={() =>
@@ -122,6 +124,7 @@ const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
 export const AccountNfts: FC<AccountNftsProps> = ({
   account,
   withHeader = true,
+  customList,
   ...rest
 }) => {
   return (
@@ -129,7 +132,7 @@ export const AccountNfts: FC<AccountNftsProps> = ({
       {withHeader && <Header>Collectibles</Header>}
       <ErrorBoundary fallback={<NftsFallback account={account} />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <Nfts account={account} />
+          <Nfts account={account} customList={customList} />
         </Suspense>
       </ErrorBoundary>
     </Container>
