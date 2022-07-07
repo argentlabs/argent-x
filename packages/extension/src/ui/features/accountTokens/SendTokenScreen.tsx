@@ -284,12 +284,11 @@ export const SendTokenScreen: FC = () => {
                 placeholder="Recipient's address"
                 name="recipient"
                 type="text"
+                style={{ paddingRight: "40px" }}
               >
-                {!inputRecipient && (
-                  <InputGroupAfter>
-                    <AtTheRateIcon />
-                  </InputGroupAfter>
-                )}
+                <InputGroupAfter>
+                  <AtTheRateIcon />
+                </InputGroupAfter>
               </StyledControlledInput>
               {errors.recipient && (
                 <FormError>{errors.recipient.message}</FormError>

@@ -126,6 +126,7 @@ export const SendNftScreen: FC = () => {
                 placeholder="Recipient's address"
                 name="recipient"
                 type="text"
+                style={{ paddingRight: "40px" }}
               >
                 <InputGroupAfter>
                   <AtTheRateIcon />
