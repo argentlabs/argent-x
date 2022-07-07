@@ -1,4 +1,4 @@
-import { capitalize } from "lodash-es"
+import { lowerCase, upperFirst } from "lodash-es"
 import { Status } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
@@ -33,7 +33,7 @@ export const compareTransactions = (
 
 export function entryPointToHumanReadable(entryPoint: string): string {
   try {
-    return capitalize(entryPoint.replaceAll("_", " "))
+    return upperFirst(lowerCase(entryPoint))
   } catch {
     return entryPoint
   }
