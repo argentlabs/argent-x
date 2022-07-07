@@ -2,7 +2,7 @@ import { FC, useCallback, useState } from "react"
 import { Call } from "starknet"
 import styled from "styled-components"
 
-import { knownContracts } from "../../../../shared/contracts"
+import { getKnownContractForAddress } from "../../../../shared/contracts"
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
 import { CopyTooltip } from "../../../components/CopyTooltip"
 import { ExpandableHeightBox } from "../../../components/ExpandableHeightBox"
@@ -49,7 +49,7 @@ export interface IContractIconContainer {
 
 export const ContractIconContainer = styled.div<IContractIconContainer>`
   background-image: ${(props) =>
-    `url(../../../../../assets/contract-icons/${props.fileName})`};
+    `url(../../../../../assets/contracts/icons/${props.fileName})`};
   background-size: cover;
   width: 24px;
   height: 24px;
@@ -64,7 +64,7 @@ const LeftPaddedField = styled.div`
 export const ContractField: FC<Pick<Call, "contractAddress">> = ({
   contractAddress,
 }) => {
-  const knownContract = knownContracts[contractAddress]
+  const knownContract = getKnownContractForAddress(contractAddress)
   if (!knownContract) {
     return null
   }
@@ -73,7 +73,7 @@ export const ContractField: FC<Pick<Call, "contractAddress">> = ({
       <FieldKey>Dapp</FieldKey>
       <FieldValue>
         <ContractIconContainer
-          fileName={knownContract.iconFileName}
+          fileName={knownContract.icon}
         ></ContractIconContainer>
         <LeftPaddedField>{knownContract.name}</LeftPaddedField>
       </FieldValue>
