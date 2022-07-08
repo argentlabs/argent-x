@@ -66,10 +66,15 @@ interface AccountNftsProps {
   account: Account
   withHeader?: boolean
   customList?: AspectNft[]
+  navigateToSend?: boolean
 }
 
 // FIXME: as soon as aspect is on mainnet this needs to be network aware
-const Nfts: FC<AccountNftsProps> = ({ account, customList }) => {
+const Nfts: FC<AccountNftsProps> = ({
+  account,
+  customList,
+  navigateToSend = false,
+}) => {
   const navigate = useNavigate()
   const { nfts = [] } = useNfts(account)
 
@@ -100,7 +105,11 @@ const Nfts: FC<AccountNftsProps> = ({ account, customList }) => {
         <NftItem
           key={`${nft.contract_address}-${nft.token_id}`}
           onClick={() =>
-            navigate(routes.accountNft(nft.contract_address, nft.token_id))
+            navigate(
+              navigateToSend
+                ? routes.sendNft(nft.contract_address, nft.token_id)
+                : routes.accountNft(nft.contract_address, nft.token_id),
+            )
           }
         >
           <img src={getNftPicture(nft)} />
@@ -125,6 +134,7 @@ export const AccountNfts: FC<AccountNftsProps> = ({
   account,
   withHeader = true,
   customList,
+  navigateToSend,
   ...rest
 }) => {
   return (
@@ -132,7 +142,11 @@ export const AccountNfts: FC<AccountNftsProps> = ({
       {withHeader && <Header>Collectibles</Header>}
       <ErrorBoundary fallback={<NftsFallback account={account} />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <Nfts account={account} customList={customList} />
+          <Nfts
+            account={account}
+            customList={customList}
+            navigateToSend={navigateToSend}
+          />
         </Suspense>
       </ErrorBoundary>
     </Container>

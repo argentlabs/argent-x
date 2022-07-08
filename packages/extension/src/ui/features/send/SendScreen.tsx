@@ -147,6 +147,7 @@ export const SendScreen: FC = () => {
                   isValidating={isValidating}
                   tokenList={tokenList}
                   showTokenSymbol
+                  navigateToSend
                 />
                 <TokenWrapper
                   {...makeClickable(() => navigate(routes.newToken()))}
@@ -164,6 +165,7 @@ export const SendScreen: FC = () => {
                 account={account}
                 withHeader={false}
                 customList={customNftList}
+                navigateToSend
               />
             )}
           </Suspense>

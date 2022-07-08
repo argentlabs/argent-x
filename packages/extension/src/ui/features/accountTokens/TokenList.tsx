@@ -12,6 +12,7 @@ interface TokenListProps {
   variant?: TokenListItemVariant
   tokenList: TokenDetailsWithBalance[]
   isValidating: boolean
+  navigateToSend?: boolean
 }
 
 export const TokenList: FC<TokenListProps> = ({
@@ -20,6 +21,7 @@ export const TokenList: FC<TokenListProps> = ({
   isValidating,
   variant,
   tokenList,
+  navigateToSend = false,
 }) => {
   if (!tokenList) {
     return <></>
@@ -29,7 +31,14 @@ export const TokenList: FC<TokenListProps> = ({
     <>
       {showTitle && <SectionHeader>Tokens</SectionHeader>}
       {tokenList.map((token) => (
-        <Link key={token.address} to={routes.token(token.address)}>
+        <Link
+          key={token.address}
+          to={
+            navigateToSend
+              ? routes.sendToken(token.address)
+              : routes.token(token.address)
+          }
+        >
           <TokenListItemContainer
             token={token}
             isLoading={isValidating}
