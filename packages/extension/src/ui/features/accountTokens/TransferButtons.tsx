@@ -55,7 +55,7 @@ export const TransferButtons: FC = () => {
         <label>Add funds</label>
       </LabeledLink>
       {sendToken && (
-        <LabeledLink to={routes.token(sendToken.address)}>
+        <LabeledLink to={routes.sendScreen()}>
           <IconButton size={40}>
             <SendIcon fontSize="medium" />
           </IconButton>

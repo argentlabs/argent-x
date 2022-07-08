@@ -17,28 +17,30 @@ test("send max eth flow", async ({ page, context }) => {
     page,
     context,
   )
+
   await navigateFromAccountToAccountList(page)
   await newAccount(page)
   const a2 = await getAccountAddressFromAccountPage(page)
-  const b2 = await getBalanceFromAccountPage(page, "Ether")
+  const b2 = await getBalanceFromAccountPage(page, "Ethereum")
   expect(b2).toBe("0.0")
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, a1)
-  await navigateFromAccountToTokenDetails(page, "Ether")
+  await navigateFromAccountToTokenDetails(page, "Ethereum")
 
+  await page.click("button:has-text('Send')")
   await page.click("button:has-text('MAX')")
-  await page.fill("input[placeholder='Recipient']", a2)
-  await page.click("button:has-text('Send'):not([disabled])")
+  await page.fill(`input[placeholder="Recipient's address"]`, a2)
+  await page.click("button:has-text('Next'):not([disabled])")
 
   await approveTransaction(page)
 
   await page.waitForSelector("h3:has-text('Pending transactions')")
   await waitForAllPendingTransactionsInAccount(page)
 
-  const b1After = await getBalanceFromAccountPage(page, "Ether")
+  const b1After = await getBalanceFromAccountPage(page, "Ethereum")
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, a2)
-  const b2After = await getBalanceFromAccountPage(page, "Ether")
+  const b2After = await getBalanceFromAccountPage(page, "Ethereum")
 
   expect(b1After).not.toBe(b1)
   expect(b1After.substring(0, 5)).toBe("0.000")

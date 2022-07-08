@@ -5,12 +5,14 @@ import styled from "styled-components"
 import { useAppState } from "./app.state"
 import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { NftScreen } from "./features/accountNfts/NftScreen"
+import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
+import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import {
@@ -39,6 +41,7 @@ import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfi
 import { SeedRecoveryPasswordScreen } from "./features/recovery/SeedRecoveryPasswordScreen"
 import { SeedRecoveryScreen } from "./features/recovery/SeedRecoveryScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
+import { SendScreen } from "./features/send/SendScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
@@ -133,6 +136,10 @@ const walletRoutes = (
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
     />
+
+    <Route path={routes.sendScreen.path} element={<SendScreen />} />
+    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
+    <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route path={routes.funding.path} element={<FundingScreen />} />

@@ -14,15 +14,15 @@ import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 
-const StyledMoreVert = styled(MoreVertSharp)`
+export const StyledMoreVert = styled(MoreVertSharp)`
   cursor: pointer;
 `
 
-const MenuContainer = styled.div`
+export const MenuContainer = styled.div`
   position: relative;
 `
 
-const Menu = styled.div`
+export const Menu = styled.div`
   position: absolute;
   top: 95%;
   right: 45%;
@@ -33,14 +33,15 @@ const Menu = styled.div`
   align-items: center;
 
   width: 134px;
+  z-index: 100;
 `
 
-const Separator = styled.div`
+export const Separator = styled.div`
   border-top: 1px solid #525252;
   width: 100%;
 `
 
-const MenuItemWrapper = styled.div`
+export const MenuItemWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
@@ -53,7 +54,7 @@ const MenuItemWrapper = styled.div`
   }
 `
 
-const MenuItem = styled.div`
+export const MenuItem = styled.div`
   display: flex;
   align-items: center;
   padding: 5px 0px 6px 10px;
@@ -65,7 +66,7 @@ const MenuItem = styled.div`
   color: rgba(255, 255, 255, 0.7);
 `
 
-const IconWrapper = styled.div`
+export const IconWrapper = styled.div`
   height: 13px;
   width: 12px;
   font-size: 12px;

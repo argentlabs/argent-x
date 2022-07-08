@@ -114,7 +114,7 @@ export const useTokenAmountToCurrencyValue = (
       unitCurrencyValue: priceDetails.ccyValue,
     })
     return currencyValue
-  }, [priceDetails, token])
+  }, [amount, priceDetails, token])
 }
 
 /**
