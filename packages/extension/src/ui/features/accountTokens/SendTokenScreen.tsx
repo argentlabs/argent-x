@@ -19,7 +19,7 @@ import { Spinner } from "../../components/Spinner"
 import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { useAddressBook } from "../../services/addressBook"
-import { addressSchema } from "../../services/addresses"
+import { addressSchema, normalizeAddress } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
@@ -241,7 +241,7 @@ export const SendTokenScreen: FC = () => {
   }
 
   const handleAddressSelect = (address: string) => {
-    setValue("recipient", address)
+    setValue("recipient", normalizeAddress(address))
     setAddressBookOpen(false)
   }
 
