@@ -41,7 +41,7 @@ export const argentApiNetworkForNetwork = (network: KnownNetworksType) => {
 
 export const argentApiHeadersForNetwork = (network: KnownNetworksType) => {
   return {
-    "argent-version": process.env.VERSION || "",
+    "argent-version": process.env.VERSION || "Unknown version",
     "argent-client": "argent-x",
     "argent-network": argentApiNetworkForNetwork(network),
   }
