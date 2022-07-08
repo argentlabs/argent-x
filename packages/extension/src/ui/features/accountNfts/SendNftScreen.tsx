@@ -1,10 +1,11 @@
 import { BigNumber } from "ethers"
-import { FC, lazy } from "react"
+import { FC, lazy, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
+import { Button } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
@@ -12,18 +13,21 @@ import { StyledControlledInput } from "../../components/InputText"
 import { RowCentered } from "../../components/Row"
 import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
+import { useAddressBook } from "../../services/addressBook"
 import { addressSchema } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { AddressBookMenu } from "../accounts/AddressBookMenu"
 import {
+  AtTheRateWrapper,
   FormError,
   InputGroupAfter,
-  NextButton,
 } from "../accountTokens/SendTokenScreen"
 import { TokenMenu } from "../accountTokens/TokenMenu"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { useNfts } from "./useNfts"
 
@@ -67,10 +71,13 @@ export const SendNftScreen: FC = () => {
   )
   const resolver = useYupValidationResolver(SendNftSchema)
 
+  const { id: currentNetworkId } = useCurrentNetwork()
+
   const {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
     control,
+    setValue,
   } = useForm<SendNftInput>({
     defaultValues: {
       recipient: "",
@@ -78,8 +85,17 @@ export const SendNftScreen: FC = () => {
     resolver,
   })
 
+  const [addressBookOpen, setAddressBookOpen] = useState(false)
+
+  const addressBook = useAddressBook(account?.networkId || currentNetworkId)
+
   if (!account || !nft || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />
+  }
+
+  const handleAddressSelect = (address: string) => {
+    setValue("recipient", address)
+    setAddressBookOpen(false)
   }
 
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
@@ -126,20 +142,38 @@ export const SendNftScreen: FC = () => {
                 placeholder="Recipient's address"
                 name="recipient"
                 type="text"
-                style={{ paddingRight: "40px" }}
+                style={{
+                  paddingRight: "50px",
+                  borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
+                }}
               >
-                <InputGroupAfter>
-                  <AtTheRateIcon />
-                </InputGroupAfter>
+                <>
+                  <InputGroupAfter>
+                    <AtTheRateWrapper
+                      type="button"
+                      onClick={() => setAddressBookOpen(!addressBookOpen)}
+                      active={addressBookOpen}
+                    >
+                      <AtTheRateIcon />
+                    </AtTheRateWrapper>
+                  </InputGroupAfter>
+
+                  {addressBookOpen && (
+                    <AddressBookMenu
+                      addressBook={addressBook}
+                      onAddressSelect={handleAddressSelect}
+                    />
+                  )}
+                </>
               </StyledControlledInput>
               {errors.recipient && (
                 <FormError>{errors.recipient.message}</FormError>
               )}
             </div>
           </Column>
-          <NextButton type="submit" disabled={disableSubmit}>
+          <Button type="submit" disabled={disableSubmit}>
             Next
-          </NextButton>
+          </Button>
         </StyledForm>
       </ColumnCenter>
     </>

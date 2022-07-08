@@ -94,6 +94,7 @@ const Input = styled.input`
 const InputAlt = styled.input`
   ${InputCssAlt}
   order: 2;
+  text-overflow: ellipsis;
 
   &::placeholder {
     color: #8f8e8c;

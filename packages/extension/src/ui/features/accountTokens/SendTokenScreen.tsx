@@ -18,12 +18,15 @@ import { StyledControlledInput } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
 import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
+import { useAddressBook } from "../../services/addressBook"
 import { addressSchema } from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { AddressBookMenu } from "../accounts/AddressBookMenu"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { TokenMenu } from "./TokenMenu"
@@ -84,6 +87,22 @@ export const StyledMaxButton = styled(Button)`
   padding: 4px 8px;
 `
 
+export const AtTheRateWrapper = styled(StyledMaxButton)<{ active?: boolean }>`
+  padding: 6px;
+  background-color: ${({ active }) => active && "#ffffff"};
+
+  :active,
+  :focus {
+    background-color: #ffffff;
+  }
+
+  svg {
+    path {
+      fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+    }
+  }
+`
+
 export const InputTokenSymbol = styled.span`
   text-transform: uppercase;
   font-weight: 600;
@@ -106,8 +125,6 @@ export const CurrencyValueText = styled(InputTokenSymbol)`
   font-weight: 400;
 `
 
-export const NextButton = styled(Button)``
-
 export interface SendInput {
   recipient: string
   amount: string
@@ -127,6 +144,8 @@ export const SendTokenScreen: FC = () => {
   const feeToken = account && getFeeToken(account.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
 
+  const { id: currentNetworkId } = useCurrentNetwork()
+
   const {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
@@ -144,7 +163,6 @@ export const SendTokenScreen: FC = () => {
   const formValues = watch()
 
   const inputAmount = formValues.amount
-  const inputRecipient = formValues.recipient
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
@@ -174,6 +192,10 @@ export const SendTokenScreen: FC = () => {
     },
     [setValue],
   )
+
+  const [addressBookOpen, setAddressBookOpen] = useState(false)
+
+  const addressBook = useAddressBook(account?.networkId || currentNetworkId)
 
   useEffect(() => {
     if (maxClicked && maxFee && token) {
@@ -206,9 +228,14 @@ export const SendTokenScreen: FC = () => {
       (inputAmount === balance ||
         parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance)))
 
-  const handleMaxClick = async () => {
+  const handleMaxClick = () => {
     setMaxClicked(true)
     setMaxInputAmount(token, maxFee)
+  }
+
+  const handleAddressSelect = (address: string) => {
+    setValue("recipient", address)
+    setAddressBookOpen(false)
   }
 
   const disableSubmit =
@@ -284,11 +311,29 @@ export const SendTokenScreen: FC = () => {
                 placeholder="Recipient's address"
                 name="recipient"
                 type="text"
-                style={{ paddingRight: "40px" }}
+                style={{
+                  paddingRight: "50px",
+                  borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
+                }}
               >
-                <InputGroupAfter>
-                  <AtTheRateIcon />
-                </InputGroupAfter>
+                <>
+                  <InputGroupAfter>
+                    <AtTheRateWrapper
+                      type="button"
+                      onClick={() => setAddressBookOpen(!addressBookOpen)}
+                      active={addressBookOpen}
+                    >
+                      <AtTheRateIcon />
+                    </AtTheRateWrapper>
+                  </InputGroupAfter>
+
+                  {addressBookOpen && (
+                    <AddressBookMenu
+                      addressBook={addressBook}
+                      onAddressSelect={handleAddressSelect}
+                    />
+                  )}
+                </>
               </StyledControlledInput>
               {errors.recipient && (
                 <FormError>{errors.recipient.message}</FormError>
@@ -296,9 +341,9 @@ export const SendTokenScreen: FC = () => {
             </div>
           </Column>
 
-          <NextButton disabled={disableSubmit} type="submit">
+          <Button disabled={disableSubmit} type="submit">
             Next
-          </NextButton>
+          </Button>
         </StyledForm>
       </ColumnCenter>
     </div>

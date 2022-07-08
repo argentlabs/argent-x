@@ -21,7 +21,6 @@ export const H3 = styled.h3`
   font-weight: bold;
   font-size: 22px;
   line-height: 28px;
-  text-align: center;
   color: #ffffff;
 `
 
@@ -29,7 +28,13 @@ export const H4 = styled.h4`
   font-weight: bold;
   font-size: 20px;
   line-height: 25px;
-  text-align: center;
+  color: #ffffff;
+`
+
+export const H5 = styled.h5`
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
   color: #ffffff;
 `
 
