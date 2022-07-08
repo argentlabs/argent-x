@@ -7,10 +7,9 @@ import { useAccounts } from "../../accounts/accounts.state"
 export function getKnownWalletAddress(
   account: BaseWalletAccount,
 ): Account | undefined {
-  const knownAccount = useAccounts.getState().accounts.find((a) => {
-    console.log(a, account)
-    return accountsEqual(account, a)
-  })
+  const knownAccount = useAccounts
+    .getState()
+    .accounts.find((a) => accountsEqual(account, a))
 
   return knownAccount
 }
