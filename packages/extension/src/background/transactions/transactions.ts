@@ -1,13 +1,18 @@
 import { uniqWith } from "lodash-es"
 import { Status } from "starknet"
 
-import { Transaction, TransactionRequest } from "../../shared/transactions"
+import {
+  Transaction,
+  TransactionBase,
+  TransactionRequest,
+  compareTransactions,
+} from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/wallet.service"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 import { getTransactionsUpdate } from "./onchain"
 import { setIntervalAsync } from "./setIntervalAsync"
-import type { GetTransactionsStore } from "./store"
+import { GetTransactionsStore } from "./store"
 import { checkTransactionHash } from "./transactionExecution"
 import { FetchTransactions, getTransactionHistory } from "./voyager"
 
@@ -20,7 +25,7 @@ export interface TransactionTracker {
     account: WalletAccount,
     transaction: TransactionRequest,
   ) => Promise<void>
-  get: (transactionHash: string) => Promise<Transaction | null>
+  get: (transaction: TransactionBase) => Promise<Transaction | null>
   getAll: (statusIn?: Status[]) => Promise<Transaction[]>
   stop: () => void
 }
@@ -48,7 +53,6 @@ export const getTransactionsTracker: GetTransactionsTracker = (
   const handleUpdate = async () => {
     const allTransactions = await transactionsStore.getItems()
     const needsHistoryUpdate = updateCounter === 0
-
     const historyTransactions = needsHistoryUpdate
       ? await getTransactionHistory(
           accounts,
@@ -63,7 +67,8 @@ export const getTransactionsTracker: GetTransactionsTracker = (
 
     const pendingTransactions = allTransactions.filter(
       (tx) =>
-        historyTransactions.findIndex((tx2) => tx.hash === tx2.hash) === -1,
+        historyTransactions.findIndex((tx2) => compareTransactions(tx, tx2)) ===
+        -1,
     )
 
     const onChainUpdates = await getTransactionsUpdate(pendingTransactions)
@@ -95,10 +100,11 @@ export const getTransactionsTracker: GetTransactionsTracker = (
 
   return {
     load: async (accountsToPopulate) => {
+      const allTransactions = await transactionsStore.getItems()
       const initialAccounts = uniqWith(accountsToPopulate, accountsEqual)
       const initialTransactions = await getTransactionHistory(
         initialAccounts,
-        [],
+        allTransactions,
         fetchTransactions,
       )
       transactionsStore.addItems(initialTransactions)
@@ -115,10 +121,8 @@ export const getTransactionsTracker: GetTransactionsTracker = (
       }
       await add(transaction)
     },
-    get: (transactionHash) =>
-      transactionsStore.getItem(
-        (transaction) => transaction.hash === transactionHash,
-      ),
+    get: (transaction: TransactionBase) =>
+      transactionsStore.getItem((tx) => compareTransactions(tx, transaction)),
     getAll: (statusIn) =>
       transactionsStore.getItems(
         statusIn

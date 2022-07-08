@@ -21,7 +21,10 @@ export const handleTransactionMessage: HandleMessage<
     }
 
     case "GET_TRANSACTION": {
-      const tracked = await transactionTracker.get(msg.data.hash)
+      const tracked = await transactionTracker.get({
+        hash: msg.data.hash,
+        account: { networkId: msg.data.network },
+      })
       if (tracked) {
         return sendToTabAndUi({ type: "GET_TRANSACTION_RES", data: tracked })
       }

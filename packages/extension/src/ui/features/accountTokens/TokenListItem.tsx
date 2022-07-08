@@ -50,11 +50,19 @@ export const TokenTitle = styled.h3`
   max-width: 250px;
 `
 
+const TokenSymbol = styled.div`
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #8f8e8c;
+  text-transform: uppercase;
+`
+
 interface IIsLoading {
   isLoading?: boolean
 }
 
-const isLoadingPulse = ({ isLoading }: IIsLoading) => {
+export const isLoadingPulse = ({ isLoading }: IIsLoading) => {
   if (isLoading) {
     return css`
       animation: ${PulseAnimation} 1s ease-in-out infinite;
@@ -114,6 +122,7 @@ interface ITokenListItem {
   variant?: TokenListItemVariant
   isLoading?: boolean
   currencyValue: string | undefined
+  showTokenSymbol?: boolean
   // ...rest
   [x: string]: any
 }
@@ -122,10 +131,11 @@ export const TokenListItem: FC<ITokenListItem> = ({
   token,
   variant,
   isLoading = false,
+  showTokenSymbol = false,
   currencyValue,
   ...rest
 }) => {
-  const { name, image } = toTokenView(token)
+  const { name, image, symbol } = toTokenView(token)
   const displayBalance = prettifyTokenBalance(token)
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
   const isNoCurrencyVariant = variant === "no-currency"
@@ -134,10 +144,11 @@ export const TokenListItem: FC<ITokenListItem> = ({
       <TokenIcon url={image} name={name} />
       <TokenDetailsWrapper>
         <TokenTextGroup>
-          <TokenTitle>{name}</TokenTitle>
+          <TokenTitle>{name === "Ether" ? "Ethereum" : name}</TokenTitle>
           {!isNoCurrencyVariant && (
             <TokenBalance isLoading={isLoading}>{displayBalance}</TokenBalance>
           )}
+          {showTokenSymbol && <TokenSymbol>{symbol}</TokenSymbol>}
         </TokenTextGroup>
         <TokenTextGroup>
           <TokenCurrencyValue isLoading={isLoading}>

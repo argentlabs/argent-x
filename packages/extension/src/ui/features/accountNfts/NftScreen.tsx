@@ -1,24 +1,21 @@
-import { BigNumber } from "ethers"
 import { FC, lazy } from "react"
-import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
 import { Button, ButtonGroup } from "../../components/Button"
+import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
-import { ControlledInputText } from "../../components/InputText"
-import { FormError } from "../../components/Typography"
+import { AspectLogo } from "../../components/Icons/AspectLogo"
+import { MintSquareLogo } from "../../components/Icons/MintSquareLogo"
+import { RowCentered } from "../../components/Row"
+import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { addressSchema } from "../../services/addresses"
-import {
-  getUint256CalldataFromBN,
-  sendTransaction,
-} from "../../services/transactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { useYupValidationResolver } from "../settings/useYupValidationResolver"
+import { TokenMenu } from "../accountTokens/TokenMenu"
 import { openAspectNft } from "./aspect.service"
-import AspectSvg from "./aspect.svg"
+import { openMintSquareNft } from "./mint-square.service"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
@@ -50,26 +47,26 @@ export const Container = styled.div`
     margin: 10px 0 15px 0;
   }
 
-  .aspect {
-    display: flex;
-    align-items: center;
-    width: inherit;
-    font-size: 13px;
-    line-height: 18px;
-    padding: 8px;
-
-    svg {
-      width: 24px;
-    }
-
-    span {
-      margin: 0 5px;
-    }
-  }
-
   ${ButtonGroup} {
     margin-top: 10px;
   }
+`
+
+const NftDescription = styled.div`
+  margin: 16px 0 20px;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+`
+
+const ViewOnText = styled.div`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+`
+
+const ViewOnButton = styled(Button)`
+  padding: 10px;
 `
 
 export interface SendNftInput {
@@ -89,71 +86,57 @@ export const NftScreen: FC = () => {
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
   )
-  const resolver = useYupValidationResolver(SendNftSchema)
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isDirty, isSubmitting, submitCount },
-  } = useForm<SendNftInput>({
-    resolver,
-    defaultValues: {
-      recipient: "",
-    },
-  })
 
   if (!account || !nft || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />
   }
 
-  const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
-
-  const onSubmit = async ({ recipient }: SendNftInput) => {
-    sendTransaction({
-      to: contractAddress,
-      method: "transferFrom",
-      calldata: {
-        from_: account.address,
-        to: recipient,
-        tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
-      },
-    })
-
-    navigate(routes.accountActivity())
-  }
-
   return (
     <>
-      <IconBar back />
+      <IconBar
+        back
+        childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
+      >
+        <H3>{nft.name}</H3>
+      </IconBar>
       <Container>
-        <h3>{nft.name}</h3>
-        {nft.animation_url ? (
+        {nft.animation_uri ? (
           <LazyNftModelViewer nft={nft} />
         ) : (
-          <img src={nft.copy_image_url} alt={nft.name} />
+          <img src={nft.image_url_copy} alt={nft.name} />
         )}
-        <p>{nft.description}</p>
-        <Button
-          className="aspect"
-          onClick={() => openAspectNft(nft.contract_address, nft.token_id)}
-        >
-          <AspectSvg /> <span>View on Aspect</span>
-        </Button>
+        <NftDescription>{nft.description}</NftDescription>
 
-        <ButtonGroup as="form" onSubmit={handleSubmit(onSubmit)}>
-          <ControlledInputText
-            autoComplete="off"
-            control={control}
-            placeholder="Recipient"
-            name="recipient"
-            type="text"
-          />
-          {errors.recipient && (
-            <FormError>{errors.recipient.message}</FormError>
-          )}
-          <Button disabled={disableSubmit} type="submit">
+        <ColumnCenter gap="20px" style={{ marginBottom: "32px" }}>
+          <RowCentered gap="8px">
+            <ViewOnButton
+              onClick={() => openAspectNft(nft.contract_address, nft.token_id)}
+            >
+              <RowCentered gap="5px">
+                <AspectLogo />
+                <ViewOnText>View on Aspect</ViewOnText>
+              </RowCentered>
+            </ViewOnButton>
+
+            <ViewOnButton
+              onClick={() =>
+                openMintSquareNft(nft.contract_address, nft.token_id)
+              }
+            >
+              <RowCentered gap="5px">
+                <MintSquareLogo />
+                <ViewOnText>View on Mint Square</ViewOnText>
+              </RowCentered>
+            </ViewOnButton>
+          </RowCentered>
+
+          <Button
+            type="button"
+            onClick={() => navigate(routes.sendNft(contractAddress, tokenId))}
+          >
             Send
           </Button>
-        </ButtonGroup>
+        </ColumnCenter>
       </Container>
     </>
   )

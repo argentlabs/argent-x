@@ -101,6 +101,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       {...props}
     >
       <TransactionsList
+        networkId={switcherNetworkId}
         transactions={transactions}
         transactionReview={transactionReview}
         tokensByNetwork={tokensByNetwork}

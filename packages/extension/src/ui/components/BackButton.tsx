@@ -14,7 +14,11 @@ export const BackButton: FC<BackButtonProps> = (props) => {
   const onClick = () => (props.to ? navigate(props.to) : navigate(-1))
 
   return (
-    <IconButton {...makeClickable(onClick, 99)} size={36} {...props}>
+    <IconButton
+      {...makeClickable(onClick, { label: "Back", tabIndex: 99 })}
+      size={36}
+      {...props}
+    >
       <ArrowBackIosNewIcon />
     </IconButton>
   )

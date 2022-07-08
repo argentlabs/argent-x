@@ -33,6 +33,7 @@ import { TokenList } from "./TokenList"
 import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { fetchFeeTokenBalance } from "./tokens.service"
+import { useTokensWithBalance } from "./tokens.state"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountStatus } from "./useAccountStatus"
@@ -74,6 +75,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     { suspense: false },
   )
 
+  const { isValidating, tokenDetails } = useTokensWithBalance(account)
+
   const { data: needsUpgrade = false, mutate } = useSWR(
     [
       getAccountIdentifier(account),
@@ -100,7 +103,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       hadPendingTransactions.current = false
       mutate(false) // update upgrade banner
     }
-  }, [showPendingTransactions])
+  }, [mutate, showPendingTransactions])
 
   useEffect(() => {
     connectAccount(account)
@@ -109,7 +112,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
 
   return (
-    <Container>
+    <Container data-testid="account-tokens">
       <AccountSubHeader
         status={status}
         account={account}
@@ -139,8 +142,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           <>
             <TokenList
               showTitle={showPendingTransactions}
-              account={account}
               variant={tokenListVariant}
+              isValidating={isValidating}
+              tokenList={tokenDetails}
             />
             <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
               <AddTokenIconButton size={40}>

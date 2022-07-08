@@ -1,7 +1,5 @@
 import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber, BigNumberish, utils } from "ethers"
-import { isString } from "lodash-es"
-import urlJoin from "url-join"
 
 import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
 import { UniqueToken } from "./token"
@@ -10,21 +8,6 @@ import {
   prettifyCurrencyNumber,
   prettifyTokenNumber,
 } from "./utils/number"
-
-const REACT_APP_ARGENT_API_BASE_URL = process.env
-  .REACT_APP_ARGENT_API_BASE_URL as string
-
-export const ARGENT_API_ENABLED =
-  isString(REACT_APP_ARGENT_API_BASE_URL) &&
-  REACT_APP_ARGENT_API_BASE_URL.length > 0
-
-export const ARGENT_API_TOKENS_PRICES_URL = ARGENT_API_ENABLED
-  ? urlJoin(REACT_APP_ARGENT_API_BASE_URL, "tokens/prices?chain=starknet")
-  : undefined
-
-export const ARGENT_API_TOKENS_INFO_URL = ARGENT_API_ENABLED
-  ? urlJoin(REACT_APP_ARGENT_API_BASE_URL, "tokens/info?chain=starknet")
-  : undefined
 
 /** shape of individual entity in the /tokens/info endpoint */
 export interface ApiTokenDetails {
@@ -40,10 +23,10 @@ export interface ApiTokenDataResponse {
 /** shape of individual entity in the /tokens/prices endpoint */
 export interface ApiPriceDetails {
   pricingId: number
-  ethValue: number
-  ccyValue: number
-  ethDayChange: number
-  ccyDayChange: number
+  ethValue: string
+  ccyValue: string
+  ethDayChange: string
+  ccyDayChange: string
 }
 
 export interface ApiPriceDataResponse {
@@ -68,6 +51,9 @@ export const lookupTokenPriceDetails = ({
   pricesData,
   tokenData,
 }: ILookupTokenPriceDetails) => {
+  if (!tokenData?.tokens) {
+    return
+  }
   /** find token from tokenData by matching address */
   const tokenInPriceData = tokenData.tokens.find(
     ({ address }) => address.toLowerCase() === token.address.toLowerCase(),
@@ -96,6 +82,7 @@ export const sumTokenBalancesToCurrencyValue = ({
   tokenData,
 }: ISumTokenBalancesToCurrencyValue) => {
   let sumTokenBalance = new CurrencyConversionNumber(0)
+  let didGetValidConversion = false
   tokens.forEach((token) => {
     const priceDetails = lookupTokenPriceDetails({
       token,
@@ -110,11 +97,17 @@ export const sumTokenBalancesToCurrencyValue = ({
         decimals: token.decimals,
         unitCurrencyValue: priceDetails.ccyValue,
       })
-      if (currencyValue) {
+      /** zero is a valid value here */
+      if (currencyValue !== undefined) {
+        didGetValidConversion = true
         sumTokenBalance = sumTokenBalance.plus(currencyValue)
       }
     }
   })
+  /** undefined if there were no valid conversions */
+  if (!didGetValidConversion) {
+    return
+  }
   /** keep as string to avoid loss of precision elsewhere */
   return sumTokenBalance.toString()
 }
@@ -137,6 +130,13 @@ export const convertTokenAmountToCurrencyValue = ({
   decimals,
   unitCurrencyValue,
 }: IConvertTokenAmountToCurrencyValue) => {
+  if (
+    !isNumeric(amount) ||
+    !isNumeric(decimals) ||
+    !isNumeric(unitCurrencyValue)
+  ) {
+    return
+  }
   const decimalsNumber = Number(decimals)
   /** amount to divide by to take amount to unit value */
   const unitDivideBy = Math.pow(10, decimalsNumber)

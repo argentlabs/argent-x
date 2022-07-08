@@ -57,7 +57,11 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
     <Container header footer>
       <AccountHeader>
         <Header>
-          <Link to={routes.accounts()}>
+          <Link
+            role="button"
+            aria-label="Show account list"
+            to={routes.accounts()}
+          >
             <ProfilePicture src={getAccountImageUrl(accountName, account)} />
           </Link>
           <NetworkSwitcher />

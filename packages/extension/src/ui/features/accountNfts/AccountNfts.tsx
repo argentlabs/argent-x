@@ -8,6 +8,7 @@ import { Spinner } from "../../components/Spinner"
 import { A, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
+import { AspectNft } from "./aspect.model"
 import { getNftPicture } from "./aspect.service"
 import { useNfts } from "./useNfts"
 
@@ -63,10 +64,17 @@ const NftItem = styled.figure`
 
 interface AccountNftsProps {
   account: Account
+  withHeader?: boolean
+  customList?: AspectNft[]
+  navigateToSend?: boolean
 }
 
 // FIXME: as soon as aspect is on mainnet this needs to be network aware
-const Nfts: FC<AccountNftsProps> = ({ account }) => {
+const Nfts: FC<AccountNftsProps> = ({
+  account,
+  customList,
+  navigateToSend = false,
+}) => {
   const navigate = useNavigate()
   const { nfts = [] } = useNfts(account)
 
@@ -93,11 +101,15 @@ const Nfts: FC<AccountNftsProps> = ({ account }) => {
           </P>
         </>
       )}
-      {nfts.map((nft) => (
+      {(customList || nfts).map((nft) => (
         <NftItem
           key={`${nft.contract_address}-${nft.token_id}`}
           onClick={() =>
-            navigate(routes.accountNft(nft.contract_address, nft.token_id))
+            navigate(
+              navigateToSend
+                ? routes.sendNft(nft.contract_address, nft.token_id)
+                : routes.accountNft(nft.contract_address, nft.token_id),
+            )
           }
         >
           <img src={getNftPicture(nft)} />
@@ -115,16 +127,26 @@ const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
     errorRetryInterval: 30e3 /* 30 seconds */,
   })
 
-  return <ErrorBoundaryFallback title="Seems like Play Oasis API is down..." />
+  return <ErrorBoundaryFallback title="Seems like Aspect API is down..." />
 }
 
-export const AccountNfts: FC<AccountNftsProps> = ({ account }) => {
+export const AccountNfts: FC<AccountNftsProps> = ({
+  account,
+  withHeader = true,
+  customList,
+  navigateToSend,
+  ...rest
+}) => {
   return (
-    <Container>
-      <Header>Collectibles</Header>
+    <Container {...rest}>
+      {withHeader && <Header>Collectibles</Header>}
       <ErrorBoundary fallback={<NftsFallback account={account} />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <Nfts account={account} />
+          <Nfts
+            account={account}
+            customList={customList}
+            navigateToSend={navigateToSend}
+          />
         </Suspense>
       </ErrorBoundary>
     </Container>

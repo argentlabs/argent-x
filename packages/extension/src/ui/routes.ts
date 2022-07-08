@@ -60,6 +60,16 @@ export const routes = {
     (accountAddress: string) => `/account/delete-confirm/${accountAddress}`,
     `/account/delete-confirm/:accountAddress`,
   ),
+  sendScreen: route("/send"),
+  sendToken: route(
+    (tokenAddress: string) => `/send-token/${tokenAddress}`,
+    "/send-token/:tokenAddress",
+  ),
+  sendNft: route(
+    (contractAddress: string, tokenId: string) =>
+      `/account/send-nft/${contractAddress}/${tokenId}`,
+    `/account/send-nft/:contractAddress/:tokenId`,
+  ),
   transactionDetail: route(
     (txHash: string) => `/account/activity/transaction-detail/${txHash}`,
     `/account/activity/transaction-detail/:txHash`,

@@ -1,20 +1,22 @@
 import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 
-import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { Token } from "../../../shared/token"
 import {
   ARGENT_API_ENABLED,
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
+} from "../../../shared/api/constants"
+import { isPrivacySettingsEnabled } from "../../../shared/settings"
+import { Token } from "../../../shared/token"
+import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
   convertTokenAmountToCurrencyValue,
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
 } from "../../../shared/tokenPrice.service"
-import { fetcher } from "../../../shared/utils/fetcher"
 import { useConditionallyEnabledSWR } from "../../services/swr"
+import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { useIsMainnet } from "../networks/useNetworks"
 import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
@@ -36,6 +38,7 @@ export const useCurrencyDisplayEnabled = () => {
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
+  const fetcher = useArgentApiFetcher()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const { data: pricesData } = useConditionallyEnabledSWR<ApiPriceDataResponse>(
     currencyDisplayEnabled,
@@ -111,7 +114,7 @@ export const useTokenAmountToCurrencyValue = (
       unitCurrencyValue: priceDetails.ccyValue,
     })
     return currencyValue
-  }, [priceDetails, token])
+  }, [amount, priceDetails, token])
 }
 
 /**

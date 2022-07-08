@@ -1,11 +1,9 @@
-import { capitalize } from "lodash-es"
 import { Abi, Call } from "starknet"
 
-import { TransactionMeta } from "../../shared/transactions"
-
-function entryPointToHumanReadable(entryPoint: string): string {
-  return capitalize(entryPoint.replaceAll("_", " "))
-}
+import {
+  TransactionMeta,
+  entryPointToHumanReadable,
+} from "../../shared/transactions"
 
 export function nameTransaction(
   calls: Call | Call[],

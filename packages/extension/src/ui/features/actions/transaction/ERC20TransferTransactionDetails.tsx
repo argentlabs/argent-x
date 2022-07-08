@@ -11,33 +11,33 @@ import {
   FieldGroup,
   FieldKey,
   FieldValue,
+  LeftPaddedField,
 } from "../../../components/Fields"
 import { formatTruncatedAddress } from "../../../services/addresses"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { formatTokenBalance } from "../../accountTokens/tokens.service"
 import { TokenDetails } from "../../accountTokens/tokens.state"
+import { AccountField } from "./AccountField"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
-
-const LeftPaddedField = styled.div`
-  margin-left: 8px;
-  text-align: right;
-`
+import { getKnownWalletAddress } from "./getKnownWalletAddress"
 
 /** Renders an ERC20 transfer transaction */
 
 export interface Erc20TransferCallTransactionItemProps {
   transaction: Erc20TransferCall
   tokensByNetwork: TokenDetails[]
+  networkId: string
 }
 
 export const ERC20TransferTransactionDetails: FC<
   Erc20TransferCallTransactionItemProps
-> = ({ transaction, tokensByNetwork }) => {
+> = ({ transaction, tokensByNetwork, networkId }) => {
   if (!isErc20TransferCall(transaction)) {
     return (
       <DefaultTransactionDetails
         transaction={transaction}
         tokensByNetwork={tokensByNetwork}
+        networkId={networkId}
       />
     )
   }
@@ -47,7 +47,12 @@ export const ERC20TransferTransactionDetails: FC<
     ({ address }) => address.toLowerCase() === contractAddress.toLowerCase(),
   )
   const displaySendAddress = formatTruncatedAddress(recipientAddress)
+  const knownAccount = getKnownWalletAddress({
+    address: recipientAddress,
+    networkId,
+  })
   const displayAmount = formatTokenBalance(amount, token?.decimals?.toNumber())
+
   return (
     <FieldGroup>
       <Field>
@@ -61,7 +66,11 @@ export const ERC20TransferTransactionDetails: FC<
       </Field>
       <Field>
         <FieldKey>To</FieldKey>
-        <FieldValue>{displaySendAddress}</FieldValue>
+        {knownAccount ? (
+          <AccountField account={knownAccount} />
+        ) : (
+          <FieldValue>{displaySendAddress}</FieldValue>
+        )}
       </Field>
     </FieldGroup>
   )

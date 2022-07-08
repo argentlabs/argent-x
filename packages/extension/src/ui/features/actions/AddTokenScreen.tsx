@@ -101,6 +101,8 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
         fetchTokenDetails(tokenAddress, account)
           .then((details) => {
             setTokenDetails(details)
+            setTokenName(details.name || "")
+            setTokenSymbol(details.symbol || "")
           })
           .catch(() => {
             setTokenDetails(undefined)
@@ -121,8 +123,8 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   const compiledData = {
     address: tokenAddress,
     ...(tokenDetails ?? {}),
-    ...(!tokenDetails?.name && { name: tokenName }),
-    ...(!tokenDetails?.symbol && { symbol: tokenSymbol }),
+    ...(tokenName && { name: tokenName }),
+    ...(tokenSymbol && { symbol: tokenSymbol }),
     ...(!tokenDetails?.decimals && {
       decimals: BigNumber.from(tokenDecimals || "0"),
     }),
@@ -163,20 +165,20 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               setTokenAddress(e.target.value?.toLowerCase())
             }}
           />
-          {!loading && (
+          {!loading && validAddress && (
             <>
               <InputText
                 placeholder="Name"
                 type="text"
-                value={tokenDetails?.name || tokenName}
-                disabled={tokenDetails?.name || loading || !validAddress}
+                value={tokenName}
+                disabled={loading || !validAddress}
                 onChange={(e: any) => setTokenName(e.target.value)}
               />
               <InputText
                 placeholder="Symbol"
                 type="text"
-                value={tokenDetails?.symbol || tokenSymbol}
-                disabled={tokenDetails?.symbol || loading || !validAddress}
+                value={tokenSymbol}
+                disabled={loading || !validAddress}
                 onChange={(e: any) => setTokenSymbol(e.target.value)}
               />
               <InputText

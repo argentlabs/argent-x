@@ -1,15 +1,35 @@
-import React, { FC, useState } from "react"
+import { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
+import styled from "styled-components"
 
+import { Alert } from "../../components/Alert"
 import { FormError, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
 import { removeToken, useTokens } from "./tokens.state"
-import { BalanceAlert, TokenName, TokenTitle } from "./TokenScreen"
 
-export const HideTokenAlert = BalanceAlert
+export const HideTokenAlert = styled(Alert)`
+  padding-top: 32px;
+  padding-bottom: 32px;
+  margin-bottom: 20px;
+`
+
+export const TokenTitle = styled.header`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+`
+
+export const TokenName = styled.h3`
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  color: #ffffff;
+`
 
 export const HideTokenScreen: FC = () => {
   const navigate = useNavigate()
