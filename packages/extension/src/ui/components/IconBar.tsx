@@ -39,9 +39,9 @@ export const IconBar: FC<IconBarProps> = ({
   children,
   ...rest
 }) => (
-  <Bar aria-label="Back" {...rest}>
+  <Bar {...rest}>
     {back ? (
-      <BackLink>
+      <BackLink aria-label="Back">
         <BackIcon />
       </BackLink>
     ) : (

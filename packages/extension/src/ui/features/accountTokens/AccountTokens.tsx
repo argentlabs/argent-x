@@ -112,7 +112,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
 
   return (
-    <Container>
+    <Container data-testid="account-tokens">
       <AccountSubHeader
         status={status}
         account={account}

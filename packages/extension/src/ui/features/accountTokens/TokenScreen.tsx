@@ -93,7 +93,9 @@ export const TokenScreen: FC = () => {
               align="baseline"
               style={{ marginTop: "12px" }}
             >
-              <H2 style={{ marginBottom: "0px" }}>{balance}</H2>
+              <H2 style={{ marginBottom: "0px" }} data-testid="tokenBalance">
+                {balance}
+              </H2>
               <H3>{symbol}</H3>
             </RowCentered>
             {currencyValue && (

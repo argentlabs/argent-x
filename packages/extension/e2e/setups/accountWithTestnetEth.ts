@@ -23,7 +23,7 @@ export async function setupNewAccountWithTestnetEth(
   await newAccount(page)
   const address = await getAccountAddressFromAccountPage(page)
   await sendDevnetEthToAccount(address)
-  const balance = await getBalanceFromAccountPage(page, "Ether")
+  const balance = await getBalanceFromAccountPage(page, "Ethereum")
 
   console.log(
     `Created Account ${formatTruncatedAddress(address)} with Ξ${balance}`,
