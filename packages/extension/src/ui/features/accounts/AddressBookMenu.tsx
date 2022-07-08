@@ -4,6 +4,7 @@ import styled from "styled-components"
 import Column from "../../components/Column"
 import Row from "../../components/Row"
 import { H5 } from "../../components/Typography"
+import { makeClickable } from "../../services/a11y"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { Account } from "./Account"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
@@ -59,7 +60,7 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
         return (
           <MenuItemWrapper
             key={account.address}
-            onClick={() => onAddressSelect(account.address)}
+            {...makeClickable(() => onAddressSelect(account.address))}
           >
             <MenuItem>
               <Row gap="16px">

@@ -89,23 +89,21 @@ export const StyledMaxButton = styled(Button)`
 
 export const AtTheRateWrapper = styled(StyledMaxButton)<{ active?: boolean }>`
   padding: 6px;
+
   background-color: ${({ active }) => active && "#ffffff"};
-
-  :active,
-  :hover,
-  :focus {
-    background-color: #ffffff;
-
-    svg {
-      path {
-        fill: #000;
-      }
-    }
-  }
-
   svg {
     path {
       fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+    }
+  }
+
+  &:hover,
+  &:focus {
+    background-color: ${({ active }) => active && "#ffffff"};
+    svg {
+      path {
+        fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+      }
     }
   }
 `
@@ -278,6 +276,7 @@ export const SendTokenScreen: FC = () => {
             <div>
               <StyledControlledInput
                 autoComplete="off"
+                autoFocus
                 control={control}
                 placeholder="Amount"
                 name="amount"
