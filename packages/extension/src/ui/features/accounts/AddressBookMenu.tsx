@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { AutoColumn } from "../../components/Column"
+import Column from "../../components/Column"
 import Row from "../../components/Row"
 import { H5 } from "../../components/Typography"
 import { formatTruncatedAddress } from "../../services/addresses"
@@ -69,12 +69,12 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
                   height="40px"
                 ></ProfilePicture>
 
-                <AutoColumn justify="center">
+                <Column>
                   <H5>{accountName}</H5>
                   <StyledAccountAddress>
                     {formatTruncatedAddress(account.address)}
                   </StyledAccountAddress>
-                </AutoColumn>
+                </Column>
               </Row>
             </MenuItem>
           </MenuItemWrapper>
