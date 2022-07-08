@@ -92,8 +92,15 @@ export const AtTheRateWrapper = styled(StyledMaxButton)<{ active?: boolean }>`
   background-color: ${({ active }) => active && "#ffffff"};
 
   :active,
+  :hover,
   :focus {
     background-color: #ffffff;
+
+    svg {
+      path {
+        fill: #000;
+      }
+    }
   }
 
   svg {
