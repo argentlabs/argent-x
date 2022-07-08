@@ -140,7 +140,7 @@ export const SendScreen: FC = () => {
 
         <TabView>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-            {selectedTab === "tokens" ? (
+            {selectedTab === "tokens" && (
               <>
                 <TokenList
                   variant="no-currency"
@@ -157,7 +157,9 @@ export const SendScreen: FC = () => {
                   <TokenTitle>Add token</TokenTitle>
                 </TokenWrapper>
               </>
-            ) : (
+            )}
+
+            {selectedTab === "nfts" && (
               <StyledAccountNfts
                 account={account}
                 withHeader={false}
