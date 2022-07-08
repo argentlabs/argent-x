@@ -7,6 +7,7 @@ import { AppRoutes } from "./AppRoutes"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { useExtensionIsInTab } from "./features/browser/tabs"
+import DevUI from "./features/dev/DevUI"
 import { useTracking } from "./services/analytics"
 import { swrCacheProvider } from "./services/swr"
 import { GlobalStyle, theme } from "./theme"
@@ -24,6 +25,7 @@ export const App: FC = () => {
           rel="stylesheet"
         />
         <GlobalStyle extensionIsInTab={extensionIsInTab} />
+        {process.env.SHOW_DEV_UI && <DevUI />}
         <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
           <Suspense fallback={<LoadingScreen />}>
             <AppRoutes />

@@ -47,6 +47,7 @@
     "build:sourcemaps": "NODE_ENV=production GEN_SOURCE_MAPS=true webpack",
     "start": "webpack",
     "dev": "webpack --color --watch",
+    "dev:ui": "SHOW_DEV_UI=true webpack --color --watch",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "test": "vitest run",
     "pretest:e2e": "playwright install chromium && ([ -d dist ] || yarn build)",

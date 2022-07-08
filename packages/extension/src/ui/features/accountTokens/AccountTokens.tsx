@@ -1,4 +1,4 @@
-import { FC, Suspense, useEffect, useRef } from "react"
+import { FC, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
@@ -8,7 +8,6 @@ import {
   isDeprecated,
 } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
-import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon } from "../../components/Icons/MuiIcons"
@@ -75,7 +74,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     { suspense: false },
   )
 
-  const { isValidating, tokenDetails } = useTokensWithBalance(account)
+  const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
+    useTokensWithBalance(account)
 
   const { data: needsUpgrade = false, mutate } = useSWR(
     [
@@ -131,30 +131,31 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       )}
       {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
       <PendingTransactions account={account} />
-      <ErrorBoundary
-        fallback={
-          <ErrorBoundaryFallbackWithCopyError
-            message={"Sorry, an error occurred fetching tokens"}
+      {error ? (
+        <ErrorBoundaryFallbackWithCopyError
+          error={error}
+          message={"Sorry, an error occurred fetching tokens"}
+        />
+      ) : (
+        <>
+          <TokenList
+            showTitle={showPendingTransactions}
+            isValidating={isValidating}
+            tokenList={tokenDetails}
+            variant={tokenListVariant}
           />
-        }
-      >
-        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <>
-            <TokenList
-              showTitle={showPendingTransactions}
-              variant={tokenListVariant}
-              isValidating={isValidating}
-              tokenList={tokenDetails}
-            />
+          {tokenDetailsIsInitialising ? (
+            <Spinner size={64} style={{ marginTop: 40 }} />
+          ) : (
             <TokenWrapper {...makeClickable(() => navigate(routes.newToken()))}>
               <AddTokenIconButton size={40}>
                 <AddIcon />
               </AddTokenIconButton>
               <TokenTitle>Add token</TokenTitle>
             </TokenWrapper>
-          </>
-        </Suspense>
-      </ErrorBoundary>
+          )}
+        </>
+      )}
     </Container>
   )
 }
