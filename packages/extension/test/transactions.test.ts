@@ -1,4 +1,4 @@
-import "isomorphic-fetch"
+import fetch from "cross-fetch"
 
 import { Call } from "starknet"
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
@@ -44,6 +44,18 @@ export const getTransactionsStore = () =>
 
 const fetchMockTransactions: FetchTransactions = async (_, __) =>
   transactionsMock.items
+
+// FIXME: replace use of fetch with mocked services
+
+const PREVIOUS_GLOBAL_FETCH = global.fetch
+
+beforeAll(() => {
+  global.fetch = fetch
+})
+
+afterAll(() => {
+  global.fetch = PREVIOUS_GLOBAL_FETCH
+})
 
 describe("transactions", () => {
   let txTracker: TransactionTracker

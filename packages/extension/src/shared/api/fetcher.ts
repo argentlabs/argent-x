@@ -8,27 +8,46 @@ export type Fetcher = (
 ) => Promise<any>
 
 export interface FetcherError extends Error {
+  url?: string
   status?: number
   statusText?: string
   responseText?: string
 }
 
-export const fetcherErrorForResponse = async (response: Response) => {
-  const error: FetcherError = new Error("An error occurred while fetching")
+export const fetcherError = (
+  message: string,
+  response: Response,
+  responseText: string,
+) => {
+  const error: FetcherError = new Error(message)
+  error.url = response.url
   error.status = response.status
   error.statusText = response.statusText
-  error.responseText = await response.text()
+  error.responseText = responseText
   return error
 }
 
 export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, init)
+  /** capture text here in the case of json parse failure we can include it in the error */
+  const responseText = await response.text()
   if (!response.ok) {
-    const error = await fetcherErrorForResponse(response)
-    throw error
+    throw fetcherError(
+      "An error occurred while fetching",
+      response,
+      responseText,
+    )
   }
-  const json = await response.json()
-  return json
+  try {
+    const json = JSON.parse(responseText)
+    return json
+  } catch (parseError) {
+    throw fetcherError(
+      "An error occurred while parsing",
+      response,
+      responseText,
+    )
+  }
 }
 
 export const fetcherWithArgentApiHeadersForNetwork = (

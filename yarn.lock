@@ -13927,6 +13927,16 @@ query-string@^6.13.8:
     split-on-first "^1.0.0"
     strict-uri-encode "^2.0.0"
 
+query-string@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-7.1.1.tgz#754620669db978625a90f635f12617c271a088e1"
+  integrity sha512-MplouLRDHBZSG9z7fpuAAcI7aAYjDLhtsiVZsevsfaHWDS2IDdORKbSd1kWUA+V4zyva/HZoSfpwnYMMQDhb0w==
+  dependencies:
+    decode-uri-component "^0.2.0"
+    filter-obj "^1.1.0"
+    split-on-first "^1.0.0"
+    strict-uri-encode "^2.0.0"
+
 querystring-es3@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/querystring-es3/-/querystring-es3-0.2.1.tgz#9ec61f79049875707d69414596fd907a4d711e73"
@@ -15840,7 +15850,7 @@ tinypool@^0.2.1:
   resolved "https://registry.npmjs.org/tinypool/-/tinypool-0.2.1.tgz#7c3347514de36113f224212590de17f04fdf0078"
   integrity sha512-HFU5ZYVq3wBfhSaf8qdqGsneaqXm0FgJQpoUlJbVdHpRLzm77IneKAD3RjzJWZvIv0YpPB9S7LUW53f6BE6ZSg==
 
-tinyspy@^0.3.3:
+tinyspy@^0.3.0, tinyspy@^0.3.3:
   version "0.3.3"
   resolved "https://registry.npmjs.org/tinyspy/-/tinyspy-0.3.3.tgz#8b57f8aec7fe1bf583a3a49cb9ab30c742f69237"
   integrity sha512-gRiUR8fuhUf0W9lzojPf1N1euJYA30ISebSfgca8z76FOvXtVXqd5ojEIaKLWbDQhAaC3ibxZIjqbyi4ybjcTw==
@@ -16523,6 +16533,14 @@ vfile@^4.0.0:
     is-buffer "^2.0.0"
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
+
+vi-fetch@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/vi-fetch/-/vi-fetch-0.7.1.tgz#ad829e49c5976cba1c8c2a83b9a21c371aa234d0"
+  integrity sha512-L80kg0UqubTaDAZ+MXC0PcaLIcSsagduUlsto45DF8Iia3BHBQ57w325N4tWbJH8+g+H8ySK0czF5vIHCfZI2A==
+  dependencies:
+    query-string "^7.1.1"
+    tinyspy "^0.3.0"
 
 "vite@^2.9.12 || ^3.0.0-0":
   version "2.9.13"
