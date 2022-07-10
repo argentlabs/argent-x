@@ -1,6 +1,5 @@
 import fs from "fs"
 import path from "path"
-import fetch from "cross-fetch"
 
 import { afterEach, expect, test, vi } from "vitest"
 
@@ -46,18 +45,6 @@ const getNetwork: GetNetwork = async (networkId) =>
     baseUrl: "http://127.0.0.1:5050/",
     name: "Test Network",
   }) as Network
-
-// FIXME: replace use of fetch with mocked services
-
-const PREVIOUS_GLOBAL_FETCH = global.fetch
-
-beforeAll(() => {
-  global.fetch = fetch
-})
-
-afterAll(() => {
-  global.fetch = PREVIOUS_GLOBAL_FETCH
-})
 
 afterEach(() => {
   vi.useRealTimers()

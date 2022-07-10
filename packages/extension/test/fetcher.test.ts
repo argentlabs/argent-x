@@ -5,6 +5,7 @@ import {
   FetcherError,
   fetcherWithArgentApiHeadersForNetwork,
 } from "../src/shared/api/fetcher"
+import "vi-fetch/setup"
 
 /** capture and return expected errors, otherwise vi-fetch test will fail even with expect...toThrow... etc. */
 const captureFetcherError = async (invocation: Promise<any | FetcherError>) => {
