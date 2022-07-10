@@ -1,8 +1,7 @@
-import { FC, useCallback, useMemo } from "react"
+import { FC, useMemo } from "react"
 import styled from "styled-components"
-import browser from "webextension-polyfill"
 
-import { useBackupRequired } from "../features/recovery/backupDownload.state"
+import { useHardResetAndReload } from "../services/resetAndReload"
 import { CopyTooltip } from "./CopyTooltip"
 import { ErrorBoundaryState } from "./ErrorBoundary"
 import {
@@ -91,10 +90,11 @@ export const coerceErrorToString = (error: any): string => {
 const ErrorBoundaryFallbackWithCopyError: FC<
   IErrorBoundaryFallbackWithCopyError
 > = ({ error, errorInfo, message = "Sorry, an error occurred" }) => {
+  const hardResetAndReload = useHardResetAndReload()
   const errorPayload = useMemo(() => {
     try {
       const displayError = coerceErrorToString(error)
-      const displayStack = errorInfo.componentStack || "No stack trace"
+      const displayStack = errorInfo?.componentStack || "No stack trace"
       return `v${version}
 
 ${displayError}
@@ -106,20 +106,6 @@ ${displayStack}
     return fallbackErrorPayload
   }, [error, errorInfo])
 
-  const onReload = useCallback(() => {
-    const url = browser.runtime.getURL("index.html")
-
-    // reset cache
-    const backupState = useBackupRequired.getState()
-    localStorage.clear()
-    useBackupRequired.setState(backupState)
-
-    setTimeout(() => {
-      // ensure state got persisted before reloading
-      window.location.href = url
-    }, 100)
-  }, [])
-
   return (
     <MessageContainer>
       <ErrorIcon />
@@ -127,7 +113,7 @@ ${displayStack}
         <P>{message}</P>
       </ErrorMessageContainer>
       <ActionsWrapper>
-        <ActionContainer onClick={onReload}>
+        <ActionContainer onClick={hardResetAndReload}>
           <RefreshIcon />
           <span>Retry</span>
         </ActionContainer>

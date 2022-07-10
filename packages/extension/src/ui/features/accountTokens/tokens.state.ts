@@ -135,7 +135,7 @@ export const useTokensWithBalance = (
   const {
     data,
     isValidating,
-    error: rawError,
+    error: maybeEmptyObjectError,
     mutate,
   } = useSWR(
     // skip if no account selected
@@ -174,19 +174,19 @@ export const useTokensWithBalance = (
    */
 
   const error: any = useMemo(() => {
-    if (!rawError) {
+    if (!maybeEmptyObjectError) {
       return
     }
     try {
-      if (JSON.stringify(rawError) === "{}") {
+      if (JSON.stringify(maybeEmptyObjectError) === "{}") {
         console.warn("FIXME: Ignoring empty object {} error")
         return
       }
     } catch (e) {
       // ignore any stringify errors
     }
-    return rawError
-  }, [rawError])
+    return maybeEmptyObjectError
+  }, [maybeEmptyObjectError])
 
   const tokenDetailsIsInitialising = !error && !data && isValidating
 

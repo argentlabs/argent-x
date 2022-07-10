@@ -1,9 +1,12 @@
-import { FC, useCallback } from "react"
+import { FC } from "react"
 import styled from "styled-components"
-import browser from "webextension-polyfill"
 
 import { RowCentered } from "../../components/Row"
-import { useBackupRequired } from "../recovery/backupDownload.state"
+import {
+  useHardReload,
+  useResetCache,
+  useSoftReload,
+} from "../../services/resetAndReload"
 
 const Container = styled(RowCentered)`
   position: fixed;
@@ -22,23 +25,14 @@ const DevButton = styled.div`
 `
 
 const DevUI: FC = () => {
-  const reset = useCallback(() => {
-    // reset cache
-    const backupState = useBackupRequired.getState()
-    localStorage.clear()
-    useBackupRequired.setState(backupState)
-  }, [])
-  const onReload = useCallback(() => {
-    const url = browser.runtime.getURL("index.html")
-    setTimeout(() => {
-      // ensure state got persisted before reloading
-      window.location.href = url
-    }, 100)
-  }, [])
+  const resetCache = useResetCache()
+  const softReload = useSoftReload()
+  const hardReload = useHardReload()
   return (
     <Container gap={"4px"}>
-      <DevButton onClick={reset}>Reset cache</DevButton>
-      <DevButton onClick={onReload}>Reload</DevButton>
+      <DevButton onClick={resetCache}>Reset cache</DevButton>
+      <DevButton onClick={softReload}>Reload UI</DevButton>
+      <DevButton onClick={hardReload}>Reload HTML</DevButton>
     </Container>
   )
 }

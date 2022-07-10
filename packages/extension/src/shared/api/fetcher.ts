@@ -7,8 +7,26 @@ export type Fetcher = (
   init?: RequestInit,
 ) => Promise<any>
 
+export interface FetcherError extends Error {
+  status?: number
+  statusText?: string
+  responseText?: string
+}
+
+export const fetcherErrorForResponse = async (response: Response) => {
+  const error: FetcherError = new Error("An error occurred while fetching")
+  error.status = response.status
+  error.statusText = response.statusText
+  error.responseText = await response.text()
+  return error
+}
+
 export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, init)
+  if (!response.ok) {
+    const error = await fetcherErrorForResponse(response)
+    throw error
+  }
   const json = await response.json()
   return json
 }
