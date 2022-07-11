@@ -13,32 +13,30 @@ import { Colors } from "./styled"
 const white = "#FFFFFF"
 const black = "#000000"
 
-export const colors = (): Colors => {
-  return {
-    white,
-    black,
+export const colors: Colors = {
+  white,
+  black,
 
-    bg1: "#161616",
-    bg2: "#333332",
-    bg3: "#474747",
-    bg4: "#5f5e5c",
-    bg5: "#fafafa",
+  bg1: "#161616",
+  bg2: "#333332",
+  bg3: "#474747",
+  bg4: "#5f5e5c",
+  bg5: "#fafafa",
 
-    text1: white,
-    text2: "#8f8e8c",
-    text3: "#5c5b59",
-    text4: "#c2c0be",
+  text1: white,
+  text2: "#8f8e8c",
+  text3: "#5c5b59",
+  text4: "#c2c0be",
 
-    red1: "#c12026",
-    red2: "#ff675c",
-    red3: "#ff875b",
-    red4: "#f36a3d",
+  red1: "#c12026",
+  red2: "#ff675c",
+  red3: "#ff875b",
+  red4: "#f36a3d",
 
-    blue1: "#29c5ff",
-    blue2: "#94e2ff",
+  blue1: "#29c5ff",
+  blue2: "#94e2ff",
 
-    yellow1: "#ffbf3d",
-  }
+  yellow1: "#ffbf3d",
 }
 
 const MEDIA_WIDTHS = {
@@ -70,37 +68,33 @@ const mediaMinWidthTemplates: {
   return accumulator
 }, {}) as any
 
-export const theme = (): DefaultTheme => {
-  return {
-    ...colors(),
+export const theme: DefaultTheme = {
+  ...colors,
 
-    // css snippets
-    flexColumnNoWrap: css`
-      display: flex;
-      flex-flow: column nowrap;
-    `,
-    flexRowNoWrap: css`
-      display: flex;
-      flex-flow: row nowrap;
-    `,
+  // css snippets
+  flexColumnNoWrap: css`
+    display: flex;
+    flex-flow: column nowrap;
+  `,
+  flexRowNoWrap: css`
+    display: flex;
+    flex-flow: row nowrap;
+  `,
 
-    // media queries
-    mediaMaxWidth: mediaMaxWidthTemplates,
-    mediaMinWidth: mediaMinWidthTemplates,
+  // media queries
+  mediaMaxWidth: mediaMaxWidthTemplates,
+  mediaMinWidth: mediaMinWidthTemplates,
 
-    margin: {
-      extensionInTab: "10%",
-    },
-  }
+  margin: {
+    extensionInTab: "10%",
+  },
 }
 
 export const ThemeProvider: FC<{
   children: React.ReactNode
 }> = ({ children }) => {
-  const themeObj = theme()
-
   return (
-    <StyledComponentsThemeProvider theme={themeObj}>
+    <StyledComponentsThemeProvider theme={theme}>
       {children}
     </StyledComponentsThemeProvider>
   )
