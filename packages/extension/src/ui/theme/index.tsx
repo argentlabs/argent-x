@@ -46,6 +46,19 @@ const MEDIA_WIDTHS = {
   xl: 1536,
 }
 
+/**
+ * Adds Media Query with max-width property
+ *
+ * Example: ${({ theme }) => theme.mediaMaxWidth.sm`
+ *  background-color: red
+ * `}
+ * The above snippet resolves to
+ *
+ * @media (max-width: 600px) {
+ *    background-color: red
+ * }
+ *
+ */
 const mediaMaxWidthTemplates: {
   [width in keyof typeof MEDIA_WIDTHS]: typeof css
 } = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
@@ -57,6 +70,19 @@ const mediaMaxWidthTemplates: {
   return accumulator
 }, {}) as any
 
+/**
+ * Adds Media Query with min-width property
+ *
+ * Example: ${({ theme }) => theme.mediaMinWidth.lg`
+ *  margin: 10px
+ * `}
+ * The above snippet resolves to
+ *
+ * @media (min-width: 1200px) {
+ *    margin: 10px
+ * }
+ *
+ */
 const mediaMinWidthTemplates: {
   [width in keyof typeof MEDIA_WIDTHS]: typeof css
 } = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
@@ -68,23 +94,54 @@ const mediaMinWidthTemplates: {
   return accumulator
 }, {}) as any
 
+/**
+ * Simpler way to add flex Column with nowrap
+ *
+ * Example: const Button = styled.button`
+ *  ${({ theme }) => theme.flexColumnNoWrap}
+ *  background-color: red
+ * `
+ *
+ * The above snippet resolves to
+ * const Button = styled.button`
+ *   display: flex;
+ *   flex-flow: column nowrap;
+ *   background-color: red
+ * `
+ */
+const flexColumnNoWrap = css`
+  display: flex;
+  flex-flow: column nowrap;
+`
+
+/**
+ * Simpler way to add flex row with nowrap
+ *
+ * Example: const Button = styled.button`
+ *  ${({ theme }) => theme.flexColumnNoWrap};
+ *  background-color: red;
+ * `
+ *
+ * The above snippet resolves to
+ * const Button = styled.button`
+ *    display: flex;
+ *    flex-flow: row nowrap;
+ *   background-color: red;
+ * `
+ */
+
+const flexRowNoWrap = css`
+  display: flex;
+  flex-flow: row nowrap;
+`
+
 export const theme: DefaultTheme = {
   ...colors,
-
-  // css snippets
-  flexColumnNoWrap: css`
-    display: flex;
-    flex-flow: column nowrap;
-  `,
-  flexRowNoWrap: css`
-    display: flex;
-    flex-flow: row nowrap;
-  `,
-
+  flexColumnNoWrap,
+  flexRowNoWrap,
   // media queries
   mediaMaxWidth: mediaMaxWidthTemplates,
   mediaMinWidth: mediaMinWidthTemplates,
-
   margin: {
     extensionInTab: "10%",
   },
