@@ -24,7 +24,7 @@ export const TokenList: FC<TokenListProps> = ({
   navigateToSend = false,
 }) => {
   if (!tokenList) {
-    return <></>
+    return null
   }
 
   return (
