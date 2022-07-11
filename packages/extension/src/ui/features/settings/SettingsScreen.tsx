@@ -11,9 +11,9 @@ import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { SupportIcon } from "../../components/Icons/SupportIcon"
 import { PrivacyStatement } from "../../components/PrivacyStatement"
 import { RowCentered } from "../../components/Row"
-import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
+import { H2 } from "../../theme/Typography"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 
 export const Title = styled.h3`

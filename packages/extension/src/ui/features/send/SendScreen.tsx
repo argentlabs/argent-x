@@ -11,9 +11,9 @@ import {
   StyledControlledInput,
 } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
-import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
+import { H3 } from "../../theme/Typography"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AspectNft } from "../accountNfts/aspect.model"
 import { useNfts } from "../accountNfts/useNfts"

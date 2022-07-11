@@ -4,7 +4,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { useAppState } from "../../app.state"
 import { InputText } from "../../components/InputText"
-import { FormError } from "../../components/Typography"
+import { FormError } from "../../theme/Typography"
 import { validatePassword } from "../recovery/seedRecovery.state"
 
 interface FieldValues {

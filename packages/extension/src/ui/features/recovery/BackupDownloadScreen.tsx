@@ -5,9 +5,9 @@ import styled from "styled-components"
 import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
 import { Header } from "../../components/Header"
-import { H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { downloadBackupFile } from "../../services/backgroundRecovery"
+import { H2, P } from "../../theme/Typography"
 import { useBackupRequired } from "./backupDownload.state"
 
 const DownloadButton = styled(Button)`

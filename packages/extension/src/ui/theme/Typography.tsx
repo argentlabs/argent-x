@@ -5,7 +5,7 @@ export const H1 = styled.h1`
   font-weight: bold;
   font-size: 40px;
   text-align: center;
-  color: #fff;
+  color: ${({ theme }) => theme.text1};
   margin: 12px 0;
 `
 
@@ -13,7 +13,7 @@ export const H2 = styled.h2`
   font-weight: bold;
   font-size: 34px;
   line-height: 41px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
   margin: 0 0 16px 0;
 `
 
@@ -21,27 +21,27 @@ export const H3 = styled.h3`
   font-weight: bold;
   font-size: 22px;
   line-height: 28px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 export const H4 = styled.h4`
   font-weight: bold;
   font-size: 20px;
   line-height: 25px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 export const H5 = styled.h5`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 export const P = styled.p`
   font-size: 16px;
   line-height: 19px;
-  color: #fff;
+  color: ${({ theme }) => theme.text1};
 `
 
 export const FormError = styled.p`

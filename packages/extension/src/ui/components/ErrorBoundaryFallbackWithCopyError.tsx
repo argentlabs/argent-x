@@ -3,6 +3,7 @@ import styled from "styled-components"
 
 import { coerceErrorToString } from "../../shared/utils/error"
 import { useHardResetAndReload } from "../services/resetAndReload"
+import { P } from "../theme/Typography"
 import { CopyTooltip } from "./CopyTooltip"
 import { ErrorBoundaryState } from "./ErrorBoundary"
 import {
@@ -10,7 +11,6 @@ import {
   RefreshIcon,
   ReportGmailerrorredIcon,
 } from "./Icons/MuiIcons"
-import { P } from "./Typography"
 
 const MessageContainer = styled.div`
   display: flex;

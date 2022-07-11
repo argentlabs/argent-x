@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
-import { P } from "../../components/Typography"
+import { P } from "../../theme/Typography"
 import { Pre } from "./ApproveSignatureScreen"
 import { ConfirmScreen } from "./ConfirmScreen"
 

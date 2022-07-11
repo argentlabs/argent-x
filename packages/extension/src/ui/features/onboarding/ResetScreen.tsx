@@ -2,9 +2,9 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTheme } from "styled-components"
 
-import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { resetAll } from "../../services/background"
+import { P } from "../../theme/Typography"
 import { initialState, useAccounts } from "../accounts/accounts.state"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
-import { H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { downloadLegacyBackupFile } from "../../services/backgroundRecovery"
+import { H2, P } from "../../theme/Typography"
 
 const ContinueButton = styled(Button)`
   margin-top: auto;

@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react"
 import styled, { keyframes } from "styled-components"
 
-import { H2 } from "../../components/Typography"
+import { H2 } from "../../theme/Typography"
 
 export const GreetingsWrapper = styled.div`
   position: relative;

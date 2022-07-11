@@ -9,7 +9,7 @@ import {
   ButtonVariant,
 } from "../../components/Button"
 import { Header } from "../../components/Header"
-import { H2 } from "../../components/Typography"
+import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,

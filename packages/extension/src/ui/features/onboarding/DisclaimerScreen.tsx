@@ -13,9 +13,9 @@ import {
   RadioButtonUncheckedIcon,
 } from "../../components/Icons/MuiIcons"
 import { PrivacyStatement } from "../../components/PrivacyStatement"
-import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const SP = styled(P)`
