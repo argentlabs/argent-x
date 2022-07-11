@@ -21,8 +21,8 @@ const MenuContainer = styled.div`
   top: 100%;
   left: 0;
   width: 100%;
-  background: #333332;
-  border: 1px solid #333332;
+  background: ${({ theme }) => theme.bg2};
+  border: 1px solid ${({ theme }) => theme.bg2};
   border-radius: 0px 0px 8px 8px;
 `
 
@@ -43,7 +43,7 @@ const StyledAccountAddress = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const AddressBookMenu: FC<AddressBookMenuProps> = ({

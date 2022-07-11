@@ -55,9 +55,10 @@ const TabGroup = styled.div`
 `
 
 const Tab = styled.div<{ active: boolean }>`
-  background: ${({ active }) => (active ? "#333332" : "transparent")};
-  border: 1px solid ${({ active }) => (active ? "transparent" : "#333332")};
-  color: ${({ active }) => (active ? "#ffffff" : "#8F8E8C")};
+  background: ${({ theme, active }) => (active ? theme.bg2 : "transparent")};
+  border: 1px solid
+    ${({ theme, active }) => (active ? "transparent" : theme.bg2)};
+  color: ${({ theme, active }) => (active ? "#ffffff" : theme.text2)};
   border-radius: 8px;
   font-weight: 600;
   font-size: 15px;

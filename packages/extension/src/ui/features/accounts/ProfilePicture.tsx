@@ -23,7 +23,7 @@ export const ProfilePicture = styled.img<ProfilePictureProps>`
       &:hover,
       &:focus {
         border: 2px solid transparent;
-        outline: 2px solid white;
+        outline: 2px solid ${({ theme }) => theme.text1};
       }
     `}
 `

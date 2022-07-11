@@ -62,8 +62,12 @@ export const StickyGroup = styled.div`
   right: 0;
   padding: 16px 32px 24px;
 
-  background-color: #161616;
-  background: linear-gradient(180deg, rgba(16, 16, 16, 0.4) 0%, #161616 73.72%);
+  background-color: ${({ theme }) => theme.bg1};
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.4) 0%,
+    ${({ theme }) => theme.bg1} 73.72%
+  );
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
   z-index: 100;

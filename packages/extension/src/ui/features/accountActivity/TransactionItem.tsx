@@ -39,7 +39,7 @@ const TransactionWrapper = styled(TokenWrapper)<{ highlighted?: boolean }>`
 const TransactionSubtitle = styled.p`
   font-size: 13px;
   line-height: 18px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   margin: 0;
 `
 

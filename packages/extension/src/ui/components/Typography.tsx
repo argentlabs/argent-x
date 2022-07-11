@@ -48,31 +48,31 @@ export const FormError = styled.p`
   margin-top: 2px;
   font-size: 12px;
   line-height: 16px;
-  color: #ff675c;
+  color: ${({ theme }) => theme.red2};
   text-align: left;
 `
 
 const anchorCss = css`
   display: inline-block;
   text-decoration: none;
-  color: #29c5ff;
+  color: ${({ theme }) => theme.blue1};
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 4px;
   transition: all 200ms ease-in-out;
 
   &:visited {
-    color: #29c5ff;
+    color: ${({ theme }) => theme.blue1};
   }
 
   &:hover {
-    color: #94e2ff;
+    color: ${({ theme }) => theme.blue2};
     outline: 0;
     border: 0;
   }
   &:focus {
     background: rgba(255, 255, 255, 0.15);
-    color: #94e2ff;
+    color: ${({ theme }) => theme.blue2};
     outline: 0;
     border: 0;
   }

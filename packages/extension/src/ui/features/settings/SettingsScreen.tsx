@@ -27,14 +27,14 @@ export const Title = styled.h3`
   justify-content: space-between;
 
   svg {
-    color: #8f8e8c;
+    color: ${({ theme }) => theme.text2};
     font-size: 12px;
   }
 `
 
 export const P = styled.p`
   font-size: 15px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   margin-top: 16px;
 `
 
@@ -54,7 +54,7 @@ export const SettingsScreenWrapper = styled.div`
   hr {
     border: none;
     height: 1px;
-    background-color: #333332;
+    background-color: ${({ theme }) => theme.bg2};
   }
 `
 
@@ -83,7 +83,7 @@ export const Footer = styled.div`
 
 const IconWrapper = styled(RowCentered)`
   padding: 8px 10px 8px 8px;
-  background: #333332;
+  background: ${({ theme }) => theme.bg2};
   border-radius: 100px;
   gap: 8px;
 `

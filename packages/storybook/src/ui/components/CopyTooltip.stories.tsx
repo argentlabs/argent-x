@@ -12,7 +12,7 @@ const Template: ComponentStory<typeof CopyTooltip> = (props) => (
 )
 
 const Message = styled.div`
-  color: white;
+  color: ${({ theme }) => theme.text1};
   cursor: pointer;
   text-align: center;
 `

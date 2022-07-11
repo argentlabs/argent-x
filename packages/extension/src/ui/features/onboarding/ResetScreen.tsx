@@ -1,5 +1,6 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
+import { useTheme } from "styled-components"
 
 import { P } from "../../components/Typography"
 import { routes } from "../../routes"
@@ -9,12 +10,13 @@ import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 export const ResetScreen: FC = () => {
   const navigate = useNavigate()
+  const theme = useTheme()
 
   return (
     <ConfirmScreen
       title="Reset wallet"
       confirmButtonText="RESET"
-      confirmButtonBackgroundColor="#c12026"
+      confirmButtonBackgroundColor={theme.red1}
       rejectButtonText="Cancel"
       onSubmit={() => {
         resetAll()

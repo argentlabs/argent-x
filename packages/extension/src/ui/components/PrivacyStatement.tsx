@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { routes } from "../routes"
 
 const StyledLink = styled(Link)`
-  color: #5c5b59;
+  color: ${({ theme }) => theme.text3};
   font-weight: 400;
   font-size: 12px;
   line-height: 14px;

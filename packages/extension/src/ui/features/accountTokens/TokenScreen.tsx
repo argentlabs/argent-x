@@ -43,7 +43,7 @@ const CurrencyValueText = styled.div`
 `
 
 const ActivityIconWrapper = styled.div`
-  background-color: #333332;
+  background-color: ${({ theme }) => theme.bg2};
   padding: 14.5px;
   border-radius: 50%;
 `
@@ -53,7 +53,7 @@ const ActivityText = styled.div`
   font-size: 17px;
   line-height: 22px;
   text-align: center;
-  color: #c2c0be;
+  color: ${({ theme }) => theme.text4};
 `
 
 const ComingSoonText = styled.div`
@@ -61,7 +61,7 @@ const ComingSoonText = styled.div`
   font-size: 13px;
   line-height: 18px;
   text-align: center;
-  color: #5c5b59;
+  color: ${({ theme }) => theme.text3};
 `
 
 export const TokenScreen: FC = () => {

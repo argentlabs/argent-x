@@ -30,7 +30,7 @@ const AddressWrapper = styled.span`
   }
 
   > ${AccountAddress} {
-    color: white;
+    color: ${({ theme }) => theme.text1};
   }
 `
 

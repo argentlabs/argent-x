@@ -40,7 +40,7 @@ export const BalanceText = styled.div`
   font-size: 15px;
   line-height: 20px;
   text-align: center;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const StyledIconBar = styled(IconBar)`
@@ -75,7 +75,7 @@ export const InputGroupBefore = styled(InputGroupAfter)`
 
 export const StyledMaxButton = styled(Button)`
   border-radius: 100px;
-  background-color: #5c5b59;
+  background-color: ${({ theme }) => theme.text3};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,14 +113,14 @@ export const InputTokenSymbol = styled.span`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const FormError = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #c12026;
+  color: ${({ theme }) => theme.red1};
   margin-top: 8px;
   margin-left: 8px;
   text-align: left;

@@ -23,7 +23,7 @@ const Container = styled.div`
   }
 
   a {
-    color: #ff875b;
+    color: ${({ theme }) => theme.red3};
     text-decoration: none;
   }
 `

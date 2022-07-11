@@ -36,7 +36,7 @@ export const Container = styled.div`
   }
 
   a {
-    color: white;
+    color: ${({ theme }) => theme.text1};
     font-size: 16px;
   }
 

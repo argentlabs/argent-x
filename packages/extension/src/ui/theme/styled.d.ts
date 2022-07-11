@@ -20,6 +20,7 @@ export interface Colors {
   red1: Color
   red2: Color
   red3: Color
+  red4: Color
 
   blue1: Color
   blue2: Color

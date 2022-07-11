@@ -32,6 +32,7 @@ export const colors = (): Colors => {
     red1: "#c12026",
     red2: "#ff675c",
     red3: "#ff875b",
+    red4: "#f36a3d",
 
     blue1: "#29c5ff",
     blue2: "#94e2ff",

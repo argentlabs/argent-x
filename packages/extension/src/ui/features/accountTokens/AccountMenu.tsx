@@ -26,7 +26,7 @@ export const Menu = styled.div`
   position: absolute;
   top: 95%;
   right: 45%;
-  background-color: #474747;
+  background-color: ${({ theme }) => theme.bg3};
   border-radius: 4px;
   display: flex;
   flex-direction: column;

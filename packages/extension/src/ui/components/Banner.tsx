@@ -18,14 +18,14 @@ const BannerWrapper = styled.div<{
       margin: 16px 20px;
     `};
 
-  ${({ type }) =>
+  ${({ type, theme }) =>
     type === "danger" &&
     css`
-      background-color: #c12026;
+      background-color: ${({ theme }) => theme.red1};
 
       h1,
       p {
-        color: white;
+        color: ${theme.text1};
       }
     `};
 `
@@ -48,7 +48,7 @@ const BannerDescription = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 20px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export interface BannerProps {
