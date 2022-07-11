@@ -72,10 +72,10 @@ export const StickyGroup = styled.div`
     margin-top: 24px;
   }
 
-  ${(props) => props.theme.breakpoints.up("sm")} {
-    left: ${(props) => props.theme.margin.extensionInTab};
-    right: ${(props) => props.theme.margin.extensionInTab};
-  }
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
 `
 
 const Placeholder = styled.div`

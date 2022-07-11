@@ -10,8 +10,8 @@ export const AccountHeader = styled.div`
   backdrop-filter: blur(10px);
   height: 68px;
   z-index: 100;
-  ${(props) => props.theme.breakpoints.up("sm")} {
-    left: ${(props) => props.theme.margin.extensionInTab};
-    right: ${(props) => props.theme.margin.extensionInTab};
-  }
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
 `

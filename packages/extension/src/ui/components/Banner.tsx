@@ -3,7 +3,7 @@ import styled, { css } from "styled-components"
 
 const BannerWrapper = styled.div<{
   noMargins?: boolean
-  theme?: "danger"
+  type?: "danger"
 }>`
   display: flex;
   cursor: pointer;
@@ -18,8 +18,8 @@ const BannerWrapper = styled.div<{
       margin: 16px 20px;
     `};
 
-  ${({ theme }) =>
-    theme === "danger" &&
+  ${({ type }) =>
+    type === "danger" &&
     css`
       background-color: #c12026;
 
@@ -66,7 +66,7 @@ export const Banner: FC<BannerProps> = ({
   noMargins,
   theme,
 }) => (
-  <BannerWrapper noMargins={noMargins} theme={theme}>
+  <BannerWrapper noMargins={noMargins} type={theme}>
     {icon}
     <BannerTextWrapper>
       <BannerTitle>{title}</BannerTitle>

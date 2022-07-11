@@ -11,10 +11,10 @@ export const AccountFooter = styled.div`
   background: linear-gradient(180deg, rgba(16, 16, 16, 0.4) 0%, #161616 73.72%);
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
-  ${(props) => props.theme.breakpoints.up("sm")} {
-    left: ${(props) => props.theme.margin.extensionInTab};
-    right: ${(props) => props.theme.margin.extensionInTab};
-  }
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
 `
 
 export const FooterTab = styled(Link)`
