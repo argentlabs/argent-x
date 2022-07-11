@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
@@ -11,6 +11,8 @@ import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
+import { usePreAuthorizations } from "../actions/connectDapp/usePreAuthorizations"
+import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
@@ -32,9 +34,23 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const navigate = useNavigate()
   const { accountClassHash, id: networkId } = useCurrentNetwork()
   const status = useAccountStatus(account, selectedAccount)
+  const originatingHost = useOriginatingHost()
+  const { preAuthorizations } = usePreAuthorizations()
 
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
+
+  const isConnected = useMemo(() => {
+    if (!originatingHost || !account) {
+      return false
+    }
+    return (
+      preAuthorizations?.accountsByHost[originatingHost] &&
+      preAuthorizations?.accountsByHost[originatingHost].includes(
+        account.address,
+      )
+    )
+  }, [account, originatingHost, preAuthorizations?.accountsByHost])
 
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), networkId, "feeTokenBalance"],
@@ -65,6 +81,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       outline={status.code === "CONNECTED"}
       deploying={status.code === "DEPLOYING"}
       upgrade={canShowUpgrade && showUpgradeBanner}
+      connected={isConnected}
     />
   )
 }

@@ -20,7 +20,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "CONNECT_ACCOUNT": {
-      return await wallet.selectAccount(msg.data)
+      await wallet.selectAccount(msg.data)
+      return sendToTabAndUi({
+        type: "CONNECT_ACCOUNT_RES",
+        data: msg.data,
+      })
     }
 
     case "NEW_ACCOUNT": {

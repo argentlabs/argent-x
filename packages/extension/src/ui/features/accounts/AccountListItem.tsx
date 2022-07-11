@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react"
 import styled from "styled-components"
 
-import { ArrowCircleDownIcon } from "../../components/Icons/MuiIcons"
+import { ArrowCircleDownIcon, LinkIcon } from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
@@ -16,9 +16,8 @@ export interface IAccountListItem {
   highlight?: boolean
   deploying?: boolean
   upgrade?: boolean
+  connected?: boolean
   children?: ReactNode
-  // ...rest
-  [x: string]: any
 }
 
 type AccountListItemWrapperProps = Pick<
@@ -78,6 +77,19 @@ const AccountAddress = styled.div`
   font-size: 13px;
 `
 
+const UpgradeIcon = styled(ArrowCircleDownIcon)`
+  font-size: 16px;
+`
+
+const ConnectedStatusWrapper = styled(NetworkStatusWrapper)`
+  color: ${({ theme }) => theme.blue1};
+`
+
+const ConnectedIcon = styled(LinkIcon)`
+  transform: rotate(-45deg);
+  font-size: 16px;
+`
+
 export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
   accountAddress,
@@ -86,6 +98,7 @@ export const AccountListItem: FC<IAccountListItem> = ({
   highlight,
   deploying,
   upgrade,
+  connected,
   children,
   ...rest
 }) => {
@@ -111,14 +124,17 @@ export const AccountListItem: FC<IAccountListItem> = ({
               <TransactionStatusIndicator color="orange" />
               <AccountStatusText>Deploying</AccountStatusText>
             </NetworkStatusWrapper>
+          ) : upgrade ? (
+            <NetworkStatusWrapper>
+              <UpgradeIcon />
+              <AccountStatusText>Upgrade</AccountStatusText>
+            </NetworkStatusWrapper>
           ) : (
-            upgrade && (
-              <NetworkStatusWrapper>
-                <ArrowCircleDownIcon
-                  style={{ maxHeight: "16px", maxWidth: "16px" }}
-                />
-                <AccountStatusText>Upgrade</AccountStatusText>
-              </NetworkStatusWrapper>
+            connected && (
+              <ConnectedStatusWrapper>
+                <ConnectedIcon />
+                <AccountStatusText>Connected</AccountStatusText>
+              </ConnectedStatusWrapper>
             )
           )}
           {children}

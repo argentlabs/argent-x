@@ -10,3 +10,13 @@ vi.stubGlobal("chrome", {
   },
   storage: chromeStorageMock,
 })
+// import browserMock from "./__mocks__/browser"
+
+// /** mock global fetch() */
+// vi.stubGlobal("fetch", fetch)
+
+// /** satisfy checks to allow use of `import browser from "webextension-polyfill"` */
+// vi.stubGlobal("chrome", { runtime: { id: "testid" } })
+
+// /** mock global browser, currently for `browser.storage.local` */
+// vi.stubGlobal("browser", browserMock)

@@ -4,6 +4,7 @@ import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { openUi } from "./openUi"
 import {
+  getPreAuthorizations,
   isPreAuthorized,
   removePreAuthorization,
   resetPreAuthorizations,
@@ -20,7 +21,10 @@ export const handlePreAuthorizationMessage: HandleMessage<
   switch (msg.type) {
     case "CONNECT_DAPP": {
       const selectedAccount = await wallet.getSelectedAccount()
-      const isAuthorized = await isPreAuthorized(msg.data.host)
+      const isAuthorized = await isPreAuthorized({
+        host: msg.data.host,
+        accountAddress: selectedAccount?.address,
+      })
 
       if (sender.tab?.id) {
         addTab({
@@ -46,21 +50,18 @@ export const handlePreAuthorizationMessage: HandleMessage<
       return openUi()
     }
 
-    case "PREAUTHORIZE": {
-      return actionQueue.push({
-        type: "CONNECT_DAPP",
-        payload: { host: msg.data },
-      })
-    }
-
     case "IS_PREAUTHORIZED": {
-      const valid = await isPreAuthorized(msg.data)
+      const selectedAccount = await wallet.getSelectedAccount()
+      const valid = await isPreAuthorized({
+        host: msg.data,
+        accountAddress: selectedAccount?.address,
+      })
       return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
     }
 
     case "REMOVE_PREAUTHORIZATION": {
-      const host = msg.data
-      await removePreAuthorization(host)
+      const { host, accountAddress } = msg.data
+      await removePreAuthorization({ host, accountAddress })
       await sendToTabAndUi({ type: "REMOVE_PREAUTHORIZATION_RES" })
       await sendMessageToHost({ type: "DISCONNECT_ACCOUNT" }, host)
       removeTabOfHost(host)
@@ -69,11 +70,18 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
     case "RESET_PREAUTHORIZATIONS": {
       await resetPreAuthorizations()
-      return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
+      await sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
+      return sendToTabAndUi({ type: "RESET_PREAUTHORIZATIONS_RES" })
     }
 
     case "REJECT_PREAUTHORIZATION": {
+      /** FIXME: this action type is never received here, but is received by the UI */
       return await actionQueue.remove(msg.data.actionHash)
+    }
+
+    case "GET_PRE_AUTHORIZATIONS": {
+      const data = await getPreAuthorizations()
+      return sendToTabAndUi({ type: "GET_PRE_AUTHORIZATIONS_RES", data })
     }
   }
 

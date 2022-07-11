@@ -9,11 +9,11 @@ import {
   sumTokenBalancesToCurrencyValue,
 } from "../src/shared/token/price"
 import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
-import mockApiPricesDataInvalid from "./__mocks__/argent-api-prices-invalid.mock.json"
-import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"
-import mockApiTokenDataInvalid from "./__mocks__/argent-api-tokens-invalid.mock.json"
-import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
-import mockTokensWithBalanceRaw from "./__mocks__/tokens-with-balance.mock.json"
+import mockApiPricesDataInvalid from "./__fixtures__/argent-api-prices-invalid.mock.json"
+import mockApiPricesData from "./__fixtures__/argent-api-prices.mock.json"
+import mockApiTokenDataInvalid from "./__fixtures__/argent-api-tokens-invalid.mock.json"
+import mockApiTokenData from "./__fixtures__/argent-api-tokens.mock.json"
+import mockTokensWithBalanceRaw from "./__fixtures__/tokens-with-balance.mock.json"
 
 /** convert to expected types */
 export const mockTokensWithBalance: TokenDetailsWithBalance[] =
