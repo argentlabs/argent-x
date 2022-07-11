@@ -1,5 +1,6 @@
 import { FC, useMemo } from "react"
 import styled from "styled-components"
+import { coerceErrorToString } from "../../shared/utils/error"
 
 import { useHardResetAndReload } from "../services/resetAndReload"
 import { CopyTooltip } from "./CopyTooltip"
@@ -74,58 +75,44 @@ export interface IErrorBoundaryFallbackWithCopyError
   message?: string
 }
 
-export const coerceErrorToString = (error: any): string => {
-  let errorString = error?.toString?.() || "Unknown error"
-  // sometimes error.toString() may return "[object Object]", attempt to stringify as a fallback
-  if (errorString === "[object Object]") {
-    try {
-      errorString = JSON.stringify(error, null, 2)
-    } catch {
-      // ignore attempt to stringify the error object
-    }
-  }
-  return errorString
-}
-
-const ErrorBoundaryFallbackWithCopyError: FC<
-  IErrorBoundaryFallbackWithCopyError
-> = ({ error, errorInfo, message = "Sorry, an error occurred" }) => {
-  const hardResetAndReload = useHardResetAndReload()
-  const errorPayload = useMemo(() => {
-    try {
-      const displayError = coerceErrorToString(error)
-      const displayStack = errorInfo?.componentStack || "No stack trace"
-      return `v${version}
+const ErrorBoundaryFallbackWithCopyError: FC<IErrorBoundaryFallbackWithCopyError> =
+  ({ error, errorInfo, message = "Sorry, an error occurred" }) => {
+    const hardResetAndReload = useHardResetAndReload()
+    const errorPayload = useMemo(() => {
+      try {
+        const displayError = coerceErrorToString(error)
+        const displayStack = errorInfo?.componentStack || "No stack trace"
+        return `v${version}
 
 ${displayError}
 ${displayStack}
       `
-    } catch (e) {
-      // ignore error
-    }
-    return fallbackErrorPayload
-  }, [error, errorInfo])
+      } catch (e) {
+        // ignore error
+      }
+      return fallbackErrorPayload
+    }, [error, errorInfo])
 
-  return (
-    <MessageContainer>
-      <ErrorIcon />
-      <ErrorMessageContainer>
-        <P>{message}</P>
-      </ErrorMessageContainer>
-      <ActionsWrapper>
-        <ActionContainer onClick={hardResetAndReload}>
-          <RefreshIcon />
-          <span>Retry</span>
-        </ActionContainer>
-        <CopyTooltip message="Copied" copyValue={errorPayload}>
-          <ActionContainer>
-            <ContentCopyIcon />
-            <span>Copy error details</span>
+    return (
+      <MessageContainer>
+        <ErrorIcon />
+        <ErrorMessageContainer>
+          <P>{message}</P>
+        </ErrorMessageContainer>
+        <ActionsWrapper>
+          <ActionContainer onClick={hardResetAndReload}>
+            <RefreshIcon />
+            <span>Retry</span>
           </ActionContainer>
-        </CopyTooltip>
-      </ActionsWrapper>
-    </MessageContainer>
-  )
-}
+          <CopyTooltip message="Copied" copyValue={errorPayload}>
+            <ActionContainer>
+              <ContentCopyIcon />
+              <span>Copy error details</span>
+            </ActionContainer>
+          </CopyTooltip>
+        </ActionsWrapper>
+      </MessageContainer>
+    )
+  }
 
 export default ErrorBoundaryFallbackWithCopyError

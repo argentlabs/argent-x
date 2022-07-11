@@ -24,7 +24,8 @@ describe("fetcher", () => {
     })
     describe("when valid", () => {
       test("returns parsed json", async () => {
-        const mock = mockGet("http://foo/v1/bar").willResolve({ foo: "bar" })
+        const mock =
+          mockGet("http://foo/v1/bar").willResolve('{ "foo": "bar" }')
         const response = await fetcher("http://foo/v1/bar")
         expect(response).toEqual({ foo: "bar" })
         expect(mock).toHaveFetched()
