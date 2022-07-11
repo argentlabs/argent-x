@@ -59,7 +59,14 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
   return (
     <FieldGroup>
       <Field>
-        <FieldKey>Contract</FieldKey>
+        <FieldKey>
+          Contract
+          <CopyTooltip message="Copied" copyValue={transaction.contractAddress}>
+            <ContentCopyIcon
+              style={{ fontSize: 12, marginLeft: "0.5em", cursor: "pointer" }}
+            />
+          </CopyTooltip>
+        </FieldKey>
         <FieldValue>{displayContractAddress}</FieldValue>
       </Field>
       <Field>
@@ -81,7 +88,7 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
           <TransactionDetailKey>
             <div>Transaction details</div>
             <CopyTooltip message="Copied" copyValue={displayTransactionDetails}>
-              <ContentCopyIcon style={{ fontSize: 12 }} />
+              <ContentCopyIcon style={{ fontSize: 12, cursor: "pointer" }} />
             </CopyTooltip>
           </TransactionDetailKey>
           <FieldValue>

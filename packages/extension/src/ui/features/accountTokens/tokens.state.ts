@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react"
 import { number } from "starknet"
 import useSWR from "swr"
 import create from "zustand"
+import shallow from "zustand/shallow"
 
 import { messageStream } from "../../../shared/messages"
 import { Token, equalToken } from "../../../shared/token"
@@ -106,6 +107,7 @@ export const selectTokensByNetwork = (networkId: string) => (state: State) =>
 
 interface UseTokens {
   tokenDetails: TokenDetailsWithBalance[]
+  tokenDetailsIsInitialising: boolean
   isValidating: boolean
   error?: any
 }
@@ -114,15 +116,28 @@ export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
   const selectedAccount = useAccount(account)
-  const tokensInNetwork = useTokens(
-    selectTokensByNetwork(selectedAccount?.networkId ?? ""),
-  )
-  const tokenAddresses = useMemo(
-    () => tokensInNetwork.map((t) => t.address),
-    [tokensInNetwork],
-  )
 
-  const { data, isValidating, error, mutate } = useSWR(
+  const tokensInNetworkSelector = useMemo(() => {
+    return selectTokensByNetwork(selectedAccount?.networkId ?? "")
+  }, [selectedAccount?.networkId])
+
+  const tokenAddressesSelector = useMemo(() => {
+    return (state: State) => {
+      const tokensInNetwork = tokensInNetworkSelector(state)
+      return tokensInNetwork.map((t) => t.address)
+    }
+  }, [tokensInNetworkSelector])
+
+  // shallow compare objects and arrays
+  const tokensInNetwork = useTokens(tokensInNetworkSelector, shallow)
+  const tokenAddresses = useTokens(tokenAddressesSelector, shallow)
+
+  const {
+    data,
+    isValidating,
+    error: maybeEmptyObjectError,
+    mutate,
+  } = useSWR(
     // skip if no account selected
     selectedAccount && [
       getAccountIdentifier(selectedAccount),
@@ -130,7 +145,7 @@ export const useTokensWithBalance = (
     ],
     async () => {
       if (!selectedAccount) {
-        return {}
+        return
       }
 
       const balances = await fetchAllTokensBalance(
@@ -138,17 +153,45 @@ export const useTokensWithBalance = (
         selectedAccount,
       )
 
-      return balances ?? {}
+      return balances
     },
     {
-      suspense: true,
       refreshInterval: 30000,
     },
   )
 
-  // refetch balances on transaction success or token edit (token was added or removed)
+  /**
+   * FIXME:
+   * Investigate what causes the SWR hook above to cache an empty object `error: {}`, usually observed after reloading the extension
+   *
+   * This is subsequently retreived by SWR from the cache and causes an immediately defined error if left unchecked
+   *
+   * You can verify this by debugging in the `set` method of `swrCacheProvider`, and
+   * checking for SWR setting a value containing a key of `error` with an empty object {}
+   *
+   * As a workaround we check for empty object here and treat as undefined while the hook revalidates properly
+   *
+   */
+
+  const error: any = useMemo(() => {
+    if (!maybeEmptyObjectError) {
+      return
+    }
+    try {
+      if (JSON.stringify(maybeEmptyObjectError) === "{}") {
+        console.warn("FIXME: Ignoring empty object {} error")
+        return
+      }
+    } catch (e) {
+      // ignore any stringify errors
+    }
+    return maybeEmptyObjectError
+  }, [maybeEmptyObjectError])
+
+  const tokenDetailsIsInitialising = !error && !data && isValidating
+
+  // refetch balances on transaction success
   useEffect(() => {
-    mutate()
     const subscription = messageStream.subscribe(([msg]) => {
       if (msg.type === "TRANSACTION_SUCCESS") {
         mutate() // refetch balances
@@ -159,7 +202,12 @@ export const useTokensWithBalance = (
         subscription.unsubscribe()
       }
     }
-  }, [tokenAddresses.join(":")])
+  }, [mutate])
+
+  // refetch balances on token edit (token was added or removed)
+  useEffect(() => {
+    mutate()
+  }, [mutate, tokenAddresses])
 
   const tokenDetails = useMemo(() => {
     return tokensInNetwork
@@ -170,7 +218,12 @@ export const useTokensWithBalance = (
       .filter(
         (token) => token.showAlways || (token.balance && token.balance.gt(0)),
       )
-  }, [tokenAddresses, data])
+  }, [tokensInNetwork, data])
 
-  return { tokenDetails, isValidating, error }
+  return {
+    tokenDetails,
+    tokenDetailsIsInitialising,
+    isValidating,
+    error,
+  }
 }
