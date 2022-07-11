@@ -15,7 +15,8 @@ describe("error", () => {
           error.status = 123
           error.statusText = "Foo bar"
           error.responseText = "Foo bar baz"
-          expect(coerceErrorToString(error)).toMatchInlineSnapshot(`
+          /** 'false' excludes the stack trace which is environment-specific */
+          expect(coerceErrorToString(error, false)).toMatchInlineSnapshot(`
           "{
             \\"message\\": \\"Error message\\",
             \\"url\\": \\"http://foo/v1/bar\\",
