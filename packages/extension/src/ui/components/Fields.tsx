@@ -50,7 +50,7 @@ export const FieldGroup = styled.section<{ error?: boolean }>`
 export const FieldValue = styled.div`
   display: flex;
   align-items: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 
   font-size: 15px;
   font-weight: 600;

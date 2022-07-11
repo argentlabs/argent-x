@@ -20,7 +20,7 @@ export const Title = styled.h3`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 
   display: flex;
   align-items: center;
@@ -67,7 +67,7 @@ export const SettingsLinkItem = styled(Link)`
   padding: 24px 32px;
 
   &:hover svg {
-    color: #ffffff;
+    color: ${({ theme }) => theme.text1};
   }
 `
 
@@ -93,7 +93,7 @@ const IconText = styled.span`
   font-size: 13px;
   line-height: 18px;
   text-align: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 const StyledPrivacyStatement = styled(PrivacyStatement)`

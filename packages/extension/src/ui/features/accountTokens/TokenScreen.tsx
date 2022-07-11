@@ -38,7 +38,7 @@ const CurrencyValueText = styled.div`
   font-size: 17px;
   line-height: 22px;
   text-align: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
   margin-top: 8px;
 `
 

@@ -28,7 +28,7 @@ export const TokenName = styled.h3`
   font-weight: 600;
   font-size: 15px;
   line-height: 20px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 export const HideTokenScreen: FC = () => {

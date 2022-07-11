@@ -58,7 +58,7 @@ const Tab = styled.div<{ active: boolean }>`
   background: ${({ theme, active }) => (active ? theme.bg2 : "transparent")};
   border: 1px solid
     ${({ theme, active }) => (active ? "transparent" : theme.bg2)};
-  color: ${({ theme, active }) => (active ? "#ffffff" : theme.text2)};
+  color: ${({ theme, active }) => (active ? theme.text1 : theme.text2)};
   border-radius: 8px;
   font-weight: 600;
   font-size: 15px;

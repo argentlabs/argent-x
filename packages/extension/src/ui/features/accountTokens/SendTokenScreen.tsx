@@ -90,19 +90,19 @@ export const StyledMaxButton = styled(Button)`
 export const AtTheRateWrapper = styled(StyledMaxButton)<{ active?: boolean }>`
   padding: 6px;
 
-  background-color: ${({ active }) => active && "#ffffff"};
+  background-color: ${({ theme, active }) => active && theme.white};
   svg {
     path {
-      fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+      fill: ${({ theme, active }) => (active ? theme.black : theme.white)};
     }
   }
 
   &:hover,
   &:focus {
-    background-color: ${({ active }) => active && "#ffffff"};
+    background-color: ${({ theme, active }) => active && theme.white};
     svg {
       path {
-        fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+        fill: ${({ theme, active }) => (active ? theme.black : theme.white)};
       }
     }
   }

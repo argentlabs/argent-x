@@ -9,7 +9,7 @@ const BannerWrapper = styled.div<{
   cursor: pointer;
   align-items: center;
   padding: 16px;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.white};
   border-radius: 8px;
 
   ${({ noMargins = false }) =>
