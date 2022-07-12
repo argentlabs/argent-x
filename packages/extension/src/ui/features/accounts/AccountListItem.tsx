@@ -8,10 +8,25 @@ import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { ProfilePicture } from "./ProfilePicture"
 
-export const AccountListItemWrapper = styled.div<{
+export interface IAccountListItem {
+  accountName: string
+  accountAddress: string
+  networkId: string
   outline?: boolean
   highlight?: boolean
-}>`
+  deploying?: boolean
+  upgrade?: boolean
+  children?: ReactNode
+  // ...rest
+  [x: string]: any
+}
+
+type AccountListItemWrapperProps = Pick<
+  IAccountListItem,
+  "highlight" | "outline"
+>
+
+export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
   cursor: pointer;
   background-color: ${({ highlight }) =>
     highlight ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.1)"};
@@ -62,19 +77,6 @@ const AccountName = styled.h1`
 const AccountAddress = styled.div`
   font-size: 13px;
 `
-
-export interface IAccountListItem {
-  accountName: string
-  accountAddress: string
-  networkId: string
-  outline?: boolean
-  highlight?: boolean
-  deploying?: boolean
-  upgrade?: boolean
-  children?: ReactNode
-  // ...rest
-  [x: string]: any
-}
 
 export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
