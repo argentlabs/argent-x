@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "name": "Argent X",
   "description": "The security of Ethereum with the scale of StarkNet",
   "version": "4.3.1",
