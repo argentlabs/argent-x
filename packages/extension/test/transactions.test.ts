@@ -77,6 +77,7 @@ describe("transactions", () => {
     expect(fn).toBeCalledTimes(0)
   })
   test("should add a transaction", async () => {
+    let allTransactions = await txTracker.getAll()
     const transactionHash =
       "0x16d38d961a659b7565b596060ca812b863a39766accab5a8fd93ace56e6001a" // add a transaction which already exists onchain
     const transaction: TransactionRequest = {
@@ -99,21 +100,36 @@ describe("transactions", () => {
       timestamp: expect.any(Number),
     })
     expect(fn).toBeCalledTimes(1)
-    expect(fn).toBeCalledWith([
-      { ...transaction, status: "RECEIVED", timestamp: expect.any(Number) }, // after the update , the transaction should be accepted on L2
-    ])
+    expect(fn).toBeCalledWith(
+      [
+        { ...transaction, status: "RECEIVED", timestamp: expect.any(Number) }, // after the update , the transaction should be accepted on L2
+      ],
+      allTransactions,
+    )
+
+    allTransactions = await txTracker.getAll()
 
     await waitForExpect(() => {
       expect(fn).toBeCalledTimes(2)
     }, 2000)
-    expect(fn).toBeCalledWith([
-      { ...transaction, status: "ACCEPTED_ON_L2", timestamp: 1652257464 }, // after the update , the transaction should be accepted on L2
-    ])
+
+    expect(fn).toBeCalledWith(
+      [
+        {
+          ...transaction,
+          status: "ACCEPTED_ON_L2",
+          timestamp: 1652257464,
+        },
+      ],
+      allTransactions,
+    )
+
+    allTransactions = await txTracker.getAll()
 
     await waitForExpect(() => {
       expect(fn).toBeCalledTimes(3)
     }, 2000)
-    expect(fn).toBeCalledWith([]) // no update this time, as ACCEPTED_ON_L2 us considered as final status
+    expect(fn).toBeCalledWith([], allTransactions) // no update this time, as ACCEPTED_ON_L2 us considered as final status
   })
 })
 
