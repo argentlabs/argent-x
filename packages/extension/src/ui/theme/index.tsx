@@ -8,12 +8,10 @@ import {
 } from "styled-components"
 import { normalize } from "styled-normalize"
 
-import { Colors } from "./styled"
-
 const white = "#FFFFFF"
 const black = "#000000"
 
-export const colors: Colors = {
+export const colors = {
   white,
   black,
 
