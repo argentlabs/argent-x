@@ -95,6 +95,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
       ...transaction,
     }
     await transactionsStore.addItem(newTransaction)
+    await handleUpdate()
     onUpdate?.([newTransaction])
   }
 
