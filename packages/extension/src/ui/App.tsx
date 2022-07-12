@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@mui/material"
+import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
 
@@ -11,7 +11,12 @@ import DevUI from "./features/dev/DevUI"
 import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
 import { swrCacheProvider } from "./services/swr"
-import { GlobalStyle, theme } from "./theme"
+import {
+  FixedGlobalStyle,
+  ThemeProvider as StyledComponentsThemeProvider,
+  ThemedGlobalStyle,
+  muiTheme,
+} from "./theme"
 
 export const App: FC = () => {
   useTracking()
@@ -19,21 +24,24 @@ export const App: FC = () => {
   return (
     <SoftReloadProvider>
       <SWRConfig value={{ provider: () => swrCacheProvider }}>
-        <ThemeProvider theme={theme}>
+        <MuiThemeProvider theme={muiTheme}>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link
             href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
             rel="stylesheet"
           />
-          <GlobalStyle extensionIsInTab={extensionIsInTab} />
+          <FixedGlobalStyle extensionIsInTab={extensionIsInTab} />
           {process.env.SHOW_DEV_UI && <DevUI />}
-          <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
-            <Suspense fallback={<LoadingScreen />}>
-              <AppRoutes />
-            </Suspense>
-          </ErrorBoundary>
-        </ThemeProvider>
+          <StyledComponentsThemeProvider>
+            <ThemedGlobalStyle />
+            <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
+              <Suspense fallback={<LoadingScreen />}>
+                <AppRoutes />
+              </Suspense>
+            </ErrorBoundary>
+          </StyledComponentsThemeProvider>
+        </MuiThemeProvider>
       </SWRConfig>
     </SoftReloadProvider>
   )

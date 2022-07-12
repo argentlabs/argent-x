@@ -11,9 +11,9 @@ import {
   StyledControlledInput,
 } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
-import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
+import { H3 } from "../../theme/Typography"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AspectNft } from "../accountNfts/aspect.model"
 import { useNfts } from "../accountNfts/useNfts"
@@ -55,9 +55,10 @@ const TabGroup = styled.div`
 `
 
 const Tab = styled.div<{ active: boolean }>`
-  background: ${({ active }) => (active ? "#333332" : "transparent")};
-  border: 1px solid ${({ active }) => (active ? "transparent" : "#333332")};
-  color: ${({ active }) => (active ? "#ffffff" : "#8F8E8C")};
+  background: ${({ theme, active }) => (active ? theme.bg2 : "transparent")};
+  border: 1px solid
+    ${({ theme, active }) => (active ? "transparent" : theme.bg2)};
+  color: ${({ theme, active }) => (active ? theme.text1 : theme.text2)};
   border-radius: 8px;
   font-weight: 600;
   font-size: 15px;

@@ -1,7 +1,7 @@
 import { isString } from "lodash-es"
 import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
-import styled from "styled-components"
+import styled, { useTheme } from "styled-components"
 
 import { compareTransactions } from "../../../shared/transactions"
 import { useAppState } from "../../app.state"
@@ -92,6 +92,7 @@ export const TransactionDetail: FC = () => {
 
   const account = useSelectedAccount()
 
+  const theme = useTheme()
   const { transactions } = useAccountTransactions(account)
 
   if (!account) {
@@ -187,7 +188,7 @@ export const TransactionDetail: FC = () => {
                   <ContentCopyIcon style={{ fontSize: 12 }} />
                 </CopyTooltip>
               </TransactionLogKey>
-              <TransactionLogMessage style={{ color: "#8f8e8c" }}>
+              <TransactionLogMessage style={{ color: theme.text2 }}>
                 {transaction.failureReason?.error_message || "Unknown error"}
               </TransactionLogMessage>
             </TransactionFailedField>

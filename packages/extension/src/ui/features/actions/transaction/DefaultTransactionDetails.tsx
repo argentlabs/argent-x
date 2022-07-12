@@ -38,7 +38,7 @@ const TransactionJson = styled.pre`
   font-weight: normal;
   font-size: 12px;
   line-height: 12px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const DefaultTransactionDetails: FC<TransactionItemProps> = ({

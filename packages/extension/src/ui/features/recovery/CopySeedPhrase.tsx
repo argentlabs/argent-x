@@ -31,7 +31,7 @@ const CopySeedPhraseButton = styled(Button)<{ active: boolean }>`
 
 const WarningText = styled.div`
   text-align: center;
-  color: #ffbf3d;
+  color: ${({ theme }) => theme.yellow1};
   font-size: 12px;
   line-height: 16px;
 `

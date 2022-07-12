@@ -8,8 +8,8 @@ import {
 } from "../../../background/preAuthorizations"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { H2, P } from "../../components/Typography"
 import { removePreAuthorization } from "../../services/background"
+import { H2, P } from "../../theme/Typography"
 import { DappConnection } from "./DappConnection"
 
 const Wrapper = styled.div`

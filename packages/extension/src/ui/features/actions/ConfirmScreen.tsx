@@ -9,7 +9,7 @@ import {
   ButtonVariant,
 } from "../../components/Button"
 import { Header } from "../../components/Header"
-import { H2 } from "../../components/Typography"
+import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -62,8 +62,12 @@ export const StickyGroup = styled.div`
   right: 0;
   padding: 16px 32px 24px;
 
-  background-color: #161616;
-  background: linear-gradient(180deg, rgba(16, 16, 16, 0.4) 0%, #161616 73.72%);
+  background-color: ${({ theme }) => theme.bg1};
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.4) 0%,
+    ${({ theme }) => theme.bg1} 73.72%
+  );
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
   z-index: 100;
@@ -72,10 +76,10 @@ export const StickyGroup = styled.div`
     margin-top: 24px;
   }
 
-  ${(props) => props.theme.breakpoints.up("sm")} {
-    left: ${(props) => props.theme.margin.extensionInTab};
-    right: ${(props) => props.theme.margin.extensionInTab};
-  }
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
 `
 
 const Placeholder = styled.div`
