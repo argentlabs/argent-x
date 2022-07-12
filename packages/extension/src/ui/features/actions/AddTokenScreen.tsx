@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom"
 import { number } from "starknet"
 import styled from "styled-components"
 
-import { RequestToken } from "../../../shared/token"
+import { addToken } from "../../../shared/token/storage"
+import { RequestToken, Token } from "../../../shared/token/type"
 import { useAppState } from "../../app.state"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupVertical } from "../../components/Button"
@@ -16,7 +17,6 @@ import { routes } from "../../routes"
 import { isValidAddress } from "../../services/addresses"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { fetchTokenDetails } from "../accountTokens/tokens.service"
-import { TokenDetails, addToken } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -35,9 +35,7 @@ const AddTokenScreenWrapper = styled.div`
   }
 `
 
-const isDataComplete = (
-  data: Partial<TokenDetails>,
-): data is Required<TokenDetails> => {
+const isDataComplete = (data: Partial<Token>): data is Token => {
   if (
     data.address &&
     isValidAddress(data.address) &&
@@ -78,7 +76,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [tokenDetails, setTokenDetails] = useState<TokenDetails>()
+  const [tokenDetails, setTokenDetails] = useState<Token>()
   const prevValidAddress = useRef("")
 
   const validAddress = useMemo(() => {
@@ -126,7 +124,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     ...(tokenName && { name: tokenName }),
     ...(tokenSymbol && { symbol: tokenSymbol }),
     ...(!tokenDetails?.decimals && {
-      decimals: BigNumber.from(tokenDecimals || "0"),
+      decimals: parseInt(tokenDecimals.toString(), 10) || 0,
     }),
     networkId: switcherNetworkId,
   }

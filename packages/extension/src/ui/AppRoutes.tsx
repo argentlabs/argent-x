@@ -13,7 +13,6 @@ import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
-import { useTokensSubscription } from "./features/accountTokens/tokens.state"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import {
   useActions,
@@ -196,7 +195,6 @@ const walletRoutes = (
 export const AppRoutes: FC = () => {
   useEntryRoute()
   useActionsSubscription()
-  useTokensSubscription()
 
   const { isLoading } = useAppState()
   const { actions } = useActions()

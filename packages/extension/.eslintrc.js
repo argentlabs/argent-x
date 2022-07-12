@@ -27,7 +27,7 @@ module.exports = {
     "react/jsx-no-target-blank": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
+    "react-hooks/exhaustive-deps": "off", // I dont see the reason for this check, I find myself always trying to use as few dependencies as possible, so it makes no sense to check if all are included in the array
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-extra-semi": "off",
     "@typescript-eslint/no-unused-vars": [

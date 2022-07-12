@@ -23,7 +23,6 @@ import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { handleSettingsMessage } from "./settingsMessaging"
 import { Storage } from "./storage"
-import { handleTokenMessage } from "./tokenMessaging"
 import { trackTransations } from "./transactions/notifications"
 import { getTransactionsStore } from "./transactions/store"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
@@ -76,7 +75,6 @@ import { Wallet, WalletStorageProps } from "./wallet"
     handleRecoveryMessage,
     handleSessionMessage,
     handleSettingsMessage,
-    handleTokenMessage,
     handleTransactionMessage,
   ] as Array<HandleMessage<MessageType>>
 

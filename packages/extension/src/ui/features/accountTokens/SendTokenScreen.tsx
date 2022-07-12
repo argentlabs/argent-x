@@ -5,11 +5,8 @@ import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
-import {
-  getFeeToken,
-  inputAmountSchema,
-  parseAmount,
-} from "../../../shared/token"
+import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
+import { getFeeToken } from "../../../shared/token/utils"
 import { Button } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
@@ -180,7 +177,7 @@ export const SendTokenScreen: FC = () => {
 
   const setMaxInputAmount = useCallback(
     (token: TokenDetailsWithBalance, maxFee?: BigNumber) => {
-      const tokenDecimals = token.decimals?.toNumber() || 18
+      const tokenDecimals = token.decimals ?? 18
       const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
 
       if (token.balance && maxFee) {
@@ -195,7 +192,7 @@ export const SendTokenScreen: FC = () => {
         setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
       }
     },
-    [setValue],
+    [],
   )
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
@@ -206,14 +203,7 @@ export const SendTokenScreen: FC = () => {
     if (maxClicked && maxFee && token) {
       setMaxInputAmount(token, maxFee)
     }
-  }, [
-    maxClicked,
-    maxFee,
-    setMaxInputAmount,
-    token,
-    token?.address,
-    token?.networkId,
-  ])
+  }, [maxClicked, maxFee, setMaxInputAmount, token?.address, token?.networkId])
 
   if (!token) {
     return <Navigate to={routes.accounts()} />

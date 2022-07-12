@@ -12,10 +12,11 @@ import {
 } from "starknet"
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import { getFeeToken } from "../../../shared/token"
+import { Token } from "../../../shared/token/type"
+import { getFeeToken } from "../../../shared/token/utils"
 import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
-import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
+import { TokenDetailsWithBalance } from "./tokens.state"
 
 export interface TokenView {
   address: string
@@ -61,7 +62,7 @@ export const toTokenView = ({
   balance,
   ...rest
 }: TokenDetailsWithBalance): TokenView => {
-  const decimalsNumber = decimals?.toNumber() || 18
+  const decimalsNumber = decimals ?? 18
   return {
     name: name || "Unknown token",
     symbol: symbol || "",
@@ -74,7 +75,7 @@ export const toTokenView = ({
 export const fetchTokenDetails = async (
   address: string,
   account: Account,
-): Promise<TokenDetails> => {
+): Promise<Token> => {
   const tokenContract = new Contract(
     parsedErc20Abi as Abi,
     address,
@@ -94,13 +95,13 @@ export const fetchTokenDetails = async (
       .then((x) => shortString.decodeShortString(number.toHex(x.symbol)))
       .catch(() => ""),
   ])
-  const decimalsBigNumber = BigNumber.from(decimals || 0)
+  const decimalsBigNumber = BigNumber.from(decimals)
   return {
     address,
     name,
     symbol,
     networkId: account.networkId,
-    decimals: decimalsBigNumber.isZero() ? undefined : decimalsBigNumber,
+    decimals: decimalsBigNumber.toNumber(),
   }
 }
 
