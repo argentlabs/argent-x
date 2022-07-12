@@ -34,11 +34,28 @@ export const getColor = (name: string) => {
 }
 
 export const getAccountImageUrl = (
-  name: string,
+  accountName: string,
   account: BaseWalletAccount,
 ) => {
-  const color = getColor(getAccountIdentifier(account))
-  return `https://eu.ui-avatars.com/api?name=${name}&background=${color}&color=fff`
+  return getNetworkAccountImageUrl({
+    accountName,
+    networkId: account.networkId,
+    accountAddress: account.address,
+  })
+}
+
+export const getNetworkAccountImageUrl = ({
+  accountName,
+  networkId,
+  accountAddress,
+}: {
+  accountName: string
+  networkId: string
+  accountAddress: string
+}) => {
+  const accountIdentifier = `${networkId}::${accountAddress}`
+  const color = getColor(accountIdentifier)
+  return `https://eu.ui-avatars.com/api?name=${accountName}&background=${color}&color=fff`
 }
 
 const isAccountDeployed = (account: Account): boolean =>

@@ -18,7 +18,7 @@ import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
-import { AccountListItem } from "./AccountListItem"
+import { AccountListScreenItem } from "./AccountListScreenItem"
 import { deployAccount } from "./accounts.service"
 import { useAccounts } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
@@ -103,7 +103,7 @@ export const AccountListScreen: FC = () => {
           </Paragraph>
         )}
         {newAccounts.map((account) => (
-          <AccountListItem
+          <AccountListScreenItem
             key={account.address}
             account={account}
             selectedAccount={selectedAccount}
@@ -114,7 +114,7 @@ export const AccountListScreen: FC = () => {
           <>
             <DeprecatedAccountsWarning />
             {deprecatedAccounts.map((account) => (
-              <AccountListItem
+              <AccountListScreenItem
                 key={account.address}
                 account={account}
                 selectedAccount={selectedAccount}
