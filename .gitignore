@@ -12,3 +12,4 @@ pnpm-lock.yaml
 **/dist/
 .env
 sourcemaps
+coverage
