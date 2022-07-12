@@ -49,8 +49,15 @@ export class KeyValueStorage<
 
   public async getItem<K extends keyof T>(key: K): Promise<T[K]> {
     const storageKey = this.getStorageKey(key)
-    const valueFromStorage = await this.storageImplementation.get(storageKey)
-    return valueFromStorage[storageKey] ?? this.defaults[key]
+    try {
+      const valueFromStorage = await this.storageImplementation.get(storageKey)
+      return valueFromStorage[storageKey] ?? this.defaults[key]
+    } catch (e: any) {
+      if (e?.toString().includes("Error in invocation of storage.get")) {
+        return this.defaults[key]
+      }
+      throw e
+    }
   }
   public async setItem<K extends keyof T>(key: K, value: T[K]): Promise<void> {
     const storageKey = this.getStorageKey(key)
@@ -77,8 +84,8 @@ export class KeyValueStorage<
       }
     }
 
-    this.implementations.onChange.addListener(handler)
+    this.implementations.onChanged.addListener(handler)
 
-    return () => this.implementations.onChange.removeListener(handler)
+    return () => this.implementations.onChanged.removeListener(handler)
   }
 }

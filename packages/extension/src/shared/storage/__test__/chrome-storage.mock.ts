@@ -1,18 +1,18 @@
 import { isFunction } from "lodash-es"
 import mitt, { WildcardHandler } from "mitt"
-import chrome from "webextension-polyfill"
+import browser from "webextension-polyfill"
 
-import { Implementations, OnChange, StorageArea } from "../implementations"
+import { Implementations, OnChanged, StorageArea } from "../implementations"
 import { AreaName } from "../types"
 
-type Events = Record<AreaName, Record<string, chrome.storage.StorageChange>>
+type Events = Record<AreaName, Record<string, browser.storage.StorageChange>>
 const emitter = mitt<Events>()
 
 function getChangeMap(
   oldValue?: any,
   newValue?: any,
-): chrome.storage.StorageChange {
-  const changeMap: chrome.storage.StorageChange = {
+): browser.storage.StorageChange {
+  const changeMap: browser.storage.StorageChange = {
     oldValue,
     newValue,
   }
@@ -90,7 +90,7 @@ class TestStore implements StorageArea {
     const changeMap = entries.reduce((acc, [key, value]) => {
       acc[key] = getChangeMap(this.store.get(key), value)
       return acc
-    }, {} as Record<string, chrome.storage.StorageChange>)
+    }, {} as Record<string, browser.storage.StorageChange>)
     for (const [key, value] of entries) {
       this.store.set(key, value)
     }
@@ -105,12 +105,12 @@ class TestStore implements StorageArea {
 
 type Callback = (
   changes: {
-    [key: string]: chrome.storage.StorageChange
+    [key: string]: browser.storage.StorageChange
   },
   areaName: "sync" | "local" | "managed" | "session",
 ) => void
 const listenersSet = new Map<Callback, WildcardHandler<Events>>()
-const onStorageChange: OnChange = {
+const onStorageChange: OnChanged = {
   addListener(callback) {
     const handler: WildcardHandler<Events> = (type, event) => {
       callback(event, type)
@@ -131,5 +131,5 @@ export const chromeStorageMock: Implementations = {
   sync: new TestStore("sync"),
   managed: new TestStore("managed"),
   // session: new TestStore("session"), // FIXME: session storage is not supported in manifest v2
-  onChange: onStorageChange,
+  onChanged: onStorageChange,
 }

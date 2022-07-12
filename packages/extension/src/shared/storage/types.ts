@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill"
+
 export type AllowPromise<T> = T | Promise<T>
 export type AllowArray<T> = T | T[]
 
@@ -18,7 +20,7 @@ export type OnlyOptionalPropertiesOf<T extends object> = Required<
   Pick<T, OptionalPropertiesOf<T>>
 >
 
-export type AreaName = Exclude<chrome.storage.AreaName, "session"> // FIXME: session storage is not supported in manifest v2
+export type AreaName = Exclude<browser.storage.AreaName, "session"> // FIXME: session storage is not supported in manifest v2
 
 export interface BaseStorage<T> {
   defaults: T
