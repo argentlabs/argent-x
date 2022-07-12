@@ -1,5 +1,4 @@
 import { Status } from "starknet"
-import { browserAction } from "webextension-polyfill"
 
 import { getProvider } from "../../shared/networks"
 import { Transaction } from "../../shared/transactions"
@@ -11,12 +10,6 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
   const transactionsToCheck = transactions.filter(({ status }) =>
     transactionStatusToCheck.includes(status),
   )
-
-  browserAction.setBadgeText({
-    text: transactionsToCheck.length ? String(transactionsToCheck.length) : "",
-  })
-
-  browserAction.setBadgeBackgroundColor({ color: "#29C5FF" })
 
   const fetchedTransactions = await Promise.allSettled(
     transactionsToCheck.map(async (transaction) => {

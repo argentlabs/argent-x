@@ -30,7 +30,10 @@ export interface TransactionTracker {
   stop: () => void
 }
 
-export type TransactionUpdateListener = (updates: Transaction[]) => void
+export type TransactionUpdateListener = (
+  newTransactions: Transaction[],
+  allTransactions: Transaction[],
+) => void
 
 type GetTransactionsTracker = (
   getTransactionsStore: GetTransactionsStore,
@@ -76,7 +79,7 @@ export const getTransactionsTracker: GetTransactionsTracker = (
     const updates = [...onChainUpdates, ...historyUpdates]
 
     await transactionsStore.addItems(updates)
-    onUpdate?.(updates)
+    onUpdate?.(updates, allTransactions)
 
     updateCounter = (updateCounter + 1) % checkHistory // as this is done at the very end, onerror it will not be incremented and therefore keep the history cycle refreshing at 15 seconds
   }
@@ -94,9 +97,11 @@ export const getTransactionsTracker: GetTransactionsTracker = (
       timestamp: timestampInSeconds(),
       ...transaction,
     }
+
+    const allTransactions = await transactionsStore.getItems()
     await transactionsStore.addItem(newTransaction)
-    await handleUpdate()
-    onUpdate?.([newTransaction])
+
+    onUpdate?.([newTransaction], allTransactions)
   }
 
   return {

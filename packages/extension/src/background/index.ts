@@ -24,7 +24,7 @@ import { handleSessionMessage } from "./sessionMessaging"
 import { handleSettingsMessage } from "./settingsMessaging"
 import { Storage } from "./storage"
 import { handleTokenMessage } from "./tokenMessaging"
-import { trackTransations } from "./transactions/notifications"
+import { trackTransactions } from "./transactions/notifications"
 import { getTransactionsStore } from "./transactions/store"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { getTransactionsTracker } from "./transactions/transactions"
@@ -48,7 +48,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
   const transactionTracker = getTransactionsTracker(
     getTransactionsStore,
     fetchVoyagerTransactions,
-    trackTransations,
+    trackTransactions,
   )
   transactionTracker.load(await wallet.getAccounts()) // no await here to defer loading
 

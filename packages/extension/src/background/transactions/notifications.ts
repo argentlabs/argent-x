@@ -1,3 +1,5 @@
+import { IS_BROWSER } from "starknet/dist/constants"
+import { browserAction } from "webextension-polyfill"
 import { sendMessageToUi } from "../activeTabs"
 import { resetStoredNonce } from "../nonce"
 import {
@@ -9,16 +11,17 @@ import { TransactionUpdateListener } from "./transactions"
 
 const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
-export const trackTransations: TransactionUpdateListener = async (
-  transactions,
+export const trackTransactions: TransactionUpdateListener = async (
+  newTransactions,
+  allTransactions,
 ) => {
-  if (transactions.length > 0) {
+  if (newTransactions.length > 0) {
     sendMessageToUi({
       type: "TRANSACTION_UPDATES",
-      data: transactions,
+      data: newTransactions,
     })
 
-    for (const transaction of transactions) {
+    for (const transaction of newTransactions) {
       const { hash, status, meta, account } = transaction
       if (
         (successStatuses.includes(status) || status === "REJECTED") &&
@@ -44,5 +47,19 @@ export const trackTransations: TransactionUpdateListener = async (
         resetStoredNonce(transaction.account)
       }
     }
+  }
+
+  if (IS_BROWSER) {
+    const pendingTransactions = [...newTransactions, ...allTransactions].filter(
+      (tx) => !successStatuses.includes(tx.status),
+    )
+
+    browserAction.setBadgeText({
+      text: pendingTransactions.length
+        ? String(pendingTransactions.length)
+        : "",
+    })
+
+    browserAction.setBadgeBackgroundColor({ color: "#29C5FF" })
   }
 }
