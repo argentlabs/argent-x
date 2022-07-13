@@ -8,17 +8,17 @@ import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, SettingsIcon } from "../../components/Icons/MuiIcons"
-import { H1, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { connectAccount } from "../../services/backgroundAccounts"
+import { H1, P } from "../../theme/Typography"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
-import { AccountListItem } from "./AccountListItem"
+import { AccountListScreenItem } from "./AccountListScreenItem"
 import { deployAccount } from "./accounts.service"
 import { useAccounts } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
@@ -103,7 +103,7 @@ export const AccountListScreen: FC = () => {
           </Paragraph>
         )}
         {newAccounts.map((account) => (
-          <AccountListItem
+          <AccountListScreenItem
             key={account.address}
             account={account}
             selectedAccount={selectedAccount}
@@ -114,7 +114,7 @@ export const AccountListScreen: FC = () => {
           <>
             <DeprecatedAccountsWarning />
             {deprecatedAccounts.map((account) => (
-              <AccountListItem
+              <AccountListScreenItem
                 key={account.address}
                 account={account}
                 selectedAccount={selectedAccount}

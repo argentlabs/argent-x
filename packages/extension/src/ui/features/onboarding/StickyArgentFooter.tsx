@@ -13,10 +13,10 @@ const StickyArgentFooterP = styled.p`
   text-align: center;
   color: #fff;
 
-  ${(props) => props.theme.breakpoints.up("sm")} {
-    left: ${(props) => props.theme.margin.extensionInTab};
-    right: ${(props) => props.theme.margin.extensionInTab};
-  }
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
 `
 
 const EmojiWrapper = styled.span`

@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { P } from "../../components/Typography"
+import { P } from "../../theme/Typography"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ConnectDappProps extends ConfirmPageProps {

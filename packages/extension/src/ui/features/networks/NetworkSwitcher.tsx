@@ -33,9 +33,10 @@ const Network = styled.div<{ selected?: boolean }>`
   font-size: 12px;
   line-height: 14.4px;
 
-  color: ${({ selected }) => (selected ? "white" : "rgba(255, 255, 255, 0.7)")};
+  color: ${({ theme, selected }) =>
+    selected ? theme.text1 : "rgba(255, 255, 255, 0.7)"};
   &:hover {
-    color: white;
+    color: ${({ theme }) => theme.text1};
   }
 
   cursor: ${({ selected }) => (selected ? "default" : "pointer")};
@@ -50,7 +51,7 @@ const NetworkList = styled.div`
   position: absolute;
   width: 100%;
   z-index: 1;
-  background: #161616;
+  background: ${({ theme }) => theme.bg1};
   border-radius: 0 0 15px 15px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 

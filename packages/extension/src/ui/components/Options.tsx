@@ -13,7 +13,7 @@ const Flex = styled.div`
 `
 
 const OptionWrapper = styled.div<{
-  backgroundColor: string
+  backgroundColor?: string
   disabled?: boolean
 }>`
   display: flex;
@@ -22,8 +22,8 @@ const OptionWrapper = styled.div<{
   align-items: center;
   padding: 16px;
   border-radius: 8px;
-  background-color: ${({ disabled, backgroundColor }) =>
-    disabled ? "#5C5B59" : backgroundColor};
+  background-color: ${({ disabled, backgroundColor, theme }) =>
+    disabled ? theme.text3 : backgroundColor ?? theme.bg2};
   cursor: ${({ disabled }) => (disabled ? "auto" : "pointer")};
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 `
@@ -84,7 +84,7 @@ export const Option: FC<OptionProps> = ({
   description,
   onClick,
   disabled,
-  backgroundColor = "#333332",
+  backgroundColor,
   hideArrow,
 }) => (
   <OptionWrapper

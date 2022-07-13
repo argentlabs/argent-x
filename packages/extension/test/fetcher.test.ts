@@ -1,11 +1,13 @@
-import { describe, expect, test, vi } from "vitest"
+import "vi-fetch/setup"
+
 import { mockFetch, mockGet } from "vi-fetch"
+import { describe, expect, test, vi } from "vitest"
+
 import {
-  fetcher,
   FetcherError,
+  fetcher,
   fetcherWithArgentApiHeadersForNetwork,
 } from "../src/shared/api/fetcher"
-import "vi-fetch/setup"
 
 /** capture and return expected errors, otherwise vi-fetch test will fail even with expect...toThrow... etc. */
 const captureFetcherError = async (invocation: Promise<any | FetcherError>) => {

@@ -4,7 +4,7 @@ import CopyToClipboard from "react-copy-to-clipboard"
 import styled from "styled-components"
 
 export const Tooltip = styled.span`
-  background: #ffffff;
+  background: ${({ theme }) => theme.white};
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
   border-radius: 20px;
   color: black;

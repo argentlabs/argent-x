@@ -13,7 +13,6 @@ import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
 import { StyledControlledInput } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
-import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { useAddressBook } from "../../services/addressBook"
 import { addressSchema, normalizeAddress } from "../../services/addresses"
@@ -21,6 +20,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -37,7 +37,7 @@ export const BalanceText = styled.div`
   font-size: 15px;
   line-height: 20px;
   text-align: center;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const StyledIconBar = styled(IconBar)`
@@ -72,7 +72,7 @@ export const InputGroupBefore = styled(InputGroupAfter)`
 
 export const StyledMaxButton = styled(Button)`
   border-radius: 100px;
-  background-color: #5c5b59;
+  background-color: ${({ theme }) => theme.text3};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,19 +87,19 @@ export const StyledMaxButton = styled(Button)`
 export const AtTheRateWrapper = styled(StyledMaxButton)<{ active?: boolean }>`
   padding: 6px;
 
-  background-color: ${({ active }) => active && "#ffffff"};
+  background-color: ${({ theme, active }) => active && theme.white};
   svg {
     path {
-      fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+      fill: ${({ theme, active }) => (active ? theme.black : theme.white)};
     }
   }
 
   &:hover,
   &:focus {
-    background-color: ${({ active }) => active && "#ffffff"};
+    background-color: ${({ theme, active }) => active && theme.white};
     svg {
       path {
-        fill: ${({ active }) => (active ? "#000000" : "#ffffff")};
+        fill: ${({ theme, active }) => (active ? theme.black : theme.white)};
       }
     }
   }
@@ -110,14 +110,14 @@ export const InputTokenSymbol = styled.span`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const FormError = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #c12026;
+  color: ${({ theme }) => theme.red1};
   margin-top: 8px;
   margin-left: 8px;
   text-align: left;

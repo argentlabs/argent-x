@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
-import { A, H2 } from "../../components/Typography"
+import { A, H2 } from "../../theme/Typography"
 
 const Container = styled.div`
   padding: 24px 40px 24px;

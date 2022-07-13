@@ -7,8 +7,8 @@ import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { FormatListBulletedIcon } from "../../components/Icons/MuiIcons"
 import { RowCentered } from "../../components/Row"
-import { H2, H3 } from "../../components/Typography"
 import { routes } from "../../routes"
+import { H2, H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenIcon } from "./TokenIcon"
 import { TokenMenu } from "./TokenMenu"
@@ -38,12 +38,12 @@ const CurrencyValueText = styled.div`
   font-size: 17px;
   line-height: 22px;
   text-align: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
   margin-top: 8px;
 `
 
 const ActivityIconWrapper = styled.div`
-  background-color: #333332;
+  background-color: ${({ theme }) => theme.bg2};
   padding: 14.5px;
   border-radius: 50%;
 `
@@ -53,7 +53,7 @@ const ActivityText = styled.div`
   font-size: 17px;
   line-height: 22px;
   text-align: center;
-  color: #c2c0be;
+  color: ${({ theme }) => theme.text4};
 `
 
 const ComingSoonText = styled.div`
@@ -61,7 +61,7 @@ const ComingSoonText = styled.div`
   font-size: 13px;
   line-height: 18px;
   text-align: center;
-  color: #5c5b59;
+  color: ${({ theme }) => theme.text3};
 `
 
 export const TokenScreen: FC = () => {

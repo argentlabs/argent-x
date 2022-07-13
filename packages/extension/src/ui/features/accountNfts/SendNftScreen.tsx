@@ -11,7 +11,6 @@ import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
 import { StyledControlledInput } from "../../components/InputText"
 import { RowCentered } from "../../components/Row"
-import { H3 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { useAddressBook } from "../../services/addressBook"
 import { addressSchema, normalizeAddress } from "../../services/addresses"
@@ -19,6 +18,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
 import {
