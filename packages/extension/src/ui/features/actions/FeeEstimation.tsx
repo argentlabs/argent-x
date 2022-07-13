@@ -4,6 +4,7 @@ import { BigNumber, utils } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 import { Call } from "starknet"
 import styled, { css, keyframes } from "styled-components"
+import { DefaultTheme } from "styled-components"
 import useSWR from "swr"
 
 import { prettifyCurrencyValue } from "../../../shared/token/price"
@@ -48,17 +49,17 @@ const ExtendableControl = styled.div`
 
 const DetailsText = styled.span`
   opacity: 0.5;
-  color: white;
+  color: ${({ theme }) => theme.text1};
 `
 
-const pulseKeyframe = keyframes`
+const pulseKeyframe = ({ theme }: { theme: DefaultTheme }) => keyframes`
   0% {
-    background-color: #8f8e8c;
-    background: linear-gradient(to right,#5f5e5c 0% #8f8e8c 50%, #5f5e5c 100%);
+    background-color: ${theme.bg4};
+    background: linear-gradient(to right, ${theme.bg4} 0% ${theme.text2} 50%, ${theme.bg4} 100%);
   }
   100% {
-    background-color: #5f5e5c;
-    background: linear-gradient(to right,#8f8e8c 0% #5f5e5c 50%, #8f8e8c 100%);
+    background-color: ${theme.bg4};
+    background: linear-gradient(to right,${theme.text2} 0% ${theme.bg4} 50%, ${theme.text2} 100%);
   }
 `
 
@@ -66,12 +67,12 @@ const LoadingInput = styled.div`
   width: 77px;
   height: 20px;
   border-radius: 2px;
-  background: #8f8e8c;
+  background: ${({ theme }) => theme.text2};
   animation: ${pulseKeyframe} 1s alternate infinite;
 `
 
 const FeeErrorContainer = styled.div`
-  border: 1px solid #333332;
+  border: 1px solid ${({ theme }) => theme.bg2};
   border-radius: 8px;
   padding: 16px 20px;
   overflow: auto;
@@ -132,7 +133,7 @@ const StyledIconMixin = css`
   max-height: 16px;
   max-width: 16px;
   margin-left: 6px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   cursor: pointer;
 `
 const StyledInfoRoundedIcon = styled(InfoRoundedIcon)`

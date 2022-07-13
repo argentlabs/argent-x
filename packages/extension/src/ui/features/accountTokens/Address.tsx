@@ -34,7 +34,7 @@ export const Address = styled.a`
   border-radius: 12px;
   padding: 4px 10px;
   white-space: nowrap;
-  color: white;
+  color: ${({ theme }) => theme.text1};
   text-decoration: none;
 
   cursor: pointer;

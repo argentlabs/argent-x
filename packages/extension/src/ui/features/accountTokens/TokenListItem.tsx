@@ -54,7 +54,7 @@ const TokenSymbol = styled.div`
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   text-transform: uppercase;
 `
 
@@ -85,7 +85,7 @@ const PulseAnimation = keyframes`
 const TokenBalance = styled.div<IIsLoading>`
   font-size: 13px;
   line-height: 18px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   ${isLoadingPulse}
 `
 

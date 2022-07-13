@@ -35,7 +35,7 @@ const AccountBalance = styled.div`
   font-weight: 600;
   font-size: 17px;
   text-align: center;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   margin-bottom: 8px;
 `
 

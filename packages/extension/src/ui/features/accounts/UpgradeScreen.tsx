@@ -2,9 +2,9 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
+import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useAccounts } from "./accounts.state"
 

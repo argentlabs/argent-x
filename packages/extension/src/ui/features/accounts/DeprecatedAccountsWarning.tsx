@@ -17,7 +17,7 @@ const Title = styled.div`
 `
 
 const Alert = styled.div`
-  background: #c12026;
+  background: ${({ theme }) => theme.red1};
   margin-top: 8px;
   border-radius: 13px;
   padding: 5px 10px;

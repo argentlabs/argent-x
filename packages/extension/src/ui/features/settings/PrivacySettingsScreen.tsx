@@ -2,8 +2,8 @@ import { FC } from "react"
 
 import { IconBar } from "../../components/IconBar"
 import { LazyInitialisedIOSSwitch } from "../../components/IOSSwitch"
-import { H2 } from "../../components/Typography"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
+import { H2 } from "../../theme/Typography"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 const ANALYTICS_UI_ENABLED = false

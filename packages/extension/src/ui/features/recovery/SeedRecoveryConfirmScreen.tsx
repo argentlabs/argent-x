@@ -1,8 +1,8 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { P } from "../../components/Typography"
 import { routes, useReturnTo } from "../../routes"
+import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { useBackupRequired } from "./backupDownload.state"
 

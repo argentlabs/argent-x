@@ -14,5 +14,5 @@ export const AccountAddress = styled.p`
   font-size: 17px;
   line-height: 22px;
   word-spacing: 5px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
 `

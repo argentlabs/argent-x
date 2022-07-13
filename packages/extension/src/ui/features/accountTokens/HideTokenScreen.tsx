@@ -5,8 +5,8 @@ import styled from "styled-components"
 import { removeToken } from "../../../shared/token/storage"
 import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
-import { FormError, P } from "../../components/Typography"
 import { routes } from "../../routes"
+import { FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
@@ -30,7 +30,7 @@ export const TokenName = styled.h3`
   font-weight: 600;
   font-size: 15px;
   line-height: 20px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 export const HideTokenScreen: FC = () => {

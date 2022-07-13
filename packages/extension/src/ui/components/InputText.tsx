@@ -12,7 +12,7 @@ export const Container = styled.div`
 `
 
 const Label = styled.label`
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   font-weight: normal;
   font-size: 17px;
   order: 1;
@@ -32,7 +32,7 @@ const InputCss = css`
   text-shadow: none;
 
   background-color: transparent;
-  color: white;
+  color: ${({ theme }) => theme.text1};
 
   border: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
@@ -46,7 +46,7 @@ const InputCss = css`
   }
 
   &:focus + ${Label} {
-    color: white;
+    color: ${({ theme }) => theme.text1};
     transform: scale(0.8) translate3d(0, 5px, 0);
   }
 
@@ -55,8 +55,8 @@ const InputCss = css`
   }
 
   &:disabled {
-    color: #8f8e8c;
-    border-bottom: 1px solid #8f8e8c;
+    color: ${({ theme }) => theme.text2};
+    border-bottom: 1px solid ${({ theme }) => theme.text2};
   }
 `
 
@@ -68,7 +68,7 @@ const InputCssAlt = css`
   text-shadow: none;
 
   background-color: transparent;
-  color: white;
+  color: ${({ theme }) => theme.text1};
 
   border: 0;
   flex: 1 1 auto;
@@ -78,7 +78,7 @@ const InputCssAlt = css`
   }
 
   &:disabled {
-    color: #8f8e8c;
+    color: ${({ theme }) => theme.text2};
   }
 `
 
@@ -97,7 +97,7 @@ const InputAlt = styled.input`
   text-overflow: ellipsis;
 
   &::placeholder {
-    color: #8f8e8c;
+    color: ${({ theme }) => theme.text2};
   }
 `
 
@@ -253,7 +253,7 @@ export const StyledControlledInput: ControlledInputType = styled(
   ControlledInputTextAlt,
 )`
   padding: 12px 16px;
-  border: 1px solid #333332;
+  border: 1px solid ${({ theme }) => theme.bg2};
   border-radius: 8px;
   background-color: black;
 `

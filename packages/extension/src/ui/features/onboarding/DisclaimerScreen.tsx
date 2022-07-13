@@ -6,16 +6,16 @@ import {
 } from "@mui/material"
 import { ChangeEventHandler, FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import styled, { useTheme } from "styled-components"
 
 import {
   CheckCircleIcon,
   RadioButtonUncheckedIcon,
 } from "../../components/Icons/MuiIcons"
 import { PrivacyStatement } from "../../components/PrivacyStatement"
-import { P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 const SP = styled(P)`
@@ -37,6 +37,8 @@ export const DisclaimerScreen: FC = () => {
     alphaVersion: false,
   })
 
+  const theme = useTheme()
+
   const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) =>
     setConditions({ ...conditions, [target.name]: target.checked })
 
@@ -44,7 +46,7 @@ export const DisclaimerScreen: FC = () => {
     <ConfirmScreen
       title="Disclaimer"
       confirmButtonText="Continue"
-      confirmButtonBackgroundColor="#c12026"
+      confirmButtonBackgroundColor={theme.red1}
       confirmButtonDisabled={
         !conditions.lossOfFunds || !conditions.alphaVersion
       }

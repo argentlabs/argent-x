@@ -9,5 +9,5 @@ export const Alert = styled.div`
   background: rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   margin: 40px 20px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1}; ;
 `

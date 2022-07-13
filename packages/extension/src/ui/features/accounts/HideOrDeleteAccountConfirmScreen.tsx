@@ -4,9 +4,9 @@ import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
 import { AccountAddress, AccountName } from "../../components/Address"
-import { P } from "../../components/Typography"
 import { formatFullAddress } from "../../services/addresses"
 import { deleteAccount, hideAccount } from "../../services/backgroundAccounts"
+import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
@@ -30,7 +30,7 @@ const AddressWrapper = styled.span`
   }
 
   > ${AccountAddress} {
-    color: white;
+    color: ${({ theme }) => theme.text1};
   }
 `
 
