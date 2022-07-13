@@ -1,5 +1,11 @@
 import { useEffect } from "react"
-import useSWR, { BareFetcher, Cache, Key, SWRConfiguration } from "swr"
+import useSWR, {
+  BareFetcher,
+  Cache,
+  Key,
+  SWRConfiguration,
+  unstable_serialize,
+} from "swr"
 
 import { reviveJsonBigNumber } from "../../shared/json"
 
@@ -9,23 +15,28 @@ export interface SWRConfigCommon {
   errorRetryInterval?: number
 }
 
-export const swrCacheProvider: Cache = {
-  set: (key: string, value: any) => {
-    localStorage.setItem(key, JSON.stringify(value))
+const swrStateCache: Cache = new Map()
+
+const swrPersistedCache: Cache = {
+  set: (key, value) => {
+    console.log("swrCacheProvider.set", key, value)
+    localStorage.setItem(unstable_serialize(key), JSON.stringify(value))
   },
-  get: (key: string) => {
-    const value = localStorage.getItem(key)
-    if (!value) {
-      return undefined
-    }
+  get: (key) => {
     try {
-      return JSON.parse(value, reviveJsonBigNumber) ?? undefined
+      const value = localStorage.getItem(unstable_serialize(key))
+      if (!value) {
+        throw new Error("No value found")
+      }
+      const x = JSON.parse(value, reviveJsonBigNumber)
+      // console.log("json result", x, key)
+      return x ?? undefined
     } catch {
       return undefined
     }
   },
-  delete: (key: string) => {
-    localStorage.removeItem(key)
+  delete: (key) => {
+    localStorage.removeItem(unstable_serialize(key))
   },
 }
 
@@ -56,4 +67,29 @@ export function useConditionallyEnabledSWR<Data = any, Error = any>(
     result.mutate()
   }, [enabled])
   return result
+}
+
+const isSwrStateKey = (key: Key) => /^\$swr\$/g.test(unstable_serialize(key))
+export const swrCacheProvider: Cache = {
+  set: (key, value) => {
+    if (isSwrStateKey(key)) {
+      return swrStateCache.set(key, value)
+    } else {
+      return swrPersistedCache.set(key, value)
+    }
+  },
+  get: (key) => {
+    if (isSwrStateKey(key)) {
+      return swrStateCache.get(key)
+    } else {
+      return swrPersistedCache.get(key)
+    }
+  },
+  delete: (key) => {
+    if (isSwrStateKey(key)) {
+      return swrStateCache.delete(key)
+    } else {
+      return swrPersistedCache.delete(key)
+    }
+  },
 }
