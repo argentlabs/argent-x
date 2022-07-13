@@ -1,6 +1,7 @@
 import * as yup from "yup"
 
 import { ArrayStorage } from "../storage"
+import { assertSchema } from "../utils/schema"
 import { BaseToken, Token } from "./type"
 import { equalToken, parsedDefaultTokens } from "./utils"
 
@@ -30,11 +31,11 @@ export const tokenSchema: yup.Schema<Token> = baseTokenSchema
 
 export async function addToken(token: Token) {
   const newToken: Token = { ...token, showAlways: true }
-  await tokenSchema.isValid(newToken)
+  await assertSchema(tokenSchema, newToken)
   return tokenStore.add(newToken)
 }
 
 export async function removeToken(token: BaseToken) {
-  await baseTokenSchema.isValid(token)
+  await assertSchema(baseTokenSchema, token)
   return tokenStore.remove((t) => equalToken(t, token))
 }
