@@ -28,9 +28,7 @@ const swrPersistedCache: Cache = {
       if (!value) {
         throw new Error("No value found")
       }
-      const x = JSON.parse(value, reviveJsonBigNumber)
-      // console.log("json result", x, key)
-      return x ?? undefined
+      return JSON.parse(value, reviveJsonBigNumber) ?? undefined
     } catch {
       return undefined
     }
