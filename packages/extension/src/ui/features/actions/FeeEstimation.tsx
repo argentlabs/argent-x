@@ -178,7 +178,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
   useEffect(() => {
     onErrorChange?.(hasError)
-  }, [hasError])
+    // only rerun when error changes
+  }, [hasError]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const parsedFeeEstimationError = showEstimateError && getParsedError(error)
   const feeToken = getFeeToken(networkId)

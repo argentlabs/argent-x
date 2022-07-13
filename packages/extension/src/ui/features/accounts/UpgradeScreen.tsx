@@ -22,7 +22,8 @@ export const UpgradeScreen: FC = () => {
     if (!selectedAccount) {
       navigate(routes.accounts())
     }
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!selectedAccount) {
     return <></>

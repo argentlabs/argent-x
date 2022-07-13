@@ -123,7 +123,8 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
     ) {
       navigate(routes.networkWarning())
     }
-  }, [currentNetworkStatus])
+    // just trigger on network status change
+  }, [currentNetworkStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>

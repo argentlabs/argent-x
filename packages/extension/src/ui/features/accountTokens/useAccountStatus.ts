@@ -32,7 +32,8 @@ export const useAccountStatus = (
         }
       })()
     }
-  }, [deployStatus])
+    // just rerun when deploystatus changes
+  }, [deployStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (deployStatus !== "PENDING" && !isDeployed) {
     return { code: "ERROR" as const, text: "Undeployed" }

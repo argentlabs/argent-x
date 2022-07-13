@@ -37,7 +37,8 @@ export const usePageTracking = <T extends keyof Pages>(
     } catch (e) {
       // nothing of this should be blocking
     }
-  }, [name, ...rest]) // as React in strict mode renders every component twice, this page will be tracked 2x in development. This is not the case in production.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, rest[0]]) // as React in strict mode renders every component twice, this page will be tracked 2x in development. This is not the case in production.
 }
 
 interface ActiveStoreValues {

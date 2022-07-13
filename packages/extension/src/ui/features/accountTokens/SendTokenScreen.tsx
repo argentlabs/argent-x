@@ -192,7 +192,8 @@ export const SendTokenScreen: FC = () => {
         setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
       }
     },
-    [],
+    // only on mount
+    [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
@@ -203,7 +204,8 @@ export const SendTokenScreen: FC = () => {
     if (maxClicked && maxFee && token) {
       setMaxInputAmount(token, maxFee)
     }
-  }, [maxClicked, maxFee, setMaxInputAmount, token?.address, token?.networkId])
+    // dont add token as dependency as the reference can change
+  }, [maxClicked, maxFee, setMaxInputAmount, token?.address, token?.networkId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!token) {
     return <Navigate to={routes.accounts()} />

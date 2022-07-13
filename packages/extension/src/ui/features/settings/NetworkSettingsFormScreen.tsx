@@ -54,7 +54,8 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
       return { id: "", name: "", chainId: "", baseUrl: "" }
     }
     return props.network
-  }, [props.mode === "add" || props.network])
+    // due to an or type we need to check different values depending on the mode
+  }, [props.mode === "add" || props.network]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const yupSchemaValidator = useYupValidationResolver(NetworkSchema)
   const {
@@ -75,7 +76,8 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
       }
     })
     return subscription.unsubscribe
-  }, [watch])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
