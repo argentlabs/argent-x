@@ -12,16 +12,16 @@ import { TransactionUpdateListener } from "./transactions"
 const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
 export const trackTransactions: TransactionUpdateListener = async (
-  newTransactions,
+  updatedTransactions,
   allTransactions,
 ) => {
-  if (newTransactions.length > 0) {
+  if (updatedTransactions.length > 0) {
     sendMessageToUi({
       type: "TRANSACTION_UPDATES",
-      data: newTransactions,
+      data: updatedTransactions,
     })
 
-    for (const transaction of newTransactions) {
+    for (const transaction of updatedTransactions) {
       const { hash, status, meta, account } = transaction
       if (
         (successStatuses.includes(status) || status === "REJECTED") &&
@@ -50,9 +50,10 @@ export const trackTransactions: TransactionUpdateListener = async (
   }
 
   if (IS_BROWSER) {
-    const pendingTransactions = [...newTransactions, ...allTransactions].filter(
-      (tx) => !successStatuses.includes(tx.status),
-    )
+    const pendingTransactions = [
+      ...updatedTransactions,
+      ...allTransactions,
+    ].filter((tx) => !successStatuses.includes(tx.status))
 
     browserAction.setBadgeText({
       text: pendingTransactions.length
