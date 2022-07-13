@@ -69,7 +69,6 @@ export const TokenScreen: FC = () => {
   const { tokenAddress } = useParams()
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
-  console.log(tokenDetails.map((t) => t.name))
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
 
