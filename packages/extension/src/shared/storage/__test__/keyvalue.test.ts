@@ -50,7 +50,10 @@ describe("full storage flow with subscription", () => {
     await store.setItem("foo", "baz")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("baz")
+    expect(handler).toHaveBeenCalledWith("baz", {
+      newValue: "baz",
+      oldValue: undefined,
+    })
     const value = await store.getItem("foo")
     expect(value).toBe("baz")
     unsub()
@@ -61,7 +64,10 @@ describe("full storage flow with subscription", () => {
     await store.removeItem("foo")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith(undefined)
+    expect(handler).toHaveBeenCalledWith(undefined, {
+      oldValue: "baz",
+      newValue: undefined,
+    })
     const value = await store.getItem("foo")
     expect(value).toBe("bar")
     unsub()

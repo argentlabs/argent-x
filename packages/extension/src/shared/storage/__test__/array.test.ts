@@ -96,12 +96,15 @@ describe("ArrayStorage()", () => {
         { id: 4, value: "d" },
       ])
       expect(onChangeHandler).toHaveBeenCalledTimes(1)
-      expect(onChangeHandler).toHaveBeenCalledWith([
-        { id: 1, value: "a" },
-        { id: 2, value: "b" },
-        { id: 3, value: "c" },
-        { id: 4, value: "d" },
-      ])
+      expect(onChangeHandler).toHaveBeenCalledWith(
+        [
+          { id: 1, value: "a" },
+          { id: 2, value: "b" },
+          { id: 3, value: "c" },
+          { id: 4, value: "d" },
+        ],
+        expect.anything(),
+      )
     })
     test("should add multiple values", async () => {
       await arrayStorage.add([
@@ -152,19 +155,22 @@ describe("ArrayStorage()", () => {
         { id: 60, value: "fx" },
       ])
       expect(onChangeHandler).toHaveBeenCalledTimes(4)
-      expect(onChangeHandler).toHaveBeenCalledWith([
-        { id: 1, value: "a" },
-        { id: 2, value: "b" },
-        { id: 3, value: "c" },
-        { id: 5, value: "e" },
-        { id: 6, value: "f" },
-        { id: 10, value: "ax" },
-        { id: 20, value: "bx" },
-        { id: 30, value: "cx" },
-        { id: 40, value: "dx" },
-        { id: 50, value: "ex" },
-        { id: 60, value: "fx" },
-      ])
+      expect(onChangeHandler).toHaveBeenCalledWith(
+        [
+          { id: 1, value: "a" },
+          { id: 2, value: "b" },
+          { id: 3, value: "c" },
+          { id: 5, value: "e" },
+          { id: 6, value: "f" },
+          { id: 10, value: "ax" },
+          { id: 20, value: "bx" },
+          { id: 30, value: "cx" },
+          { id: 40, value: "dx" },
+          { id: 50, value: "ex" },
+          { id: 60, value: "fx" },
+        ],
+        expect.anything(),
+      )
     })
     test("should remove multiple values", async () => {
       await arrayStorage.remove([
@@ -199,11 +205,14 @@ describe("ArrayStorage()", () => {
         { id: 3, value: "c" },
       ])
       expect(onChangeHandler).toHaveBeenCalledTimes(7)
-      expect(onChangeHandler).toHaveBeenCalledWith([
-        { id: 1, value: "au" },
-        { id: 2, value: "b" },
-        { id: 3, value: "c" },
-      ])
+      expect(onChangeHandler).toHaveBeenCalledWith(
+        [
+          { id: 1, value: "au" },
+          { id: 2, value: "b" },
+          { id: 3, value: "c" },
+        ],
+        expect.anything(),
+      )
     })
     test("should not emit event when unsubscribed", async () => {
       unsub()

@@ -62,7 +62,7 @@ describe("full storage flow with string and subscription", () => {
     await store.set("baz")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("baz")
+    expect(handler).toHaveBeenCalledWith("baz", { newValue: "baz" })
     const value = await store.get()
     expect(value).toBe("baz")
     unsub()

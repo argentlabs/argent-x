@@ -29,24 +29,24 @@ class TestStore implements StorageArea {
   remove(keys: string | string[], callback?: (() => void) | undefined): void
   remove(keys: unknown, callback?: unknown): void | Promise<void> {
     if (Array.isArray(keys)) {
+      const itemsToRemove = Array.from(this.store.entries()).filter(([key]) =>
+        keys.includes(key),
+      )
+      keys.forEach((key) => this.store.delete(key))
       emitter.emit(
         this.area,
         Object.fromEntries(
-          Array.from(this.store.entries())
-            .filter(([key]) => {
-              return keys.includes(key)
-            })
-            .map(([key]) => [
-              key,
-              getChangeMap(this.store.get(key), undefined),
-            ]),
+          itemsToRemove.map(([key, value]) => [
+            key,
+            getChangeMap(value, undefined),
+          ]),
         ),
       )
-      keys.forEach((key) => this.store.delete(key))
     } else {
+      const oldValue = this.store.get(keys)
       this.store.delete(keys)
       emitter.emit(this.area, {
-        [keys as string]: getChangeMap(this.store.get(keys), undefined),
+        [keys as string]: getChangeMap(oldValue, undefined),
       })
     }
     if (isFunction(callback)) {
