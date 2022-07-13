@@ -19,8 +19,7 @@ const swrStateCache: Cache = new Map()
 
 const swrPersistedCache: Cache = {
   set: (key, value) => {
-    console.log("swrCacheProvider.set", key, value)
-    localStorage.setItem(unstable_serialize(key), JSON.stringify(value))
+    return localStorage.setItem(unstable_serialize(key), JSON.stringify(value))
   },
   get: (key) => {
     try {
@@ -34,7 +33,7 @@ const swrPersistedCache: Cache = {
     }
   },
   delete: (key) => {
-    localStorage.removeItem(unstable_serialize(key))
+    return localStorage.removeItem(unstable_serialize(key))
   },
 }
 
