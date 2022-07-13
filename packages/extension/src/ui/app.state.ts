@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import create from "zustand"
 
 import { messageStream } from "../shared/messages"
-import { defaultNetwork } from "../shared/networks"
+import { defaultNetwork } from "../shared/network"
 
 interface State {
   switcherNetworkId: string

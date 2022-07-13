@@ -13,7 +13,7 @@ import {
   getTransactionsTracker,
 } from "../src/background/transactions/transactions"
 import { FetchTransactions } from "../src/background/transactions/voyager"
-import { defaultNetwork } from "../src/shared/networks"
+import { defaultNetwork } from "../src/shared/network"
 import {
   Transaction,
   TransactionRequest,

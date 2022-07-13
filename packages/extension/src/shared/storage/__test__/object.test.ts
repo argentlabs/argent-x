@@ -1,5 +1,4 @@
 import { IObjectStorage, ObjectStorage } from "../object"
-import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("full storage flow with object", () => {
   const defaults = { foo: "bar" }
@@ -7,11 +6,7 @@ describe("full storage flow with object", () => {
     foo: string
   }>
   beforeAll(() => {
-    store = new ObjectStorage<{ foo: string }>(
-      defaults,
-      "test",
-      chromeStorageMock,
-    )
+    store = new ObjectStorage<{ foo: string }>(defaults, "test")
   })
   test("should return defaults", async () => {
     const value = await store.get()
@@ -30,19 +25,15 @@ describe("full storage flow with object and parsing", () => {
     foo: string
   }>
   beforeAll(() => {
-    store = new ObjectStorage<{ foo: string }>(
-      defaults,
-      {
-        namespace: "test2",
-        serialize(value) {
-          return JSON.stringify(value)
-        },
-        deserialize(value) {
-          return JSON.parse(value)
-        },
+    store = new ObjectStorage<{ foo: string }>(defaults, {
+      namespace: "test2",
+      serialize(value) {
+        return JSON.stringify(value)
       },
-      chromeStorageMock,
-    )
+      deserialize(value) {
+        return JSON.parse(value)
+      },
+    })
   })
   test("should return defaults", async () => {
     const value = await store.get()
@@ -63,11 +54,7 @@ describe("full storage flow with object and parsing", () => {
 describe("full storage flow with string and subscription", () => {
   let store: ObjectStorage<string>
   beforeAll(() => {
-    store = new ObjectStorage<string>(
-      "bar",
-      { namespace: "test3" },
-      chromeStorageMock,
-    )
+    store = new ObjectStorage<string>("bar", { namespace: "test3" })
   })
   test("should write and notify", async () => {
     const handler = vi.fn()

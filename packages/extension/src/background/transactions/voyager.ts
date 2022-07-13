@@ -1,6 +1,6 @@
 import join from "url-join"
 
-import { Network, isKnownNetwork } from "../../shared/networks"
+import { Network, isPublicNetwork } from "../../shared/network"
 import { Transaction, compareTransactions } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { fetchWithTimeout } from "../utils/fetchWithTimeout"
@@ -41,7 +41,7 @@ export async function getTransactionHistory(
   fetchTransactions: FetchTransactions,
 ) {
   const accountsWithHistory = accountsToPopulate.filter((account) =>
-    isKnownNetwork(account.network.id),
+    isPublicNetwork(account.network.id),
   )
   const transactionsPerAccount = await Promise.all(
     accountsWithHistory.map(async (account) => {

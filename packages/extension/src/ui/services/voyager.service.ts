@@ -1,6 +1,6 @@
 import join from "url-join"
 
-import { Network } from "../../shared/networks"
+import { Network } from "../../shared/network"
 
 export const getVoyagerContractLink = (
   address: string,

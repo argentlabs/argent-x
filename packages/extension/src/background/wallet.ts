@@ -19,7 +19,7 @@ import {
   defaultNetwork,
   defaultNetworks,
   getProvider,
-} from "../shared/networks"
+} from "../shared/network"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
@@ -486,7 +486,11 @@ export class Wallet {
       throw Error("no open session")
     }
 
+    console.log("addAccount", networkId)
+
     const network = await this.getNetwork(networkId)
+
+    console.log("network", network)
 
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 

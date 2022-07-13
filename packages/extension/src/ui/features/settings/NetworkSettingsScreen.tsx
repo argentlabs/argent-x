@@ -1,15 +1,19 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import {
+  customNetworksStore,
+  extendByDefaultNetworks,
+  removeNetwork,
+} from "../../../shared/network"
+import { useArrayStorage } from "../../../shared/storage/hooks"
 import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { removeNetworks } from "../../services/backgroundNetworks"
 import { H2, P } from "../../theme/Typography"
-import { useNetworks } from "../networks/useNetworks"
 import { DappConnection } from "./DappConnection"
 import { useSelectedNetwork } from "./selectedNetwork.state"
 
@@ -43,7 +47,10 @@ const List = styled.div`
 `
 
 export const NetworkSettingsScreen: FC = () => {
-  const { allNetworks, mutate } = useNetworks()
+  const customNetworks = useArrayStorage(customNetworksStore)
+  const allNetworks = useMemo(() => {
+    return extendByDefaultNetworks(customNetworks)
+  }, [customNetworks])
   const navigate = useNavigate()
   const [, setSelectedCustomNetwork] = useSelectedNetwork()
 
@@ -68,13 +75,7 @@ export const NetworkSettingsScreen: FC = () => {
                 }}
                 hideRemove={network.readonly}
                 onRemoveClick={async () => {
-                  // navigate(routes.settingsRemoveCustomNetwork()) // intended behavior in the future, so we can get a confirmation
-                  await removeNetworks([network.id])
-
-                  // optimistic update
-                  await mutate((prevData) =>
-                    prevData?.filter((n) => n.id !== network.id),
-                  )
+                  await removeNetwork(network.id)
                 }}
               />
             ))

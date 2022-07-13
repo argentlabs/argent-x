@@ -1,4 +1,4 @@
-import { Network } from "./../shared/networks"
+import { Network } from "../shared/network"
 import {
   AddStarknetChainParameters,
   WatchAssetParameters,

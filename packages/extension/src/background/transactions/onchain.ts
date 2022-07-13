@@ -1,6 +1,6 @@
 import { Status } from "starknet"
 
-import { getProvider } from "../../shared/networks"
+import { getProvider } from "../../shared/network"
 import { Transaction } from "../../shared/transactions"
 import { getTransactionsStatusUpdate } from "./determineUpdates"
 

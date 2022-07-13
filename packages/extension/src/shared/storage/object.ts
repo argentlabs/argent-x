@@ -1,6 +1,5 @@
 import { isPlainObject, merge } from "lodash-es"
 
-import { Implementations, getDefaultImplementations } from "./implementations"
 import { KeyValueStorage } from "./keyvalue"
 import { StorageOptions, StorageOptionsOrNameSpace } from "./options"
 import { AreaName, BaseStorage } from "./types"
@@ -33,7 +32,6 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   constructor(
     public readonly defaults: T,
     optionsOrNamespace: StorageOptionsOrNameSpace<ObjectStorageOptions<T>>,
-    implementations: Implementations = getDefaultImplementations(),
   ) {
     const passThrough = (value: any) => value
     function defaultMerge(oldValue: T, newValue: T) {
@@ -60,7 +58,6 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
         inner: this.serialize(this.defaults),
       },
       optionsOrNamespace,
-      implementations,
     )
 
     this.areaName = this.storageImplementation.areaName

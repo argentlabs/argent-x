@@ -1,5 +1,6 @@
 import { ActionItem } from "../shared/actionQueue"
 import { MessageType, messageStream } from "../shared/messages"
+import { getNetwork } from "../shared/network"
 import { handleAccountMessage } from "./accountMessaging"
 import { loadContracts } from "./accounts"
 import { handleActionMessage } from "./actionMessaging"
@@ -14,7 +15,6 @@ import {
   HandleMessage,
   UnhandledMessage,
 } from "./background"
-import { getNetwork as getNetworkImplementation } from "./customNetworks"
 import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
@@ -35,12 +35,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
 
   const onAutoLock = () =>
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
-  const wallet = new Wallet(
-    storage,
-    loadContracts,
-    getNetworkImplementation,
-    onAutoLock,
-  )
+  const wallet = new Wallet(storage, loadContracts, getNetwork, onAutoLock)
   await wallet.setup()
 
   // may get reassigned when a recovery happens

@@ -1,15 +1,10 @@
 import { ArrayStorage } from "../array"
-import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("ArrayStorage()", () => {
   describe("with primitives", () => {
     let arrayStorage: ArrayStorage<number>
     beforeAll(() => {
-      arrayStorage = new ArrayStorage(
-        [1, 2, 3],
-        "arrayNumberTest",
-        chromeStorageMock,
-      )
+      arrayStorage = new ArrayStorage([1, 2, 3], "arrayNumberTest")
     })
 
     test("should return defaults", async () => {
@@ -72,7 +67,6 @@ describe("ArrayStorage()", () => {
           namespace: "arrayAdvancedObjectTest",
           compare: (a, b) => a.id === b.id,
         },
-        chromeStorageMock,
       )
       unsub = arrayStorage.subscribe(onChangeHandler)
     })

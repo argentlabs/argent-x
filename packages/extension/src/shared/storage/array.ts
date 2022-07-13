@@ -6,7 +6,6 @@ import {
   uniqWith,
 } from "lodash-es"
 
-import { Implementations, getDefaultImplementations } from "./implementations"
 import { ObjectStorage, ObjectStorageOptions } from "./object"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
 import {
@@ -57,7 +56,6 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
   constructor(
     public readonly defaults: T[],
     optionsOrNamespace: StorageOptionsOrNameSpace<ArrayStorageOptions<T>>,
-    implementations: Implementations = getDefaultImplementations(),
   ) {
     const options = getOptionsWithDefaults(optionsOrNamespace)
     this.compare = options.compare ?? isEqual
@@ -65,7 +63,6 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
     this.storageImplementation = new ObjectStorage<T[]>(
       this.defaults,
       optionsOrNamespace,
-      implementations,
     )
     this.areaName = this.storageImplementation.areaName
     this.namespace = this.storageImplementation.namespace
@@ -90,6 +87,12 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
     await this.storageImplementation.set(newAll)
   }
 
+  /**
+   * Remove on or multiple values from the array
+   *
+   * @param value can be a selector function or an array of values to remove
+   * @returns the removed values
+   */
   public async remove(value: AllowArray<T> | SelectorFn<T>): Promise<T[]> {
     const all = await this.get()
     const valuesToRemove = isFunction(value)

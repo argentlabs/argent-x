@@ -1,6 +1,6 @@
 import { assertNever } from "./../ui/services/assertNever"
 import { WindowMessageType } from "../shared/messages"
-import { getProvider } from "../shared/networks"
+import { getProvider } from "../shared/network"
 import { ArgentXAccount } from "./ArgentXAccount"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 

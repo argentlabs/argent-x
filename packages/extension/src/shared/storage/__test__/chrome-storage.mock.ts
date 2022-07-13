@@ -2,8 +2,7 @@ import { isFunction } from "lodash-es"
 import mitt, { WildcardHandler } from "mitt"
 import browser from "webextension-polyfill"
 
-import { Implementations, OnChanged, StorageArea } from "../implementations"
-import { AreaName } from "../types"
+import { AreaName, Implementations, OnChanged, StorageArea } from "../types"
 
 type Events = Record<AreaName, Record<string, browser.storage.StorageChange>>
 const emitter = mitt<Events>()

@@ -1,12 +1,7 @@
 import browser from "webextension-polyfill"
 
-import {
-  Implementations,
-  StorageArea,
-  getDefaultImplementations,
-} from "./implementations"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
-import { AllowPromise, AreaName, BaseStorage } from "./types"
+import { AllowPromise, AreaName, BaseStorage, StorageArea } from "./types"
 
 export interface IKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
@@ -31,12 +26,11 @@ export class KeyValueStorage<
   constructor(
     public readonly defaults: T,
     optionsOrNamespace: StorageOptionsOrNameSpace,
-    private readonly implementations: Implementations = getDefaultImplementations(),
   ) {
     const options = getOptionsWithDefaults(optionsOrNamespace)
     this.namespace = options.namespace
     this.areaName = options.areaName
-    this.storageImplementation = implementations[options.areaName]
+    this.storageImplementation = browser.storage[options.areaName]
 
     if (!this.storageImplementation) {
       throw new Error(`Unknown storage area: ${options.areaName}`)
@@ -84,8 +78,8 @@ export class KeyValueStorage<
       }
     }
 
-    this.implementations.onChanged.addListener(handler)
+    browser.storage.onChanged.addListener(handler)
 
-    return () => this.implementations.onChanged.removeListener(handler)
+    return () => browser.storage.onChanged.removeListener(handler)
   }
 }
