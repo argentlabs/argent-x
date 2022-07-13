@@ -1,17 +1,19 @@
 import { isFunction } from "lodash-es"
 import mitt, { WildcardHandler } from "mitt"
-import browser from "webextension-polyfill"
 
-import { AreaName, Implementations, OnChanged, StorageArea } from "../types"
+import {
+  AreaName,
+  Implementations,
+  OnChanged,
+  StorageArea,
+  StorageChange,
+} from "../types"
 
-type Events = Record<AreaName, Record<string, browser.storage.StorageChange>>
+type Events = Record<AreaName, Record<string, StorageChange>>
 const emitter = mitt<Events>()
 
-function getChangeMap(
-  oldValue?: any,
-  newValue?: any,
-): browser.storage.StorageChange {
-  const changeMap: browser.storage.StorageChange = {
+function getChangeMap(oldValue?: any, newValue?: any): StorageChange {
+  const changeMap: StorageChange = {
     oldValue,
     newValue,
   }
@@ -89,7 +91,7 @@ class TestStore implements StorageArea {
     const changeMap = entries.reduce((acc, [key, value]) => {
       acc[key] = getChangeMap(this.store.get(key), value)
       return acc
-    }, {} as Record<string, browser.storage.StorageChange>)
+    }, {} as Record<string, StorageChange>)
     for (const [key, value] of entries) {
       this.store.set(key, value)
     }
@@ -104,7 +106,7 @@ class TestStore implements StorageArea {
 
 type Callback = (
   changes: {
-    [key: string]: browser.storage.StorageChange
+    [key: string]: StorageChange
   },
   areaName: "sync" | "local" | "managed" | "session",
 ) => void

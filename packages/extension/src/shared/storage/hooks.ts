@@ -1,5 +1,5 @@
 import { memoize } from "lodash-es"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { IArrayStorage } from "./array"
 import { IKeyValueStorage } from "./keyvalue"
@@ -48,19 +48,22 @@ export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
   return value
 }
 
-const defaultSelector = memoize(() => true)
+const defaultSelector = memoize(
+  () => true,
+  () => "default",
+)
 
 export function useArrayStorage<T>(
   storage: IArrayStorage<T>,
   selector: SelectorFn<T> = defaultSelector,
 ): T[] {
   const [value, setValue] = useState<T[]>(
-    clientCache.get(storage.namespace) ?? storage.defaults.filter(selector),
+    clientCache.get(storage.namespace) ?? storage.defaults,
   )
 
   useEffect(() => {
-    storage.get(selector).then(setValue)
-    const sub = storage.subscribe((value) => setValue(value.filter(selector)))
+    storage.get().then(setValue)
+    const sub = storage.subscribe(setValue)
     return () => sub()
   }, [selector, storage])
 
@@ -68,5 +71,7 @@ export function useArrayStorage<T>(
     clientCache.set(storage.namespace, value)
   }, [value, storage.namespace])
 
-  return value
+  const filteredValue = useMemo(() => value.filter(selector), [value, selector])
+
+  return filteredValue
 }

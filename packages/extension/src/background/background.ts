@@ -4,7 +4,7 @@ import { ActionItem } from "../shared/actionQueue"
 import { MessageType } from "../shared/messages"
 import { Queue } from "./actionQueue"
 import { MessagingKeys } from "./keys/messagingKeys"
-import { TransactionTracker } from "./transactions/transactions"
+import { TransactionTracker } from "./transactions/tracking"
 import { Wallet } from "./wallet"
 
 export interface BackgroundService {

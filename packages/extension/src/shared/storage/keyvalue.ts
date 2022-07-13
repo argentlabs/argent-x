@@ -1,7 +1,13 @@
 import browser from "webextension-polyfill"
 
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
-import { AllowPromise, AreaName, BaseStorage, StorageArea } from "./types"
+import {
+  AllowPromise,
+  AreaName,
+  BaseStorage,
+  StorageArea,
+  StorageChange,
+} from "./types"
 
 export interface IKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
@@ -11,7 +17,7 @@ export interface IKeyValueStorage<
   removeItem<K extends keyof T>(key: K): Promise<void>
   subscribe<K extends keyof T>(
     key: K,
-    callback: (value: T[K]) => AllowPromise<void>,
+    callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
   ): () => void
 }
 
@@ -65,16 +71,16 @@ export class KeyValueStorage<
 
   public subscribe<K extends keyof T>(
     key: K,
-    callback: (value: T[K]) => AllowPromise<void>,
+    callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
   ): () => void {
     const storageKey = this.getStorageKey(key)
 
     const handler = async (
-      changes: Record<string, browser.storage.StorageChange>,
+      changes: Record<string, StorageChange>,
       areaName: browser.storage.AreaName,
     ) => {
       if (this.areaName === areaName && changes[storageKey]) {
-        callback(changes[storageKey].newValue)
+        callback(changes[storageKey].newValue, changes[storageKey])
       }
     }
 

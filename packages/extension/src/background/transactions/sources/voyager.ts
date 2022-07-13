@@ -1,10 +1,10 @@
 import join from "url-join"
 
-import { Network, isPublicNetwork } from "../../shared/network"
-import { Transaction, compareTransactions } from "../../shared/transactions"
-import { WalletAccount } from "../../shared/wallet.model"
-import { fetchWithTimeout } from "../utils/fetchWithTimeout"
-import { mapVoyagerTransactionToTransaction } from "./transformers"
+import { Network, isPublicNetwork } from "../../../shared/network"
+import { Transaction, compareTransactions } from "../../../shared/transactions"
+import { WalletAccount } from "../../../shared/wallet.model"
+import { fetchWithTimeout } from "../../utils/fetchWithTimeout"
+import { mapVoyagerTransactionToTransaction } from "../transformers"
 
 export interface VoyagerTransaction {
   blockId: string
@@ -33,19 +33,16 @@ export const fetchVoyagerTransactions = async (
   return items
 }
 
-export type FetchTransactions = typeof fetchVoyagerTransactions
-
 export async function getTransactionHistory(
   accountsToPopulate: WalletAccount[],
   metadataTransactions: Transaction[],
-  fetchTransactions: FetchTransactions,
 ) {
   const accountsWithHistory = accountsToPopulate.filter((account) =>
     isPublicNetwork(account.network.id),
   )
   const transactionsPerAccount = await Promise.all(
     accountsWithHistory.map(async (account) => {
-      const voyagerTransactions = await fetchTransactions(
+      const voyagerTransactions = await fetchVoyagerTransactions(
         account.address,
         account.network,
       )

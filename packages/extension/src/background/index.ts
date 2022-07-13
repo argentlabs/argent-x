@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill"
+
 import { ActionItem } from "../shared/actionQueue"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
@@ -23,12 +25,33 @@ import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { handleSettingsMessage } from "./settingsMessaging"
 import { Storage } from "./storage"
-import { trackTransations } from "./transactions/notifications"
-import { getTransactionsStore } from "./transactions/store"
+import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
-import { getTransactionsTracker } from "./transactions/transactions"
-import { fetchVoyagerTransactions } from "./transactions/voyager"
 import { Wallet, WalletStorageProps } from "./wallet"
+
+browser.alarms.create("core:transactionTracker:history", {
+  periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager
+})
+browser.alarms.create("core:transactionTracker:update", {
+  periodInMinutes: 1, // fetch transaction updates of existing transactions every minute from onchain
+})
+browser.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === "core:transactionTracker:history") {
+    console.info("~> fetching transaction history")
+    const storage = new Storage<WalletStorageProps>({}, "wallet")
+    const onAutoLock = () =>
+      sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
+    const wallet = new Wallet(storage, loadContracts, getNetwork, onAutoLock)
+    await wallet.setup()
+    await transactionTracker.loadHistory(await wallet.getAccounts())
+  }
+  if (alarm.name === "core:transactionTracker:update") {
+    console.info("~> fetching transaction updates")
+    await transactionTracker.update()
+  }
+})
+
+// runs on startup
 ;(async () => {
   const messagingKeys = await getMessagingKeys()
   const storage = new Storage<WalletStorageProps>({}, "wallet")
@@ -39,12 +62,7 @@ import { Wallet, WalletStorageProps } from "./wallet"
   await wallet.setup()
 
   // may get reassigned when a recovery happens
-  const transactionTracker = getTransactionsTracker(
-    getTransactionsStore,
-    fetchVoyagerTransactions,
-    trackTransations,
-  )
-  transactionTracker.load(await wallet.getAccounts()) // no await here to defer loading
+  transactionTracker.loadHistory(await wallet.getAccounts()) // no await here to defer loading
 
   const actionQueue = await getQueue<ActionItem>({
     onUpdate: (actions) => {

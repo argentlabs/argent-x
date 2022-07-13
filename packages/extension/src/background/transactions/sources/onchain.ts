@@ -1,8 +1,8 @@
 import { Status } from "starknet"
 
-import { getProvider } from "../../shared/network"
-import { Transaction } from "../../shared/transactions"
-import { getTransactionsStatusUpdate } from "./determineUpdates"
+import { getProvider } from "../../../shared/network"
+import { Transaction } from "../../../shared/transactions"
+import { getTransactionsStatusUpdate } from "../determineUpdates"
 
 const transactionStatusToCheck: Status[] = ["RECEIVED", "NOT_RECEIVED"]
 
@@ -11,6 +11,8 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
     transactionStatusToCheck.includes(status),
   )
 
+  // as this function tends to run into 429 errors, we'll simply keep the old status when it fails
+  // TODO: we should add a cooldown when user run into 429 errors
   const fetchedTransactions = await Promise.allSettled(
     transactionsToCheck.map(async (transaction) => {
       const provider = getProvider(transaction.account.network)

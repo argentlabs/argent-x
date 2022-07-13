@@ -6,6 +6,6 @@ export const networkSelector = memoize(
   (networkId: string) => (network: Network) => network.id === networkId,
 )
 
-export const networkSelectorByChainId = memoize(
-  (chainId: string) => (network: Network) => network.chainId === chainId,
-)
+export const networkSelectorByChainId =
+  (chainId: string) => (network: Network) =>
+    network.chainId === chainId

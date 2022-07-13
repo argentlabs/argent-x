@@ -3,7 +3,6 @@ import { memoize } from "lodash-es"
 import { useEffect, useMemo } from "react"
 import useSWR from "swr"
 
-import { messageStream } from "../../../shared/messages"
 import { useArrayStorage } from "../../../shared/storage/hooks"
 import { tokenStore } from "../../../shared/token/storage"
 import { BaseToken, Token } from "../../../shared/token/type"
@@ -27,8 +26,10 @@ interface UseTokens {
 const networkIdSelector = memoize(
   (networkId: string) => (token: Token) => token.networkId === networkId,
 )
+
 const tokenSelector = memoize(
   (baseToken: BaseToken) => (token: Token) => equalToken(token, baseToken),
+  (baseToken) => getAccountIdentifier(baseToken),
 )
 
 export const useTokensInNetwork = (networkId: string) =>
@@ -42,13 +43,19 @@ export const useToken = (baseToken: BaseToken): Token | undefined => {
 export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
+  console.log("a", account?.networkId)
   const selectedAccount = useAccount(account)
-
+  console.log("b", selectedAccount?.networkId)
   const networkId = useMemo(() => {
     return selectedAccount?.networkId ?? ""
   }, [selectedAccount?.networkId])
+  console.log("c", networkId)
 
   const tokensInNetwork = useTokensInNetwork(networkId)
+  console.log(
+    "d",
+    tokensInNetwork.map((t) => t.networkId),
+  )
 
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),
@@ -67,7 +74,7 @@ export const useTokensWithBalance = (
       }
 
       const balances = await fetchAllTokensBalance(
-        tokenAddresses,
+        tokensInNetwork.map((t) => t.address),
         selectedAccount,
       )
 
@@ -81,19 +88,7 @@ export const useTokensWithBalance = (
 
   const tokenDetailsIsInitialising = !error && !data && isValidating
 
-  // refetch balances on transaction success
-  useEffect(() => {
-    const subscription = messageStream.subscribe(([msg]) => {
-      if (msg.type === "TRANSACTION_SUCCESS") {
-        mutate() // refetch balances
-      }
-    })
-    return () => {
-      if (!subscription.closed) {
-        subscription.unsubscribe()
-      }
-    }
-  }, [mutate])
+  // TODO: refetch balances on transaction success
 
   // refetch balances on token edit (token was added or removed)
   useEffect(() => {

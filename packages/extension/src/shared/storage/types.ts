@@ -40,3 +40,10 @@ export type StorageArea = Pick<
 export type Implementations = Record<AreaName, StorageArea> & {
   onChanged: OnChanged
 }
+
+export interface StorageChange<T = any> {
+  /** Optional. The new value of the item, if there is a new value. */
+  newValue?: T
+  /** Optional. The old value of the item, if there was an old value. */
+  oldValue?: T
+}

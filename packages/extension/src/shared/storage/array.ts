@@ -15,6 +15,7 @@ import {
   BaseStorage,
   SelectorFn,
   SetterFn,
+  StorageChange,
 } from "./types"
 
 export function mergeArrayStableWith<T>(
@@ -42,7 +43,9 @@ export interface IArrayStorage<T> extends BaseStorage<T[]> {
   get(selector?: SelectorFn<T>): Promise<T[]>
   add(value: AllowArray<T> | SetterFn<T>): Promise<void>
   remove(value: AllowArray<T> | SelectorFn<T>): Promise<T[]>
-  subscribe(callback: (value: T[]) => AllowPromise<void>): () => void
+  subscribe(
+    callback: (value: T[], changeSet: StorageChange<T[]>) => AllowPromise<void>,
+  ): () => void
 }
 
 // implement ArrayStorage using ObjectStorage as a base
@@ -105,7 +108,9 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
     return valuesToRemove
   }
 
-  public subscribe(callback: (value: T[]) => AllowPromise<void>): () => void {
+  public subscribe(
+    callback: (value: T[], changeSet: StorageChange<T[]>) => AllowPromise<void>,
+  ): () => void {
     return this.storageImplementation.subscribe(callback)
   }
 }
