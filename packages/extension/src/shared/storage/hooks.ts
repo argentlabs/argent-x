@@ -1,3 +1,4 @@
+import { memoize } from "lodash-es"
 import { useEffect, useState } from "react"
 
 import { IArrayStorage } from "./array"
@@ -47,9 +48,11 @@ export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
   return value
 }
 
+const defaultSelector = memoize(() => true)
+
 export function useArrayStorage<T>(
   storage: IArrayStorage<T>,
-  selector: SelectorFn<T> = () => true,
+  selector: SelectorFn<T> = defaultSelector,
 ): T[] {
   const [value, setValue] = useState<T[]>(
     clientCache.get(storage.namespace) ?? storage.defaults.filter(selector),
