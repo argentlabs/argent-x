@@ -1,25 +1,28 @@
 import React, { FC } from "react"
 import styled from "styled-components"
+import { DefaultTheme } from "styled-components"
 
 import { ApiTransactionReviewAssessment } from "../../../../shared/transactionReview.service"
 
 type Variant = ApiTransactionReviewAssessment | undefined
 
 interface IContainer {
+  theme: DefaultTheme
   variant: ApiTransactionReviewAssessment | undefined
 }
 
-export const getVariantColor = ({ variant }: IContainer) => {
+export const getVariantColor = ({ variant, theme }: IContainer) => {
   switch (variant) {
     case "warn":
-      return "#f36a3d"
+      return theme.red4
   }
   return "#02A697"
 }
 
-const Container = styled.div<IContainer>`
-  background-color: ${getVariantColor};
-  color: white;
+const Container = styled.div<{ variant: IContainer["variant"] }>`
+  background-color: ${({ theme, variant }) =>
+    getVariantColor({ theme, variant })};
+  color: ${({ theme }) => theme.text1};
   font-size: 13px;
   font-weight: 600;
   line-height: 18px;

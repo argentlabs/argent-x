@@ -6,8 +6,8 @@ import { Button } from "../../components/Button"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
-import { H2 } from "../../components/Typography"
 import { checkPassword } from "../../services/backgroundSessions"
+import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { PasswordForm } from "../onboarding/PasswordForm"
 import { usePrivateKey } from "./usePrivateKey"
@@ -27,8 +27,8 @@ const Container = styled.div`
 `
 
 const KeyContainer = styled.div`
-  background: #333332;
-  border: 1px solid #161616;
+  background: ${({ theme }) => theme.bg2};
+  border: 1px solid ${({ theme }) => theme.bg1};
   border-radius: 4px;
   padding: 9px 13px 8px;
   overflow-wrap: break-word;
@@ -39,7 +39,7 @@ const KeyContainer = styled.div`
 
 const WarningContainer = styled.div`
   margin-top: 15px;
-  border: 1px solid #333332;
+  border: 1px solid ${({ theme }) => theme.bg2};
   padding: 9px 13px 8px;
   overflow-wrap: break-word;
   font-size: 14px;

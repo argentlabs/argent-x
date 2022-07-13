@@ -6,9 +6,9 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { OpenInNewIcon } from "../../components/Icons/MuiIcons"
-import { H2, P } from "../../components/Typography"
 import { routes } from "../../routes"
 import { connectAccount } from "../../services/backgroundAccounts"
+import { H2, P } from "../../theme/Typography"
 import { deployAccount } from "../accounts/accounts.service"
 import { useAccounts } from "../accounts/accounts.state"
 import { recover } from "../recovery/recovery.service"
@@ -25,7 +25,7 @@ const Container = styled.div`
   }
 
   a {
-    color: #ff875b;
+    color: ${({ theme }) => theme.red3};
     text-decoration: none;
   }
 `

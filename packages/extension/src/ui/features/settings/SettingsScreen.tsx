@@ -11,30 +11,30 @@ import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { SupportIcon } from "../../components/Icons/SupportIcon"
 import { PrivacyStatement } from "../../components/PrivacyStatement"
 import { RowCentered } from "../../components/Row"
-import { H2 } from "../../components/Typography"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
+import { H2 } from "../../theme/Typography"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 
 export const Title = styled.h3`
   font-weight: 600;
   font-size: 17px;
   line-height: 22px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   svg {
-    color: #8f8e8c;
+    color: ${({ theme }) => theme.text2};
     font-size: 12px;
   }
 `
 
 export const P = styled.p`
   font-size: 15px;
-  color: #8f8e8c;
+  color: ${({ theme }) => theme.text2};
   margin-top: 16px;
 `
 
@@ -54,7 +54,7 @@ export const SettingsScreenWrapper = styled.div`
   hr {
     border: none;
     height: 1px;
-    background-color: #333332;
+    background-color: ${({ theme }) => theme.bg2};
   }
 `
 
@@ -67,7 +67,7 @@ export const SettingsLinkItem = styled(Link)`
   padding: 24px 32px;
 
   &:hover svg {
-    color: #ffffff;
+    color: ${({ theme }) => theme.text1};
   }
 `
 
@@ -83,7 +83,7 @@ export const Footer = styled.div`
 
 const IconWrapper = styled(RowCentered)`
   padding: 8px 10px 8px 8px;
-  background: #333332;
+  background: ${({ theme }) => theme.bg2};
   border-radius: 100px;
   gap: 8px;
 `
@@ -93,7 +93,7 @@ const IconText = styled.span`
   font-size: 13px;
   line-height: 18px;
   text-align: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text1};
 `
 
 const StyledPrivacyStatement = styled(PrivacyStatement)`

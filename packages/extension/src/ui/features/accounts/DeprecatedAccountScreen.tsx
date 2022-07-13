@@ -3,7 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
-import { H2, P } from "../../components/Typography"
+import { H2, P } from "../../theme/Typography"
 
 const Container = styled.div`
   padding: 88px 40px 24px 40px;
