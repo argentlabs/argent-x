@@ -63,8 +63,10 @@ const activeStore = create<ActiveStore>(
   ),
 )
 
-const N_24_HOURS = 24 * 60 * 60 * 1000
 const N_5_MINUTES = 5 * 60 * 1000
+const N_24_HOURS = 24 * 60 * 60 * 1000
+const N_1_WEEK = 7 * N_24_HOURS
+const N_1_MONTH = 4 * N_1_WEEK
 
 function openedExtensionTodayTracking() {
   try {
@@ -77,12 +79,20 @@ function openedExtensionTodayTracking() {
   }
 }
 
-export function unlockedExtensionTodayTracking() {
+export function unlockedExtensionTracking() {
   try {
+    const { lastUnlocked } = activeStore.getState()
     // track once every 24h
-    if (Date.now() - activeStore.getState().lastUnlocked > N_24_HOURS) {
+    if (Date.now() - lastUnlocked > N_24_HOURS) {
       activeStore.getState().update("lastUnlocked")
       analytics.track("unlockedExtensionToday")
+
+      if (Date.now() - lastUnlocked > N_1_WEEK) {
+        analytics.track("unlockedExtensionWeekly")
+      }
+      if (Date.now() - lastUnlocked > N_1_MONTH) {
+        analytics.track("unlockedExtensionMonthly")
+      }
     }
   } catch (e) {
     // nothing of this should be blocking
