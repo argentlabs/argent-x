@@ -38,6 +38,7 @@
     "typescript-styled-plugin": "^0.18.2",
     "url-loader": "^4.1.1",
     "vi-fetch": "^0.7.1",
+    "vite": "^3.0.0",
     "vitest": "^0.18.0",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
