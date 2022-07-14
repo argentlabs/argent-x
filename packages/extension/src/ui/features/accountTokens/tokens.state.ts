@@ -1,109 +1,21 @@
 import { BigNumber } from "ethers"
+import { memoize } from "lodash-es"
 import { useEffect, useMemo } from "react"
-import { number } from "starknet"
 import useSWR from "swr"
-import create from "zustand"
-import shallow from "zustand/shallow"
 
 import { messageStream } from "../../../shared/messages"
-import { Token, equalToken } from "../../../shared/token"
+import { useArrayStorage } from "../../../shared/storage/hooks"
+import { tokenStore } from "../../../shared/token/storage"
+import { BaseToken, Token } from "../../../shared/token/type"
+import { equalToken } from "../../../shared/token/utils"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { isValidAddress } from "../../services/addresses"
-import {
-  addToken as addTokenMsg,
-  getTokens,
-  removeToken as removeTokenMsg,
-} from "../../services/backgroundTokens"
 import { useAccount } from "../accounts/accounts.state"
 import { fetchAllTokensBalance } from "./tokens.service"
 
-export interface TokenDetails extends Omit<Token, "decimals"> {
-  decimals?: BigNumber
-}
-
-export interface TokenDetailsWithBalance extends TokenDetails {
+export interface TokenDetailsWithBalance extends Token {
   balance?: BigNumber
 }
-
-interface State {
-  tokens: TokenDetails[]
-  addToken: (token: Required<TokenDetails>) => void
-  removeToken: (tokenAddress: string) => void
-}
-
-export const mapTokenToTokenDetails = (token: Token): TokenDetails => ({
-  ...token,
-  decimals: number.toBN(token.decimals),
-})
-
-export const mapTokenDetailsToToken = (
-  token: Required<TokenDetails>,
-): Token => ({
-  ...token,
-  decimals: token.decimals.toString(),
-})
-
-export const useTokens = create<State>((set, get) => ({
-  tokens: [],
-  addToken: async (token: Required<TokenDetails>) => {
-    if (!isValidAddress(token.address)) {
-      throw Error("token address malformed")
-    }
-    const equalTokenHit = get().tokens.find((t) => equalToken(t, token))
-    if (equalTokenHit) {
-      // if token already exists, but was hidden without balance, show it
-      if (!equalTokenHit.showAlways) {
-        return set((state) => ({
-          ...state,
-          tokens: state.tokens.map((t) =>
-            equalToken(t, equalTokenHit) ? { ...t, showAlways: true } : t,
-          ),
-        }))
-      }
-      throw Error("token already added")
-    }
-    const newToken = { ...token, showAlways: true }
-    await addTokenMsg(mapTokenDetailsToToken(newToken))
-  },
-  removeToken: async (tokenAddress: string) => {
-    await removeTokenMsg(tokenAddress)
-  },
-}))
-
-export const useTokensSubscription = () => {
-  useEffect(() => {
-    ;(async () => {
-      const tokens = await getTokens()
-      useTokens.setState({ tokens: tokens.map(mapTokenToTokenDetails) })
-    })()
-
-    const subscription = messageStream.subscribe(([message]) => {
-      if (message.type === "UPDATE_TOKENS") {
-        useTokens.setState({
-          tokens: message.data.map(mapTokenToTokenDetails),
-        })
-      }
-    })
-
-    return () => {
-      if (!subscription.closed) {
-        subscription.unsubscribe()
-      }
-    }
-  }, [])
-}
-
-export const addToken = (token: Required<TokenDetails>) => {
-  useTokens.getState().addToken(token)
-}
-
-export const removeToken = (tokenAddress: string) => {
-  useTokens.getState().removeToken(tokenAddress)
-}
-
-export const selectTokensByNetwork = (networkId: string) => (state: State) =>
-  state.tokens.filter((token) => token.networkId === networkId)
 
 interface UseTokens {
   tokenDetails: TokenDetailsWithBalance[]
@@ -112,32 +24,38 @@ interface UseTokens {
   error?: any
 }
 
+const networkIdSelector = memoize(
+  (networkId: string) => (token: Token) => token.networkId === networkId,
+)
+const tokenSelector = memoize(
+  (baseToken: BaseToken) => (token: Token) => equalToken(token, baseToken),
+)
+
+export const useTokensInNetwork = (networkId: string) =>
+  useArrayStorage(tokenStore, networkIdSelector(networkId))
+
+export const useToken = (baseToken: BaseToken): Token | undefined => {
+  const [token] = useArrayStorage(tokenStore, tokenSelector(baseToken))
+  return token
+}
+
 export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
   const selectedAccount = useAccount(account)
 
-  const tokensInNetworkSelector = useMemo(() => {
-    return selectTokensByNetwork(selectedAccount?.networkId ?? "")
+  const networkId = useMemo(() => {
+    return selectedAccount?.networkId ?? ""
   }, [selectedAccount?.networkId])
 
-  const tokenAddressesSelector = useMemo(() => {
-    return (state: State) => {
-      const tokensInNetwork = tokensInNetworkSelector(state)
-      return tokensInNetwork.map((t) => t.address)
-    }
-  }, [tokensInNetworkSelector])
+  const tokensInNetwork = useTokensInNetwork(networkId)
 
-  // shallow compare objects and arrays
-  const tokensInNetwork = useTokens(tokensInNetworkSelector, shallow)
-  const tokenAddresses = useTokens(tokenAddressesSelector, shallow)
+  const tokenAddresses = useMemo(
+    () => tokensInNetwork.map((t) => t.address),
+    [tokensInNetwork],
+  )
 
-  const {
-    data,
-    isValidating,
-    error: maybeEmptyObjectError,
-    mutate,
-  } = useSWR(
+  const { data, isValidating, error, mutate } = useSWR(
     // skip if no account selected
     selectedAccount && [
       getAccountIdentifier(selectedAccount),
@@ -157,36 +75,9 @@ export const useTokensWithBalance = (
     },
     {
       refreshInterval: 30000,
+      shouldRetryOnError: false,
     },
   )
-
-  /**
-   * FIXME:
-   * Investigate what causes the SWR hook above to cache an empty object `error: {}`, usually observed after reloading the extension
-   *
-   * This is subsequently retreived by SWR from the cache and causes an immediately defined error if left unchecked
-   *
-   * You can verify this by debugging in the `set` method of `swrCacheProvider`, and
-   * checking for SWR setting a value containing a key of `error` with an empty object {}
-   *
-   * As a workaround we check for empty object here and treat as undefined while the hook revalidates properly
-   *
-   */
-
-  const error: any = useMemo(() => {
-    if (!maybeEmptyObjectError) {
-      return
-    }
-    try {
-      if (JSON.stringify(maybeEmptyObjectError) === "{}") {
-        console.warn("FIXME: Ignoring empty object {} error")
-        return
-      }
-    } catch (e) {
-      // ignore any stringify errors
-    }
-    return maybeEmptyObjectError
-  }, [maybeEmptyObjectError])
 
   const tokenDetailsIsInitialising = !error && !data && isValidating
 

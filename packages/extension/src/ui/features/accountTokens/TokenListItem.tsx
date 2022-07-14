@@ -4,7 +4,7 @@ import styled, { css, keyframes } from "styled-components"
 import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
-} from "../../../shared/tokenPrice.service"
+} from "../../../shared/token/price"
 import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"

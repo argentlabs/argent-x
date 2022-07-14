@@ -8,7 +8,7 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
   sumTokenBalancesToCurrencyValue,
-} from "../src/shared/tokenPrice.service"
+} from "../src/shared/token/price"
 import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
 import mockApiPricesDataInvalid from "./__mocks__/argent-api-prices-invalid.mock.json"
 import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"

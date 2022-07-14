@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill"
+
 import { ActionItem } from "../shared/actionQueue"
 import { MessageType } from "../shared/messages"
 import { Queue } from "./actionQueue"
@@ -20,7 +22,7 @@ export class UnhandledMessage extends Error {
 
 interface HandlerParams<T> {
   msg: T
-  sender: chrome.runtime.MessageSender
+  sender: browser.runtime.MessageSender
   background: BackgroundService
   messagingKeys: MessagingKeys
   sendToTabAndUi: (msg: MessageType) => Promise<void>

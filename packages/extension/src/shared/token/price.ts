@@ -1,13 +1,13 @@
 import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber, BigNumberish, utils } from "ethers"
 
-import { TokenDetailsWithBalance } from "../ui/features/accountTokens/tokens.state"
-import { UniqueToken } from "./token"
+import { TokenDetailsWithBalance } from "../../ui/features/accountTokens/tokens.state"
 import {
   isNumeric,
   prettifyCurrencyNumber,
   prettifyTokenNumber,
-} from "./utils/number"
+} from "../utils/number"
+import { BaseToken } from "./type"
 
 /** shape of individual entity in the /tokens/info endpoint */
 export interface ApiTokenDetails {
@@ -35,7 +35,7 @@ export interface ApiPriceDataResponse {
 
 export interface ILookupTokenPriceDetails {
   /** the token to query */
-  token: UniqueToken
+  token: BaseToken
   /** reponse from `/tokens/prices` endpoint */
   pricesData: ApiPriceDataResponse
   /** reponse from `/tokens/info` endpoint */

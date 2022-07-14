@@ -55,7 +55,8 @@ export const useAccountTransactions = (account?: BaseWalletAccount) => {
         }
       }
     }
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const transactions = useTransactionsStore((state) =>
     state.transactions.sort((a, b) => b.timestamp - a.timestamp),

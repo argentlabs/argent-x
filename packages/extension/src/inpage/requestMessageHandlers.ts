@@ -13,7 +13,7 @@ export async function handleAddTokenRequest(
     data: {
       address: callParams.options.address,
       symbol: callParams.options.symbol,
-      decimals: callParams.options.decimals?.toString(),
+      decimals: callParams.options.decimals,
       name: callParams.options.name,
     },
   })

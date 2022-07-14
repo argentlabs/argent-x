@@ -3,7 +3,7 @@ import browser from "webextension-polyfill"
 const NOTIFICATION_WIDTH = 360
 const NOTIFICATION_HEIGHT = 600 + 28 // +28 for the title bar
 
-let openUiPending: Promise<browser.Windows.Window> | undefined
+let openUiPending: Promise<browser.windows.Window> | undefined
 
 export async function openUi() {
   if (!openUiPending) {
