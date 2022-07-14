@@ -79,7 +79,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   /** will be undefined while initialising */
   if (isPreauthorized === false) {
     /** FIXME: somehow the user has created a transaction with a non-connected account */
-    /** they should be prompted to pick an account here */
+    /** they should be prompted to pick a different account here */
   }
 
   const accountName = getAccountName(selectedAccount, accountNames)
