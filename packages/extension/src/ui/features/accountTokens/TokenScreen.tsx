@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
@@ -69,8 +69,10 @@ export const TokenScreen: FC = () => {
   const { tokenAddress } = useParams()
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
-  console.log(tokenDetails.map((t) => t.name))
-  const token = tokenDetails.find(({ address }) => address === tokenAddress)
+  const token = useMemo(
+    () => tokenDetails.find(({ address }) => address === tokenAddress),
+    [tokenAddress, tokenDetails],
+  )
   const currencyValue = useTokenBalanceToCurrencyValue(token)
 
   if (!token) {
