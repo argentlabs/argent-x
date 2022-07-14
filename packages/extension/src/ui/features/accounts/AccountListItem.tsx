@@ -17,18 +17,23 @@ export interface IAccountListItem {
   deploying?: boolean
   upgrade?: boolean
   connected?: boolean
+  transparent?: boolean
   children?: ReactNode
 }
 
 type AccountListItemWrapperProps = Pick<
   IAccountListItem,
-  "highlight" | "outline"
+  "highlight" | "outline" | "transparent"
 >
 
 export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
   cursor: pointer;
-  background-color: ${({ highlight }) =>
-    highlight ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.1)"};
+  background-color: ${({ highlight, transparent }) =>
+    transparent
+      ? "transparent"
+      : highlight
+      ? "rgba(255, 255, 255, 0.15)"
+      : "rgba(255, 255, 255, 0.1)"};
   border-radius: 4px;
   padding: 20px 16px;
   border: 1px solid
@@ -42,7 +47,8 @@ export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
 
   &:hover,
   &:focus {
-    background: rgba(255, 255, 255, 0.15);
+    background: ${({ transparent }) =>
+      transparent ? "transparent" : "rgba(255, 255, 255, 0.15)"};
     outline: 0;
   }
 `
@@ -75,6 +81,7 @@ const AccountName = styled.h1`
 
 const AccountAddress = styled.div`
   font-size: 13px;
+  line-height: 13px;
 `
 
 const UpgradeIcon = styled(ArrowCircleDownIcon)`
@@ -94,8 +101,6 @@ export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
   accountAddress,
   networkId,
-  outline,
-  highlight,
   deploying,
   upgrade,
   connected,
@@ -103,7 +108,7 @@ export const AccountListItem: FC<IAccountListItem> = ({
   ...rest
 }) => {
   return (
-    <AccountListItemWrapper outline={outline} highlight={highlight} {...rest}>
+    <AccountListItemWrapper {...rest}>
       <ProfilePicture
         src={getNetworkAccountImageUrl({
           accountName,
