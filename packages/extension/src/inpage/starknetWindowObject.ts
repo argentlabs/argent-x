@@ -1,10 +1,10 @@
 import { defaultProvider } from "starknet"
 
 import { assertNever } from "./../ui/services/assertNever"
-import { WindowMessageType } from "../shared/messages"
-import { getProvider } from "../shared/network"
+import type { WindowMessageType } from "../shared/messages"
+import { getProvider } from "../shared/network/provider"
 import { ArgentXAccount } from "./ArgentXAccount"
-import {
+import type {
   AccountChangeEventHandler,
   NetworkChangeEventHandler,
   StarknetWindowObject,

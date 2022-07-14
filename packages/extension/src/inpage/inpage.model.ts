@@ -1,6 +1,6 @@
 import type { AccountInterface, Provider } from "starknet"
 
-import { Network } from "../shared/network"
+import type { Network } from "../shared/network"
 
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
