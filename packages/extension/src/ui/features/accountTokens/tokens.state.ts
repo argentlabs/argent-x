@@ -43,19 +43,12 @@ export const useToken = (baseToken: BaseToken): Token | undefined => {
 export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
-  console.log("a", account?.networkId)
   const selectedAccount = useAccount(account)
-  console.log("b", selectedAccount?.networkId)
   const networkId = useMemo(() => {
     return selectedAccount?.networkId ?? ""
   }, [selectedAccount?.networkId])
-  console.log("c", networkId)
 
   const tokensInNetwork = useTokensInNetwork(networkId)
-  console.log(
-    "d",
-    tokensInNetwork.map((t) => t.networkId),
-  )
 
   const tokenAddresses = useMemo(
     () => tokensInNetwork.map((t) => t.address),

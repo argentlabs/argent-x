@@ -19,7 +19,6 @@ export const transactionTracker: TransactionTracker = {
       uniqAccounts,
       allTransactions,
     )
-    console.log("historyTransactions", historyTransactions)
     return transactionsStore.add(historyTransactions)
   },
   async update() {

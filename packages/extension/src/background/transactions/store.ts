@@ -45,12 +45,10 @@ transactionsStore.subscribe((_, changeSet) => {
     changeSet.newValue ?? [],
     equalTransactionWithStatus,
   )
+
+  // TODO: add badge to extension icon
+
   if (updatedTransactions.length > 0) {
-    console.log(
-      "transactionsStore updated",
-      updatedTransactions.length,
-      updatedTransactions,
-    )
     notifyAboutCompletedTransactions(updatedTransactions)
   }
 })
