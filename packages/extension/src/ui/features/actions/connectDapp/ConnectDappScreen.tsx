@@ -110,12 +110,14 @@ const Title = styled.div`
   font-weight: 600;
   font-size: 17px;
   margin-top: 16px;
+  text-align: center;
 `
 
 const Host = styled.div`
   font-size: 15px;
   color: ${({ theme }) => theme.text2};
   margin-bottom: 8px;
+  text-align: center;
 `
 
 const HR = styled.div`

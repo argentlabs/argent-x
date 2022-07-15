@@ -15,10 +15,10 @@ const Container = styled.div<IContainer>`
   width: 100%;
   height: 100%;
   border-radius: 500px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: ${({ iconUrl }) =>
+    iconUrl ? "white" : "rgba(255, 255, 255, 0.15)"};
   background-size: cover;
-  background-image: ${({ iconUrl }) =>
-    iconUrl ? `url(${iconUrl})` : "none"}; ;
+  background-image: ${({ iconUrl }) => (iconUrl ? `url(${iconUrl})` : "none")};
 `
 
 export const DappIcon: FC<IDappIcon> = ({ host, ...rest }) => {
