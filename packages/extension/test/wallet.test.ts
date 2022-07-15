@@ -10,7 +10,7 @@ import {
   Wallet,
   WalletStorageProps,
 } from "../src/background/wallet"
-import { Network } from "../src/shared/networks"
+import { Network } from "../src/shared/network"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
 import { MockStorage } from "./mock"

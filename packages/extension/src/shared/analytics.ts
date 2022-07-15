@@ -14,10 +14,8 @@ export interface Events {
   sessionStart: undefined
   openedExtensionToday: undefined
   unlockedExtensionToday: undefined
-  voyagerCalled: {
-    networkId: string
-    endpoint: "txns"
-  }
+  unlockedExtensionWeekly: undefined
+  unlockedExtensionMonthly: undefined
   createWallet:
     | {
         status: "success"

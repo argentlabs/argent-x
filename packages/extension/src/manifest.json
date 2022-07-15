@@ -1,7 +1,8 @@
 {
+  "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "name": "Argent X",
   "description": "The security of Ethereum with the scale of StarkNet",
-  "version": "4.3.1",
+  "version": "4.4.1",
   "manifest_version": 2,
   "browser_action": {
     "default_icon": {
@@ -13,6 +14,7 @@
     "default_popup": "index.html"
   },
   "permissions": [
+    "alarms",
     "downloads",
     "tabs",
     "storage",

@@ -23,7 +23,8 @@ export const useBackgroundSettingsValue = <T extends SettingsStorageValue>(
     if (!initialised) {
       setInitialised(true)
     }
-  }, [initialised, key])
+    // dont rerun when initialised changes, as it would cause an infinite loop
+  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setValue = useCallback(
     async (value: T) => {

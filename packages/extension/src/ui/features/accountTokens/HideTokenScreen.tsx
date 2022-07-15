@@ -2,13 +2,15 @@ import { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { removeToken } from "../../../shared/token/storage"
+import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
 import { routes } from "../../routes"
 import { FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
-import { removeToken, useTokens } from "./tokens.state"
+import { useToken } from "./tokens.state"
 
 export const HideTokenAlert = styled(Alert)`
   padding-top: 32px;
@@ -33,11 +35,14 @@ export const TokenName = styled.h3`
 
 export const HideTokenScreen: FC = () => {
   const navigate = useNavigate()
+  const { switcherNetworkId } = useAppState()
   const { tokenAddress } = useParams()
-  const { tokens } = useTokens()
+  const token = useToken({
+    address: tokenAddress || "0x0",
+    networkId: switcherNetworkId || "Unknown",
+  })
   const [error, setError] = useState("")
 
-  const token = tokens.find(({ address }) => address === tokenAddress)
   if (!token) {
     return <Navigate to={routes.accountTokens()} />
   }
@@ -46,7 +51,7 @@ export const HideTokenScreen: FC = () => {
 
   const handleSubmit = () => {
     try {
-      removeToken(token.address)
+      removeToken(token)
       navigate(routes.accountTokens())
     } catch {
       setError("Token not hidden")

@@ -5,33 +5,8 @@ import { HandleMessage, UnhandledMessage } from "../background"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
-> = async ({
-  msg,
-  background: { wallet, transactionTracker, actionQueue },
-  sendToTabAndUi,
-}) => {
+> = async ({ msg, background: { wallet, actionQueue }, sendToTabAndUi }) => {
   switch (msg.type) {
-    case "GET_TRANSACTIONS": {
-      const transactions = await transactionTracker.getAll()
-
-      return sendToTabAndUi({
-        type: "GET_TRANSACTIONS_RES",
-        data: transactions,
-      })
-    }
-
-    case "GET_TRANSACTION": {
-      const tracked = await transactionTracker.get({
-        hash: msg.data.hash,
-        account: { networkId: msg.data.network },
-      })
-      if (tracked) {
-        return sendToTabAndUi({ type: "GET_TRANSACTION_RES", data: tracked })
-      }
-
-      return sendToTabAndUi({ type: "GET_TRANSACTION_REJ" })
-    }
-
     case "EXECUTE_TRANSACTION": {
       const { meta } = await actionQueue.push({
         type: "TRANSACTION",

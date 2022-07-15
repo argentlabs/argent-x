@@ -27,7 +27,7 @@ export type ActionItem =
       type: "REQUEST_TOKEN"
       payload: {
         address: string
-        decimals?: string
+        decimals?: number
         name?: string
         symbol?: string
         networkId?: string

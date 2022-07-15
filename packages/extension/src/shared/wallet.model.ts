@@ -1,4 +1,4 @@
-import type { Network } from "./networks"
+import { Network } from "./network"
 
 export interface WalletAccountSigner {
   type: "local_secret"

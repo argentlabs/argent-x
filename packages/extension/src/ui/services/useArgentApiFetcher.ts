@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 
 import { fetcherWithArgentApiHeadersForNetwork } from "../../shared/api/fetcher"
-import { KnownNetworksType } from "../../shared/networks"
+import { PublicNetworkIds } from "../../shared/network/public"
 import { useAppState } from "../app.state"
 
 /**
@@ -15,7 +15,7 @@ export const useArgentApiFetcher = () => {
   const { switcherNetworkId } = useAppState()
   const fetcher = useMemo(() => {
     return fetcherWithArgentApiHeadersForNetwork(
-      switcherNetworkId as KnownNetworksType,
+      switcherNetworkId as PublicNetworkIds,
     )
   }, [switcherNetworkId])
   return fetcher

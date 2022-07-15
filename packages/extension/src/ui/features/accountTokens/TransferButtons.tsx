@@ -2,7 +2,7 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
-import { getFeeToken } from "../../../shared/token"
+import { getFeeToken } from "../../../shared/token/utils"
 import { useAppState } from "../../app.state"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
