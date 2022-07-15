@@ -9,12 +9,8 @@ import {
   removePreAuthorizationAllAccounts,
   resetPreAuthorizations,
 } from "../src/background/preAuthorizations"
-// import { clearStorage } from "../src/background/storage"
 
 describe("preAuthorizations", () => {
-  // afterEach(async () => {
-  //   await clearStorage()
-  // })
   describe("original implementation pre-authorized all acounts", () => {
     test("manages authorization state correctly", async () => {
       expect(await isPreAuthorizedAllAccounts("foo.xyz")).toBeFalsy()
