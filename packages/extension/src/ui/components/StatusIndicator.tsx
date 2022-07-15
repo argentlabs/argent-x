@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
-import { NetworkStatus } from "../../shared/networks"
+import { NetworkStatus } from "../../shared/network"
 import { assertNever } from "../services/assertNever"
 import { NetworkWarningIcon } from "./Icons/NetworkWarningIcon"
 

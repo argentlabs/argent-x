@@ -3,10 +3,11 @@ import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
+import { addTransaction } from "./transactions/store"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
-  background: { wallet, transactionTracker, actionQueue },
+  background: { wallet, actionQueue },
   messagingKeys: { privateKey },
   sendToTabAndUi,
 }) => {
@@ -30,7 +31,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       const network = msg.data
       try {
         const { account, txHash } = await wallet.addAccount(network)
-        transactionTracker.addAccount(account, {
+        addTransaction({
           hash: txHash,
           account,
           meta: { title: "Deploy wallet" },

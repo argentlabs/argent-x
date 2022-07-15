@@ -19,7 +19,7 @@ import {
   defaultNetwork,
   defaultNetworks,
   getProvider,
-} from "../shared/networks"
+} from "../shared/network"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"

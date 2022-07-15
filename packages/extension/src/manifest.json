@@ -14,6 +14,7 @@
     "default_popup": "index.html"
   },
   "permissions": [
+    "alarms",
     "downloads",
     "tabs",
     "storage",

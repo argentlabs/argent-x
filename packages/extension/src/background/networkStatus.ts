@@ -1,6 +1,6 @@
 import urljoin from "url-join"
 
-import { Network, NetworkStatus } from "../shared/networks"
+import { Network, NetworkStatus } from "../shared/network"
 import { Storage } from "./storage/default"
 import { createStaleWhileRevalidateCache } from "./swr"
 import { fetchWithTimeout } from "./utils/fetchWithTimeout"

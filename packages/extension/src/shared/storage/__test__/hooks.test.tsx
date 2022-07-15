@@ -5,7 +5,6 @@ import { ArrayStorage } from "../array"
 import { useArrayStorage, useKeyValueStorage, useObjectStorage } from "../hooks"
 import { KeyValueStorage } from "../keyvalue"
 import { ObjectStorage } from "../object"
-import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("useKeyValueStorage()", () => {
   test("should render with storage values", async () => {
@@ -14,7 +13,6 @@ describe("useKeyValueStorage()", () => {
         message: "Hello World!",
       },
       "ui-test-kv",
-      chromeStorageMock,
     )
 
     function Component() {
@@ -42,11 +40,7 @@ describe("useKeyValueStorage()", () => {
 
 describe("useObjectStorage()", () => {
   test("should render with storage values", async () => {
-    const store = new ObjectStorage(
-      "Hello World!",
-      "ui-test-object",
-      chromeStorageMock,
-    )
+    const store = new ObjectStorage("Hello World!", "ui-test-object")
 
     function Component() {
       const data = useObjectStorage(store)
@@ -73,11 +67,7 @@ describe("useObjectStorage()", () => {
 
 describe("useArrayStorage()", () => {
   test("should render with storage values", async () => {
-    const store = new ArrayStorage(
-      ["Hello", "World!"],
-      "ui-test-array",
-      chromeStorageMock,
-    )
+    const store = new ArrayStorage(["Hello", "World!"], "ui-test-array")
 
     function Component() {
       const data = useArrayStorage(store)

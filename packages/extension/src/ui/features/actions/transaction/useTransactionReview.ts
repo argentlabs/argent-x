@@ -3,7 +3,7 @@ import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
-import { KnownNetworksType } from "../../../../shared/networks"
+import { PublicNetworkIds } from "../../../../shared/network/public"
 import { isPrivacySettingsEnabled } from "../../../../shared/settings"
 import {
   ApiTransactionReviewResponse,
@@ -45,7 +45,7 @@ export const useTransactionReview = ({
       return
     }
     const network = argentApiNetworkForNetwork(
-      account.networkId as KnownNetworksType,
+      account.networkId as PublicNetworkIds,
     )
     const accountAddress = account.address
     return fetchTransactionReview({

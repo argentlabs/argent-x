@@ -52,7 +52,7 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
         } = JSON.parse(encode.arrayBufferToString(plaintext))
 
         await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-        transactionTracker.load(await wallet.getAccounts())
+        transactionTracker.loadHistory(await wallet.getAccounts())
 
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
       } catch (error) {

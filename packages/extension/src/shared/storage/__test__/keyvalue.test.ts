@@ -1,5 +1,4 @@
 import { IKeyValueStorage, KeyValueStorage } from "../keyvalue"
-import { chromeStorageMock } from "./chrome-storage.mock"
 
 describe("full storage flow", () => {
   let store: IKeyValueStorage<{
@@ -9,7 +8,6 @@ describe("full storage flow", () => {
     store = new KeyValueStorage<{ foo: string }>(
       { foo: "bar" },
       { namespace: "test", areaName: "local" },
-      chromeStorageMock,
     )
   })
   test("throw when storage area is invalid", () => {
@@ -17,7 +15,6 @@ describe("full storage flow", () => {
       new KeyValueStorage<{ foo: string }>(
         { foo: "bar" },
         { namespace: "test", areaName: "invalid" as any },
-        chromeStorageMock,
       )
     }).toThrowErrorMatchingInlineSnapshot('"Unknown storage area: invalid"')
   })
@@ -45,7 +42,6 @@ describe("full storage flow with subscription", () => {
     store = new KeyValueStorage<{ foo: string }>(
       { foo: "bar" },
       { namespace: "test", areaName: "local" },
-      chromeStorageMock,
     )
   })
   test("should write and notify", async () => {
@@ -54,7 +50,10 @@ describe("full storage flow with subscription", () => {
     await store.setItem("foo", "baz")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("baz")
+    expect(handler).toHaveBeenCalledWith("baz", {
+      newValue: "baz",
+      oldValue: undefined,
+    })
     const value = await store.getItem("foo")
     expect(value).toBe("baz")
     unsub()
@@ -65,7 +64,10 @@ describe("full storage flow with subscription", () => {
     await store.removeItem("foo")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith(undefined)
+    expect(handler).toHaveBeenCalledWith(undefined, {
+      oldValue: "baz",
+      newValue: undefined,
+    })
     const value = await store.getItem("foo")
     expect(value).toBe("bar")
     unsub()

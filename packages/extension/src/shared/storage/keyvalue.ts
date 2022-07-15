@@ -1,12 +1,13 @@
 import browser from "webextension-polyfill"
 
-import {
-  Implementations,
-  StorageArea,
-  getDefaultImplementations,
-} from "./implementations"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
-import { AllowPromise, AreaName, BaseStorage } from "./types"
+import {
+  AllowPromise,
+  AreaName,
+  BaseStorage,
+  StorageArea,
+  StorageChange,
+} from "./types"
 
 export interface IKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
@@ -16,7 +17,7 @@ export interface IKeyValueStorage<
   removeItem<K extends keyof T>(key: K): Promise<void>
   subscribe<K extends keyof T>(
     key: K,
-    callback: (value: T[K]) => AllowPromise<void>,
+    callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
   ): () => void
 }
 
@@ -31,12 +32,11 @@ export class KeyValueStorage<
   constructor(
     public readonly defaults: T,
     optionsOrNamespace: StorageOptionsOrNameSpace,
-    private readonly implementations: Implementations = getDefaultImplementations(),
   ) {
     const options = getOptionsWithDefaults(optionsOrNamespace)
     this.namespace = options.namespace
     this.areaName = options.areaName
-    this.storageImplementation = implementations[options.areaName]
+    this.storageImplementation = browser.storage[options.areaName]
 
     if (!this.storageImplementation) {
       throw new Error(`Unknown storage area: ${options.areaName}`)
@@ -71,21 +71,21 @@ export class KeyValueStorage<
 
   public subscribe<K extends keyof T>(
     key: K,
-    callback: (value: T[K]) => AllowPromise<void>,
+    callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
   ): () => void {
     const storageKey = this.getStorageKey(key)
 
     const handler = async (
-      changes: Record<string, browser.storage.StorageChange>,
+      changes: Record<string, StorageChange>,
       areaName: browser.storage.AreaName,
     ) => {
       if (this.areaName === areaName && changes[storageKey]) {
-        callback(changes[storageKey].newValue)
+        callback(changes[storageKey].newValue, changes[storageKey])
       }
     }
 
-    this.implementations.onChanged.addListener(handler)
+    browser.storage.onChanged.addListener(handler)
 
-    return () => this.implementations.onChanged.removeListener(handler)
+    return () => browser.storage.onChanged.removeListener(handler)
   }
 }

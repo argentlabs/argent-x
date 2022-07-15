@@ -24,7 +24,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
-import { useNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork, useNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountSubHeader } from "./AccountSubheader"
@@ -58,7 +58,6 @@ interface AccountTokensProps {
 
 export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
@@ -67,11 +66,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
-  const { network } = useNetwork(switcherNetworkId)
+  const network = useCurrentNetwork()
 
   const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, switcherNetworkId),
+    [getAccountIdentifier(account), network.id, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, network.id),
     { suspense: false },
   )
 

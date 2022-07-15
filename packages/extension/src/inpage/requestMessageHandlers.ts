@@ -1,5 +1,5 @@
-import { Network } from "./../shared/networks"
-import {
+import type { Network } from "../shared/network"
+import type {
   AddStarknetChainParameters,
   WatchAssetParameters,
 } from "./inpage.model"

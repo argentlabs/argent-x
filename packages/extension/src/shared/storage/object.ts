@@ -1,9 +1,8 @@
 import { isPlainObject, merge } from "lodash-es"
 
-import { Implementations, getDefaultImplementations } from "./implementations"
 import { KeyValueStorage } from "./keyvalue"
 import { StorageOptions, StorageOptionsOrNameSpace } from "./options"
-import { AreaName, BaseStorage } from "./types"
+import { AreaName, BaseStorage, StorageChange } from "./types"
 
 type AllowPromise<T> = T | Promise<T>
 
@@ -18,7 +17,9 @@ type SetterFn<T> = (value: T) => Partial<T>
 export interface IObjectStorage<T> extends BaseStorage<T> {
   get(): Promise<T>
   set(value: Partial<T> | SetterFn<T>): Promise<void>
-  subscribe(callback: (value: T) => AllowPromise<void>): () => void
+  subscribe(
+    callback: (value: T, changeSet: StorageChange<T>) => AllowPromise<void>,
+  ): () => void
 }
 
 export class ObjectStorage<T> implements IObjectStorage<T> {
@@ -33,7 +34,6 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   constructor(
     public readonly defaults: T,
     optionsOrNamespace: StorageOptionsOrNameSpace<ObjectStorageOptions<T>>,
-    implementations: Implementations = getDefaultImplementations(),
   ) {
     const passThrough = (value: any) => value
     function defaultMerge(oldValue: T, newValue: T) {
@@ -60,7 +60,6 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
         inner: this.serialize(this.defaults),
       },
       optionsOrNamespace,
-      implementations,
     )
 
     this.areaName = this.storageImplementation.areaName
@@ -80,9 +79,22 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
     )
   }
 
-  public subscribe(callback: (value: T) => AllowPromise<void>): () => void {
-    return this.storageImplementation.subscribe("inner", (t) => {
-      return callback(this.deserialize(t))
+  private deserializeChangeSet(changeSet: StorageChange): StorageChange<T> {
+    return {
+      ...(changeSet.oldValue && {
+        oldValue: this.deserialize(changeSet.oldValue),
+      }),
+      ...(changeSet.newValue && {
+        newValue: this.deserialize(changeSet.newValue),
+      }),
+    }
+  }
+
+  public subscribe(
+    callback: (value: T, changeSet: StorageChange<T>) => AllowPromise<void>,
+  ): () => void {
+    return this.storageImplementation.subscribe("inner", (t, c) => {
+      return callback(this.deserialize(t), this.deserializeChangeSet(c))
     })
   }
 }

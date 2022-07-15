@@ -4,14 +4,13 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Network, NetworkSchema } from "../../../shared/networks"
+import { Network, addNetwork, networkSchema } from "../../../shared/network"
 import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { makeClickable } from "../../services/a11y"
-import { addNetworks } from "../../services/backgroundNetworks"
 import { A, FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { slugify } from "./slugify"
@@ -57,7 +56,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
     // due to an or type we need to check different values depending on the mode
   }, [props.mode === "add" || props.network]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const yupSchemaValidator = useYupValidationResolver(NetworkSchema)
+  const yupSchemaValidator = useYupValidationResolver(networkSchema)
   const {
     handleSubmit,
     formState: { errors },
@@ -91,7 +90,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
         onSubmit={handleSubmit(async (network) => {
           try {
             useAppState.setState({ isLoading: true })
-            await addNetworks([network])
+            await addNetwork(network)
             navigate(-1)
           } finally {
             useAppState.setState({ isLoading: false })

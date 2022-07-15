@@ -27,3 +27,23 @@ export interface BaseStorage<T> {
   namespace: string
   areaName: AreaName
 }
+
+export type OnChanged = Pick<
+  browser.storage.StorageChangedEvent,
+  "addListener" | "removeListener"
+>
+export type StorageArea = Pick<
+  browser.storage.StorageArea,
+  "get" | "set" | "remove"
+>
+
+export type Implementations = Record<AreaName, StorageArea> & {
+  onChanged: OnChanged
+}
+
+export interface StorageChange<T = any> {
+  /** Optional. The new value of the item, if there is a new value. */
+  newValue?: T
+  /** Optional. The old value of the item, if there was an old value. */
+  oldValue?: T
+}
