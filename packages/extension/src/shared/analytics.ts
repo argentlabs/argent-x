@@ -14,6 +14,8 @@ export interface Events {
   sessionStart: undefined
   openedExtensionToday: undefined
   unlockedExtensionToday: undefined
+  unlockedExtensionWeekly: undefined
+  unlockedExtensionMonthly: undefined
   createWallet:
     | {
         status: "success"
