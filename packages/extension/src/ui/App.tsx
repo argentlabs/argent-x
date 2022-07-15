@@ -4,11 +4,13 @@ import { SWRConfig } from "swr"
 
 import AppErrorBoundaryFallback from "./AppErrorBoundaryFallback"
 import { AppRoutes } from "./AppRoutes"
+import { ErrorBoundary } from "./components/ErrorBoundary"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { useExtensionIsInTab } from "./features/browser/tabs"
 import DevUI from "./features/dev/DevUI"
 import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
+import { useSentryInit } from "./services/sentry"
 import { swrCacheProvider } from "./services/swr"
 import {
   FixedGlobalStyle,
@@ -16,8 +18,6 @@ import {
   ThemedGlobalStyle,
   muiTheme,
 } from "./theme"
-import * as Sentry from "@sentry/react"
-import { useSentryInit } from "./services/sentry"
 
 export const App: FC = () => {
   useTracking()
@@ -37,11 +37,11 @@ export const App: FC = () => {
           {process.env.SHOW_DEV_UI && <DevUI />}
           <StyledComponentsThemeProvider>
             <ThemedGlobalStyle />
-            <Sentry.ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
+            <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
               <Suspense fallback={<LoadingScreen />}>
                 <AppRoutes />
               </Suspense>
-            </Sentry.ErrorBoundary>
+            </ErrorBoundary>
           </StyledComponentsThemeProvider>
         </MuiThemeProvider>
       </SWRConfig>

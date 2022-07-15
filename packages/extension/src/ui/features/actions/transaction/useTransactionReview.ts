@@ -54,9 +54,9 @@ export const useTransactionReview = ({
       transactions,
       fetcher,
     })
-  }, [account, transactions])
+  }, [account, fetcher, transactions])
   return useConditionallyEnabledSWR<ApiTransactionReviewResponse>(
-    transactionReviewEnabled,
+    !!transactionReviewEnabled,
     [actionHash, "transactionReview"],
     transactionReviewFetcher,
   )

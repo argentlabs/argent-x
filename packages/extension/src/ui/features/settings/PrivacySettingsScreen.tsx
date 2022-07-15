@@ -1,5 +1,6 @@
 import { FC } from "react"
 
+import { ISettingsStorage } from "../../../shared/settings"
 import { IconBar } from "../../components/IconBar"
 import { LazyInitialisedIOSSwitch } from "../../components/IOSSwitch"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
@@ -13,13 +14,25 @@ export const PrivacySettingsScreen: FC = () => {
     initialised: privacyUseArgentServicesInitialised,
     value: privacyUseArgentServicesValue,
     setValue: setPrivacyUseArgentServicesValue,
-  } = useBackgroundSettingsValue("privacyUseArgentServices")
+  } = useBackgroundSettingsValue<ISettingsStorage["privacyUseArgentServices"]>(
+    "privacyUseArgentServices",
+  )
 
   const {
     initialised: privacyShareAnalyticsDataInitialised,
     value: privacyShareAnalyticsDataValue,
     setValue: setPrivacyShareAnalyticsDataValue,
-  } = useBackgroundSettingsValue("privacyShareAnalyticsData")
+  } = useBackgroundSettingsValue<ISettingsStorage["privacyShareAnalyticsData"]>(
+    "privacyShareAnalyticsData",
+  )
+
+  const {
+    initialised: privacyErrorReportingInitialised,
+    value: privacyErrorReportingValue,
+    setValue: setPrivacyErrorReportingValue,
+  } = useBackgroundSettingsValue<ISettingsStorage["privacyErrorReporting"]>(
+    "privacyErrorReporting",
+  )
 
   return (
     <>
@@ -41,6 +54,20 @@ export const PrivacySettingsScreen: FC = () => {
             Use the Argent backend for token pricing, rich activity feed,
             transaction review & assessment
           </P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem>
+          <Title>
+            <span>Automatic Error Reporting</span>
+            <LazyInitialisedIOSSwitch
+              initialised={privacyErrorReportingInitialised}
+              checked={privacyErrorReportingValue}
+              onClick={() =>
+                setPrivacyErrorReportingValue(!privacyErrorReportingValue)
+              }
+            />
+          </Title>
+          <P>Automatically share crash logs with Argent</P>
         </SettingsItem>
         <hr />
         {ANALYTICS_UI_ENABLED && (

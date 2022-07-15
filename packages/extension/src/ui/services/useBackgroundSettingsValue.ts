@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { messageStream } from "../../shared/messages"
-import { ISettingsStorage } from "../../shared/settings"
+import { ISettingsStorage, SettingsStorageValue } from "../../shared/settings"
 import { getSetting, removeSetting, setSetting } from "./backgroundSettings"
 
 /**
@@ -10,21 +10,23 @@ import { getSetting, removeSetting, setSetting } from "./backgroundSettings"
  * @param key the key of the value to use
  */
 
-export const useBackgroundSettingsValue = (key: keyof ISettingsStorage) => {
+export const useBackgroundSettingsValue = <T extends SettingsStorageValue>(
+  key: keyof ISettingsStorage,
+) => {
   const [initialised, setInitialised] = useState<boolean>(false)
-  const [storedValue, setStoredValue] = useState<any>(null)
+  const [storedValue, setStoredValue] = useState<T>()
 
   /** read the value async from storage then update in hook state */
   const updateStoredValue = useCallback(async () => {
-    const value = await getSetting(key as keyof ISettingsStorage)
+    const value = (await getSetting(key as keyof ISettingsStorage)) as T
     setStoredValue(value)
     if (!initialised) {
       setInitialised(true)
     }
-  }, [key])
+  }, [initialised, key])
 
   const setValue = useCallback(
-    async (value: any) => {
+    async (value: T) => {
       await setSetting(key, value)
     },
     [key],
@@ -47,7 +49,7 @@ export const useBackgroundSettingsValue = (key: keyof ISettingsStorage) => {
         subscription.unsubscribe()
       }
     }
-  }, [updateStoredValue])
+  }, [key, updateStoredValue])
 
   return {
     initialised,
