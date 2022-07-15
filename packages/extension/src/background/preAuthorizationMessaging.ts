@@ -50,6 +50,13 @@ export const handlePreAuthorizationMessage: HandleMessage<
       return openUi()
     }
 
+    case "PREAUTHORIZE": {
+      return actionQueue.push({
+        type: "CONNECT_DAPP",
+        payload: { host: msg.data },
+      })
+    }
+
     case "IS_PREAUTHORIZED": {
       const selectedAccount = await wallet.getSelectedAccount()
       const valid = await isPreAuthorized({
