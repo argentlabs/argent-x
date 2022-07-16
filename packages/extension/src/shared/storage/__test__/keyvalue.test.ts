@@ -58,13 +58,13 @@ describe("full storage flow with subscription", () => {
     expect(value).toBe("baz")
     unsub()
   })
-  test("should remove and notify", async () => {
+  test("should remove, fallback to default and notify", async () => {
     const handler = vi.fn()
     const unsub = store.subscribe("foo", handler)
     await store.delete("foo")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith(undefined, {
+    expect(handler).toHaveBeenCalledWith("bar", {
       oldValue: "baz",
       newValue: undefined,
     })
