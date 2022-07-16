@@ -19,17 +19,17 @@ describe("full storage flow", () => {
     }).toThrowErrorMatchingInlineSnapshot('"Unknown storage area: invalid"')
   })
   test("should return defaults", async () => {
-    const value = await store.getItem("foo")
+    const value = await store.get("foo")
     expect(value).toBe("bar")
   })
   test("should write", async () => {
-    await store.setItem("foo", "baz")
-    const value = await store.getItem("foo")
+    await store.set("foo", "baz")
+    const value = await store.get("foo")
     expect(value).toBe("baz")
   })
   test("should remove and return default value", async () => {
-    await store.removeItem("foo")
-    const value = await store.getItem("foo")
+    await store.delete("foo")
+    const value = await store.get("foo")
     expect(value).toBe("bar") // default
   })
 })
@@ -47,28 +47,28 @@ describe("full storage flow with subscription", () => {
   test("should write and notify", async () => {
     const handler = vi.fn()
     const unsub = store.subscribe("foo", handler)
-    await store.setItem("foo", "baz")
+    await store.set("foo", "baz")
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith("baz", {
       newValue: "baz",
       oldValue: undefined,
     })
-    const value = await store.getItem("foo")
+    const value = await store.get("foo")
     expect(value).toBe("baz")
     unsub()
   })
   test("should remove and notify", async () => {
     const handler = vi.fn()
     const unsub = store.subscribe("foo", handler)
-    await store.removeItem("foo")
+    await store.delete("foo")
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(undefined, {
       oldValue: "baz",
       newValue: undefined,
     })
-    const value = await store.getItem("foo")
+    const value = await store.get("foo")
     expect(value).toBe("bar")
     unsub()
   })
@@ -76,7 +76,7 @@ describe("full storage flow with subscription", () => {
     const handler = vi.fn()
     const unsub = store.subscribe("foo", handler)
     unsub()
-    await store.setItem("foo", "baz")
+    await store.set("foo", "baz")
     expect(handler).not.toHaveBeenCalled()
   })
 })

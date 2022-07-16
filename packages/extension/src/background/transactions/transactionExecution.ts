@@ -71,7 +71,7 @@ export const executeTransaction = async (
   })
 
   if (!nonceWasProvidedByUI) {
-    increaseStoredNonce(selectedAccount)
+    await increaseStoredNonce(selectedAccount)
   }
   return transaction
 }

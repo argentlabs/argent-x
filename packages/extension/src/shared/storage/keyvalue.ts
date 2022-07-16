@@ -12,9 +12,9 @@ import {
 export interface IKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
 > extends BaseStorage<T> {
-  getItem<K extends keyof T>(key: K): Promise<T[K]>
-  setItem<K extends keyof T>(key: K, value: T[K]): Promise<void>
-  removeItem<K extends keyof T>(key: K): Promise<void>
+  get<K extends keyof T>(key: K): Promise<T[K]>
+  set<K extends keyof T>(key: K, value: T[K]): Promise<void>
+  delete<K extends keyof T>(key: K): Promise<void>
   subscribe<K extends keyof T>(
     key: K,
     callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
@@ -47,7 +47,7 @@ export class KeyValueStorage<
     return this.namespace + ":" + key.toString()
   }
 
-  public async getItem<K extends keyof T>(key: K): Promise<T[K]> {
+  public async get<K extends keyof T>(key: K): Promise<T[K]> {
     const storageKey = this.getStorageKey(key)
     try {
       const valueFromStorage = await this.storageImplementation.get(storageKey)
@@ -59,12 +59,12 @@ export class KeyValueStorage<
       throw e
     }
   }
-  public async setItem<K extends keyof T>(key: K, value: T[K]): Promise<void> {
+  public async set<K extends keyof T>(key: K, value: T[K]): Promise<void> {
     const storageKey = this.getStorageKey(key)
     return this.storageImplementation.set({ [storageKey]: value })
   }
 
-  public async removeItem<K extends keyof T>(key: K): Promise<void> {
+  public async delete<K extends keyof T>(key: K): Promise<void> {
     const storageKey = this.getStorageKey(key)
     return this.storageImplementation.remove(storageKey)
   }

@@ -22,7 +22,7 @@ describe("useKeyValueStorage()", () => {
           <p>{data}</p>
           <button
             onClick={() => {
-              store.setItem("message", "Bye World!")
+              store.set("message", "Bye World!")
             }}
           >
             change value

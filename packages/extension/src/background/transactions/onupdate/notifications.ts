@@ -27,7 +27,7 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
       }
       // on error remove stored (increased) nonce
       if (transaction.account && status === "REJECTED") {
-        resetStoredNonce(transaction.account)
+        await resetStoredNonce(transaction.account)
       }
     }
   }

@@ -18,7 +18,7 @@ export function useKeyValueStorage<
   )
 
   useEffect(() => {
-    storage.getItem(key).then(setValue)
+    storage.get(key).then(setValue)
     const sub = storage.subscribe(key, setValue)
     return () => sub()
   }, [storage, key])

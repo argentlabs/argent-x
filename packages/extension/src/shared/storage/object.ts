@@ -67,13 +67,13 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   }
 
   public async get(): Promise<T> {
-    return this.deserialize(await this.storageImplementation.getItem("inner"))
+    return this.deserialize(await this.storageImplementation.get("inner"))
   }
 
   public async set(setter: Partial<T> | SetterFn<T>): Promise<void> {
     const oldState = await this.get()
     const value = typeof setter === "function" ? setter(oldState) : setter
-    return this.storageImplementation.setItem(
+    return this.storageImplementation.set(
       "inner",
       this.serialize(this.merge(oldState, value as T)),
     )
