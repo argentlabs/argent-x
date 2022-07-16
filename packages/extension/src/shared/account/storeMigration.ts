@@ -7,24 +7,26 @@ import { accountsEqual } from "../wallet.service"
 import { addAccounts } from "./store"
 
 export async function migrateWalletAccounts() {
-  const needsMigration = (await browser.storage.local.get("wallet:accounts"))[
-    "wallet:accounts"
-  ]
+  try {
+    const needsMigration = (await browser.storage.local.get("wallet:accounts"))[
+      "wallet:accounts"
+    ]
 
-  if (!needsMigration) {
-    return
+    if (!needsMigration) {
+      return
+    }
+
+    const oldAccounts: WalletAccount[] = JSON.parse(needsMigration)
+    const [newAccounts] = await checkAccountsForMigration(oldAccounts)
+
+    await addAccounts(newAccounts)
+    return browser.storage.local.remove("wallet:accounts")
+  } catch (e) {
+    console.error(e)
   }
-
-  const oldAccounts: WalletAccount[] = JSON.parse(needsMigration)
-  console.log(oldAccounts)
-  const [newAccounts] = await migrateAccounts(oldAccounts)
-  console.log("new", newAccounts)
-
-  await addAccounts(newAccounts)
-  //   return browser.storage.local.remove("wallet:accounts")
 }
 
-async function migrateAccounts(accounts: WalletAccount[]) {
+async function checkAccountsForMigration(accounts: WalletAccount[]) {
   // migrate from storing network to just storing networkId
   // populate network back from networkId
   const accountsWithNetworkAndMigrationStatus = await Promise.all(

@@ -21,7 +21,11 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/network"
-import { IArrayStorage, IKeyValueStorage } from "../shared/storage"
+import {
+  IArrayStorage,
+  IKeyValueStorage,
+  KeyValueStorage,
+} from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
@@ -83,6 +87,11 @@ function calculateContractAddress(
     constructorCalldataHash,
   ])
 }
+
+export const walletStore = new KeyValueStorage<WalletStorageProps>(
+  {},
+  "core:wallet",
+)
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -552,7 +561,7 @@ export class Wallet {
 
   private async readBackup() {
     this.encryptedBackup = await this.store.get("backup")
-    console.log("read backup", this.encryptedBackup)
+
     if (this.encryptedBackup === undefined) {
       return
     }

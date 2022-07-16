@@ -1,13 +1,12 @@
 import browser from "webextension-polyfill"
 
 import { accountStore, getAccounts } from "../shared/account/store"
-import { migrateWalletAccounts } from "../shared/account/storeMigration"
 import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
-import { KeyValueStorage } from "../shared/storage"
 import { delay } from "../shared/utils/delay"
+import { migrateWallet } from "../shared/wallet/storeMigration"
 import { handleAccountMessage } from "./accountMessaging"
 import { loadContracts } from "./accounts"
 import { handleActionMessage } from "./actionMessaging"
@@ -30,7 +29,7 @@ import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
-import { Wallet, WalletStorageProps } from "./wallet"
+import { Wallet, walletStore } from "./wallet"
 
 browser.alarms.create("core:transactionTracker:history", {
   periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager
@@ -41,11 +40,11 @@ browser.alarms.create("core:transactionTracker:update", {
 browser.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "core:transactionTracker:history") {
     console.info("~> fetching transaction history")
-    const storage = new KeyValueStorage<WalletStorageProps>({}, "core:wallet")
+
     const onAutoLock = () =>
       sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
     const wallet = new Wallet(
-      storage,
+      walletStore,
       accountStore,
       loadContracts,
       getNetwork,
@@ -78,15 +77,14 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
 
 // runs on startup
 ;(async () => {
-  await migrateWalletAccounts()
+  await migrateWallet()
 
   const messagingKeys = await getMessagingKeys()
-  const storage = new KeyValueStorage<WalletStorageProps>({}, "core:wallet")
 
   const onAutoLock = () =>
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
   const wallet = new Wallet(
-    storage,
+    walletStore,
     accountStore,
     loadContracts,
     getNetwork,
