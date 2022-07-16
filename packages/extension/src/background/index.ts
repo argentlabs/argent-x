@@ -4,6 +4,7 @@ import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
+import { delay } from "../shared/utils/delay"
 import { handleAccountMessage } from "./accountMessaging"
 import { loadContracts } from "./accounts"
 import { handleActionMessage } from "./actionMessaging"
@@ -58,7 +59,7 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     let runs = 0
     while (hasInFlightTransactions && runs < maxRetries) {
       console.info(`~> waiting ${waitTimeInS}s for transaction updates`)
-      await new Promise((resolve) => setTimeout(resolve, waitTimeInS * 1000))
+      await delay(waitTimeInS * 1000)
       console.info(
         "~> fetching transaction updates as pending transactions were detected",
       )
