@@ -87,7 +87,10 @@ export const SendNftScreen: FC = () => {
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
 
-  const addressBook = useAddressBook(account?.networkId || currentNetworkId)
+  const addressBook = useAddressBook(
+    account?.networkId || currentNetworkId,
+    account ? [account] : [],
+  )
 
   if (!account || !nft || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />
