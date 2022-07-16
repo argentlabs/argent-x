@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { differenceWith, find, union, uniqWith } from "lodash-es"
+import { find, union } from "lodash-es"
 import {
   Account,
   AddTransactionResponse,
@@ -14,13 +14,14 @@ import {
 } from "starknet/dist/utils/hash"
 import { BigNumberish } from "starknet/dist/utils/number"
 
+import { withHiddenSelector } from "../shared/account/selectors"
 import {
   Network,
   defaultNetwork,
   defaultNetworks,
   getProvider,
 } from "../shared/network"
-import { IKeyValueStorage } from "../shared/storage"
+import { IArrayStorage, IKeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
@@ -47,23 +48,6 @@ const PROXY_CONTRACT_CLASS_HASHES = [
 const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
   "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
 ]
-
-function mergeArrayStableWith<T>(
-  array: T[],
-  other: T[],
-  compareFn: (a: T, b: T) => boolean,
-): T[] {
-  const result = [...array]
-  for (const element of other) {
-    const index = result.findIndex((e) => compareFn(e, element))
-    if (index === -1) {
-      result.push(element)
-    } else {
-      result[index] = element
-    }
-  }
-  return result
-}
 
 interface WalletSession {
   secret: string
@@ -108,6 +92,7 @@ export class Wallet {
 
   constructor(
     private readonly store: IKeyValueStorage<WalletStorageProps>,
+    private readonly walletStore: IArrayStorage<WalletAccount>,
     private readonly loadContracts: LoadContracts,
     private readonly getNetwork: GetNetwork,
     private readonly onAutoLock?: () => Promise<void>,
@@ -143,136 +128,6 @@ export class Wallet {
 
     await this.writeBackup()
     this.setSession(ethersWallet.privateKey, password)
-  }
-
-  public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
-    const accounts = (await this.store.get("accounts")) || []
-
-    // migrate from storing network to just storing networkId
-    // populate network back from networkId
-    const accountsWithNetworkAndMigrationStatus = await Promise.all(
-      accounts.map(
-        async (
-          account,
-        ): Promise<{
-          needMigration: boolean
-          account: WalletAccount
-        }> => {
-          let needMigration = false
-          try {
-            const network = await this.getNetwork(
-              account.networkId || account.network?.id,
-            )
-            if (!network) {
-              throw new Error("Network not found")
-            }
-
-            // migrations needed
-            try {
-              if (account.network?.id) {
-                account.networkId = account.network.id
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                delete account.network
-
-                needMigration = true
-              }
-              // migrate signer.type local_signer to local_secret
-              if ((account.signer.type as any) !== "local_secret") {
-                // currently there is just one type of signer
-                account.signer.type = "local_secret"
-                needMigration = true
-              }
-            } catch {
-              // noop
-            }
-
-            return {
-              account: {
-                ...account,
-                network,
-              },
-              needMigration,
-            }
-          } catch {
-            return { account, needMigration }
-          }
-        },
-      ),
-    )
-
-    const accountsWithNetwork = accountsWithNetworkAndMigrationStatus.map(
-      (a) => a.account,
-    )
-
-    // combine accounts without duplicates
-    const uniqueAccounts = uniqWith(accountsWithNetwork, accountsEqual)
-
-    const needsWrite =
-      accountsWithNetworkAndMigrationStatus.some(
-        // some account requests migration
-        (account) => account.needMigration,
-      ) || accountsWithNetwork.length !== uniqueAccounts.length // some accounts were duplicated
-
-    if (needsWrite) {
-      // we store the network as it was at the creation date of the wallet. This may be useful in the future.
-      await this.store.set("accounts", uniqueAccounts)
-    }
-
-    return uniqueAccounts.filter((account) => includeHidden || !account.hidden)
-  }
-
-  private async addWalletAccounts(accounts: WalletAccount[]) {
-    const oldAccounts = await this.getAccounts(true)
-
-    // combine accounts without duplicates
-    const newAccounts = mergeArrayStableWith(
-      oldAccounts,
-      accounts,
-      accountsEqual,
-    )
-
-    // we store the network as it was at the creation date of the wallet. This may be useful in the future.
-    return this.store.set("accounts", newAccounts)
-  }
-
-  private async addWalletAccount(account: WalletAccount) {
-    return this.addWalletAccounts([account])
-  }
-
-  public async removeAccount(account: BaseWalletAccount) {
-    const accounts = await this.getAccounts(true)
-    const newAccounts = differenceWith(accounts, [account], accountsEqual)
-    return this.store.set("accounts", newAccounts)
-  }
-
-  public async hideAccount(account: BaseWalletAccount) {
-    const accounts = await this.getAccounts()
-
-    const fullAccount = find(accounts, (a) => accountsEqual(a, account))
-
-    if (!fullAccount) {
-      return
-    }
-
-    const hiddenAccount: WalletAccount = {
-      ...fullAccount,
-      hidden: true,
-    }
-
-    const newAccounts = mergeArrayStableWith(
-      accounts,
-      [hiddenAccount],
-      accountsEqual,
-    )
-
-    await this.store.set("accounts", newAccounts)
-
-    await this.writeBackup()
-  }
-
-  private resetAccounts() {
-    return this.store.set("accounts", [])
   }
 
   public async getSeedPhrase(): Promise<string> {
@@ -323,7 +178,7 @@ export class Wallet {
     )
     const accounts = accountsResults.flatMap((x) => x)
 
-    await this.addWalletAccounts(accounts)
+    await this.walletStore.push(accounts)
 
     this.store.set("discoveredOnce", true)
   }
@@ -476,7 +331,7 @@ export class Wallet {
       offset,
     )
 
-    await this.addWalletAccounts(accounts)
+    await this.walletStore.push(accounts)
   }
 
   public async addAccount(
@@ -490,7 +345,7 @@ export class Wallet {
 
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
-    const accounts = await this.getAccounts(true)
+    const accounts = await this.walletStore.get(withHiddenSelector)
     const currentPaths = accounts
       .filter(
         (account) =>
@@ -535,7 +390,7 @@ export class Wallet {
       },
     }
 
-    await this.addWalletAccount(account)
+    await this.walletStore.push([account])
 
     await this.writeBackup()
     await this.selectAccount(account)
@@ -544,7 +399,7 @@ export class Wallet {
   }
 
   public async getAccount(selector: BaseWalletAccount): Promise<WalletAccount> {
-    const accounts = await this.getAccounts()
+    const accounts = await this.walletStore.get()
     const hit = find(accounts, (account) => accountsEqual(account, selector))
     if (!hit) {
       throw Error("account not found")
@@ -591,7 +446,7 @@ export class Wallet {
     if (!this.isSessionOpen()) {
       return
     }
-    const accounts = await this.getAccounts()
+    const accounts = await this.walletStore.get()
     const selectedAccount = await this.store.get("selected")
     const defaultAccount =
       accounts.find((account) => account.networkId === defaultNetwork.id) ??
@@ -606,7 +461,7 @@ export class Wallet {
   }
 
   public async selectAccount(accountIdentifier: BaseWalletAccount) {
-    const accounts = await this.getAccounts()
+    const accounts = await this.walletStore.get()
     const account = find(accounts, (account) =>
       accountsEqual(account, accountIdentifier),
     )
@@ -622,7 +477,7 @@ export class Wallet {
   }
 
   public async reset() {
-    await this.resetAccounts()
+    // TODO: reset account store
     this.encryptedBackup = undefined
     this.session = undefined
   }
@@ -727,7 +582,7 @@ export class Wallet {
       }),
     )
 
-    await this.addWalletAccounts(accounts)
+    await this.walletStore.push(accounts)
   }
 
   private async writeBackup() {
@@ -735,10 +590,12 @@ export class Wallet {
       return
     }
     const backup = JSON.parse(this.encryptedBackup)
-    const accounts = (await this.getAccounts(true)).map((account) => ({
-      ...account,
-      network: account.network.id,
-    }))
+    const accounts = (await this.walletStore.get(withHiddenSelector)).map(
+      (account) => ({
+        ...account,
+        network: account.networkId,
+      }),
+    )
     const extendedBackup = {
       ...backup,
       argent: { version: CURRENT_BACKUP_VERSION, accounts },

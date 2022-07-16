@@ -1,6 +1,7 @@
 import { compactDecrypt } from "jose"
 import { encode } from "starknet"
 
+import { getAccounts } from "../shared/account/store"
 import { RecoveryMessage } from "../shared/messages/RecoveryMessage"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
@@ -46,7 +47,7 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
         } = JSON.parse(encode.arrayBufferToString(plaintext))
 
         await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-        transactionTracker.loadHistory(await wallet.getAccounts())
+        transactionTracker.loadHistory(await getAccounts())
 
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
       } catch (error) {

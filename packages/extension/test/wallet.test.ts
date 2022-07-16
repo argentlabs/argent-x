@@ -10,8 +10,11 @@ import {
   Wallet,
   WalletStorageProps,
 } from "../src/background/wallet"
+import { deserialize, serialize } from "../src/shared/account/serialize"
 import { Network } from "../src/shared/network"
-import { KeyValueStorage } from "../src/shared/storage"
+import { ArrayStorage, KeyValueStorage } from "../src/shared/storage"
+import { WalletAccount } from "../src/shared/wallet.model"
+import { accountsEqual } from "../src/shared/wallet.service"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
 
@@ -32,6 +35,15 @@ const loadContracts: LoadContracts = async () => [
   proxyCompiledContract,
   argentAccountCompiledContract,
 ]
+
+const getAccountStore = (name: string) => {
+  return new ArrayStorage<WalletAccount>([], {
+    namespace: name,
+    compare: accountsEqual,
+    serialize,
+    deserialize,
+  })
+}
 
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
@@ -54,7 +66,8 @@ test("create a new wallet", async () => {
   vi.useFakeTimers()
 
   const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet1")
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const accountStore = getAccountStore("test:accounts1")
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
@@ -72,7 +85,7 @@ test("create a new wallet", async () => {
   const { txHash } = await wallet.addAccount(NETWORK)
   expect(txHash).toMatch(REGEX_HEXSTRING)
 
-  const accounts = await wallet.getAccounts()
+  const accounts = await accountStore.get()
   expect(accounts).toHaveLength(1)
 
   const backupWithAccount = await storage.get("backup")
@@ -90,9 +103,11 @@ test("open existing wallet", async () => {
   vi.useFakeTimers()
 
   const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet2")
+  const accountStore = getAccountStore("test:accounts2")
+
   storage.set("backup", backupString)
   storage.set("discoveredOnce", true)
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(true)
@@ -101,7 +116,7 @@ test("open existing wallet", async () => {
   expect(isValid).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
 
-  const accounts = await wallet.getAccounts()
+  const accounts = await accountStore.get()
   expect(accounts).toHaveLength(1)
   const account = accounts[0]
   expect(account.address).toBe(
@@ -124,9 +139,11 @@ test("open existing wallet", async () => {
 
 test("open existing wallet with wrong password", async () => {
   const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet3")
+  const accountStore = getAccountStore("test:accounts3")
+
   storage.set("backup", backupString)
   storage.set("discoveredOnce", true)
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(true)
@@ -140,8 +157,10 @@ test("import backup file", async () => {
   vi.useFakeTimers()
 
   const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet4")
+  const accountStore = getAccountStore("test:accounts4")
+
   storage.set("discoveredOnce", true)
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
@@ -160,7 +179,8 @@ test("import backup file", async () => {
 
 test("import wrong backup file", async () => {
   const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet5")
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const accountStore = getAccountStore("test:accounts5")
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)

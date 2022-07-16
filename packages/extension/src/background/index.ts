@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill"
 
+import { accountStore, getAccounts } from "../shared/account/store"
 import { migrateWalletAccounts } from "../shared/account/storeMigration"
 import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
@@ -43,9 +44,15 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     const storage = new KeyValueStorage<WalletStorageProps>({}, "core:wallet")
     const onAutoLock = () =>
       sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
-    const wallet = new Wallet(storage, loadContracts, getNetwork, onAutoLock)
+    const wallet = new Wallet(
+      storage,
+      accountStore,
+      loadContracts,
+      getNetwork,
+      onAutoLock,
+    )
     await wallet.setup()
-    await transactionTracker.loadHistory(await wallet.getAccounts())
+    await transactionTracker.loadHistory(await getAccounts())
   }
   if (alarm.name === "core:transactionTracker:update") {
     console.info("~> fetching transaction updates")
@@ -78,11 +85,17 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
 
   const onAutoLock = () =>
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
-  const wallet = new Wallet(storage, loadContracts, getNetwork, onAutoLock)
+  const wallet = new Wallet(
+    storage,
+    accountStore,
+    loadContracts,
+    getNetwork,
+    onAutoLock,
+  )
   await wallet.setup()
 
   // may get reassigned when a recovery happens
-  transactionTracker.loadHistory(await wallet.getAccounts()) // no await here to defer loading
+  transactionTracker.loadHistory(await getAccounts()) // no await here to defer loading
 
   const actionQueue = await getQueue<ActionItem>(globalActionQueueStore)
 

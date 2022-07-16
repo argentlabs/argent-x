@@ -5,7 +5,7 @@ import { accountsEqual } from "../wallet.service"
 import { getAccountSelector, withoutHiddenSelector } from "./selectors"
 import { deserialize, serialize } from "./serialize"
 
-const accountStore = new ArrayStorage<WalletAccount>([], {
+export const accountStore = new ArrayStorage<WalletAccount>([], {
   namespace: "core:accounts",
   compare: accountsEqual,
   serialize,
