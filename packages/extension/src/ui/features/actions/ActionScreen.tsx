@@ -51,9 +51,9 @@ export const ActionScreen: FC = () => {
       }
     }
     init()
-  }, [extensionIsInTab, action.type])
+  }, [extensionIsInTab, action?.type])
 
-  switch (action.type) {
+  switch (action?.type) {
     case "CONNECT_DAPP":
       return (
         <ConnectDappScreen
