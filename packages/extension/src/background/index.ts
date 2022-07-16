@@ -4,6 +4,7 @@ import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
+import { KeyValueStorage } from "../shared/storage"
 import { delay } from "../shared/utils/delay"
 import { handleAccountMessage } from "./accountMessaging"
 import { loadContracts } from "./accounts"
@@ -25,8 +26,6 @@ import { handleNetworkMessage } from "./networkMessaging"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
-import { handleSettingsMessage } from "./settingsMessaging"
-import { Storage } from "./storage"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { Wallet, WalletStorageProps } from "./wallet"
@@ -40,7 +39,7 @@ browser.alarms.create("core:transactionTracker:update", {
 browser.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "core:transactionTracker:history") {
     console.info("~> fetching transaction history")
-    const storage = new Storage<WalletStorageProps>({}, "wallet")
+    const storage = new KeyValueStorage<WalletStorageProps>({}, "wallet")
     const onAutoLock = () =>
       sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
     const wallet = new Wallet(storage, loadContracts, getNetwork, onAutoLock)
@@ -72,7 +71,7 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
 // runs on startup
 ;(async () => {
   const messagingKeys = await getMessagingKeys()
-  const storage = new Storage<WalletStorageProps>({}, "wallet")
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "wallet")
 
   const onAutoLock = () =>
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
@@ -98,7 +97,6 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     handlePreAuthorizationMessage,
     handleRecoveryMessage,
     handleSessionMessage,
-    handleSettingsMessage,
     handleTransactionMessage,
   ] as Array<HandleMessage<MessageType>>
 

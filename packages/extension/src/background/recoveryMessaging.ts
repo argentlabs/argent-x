@@ -5,7 +5,6 @@ import { RecoveryMessage } from "../shared/messages/RecoveryMessage"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { downloadFile } from "./download"
-import { exportLegacyBackup } from "./legacy"
 
 export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
   msg,
@@ -29,11 +28,6 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
     case "DOWNLOAD_BACKUP_FILE": {
       await downloadFile(wallet.exportBackup())
       return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
-    }
-
-    case "DOWNLOAD_LEGACY_BACKUP_FILE": {
-      await downloadFile(await exportLegacyBackup())
-      return sendToTabAndUi({ type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" })
     }
 
     case "RECOVER_SEEDPHRASE": {

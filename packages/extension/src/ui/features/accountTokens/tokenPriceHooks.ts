@@ -6,7 +6,11 @@ import {
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
 } from "../../../shared/api/constants"
-import { isPrivacySettingsEnabled } from "../../../shared/settings"
+import {
+  isPrivacySettingsEnabled,
+  settingsStore,
+} from "../../../shared/settings"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
@@ -17,7 +21,6 @@ import {
 import { Token } from "../../../shared/token/type"
 import { useConditionallyEnabledSWR } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
-import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { useIsMainnet } from "../networks/useNetworks"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
@@ -25,7 +28,8 @@ import { TokenDetailsWithBalance } from "./tokens.state"
 
 export const useCurrencyDisplayEnabled = () => {
   const isMainnet = useIsMainnet()
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
+  const privacyUseArgentServicesEnabled = useKeyValueStorage(
+    settingsStore,
     "privacyUseArgentServices",
   )
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */

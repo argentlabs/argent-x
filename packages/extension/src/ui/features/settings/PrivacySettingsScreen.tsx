@@ -1,25 +1,24 @@
 import { FC } from "react"
 
+import { settingsStore } from "../../../shared/settings"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { IconBar } from "../../components/IconBar"
-import { LazyInitialisedIOSSwitch } from "../../components/IOSSwitch"
-import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
+import IOSSwitch from "../../components/IOSSwitch"
 import { H2 } from "../../theme/Typography"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 const ANALYTICS_UI_ENABLED = false
 
 export const PrivacySettingsScreen: FC = () => {
-  const {
-    initialised: privacyUseArgentServicesInitialised,
-    value: privacyUseArgentServicesValue,
-    setValue: setPrivacyUseArgentServicesValue,
-  } = useBackgroundSettingsValue("privacyUseArgentServices")
+  const privacyUseArgentServices = useKeyValueStorage(
+    settingsStore,
+    "privacyUseArgentServices",
+  )
 
-  const {
-    initialised: privacyShareAnalyticsDataInitialised,
-    value: privacyShareAnalyticsDataValue,
-    setValue: setPrivacyShareAnalyticsDataValue,
-  } = useBackgroundSettingsValue("privacyShareAnalyticsData")
+  const privacyShareAnalyticsData = useKeyValueStorage(
+    settingsStore,
+    "privacyShareAnalyticsData",
+  )
 
   return (
     <>
@@ -29,11 +28,13 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Use Argent services</span>
-            <LazyInitialisedIOSSwitch
-              initialised={privacyUseArgentServicesInitialised}
-              checked={privacyUseArgentServicesValue}
+            <IOSSwitch
+              checked={privacyUseArgentServices}
               onClick={() =>
-                setPrivacyUseArgentServicesValue(!privacyUseArgentServicesValue)
+                settingsStore.set(
+                  "privacyUseArgentServices",
+                  !privacyUseArgentServices,
+                )
               }
             />
           </Title>
@@ -48,12 +49,12 @@ export const PrivacySettingsScreen: FC = () => {
             <SettingsItem>
               <Title>
                 <span>Share analytics data</span>
-                <LazyInitialisedIOSSwitch
-                  initialised={privacyShareAnalyticsDataInitialised}
-                  checked={privacyShareAnalyticsDataValue}
+                <IOSSwitch
+                  checked={privacyShareAnalyticsData}
                   onClick={() =>
-                    setPrivacyShareAnalyticsDataValue(
-                      !privacyShareAnalyticsDataValue,
+                    settingsStore.set(
+                      "privacyShareAnalyticsData",
+                      !privacyShareAnalyticsData,
                     )
                   }
                 />

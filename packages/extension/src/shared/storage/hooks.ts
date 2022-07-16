@@ -17,15 +17,19 @@ export function useKeyValueStorage<
       storage.defaults[key],
   )
 
-  useEffect(() => {
-    storage.get(key).then(setValue)
-    const sub = storage.subscribe(key, setValue)
-    return () => sub()
-  }, [storage, key])
+  const set = useCallback(
+    (value: T[K]) => {
+      clientCache.set(storage.namespace + ":" + key.toString(), value)
+      setValue(value)
+    },
+    [key, storage.namespace],
+  )
 
   useEffect(() => {
-    clientCache.set(storage.namespace + ":" + key.toString(), value)
-  }, [value, storage.namespace, key])
+    storage.get(key).then(set)
+    const sub = storage.subscribe(key, set)
+    return () => sub()
+  }, [storage, key, set])
 
   return value
 }
@@ -35,15 +39,19 @@ export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
     clientCache.get(storage.namespace) ?? storage.defaults,
   )
 
-  useEffect(() => {
-    storage.get().then(setValue)
-    const sub = storage.subscribe(setValue)
-    return () => sub()
-  }, [storage])
+  const set = useCallback(
+    (value: T) => {
+      clientCache.set(storage.namespace, value)
+      setValue(value)
+    },
+    [storage.namespace],
+  )
 
   useEffect(() => {
-    clientCache.set(storage.namespace, value)
-  }, [value, storage.namespace])
+    storage.get().then(set)
+    const sub = storage.subscribe(set)
+    return () => sub()
+  }, [set, storage])
 
   return value
 }

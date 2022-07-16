@@ -20,6 +20,7 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/network"
+import { IKeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
@@ -30,7 +31,6 @@ import {
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 import legacyBackupSchema from "./schema/legacyBackup.schema"
-import type { IStorage } from "./storage"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -107,7 +107,7 @@ export class Wallet {
   private session?: WalletSession
 
   constructor(
-    private readonly store: IStorage<WalletStorageProps>,
+    private readonly store: IKeyValueStorage<WalletStorageProps>,
     private readonly loadContracts: LoadContracts,
     private readonly getNetwork: GetNetwork,
     private readonly onAutoLock?: () => Promise<void>,
@@ -133,7 +133,7 @@ export class Wallet {
       return
     }
     const N = isDevOrTest ? 64 : 32768
-    this.store.setItem("discoveredOnce", true)
+    this.store.set("discoveredOnce", true)
     const ethersWallet = ethers.Wallet.createRandom()
     this.encryptedBackup = await ethersWallet.encrypt(
       password,
@@ -146,7 +146,7 @@ export class Wallet {
   }
 
   public async getAccounts(includeHidden = false): Promise<WalletAccount[]> {
-    const accounts = (await this.store.getItem("accounts")) || []
+    const accounts = (await this.store.get("accounts")) || []
 
     // migrate from storing network to just storing networkId
     // populate network back from networkId
@@ -216,7 +216,7 @@ export class Wallet {
 
     if (needsWrite) {
       // we store the network as it was at the creation date of the wallet. This may be useful in the future.
-      await this.store.setItem("accounts", uniqueAccounts)
+      await this.store.set("accounts", uniqueAccounts)
     }
 
     return uniqueAccounts.filter((account) => includeHidden || !account.hidden)
@@ -233,7 +233,7 @@ export class Wallet {
     )
 
     // we store the network as it was at the creation date of the wallet. This may be useful in the future.
-    return this.store.setItem("accounts", newAccounts)
+    return this.store.set("accounts", newAccounts)
   }
 
   private async addWalletAccount(account: WalletAccount) {
@@ -243,7 +243,7 @@ export class Wallet {
   public async removeAccount(account: BaseWalletAccount) {
     const accounts = await this.getAccounts(true)
     const newAccounts = differenceWith(accounts, [account], accountsEqual)
-    return this.store.setItem("accounts", newAccounts)
+    return this.store.set("accounts", newAccounts)
   }
 
   public async hideAccount(account: BaseWalletAccount) {
@@ -266,13 +266,13 @@ export class Wallet {
       accountsEqual,
     )
 
-    await this.store.setItem("accounts", newAccounts)
+    await this.store.set("accounts", newAccounts)
 
     await this.writeBackup()
   }
 
   private resetAccounts() {
-    return this.store.setItem("accounts", [])
+    return this.store.set("accounts", [])
   }
 
   public async getSeedPhrase(): Promise<string> {
@@ -325,7 +325,7 @@ export class Wallet {
 
     await this.addWalletAccounts(accounts)
 
-    this.store.setItem("discoveredOnce", true)
+    this.store.set("discoveredOnce", true)
   }
 
   private async getAccountClassHashForNetwork(
@@ -441,7 +441,7 @@ export class Wallet {
       this.setSession(wallet.privateKey, password)
 
       // if we have not yet discovered accounts, do it now. This only applies to wallets which got restored from a backup file, as we could not restore all accounts from onchain yet as the backup was locked until now.
-      const discoveredOnce = await this.store.getItem("discoveredOnce")
+      const discoveredOnce = await this.store.get("discoveredOnce")
       if (!discoveredOnce) {
         await this.discoverAccounts()
       }
@@ -592,7 +592,7 @@ export class Wallet {
       return
     }
     const accounts = await this.getAccounts()
-    const selectedAccount = await this.store.getItem("selected")
+    const selectedAccount = await this.store.get("selected")
     const defaultAccount =
       accounts.find((account) => account.networkId === defaultNetwork.id) ??
       accounts[0]
@@ -613,7 +613,7 @@ export class Wallet {
 
     if (account) {
       const { address, networkId } = account // makes sure to strip away unused properties
-      await this.store.setItem("selected", { address, networkId })
+      await this.store.set("selected", { address, networkId })
     }
   }
 
@@ -634,7 +634,7 @@ export class Wallet {
       }
       throw new Error("invalid backup file")
     }
-    await this.store.setItem("backup", backupString)
+    await this.store.set("backup", backupString)
     await this.setup()
   }
 
@@ -696,7 +696,7 @@ export class Wallet {
   }
 
   private async readBackup() {
-    this.encryptedBackup = await this.store.getItem("backup")
+    this.encryptedBackup = await this.store.get("backup")
     if (this.encryptedBackup === undefined) {
       return
     }
@@ -749,7 +749,7 @@ export class Wallet {
       throw new Error("invalid new backup file")
     }
 
-    await this.store.setItem("backup", backupString)
+    await this.store.set("backup", backupString)
     this.encryptedBackup = backupString
   }
 }

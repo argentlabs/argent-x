@@ -4,7 +4,6 @@ import { encode } from "starknet"
 import { SessionMessage } from "../shared/messages/SessionMessage"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { hasLegacy } from "./legacy"
 
 export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
   msg,
@@ -57,10 +56,9 @@ export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
 
     case "IS_INITIALIZED": {
       const initialized = wallet.isInitialized()
-      const legacy = initialized ? false : await hasLegacy()
       return sendToTabAndUi({
         type: "IS_INITIALIZED_RES",
-        data: { initialized, hasLegacy: legacy },
+        data: { initialized },
       })
     }
   }

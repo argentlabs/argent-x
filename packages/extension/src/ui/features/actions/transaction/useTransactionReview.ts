@@ -4,14 +4,17 @@ import { Call } from "starknet"
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
 import { PublicNetworkIds } from "../../../../shared/network/public"
-import { isPrivacySettingsEnabled } from "../../../../shared/settings"
+import {
+  isPrivacySettingsEnabled,
+  settingsStore,
+} from "../../../../shared/settings"
+import { useKeyValueStorage } from "../../../../shared/storage/hooks"
 import {
   ApiTransactionReviewResponse,
   fetchTransactionReview,
 } from "../../../../shared/transactionReview.service"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { useArgentApiFetcher } from "../../../services/useArgentApiFetcher"
-import { useBackgroundSettingsValue } from "../../../services/useBackgroundSettingsValue"
 import { Account } from "../../accounts/Account"
 
 export interface IUseTransactionReview {
@@ -21,7 +24,8 @@ export interface IUseTransactionReview {
 }
 
 export const useTransactionReviewEnabled = () => {
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
+  const privacyUseArgentServicesEnabled = useKeyValueStorage(
+    settingsStore,
     "privacyUseArgentServices",
   )
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */

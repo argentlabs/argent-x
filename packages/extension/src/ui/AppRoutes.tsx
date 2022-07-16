@@ -23,7 +23,6 @@ import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
-import { LegacyScreen } from "./features/onboarding/LegacyWalletScreen"
 import { LockScreen } from "./features/onboarding/LockScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
@@ -95,7 +94,6 @@ const nonWalletRoutes = (
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
     />
-    <Route path={routes.legacy.path} element={<LegacyScreen />} />
     <Route path={routes.error.path} element={<ErrorScreen />} />
   </>
 )
