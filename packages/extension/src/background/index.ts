@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill"
 
+import { migrateWalletAccounts } from "../shared/account/storeMigration"
 import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
@@ -39,7 +40,7 @@ browser.alarms.create("core:transactionTracker:update", {
 browser.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "core:transactionTracker:history") {
     console.info("~> fetching transaction history")
-    const storage = new KeyValueStorage<WalletStorageProps>({}, "wallet")
+    const storage = new KeyValueStorage<WalletStorageProps>({}, "core:wallet")
     const onAutoLock = () =>
       sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
     const wallet = new Wallet(storage, loadContracts, getNetwork, onAutoLock)
@@ -70,8 +71,10 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
 
 // runs on startup
 ;(async () => {
+  await migrateWalletAccounts()
+
   const messagingKeys = await getMessagingKeys()
-  const storage = new KeyValueStorage<WalletStorageProps>({}, "wallet")
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "core:wallet")
 
   const onAutoLock = () =>
     sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })

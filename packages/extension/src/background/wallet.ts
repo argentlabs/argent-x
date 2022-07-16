@@ -697,6 +697,7 @@ export class Wallet {
 
   private async readBackup() {
     this.encryptedBackup = await this.store.get("backup")
+    console.log("read backup", this.encryptedBackup)
     if (this.encryptedBackup === undefined) {
       return
     }

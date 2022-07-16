@@ -7,7 +7,7 @@ import { AreaName, BaseStorage, StorageChange } from "./types"
 type AllowPromise<T> = T | Promise<T>
 
 export interface ObjectStorageOptions<T> extends StorageOptions {
-  serialize?: (value: T) => AllowPromise<any>
+  serialize?: (value: T) => any
   deserialize?: (value: any) => AllowPromise<T>
   merge?: (oldValue: T, newValue: T) => T
 }
@@ -27,7 +27,7 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   public areaName: AreaName
 
   private storageImplementation: KeyValueStorage<{ inner: T }>
-  private serialize: (value: T) => AllowPromise<any>
+  private serialize: (value: T) => any
   private deserialize: (value: any) => AllowPromise<T>
   private merge: (oldValue: T, newValue: T) => T
 
@@ -64,7 +64,7 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
       inner: T
     }>(
       {
-        inner: this.defaults,
+        inner: this.serialize(this.defaults),
       },
       optionsOrNamespace,
     )
