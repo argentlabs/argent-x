@@ -76,7 +76,7 @@ describe("useArrayStorage()", () => {
           <p>{data.join(" ")}</p>
           <button
             onClick={() => {
-              store.add("See you tomorrow!")
+              store.push("See you tomorrow!")
             }}
           >
             change value

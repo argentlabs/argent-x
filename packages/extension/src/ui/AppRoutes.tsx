@@ -14,10 +14,7 @@ import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKe
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
-import {
-  useActions,
-  useActionsSubscription,
-} from "./features/actions/actions.state"
+import { useActions } from "./features/actions/actions.state"
 import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
@@ -194,10 +191,9 @@ const walletRoutes = (
 
 export const AppRoutes: FC = () => {
   useEntryRoute()
-  useActionsSubscription()
 
   const { isLoading } = useAppState()
-  const { actions } = useActions()
+  const actions = useActions()
 
   if (isLoading) {
     return <LoadingScreen />

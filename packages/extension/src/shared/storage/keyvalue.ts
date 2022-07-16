@@ -80,7 +80,10 @@ export class KeyValueStorage<
       areaName: browser.storage.AreaName,
     ) => {
       if (this.areaName === areaName && changes[storageKey]) {
-        callback(changes[storageKey].newValue, changes[storageKey])
+        callback(
+          changes[storageKey].newValue ?? this.defaults[key], // if newValue is undefined, it means the value was deleted from storage, so we use the default value
+          changes[storageKey],
+        )
       }
     }
 

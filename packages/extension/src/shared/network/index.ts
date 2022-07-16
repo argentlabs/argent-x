@@ -34,7 +34,7 @@ export async function getNetworkByChainId(chainId: string) {
 
 export const addNetwork = async (network: Network) => {
   await assertSchema(networkSchema, network)
-  return customNetworksStore.add(network)
+  return customNetworksStore.push(network)
 }
 
 export const removeNetwork = async (networkId: string) => {

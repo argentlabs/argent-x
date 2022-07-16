@@ -1,7 +1,9 @@
 import { constants, number } from "starknet"
 
-import { TransactionActionPayload } from "../../shared/actionQueue"
-import { ExtQueueItem } from "../actionQueue"
+import {
+  ExtQueueItem,
+  TransactionActionPayload,
+} from "../../shared/actionQueue/types"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce } from "../nonce"
 import { nameTransaction } from "../transactions/transactionNames"

@@ -19,7 +19,7 @@ export const transactionTracker: TransactionTracker = {
       uniqAccounts,
       allTransactions,
     )
-    return transactionsStore.add(historyTransactions)
+    return transactionsStore.push(historyTransactions)
   },
   async update() {
     const allTransactions = await transactionsStore.get()
@@ -27,6 +27,6 @@ export const transactionTracker: TransactionTracker = {
       // is smart enough to filter for just the pending transactions, as the rest needs no update
       allTransactions,
     )
-    return transactionsStore.add(updatedTransactions)
+    return transactionsStore.push(updatedTransactions)
   },
 }

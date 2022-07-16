@@ -1,6 +1,13 @@
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
-import type { ExtQueueItem as ExtensionQueueItem } from "../background/actionQueue"
+export interface QueueItem {
+  meta: {
+    hash: string
+    expires: number
+  }
+}
+
+export type ExtQueueItem<T> = QueueItem & T
 
 export interface TransactionActionPayload {
   transactions: Call | Call[]
@@ -58,4 +65,4 @@ export type ActionItem =
       }
     }
 
-export type ExtensionActionItem = ExtensionQueueItem<ActionItem>
+export type ExtensionActionItem = ExtQueueItem<ActionItem>

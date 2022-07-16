@@ -1,6 +1,6 @@
 import { isString } from "lodash-es"
 
-import { ExtensionActionItem } from "../../shared/actionQueue"
+import { ExtensionActionItem } from "../../shared/actionQueue/types"
 import { sendMessage, waitForMessage } from "../../shared/messages"
 
 export const getActions = async () => {

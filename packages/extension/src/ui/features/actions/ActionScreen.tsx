@@ -22,7 +22,7 @@ export const ActionScreen: FC = () => {
   const navigate = useNavigate()
   const account = useSelectedAccount()
   const extensionIsInTab = useExtensionIsInTab()
-  const { actions } = useActions()
+  const actions = useActions()
 
   const [action] = actions
   const isLastAction = actions.length === 1

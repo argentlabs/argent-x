@@ -32,7 +32,7 @@ export const addTransaction = async (transaction: TransactionRequest) => {
     ...transaction,
   }
 
-  return transactionsStore.add(newTransaction)
+  return transactionsStore.push(newTransaction)
 }
 
 const equalTransactionWithStatus = (

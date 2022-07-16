@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill"
 
-import { ActionItem } from "../shared/actionQueue"
+import { globalActionQueueStore } from "../shared/actionQueue/store"
+import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
 import { handleAccountMessage } from "./accountMessaging"
@@ -64,14 +65,7 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
   // may get reassigned when a recovery happens
   transactionTracker.loadHistory(await wallet.getAccounts()) // no await here to defer loading
 
-  const actionQueue = await getQueue<ActionItem>({
-    onUpdate: (actions) => {
-      sendMessageToActiveTabsAndUi({
-        type: "ACTIONS_QUEUE_UPDATE",
-        data: { actions },
-      })
-    },
-  })
+  const actionQueue = await getQueue<ActionItem>(globalActionQueueStore)
 
   const background: BackgroundService = {
     wallet,

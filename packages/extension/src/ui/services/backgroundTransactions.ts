@@ -27,17 +27,6 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
   }
 }
 
-export const updateTransactionFee = async (
-  actionHash: string,
-  maxFee: number.BigNumberish,
-) => {
-  sendMessage({ type: "UPDATE_TRANSACTION_FEE", data: { actionHash, maxFee } })
-  return waitForMessage(
-    "UPDATE_TRANSACTION_FEE_RES",
-    (x) => x.data.actionHash === actionHash,
-  )
-}
-
 // for debugging purposes
 try {
   ;(window as any).downloadBackup = () => {
