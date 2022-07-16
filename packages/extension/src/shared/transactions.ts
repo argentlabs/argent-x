@@ -3,6 +3,18 @@ import { Status } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
 
+// Global Constants for Transactions
+export const SUCCESS_STATUSES: Status[] = [
+  "ACCEPTED_ON_L1",
+  "ACCEPTED_ON_L2",
+  "PENDING",
+]
+
+export const TRANSACTION_STATUSES_TO_TRACK: Status[] = [
+  "RECEIVED",
+  "NOT_RECEIVED",
+]
+
 export interface TransactionMeta {
   title?: string
   subTitle?: string
@@ -38,3 +50,10 @@ export function entryPointToHumanReadable(entryPoint: string): string {
     return entryPoint
   }
 }
+
+export const getInFlightTransactions = (
+  transactions: Transaction[],
+): Transaction[] =>
+  transactions.filter(({ status }) =>
+    TRANSACTION_STATUSES_TO_TRACK.includes(status),
+  )

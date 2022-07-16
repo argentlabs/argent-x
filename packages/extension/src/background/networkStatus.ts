@@ -1,13 +1,16 @@
 import urljoin from "url-join"
 
 import { Network, NetworkStatus } from "../shared/network"
-import { Storage } from "./storage/default"
+import { KeyValueStorage } from "../shared/storage"
 import { createStaleWhileRevalidateCache } from "./swr"
 import { fetchWithTimeout } from "./utils/fetchWithTimeout"
 
 type SwrCacheKey = string
 
-const swrStorage = new Storage<Record<SwrCacheKey, any>>({}, "swrStore")
+const swrStorage = new KeyValueStorage<Record<SwrCacheKey, any>>(
+  {},
+  "cache:swr",
+)
 
 // see: https://github.com/jperasmus/stale-while-revalidate-cache#configuration
 const swr = createStaleWhileRevalidateCache({

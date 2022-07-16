@@ -7,5 +7,3 @@ export type RecoveryMessage =
   | { type: "RECOVER_SEEDPHRASE_REJ" }
   | { type: "DOWNLOAD_BACKUP_FILE" }
   | { type: "DOWNLOAD_BACKUP_FILE_RES" }
-  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE" }
-  | { type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" }

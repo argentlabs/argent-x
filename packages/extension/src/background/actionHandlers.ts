@@ -1,7 +1,6 @@
-import { ActionItem } from "../shared/actionQueue"
+import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
 import { assertNever } from "../ui/services/assertNever"
-import { ExtQueueItem } from "./actionQueue"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"

@@ -1,9 +1,10 @@
+import browser from "webextension-polyfill"
+
 import { MiscenalleousMessage as MiscellaneousMessage } from "../shared/messages/MiscellaneousMessage"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { openUi } from "./openUi"
-import { clearStorage } from "./storage"
 
 export const handleMiscellaneousMessage: HandleMessage<
   MiscellaneousMessage
@@ -19,7 +20,12 @@ export const handleMiscellaneousMessage: HandleMessage<
     }
 
     case "RESET_ALL": {
-      clearStorage()
+      browser.storage.local.clear()
+      browser.storage.sync.clear()
+      browser.storage.managed.clear()
+      if ("session" in browser.storage) {
+        browser.storage.session.clear()
+      }
       wallet.reset()
       return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
     }

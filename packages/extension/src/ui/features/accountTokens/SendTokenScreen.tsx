@@ -198,7 +198,10 @@ export const SendTokenScreen: FC = () => {
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
 
-  const addressBook = useAddressBook(account?.networkId || currentNetworkId)
+  const addressBook = useAddressBook(
+    account?.networkId || currentNetworkId,
+    account ? [account] : [],
+  )
 
   useEffect(() => {
     if (maxClicked && maxFee && token) {

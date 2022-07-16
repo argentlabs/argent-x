@@ -21,8 +21,8 @@ export function createStaleWhileRevalidateCache(
     async function retrieveCachedValue() {
       try {
         const [cachedValue, cachedTime] = await Promise.all([
-          storage.getItem(key),
-          storage.getItem(timeKey),
+          storage.get(key),
+          storage.get(timeKey),
         ])
 
         let deserializedCachedValue = deserialize(cachedValue)
@@ -47,8 +47,8 @@ export function createStaleWhileRevalidateCache(
     async function persistValue(result: TReturnValue) {
       try {
         await Promise.all([
-          storage.setItem(key, serialize(result)),
-          storage.setItem(timeKey, Date.now().toString()),
+          storage.set(key, serialize(result)),
+          storage.set(timeKey, Date.now().toString()),
         ])
       } catch {
         // Ignore

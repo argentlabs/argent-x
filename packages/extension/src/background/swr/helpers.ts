@@ -13,8 +13,8 @@ export function parseConfig(config: Config) {
 
   if (
     !isObjectLike(storage) ||
-    !isFunction(storage.getItem) ||
-    !isFunction(storage.setItem)
+    !isFunction(storage.get) ||
+    !isFunction(storage.set)
   ) {
     throw new Error(
       'Storage is required and should satisfy the Config["storage"] type',

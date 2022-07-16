@@ -1,28 +1,24 @@
-import { getFromStorage, setToStorage } from "./storage"
+import { ArrayStorage } from "../shared/storage"
+
+const preAuthStore = new ArrayStorage<string>([], "core:preAuth")
 
 export async function preAuthorize(host: string) {
-  const approved = await getFromStorage<string[]>(`PREAUTHORIZATION:APPROVED`)
-  await setToStorage(`PREAUTHORIZATION:APPROVED`, [...(approved || []), host])
+  await preAuthStore.push(host)
 }
 
 export async function getPreAuthorizations() {
-  const approved = await getFromStorage<string[]>(`PREAUTHORIZATION:APPROVED`)
-  return approved || []
+  return preAuthStore.get()
 }
 
 export async function removePreAuthorization(host: string) {
-  const approved = await getFromStorage<string[]>(`PREAUTHORIZATION:APPROVED`)
-  await setToStorage(
-    `PREAUTHORIZATION:APPROVED`,
-    (approved || []).filter((x) => x !== host),
-  )
+  await preAuthStore.remove(host)
 }
 
 export async function isPreAuthorized(host: string) {
-  const approved = await getFromStorage<string[]>(`PREAUTHORIZATION:APPROVED`)
-  return (approved || []).includes(host)
+  const [hit] = await preAuthStore.get((h) => h === host)
+  return !!hit
 }
 
 export async function resetPreAuthorizations() {
-  await setToStorage(`PREAUTHORIZATION:APPROVED`, [])
+  await preAuthStore.remove(() => true)
 }

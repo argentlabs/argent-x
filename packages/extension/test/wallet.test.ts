@@ -10,10 +10,13 @@ import {
   Wallet,
   WalletStorageProps,
 } from "../src/background/wallet"
+import { deserialize, serialize } from "../src/shared/account/serialize"
 import { Network } from "../src/shared/network"
+import { ArrayStorage, KeyValueStorage } from "../src/shared/storage"
+import { WalletAccount } from "../src/shared/wallet.model"
+import { accountsEqual } from "../src/shared/wallet.service"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
-import { MockStorage } from "./mock"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
@@ -32,6 +35,15 @@ const loadContracts: LoadContracts = async () => [
   proxyCompiledContract,
   argentAccountCompiledContract,
 ]
+
+const getAccountStore = (name: string) => {
+  return new ArrayStorage<WalletAccount>([], {
+    namespace: name,
+    compare: accountsEqual,
+    serialize,
+    deserialize,
+  })
+}
 
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 const SESSION_DURATION_PLUS_ONE_SEC = SESSION_DURATION + 1000
@@ -53,8 +65,9 @@ afterEach(() => {
 test("create a new wallet", async () => {
   vi.useFakeTimers()
 
-  const storage = new MockStorage<WalletStorageProps>()
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet1")
+  const accountStore = getAccountStore("test:accounts1")
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
@@ -65,17 +78,17 @@ test("create a new wallet", async () => {
   expect(wallet.isInitialized()).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
 
-  const backupWithoutAccount = await storage.getItem("backup")
+  const backupWithoutAccount = await storage.get("backup")
   expect(backupWithoutAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithoutAccount as string)).toBe(true)
 
   const { txHash } = await wallet.addAccount(NETWORK)
   expect(txHash).toMatch(REGEX_HEXSTRING)
 
-  const accounts = await wallet.getAccounts()
+  const accounts = await accountStore.get()
   expect(accounts).toHaveLength(1)
 
-  const backupWithAccount = await storage.getItem("backup")
+  const backupWithAccount = await storage.get("backup")
   expect(backupWithAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithAccount as string)).toBe(true)
 
@@ -89,10 +102,12 @@ test("create a new wallet", async () => {
 test("open existing wallet", async () => {
   vi.useFakeTimers()
 
-  const storage = new MockStorage<WalletStorageProps>()
-  storage.setItem("backup", backupString)
-  storage.setItem("discoveredOnce", true)
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet2")
+  const accountStore = getAccountStore("test:accounts2")
+
+  storage.set("backup", backupString)
+  storage.set("discoveredOnce", true)
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(true)
@@ -101,14 +116,14 @@ test("open existing wallet", async () => {
   expect(isValid).toBe(true)
   expect(wallet.isSessionOpen()).toBe(true)
 
-  const accounts = await wallet.getAccounts()
+  const accounts = await accountStore.get()
   expect(accounts).toHaveLength(1)
   const account = accounts[0]
   expect(account.address).toBe(
     "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
   )
 
-  const backupWithAccount = await storage.getItem("backup")
+  const backupWithAccount = await storage.get("backup")
   expect(backupWithAccount).toBeDefined()
   expect(Wallet.validateBackup(backupWithAccount as string)).toBe(true)
 
@@ -123,10 +138,12 @@ test("open existing wallet", async () => {
 })
 
 test("open existing wallet with wrong password", async () => {
-  const storage = new MockStorage<WalletStorageProps>()
-  storage.setItem("backup", backupString)
-  storage.setItem("discoveredOnce", true)
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet3")
+  const accountStore = getAccountStore("test:accounts3")
+
+  storage.set("backup", backupString)
+  storage.set("discoveredOnce", true)
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(true)
@@ -139,9 +156,11 @@ test("open existing wallet with wrong password", async () => {
 test("import backup file", async () => {
   vi.useFakeTimers()
 
-  const storage = new MockStorage<WalletStorageProps>()
-  storage.setItem("discoveredOnce", true)
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet4")
+  const accountStore = getAccountStore("test:accounts4")
+
+  storage.set("discoveredOnce", true)
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)
@@ -159,8 +178,9 @@ test("import backup file", async () => {
 })
 
 test("import wrong backup file", async () => {
-  const storage = new MockStorage<WalletStorageProps>()
-  const wallet = new Wallet(storage, loadContracts, getNetwork)
+  const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet5")
+  const accountStore = getAccountStore("test:accounts5")
+  const wallet = new Wallet(storage, accountStore, loadContracts, getNetwork)
   await wallet.setup()
 
   expect(wallet.isInitialized()).toBe(false)

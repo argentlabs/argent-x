@@ -18,3 +18,5 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
   network: Network
   hidden?: boolean
 }
+
+export type StoredWalletAccount = Omit<WalletAccount, "network">

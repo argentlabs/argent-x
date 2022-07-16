@@ -50,18 +50,6 @@ export const handleTransactionMessage: HandleMessage<
       }
     }
 
-    case "UPDATE_TRANSACTION_FEE": {
-      const { actionHash } = msg.data
-      await actionQueue.override(actionHash, {
-        maxFee: msg.data.maxFee,
-      })
-
-      return sendToTabAndUi({
-        type: "UPDATE_TRANSACTION_FEE_RES",
-        data: { actionHash },
-      })
-    }
-
     case "TRANSACTION_FAILED": {
       return await actionQueue.remove(msg.data.actionHash)
     }

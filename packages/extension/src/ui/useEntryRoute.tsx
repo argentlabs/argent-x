@@ -22,12 +22,8 @@ export const useEntryRoute = () => {
 }
 
 const determineEntry = async () => {
-  const { initialized, hasLegacy } = await isInitialized()
+  const { initialized } = await isInitialized()
   if (!initialized) {
-    if (hasLegacy) {
-      return routes.legacy()
-    }
-
     return routes.welcome()
   }
 

@@ -1,12 +1,12 @@
 import { getProvider } from "../../../shared/network"
-import { Transaction } from "../../../shared/transactions"
-import { TRANSACTION_STATUSES_TO_TRACK } from "../constants"
+import {
+  Transaction,
+  getInFlightTransactions,
+} from "../../../shared/transactions"
 import { getTransactionsStatusUpdate } from "../determineUpdates"
 
 export async function getTransactionsUpdate(transactions: Transaction[]) {
-  const transactionsToCheck = transactions.filter(({ status }) =>
-    TRANSACTION_STATUSES_TO_TRACK.includes(status),
-  )
+  const transactionsToCheck = getInFlightTransactions(transactions)
 
   // as this function tends to run into 429 errors, we'll simply keep the old status when it fails
   // TODO: we should add a cooldown when user run into 429 errors

@@ -1,3 +1,8 @@
+import {
+  getAccounts,
+  hideAccount,
+  removeAccount,
+} from "../shared/account/store"
 import { AccountMessage } from "../shared/messages/AccountMessage"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
@@ -15,7 +20,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     case "GET_ACCOUNTS": {
       return sendToTabAndUi({
         type: "GET_ACCOUNTS_RES",
-        data: await wallet.getAccounts(msg.data?.showHidden),
+        data: await getAccounts(msg.data?.showHidden ? () => true : undefined),
       })
     }
 
@@ -43,7 +48,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             txHash,
             address: account.address,
             account: account,
-            accounts: await wallet.getAccounts(),
+            accounts: await getAccounts(),
           },
         })
       } catch (exception: unknown) {
@@ -86,7 +91,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "DELETE_ACCOUNT": {
       try {
-        await wallet.removeAccount(msg.data)
+        await removeAccount(msg.data)
         return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
       } catch {
         return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
@@ -95,7 +100,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "HIDE_ACCOUNT": {
       try {
-        await wallet.hideAccount(msg.data)
+        await hideAccount(msg.data)
         return sendToTabAndUi({
           type: "HIDE_ACCOUNT_RES",
         })

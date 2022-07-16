@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill"
 
-import { ActionItem } from "../shared/actionQueue"
+import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
 import { Queue } from "./actionQueue"
 import { MessagingKeys } from "./keys/messagingKeys"

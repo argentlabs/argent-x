@@ -1,49 +1,34 @@
+import { partition } from "lodash-es"
 import oHash from "object-hash"
+
+import { ExtQueueItem } from "../shared/actionQueue/types"
+import type { IArrayStorage } from "../shared/storage/array"
 
 function objectHash(obj: object | null) {
   return oHash(obj, { unorderedArrays: true })
 }
 
-type Overrides = Record<string, any>
-
-export interface QueueItem {
-  meta: {
-    hash: string
-    expires: number
-  }
-  override?: Overrides
-}
-
-export type ExtQueueItem<T> = QueueItem & T
-
-interface QueueConfig<T> {
-  onUpdate?: (items: ExtQueueItem<T>[]) => void
-}
-
-// in-memory queue is better than localStorage, because it's way faster and persistance is not required
-let globalQueue: ExtQueueItem<any>[] = []
+type AllObjects = Record<string | number | symbol, unknown>
 
 export interface Queue<T> {
   getAll: () => Promise<ExtQueueItem<T>[]>
   push: (item: T, expires?: number) => Promise<ExtQueueItem<T>>
-  override: (
-    hash: string,
-    overrides: Overrides,
-  ) => Promise<ExtQueueItem<T> | undefined>
   remove: (hash: string) => Promise<ExtQueueItem<T> | null>
 }
 
-export async function getQueue<T extends object>(
-  config: QueueConfig<T> = {},
+export async function getQueue<T extends AllObjects>(
+  storage: IArrayStorage<ExtQueueItem<T>>,
 ): Promise<Queue<T>> {
   async function getAll(): Promise<ExtQueueItem<T>[]> {
-    const notExpiredQueue = globalQueue.filter(
+    const allInQueue = await storage.get()
+    const [notExpiredQueue, expiredItems] = partition(
+      allInQueue,
       (item) => item.meta.expires > Date.now(),
     )
 
     // set queue to storage if it has changed
-    if (globalQueue.length !== notExpiredQueue.length) {
-      globalQueue = notExpiredQueue
+    if (expiredItems.length) {
+      await storage.remove(expiredItems)
     }
 
     return notExpiredQueue
@@ -51,10 +36,9 @@ export async function getQueue<T extends object>(
 
   async function push(
     item: T,
-    expires: number = 5 * 60 * 60 * 1000,
+    expires: number = 5 * 60 * 60 * 1000, // 5 hours
   ): Promise<ExtQueueItem<T>> {
     const hash = objectHash(item)
-    const existsAlready = globalQueue.some((item) => item.meta.hash === hash)
     const newItem = {
       ...item,
       meta: {
@@ -62,37 +46,20 @@ export async function getQueue<T extends object>(
         expires: Date.now() + expires,
       },
     }
-    if (!existsAlready) {
-      globalQueue.unshift(newItem)
-      config.onUpdate?.(globalQueue)
-    }
+
+    await storage.unshift(newItem)
 
     return newItem
   }
 
-  async function override(
-    hash: string,
-    overrides: Overrides,
-  ): Promise<ExtQueueItem<T> | undefined> {
-    const item = globalQueue.find((item) => item.meta.hash === hash)
-    if (item) {
-      item.override = overrides
-      config.onUpdate?.(globalQueue)
-    }
-    return item
-  }
-
   async function remove(hash: string): Promise<ExtQueueItem<T> | null> {
-    const hit = globalQueue.find((item) => item.meta.hash === hash)
-    globalQueue = globalQueue.filter((item) => item.meta.hash !== hash)
-    config.onUpdate?.(globalQueue)
-    return hit ?? null
+    const [item] = await storage.remove((item) => item.meta.hash === hash)
+    return item ?? null
   }
 
   return {
     getAll,
     push,
-    override,
     remove,
   }
 }

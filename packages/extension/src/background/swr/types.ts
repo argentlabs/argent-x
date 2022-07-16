@@ -1,4 +1,4 @@
-import type { IStorage } from "../storage"
+import { IKeyValueStorage } from "../../shared/storage/keyvalue"
 
 export type StaleWhileRevalidateCache = <TReturnValue>(
   cacheKey: string | (() => string),
@@ -8,7 +8,7 @@ export type StaleWhileRevalidateCache = <TReturnValue>(
 export interface Config {
   minTimeToStale?: number
   maxTimeToLive?: number
-  storage: IStorage
+  storage: IKeyValueStorage
   serialize?: (value: unknown) => unknown
   deserialize?: (value: unknown) => unknown
 }

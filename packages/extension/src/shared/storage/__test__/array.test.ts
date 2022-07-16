@@ -13,34 +13,38 @@ describe("ArrayStorage()", () => {
     test("should get with selector", async () => {
       expect(await arrayStorage.get((x) => x % 2 === 0)).toEqual([2])
     })
-    test("should add single value", async () => {
-      await arrayStorage.add(4)
-      expect(await arrayStorage.get()).toEqual([1, 2, 3, 4])
+    test("should unshift single value", async () => {
+      await arrayStorage.unshift(0)
+      expect(await arrayStorage.get()).toEqual([0, 1, 2, 3])
     })
-    test("should add multiple values", async () => {
-      await arrayStorage.add([5, 6])
-      expect(await arrayStorage.get()).toEqual([1, 2, 3, 4, 5, 6])
+    test("should push single value", async () => {
+      await arrayStorage.push(4)
+      expect(await arrayStorage.get()).toEqual([0, 1, 2, 3, 4])
     })
-    test("try to add a duplicate as part of multiple values", async () => {
-      await arrayStorage.add([5, 6, 4])
-      expect(await arrayStorage.get()).toEqual([1, 2, 3, 4, 5, 6])
+    test("should push multiple values", async () => {
+      await arrayStorage.push([5, 6])
+      expect(await arrayStorage.get()).toEqual([0, 1, 2, 3, 4, 5, 6])
     })
-    test("should add with selector function", async () => {
-      await arrayStorage.add((value) => value.map((v) => v * 10))
+    test("try to push a duplicate as part of multiple values", async () => {
+      await arrayStorage.push([5, 6, 4])
+      expect(await arrayStorage.get()).toEqual([0, 1, 2, 3, 4, 5, 6])
+    })
+    test("should push with selector function", async () => {
+      await arrayStorage.push((value) => value.map((v) => v * 10))
       expect(await arrayStorage.get()).toEqual([
-        1, 2, 3, 4, 5, 6, 10, 20, 30, 40, 50, 60,
+        0, 1, 2, 3, 4, 5, 6, 10, 20, 30, 40, 50, 60,
       ])
     })
     test("should remove single value", async () => {
       await arrayStorage.remove(4)
       expect(await arrayStorage.get()).toEqual([
-        1, 2, 3, 5, 6, 10, 20, 30, 40, 50, 60,
+        0, 1, 2, 3, 5, 6, 10, 20, 30, 40, 50, 60,
       ])
     })
     test("should remove multiple values", async () => {
       await arrayStorage.remove([5, 6])
       expect(await arrayStorage.get()).toEqual([
-        1, 2, 3, 10, 20, 30, 40, 50, 60,
+        0, 1, 2, 3, 10, 20, 30, 40, 50, 60,
       ])
     })
     test("should remove with selector function", async () => {
@@ -87,8 +91,8 @@ describe("ArrayStorage()", () => {
       ])
       expect(onChangeHandler).toHaveBeenCalledTimes(0)
     })
-    test("should add single value", async () => {
-      await arrayStorage.add({ id: 4, value: "d" })
+    test("should push single value", async () => {
+      await arrayStorage.push({ id: 4, value: "d" })
       expect(await arrayStorage.get()).toEqual([
         { id: 1, value: "a" },
         { id: 2, value: "b" },
@@ -106,8 +110,8 @@ describe("ArrayStorage()", () => {
         expect.anything(),
       )
     })
-    test("should add multiple values", async () => {
-      await arrayStorage.add([
+    test("should push multiple values", async () => {
+      await arrayStorage.push([
         { id: 5, value: "e" },
         { id: 6, value: "f" },
       ])
@@ -120,8 +124,8 @@ describe("ArrayStorage()", () => {
         { id: 6, value: "f" },
       ])
     })
-    test("should add with selector function", async () => {
-      await arrayStorage.add((value) =>
+    test("should push with selector function", async () => {
+      await arrayStorage.push((value) =>
         value.map((v) => ({ id: v.id * 10, value: v.value + "x" })),
       )
       expect(await arrayStorage.get()).toEqual([
@@ -198,7 +202,7 @@ describe("ArrayStorage()", () => {
       ])
     })
     test("should update duplicates", async () => {
-      await arrayStorage.add([{ id: 1, value: "au" }])
+      await arrayStorage.push([{ id: 1, value: "au" }])
       expect(await arrayStorage.get()).toEqual([
         { id: 1, value: "au" },
         { id: 2, value: "b" },
@@ -216,7 +220,7 @@ describe("ArrayStorage()", () => {
     })
     test("should not emit event when unsubscribed", async () => {
       unsub()
-      await arrayStorage.add([{ id: 1, value: "au" }])
+      await arrayStorage.push([{ id: 1, value: "au" }])
       expect(await arrayStorage.get()).toEqual([
         { id: 1, value: "au" },
         { id: 2, value: "b" },

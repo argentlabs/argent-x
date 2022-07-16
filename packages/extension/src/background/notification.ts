@@ -1,28 +1,21 @@
 import { Status } from "starknet"
 import browser from "webextension-polyfill"
 
+import { ArrayStorage } from "../shared/storage"
 import { TransactionMeta } from "../shared/transactions"
-import { Storage } from "./storage"
 
-const notificationsStorage = new Storage({
-  notificationsShown: [] as string[],
-})
+const notificationsStorage = new ArrayStorage<string>(
+  [],
+  "core:notifications:seenTransactions",
+)
 
 export async function hasShownNotification(hash: string) {
-  const notificationsShown = await notificationsStorage.getItem(
-    "notificationsShown",
-  )
-  return notificationsShown.includes(hash)
+  const [hit] = await notificationsStorage.get((h) => h === hash)
+  return !!hit
 }
 
 export async function addToAlreadyShown(hash: string) {
-  const notificationsShown = await notificationsStorage.getItem(
-    "notificationsShown",
-  )
-  await notificationsStorage.setItem("notificationsShown", [
-    ...notificationsShown,
-    hash,
-  ])
+  await notificationsStorage.push(hash)
 }
 
 export async function sentTransactionNotification(

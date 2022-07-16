@@ -7,7 +7,7 @@ export type SessionMessage =
   | { type: "IS_INITIALIZED" }
   | {
       type: "IS_INITIALIZED_RES"
-      data: { initialized: boolean; hasLegacy: boolean }
+      data: { initialized: boolean }
     }
   | { type: "START_SESSION"; data: { secure: true; body: string } }
   | { type: "START_SESSION_REJ" }
