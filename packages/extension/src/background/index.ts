@@ -48,7 +48,23 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
   }
   if (alarm.name === "core:transactionTracker:update") {
     console.info("~> fetching transaction updates")
-    await transactionTracker.update()
+    let hasInFlightTransactions = await transactionTracker.update()
+
+    // the config below will run transaction updates 4x per minute, if there are in-flight transactions
+    // it will update on second 0, 15, 30 and 45
+    const maxRetries = 3 // max 3 retries
+    const waitTimeInS = 15 // wait 15 seconds between retries
+
+    let runs = 0
+    while (hasInFlightTransactions && runs < maxRetries) {
+      console.info(`~> waiting ${waitTimeInS}s for transaction updates`)
+      await new Promise((resolve) => setTimeout(resolve, waitTimeInS * 1000))
+      console.info(
+        "~> fetching transaction updates as pending transactions were detected",
+      )
+      runs++
+      hasInFlightTransactions = await transactionTracker.update()
+    }
   }
 })
 

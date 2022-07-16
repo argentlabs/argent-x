@@ -1,6 +1,7 @@
 import { lowerCase, upperFirst } from "lodash-es"
 import { Status } from "starknet"
 
+import { TRANSACTION_STATUSES_TO_TRACK } from "../background/transactions/constants"
 import { WalletAccount } from "./wallet.model"
 
 export interface TransactionMeta {
@@ -38,3 +39,10 @@ export function entryPointToHumanReadable(entryPoint: string): string {
     return entryPoint
   }
 }
+
+export const getInFlightTransactions = (
+  transactions: Transaction[],
+): Transaction[] =>
+  transactions.filter(({ status }) =>
+    TRANSACTION_STATUSES_TO_TRACK.includes(status),
+  )
