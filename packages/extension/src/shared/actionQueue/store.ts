@@ -13,6 +13,7 @@ export const globalActionQueueStore = new ArrayStorage<ExtensionActionItem>(
 )
 
 const showNotificationBadge = (actions: ExtensionActionItem[]) => {
+  // TODO: MV3 - replace browserAction by action
   browser.browserAction.setBadgeText({
     text: `${actions.length || ""}`, // 0 should not show a badge
   })

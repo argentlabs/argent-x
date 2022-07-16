@@ -6,7 +6,7 @@ import { Wallet } from "./wallet"
 
 const nonceStore = new Map<string, string>()
 
-// TODO: needs to be enabled with MV3, but session storage is not available in MV2
+// TODO: MV3 needs to be enabled with MV3, but session storage is not available in MV2
 // const nonceStore = new KeyValueStorage<Record<string, string>>(
 //   {},
 //   {
