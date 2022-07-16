@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { Call, number } from "starknet"
+import { Call } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
