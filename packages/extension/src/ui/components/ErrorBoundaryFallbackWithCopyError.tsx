@@ -114,7 +114,11 @@ ${displayStack}
       Object.keys(errorInfo).forEach((key) => {
         scope.setExtra(key, errorInfo[key])
       })
-      Sentry.captureException(error)
+      const eventId = Sentry.captureException(error)
+      console.log(
+        "🚀 ~ file: ErrorBoundaryFallbackWithCopyError.tsx ~ line 118 ~ Sentry.withScope ~ eventId",
+        eventId,
+      )
     })
   }, [error, errorInfo])
 

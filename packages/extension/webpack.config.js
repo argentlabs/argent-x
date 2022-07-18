@@ -7,6 +7,7 @@ const { ESBuildMinifyPlugin } = require("esbuild-loader")
 
 const ESLintPlugin = require("eslint-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
+const SentryWebpackPlugin = require("@sentry/webpack-plugin")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -32,11 +33,7 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: isProd
-    ? genSourceMaps
-      ? "hidden-source-map"
-      : undefined
-    : "inline-source-map",
+  devtool: "source-map",
   mode: isProd ? "production" : "development",
   module: {
     rules: [
@@ -95,9 +92,31 @@ module.exports = {
       }),
 
     new ForkTsCheckerWebpackPlugin(), // does the type checking in a separate process (non-blocking in dev) as esbuild is skipping type checking
+
     new Dotenv({
       systemvars: true,
       safe: safeEnvVars,
+    }),
+    new SentryWebpackPlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      project: "argent-x",
+      org: "argent",
+      release: process.env.npm_package_version,
+      include: [
+        {
+          paths: ["./dist"],
+          urlPrefix: "~/",
+        },
+        {
+          paths: ["./sourcemaps"],
+          urlPrefix: "~/sourcemaps",
+        },
+      ],
+      debug: true,
+      ignore: ["node_modules"],
+      validate: true,
+      cleanArtifacts: true,
+      sourceMapReference: !isProd,
     }),
   ].filter(Boolean),
   resolve: {
@@ -113,6 +132,7 @@ module.exports = {
         minimizer: [
           new ESBuildMinifyPlugin({
             target: "es2015", // Syntax to compile to (see options below for possible values)
+            loader: "tsx",
           }),
         ],
         splitChunks: {

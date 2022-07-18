@@ -14,6 +14,7 @@ export const useSentryInit = () => {
       dsn: process.env.SENTRY_DSN,
       debug: process.env.NODE_ENV === "development",
       environment: process.env.NODE_ENV,
+      autoSessionTracking: false, // don't want to track user sessions. Maybe opt-in for future?
       integrations: (integrations) => {
         if (automaticErrorReporting) {
           return integrations
