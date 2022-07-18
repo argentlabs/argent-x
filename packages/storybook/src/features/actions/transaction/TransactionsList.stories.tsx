@@ -26,7 +26,7 @@ const tokensByNetwork: TokenDetails[] = defaultTokens
     return {
       ...token,
       networkId: token.network,
-      decimals: number.toBN(token.decimals),
+      decimals: Number(token.decimals),
     }
   })
 

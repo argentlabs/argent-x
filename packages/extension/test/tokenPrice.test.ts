@@ -16,11 +16,11 @@ import mockApiTokenDataInvalid from "./__mocks__/argent-api-tokens-invalid.mock.
 import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
 import mockTokensWithBalanceRaw from "./__mocks__/tokens-with-balance.mock.json"
 
-/** convert to expected types - a mix of BN and BigNumber */
+/** convert to expected types */
 export const mockTokensWithBalance = mockTokensWithBalanceRaw.map((token) => {
   return {
     ...token,
-    decimals: number.toBN(token.decimals),
+    decimals: Number(token.decimals),
     balance: BigNumber.from(token.balance),
   }
 })
@@ -32,7 +32,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
         /** decimals may be of type BN in the wild */
         convertTokenAmountToCurrencyValue({
           amount: "1000000000000000000",
-          decimals: number.toBN(18, 10),
+          decimals: 18,
           unitCurrencyValue: 1.23,
         }),
       ).toEqual("1.23")
