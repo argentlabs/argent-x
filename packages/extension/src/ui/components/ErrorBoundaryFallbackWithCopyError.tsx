@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react"
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import styled from "styled-components"
 
 import { ISettingsStorage } from "../../shared/settings"
@@ -109,14 +109,14 @@ ${displayStack}
     return fallbackErrorPayload
   }, [error, errorInfo])
 
-  const reportToSentry = () => {
+  const reportToSentry = useCallback(() => {
     Sentry.withScope((scope) => {
       Object.keys(errorInfo).forEach((key) => {
         scope.setExtra(key, errorInfo[key])
       })
       Sentry.captureException(error)
     })
-  }
+  }, [error, errorInfo])
 
   const {
     initialised: privacyErrorReportingInitialised,
