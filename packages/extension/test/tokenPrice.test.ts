@@ -1,5 +1,4 @@
 import { BigNumber } from "ethers"
-import { number } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import {
@@ -17,13 +16,14 @@ import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
 import mockTokensWithBalanceRaw from "./__mocks__/tokens-with-balance.mock.json"
 
 /** convert to expected types */
-export const mockTokensWithBalance = mockTokensWithBalanceRaw.map((token) => {
-  return {
-    ...token,
-    decimals: Number(token.decimals),
-    balance: BigNumber.from(token.balance),
-  }
-})
+export const mockTokensWithBalance: TokenDetailsWithBalance[] =
+  mockTokensWithBalanceRaw.map((token) => {
+    return {
+      ...token,
+      decimals: Number(token.decimals),
+      balance: BigNumber.from(token.balance),
+    }
+  })
 
 describe("convertTokenAmountToCurrencyValue()", () => {
   describe("when valid", () => {
@@ -65,7 +65,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
       expect(
         convertTokenAmountToCurrencyValue({
           amount: "30000000000",
-          decimals: 10,
+          decimals: BigNumber.from("10"),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           unitCurrencyValue: null,
@@ -91,7 +91,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
 describe("lookupTokenPriceDetails()", () => {
   describe("when valid", () => {
     test("should find token price details in API response", () => {
-      const token = mockTokensWithBalance[0] as TokenDetailsWithBalance
+      const token = mockTokensWithBalance[0]
       const price = lookupTokenPriceDetails({
         token,
         pricesData: mockApiPricesData,
@@ -115,7 +115,7 @@ describe("lookupTokenPriceDetails()", () => {
   })
   describe("when invalid", () => {
     test("should return undefined without throwing", () => {
-      const token = mockTokensWithBalance[0] as TokenDetailsWithBalance
+      const token = mockTokensWithBalance[0]
       const price = lookupTokenPriceDetails({
         token,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
