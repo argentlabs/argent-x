@@ -11,7 +11,7 @@ export const useSentryInit = () => {
 
   useEffect(() => {
     Sentry.init({
-      dsn: "https://c2c861914bb2448e873ea3235fe03e5e@o1315819.ingest.sentry.io/6567926",
+      dsn: process.env.SENTRY_DSN,
       debug: process.env.NODE_ENV === "development",
       environment: process.env.NODE_ENV,
       integrations: (integrations) => {
