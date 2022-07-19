@@ -3,6 +3,7 @@ import create from "zustand"
 import { persist } from "zustand/middleware"
 
 import { AddFundsServices, Pages, getAnalytics } from "../../shared/analytics"
+import { useNetworkLogs } from "./../../ui/features/settings/networkLogs.state"
 
 /**
  * Lets switch to this analytics implementation once sendBeacon supports Authorization headers:
@@ -25,7 +26,8 @@ import { AddFundsServices, Pages, getAnalytics } from "../../shared/analytics"
   * ```
 */
 
-export const analytics = getAnalytics(fetch)
+const [ , addNetworkLog] = useNetworkLogs()
+export const analytics = getAnalytics(fetch, addNetworkLog)
 
 export const usePageTracking = <T extends keyof Pages>(
   name: T,

@@ -113,6 +113,7 @@ const defaultUserAgent = isBrowser ? window.navigator.userAgent : "unknown"
 
 export function getAnalytics(
   fetch: Fetch,
+  addNetworkLog,
   userAgent = defaultUserAgent,
 ): Analytics {
   const prebuiltPayload = {
@@ -135,11 +136,13 @@ export function getAnalytics(
       }
 
       try {
-        return await fetch(SEGMENT_TRACK_URL, {
+        const data = {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
-        })
+        }
+        await addNetworkLog({ url: SEGMENT_TRACK_URL, ...data })
+        return await fetch(SEGMENT_TRACK_URL, data)
       } catch {
         // ignore
       }
@@ -155,11 +158,13 @@ export function getAnalytics(
         timestamp: new Date().toISOString(),
       }
       try {
-        return await fetch(SEGMENT_PAGE_URL, {
+        const data =  {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
-        })
+        }
+        await addNetworkLog({ url: SEGMENT_PAGE_URL, ...data })
+        return await fetch(SEGMENT_PAGE_URL, data)
       } catch {
         // ignore
       }
