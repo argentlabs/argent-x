@@ -18,11 +18,13 @@ import {
 interface RecoveryOptions {
   networkId?: string
   showAccountList?: boolean
+  showNetworkLogs?: boolean
 }
 
 export const recover = async ({
   networkId,
   showAccountList,
+  showNetworkLogs,
 }: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
@@ -46,6 +48,10 @@ export const recover = async ({
     // shows deprecation screen depending on selected network
     if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
       return routes.migrationDisclaimer()
+    }
+
+    if (showNetworkLogs) {
+      return routes.settingsNetworkLogging()
     }
 
     if (showAccountList || !selectedAccount) {
