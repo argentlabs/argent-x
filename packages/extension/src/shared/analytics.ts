@@ -1,6 +1,8 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
 import browser from "webextension-polyfill"
+import create from "zustand"
+import { persist } from "zustand/middleware"
 
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
@@ -171,6 +173,32 @@ export function getAnalytics(
   }
 }
 
+interface ActiveStoreValues {
+  lastOpened: number
+  lastUnlocked: number
+  lastSession: number
+  lastClosed: number
+}
+
+interface ActiveStore extends ActiveStoreValues {
+  update: (key: keyof ActiveStoreValues) => void
+}
+
+export const activeStore = create<ActiveStore>(
+  persist(
+    (set) => ({
+      lastOpened: 0, // defaults to tracking once when no value set yet
+      lastUnlocked: 0, // defaults to tracking once when no value set yet
+      lastSession: 0, // defaults to tracking once when no value set yet
+      lastClosed: 0, // defaults to tracking once when no value set yet
+      update: (key) => set((state) => ({ ...state, [key]: Date.now() })),
+    }),
+    {
+      name: "lastSeen",
+    },
+  ),
+)
+
 /*
  * There is no usable 'close' event on an extension
  *
@@ -183,10 +211,10 @@ const EXTENSION_CONNECT_ID = "argent-x-analytics-connect"
 /** listen for the port connection from the UI, then detect disconnection */
 export const initBackgroundExtensionCloseListener = () => {
   browser.runtime.onConnect.addListener((port) => {
-    console.log("onConnect", port)
     if (port.name === EXTENSION_CONNECT_ID) {
-      port.onDisconnect.addListener((e) => {
-        console.log("onDisconnect", e)
+      port.onDisconnect.addListener(() => {
+        /** Extension was closed */
+        activeStore.getState().update("lastClosed")
       })
     }
   })
