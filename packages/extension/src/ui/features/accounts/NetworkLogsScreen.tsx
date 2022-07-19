@@ -1,9 +1,8 @@
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import styled from "styled-components"
 
 import { NetworkLog } from "./../../../shared/network_log"
 import { H2 } from "../../theme/Typography"
-import { useNetworkLogs } from "./../settings/networkLogs.state"
 
 export const P = styled.p`
   font-size: 15px;
@@ -52,18 +51,49 @@ function useLocalStorage(key: string, initialValue: any) {
       console.log(error)
     }
   }
+
+  const listener = () => {
+    try {
+      const item = window.localStorage.getItem(key)
+      console.log(`item ${item}`)
+      if (item && JSON.parse(item) !== storedValue) {
+        console.log(`localStorage[key] ${JSON.parse(item)}`)
+        setValue(JSON.parse(item))
+      }
+    } catch (error) {
+      console.log(error)
+      // return initialValue
+    }
+  }
+
+  useEffect(() => {
+    console.log("useEffect")
+    window.addEventListener("storage", listener)
+    return () => window.removeEventListener("storage", listener)
+  }, [])
+
   return [storedValue, setValue]
 }
 
 export const NetworkLogsScreen: FC = () => {
   const [networkLogs] = useLocalStorage("networkLogs", [])
 
+  console.log(`networkLogs type ${typeof networkLogs}`)
+
   let count = 0
 
-  const logNodes = networkLogs.map((log: NetworkLog) => {
-    const key = `log-${count++}`
-    return <P key={key}>{JSON.stringify(log)}</P>
-  })
+  const logNodes = networkLogs
+    ? networkLogs
+        .map((log: NetworkLog) => {
+          const key = `log-${count++}`
+          return (
+            <P key={key}>
+              {key} {JSON.stringify(log)}
+            </P>
+          )
+        })
+        .reverse()
+    : []
 
   return (
     <div>
