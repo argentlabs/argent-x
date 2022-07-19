@@ -9,6 +9,7 @@ const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 // dont use destructuring here
 const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
 const VERSION = process.env.VERSION
+console.log("SEGMENT_WRITE_KEY", SEGMENT_WRITE_KEY)
 
 export type AddFundsServices = "banxa" | "layerswap" | "starkgate"
 
@@ -144,7 +145,9 @@ export function getAnalytics(
           body: JSON.stringify(payload),
         }
         networkLogs.push({ url: SEGMENT_TRACK_URL, ...data })
+        console.log(data)
         useNetworkLogsStore.setState({ networkLogs })
+        localStorage.setItem("networkLogs", JSON.stringify(networkLogs))
         return await fetch(SEGMENT_TRACK_URL, data)
       } catch {
         // ignore
@@ -169,12 +172,11 @@ export function getAnalytics(
           body: JSON.stringify(payload),
         }
 
-        // networkLogs.push({ url: SEGMENT_PAGE_URL, ...data })
+        networkLogs.push({ url: SEGMENT_PAGE_URL, ...data })
 
-        useNetworkLogsStore.setState((state) => [
-          ...state,
-          { networkLogs: { url: SEGMENT_PAGE_URL, ...data } },
-        ])
+        console.log(data)
+        useNetworkLogsStore.setState({ networkLogs })
+        localStorage.setItem("networkLogs", JSON.stringify(networkLogs))
 
         return await fetch(SEGMENT_PAGE_URL, data)
       } catch {
