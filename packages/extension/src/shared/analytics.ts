@@ -1,5 +1,6 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
+import browser from "webextension-polyfill"
 
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
@@ -12,6 +13,9 @@ export type AddFundsServices = "banxa" | "layerswap" | "starkgate"
 
 export interface Events {
   sessionStart: undefined
+  sessionEnded: {
+    length: number
+  }
   openedExtensionToday: undefined
   unlockedExtensionToday: undefined
   unlockedExtensionWeekly: undefined
@@ -165,4 +169,30 @@ export function getAnalytics(
       }
     },
   }
+}
+
+/*
+ * There is no usable 'close' event on an extension
+ *
+ * instead we open a message port to the extension and simply listen for it to be disconnected
+ * as a side-effect of the extension being closed
+ */
+
+const EXTENSION_CONNECT_ID = "argent-x-analytics-connect"
+
+/** listen for the port connection from the UI, then detect disconnection */
+export const initBackgroundExtensionCloseListener = () => {
+  browser.runtime.onConnect.addListener((port) => {
+    console.log("onConnect", port)
+    if (port.name === EXTENSION_CONNECT_ID) {
+      port.onDisconnect.addListener((e) => {
+        console.log("onDisconnect", e)
+      })
+    }
+  })
+}
+
+/** connect to the background port from the UI */
+export const initUiExtensionCloseListener = () => {
+  browser.runtime.connect({ name: EXTENSION_CONNECT_ID })
 }
