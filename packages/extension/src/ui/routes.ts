@@ -101,6 +101,7 @@ export const routes = {
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
   networkWarning: route("/network-warning"),
+  settingsNetworkLogging: route("/settings/network-logging"),
   backupDownload: route(
     (isFromSettings?: boolean) =>
       `/backup-download${isFromSettings ? "?settings" : ""}`,
