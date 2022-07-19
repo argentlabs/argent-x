@@ -162,13 +162,19 @@ export function getAnalytics(
       }
       try {
         const networkLogs = useNetworkLogsStore.getState().networkLogs
+
         const data = {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
         }
-        networkLogs.push({ url: SEGMENT_PAGE_URL, ...data })
-        useNetworkLogsStore.setState({ networkLogs })
+
+        // networkLogs.push({ url: SEGMENT_PAGE_URL, ...data })
+
+        useNetworkLogsStore.setState((state) => [
+          ...state,
+          { networkLogs: { url: SEGMENT_PAGE_URL, ...data } },
+        ])
 
         return await fetch(SEGMENT_PAGE_URL, data)
       } catch {
