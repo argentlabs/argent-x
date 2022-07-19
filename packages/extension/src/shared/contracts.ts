@@ -1,11 +1,11 @@
 import untypedKnownContracts from "../assets/contracts/known-contracts.json"
-import { KnownNetworksType } from "./networks"
+import { PublicNetworkIds } from "./network/public"
 
 export interface KnownContract {
   name: string
   icon: string
   contracts: {
-    [network in KnownNetworksType]: string[]
+    [network in PublicNetworkIds]: string[]
   }
 }
 
@@ -15,7 +15,7 @@ export { knownContracts }
 
 export const getKnownContractForAddress = (
   address: string,
-  network?: KnownNetworksType,
+  network?: PublicNetworkIds,
 ) => {
   try {
     const knownContract = knownContracts.find(({ contracts }) => {
