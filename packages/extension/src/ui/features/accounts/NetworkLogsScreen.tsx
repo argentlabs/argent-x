@@ -26,59 +26,24 @@ export const SettingsScreenWrapper = styled.div`
   }
 `
 
-function useLocalStorage(key: string, initialValue: any) {
-  const [storedValue, setStoredValue] = useState(() => {
-    if (typeof window === "undefined") {
-      return initialValue
-    }
-    try {
-      const item = window.localStorage.getItem(key)
-      return item ? JSON.parse(item) : initialValue
-    } catch (error) {
-      console.log(error)
-      return initialValue
-    }
-  })
-  const setValue = (value: any) => {
-    try {
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value
-      setStoredValue(valueToStore)
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore))
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const listener = () => {
-    try {
-      const item = window.localStorage.getItem(key)
-      console.log(`item ${item}`)
-      if (item && JSON.parse(item) !== storedValue) {
-        console.log(`localStorage[key] ${JSON.parse(item)}`)
-        setValue(JSON.parse(item))
-      }
-    } catch (error) {
-      console.log(error)
-      // return initialValue
-    }
-  }
+export const NetworkLogsScreen: FC = () => {
+  const key = "networkLogs"
+  const [currentStorage, setStorage] = useState(
+    localStorage[key] || JSON.stringify([]),
+  )
 
   useEffect(() => {
-    console.log("useEffect")
+    const listener = () => {
+      if (localStorage[key] !== currentStorage) {
+        setStorage(localStorage[key])
+      }
+    }
+
     window.addEventListener("storage", listener)
     return () => window.removeEventListener("storage", listener)
-  }, [])
+  }, [currentStorage])
 
-  return [storedValue, setValue]
-}
-
-export const NetworkLogsScreen: FC = () => {
-  const [networkLogs] = useLocalStorage("networkLogs", [])
-
-  console.log(`networkLogs type ${typeof networkLogs}`)
+  const networkLogs = JSON.parse(currentStorage)
 
   let count = 0
 
