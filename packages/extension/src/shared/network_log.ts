@@ -1,5 +1,5 @@
 export type NetworkLog = {
-  method: "POST" | "GET"
+  method: string
   headers: any
   body: string
   url: string

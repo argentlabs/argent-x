@@ -1,6 +1,8 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
 
+import { useNetworkLogsStore } from "./../ui/features/settings/networkLogs.state"
+
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
@@ -113,7 +115,6 @@ const defaultUserAgent = isBrowser ? window.navigator.userAgent : "unknown"
 
 export function getAnalytics(
   fetch: Fetch,
-  addNetworkLog,
   userAgent = defaultUserAgent,
 ): Analytics {
   const prebuiltPayload = {
@@ -136,12 +137,14 @@ export function getAnalytics(
       }
 
       try {
+        const networkLogs = useNetworkLogsStore.getState().networkLogs
         const data = {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
         }
-        await addNetworkLog({ url: SEGMENT_TRACK_URL, ...data })
+        networkLogs.push({ url: SEGMENT_TRACK_URL, ...data })
+        useNetworkLogsStore.setState({ networkLogs })
         return await fetch(SEGMENT_TRACK_URL, data)
       } catch {
         // ignore
@@ -158,12 +161,15 @@ export function getAnalytics(
         timestamp: new Date().toISOString(),
       }
       try {
-        const data =  {
+        const networkLogs = useNetworkLogsStore.getState().networkLogs
+        const data = {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
         }
-        await addNetworkLog({ url: SEGMENT_PAGE_URL, ...data })
+        networkLogs.push({ url: SEGMENT_PAGE_URL, ...data })
+        useNetworkLogsStore.setState({ networkLogs })
+
         return await fetch(SEGMENT_PAGE_URL, data)
       } catch {
         // ignore
