@@ -1,3 +1,4 @@
+import { chromeStorageMock } from "@argent-x/extension/src/shared/storage/__test__/chrome-storage.mock"
 import {
   FixedGlobalStyle,
   ThemeProvider as StyledComponentsThemeProvider,
@@ -6,6 +7,18 @@ import {
 } from "@argent-x/extension/src/ui/theme"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import React from "react"
+
+/** polyfill browser extension storage  */
+global.chrome = {
+  ...global.chrome,
+  runtime: {
+    ...global.chrome.runtime,
+    id: "test",
+  },
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  storage: chromeStorageMock,
+}
 
 export const decorators = [
   (Story) => (
