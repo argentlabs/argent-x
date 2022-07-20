@@ -14,8 +14,7 @@ export const getWindowLocationHost = async () => {
     const tab = tabs[0]
     if (tab.url) {
       const url = new URL(tab.url)
-      const host = url.host
-      return host
+      return url.host
     }
   }
 }
