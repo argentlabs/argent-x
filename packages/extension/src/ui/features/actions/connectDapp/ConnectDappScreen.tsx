@@ -86,7 +86,6 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
   )
   const onSelectedAccountItemChange = useCallback(
     (accountItem: IAccountListItem) => {
-      console.log("onSelectedAccountItemChange", accountItem)
       onSelectedAccountAddressChange &&
         onSelectedAccountAddressChange(accountItem.accountAddress)
     },
