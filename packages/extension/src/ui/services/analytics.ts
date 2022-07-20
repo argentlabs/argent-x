@@ -81,7 +81,6 @@ export function unlockedExtensionTracking() {
 }
 
 export function sessionStartTracking() {
-  console.log("sessionStartTracking")
   try {
     // track once every 5 minutes
     if (Date.now() - activeStore.getState().lastSession > N_5_MINUTES) {
