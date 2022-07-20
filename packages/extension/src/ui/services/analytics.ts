@@ -1,8 +1,11 @@
 import { useEffect } from "react"
-import create from "zustand"
-import { persist } from "zustand/middleware"
 
-import { AddFundsServices, Pages, getAnalytics } from "../../shared/analytics"
+import {
+  AddFundsServices,
+  Pages,
+  activeStore,
+  getAnalytics,
+} from "../../shared/analytics"
 
 /**
  * Lets switch to this analytics implementation once sendBeacon supports Authorization headers:
@@ -40,28 +43,6 @@ export const usePageTracking = <T extends keyof Pages>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, rest[0]]) // as React in strict mode renders every component twice, this page will be tracked 2x in development. This is not the case in production.
 }
-
-interface ActiveStoreValues {
-  lastOpened: number
-  lastUnlocked: number
-  lastSession: number
-}
-interface ActiveStore extends ActiveStoreValues {
-  update: (key: keyof ActiveStoreValues) => void
-}
-const activeStore = create<ActiveStore>(
-  persist(
-    (set) => ({
-      lastOpened: 0, // defaults to tracking once when no value set yet
-      lastUnlocked: 0, // defaults to tracking once when no value set yet
-      lastSession: 0, // defaults to tracking once when no value set yet
-      update: (key) => set((state) => ({ ...state, [key]: Date.now() })),
-    }),
-    {
-      name: "lastSeen",
-    },
-  ),
-)
 
 const N_5_MINUTES = 5 * 60 * 1000
 const N_24_HOURS = 24 * 60 * 60 * 1000
@@ -104,6 +85,12 @@ export function sessionStartTracking() {
     // track once every 5 minutes
     if (Date.now() - activeStore.getState().lastSession > N_5_MINUTES) {
       analytics.track("sessionStart")
+      // ...and also if extension was closed for 5 minutes
+      if (Date.now() - activeStore.getState().lastClosed > N_5_MINUTES) {
+        const length =
+          activeStore.getState().lastClosed - activeStore.getState().lastSession
+        analytics.track("sessionEnded", { length })
+      }
     }
     activeStore.getState().update("lastSession")
   } catch (e) {
@@ -120,7 +107,16 @@ export function trackAddFundsService(
 
 export const useTracking = () => {
   useEffect(() => {
+    // as React in strict mode renders every component twice, this will be called 2x in development. This is not the case in production.
     sessionStartTracking()
     openedExtensionTodayTracking()
+    return () => {
+      /**
+       * NOTE: any code here may run in dev but will not be triggered in a production build
+       * and therefore cannot be used for 'extension closed' events
+       *
+       * @see initUiExtensionCloseListener and initBackgroundExtensionCloseListener for solution
+       */
+    }
   }, [])
 }
