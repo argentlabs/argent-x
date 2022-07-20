@@ -7,7 +7,6 @@ import {
   getAccountIdentifier,
   isDeprecated,
 } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { IconButton } from "../../components/IconButton"
@@ -24,7 +23,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
-import { useCurrentNetwork, useNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountSubHeader } from "./AccountSubheader"

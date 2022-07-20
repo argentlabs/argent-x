@@ -1,10 +1,7 @@
 import { ethers } from "ethers"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import {
-  accountsEqual,
-  getAccountIdentifier,
-} from "../../../shared/wallet.service"
+import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
