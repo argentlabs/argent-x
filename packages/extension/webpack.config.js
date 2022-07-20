@@ -97,27 +97,29 @@ module.exports = {
       systemvars: true,
       safe: safeEnvVars,
     }),
-    new SentryWebpackPlugin({
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      project: "argent-x",
-      org: "argent",
-      release: process.env.npm_package_version,
-      include: [
-        {
-          paths: ["./dist"],
-          urlPrefix: "~/",
-        },
-        {
-          paths: ["./sourcemaps"],
-          urlPrefix: "~/sourcemaps",
-        },
-      ],
-      debug: true,
-      ignore: ["node_modules"],
-      validate: true,
-      cleanArtifacts: true,
-      sourceMapReference: !isProd,
-    }),
+
+    // Only use sentry-sourcemaping on Prod
+    isProd &&
+      new SentryWebpackPlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        project: "argent-x",
+        org: "argent",
+        release: process.env.npm_package_version,
+        include: [
+          {
+            paths: ["./dist"],
+            urlPrefix: "~/",
+          },
+          {
+            paths: ["./sourcemaps"],
+            urlPrefix: "~/sourcemaps",
+          },
+        ],
+        debug: true,
+        ignore: ["node_modules"],
+        validate: true,
+        cleanArtifacts: true,
+      }),
   ].filter(Boolean),
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
