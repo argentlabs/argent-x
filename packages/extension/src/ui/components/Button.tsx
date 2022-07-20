@@ -9,7 +9,7 @@ interface IButton {
   variant?: ButtonVariant
 }
 
-/** TODO: move colour tokens into theme */
+/** TODO: move color tokens into theme */
 
 export const getVariantColor =
   ({
