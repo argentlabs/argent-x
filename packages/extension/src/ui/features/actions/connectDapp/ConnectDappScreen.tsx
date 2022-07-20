@@ -190,7 +190,6 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
 
   const onSelectedAccountChange = useCallback(
     (accountAddress: string) => {
-      console.log("onSelectedAccountChange", selectedAccount)
       setConnectAccountAddress(accountAddress)
     },
     [selectedAccount],
