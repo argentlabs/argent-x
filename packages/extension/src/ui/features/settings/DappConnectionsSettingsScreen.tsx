@@ -40,7 +40,8 @@ export const DappConnectionsSettingsScreen: FC = () => {
 
   useEffect(() => {
     requestPreAuthorizations()
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

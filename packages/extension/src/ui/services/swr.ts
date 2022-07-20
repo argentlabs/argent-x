@@ -62,7 +62,8 @@ export function useConditionallyEnabledSWR<Data = any, Error = any>(
   /** revalidate when enabled changes */
   useEffect(() => {
     result.mutate()
-  }, [enabled])
+    // dont add result to dependencies to avoid revalidating on every render
+  }, [enabled]) // eslint-disable-line react-hooks/exhaustive-deps
   return result
 }
 

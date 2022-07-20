@@ -1,68 +1,40 @@
-import { filter, uniqBy } from "lodash-es"
-import { useEffect } from "react"
-import create from "zustand"
+import { memoize } from "lodash-es"
+import { useMemo } from "react"
 
-import { messageStream } from "../../../shared/messages"
+import { transactionsStore } from "../../../background/transactions/store"
+import { useArrayStorage } from "../../../shared/storage/hooks"
 import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/wallet.service"
-import { getTransactions } from "../../services/backgroundTransactions"
+import {
+  accountsEqual,
+  getAccountIdentifier,
+} from "../../../shared/wallet.service"
 
-interface State {
+type UseAccountTransactions = (account?: BaseWalletAccount) => {
   transactions: Transaction[]
-  addTransactions: (transactions: Transaction[]) => void
+  pendingTransactions: Transaction[]
 }
 
-function mergeTransactionArrays(
-  transactions: Transaction[],
-  newTransactions: Transaction[],
-): Transaction[] {
-  return uniqBy([...newTransactions, ...transactions], "hash")
-}
+const byAccountSelector = memoize(
+  (account?: BaseWalletAccount) => (transaction: Transaction) =>
+    Boolean(account && accountsEqual(transaction.account, account)),
+  (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
+)
 
-const useTransactionsStore = create<State>((set) => ({
-  transactions: [],
-  addTransactions: (transactions: Transaction[]) => {
-    set((state) => ({
-      ...state,
-      transactions: mergeTransactionArrays(state.transactions, transactions),
-    }))
-  },
-}))
-
-export const useAccountTransactions = (account?: BaseWalletAccount) => {
-  useEffect(() => {
-    if (account) {
-      getTransactions(account).then((transactions) => {
-        useTransactionsStore.setState({ transactions })
-      })
-
-      const subscription = messageStream.subscribe(([message]) => {
-        if (message.type === "TRANSACTION_UPDATES") {
-          useTransactionsStore
-            .getState()
-            .addTransactions(
-              filter(message.data, (transaction) =>
-                accountsEqual(transaction.account, account),
-              ),
-            )
-        }
-      })
-
-      return () => {
-        if (!subscription.closed) {
-          subscription.unsubscribe()
-        }
-      }
-    }
-  }, [])
-
-  const transactions = useTransactionsStore((state) =>
-    state.transactions.sort((a, b) => b.timestamp - a.timestamp),
+export const useAccountTransactions: UseAccountTransactions = (account) => {
+  const transactions = useArrayStorage(
+    transactionsStore,
+    byAccountSelector(account),
   )
-  const pendingTransactions = transactions.filter(
-    ({ status, account: a }) =>
-      status === "RECEIVED" && account && accountsEqual(a, account),
+
+  const sortedTransactions = useMemo(
+    () => transactions.sort((a, b) => b.timestamp - a.timestamp),
+    [transactions],
   )
+
+  const pendingTransactions = sortedTransactions.filter(
+    ({ status }) => status === "RECEIVED",
+  )
+
   return { transactions, pendingTransactions }
 }

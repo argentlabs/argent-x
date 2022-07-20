@@ -1,5 +1,5 @@
-import { Network } from "./../shared/networks"
-import {
+import type { Network } from "../shared/network"
+import type {
   AddStarknetChainParameters,
   WatchAssetParameters,
 } from "./inpage.model"
@@ -13,7 +13,7 @@ export async function handleAddTokenRequest(
     data: {
       address: callParams.options.address,
       symbol: callParams.options.symbol,
-      decimals: callParams.options.decimals?.toString(),
+      decimals: callParams.options.decimals,
       name: callParams.options.name,
     },
   })

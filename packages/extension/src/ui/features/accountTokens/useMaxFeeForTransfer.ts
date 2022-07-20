@@ -2,7 +2,7 @@ import { BigNumber } from "ethers"
 import { Call, stark } from "starknet"
 import useSWR from "swr"
 
-import { getFeeToken } from "../../../shared/token"
+import { getFeeToken } from "../../../shared/token/utils"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"

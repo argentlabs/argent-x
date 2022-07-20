@@ -1,6 +1,7 @@
 import { validateAndParseAddress } from "starknet"
 
-import { Token, parsedDefaultTokens } from "../shared/token"
+import { Token } from "../shared/token/type"
+import { parsedDefaultTokens } from "../shared/token/utils"
 import { Storage } from "./storage"
 
 const customTokenStore = new Storage<{

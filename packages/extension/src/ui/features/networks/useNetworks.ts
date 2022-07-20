@@ -1,34 +1,15 @@
+import { useMemo } from "react"
 import useSWR from "swr"
 
-import { getNetwork } from "../../../shared/networks"
-import { useAppState } from "./../../app.state"
 import {
-  getNetworkStatuses,
-  getNetworks,
-} from "../../services/backgroundNetworks"
+  customNetworksStore,
+  defaultNetwork,
+  extendByDefaultNetworks,
+} from "../../../shared/network"
+import { useArrayStorage } from "../../../shared/storage/hooks"
+import { useAppState } from "./../../app.state"
+import { getNetworkStatuses } from "../../services/backgroundNetworks"
 import { SWRConfigCommon } from "../../services/swr"
-
-export const useNetworks = (config?: SWRConfigCommon) => {
-  const { data: allNetworks = [], ...rest } = useSWR(
-    ["customNetworks"],
-    getNetworks,
-    config,
-  )
-
-  return {
-    allNetworks,
-    ...rest,
-  }
-}
-
-export const useNetwork = (networkId: string, config?: SWRConfigCommon) => {
-  const { allNetworks, ...rest } = useNetworks(config)
-
-  return {
-    network: getNetwork(networkId, allNetworks),
-    ...rest,
-  }
-}
 
 export const useNetworkStatuses = (config?: SWRConfigCommon) => {
   const { data: networkStatuses = {}, ...rest } = useSWR(
@@ -45,16 +26,29 @@ export const useNetworkStatuses = (config?: SWRConfigCommon) => {
   }
 }
 
-export const useCurrentNetwork = () => {
-  const { switcherNetworkId } = useAppState()
-
-  const currentNetwork = useNetwork(switcherNetworkId)
-
-  return currentNetwork.network
-}
-
 export const useIsMainnet = () => {
   const { switcherNetworkId } = useAppState()
-  const isMainnet = switcherNetworkId === "mainnet-alpha"
-  return isMainnet
+  return switcherNetworkId === "mainnet-alpha"
+}
+
+export const useNetworks = () => {
+  const customNetworks = useArrayStorage(customNetworksStore)
+  return useMemo(
+    () => extendByDefaultNetworks(customNetworks),
+    [customNetworks],
+  )
+}
+
+export const useNetwork = (networkId: string) => {
+  const networks = useNetworks()
+  return useMemo(
+    () =>
+      networks.find((network) => network.id === networkId) || defaultNetwork,
+    [networks, networkId],
+  )
+}
+
+export const useCurrentNetwork = () => {
+  const { switcherNetworkId } = useAppState()
+  return useNetwork(switcherNetworkId)
 }

@@ -1,5 +1,5 @@
 import { sendMessage, waitForMessage } from "../../shared/messages"
-import { BaseWalletAccount } from "../../shared/wallet.model"
+import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
 import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
@@ -20,6 +20,11 @@ export const getAccounts = async (showHidden = false) => {
   sendMessage({ type: "GET_ACCOUNTS", data: { showHidden } })
   return waitForMessage("GET_ACCOUNTS_RES")
 }
+
+export const accountsOnNetwork = (
+  accounts: WalletAccount[],
+  networkId: string,
+) => accounts.filter((account) => account.networkId === networkId)
 
 export const connectAccount = ({
   address,

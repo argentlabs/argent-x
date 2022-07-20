@@ -22,7 +22,7 @@ export const resetPreAuthorizatinos = () => {
   sendMessage({ type: "RESET_PREAUTHORIZATIONS" })
 }
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" && messageStream) {
   messageStream.subscribe(([message]) => {
     console.log("Received message", message)
   })

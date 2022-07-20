@@ -26,6 +26,7 @@
     "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
     "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
+    "test:watch": "lerna run test:watch --stream",
     "test:e2e": "lerna run test:e2e --stream",
     "prepare": "yarn --cwd packages/get-starknet build && husky install",
     "storybook": "cd packages/storybook && yarn storybook",

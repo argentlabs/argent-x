@@ -1,9 +1,8 @@
 import defaultTokens from "@argent-x/extension/src/assets/default-tokens.json"
 import { ApiTransactionReviewResponse } from "@argent-x/extension/src/shared/transactionReview.service"
-import { TokenDetails } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
+import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { TransactionsList } from "@argent-x/extension/src/ui/features/actions/transaction/TransactionsList"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { number } from "starknet"
 
 import erc20TransferResponse from "./__fixtures__/neutral/erc20-transfer-response.json"
 import erc20Transfer from "./__fixtures__/neutral/erc20-transfer.json"
@@ -20,13 +19,13 @@ import erc20TransferIsTokenAddress from "./__fixtures__/warn/erc20-transfer-reci
 import erc20TransferWarnResponse from "./__fixtures__/warn/erc20-transfer-warn-response.json"
 
 /** convert to expected types and shape */
-const tokensByNetwork: TokenDetails[] = defaultTokens
+const tokensByNetwork: TokenDetailsWithBalance[] = defaultTokens
   .filter(({ network }) => network === "goerli-alpha")
   .map((token) => {
     return {
       ...token,
       networkId: token.network,
-      decimals: number.toBN(token.decimals),
+      decimals: Number(token.decimals),
     }
   })
 

@@ -32,14 +32,16 @@ export const ActionScreen: FC = () => {
     if (isPopup && isLastAction) {
       window.close()
     }
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onReject = useCallback(async () => {
     rejectAction(action)
     if (isPopup && isLastAction) {
       window.close()
     }
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {

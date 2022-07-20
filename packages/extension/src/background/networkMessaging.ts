@@ -1,46 +1,15 @@
 import { NetworkMessage } from "../shared/messages/NetworkMessage"
+import { getNetwork, getNetworkByChainId, getNetworks } from "../shared/network"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { getNetworkByChainId, hasNetwork } from "./customNetworks"
-import { addNetworks, getNetworks, removeNetworks } from "./customNetworks"
 import { getNetworkStatuses } from "./networkStatus"
 
 export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
   msg,
-  background: { wallet, actionQueue },
+  background: { actionQueue },
   sendToTabAndUi,
 }) => {
   switch (msg.type) {
-    case "GET_CUSTOM_NETWORKS": {
-      const networks = await getNetworks()
-      return sendToTabAndUi({
-        type: "GET_CUSTOM_NETWORKS_RES",
-        data: networks,
-      })
-    }
-
-    case "ADD_CUSTOM_NETWORKS": {
-      const networks = msg.data
-      const newNetworks = await addNetworks(networks)
-      await Promise.all(
-        newNetworks.map(
-          (network) => wallet.discoverAccountsForNetwork(network, 2), // just close gaps up to 1 blank space, as these networks are new and should be linked lists
-        ),
-      )
-      return sendToTabAndUi({
-        type: "ADD_CUSTOM_NETWORKS_RES",
-        data: newNetworks,
-      })
-    }
-
-    case "REMOVE_CUSTOM_NETWORKS": {
-      const networks = msg.data
-      return sendToTabAndUi({
-        type: "REMOVE_CUSTOM_NETWORKS_RES",
-        data: await removeNetworks(networks),
-      })
-    }
-
     case "GET_NETWORK_STATUSES": {
       const networks = msg.data?.length ? msg.data : await getNetworks()
       const statuses = await getNetworkStatuses(networks)
@@ -51,7 +20,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
     }
 
     case "REQUEST_ADD_CUSTOM_NETWORK": {
-      const exists = await hasNetwork(msg.data.chainId)
+      const exists = await getNetwork(msg.data.chainId)
 
       if (exists) {
         return sendToTabAndUi({

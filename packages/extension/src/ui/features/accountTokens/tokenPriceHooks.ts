@@ -7,19 +7,19 @@ import {
   ARGENT_API_TOKENS_PRICES_URL,
 } from "../../../shared/api/constants"
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { Token } from "../../../shared/token"
 import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
   convertTokenAmountToCurrencyValue,
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
-} from "../../../shared/tokenPrice.service"
+} from "../../../shared/token/price"
+import { Token } from "../../../shared/token/type"
 import { useConditionallyEnabledSWR } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { useIsMainnet } from "../networks/useNetworks"
-import { TokenDetails, TokenDetailsWithBalance } from "./tokens.state"
+import { TokenDetailsWithBalance } from "./tokens.state"
 
 /** @returns true if API is enabled, app is on mainnet and the user has enabled Argent services */
 
@@ -76,7 +76,7 @@ export const usePriceAndTokenData = ARGENT_API_ENABLED
 /** @returns individual price details for the token */
 
 export const useTokenPriceDetails = (
-  token?: Token | TokenDetails | TokenDetailsWithBalance,
+  token?: Token | TokenDetailsWithBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const { pricesData, tokenData } = usePriceAndTokenDataImpl()
@@ -99,7 +99,7 @@ export const useTokenPriceDetails = (
  */
 
 export const useTokenAmountToCurrencyValue = (
-  token?: Token | TokenDetails | TokenDetailsWithBalance,
+  token?: Token | TokenDetailsWithBalance,
   amount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {

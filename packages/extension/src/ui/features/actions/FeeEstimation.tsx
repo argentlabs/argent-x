@@ -7,8 +7,8 @@ import styled, { css, keyframes } from "styled-components"
 import { DefaultTheme } from "styled-components"
 import useSWR from "swr"
 
-import { getFeeToken } from "../../../shared/token"
-import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
+import { prettifyCurrencyValue } from "../../../shared/token/price"
+import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../components/CopyTooltip"
 import {
@@ -179,7 +179,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
   useEffect(() => {
     onErrorChange?.(hasError)
-  }, [hasError])
+    // only rerun when error changes
+  }, [hasError]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const parsedFeeEstimationError = showEstimateError && getParsedError(error)
   const feeToken = getFeeToken(networkId)

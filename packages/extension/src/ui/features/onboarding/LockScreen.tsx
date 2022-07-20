@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { routes } from "../../routes"
-import { unlockedExtensionTodayTracking } from "../../services/analytics"
+import { unlockedExtensionTracking } from "../../services/analytics"
 import { startSession } from "../../services/backgroundSessions"
 import { P, StyledLink } from "../../theme/Typography"
 import { useActions } from "../actions/actions.state"
@@ -61,7 +61,7 @@ export const LockScreen: FC = () => {
           useAppState.setState({ isLoading: true })
           try {
             await startSession(password)
-            unlockedExtensionTodayTracking()
+            unlockedExtensionTracking()
             const target = await recover()
 
             // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close

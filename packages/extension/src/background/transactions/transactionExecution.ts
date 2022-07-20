@@ -5,6 +5,7 @@ import { ExtQueueItem } from "../actionQueue"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce } from "../nonce"
 import { nameTransaction } from "../transactions/transactionNames"
+import { addTransaction } from "./store"
 
 export const checkTransactionHash = (
   transactionHash?: number.BigNumberish,
@@ -30,7 +31,7 @@ type TransactionAction = ExtQueueItem<{
 
 export const executeTransaction = async (
   action: TransactionAction,
-  { wallet, transactionTracker }: BackgroundService,
+  { wallet }: BackgroundService,
 ) => {
   const { transactions, abis, transactionsDetail } = action.payload
   if (!wallet.isSessionOpen()) {
@@ -63,7 +64,7 @@ export const executeTransaction = async (
     throw Error("Transaction could not get added to the sequencer")
   }
 
-  transactionTracker.add({
+  await addTransaction({
     hash: transaction.transaction_hash,
     account: selectedAccount,
     meta: nameTransaction(transactions, abis),

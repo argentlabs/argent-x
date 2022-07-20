@@ -1,4 +1,4 @@
-import { Network, NetworkStatus } from "../networks"
+import { Network, NetworkStatus } from "../network"
 
 export type NetworkMessage =
   // ***** networks *****

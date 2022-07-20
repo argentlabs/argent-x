@@ -2,12 +2,12 @@ import { isArray } from "lodash-es"
 import { FC, useMemo } from "react"
 import { Call } from "starknet"
 
+import { Token } from "../../../../shared/token/type"
 import {
   ApiTransactionReviewResponse,
   getDisplayWarnAndReasonForTransactionReview,
 } from "../../../../shared/transactionReview.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
-import { TokenDetails } from "../../accountTokens/tokens.state"
 import { TransactionBanner } from "./TransactionBanner"
 import { TransactionItem } from "./TransactionItem"
 
@@ -15,7 +15,7 @@ export interface ITransactionsList {
   networkId: string
   transactions: Call | Call[]
   transactionReview?: ApiTransactionReviewResponse
-  tokensByNetwork?: TokenDetails[]
+  tokensByNetwork?: Token[]
 }
 
 /** Renders one or more transactions with review if available */

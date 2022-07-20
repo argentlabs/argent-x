@@ -1,9 +1,9 @@
 import { stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue"
+import { getNetwork } from "../shared/network"
 import { BaseWalletAccount } from "../shared/wallet.model"
 import { Queue } from "./actionQueue"
-import { getNetwork } from "./customNetworks"
 import { Wallet } from "./wallet"
 
 export interface IUpgradeAccount {

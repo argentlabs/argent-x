@@ -2,13 +2,12 @@ import { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Network } from "../../../shared/networks"
+import { Network, addNetwork } from "../../../shared/network"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupVertical } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
-import { addNetworks } from "../../services/backgroundNetworks"
 import { FormError, H2 } from "../../theme/Typography"
 import { useNetworks } from "../networks/useNetworks"
 import { recover } from "../recovery/recovery.service"
@@ -46,7 +45,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
   mode = "add",
 }) => {
   const navigate = useNavigate()
-  const { allNetworks } = useNetworks({ suspense: false })
+  const allNetworks = useNetworks()
 
   const [error, setError] = useState("")
 
@@ -65,7 +64,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
             if (requestedNetwork) {
               try {
                 if (mode === "add") {
-                  addNetworks([requestedNetwork])
+                  addNetwork(requestedNetwork)
                   onSubmit?.()
                   navigate(await recover({ networkId: requestedNetwork.id }))
                 } else if (mode === "switch") {

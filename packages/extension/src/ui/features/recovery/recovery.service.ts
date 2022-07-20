@@ -1,10 +1,11 @@
 import { some } from "lodash-es"
 
-import { accountsOnNetwork, defaultNetwork } from "../../../shared/networks"
+import { defaultNetwork } from "../../../shared/network"
 import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import {
+  accountsOnNetwork,
   getAccounts,
   getLastSelectedAccount,
 } from "../../services/backgroundAccounts"
@@ -25,9 +26,7 @@ export const recover = async ({
 }: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
-    networkId ||= lastSelectedAccount
-      ? lastSelectedAccount.network.id
-      : defaultNetwork.id
+    networkId ??= lastSelectedAccount?.networkId ?? defaultNetwork.id
 
     const allAccounts = await getAccounts()
     const walletAccounts = accountsOnNetwork(allAccounts, networkId)

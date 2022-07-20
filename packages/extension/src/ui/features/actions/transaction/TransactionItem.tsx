@@ -2,13 +2,13 @@ import { FC } from "react"
 import { Call } from "starknet"
 
 import { isErc20TransferCall } from "../../../../shared/call"
-import { TokenDetails } from "../../accountTokens/tokens.state"
+import { Token } from "../../../../shared/token/type"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
 import { ERC20TransferTransactionDetails } from "./ERC20TransferTransactionDetails"
 
 export interface TransactionItemProps {
   transaction: Call
-  tokensByNetwork: TokenDetails[]
+  tokensByNetwork: Token[]
   networkId: string
 }
 /** Renders a single transaction */

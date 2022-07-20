@@ -7,12 +7,11 @@ import {
   getAccountIdentifier,
   isDeprecated,
 } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
-import { useNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
@@ -31,18 +30,15 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   canShowUpgrade,
 }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const {
-    network: { accountClassHash },
-  } = useNetwork(switcherNetworkId)
+  const { accountClassHash, id: networkId } = useCurrentNetwork()
   const status = useAccountStatus(account, selectedAccount)
 
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
 
   const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), switcherNetworkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, switcherNetworkId),
+    [getAccountIdentifier(account), networkId, "feeTokenBalance"],
+    () => fetchFeeTokenBalance(account, networkId),
     { suspense: false },
   )
 

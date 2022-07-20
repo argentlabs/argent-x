@@ -1,7 +1,7 @@
 import { FC, useRef } from "react"
 import styled from "styled-components"
 
-import { prettifyCurrencyValue } from "../../../shared/tokenPrice.service"
+import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"

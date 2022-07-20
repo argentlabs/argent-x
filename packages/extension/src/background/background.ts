@@ -1,8 +1,10 @@
+import browser from "webextension-polyfill"
+
 import { ActionItem } from "../shared/actionQueue"
 import { MessageType } from "../shared/messages"
 import { Queue } from "./actionQueue"
 import { MessagingKeys } from "./keys/messagingKeys"
-import { TransactionTracker } from "./transactions/transactions"
+import { TransactionTracker } from "./transactions/tracking"
 import { Wallet } from "./wallet"
 
 export interface BackgroundService {
@@ -20,7 +22,7 @@ export class UnhandledMessage extends Error {
 
 interface HandlerParams<T> {
   msg: T
-  sender: chrome.runtime.MessageSender
+  sender: browser.runtime.MessageSender
   background: BackgroundService
   messagingKeys: MessagingKeys
   sendToTabAndUi: (msg: MessageType) => Promise<void>
