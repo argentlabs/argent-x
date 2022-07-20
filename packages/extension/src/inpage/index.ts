@@ -1,7 +1,6 @@
 import { assertNever } from "./../ui/services/assertNever"
 import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
-import { IS_DEV } from "../shared/utils/dev"
 import { ArgentXAccount } from "./ArgentXAccount"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
@@ -73,7 +72,3 @@ window.addEventListener(
     }
   },
 )
-
-if (IS_DEV) {
-  require("./hotReload")
-}

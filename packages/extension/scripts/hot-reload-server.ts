@@ -6,7 +6,8 @@ import WebSocket from "ws"
 
 import { HOT_RELOAD_MESSAGE, HOT_RELOAD_PORT } from "../src/shared/utils/dev"
 
-const srcUiPath = path.resolve("./src/ui")
+/** watch webpack output changes to trigger reload */
+const watchChangesInPath = path.join(__dirname, "../dist")
 
 const wss = new WebSocket.Server({ port: HOT_RELOAD_PORT })
 
@@ -20,10 +21,10 @@ wss.on("close", () => {
 
 wss.on("connection", (ws) => {
   console.log(
-    `Hot reload server connected, watching for changes in ${srcUiPath}`,
+    `Hot reload server connected, watching for changes in ${watchChangesInPath}`,
   )
   chokidar
-    .watch(srcUiPath, {
+    .watch(watchChangesInPath, {
       ignoreInitial: true,
     })
     .on(

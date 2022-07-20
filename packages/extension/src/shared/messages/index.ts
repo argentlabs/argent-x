@@ -2,7 +2,6 @@ import { getMessage } from "@extend-chrome/messages"
 
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
-import { DevMessage } from "./DevMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
 import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
@@ -23,7 +22,6 @@ export type MessageType =
   | TokenMessage
   | TransactionMessage
   | SettingsMessage
-  | DevMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

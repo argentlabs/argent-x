@@ -3,8 +3,7 @@ import {
   sendMessage,
   waitForMessage,
 } from "../../shared/messages"
-import { HOT_RELOAD_MESSAGE, IS_DEV } from "../../shared/utils/dev"
-import { hardReload } from "./resetAndReload"
+import { IS_DEV } from "../../shared/utils/dev"
 
 export const getMessagingPublicKey = async () => {
   sendMessage({ type: "GET_MESSAGING_PUBLIC_KEY" })
@@ -27,8 +26,6 @@ export const resetPreAuthorizatinos = () => {
 if (IS_DEV) {
   messageStream.subscribe(([message]) => {
     console.log("Received message", message)
-    if (message.type === HOT_RELOAD_MESSAGE) {
-      hardReload(false)
-    }
   })
+  require("../features/dev/hotReload")
 }
