@@ -33,7 +33,7 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: "source-map",
+  devtool: isProd ? "source-map" : "inline-source-map",
   mode: isProd ? "production" : "development",
   module: {
     rules: [
