@@ -1,5 +1,5 @@
 import { partition, some } from "lodash-es"
-import { FC } from "react"
+import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -8,6 +8,7 @@ import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, SettingsIcon } from "../../components/Icons/MuiIcons"
+import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { connectAccount } from "../../services/backgroundAccounts"
@@ -33,6 +34,7 @@ const AccountList = styled.div`
 const AccountListWrapper = styled(Container)`
   display: flex;
   flex-direction: column;
+  position: relative;
 
   ${H1} {
     text-align: center;
@@ -47,8 +49,28 @@ const IconButtonCenter = styled(IconButton)`
   margin: auto;
 `
 
+const IconButtonCenterDisabled = styled(IconButtonCenter)`
+  pointer-events: none;
+`
+
 const Paragraph = styled(P)`
   text-align: center;
+`
+
+const ErrorText = styled.div`
+  text-align: center;
+  font-size: 12px;
+  color: ${({ theme }) => theme.red2};
+`
+
+const DimmingContainer = styled.div`
+  background-color: ${({ theme }) => theme.bg1};
+  opacity: 0.5;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 `
 
 export const AccountListScreen: FC = () => {
@@ -56,6 +78,8 @@ export const AccountListScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
   const { accounts, selectedAccount, addAccount } = useAccounts()
   const { isBackupRequired } = useBackupRequired()
+  const [isDeploying, setIsDeploying] = useState(false)
+  const [deployFailed, setDeployFailed] = useState(false)
 
   const accountsList = Object.values(accounts)
 
@@ -63,20 +87,20 @@ export const AccountListScreen: FC = () => {
     isDeprecated(account),
   )
 
-  const handleAddAccount = async () => {
-    useAppState.setState({ isLoading: true })
+  const handleAddAccount = useCallback(async () => {
+    setIsDeploying(true)
+    setDeployFailed(false)
     try {
       const newAccount = await deployAccount(switcherNetworkId)
       addAccount(newAccount)
       connectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {
-      useAppState.setState({ error: `${error}` })
-      navigate(routes.error())
+      setDeployFailed(true)
     } finally {
-      useAppState.setState({ isLoading: false })
+      setIsDeploying(false)
     }
-  }
+  }, [addAccount, navigate, switcherNetworkId])
 
   return (
     <AccountListWrapper header>
@@ -123,12 +147,26 @@ export const AccountListScreen: FC = () => {
             ))}
           </>
         )}
-        <IconButtonCenter
-          size={48}
-          {...makeClickable(handleAddAccount, { label: "Create new wallet" })}
-        >
-          <AddIcon fontSize="large" />
-        </IconButtonCenter>
+        {isDeploying ? (
+          <>
+            <DimmingContainer />
+            <IconButtonCenterDisabled size={48}>
+              <Spinner size={24} />
+            </IconButtonCenterDisabled>
+          </>
+        ) : (
+          <IconButtonCenter
+            size={48}
+            {...makeClickable(handleAddAccount, { label: "Create new wallet" })}
+          >
+            <AddIcon fontSize="large" />
+          </IconButtonCenter>
+        )}
+        {deployFailed && (
+          <ErrorText>
+            Sorry, unable to create wallet. Please try again later.
+          </ErrorText>
+        )}
       </AccountList>
     </AccountListWrapper>
   )

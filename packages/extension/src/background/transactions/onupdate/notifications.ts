@@ -32,7 +32,7 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
     }
   }
 
-export const showNotificationBadge = (allTransactions: Transaction[]) => {
+export const showNotificationBadge = (allTransactions: Transaction[] = []) => {
   const shouldShowBadge = (tx: Transaction) =>
     TRANSACTION_STATUSES_TO_TRACK.includes(tx.status)
 

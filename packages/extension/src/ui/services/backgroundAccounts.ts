@@ -1,4 +1,5 @@
-import { sendMessage, waitForMessage } from "../../shared/messages"
+import { MessageType, sendMessage, waitForMessage } from "../../shared/messages"
+import { AccountMessage } from "../../shared/messages/AccountMessage"
 import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
 import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
@@ -81,6 +82,23 @@ export const upgradeAccount = async (data: BaseWalletAccount) => {
     ])
   } catch {
     throw Error("Could not upgrade account")
+  }
+}
+
+export const redeployAccount = async (data: BaseWalletAccount) => {
+  sendMessage({ type: "REDEPLOY_ACCOUNT", data })
+  try {
+    return await Promise.race([
+      waitForMessage(
+        "REDEPLOY_ACCOUNT_RES",
+        (message) => message.data.address === data.address,
+      ),
+      waitForMessage("REDEPLOY_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could not redeploy account")
   }
 }
 

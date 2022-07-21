@@ -30,14 +30,14 @@ const ErrorMessageContainer = styled.div`
   margin-bottom: 16px;
 `
 
-const ActionsWrapper = styled.div`
+export const ActionsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
 `
 
-const ActionContainer = styled.div`
+export const ActionContainer = styled.div`
   text-align: center;
   display: flex;
   align-items: center;

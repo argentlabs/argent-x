@@ -2,6 +2,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { coerceErrorToString } from "../../../shared/utils/error"
 import { useAppState } from "../../app.state"
 import { P } from "../../theme/Typography"
 import { Pre } from "./ApproveSignatureScreen"
@@ -19,10 +20,10 @@ const WrappingPre = styled(Pre)`
 export const ErrorScreen: FC = () => {
   const navigate = useNavigate()
   const { error } = useAppState()
+  const displayError = coerceErrorToString(error)
 
-  const message = error
-    ? error.replace(/^(error:\s*)+/gi, "")
-    : "No error message available"
+  const message =
+    error && error.replace ? error.replace(/^(error:\s*)+/gi, "") : displayError
 
   return (
     <ConfirmScreen

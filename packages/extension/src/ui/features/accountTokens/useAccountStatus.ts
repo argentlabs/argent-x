@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { Account } from "../accounts/Account"
-import { getStatus } from "../accounts/accounts.service"
+import { AccountStatus, getStatus } from "../accounts/accounts.service"
 import { useTransactionStatus } from "./useTransactionStatus"
+
+const ERROR_STATUS: AccountStatus = {
+  code: "ERROR",
+  text: "Deployment failed",
+}
 
 export const useAccountStatus = (
   account: Account,
@@ -32,12 +37,15 @@ export const useAccountStatus = (
         }
       })()
     }
-    // just rerun when deploystatus changes
+    // just rerun when deployStatus changes
   }, [deployStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (deployStatus !== "PENDING" && !isDeployed) {
-    return { code: "ERROR" as const, text: "Undeployed" }
-  }
+  const status = useMemo(() => {
+    if (deployStatus !== "PENDING" && !isDeployed) {
+      return ERROR_STATUS
+    }
+    return getStatus(account, activeAccount, deployStatus === "SUCCESS")
+  }, [account, activeAccount, deployStatus, isDeployed])
 
-  return getStatus(account, activeAccount, deployStatus === "SUCCESS")
+  return status
 }

@@ -27,6 +27,14 @@ export function getPathForIndex(
   return `${baseDerivationPath}/${index}`
 }
 
+export function getIndexForPath(path: string, baseDerivationPath: string) {
+  if (!path.startsWith(baseDerivationPath)) {
+    throw "path should begin with baseDerivationPath"
+  }
+  const index = path.substring(path.lastIndexOf("/") + 1)
+  return parseInt(index)
+}
+
 export function getNextPathIndex(
   paths: string[],
   baseDerivationPath: string,
