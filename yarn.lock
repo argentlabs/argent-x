@@ -16015,11 +16015,6 @@ tinypool@^0.2.4:
   resolved "https://registry.yarnpkg.com/tinypool/-/tinypool-0.2.4.tgz#4d2598c4689d1a2ce267ddf3360a9c6b3925a20c"
   integrity sha512-Vs3rhkUH6Qq1t5bqtb816oT+HeJTXfwt2cbPH17sWHIYKTotQIFPk3tf2fgqRrVyMDVOc1EnPgzIxfIulXVzwQ==
 
-tinyspy@^0.3.0:
-  version "0.3.3"
-  resolved "https://registry.npmjs.org/tinyspy/-/tinyspy-0.3.3.tgz#8b57f8aec7fe1bf583a3a49cb9ab30c742f69237"
-  integrity sha512-gRiUR8fuhUf0W9lzojPf1N1euJYA30ISebSfgca8z76FOvXtVXqd5ojEIaKLWbDQhAaC3ibxZIjqbyi4ybjcTw==
-
 tinyspy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/tinyspy/-/tinyspy-1.0.0.tgz#0cb34587287b0432b33fe36a9bd945fe22b1eb89"
@@ -16697,13 +16692,13 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vi-fetch@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/vi-fetch/-/vi-fetch-0.7.1.tgz#ad829e49c5976cba1c8c2a83b9a21c371aa234d0"
-  integrity sha512-L80kg0UqubTaDAZ+MXC0PcaLIcSsagduUlsto45DF8Iia3BHBQ57w325N4tWbJH8+g+H8ySK0czF5vIHCfZI2A==
+vi-fetch@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/vi-fetch/-/vi-fetch-0.8.0.tgz#45170a3d9e2ecb2a775b128356f8faae671b5a66"
+  integrity sha512-uvEgEBTacSnlxRcoA56Drwkc2LbTvRNOdSx5MVayBfEsHAgQJAu+LwePlUOkidFsqQMcQxcb+LlC9qZ9v1yXiw==
   dependencies:
     query-string "^7.1.1"
-    tinyspy "^0.3.0"
+    tinyspy "^1.0.0"
 
 "vite@^2.9.12 || ^3.0.0-0", vite@^3.0.0:
   version "3.0.0"
