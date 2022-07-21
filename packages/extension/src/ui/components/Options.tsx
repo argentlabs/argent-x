@@ -1,3 +1,4 @@
+import { colord } from "colord"
 import { FC, ReactNode } from "react"
 import styled from "styled-components"
 
@@ -26,6 +27,17 @@ const OptionWrapper = styled.div<{
     disabled ? theme.text3 : backgroundColor ?? theme.bg2};
   cursor: ${({ disabled }) => (disabled ? "auto" : "pointer")};
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
+
+  &:hover,
+  &:focus {
+    outline: 0;
+    background-color: ${({ theme, backgroundColor }) =>
+      backgroundColor
+        ? colord(backgroundColor).lighten(0.075).toRgbString()
+        : theme.bg3};
+  }
 `
 
 const OptionTextWrapper = styled.div`

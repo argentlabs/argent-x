@@ -17,3 +17,26 @@ BuyWithCard.args = {
   icon: <CardSvg />,
   hideArrow: true,
 }
+
+export const FromAnExchange = Template.bind({})
+FromAnExchange.args = {
+  title: "From an exchange",
+  description: "Coinbase, Binance, etc",
+  icon: <CardSvg />,
+}
+
+export const Disabled = Template.bind({})
+Disabled.args = {
+  title: "High security",
+  description: "Coming soon",
+  icon: <CardSvg />,
+  disabled: true,
+}
+
+export const Coloured = Template.bind({})
+Coloured.args = {
+  title: "Low security",
+  description: "Save a recovery phrase",
+  icon: <CardSvg />,
+  backgroundColor: "#C12026",
+}
