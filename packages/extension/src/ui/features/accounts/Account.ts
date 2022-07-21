@@ -3,7 +3,11 @@ import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { Network, getNetwork, getProvider } from "../../../shared/network"
-import { WalletAccountSigner } from "../../../shared/wallet.model"
+import {
+  BaseWalletAccount,
+  WalletAccount,
+  WalletAccountSigner,
+} from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { createNewAccount } from "../../services/backgroundAccounts"
 
@@ -53,6 +57,12 @@ export class Account {
     return key
   }
 
+  public updateDeployTx(deployTransaction: string) {
+    const key = this.getDeployTransactionStorageKey()
+    this.deployTransaction = deployTransaction
+    localStorage.setItem(key, deployTransaction)
+  }
+
   public completeDeployTx(): void {
     const key = this.getDeployTransactionStorageKey()
     localStorage.removeItem(key)
@@ -89,5 +99,23 @@ export class Account {
       result.account.signer,
       result.txHash,
     )
+  }
+
+  public toWalletAccount(): WalletAccount {
+    const { networkId, address, network, signer } = this
+    return {
+      networkId,
+      address,
+      network,
+      signer,
+    }
+  }
+
+  public toBaseWalletAccount(): BaseWalletAccount {
+    const { networkId, address } = this
+    return {
+      networkId,
+      address,
+    }
   }
 }

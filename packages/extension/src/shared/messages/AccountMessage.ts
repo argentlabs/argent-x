@@ -31,6 +31,18 @@ export type AccountMessage =
   | { type: "UPGRADE_ACCOUNT_RES" }
   | { type: "UPGRADE_ACCOUNT_REJ" }
   | {
+      type: "REDEPLOY_ACCOUNT"
+      data: BaseWalletAccount
+    }
+  | {
+      type: "REDEPLOY_ACCOUNT_RES"
+      data: {
+        txHash: string
+        address: string
+      }
+    }
+  | { type: "REDEPLOY_ACCOUNT_REJ" }
+  | {
       type: "GET_ENCRYPTED_PRIVATE_KEY"
       data: { encryptedSecret: string }
     }

@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -98,6 +98,16 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
     [addAccount, navigate, overrideSubmit, switcherNetworkId],
   )
 
+  const buttonText = useMemo(() => {
+    if (overrideSubmitText) {
+      return overrideSubmitText
+    }
+    if (isDeploying) {
+      return "Creating wallet…"
+    }
+    return deployFailed ? "Retry create wallet" : "Create wallet"
+  }, [deployFailed, isDeploying, overrideSubmitText])
+
   return (
     <>
       <IconBar back={routes.welcome()} />
@@ -143,7 +153,6 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
           {errors.repeatPassword?.type === "validate" && (
             <FormError>Passwords do not match</FormError>
           )}
-
           <StickyGroup>
             {deployFailed && (
               <ErrorText>
@@ -151,11 +160,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
               </ErrorText>
             )}
             <Button type="submit" disabled={!isDirty || isDeploying}>
-              {overrideSubmitText || isDeploying
-                ? "Creating wallet…"
-                : deployFailed
-                ? "Retry create wallet"
-                : "Create wallet"}
+              {buttonText}
             </Button>
           </StickyGroup>
         </form>
