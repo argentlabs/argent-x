@@ -43,9 +43,9 @@ test("send max eth flow", async ({ page, context }) => {
   const b2After = await getBalanceFromAccountPage(page, "Ethereum")
 
   expect(b1After).not.toBe(b1)
-  expect(b1After.substring(0, 5)).toBe("0.000")
+  expect(b1After.substring(0, 4)).toBe("0.00")
   expect(b2After).not.toBe(b2)
-  expect(b2After.substring(0, 4)).toBe("0.99")
+  expect(b2After.substring(0, 3)).toBe("0.9")
 
   console.log(
     `Account ${formatTruncatedAddress(a1)} had Ξ${b1} and now has Ξ${b1After}`,
