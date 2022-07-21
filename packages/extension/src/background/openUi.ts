@@ -1,5 +1,7 @@
 import browser from "webextension-polyfill"
 
+import { getWindowLocationHost } from "../shared/browser/host"
+
 const NOTIFICATION_WIDTH = 360
 const NOTIFICATION_HEIGHT = 600 + 28 // +28 for the title bar
 
@@ -43,8 +45,13 @@ async function openPopup() {
     left = Math.max(screenX + (outerWidth - NOTIFICATION_WIDTH), 0)
   }
 
+  /** popup loses context of originating host so it is passed in query */
+  const windowLocationHost = await getWindowLocationHost()
+  const host = windowLocationHost ? encodeURIComponent(windowLocationHost) : ""
+  const url = `index.html?popup&host=${host}`
+
   const popup = await browser.windows.create({
-    url: "index.html?popup",
+    url,
     type: "popup",
     width: NOTIFICATION_WIDTH,
     height: NOTIFICATION_HEIGHT,

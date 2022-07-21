@@ -2,21 +2,23 @@ import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
+import { removePreAuthorization } from "../../../shared/preAuthorizations"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { analytics } from "../../services/analytics"
 import { assertNever } from "../../services/assertNever"
+import { connectAccount } from "../../services/backgroundAccounts"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { Account } from "../accounts/Account"
+import { useAccounts, useSelectedAccount } from "../accounts/accounts.state"
+import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
-import { ConnectDappScreen } from "./ConnectDappScreen"
-
-const isPopup = new URLSearchParams(window.location.search).has("popup")
+import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
@@ -27,21 +29,21 @@ export const ActionScreen: FC = () => {
   const [action] = actions
   const isLastAction = actions.length === 1
 
-  const onSubmit = useCallback(async () => {
-    approveAction(action)
-    if (isPopup && isLastAction) {
+  const closePopupIfLastAction = useCallback(() => {
+    if (EXTENSION_IS_POPUP && isLastAction) {
       window.close()
     }
-    // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLastAction])
+
+  const onSubmit = useCallback(async () => {
+    approveAction(action)
+    closePopupIfLastAction()
+  }, [action, closePopupIfLastAction])
 
   const onReject = useCallback(async () => {
     rejectAction(action)
-    if (isPopup && isLastAction) {
-      window.close()
-    }
-    // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    closePopupIfLastAction()
+  }, [action, closePopupIfLastAction])
 
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {
@@ -58,8 +60,30 @@ export const ActionScreen: FC = () => {
       return (
         <ConnectDappScreen
           host={action.payload.host}
+          onConnect={async (selectedAccount: Account) => {
+            useAppState.setState({ isLoading: true })
+            // switch UI to the account that was selected
+            useAccounts.setState({
+              selectedAccount,
+            })
+            // switch background wallet to the account that was selected
+            connectAccount(selectedAccount)
+            await waitForMessage("CONNECT_ACCOUNT_RES")
+            // continue with approval with selected account
+            approveAction(action)
+            await waitForMessage("CONNECT_DAPP_RES")
+            useAppState.setState({ isLoading: false })
+            closePopupIfLastAction()
+          }}
+          onDisconnect={async (selectedAccount: Account) => {
+            await removePreAuthorization({
+              host: action.payload.host,
+              accountAddress: selectedAccount.address,
+            })
+            rejectAction(action)
+            closePopupIfLastAction()
+          }}
           onReject={onReject}
-          onSubmit={onSubmit}
         />
       )
 
@@ -127,9 +151,7 @@ export const ActionScreen: FC = () => {
               })
               navigate(routes.error())
             } else {
-              if (isPopup && isLastAction) {
-                window.close()
-              }
+              closePopupIfLastAction()
               useAppState.setState({ isLoading: false })
             }
           }}
@@ -152,9 +174,7 @@ export const ActionScreen: FC = () => {
             await analytics.track("signedMessage", {
               networkId: account?.networkId || "unknown",
             })
-            if (isPopup && isLastAction) {
-              window.close()
-            }
+            closePopupIfLastAction()
             useAppState.setState({ isLoading: false })
           }}
           onReject={onReject}
