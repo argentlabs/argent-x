@@ -1,5 +1,7 @@
 /** generic json fetcher */
 
+import type { NetworkInfo } from "./../../shared/network_log"
+import { useNetworkLogsStore } from "./../../ui/features/settings/networkLogs.state"
 import { PublicNetworkIds } from "../network/public"
 
 export type Fetcher = (
@@ -28,6 +30,32 @@ export const fetcherError = (
 }
 
 export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const networkLogs = useNetworkLogsStore.getState().networkLogs
+  let log: NetworkInfo = {
+    url: init?.url || input.url,
+  }
+  if (typeof input === "RequestInfo") {
+    log = {
+      ...log,
+      headers: input.headers,
+      method: input.method,
+      body: (input as RequestInfo).body,
+    }
+  }
+  if (init?.headers) {
+    log.headers = init.headers
+  }
+  if (init?.method) {
+    log.method = init.method
+  }
+  if (init?.body) {
+    log.body = init.body
+  }
+
+  networkLogs.push(log)
+  useNetworkLogsStore.setState(log)
+  localStorage.setItem("networkLogs", JSON.stringify(networkLogs))
+
   const response = await fetch(input, init)
   /** capture text here in the case of json parse failure we can include it in the error */
   const responseText = await response.text()
