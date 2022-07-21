@@ -40,6 +40,9 @@ export const useToken = (baseToken: BaseToken): Token | undefined => {
   return token
 }
 
+/** error codes to suppress - will not bubble error up to parent */
+const SUPPRESS_ERROR_STATUS = [429]
+
 export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
@@ -62,24 +65,33 @@ export const useTokensWithBalance = (
       "accountTokenBalances",
     ],
     async () => {
-      if (!selectedAccount) {
-        return
+      try {
+        if (!selectedAccount) {
+          return
+        }
+
+        const balances = await fetchAllTokensBalance(
+          tokensInNetwork.map((t) => t.address),
+          selectedAccount,
+        )
+
+        return balances
+      } catch (error: any) {
+        /** re-throw if not suppressed */
+        if (!SUPPRESS_ERROR_STATUS.includes(error?.status)) {
+          throw error
+        }
       }
-
-      const balances = await fetchAllTokensBalance(
-        tokensInNetwork.map((t) => t.address),
-        selectedAccount,
-      )
-
-      return balances
     },
     {
       refreshInterval: 30000,
-      shouldRetryOnError: false,
+      shouldRetryOnError: (error) => {
+        return SUPPRESS_ERROR_STATUS.includes(error?.status)
+      },
     },
   )
 
-  const tokenDetailsIsInitialising = !error && !data && isValidating
+  const tokenDetailsIsInitialising = !error && !data
 
   // TODO: refetch balances on transaction success
 
