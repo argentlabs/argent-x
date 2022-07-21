@@ -63,7 +63,6 @@ export const FundingScreen: FC = () => {
             >
               <Option
                 title="Buy with card or bank transfer"
-                description={"Provided by Banxa"}
                 icon={<CardSvg />}
                 hideArrow
               />
