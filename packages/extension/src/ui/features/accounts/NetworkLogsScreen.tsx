@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react"
 import styled from "styled-components"
 
-import { NetworkLog } from "./../../../shared/network_log"
+import { NetworkLog } from "./../../../shared/networkLog"
 import { H2 } from "../../theme/Typography"
 
 export const P = styled.p`

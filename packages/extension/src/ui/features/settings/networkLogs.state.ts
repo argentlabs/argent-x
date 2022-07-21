@@ -1,6 +1,6 @@
 import create from "zustand"
 
-import { NetworkLog } from "../../../shared/network_log"
+import { NetworkLog } from "../../../shared/networkLog"
 
 interface State {
   networkLogs: NetworkLog[]

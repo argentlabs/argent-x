@@ -1,6 +1,6 @@
 /** generic json fetcher */
 
-import type { NetworkInfo } from "./../../shared/network_log"
+import type { NetworkLog } from "./../../shared/networkLog"
 import { useNetworkLogsStore } from "./../../ui/features/settings/networkLogs.state"
 import { PublicNetworkIds } from "../network/public"
 
@@ -30,18 +30,19 @@ export const fetcherError = (
 }
 
 export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
-  const networkLogs = useNetworkLogsStore.getState().networkLogs
-  let log: NetworkInfo = {
-    url: init?.url || input.url,
+  let log: NetworkLog = {
+    url: "",
   }
-  if (typeof input === "RequestInfo") {
+  if (typeof input === "string") {
     log = {
       ...log,
-      headers: input.headers,
-      method: input.method,
-      body: (input as RequestInfo).body,
+      url: input,
     }
   }
+  if ((input as Request)?.url) {
+    log.url = (input as Request).url
+  }
+
   if (init?.headers) {
     log.headers = init.headers
   }
@@ -49,11 +50,12 @@ export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
     log.method = init.method
   }
   if (init?.body) {
-    log.body = init.body
+    log.body = init.body as string
   }
 
+  const networkLogs = useNetworkLogsStore.getState().networkLogs
   networkLogs.push(log)
-  useNetworkLogsStore.setState(log)
+  useNetworkLogsStore.setState({ networkLogs })
   localStorage.setItem("networkLogs", JSON.stringify(networkLogs))
 
   const response = await fetch(input, init)
