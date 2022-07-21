@@ -138,11 +138,7 @@ ${displayStack}
       Object.keys(errorInfo).forEach((key) => {
         scope.setExtra(key, errorInfo[key])
       })
-      const eventId = Sentry.captureException(error)
-      console.log(
-        "🚀 ~ file: ErrorBoundaryFallbackWithCopyError.tsx ~ line 118 ~ Sentry.withScope ~ eventId",
-        eventId,
-      )
+      Sentry.captureException(error)
     })
   }, [error, errorInfo])
 
@@ -152,11 +148,6 @@ ${displayStack}
     setValue: setPrivacyErrorReportingValue,
   } = useBackgroundSettingsValue<ISettingsStorage["privacyErrorReporting"]>(
     "privacyErrorReporting",
-  )
-
-  console.log(
-    "🚀 ~ file: ErrorBoundaryFallbackWithCopyError.tsx ~ line 159 ~ initialised",
-    privacyErrorReportingInitialised,
   )
 
   return (

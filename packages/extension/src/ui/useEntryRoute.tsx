@@ -19,11 +19,6 @@ export const useEntryRoute = () => {
       }
     })()
   }, [isFirstRender, navigate])
-
-  // FIXME: Need to remove before merging.
-  // useEffect(() => {
-  //   throw new Error("Test error")
-  // }, [])
 }
 
 const determineEntry = async () => {
