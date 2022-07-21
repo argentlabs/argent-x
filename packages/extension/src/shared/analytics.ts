@@ -4,6 +4,8 @@ import browser from "webextension-polyfill"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
+import { useNetworkLogsStore } from "./../ui/features/settings/networkLogs.state"
+
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
@@ -141,11 +143,16 @@ export function getAnalytics(
       }
 
       try {
-        return await fetch(SEGMENT_TRACK_URL, {
+        const networkLogs = useNetworkLogsStore.getState().networkLogs
+        const data = {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
-        })
+        }
+        networkLogs.push({ url: SEGMENT_TRACK_URL, ...data })
+        useNetworkLogsStore.setState({ networkLogs })
+        localStorage.setItem("networkLogs", JSON.stringify(networkLogs))
+        return await fetch(SEGMENT_TRACK_URL, data)
       } catch {
         // ignore
       }
@@ -161,11 +168,20 @@ export function getAnalytics(
         timestamp: new Date().toISOString(),
       }
       try {
-        return await fetch(SEGMENT_PAGE_URL, {
+        const networkLogs = useNetworkLogsStore.getState().networkLogs
+
+        const data = {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
-        })
+        }
+
+        networkLogs.push({ url: SEGMENT_PAGE_URL, ...data })
+
+        useNetworkLogsStore.setState({ networkLogs })
+        localStorage.setItem("networkLogs", JSON.stringify(networkLogs))
+
+        return await fetch(SEGMENT_PAGE_URL, data)
       } catch {
         // ignore
       }

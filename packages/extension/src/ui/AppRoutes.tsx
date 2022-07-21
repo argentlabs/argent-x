@@ -9,6 +9,7 @@ import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
+import { NetworkLogsScreen } from "./features/accounts/NetworkLogsScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
@@ -188,6 +189,10 @@ const walletRoutes = (
     <Route
       path={routes.privacyStatement.path}
       element={<PrivacyStatementScreen />}
+    />
+    <Route
+      path={routes.settingsNetworkLogging.path}
+      element={<NetworkLogsScreen />}
     />
   </>
 )

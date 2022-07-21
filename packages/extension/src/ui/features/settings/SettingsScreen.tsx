@@ -141,7 +141,10 @@ export const SupportFooter: FC = () => (
 )
 
 export const SettingsScreen: FC = () => {
-  const openExtensionInTab = useOpenExtensionInTab()
+  const openExtensionInTabAccounts = useOpenExtensionInTab(routes.settings())
+  const openExtensionInTabNetworkLogs = useOpenExtensionInTab(
+    routes.settingsNetworkLogging(),
+  )
   const extensionIsInTab = useExtensionIsInTab()
   const { pathname: returnTo } = useLocation()
   return (
@@ -160,7 +163,7 @@ export const SettingsScreen: FC = () => {
           <>
             <SettingsLinkItem
               to={routes.settings()}
-              onClick={openExtensionInTab}
+              onClick={openExtensionInTabAccounts}
             >
               <Title>
                 <span>Extended view</span>
@@ -211,6 +214,20 @@ export const SettingsScreen: FC = () => {
             <hr />
           </>
         )}
+        <SettingsLinkItem
+          to={routes.settingsNetworkLogging()}
+          onClick={openExtensionInTabNetworkLogs}
+        >
+          <Title>
+            <span>Open Network Logs</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+          <P>
+            This debug views lets you watch all network requests being performed
+            by your wallet.
+          </P>
+        </SettingsLinkItem>
+        <hr />
         <SupportFooter />
       </SettingsScreenWrapper>
     </>
