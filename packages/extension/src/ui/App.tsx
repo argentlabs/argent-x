@@ -10,6 +10,7 @@ import { useExtensionIsInTab } from "./features/browser/tabs"
 import DevUI from "./features/dev/DevUI"
 import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
+import { useSentryInit } from "./services/sentry"
 import { swrCacheProvider } from "./services/swr"
 import {
   FixedGlobalStyle,
@@ -20,6 +21,7 @@ import {
 
 export const App: FC = () => {
   useTracking()
+  useSentryInit()
   const extensionIsInTab = useExtensionIsInTab()
   return (
     <SoftReloadProvider>

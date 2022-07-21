@@ -16,7 +16,7 @@ export type SettingsMessageDataKeyValueRemoved = {
 
 export type SettingsMessage =
   | { type: "GET_SETTING"; data: SettingsMessageDataKey }
-  | { type: "GET_SETTING_RES"; data: SettingsStorageValue }
+  | { type: "GET_SETTING_RES"; data: SettingsMessageDataKeyValue }
   | { type: "SET_SETTING"; data: SettingsMessageDataKeyValue }
   | { type: "SET_SETTING_RES"; data: SettingsStorageValue }
   | { type: "REMOVE_SETTING"; data: SettingsMessageDataKey }

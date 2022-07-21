@@ -14,7 +14,10 @@ export const handleSettingsMessage: HandleMessage<SettingsMessage> = async ({
       const value = await settingsStorage.getItem(key)
       return sendToTabAndUi({
         type: "GET_SETTING_RES",
-        data: value,
+        data: {
+          key,
+          value,
+        },
       })
     }
 

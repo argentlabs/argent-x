@@ -41,7 +41,7 @@ export const usePriceAndTokenDataFromApi = () => {
   const fetcher = useArgentApiFetcher()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const { data: pricesData } = useConditionallyEnabledSWR<ApiPriceDataResponse>(
-    currencyDisplayEnabled,
+    !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     fetcher,
     {
@@ -49,7 +49,7 @@ export const usePriceAndTokenDataFromApi = () => {
     },
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
-    currencyDisplayEnabled,
+    !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
     fetcher,
     {
