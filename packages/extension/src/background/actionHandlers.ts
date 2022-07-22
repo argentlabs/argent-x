@@ -29,7 +29,11 @@ export const handleActionApproval = async (
         host,
         networkId: selectedAccount.networkId,
       })
-      await preAuthorize(host)
+
+      await preAuthorize({
+        host,
+        accountAddress: selectedAccount.address,
+      })
 
       return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }

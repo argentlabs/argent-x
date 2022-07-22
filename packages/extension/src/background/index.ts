@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill"
 
 import { ActionItem } from "../shared/actionQueue"
+import { initBackgroundExtensionCloseListener } from "../shared/analytics"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
 import { handleAccountMessage } from "./accountMessaging"
@@ -50,6 +51,8 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     await transactionTracker.update()
   }
 })
+
+initBackgroundExtensionCloseListener()
 
 // runs on startup
 ;(async () => {

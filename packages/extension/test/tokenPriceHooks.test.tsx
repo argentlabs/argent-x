@@ -6,10 +6,10 @@ import {
   useTokenBalanceToCurrencyValue,
   useTokenPriceDetails,
 } from "../src/ui/features/accountTokens/tokenPriceHooks"
-import mockApiPricesDataInvalid from "./__mocks__/argent-api-prices-invalid.mock.json"
-import mockApiPricesData from "./__mocks__/argent-api-prices.mock.json"
-import mockApiTokenDataInvalid from "./__mocks__/argent-api-tokens-invalid.mock.json"
-import mockApiTokenData from "./__mocks__/argent-api-tokens.mock.json"
+import mockApiPricesDataInvalid from "./__fixtures__/argent-api-prices-invalid.mock.json"
+import mockApiPricesData from "./__fixtures__/argent-api-prices.mock.json"
+import mockApiTokenDataInvalid from "./__fixtures__/argent-api-tokens-invalid.mock.json"
+import mockApiTokenData from "./__fixtures__/argent-api-tokens.mock.json"
 import { mockTokensWithBalance } from "./tokenPrice.test"
 
 describe("tokenPriceHooks", () => {

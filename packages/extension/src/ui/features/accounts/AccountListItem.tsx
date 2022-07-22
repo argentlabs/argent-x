@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react"
 import styled from "styled-components"
 
-import { ArrowCircleDownIcon } from "../../components/Icons/MuiIcons"
+import { ArrowCircleDownIcon, LinkIcon } from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
@@ -16,20 +16,24 @@ export interface IAccountListItem {
   highlight?: boolean
   deploying?: boolean
   upgrade?: boolean
+  connected?: boolean
+  transparent?: boolean
   children?: ReactNode
-  // ...rest
-  [x: string]: any
 }
 
 type AccountListItemWrapperProps = Pick<
   IAccountListItem,
-  "highlight" | "outline"
+  "highlight" | "outline" | "transparent"
 >
 
 export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
   cursor: pointer;
-  background-color: ${({ highlight }) =>
-    highlight ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.1)"};
+  background-color: ${({ highlight, transparent }) =>
+    transparent
+      ? "transparent"
+      : highlight
+      ? "rgba(255, 255, 255, 0.15)"
+      : "rgba(255, 255, 255, 0.1)"};
   border-radius: 4px;
   padding: 20px 16px;
   border: 1px solid
@@ -43,7 +47,8 @@ export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
 
   &:hover,
   &:focus {
-    background: rgba(255, 255, 255, 0.15);
+    background: ${({ transparent }) =>
+      transparent ? "transparent" : "rgba(255, 255, 255, 0.15)"};
     outline: 0;
   }
 `
@@ -76,21 +81,34 @@ const AccountName = styled.h1`
 
 const AccountAddress = styled.div`
   font-size: 13px;
+  line-height: 13px;
+`
+
+const UpgradeIcon = styled(ArrowCircleDownIcon)`
+  font-size: 16px;
+`
+
+const ConnectedStatusWrapper = styled(NetworkStatusWrapper)`
+  color: ${({ theme }) => theme.blue1};
+`
+
+const ConnectedIcon = styled(LinkIcon)`
+  transform: rotate(-45deg);
+  font-size: 16px;
 `
 
 export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
   accountAddress,
   networkId,
-  outline,
-  highlight,
   deploying,
   upgrade,
+  connected,
   children,
   ...rest
 }) => {
   return (
-    <AccountListItemWrapper outline={outline} highlight={highlight} {...rest}>
+    <AccountListItemWrapper {...rest}>
       <ProfilePicture
         src={getNetworkAccountImageUrl({
           accountName,
@@ -111,14 +129,17 @@ export const AccountListItem: FC<IAccountListItem> = ({
               <TransactionStatusIndicator color="orange" />
               <AccountStatusText>Deploying</AccountStatusText>
             </NetworkStatusWrapper>
+          ) : upgrade ? (
+            <NetworkStatusWrapper>
+              <UpgradeIcon />
+              <AccountStatusText>Upgrade</AccountStatusText>
+            </NetworkStatusWrapper>
           ) : (
-            upgrade && (
-              <NetworkStatusWrapper>
-                <ArrowCircleDownIcon
-                  style={{ maxHeight: "16px", maxWidth: "16px" }}
-                />
-                <AccountStatusText>Upgrade</AccountStatusText>
-              </NetworkStatusWrapper>
+            connected && (
+              <ConnectedStatusWrapper>
+                <ConnectedIcon />
+                <AccountStatusText>Connected</AccountStatusText>
+              </ConnectedStatusWrapper>
             )
           )}
           {children}
