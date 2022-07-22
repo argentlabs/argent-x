@@ -21,6 +21,12 @@ export const PrivacySettingsScreen: FC = () => {
     setValue: setPrivacyShareAnalyticsDataValue,
   } = useBackgroundSettingsValue("privacyShareAnalyticsData")
 
+  const {
+    initialised: privacyErrorReportingInitialised,
+    value: privacyErrorReportingValue,
+    setValue: setPrivacyErrorReportingValue,
+  } = useBackgroundSettingsValue("privacyErrorReporting")
+
   return (
     <>
       <IconBar back />
@@ -41,6 +47,20 @@ export const PrivacySettingsScreen: FC = () => {
             Use the Argent backend for token pricing, rich activity feed,
             transaction review & assessment
           </P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem>
+          <Title>
+            <span>Automatic Error Reporting</span>
+            <LazyInitialisedIOSSwitch
+              initialised={privacyErrorReportingInitialised}
+              checked={privacyErrorReportingValue}
+              onClick={() =>
+                setPrivacyErrorReportingValue(!privacyErrorReportingValue)
+              }
+            />
+          </Title>
+          <P>Automatically share crash logs with Argent</P>
         </SettingsItem>
         <hr />
         {ANALYTICS_UI_ENABLED && (

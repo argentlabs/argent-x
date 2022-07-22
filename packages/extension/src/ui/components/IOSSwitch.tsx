@@ -57,10 +57,8 @@ const IOSSwitch = styled((props: SwitchProps) => (
 
 export default IOSSwitch
 
-export interface ILazyInitialisedIOSSwitch {
+export interface ILazyInitialisedIOSSwitch extends SwitchProps {
   initialised: boolean
-  // ...rest
-  [x: string]: any
 }
 
 /** A wrapped IOSSwitch which does not animate when initialised with the original value  */

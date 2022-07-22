@@ -28,7 +28,7 @@ export function getAllStorage() {
   return browser.storage.local.get()
 }
 
-export class Storage<T> implements IStorage<T> {
+export class Storage<T extends Record<string, any>> implements IStorage<T> {
   private NS: string
   public defaults: T
   constructor(defaults: T, namespace = "") {

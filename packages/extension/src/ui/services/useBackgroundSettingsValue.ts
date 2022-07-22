@@ -1,8 +1,13 @@
+import { isFunction, isUndefined } from "lodash-es"
 import { useCallback, useEffect, useState } from "react"
 
-import { messageStream } from "../../shared/messages"
-import { ISettingsStorage } from "../../shared/settings"
-import { getSetting, removeSetting, setSetting } from "./backgroundSettings"
+import { SettingsStorageKey } from "./../../shared/settings/types"
+import {
+  SettingsStorageValue,
+  getSetting,
+  setSetting,
+  subscribeToSettings,
+} from "../../shared/settings"
 
 /**
  * Hook providing access to an indiviudal value from background settings
@@ -10,13 +15,15 @@ import { getSetting, removeSetting, setSetting } from "./backgroundSettings"
  * @param key the key of the value to use
  */
 
-export const useBackgroundSettingsValue = (key: keyof ISettingsStorage) => {
+export const useBackgroundSettingsValue = <K extends SettingsStorageKey>(
+  key: K,
+) => {
   const [initialised, setInitialised] = useState<boolean>(false)
-  const [storedValue, setStoredValue] = useState<any>(null)
+  const [storedValue, setStoredValue] = useState<SettingsStorageValue<K>>()
 
   /** read the value async from storage then update in hook state */
   const updateStoredValue = useCallback(async () => {
-    const value = await getSetting(key as keyof ISettingsStorage)
+    const value = await getSetting(key)
     setStoredValue(value)
     if (!initialised) {
       setInitialised(true)
@@ -25,35 +32,32 @@ export const useBackgroundSettingsValue = (key: keyof ISettingsStorage) => {
   }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setValue = useCallback(
-    async (value: any) => {
+    async (value: SettingsStorageValue<K>) => {
       await setSetting(key, value)
     },
     [key],
   )
 
-  const removeValue = useCallback(async () => {
-    await removeSetting(key)
-  }, [key])
-
   /** subscribe to change message to update the local hook state */
   useEffect(() => {
-    const subscription = messageStream.subscribe(([message]) => {
-      if (message.type === "SETTING_CHANGED" && message.data.key === key) {
-        updateStoredValue()
-      }
-    })
-    updateStoredValue()
+    let unsub: unknown
+
+    if (isUndefined(storedValue)) {
+      updateStoredValue()
+    } else {
+      unsub = subscribeToSettings(updateStoredValue)
+    }
+
     return () => {
-      if (!subscription.closed) {
-        subscription.unsubscribe()
+      if (isFunction(unsub)) {
+        unsub()
       }
     }
-  }, [key, updateStoredValue])
+  }, [key, storedValue, updateStoredValue])
 
   return {
     initialised,
     value: storedValue,
     setValue,
-    removeValue,
   }
 }

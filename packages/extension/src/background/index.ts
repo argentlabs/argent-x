@@ -24,7 +24,6 @@ import { handleNetworkMessage } from "./networkMessaging"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
-import { handleSettingsMessage } from "./settingsMessaging"
 import { Storage } from "./storage"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
@@ -90,7 +89,6 @@ initBackgroundExtensionCloseListener()
     handlePreAuthorizationMessage,
     handleRecoveryMessage,
     handleSessionMessage,
-    handleSettingsMessage,
     handleTransactionMessage,
   ] as Array<HandleMessage<MessageType>>
 
