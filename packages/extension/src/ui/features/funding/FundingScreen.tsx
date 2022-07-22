@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { Link, Navigate } from "react-router-dom"
+import { Link, Navigate, useLocation } from "react-router-dom"
 import styled from "styled-components"
 import A from "tracking-link"
 
@@ -54,19 +54,13 @@ export const FundingScreen: FC = () => {
         <Title>How would you like to fund your account?</Title>
         <OptionsWrapper>
           {allowFiatPurchase ? (
-            <A
-              href={`https://argentx.banxa.com/?walletAddress=${normalizeAddress(
-                account.address,
-              )}`}
-              targetBlank
-              onClick={trackAddFundsService("banxa", account.networkId)}
-            >
+            <Link to={routes.fundingProvider()}>
               <Option
                 title="Buy with card or bank transfer"
                 icon={<CardSvg />}
                 hideArrow
               />
-            </A>
+            </Link>
           ) : (
             <Option
               title="Buy with card or bank transfer"
