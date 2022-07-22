@@ -1,4 +1,4 @@
-import { isUndefined } from "lodash-es"
+import { isFunction, isUndefined } from "lodash-es"
 import { useCallback, useEffect, useState } from "react"
 
 import { SettingsStorageKey } from "./../../shared/settings/types"
@@ -40,10 +40,18 @@ export const useBackgroundSettingsValue = <K extends SettingsStorageKey>(
 
   /** subscribe to change message to update the local hook state */
   useEffect(() => {
+    let unsub: unknown
+
     if (isUndefined(storedValue)) {
       updateStoredValue()
     } else {
-      subscribeToSettings(updateStoredValue)
+      unsub = subscribeToSettings(updateStoredValue)
+    }
+
+    return () => {
+      if (isFunction(unsub)) {
+        unsub()
+      }
     }
   }, [key, storedValue, updateStoredValue])
 
