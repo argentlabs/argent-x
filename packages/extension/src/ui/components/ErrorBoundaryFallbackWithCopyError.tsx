@@ -3,7 +3,6 @@ import * as Sentry from "@sentry/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import styled from "styled-components"
 
-import { ISettingsStorage } from "../../shared/settings"
 import { coerceErrorToString } from "../../shared/utils/error"
 import { ResponsiveBehaviour, ScrollBehaviour } from "../AppRoutes"
 import { SettingsItem, Title } from "../features/settings/SettingsScreen"
@@ -146,9 +145,7 @@ ${displayStack}
     initialised: privacyErrorReportingInitialised,
     value: privacyErrorReportingValue,
     setValue: setPrivacyErrorReportingValue,
-  } = useBackgroundSettingsValue<ISettingsStorage["privacyErrorReporting"]>(
-    "privacyErrorReporting",
-  )
+  } = useBackgroundSettingsValue("privacyErrorReporting")
 
   return (
     <ScrollBehaviour>

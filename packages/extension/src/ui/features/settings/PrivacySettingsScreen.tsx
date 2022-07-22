@@ -1,6 +1,5 @@
 import { FC } from "react"
 
-import { ISettingsStorage } from "../../../shared/settings"
 import { IconBar } from "../../components/IconBar"
 import { LazyInitialisedIOSSwitch } from "../../components/IOSSwitch"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
@@ -14,25 +13,19 @@ export const PrivacySettingsScreen: FC = () => {
     initialised: privacyUseArgentServicesInitialised,
     value: privacyUseArgentServicesValue,
     setValue: setPrivacyUseArgentServicesValue,
-  } = useBackgroundSettingsValue<ISettingsStorage["privacyUseArgentServices"]>(
-    "privacyUseArgentServices",
-  )
+  } = useBackgroundSettingsValue("privacyUseArgentServices")
 
   const {
     initialised: privacyShareAnalyticsDataInitialised,
     value: privacyShareAnalyticsDataValue,
     setValue: setPrivacyShareAnalyticsDataValue,
-  } = useBackgroundSettingsValue<ISettingsStorage["privacyShareAnalyticsData"]>(
-    "privacyShareAnalyticsData",
-  )
+  } = useBackgroundSettingsValue("privacyShareAnalyticsData")
 
   const {
     initialised: privacyErrorReportingInitialised,
     value: privacyErrorReportingValue,
     setValue: setPrivacyErrorReportingValue,
-  } = useBackgroundSettingsValue<ISettingsStorage["privacyErrorReporting"]>(
-    "privacyErrorReporting",
-  )
+  } = useBackgroundSettingsValue("privacyErrorReporting")
 
   return (
     <>
