@@ -1,4 +1,3 @@
-import { colord } from "colord"
 import styled from "styled-components"
 import { DefaultTheme } from "styled-components"
 
@@ -25,20 +24,22 @@ export const getVariantColor =
     switch (variant) {
       case "warn":
         return hover
-          ? colord(theme.red4).saturate(1).lighten(0.075).toRgbString()
+          ? theme.button.warn.bg.hover
           : disabled
-          ? colord(theme.red4).alpha(0.5).toRgbString()
-          : theme.red4
+          ? theme.button.warn.bg.disabled
+          : theme.button.warn.bg.base
       case "danger":
         return hover
-          ? colord(theme.red1).lighten(0.075).toRgbString()
+          ? theme.button.danger.bg.hover
           : disabled
-          ? colord(theme.red1).alpha(0.5).toRgbString()
-          : theme.red1
+          ? theme.button.danger.bg.disabled
+          : theme.button.danger.bg.base
     }
-    return hover && !disabled
-      ? `rgba(255, 255, 255, 0.25)`
-      : `rgba(255, 255, 255, 0.15);`
+    return hover
+      ? theme.button.default.bg.hover
+      : disabled
+      ? theme.button.default.bg.disabled
+      : theme.button.default.bg.base
   }
 
 export const Button = styled.button<IButton>`
@@ -50,13 +51,13 @@ export const Button = styled.button<IButton>`
   text-align: center;
 
   background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
-  border-radius: 100px;
+  border-radius: ${({ theme }) => theme.button.radius};
   width: 100%;
   outline: none;
   border: none;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.button.default.fg.base};
   cursor: pointer;
-  transition: all 200ms ease-in-out;
+  transition: ${({ theme }) => theme.button.transition};
 
   &:hover,
   &:focus {
@@ -67,7 +68,7 @@ export const Button = styled.button<IButton>`
   &:disabled {
     cursor: auto;
     cursor: not-allowed;
-    color: rgba(255, 255, 255, 0.5);
+    color: ${({ theme }) => theme.button.default.fg.disabled};
     background-color: ${({ theme }) =>
       getVariantColor({ theme, disabled: true })};
   }

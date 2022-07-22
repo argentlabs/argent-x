@@ -1,9 +1,10 @@
 import { FlattenSimpleInterpolation } from "styled-components"
 
-import { colors } from "./index"
+import { colors, components } from "./index"
 
 export type Color = string
 export type Colors = typeof colors
+export type Components = typeof components
 
 interface ThemeOptions {
   margin?: {
@@ -19,7 +20,7 @@ interface StyledBreakpoints {
 }
 
 declare module "styled-components" {
-  export interface DefaultTheme extends Colors {
+  export interface DefaultTheme extends Colors, Components {
     // css snippets
     flexColumnNoWrap: FlattenSimpleInterpolation
     flexRowNoWrap: FlattenSimpleInterpolation

@@ -38,5 +38,5 @@ Coloured.args = {
   title: "Low security",
   description: "Save a recovery phrase",
   icon: <CardSvg />,
-  backgroundColor: "#C12026",
+  variant: "danger",
 }
