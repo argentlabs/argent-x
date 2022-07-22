@@ -20,7 +20,11 @@ import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import { deployAccount } from "./accounts.service"
-import { useAccounts } from "./accounts.state"
+import {
+  useAccounts,
+  useHiddenAccounts,
+  useVisibleAccounts,
+} from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 
 const AccountList = styled.div`
@@ -54,13 +58,19 @@ const Paragraph = styled(P)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { accounts, selectedAccount, addAccount } = useAccounts()
+  const { selectedAccount, addAccount } = useAccounts()
+  const visibleAccounts = useVisibleAccounts()
+  const hiddenAccounts = useHiddenAccounts()
   const { isBackupRequired } = useBackupRequired()
 
-  const accountsList = Object.values(accounts)
+  console.log({ visibleAccounts, hiddenAccounts })
 
-  const [deprecatedAccounts, newAccounts] = partition(accountsList, (account) =>
-    isDeprecated(account),
+  const visibleAccountsList = Object.values(visibleAccounts)
+  const hasHiddenAccounts = Object.values(hiddenAccounts).length > 0
+
+  const [deprecatedAccounts, newAccounts] = partition(
+    visibleAccountsList,
+    (account) => isDeprecated(account),
   )
 
   const handleAddAccount = async () => {
@@ -97,9 +107,10 @@ export const AccountListScreen: FC = () => {
       <H1>Accounts</H1>
       <AccountList>
         {isBackupRequired && <RecoveryBanner noMargins />}
-        {accountsList.length === 0 && (
+        {visibleAccountsList.length === 0 && (
           <Paragraph>
-            No accounts on this network, click below to add one.
+            No {hasHiddenAccounts ? "visible" : ""} accounts on this network,
+            click below to add one.
           </Paragraph>
         )}
         {newAccounts.map((account) => (
@@ -130,6 +141,11 @@ export const AccountListScreen: FC = () => {
           <AddIcon fontSize="large" />
         </IconButtonCenter>
       </AccountList>
+      {hasHiddenAccounts && (
+        <button onClick={() => navigate(routes.accountsHidden())}>
+          Hidden accounts
+        </button>
+      )}
     </AccountListWrapper>
   )
 }

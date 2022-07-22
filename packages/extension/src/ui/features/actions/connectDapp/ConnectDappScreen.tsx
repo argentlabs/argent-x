@@ -11,7 +11,7 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../../accounts/accountMetadata.state"
-import { useAccounts } from "../../accounts/accounts.state"
+import { useAccounts, useVisibleAccounts } from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import { ConfirmPageProps, ConfirmScreen } from "../ConfirmScreen"
 import { ConnectDappAccountListItem } from "./ConnectDappAccountListItem"
@@ -168,7 +168,8 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
   host,
   ...rest
 }) => {
-  const { accounts, selectedAccount: initiallySelectedAccount } = useAccounts()
+  const { selectedAccount: initiallySelectedAccount } = useAccounts()
+  const visibleAccounts = useVisibleAccounts()
   const [connectAccountAddress, setConnectAccountAddress] = useState(
     initiallySelectedAccount?.address,
   )
@@ -180,19 +181,16 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
 
   const selectedAccount = useMemo(() => {
     if (connectAccountAddress) {
-      const account = accounts.find(
+      const account = visibleAccounts.find(
         ({ address }) => address === connectAccountAddress,
       )
       return account
     }
-  }, [accounts, connectAccountAddress])
+  }, [visibleAccounts, connectAccountAddress])
 
-  const onSelectedAccountChange = useCallback(
-    (accountAddress: string) => {
-      setConnectAccountAddress(accountAddress)
-    },
-    [selectedAccount],
-  )
+  const onSelectedAccountChange = useCallback((accountAddress: string) => {
+    setConnectAccountAddress(accountAddress)
+  }, [])
 
   const onConnect = useCallback(() => {
     selectedAccount && onConnectProp(selectedAccount)
@@ -227,7 +225,7 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
       <SmallText>Select the account to connect:</SmallText>
       <SelectContainer>
         <ConnectDappAccountSelect
-          accounts={accounts}
+          accounts={visibleAccounts}
           selectedAccountAddress={connectAccountAddress}
           onSelectedAccountAddressChange={onSelectedAccountChange}
           host={host}

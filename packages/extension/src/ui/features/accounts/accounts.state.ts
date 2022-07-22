@@ -36,6 +36,20 @@ export const useAccount = (account?: BaseWalletAccount): Account | undefined =>
     }),
   )
 
+const visibleAccountsSelector = ({ accounts }: Pick<State, "accounts">) =>
+  accounts.filter((account) => !account.hidden)
+
+const hiddenAccountsSelector = ({ accounts }: Pick<State, "accounts">) =>
+  accounts.filter((account) => account.hidden)
+
+export const useVisibleAccounts = () => {
+  return useAccounts(visibleAccountsSelector)
+}
+
+export const useHiddenAccounts = () => {
+  return useAccounts(hiddenAccountsSelector)
+}
+
 export const useSelectedAccount = () =>
   useAccounts(({ accounts, selectedAccount }) =>
     selectedAccount
@@ -48,10 +62,11 @@ export const mapWalletAccountsToAccounts = (
 ): State["accounts"] => {
   return walletAccounts.map(
     (walletAccount) =>
-      new Account(
-        walletAccount.address,
-        walletAccount.network,
-        walletAccount.signer,
-      ),
+      new Account({
+        address: walletAccount.address,
+        network: walletAccount.network,
+        signer: walletAccount.signer,
+        hidden: walletAccount.hidden,
+      }),
   )
 }

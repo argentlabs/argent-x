@@ -20,6 +20,14 @@ interface RecoveryOptions {
   showAccountList?: boolean
 }
 
+// TODO: refactor - currently explicit sync wallet state into UI store, should be reactive
+export const updateAccountsStateFromWallet = async (networkId: string) => {
+  const allAccounts = await getAccounts(true)
+  const walletAccounts = accountsOnNetwork(allAccounts, networkId)
+  const accounts = mapWalletAccountsToAccounts(walletAccounts)
+  useAccounts.setState({ accounts })
+}
+
 export const recover = async ({
   networkId,
   showAccountList,
@@ -28,7 +36,7 @@ export const recover = async ({
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ??= lastSelectedAccount?.networkId ?? defaultNetwork.id
 
-    const allAccounts = await getAccounts()
+    const allAccounts = await getAccounts(true)
     const walletAccounts = accountsOnNetwork(allAccounts, networkId)
 
     const selectedAccount = walletAccounts.find(

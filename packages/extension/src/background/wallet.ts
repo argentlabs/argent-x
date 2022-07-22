@@ -222,6 +222,11 @@ export class Wallet {
     return uniqueAccounts.filter((account) => includeHidden || !account.hidden)
   }
 
+  public async getHiddenAccounts() {
+    const accounts = await this.getAccounts(true)
+    return accounts.filter((account) => !!account.hidden)
+  }
+
   private async addWalletAccounts(accounts: WalletAccount[]) {
     const oldAccounts = await this.getAccounts(true)
 
@@ -247,7 +252,15 @@ export class Wallet {
   }
 
   public async hideAccount(account: BaseWalletAccount) {
-    const accounts = await this.getAccounts()
+    return this.setAccountHidden(account, true)
+  }
+
+  public async unhideAccount(account: BaseWalletAccount) {
+    return this.setAccountHidden(account, false)
+  }
+
+  public async setAccountHidden(account: BaseWalletAccount, hidden: boolean) {
+    const accounts = await this.getAccounts(true)
 
     const fullAccount = find(accounts, (a) => accountsEqual(a, account))
 
@@ -257,7 +270,7 @@ export class Wallet {
 
     const hiddenAccount: WalletAccount = {
       ...fullAccount,
-      hidden: true,
+      hidden,
     }
 
     const newAccounts = mergeArrayStableWith(

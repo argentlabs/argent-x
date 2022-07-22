@@ -76,6 +76,7 @@ export const routes = {
   ),
   upgrade: route("/account/upgrade"),
   accounts: route("/accounts"),
+  accountsHidden: route("/accounts/hidden"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   exportPrivateKey: route("/export-private-key"),
