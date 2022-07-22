@@ -33,8 +33,16 @@ Disabled.args = {
   disabled: true,
 }
 
-export const Coloured = Template.bind({})
-Coloured.args = {
+export const Warn = Template.bind({})
+Warn.args = {
+  title: "Low security",
+  description: "Save a recovery phrase",
+  icon: <CardSvg />,
+  variant: "warn",
+}
+
+export const Danger = Template.bind({})
+Danger.args = {
   title: "Low security",
   description: "Save a recovery phrase",
   icon: <CardSvg />,
