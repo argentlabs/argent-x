@@ -52,6 +52,12 @@ Connected.args = {
   connected: true,
 }
 
+export const Hidden = Template.bind({})
+Hidden.args = {
+  ...account,
+  hidden: true,
+}
+
 export const Children = Template.bind({})
 Children.args = {
   ...account,
