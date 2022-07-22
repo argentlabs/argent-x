@@ -7,7 +7,11 @@ import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
-import { AddIcon, SettingsIcon } from "../../components/Icons/MuiIcons"
+import {
+  AddIcon,
+  SettingsIcon,
+  VisibilityOff,
+} from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
@@ -28,11 +32,16 @@ import {
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 
-const AccountList = styled.div`
+interface IAccountList {
+  hasHiddenAccounts: boolean
+}
+
+const AccountList = styled.div<IAccountList>`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 48px 32px;
+  padding: 48px 32px
+    ${({ hasHiddenAccounts }) => (hasHiddenAccounts ? "64px" : "48px")} 32px;
 `
 
 const AccountListWrapper = styled(Container)`
@@ -77,6 +86,52 @@ const DimmingContainer = styled.div`
   bottom: 0;
 `
 
+const Footer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: ${({ theme }) => theme.bg1};
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.4) 0%,
+    ${({ theme }) => theme.bg1} 73.72%
+  );
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
+`
+
+const HiddenAccountsButton = styled.button`
+  appearance: none;
+  border: none;
+  background: none;
+  color: ${({ theme }) => theme.text3};
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 200ms ease-in-out;
+  &:hover {
+    color: ${({ theme }) => theme.text2};
+  }
+`
+
+const HiddenAccountsButtonIcon = styled.div`
+  font-size: 14px;
+`
+
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
@@ -86,8 +141,6 @@ export const AccountListScreen: FC = () => {
   const { isBackupRequired } = useBackupRequired()
   const [isDeploying, setIsDeploying] = useState(false)
   const [deployFailed, setDeployFailed] = useState(false)
-
-  console.log({ visibleAccounts, hiddenAccounts })
 
   const visibleAccountsList = Object.values(visibleAccounts)
   const hasHiddenAccounts = Object.values(hiddenAccounts).length > 0
@@ -129,7 +182,7 @@ export const AccountListScreen: FC = () => {
         </Header>
       </AccountHeader>
       <H1>Accounts</H1>
-      <AccountList>
+      <AccountList hasHiddenAccounts={hasHiddenAccounts}>
         {isBackupRequired && <RecoveryBanner noMargins />}
         {visibleAccountsList.length === 0 && (
           <Paragraph>
@@ -180,9 +233,16 @@ export const AccountListScreen: FC = () => {
         )}
       </AccountList>
       {hasHiddenAccounts && (
-        <button onClick={() => navigate(routes.accountsHidden())}>
-          Hidden accounts
-        </button>
+        <Footer>
+          <HiddenAccountsButton
+            onClick={() => navigate(routes.accountsHidden())}
+          >
+            <HiddenAccountsButtonIcon>
+              <VisibilityOff fontSize="inherit" />
+            </HiddenAccountsButtonIcon>
+            <div>Hidden accounts</div>
+          </HiddenAccountsButton>
+        </Footer>
       )}
     </AccountListWrapper>
   )
