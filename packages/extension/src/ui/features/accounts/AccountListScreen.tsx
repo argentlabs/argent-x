@@ -27,11 +27,16 @@ import {
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 
-const AccountList = styled.div`
+interface IAccountList {
+  hasHiddenAccounts: boolean
+}
+
+const AccountList = styled.div<IAccountList>`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 48px 32px;
+  padding: 48px 32px
+    ${({ hasHiddenAccounts }) => (hasHiddenAccounts ? "64px" : "48px")} 32px;
 `
 
 const AccountListWrapper = styled(Container)`
@@ -55,6 +60,30 @@ const Paragraph = styled(P)`
   text-align: center;
 `
 
+export const Footer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: ${({ theme }) => theme.bg1};
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.4) 0%,
+    ${({ theme }) => theme.bg1} 73.72%
+  );
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${({ theme }) => theme.mediaMinWidth.sm`
+    left: ${theme.margin.extensionInTab};
+    right: ${theme.margin.extensionInTab};
+  `}
+`
+
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
@@ -62,8 +91,6 @@ export const AccountListScreen: FC = () => {
   const visibleAccounts = useVisibleAccounts()
   const hiddenAccounts = useHiddenAccounts()
   const { isBackupRequired } = useBackupRequired()
-
-  console.log({ visibleAccounts, hiddenAccounts })
 
   const visibleAccountsList = Object.values(visibleAccounts)
   const hasHiddenAccounts = Object.values(hiddenAccounts).length > 0
@@ -105,7 +132,7 @@ export const AccountListScreen: FC = () => {
         </Header>
       </AccountHeader>
       <H1>Accounts</H1>
-      <AccountList>
+      <AccountList hasHiddenAccounts={hasHiddenAccounts}>
         {isBackupRequired && <RecoveryBanner noMargins />}
         {visibleAccountsList.length === 0 && (
           <Paragraph>
@@ -142,9 +169,11 @@ export const AccountListScreen: FC = () => {
         </IconButtonCenter>
       </AccountList>
       {hasHiddenAccounts && (
-        <button onClick={() => navigate(routes.accountsHidden())}>
-          Hidden accounts
-        </button>
+        <Footer>
+          <button onClick={() => navigate(routes.accountsHidden())}>
+            Hidden accounts
+          </button>
+        </Footer>
       )}
     </AccountListWrapper>
   )
