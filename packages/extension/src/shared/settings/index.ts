@@ -8,18 +8,15 @@ export const getAllSettings = async () => {
 
 export const getSetting = async <K extends SettingsStorageKey>(
   key: K,
-): Promise<SettingsStorageValue> => {
+): Promise<SettingsStorageValue<K>> => {
   const allSettings = await getAllSettings()
 
   return allSettings[key]
 }
 
-export const setSetting = async <
-  K extends SettingsStorageKey,
-  V extends SettingsStorageValue,
->(
+export const setSetting = async <K extends SettingsStorageKey>(
   key: K,
-  value: V,
+  value: SettingsStorageValue<K>,
 ) => {
   return await settingsStorage.set({ [key]: value })
 }
