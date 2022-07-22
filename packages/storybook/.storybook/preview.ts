@@ -1,6 +1,6 @@
 export const parameters = {
   backgrounds: {
-    default: "Black",
+    default: "Extension",
     values: [
       {
         name: "White",
@@ -9,6 +9,10 @@ export const parameters = {
       {
         name: "Mid",
         value: "#888",
+      },
+      {
+        name: "Extension",
+        value: "#161616",
       },
       {
         name: "Black",

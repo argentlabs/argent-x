@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles"
+import { colord } from "colord"
 import React, { FC } from "react"
 import {
   DefaultTheme,
@@ -35,6 +36,38 @@ export const colors = {
   blue2: "#94e2ff",
 
   yellow1: "#ffbf3d",
+}
+
+export const components = {
+  button: {
+    default: {
+      fg: {
+        base: colors.text1,
+        disabled: colord(colors.text1).alpha(0.5).toRgbString(),
+      },
+      bg: {
+        base: "rgba(255, 255, 255, 0.15)",
+        hover: "rgba(255, 255, 255, 0.25)",
+        disabled: "rgba(255, 255, 255, 0.15)",
+      },
+    },
+    warn: {
+      bg: {
+        base: colors.red4,
+        hover: colord(colors.red4).saturate(1).lighten(0.075).toRgbString(),
+        disabled: colord(colors.red4).alpha(0.5).toRgbString(),
+      },
+    },
+    danger: {
+      bg: {
+        base: colors.red1,
+        hover: colord(colors.red1).lighten(0.075).toRgbString(),
+        disabled: colord(colors.red1).alpha(0.5).toRgbString(),
+      },
+    },
+    radius: "500px",
+    transition: "color 200ms ease-in-out, background-color 200ms ease-in-out",
+  },
 }
 
 const MEDIA_WIDTHS = {
@@ -135,6 +168,7 @@ const flexRowNoWrap = css`
 
 export const theme: DefaultTheme = {
   ...colors,
+  ...components,
   flexColumnNoWrap,
   flexRowNoWrap,
   // media queries

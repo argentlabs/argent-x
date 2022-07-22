@@ -80,6 +80,7 @@ export const routes = {
   funding: route("/funding"),
   exportPrivateKey: route("/export-private-key"),
   fundingQrCode: route("/funding/qr-code"),
+  fundingProvider: route("/funding/provider"),
   token: route(
     (tokenAddress: string) => `/tokens/${tokenAddress}`,
     "/tokens/:tokenAddress",
