@@ -1,8 +1,8 @@
 import { memoize } from "lodash-es"
 
-import { AddressBookAccount } from "./type"
+import { AddressBookContact } from "./type"
 
 export const accountNetworkSelector = memoize(
-  (networkId: string) => (account: AddressBookAccount) =>
+  (networkId: string) => (account: AddressBookContact) =>
     account.networkId === networkId,
 )

@@ -1,12 +1,13 @@
 import * as yup from "yup"
 
-import { AddressBookAccount } from "./type"
+import { AddressBookContact } from "./type"
 
-export const addressBookAccountSchema: yup.Schema<AddressBookAccount> = yup
+export const addressBookContactSchema: yup.Schema<AddressBookContact> = yup
   .object()
-  .required("Account is required")
+  .required("Contact is required")
   .shape({
-    name: yup.string().required("Account Name is required"),
-    networkId: yup.string().required("Account Network is required"),
-    address: yup.string().required("Account Address is required"),
+    id: yup.string().required(),
+    name: yup.string().required("Contact Name is required"),
+    networkId: yup.string().required("Contact Network is required"),
+    address: yup.string().required("Contact Address is required"),
   })
