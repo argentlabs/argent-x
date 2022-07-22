@@ -7,7 +7,6 @@ import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
 import { RecoveryMessage } from "./RecoveryMessage"
 import { SessionMessage } from "./SessionMessage"
-import { SettingsMessage } from "./SettingsMessage"
 import { TokenMessage } from "./TokenMessage"
 import { TransactionMessage } from "./TransactionMessage"
 
@@ -21,7 +20,6 @@ export type MessageType =
   | SessionMessage
   | TokenMessage
   | TransactionMessage
-  | SettingsMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean
