@@ -237,6 +237,12 @@ describe("prettifyTokenAmount()", () => {
           decimals: 18,
         }),
       ).toEqual("123,456,789.0")
+      expect(
+        prettifyTokenAmount({
+          amount: "100",
+          decimals: 18,
+        }),
+      ).toEqual("0.0000000000000001")
     })
   })
   describe("when invalid", () => {
