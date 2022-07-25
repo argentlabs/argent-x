@@ -1,28 +1,44 @@
 import { BigNumber, utils } from "ethers"
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
+import { AddressBookContact } from "../../../shared/addressBook"
 import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
 import { getFeeToken } from "../../../shared/token/utils"
-import { Button } from "../../components/Button"
+import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
+import { CloseIconAlt } from "../../components/Icons/CloseIconAlt"
+import { AddIcon } from "../../components/Icons/MuiIcons"
 import { StyledControlledInput } from "../../components/InputText"
+import Row, { RowBetween } from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
+import { makeClickable } from "../../services/a11y"
 import { useAddressBook } from "../../services/addressBook"
-import { addressSchema, normalizeAddress } from "../../services/addresses"
+import {
+  addressSchema,
+  formatTruncatedAddress,
+  normalizeAddress,
+} from "../../services/addresses"
 import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
-import { H3 } from "../../theme/Typography"
+import { H3, H5 } from "../../theme/Typography"
+import { Account } from "../accounts/Account"
+import {
+  getAccountName,
+  useAccountMetadata,
+} from "../accounts/accountMetadata.state"
+import { getAccountImageUrl } from "../accounts/accounts.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
+import { ProfilePicture } from "../accounts/ProfilePicture"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
@@ -127,6 +143,36 @@ export const CurrencyValueText = styled(InputTokenSymbol)`
   font-weight: 400;
 `
 
+export const AddressBookRecipient = styled.div`
+  background-color: ${({ theme }) => theme.black};
+  border: 1px solid ${({ theme }) => theme.bg2};
+  border-radius: 8px;
+  padding: 16px;
+`
+
+const StyledAccountAddress = styled.p`
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.text2};
+`
+export const SaveAddressButton = styled(ButtonTransparent)`
+  ${({ theme }) => theme.flexRowNoWrap}
+  justify-content: flex-end;
+  gap: 3px;
+  align-items: center;
+
+  color: ${({ theme }) => theme.blue1};
+
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
 export interface SendInput {
   recipient: string
   amount: string
@@ -145,6 +191,20 @@ export const SendTokenScreen: FC = () => {
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = account && getFeeToken(account.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
+  const [addressBookRecipient, setAddressBookRecipient] = useState<
+    Account | AddressBookContact
+  >()
+  const { accountNames } = useAccountMetadata()
+
+  const accountName = useMemo(
+    () =>
+      addressBookRecipient
+        ? "name" in addressBookRecipient
+          ? addressBookRecipient.name
+          : getAccountName(addressBookRecipient, accountNames)
+        : undefined,
+    [accountNames, addressBookRecipient],
+  )
 
   const { id: currentNetworkId } = useCurrentNetwork()
 
@@ -165,6 +225,7 @@ export const SendTokenScreen: FC = () => {
   const formValues = watch()
 
   const inputAmount = formValues.amount
+  const inputRecipient = formValues.recipient
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
   const currencyValue = useTokenBalanceToCurrencyValue(token)
@@ -192,8 +253,7 @@ export const SendTokenScreen: FC = () => {
         setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
       }
     },
-    // only on mount
-    [], // eslint-disable-line react-hooks/exhaustive-deps
+    [setValue],
   )
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
@@ -230,10 +290,19 @@ export const SendTokenScreen: FC = () => {
     setMaxInputAmount(token, maxFee)
   }
 
-  const handleAddressSelect = (address: string) => {
-    setValue("recipient", normalizeAddress(address))
+  const handleAddressSelect = (account: Account | AddressBookContact) => {
+    setAddressBookRecipient(account)
+    setValue("recipient", normalizeAddress(account.address))
     setAddressBookOpen(false)
   }
+
+  const resetAddressBookRecipient = () => {
+    setAddressBookRecipient(undefined)
+    setValue("recipient", "")
+  }
+
+  const showSaveAddressButton =
+    inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
 
   const disableSubmit =
     !isDirty ||
@@ -303,38 +372,74 @@ export const SendTokenScreen: FC = () => {
             </div>
 
             <div>
-              <StyledControlledInput
-                autoComplete="off"
-                control={control}
-                placeholder="Recipient's address"
-                name="recipient"
-                type="text"
-                style={{
-                  paddingRight: "50px",
-                  borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
-                }}
-              >
-                <>
-                  <InputGroupAfter>
-                    <AtTheRateWrapper
-                      type="button"
-                      onClick={() => setAddressBookOpen(!addressBookOpen)}
-                      active={addressBookOpen}
-                    >
-                      <AtTheRateIcon />
-                    </AtTheRateWrapper>
-                  </InputGroupAfter>
+              {addressBookRecipient && accountName ? (
+                <AddressBookRecipient>
+                  <RowBetween>
+                    <Row gap="16px">
+                      <ProfilePicture
+                        src={getAccountImageUrl(
+                          accountName,
+                          addressBookRecipient,
+                        )}
+                        width="40px"
+                        height="40px"
+                      ></ProfilePicture>
 
-                  {addressBookOpen && (
-                    <AddressBookMenu
-                      addressBook={addressBook}
-                      onAddressSelect={handleAddressSelect}
+                      <Column>
+                        <H5>{accountName}</H5>
+                        <StyledAccountAddress>
+                          {formatTruncatedAddress(addressBookRecipient.address)}
+                        </StyledAccountAddress>
+                      </Column>
+                    </Row>
+                    <CloseIconAlt
+                      {...makeClickable(resetAddressBookRecipient)}
+                      style={{ cursor: "pointer" }}
                     />
+                  </RowBetween>
+                </AddressBookRecipient>
+              ) : (
+                <>
+                  <StyledControlledInput
+                    autoComplete="off"
+                    control={control}
+                    placeholder="Recipient's address"
+                    name="recipient"
+                    type="text"
+                    style={{
+                      paddingRight: "50px",
+                      borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
+                    }}
+                  >
+                    <>
+                      <InputGroupAfter>
+                        <AtTheRateWrapper
+                          type="button"
+                          onClick={() => setAddressBookOpen(!addressBookOpen)}
+                          active={addressBookOpen}
+                        >
+                          <AtTheRateIcon />
+                        </AtTheRateWrapper>
+                      </InputGroupAfter>
+
+                      {addressBookOpen && (
+                        <AddressBookMenu
+                          addressBook={addressBook}
+                          onAddressSelect={handleAddressSelect}
+                        />
+                      )}
+                    </>
+                  </StyledControlledInput>
+                  {showSaveAddressButton && (
+                    <SaveAddressButton type="button">
+                      <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
+                      Save address
+                    </SaveAddressButton>
+                  )}
+                  {errors.recipient && (
+                    <FormError>{errors.recipient.message}</FormError>
                   )}
                 </>
-              </StyledControlledInput>
-              {errors.recipient && (
-                <FormError>{errors.recipient.message}</FormError>
               )}
             </div>
           </Column>

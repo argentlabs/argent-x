@@ -1,20 +1,17 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import styled from "styled-components"
 
+import { AddressBookContact } from "../../../shared/addressBook"
 import Column from "../../components/Column"
 import Row from "../../components/Row"
 import { makeClickable } from "../../services/a11y"
+import { AddressBook } from "../../services/addressBook"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { H5 } from "../../theme/Typography"
 import { Account } from "./Account"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { getAccountImageUrl } from "./accounts.service"
 import { ProfilePicture } from "./ProfilePicture"
-
-interface AddressBookMenuProps {
-  addressBook: Account[]
-  onAddressSelect: (address: string) => void
-}
 
 const MenuContainer = styled.div`
   position: absolute;
@@ -46,41 +43,101 @@ const StyledAccountAddress = styled.p`
   color: ${({ theme }) => theme.text2};
 `
 
+const TabsWrapper = styled(Row)`
+  gap: 8px;
+  padding: 16px 16px 8px 16px;
+`
+
+const Tab = styled.div<{ selected: boolean }>`
+  background-color: ${({ theme, selected }) =>
+    selected ? theme.text3 : "transparent"};
+  color: ${({ theme, selected }) => (selected ? theme.white : theme.text2)};
+  border: 1px solid
+    ${({ theme, selected }) => (selected ? theme.text3 : theme.text2)};
+  border-radius: 8px;
+  padding: 6px 12px 8px;
+
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+
+  cursor: pointer;
+`
+
+export interface AddressBookMenuProps {
+  addressBook: AddressBook
+  onAddressSelect: (account: Account | AddressBookContact) => void
+}
+
+export type AddressBookMenuTabs = "external" | "user"
+
 export const AddressBookMenu: FC<AddressBookMenuProps> = ({
   addressBook,
   onAddressSelect,
 }) => {
   const { accountNames } = useAccountMetadata()
+  const [selectedTab, setSelectedTab] = useState<AddressBookMenuTabs>(
+    addressBook.contacts.length > 0 ? "external" : "user",
+  )
+
+  const { userAccounts, contacts } = addressBook
+
+  const accountsToList = (accounts: Account[] | AddressBookContact[]) => {
+    return accounts.map((account) => {
+      const accountName =
+        "name" in account ? account.name : getAccountName(account, accountNames)
+
+      return (
+        <MenuItemWrapper
+          key={account.address}
+          {...makeClickable(() => onAddressSelect(account))}
+        >
+          <MenuItem>
+            <Row gap="16px">
+              <ProfilePicture
+                src={getAccountImageUrl(accountName, account)}
+                width="40px"
+                height="40px"
+              ></ProfilePicture>
+
+              <Column>
+                <H5>{accountName}</H5>
+                <StyledAccountAddress>
+                  {formatTruncatedAddress(account.address)}
+                </StyledAccountAddress>
+              </Column>
+            </Row>
+          </MenuItem>
+        </MenuItemWrapper>
+      )
+    })
+  }
 
   return (
     <MenuContainer>
-      {addressBook.map((account) => {
-        const accountName = getAccountName(account, accountNames)
-
-        return (
-          <MenuItemWrapper
-            key={account.address}
-            {...makeClickable(() => onAddressSelect(account.address))}
+      {/*** Tabs ***/}
+      <TabsWrapper>
+        {addressBook.contacts.length > 0 && (
+          <Tab
+            selected={selectedTab === "external"}
+            onClick={() => setSelectedTab("external")}
           >
-            <MenuItem>
-              <Row gap="16px">
-                <ProfilePicture
-                  src={getAccountImageUrl(accountName, account)}
-                  width="40px"
-                  height="40px"
-                ></ProfilePicture>
+            Addresses
+          </Tab>
+        )}
+        <Tab
+          selected={selectedTab === "user"}
+          onClick={() => setSelectedTab("user")}
+        >
+          My accounts
+        </Tab>
+      </TabsWrapper>
 
-                <Column>
-                  <H5>{accountName}</H5>
-                  <StyledAccountAddress>
-                    {formatTruncatedAddress(account.address)}
-                  </StyledAccountAddress>
-                </Column>
-              </Row>
-            </MenuItem>
-          </MenuItemWrapper>
-        )
-      })}
+      {/*** Addresses Tab ***/}
+      {selectedTab === "external" && accountsToList(contacts)}
+
+      {/*** My accounts Tab ***/}
+      {selectedTab === "user" && accountsToList(userAccounts)}
     </MenuContainer>
   )
 }

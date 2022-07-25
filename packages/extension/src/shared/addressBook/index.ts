@@ -32,11 +32,11 @@ export const getAddressBookByKey = async (
   return (await getAddressBookContacts()).map((account) => account[key])
 }
 
-export const getAddressBookAddresses = async () => {
+export const getAddressBookByAddresses = async () => {
   return await getAddressBookByKey("address")
 }
 
-export const getAddressBookName = async () => {
+export const getAddressBookByNames = async () => {
   return await getAddressBookByKey("name")
 }
 

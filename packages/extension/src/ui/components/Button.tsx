@@ -41,22 +41,24 @@ export const getVariantColor =
       : `rgba(255, 255, 255, 0.15);`
   }
 
-export const Button = styled.button<IButton>`
+const BaseButton = styled.button`
   margin: 0;
   padding: 13.5px;
   font-weight: 600;
   font-size: 16px;
   line-height: 21px;
   text-align: center;
-
-  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
-  border-radius: 100px;
   width: 100%;
   outline: none;
   border: none;
-  color: ${({ theme }) => theme.text1};
-  cursor: pointer;
   transition: all 200ms ease-in-out;
+  cursor: pointer;
+`
+
+export const Button = styled(BaseButton)<IButton>`
+  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  border-radius: 100px;
+  color: ${({ theme }) => theme.text1};
 
   &:hover,
   &:focus {
@@ -88,4 +90,20 @@ export const ButtonGroupVertical = styled.div<{
     switchButtonOrder ? "row-reverse" : "row"};
   gap: 12px;
   width: 100%;
+`
+
+export const ButtonTransparent = styled(BaseButton)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.text1};
+
+  &:hover,
+  &:focus {
+    outline: 0;
+  }
+
+  &:disabled {
+    cursor: auto;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.5);
+  }
 `
