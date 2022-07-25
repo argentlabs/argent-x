@@ -4,7 +4,7 @@ import useSWR from "swr"
 import {
   customNetworksStore,
   defaultNetwork,
-  extendByDefaultNetworks,
+  extendByDefaultReadonlyNetworks,
 } from "../../../shared/network"
 import { useArrayStorage } from "../../../shared/storage/hooks"
 import { useAppState } from "./../../app.state"
@@ -34,9 +34,14 @@ export const useIsMainnet = () => {
 export const useNetworks = () => {
   const customNetworks = useArrayStorage(customNetworksStore)
   return useMemo(
-    () => extendByDefaultNetworks(customNetworks),
+    () => extendByDefaultReadonlyNetworks(customNetworks),
     [customNetworks],
   )
+}
+
+export const useCustomNetworks = () => {
+  const customNetworks = useArrayStorage(customNetworksStore)
+  return customNetworks
 }
 
 export const useNetwork = (networkId: string) => {

@@ -1,6 +1,6 @@
 import { Collapse } from "@mui/material"
-import { FC, useEffect, useMemo, useState } from "react"
-import { useForm } from "react-hook-form"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { WatchObserver, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -70,7 +70,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
-      if (type === "change" && name === "name") {
+      if (props.mode === "add" && type === "change" && name === "name") {
         setValue("id", slugify(value.name || ""))
       }
     })
