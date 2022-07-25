@@ -2,6 +2,7 @@ import { FC, useMemo } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
@@ -101,7 +102,9 @@ export const TokenScreen: FC = () => {
               <H3>{symbol}</H3>
             </RowCentered>
             {currencyValue && (
-              <CurrencyValueText>{currencyValue}</CurrencyValueText>
+              <CurrencyValueText>
+                {prettifyCurrencyValue(currencyValue)}
+              </CurrencyValueText>
             )}
           </ColumnCenter>
         </TokenHeader>
