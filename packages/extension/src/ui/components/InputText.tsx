@@ -1,5 +1,8 @@
 import { useRef } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
+import TextareaAutosize, {
+  TextareaAutosizeProps,
+} from "react-textarea-autosize"
 import styled, { css } from "styled-components"
 
 import { isNumeric } from "../../shared/utils/number"
@@ -263,4 +266,107 @@ export const TextArea = styled.textarea`
   resize: none;
   min-height: 116px;
   width: 100%;
+`
+
+export const TextAreaAlt = styled(TextareaAutosize)`
+  ${InputCssAlt}
+  resize: none;
+  width: 100%;
+`
+
+export type InputTextAreaProps = Omit<TextareaAutosizeProps, "ref" | "as">
+
+export const InputTextArea = styled(
+  ({
+    placeholder,
+    autoFocus,
+    onChange,
+    value,
+    disabled,
+    className,
+    style,
+    inputRef,
+    children,
+    ...props
+  }: { inputRef: any } & InputTextAreaProps) => {
+    const idRef = useRef(randomString())
+    return (
+      <Container className={className} style={style}>
+        <TextAreaAlt
+          placeholder={placeholder}
+          id={idRef.current}
+          onChange={onChange}
+          value={value}
+          autoFocus={autoFocus}
+          disabled={disabled}
+          ref={inputRef}
+          {...props}
+        />
+        {children}
+      </Container>
+    )
+  },
+)``
+
+export type ControlledTextAreaProps<T extends FieldValues> =
+  InputTextAreaProps &
+    Omit<ControllerProps<T>, "render"> &
+    AdditionalControlledInputProps
+
+export const ControlledTextAreaAlt = <T extends FieldValues>({
+  name,
+  control,
+  defaultValue,
+  rules,
+  onlyNumeric,
+  maxRows,
+  children,
+  ...props
+}: ControlledTextAreaProps<T>) => (
+  <Controller
+    name={name}
+    control={control}
+    defaultValue={defaultValue}
+    rules={rules}
+    render={({ field: { ref, value, onChange: onValueChange, ...field } }) => (
+      <InputTextArea
+        style={{ position: "relative" }}
+        value={value || ""}
+        inputRef={ref}
+        maxRows={maxRows}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+          const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
+          if (onlyNumeric) {
+            if (e.target.value === "") {
+              return onValueChange(e)
+            }
+
+            return (
+              numericalRegex.test(e.target.value) &&
+              // just being double sure
+              isNumeric(e.target.value) &&
+              onValueChange(e)
+            )
+          } else {
+            return onValueChange(e)
+          }
+        }}
+        {...field}
+        {...props}
+      >
+        {children}
+      </InputTextArea>
+    )}
+  />
+)
+
+export type ControlledTextAreaType = typeof ControlledTextAreaAlt
+
+export const StyledControlledTextArea: ControlledTextAreaType = styled(
+  ControlledTextAreaAlt,
+)`
+  padding: 12px 16px;
+  border: 1px solid ${({ theme }) => theme.bg2};
+  border-radius: 8px;
+  background-color: black;
 `

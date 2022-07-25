@@ -14,7 +14,10 @@ import { IconBar } from "../../components/IconBar"
 import { AtTheRateIcon } from "../../components/Icons/AtTheRateIcon"
 import { CloseIconAlt } from "../../components/Icons/CloseIconAlt"
 import { AddIcon } from "../../components/Icons/MuiIcons"
-import { StyledControlledInput } from "../../components/InputText"
+import {
+  StyledControlledInput,
+  StyledControlledTextArea,
+} from "../../components/InputText"
 import Row, { RowBetween } from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
@@ -191,9 +194,8 @@ export const SendTokenScreen: FC = () => {
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = account && getFeeToken(account.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
-  const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
-  >()
+  const [addressBookRecipient, setAddressBookRecipient] =
+    useState<Account | AddressBookContact>()
   const { accountNames } = useAccountMetadata()
 
   const accountName = useMemo(
@@ -301,8 +303,10 @@ export const SendTokenScreen: FC = () => {
     setValue("recipient", "")
   }
 
-  const showSaveAddressButton =
+  const validStarknetAddress =
     inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
+
+  const showSaveAddressButton = validStarknetAddress
 
   const disableSubmit =
     !isDirty ||
@@ -400,12 +404,12 @@ export const SendTokenScreen: FC = () => {
                 </AddressBookRecipient>
               ) : (
                 <>
-                  <StyledControlledInput
+                  <StyledControlledTextArea
                     autoComplete="off"
                     control={control}
                     placeholder="Recipient's address"
                     name="recipient"
-                    type="text"
+                    maxRows={3}
                     style={{
                       paddingRight: "50px",
                       borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
@@ -413,13 +417,22 @@ export const SendTokenScreen: FC = () => {
                   >
                     <>
                       <InputGroupAfter>
-                        <AtTheRateWrapper
-                          type="button"
-                          onClick={() => setAddressBookOpen(!addressBookOpen)}
-                          active={addressBookOpen}
-                        >
-                          <AtTheRateIcon />
-                        </AtTheRateWrapper>
+                        {validStarknetAddress ? (
+                          <CloseIconAlt
+                            {...makeClickable(resetAddressBookRecipient)}
+                            style={{ cursor: "pointer" }}
+                          />
+                        ) : (
+                          <AtTheRateWrapper
+                            type="button"
+                            active={addressBookOpen}
+                            {...makeClickable(() =>
+                              setAddressBookOpen(!addressBookOpen),
+                            )}
+                          >
+                            <AtTheRateIcon />
+                          </AtTheRateWrapper>
+                        )}
                       </InputGroupAfter>
 
                       {addressBookOpen && (
@@ -429,7 +442,7 @@ export const SendTokenScreen: FC = () => {
                         />
                       )}
                     </>
-                  </StyledControlledInput>
+                  </StyledControlledTextArea>
                   {showSaveAddressButton && (
                     <SaveAddressButton type="button">
                       <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
