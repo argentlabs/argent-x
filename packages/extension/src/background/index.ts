@@ -3,6 +3,7 @@ import browser from "webextension-polyfill"
 import { accountStore, getAccounts } from "../shared/account/store"
 import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
+import { initBackgroundExtensionCloseListener } from "../shared/analytics"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
 import { delay } from "../shared/utils/delay"
@@ -63,6 +64,8 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     }
   }
 })
+
+initBackgroundExtensionCloseListener()
 
 // runs on startup
 

@@ -1,14 +1,15 @@
-import { FC, useCallback, useEffect, useState } from "react"
+import { uniq } from "lodash-es"
+import { FC, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import {
-  getPreAuthorizations,
+  removePreAuthorization,
   resetPreAuthorizations,
-} from "../../../background/preAuthorizations"
+  usePreAuthorizations,
+} from "../../../shared/preAuthorizations"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
-import { removePreAuthorization } from "../../services/background"
 import { H2, P } from "../../theme/Typography"
 import { DappConnection } from "./DappConnection"
 
@@ -32,33 +33,32 @@ const Wrapper = styled.div`
 
 export const DappConnectionsSettingsScreen: FC = () => {
   const navigate = useNavigate()
-  const [preAuthorizations, setPreAuthorizations] = useState<string[]>([])
 
-  const requestPreAuthorizations = useCallback(async () => {
-    setPreAuthorizations(await getPreAuthorizations())
-  }, [])
+  const preAuthorizations = usePreAuthorizations()
 
-  useEffect(() => {
-    requestPreAuthorizations()
-    // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const preauthorizedHosts = useMemo<string[]>(() => {
+    return uniq(
+      preAuthorizations.map((preAuthorization) => preAuthorization.host),
+    )
+  }, [preAuthorizations])
 
   return (
     <>
       <IconBar back />
       <Wrapper>
         <H2>Dapp connections</H2>
-        {preAuthorizations.length === 0 ? (
+        {preauthorizedHosts === null ? null : preauthorizedHosts.length ===
+          0 ? (
           <P>You haven&apos;t connected to any dapp yet.</P>
         ) : (
           <>
-            {preAuthorizations.map((dapp) => (
+            {preauthorizedHosts.map((host) => (
               <DappConnection
-                key={dapp}
-                host={dapp}
+                key={host}
+                host={host}
                 onRemoveClick={async () => {
-                  await removePreAuthorization(dapp)
-                  requestPreAuthorizations()
+                  /** passing null as accountAddress will remove all accounts */
+                  await removePreAuthorization(host)
                 }}
               />
             ))}

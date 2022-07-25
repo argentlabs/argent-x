@@ -174,7 +174,10 @@ export const prettifyCurrencyValue = (
  * Returns a string of token balance with symbol if available e.g.
  */
 
-export const prettifyTokenBalance = (token: TokenDetailsWithBalance) => {
+export const prettifyTokenBalance = (
+  token: TokenDetailsWithBalance,
+  withSymbol = true,
+) => {
   const { balance, decimals, symbol } = token
   if (balance === undefined || decimals === undefined) {
     return null
@@ -182,7 +185,7 @@ export const prettifyTokenBalance = (token: TokenDetailsWithBalance) => {
   return prettifyTokenAmount({
     amount: balance,
     decimals,
-    symbol,
+    symbol: withSymbol ? symbol : "",
   })
 }
 

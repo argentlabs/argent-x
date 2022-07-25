@@ -25,7 +25,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "CONNECT_ACCOUNT": {
-      return await wallet.selectAccount(msg.data)
+      await wallet.selectAccount(msg.data)
+      return sendToTabAndUi({
+        type: "CONNECT_ACCOUNT_RES",
+        data: msg.data,
+      })
     }
 
     case "NEW_ACCOUNT": {
@@ -86,6 +90,28 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendToTabAndUi({ type: "UPGRADE_ACCOUNT_RES" })
       } catch {
         return sendToTabAndUi({ type: "UPGRADE_ACCOUNT_REJ" })
+      }
+    }
+
+    case "REDEPLOY_ACCOUNT": {
+      try {
+        const account = msg.data
+        const fullAccount = await wallet.getAccount(account)
+        const { txHash } = await wallet.redeployAccount(fullAccount)
+        addTransaction({
+          hash: txHash,
+          account: fullAccount,
+          meta: { title: "Redeploy wallet" },
+        })
+        return sendToTabAndUi({
+          type: "REDEPLOY_ACCOUNT_RES",
+          data: {
+            txHash,
+            address: account.address,
+          },
+        })
+      } catch {
+        return sendToTabAndUi({ type: "REDEPLOY_ACCOUNT_REJ" })
       }
     }
 

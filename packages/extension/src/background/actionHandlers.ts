@@ -1,10 +1,10 @@
 import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
+import { preAuthorize } from "../shared/preAuthorizations"
 import { assertNever } from "../ui/services/assertNever"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
-import { preAuthorize } from "./preAuthorizations"
 import { executeTransaction } from "./transactions/transactionExecution"
 
 export const handleActionApproval = async (
@@ -28,7 +28,8 @@ export const handleActionApproval = async (
         host,
         networkId: selectedAccount.networkId,
       })
-      await preAuthorize(host)
+
+      await preAuthorize(selectedAccount, host)
 
       return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }

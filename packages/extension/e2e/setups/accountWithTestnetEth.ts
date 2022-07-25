@@ -11,12 +11,9 @@ import { openExtension } from "../steps/openExtension"
 import { switchNetwork } from "../steps/switchNetwork"
 import { formatTruncatedAddress } from "../utils"
 
-export async function setupNewAccountWithTestnetEth(
-  page: Page,
-  context: BrowserContext,
-) {
+export async function setupNewAccountWithTestnetEth(page: Page) {
   await disableNetworkIssuesWarning(page)
-  await openExtension(page, context)
+  await openExtension(page)
   await newWallet(page)
   await navigateFromAccountToAccountList(page)
   await switchNetwork(page, "Localhost")

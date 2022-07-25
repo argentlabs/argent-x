@@ -1,5 +1,6 @@
 import { number } from "starknet"
 
+import { isDeprecated } from "../../../shared/wallet.service"
 import { Account } from "./Account"
 
 export async function checkIfUpgradeAvailable(
@@ -12,7 +13,11 @@ export async function checkIfUpgradeAvailable(
 
   const currentImplementation = await account.getCurrentImplementation()
 
-  return !number
-    .toBN(currentImplementation)
-    .eq(number.toBN(targetImplementation))
+  // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
+  const oldAccount = isDeprecated(account)
+
+  return (
+    !oldAccount &&
+    !number.toBN(currentImplementation).eq(number.toBN(targetImplementation))
+  )
 }

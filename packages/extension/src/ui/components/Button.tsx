@@ -9,7 +9,7 @@ interface IButton {
   variant?: ButtonVariant
 }
 
-/** TODO: move colour tokens into theme */
+/** TODO: move color tokens into theme */
 
 export const getVariantColor =
   ({
@@ -56,7 +56,7 @@ export const Button = styled.button<IButton>`
   border: none;
   color: ${({ theme }) => theme.text1};
   cursor: pointer;
-  transition: all 200ms ease-in-out;
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
 
   &:hover,
   &:focus {

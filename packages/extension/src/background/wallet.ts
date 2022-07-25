@@ -1,7 +1,13 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, union } from "lodash-es"
-import { Account, AddTransactionResponse, ec, stark } from "starknet"
+import {
+  Account,
+  AddTransactionResponse,
+  DeployContractPayload,
+  ec,
+  stark,
+} from "starknet"
 import {
   calculateContractAddressFromHash,
   getSelectorFromName,
@@ -26,6 +32,7 @@ import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { LoadContracts } from "./accounts"
 import {
+  getIndexForPath,
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
@@ -351,23 +358,15 @@ export class Wallet {
       .map((account) => account.signer.derivationPath)
 
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
-    const starkPair = getStarkPair(index, session.secret, baseDerivationPath)
-    const starkPub = ec.getStarkKey(starkPair)
-    const [proxyCompiledContract] = await this.loadContracts(baseDerivationPath)
 
     const provider = getProvider(network)
 
-    const accountClassHash = await this.getAccountClassHashForNetwork(network)
+    const payload = await this.getDeployContractPayloadForAccountIndex(
+      index,
+      networkId,
+    )
 
-    const deployTransaction = await provider.deployContract({
-      contract: proxyCompiledContract,
-      constructorCalldata: stark.compileCalldata({
-        implementation: accountClassHash,
-        selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-      }),
-      addressSalt: starkPub,
-    })
+    const deployTransaction = await provider.deployContract(payload)
 
     assertTransactionReceived(deployTransaction, true)
     const proxyAddress = deployTransaction.address as string
@@ -387,6 +386,67 @@ export class Wallet {
     await this.selectAccount(account)
 
     return { account, txHash: deployTransaction.transaction_hash }
+  }
+
+  public async redeployAccount(account: WalletAccount) {
+    if (!this.isSessionOpen()) {
+      throw Error("no open session")
+    }
+    const networkId = account.networkId
+    const network = await this.getNetwork(networkId)
+
+    const provider = getProvider(network)
+
+    const index = getIndexForPath(
+      account.signer.derivationPath,
+      baseDerivationPath,
+    )
+
+    const payload = await this.getDeployContractPayloadForAccountIndex(
+      index,
+      networkId,
+    )
+
+    const deployTransaction = await provider.deployContract(payload)
+
+    assertTransactionReceived(deployTransaction, true)
+
+    return { account, txHash: deployTransaction.transaction_hash }
+  }
+
+  public async getDeployContractPayloadForAccountIndex(
+    index: number,
+    networkId: string,
+  ): Promise<DeployContractPayload> {
+    const hasSession = await this.isSessionOpen()
+    const session = await this.sessionStore.get()
+    const initialised = await this.isInitialized()
+
+    if (!initialised) {
+      throw Error("wallet is not initialized")
+    }
+    if (!hasSession || !session) {
+      throw Error("no open session")
+    }
+
+    const network = await this.getNetwork(networkId)
+    const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
+    const starkPub = ec.getStarkKey(starkPair)
+    const [proxyCompiledContract] = await this.loadContracts(baseDerivationPath)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(network)
+
+    const payload = {
+      contract: proxyCompiledContract,
+      constructorCalldata: stark.compileCalldata({
+        implementation: accountClassHash,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      }),
+      addressSalt: starkPub,
+    }
+
+    return payload
   }
 
   public async getAccount(selector: BaseWalletAccount): Promise<WalletAccount> {
