@@ -51,7 +51,7 @@ export const handleActionApproval = async (
 
     case "SIGN": {
       const typedData = action.payload
-      if (!wallet.isSessionOpen()) {
+      if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }
       const starknetAccount = await wallet.getSelectedStarknetAccount()

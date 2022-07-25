@@ -8,12 +8,7 @@ import { openUi } from "./openUi"
 
 export const handleMiscellaneousMessage: HandleMessage<
   MiscellaneousMessage
-> = async ({
-  msg,
-  background: { wallet },
-  messagingKeys: { publicKeyJwk },
-  sendToTabAndUi,
-}) => {
+> = async ({ msg, messagingKeys: { publicKeyJwk }, sendToTabAndUi }) => {
   switch (msg.type) {
     case "OPEN_UI": {
       return openUi()
@@ -23,10 +18,7 @@ export const handleMiscellaneousMessage: HandleMessage<
       browser.storage.local.clear()
       browser.storage.sync.clear()
       browser.storage.managed.clear()
-      if ("session" in browser.storage) {
-        browser.storage.session.clear()
-      }
-      wallet.reset()
+      browser.storage.session.clear()
       return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
     }
 

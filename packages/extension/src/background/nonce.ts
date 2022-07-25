@@ -1,19 +1,17 @@
 import { number } from "starknet"
 
+import { KeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount } from "../shared/wallet.model"
 import { getAccountIdentifier } from "../shared/wallet.service"
 import { Wallet } from "./wallet"
 
-const nonceStore = new Map<string, string>()
-
-// TODO: MV3 needs to be enabled with MV3, but session storage is not available in MV2
-// const nonceStore = new KeyValueStorage<Record<string, string>>(
-//   {},
-//   {
-//     namespace: "core:nonceManager",
-//     areaName: "session",
-//   },
-// )
+const nonceStore = new KeyValueStorage<Record<string, string>>(
+  {},
+  {
+    namespace: "core:nonceManager",
+    areaName: "session",
+  },
+)
 
 export async function getNonce(
   baseWallet: BaseWalletAccount,

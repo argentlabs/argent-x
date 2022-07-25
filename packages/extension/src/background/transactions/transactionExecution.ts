@@ -36,7 +36,7 @@ export const executeTransaction = async (
   { wallet }: BackgroundService,
 ) => {
   const { transactions, abis, transactionsDetail } = action.payload
-  if (!wallet.isSessionOpen()) {
+  if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
   const selectedAccount = await wallet.getSelectedAccount()

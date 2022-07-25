@@ -3,8 +3,8 @@
   "name": "Argent X",
   "description": "The security of Ethereum with the scale of StarkNet",
   "version": "4.4.1",
-  "manifest_version": 2,
-  "browser_action": {
+  "manifest_version": 3,
+  "action": {
     "default_icon": {
       "16": "assets/logo.png",
       "48": "assets/logo.png",
@@ -35,8 +35,12 @@
     }
   ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": true
+    "service_worker": "background.js"
   },
-  "web_accessible_resources": ["inpage.js"]
+  "web_accessible_resources": [
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["inpage.js"]
+    }
+  ]
 }

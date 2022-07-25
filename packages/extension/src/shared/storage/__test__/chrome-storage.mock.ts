@@ -131,6 +131,6 @@ export const chromeStorageMock: Implementations = {
   local: new TestStore("local"),
   sync: new TestStore("sync"),
   managed: new TestStore("managed"),
-  // session: new TestStore("session"), // FIXME: session storage is not supported in manifest v2
+  session: new TestStore("session"),
   onChanged: onStorageChange,
 }

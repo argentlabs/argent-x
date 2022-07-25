@@ -13,12 +13,11 @@ export const globalActionQueueStore = new ArrayStorage<ExtensionActionItem>(
 )
 
 const showNotificationBadge = (actions: ExtensionActionItem[]) => {
-  // TODO: MV3 - replace browserAction by action
-  browser.browserAction.setBadgeText({
+  browser.action.setBadgeText({
     text: `${actions.length || ""}`, // 0 should not show a badge
   })
 
-  browser.browserAction.setBadgeBackgroundColor({ color: "#29C5FF" })
+  browser.action.setBadgeBackgroundColor({ color: "#29C5FF" })
 }
 
 globalActionQueueStore.subscribe((all) => {

@@ -29,7 +29,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "NEW_ACCOUNT": {
-      if (!wallet.isSessionOpen()) {
+      if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }
 
@@ -110,7 +110,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "GET_ENCRYPTED_PRIVATE_KEY": {
-      if (!wallet.isSessionOpen()) {
+      if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }
 
@@ -127,7 +127,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "GET_ENCRYPTED_SEED_PHRASE": {
-      if (!wallet.isSessionOpen()) {
+      if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }
 

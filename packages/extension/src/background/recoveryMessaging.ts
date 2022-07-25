@@ -27,7 +27,7 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
     }
 
     case "DOWNLOAD_BACKUP_FILE": {
-      await downloadFile(wallet.exportBackup())
+      await downloadFile(await wallet.exportBackup())
       return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
     }
 
