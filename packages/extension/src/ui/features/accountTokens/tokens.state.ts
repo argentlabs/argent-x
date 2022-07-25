@@ -58,38 +58,43 @@ export const useTokensWithBalance = (
     [tokensInNetwork],
   )
 
-  const { data, isValidating, error, mutate } = useSWR(
+  const {
+    data,
+    isValidating,
+    error: maybeSuppressError,
+    mutate,
+  } = useSWR(
     // skip if no account selected
     selectedAccount && [
       getAccountIdentifier(selectedAccount),
       "accountTokenBalances",
     ],
     async () => {
-      try {
-        if (!selectedAccount) {
-          return
-        }
-
-        const balances = await fetchAllTokensBalance(
-          tokensInNetwork.map((t) => t.address),
-          selectedAccount,
-        )
-
-        return balances
-      } catch (error: any) {
-        /** re-throw if not suppressed */
-        if (!SUPPRESS_ERROR_STATUS.includes(error?.status)) {
-          throw error
-        }
+      if (!selectedAccount) {
+        return
       }
+
+      const balances = await fetchAllTokensBalance(
+        tokensInNetwork.map((t) => t.address),
+        selectedAccount,
+      )
+
+      return balances
     },
     {
       refreshInterval: 30000,
       shouldRetryOnError: (error) => {
-        return SUPPRESS_ERROR_STATUS.includes(error?.status)
+        const suppressError = SUPPRESS_ERROR_STATUS.includes(error?.status)
+        return suppressError
       },
     },
   )
+
+  const error = useMemo(() => {
+    if (!SUPPRESS_ERROR_STATUS.includes(maybeSuppressError?.status)) {
+      return maybeSuppressError
+    }
+  }, [maybeSuppressError])
 
   const tokenDetailsIsInitialising = !error && !data
 
