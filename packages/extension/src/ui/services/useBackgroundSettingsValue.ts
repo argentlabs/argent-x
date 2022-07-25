@@ -1,13 +1,15 @@
-import { isFunction, isUndefined } from "lodash-es"
 import { useCallback, useEffect, useState } from "react"
 
-import { SettingsStorageKey } from "./../../shared/settings/types"
+import {
+  ISettingsStorage,
+  SettingsStorageKey,
+} from "./../../shared/settings/types"
 import {
   SettingsStorageValue,
-  getSetting,
   setSetting,
-  subscribeToSettings,
+  settingsStorage,
 } from "../../shared/settings"
+import { useObjectStorage } from "../../shared/storage/hooks"
 
 /**
  * Hook providing access to an indiviudal value from background settings
@@ -19,17 +21,7 @@ export const useBackgroundSettingsValue = <K extends SettingsStorageKey>(
   key: K,
 ) => {
   const [initialised, setInitialised] = useState<boolean>(false)
-  const [storedValue, setStoredValue] = useState<SettingsStorageValue<K>>()
-
-  /** read the value async from storage then update in hook state */
-  const updateStoredValue = useCallback(async () => {
-    const value = await getSetting(key)
-    setStoredValue(value)
-    if (!initialised) {
-      setInitialised(true)
-    }
-    // dont rerun when initialised changes, as it would cause an infinite loop
-  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
+  const settingsStore = useObjectStorage<ISettingsStorage>(settingsStorage)
 
   const setValue = useCallback(
     async (value: SettingsStorageValue<K>) => {
@@ -38,26 +30,16 @@ export const useBackgroundSettingsValue = <K extends SettingsStorageKey>(
     [key],
   )
 
-  /** subscribe to change message to update the local hook state */
   useEffect(() => {
-    let unsub: unknown
-
-    if (isUndefined(storedValue)) {
-      updateStoredValue()
-    } else {
-      unsub = subscribeToSettings(updateStoredValue)
+    if (!initialised) {
+      setInitialised(true)
     }
-
-    return () => {
-      if (isFunction(unsub)) {
-        unsub()
-      }
-    }
-  }, [key, storedValue, updateStoredValue])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
 
   return {
     initialised,
-    value: storedValue,
+    value: settingsStore[key],
     setValue,
   }
 }
