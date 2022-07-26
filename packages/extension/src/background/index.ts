@@ -6,6 +6,7 @@ import { ActionItem } from "../shared/actionQueue/types"
 import { initBackgroundExtensionCloseListener } from "../shared/analytics"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
+import { migratePreAuthorizations } from "../shared/preAuthorizations"
 import { delay } from "../shared/utils/delay"
 import { migrateWallet } from "../shared/wallet/storeMigration"
 import { handleAccountMessage } from "./accountMessaging"
@@ -81,7 +82,7 @@ const handlers = [
 ] as Array<HandleMessage<MessageType>>
 
 messageStream.subscribe(async ([msg, sender]) => {
-  await migrateWallet()
+  await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages
 
   const messagingKeys = await getMessagingKeys()
 

@@ -1,3 +1,7 @@
+import { isArray, pick } from "lodash-es"
+import browser from "webextension-polyfill"
+
+import { accountStore } from "./account/store"
 import { ArrayStorage } from "./storage"
 import { useArrayStorage } from "./storage/hooks"
 import { BaseWalletAccount } from "./wallet.model"
@@ -16,6 +20,36 @@ export const preAuthorizeStore = new ArrayStorage<PreAuthorization>([], {
   namespace: `core:whitelist`,
   compare: equalPreAuthorization,
 })
+
+async function getFromStorage<T, K extends string = string>(
+  key: K,
+): Promise<T | null> {
+  try {
+    return JSON.parse((await browser.storage.local.get(key))[key]) ?? null
+  } catch {
+    return null
+  }
+}
+export const migratePreAuthorizations = async () => {
+  try {
+    const old = await getFromStorage<string[]>("PREAUTHORIZATION:APPROVED")
+    if (isArray(old) && old.length > 0) {
+      await browser.storage.local.remove("PREAUTHORIZATION:APPROVED")
+      const allAccounts = await accountStore.get()
+
+      const accountHostCombinations = old.flatMap((h) =>
+        allAccounts.map((a) => ({
+          account: pick(a, "address", "networkId"),
+          host: h,
+        })),
+      )
+
+      return preAuthorizeStore.push(accountHostCombinations)
+    }
+  } catch {
+    console.error("Failed to migrate preauthorizations")
+  }
+}
 
 export const preAuthorize = async (
   account: BaseWalletAccount,
