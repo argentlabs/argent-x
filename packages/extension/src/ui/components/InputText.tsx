@@ -196,6 +196,20 @@ interface AdditionalControlledInputProps {
   children?: React.ReactNode
 }
 
+export const isAllowedNumericInputValue = (value: string, maxDecimals = 16) => {
+  const numericalRegex = new RegExp(`^[0-9]*.?[0-9]{0,${maxDecimals}}$`)
+  if (value === "") {
+    return true
+  }
+  if (!isNumeric(value)) {
+    return false
+  }
+  if (numericalRegex.test(value)) {
+    return true
+  }
+  return false
+}
+
 export type ControlledInputProps<T extends FieldValues> = InputFieldProps &
   Omit<ControllerProps<T>, "render"> &
   AdditionalControlledInputProps
@@ -224,18 +238,10 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
         inputMode="decimal"
         type="text"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
           if (onlyNumeric) {
-            if (e.target.value === "") {
+            if (isAllowedNumericInputValue(e.target.value)) {
               return onValueChange(e)
             }
-
-            return (
-              numericalRegex.test(e.target.value) &&
-              // just being double sure
-              isNumeric(e.target.value) &&
-              onValueChange(e)
-            )
           } else {
             return onValueChange(e)
           }

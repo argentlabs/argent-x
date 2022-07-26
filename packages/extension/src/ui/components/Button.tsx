@@ -57,7 +57,7 @@ export const Button = styled.button<IButton>`
   border: none;
   color: ${({ theme }) => theme.button.default.fg.base};
   cursor: pointer;
-  transition: ${({ theme }) => theme.button.transition};
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
 
   &:hover,
   &:focus {

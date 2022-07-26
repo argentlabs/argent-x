@@ -5,6 +5,7 @@ import {
   isErc20TransferCall,
   parseErc20TransferCall,
 } from "../../../../shared/call"
+import { prettifyTokenAmount } from "../../../../shared/token/price"
 import { Token } from "../../../../shared/token/type"
 import {
   Field,
@@ -15,7 +16,6 @@ import {
 } from "../../../components/Fields"
 import { formatTruncatedAddress } from "../../../services/addresses"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
-import { formatTokenBalance } from "../../accountTokens/tokens.service"
 import { AccountField } from "./AccountField"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
 import { getKnownWalletAddress } from "./getKnownWalletAddress"
@@ -50,7 +50,13 @@ export const ERC20TransferTransactionDetails: FC<
     address: recipientAddress,
     networkId,
   })
-  const displayAmount = formatTokenBalance(amount, token?.decimals)
+  const displayAmount = token
+    ? prettifyTokenAmount({
+        amount,
+        decimals: token?.decimals,
+        symbol: token?.symbol || "Unknown token",
+      })
+    : amount.toString()
 
   return (
     <FieldGroup>
@@ -58,9 +64,7 @@ export const ERC20TransferTransactionDetails: FC<
         <FieldKey>Send</FieldKey>
         <FieldValue>
           {token && <TokenIcon url={token.image} name={token.name} small />}
-          <LeftPaddedField>
-            {displayAmount} {token?.symbol || "Unknown token"}
-          </LeftPaddedField>
+          <LeftPaddedField>{displayAmount}</LeftPaddedField>
         </FieldValue>
       </Field>
       <Field>

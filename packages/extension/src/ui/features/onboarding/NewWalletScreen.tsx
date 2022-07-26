@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -25,9 +25,12 @@ const Container = styled.div`
   ${InputText} {
     margin-top: 15px;
   }
-  ${Button} {
-    margin-top: 116px;
-  }
+`
+
+const ErrorText = styled.div`
+  text-align: center;
+  font-size: 12px;
+  color: ${({ theme }) => theme.red2};
 `
 
 interface FieldValues {
@@ -54,39 +57,56 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
     criteriaMode: "firstError",
   })
   const { errors, isDirty } = formState
+  const [isDeploying, setIsDeploying] = useState(false)
+  const [deployFailed, setDeployFailed] = useState(false)
 
   const password = watch("password")
 
-  const handleDeploy = async (password?: string) => {
-    if (!password) {
-      return
-    }
-    useAppState.setState({ isLoading: true })
-
-    if (overrideSubmit) {
-      await overrideSubmit({ password })
-    } else {
-      try {
-        const newAccount = await deployAccount(switcherNetworkId, password)
-        addAccount(newAccount)
-        connectAccount(newAccount)
-        analytics.track("createWallet", {
-          status: "success",
-          networkId: newAccount.networkId,
-        })
-        navigate(await recover())
-      } catch (error: any) {
-        useAppState.setState({ error })
-        analytics.track("createWallet", {
-          status: "failure",
-          errorMessage: error.message,
-          networkId: switcherNetworkId,
-        })
-        navigate(routes.error())
+  const handleDeploy = useCallback(
+    async (password?: string) => {
+      if (!password) {
+        return
       }
+      if (overrideSubmit) {
+        useAppState.setState({ isLoading: true })
+        await overrideSubmit({ password })
+        useAppState.setState({ isLoading: false })
+      } else {
+        setIsDeploying(true)
+        setDeployFailed(false)
+        try {
+          const newAccount = await deployAccount(switcherNetworkId, password)
+          addAccount(newAccount)
+          connectAccount(newAccount)
+          analytics.track("createWallet", {
+            status: "success",
+            networkId: newAccount.networkId,
+          })
+          setIsDeploying(false)
+          navigate(await recover())
+        } catch (error: any) {
+          analytics.track("createWallet", {
+            status: "failure",
+            errorMessage: error.message,
+            networkId: switcherNetworkId,
+          })
+          setIsDeploying(false)
+          setDeployFailed(true)
+        }
+      }
+    },
+    [addAccount, navigate, overrideSubmit, switcherNetworkId],
+  )
+
+  const buttonText = useMemo(() => {
+    if (overrideSubmitText) {
+      return overrideSubmitText
     }
-    useAppState.setState({ isLoading: false })
-  }
+    if (isDeploying) {
+      return "Creating wallet…"
+    }
+    return deployFailed ? "Retry create wallet" : "Create wallet"
+  }, [deployFailed, isDeploying, overrideSubmitText])
 
   return (
     <>
@@ -105,6 +125,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
                 autoFocus
                 type="password"
                 placeholder="Password"
+                disabled={isDeploying}
                 {...field}
               />
             )}
@@ -124,6 +145,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
               <InputText
                 type="password"
                 placeholder="Repeat password"
+                disabled={isDeploying}
                 {...field}
               />
             )}
@@ -131,10 +153,14 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
           {errors.repeatPassword?.type === "validate" && (
             <FormError>Passwords do not match</FormError>
           )}
-
           <StickyGroup>
-            <Button type="submit" disabled={!isDirty}>
-              {overrideSubmitText || "Create wallet"}
+            {deployFailed && (
+              <ErrorText>
+                Sorry, unable to create wallet. Please try again later.
+              </ErrorText>
+            )}
+            <Button type="submit" disabled={!isDirty || isDeploying}>
+              {buttonText}
             </Button>
           </StickyGroup>
         </form>
