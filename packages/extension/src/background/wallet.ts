@@ -112,7 +112,7 @@ export class Wallet {
 
     await this.store.set("discoveredOnce", true)
     await this.store.set("backup", encryptedBackup)
-    this.setSession(ethersWallet.privateKey, password)
+    return this.setSession(ethersWallet.privateKey, password)
   }
 
   public async getSeedPhrase(): Promise<string> {
