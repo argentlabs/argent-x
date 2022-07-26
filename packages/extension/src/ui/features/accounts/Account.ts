@@ -20,17 +20,26 @@ export class Account {
   contract: Contract
   proxyContract: Contract
   provider: ProviderInterface
+  hidden?: boolean
 
-  constructor(
-    address: string,
-    network: Network,
-    signer: WalletAccountSigner,
-    deployTransaction?: string,
-  ) {
+  constructor({
+    address,
+    network,
+    signer,
+    deployTransaction,
+    hidden,
+  }: {
+    address: string
+    network: Network
+    signer: WalletAccountSigner
+    deployTransaction?: string
+    hidden?: boolean
+  }) {
     this.address = address
     this.network = network
     this.networkId = network.id
     this.signer = signer
+    this.hidden = hidden
     this.deployTransaction = deployTransaction
     this.provider = getProvider(network)
     this.contract = new Contract(
@@ -93,12 +102,12 @@ export class Account {
       throw new Error(`Network ${networkId} not found`)
     }
 
-    return new Account(
-      result.address,
+    return new Account({
+      address: result.address,
       network,
-      result.account.signer,
-      result.txHash,
-    )
+      signer: result.account.signer,
+      deployTransaction: result.txHash,
+    })
   }
 
   public toWalletAccount(): WalletAccount {
