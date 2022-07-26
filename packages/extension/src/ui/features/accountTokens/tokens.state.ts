@@ -40,6 +40,9 @@ export const useToken = (baseToken: BaseToken): Token | undefined => {
   return token
 }
 
+/** error codes to suppress - will not bubble error up to parent */
+const SUPPRESS_ERROR_STATUS = [429]
+
 export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
@@ -55,7 +58,12 @@ export const useTokensWithBalance = (
     [tokensInNetwork],
   )
 
-  const { data, isValidating, error, mutate } = useSWR(
+  const {
+    data,
+    isValidating,
+    error: maybeSuppressError,
+    mutate,
+  } = useSWR(
     // skip if no account selected
     selectedAccount && [
       getAccountIdentifier(selectedAccount),
@@ -75,11 +83,20 @@ export const useTokensWithBalance = (
     },
     {
       refreshInterval: 30000,
-      shouldRetryOnError: false,
+      shouldRetryOnError: (error) => {
+        const suppressError = SUPPRESS_ERROR_STATUS.includes(error?.status)
+        return suppressError
+      },
     },
   )
 
-  const tokenDetailsIsInitialising = !error && !data && isValidating
+  const error = useMemo(() => {
+    if (!SUPPRESS_ERROR_STATUS.includes(maybeSuppressError?.status)) {
+      return maybeSuppressError
+    }
+  }, [maybeSuppressError])
+
+  const tokenDetailsIsInitialising = !error && !data
 
   // TODO: refetch balances on transaction success
 
