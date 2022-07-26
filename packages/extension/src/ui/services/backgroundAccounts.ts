@@ -1,5 +1,4 @@
-import { MessageType, sendMessage, waitForMessage } from "../../shared/messages"
-import { AccountMessage } from "../../shared/messages/AccountMessage"
+import { sendMessage, waitForMessage } from "../../shared/messages"
 import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
 import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"

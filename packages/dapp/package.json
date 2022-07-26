@@ -15,7 +15,7 @@
     "next": "^12.1.4",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "starknet": "^3.17.0"
+    "starknet": "^3.18.2"
   },
   "devDependencies": {
     "@types/node": "18.0.6",
