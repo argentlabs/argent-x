@@ -4,7 +4,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
 
 import { compareTransactions } from "../../../shared/transactions"
-import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -20,7 +19,7 @@ import { formatDateTime } from "../../services/dates"
 import { openVoyagerTransaction } from "../../services/voyager.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { useNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/useNetworks"
 
 function getErrorMessageFromErrorDump(errorDump?: string) {
   try {
@@ -86,8 +85,7 @@ const TransactionLogKey = styled(FieldKey)`
 `
 export const TransactionDetail: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const { network } = useNetwork(switcherNetworkId)
+  const network = useCurrentNetwork()
   const { txHash } = useParams()
 
   const account = useSelectedAccount()

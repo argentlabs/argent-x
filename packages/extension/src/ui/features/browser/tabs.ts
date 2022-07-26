@@ -1,3 +1,4 @@
+import { isNumber } from "lodash-es"
 import { useCallback, useEffect, useState } from "react"
 import browser from "webextension-polyfill"
 
@@ -13,7 +14,7 @@ export const extensionIsInTab = async () => {
 
 export const focusExtensionTab = async () => {
   const tab = await browser.tabs.getCurrent()
-  if (tab) {
+  if (tab && isNumber(tab?.id) && tab?.id !== browser.tabs.TAB_ID_NONE) {
     browser.tabs.update(tab.id, { active: true })
   }
 }

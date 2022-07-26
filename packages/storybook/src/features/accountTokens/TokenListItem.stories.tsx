@@ -3,7 +3,6 @@ import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens
 import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { BigNumber } from "ethers"
-import { number } from "starknet"
 
 export default {
   title: "features/TokenListItem",
@@ -22,7 +21,7 @@ const tokenWithBalance = (
   return {
     ...token,
     networkId: token.network,
-    decimals: number.toBN(token.decimals),
+    decimals: Number(token.decimals),
     balance: balance ? BigNumber.from(balance) : undefined,
   }
 }

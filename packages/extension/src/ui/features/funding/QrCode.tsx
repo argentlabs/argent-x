@@ -25,11 +25,13 @@ export const QrCode: FC<QrCodeProps> = ({ size, data, ...props }) => {
   )
   useEffect(() => {
     qrCode.append(ref.current ?? undefined)
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     qrCode.update({ data })
-  }, [data])
+    // only on data change
+  }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div

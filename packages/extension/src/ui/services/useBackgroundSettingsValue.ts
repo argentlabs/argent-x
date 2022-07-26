@@ -21,7 +21,8 @@ export const useBackgroundSettingsValue = (key: keyof ISettingsStorage) => {
     if (!initialised) {
       setInitialised(true)
     }
-  }, [key])
+    // dont rerun when initialised changes, as it would cause an infinite loop
+  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setValue = useCallback(
     async (value: any) => {
@@ -47,7 +48,7 @@ export const useBackgroundSettingsValue = (key: keyof ISettingsStorage) => {
         subscription.unsubscribe()
       }
     }
-  }, [updateStoredValue])
+  }, [key, updateStoredValue])
 
   return {
     initialised,

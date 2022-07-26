@@ -1,11 +1,11 @@
 import { FC } from "react"
-import styled from "styled-components"
 
 import {
   Erc20TransferCall,
   isErc20TransferCall,
   parseErc20TransferCall,
 } from "../../../../shared/call"
+import { Token } from "../../../../shared/token/type"
 import {
   Field,
   FieldGroup,
@@ -16,7 +16,6 @@ import {
 import { formatTruncatedAddress } from "../../../services/addresses"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { formatTokenBalance } from "../../accountTokens/tokens.service"
-import { TokenDetails } from "../../accountTokens/tokens.state"
 import { AccountField } from "./AccountField"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
 import { getKnownWalletAddress } from "./getKnownWalletAddress"
@@ -25,7 +24,7 @@ import { getKnownWalletAddress } from "./getKnownWalletAddress"
 
 export interface Erc20TransferCallTransactionItemProps {
   transaction: Erc20TransferCall
-  tokensByNetwork: TokenDetails[]
+  tokensByNetwork: Token[]
   networkId: string
 }
 
@@ -51,7 +50,7 @@ export const ERC20TransferTransactionDetails: FC<
     address: recipientAddress,
     networkId,
   })
-  const displayAmount = formatTokenBalance(amount, token?.decimals?.toNumber())
+  const displayAmount = formatTokenBalance(amount, token?.decimals)
 
   return (
     <FieldGroup>

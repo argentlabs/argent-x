@@ -2,7 +2,8 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { NetworkStatus, getNetwork } from "../../../shared/networks"
+import { NetworkStatus } from "../../../shared/network"
+import { equalNetwork } from "../../../shared/network/storage"
 import { useAppState } from "../../app.state"
 import {
   NetworkStatusIndicator,
@@ -11,7 +12,7 @@ import {
 import { routes } from "../../routes"
 import { recover } from "../recovery/recovery.service"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
-import { useNetworkStatuses, useNetworks } from "./useNetworks"
+import { useNetwork, useNetworkStatuses, useNetworks } from "./useNetworks"
 
 const NetworkName = styled.span`
   text-align: right;
@@ -106,14 +107,13 @@ interface NetworkSwitcherProps {
 export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { allNetworks } = useNetworks({ suspense: true })
-  const currentNetwork = getNetwork(switcherNetworkId, allNetworks)
-  const otherNetworks = allNetworks.filter(
-    (network) => network !== currentNetwork,
-  )
+  const allNetworks = useNetworks()
+  const currentNetwork = useNetwork(switcherNetworkId)
   const { networkStatuses } = useNetworkStatuses()
   const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
-
+  const otherNetworks = allNetworks.filter(
+    (n) => !equalNetwork(n, currentNetwork),
+  )
   const currentNetworkStatus = networkStatuses[currentNetwork.id]
 
   useEffect(() => {
@@ -124,7 +124,8 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
     ) {
       navigate(routes.networkWarning())
     }
-  }, [currentNetworkStatus])
+    // just trigger on network status change
+  }, [currentNetworkStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <NetworkSwitcherWrapper disabled={disabled}>

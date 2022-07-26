@@ -2,6 +2,7 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
 
+import { initUiExtensionCloseListener } from "../shared/analytics"
 import {
   ARGENT_API_ENABLED,
   ARGENT_TRANSACTION_REVIEW_API_ENABLED,
@@ -25,6 +26,8 @@ if (!ARGENT_TRANSACTION_REVIEW_API_ENABLED && isDev) {
     "process.env.ARGENT_TRANSACTION_REVIEW_API_BASE_URL is not defined or invalid in .env file or environment - transaction review API calls will not be made",
   )
 }
+
+initUiExtensionCloseListener()
 
 const root = createRoot(container)
 

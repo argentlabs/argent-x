@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react"
+import { memoize } from "lodash-es"
+import { useMemo } from "react"
 import { Status as StarkNetStatus } from "starknet"
 
-import { messageStream } from "../../../shared/messages"
-import { getTransactionStatus } from "../../services/backgroundTransactions"
+import { transactionsStore } from "../../../background/transactions/store"
+import { useArrayStorage } from "../../../shared/storage/hooks"
+import { Transaction } from "../../../shared/transactions"
 
 function transformStatus(status: StarkNetStatus): Status {
   return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)
@@ -14,33 +16,25 @@ function transformStatus(status: StarkNetStatus): Status {
 
 type Status = "UNKNOWN" | "PENDING" | "SUCCESS" | "ERROR"
 
+const transactionSelector = memoize(
+  (hash?: string, networkId?: string) => (transaction: Transaction) =>
+    transaction.hash === hash && transaction.account.networkId === networkId,
+  (hash, networkId) => `${hash}-${networkId}`,
+)
+
 export const useTransactionStatus = (
   transactionHash?: string,
-  network?: string,
+  networkId?: string,
 ): Status => {
-  const [transactionStatus, setTransactionStatus] = useState<Status>("UNKNOWN")
+  const [transaction] = useArrayStorage(
+    transactionsStore,
+    transactionSelector(transactionHash, networkId),
+  )
 
-  useEffect(() => {
-    if (transactionHash && network) {
-      getTransactionStatus(transactionHash, network).then(({ status }) => {
-        if (status) {
-          setTransactionStatus(transformStatus(status))
-        } else {
-          setTransactionStatus("UNKNOWN")
-        }
-      })
-      messageStream.subscribe(([message]) => {
-        if (message.type === "TRANSACTION_UPDATES") {
-          const transaction = message.data.find(
-            ({ hash }) => hash === transactionHash,
-          )
-          if (transaction) {
-            setTransactionStatus(transformStatus(transaction.status))
-          }
-        }
-      })
+  return useMemo(() => {
+    if (!transaction?.status) {
+      return "UNKNOWN"
     }
-  }, [transactionHash, network])
-
-  return transactionStatus
+    return transformStatus(transaction.status)
+  }, [transaction?.status])
 }

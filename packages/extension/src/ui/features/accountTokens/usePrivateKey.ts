@@ -9,7 +9,8 @@ export const usePrivateKey = () => {
 
   useEffect(() => {
     getPrivateKeyCallback().then(setPrivateKey)
-  }, [])
+    // on mount
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return privateKey
 }

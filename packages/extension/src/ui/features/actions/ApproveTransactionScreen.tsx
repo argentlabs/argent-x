@@ -20,7 +20,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
-import { selectTokensByNetwork, useTokens } from "../accountTokens/tokens.state"
+import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
 import { TransactionsList } from "./transaction/TransactionsList"
@@ -58,7 +58,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const [disableConfirm, setDisableConfirm] = useState(true)
   const { accountNames } = useAccountMetadata()
   const { switcherNetworkId } = useAppState()
-  const tokensByNetwork = useTokens(selectTokensByNetwork(switcherNetworkId))
+  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
 
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,

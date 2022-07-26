@@ -25,8 +25,9 @@ const loadingTexts = [
 export const LoadingScreen: FC = () => {
   const { progress, clearProgress } = useLoadingProgress()
 
+  // TODO: make clearProgress function stable
   // reset to 'indeterminate' spinner type on unmount
-  useEffect(() => () => clearProgress(), [])
+  useEffect(() => () => clearProgress(), []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <LoadingScreenWrapper>
