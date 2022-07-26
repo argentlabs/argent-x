@@ -44,7 +44,7 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   ) {
     const passThrough = (value: any) => value
     function defaultMerge(oldValue: T, newValue: T) {
-      if (isPlainObject(oldValue)) {
+      if (isPlainObject(oldValue) && isPlainObject(newValue)) {
         return merge(oldValue, newValue)
       }
       return newValue
@@ -80,6 +80,8 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   public async set(setter: Partial<T> | SetterFn<T>): Promise<void> {
     const oldState = await this.get()
     const value = typeof setter === "function" ? setter(oldState) : setter
+    console.log("oldState", oldState, "value", value)
+    console.log("merged", this.merge(oldState, value as T))
     return this.storageImplementation.set(
       "inner",
       await this.serialize(this.merge(oldState, value as T)),

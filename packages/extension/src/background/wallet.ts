@@ -85,7 +85,7 @@ export class Wallet {
     private readonly sessionStore: IObjectStorage<WalletSession | undefined>,
     private readonly loadContracts: LoadContracts,
     private readonly getNetwork: GetNetwork,
-    private readonly onAutoLock?: () => Promise<void>,
+    private readonly onLock?: () => Promise<void>,
   ) {}
 
   public async isInitialized(): Promise<boolean> {
@@ -529,6 +529,7 @@ export class Wallet {
 
   public async lock() {
     await this.sessionStore.set(this.sessionStore.defaults)
+    await this.onLock?.()
   }
 
   public async exportBackup(): Promise<{ url: string; filename: string }> {
@@ -578,8 +579,7 @@ export class Wallet {
 
     browser.alarms.onAlarm.addListener(async (alarm) => {
       if (alarm.name === "session_timeout") {
-        await this.lock()
-        return this.onAutoLock?.()
+        return this.lock()
       }
     })
 

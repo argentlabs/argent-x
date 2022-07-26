@@ -104,7 +104,7 @@ describe("Wallet", () => {
     expect(selectedAccount).toBeDefined()
   })
 
-  test("open existing wallet", async () => {
+  test("open existing wallet and lock", async () => {
     const storage = new KeyValueStorage<WalletStorageProps>(
       {
         backup: backupString,
@@ -157,6 +157,9 @@ describe("Wallet", () => {
     expect(selectedAccount?.address).toBe(
       "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
     )
+
+    await wallet.lock()
+    expect(await wallet.isSessionOpen()).toBe(false)
   })
 
   test("open existing wallet with wrong password", async () => {
