@@ -142,8 +142,8 @@ export class Wallet {
       scrypt: { N },
     })
 
-    this.importBackup(encryptedBackup)
-    this.setSession(ethersWallet.privateKey, newPassword)
+    await this.importBackup(encryptedBackup)
+    await this.setSession(ethersWallet.privateKey, newPassword)
 
     await this.discoverAccounts()
   }
