@@ -36,12 +36,12 @@ export const ActionScreen: FC = () => {
   }, [isLastAction])
 
   const onSubmit = useCallback(async () => {
-    approveAction(action)
+    await approveAction(action)
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
 
   const onReject = useCallback(async () => {
-    rejectAction(action)
+    await rejectAction(action)
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
 
@@ -70,14 +70,14 @@ export const ActionScreen: FC = () => {
             connectAccount(selectedAccount)
             await waitForMessage("CONNECT_ACCOUNT_RES")
             // continue with approval with selected account
-            approveAction(action)
+            await approveAction(action)
             await waitForMessage("CONNECT_DAPP_RES")
             useAppState.setState({ isLoading: false })
             closePopupIfLastAction()
           }}
           onDisconnect={async (selectedAccount: Account) => {
             await removePreAuthorization(action.payload.host, selectedAccount)
-            rejectAction(action)
+            await rejectAction(action)
             closePopupIfLastAction()
           }}
           onReject={onReject}
@@ -124,7 +124,7 @@ export const ActionScreen: FC = () => {
             analytics.track("signedTransaction", {
               networkId: account?.networkId || "unknown",
             })
-            approveAction(action)
+            await approveAction(action)
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([
               waitForMessage(
@@ -162,7 +162,7 @@ export const ActionScreen: FC = () => {
         <ApproveSignatureScreen
           dataToSign={action.payload}
           onSubmit={async () => {
-            approveAction(action)
+            await approveAction(action)
             useAppState.setState({ isLoading: true })
             await waitForMessage(
               "SIGNATURE_SUCCESS",

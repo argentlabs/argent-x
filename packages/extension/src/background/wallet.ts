@@ -73,7 +73,7 @@ export const walletStore = new KeyValueStorage<WalletStorageProps>(
 
 export const sessionStore = new ObjectStorage<WalletSession | undefined>(
   undefined,
-  "core:wallet:session",
+  { namespace: "core:wallet:session", areaName: "session" },
 )
 
 export type GetNetwork = (networkId: string) => Promise<Network>
