@@ -12,8 +12,11 @@ import { selectAccountFromAccountList } from "./steps/selectAccountFromAccountLi
 import { waitForAllPendingTransactionsInAccount } from "./steps/waitForAllPendingTransactionsInAccount"
 import { formatTruncatedAddress } from "./utils"
 
-test("send max eth flow", async ({ page }) => {
-  const { address: a1, balance: b1 } = await setupNewAccountWithTestnetEth(page)
+test("send max eth flow", async ({ page, context }) => {
+  const { address: a1, balance: b1 } = await setupNewAccountWithTestnetEth(
+    page,
+    context,
+  )
 
   await navigateFromAccountToAccountList(page)
   await newAccount(page)

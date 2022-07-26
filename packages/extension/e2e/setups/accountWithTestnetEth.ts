@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test"
+import type { BrowserContext, Page } from "@playwright/test"
 
 import { mintDevnetEthToAccount } from "../apis/sendDevnetEthToAccount"
 import { getAccountAddressFromAccountPage } from "../selectors/getAccountAddressFromAccountPage"
@@ -11,9 +11,12 @@ import { openExtension } from "../steps/openExtension"
 import { switchNetwork } from "../steps/switchNetwork"
 import { formatTruncatedAddress } from "../utils"
 
-export async function setupNewAccountWithTestnetEth(page: Page) {
+export async function setupNewAccountWithTestnetEth(
+  page: Page,
+  context: BrowserContext,
+) {
   await disableNetworkIssuesWarning(page)
-  await openExtension(page)
+  await openExtension(page, context)
   await newWallet(page)
   await navigateFromAccountToAccountList(page)
   await switchNetwork(page, "Localhost")

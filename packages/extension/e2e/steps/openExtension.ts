@@ -1,8 +1,10 @@
-import type { Page } from "@playwright/test"
+import type { BrowserContext, Page } from "@playwright/test"
 
-export async function openExtension(page: Page) {
-  await page.waitForTimeout(1000) // give the extension time to startup
-  await page.goto(
-    "chrome-extension://doejacbklailgdhaiolhenjojmjcgbjp/index.html",
-  )
+export async function openExtension(page: Page, context: BrowserContext) {
+  let [background] = context.serviceWorkers()
+  if (!background) {
+    background = await context.waitForEvent("serviceworker")
+  }
+  const url = background.url().replace("/background.js", "/index.html")
+  await page.goto(url)
 }
