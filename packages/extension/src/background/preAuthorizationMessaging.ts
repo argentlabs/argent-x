@@ -1,9 +1,21 @@
+import { difference } from "lodash-es"
+
 import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
-import { isPreAuthorized } from "../shared/preAuthorizations"
-import { addTab } from "./activeTabs"
+import { isPreAuthorized, preAuthorizeStore } from "../shared/preAuthorizations"
+import { addTab, sendMessageToHost } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { openUi } from "./openUi"
+
+preAuthorizeStore.subscribe(async (_, changeSet) => {
+  const removed = difference(changeSet.oldValue ?? [], changeSet.newValue ?? [])
+  for (const preAuthorization of removed) {
+    await sendMessageToHost(
+      { type: "DISCONNECT_ACCOUNT" },
+      preAuthorization.host,
+    )
+  }
+})
 
 export const handlePreAuthorizationMessage: HandleMessage<
   PreAuthorisationMessage

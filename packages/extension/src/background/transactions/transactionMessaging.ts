@@ -24,7 +24,6 @@ export const handleTransactionMessage: HandleMessage<
       if (!selectedAccount) {
         throw Error("no accounts")
       }
-      console.log(starknetAccount)
       try {
         const { amount, unit, suggestedMaxFee } =
           await starknetAccount.estimateFee(msg.data)

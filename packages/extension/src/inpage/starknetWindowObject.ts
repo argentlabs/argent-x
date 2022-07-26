@@ -10,7 +10,8 @@ import type {
   StarknetWindowObject,
   WalletEvents,
 } from "./inpage.model"
-import { sendMessage, waitForMessage } from "./messageActions"
+import { sendMessage } from "./messageActions"
+import { getIsPreauthorized } from "./preAuthorization"
 import {
   handleAddNetworkRequest,
   handleAddTokenRequest,
@@ -70,11 +71,7 @@ export const starknetWindowObject: StarknetWindowObject = {
       })
     }),
   isPreauthorized: async () => {
-    sendMessage({
-      type: "IS_PREAUTHORIZED",
-      data: window.location.host,
-    })
-    return waitForMessage("IS_PREAUTHORIZED_RES", 1000)
+    return getIsPreauthorized()
   },
   on: (event, handleEvent) => {
     if (event === "accountsChanged") {

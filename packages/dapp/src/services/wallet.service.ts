@@ -5,7 +5,9 @@ import { Network } from "./token.service"
 
 export const silentConnectWallet = async () => {
   const windowStarknet = await connect({ showList: false })
-  await windowStarknet?.enable()
+  if (!windowStarknet?.isConnected) {
+    await windowStarknet?.enable({ showModal: false })
+  }
   return windowStarknet
 }
 

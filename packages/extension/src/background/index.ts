@@ -86,15 +86,12 @@ messageStream.subscribe(async ([msg, sender]) => {
 
   const messagingKeys = await getMessagingKeys()
 
-  const onAutoLock = () =>
-    sendMessageToActiveTabsAndUi({ type: "DISCONNECT_ACCOUNT" })
   const wallet = new Wallet(
     walletStore,
     accountStore,
     sessionStore,
     loadContracts,
     getNetwork,
-    onAutoLock,
   )
 
   const actionQueue = await getQueue<ActionItem>(globalActionQueueStore)

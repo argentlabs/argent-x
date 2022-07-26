@@ -71,10 +71,10 @@ export const walletStore = new KeyValueStorage<WalletStorageProps>(
   "core:wallet",
 )
 
-export const sessionStore = new ObjectStorage<WalletSession | undefined>(
-  undefined,
-  { namespace: "core:wallet:session", areaName: "session" },
-)
+export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
+  namespace: "core:wallet:session",
+  areaName: "session",
+})
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -82,10 +82,9 @@ export class Wallet {
   constructor(
     private readonly store: IKeyValueStorage<WalletStorageProps>,
     private readonly walletStore: IArrayStorage<WalletAccount>,
-    private readonly sessionStore: IObjectStorage<WalletSession | undefined>,
+    private readonly sessionStore: IObjectStorage<WalletSession | null>,
     private readonly loadContracts: LoadContracts,
     private readonly getNetwork: GetNetwork,
-    private readonly onLock?: () => Promise<void>,
   ) {}
 
   public async isInitialized(): Promise<boolean> {
@@ -93,7 +92,7 @@ export class Wallet {
   }
 
   public async isSessionOpen(): Promise<boolean> {
-    return (await this.sessionStore.get()) !== undefined
+    return (await this.sessionStore.get()) !== null
   }
 
   private async generateNewLocalSecret(
@@ -529,7 +528,6 @@ export class Wallet {
 
   public async lock() {
     await this.sessionStore.set(this.sessionStore.defaults)
-    await this.onLock?.()
   }
 
   public async exportBackup(): Promise<{ url: string; filename: string }> {

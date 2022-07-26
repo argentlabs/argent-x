@@ -50,7 +50,7 @@ const getAccountStore = (name: string, defaults: WalletAccount[] = []) => {
 }
 
 const getSessionStore = (name: string) => {
-  return new ObjectStorage<WalletSession | undefined>(undefined, name)
+  return new ObjectStorage<WalletSession | null>(null, name)
 }
 
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
