@@ -1,21 +1,29 @@
 import { mergeArrayStableWith } from "../storage/array"
 import { SelectorFn } from "../storage/types"
 import { assertSchema } from "../utils/schema"
-import { defaultNetworks } from "./defaults"
 import { networkSchema } from "./schema"
 import { networkSelector, networkSelectorByChainId } from "./selectors"
-import { customNetworksStore, equalNetwork } from "./storage"
+import {
+  customNetworksStore,
+  defaultCustomNetworks,
+  defaultReadonlyNetworks,
+  equalNetwork,
+} from "./storage"
 import { Network } from "./type"
 
-export function extendByDefaultNetworks(customNetworks: Network[]) {
-  return mergeArrayStableWith(defaultNetworks, customNetworks, equalNetwork)
+export function extendByDefaultReadonlyNetworks(customNetworks: Network[]) {
+  return mergeArrayStableWith(
+    defaultReadonlyNetworks,
+    customNetworks,
+    equalNetwork,
+  )
 }
 
 export async function getNetworks(
   selector?: SelectorFn<Network>,
 ): Promise<Network[]> {
   const customNetworks = await customNetworksStore.get()
-  const allNetworks = extendByDefaultNetworks(customNetworks)
+  const allNetworks = extendByDefaultReadonlyNetworks(customNetworks)
   if (selector) {
     return allNetworks.filter(selector)
   }
@@ -39,6 +47,12 @@ export const addNetwork = async (network: Network) => {
 
 export const removeNetwork = async (networkId: string) => {
   return customNetworksStore.remove(networkSelector(networkId))
+}
+
+export const restoreDefaultCustomNetworks = async () => {
+  const customNetworks = await customNetworksStore.get()
+  await customNetworksStore.remove(customNetworks)
+  await customNetworksStore.add(defaultCustomNetworks)
 }
 
 export type { Network, NetworkStatus } from "./type"
