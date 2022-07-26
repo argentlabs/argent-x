@@ -469,7 +469,7 @@ export class Wallet {
   public async getStarknetAccount(
     selector: BaseWalletAccount,
   ): Promise<Account> {
-    if (!this.isSessionOpen()) {
+    if (!(await this.isSessionOpen())) {
       throw Error("no open session")
     }
     const account = await this.getAccount(selector)
@@ -477,7 +477,7 @@ export class Wallet {
       throw Error("account not found")
     }
 
-    const keyPair = this.getKeyPairByDerivationPath(
+    const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
     const provider = getProvider(account.network)

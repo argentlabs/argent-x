@@ -74,7 +74,9 @@ export const starknetWindowObject: StarknetWindowObject = {
       type: "IS_PREAUTHORIZED",
       data: window.location.host,
     })
-    return waitForMessage("IS_PREAUTHORIZED_RES", 1000)
+    const x = await waitForMessage("IS_PREAUTHORIZED_RES", 1000)
+    console.log(x)
+    return x
   },
   on: (event, handleEvent) => {
     if (event === "accountsChanged") {

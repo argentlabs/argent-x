@@ -47,10 +47,10 @@ export const isPreAuthorized = async (
   account: BaseWalletAccount,
   host: string,
 ) => {
-  const hit = await preAuthorizeStore.get((x) =>
+  const hits = await preAuthorizeStore.get((x) =>
     equalPreAuthorization(x, { account, host }),
   )
-  return !!hit
+  return Boolean(hits.length)
 }
 
 export async function resetPreAuthorizations() {
