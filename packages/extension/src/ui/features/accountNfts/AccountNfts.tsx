@@ -69,7 +69,6 @@ interface AccountNftsProps {
   navigateToSend?: boolean
 }
 
-// FIXME: as soon as aspect is on mainnet this needs to be network aware
 const Nfts: FC<AccountNftsProps> = ({
   account,
   customList,
@@ -83,22 +82,36 @@ const Nfts: FC<AccountNftsProps> = ({
       {nfts.length === 0 && (
         <>
           <P>No collectibles to show</P>
-          <P style={{ marginTop: 120 }}>
-            <small>
-              You can browse collectibles on
-              <A href="https://testnet.aspect.co" target="_blank">
-                Aspect
-              </A>
-            </small>
-          </P>
-          <P style={{ marginTop: 16 }}>
-            <small>
-              Or build your own 3D collectible on
-              <A href="https://briq.construction/" target="_blank">
-                briq
-              </A>
-            </small>
-          </P>
+          {account.networkId === "goerli-alpha" && (
+            <P style={{ marginTop: 120 }}>
+              <small>
+                You can browse collectibles on
+                <A href="https://testnet.aspect.co" target="_blank">
+                  Aspect
+                </A>
+              </small>
+            </P>
+          )}
+          {account.networkId === "mainnet-alpha" && (
+            <P style={{ marginTop: 120 }}>
+              <small>
+                You can browse collectibles on
+                <A href="https://aspect.co" target="_blank">
+                  Aspect
+                </A>
+              </small>
+            </P>
+          )}
+          {account.networkId === "goerli-alpha" && (
+            <P style={{ marginTop: 16 }}>
+              <small>
+                Or build your own 3D collectible on
+                <A href="https://briq.construction/" target="_blank">
+                  briq
+                </A>
+              </small>
+            </P>
+          )}
         </>
       )}
       {(customList || nfts).map((nft) => (
