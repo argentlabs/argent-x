@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { FC, useMemo } from "react"
+import { FC, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAddressBook } from "../../services/addressBook"
 import { AddRoundedIcon } from "../../components/Icons/MuiIcons"
@@ -24,11 +24,13 @@ import {
 } from "../../components/InputText"
 import { StyledControlledSelect } from "../../components/InputSelect"
 import { Button, ButtonTransparent } from "../../components/Button"
+import { DeleteDialog } from "../../components/DeleteDialog"
 
 const Wrapper = styled(ColumnCenter)`
   padding: 56px 24px 32px;
   gap: 32px;
   justify-content: space-between;
+  position: relative;
 `
 
 const IconWrapper = styled(RowCentered)`
@@ -77,6 +79,7 @@ type mode = "add" | "edit"
 
 export const AddressbookAddOrEditScreen: FC = () => {
   const { contactId } = useParams<{ contactId?: string }>()
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const navigate = useNavigate()
 
   const { contacts } = useAddressBook()
@@ -132,8 +135,21 @@ export const AddressbookAddOrEditScreen: FC = () => {
     navigate(-1)
   }
 
+  const handleDelete = async () => {
+    selectedContact && (await removeAddressBookContact(selectedContact))
+    setDeleteDialogOpen(false)
+    navigate(-1)
+  }
+
   return (
     <Wrapper>
+      <DeleteDialog
+        isOpen={deleteDialogOpen}
+        title="Delete contact"
+        content="Are you sure you want to delete this contact from your address book?"
+        onDelete={handleDelete}
+        onCancel={() => setDeleteDialogOpen(false)}
+      />
       <ColumnCenter gap="16px">
         <IconWrapper>
           {currentMode === "add" && <StyledAddIcon />}
@@ -190,10 +206,7 @@ export const AddressbookAddOrEditScreen: FC = () => {
           {selectedContact && currentMode === "edit" && (
             <RemoveContactButton
               type="button"
-              onClick={async () => {
-                await removeAddressBookContact(selectedContact)
-                navigate(-1)
-              }}
+              onClick={() => setDeleteDialogOpen(true)}
             >
               Remove from address book
             </RemoveContactButton>

@@ -20,6 +20,7 @@ export const colors = {
   bg3: "#474747",
   bg4: "#5f5e5c",
   bg5: "#fafafa",
+  bg6: "#393939",
 
   text1: white,
   text2: "#8f8e8c",
