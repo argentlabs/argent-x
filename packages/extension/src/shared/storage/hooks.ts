@@ -1,25 +1,24 @@
 import { memoize } from "lodash-es"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { swrCacheProvider } from "../../ui/services/swr"
 import { IArrayStorage } from "./array"
 import { IKeyValueStorage } from "./keyvalue"
 import { IObjectStorage } from "./object"
 import { SelectorFn } from "./types"
-
-const clientCache = new Map<string, any>()
 
 export function useKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
   K extends keyof T = keyof T,
 >(storage: IKeyValueStorage<T>, key: K): T[K] {
   const [value, setValue] = useState<T[K]>(
-    clientCache.get(storage.namespace + ":" + key.toString()) ??
+    swrCacheProvider.get(storage.namespace + ":" + key.toString()) ??
       storage.defaults[key],
   )
 
   const set = useCallback(
     (value: T[K]) => {
-      clientCache.set(storage.namespace + ":" + key.toString(), value)
+      swrCacheProvider.set(storage.namespace + ":" + key.toString(), value)
       setValue(value)
     },
     [key, storage.namespace],
@@ -36,12 +35,12 @@ export function useKeyValueStorage<
 
 export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
   const [value, setValue] = useState<T>(
-    clientCache.get(storage.namespace) ?? storage.defaults,
+    swrCacheProvider.get(storage.namespace) ?? storage.defaults,
   )
 
   const set = useCallback(
     (value: T) => {
-      clientCache.set(storage.namespace, value)
+      swrCacheProvider.set(storage.namespace, value)
       setValue(value)
     },
     [storage.namespace],
@@ -66,12 +65,12 @@ export function useArrayStorage<T>(
   selector: SelectorFn<T> = defaultSelector,
 ): T[] {
   const [value, setValue] = useState<T[]>(
-    clientCache.get(storage.namespace) ?? storage.defaults,
+    swrCacheProvider.get(storage.namespace) ?? storage.defaults,
   )
 
   const set = useCallback(
     (value: T[]) => {
-      clientCache.set(storage.namespace, value)
+      swrCacheProvider.set(storage.namespace, value)
       setValue(value)
     },
     [storage.namespace],

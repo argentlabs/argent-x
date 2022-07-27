@@ -8,6 +8,11 @@ export const getAccountSelector = memoize(
     accountsEqual(account, baseAccount),
 )
 
+export const getNetworkSelector = memoize(
+  (networkId: string) => (account: StoredWalletAccount) =>
+    account.networkId === networkId,
+)
+
 export const withoutHiddenSelector = (account: StoredWalletAccount) =>
   !account.hidden
 

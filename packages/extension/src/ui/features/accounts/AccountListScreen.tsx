@@ -136,7 +136,7 @@ export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { selectedAccount } = useSelectedAccountStore()
-  const allAccounts = useAccounts(true)
+  const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
     isHiddenAccount,

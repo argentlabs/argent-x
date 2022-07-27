@@ -30,7 +30,9 @@ const AccountListWrapper = styled(Container)`
 `
 
 export const AccountListHiddenScreen: FC = () => {
-  const hiddenAccounts = useAccounts(true).filter(isHiddenAccount)
+  const hiddenAccounts = useAccounts({ showHidden: true }).filter(
+    isHiddenAccount,
+  )
   const hasHiddenAccounts = hiddenAccounts.length > 0
   if (!hasHiddenAccounts) {
     return <Navigate to={routes.accounts()} />
