@@ -135,6 +135,17 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
+    case "UNHIDE_ACCOUNT": {
+      try {
+        await wallet.unhideAccount(msg.data)
+        return sendToTabAndUi({
+          type: "UNHIDE_ACCOUNT_RES",
+        })
+      } catch {
+        return sendToTabAndUi({ type: "UNHIDE_ACCOUNT_REJ" })
+      }
+    }
+
     case "GET_ENCRYPTED_PRIVATE_KEY": {
       if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")

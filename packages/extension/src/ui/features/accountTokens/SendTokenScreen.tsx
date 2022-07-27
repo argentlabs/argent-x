@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { Schema, object } from "yup"
 
 import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
+import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { getFeeToken } from "../../../shared/token/utils"
 import { Button } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -27,7 +28,7 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { TokenMenu } from "./TokenMenu"
-import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
+import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
 import { useMaxFeeEstimateForTransfer } from "./useMaxFeeForTransfer"
@@ -167,7 +168,7 @@ export const SendTokenScreen: FC = () => {
   const inputAmount = formValues.amount
 
   const token = tokenDetails.find(({ address }) => address === tokenAddress)
-  const currencyValue = useTokenBalanceToCurrencyValue(token)
+  const currencyValue = useTokenUnitAmountToCurrencyValue(token, inputAmount)
 
   const {
     maxFee,
@@ -287,7 +288,9 @@ export const SendTokenScreen: FC = () => {
                 </InputGroupBefore>
                 <InputGroupAfter>
                   {inputAmount ? (
-                    <CurrencyValueText>{currencyValue}</CurrencyValueText>
+                    <CurrencyValueText>
+                      {prettifyCurrencyValue(currencyValue)}
+                    </CurrencyValueText>
                   ) : (
                     <>
                       <InputTokenSymbol>{token.symbol}</InputTokenSymbol>

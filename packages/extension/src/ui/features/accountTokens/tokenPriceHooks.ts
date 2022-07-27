@@ -15,10 +15,12 @@ import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
   convertTokenAmountToCurrencyValue,
+  convertTokenUnitAmountWithDecimals,
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
 } from "../../../shared/token/price"
 import { Token } from "../../../shared/token/type"
+import { isNumeric } from "../../../shared/utils/number"
 import { useConditionallyEnabledSWR } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { useIsMainnet } from "../networks/useNetworks"
@@ -97,6 +99,30 @@ export const useTokenPriceDetails = (
 }
 
 /**
+ * Convert a unit amount of token into native amount, useful for user input
+ *
+ * @see {@link convertTokenUnitAmountWithDecimals}
+ *
+ * @returns currency value
+ */
+
+export const useTokenUnitAmountToCurrencyValue = (
+  token?: Token | TokenDetailsWithBalance,
+  unitAmount?: BigNumberish,
+  usePriceAndTokenDataImpl = usePriceAndTokenData,
+) => {
+  const convertedAmount = convertTokenUnitAmountWithDecimals({
+    unitAmount,
+    decimals: token?.decimals,
+  })
+  return useTokenAmountToCurrencyValue(
+    token,
+    convertedAmount,
+    usePriceAndTokenDataImpl,
+  )
+}
+
+/**
  * Converts the amount of token into currecy value
  *
  * @returns currency value
@@ -109,7 +135,13 @@ export const useTokenAmountToCurrencyValue = (
 ) => {
   const priceDetails = useTokenPriceDetails(token, usePriceAndTokenDataImpl)
   return useMemo(() => {
-    if (!token || !priceDetails || amount === undefined || !token.decimals) {
+    if (
+      !token ||
+      !priceDetails ||
+      amount === undefined ||
+      !isNumeric(amount) ||
+      !token.decimals
+    ) {
       return
     }
     const currencyValue = convertTokenAmountToCurrencyValue({

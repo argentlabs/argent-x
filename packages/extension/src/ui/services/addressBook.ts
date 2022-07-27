@@ -7,7 +7,7 @@ export const useAddressBook = (
 ) => {
   // TODO: Implement actual address book
   const allAccountsOnNetwork = useAccounts()
-    .accounts.filter(
+    .filter(
       // all accounts on this network
       (account) => account.networkId === networkId,
     )

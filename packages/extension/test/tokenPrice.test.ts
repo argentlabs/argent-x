@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest"
 
 import {
   convertTokenAmountToCurrencyValue,
+  convertTokenUnitAmountWithDecimals,
   lookupTokenPriceDetails,
   prettifyCurrencyValue,
   prettifyTokenAmount,
@@ -237,6 +238,12 @@ describe("prettifyTokenAmount()", () => {
           decimals: 18,
         }),
       ).toEqual("123,456,789.0")
+      expect(
+        prettifyTokenAmount({
+          amount: "100",
+          decimals: 18,
+        }),
+      ).toEqual("0.0000000000000001")
     })
   })
   describe("when invalid", () => {
@@ -245,6 +252,44 @@ describe("prettifyTokenAmount()", () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(prettifyTokenAmount({})).toBeNull()
+    })
+  })
+})
+
+describe("convertTokenUnitAmountWithDecimals()", () => {
+  describe("when valid", () => {
+    test("should convert token unit amount", () => {
+      expect(
+        convertTokenUnitAmountWithDecimals({ unitAmount: 0, decimals: 18 }),
+      ).toEqual("0")
+      expect(
+        convertTokenUnitAmountWithDecimals({ unitAmount: 1.23, decimals: 2 }),
+      ).toEqual("123")
+      expect(
+        convertTokenUnitAmountWithDecimals({
+          unitAmount: 1.23456,
+          decimals: 2,
+        }),
+      ).toEqual("123")
+      expect(
+        convertTokenUnitAmountWithDecimals({ unitAmount: 1, decimals: 5 }),
+      ).toEqual("100000")
+      expect(
+        convertTokenUnitAmountWithDecimals({ unitAmount: 1, decimals: 18 }),
+      ).toEqual("1000000000000000000")
+      expect(
+        convertTokenUnitAmountWithDecimals({
+          unitAmount: "1.23456789",
+          decimals: 18,
+        }),
+      ).toEqual("1234567890000000000")
+    })
+  })
+  describe("when invalid", () => {
+    test("should return undefined", () => {
+      expect(
+        convertTokenUnitAmountWithDecimals({ unitAmount: "foo" }),
+      ).toBeUndefined()
     })
   })
 })

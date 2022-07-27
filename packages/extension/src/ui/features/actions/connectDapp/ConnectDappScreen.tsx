@@ -16,7 +16,10 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../../accounts/accountMetadata.state"
-import { useAccounts } from "../../accounts/accounts.state"
+import {
+  useAccounts,
+  useSelectedAccountStore,
+} from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import { ConfirmPageProps, ConfirmScreen } from "../ConfirmScreen"
 import { DappIcon } from "./DappIcon"
@@ -169,7 +172,9 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
   host,
   ...rest
 }) => {
-  const { accounts, selectedAccount: initiallySelectedAccount } = useAccounts()
+  const { selectedAccount: initiallySelectedAccount } =
+    useSelectedAccountStore()
+  const visibleAccounts = useAccounts()
   const [connectAccount, setConnectAccount] = useState<
     BaseWalletAccount | undefined
   >(initiallySelectedAccount)
@@ -177,12 +182,12 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
 
   const selectedAccount = useMemo(() => {
     if (connectAccount) {
-      const account = accounts.find((account) =>
+      const account = visibleAccounts.find((account) =>
         accountsEqual(account, connectAccount),
       )
       return account
     }
-  }, [accounts, connectAccount])
+  }, [visibleAccounts, connectAccount])
 
   const onSelectedAccountChange = useCallback((account: BaseWalletAccount) => {
     setConnectAccount(account)
@@ -217,7 +222,7 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
       <SmallText>Select the account to connect:</SmallText>
       <SelectContainer>
         <ConnectDappAccountSelect
-          accounts={accounts}
+          accounts={visibleAccounts}
           selectedAccount={connectAccount}
           onSelectedAccountChange={onSelectedAccountChange}
           host={host}
