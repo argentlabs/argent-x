@@ -46,6 +46,18 @@ Upgrade.args = {
   upgrade: true,
 }
 
+export const Connected = Template.bind({})
+Connected.args = {
+  ...account,
+  connected: true,
+}
+
+export const Hidden = Template.bind({})
+Hidden.args = {
+  ...account,
+  hidden: true,
+}
+
 export const Children = Template.bind({})
 Children.args = {
   ...account,

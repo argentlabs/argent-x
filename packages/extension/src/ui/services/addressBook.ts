@@ -1,8 +1,8 @@
-import { useAccounts } from "../features/accounts/accounts.state"
+import { useVisibleAccounts } from "../features/accounts/accounts.state"
 
 export const useAddressBook = (networkId: string) => {
   // TODO: Implement actual address book
-  const allAccountsOnNetwork = useAccounts().accounts.filter(
+  const allAccountsOnNetwork = useVisibleAccounts().filter(
     (account) => account.networkId === networkId,
   )
 

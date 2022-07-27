@@ -5,7 +5,7 @@ import { account } from "./account"
 export async function sendDevnetEthToAccount(address: string) {
   const response = await account.execute({
     contractAddress:
-      "0x6A7A6243F92A347C03C935CE4834C47CBD2A951536C10319168866DB9D57983".toLowerCase(), // fee token address on devnet
+      "0x62230ea046a9a5fbc261ac77d03c8d41e5d442db2284587570ab46455fd2488".toLowerCase(), // fee token address on devnet
     entrypoint: "transfer",
     calldata: stark.compileCalldata({
       recipient: address.toLowerCase(), // put recipient address here

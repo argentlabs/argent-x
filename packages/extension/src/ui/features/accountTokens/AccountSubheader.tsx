@@ -4,7 +4,11 @@ import styled from "styled-components"
 import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { CopyTooltip } from "../../components/CopyTooltip"
-import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
+import {
+  ActionContainer,
+  ActionsWrapper,
+} from "../../components/ErrorBoundaryFallbackWithCopyError"
+import { ContentCopyIcon, RefreshIcon } from "../../components/Icons/MuiIcons"
 import {
   formatTruncatedAddress,
   normalizeAddress,
@@ -16,13 +20,13 @@ import { AccountAddressWrapper, Address } from "./Address"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
 
-const AccountStatusText = styled.p<{ color?: string }>`
+const AccountStatusText = styled.p<{ error?: boolean }>`
   font-size: 12px;
   font-weight: 600;
   line-height: 12px;
   text-align: center;
   margin-bottom: 6px;
-  color: ${({ color }) => color};
+  color: ${({ error, theme }) => (error ? theme.red2 : "inherit")};
 `
 
 const Header = styled.div`
@@ -39,11 +43,16 @@ const AccountBalance = styled.div`
   margin-bottom: 8px;
 `
 
+const StyledActionsWrapper = styled(ActionsWrapper)`
+  margin: 8px 0;
+`
+
 interface AccountSubheaderProps {
   status: AccountStatus
   account: BaseWalletAccount
   accountName?: string
   onChangeName: (name: string) => void
+  onRedeploy: () => void
 }
 
 export const AccountSubHeader: FC<AccountSubheaderProps> = ({
@@ -51,6 +60,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
   account,
   onChangeName,
   accountName,
+  onRedeploy,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const { tokenDetails } = useTokensWithBalance(account)
@@ -78,13 +88,20 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
             <AccountMenu onAccountNameEdit={() => inputRef.current?.focus()} />
           </Header>
         </div>
-
         {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
-          <AccountStatusText
-            color={status.code === "ERROR" ? "red" : undefined}
-          >
-            {status.text}
-          </AccountStatusText>
+          <>
+            <AccountStatusText error={status.code === "ERROR"}>
+              {status.text}
+            </AccountStatusText>
+            {status.code === "ERROR" && (
+              <StyledActionsWrapper>
+                <ActionContainer onClick={onRedeploy}>
+                  <RefreshIcon />
+                  <span>Redeploy</span>
+                </ActionContainer>
+              </StyledActionsWrapper>
+            )}
+          </>
         )}
       </div>
       {sumCurrencyValue !== undefined && (
