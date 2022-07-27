@@ -110,7 +110,13 @@ export const NftScreen: FC = () => {
         <ColumnCenter gap="20px" style={{ marginBottom: "32px" }}>
           <RowCentered gap="8px">
             <ViewOnButton
-              onClick={() => openAspectNft(nft.contract_address, nft.token_id)}
+              onClick={() =>
+                openAspectNft(
+                  nft.contract_address,
+                  nft.token_id,
+                  account.networkId,
+                )
+              }
             >
               <RowCentered gap="5px">
                 <AspectLogo />
