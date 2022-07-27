@@ -6,7 +6,7 @@ import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { useAccounts } from "./accounts.state"
+import { useSelectedAccountStore } from "./accounts.state"
 
 const StyledP = styled(P)`
   margin-bottom: 16px;
@@ -15,7 +15,7 @@ const StyledP = styled(P)`
 
 export const UpgradeScreen: FC = () => {
   const navigate = useNavigate()
-  const { selectedAccount } = useAccounts()
+  const { selectedAccount } = useSelectedAccountStore()
 
   // If no account is selected, navigate to the account list screen. Dont show anything while doing so.
   useEffect(() => {

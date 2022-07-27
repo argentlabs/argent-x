@@ -52,7 +52,7 @@ export const removeNetwork = async (networkId: string) => {
 export const restoreDefaultCustomNetworks = async () => {
   const customNetworks = await customNetworksStore.get()
   await customNetworksStore.remove(customNetworks)
-  await customNetworksStore.add(defaultCustomNetworks)
+  await customNetworksStore.push(defaultCustomNetworks)
 }
 
 export type { Network, NetworkStatus } from "./type"

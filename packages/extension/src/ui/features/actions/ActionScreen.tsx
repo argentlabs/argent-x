@@ -10,7 +10,10 @@ import { assertNever } from "../../services/assertNever"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { Account } from "../accounts/Account"
-import { useAccounts, useSelectedAccount } from "../accounts/accounts.state"
+import {
+  useSelectedAccount,
+  useSelectedAccountStore,
+} from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
@@ -63,7 +66,7 @@ export const ActionScreen: FC = () => {
           onConnect={async (selectedAccount: Account) => {
             useAppState.setState({ isLoading: true })
             // switch UI to the account that was selected
-            useAccounts.setState({
+            useSelectedAccountStore.setState({
               selectedAccount,
             })
             // switch background wallet to the account that was selected

@@ -1,65 +1,19 @@
-import { find } from "lodash-es"
+import { useMemo } from "react"
 import create from "zustand"
 
+import {
+  withHiddenSelector,
+  withoutHiddenSelector,
+} from "../../../shared/account/selectors"
+import { accountStore } from "../../../shared/account/store"
+import { useArrayStorage } from "../../../shared/storage/hooks"
 import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { Account } from "./Account"
 
-interface State {
-  accounts: Account[]
-  selectedAccount?: BaseWalletAccount
-  addAccount: (newAccount: Account) => void
-  showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
-}
-
-export const initialState = {
-  accounts: [],
-  selectedAccount: undefined,
-}
-
-export const useAccounts = create<State>((set) => ({
-  ...initialState,
-  addAccount: (newAccount: Account) =>
-    set((state) => ({
-      selectedAccount: newAccount,
-      accounts: [...state.accounts, newAccount],
-    })),
-}))
-
-export const useAccount = (account?: BaseWalletAccount): Account | undefined =>
-  useAccounts(({ accounts }) =>
-    find(accounts, (a) => {
-      if (!account) {
-        return false
-      }
-      return accountsEqual(a, account)
-    }),
-  )
-
-const visibleAccountsSelector = ({ accounts }: Pick<State, "accounts">) =>
-  accounts.filter((account) => !account.hidden)
-
-const hiddenAccountsSelector = ({ accounts }: Pick<State, "accounts">) =>
-  accounts.filter((account) => account.hidden)
-
-export const useVisibleAccounts = () => {
-  return useAccounts(visibleAccountsSelector)
-}
-
-export const useHiddenAccounts = () => {
-  return useAccounts(hiddenAccountsSelector)
-}
-
-export const useSelectedAccount = () =>
-  useAccounts(({ accounts, selectedAccount }) =>
-    selectedAccount
-      ? find(accounts, (account) => accountsEqual(account, selectedAccount))
-      : undefined,
-  )
-
 export const mapWalletAccountsToAccounts = (
   walletAccounts: WalletAccount[],
-): State["accounts"] => {
+): Account[] => {
   return walletAccounts.map(
     (walletAccount) =>
       new Account({
@@ -69,4 +23,45 @@ export const mapWalletAccountsToAccounts = (
         hidden: walletAccount.hidden,
       }),
   )
+}
+
+export const useAccounts = (showHidden = false) => {
+  const accounts = useArrayStorage(
+    accountStore,
+    showHidden ? withHiddenSelector : withoutHiddenSelector,
+  )
+
+  return useMemo(() => {
+    return mapWalletAccountsToAccounts(accounts)
+  }, [accounts])
+}
+
+export const useAccount = (
+  account?: BaseWalletAccount,
+): Account | undefined => {
+  const accounts = useAccounts(true)
+  return useMemo(() => {
+    return accounts.find((a) => account && accountsEqual(a, account))
+  }, [accounts, account])
+}
+
+export const isHiddenAccount = (account: Account) => !!account.hidden
+
+interface State {
+  selectedAccount?: BaseWalletAccount
+  showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
+}
+
+export const useSelectedAccountStore = create<State>(() => ({}))
+
+export const useSelectedAccount = () => {
+  const allAccounts = useAccounts(true)
+  const selectedAccount = useSelectedAccountStore(
+    (state) => state.selectedAccount,
+  )
+  return useMemo(() => {
+    return allAccounts.find(
+      (a) => selectedAccount && accountsEqual(a, selectedAccount),
+    )
+  }, [allAccounts, selectedAccount])
 }

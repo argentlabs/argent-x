@@ -17,7 +17,7 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useAccounts } from "./accounts.state"
+import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
 interface IAccountListScreenItem {
@@ -58,7 +58,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   return (
     <AccountListItem
       {...makeClickable(() => {
-        useAccounts.setState({
+        useSelectedAccountStore.setState({
           selectedAccount: account,
           showMigrationScreen: account ? isDeprecated(account) : false,
         })

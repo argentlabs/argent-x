@@ -10,7 +10,6 @@ import { routes } from "../../routes"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
 import { deployAccount } from "../accounts/accounts.service"
-import { useAccounts } from "../accounts/accounts.state"
 import { recover } from "../recovery/recovery.service"
 
 const Container = styled.div`
@@ -32,14 +31,12 @@ const Container = styled.div`
 
 export const MigrationDisclaimerScreen: FC = () => {
   const navigate = useNavigate()
-  const { addAccount } = useAccounts()
   const { switcherNetworkId } = useAppState()
 
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })
     try {
       const newAccount = await deployAccount(switcherNetworkId)
-      addAccount(newAccount)
       connectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {

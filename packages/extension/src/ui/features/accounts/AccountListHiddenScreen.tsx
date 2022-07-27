@@ -7,7 +7,7 @@ import { routes } from "../../routes"
 import { H1 } from "../../theme/Typography"
 import { Container } from "./AccountContainer"
 import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
-import { useHiddenAccounts } from "./accounts.state"
+import { isHiddenAccount, useAccounts } from "./accounts.state"
 
 const AccountList = styled.div`
   display: flex;
@@ -30,9 +30,8 @@ const AccountListWrapper = styled(Container)`
 `
 
 export const AccountListHiddenScreen: FC = () => {
-  const hiddenAccounts = useHiddenAccounts()
-  const hiddenAccountsList = Object.values(hiddenAccounts)
-  const hasHiddenAccounts = Object.values(hiddenAccounts).length > 0
+  const hiddenAccounts = useAccounts(true).filter(isHiddenAccount)
+  const hasHiddenAccounts = hiddenAccounts.length > 0
   if (!hasHiddenAccounts) {
     return <Navigate to={routes.accounts()} />
   }
@@ -41,7 +40,7 @@ export const AccountListHiddenScreen: FC = () => {
       <IconBar back />
       <H1>Hidden Accounts</H1>
       <AccountList>
-        {hiddenAccountsList.map((account) => (
+        {hiddenAccounts.map((account) => (
           <AccountListHiddenScreenItem
             key={account.address}
             account={account}

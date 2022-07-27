@@ -15,6 +15,7 @@ import {
   LeftPaddedField,
 } from "../../../components/Fields"
 import { formatTruncatedAddress } from "../../../services/addresses"
+import { useAccounts } from "../../accounts/accounts.state"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { AccountField } from "./AccountField"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
@@ -31,6 +32,7 @@ export interface Erc20TransferCallTransactionItemProps {
 export const ERC20TransferTransactionDetails: FC<
   Erc20TransferCallTransactionItemProps
 > = ({ transaction, tokensByNetwork, networkId }) => {
+  const allAccounts = useAccounts()
   if (!isErc20TransferCall(transaction)) {
     return (
       <DefaultTransactionDetails
@@ -46,7 +48,7 @@ export const ERC20TransferTransactionDetails: FC<
     ({ address }) => address.toLowerCase() === contractAddress.toLowerCase(),
   )
   const displaySendAddress = formatTruncatedAddress(recipientAddress)
-  const knownAccount = getKnownWalletAddress({
+  const knownAccount = getKnownWalletAddress(allAccounts, {
     address: recipientAddress,
     networkId,
   })

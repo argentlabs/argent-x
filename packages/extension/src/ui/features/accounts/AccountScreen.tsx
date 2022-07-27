@@ -5,7 +5,7 @@ import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { AccountContainer } from "./AccountContainer"
-import { useAccounts, useSelectedAccount } from "./accounts.state"
+import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
 import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
 
 interface AccountScreenProps {
@@ -14,7 +14,9 @@ interface AccountScreenProps {
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
-  const { showMigrationScreen } = useAccounts()
+  const showMigrationScreen = useSelectedAccountStore(
+    (x) => x.showMigrationScreen,
+  )
 
   let body: ReactNode
   if (!account) {
@@ -22,7 +24,9 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   } else if (showMigrationScreen) {
     return (
       <DeprecatedAccountScreen
-        onSubmit={() => useAccounts.setState({ showMigrationScreen: false })}
+        onSubmit={() =>
+          useSelectedAccountStore.setState({ showMigrationScreen: false })
+        }
       />
     )
   } else if (tab === "tokens") {

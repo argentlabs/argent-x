@@ -26,9 +26,9 @@ import { AccountHeader } from "./AccountHeader"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import { deployAccount } from "./accounts.service"
 import {
+  isHiddenAccount,
   useAccounts,
-  useHiddenAccounts,
-  useVisibleAccounts,
+  useSelectedAccountStore,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 
@@ -135,35 +135,35 @@ const HiddenAccountsButtonIcon = styled.div`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { selectedAccount, addAccount } = useAccounts()
-  const visibleAccounts = useVisibleAccounts()
-  const hiddenAccounts = useHiddenAccounts()
+  const { selectedAccount } = useSelectedAccountStore()
+  const allAccounts = useAccounts(true)
+  const [hiddenAccounts, visibleAccounts] = partition(
+    allAccounts,
+    isHiddenAccount,
+  )
   const { isBackupRequired } = useBackupRequired()
   const [isDeploying, setIsDeploying] = useState(false)
   const [deployFailed, setDeployFailed] = useState(false)
 
-  const visibleAccountsList = Object.values(visibleAccounts)
-  const hasHiddenAccounts = Object.values(hiddenAccounts).length > 0
-
   const [deprecatedAccounts, newAccounts] = partition(
-    visibleAccountsList,
+    visibleAccounts,
     (account) => isDeprecated(account),
   )
+  const hasHiddenAccounts = hiddenAccounts.length > 0
 
   const handleAddAccount = useCallback(async () => {
     setIsDeploying(true)
     setDeployFailed(false)
     try {
       const newAccount = await deployAccount(switcherNetworkId)
-      addAccount(newAccount)
       connectAccount(newAccount)
       navigate(await recover())
-    } catch (error: any) {
+    } catch {
       setDeployFailed(true)
     } finally {
       setIsDeploying(false)
     }
-  }, [addAccount, navigate, switcherNetworkId])
+  }, [navigate, switcherNetworkId])
 
   return (
     <AccountListWrapper header>
@@ -184,7 +184,7 @@ export const AccountListScreen: FC = () => {
       <H1>Accounts</H1>
       <AccountList hasHiddenAccounts={hasHiddenAccounts}>
         {isBackupRequired && <RecoveryBanner noMargins />}
-        {visibleAccountsList.length === 0 && (
+        {visibleAccounts.length === 0 && (
           <Paragraph>
             No {hasHiddenAccounts ? "visible" : ""} accounts on this network,
             click below to add one.

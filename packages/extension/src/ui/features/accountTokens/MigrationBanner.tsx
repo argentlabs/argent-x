@@ -5,12 +5,14 @@ import { Link } from "react-router-dom"
 import { Banner } from "../../components/Banner"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
-import { useAccounts } from "../accounts/accounts.state"
+import { useSelectedAccountStore } from "../accounts/accounts.state"
 
 export const MigrationBanner: FC = () => (
   <Link
     to={routes.accountTokens()}
-    onClick={() => useAccounts.setState({ showMigrationScreen: true })}
+    onClick={() =>
+      useSelectedAccountStore.setState({ showMigrationScreen: true })
+    }
   >
     <Banner
       title="Please migrate your funds"
