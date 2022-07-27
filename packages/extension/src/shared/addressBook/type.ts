@@ -4,3 +4,5 @@ export interface AddressBookContact {
   networkId: string
   address: string
 }
+
+export type AddressBookContactNoId = Omit<AddressBookContact, "id">

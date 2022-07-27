@@ -9,14 +9,20 @@ export interface AddressBook {
   contacts: AddressBookContact[]
 }
 
-export const useAddressBook = (networkId: string): AddressBook => {
-  const userAccountsOnNetwork = useAccounts().accounts.filter(
-    (account) => account.networkId === networkId,
-  )
-
+export const useAddressBook = (networkId?: string): AddressBook => {
   const contactsOnNetwork = useArrayStorage<AddressBookContact>(
     addressBookStore,
-    accountNetworkSelector(networkId),
+    networkId ? accountNetworkSelector(networkId) : undefined,
+  )
+
+  const userAccounts = useAccounts().accounts
+
+  if (!networkId) {
+    return { userAccounts, contacts: contactsOnNetwork }
+  }
+
+  const userAccountsOnNetwork = userAccounts.filter(
+    (acc) => acc.networkId === networkId,
   )
 
   return {

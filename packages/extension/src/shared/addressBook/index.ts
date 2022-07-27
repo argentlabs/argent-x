@@ -1,5 +1,3 @@
-import { uniqueId } from "lodash-es"
-
 import { addressBookContactSchema } from "./../addressBook/schema"
 import { accountNetworkSelector } from "./../addressBook/selectors"
 import { addressBookStore } from "./../addressBook/storage"
@@ -40,14 +38,10 @@ export const getAddressBookByNames = async () => {
   return await getAddressBookByKey("name")
 }
 
-export const addAddressBookContact = async (
-  contact: Omit<AddressBookContact, "id">,
-) => {
-  const newContact: AddressBookContact = { ...contact, id: uniqueId() }
+export const addAddressBookContact = async (contact: AddressBookContact) => {
+  await assertSchema(addressBookContactSchema, contact)
 
-  await assertSchema(addressBookContactSchema, newContact)
-
-  return addressBookStore.add(newContact)
+  return addressBookStore.add(contact)
 }
 
 export const removeAddressBookContact = async (contact: AddressBookContact) => {

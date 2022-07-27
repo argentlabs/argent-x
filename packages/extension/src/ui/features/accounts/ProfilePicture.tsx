@@ -3,10 +3,11 @@ import styled, { css } from "styled-components"
 export interface ProfilePictureProps {
   disabled?: boolean
   small?: boolean
+  size?: number
 }
 
-const sizeAttribute = ({ small }: ProfilePictureProps) =>
-  small ? "24px" : "36px"
+const sizeAttribute = ({ small, size }: ProfilePictureProps) =>
+  size ? `${size}px` : small ? "24px" : "36px"
 
 export const ProfilePicture = styled.img<ProfilePictureProps>`
   width: ${sizeAttribute};

@@ -170,6 +170,13 @@ export const SettingsScreen: FC = () => {
             <hr />
           </>
         )}
+        <SettingsLinkItem to={routes.settingsAddressbook()}>
+          <Title>
+            <span>Address book</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+        </SettingsLinkItem>
+        <hr />
         <SettingsLinkItem to={routes.settingsDappConnections()}>
           <Title>
             <span>Reset dapp connections</span>

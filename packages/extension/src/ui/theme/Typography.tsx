@@ -52,6 +52,16 @@ export const FormError = styled.p`
   text-align: left;
 `
 
+export const FormErrorAlt = styled.p`
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.red1};
+  margin-top: 8px;
+  margin-left: 8px;
+  text-align: left;
+`
+
 const anchorCss = css`
   display: inline-block;
   text-decoration: none;
