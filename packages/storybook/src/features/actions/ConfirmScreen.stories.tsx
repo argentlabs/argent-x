@@ -18,9 +18,9 @@ Default.args = {
   confirmButtonDisabled: false,
 }
 
-export const ConfirmWarn = Template.bind({})
-ConfirmWarn.args = {
-  confirmButtonVariant: "warn",
+export const ConfirmWarnHigh = Template.bind({})
+ConfirmWarnHigh.args = {
+  confirmButtonVariant: "warn-high",
   confirmButtonDisabled: false,
 }
 

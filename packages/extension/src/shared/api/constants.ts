@@ -28,3 +28,5 @@ export const ARGENT_TRANSACTION_REVIEW_STARKNET_URL =
         "transactions/review/starknet",
       )
     : undefined
+
+export const ARGENT_X_STATUS_URL = process.env.ARGENT_X_STATUS_URL as string
