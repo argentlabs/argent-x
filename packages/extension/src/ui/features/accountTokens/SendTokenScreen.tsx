@@ -154,7 +154,7 @@ export const AddressBookRecipient = styled.div`
   padding: 16px;
 `
 
-const StyledAccountAddress = styled.p`
+export const StyledAccountAddress = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -391,7 +391,7 @@ export const SendTokenScreen: FC = () => {
                         )}
                         width="40px"
                         height="40px"
-                      ></ProfilePicture>
+                      />
 
                       <Column>
                         <H5>{accountName}</H5>
