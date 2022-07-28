@@ -1,7 +1,9 @@
 import { assertNever } from "./../ui/services/assertNever"
 import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
+import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
+import { getIsPreauthorized } from "./preAuthorization"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
 function attach() {
@@ -35,24 +37,32 @@ document.addEventListener("readystatechange", () => attachHandler())
 
 window.addEventListener(
   "message",
-  ({ data }: MessageEvent<WindowMessageType>) => {
+  async ({ data }: MessageEvent<WindowMessageType>) => {
     const { starknet } = window
     if (!starknet) {
       return
     }
+
     if (starknet.account && data.type === "CONNECT_ACCOUNT") {
       const { address, network } = data.data
-      if (address !== starknet.selectedAddress) {
-        starknet.selectedAddress = address
-        starknet.provider = getProvider(network)
-        starknet.account = new ArgentXAccount(address, starknet.provider)
-        for (const userEvent of userEventHandlers) {
-          if (userEvent.type === "accountsChanged") {
-            userEvent.handler([address])
-          } else if (userEvent.type === "networkChanged") {
-            userEvent.handler(network.chainId)
-          } else {
-            assertNever(userEvent)
+      const isPreauthorized = await getIsPreauthorized()
+      if (!isPreauthorized) {
+        // disconnect so the user can see they are no longer connected
+        // TODO: better UX would be to also re-connect when user selects pre-authorized account
+        await disconnectAccount()
+      } else {
+        if (address !== starknet.selectedAddress) {
+          starknet.selectedAddress = address
+          starknet.provider = getProvider(network)
+          starknet.account = new ArgentXAccount(address, starknet.provider)
+          for (const userEvent of userEventHandlers) {
+            if (userEvent.type === "accountsChanged") {
+              userEvent.handler([address])
+            } else if (userEvent.type === "networkChanged") {
+              userEvent.handler(network.chainId)
+            } else {
+              assertNever(userEvent)
+            }
           }
         }
       }

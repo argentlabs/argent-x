@@ -10,6 +10,7 @@ import { startSession } from "../../services/backgroundSessions"
 import { P, StyledLink } from "../../theme/Typography"
 import { useActions } from "../actions/actions.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
+import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { recover } from "../recovery/recovery.service"
 import { Greetings, GreetingsWrapper } from "./Greetings"
 import LogoSvg from "./logo.svg"
@@ -45,8 +46,6 @@ export const greetings = [
   "hi fren",
 ]
 
-const isPopup = new URLSearchParams(window.location.search).has("popup")
-
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
 
@@ -65,7 +64,7 @@ export const LockScreen: FC = () => {
             const target = await recover()
 
             // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close
-            if (isPopup && !useActions.getState().actions.length) {
+            if (EXTENSION_IS_POPUP && !useActions.getState().actions.length) {
               window.close()
             }
 

@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from "react"
+import { FC, useCallback, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
@@ -14,7 +14,10 @@ import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
-import { connectAccount } from "../../services/backgroundAccounts"
+import {
+  connectAccount,
+  redeployAccount,
+} from "../../services/backgroundAccounts"
 import { PendingTransactions } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {
@@ -86,6 +89,16 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     { suspense: false },
   )
 
+  const onRedeploy = useCallback(async () => {
+    const data = account.toBaseWalletAccount()
+    try {
+      const result = await redeployAccount(data)
+      account.updateDeployTx(result.txHash)
+    } catch {
+      // ignore, account should enter error state and failure will be actionable elsewhere in UI
+    }
+  }, [account])
+
   const showUpgradeBanner = Boolean(
     needsUpgrade && !showPendingTransactions && feeTokenBalance?.gt(0),
   )
@@ -116,6 +129,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         status={status}
         account={account}
         accountName={accountName}
+        onRedeploy={onRedeploy}
         onChangeName={(name) =>
           setAccountName(account.networkId, account.address, name)
         }

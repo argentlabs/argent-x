@@ -23,7 +23,7 @@ export const prettifyNumberConfig: Record<string, IPrettifyNumberConfig> = {
   },
   TOKEN: {
     minDecimalPlaces: 4,
-    maxDecimalPlaces: 10,
+    maxDecimalPlaces: 16,
     minDecimalSignificanDigits: 2,
     decimalPlacesWhenZero: 1,
   },

@@ -41,7 +41,7 @@ const ErrorMessageContainer = styled.div`
   margin-bottom: 16px;
 `
 
-const ActionsWrapper = styled.div`
+export const ActionsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,7 +50,7 @@ const ActionsWrapper = styled.div`
   width: 100%;
 `
 
-const ActionContainer = styled.div`
+export const ActionContainer = styled.div`
   text-align: center;
   display: flex;
   align-items: center;

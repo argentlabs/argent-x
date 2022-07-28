@@ -20,7 +20,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "CONNECT_ACCOUNT": {
-      return await wallet.selectAccount(msg.data)
+      await wallet.selectAccount(msg.data)
+      return sendToTabAndUi({
+        type: "CONNECT_ACCOUNT_RES",
+        data: msg.data,
+      })
     }
 
     case "NEW_ACCOUNT": {
@@ -84,6 +88,28 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
+    case "REDEPLOY_ACCOUNT": {
+      try {
+        const account = msg.data
+        const fullAccount = await wallet.getAccount(account)
+        const { txHash } = await wallet.redeployAccount(fullAccount)
+        addTransaction({
+          hash: txHash,
+          account: fullAccount,
+          meta: { title: "Redeploy wallet" },
+        })
+        return sendToTabAndUi({
+          type: "REDEPLOY_ACCOUNT_RES",
+          data: {
+            txHash,
+            address: account.address,
+          },
+        })
+      } catch {
+        return sendToTabAndUi({ type: "REDEPLOY_ACCOUNT_REJ" })
+      }
+    }
+
     case "DELETE_ACCOUNT": {
       try {
         await wallet.removeAccount(msg.data)
@@ -101,6 +127,17 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         })
       } catch {
         return sendToTabAndUi({ type: "HIDE_ACCOUNT_REJ" })
+      }
+    }
+
+    case "UNHIDE_ACCOUNT": {
+      try {
+        await wallet.unhideAccount(msg.data)
+        return sendToTabAndUi({
+          type: "UNHIDE_ACCOUNT_RES",
+        })
+      } catch {
+        return sendToTabAndUi({ type: "UNHIDE_ACCOUNT_REJ" })
       }
     }
 

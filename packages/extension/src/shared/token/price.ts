@@ -174,7 +174,10 @@ export const prettifyCurrencyValue = (
  * Returns a string of token balance with symbol if available e.g.
  */
 
-export const prettifyTokenBalance = (token: TokenDetailsWithBalance) => {
+export const prettifyTokenBalance = (
+  token: TokenDetailsWithBalance,
+  withSymbol = true,
+) => {
   const { balance, decimals, symbol } = token
   if (balance === undefined || decimals === undefined) {
     return null
@@ -182,7 +185,7 @@ export const prettifyTokenBalance = (token: TokenDetailsWithBalance) => {
   return prettifyTokenAmount({
     amount: balance,
     decimals,
-    symbol,
+    symbol: withSymbol ? symbol : "",
   })
 }
 
@@ -206,4 +209,48 @@ export const prettifyTokenAmount = ({
   const prettyValue = prettifyTokenNumber(balanceFullString)
   const prettyValueWithSymbol = [prettyValue, symbol].filter(Boolean).join(" ")
   return prettyValueWithSymbol
+}
+
+export interface IConvertTokenAmount {
+  unitAmount?: BigNumberish
+  decimals?: BigNumberish
+}
+
+/**
+ * Convert a unit amount of token into native amount, useful for user input
+ *
+ * @example
+ * ```ts
+ * // Prints '1000000000000000000'
+ * convertTokenUnitAmountWithDecimals({ unitAmount: 1, decimals: 18 }),
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Prints '123'
+ * convertTokenUnitAmountWithDecimals({ unitAmount: 1.23, decimals: 2 }),
+ * ```
+ */
+
+export const convertTokenUnitAmountWithDecimals = ({
+  unitAmount,
+  decimals,
+}: IConvertTokenAmount) => {
+  if (
+    unitAmount === undefined ||
+    !isNumeric(unitAmount) ||
+    decimals === undefined ||
+    !isNumeric(decimals)
+  ) {
+    return
+  }
+  const decimalsNumber = Number(decimals)
+  /** amount to multipy by to take unit amount to token value */
+  const unitMultiplyBy = Math.pow(10, decimalsNumber)
+  /** take unit amount to token amount, enforcing integer */
+  const amount = new CurrencyConversionNumber(unitAmount.toString())
+    .multipliedBy(unitMultiplyBy)
+    .integerValue()
+  /** keep as string to avoid loss of precision elsewhere */
+  return amount.toString()
 }

@@ -45,13 +45,15 @@ export const getNetworkAccountImageUrl = ({
   accountName,
   networkId,
   accountAddress,
+  backgroundColor,
 }: {
   accountName: string
   networkId: string
   accountAddress: string
+  backgroundColor?: string
 }) => {
   const accountIdentifier = `${networkId}::${accountAddress}`
-  const color = getColor(accountIdentifier)
+  const color = backgroundColor || getColor(accountIdentifier)
   return `https://eu.ui-avatars.com/api?name=${accountName}&background=${color}&color=fff`
 }
 
