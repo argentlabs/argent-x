@@ -1,3 +1,4 @@
+import { isFunction } from "lodash-es"
 import { useRef } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import TextareaAutosize, {
@@ -327,6 +328,7 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
   onlyNumeric,
   maxRows,
   children,
+  onChange,
   ...props
 }: ControlledTextAreaProps<T>) => (
   <Controller
@@ -344,17 +346,19 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
           const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
           if (onlyNumeric) {
             if (e.target.value === "") {
-              return onValueChange(e)
+              onValueChange(e)
+              return isFunction(onChange) && onChange(e)
             }
 
-            return (
-              numericalRegex.test(e.target.value) &&
+            numericalRegex.test(e.target.value) &&
               // just being double sure
               isNumeric(e.target.value) &&
               onValueChange(e)
-            )
+
+            return isFunction(onChange) && onChange(e)
           } else {
-            return onValueChange(e)
+            onValueChange(e)
+            return isFunction(onChange) && onChange(e)
           }
         }}
         {...field}

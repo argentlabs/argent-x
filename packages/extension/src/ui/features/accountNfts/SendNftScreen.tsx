@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { FC, lazy, useMemo, useRef, useState } from "react"
+import { FC, lazy, useCallback, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
@@ -124,8 +124,16 @@ export const SendNftScreen: FC = () => {
 
   const formValues = watch()
   const inputRecipient = formValues.recipient
-  const validStarknetAddress =
-    inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
+
+  const validateStarknetAddress = useCallback(
+    (addr: string) => addr.length > 62 && addr.length <= 66, // including 0x
+    [],
+  )
+
+  const validRecipientAddress = useMemo(
+    () => validateStarknetAddress(inputRecipient),
+    [inputRecipient, validateStarknetAddress],
+  )
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
 
@@ -142,7 +150,7 @@ export const SendNftScreen: FC = () => {
     [addressBook.contacts, inputRecipient],
   )
 
-  const showSaveAddressButton = validStarknetAddress && !recipientInAddressBook
+  const showSaveAddressButton = validRecipientAddress && !recipientInAddressBook
 
   if (!account || !nft || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />
@@ -164,7 +172,11 @@ export const SendNftScreen: FC = () => {
     navigate(routes.accountActivity())
   }
 
-  const handleAddressSelect = (account: Account | AddressBookContact) => {
+  const handleAddressSelect = (account?: Account | AddressBookContact) => {
+    if (!account) {
+      return
+    }
+
     setAddressBookRecipient(account)
     setValue("recipient", normalizeAddress(account.address))
     setAddressBookOpen(false)
@@ -210,7 +222,9 @@ export const SendNftScreen: FC = () => {
             </RowCentered>
             <div>
               {addressBookRecipient && accountName ? (
-                <AddressBookRecipient>
+                <AddressBookRecipient
+                  onDoubleClick={() => setAddressBookRecipient(undefined)}
+                >
                   <RowBetween>
                     <Row gap="16px">
                       <ProfilePicture
@@ -247,10 +261,21 @@ export const SendNftScreen: FC = () => {
                       paddingRight: "50px",
                       borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
                     }}
+                    onChange={(e) => {
+                      if (validateStarknetAddress(e.target.value)) {
+                        const account = addressBook.contacts.find((c) => {
+                          return (
+                            normalizeAddress(c.address) ===
+                            normalizeAddress(e.target.value)
+                          )
+                        })
+                        handleAddressSelect(account)
+                      }
+                    }}
                   >
                     <>
                       <InputGroupAfter>
-                        {validStarknetAddress ? (
+                        {validRecipientAddress ? (
                           <CloseIconAlt
                             {...makeClickable(resetAddressBookRecipient)}
                             style={{ cursor: "pointer" }}
