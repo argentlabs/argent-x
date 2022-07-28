@@ -40,20 +40,20 @@ export const getAddressBookByNames = async () => {
 
 export const addAddressBookContact = async (contact: AddressBookContact) => {
   await assertSchema(addressBookContactSchema, contact)
-
-  return addressBookStore.add(contact)
+  await addressBookStore.add(contact)
+  return contact
 }
 
 export const removeAddressBookContact = async (contact: AddressBookContact) => {
   await assertSchema(addressBookContactSchema, contact)
-
-  return addressBookStore.remove(contact)
+  await addressBookStore.remove(contact)
+  return contact
 }
 
 export const editAddressBookContact = async (contact: AddressBookContact) => {
   await assertSchema(addressBookContactSchema, contact)
-
-  return await addAddressBookContact(contact)
+  await addAddressBookContact(contact)
+  return contact
 }
 
 export type { AddressBookContact as AddressBookContact } from "./type"

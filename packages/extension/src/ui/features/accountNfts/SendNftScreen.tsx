@@ -171,11 +171,17 @@ export const SendNftScreen: FC = () => {
     setValue("recipient", "")
   }
 
+  const handleSaveAddress = (savedContact: AddressBookContact) => {
+    handleAddressSelect(savedContact)
+
+    setBottomSheetOpen(false)
+  }
+
   return (
     <div style={{ position: "relative" }}>
       <AddContactBottomSheet
         open={bottomSheetOpen}
-        onSave={() => setBottomSheetOpen(false)}
+        onSave={handleSaveAddress}
         onCancel={() => setBottomSheetOpen(false)}
         recipientAddress={inputRecipient}
       />

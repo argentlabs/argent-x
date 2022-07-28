@@ -1,8 +1,9 @@
-export interface AddressBookContact {
-  id: string
+export interface AddressBookContactNoId {
   name: string
   networkId: string
   address: string
 }
 
-export type AddressBookContactNoId = Omit<AddressBookContact, "id">
+export interface AddressBookContact extends AddressBookContactNoId {
+  id: string
+}

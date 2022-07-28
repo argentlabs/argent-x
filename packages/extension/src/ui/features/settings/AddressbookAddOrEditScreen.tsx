@@ -10,7 +10,10 @@ import {
   removeAddressBookContact,
 } from "../../../shared/addressBook"
 import { addressBookContactNoIdSchema } from "../../../shared/addressBook/schema"
-import { AddressBookContactNoId } from "../../../shared/addressBook/type"
+import {
+  AddressBookContact,
+  AddressBookContactNoId,
+} from "../../../shared/addressBook/type"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
 import { DeleteDialog } from "../../components/DeleteDialog"
@@ -80,7 +83,7 @@ type mode = "add" | "edit"
 
 export interface AddressbookAddOrEditProps {
   networkDisabled?: boolean
-  onSave?: () => void
+  onSave?: (savedContact: AddressBookContact) => void
   onCancel?: () => void
   formHeight?: string
   recipientAddress?: string
@@ -134,21 +137,23 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
   const handleAddOrEditContact = async (
     addressBookContactNoId: AddressBookContactNoId,
   ) => {
+    let savedContact: AddressBookContact | undefined
+
     if (currentMode === "add") {
-      await addAddressBookContact({
+      savedContact = await addAddressBookContact({
         ...addressBookContactNoId,
         id: uniqueId("addressbook-contact"),
       })
     }
 
     if (currentMode === "edit" && selectedContact?.id) {
-      await editAddressBookContact({
+      savedContact = await editAddressBookContact({
         ...addressBookContactNoId,
         id: selectedContact.id,
       })
     }
 
-    isFunction(onSave) ? onSave() : navigate(-1)
+    isFunction(onSave) && savedContact ? onSave(savedContact) : navigate(-1)
   }
 
   const handleDelete = async () => {

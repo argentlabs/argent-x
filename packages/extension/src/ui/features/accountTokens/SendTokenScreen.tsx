@@ -320,6 +320,12 @@ export const SendTokenScreen: FC = () => {
     setValue("recipient", "")
   }
 
+  const handleSaveAddress = (savedContact: AddressBookContact) => {
+    handleAddressSelect(savedContact)
+
+    setBottomSheetOpen(false)
+  }
+
   const disableSubmit =
     !isDirty ||
     isSubmitting ||
@@ -330,7 +336,7 @@ export const SendTokenScreen: FC = () => {
     <div style={{ position: "relative" }}>
       <AddContactBottomSheet
         open={bottomSheetOpen}
-        onSave={() => setBottomSheetOpen(false)}
+        onSave={handleSaveAddress}
         onCancel={() => setBottomSheetOpen(false)}
         recipientAddress={inputRecipient}
       />
