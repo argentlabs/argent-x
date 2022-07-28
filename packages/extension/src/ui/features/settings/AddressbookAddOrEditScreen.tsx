@@ -1,30 +1,31 @@
-import styled from "styled-components"
+import { isFunction, uniqueId } from "lodash-es"
 import { FC, useMemo, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { useAddressBook } from "../../services/addressBook"
-import { AddRoundedIcon } from "../../components/Icons/MuiIcons"
-import { EditRoundedIcon } from "../../components/Icons/MuiIcons"
-import Column, { ColumnCenter } from "../../components/Column"
-import Row, { RowCentered } from "../../components/Row"
-import { FormErrorAlt, H3 } from "../../theme/Typography"
 import { useForm } from "react-hook-form"
+import { useNavigate, useParams } from "react-router-dom"
+import styled from "styled-components"
+
 import {
   addAddressBookContact,
   editAddressBookContact,
   removeAddressBookContact,
 } from "../../../shared/addressBook"
-import { uniqueId } from "lodash-es"
-import { useYupValidationResolver } from "./useYupValidationResolver"
 import { addressBookContactNoIdSchema } from "../../../shared/addressBook/schema"
 import { AddressBookContactNoId } from "../../../shared/addressBook/type"
-import { useCurrentNetwork, useNetworks } from "../networks/useNetworks"
+import { Button, ButtonTransparent } from "../../components/Button"
+import Column, { ColumnCenter } from "../../components/Column"
+import { DeleteDialog } from "../../components/DeleteDialog"
+import { AddRoundedIcon } from "../../components/Icons/MuiIcons"
+import { EditRoundedIcon } from "../../components/Icons/MuiIcons"
+import { StyledControlledSelect } from "../../components/InputSelect"
 import {
   StyledControlledInput,
   StyledControlledTextArea,
 } from "../../components/InputText"
-import { StyledControlledSelect } from "../../components/InputSelect"
-import { Button, ButtonTransparent } from "../../components/Button"
-import { DeleteDialog } from "../../components/DeleteDialog"
+import Row, { RowCentered } from "../../components/Row"
+import { useAddressBook } from "../../services/addressBook"
+import { FormErrorAlt, H3 } from "../../theme/Typography"
+import { useCurrentNetwork, useNetworks } from "../networks/useNetworks"
+import { useYupValidationResolver } from "./useYupValidationResolver"
 
 const Wrapper = styled(ColumnCenter)`
   padding: 56px 24px 32px;
@@ -51,9 +52,9 @@ const StyledEditIcon = styled(EditRoundedIcon)`
   fill: ${({ theme }) => theme.text2};
 `
 
-const StyledContactForm = styled.form`
+const StyledContactForm = styled.form<{ formHeight?: string }>`
   ${({ theme }) => theme.flexColumnNoWrap}
-  height: 62vh;
+  height: ${({ formHeight }) => (formHeight ? formHeight : "62vh")};
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -77,7 +78,22 @@ const RemoveContactButton = styled(ButtonTransparent)`
 
 type mode = "add" | "edit"
 
-export const AddressbookAddOrEditScreen: FC = () => {
+export interface AddressbookAddOrEditProps {
+  networkDisabled?: boolean
+  onSave?: () => void
+  onCancel?: () => void
+  formHeight?: string
+  recipientAddress?: string
+}
+
+export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
+  networkDisabled,
+  onSave,
+  onCancel,
+  formHeight,
+  recipientAddress,
+  ...props
+}) => {
   const { contactId } = useParams<{ contactId?: string }>()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const navigate = useNavigate()
@@ -108,7 +124,7 @@ export const AddressbookAddOrEditScreen: FC = () => {
     formState: { errors },
   } = useForm<AddressBookContactNoId>({
     defaultValues: {
-      address: selectedContact?.address ?? "",
+      address: selectedContact?.address || recipientAddress || "",
       name: selectedContact?.name ?? "",
       networkId: selectedContact?.networkId ?? currentNetwork.id,
     },
@@ -132,7 +148,7 @@ export const AddressbookAddOrEditScreen: FC = () => {
       })
     }
 
-    navigate(-1)
+    isFunction(onSave) ? onSave() : navigate(-1)
   }
 
   const handleDelete = async () => {
@@ -142,7 +158,7 @@ export const AddressbookAddOrEditScreen: FC = () => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       <DeleteDialog
         isOpen={deleteDialogOpen}
         title="Delete contact"
@@ -164,6 +180,7 @@ export const AddressbookAddOrEditScreen: FC = () => {
         onSubmit={handleSubmit(
           async (contact) => await handleAddOrEditContact(contact),
         )}
+        formHeight={formHeight}
       >
         <Column gap="12px">
           <div>
@@ -200,6 +217,7 @@ export const AddressbookAddOrEditScreen: FC = () => {
               control={control}
               placeholder="Network"
               classNamePrefix="network-selector"
+              isDisabled={networkDisabled}
             />
           </div>
 
@@ -214,7 +232,10 @@ export const AddressbookAddOrEditScreen: FC = () => {
         </Column>
 
         <Row gap="12px">
-          <Button type="button" onClick={() => navigate(-1)}>
+          <Button
+            type="button"
+            onClick={() => (isFunction(onCancel) ? onCancel() : navigate(-1))}
+          >
             Cancel
           </Button>
           <Button>Save</Button>

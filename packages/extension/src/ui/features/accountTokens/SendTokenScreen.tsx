@@ -9,6 +9,7 @@ import { AddressBookContact } from "../../../shared/addressBook"
 import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
 import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { getFeeToken } from "../../../shared/token/utils"
+import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
@@ -198,6 +199,7 @@ export const SendTokenScreen: FC = () => {
   const [addressBookRecipient, setAddressBookRecipient] = useState<
     Account | AddressBookContact
   >()
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { accountNames } = useAccountMetadata()
 
   const accountName = useMemo(
@@ -326,6 +328,12 @@ export const SendTokenScreen: FC = () => {
 
   return (
     <div style={{ position: "relative" }}>
+      <AddContactBottomSheet
+        open={bottomSheetOpen}
+        onSave={() => setBottomSheetOpen(false)}
+        onCancel={() => setBottomSheetOpen(false)}
+        recipientAddress={inputRecipient}
+      />
       <StyledIconBar back childAfter={<TokenMenu tokenAddress={address} />}>
         <ColumnCenter>
           <H3>Send {symbol}</H3>
@@ -456,7 +464,10 @@ export const SendTokenScreen: FC = () => {
                     </>
                   </StyledControlledTextArea>
                   {showSaveAddressButton && (
-                    <SaveAddressButton type="button">
+                    <SaveAddressButton
+                      type="button"
+                      onClick={() => setBottomSheetOpen(true)}
+                    >
                       <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
                       Save address
                     </SaveAddressButton>

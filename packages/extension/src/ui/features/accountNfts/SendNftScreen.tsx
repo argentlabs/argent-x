@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { Schema, object } from "yup"
 
 import { AddressBookContact } from "../../../shared/addressBook"
+import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
@@ -95,6 +96,7 @@ export const SendNftScreen: FC = () => {
   >()
 
   const { accountNames } = useAccountMetadata()
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
 
   const accountName = useMemo(
     () =>
@@ -170,7 +172,13 @@ export const SendNftScreen: FC = () => {
   }
 
   return (
-    <>
+    <div style={{ position: "relative" }}>
+      <AddContactBottomSheet
+        open={bottomSheetOpen}
+        onSave={() => setBottomSheetOpen(false)}
+        onCancel={() => setBottomSheetOpen(false)}
+        recipientAddress={inputRecipient}
+      />
       <IconBar
         back
         childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
@@ -276,6 +284,6 @@ export const SendNftScreen: FC = () => {
           </Button>
         </StyledForm>
       </ColumnCenter>
-    </>
+    </div>
   )
 }
