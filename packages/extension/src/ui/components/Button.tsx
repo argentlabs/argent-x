@@ -51,7 +51,7 @@ const BaseButton = styled.button`
   width: 100%;
   outline: none;
   border: none;
-  transition: all 200ms ease-in-out;
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
   cursor: pointer;
 `
 

@@ -1,12 +1,15 @@
 import { FC, ReactNode } from "react"
 import styled from "styled-components"
 
-import { ArrowCircleDownIcon, LinkIcon } from "../../components/Icons/MuiIcons"
+import {
+  ArrowCircleDownIcon,
+  LinkIcon,
+  VisibilityIcon,
+} from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
-import { ProfilePicture } from "./ProfilePicture"
 
 export interface IAccountListItem {
   accountName: string
@@ -18,18 +21,21 @@ export interface IAccountListItem {
   upgrade?: boolean
   connected?: boolean
   transparent?: boolean
+  hidden?: boolean
   children?: ReactNode
 }
 
 type AccountListItemWrapperProps = Pick<
   IAccountListItem,
   "highlight" | "outline" | "transparent"
->
+> & {
+  dark?: boolean
+}
 
 export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
   cursor: pointer;
-  background-color: ${({ highlight, transparent }) =>
-    transparent
+  background-color: ${({ highlight, transparent, dark }) =>
+    transparent || dark
       ? "transparent"
       : highlight
       ? "rgba(255, 255, 255, 0.15)"
@@ -37,7 +43,8 @@ export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
   border-radius: 4px;
   padding: 20px 16px;
   border: 1px solid
-    ${({ outline }) => (outline ? "rgba(255, 255, 255, 0.3)" : "transparent")};
+    ${({ outline, dark }) =>
+      outline || dark ? "rgba(255, 255, 255, 0.3)" : "transparent"};
 
   display: flex;
   gap: 12px;
@@ -47,10 +54,20 @@ export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
 
   &:hover,
   &:focus {
-    background: ${({ transparent }) =>
-      transparent ? "transparent" : "rgba(255, 255, 255, 0.15)"};
+    background: ${({ transparent, dark }) =>
+      transparent
+        ? "transparent"
+        : dark
+        ? "rgba(255, 255, 255, 0.1)"
+        : "rgba(255, 255, 255, 0.15)"};
     outline: 0;
   }
+`
+
+const AccountAvatar = styled.img`
+  border-radius: 500px;
+  width: 40px;
+  height: 40px;
 `
 
 const AccountColumn = styled.div`
@@ -97,6 +114,16 @@ const ConnectedIcon = styled(LinkIcon)`
   font-size: 16px;
 `
 
+const HiddenStatusWrapper = styled.div`
+  background-color: ${({ theme }) => theme.bg2};
+  width: 40px;
+  height: 40px;
+  border-radius: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
 export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
   accountAddress,
@@ -104,16 +131,18 @@ export const AccountListItem: FC<IAccountListItem> = ({
   deploying,
   upgrade,
   connected,
+  hidden,
   children,
   ...rest
 }) => {
   return (
-    <AccountListItemWrapper {...rest}>
-      <ProfilePicture
+    <AccountListItemWrapper dark={hidden} {...rest}>
+      <AccountAvatar
         src={getNetworkAccountImageUrl({
           accountName,
           accountAddress,
           networkId,
+          backgroundColor: hidden ? "333332" : undefined,
         })}
       />
       <AccountRow>
@@ -134,12 +163,16 @@ export const AccountListItem: FC<IAccountListItem> = ({
               <UpgradeIcon />
               <AccountStatusText>Upgrade</AccountStatusText>
             </NetworkStatusWrapper>
+          ) : connected ? (
+            <ConnectedStatusWrapper>
+              <ConnectedIcon />
+              <AccountStatusText>Connected</AccountStatusText>
+            </ConnectedStatusWrapper>
           ) : (
-            connected && (
-              <ConnectedStatusWrapper>
-                <ConnectedIcon />
-                <AccountStatusText>Connected</AccountStatusText>
-              </ConnectedStatusWrapper>
+            hidden && (
+              <HiddenStatusWrapper>
+                <VisibilityIcon />
+              </HiddenStatusWrapper>
             )
           )}
           {children}

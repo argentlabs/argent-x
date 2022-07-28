@@ -3,6 +3,11 @@ on: pull_request
 jobs:
   worker:
     runs-on: ubuntu-latest
+    services:
+      devnet:
+        image: janek2601/starknet-devnet-patched
+        ports:
+          - 5050:5050
     if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v2

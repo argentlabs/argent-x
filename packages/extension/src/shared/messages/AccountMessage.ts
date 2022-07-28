@@ -25,12 +25,27 @@ export type AccountMessage =
   | { type: "HIDE_ACCOUNT"; data: BaseWalletAccount }
   | { type: "HIDE_ACCOUNT_RES" }
   | { type: "HIDE_ACCOUNT_REJ" }
+  | { type: "UNHIDE_ACCOUNT"; data: BaseWalletAccount }
+  | { type: "UNHIDE_ACCOUNT_RES" }
+  | { type: "UNHIDE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"
       data: BaseWalletAccount
     }
   | { type: "UPGRADE_ACCOUNT_RES" }
   | { type: "UPGRADE_ACCOUNT_REJ" }
+  | {
+      type: "REDEPLOY_ACCOUNT"
+      data: BaseWalletAccount
+    }
+  | {
+      type: "REDEPLOY_ACCOUNT_RES"
+      data: {
+        txHash: string
+        address: string
+      }
+    }
+  | { type: "REDEPLOY_ACCOUNT_REJ" }
   | {
       type: "GET_ENCRYPTED_PRIVATE_KEY"
       data: { encryptedSecret: string }

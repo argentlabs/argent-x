@@ -3,6 +3,7 @@ import {
   sendMessage,
   waitForMessage,
 } from "../../shared/messages"
+import { IS_DEV } from "../../shared/utils/dev"
 
 export const getMessagingPublicKey = async () => {
   sendMessage({ type: "GET_MESSAGING_PUBLIC_KEY" })
@@ -13,8 +14,9 @@ export const resetAll = () => {
   sendMessage({ type: "RESET_ALL" })
 }
 
-if (process.env.NODE_ENV === "development") {
+if (IS_DEV) {
   messageStream.subscribe(([message]) => {
     console.log("Received message", message)
   })
+  require("../features/dev/hotReload")
 }

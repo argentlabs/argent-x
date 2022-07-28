@@ -24,4 +24,5 @@ export { default as ReportGmailerrorredIcon } from "@mui/icons-material/ReportGm
 export { default as ReportGmailerrorredRoundedIcon } from "@mui/icons-material/ReportGmailerrorredRounded"
 export { default as SendIcon } from "@mui/icons-material/Send"
 export { default as SettingsIcon } from "@mui/icons-material/Settings"
+export { default as VisibilityIcon } from "@mui/icons-material/Visibility"
 export { default as VisibilityOff } from "@mui/icons-material/VisibilityOff"

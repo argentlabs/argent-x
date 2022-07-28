@@ -70,7 +70,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
-      if (type === "change" && name === "name") {
+      if (props.mode === "add" && type === "change" && name === "name") {
         setValue("id", slugify(value.name || ""))
       }
     })

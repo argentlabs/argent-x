@@ -3,7 +3,11 @@ import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { Network, getNetwork, getProvider } from "../../../shared/network"
-import { WalletAccountSigner } from "../../../shared/wallet.model"
+import {
+  BaseWalletAccount,
+  WalletAccount,
+  WalletAccountSigner,
+} from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { createNewAccount } from "../../services/backgroundAccounts"
 
@@ -16,17 +20,26 @@ export class Account {
   contract: Contract
   proxyContract: Contract
   provider: ProviderInterface
+  hidden?: boolean
 
-  constructor(
-    address: string,
-    network: Network,
-    signer: WalletAccountSigner,
-    deployTransaction?: string,
-  ) {
+  constructor({
+    address,
+    network,
+    signer,
+    deployTransaction,
+    hidden,
+  }: {
+    address: string
+    network: Network
+    signer: WalletAccountSigner
+    deployTransaction?: string
+    hidden?: boolean
+  }) {
     this.address = address
     this.network = network
     this.networkId = network.id
     this.signer = signer
+    this.hidden = hidden
     this.deployTransaction = deployTransaction
     this.provider = getProvider(network)
     this.contract = new Contract(
@@ -51,6 +64,12 @@ export class Account {
   public getDeployTransactionStorageKey(): string {
     const key = `deployTransaction:${getAccountIdentifier(this)}`
     return key
+  }
+
+  public updateDeployTx(deployTransaction: string) {
+    const key = this.getDeployTransactionStorageKey()
+    this.deployTransaction = deployTransaction
+    localStorage.setItem(key, deployTransaction)
   }
 
   public completeDeployTx(): void {
@@ -83,11 +102,29 @@ export class Account {
       throw new Error(`Network ${networkId} not found`)
     }
 
-    return new Account(
-      result.address,
+    return new Account({
+      address: result.address,
       network,
-      result.account.signer,
-      result.txHash,
-    )
+      signer: result.account.signer,
+      deployTransaction: result.txHash,
+    })
+  }
+
+  public toWalletAccount(): WalletAccount {
+    const { networkId, address, network, signer } = this
+    return {
+      networkId,
+      address,
+      network,
+      signer,
+    }
+  }
+
+  public toBaseWalletAccount(): BaseWalletAccount {
+    const { networkId, address } = this
+    return {
+      networkId,
+      address,
+    }
   }
 }

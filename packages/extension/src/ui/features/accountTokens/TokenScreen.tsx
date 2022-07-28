@@ -2,6 +2,10 @@ import { FC, useMemo } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import {
+  prettifyCurrencyValue,
+  prettifyTokenBalance,
+} from "../../../shared/token/price"
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
@@ -79,7 +83,8 @@ export const TokenScreen: FC = () => {
     return <Navigate to={routes.accounts()} />
   }
 
-  const { address, name, symbol, balance, image } = toTokenView(token)
+  const { address, name, symbol, image } = toTokenView(token)
+  const displayBalance = prettifyTokenBalance(token, false)
 
   return (
     <>
@@ -96,12 +101,14 @@ export const TokenScreen: FC = () => {
               style={{ marginTop: "12px" }}
             >
               <H2 style={{ marginBottom: "0px" }} data-testid="tokenBalance">
-                {balance}
+                {displayBalance}
               </H2>
               <H3>{symbol}</H3>
             </RowCentered>
             {currencyValue && (
-              <CurrencyValueText>{currencyValue}</CurrencyValueText>
+              <CurrencyValueText>
+                {prettifyCurrencyValue(currencyValue)}
+              </CurrencyValueText>
             )}
           </ColumnCenter>
         </TokenHeader>
