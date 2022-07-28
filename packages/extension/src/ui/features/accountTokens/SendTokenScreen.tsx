@@ -264,6 +264,19 @@ export const SendTokenScreen: FC = () => {
 
   const addressBook = useAddressBook(account?.networkId || currentNetworkId)
 
+  const validStarknetAddress =
+    inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
+
+  const recipientInAddressBook = useMemo(
+    () =>
+      addressBook.contacts
+        .map((contact) => contact.address)
+        .includes(inputRecipient),
+    [addressBook.contacts, inputRecipient],
+  )
+
+  const showSaveAddressButton = validStarknetAddress && !recipientInAddressBook
+
   useEffect(() => {
     if (maxClicked && maxFee && token) {
       setMaxInputAmount(token, maxFee)
@@ -304,11 +317,6 @@ export const SendTokenScreen: FC = () => {
     setAddressBookRecipient(undefined)
     setValue("recipient", "")
   }
-
-  const validStarknetAddress =
-    inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
-
-  const showSaveAddressButton = validStarknetAddress
 
   const disableSubmit =
     !isDirty ||

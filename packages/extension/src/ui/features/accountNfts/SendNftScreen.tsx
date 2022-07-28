@@ -124,10 +124,19 @@ export const SendNftScreen: FC = () => {
   const validStarknetAddress =
     inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
 
-  const showSaveAddressButton = validStarknetAddress
   const [addressBookOpen, setAddressBookOpen] = useState(false)
 
   const addressBook = useAddressBook(account?.networkId || currentNetworkId)
+
+  const recipientInAddressBook = useMemo(
+    () =>
+      addressBook.contacts
+        .map((contact) => contact.address)
+        .includes(inputRecipient),
+    [addressBook.contacts, inputRecipient],
+  )
+
+  const showSaveAddressButton = validStarknetAddress && !recipientInAddressBook
 
   if (!account || !nft || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />
