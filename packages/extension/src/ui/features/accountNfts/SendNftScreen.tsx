@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { FC, lazy, useMemo, useState } from "react"
+import { FC, lazy, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
@@ -27,6 +27,7 @@ import {
   getUint256CalldataFromBN,
   sendTransaction,
 } from "../../services/transactions"
+import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { H3, H5 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
@@ -127,6 +128,9 @@ export const SendNftScreen: FC = () => {
     inputRecipient.length > 62 && inputRecipient.length <= 66 // including 0x
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
+
+  const ref = useRef<HTMLDivElement>(null)
+  useOnClickOutside(ref, () => setAddressBookOpen(false))
 
   const addressBook = useAddressBook(account?.networkId || currentNetworkId)
 
@@ -232,7 +236,7 @@ export const SendNftScreen: FC = () => {
                   </RowBetween>
                 </AddressBookRecipient>
               ) : (
-                <>
+                <div ref={ref}>
                   <StyledControlledTextArea
                     autoComplete="off"
                     control={control}
@@ -264,7 +268,7 @@ export const SendNftScreen: FC = () => {
                         )}
                       </InputGroupAfter>
 
-                      {addressBookOpen && (
+                      {addressBookOpen && !showSaveAddressButton && (
                         <AddressBookMenu
                           addressBook={addressBook}
                           onAddressSelect={handleAddressSelect}
@@ -281,7 +285,7 @@ export const SendNftScreen: FC = () => {
                   {errors.recipient && (
                     <FormError>{errors.recipient.message}</FormError>
                   )}
-                </>
+                </div>
               )}
             </div>
           </Column>
