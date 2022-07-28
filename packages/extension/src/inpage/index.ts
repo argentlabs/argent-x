@@ -23,6 +23,21 @@ function attach() {
   } catch {
     // ignore
   }
+  try {
+    delete (window as any)["starknet-argentX"]
+    // set read only property to window
+    Object.defineProperty(window, "starknet-argentX", {
+      value: starknetWindowObject,
+      writable: false,
+    })
+  } catch {
+    // ignore
+  }
+  try {
+    ;(window as any)["starknet-argentX"] = starknetWindowObject
+  } catch {
+    // ignore
+  }
 }
 
 function attachHandler() {

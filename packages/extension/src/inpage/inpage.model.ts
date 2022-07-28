@@ -1,7 +1,5 @@
 import type { AccountInterface, Provider } from "starknet"
 
-import type { Network } from "../shared/network"
-
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
 export type NetworkChangeEventHandler = (network?: string) => void
@@ -54,7 +52,7 @@ export interface AddStarknetChainParameters {
 }
 
 export interface SwitchStarknetChainParameter {
-  chainId: Network["chainId"] // A 0x-prefixed hexadecimal string
+  chainId: string // A 0x-prefixed hexadecimal string
 }
 
 export type RpcMessage =
@@ -80,11 +78,14 @@ export type RpcMessage =
     }
 
 interface IStarketWindowObject {
-  id: "argent-x"
+  id: string
+  name: string
+  version: string
+  icon: string
   request: <T extends RpcMessage>(
     call: Omit<T, "result">,
   ) => Promise<T["result"]>
-  enable: (options?: { showModal?: boolean }) => Promise<string[]>
+  enable: (options?: { starknetVersion?: "v3" | "v4" }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
   on: (
     event: WalletEvents["type"],
@@ -98,7 +99,6 @@ interface IStarketWindowObject {
   provider: Provider
   selectedAddress?: string
   chainId?: string
-  version: string
 }
 
 interface ConnectedStarketWindowObject extends IStarketWindowObject {
