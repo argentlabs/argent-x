@@ -1,12 +1,12 @@
 import * as Sentry from "@sentry/react"
 import { useEffect } from "react"
 
-import { useBackgroundSettingsValue } from "./useBackgroundSettingsValue"
+import { ISettingsStorage, settingsStorage } from "../../shared/settings"
+import { useObjectStorage } from "../../shared/storage/hooks"
 
 export const useSentryInit = () => {
-  const { value: automaticErrorReporting } = useBackgroundSettingsValue(
-    "privacyErrorReporting",
-  )
+  const { privacyErrorReporting: automaticErrorReporting } =
+    useObjectStorage<ISettingsStorage>(settingsStorage)
 
   useEffect(() => {
     Sentry.init({

@@ -3,12 +3,17 @@ import * as Sentry from "@sentry/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import styled from "styled-components"
 
+import {
+  ISettingsStorage,
+  setSetting,
+  settingsStorage,
+} from "../../shared/settings"
+import { useObjectStorage } from "../../shared/storage/hooks"
 import { coerceErrorToString } from "../../shared/utils/error"
 import { ResponsiveBehaviour, ScrollBehaviour } from "../AppRoutes"
 import { SettingsItem, Title } from "../features/settings/SettingsScreen"
 import { makeClickable } from "../services/a11y"
 import { useHardResetAndReload } from "../services/resetAndReload"
-import { useBackgroundSettingsValue } from "../services/useBackgroundSettingsValue"
 import { P } from "../theme/Typography"
 import { ColumnCenter } from "./Column"
 import { CopyTooltip } from "./CopyTooltip"
@@ -20,7 +25,7 @@ import {
   RefreshIcon,
 } from "./Icons/MuiIcons"
 import { WarningIcon } from "./Icons/WarningIcon"
-import { LazyInitialisedIOSSwitch } from "./IOSSwitch"
+import IOSSwitch from "./IOSSwitch"
 
 const MessageContainer = styled.div`
   display: flex;
@@ -141,11 +146,8 @@ ${displayStack}
     })
   }, [error, errorInfo])
 
-  const {
-    initialised: privacyErrorReportingInitialised,
-    value: privacyErrorReportingValue,
-    setValue: setPrivacyErrorReportingValue,
-  } = useBackgroundSettingsValue("privacyErrorReporting")
+  const { privacyErrorReporting } =
+    useObjectStorage<ISettingsStorage>(settingsStorage)
 
   return (
     <ScrollBehaviour>
@@ -202,29 +204,33 @@ ${displayStack}
             </ActionContainer>
           </ActionsWrapper>
 
-          <StyledSettingsItem>
-            <Title>
-              <span
-                style={{
-                  fontSize: "12px",
-                  lineHeight: "16px",
-                  fontWeight: 600,
-                }}
-              >
-                Automatic Error Reporting.{" "}
-                <span style={{ fontWeight: 400 }}>
-                  Be aware that shared logs might contain sensitive data
+          {!privacyErrorReporting && (
+            <StyledSettingsItem>
+              <Title>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    lineHeight: "16px",
+                    fontWeight: 600,
+                  }}
+                >
+                  Automatic Error Reporting.{" "}
+                  <span style={{ fontWeight: 400 }}>
+                    Be aware that shared logs might contain sensitive data
+                  </span>
                 </span>
-              </span>
-              <LazyInitialisedIOSSwitch
-                initialised={privacyErrorReportingInitialised}
-                checked={privacyErrorReportingValue}
-                onClick={() =>
-                  setPrivacyErrorReportingValue(!privacyErrorReportingValue)
-                }
-              />
-            </Title>
-          </StyledSettingsItem>
+                <IOSSwitch
+                  checked={privacyErrorReporting}
+                  onClick={async () =>
+                    await setSetting(
+                      "privacyErrorReporting",
+                      !privacyErrorReporting,
+                    )
+                  }
+                />
+              </Title>
+            </StyledSettingsItem>
+          )}
         </MessageContainer>
       </ResponsiveBehaviour>
     </ScrollBehaviour>

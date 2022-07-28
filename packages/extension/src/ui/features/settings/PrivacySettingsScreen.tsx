@@ -1,8 +1,13 @@
 import { FC } from "react"
 
+import {
+  ISettingsStorage,
+  setSetting,
+  settingsStorage,
+} from "../../../shared/settings"
+import { useObjectStorage } from "../../../shared/storage/hooks"
 import { IconBar } from "../../components/IconBar"
-import { LazyInitialisedIOSSwitch } from "../../components/IOSSwitch"
-import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
+import IOSSwitch from "../../components/IOSSwitch"
 import { H2 } from "../../theme/Typography"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
@@ -10,22 +15,10 @@ const ANALYTICS_UI_ENABLED = false
 
 export const PrivacySettingsScreen: FC = () => {
   const {
-    initialised: privacyUseArgentServicesInitialised,
-    value: privacyUseArgentServicesValue,
-    setValue: setPrivacyUseArgentServicesValue,
-  } = useBackgroundSettingsValue("privacyUseArgentServices")
-
-  const {
-    initialised: privacyShareAnalyticsDataInitialised,
-    value: privacyShareAnalyticsDataValue,
-    setValue: setPrivacyShareAnalyticsDataValue,
-  } = useBackgroundSettingsValue("privacyShareAnalyticsData")
-
-  const {
-    initialised: privacyErrorReportingInitialised,
-    value: privacyErrorReportingValue,
-    setValue: setPrivacyErrorReportingValue,
-  } = useBackgroundSettingsValue("privacyErrorReporting")
+    privacyUseArgentServices,
+    privacyErrorReporting,
+    privacyShareAnalyticsData,
+  } = useObjectStorage<ISettingsStorage>(settingsStorage)
 
   return (
     <>
@@ -35,11 +28,13 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Use Argent services</span>
-            <LazyInitialisedIOSSwitch
-              initialised={privacyUseArgentServicesInitialised}
-              checked={privacyUseArgentServicesValue}
-              onClick={() =>
-                setPrivacyUseArgentServicesValue(!privacyUseArgentServicesValue)
+            <IOSSwitch
+              checked={privacyUseArgentServices}
+              onClick={async () =>
+                await setSetting(
+                  "privacyUseArgentServices",
+                  !privacyUseArgentServices,
+                )
               }
             />
           </Title>
@@ -52,11 +47,13 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Automatic Error Reporting</span>
-            <LazyInitialisedIOSSwitch
-              initialised={privacyErrorReportingInitialised}
-              checked={privacyErrorReportingValue}
-              onClick={() =>
-                setPrivacyErrorReportingValue(!privacyErrorReportingValue)
+            <IOSSwitch
+              checked={privacyErrorReporting}
+              onClick={async () =>
+                await setSetting(
+                  "privacyErrorReporting",
+                  !privacyErrorReporting,
+                )
               }
             />
           </Title>
@@ -68,12 +65,12 @@ export const PrivacySettingsScreen: FC = () => {
             <SettingsItem>
               <Title>
                 <span>Share analytics data</span>
-                <LazyInitialisedIOSSwitch
-                  initialised={privacyShareAnalyticsDataInitialised}
-                  checked={privacyShareAnalyticsDataValue}
-                  onClick={() =>
-                    setPrivacyShareAnalyticsDataValue(
-                      !privacyShareAnalyticsDataValue,
+                <IOSSwitch
+                  checked={privacyShareAnalyticsData}
+                  onClick={async () =>
+                    await setSetting(
+                      "privacyShareAnalyticsData",
+                      !privacyShareAnalyticsData,
                     )
                   }
                 />

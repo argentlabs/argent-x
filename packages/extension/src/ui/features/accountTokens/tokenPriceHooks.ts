@@ -1,12 +1,17 @@
 import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 
+import { settingsStorage } from "./../../../shared/settings/storage"
 import {
   ARGENT_API_ENABLED,
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
 } from "../../../shared/api/constants"
-import { isPrivacySettingsEnabled } from "../../../shared/settings"
+import {
+  ISettingsStorage,
+  isPrivacySettingsEnabled,
+} from "../../../shared/settings"
+import { useObjectStorage } from "../../../shared/storage/hooks"
 import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
@@ -17,7 +22,6 @@ import {
 import { Token } from "../../../shared/token/type"
 import { useConditionallyEnabledSWR } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
-import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { useIsMainnet } from "../networks/useNetworks"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
@@ -25,14 +29,13 @@ import { TokenDetailsWithBalance } from "./tokens.state"
 
 export const useCurrencyDisplayEnabled = () => {
   const isMainnet = useIsMainnet()
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
-    "privacyUseArgentServices",
-  )
+  const { privacyUseArgentServices } =
+    useObjectStorage<ISettingsStorage>(settingsStorage)
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_API_ENABLED && isMainnet
   }
-  return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServicesEnabled
+  return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServices
 }
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
