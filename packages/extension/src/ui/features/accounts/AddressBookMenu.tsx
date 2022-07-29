@@ -21,6 +21,8 @@ const MenuContainer = styled.div`
   background: ${({ theme }) => theme.bg2};
   border: 1px solid ${({ theme }) => theme.bg2};
   border-radius: 0px 0px 8px 8px;
+  max-height: 45vh;
+  overflow-y: scroll;
 `
 
 const MenuItemWrapper = styled.div`
