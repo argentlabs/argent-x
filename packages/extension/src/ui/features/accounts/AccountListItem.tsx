@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react"
+import { FC, HTMLProps, ReactNode } from "react"
 import styled from "styled-components"
 
 import {
@@ -6,6 +6,7 @@ import {
   LinkIcon,
   VisibilityIcon,
 } from "../../components/Icons/MuiIcons"
+import Row from "../../components/Row"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
@@ -15,6 +16,7 @@ export interface IAccountListItem {
   accountName: string
   accountAddress: string
   networkId: string
+  networkName?: string
   outline?: boolean
   highlight?: boolean
   deploying?: boolean
@@ -23,6 +25,8 @@ export interface IAccountListItem {
   transparent?: boolean
   hidden?: boolean
   children?: ReactNode
+  onClick?: () => void
+  style?: HTMLProps<HTMLDivElement>["style"]
 }
 
 type AccountListItemWrapperProps = Pick<
@@ -124,19 +128,46 @@ const HiddenStatusWrapper = styled.div`
   justify-content: center;
 `
 
+const NetworkContainer = styled.div`
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  padding: 0px 3px 1px;
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.text2};
+`
+
+const StyledContactAddress = styled.p`
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  color: ${({ theme }) => theme.text1};
+`
+
 export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
   accountAddress,
   networkId,
+  networkName,
   deploying,
   upgrade,
   connected,
   hidden,
   children,
+  onClick,
+  style,
   ...rest
 }) => {
   return (
-    <AccountListItemWrapper dark={hidden} {...rest}>
+    <AccountListItemWrapper
+      dark={hidden}
+      style={style}
+      {...rest}
+      onClick={onClick}
+    >
       <AccountAvatar
         src={getNetworkAccountImageUrl({
           accountName,
@@ -148,9 +179,19 @@ export const AccountListItem: FC<IAccountListItem> = ({
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountName}</AccountName>
-          <AccountAddress>
-            {formatTruncatedAddress(accountAddress)}
-          </AccountAddress>
+
+          {networkName ? (
+            <Row gap="8px">
+              <StyledContactAddress>
+                {formatTruncatedAddress(accountAddress)}
+              </StyledContactAddress>
+              <NetworkContainer>{networkName}</NetworkContainer>
+            </Row>
+          ) : (
+            <AccountAddress>
+              {formatTruncatedAddress(accountAddress)}
+            </AccountAddress>
+          )}
         </AccountColumn>
         <AccountColumn>
           {deploying ? (
