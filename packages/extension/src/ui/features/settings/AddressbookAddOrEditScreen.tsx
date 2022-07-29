@@ -197,6 +197,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
               autoFocus
               control={control}
               type="text"
+              spellCheck={false}
             />
             {errors.name && <FormErrorAlt>{errors.name.message}</FormErrorAlt>}
           </div>
@@ -209,6 +210,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
               control={control}
               minRows={3}
               maxRows={3}
+              spellCheck={false}
             />
             {errors.address && (
               <FormErrorAlt>{errors.address.message}</FormErrorAlt>
