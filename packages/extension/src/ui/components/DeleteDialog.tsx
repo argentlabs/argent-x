@@ -1,11 +1,11 @@
 import { FC } from "react"
 import styled from "styled-components"
+
 import { DialogContentText, H3 } from "../theme/Typography"
 import { Button } from "./Button"
 import { ColumnCenter } from "./Column"
 import { CustomDialog } from "./CustomDialog"
 import Row from "./Row"
-import { darken } from "polished"
 
 export interface DeleteDialogProps {
   onDelete: () => void
@@ -22,13 +22,6 @@ const DeleteButtonGroup = styled(Row)`
 `
 const CancelButton = styled(Button)`
   background-color: ${({ theme }) => theme.text3};
-`
-const DeleteButton = styled(Button)`
-  background-color: ${({ theme }) => theme.red1};
-
-  &:hover {
-    background-color: ${({ theme }) => darken(0.1, theme.red1)};
-  }
 `
 
 export const DeleteDialog: FC<DeleteDialogProps> = ({
@@ -48,7 +41,9 @@ export const DeleteDialog: FC<DeleteDialogProps> = ({
         {children}
         <DeleteButtonGroup>
           <CancelButton onClick={onCancel}>Cancel</CancelButton>
-          <DeleteButton onClick={onDelete}>Delete</DeleteButton>
+          <Button variant="danger" onClick={onDelete}>
+            Delete
+          </Button>
         </DeleteButtonGroup>
       </ColumnCenter>
     </CustomDialog>
