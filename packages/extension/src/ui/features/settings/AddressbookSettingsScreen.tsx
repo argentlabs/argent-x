@@ -109,10 +109,12 @@ export const AddressbookSettingsScreen: FC = () => {
     return contacts.filter(({ name, address, networkId }) => {
       const networkName = networkNameFromNetworkId(networkId)
 
+      const query = currentQueryValue.toLowerCase()
+
       return (
-        name.includes(currentQueryValue) ||
-        address.includes(currentQueryValue) ||
-        networkName?.includes(currentQueryValue)
+        name.toLowerCase().includes(query) ||
+        address.toLowerCase().includes(query) ||
+        networkName?.toLowerCase().includes(query)
       )
     })
   }, [contacts, currentQueryValue, networkNameFromNetworkId])
