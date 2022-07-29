@@ -197,9 +197,8 @@ export const SendTokenScreen: FC = () => {
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = account && getFeeToken(account.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
-  const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
-  >()
+  const [addressBookRecipient, setAddressBookRecipient] =
+    useState<Account | AddressBookContact>()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { accountNames } = useAccountMetadata()
 
@@ -449,6 +448,7 @@ export const SendTokenScreen: FC = () => {
                   <StyledControlledTextArea
                     autoComplete="off"
                     control={control}
+                    spellCheck={false}
                     placeholder="Recipient's address"
                     name="recipient"
                     maxRows={3}
