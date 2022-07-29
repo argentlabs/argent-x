@@ -37,6 +37,14 @@ export const useCurrencyDisplayEnabled = () => {
   return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServicesEnabled
 }
 
+/** swr config - keep default revalidate behaviour but with refresh and dedepe for 'polling' behaviour */
+export const revalidateThenPoll = (interval: number) => {
+  return {
+    refreshInterval: interval,
+    dedupingInterval: interval /** dedupe multiple requests */,
+  }
+}
+
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
@@ -46,17 +54,13 @@ export const usePriceAndTokenDataFromApi = () => {
     currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     fetcher,
-    {
-      refreshInterval: 60 * 1000 /** 60 seconds */,
-    },
+    revalidateThenPoll(60 * 1000) /** 60 seconds */,
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
     currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
     fetcher,
-    {
-      refreshInterval: 5 * 60 * 1000 /** 5 minutes */,
-    },
+    revalidateThenPoll(5 * 60 * 1000) /** 5 minutes */,
   )
   return {
     pricesData,
