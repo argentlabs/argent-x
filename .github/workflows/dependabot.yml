@@ -19,7 +19,7 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test
-      - run: yarn test:e2e
+      - run: xvfb-run --auto-servernum yarn test:e2e
       - run: yarn --cwd packages/dapp export
       - uses: actions/github-script@v6
         with:
