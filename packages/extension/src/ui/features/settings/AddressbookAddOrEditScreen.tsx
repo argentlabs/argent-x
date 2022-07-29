@@ -1,4 +1,5 @@
-import { isFunction, uniqueId } from "lodash-es"
+import { isFunction } from "lodash-es"
+import { v4 as uuidv4 } from "uuid"
 import { FC, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate, useParams } from "react-router-dom"
@@ -142,7 +143,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
     if (currentMode === "add") {
       savedContact = await addAddressBookContact({
         ...addressBookContactNoId,
-        id: uniqueId("addressbook-contact"),
+        id: uuidv4(),
       })
     }
 
