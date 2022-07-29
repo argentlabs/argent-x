@@ -17,7 +17,7 @@ import {
 } from "../../../shared/token/price"
 import { Token } from "../../../shared/token/type"
 import { isNumeric } from "../../../shared/utils/number"
-import { useConditionallyEnabledSWR } from "../../services/swr"
+import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 import { useIsMainnet } from "../networks/useNetworks"
@@ -37,14 +37,6 @@ export const useCurrencyDisplayEnabled = () => {
   return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServicesEnabled
 }
 
-/** swr config - keep default revalidate behaviour but with refresh and dedepe for 'polling' behaviour */
-export const revalidateThenPoll = (interval: number) => {
-  return {
-    refreshInterval: interval,
-    dedupingInterval: interval /** dedupe multiple requests */,
-  }
-}
-
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
@@ -54,13 +46,13 @@ export const usePriceAndTokenDataFromApi = () => {
     currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     fetcher,
-    revalidateThenPoll(60 * 1000) /** 60 seconds */,
+    withPolling(60 * 1000) /** 60 seconds */,
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
     currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
     fetcher,
-    revalidateThenPoll(5 * 60 * 1000) /** 5 minutes */,
+    withPolling(5 * 60 * 1000) /** 5 minutes */,
   )
   return {
     pricesData,

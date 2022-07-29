@@ -38,6 +38,14 @@ const swrPersistedCache: Cache = {
   },
 }
 
+/** SWR config - keep default behaviour with refresh and dedepe for 'polling' behaviour */
+export const withPolling = (interval: number) => {
+  return {
+    refreshInterval: interval,
+    dedupingInterval: interval /** dedupe multiple requests */,
+  }
+}
+
 /** SWR fetcher used by useConditionallyEnabledSWR when disabled */
 
 const fetcherDisabled: BareFetcher<any> = () => undefined

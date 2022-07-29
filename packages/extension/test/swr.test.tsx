@@ -1,9 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { useCallback, useState } from "react"
-import { SWRConfig } from "swr"
+import useSWR, { SWRConfig } from "swr"
 import { describe, expect, test, vi } from "vitest"
 
-import { useConditionallyEnabledSWR } from "../src/ui/services/swr"
+import { delay } from "../src/shared/utils/delay"
+import { useConditionallyEnabledSWR, withPolling } from "../src/ui/services/swr"
 
 describe("swr", () => {
   describe("useConditionallyEnabledSWR()", () => {
@@ -94,6 +95,63 @@ describe("swr", () => {
 
       // Cache should be populated
       expect(cache.get("test-key")).toEqual("bar")
+    })
+  })
+
+  describe("withPolling()", () => {
+    test("should initially fetch, then only poll at specified interval", async () => {
+      const POLL_INTERVAL = 100
+      const fetcher = vi.fn(() => "foo")
+
+      function Component() {
+        const { data } = useSWR<string>(
+          "test-key",
+          fetcher,
+          withPolling(POLL_INTERVAL),
+        )
+        return (
+          <div>
+            <p>data:{data === undefined ? "undefined" : data}</p>
+          </div>
+        )
+      }
+
+      render(
+        <>
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+          <Component />
+        </>,
+      )
+      await screen.findAllByText("data:foo")
+
+      // initial fetch
+      expect(fetcher).toHaveBeenCalledTimes(1)
+
+      // offset before checking polling
+      await delay(0.5 * POLL_INTERVAL)
+
+      await delay(POLL_INTERVAL)
+      expect(fetcher).toHaveBeenCalledTimes(1)
+
+      await delay(POLL_INTERVAL)
+      expect(fetcher).toHaveBeenCalledTimes(2)
+
+      await delay(POLL_INTERVAL)
+      expect(fetcher).toHaveBeenCalledTimes(3)
+
+      await delay(POLL_INTERVAL)
+      expect(fetcher).toHaveBeenCalledTimes(4)
+
+      await delay(POLL_INTERVAL)
+      expect(fetcher).toHaveBeenCalledTimes(5)
     })
   })
 })
