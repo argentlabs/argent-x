@@ -414,8 +414,20 @@ export const SendTokenScreen: FC = () => {
               {inputAmount && isInputAmountGtBalance && (
                 <FormError>Insufficient balance</FormError>
               )}
-              {maxFeeError && <FormError>{maxFeeError.message}</FormError>}
-              {errors.amount && <FormError>{errors.amount.message}</FormError>}
+              {maxFeeError ? (
+                maxFeeError.message ? (
+                  <FormError>{maxFeeError.message}</FormError>
+                ) : (
+                  <FormError>Unable to estimate fee</FormError>
+                )
+              ) : undefined}
+              {errors.amount ? (
+                errors.amount.message ? (
+                  <FormError>{errors.amount.message}</FormError>
+                ) : (
+                  <FormError>Incorrect Amount</FormError>
+                )
+              ) : undefined}
             </div>
 
             <div>
