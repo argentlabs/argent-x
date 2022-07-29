@@ -343,22 +343,12 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
         inputRef={ref}
         maxRows={maxRows}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-          const numericalRegex = new RegExp(/^[0-9]*.?[0-9]*$/)
           if (onlyNumeric) {
-            if (e.target.value === "") {
-              onValueChange(e)
-              return isFunction(onChange) && onChange(e)
+            if (isAllowedNumericInputValue(e.target.value)) {
+              return onValueChange(e)
             }
-
-            numericalRegex.test(e.target.value) &&
-              // just being double sure
-              isNumeric(e.target.value) &&
-              onValueChange(e)
-
-            return isFunction(onChange) && onChange(e)
           } else {
-            onValueChange(e)
-            return isFunction(onChange) && onChange(e)
+            return onValueChange(e)
           }
         }}
         {...field}
