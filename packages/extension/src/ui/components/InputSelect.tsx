@@ -135,7 +135,10 @@ export const StyledControlledSelect: ControlledSelectType = styled(
       &--is-focused {
         box-shadow: none;
         border-radius: 8px 8px 0px 0px;
-        // border-bottom: none;
+      }
+
+      &--is-disabled {
+        opacity: 0.5;
       }
     }
 
