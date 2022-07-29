@@ -2,6 +2,7 @@ import { BigNumber, utils } from "ethers"
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { number } from "starknet"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
@@ -280,10 +281,13 @@ export const SendTokenScreen: FC = () => {
 
   const recipientInAddressBook = useMemo(
     () =>
-      addressBook.contacts
-        .map((contact) => contact.address)
-        .includes(inputRecipient),
-    [addressBook.contacts, inputRecipient],
+      // Check if inputRecipient is in Contacts or userAccounts
+      [...addressBook.contacts, ...addressBook.userAccounts].some(
+        (acc) =>
+          number.hexToDecimalString(acc.address) ===
+          number.hexToDecimalString(inputRecipient),
+      ),
+    [addressBook.contacts, addressBook.userAccounts, inputRecipient],
   )
 
   const showSaveAddressButton = validRecipientAddress && !recipientInAddressBook
