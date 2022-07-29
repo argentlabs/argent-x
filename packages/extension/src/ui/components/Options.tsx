@@ -1,15 +1,12 @@
 import { FC, ReactNode } from "react"
 import styled from "styled-components"
 
+import Row from "./Row"
+
 export const OptionsWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-`
-
-const Flex = styled.div`
-  display: flex;
-  align-items: center;
 `
 
 const OptionWrapper = styled.div<{
@@ -31,7 +28,6 @@ const OptionWrapper = styled.div<{
 const OptionTextWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 12px;
   justify-self: flex-start;
 `
 
@@ -92,13 +88,13 @@ export const Option: FC<OptionProps> = ({
     onClick={onClick}
     disabled={disabled}
   >
-    <Flex>
-      {icon}
+    <Row gap="12px">
+      <div>{icon}</div>
       <OptionTextWrapper>
         <OptionTitle>{title}</OptionTitle>
         {description && <OptionDescription>{description}</OptionDescription>}
       </OptionTextWrapper>
-    </Flex>
+    </Row>
     {!hideArrow && <OptionIcon />}
   </OptionWrapper>
 )

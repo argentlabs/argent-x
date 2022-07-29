@@ -79,6 +79,7 @@ export const routes = {
   accountsHidden: route("/accounts/hidden"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
+  fundingBridge: route("/funding/bridge"),
   exportPrivateKey: route("/export-private-key"),
   fundingQrCode: route("/funding/qr-code"),
   token: route(
