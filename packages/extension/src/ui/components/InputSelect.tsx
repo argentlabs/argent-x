@@ -4,10 +4,10 @@ import Select, {
   DropdownIndicatorProps,
   Props as ReactSelectProps,
 } from "react-select"
-import { HTMLProps, useRef } from "react"
+import { HTMLProps, useId } from "react"
 import { ChevronDown } from "./Icons/ChevronDown"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
-import { Container, randomString } from "./InputText"
+import { Container } from "./InputText"
 
 export type InputSelectProps = Omit<
   ReactSelectProps,
@@ -42,12 +42,12 @@ export const InputSelect = styled(
     inputRef: any
     style: HTMLProps<HTMLDivElement>["style"]
   } & InputSelectProps) => {
-    const idRef = useRef(randomString())
+    const id = useId()
     return (
       <Container className={className} style={style}>
         <Select
           placeholder={placeholder}
-          id={idRef.current}
+          id={id}
           onChange={onChange}
           blurInputOnSelect={true}
           value={value}

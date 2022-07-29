@@ -1,5 +1,5 @@
 import { isFunction } from "lodash-es"
-import { useRef } from "react"
+import { useId } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import TextareaAutosize, {
   TextareaAutosizeProps,
@@ -122,12 +122,12 @@ export const InputText = styled(
     inputRef,
     ...props
   }) => {
-    const idRef = useRef(randomString())
+    const id = useId()
     return (
       <Container className={className} style={style}>
         <Input
           placeholder={placeholder}
-          id={idRef.current}
+          id={id}
           type={type}
           onChange={onChange}
           value={value}
@@ -161,12 +161,12 @@ export const InputTextAlt = styled(
     children,
     ...props
   }: { inputRef: any } & InputFieldProps) => {
-    const idRef = useRef(randomString())
+    const id = useId()
     return (
       <Container className={className} style={style}>
         <InputAlt
           placeholder={placeholder}
-          id={idRef.current}
+          id={id}
           type={type}
           onChange={onChange}
           value={value}
@@ -296,12 +296,12 @@ export const InputTextArea = styled(
     children,
     ...props
   }: { inputRef: any } & InputTextAreaProps) => {
-    const idRef = useRef(randomString())
+    const id = useId()
     return (
       <Container className={className} style={style}>
         <TextAreaAlt
           placeholder={placeholder}
-          id={idRef.current}
+          id={id}
           onChange={onChange}
           value={value}
           autoFocus={autoFocus}
