@@ -25,6 +25,12 @@ FromAnExchange.args = {
   icon: <CardSvg />,
 }
 
+export const BridgeFromEthereum = Template.bind({})
+BridgeFromEthereum.args = {
+  title: "Bridge from Ethereum and other chains",
+  icon: <CardSvg />,
+}
+
 export const Disabled = Template.bind({})
 Disabled.args = {
   title: "High security",

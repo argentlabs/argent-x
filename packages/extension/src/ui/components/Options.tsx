@@ -9,18 +9,13 @@ export const OptionsWrapper = styled.div`
   gap: 16px;
 `
 
-const Flex = styled.div`
-  display: flex;
-  align-items: center;
-`
-
 const OptionWrapper = styled.div<{
   disabled?: boolean
   variant?: ButtonVariant
 }>`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  gap: 12px;
   align-items: center;
   padding: 16px;
   border-radius: 8px;
@@ -41,10 +36,14 @@ const OptionWrapper = styled.div<{
   }
 `
 
+const IconWapper = styled.div`
+  display: flex;
+`
+
 const OptionTextWrapper = styled.div`
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
-  margin-left: 12px;
   justify-self: flex-start;
 `
 
@@ -101,13 +100,11 @@ export const Option: FC<OptionProps> = ({
   variant,
 }) => (
   <OptionWrapper variant={variant} onClick={onClick} disabled={disabled}>
-    <Flex>
-      {icon}
-      <OptionTextWrapper>
-        <OptionTitle>{title}</OptionTitle>
-        {description && <OptionDescription>{description}</OptionDescription>}
-      </OptionTextWrapper>
-    </Flex>
+    {icon && <IconWapper>{icon}</IconWapper>}
+    <OptionTextWrapper>
+      <OptionTitle>{title}</OptionTitle>
+      {description && <OptionDescription>{description}</OptionDescription>}
+    </OptionTextWrapper>
     {!hideArrow && <OptionIcon />}
   </OptionWrapper>
 )

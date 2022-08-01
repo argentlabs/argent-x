@@ -3,18 +3,15 @@ import styled from "styled-components"
 
 import { ColumnCenter } from "../../../components/Column"
 import { LinkIcon } from "../../../components/Icons/MuiIcons"
-import { makeClickable } from "../../../services/a11y"
-import { P } from "../../../theme/Typography"
 import { Account } from "../../accounts/Account"
 import { IAccountListItem } from "../../accounts/AccountListItem"
 import {
   getAccountName,
   useAccountMetadata,
 } from "../../accounts/accountMetadata.state"
-import { useAccounts } from "../../accounts/accounts.state"
+import { useAccounts, useVisibleAccounts } from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import { ConfirmPageProps, ConfirmScreen } from "../ConfirmScreen"
-import { ConnectDappAccountListItem } from "./ConnectDappAccountListItem"
 import { DappIcon } from "./DappIcon"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 import { usePreAuthorizations } from "./usePreAuthorizations"
@@ -24,12 +21,6 @@ interface ConnectDappProps extends Omit<ConfirmPageProps, "onSubmit"> {
   onDisconnect: (selectedAccount: Account) => void
   host: string
 }
-
-const Code = styled.code`
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
-  padding: 0 0.5em;
-`
 
 export const useAccountAddressIsConnected = (host: string) => {
   const { preAuthorizations } = usePreAuthorizations()
@@ -168,7 +159,8 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
   host,
   ...rest
 }) => {
-  const { accounts, selectedAccount: initiallySelectedAccount } = useAccounts()
+  const { selectedAccount: initiallySelectedAccount } = useAccounts()
+  const visibleAccounts = useVisibleAccounts()
   const [connectAccountAddress, setConnectAccountAddress] = useState(
     initiallySelectedAccount?.address,
   )
@@ -180,19 +172,16 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
 
   const selectedAccount = useMemo(() => {
     if (connectAccountAddress) {
-      const account = accounts.find(
+      const account = visibleAccounts.find(
         ({ address }) => address === connectAccountAddress,
       )
       return account
     }
-  }, [accounts, connectAccountAddress])
+  }, [visibleAccounts, connectAccountAddress])
 
-  const onSelectedAccountChange = useCallback(
-    (accountAddress: string) => {
-      setConnectAccountAddress(accountAddress)
-    },
-    [selectedAccount],
-  )
+  const onSelectedAccountChange = useCallback((accountAddress: string) => {
+    setConnectAccountAddress(accountAddress)
+  }, [])
 
   const onConnect = useCallback(() => {
     selectedAccount && onConnectProp(selectedAccount)
@@ -227,7 +216,7 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
       <SmallText>Select the account to connect:</SmallText>
       <SelectContainer>
         <ConnectDappAccountSelect
-          accounts={accounts}
+          accounts={visibleAccounts}
           selectedAccountAddress={connectAccountAddress}
           onSelectedAccountAddressChange={onSelectedAccountChange}
           host={host}

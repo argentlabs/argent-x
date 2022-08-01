@@ -6,6 +6,7 @@ import { useAppState } from "./app.state"
 import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
+import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
@@ -22,6 +23,7 @@ import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
+import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
@@ -142,7 +144,12 @@ const walletRoutes = (
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
+    <Route
+      path={routes.accountsHidden.path}
+      element={<AccountListHiddenScreen />}
+    />
     <Route path={routes.funding.path} element={<FundingScreen />} />
+    <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
     <Route path={routes.fundingQrCode.path} element={<FundingQrCodeScreen />} />
     <Route
       path={routes.fundingProvider.path}
