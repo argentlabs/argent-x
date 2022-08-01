@@ -1,7 +1,6 @@
 [
   {
-    "name": "briq",
-    "icon": "briq.png",
+    "host": "briq.construction",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [
@@ -10,8 +9,7 @@
     }
   },
   {
-    "name": "Jediswap",
-    "icon": "jediswap.svg",
+    "host": "app.testnet.jediswap.xyz",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [
@@ -23,8 +21,7 @@
     }
   },
   {
-    "name": "mySwap",
-    "icon": "myswap.png",
+    "host": "www.myswap.xyz",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [
@@ -34,8 +31,7 @@
     }
   },
   {
-    "name": "Alpha Road",
-    "icon": "alpharoad.svg",
+    "host": "testnet.app.alpharoad.fi",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [

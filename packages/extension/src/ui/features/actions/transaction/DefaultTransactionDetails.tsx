@@ -2,7 +2,10 @@ import { FC, useCallback, useState } from "react"
 import { Call } from "starknet"
 import styled from "styled-components"
 
-import { getKnownContractForAddress } from "../../../../shared/contracts"
+import {
+  KnownDappContract,
+  getKnownContractForAddress,
+} from "../../../../shared/contracts"
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
 import { CopyTooltip } from "../../../components/CopyTooltip"
 import { ExpandableHeightBox } from "../../../components/ExpandableHeightBox"
@@ -17,6 +20,8 @@ import {
   ContentCopyIcon,
 } from "../../../components/Icons/MuiIcons"
 import { formatTruncatedAddress } from "../../../services/addresses"
+import { DappIcon } from "../connectDapp/DappIcon"
+import { useDappDisplayAttributes } from "../connectDapp/useDappDisplayAttributes"
 import { TransactionItemProps } from "./TransactionItem"
 
 const DisclosureIconContainer = styled.div<{ expanded: boolean }>`
@@ -56,6 +61,11 @@ export const ContractIconContainer = styled.div<IContractIconContainer>`
   border-radius: 12px;
 `
 
+const DappIconContainer = styled.div`
+  width: 24px;
+  height: 24px;
+`
+
 const LeftPaddedField = styled.div`
   margin-left: 8px;
   text-align: right;
@@ -68,14 +78,23 @@ export const ContractField: FC<Pick<Call, "contractAddress">> = ({
   if (!knownContract) {
     return null
   }
+  return <DappContractField knownContract={knownContract} />
+}
+
+export const DappContractField: FC<{ knownContract: KnownDappContract }> = ({
+  knownContract,
+}) => {
+  const dappDisplayAttributes = useDappDisplayAttributes(knownContract.host)
   return (
     <Field>
       <FieldKey>Dapp</FieldKey>
       <FieldValue>
-        <ContractIconContainer
-          fileName={knownContract.icon}
-        ></ContractIconContainer>
-        <LeftPaddedField>{knownContract.name}</LeftPaddedField>
+        <DappIconContainer>
+          <DappIcon host={knownContract.host} />
+        </DappIconContainer>
+        <LeftPaddedField>
+          {dappDisplayAttributes?.title || knownContract.host}
+        </LeftPaddedField>
       </FieldValue>
     </Field>
   )

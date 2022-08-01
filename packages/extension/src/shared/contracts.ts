@@ -1,24 +1,23 @@
-import untypedKnownContracts from "../assets/contracts/known-contracts.json"
+import untypedKnownDappContracts from "../assets/contracts/known-dapp-contracts.json"
 import { PublicNetworkIds } from "./network/public"
 
-export interface KnownContract {
-  name: string
-  icon: string
+export interface KnownDappContract {
+  host: string
   contracts: {
     [network in PublicNetworkIds]: string[]
   }
 }
 
-const knownContracts: KnownContract[] = untypedKnownContracts
+const knownDappContracts: KnownDappContract[] = untypedKnownDappContracts
 
-export { knownContracts }
+export { knownDappContracts }
 
 export const getKnownContractForAddress = (
   address: string,
   network?: PublicNetworkIds,
 ) => {
   try {
-    const knownContract = knownContracts.find(({ contracts }) => {
+    const knownContract = knownDappContracts.find(({ contracts }) => {
       if (network) {
         return Object.values(contracts[network]).includes(address)
       }
