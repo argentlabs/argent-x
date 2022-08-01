@@ -24,6 +24,7 @@ import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
+import { FundingProviderRampScreen } from "./features/funding/FundingProviderRampScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
@@ -154,6 +155,10 @@ const walletRoutes = (
     <Route
       path={routes.fundingProvider.path}
       element={<FundingProviderScreen />}
+    />
+    <Route
+      path={routes.fundingProviderRamp.path}
+      element={<FundingProviderRampScreen />}
     />
     <Route
       path={routes.confirmSeedRecovery.path}

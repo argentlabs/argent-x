@@ -105,6 +105,10 @@ export const Option: FC<OptionProps> = ({
       <OptionTitle>{title}</OptionTitle>
       {description && <OptionDescription>{description}</OptionDescription>}
     </OptionTextWrapper>
-    {!hideArrow && <OptionIcon />}
+    {!hideArrow && (
+      <IconWapper>
+        <OptionIcon />
+      </IconWapper>
+    )}
   </OptionWrapper>
 )

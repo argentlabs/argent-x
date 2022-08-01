@@ -1,5 +1,5 @@
-import { FC } from "react"
-import { Navigate } from "react-router-dom"
+import { FC, useCallback } from "react"
+import { Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import A from "tracking-link"
 
@@ -22,25 +22,27 @@ const Title = styled.h1`
   text-align: center;
   margin: 0 0 36px 0;
 `
+
 export const FundingProviderScreen: FC = () => {
   const account = useSelectedAccount()
   const isMainnet = useIsMainnet()
+  const navigate = useNavigate()
 
   const isBanxaEnabled = (process.env.FEATURE_BANXA || "false") === "true"
   const allowFiatPurchase = account && isMainnet
+  const normalizedAddress = account && normalizeAddress(account.address)
+
+  const openRamp = useCallback(() => {
+    account && trackAddFundsService("ramp", account.networkId)
+    navigate(routes.fundingProviderRamp())
+  }, [account, navigate])
 
   if (!allowFiatPurchase) {
     /** not possible via UI */
     return <Navigate to={routes.funding()} />
   }
 
-  const normalizedAddress = normalizeAddress(account.address)
-  const logoUrl = encodeURIComponent(
-    `https://www.argent.xyz/icons/icon-512x512.png`,
-  )
-
   const banxaUrl = `https://argentx.banxa.com/?walletAddress=${normalizedAddress}`
-  const rampUrl = `https://buy.ramp.network/?swapAsset=STARKNET_*&userAddress=${normalizedAddress}&hostLogoUrl=${logoUrl}`
 
   return (
     <>
@@ -61,17 +63,12 @@ export const FundingProviderScreen: FC = () => {
               />
             </A>
           )}
-          <A
-            href={rampUrl}
-            targetBlank
-            onClick={trackAddFundsService("ramp", account.networkId)}
-          >
-            <Option
-              title="Ramp"
-              description="Card or bank transfer"
-              icon={<RampSvg />}
-            />
-          </A>
+          <Option
+            title="Ramp"
+            description="Card or bank transfer"
+            icon={<RampSvg />}
+            onClick={openRamp}
+          />
         </OptionsWrapper>
       </PageWrapper>
     </>
