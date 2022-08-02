@@ -2,19 +2,20 @@ import styled, { css } from "styled-components"
 
 export interface ProfilePictureProps {
   disabled?: boolean
-  small?: boolean
-  size?: number
+  size?: "lg" | "md" | "sm"
 }
 
-const sizeAttribute = ({ small, size }: ProfilePictureProps) =>
-  size ? `${size}px` : small ? "24px" : "36px"
+const sizeAttribute = ({ size = "md" }: ProfilePictureProps) =>
+  (size === "sm" && "24px") ||
+  (size === "md" && "36px") ||
+  (size === "lg" && "40px")
 
 export const ProfilePicture = styled.img<ProfilePictureProps>`
   width: ${sizeAttribute};
   height: ${sizeAttribute};
   flex: 0 0 ${sizeAttribute};
   border-radius: 50%;
-  border: ${({ small }) => (small ? "none" : "2px solid transparent")};
+  border: ${({ size }) => (size === "sm" ? "none" : "2px solid transparent")};
 
   ${({ disabled }) =>
     !disabled &&

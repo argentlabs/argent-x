@@ -120,7 +120,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           <FieldValue>
             <ProfilePicture
               src={getAccountImageUrl(accountName, selectedAccount)}
-              small
+              size="sm"
               disabled
             />
             <LeftPaddedField>{accountName}</LeftPaddedField>

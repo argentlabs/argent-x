@@ -98,8 +98,7 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
             <Row gap="16px">
               <ProfilePicture
                 src={getAccountImageUrl(accountName, account)}
-                width="40px"
-                height="40px"
+                size="lg"
               ></ProfilePicture>
 
               <Column>

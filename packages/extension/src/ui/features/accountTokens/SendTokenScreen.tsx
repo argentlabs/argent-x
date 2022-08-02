@@ -443,8 +443,7 @@ export const SendTokenScreen: FC = () => {
                           accountName,
                           addressBookRecipient,
                         )}
-                        width="40px"
-                        height="40px"
+                        size="lg"
                       />
 
                       <Column>
