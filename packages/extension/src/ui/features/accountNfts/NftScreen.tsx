@@ -126,7 +126,11 @@ export const NftScreen: FC = () => {
 
             <ViewOnButton
               onClick={() =>
-                openMintSquareNft(nft.contract_address, nft.token_id)
+                openMintSquareNft(
+                  nft.contract_address,
+                  nft.token_id,
+                  account.networkId,
+                )
               }
             >
               <RowCentered gap="5px">
