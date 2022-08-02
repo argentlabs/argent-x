@@ -1,4 +1,3 @@
-import { isFunction } from "lodash-es"
 import { useId } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import TextareaAutosize, {
@@ -104,10 +103,6 @@ const InputAlt = styled.input`
     color: ${({ theme }) => theme.text2};
   }
 `
-
-export function randomString() {
-  return Math.floor(Math.random() * 1000).toString()
-}
 
 export const InputText = styled(
   ({
