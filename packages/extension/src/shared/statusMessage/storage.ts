@@ -4,6 +4,6 @@ import { IStatusMessageStorage } from "./types"
 export const statusMessageStore = new KeyValueStorage<IStatusMessageStorage>(
   {},
   {
-    namespace: "status:statusMessage",
+    namespace: "service:statusMessage",
   },
 )

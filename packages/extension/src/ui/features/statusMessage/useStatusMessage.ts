@@ -1,11 +1,20 @@
-import { ARGENT_X_STATUS_URL } from "../../../shared/api/constants"
-import { isPrivacySettingsEnabled } from "../../../shared/settings"
+import {
+  ARGENT_X_STATUS_ENABLED,
+  ARGENT_X_STATUS_URL,
+} from "../../../shared/api/constants"
+import {
+  ISettingsStorage,
+  isPrivacySettingsEnabled,
+  settingsStorage,
+} from "../../../shared/settings"
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import { IStatusMessage } from "../../../shared/statusMessage/types"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import {
+  useKeyValueStorage,
+  useObjectStorage,
+} from "../../../shared/storage/hooks"
 import { useConditionallyEnabledSWR } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
-import { useBackgroundSettingsValue } from "../../services/useBackgroundSettingsValue"
 
 export const useLastDismissedMessageId = () =>
   useKeyValueStorage(statusMessageStore, "lastDismissedMessageId")
@@ -14,13 +23,13 @@ export const useLastFullScreenMessageClosedId = () =>
   useKeyValueStorage(statusMessageStore, "lastFullScreenMessageClosedId")
 
 export const useStatusMessageEnabled = () => {
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
-    "privacyUseArgentServices",
-  )
+  const { privacyUseArgentServices } =
+    useObjectStorage<ISettingsStorage>(settingsStorage)
+  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
-    return false
+    return ARGENT_X_STATUS_ENABLED
   }
-  return privacyUseArgentServicesEnabled
+  return ARGENT_X_STATUS_ENABLED && privacyUseArgentServices
 }
 
 export const useStatusMessage = () => {

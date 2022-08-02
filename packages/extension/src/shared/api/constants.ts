@@ -30,3 +30,6 @@ export const ARGENT_TRANSACTION_REVIEW_STARKNET_URL =
     : undefined
 
 export const ARGENT_X_STATUS_URL = process.env.ARGENT_X_STATUS_URL as string
+
+export const ARGENT_X_STATUS_ENABLED =
+  isString(ARGENT_X_STATUS_URL) && ARGENT_X_STATUS_URL.length > 0

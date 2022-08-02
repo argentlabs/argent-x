@@ -142,6 +142,7 @@ export const ButtonGroupVertical = styled.div<{
   width: 100%;
 `
 
+/** TODO: change to variant=transparent */
 export const ButtonTransparent = styled(BaseButton)`
   background-color: transparent;
   color: ${({ theme }) => theme.text1};
