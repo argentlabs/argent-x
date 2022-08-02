@@ -13,7 +13,7 @@ import {
   useKeyValueStorage,
   useObjectStorage,
 } from "../../../shared/storage/hooks"
-import { useConditionallyEnabledSWR } from "../../services/swr"
+import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 
 export const useLastDismissedMessageId = () =>
@@ -39,9 +39,7 @@ export const useStatusMessage = () => {
     statusMessageEnabled,
     ARGENT_X_STATUS_URL,
     fetcher,
-    {
-      refreshInterval: 5 * 60 * 60 * 1000 /** 5 minutes */,
-    },
+    withPolling(5 * 60 * 60 * 1000) /** 5 minutes */,
   )
   return statusMessage
 }
