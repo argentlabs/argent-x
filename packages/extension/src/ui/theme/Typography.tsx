@@ -44,11 +44,29 @@ export const P = styled.p`
   color: ${({ theme }) => theme.text1};
 `
 
+export const DialogContentText = styled.p`
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.text1};
+  text-align: center;
+`
+
 export const FormError = styled.p`
   margin-top: 2px;
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.red2};
+  text-align: left;
+`
+
+export const FormErrorAlt = styled.p`
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.red1};
+  margin-top: 8px;
+  margin-left: 8px;
   text-align: left;
 `
 

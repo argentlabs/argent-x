@@ -29,7 +29,7 @@ test("send max eth flow", async ({ page, context }) => {
 
   await page.click("button:has-text('Send')")
   await page.click("button:has-text('MAX')")
-  await page.fill(`input[placeholder="Recipient's address"]`, a2)
+  await page.fill(`textarea[placeholder="Recipient's address"]`, a2)
   await page.click("button:has-text('Next'):not([disabled])")
 
   await approveTransaction(page)

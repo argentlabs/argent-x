@@ -43,6 +43,8 @@ import { SeedRecoveryPasswordScreen } from "./features/recovery/SeedRecoveryPass
 import { SeedRecoveryScreen } from "./features/recovery/SeedRecoveryScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
 import { SendScreen } from "./features/send/SendScreen"
+import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
+import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
@@ -179,6 +181,18 @@ const walletRoutes = (
     <Route
       path={routes.settingsDappConnections.path}
       element={<DappConnectionsSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbook.path}
+      element={<AddressbookSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbookAdd.path}
+      element={<AddressbookAddOrEditScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbookEdit.path}
+      element={<AddressbookAddOrEditScreen />}
     />
     <Route
       path={routes.backupDownload.path}

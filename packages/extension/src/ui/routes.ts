@@ -102,6 +102,12 @@ export const routes = {
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
+  settingsAddressbook: route("/settings/addressbook"),
+  settingsAddressbookEdit: route(
+    (contactId) => `/settings/addressbook/add-or-edit/${contactId}`,
+    "/settings/addressbook/add-or-edit/:contactId",
+  ),
+  settingsAddressbookAdd: route("/settings/addressbook/add-or-edit"),
   networkWarning: route("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>
