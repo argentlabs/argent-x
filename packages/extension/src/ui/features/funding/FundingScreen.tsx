@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { Link, Navigate } from "react-router-dom"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import A from "tracking-link"
 
@@ -15,7 +15,7 @@ import CoinbaseSvg from "./coinbase.svg"
 import EthereumSvg from "./ethereum.svg"
 import StarkNetSvg from "./starknet.svg"
 
-const Title = styled.h1`
+export const Title = styled.h1`
   font-style: normal;
   font-weight: 500;
   font-size: 20px;
@@ -26,6 +26,7 @@ const Title = styled.h1`
 
 export const FundingScreen: FC = () => {
   const account = useSelectedAccount()
+  const navigate = useNavigate()
   usePageTracking("addFunds", {
     networkId: account?.networkId || "unknown",
   })
@@ -35,11 +36,6 @@ export const FundingScreen: FC = () => {
   }
 
   const isMainnet = account.networkId === "mainnet-alpha"
-  const bridgeUrl = isMainnet
-    ? "https://starkgate.starknet.io"
-    : account.networkId === "goerli-alpha" &&
-      "https://goerli.starkgate.starknet.io"
-
   const isBanxaEnabled = (process.env.FEATURE_BANXA || "false") === "true"
   const isLayerswapEnabled =
     (process.env.FEATURE_LAYERSWAP || "false") === "true"
@@ -106,27 +102,11 @@ export const FundingScreen: FC = () => {
               />
             </A>
           )}
-          {bridgeUrl ? (
-            <A
-              href={bridgeUrl}
-              targetBlank
-              onClick={trackAddFundsService("starkgate", account.networkId)}
-            >
-              <Option
-                title="Bridge from Ethereum"
-                icon={<EthereumSvg />}
-                hideArrow
-              />
-            </A>
-          ) : (
-            <Option
-              title="Bridge from Ethereum"
-              description="Not available for this network"
-              icon={<EthereumSvg />}
-              disabled
-              hideArrow
-            />
-          )}
+          <Option
+            title="Bridge from Ethereum and other chains"
+            icon={<EthereumSvg />}
+            onClick={() => navigate(routes.fundingBridge())}
+          />
         </OptionsWrapper>
       </PageWrapper>
     </>
