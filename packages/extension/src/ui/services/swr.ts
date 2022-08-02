@@ -5,6 +5,7 @@ import useSWR, {
   Key,
   SWRConfiguration,
   unstable_serialize,
+  useSWRConfig,
 } from "swr"
 
 import { reviveJsonBigNumber } from "../../shared/json"
@@ -37,6 +38,14 @@ const swrPersistedCache: Cache = {
   },
 }
 
+/** SWR config - keep default behaviour with refresh and dedepe for 'polling' behaviour */
+export const withPolling = (interval: number) => {
+  return {
+    refreshInterval: interval,
+    dedupingInterval: interval /** dedupe multiple requests */,
+  }
+}
+
 /** SWR fetcher used by useConditionallyEnabledSWR when disabled */
 
 const fetcherDisabled: BareFetcher<any> = () => undefined
@@ -54,14 +63,18 @@ export function useConditionallyEnabledSWR<Data = any, Error = any>(
   config?: SWRConfiguration<Data, Error, BareFetcher<Data>>,
 ) {
   /** fetcher conditional on enabled */
+  const { cache } = useSWRConfig()
   const result = useSWR<Data, Error>(
-    key,
+    enabled && key,
     enabled ? fetcher : fetcherDisabled,
     config,
   )
-  /** revalidate when enabled changes */
+  /** reset the cache when disabled */
   useEffect(() => {
-    result.mutate()
+    if (!enabled) {
+      result.mutate()
+      cache.delete(key)
+    }
     // dont add result to dependencies to avoid revalidating on every render
   }, [enabled]) // eslint-disable-line react-hooks/exhaustive-deps
   return result
