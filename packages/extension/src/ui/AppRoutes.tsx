@@ -23,6 +23,7 @@ import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
+import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
@@ -149,6 +150,7 @@ const walletRoutes = (
       element={<AccountListHiddenScreen />}
     />
     <Route path={routes.funding.path} element={<FundingScreen />} />
+    <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
     <Route path={routes.fundingQrCode.path} element={<FundingQrCodeScreen />} />
     <Route
       path={routes.confirmSeedRecovery.path}
