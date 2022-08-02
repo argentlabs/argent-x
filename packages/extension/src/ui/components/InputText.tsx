@@ -1,3 +1,4 @@
+import { isFunction } from "lodash-es"
 import { useId } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import TextareaAutosize, {
@@ -340,10 +341,12 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
           if (onlyNumeric) {
             if (isAllowedNumericInputValue(e.target.value)) {
-              return onValueChange(e)
+              onValueChange(e)
+              return isFunction(onChange) && onChange(e)
             }
           } else {
-            return onValueChange(e)
+            onValueChange(e)
+            return isFunction(onChange) && onChange(e)
           }
         }}
         {...field}

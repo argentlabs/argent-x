@@ -2,7 +2,6 @@ import { BigNumber, utils } from "ethers"
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
-import { number } from "starknet"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
@@ -29,6 +28,7 @@ import { useAddressBook } from "../../services/addressBook"
 import {
   addressSchema,
   formatTruncatedAddress,
+  isEqualAddress,
   isValidAddress,
   normalizeAddress,
 } from "../../services/addresses"
@@ -283,10 +283,8 @@ export const SendTokenScreen: FC = () => {
   const recipientInAddressBook = useMemo(
     () =>
       // Check if inputRecipient is in Contacts or userAccounts
-      [...addressBook.contacts, ...addressBook.userAccounts].some(
-        (acc) =>
-          number.hexToDecimalString(acc.address) ===
-          number.hexToDecimalString(inputRecipient),
+      [...addressBook.contacts, ...addressBook.userAccounts].some((acc) =>
+        isEqualAddress(acc.address, inputRecipient),
       ),
     [addressBook.contacts, addressBook.userAccounts, inputRecipient],
   )
@@ -474,12 +472,9 @@ export const SendTokenScreen: FC = () => {
                     }}
                     onChange={(e) => {
                       if (validateStarknetAddress(e.target.value)) {
-                        const account = addressBook.contacts.find((c) => {
-                          return (
-                            normalizeAddress(c.address) ===
-                            normalizeAddress(e.target.value)
-                          )
-                        })
+                        const account = addressBook.contacts.find((c) =>
+                          isEqualAddress(c.address, e.target.value),
+                        )
                         handleAddressSelect(account)
                       }
                     }}
