@@ -22,6 +22,7 @@ import { useAddressBook } from "../../services/addressBook"
 import {
   addressSchema,
   formatTruncatedAddress,
+  isValidAddress,
   normalizeAddress,
 } from "../../services/addresses"
 import {
@@ -93,8 +94,9 @@ export const SendNftScreen: FC = () => {
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] =
-    useState<Account | AddressBookContact>()
+  const [addressBookRecipient, setAddressBookRecipient] = useState<
+    Account | AddressBookContact
+  >()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
@@ -112,6 +114,7 @@ export const SendNftScreen: FC = () => {
   const {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
+    getFieldState,
     control,
     setValue,
     watch,
@@ -126,14 +129,12 @@ export const SendNftScreen: FC = () => {
   const inputRecipient = formValues.recipient
 
   const validateStarknetAddress = useCallback(
-    (addr: string) => addr.length > 62 && addr.length <= 66, // including 0x
+    (addr: string) => isValidAddress(addr),
     [],
   )
 
-  const validRecipientAddress = useMemo(
-    () => validateStarknetAddress(inputRecipient),
-    [inputRecipient, validateStarknetAddress],
-  )
+  const validRecipientAddress =
+    inputRecipient && !getFieldState("recipient").error
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
 

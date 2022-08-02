@@ -29,6 +29,7 @@ import { useAddressBook } from "../../services/addressBook"
 import {
   addressSchema,
   formatTruncatedAddress,
+  isValidAddress,
   normalizeAddress,
 } from "../../services/addresses"
 import {
@@ -198,8 +199,9 @@ export const SendTokenScreen: FC = () => {
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = account && getFeeToken(account.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
-  const [addressBookRecipient, setAddressBookRecipient] =
-    useState<Account | AddressBookContact>()
+  const [addressBookRecipient, setAddressBookRecipient] = useState<
+    Account | AddressBookContact
+  >()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { accountNames } = useAccountMetadata()
 
@@ -218,6 +220,7 @@ export const SendTokenScreen: FC = () => {
   const {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, submitCount },
+    getFieldState,
     control,
     setValue,
     watch,
@@ -270,14 +273,12 @@ export const SendTokenScreen: FC = () => {
   const addressBook = useAddressBook(account?.networkId || currentNetworkId)
 
   const validateStarknetAddress = useCallback(
-    (addr: string) => addr.length > 62 && addr.length <= 66, // including 0x
+    (addr: string) => isValidAddress(addr),
     [],
   )
 
-  const validRecipientAddress = useMemo(
-    () => validateStarknetAddress(inputRecipient),
-    [inputRecipient, validateStarknetAddress],
-  )
+  const validRecipientAddress =
+    inputRecipient && !getFieldState("recipient").error
 
   const recipientInAddressBook = useMemo(
     () =>
