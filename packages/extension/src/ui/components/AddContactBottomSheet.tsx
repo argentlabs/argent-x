@@ -5,7 +5,7 @@ import {
   AddressbookAddOrEditProps,
   AddressbookAddOrEditScreen,
 } from "../features/settings/AddressbookAddOrEditScreen"
-import { CustomBottomSheet, CustomBottomSheetProps } from "./CustomBottomSheet"
+import { CustomBottomSheet, CustomBottomSheetProps } from "./BottomSheet"
 
 const StyledAddressBookAdd = styled(AddressbookAddOrEditScreen)`
   padding-top: 40px;
