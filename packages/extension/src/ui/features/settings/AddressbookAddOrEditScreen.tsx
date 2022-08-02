@@ -27,7 +27,9 @@ import {
 } from "../../components/InputText"
 import Row, { RowCentered } from "../../components/Row"
 import { useAddressBook } from "../../services/addressBook"
+import useDebounce from "../../services/useDebounce"
 import { FormErrorAlt, H3 } from "../../theme/Typography"
+import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useCurrentNetwork, useNetworks } from "../networks/useNetworks"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 
@@ -44,6 +46,12 @@ const IconWrapper = styled(RowCentered)`
 
   background-color: ${({ theme }) => theme.bg2};
   border-radius: 100px;
+`
+
+const ContactAvatar = styled.img`
+  border-radius: 100px;
+  height: 64px;
+  width: 64px;
 `
 
 const StyledAddIcon = styled(AddRoundedIcon)`
@@ -126,6 +134,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<AddressBookContactNoId>({
     defaultValues: {
       address: selectedContact?.address || recipientAddress || "",
@@ -134,6 +143,16 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
     },
     resolver,
   })
+
+  const {
+    name: contactName,
+    address: contactAddress,
+    networkId: contactNetwork,
+  } = watch()
+
+  const debouncedCName = useDebounce(contactName, 250)
+  const debouncedCNetwork = useDebounce(contactNetwork, 250)
+  const debouncedCAddress = useDebounce(contactAddress, 250)
 
   const handleAddOrEditContact = async (
     addressBookContactNoId: AddressBookContactNoId,
@@ -173,10 +192,20 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
         onCancel={() => setDeleteDialogOpen(false)}
       />
       <ColumnCenter gap="16px">
-        <IconWrapper>
-          {currentMode === "add" && <StyledAddIcon />}
-          {currentMode === "edit" && <StyledEditIcon />}
-        </IconWrapper>
+        {!debouncedCName ? (
+          <IconWrapper>
+            {currentMode === "add" && <StyledAddIcon />}
+            {currentMode === "edit" && <StyledEditIcon />}
+          </IconWrapper>
+        ) : (
+          <ContactAvatar
+            src={getNetworkAccountImageUrl({
+              accountName: debouncedCName,
+              accountAddress: debouncedCAddress,
+              networkId: debouncedCNetwork,
+            })}
+          />
+        )}
 
         {currentMode === "add" && <H3>New address</H3>}
         {currentMode === "edit" && <H3>Edit address</H3>}
