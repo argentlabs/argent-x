@@ -1,17 +1,21 @@
 import { useCallback } from "react"
 import { Call } from "starknet"
 
+import { settingsStorage } from "./../../../../shared/settings/storage"
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
 import { PublicNetworkIds } from "../../../../shared/network/public"
-import { isPrivacySettingsEnabled } from "../../../../shared/settings"
+import {
+  ISettingsStorage,
+  isPrivacySettingsEnabled,
+} from "../../../../shared/settings"
+import { useObjectStorage } from "../../../../shared/storage/hooks"
 import {
   ApiTransactionReviewResponse,
   fetchTransactionReview,
 } from "../../../../shared/transactionReview.service"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { useArgentApiFetcher } from "../../../services/useArgentApiFetcher"
-import { useBackgroundSettingsValue } from "../../../services/useBackgroundSettingsValue"
 import { Account } from "../../accounts/Account"
 
 export interface IUseTransactionReview {
@@ -21,16 +25,13 @@ export interface IUseTransactionReview {
 }
 
 export const useTransactionReviewEnabled = () => {
-  const { value: privacyUseArgentServicesEnabled } = useBackgroundSettingsValue(
-    "privacyUseArgentServices",
-  )
+  const { privacyUseArgentServices } =
+    useObjectStorage<ISettingsStorage>(settingsStorage)
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_TRANSACTION_REVIEW_API_ENABLED
   }
-  return (
-    ARGENT_TRANSACTION_REVIEW_API_ENABLED && privacyUseArgentServicesEnabled
-  )
+  return ARGENT_TRANSACTION_REVIEW_API_ENABLED && privacyUseArgentServices
 }
 
 export const useTransactionReview = ({
@@ -57,7 +58,7 @@ export const useTransactionReview = ({
     // TODO: come back - dont rerender when fetcher reference changes
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<ApiTransactionReviewResponse>(
-    transactionReviewEnabled,
+    !!transactionReviewEnabled,
     [actionHash, "transactionReview"],
     transactionReviewFetcher,
   )

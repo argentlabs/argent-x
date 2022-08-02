@@ -5,6 +5,7 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.23.0",
+    "@sentry/webpack-plugin": "^1.18.9",
     "@svgr/webpack": "^6.0.0",
     "@testing-library/react": "^13.3.0",
     "@types/chrome": "^0.0.193",
@@ -73,6 +74,8 @@
     "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.1.0",
+    "@sentry/react": "^7.6.0",
+    "@sentry/tracing": "^7.6.0",
     "@tippyjs/react": "^4.2.6",
     "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
