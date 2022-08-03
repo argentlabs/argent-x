@@ -5,6 +5,10 @@ import { Call } from "starknet"
 import styled from "styled-components"
 
 import { isErc20TransferCall } from "../../../shared/call"
+import {
+  ApiTransactionReviewResponse,
+  getTransactionReviewHasSwap,
+} from "../../../shared/transactionReview.service"
 import { useAppState } from "../../app.state"
 import {
   Field,
@@ -38,12 +42,20 @@ const LeftPaddedField = styled.div`
   margin-left: 8px;
 `
 
-export const titleForTransactions = (transactions: Call | Call[] = []) => {
+export const titleForTransactionsAndReview = (
+  transactions: Call | Call[] = [],
+  transactionReview: ApiTransactionReviewResponse | undefined,
+) => {
   const transactionsArray: Call[] = isArray(transactions)
     ? transactions
     : [transactions]
   const hasErc20Transfer = transactionsArray.some(isErc20TransferCall)
-  return hasErc20Transfer ? "Review send" : "Check transactions"
+  const hasSwap = getTransactionReviewHasSwap(transactionReview)
+  return hasErc20Transfer
+    ? "Review send"
+    : hasSwap
+    ? "Review trade"
+    : "Check transactions"
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
@@ -69,8 +81,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   })
 
   const title = useMemo(() => {
-    return titleForTransactions(transactions)
-  }, [transactions])
+    return titleForTransactionsAndReview(transactions, transactionReview)
+  }, [transactionReview, transactions])
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />

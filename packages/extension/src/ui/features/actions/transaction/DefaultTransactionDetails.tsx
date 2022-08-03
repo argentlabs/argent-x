@@ -9,12 +9,13 @@ import {
   FieldGroup,
   FieldKey,
   FieldValue,
+  LeftPaddedField,
 } from "../../../components/Fields"
 import {
   ArrowForwardIosIcon,
   ContentCopyIcon,
 } from "../../../components/Icons/MuiIcons"
-import { formatTruncatedAddress } from "../../../services/addresses"
+import { ContractField } from "./fields/ContractField"
 import { TransactionItemProps } from "./TransactionItem"
 
 const DisclosureIconContainer = styled.div<{ expanded: boolean }>`
@@ -48,9 +49,6 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
   const toggleExpanded = useCallback(() => {
     setExpanded((expanded) => !expanded)
   }, [])
-  const displayContractAddress = formatTruncatedAddress(
-    transaction.contractAddress,
-  )
   const displayTransactionDetails = JSON.stringify(
     transaction.calldata,
     null,
@@ -58,22 +56,12 @@ export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
   )
   return (
     <FieldGroup>
-      <Field>
-        <FieldKey>
-          Contract
-          <CopyTooltip message="Copied" copyValue={transaction.contractAddress}>
-            <ContentCopyIcon
-              style={{ fontSize: 12, marginLeft: "0.5em", cursor: "pointer" }}
-            />
-          </CopyTooltip>
-        </FieldKey>
-        <FieldValue>{displayContractAddress}</FieldValue>
-      </Field>
+      <ContractField contractAddress={transaction.contractAddress} />
       <Field>
         <FieldKey>Action</FieldKey>
-        <FieldValue>
+        <LeftPaddedField>
           {entryPointToHumanReadable(transaction.entrypoint)}
-        </FieldValue>
+        </LeftPaddedField>
       </Field>
       <Field clickable onClick={toggleExpanded}>
         <FieldKey>View details</FieldKey>

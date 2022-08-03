@@ -1,6 +1,4 @@
-import defaultTokens from "@argent-x/extension/src/assets/default-tokens.json"
 import { ApiTransactionReviewResponse } from "@argent-x/extension/src/shared/transactionReview.service"
-import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { TransactionsList } from "@argent-x/extension/src/ui/features/actions/transaction/TransactionsList"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
@@ -17,17 +15,9 @@ import accountUpgradeUnknownImplementation from "./__fixtures__/warn/account-upg
 import erc20TransferIsTokenAddressResponse from "./__fixtures__/warn/erc20-transfer-recipient-is-token-address-response.json"
 import erc20TransferIsTokenAddress from "./__fixtures__/warn/erc20-transfer-recipient-is-token-address.json"
 import erc20TransferWarnResponse from "./__fixtures__/warn/erc20-transfer-warn-response.json"
-
-/** convert to expected types and shape */
-const tokensByNetwork: TokenDetailsWithBalance[] = defaultTokens
-  .filter(({ network }) => network === "goerli-alpha")
-  .map((token) => {
-    return {
-      ...token,
-      networkId: token.network,
-      decimals: Number(token.decimals),
-    }
-  })
+import jediSwapApproveAndSwapWarnResponse from "./__fixtures__/warn/jedi-swap-approve-and-swap-warn-response.json"
+import jediSwapApproveAndSwapWarn from "./__fixtures__/warn/jedi-swap-approve-and-swap-warn.json"
+import { tokensByNetwork } from "./tokensByNetwork"
 
 export default {
   title: "features/TransactionsList",
@@ -68,6 +58,18 @@ export const JediSwapMint = Template.bind({})
 JediSwapMint.args = {
   transactions: jediSwapMint,
   transactionReview: jediSwapMintResponse as ApiTransactionReviewResponse,
+}
+
+export const JediSwapApproveAndSwapWarn = Template.bind({})
+JediSwapApproveAndSwapWarn.args = {
+  transactions: jediSwapApproveAndSwapWarn,
+  transactionReview:
+    jediSwapApproveAndSwapWarnResponse as ApiTransactionReviewResponse,
+}
+
+export const JediSwapApproveAndSwapNoReview = Template.bind({})
+JediSwapApproveAndSwapNoReview.args = {
+  transactions: jediSwapApproveAndSwapWarn,
 }
 
 export const NftTransfer = Template.bind({})
