@@ -1,4 +1,5 @@
 import { isString } from "@sentry/utils"
+import { colord } from "colord"
 import { FC } from "react"
 import { Navigate } from "react-router-dom"
 import styled from "styled-components"
@@ -23,6 +24,17 @@ const Title = styled.h1`
   line-height: 25px;
   text-align: center;
   margin: 0 0 36px 0;
+`
+
+const RecommendedText = styled.span`
+  background-color: ${({ theme }) =>
+    colord(theme.green1).alpha(0.2).toRgbString()};
+  color: ${({ theme }) => theme.green1};
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 11px;
+  margin-left: 4px;
+  font-weight: 500;
 `
 
 const BANXA_ENABLED = (process.env.FEATURE_BANXA || "false") === "true"
@@ -58,6 +70,23 @@ export const FundingProviderScreen: FC = () => {
       <PageWrapper>
         <Title>Choose provider</Title>
         <OptionsWrapper>
+          {RAMP_ENABLED && (
+            <A
+              href={rampUrl}
+              targetBlank
+              onClick={trackAddFundsService("ramp", account.networkId)}
+            >
+              <Option
+                title={
+                  <>
+                    Ramp<RecommendedText>Recommended</RecommendedText>
+                  </>
+                }
+                description="Card or bank transfer"
+                icon={<RampSvg />}
+              />
+            </A>
+          )}
           {BANXA_ENABLED && (
             <A
               href={banxaUrl}
@@ -68,19 +97,6 @@ export const FundingProviderScreen: FC = () => {
                 title="Banxa"
                 description="Card or bank transfer"
                 icon={<BanxaSvg />}
-              />
-            </A>
-          )}
-          {RAMP_ENABLED && (
-            <A
-              href={rampUrl}
-              targetBlank
-              onClick={trackAddFundsService("ramp", account.networkId)}
-            >
-              <Option
-                title="Ramp"
-                description="Card or bank transfer"
-                icon={<RampSvg />}
               />
             </A>
           )}
