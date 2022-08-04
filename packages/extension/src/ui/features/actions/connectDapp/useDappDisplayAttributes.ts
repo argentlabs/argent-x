@@ -1,7 +1,7 @@
 import useSWRImmutable from "swr/immutable"
 import urlJoin from "url-join"
 
-import { getBaseUrlForHost } from "../../../../shared/utils/host"
+import { getBaseUrlForHost } from "../../../../shared/utils/url"
 import { getColor } from "../../accounts/accounts.service"
 
 export interface IDappDisplayAttributes {

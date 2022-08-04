@@ -84,7 +84,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   const accountName = getAccountName(selectedAccount, accountNames)
   const confirmButtonVariant =
-    transactionReview?.assessment === "warn" ? "warn" : undefined
+    transactionReview?.assessment === "warn" ? "warn-high" : undefined
 
   return (
     <ConfirmScreen
@@ -120,7 +120,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           <FieldValue>
             <ProfilePicture
               src={getAccountImageUrl(accountName, selectedAccount)}
-              small
+              size="sm"
               disabled
             />
             <LeftPaddedField>{accountName}</LeftPaddedField>

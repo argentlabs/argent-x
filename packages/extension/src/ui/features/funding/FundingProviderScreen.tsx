@@ -1,8 +1,10 @@
-import { FC, useCallback } from "react"
-import { Navigate, useNavigate } from "react-router-dom"
+import { isString } from "@sentry/utils"
+import { FC } from "react"
+import { Navigate } from "react-router-dom"
 import styled from "styled-components"
 import A from "tracking-link"
 
+import { urlWithQuery } from "../../../shared/utils/url"
 import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
@@ -23,26 +25,32 @@ const Title = styled.h1`
   margin: 0 0 36px 0;
 `
 
+const BANXA_ENABLED = (process.env.FEATURE_BANXA || "false") === "true"
+const RAMP_ENABLED =
+  isString(process.env.RAMP_API_KEY) && process.env.RAMP_API_KEY.length > 0
+
 export const FundingProviderScreen: FC = () => {
   const account = useSelectedAccount()
   const isMainnet = useIsMainnet()
-  const navigate = useNavigate()
 
-  const isBanxaEnabled = (process.env.FEATURE_BANXA || "false") === "true"
   const allowFiatPurchase = account && isMainnet
-  const normalizedAddress = account && normalizeAddress(account.address)
-
-  const openRamp = useCallback(() => {
-    account && trackAddFundsService("ramp", account.networkId)
-    navigate(routes.fundingProviderRamp())
-  }, [account, navigate])
+  const normalizedAddress = account ? normalizeAddress(account.address) : ""
 
   if (!allowFiatPurchase) {
     /** not possible via UI */
     return <Navigate to={routes.funding()} />
   }
 
-  const banxaUrl = `https://argentx.banxa.com/?walletAddress=${normalizedAddress}`
+  const banxaUrl = urlWithQuery("https://argentx.banxa.com/", {
+    walletAddress: normalizedAddress,
+  })
+
+  const rampUrl = urlWithQuery("https://buy.ramp.network/", {
+    hostApiKey: process.env.RAMP_API_KEY as string,
+    hostLogoUrl: "https://www.argent.xyz/icons/icon-512x512.png",
+    swapAsset: "STARKNET_*",
+    userAddress: normalizedAddress,
+  })
 
   return (
     <>
@@ -50,7 +58,7 @@ export const FundingProviderScreen: FC = () => {
       <PageWrapper>
         <Title>Choose provider</Title>
         <OptionsWrapper>
-          {isBanxaEnabled && (
+          {BANXA_ENABLED && (
             <A
               href={banxaUrl}
               targetBlank
@@ -63,12 +71,19 @@ export const FundingProviderScreen: FC = () => {
               />
             </A>
           )}
-          <Option
-            title="Ramp"
-            description="Card or bank transfer"
-            icon={<RampSvg />}
-            onClick={openRamp}
-          />
+          {RAMP_ENABLED && (
+            <A
+              href={rampUrl}
+              targetBlank
+              onClick={trackAddFundsService("ramp", account.networkId)}
+            >
+              <Option
+                title="Ramp"
+                description="Card or bank transfer"
+                icon={<RampSvg />}
+              />
+            </A>
+          )}
         </OptionsWrapper>
       </PageWrapper>
     </>

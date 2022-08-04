@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+
 import { delay } from "../shared/utils/delay"
 import { IS_DEV } from "../shared/utils/dev"
-
 import { useAppState } from "./app.state"
 import { recover } from "./features/recovery/recovery.service"
 import { routes } from "./routes"

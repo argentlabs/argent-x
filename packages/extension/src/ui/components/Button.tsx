@@ -1,11 +1,20 @@
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 import { DefaultTheme } from "styled-components"
 
-export type ButtonVariant = "default" | "primary" | "warn" | "danger"
+export type ButtonVariant =
+  | "default"
+  | "primary"
+  | "warn"
+  | "warn-high"
+  | "danger"
+  | "info"
+
+export type ButtonSize = "default" | "xs" | "s" | "m" | "l" | "xl"
 
 interface IButton {
   theme: DefaultTheme
   variant?: ButtonVariant
+  size?: ButtonSize
 }
 
 /** TODO: move color tokens into theme */
@@ -22,18 +31,30 @@ export const getVariantColor =
   }) =>
   ({ variant }: IButton) => {
     switch (variant) {
-      case "warn":
-        return hover
-          ? theme.button.warn.bg.hover
-          : disabled
-          ? theme.button.warn.bg.disabled
-          : theme.button.warn.bg.base
       case "danger":
         return hover
           ? theme.button.danger.bg.hover
           : disabled
           ? theme.button.danger.bg.disabled
           : theme.button.danger.bg.base
+      case "warn-high":
+        return hover
+          ? theme.button["warn-high"].bg.hover
+          : disabled
+          ? theme.button["warn-high"].bg.disabled
+          : theme.button["warn-high"].bg.base
+      case "warn":
+        return hover
+          ? theme.button.warn.bg.hover
+          : disabled
+          ? theme.button.warn.bg.disabled
+          : theme.button.warn.bg.base
+      case "info":
+        return hover
+          ? theme.button.info.bg.hover
+          : disabled
+          ? theme.button.info.bg.disabled
+          : theme.button.info.bg.base
     }
     return hover
       ? theme.button.default.bg.hover
@@ -42,7 +63,30 @@ export const getVariantColor =
       : theme.button.default.bg.base
   }
 
-export const Button = styled.button<IButton>`
+export const getSizeStyle = (size: ButtonSize = "default") => {
+  switch (size) {
+    case "xs":
+      return css`
+        padding: 4px 8px;
+        font-size: 13px;
+        line-height: 1.2;
+      `
+    case "s":
+      return css`
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.2;
+      `
+  }
+  return css`
+    padding: 13.5px;
+    font-size: 16px;
+    line-height: 21px;
+    width: 100%;
+  `
+}
+
+const BaseButton = styled.button`
   margin: 0;
   padding: 13.5px;
   font-weight: 600;
@@ -57,7 +101,23 @@ export const Button = styled.button<IButton>`
   border: none;
   color: ${({ theme }) => theme.button.default.fg.base};
   cursor: pointer;
+  width: 100%;
+  outline: none;
+  border: none;
   transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+  cursor: pointer;
+`
+
+export const Button = styled(BaseButton)<IButton>`
+  ${({ size }) => getSizeStyle(size)}
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+
+  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  border-radius: 100px;
+  color: ${({ theme, variant }) =>
+    variant === "warn" ? theme.bg1 : theme.text1};
 
   &:hover,
   &:focus {
@@ -89,4 +149,21 @@ export const ButtonGroupVertical = styled.div<{
     switchButtonOrder ? "row-reverse" : "row"};
   gap: 12px;
   width: 100%;
+`
+
+/** TODO: change to variant=transparent */
+export const ButtonTransparent = styled(BaseButton)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.text1};
+
+  &:hover,
+  &:focus {
+    outline: 0;
+  }
+
+  &:disabled {
+    cursor: auto;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.5);
+  }
 `

@@ -9,7 +9,7 @@ import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 
 const Container = styled.div`
-  margin: 8px 0 40px 0;
+  margin: 8px 0 24px 0;
   display: flex;
   justify-content: center;
   width: 100%;
