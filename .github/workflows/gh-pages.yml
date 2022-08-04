@@ -25,8 +25,7 @@ jobs:
           echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
       - run: yarn build
         env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          UPLOAD_SENTRY_SOURCEMAPS: false
 
       - run: yarn --cwd packages/dapp export
 

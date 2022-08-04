@@ -17,7 +17,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 
 const isProd = process.env.NODE_ENV === "production"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
-const genSourceMaps = process.env.GEN_SOURCE_MAPS === "true"
+const uploadSentrySourcemaps = process.env.UPLOAD_SENTRY_SOURCEMAPS === "true"
 
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
@@ -100,6 +100,7 @@ module.exports = {
 
     // Only use sentry-sourcemaping on Prod
     isProd &&
+      uploadSentrySourcemaps &&
       new SentryWebpackPlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
         project: "argent-x",
