@@ -103,18 +103,34 @@ interface IStarketWindowObject {
     event: WalletEvents["type"],
     handleEvent: WalletEvents["handler"],
   ) => void
-  account?: AccountInterface
-  provider: ProviderInterface
+  starknetJsVersion?: StarknetJsVersion
+  account?: AccountInterface | AccountInterface3
+  provider?: ProviderInterface | ProviderInterface3
   selectedAddress?: string
   chainId?: string
 }
 
-interface ConnectedStarketWindowObject extends IStarketWindowObject {
+interface ConnectedStarketWindowObjectV3 extends IStarketWindowObject {
   isConnected: true
-  account: AccountInterface
+  starknetJsVersion: "v3"
+  account: AccountInterface3
+  provider: ProviderInterface3
   selectedAddress: string
   chainId: string
 }
+
+interface ConnectedStarketWindowObjectV4 extends IStarketWindowObject {
+  isConnected: true
+  starknetJsVersion: "v4"
+  account: AccountInterface
+  provider: ProviderInterface
+  selectedAddress: string
+  chainId: string
+}
+
+type ConnectedStarketWindowObject =
+  | ConnectedStarketWindowObjectV3
+  | ConnectedStarketWindowObjectV4
 
 interface DisconnectedStarketWindowObject extends IStarketWindowObject {
   isConnected: false
