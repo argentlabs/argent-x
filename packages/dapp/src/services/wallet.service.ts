@@ -1,5 +1,6 @@
 import { connect, getStarknet } from "@argent/get-starknet"
-import { shortString } from "starknet"
+import { constants, shortString } from "starknet"
+import { StarknetChainId } from "starknet/dist/constants"
 
 import { Network } from "./token.service"
 
@@ -33,12 +34,12 @@ export const networkId = (): Network | undefined => {
     return
   }
   try {
-    const { baseUrl } = starknet.provider
-    if (baseUrl.includes("alpha-mainnet.starknet.io")) {
+    const { chainId } = starknet.provider
+    if (chainId === constants.StarknetChainId.MAINNET) {
       return "mainnet-alpha"
-    } else if (baseUrl.includes("alpha4.starknet.io")) {
+    } else if (chainId === constants.StarknetChainId.TESTNET) {
       return "goerli-alpha"
-    } else if (baseUrl.match(/^https?:\/\/localhost.*/)) {
+    } else {
       return "localhost"
     }
   } catch {}
@@ -69,13 +70,13 @@ export const getExplorerBaseUrl = (): string | undefined => {
   }
 }
 
-export const networkUrl = (): string | undefined => {
+export const chainId = (): string | undefined => {
   const starknet = getStarknet()
   if (!starknet?.isConnected) {
     return
   }
   try {
-    return starknet.provider.baseUrl
+    return shortString.decodeShortString(starknet.provider.chainId)
   } catch {}
 }
 

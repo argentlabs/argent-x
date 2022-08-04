@@ -1,4 +1,8 @@
-import type { AccountInterface, Provider } from "starknet"
+import type { AccountInterface, ProviderInterface } from "starknet"
+import type {
+  AccountInterface as AccountInterface3,
+  ProviderInterface as ProviderInterface3,
+} from "starknet3"
 
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
@@ -77,6 +81,8 @@ export type RpcMessage =
       result: never
     }
 
+type StarknetJsVersion = "v3" | "v4"
+
 interface IStarketWindowObject {
   id: string
   name: string
@@ -85,7 +91,9 @@ interface IStarketWindowObject {
   request: <T extends RpcMessage>(
     call: Omit<T, "result">,
   ) => Promise<T["result"]>
-  enable: (options?: { starknetVersion?: "v3" | "v4" }) => Promise<string[]>
+  enable: (options?: {
+    starknetVersion?: StarknetJsVersion
+  }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
   on: (
     event: WalletEvents["type"],
@@ -96,7 +104,7 @@ interface IStarketWindowObject {
     handleEvent: WalletEvents["handler"],
   ) => void
   account?: AccountInterface
-  provider: Provider
+  provider: ProviderInterface
   selectedAddress?: string
   chainId?: string
 }

@@ -25,14 +25,13 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
       try {
-        const { amount, unit, suggestedMaxFee } =
+        const { overall_fee, suggestedMaxFee } =
           await starknetAccount.estimateFee(msg.data)
 
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
-            amount: number.toHex(amount),
-            unit,
+            amount: number.toHex(overall_fee),
             suggestedMaxFee: number.toHex(suggestedMaxFee),
           },
         })

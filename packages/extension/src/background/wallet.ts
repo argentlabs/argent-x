@@ -1,13 +1,7 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, union } from "lodash-es"
-import {
-  Account,
-  AddTransactionResponse,
-  DeployContractPayload,
-  ec,
-  stark,
-} from "starknet"
+import { Account, DeployContractPayload, ec, stark } from "starknet"
 import {
   calculateContractAddressFromHash,
   getSelectorFromName,
@@ -367,8 +361,7 @@ export class Wallet {
 
     const deployTransaction = await provider.deployContract(payload)
 
-    assertTransactionReceived(deployTransaction, true)
-    const proxyAddress = deployTransaction.address as string
+    const proxyAddress = deployTransaction.contract_address
 
     const account = {
       network,
@@ -407,8 +400,6 @@ export class Wallet {
     )
 
     const deployTransaction = await provider.deployContract(payload)
-
-    assertTransactionReceived(deployTransaction, true)
 
     return { account, txHash: deployTransaction.transaction_hash }
   }
@@ -615,21 +606,5 @@ export class Wallet {
     if (accounts.length > 0) {
       await this.walletStore.push(accounts)
     }
-  }
-}
-
-const assertTransactionReceived = (
-  transactionResponse: AddTransactionResponse,
-  deployContract = false,
-) => {
-  if (transactionResponse.code !== "TRANSACTION_RECEIVED") {
-    throw new Error(
-      `Transaction not received: ${transactionResponse.transaction_hash}`,
-    )
-  }
-  if (deployContract && !transactionResponse.address) {
-    throw new Error(
-      `Contract not deployed: ${transactionResponse.transaction_hash}`,
-    )
   }
 }

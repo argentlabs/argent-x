@@ -1,10 +1,9 @@
 import {
   Abi,
   Account,
-  AddTransactionResponse,
   Call,
   InvocationsDetails,
-  Provider,
+  ProviderInterface,
   Signature,
   defaultProvider,
   ec,
@@ -14,7 +13,7 @@ import {
 import { sendMessage, waitForMessage } from "./messageActions"
 
 export class ArgentXAccount extends Account {
-  constructor(address: string, provider?: Provider) {
+  constructor(address: string, provider?: ProviderInterface) {
     // since account constructor is taking a KeyPair,
     // we set a dummy one (never used anyway)
     const keyPair = ec.getKeyPair(0)
@@ -25,7 +24,7 @@ export class ArgentXAccount extends Account {
     transactions: Call | Call[],
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails,
-  ): Promise<AddTransactionResponse> {
+  ): ReturnType<Account["execute"]> {
     sendMessage({
       type: "EXECUTE_TRANSACTION",
       data: { transactions, abis, transactionsDetail },
@@ -59,8 +58,6 @@ export class ArgentXAccount extends Account {
     }
 
     return {
-      code: "TRANSACTION_RECEIVED",
-      address: this.address,
       transaction_hash: result.txHash,
     }
   }
