@@ -5,6 +5,7 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
   {
     privacyUseArgentServices: false,
     privacyShareAnalyticsData: false,
+    privacyErrorReporting: false,
   },
   "core:settings",
 )

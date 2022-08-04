@@ -1,12 +1,20 @@
-import { colord } from "colord"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 import { DefaultTheme } from "styled-components"
 
-export type ButtonVariant = "default" | "primary" | "warn" | "danger"
+export type ButtonVariant =
+  | "default"
+  | "primary"
+  | "warn"
+  | "warn-high"
+  | "danger"
+  | "info"
+
+export type ButtonSize = "default" | "xs" | "s" | "m" | "l" | "xl"
 
 interface IButton {
   theme: DefaultTheme
   variant?: ButtonVariant
+  size?: ButtonSize
 }
 
 /** TODO: move color tokens into theme */
@@ -23,25 +31,62 @@ export const getVariantColor =
   }) =>
   ({ variant }: IButton) => {
     switch (variant) {
-      case "warn":
-        return hover
-          ? colord(theme.red4).saturate(1).lighten(0.075).toRgbString()
-          : disabled
-          ? colord(theme.red4).alpha(0.5).toRgbString()
-          : theme.red4
       case "danger":
         return hover
-          ? colord(theme.red1).lighten(0.075).toRgbString()
+          ? theme.button.danger.bg.hover
           : disabled
-          ? colord(theme.red1).alpha(0.5).toRgbString()
-          : theme.red1
+          ? theme.button.danger.bg.disabled
+          : theme.button.danger.bg.base
+      case "warn-high":
+        return hover
+          ? theme.button["warn-high"].bg.hover
+          : disabled
+          ? theme.button["warn-high"].bg.disabled
+          : theme.button["warn-high"].bg.base
+      case "warn":
+        return hover
+          ? theme.button.warn.bg.hover
+          : disabled
+          ? theme.button.warn.bg.disabled
+          : theme.button.warn.bg.base
+      case "info":
+        return hover
+          ? theme.button.info.bg.hover
+          : disabled
+          ? theme.button.info.bg.disabled
+          : theme.button.info.bg.base
     }
-    return hover && !disabled
-      ? `rgba(255, 255, 255, 0.25)`
-      : `rgba(255, 255, 255, 0.15);`
+    return hover
+      ? theme.button.default.bg.hover
+      : disabled
+      ? theme.button.default.bg.disabled
+      : theme.button.default.bg.base
   }
 
-export const Button = styled.button<IButton>`
+export const getSizeStyle = (size: ButtonSize = "default") => {
+  switch (size) {
+    case "xs":
+      return css`
+        padding: 4px 8px;
+        font-size: 13px;
+        line-height: 1.2;
+      `
+    case "s":
+      return css`
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.2;
+      `
+  }
+  return css`
+    padding: 13.5px;
+    font-size: 16px;
+    line-height: 21px;
+    width: 100%;
+  `
+}
+
+const BaseButton = styled.button`
   margin: 0;
   padding: 13.5px;
   font-weight: 600;
@@ -50,13 +95,29 @@ export const Button = styled.button<IButton>`
   text-align: center;
 
   background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
-  border-radius: 100px;
+  border-radius: ${({ theme }) => theme.button.radius};
   width: 100%;
   outline: none;
   border: none;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.button.default.fg.base};
   cursor: pointer;
+  width: 100%;
+  outline: none;
+  border: none;
   transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+  cursor: pointer;
+`
+
+export const Button = styled(BaseButton)<IButton>`
+  ${({ size }) => getSizeStyle(size)}
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+
+  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  border-radius: 100px;
+  color: ${({ theme, variant }) =>
+    variant === "warn" ? theme.bg1 : theme.text1};
 
   &:hover,
   &:focus {
@@ -67,7 +128,7 @@ export const Button = styled.button<IButton>`
   &:disabled {
     cursor: auto;
     cursor: not-allowed;
-    color: rgba(255, 255, 255, 0.5);
+    color: ${({ theme }) => theme.button.default.fg.disabled};
     background-color: ${({ theme }) =>
       getVariantColor({ theme, disabled: true })};
   }
@@ -88,4 +149,21 @@ export const ButtonGroupVertical = styled.div<{
     switchButtonOrder ? "row-reverse" : "row"};
   gap: 12px;
   width: 100%;
+`
+
+/** TODO: change to variant=transparent */
+export const ButtonTransparent = styled(BaseButton)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.text1};
+
+  &:hover,
+  &:focus {
+    outline: 0;
+  }
+
+  &:disabled {
+    cursor: auto;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.5);
+  }
 `

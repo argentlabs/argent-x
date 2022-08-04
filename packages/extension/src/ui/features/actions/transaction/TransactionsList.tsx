@@ -6,10 +6,12 @@ import { Token } from "../../../../shared/token/type"
 import {
   ApiTransactionReviewResponse,
   getDisplayWarnAndReasonForTransactionReview,
+  getTransactionReviewHasSwap,
 } from "../../../../shared/transactionReview.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
 import { TransactionBanner } from "./TransactionBanner"
 import { TransactionItem } from "./TransactionItem"
+import { TransactionsListSwap } from "./TransactionsListSwap"
 
 export interface ITransactionsList {
   networkId: string
@@ -32,6 +34,7 @@ export const TransactionsList: FC<ITransactionsList> = ({
   )
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
+  const hasSwap = getTransactionReviewHasSwap(transactionReview)
   return (
     <>
       {warn && (
@@ -41,14 +44,21 @@ export const TransactionsList: FC<ITransactionsList> = ({
           message={reason}
         />
       )}
-      {transactionsArray.map((transaction, index) => (
-        <TransactionItem
-          key={index}
-          networkId={networkId}
-          transaction={transaction}
+      {hasSwap ? (
+        <TransactionsListSwap
+          transactionReview={transactionReview}
           tokensByNetwork={tokensByNetwork}
         />
-      ))}
+      ) : (
+        transactionsArray.map((transaction, index) => (
+          <TransactionItem
+            key={index}
+            networkId={networkId}
+            transaction={transaction}
+            tokensByNetwork={tokensByNetwork}
+          />
+        ))
+      )}
     </>
   )
 }

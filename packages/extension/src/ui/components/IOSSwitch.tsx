@@ -1,5 +1,6 @@
 import { styled } from "@mui/material/styles"
 import Switch, { SwitchProps } from "@mui/material/Switch"
+import { FC, useId } from "react"
 
 /** @see https://mui.com/material-ui/react-switch/#CustomizedSwitches.tsx */
 
@@ -55,3 +56,21 @@ const IOSSwitch = styled((props: SwitchProps) => (
 }))
 
 export default IOSSwitch
+
+export interface ILazyInitialisedIOSSwitch extends SwitchProps {
+  initialised: boolean
+}
+
+/** A wrapped IOSSwitch which does not animate when initialised with the original value  */
+
+export const LazyInitialisedIOSSwitch: FC<ILazyInitialisedIOSSwitch> = ({
+  initialised,
+  ...rest
+}) => {
+  const id = useId()
+  return initialised ? (
+    <IOSSwitch {...rest} />
+  ) : (
+    <IOSSwitch key={id} disabled {...rest} />
+  )
+}

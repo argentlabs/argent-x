@@ -11,7 +11,12 @@ const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
 const VERSION = process.env.VERSION
 
-export type AddFundsServices = "banxa" | "layerswap" | "starkgate"
+export type AddFundsServices =
+  | "banxa"
+  | "layerswap"
+  | "starkgate"
+  | "orbiter"
+  | "ramp"
 
 export interface Events {
   sessionStart: undefined

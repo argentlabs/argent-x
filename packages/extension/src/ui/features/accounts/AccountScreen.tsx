@@ -4,6 +4,8 @@ import { assertNever } from "../../services/assertNever"
 import { AccountActivity } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AccountTokens } from "../accountTokens/AccountTokens"
+import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
+import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShouldShowFullScreenStatusMessage"
 import { AccountContainer } from "./AccountContainer"
 import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
 import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
@@ -17,6 +19,8 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const showMigrationScreen = useSelectedAccountStore(
     (x) => x.showMigrationScreen,
   )
+  const shouldShowFullScreenStatusMessage =
+    useShouldShowFullScreenStatusMessage()
 
   let body: ReactNode
   if (!account) {
@@ -29,6 +33,8 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
         }
       />
     )
+  } else if (shouldShowFullScreenStatusMessage) {
+    return <StatusMessageFullScreenContainer />
   } else if (tab === "tokens") {
     body = <AccountTokens account={account} />
   } else if (tab === "nfts") {

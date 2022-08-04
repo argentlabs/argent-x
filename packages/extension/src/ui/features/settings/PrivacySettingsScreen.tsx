@@ -15,6 +15,11 @@ export const PrivacySettingsScreen: FC = () => {
     "privacyUseArgentServices",
   )
 
+  const privacyErrorReporting = useKeyValueStorage(
+    settingsStore,
+    "privacyErrorReporting",
+  )
+
   const privacyShareAnalyticsData = useKeyValueStorage(
     settingsStore,
     "privacyShareAnalyticsData",
@@ -42,6 +47,22 @@ export const PrivacySettingsScreen: FC = () => {
             Use the Argent backend for token pricing, rich activity feed,
             transaction review & assessment
           </P>
+        </SettingsItem>
+        <hr />
+        <SettingsItem>
+          <Title>
+            <span>Automatic Error Reporting</span>
+            <IOSSwitch
+              checked={privacyErrorReporting}
+              onClick={() =>
+                settingsStore.set(
+                  "privacyErrorReporting",
+                  !privacyErrorReporting,
+                )
+              }
+            />
+          </Title>
+          <P>Automatically share crash logs with Argent</P>
         </SettingsItem>
         <hr />
         {ANALYTICS_UI_ENABLED && (

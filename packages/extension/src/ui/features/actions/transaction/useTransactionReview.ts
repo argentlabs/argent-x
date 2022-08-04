@@ -61,7 +61,7 @@ export const useTransactionReview = ({
     // TODO: come back - dont rerender when fetcher reference changes
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<ApiTransactionReviewResponse>(
-    transactionReviewEnabled,
+    !!transactionReviewEnabled,
     [actionHash, "transactionReview"],
     transactionReviewFetcher,
   )

@@ -1,14 +1,14 @@
 import { FC } from "react"
 
-import { FieldValue, LeftPaddedField } from "../../../components/Fields"
-import { formatTruncatedAddress } from "../../../services/addresses"
-import { Account } from "../../accounts/Account"
+import { FieldValue, LeftPaddedField } from "../../../../components/Fields"
+import { formatTruncatedAddress } from "../../../../services/addresses"
+import { Account } from "../../../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
-import { getAccountImageUrl } from "../../accounts/accounts.service"
-import { TokenIcon } from "../../accountTokens/TokenIcon"
+} from "../../../accounts/accountMetadata.state"
+import { getAccountImageUrl } from "../../../accounts/accounts.service"
+import { TokenIcon } from "../../../accountTokens/TokenIcon"
 
 interface AccountFieldProps {
   account: Account

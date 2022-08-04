@@ -24,6 +24,9 @@ jobs:
       - run: |
           echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
       - run: yarn build
+        env:
+          UPLOAD_SENTRY_SOURCEMAPS: false
+
       - run: yarn --cwd packages/dapp export
 
       - name: Deploy
