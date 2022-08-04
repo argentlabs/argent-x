@@ -1,6 +1,6 @@
-import { addressSchema } from "./../../ui/services/addresses"
 import * as yup from "yup"
 
+import { addressSchema } from "./../../ui/services/addresses"
 import { AddressBookContact, AddressBookContactNoId } from "./type"
 
 export const addressBookContactNoIdSchema: yup.Schema<AddressBookContactNoId> =

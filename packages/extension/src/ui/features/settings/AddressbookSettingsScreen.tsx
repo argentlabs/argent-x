@@ -1,23 +1,23 @@
 import { FC, useMemo } from "react"
-import { IconBar } from "../../components/IconBar"
+import { useCallback } from "react"
+import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { PlusCircle } from "../../components/Icons/PlusCircle"
-import { H2, P } from "../../theme/Typography"
 import { AutoColumn } from "../../components/Column"
+import { IconBar } from "../../components/IconBar"
+import { PlusCircle } from "../../components/Icons/PlusCircle"
+import { SearchIcon } from "../../components/Icons/SearchIcon"
 import {
   ControlledInputType,
   StyledControlledInput,
 } from "../../components/InputText"
-import { SearchIcon } from "../../components/Icons/SearchIcon"
-import { useForm } from "react-hook-form"
-import { useAddressBook } from "../../services/addressBook"
-import { useNetworks } from "../networks/useNetworks"
-import { useNavigate } from "react-router-dom"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
-import { useCallback } from "react"
+import { useAddressBook } from "../../services/addressBook"
+import { H2, P } from "../../theme/Typography"
 import { AccountListItem } from "../accounts/AccountListItem"
+import { useNetworks } from "../networks/useNetworks"
 
 const Wrapper = styled(AutoColumn)`
   padding: 24px;

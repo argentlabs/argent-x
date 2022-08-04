@@ -1,12 +1,13 @@
-import styled, { css } from "styled-components"
+import { HTMLProps, useId } from "react"
+import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import Select, {
-  components,
   DropdownIndicatorProps,
   Props as ReactSelectProps,
+  components,
 } from "react-select"
-import { HTMLProps, useId } from "react"
+import styled, { css } from "styled-components"
+
 import { ChevronDown } from "./Icons/ChevronDown"
-import { Controller, ControllerProps, FieldValues } from "react-hook-form"
 import { Container } from "./InputText"
 
 export type InputSelectProps = Omit<

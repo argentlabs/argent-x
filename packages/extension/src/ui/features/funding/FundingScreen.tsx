@@ -50,20 +50,12 @@ export const FundingScreen: FC = () => {
         <Title>How would you like to fund your account?</Title>
         <OptionsWrapper>
           {allowFiatPurchase ? (
-            <A
-              href={`https://argentx.banxa.com/?walletAddress=${normalizeAddress(
-                account.address,
-              )}`}
-              targetBlank
-              onClick={trackAddFundsService("banxa", account.networkId)}
-            >
+            <Link to={routes.fundingProvider()}>
               <Option
                 title="Buy with card or bank transfer"
-                description={"Provided by Banxa"}
                 icon={<CardSvg />}
-                hideArrow
               />
-            </A>
+            </Link>
           ) : (
             <Option
               title="Buy with card or bank transfer"
