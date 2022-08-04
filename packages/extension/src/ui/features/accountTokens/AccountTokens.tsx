@@ -29,6 +29,7 @@ import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
+import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountSubHeader } from "./AccountSubheader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
@@ -52,6 +53,10 @@ export const AddTokenIconButton = styled(IconButton)`
     background-color: rgba(255, 255, 255, 0.15);
     outline: 0;
   }
+`
+
+const StatusMessage = styled.div`
+  margin: 0 20px 16px 20px;
 `
 
 interface AccountTokensProps {
@@ -135,6 +140,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         }
       />
       <TransferButtons />
+      <StatusMessage>
+        <StatusMessageBannerContainer />
+      </StatusMessage>
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && (

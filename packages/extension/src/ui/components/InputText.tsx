@@ -1,5 +1,9 @@
-import { useRef } from "react"
+import { isFunction } from "lodash-es"
+import { useId } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
+import TextareaAutosize, {
+  TextareaAutosizeProps,
+} from "react-textarea-autosize"
 import styled, { css } from "styled-components"
 
 import { isNumeric } from "../../shared/utils/number"
@@ -101,10 +105,6 @@ const InputAlt = styled.input`
   }
 `
 
-function randomString() {
-  return Math.floor(Math.random() * 1000).toString()
-}
-
 export const InputText = styled(
   ({
     placeholder,
@@ -118,12 +118,12 @@ export const InputText = styled(
     inputRef,
     ...props
   }) => {
-    const idRef = useRef(randomString())
+    const id = useId()
     return (
       <Container className={className} style={style}>
         <Input
           placeholder={placeholder}
-          id={idRef.current}
+          id={id}
           type={type}
           onChange={onChange}
           value={value}
@@ -157,12 +157,12 @@ export const InputTextAlt = styled(
     children,
     ...props
   }: { inputRef: any } & InputFieldProps) => {
-    const idRef = useRef(randomString())
+    const id = useId()
     return (
       <Container className={className} style={style}>
         <InputAlt
           placeholder={placeholder}
-          id={idRef.current}
+          id={id}
           type={type}
           onChange={onChange}
           value={value}
@@ -269,4 +269,102 @@ export const TextArea = styled.textarea`
   resize: none;
   min-height: 116px;
   width: 100%;
+`
+
+export const TextAreaAlt = styled(TextareaAutosize)`
+  ${InputCssAlt}
+  resize: none;
+  width: 100%;
+`
+
+export type InputTextAreaProps = Omit<TextareaAutosizeProps, "ref" | "as">
+
+export const InputTextArea = styled(
+  ({
+    placeholder,
+    autoFocus,
+    onChange,
+    value,
+    disabled,
+    className,
+    style,
+    inputRef,
+    children,
+    ...props
+  }: { inputRef: any } & InputTextAreaProps) => {
+    const id = useId()
+    return (
+      <Container className={className} style={style}>
+        <TextAreaAlt
+          placeholder={placeholder}
+          id={id}
+          onChange={onChange}
+          value={value}
+          autoFocus={autoFocus}
+          disabled={disabled}
+          ref={inputRef}
+          {...props}
+        />
+        {children}
+      </Container>
+    )
+  },
+)``
+
+export type ControlledTextAreaProps<T extends FieldValues> =
+  InputTextAreaProps &
+    Omit<ControllerProps<T>, "render"> &
+    AdditionalControlledInputProps
+
+export const ControlledTextAreaAlt = <T extends FieldValues>({
+  name,
+  control,
+  defaultValue,
+  rules,
+  onlyNumeric,
+  maxRows,
+  children,
+  onChange,
+  ...props
+}: ControlledTextAreaProps<T>) => (
+  <Controller
+    name={name}
+    control={control}
+    defaultValue={defaultValue}
+    rules={rules}
+    render={({ field: { ref, value, onChange: onValueChange, ...field } }) => (
+      <InputTextArea
+        style={{ position: "relative" }}
+        value={value || ""}
+        inputRef={ref}
+        maxRows={maxRows}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+          if (onlyNumeric) {
+            if (isAllowedNumericInputValue(e.target.value)) {
+              onValueChange(e)
+              return isFunction(onChange) && onChange(e)
+            }
+          } else {
+            onValueChange(e)
+            return isFunction(onChange) && onChange(e)
+          }
+        }}
+        {...field}
+        {...props}
+      >
+        {children}
+      </InputTextArea>
+    )}
+  />
+)
+
+export type ControlledTextAreaType = typeof ControlledTextAreaAlt
+
+export const StyledControlledTextArea: ControlledTextAreaType = styled(
+  ControlledTextAreaAlt,
+)`
+  padding: 12px 16px;
+  border: 1px solid ${({ theme }) => theme.bg2};
+  border-radius: 8px;
+  background-color: black;
 `

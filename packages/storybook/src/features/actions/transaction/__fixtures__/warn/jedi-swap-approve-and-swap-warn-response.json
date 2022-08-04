@@ -1,0 +1,67 @@
+{
+  "assessment": "warn",
+  "reason": "amount_mismatch_too_low",
+  "reviews": [
+    {
+      "assessment": "neutral",
+      "assessmentDetails": {
+        "contract_address": "0x02f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c"
+      },
+      "activity": {
+        "value": {
+          "token": {
+            "address": "0x02f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
+            "name": "Mint Square Storefront",
+            "symbol": "MINTSQ",
+            "unknown": false,
+            "type": "ERC721"
+          },
+          "tokenId": "36713",
+          "tokenURI": "ipfs://QmTDeD1X7QG6m7kkHW1g1krc4VqFyW6VZ86hVcgkK1Q69H"
+        },
+        "spender": "866079946690358847859985129991514658898248253189226492476287621475869744734",
+        "type": "approve"
+      }
+    },
+    {
+      "assessment": "warn",
+      "assessmentReason": "amount_mismatch_too_low",
+      "assessmentDetails": {
+        "contract_address": "0x01ea2f12a70ad6a052f99a49dace349996a8e968a0d6d4e9ec34e0991e6d5e5e"
+      },
+      "activity": {
+        "dapp": {
+          "address": "0x01ea2f12a70ad6a052f99a49dace349996a8e968a0d6d4e9ec34e0991e6d5e5e",
+          "name": "Jediswap"
+        },
+        "src": {
+          "token": {
+            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "name": "Ether",
+            "symbol": "ETH",
+            "decimals": 18,
+            "unknown": false,
+            "type": "ERC20"
+          },
+          "amount": "1000000000000000000",
+          "usd": 1657.07,
+          "slippage": "equal"
+        },
+        "dst": {
+          "token": {
+            "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+            "name": "DAI",
+            "symbol": "DAI",
+            "decimals": 18,
+            "unknown": false,
+            "type": "ERC20"
+          },
+          "amount": "1120000000000000000000",
+          "usd": 1119.31,
+          "slippage": "at_least"
+        },
+        "type": "swap"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "contractAddress": "0x02f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
+    "entrypoint": "approve",
+    "calldata": [
+      "866079946690358847859985129991514658898248253189226492476287621475869744734",
+      "36713",
+      "0"
+    ]
+  },
+  {
+    "contractAddress": "0x01ea2f12a70ad6a052f99a49dace349996a8e968a0d6d4e9ec34e0991e6d5e5e",
+    "entrypoint": "swap_exact_tokens_for_tokens",
+    "calldata": [
+      "1000000000000000000",
+      "0",
+      "1120000000000000000000",
+      "0",
+      "2",
+      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+      "0x1",
+      "1649694832"
+    ]
+  }
+]

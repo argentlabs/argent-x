@@ -1,4 +1,4 @@
-import { isArray } from "lodash-es"
+import { isArray, lowerCase } from "lodash-es"
 import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_REVIEW_STARKNET_URL } from "./api/constants"
@@ -32,32 +32,61 @@ export interface ApiTransactionReviewResponse {
   reviews: ApiTransactionReview[]
 }
 
+export type ApiTransactionReviewActivityType =
+  | "account-upgrade"
+  | "approve"
+  | "set-approval-for-all"
+  | "swap"
+  | "transfer"
+
+export type ApiTransactionReviewSlippageType = "equals" | "at_least" | "at_most"
+
+export interface ApiTransactionReviewToken {
+  address: string
+  name?: string
+  symbol?: string
+  decimals: number
+  unknown: boolean
+  type: "ERC20" | "ERC721"
+}
+
+export interface ApiTransactionReviewActivity {
+  value?: {
+    token: ApiTransactionReviewToken
+    tokenId?: string
+    amount?: string
+    /** usd converted fiat equivalent of token amount */
+    usd?: number
+    slippage: ApiTransactionReviewSlippageType
+  }
+  dapp?: {
+    address: string
+    name: string
+  }
+  src?: {
+    token: ApiTransactionReviewToken
+    amount: string
+    usd: number
+    slippage: ApiTransactionReviewSlippageType
+  }
+  dst?: {
+    token: ApiTransactionReviewToken
+    amount: string
+    usd: number
+    slippage: ApiTransactionReviewSlippageType
+  }
+  recipient?: string
+  spender?: string
+  type: ApiTransactionReviewActivityType
+}
+
 export interface ApiTransactionReview {
   assessment: ApiTransactionReviewAssessment
   assessmentReason?: ApiTransactionReviewAssessmentReason
   assessmentDetails: {
     contract_address: string
   }
-  activity?: {
-    value?: {
-      token: {
-        address: string
-        name?: string
-        symbol?: string
-        decimals: number
-        unknown: boolean
-        type: string
-      }
-      tokenId?: string
-      amount?: string
-      /** usd converted fiat equivalent of token amount */
-      usd?: number
-      slippage: string
-    }
-    recipient?: string
-    spender?: string
-    type: string
-  }
+  activity?: ApiTransactionReviewActivity
 }
 
 export type ApiTransactionReviewNetwork =
@@ -116,13 +145,36 @@ export const getDisplayWarnAndReasonForTransactionReview = (
     return {}
   }
   const warn = transactionReview.assessment === "warn"
+  const suffix = transactionReview.reason
+    ? ` (Reason: ${lowerCase(transactionReview.reason)})`
+    : ""
   const reason = warn
     ? transactionReview.reason === "recipient_is_token_address"
       ? "You are sending tokens to their own address. This is likely to burn them."
-      : "This transaction has been flagged as dangerous. We recommend you reject this transaction unless you are sure."
+      : `This transaction has been flagged as dangerous. We recommend you reject this transaction unless you are sure.${suffix}`
     : undefined
   return {
     warn,
     reason,
   }
+}
+
+/** finds activity of type 'swap */
+export const getTransactionReviewSwap = (
+  transactionReview?: ApiTransactionReviewResponse,
+): ApiTransactionReviewActivity | undefined => {
+  if (!transactionReview) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.activity?.type === "swap") {
+      return review.activity
+    }
+  }
+}
+
+export const getTransactionReviewHasSwap = (
+  transactionReview?: ApiTransactionReviewResponse,
+) => {
+  return !!getTransactionReviewSwap(transactionReview)
 }
