@@ -82,7 +82,7 @@ const OptionIcon: FC = () => {
 
 interface OptionProps {
   icon: ReactNode
-  title: string
+  title: ReactNode
   description?: string
   onClick?: () => void
   disabled?: boolean
