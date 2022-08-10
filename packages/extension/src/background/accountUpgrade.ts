@@ -19,6 +19,8 @@ export const upgradeAccount = async ({
 }: IUpgradeAccount) => {
   const fullAccount = await wallet.getAccount(account)
 
+  const accountType = fullAccount.type
+
   const { accountClassHash: newImplementation } = await getNetwork(
     fullAccount.network.id,
   )
@@ -27,12 +29,17 @@ export const upgradeAccount = async ({
     throw "Cannot upgrade account without a new contract implementation"
   }
 
+  const implementationClassHash =
+    accountType === "argent-plugin" && newImplementation.argentPluginAccount
+      ? newImplementation.argentPluginAccount
+      : newImplementation.argentAccount
+
   const payload = {
     transactions: {
       contractAddress: fullAccount.address,
       entrypoint: "upgrade",
       calldata: stark.compileCalldata({
-        implementation: newImplementation,
+        implementation: implementationClassHash,
       }),
     },
   }

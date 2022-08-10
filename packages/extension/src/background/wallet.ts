@@ -8,6 +8,7 @@ import {
 } from "starknet/dist/utils/hash"
 import browser from "webextension-polyfill"
 
+import { ArgentAccountType } from "./../shared/wallet.model"
 import { withHiddenSelector } from "../shared/account/selectors"
 import {
   Network,
@@ -15,6 +16,7 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/network"
+import { settingsStore } from "../shared/settings"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -47,6 +49,7 @@ const PROXY_CONTRACT_CLASS_HASHES = [
 ]
 const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
   "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+  "0x7e28fb0161d10d1cf7fe1f13e7ca57bce062731a3bd04494dfd2d0412699727",
 ]
 
 export interface WalletSession {
@@ -170,9 +173,16 @@ export class Wallet {
 
   private async getAccountClassHashForNetwork(
     network: Network,
+    accountType: ArgentAccountType,
   ): Promise<string> {
-    if (network?.accountClassHash) {
-      return network.accountClassHash
+    if (network.accountClassHash) {
+      if (
+        accountType === "argent-plugin" &&
+        network.accountClassHash.argentPluginAccount
+      ) {
+        return network.accountClassHash.argentPluginAccount
+      }
+      return network.accountClassHash.argentAccount
     }
     const [, accountContract] = await this.loadContracts(network.id)
     const provider = getProvider(network)
@@ -191,9 +201,14 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
+    const shouldUsePluginAccount = await settingsStore.get(
+      "experimentalPluginAccount",
+    )
+    const accountType = shouldUsePluginAccount ? "argent-plugin" : "argent"
+
     const accountClassHashes = union(
       ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash ? [network.accountClassHash] : [],
+      network?.accountClassHash ? [network.accountClassHash.argentAccount] : [],
     )
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
@@ -244,6 +259,7 @@ export class Wallet {
                 type: "local_secret",
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
+              type: accountType,
             })
           }
 
@@ -342,6 +358,11 @@ export class Wallet {
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.walletStore.get(withHiddenSelector)
+    const shouldUsePluginAccount = await settingsStore.get(
+      "experimentalPluginAccount",
+    )
+    const accountType = shouldUsePluginAccount ? "argent-plugin" : "argent"
+
     const currentPaths = accounts
       .filter(
         (account) =>
@@ -357,13 +378,14 @@ export class Wallet {
     const payload = await this.getDeployContractPayloadForAccountIndex(
       index,
       networkId,
+      accountType,
     )
 
     const deployTransaction = await provider.deployContract(payload)
 
     const proxyAddress = deployTransaction.contract_address
 
-    const account = {
+    const account: WalletAccount = {
       network,
       networkId: network.id,
       address: proxyAddress,
@@ -371,6 +393,7 @@ export class Wallet {
         type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
+      type: accountType,
     }
 
     await this.walletStore.push([account])
@@ -394,9 +417,15 @@ export class Wallet {
       baseDerivationPath,
     )
 
+    const shouldUsePluginAccount = await settingsStore.get(
+      "experimentalPluginAccount",
+    )
+    const accountType = shouldUsePluginAccount ? "argent-plugin" : "argent"
+
     const payload = await this.getDeployContractPayloadForAccountIndex(
       index,
       networkId,
+      accountType,
     )
 
     const deployTransaction = await provider.deployContract(payload)
@@ -407,6 +436,7 @@ export class Wallet {
   public async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
+    accountType: ArgentAccountType,
   ): Promise<DeployContractPayload> {
     const hasSession = await this.isSessionOpen()
     const session = await this.sessionStore.get()
@@ -424,7 +454,10 @@ export class Wallet {
     const starkPub = ec.getStarkKey(starkPair)
     const [proxyCompiledContract] = await this.loadContracts(baseDerivationPath)
 
-    const accountClassHash = await this.getAccountClassHashForNetwork(network)
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      accountType,
+    )
 
     const payload = {
       contract: proxyCompiledContract,

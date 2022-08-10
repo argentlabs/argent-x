@@ -4,6 +4,7 @@ import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { Network, getNetwork, getProvider } from "../../../shared/network"
 import {
+  ArgentAccountType,
   BaseWalletAccount,
   WalletAccount,
   WalletAccountSigner,
@@ -16,6 +17,7 @@ export class Account {
   network: Network
   networkId: string
   signer: WalletAccountSigner
+  type: ArgentAccountType
   deployTransaction?: string
   contract: Contract
   proxyContract: Contract
@@ -28,12 +30,14 @@ export class Account {
     signer,
     deployTransaction,
     hidden,
+    type,
   }: {
     address: string
     network: Network
     signer: WalletAccountSigner
     deployTransaction?: string
     hidden?: boolean
+    type: ArgentAccountType
   }) {
     this.address = address
     this.network = network
@@ -41,6 +45,7 @@ export class Account {
     this.signer = signer
     this.hidden = hidden
     this.deployTransaction = deployTransaction
+    this.type = type
     this.provider = getProvider(network)
     this.contract = new Contract(
       ArgentCompiledContractAbi as Abi,
@@ -107,16 +112,18 @@ export class Account {
       network,
       signer: result.account.signer,
       deployTransaction: result.txHash,
+      type: result.account.type,
     })
   }
 
   public toWalletAccount(): WalletAccount {
-    const { networkId, address, network, signer } = this
+    const { networkId, address, network, signer, type } = this
     return {
       networkId,
       address,
       network,
       signer,
+      type,
     }
   }
 

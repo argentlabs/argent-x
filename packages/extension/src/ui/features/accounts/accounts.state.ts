@@ -24,6 +24,7 @@ export const mapWalletAccountsToAccounts = (
         network: walletAccount.network,
         signer: walletAccount.signer,
         hidden: walletAccount.hidden,
+        type: walletAccount.type,
       }),
   )
 }

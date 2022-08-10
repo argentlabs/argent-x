@@ -31,10 +31,11 @@ export const connectAccount = ({
   network,
   networkId,
   signer,
+  type,
 }: Account) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
-    data: { address, network, networkId, signer },
+    data: { address, network, networkId, signer, type },
   })
 }
 

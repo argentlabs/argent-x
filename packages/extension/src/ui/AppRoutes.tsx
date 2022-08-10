@@ -43,6 +43,7 @@ import { SendScreen } from "./features/send/SendScreen"
 import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
 import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
+import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
@@ -135,7 +136,6 @@ const walletRoutes = (
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
     />
-
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
@@ -205,6 +205,10 @@ const walletRoutes = (
     <Route
       path={routes.settingsPrivacy.path}
       element={<PrivacySettingsScreen />}
+    />
+    <Route
+      path={routes.settingsExperimental.path}
+      element={<PrivacyExperimentalSettings />}
     />
     <Route
       path={routes.privacyStatement.path}

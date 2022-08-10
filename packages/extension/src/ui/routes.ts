@@ -103,6 +103,7 @@ export const routes = {
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
+  settingsExperimental: route("/settings/experimental"),
   settingsAddressbook: route("/settings/addressbook"),
   settingsAddressbookEdit: route(
     (contactId) => `/settings/addressbook/add-or-edit/${contactId}`,

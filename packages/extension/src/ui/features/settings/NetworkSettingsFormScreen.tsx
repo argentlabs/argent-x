@@ -168,7 +168,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
               autoComplete="off"
               control={control}
               placeholder="Account class hash"
-              name="accountClassHash"
+              name="accountClassHash.argentAccount"
               type="text"
               disabled={defaultNetwork.readonly}
             />
