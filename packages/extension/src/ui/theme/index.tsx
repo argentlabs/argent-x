@@ -38,6 +38,8 @@ export const colors = {
   blue2: "#94e2ff",
 
   yellow1: "#ffbf3d",
+
+  green1: "#02bba8",
 }
 
 export const components = {
