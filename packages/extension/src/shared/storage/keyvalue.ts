@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill"
 
+import { MockStorage } from "./__test__/chrome-storage.mock"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
 import {
   AllowPromise,
@@ -36,10 +37,21 @@ export class KeyValueStorage<
     const options = getOptionsWithDefaults(optionsOrNamespace)
     this.namespace = options.namespace
     this.areaName = options.areaName
-    this.storageImplementation = browser.storage[options.areaName]
-
-    if (!this.storageImplementation) {
-      throw new Error(`Unknown storage area: ${options.areaName}`)
+    try {
+      this.storageImplementation = browser.storage[options.areaName]
+      if (!this.storageImplementation) {
+        throw new Error()
+      }
+    } catch (e) {
+      if (options.areaName === "session") {
+        const { manifest_version } = browser.runtime.getManifest()
+        if (manifest_version === 2) {
+          console.log("[v2] Polyfill for browser.storage.session")
+          this.storageImplementation = new MockStorage("session") // for manifest v2
+          return
+        }
+      }
+      throw new Error(`Unsupported storage area: ${options.areaName}`)
     }
   }
 
