@@ -4047,26 +4047,26 @@
     webpack-virtual-modules "^0.2.2"
 
 "@storybook/builder-webpack5@^6.5.9":
-  version "6.5.9"
-  resolved "https://registry.yarnpkg.com/@storybook/builder-webpack5/-/builder-webpack5-6.5.9.tgz#30b4e08622daff104bcccd015d3ee7902f99dd99"
-  integrity sha512-NUVZ4Qci6HWPuoH8U/zQkdBO5soGgu7QYrGC/LWU0tRfmmZxkjr7IUU14ppDpGPYgx3r7jkaQI1J/E1YEmSCWQ==
+  version "6.5.10"
+  resolved "https://registry.yarnpkg.com/@storybook/builder-webpack5/-/builder-webpack5-6.5.10.tgz#de78a8a262410bbe65eecc62f2beaed1fe44dd5d"
+  integrity sha512-Hcsm/TzGRXHndgQCftt+pzI7GQJRqAv8A8ie5b3aFcodhJfK0qzZsQD4Y4ZWxXh1I/xe5t74Kl2qUJ40PX+geA==
   dependencies:
     "@babel/core" "^7.12.10"
-    "@storybook/addons" "6.5.9"
-    "@storybook/api" "6.5.9"
-    "@storybook/channel-postmessage" "6.5.9"
-    "@storybook/channels" "6.5.9"
-    "@storybook/client-api" "6.5.9"
-    "@storybook/client-logger" "6.5.9"
-    "@storybook/components" "6.5.9"
-    "@storybook/core-common" "6.5.9"
-    "@storybook/core-events" "6.5.9"
-    "@storybook/node-logger" "6.5.9"
-    "@storybook/preview-web" "6.5.9"
-    "@storybook/router" "6.5.9"
+    "@storybook/addons" "6.5.10"
+    "@storybook/api" "6.5.10"
+    "@storybook/channel-postmessage" "6.5.10"
+    "@storybook/channels" "6.5.10"
+    "@storybook/client-api" "6.5.10"
+    "@storybook/client-logger" "6.5.10"
+    "@storybook/components" "6.5.10"
+    "@storybook/core-common" "6.5.10"
+    "@storybook/core-events" "6.5.10"
+    "@storybook/node-logger" "6.5.10"
+    "@storybook/preview-web" "6.5.10"
+    "@storybook/router" "6.5.10"
     "@storybook/semver" "^7.3.2"
-    "@storybook/store" "6.5.9"
-    "@storybook/theming" "6.5.9"
+    "@storybook/store" "6.5.10"
+    "@storybook/theming" "6.5.10"
     "@types/node" "^14.0.10 || ^16.0.0"
     babel-loader "^8.0.0"
     babel-plugin-named-exports-order "^0.0.2"
@@ -16472,7 +16472,7 @@ terser-webpack-plugin@^4.2.3:
     terser "^5.3.4"
     webpack-sources "^1.4.3"
 
-terser-webpack-plugin@^5.0.3:
+terser-webpack-plugin@^5.0.3, terser-webpack-plugin@^5.1.3:
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-5.3.3.tgz#8033db876dd5875487213e87c627bca323e5ed90"
   integrity sha512-Fx60G5HNYknNTNQnzQ1VePRuu89ZVYWfjRAeT5rITuCY/1b08s49e5kSQwHDirKZWuoKOBRFS98EUUoZ9kLEwQ==
@@ -16481,17 +16481,6 @@ terser-webpack-plugin@^5.0.3:
     jest-worker "^27.4.5"
     schema-utils "^3.1.1"
     serialize-javascript "^6.0.0"
-    terser "^5.7.2"
-
-terser-webpack-plugin@^5.1.3:
-  version "5.3.1"
-  resolved "https://registry.npmjs.org/terser-webpack-plugin/-/terser-webpack-plugin-5.3.1.tgz#0320dcc270ad5372c1e8993fabbd927929773e54"
-  integrity sha512-GvlZdT6wPQKbDNW/GDQzZFg/j4vKU96yl2q6mcUkzKOgW4gwf1Z8cZToUCrz31XHlPWH8MVb1r2tFtdDtTGJ7g==
-  dependencies:
-    jest-worker "^27.4.5"
-    schema-utils "^3.1.1"
-    serialize-javascript "^6.0.0"
-    source-map "^0.6.1"
     terser "^5.7.2"
 
 terser@^4.1.2, terser@^4.6.3:
