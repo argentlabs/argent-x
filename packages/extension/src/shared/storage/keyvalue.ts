@@ -51,7 +51,7 @@ export class KeyValueStorage<
           return
         }
       }
-      throw new Error(`Unsupported storage area: ${options.areaName}`)
+      throw new Error(`Unknown storage area: ${options.areaName}`)
     }
   }
 
