@@ -62,7 +62,7 @@ export const FundingBridgeScreen: FC = () => {
           )}
           {allowOrbiter && (
             <A
-              href={`https://www.orbiter.finance/?refer=argent&dests=starknet&fixed=1`}
+              href={`https://www.orbiter.finance/?referer=argent&dest=starknet&fixed=1&source=Mainnet`}
               targetBlank
               onClick={trackAddFundsService("orbiter", account.networkId)}
             >
