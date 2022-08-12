@@ -24,6 +24,7 @@ export const AccountListHiddenScreenItem: FC<IAccountListHiddenScreenItem> = ({
       accountName={accountName}
       accountAddress={account.address}
       networkId={account.networkId}
+      accountType={account.type}
       hidden
     />
   )
