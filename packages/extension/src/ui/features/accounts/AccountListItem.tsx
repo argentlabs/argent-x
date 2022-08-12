@@ -1,14 +1,21 @@
 import { FC, HTMLProps, ReactNode } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { ArgentAccountType } from "../../../shared/wallet.model"
+import { ButtonOutline } from "../../components/Button"
 import {
+  AddRoundedIcon,
   ArrowCircleDownIcon,
   LinkIcon,
   VisibilityIcon,
 } from "../../components/Icons/MuiIcons"
+import { PluginIcon } from "../../components/Icons/PluginIcon"
 import Row from "../../components/Row"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
+import { routes } from "../../routes"
 import { formatTruncatedAddress } from "../../services/addresses"
+import { useHover } from "../../services/useHover"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
@@ -17,6 +24,7 @@ export interface IAccountListItem {
   accountAddress: string
   networkId: string
   networkName?: string
+  accountType: ArgentAccountType
   outline?: boolean
   highlight?: boolean
   deploying?: boolean
@@ -37,6 +45,7 @@ type AccountListItemWrapperProps = Pick<
 }
 
 export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
+  position: relative;
   cursor: pointer;
   background-color: ${({ highlight, transparent, dark }) =>
     transparent || dark
@@ -140,6 +149,21 @@ const NetworkContainer = styled.div`
   color: ${({ theme }) => theme.text2};
 `
 
+const PluginTextContainer = styled(NetworkContainer)`
+  font-size: 10px;
+  position: absolute;
+  top: 7.5px;
+  right: 8px;
+`
+const AddPluginButton = styled(ButtonOutline)`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: center;
+  justify-content: center;
+  gap: 4.28px;
+  padding: 5px 6px;
+  font-size: 8px;
+`
+
 const StyledContactAddress = styled.p`
   font-weight: 400;
   font-size: 10px;
@@ -152,6 +176,7 @@ export const AccountListItem: FC<IAccountListItem> = ({
   accountAddress,
   networkId,
   networkName,
+  accountType,
   deploying,
   upgrade,
   connected,
@@ -161,12 +186,16 @@ export const AccountListItem: FC<IAccountListItem> = ({
   style,
   ...rest
 }) => {
+  const [hoverRef, isHovered] = useHover<HTMLDivElement>()
+  const navigate = useNavigate()
+
   return (
     <AccountListItemWrapper
       dark={hidden}
       style={style}
       {...rest}
       onClick={onClick}
+      ref={hoverRef}
     >
       <AccountAvatar
         src={getNetworkAccountImageUrl({
@@ -194,6 +223,21 @@ export const AccountListItem: FC<IAccountListItem> = ({
           )}
         </AccountColumn>
         <AccountColumn>
+          {accountType === "argent-plugin" ? (
+            isHovered ? (
+              <AddPluginButton
+                onClick={(e) => {
+                  e.stopPropagation()
+                  navigate(routes.addPlugin(accountAddress))
+                }}
+              >
+                <AddRoundedIcon style={{ fontSize: "12px" }} />
+                <PluginIcon />
+              </AddPluginButton>
+            ) : (
+              <PluginTextContainer>Plugin</PluginTextContainer>
+            )
+          ) : undefined}
           {deploying ? (
             <NetworkStatusWrapper>
               <TransactionStatusIndicator color="orange" />

@@ -91,6 +91,10 @@ export const routes = {
     (tokenAddress: string) => `/tokens/${tokenAddress}/hide`,
     "/tokens/:tokenAddress/hide",
   ),
+  addPlugin: route(
+    (accountAddress) => `/add-plugin/${accountAddress}`,
+    "/add-plugin/:accountAddress",
+  ),
   reset: route("/reset"),
   disclaimer: route("/disclaimer"),
   migrationDisclaimer: route("/migration-disclaimer"),
