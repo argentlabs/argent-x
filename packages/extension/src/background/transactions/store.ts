@@ -1,6 +1,7 @@
 import { differenceWith } from "lodash-es"
 
 import { ArrayStorage } from "../../shared/storage"
+import { StorageChange } from "../../shared/storage/types"
 import {
   Transaction,
   TransactionRequest,
@@ -30,6 +31,17 @@ export const addTransaction = async (transaction: TransactionRequest) => {
   }
 
   return transactionsStore.push(newTransaction)
+}
+
+export const getUpdatedTransactionsForChangeSet = (
+  changeSet: StorageChange<Transaction[]>,
+) => {
+  const updatedTransactions = differenceWith(
+    changeSet.oldValue ?? [],
+    changeSet.newValue ?? [],
+    equalTransactionWithStatus,
+  )
+  return updatedTransactions
 }
 
 const equalTransactionWithStatus = (

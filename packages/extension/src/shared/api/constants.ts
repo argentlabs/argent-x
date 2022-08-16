@@ -33,3 +33,9 @@ export const ARGENT_X_STATUS_URL = process.env.ARGENT_X_STATUS_URL as string
 
 export const ARGENT_X_STATUS_ENABLED =
   isString(ARGENT_X_STATUS_URL) && ARGENT_X_STATUS_URL.length > 0
+
+export const ARGENT_EXPLORER_BASE_URL = process.env
+  .ARGENT_EXPLORER_BASE_URL as string
+
+export const ARGENT_EXPLORER_ENABLED =
+  isString(ARGENT_EXPLORER_BASE_URL) && ARGENT_EXPLORER_BASE_URL.length > 0

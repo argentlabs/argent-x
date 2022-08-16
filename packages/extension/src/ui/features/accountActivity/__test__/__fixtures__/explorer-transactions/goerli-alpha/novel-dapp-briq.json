@@ -1,0 +1,119 @@
+{
+  "id": "0xb7572612045a9c28277f0265499f78f9a549c34a1b5591598cce34d0cc042d",
+  "blockNumber": 284700,
+  "timestamp": 1660823428,
+  "transactionHash": "0xb7572612045a9c28277f0265499f78f9a549c34a1b5591598cce34d0cc042d",
+  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "entryPoint": "__execute__",
+  "maxFee": "0x18052c7bc254",
+  "actualFee": "0x100372fce771",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "TransferSingle",
+      "address": "0x1317354276941f7f799574c73fd8fe53fa3f251084b4c04d88cf601b6bd915e",
+      "parameters": [
+        {
+          "name": "operator_",
+          "value": "0x1317354276941f7f799574c73fd8fe53fa3f251084b4c04d88cf601b6bd915e"
+        },
+        {
+          "name": "from_",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "to_",
+          "value": "0x754e34a517c482d716ba7b38dbd4138611a4439aa9d6ab9d000000000000000"
+        },
+        { "name": "id_", "value": "0x1" },
+        { "name": "value_", "value": "0x4" }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x266b1276d23ffb53d99da3f01be7e29fa024dd33cd7f7b1eb7a46c67891c9d0",
+      "parameters": [
+        { "name": "from_", "value": "0x0" },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "value",
+          "value": "3316173793562446080645276102223254302497989077948078348945582180132758487040"
+        }
+      ]
+    },
+    {
+      "name": "URI",
+      "address": "0x266b1276d23ffb53d99da3f01be7e29fa024dd33cd7f7b1eb7a46c67891c9d0",
+      "parameters": [
+        { "name": "value__len", "value": "0x4" },
+        {
+          "name": "value_",
+          "value": [
+            "0x68747470733a2f2f6170692e627269712e636f6e737472756374696f6e2f73",
+            "0x746f72655f6765742f30783735346533346135313763343832643731366261",
+            "0x37623338646264343133383631316134343339616139643661623964303030",
+            "0x303030303030303030303030"
+          ]
+        },
+        {
+          "name": "id_",
+          "value": "0x754e34a517c482d716ba7b38dbd4138611a4439aa9d6ab9d000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0xb7572612045a9c28277f0265499f78f9a549c34a1b5591598cce34d0cc042d"
+        },
+        { "name": "response_len", "value": "0x0" },
+        { "name": "response", "value": [] }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "assemble",
+      "address": "0x266b1276d23ffb53d99da3f01be7e29fa024dd33cd7f7b1eb7a46c67891c9d0",
+      "parameters": [
+        {
+          "name": "owner",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "token_id_hint",
+          "value": "0x7ed6c4e63714ac7bd61140debab5fc6"
+        },
+        { "name": "fts_len", "value": "0x1" },
+        {
+          "name": "fts",
+          "value": [
+            [
+              { "name": "token_id", "value": "0x1", "type": "felt" },
+              { "name": "qty", "value": "0x4", "type": "felt" }
+            ]
+          ]
+        },
+        { "name": "nfts_len", "value": "0x0" },
+        { "name": "nfts", "value": [] },
+        { "name": "uri_len", "value": "0x4" },
+        {
+          "name": "uri",
+          "value": [
+            "0x68747470733a2f2f6170692e627269712e636f6e737472756374696f6e2f73",
+            "0x746f72655f6765742f30783735346533346135313763343832643731366261",
+            "0x37623338646264343133383631316134343339616139643661623964303030",
+            "0x303030303030303030303030"
+          ]
+        }
+      ]
+    }
+  ]
+}

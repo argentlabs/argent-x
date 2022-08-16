@@ -1,5 +1,5 @@
 import { lowerCase, upperFirst } from "lodash-es"
-import { Status } from "starknet"
+import { Call, Status } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
 
@@ -57,3 +57,25 @@ export const getInFlightTransactions = (
   transactions.filter(({ status }) =>
     TRANSACTION_STATUSES_TO_TRACK.includes(status),
   )
+
+export function nameTransaction(calls: Call | Call[]): TransactionMeta {
+  const callsArray = Array.isArray(calls) ? calls : [calls]
+  const entrypointNames = callsArray.map((call) => call.entrypoint)
+  return {
+    title: transactionNamesToTitle(entrypointNames),
+  }
+}
+
+export function transactionNamesToTitle(
+  names: string | string[],
+): string | undefined {
+  if (!Array.isArray(names)) {
+    names = [names]
+  }
+  const entrypointNames = names.map((name) => lowerCase(name))
+  const lastName = entrypointNames.pop()
+  const title = entrypointNames.length
+    ? `${entrypointNames.join(", ")} and ${lastName}`
+    : lastName
+  return upperFirst(title)
+}

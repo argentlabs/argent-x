@@ -4,9 +4,9 @@ import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
+import { nameTransaction } from "../../shared/transactions"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce } from "../nonce"
-import { nameTransaction } from "../transactions/transactionNames"
 import { addTransaction } from "./store"
 
 export const checkTransactionHash = (
@@ -69,7 +69,7 @@ export const executeTransaction = async (
   await addTransaction({
     hash: transaction.transaction_hash,
     account: selectedAccount,
-    meta: nameTransaction(transactions, abis),
+    meta: nameTransaction(transactions),
   })
 
   if (!nonceWasProvidedByUI) {

@@ -27,7 +27,7 @@ export const TokenWrapper = styled.div`
 `
 
 export const TokenDetailsWrapper = styled.div`
-  width: 100%;
+  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,6 +36,7 @@ export const TokenDetailsWrapper = styled.div`
 export const TokenTextGroup = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `
 
 export const TokenTitle = styled.h3`

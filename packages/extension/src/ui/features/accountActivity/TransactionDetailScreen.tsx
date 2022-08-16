@@ -1,10 +1,11 @@
 import { isString } from "lodash-es"
-import { FC } from "react"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { FC, useMemo } from "react"
+import { Navigate, useParams } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
 
 import { Network } from "../../../shared/network"
 import { Transaction, compareTransactions } from "../../../shared/transactions"
+import { useAppState } from "../../app.state"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -13,7 +14,6 @@ import {
   FieldValue,
   LeftPaddedField,
 } from "../../components/Fields"
-import { CloseIcon } from "../../components/Icons/CloseIcon"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 import { formatTruncatedAddress } from "../../services/addresses"
@@ -21,7 +21,13 @@ import { formatDateTime } from "../../services/dates"
 import { openVoyagerTransaction } from "../../services/voyager.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
+import { useTokensInNetwork } from "../accountTokens/tokens.state"
+import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { ExplorerTransactionDetail } from "./ExplorerTransactionDetail"
+import { TransactionDetailWrapper } from "./TransactionDetailWrapper"
+import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
+import { useArgentExplorerTransaction } from "./useArgentExplorer"
 
 function getErrorMessageFromErrorDump(errorDump?: string) {
   try {
@@ -35,36 +41,10 @@ function getErrorMessageFromErrorDump(errorDump?: string) {
   }
 }
 
-const HeadContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  padding: 20px 18px;
-`
-
-const CloseIconWrapper = styled.div`
-  cursor: pointer;
-`
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0 16px 0px;
-  margin-bottom: 24px;
-`
-
 const StyledContentCopyIcon = styled(ContentCopyIcon)`
   margin-left: 0.5em;
   cursor: pointer;
   font-size: 12px;
-`
-
-const Title = styled.h2`
-  font-weight: 700;
-  font-size: 28px;
-  line-height: 34px;
-  margin-bottom: 17.5px;
-  text-align: left;
-  padding-left: 8px;
 `
 
 const TransactionFailedField = styled(Field)`
@@ -85,13 +65,46 @@ const TransactionLogKey = styled(FieldKey)`
   align-items: center;
   gap: 7px;
 `
+
 export const TransactionDetailScreen: FC = () => {
   const network = useCurrentNetwork()
   const { txHash } = useParams()
-
+  const { data: explorerTransaction, isValidating } =
+    useArgentExplorerTransaction(txHash)
   const account = useSelectedAccount()
+  const { switcherNetworkId } = useAppState()
+  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
 
   const { transactions } = useAccountTransactions(account)
+
+  const isLoading = isValidating && !explorerTransaction
+
+  const transaction = useMemo(() => {
+    if (!txHash) {
+      return
+    }
+    return transactions.find((tx) =>
+      compareTransactions(tx, {
+        hash: txHash,
+        account: {
+          networkId: network.id,
+        },
+      }),
+    )
+  }, [network.id, transactions, txHash])
+
+  const explorerTransactionTransformed = useMemo(() => {
+    if (explorerTransaction && account) {
+      if (!explorerTransaction.timestamp && transaction) {
+        explorerTransaction.timestamp = transaction.timestamp
+      }
+      return transformExplorerTransaction({
+        explorerTransaction,
+        accountAddress: account.address,
+        tokensByNetwork,
+      })
+    }
+  }, [account, explorerTransaction, tokensByNetwork, transaction])
 
   if (!account) {
     return <Navigate to={routes.accounts()} />
@@ -99,18 +112,26 @@ export const TransactionDetailScreen: FC = () => {
     return <Navigate to={routes.accountTokens()} />
   }
 
-  const transaction = transactions.find((tx) =>
-    compareTransactions(tx, {
-      hash: txHash,
-      account: {
-        networkId: network.id,
-      },
-    }),
-  )
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
+  if (explorerTransaction && explorerTransactionTransformed) {
+    return (
+      <ExplorerTransactionDetail
+        explorerTransaction={explorerTransaction}
+        explorerTransactionTransformed={explorerTransactionTransformed}
+        network={network}
+        tokensByNetwork={tokensByNetwork}
+      />
+    )
+  }
 
   if (!transaction) {
-    return <Navigate to={routes.accountTokens()} />
+    /** not possible via UI */
+    return null
   }
+
   return <TransactionDetail transaction={transaction} network={network} />
 }
 
@@ -119,16 +140,10 @@ interface ITransactionDetail {
   network: Network
 }
 
-/**
- * TODO: rename - this currently displays a 'voyager' transaction shape,
- * should eventually be differentiated from 'rich' transaction from API
- */
-
 export const TransactionDetail: FC<ITransactionDetail> = ({
   transaction,
   network,
 }) => {
-  const navigate = useNavigate()
   const theme = useTheme()
   const isRejected = transaction.status === "REJECTED"
 
@@ -141,88 +156,77 @@ export const TransactionDetail: FC<ITransactionDetail> = ({
   const dateLabel = formatDateTime(date)
 
   return (
-    <>
-      <HeadContainer>
-        <CloseIconWrapper onClick={() => navigate(routes.accountActivity())}>
-          <CloseIcon />
-        </CloseIconWrapper>
-      </HeadContainer>
-      <Container>
-        <Title>Transaction</Title>
-
-        <FieldGroup>
+    <TransactionDetailWrapper>
+      <FieldGroup>
+        <Field>
+          <FieldKey>Status</FieldKey>
+          <FieldValue>{isRejected ? "Failed" : "Complete"}</FieldValue>
+        </Field>
+        {errorMessage && (
           <Field>
-            <FieldKey>Status</FieldKey>
-            <FieldValue>{isRejected ? "Failed" : "Complete"}</FieldValue>
+            <FieldKey>Reason</FieldKey>
+            <LeftPaddedField>{errorMessage}</LeftPaddedField>
           </Field>
-          {errorMessage && (
-            <Field>
-              <FieldKey>Reason</FieldKey>
-              <LeftPaddedField>{errorMessage}</LeftPaddedField>
-            </Field>
+        )}
+        <Field>
+          <FieldKey>Time</FieldKey>
+          {dateLabel && <FieldValue>{dateLabel}</FieldValue>}
+        </Field>
+        <Field>
+          <FieldKey>
+            Hash
+            <CopyTooltip message="Copied" copyValue={transaction.hash}>
+              <StyledContentCopyIcon />
+            </CopyTooltip>
+          </FieldKey>
+          {transaction.hash && (
+            <FieldValue>{formatTruncatedAddress(transaction.hash)}</FieldValue>
           )}
-          <Field>
-            <FieldKey>Time</FieldKey>
-            {dateLabel && <FieldValue>{dateLabel}</FieldValue>}
-          </Field>
-          <Field>
-            <FieldKey>
-              Hash
-              <CopyTooltip message="Copied" copyValue={transaction.hash}>
-                <StyledContentCopyIcon />
-              </CopyTooltip>
-            </FieldKey>
-            {transaction.hash && (
-              <FieldValue>
-                {formatTruncatedAddress(transaction.hash)}
-              </FieldValue>
-            )}
-          </Field>
+        </Field>
 
-          {/* TODO: Add this back when we have a way to fetch Network Fee from
+        {/* TODO: Add this back when we have a way to fetch Network Fee from
            txHash */}
 
-          {/* {!isRejected && (
+        {/* {!isRejected && (
             <TransactionField>
               <TransactionFieldKey>Network Fee</TransactionFieldKey>
               <TransactionFieldValue>0.0012 ETH</TransactionFieldValue>
             </TransactionField>
           )} */}
-        </FieldGroup>
+      </FieldGroup>
 
-        {isRejected ? (
-          <FieldGroup>
-            <TransactionFailedField clickable>
-              <TransactionLogKey>
-                <div>Transaction log</div>
-                <CopyTooltip
-                  message="Copied"
-                  copyValue={
-                    transaction.failureReason?.error_message || transaction.hash
-                  }
-                >
-                  <ContentCopyIcon style={{ fontSize: 12 }} />
-                </CopyTooltip>
-              </TransactionLogKey>
-              <TransactionLogMessage style={{ color: theme.text2 }}>
-                {transaction.failureReason?.error_message || "Unknown error"}
-              </TransactionLogMessage>
-            </TransactionFailedField>
-          </FieldGroup>
-        ) : (
-          <FieldGroup>
-            <Field
-              clickable
-              onClick={() => openVoyagerTransaction(transaction.hash, network)}
-            >
-              <FieldKey>View on Voyager</FieldKey>
-              <FieldValue>
-                <OpenInNewIcon />
-              </FieldValue>
-            </Field>
-          </FieldGroup>
-        )}
-      </Container>
-    </>
+      {isRejected ? (
+        <FieldGroup>
+          <TransactionFailedField clickable>
+            <TransactionLogKey>
+              <div>Transaction log</div>
+              <CopyTooltip
+                message="Copied"
+                copyValue={
+                  transaction.failureReason?.error_message || transaction.hash
+                }
+              >
+                <ContentCopyIcon style={{ fontSize: 12 }} />
+              </CopyTooltip>
+            </TransactionLogKey>
+            <TransactionLogMessage style={{ color: theme.text2 }}>
+              {transaction.failureReason?.error_message || "Unknown error"}
+            </TransactionLogMessage>
+          </TransactionFailedField>
+        </FieldGroup>
+      ) : (
+        <FieldGroup>
+          <Field
+            clickable
+            onClick={() => openVoyagerTransaction(transaction.hash, network)}
+          >
+            <FieldKey>View on Voyager</FieldKey>
+            <FieldValue>
+              <OpenInNewIcon />
+            </FieldValue>
+          </Field>
+        </FieldGroup>
+      )}
+    </TransactionDetailWrapper>
   )
 }

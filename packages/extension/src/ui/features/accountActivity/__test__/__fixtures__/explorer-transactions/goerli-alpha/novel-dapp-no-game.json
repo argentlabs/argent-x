@@ -1,0 +1,57 @@
+{
+  "id": "0x3e6c83914355eaf85977bed0338d20405745e361bde07035547a6a60b69ff93",
+  "blockNumber": 271167,
+  "timestamp": 1660823428,
+  "transactionHash": "0x3e6c83914355eaf85977bed0338d20405745e361bde07035547a6a60b69ff93",
+  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "entryPoint": "__execute__",
+  "maxFee": "0x12a4fccd3f2e",
+  "actualFee": "0xc6dfdde2a1f",
+  "status": "ACCEPTED_ON_L1",
+  "statusData": "",
+  "events": [
+    {
+      "name": "structure_updated",
+      "address": "0x35401b96dc690eda2716068d3b03732d7c18af7c0327787660179108789d84f",
+      "parameters": [
+        {
+          "name": "metal_used",
+          "value": "0x30"
+        },
+        {
+          "name": "crystal_used",
+          "value": "0x18"
+        },
+        {
+          "name": "deuterium_used",
+          "value": "0x0"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x3e6c83914355eaf85977bed0338d20405745e361bde07035547a6a60b69ff93"
+        },
+        {
+          "name": "response_len",
+          "value": "0x0"
+        },
+        {
+          "name": "response",
+          "value": []
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "crystal_upgrade_complete",
+      "address": "0x35401b96dc690eda2716068d3b03732d7c18af7c0327787660179108789d84f",
+      "parameters": []
+    }
+  ]
+}

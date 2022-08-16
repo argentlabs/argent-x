@@ -1,5 +1,7 @@
+import useSWR from "swr"
 import join from "url-join"
 
+import { fetcher } from "../../../shared/api/fetcher"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AspectNft } from "./aspect.model"
 
@@ -44,6 +46,18 @@ export const fetchAspectNftsByUrl = async (
   } catch {
     return []
   }
+}
+
+export const useAspectNft = (
+  contractAddress: string | undefined,
+  tokenId: string | undefined,
+  networkId: string,
+) => {
+  const url =
+    networkId === "goerli-alpha"
+      ? `https://api-testnet.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
+      : `https://api.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
+  return useSWR<AspectNft>(contractAddress && tokenId && url, fetcher)
 }
 
 export const openAspectNft = (

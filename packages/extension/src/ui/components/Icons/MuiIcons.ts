@@ -9,6 +9,7 @@ export { default as CheckCircleOutlineIcon } from "@mui/icons-material/CheckCirc
 export { default as CloseRoundedIcon } from "@mui/icons-material/CloseRounded"
 export { default as ContentCopyIcon } from "@mui/icons-material/ContentCopy"
 export { default as DeleteIcon } from "@mui/icons-material/Delete"
+export { default as DoneIcon } from "@mui/icons-material/DoneRounded"
 export { default as EditIcon } from "@mui/icons-material/Edit"
 export { default as EditRoundedIcon } from "@mui/icons-material/EditRounded"
 export { default as ErrorOutlineRoundedIcon } from "@mui/icons-material/ErrorOutlineRounded"

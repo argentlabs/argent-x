@@ -1,0 +1,12 @@
+{
+  "id": "0x23a45a6c7db9b8e3a04607292a89cfad17e864d3369e672d0de267c9ab1d545",
+  "blockNumber": 309970,
+  "timestamp": 1661423752,
+  "transactionHash": "0x23a45a6c7db9b8e3a04607292a89cfad17e864d3369e672d0de267c9ab1d545",
+  "contractAddress": "0x232398615e8e9c61ece466851420c93ccdf160be1b59927f7057bfd7a68c365",
+  "actualFee": "0x0",
+  "blockGasPrice": "3025969",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": []
+}
