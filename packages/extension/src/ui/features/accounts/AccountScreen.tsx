@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react"
 
 import { assertNever } from "../../services/assertNever"
-import { AccountActivity } from "../accountActivity/AccountActivity"
+import { AccountActivityContainer } from "../accountActivity/AccountActivity"
 import { AccountNfts } from "../accountNfts/AccountNfts"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
@@ -40,7 +40,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   } else if (tab === "nfts") {
     body = <AccountNfts account={account} />
   } else if (tab === "activity") {
-    body = <AccountActivity account={account} />
+    body = <AccountActivityContainer account={account} />
   } else {
     assertNever(tab)
   }

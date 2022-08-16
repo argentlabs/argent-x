@@ -6,14 +6,15 @@ import { Token } from "../../../../shared/token/type"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
 import { ERC20TransferTransactionDetails } from "./ERC20TransferTransactionDetails"
 
-export interface TransactionItemProps {
+export interface TransactionDetailsProps {
   transaction: Call
   tokensByNetwork: Token[]
   networkId: string
 }
+
 /** Renders a single transaction */
 
-export const TransactionItem: FC<TransactionItemProps> = ({
+export const TransactionDetails: FC<TransactionDetailsProps> = ({
   transaction,
   tokensByNetwork,
   networkId,

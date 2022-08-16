@@ -5,7 +5,7 @@ import { useAccountTransactions } from "../accounts/accountTransactions.state"
 
 export interface ActivityTransaction {
   hash: string
-  date: Date
+  date: string
   meta?: TransactionMeta
   isRejected?: boolean
 }
@@ -18,11 +18,16 @@ export function useActivity(account: BaseWalletAccount): DailyActivity {
   for (const { hash, timestamp, meta, status } of transactions) {
     // RECEIVED transactions are already shown as pending
     if (status !== "RECEIVED") {
-      const date = new Date(timestamp * 1000)
+      const date = new Date(timestamp * 1000).toString()
       const dateLabel = formatDate(date)
       const isRejected = status === "REJECTED"
       activity[dateLabel] ||= []
-      activity[dateLabel].push({ hash, date, meta, isRejected })
+      activity[dateLabel].push({
+        hash,
+        date,
+        meta,
+        isRejected,
+      })
     }
   }
   return activity
