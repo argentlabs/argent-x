@@ -4,10 +4,7 @@ import styled from "styled-components"
 import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { CopyTooltip } from "../../components/CopyTooltip"
-import {
-  ActionContainer,
-  ActionsWrapper,
-} from "../../components/ErrorBoundaryFallbackWithCopyError"
+import { ActionContainer } from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { ContentCopyIcon, RefreshIcon } from "../../components/Icons/MuiIcons"
 import {
   formatTruncatedAddress,
@@ -43,7 +40,13 @@ const AccountBalance = styled.div`
   margin-bottom: 8px;
 `
 
-const StyledActionsWrapper = styled(ActionsWrapper)`
+const StyledActionsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
   margin: 8px 0;
 `
 

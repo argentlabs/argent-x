@@ -1,4 +1,10 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import {
+  ComponentPropsWithoutRef,
+  FC,
+  useCallback,
+  useMemo,
+  useState,
+} from "react"
 import Measure, { ContentRect } from "react-measure"
 import styled from "styled-components"
 
@@ -6,10 +12,8 @@ const AnimatedHeight = styled.div`
   transition: height 0.2s;
 `
 
-export interface IExpandableHeightBox {
+export interface IExpandableHeightBox extends ComponentPropsWithoutRef<"div"> {
   expanded: boolean
-  // ...rest
-  [x: string]: any
 }
 
 export const ExpandableHeightBox: FC<IExpandableHeightBox> = ({

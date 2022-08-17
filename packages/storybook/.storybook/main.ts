@@ -25,6 +25,29 @@ export default {
         "@mui/styled-engine": "@mui/styled-engine-sc",
       },
     }
+
+    /**
+     * Override default Storybook svg loader with svgr
+     */
+    const fileLoaderRule = config.module?.rules?.find((rule) => {
+      if (rule !== "..." && rule?.test instanceof RegExp) {
+        return rule.test.test(".svg")
+      }
+    })
+    if (fileLoaderRule && fileLoaderRule !== "...") {
+      fileLoaderRule.exclude = /\.svg$/
+    }
+    config.module = {
+      ...(config.module || {}),
+      rules: [
+        ...(config.module?.rules || []),
+        {
+          test: /\.svg$/,
+          enforce: "pre",
+          loader: require.resolve("@svgr/webpack"),
+        },
+      ],
+    }
     return config
   },
 }
