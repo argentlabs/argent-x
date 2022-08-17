@@ -1,0 +1,18 @@
+[
+  {
+    "id": "310e899a-8f19-43c1-990d-95d87acaecf3",
+    "updatedAt": "2022-07-19T10:39:30.288Z",
+    "minVersion": "1.0.0",
+    "maxVersion": "1.0.0",
+    "level": "info",
+    "summary": "Message for version 1.0.0"
+  },
+  {
+    "id": "61f52d0d-c102-4a1c-a507-0a78aa909ae1",
+    "updatedAt": "2022-07-19T10:39:30.288Z",
+    "minVersion": "1.0.1",
+    "maxVersion": "2.0.0",
+    "level": "info",
+    "summary": "Message for version 1.0.1 to 2.0.0"
+  }
+]
