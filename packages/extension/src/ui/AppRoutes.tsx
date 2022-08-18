@@ -3,7 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "./app.state"
-import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
+import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
@@ -125,7 +125,7 @@ const walletRoutes = (
     />
     <Route
       path={routes.transactionDetail.path}
-      element={<TransactionDetail />}
+      element={<TransactionDetailScreen />}
     />
     <Route
       path={routes.accountHideConfirm.path}

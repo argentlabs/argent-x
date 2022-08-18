@@ -1,13 +1,6 @@
-import defaultTokens from "@argent-x/extension/src/assets/default-tokens.json"
-import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
+import { Token } from "@argent-x/extension/src/shared/token/type"
+import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/utils"
 
-/** convert to expected types and shape */
-export const tokensByNetwork: TokenDetailsWithBalance[] = defaultTokens
-  .filter(({ network }) => network === "goerli-alpha")
-  .map((token) => {
-    return {
-      ...token,
-      networkId: token.network,
-      decimals: Number(token.decimals),
-    }
-  })
+export const tokensByNetwork: Token[] = parsedDefaultTokens.filter(
+  ({ networkId }) => networkId === "goerli-alpha",
+)

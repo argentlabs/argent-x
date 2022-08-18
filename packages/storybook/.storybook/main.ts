@@ -50,4 +50,5 @@ export default {
     }
     return config
   },
+  staticDirs: ["../../extension/src"],
 }

@@ -9,9 +9,12 @@ import { routes } from "../../routes"
 import { formatDateTime } from "../../services/dates"
 import { Account } from "../accounts/Account"
 import { SectionHeader } from "../accounts/SectionHeader"
-import { PendingTransactions } from "./PendingTransactions"
-import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
-import { useActivity } from "./useActivity"
+import { PendingTransactionsContainer } from "./PendingTransactions"
+import {
+  TransactionListItem,
+  TransactionsListWrapper,
+} from "./TransactionListItem"
+import { DailyActivity, useActivity } from "./useActivity"
 
 const Container = styled.div`
   display: flex;
@@ -28,23 +31,20 @@ const Header = styled.h2`
   text-align: center;
 `
 
-interface AccountActivityProps {
-  account: Account
+interface IAccountActivity {
+  activity: DailyActivity
 }
 
-const Activity: FC<AccountActivityProps> = ({ account }) => {
+export const AccountActivity: FC<IAccountActivity> = ({ activity }) => {
   const navigate = useNavigate()
-
-  const activity = useActivity(account)
-
   return (
     <>
       {Object.entries(activity).map(([dateLabel, transactions]) => (
         <Fragment key={dateLabel}>
           <SectionHeader>{dateLabel}</SectionHeader>
-          <TransactionsWrapper>
+          <TransactionsListWrapper>
             {transactions.map(({ hash, date, meta, isRejected }) => (
-              <TransactionItem
+              <TransactionListItem
                 key={hash}
                 hash={hash}
                 status={isRejected ? "red" : undefined}
@@ -52,25 +52,34 @@ const Activity: FC<AccountActivityProps> = ({ account }) => {
                 onClick={() => navigate(routes.transactionDetail(hash))}
               />
             ))}
-          </TransactionsWrapper>
+          </TransactionsListWrapper>
         </Fragment>
       ))}
     </>
   )
 }
 
-export const AccountActivity: FC<AccountActivityProps> = ({ account }) => (
-  <Container>
-    <Header>Activity</Header>
-    <PendingTransactions account={account} />
-    <ErrorBoundary
-      fallback={
-        <ErrorBoundaryFallback title="Seems like Voyager API is down..." />
-      }
-    >
-      <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-        <Activity account={account} />
-      </Suspense>
-    </ErrorBoundary>
-  </Container>
-)
+interface IAccountActivityContainer {
+  account: Account
+}
+
+export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
+  account,
+}) => {
+  const activity = useActivity(account)
+  return (
+    <Container>
+      <Header>Activity</Header>
+      <PendingTransactionsContainer account={account} />
+      <ErrorBoundary
+        fallback={
+          <ErrorBoundaryFallback title="Seems like Voyager API is down..." />
+        }
+      >
+        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
+          <AccountActivity activity={activity} />
+        </Suspense>
+      </ErrorBoundary>
+    </Container>
+  )
+}
