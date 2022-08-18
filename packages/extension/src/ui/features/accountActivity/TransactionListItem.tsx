@@ -17,12 +17,14 @@ import {
   TokenWrapper,
 } from "../accountTokens/TokenListItem"
 
-export const TransactionsWrapper = styled.div`
+export const TransactionsListWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `
 
-const TransactionWrapper = styled(TokenWrapper)<{ highlighted?: boolean }>`
+const Container = styled(TokenWrapper)<{
+  highlighted?: boolean
+}>`
   cursor: pointer;
 
   ${({ highlighted }) =>
@@ -43,7 +45,7 @@ const TransactionSubtitle = styled.p`
   margin: 0;
 `
 
-interface TransactionItemProps {
+interface ITransactionListItem {
   hash: string
   status?: StatusIndicatorColor
   showExternalOpenIcon?: boolean
@@ -52,7 +54,7 @@ interface TransactionItemProps {
   onClick?: () => void
 }
 
-export const TransactionItem: FC<TransactionItemProps> = ({
+export const TransactionListItem: FC<ITransactionListItem> = ({
   hash,
   status = "transparent",
   highlighted,
@@ -61,11 +63,7 @@ export const TransactionItem: FC<TransactionItemProps> = ({
   onClick,
   ...props
 }) => (
-  <TransactionWrapper
-    {...makeClickable(onClick)}
-    highlighted={highlighted}
-    {...props}
-  >
+  <Container {...makeClickable(onClick)} highlighted={highlighted} {...props}>
     <TokenIcon name={meta?.title || hash.substring(2)} />
     <TokenDetailsWrapper>
       <TokenTextGroup>
@@ -81,5 +79,5 @@ export const TransactionItem: FC<TransactionItemProps> = ({
       </TokenTextGroup>
       <TransactionStatusIndicator color={status} />
     </TokenDetailsWrapper>
-  </TransactionWrapper>
+  </Container>
 )

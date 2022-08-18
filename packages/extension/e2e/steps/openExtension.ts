@@ -1,10 +1,18 @@
-import type { BrowserContext, Page } from "@playwright/test"
+import type { BrowserContext, Page, Worker } from "@playwright/test"
 
+// supports manifest v2 and v3
 export async function openExtension(page: Page, context: BrowserContext) {
-  let [background] = context.serviceWorkers()
+  let background: Page | Worker | undefined
+  const [bp] = context.backgroundPages()
+  const [sw] = context.serviceWorkers()
+  background = bp || sw
   if (!background) {
-    background = await context.waitForEvent("serviceworker")
+    background = await Promise.race([
+      context.waitForEvent("backgroundpage"),
+      context.waitForEvent("serviceworker"),
+    ])
   }
-  const url = background.url().replace("/background.js", "/index.html")
-  await page.goto(url)
+  const url = new URL(background.url())
+  url.pathname = "/index.html"
+  await page.goto(url.toString())
 }

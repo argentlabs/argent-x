@@ -127,7 +127,7 @@ describe("call", () => {
           contractAddress:
             "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
           recipientAddress:
-            "0x0470007fc2b04C3bB560a55f70F3eA005A4c1D46f970B9561428553cf6D6120E",
+            "0x0470007FC2B04c3bB560a55f70F3EA005A4C1D46F970B9561428553cF6D6120E",
           amount: "155168759315947939339298820988886304424059",
         })
       })

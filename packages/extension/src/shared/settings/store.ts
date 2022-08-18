@@ -3,9 +3,10 @@ import { ISettingsStorage } from "./types"
 
 export const settingsStore = new KeyValueStorage<ISettingsStorage>(
   {
-    privacyUseArgentServices: false,
-    privacyShareAnalyticsData: false,
-    privacyErrorReporting: false,
+    privacyUseArgentServices: true,
+    privacyShareAnalyticsData: true,
+    privacyErrorReporting: Boolean(process.env.SENTRY_DSN), // use SENRY_DSN to enable error reporting
+    privacyAutomaticErrorReporting: false,
     experimentalPluginAccount: false, // Used experimental as namespace for now. Should be changed in future according to the place of the setting.
   },
   "core:settings",

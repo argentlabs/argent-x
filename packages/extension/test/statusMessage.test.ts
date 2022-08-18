@@ -1,68 +1,177 @@
 import { describe, expect, test } from "vitest"
 
 import { IStatusMessage } from "../src/shared/statusMessage/types"
-import { getShouldShowMessage } from "../src/ui/features/statusMessage/getShouldShowMessage"
-
-const statusMessageNull: IStatusMessage = {
-  id: "310e899a-8f19-43c1-990d-95d87acaecf3",
-  updatedAt: "2022-07-19T10:39:30.288Z",
-  message: null,
-}
-
-const statusMessageInfo: IStatusMessage = {
-  id: "310e899a-8f19-43c1-990d-95d87acaecf3",
-  updatedAt: "2022-07-19T10:39:30.288Z",
-  minVersion: "3.9.2",
-  maxVersion: "4.1.0",
-  level: "info",
-  dismissable: true,
-  fullScreen: false,
-  summary: "New version available",
-  message:
-    "A new version of Argent X is available and is a recommended upgrade",
-  linkTitle: "Upgrade now",
-  linkUrl: "https://argent.xyz/announcements/034",
-}
+import {
+  getMessageToShow,
+  getShouldShowMessage,
+} from "../src/ui/features/statusMessage/statusMessageVisibility"
+import statusMessageInfo from "./__fixtures__/status-message-info.json"
+import statusMessageMultiple from "./__fixtures__/status-message-multiple.json"
+import statusMessageNoVersion from "./__fixtures__/status-message-no-version.json"
+import statusMessageNull from "./__fixtures__/status-message-null.json"
 
 describe("statusMessage", () => {
   describe("getShouldShowMessage", () => {
-    test("should return true or false as expected", () => {
-      expect(
-        getShouldShowMessage({
-          statusMessage: statusMessageNull,
-        }),
-      ).toBeFalsy()
-      expect(
-        getShouldShowMessage({
-          statusMessage: statusMessageInfo,
-          version: "3.9.2",
-        }),
-      ).toBeTruthy()
-      expect(
-        getShouldShowMessage({
-          statusMessage: statusMessageInfo,
-          version: "3.9.1",
-        }),
-      ).toBeFalsy()
-      expect(
-        getShouldShowMessage({
-          statusMessage: statusMessageInfo,
-          version: "4.1.0",
-        }),
-      ).toBeTruthy()
-      expect(
-        getShouldShowMessage({
-          statusMessage: statusMessageInfo,
-          version: "4.1.1",
-        }),
-      ).toBeFalsy()
-      expect(
-        getShouldShowMessage({
-          statusMessage: statusMessageInfo,
-          lastDismissedMessageId: statusMessageInfo.id,
-          version: "4.1.0",
-        }),
-      ).toBeFalsy()
+    describe("when given a single message", () => {
+      describe("and the message is null", () => {
+        test("should return false", () => {
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageNull,
+            }),
+          ).toBeFalsy()
+        })
+      })
+      describe("and the message does not specify version(s)", () => {
+        test("should return true unless dismissed", () => {
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageNoVersion as IStatusMessage,
+              version: "4.1.0",
+            }),
+          ).toBeTruthy()
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageNoVersion as IStatusMessage,
+              lastDismissedMessageId: statusMessageNoVersion.id,
+              version: "4.1.0",
+            }),
+          ).toBeFalsy()
+        })
+      })
+      describe("and the message specifies version(s)", () => {
+        test("should return true when version is within range", () => {
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "3.9.2",
+            }),
+          ).toBeTruthy()
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "3.9.1",
+            }),
+          ).toBeFalsy()
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "4.1.0",
+            }),
+          ).toBeTruthy()
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "4.1.1",
+            }),
+          ).toBeFalsy()
+          expect(
+            getShouldShowMessage({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              lastDismissedMessageId: statusMessageInfo.id,
+              version: "4.1.0",
+            }),
+          ).toBeFalsy()
+        })
+      })
+    })
+    describe("when given multiple messages", () => {
+      test("should return true or false as expected", () => {
+        expect(
+          getShouldShowMessage({
+            statusMessage: statusMessageMultiple as IStatusMessage[],
+            version: "1.0.0",
+          }),
+        ).toBeTruthy()
+        expect(
+          getShouldShowMessage({
+            statusMessage: statusMessageMultiple as IStatusMessage[],
+            version: "1.1.0",
+          }),
+        ).toBeTruthy()
+        expect(
+          getShouldShowMessage({
+            statusMessage: statusMessageMultiple as IStatusMessage[],
+            version: "0.9.0",
+          }),
+        ).toBeFalsy()
+        expect(
+          getShouldShowMessage({
+            statusMessage: statusMessageMultiple as IStatusMessage[],
+            version: "2.1.0",
+          }),
+        ).toBeFalsy()
+      })
+    })
+  })
+  describe("getMessageToShow", () => {
+    describe("when given a single message", () => {
+      describe("and the version is within range", () => {
+        test("should return the message", () => {
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "3.9.2",
+            }),
+          ).toEqual(statusMessageInfo)
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "4.1.0",
+            }),
+          ).toEqual(statusMessageInfo)
+        })
+      })
+      describe("and the version is outside range", () => {
+        test("should return undefined", () => {
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "3.9.1",
+            }),
+          ).toBeUndefined()
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageInfo as IStatusMessage,
+              version: "4.1.1",
+            }),
+          ).toBeUndefined()
+        })
+      })
+    })
+    describe("when given multiple messages", () => {
+      describe("and the version is within range", () => {
+        test("should return the message", () => {
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageMultiple as IStatusMessage[],
+              version: "1.0.0",
+            }),
+          ).toEqual(statusMessageMultiple[0])
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageMultiple as IStatusMessage[],
+              version: "1.1.0",
+            }),
+          ).toEqual(statusMessageMultiple[1])
+        })
+      })
+      describe("and the version is outside range", () => {
+        test("should return undefined", () => {
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageMultiple as IStatusMessage[],
+              version: "0.9.0",
+            }),
+          ).toBeUndefined()
+          expect(
+            getMessageToShow({
+              statusMessage: statusMessageMultiple as IStatusMessage[],
+              version: "2.0.1",
+            }),
+          ).toBeUndefined()
+        })
+      })
     })
   })
 })

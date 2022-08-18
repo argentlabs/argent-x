@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "4.6.2",
+  "version": "4.7.0",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -46,7 +46,7 @@
     "url-loader": "^4.1.1",
     "vi-fetch": "^0.8.0",
     "vite": "^3.0.2",
-    "vitest": "^0.19.1",
+    "vitest": "^0.21.1",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
     "webpack-cli": "^4.9.1",
@@ -54,7 +54,7 @@
   },
   "scripts": {
     "build": "NODE_ENV=production webpack",
-    "build:sourcemaps": "NODE_ENV=production GEN_SOURCE_MAPS=true webpack",
+    "build:sourcemaps": "GEN_SOURCE_MAPS=true yarn build",
     "start": "webpack",
     "dev": "concurrently -k -r \"webpack --color --watch\" \"yarn dev:hot-reload-server\"",
     "dev:ui": "SHOW_DEV_UI=true yarn dev",
@@ -66,8 +66,10 @@
     "test:e2e": "playwright test",
     "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes && yarn run push-release-branch",
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",
-    "sync-manifest-version": "node -p \"JSON.stringify({...require('./src/manifest.json'), version: '$npm_package_version'}, null, 2)\" > ./src/manifest.temp.json && prettier --write ./src/manifest.temp.json && mv ./src/manifest.temp.json ./src/manifest.json",
-    "commit-version-changes": "git add ./src/manifest.json && git commit -m \"chore(release): manifest v$npm_package_version\"",
+    "sync-manifest-version": "concurrently \"yarn sync-manifest-version:v2\" \"yarn sync-manifest-version:v3\"",
+    "sync-manifest-version:v2": "node -p \"JSON.stringify({...require('./manifest/v2.json'), version: '$npm_package_version'}, null, 2)\" > ./manifest/v2.temp.json && prettier --write ./manifest/v2.temp.json && mv ./manifest/v2.temp.json ./manifest/v2.json",
+    "sync-manifest-version:v3": "node -p \"JSON.stringify({...require('./manifest/v3.json'), version: '$npm_package_version'}, null, 2)\" > ./manifest/v3.temp.json && prettier --write ./manifest/v3.temp.json && mv ./manifest/v3.temp.json ./manifest/v3.json",
+    "commit-version-changes": "git add ./manifest/* && git commit -m \"chore(release): manifest v$npm_package_version\"",
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {

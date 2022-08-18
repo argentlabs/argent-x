@@ -1,32 +1,53 @@
 import { FC } from "react"
 
+import { Network } from "../../../shared/network"
+import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { openVoyagerTransaction } from "../../services/voyager.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { TransactionItem, TransactionsWrapper } from "./TransactionItem"
+import {
+  TransactionListItem,
+  TransactionsListWrapper,
+} from "./TransactionListItem"
 
-interface PendingTransactionsProps {
+interface IPendingTransactionsContainer {
   account: BaseWalletAccount
 }
 
-export const PendingTransactions: FC<PendingTransactionsProps> = ({
-  account,
-}) => {
+export const PendingTransactionsContainer: FC<
+  IPendingTransactionsContainer
+> = ({ account }) => {
   const network = useCurrentNetwork()
   const { pendingTransactions } = useAccountTransactions(account)
+  return (
+    <PendingTransactions
+      pendingTransactions={pendingTransactions}
+      network={network}
+    />
+  )
+}
 
+interface IPendingTransactions {
+  pendingTransactions: Transaction[]
+  network: Network
+}
+
+export const PendingTransactions: FC<IPendingTransactions> = ({
+  pendingTransactions,
+  network,
+}) => {
   if (!pendingTransactions.length) {
-    return <></>
+    return null
   }
 
   return (
     <>
       <SectionHeader>Pending transactions</SectionHeader>
-      <TransactionsWrapper>
+      <TransactionsListWrapper>
         {pendingTransactions.map(({ hash, meta }) => (
-          <TransactionItem
+          <TransactionListItem
             key={hash}
             hash={hash}
             status="orange"
@@ -36,7 +57,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
             onClick={() => openVoyagerTransaction(hash, network)}
           />
         ))}
-      </TransactionsWrapper>
+      </TransactionsListWrapper>
     </>
   )
 }

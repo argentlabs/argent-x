@@ -9,6 +9,7 @@ env:
   FEATURE_BANXA: "true"
   FEATURE_LAYERSWAP: "true"
   FEATURE_ORBITER: "true"
+  FEATURE_PRIVACY_SETTINGS: "true"
 
 jobs:
   build:
@@ -17,13 +18,15 @@ jobs:
       contents: write
     env:
       NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-      FILENAME: argent-extension-${{ github.ref_name }}.zip
+      FILENAME: argent-extension-${{ github.ref_name }}
       SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      # SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
       UPLOAD_SENTRY_SOURCEMAPS: true
       ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
       ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ secrets.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+      # ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
       SAFE_ENV_VARS: true
     steps:
       - uses: actions/checkout@v2
@@ -39,17 +42,28 @@ jobs:
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
       - run: yarn --cwd packages/dapp export
-      - name: Check bundlesize
+      - name: Check bundlesize for chrome
         run: yarn run bundlewatch
-      - name: Create zip
+      - name: Create chrome zip
         run: |
           cd packages/extension/dist
-          zip -r ${{ env.FILENAME }} ./*
-          mv ${{ env.FILENAME }} ../../../
+          zip -r ${{ env.FILENAME }}-chrome.zip ./*
+          mv ${{ env.FILENAME }}-chrome.zip ../../../
           cd ../../../
+      - name: Build Firefox version
+        run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+      - name: Create firefox zip
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME }}-firefox.zip ./*
+          mv ${{ env.FILENAME }}-firefox.zip ../../../
+          cd ../../../
+      - name: Check bundlesize for firefox
+        run: yarn run bundlewatch
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           files: |
-            ${{ env.FILENAME }}
+            ${{ env.FILENAME }}-chrome.zip
+            ${{ env.FILENAME }}-firefox.zip

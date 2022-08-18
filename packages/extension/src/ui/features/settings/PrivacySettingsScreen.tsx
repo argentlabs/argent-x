@@ -7,17 +7,15 @@ import IOSSwitch from "../../components/IOSSwitch"
 import { H2 } from "../../theme/Typography"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
-const ANALYTICS_UI_ENABLED = false
-
 export const PrivacySettingsScreen: FC = () => {
   const privacyUseArgentServices = useKeyValueStorage(
     settingsStore,
     "privacyUseArgentServices",
   )
 
-  const privacyErrorReporting = useKeyValueStorage(
+  const privacyAutomaticErrorReporting = useKeyValueStorage(
     settingsStore,
-    "privacyErrorReporting",
+    "privacyAutomaticErrorReporting",
   )
 
   const privacyShareAnalyticsData = useKeyValueStorage(
@@ -30,6 +28,7 @@ export const PrivacySettingsScreen: FC = () => {
       <IconBar back />
       <SettingsScreenWrapper>
         <H2>Privacy</H2>
+        <hr />
         <SettingsItem>
           <Title>
             <span>Use Argent services</span>
@@ -53,11 +52,11 @@ export const PrivacySettingsScreen: FC = () => {
           <Title>
             <span>Automatic Error Reporting</span>
             <IOSSwitch
-              checked={privacyErrorReporting}
+              checked={privacyAutomaticErrorReporting}
               onClick={() =>
                 settingsStore.set(
-                  "privacyErrorReporting",
-                  !privacyErrorReporting,
+                  "privacyAutomaticErrorReporting",
+                  !privacyAutomaticErrorReporting,
                 )
               }
             />
@@ -65,29 +64,24 @@ export const PrivacySettingsScreen: FC = () => {
           <P>Automatically share crash logs with Argent</P>
         </SettingsItem>
         <hr />
-        {ANALYTICS_UI_ENABLED && (
-          <>
-            <SettingsItem>
-              <Title>
-                <span>Share analytics data</span>
-                <IOSSwitch
-                  checked={privacyShareAnalyticsData}
-                  onClick={() =>
-                    settingsStore.set(
-                      "privacyShareAnalyticsData",
-                      !privacyShareAnalyticsData,
-                    )
-                  }
-                />
-              </Title>
-              <P>
-                This helps the Argent team to identify issues, prioritize
-                features and build a better product
-              </P>
-            </SettingsItem>
-            <hr />
-          </>
-        )}
+        <SettingsItem>
+          <Title>
+            <span>Share analytics data</span>
+            <IOSSwitch
+              checked={privacyShareAnalyticsData}
+              onClick={() =>
+                settingsStore.set(
+                  "privacyShareAnalyticsData",
+                  !privacyShareAnalyticsData,
+                )
+              }
+            />
+          </Title>
+          <P>
+            This helps the Argent team to identify issues, prioritize features
+            and build a better product
+          </P>
+        </SettingsItem>
       </SettingsScreenWrapper>
     </>
   )

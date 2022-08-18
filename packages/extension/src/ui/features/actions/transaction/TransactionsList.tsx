@@ -10,7 +10,7 @@ import {
 } from "../../../../shared/transactionReview.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
 import { TransactionBanner } from "./TransactionBanner"
-import { TransactionItem } from "./TransactionItem"
+import { TransactionDetails } from "./TransactionDetails"
 import { TransactionsListSwap } from "./TransactionsListSwap"
 
 export interface ITransactionsList {
@@ -51,7 +51,7 @@ export const TransactionsList: FC<ITransactionsList> = ({
         />
       ) : (
         transactionsArray.map((transaction, index) => (
-          <TransactionItem
+          <TransactionDetails
             key={index}
             networkId={networkId}
             transaction={transaction}
