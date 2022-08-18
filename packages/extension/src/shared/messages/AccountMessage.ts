@@ -22,12 +22,6 @@ export type AccountMessage =
   | { type: "DELETE_ACCOUNT"; data: BaseWalletAccount }
   | { type: "DELETE_ACCOUNT_RES" }
   | { type: "DELETE_ACCOUNT_REJ" }
-  | { type: "HIDE_ACCOUNT"; data: BaseWalletAccount }
-  | { type: "HIDE_ACCOUNT_RES" }
-  | { type: "HIDE_ACCOUNT_REJ" }
-  | { type: "UNHIDE_ACCOUNT"; data: BaseWalletAccount }
-  | { type: "UNHIDE_ACCOUNT_RES" }
-  | { type: "UNHIDE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"
       data: BaseWalletAccount

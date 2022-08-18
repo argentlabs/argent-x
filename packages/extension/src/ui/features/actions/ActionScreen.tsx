@@ -10,7 +10,10 @@ import { assertNever } from "../../services/assertNever"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { Account } from "../accounts/Account"
-import { useAccounts, useSelectedAccount } from "../accounts/accounts.state"
+import {
+  useSelectedAccount,
+  useSelectedAccountStore,
+} from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
@@ -24,7 +27,7 @@ export const ActionScreen: FC = () => {
   const navigate = useNavigate()
   const account = useSelectedAccount()
   const extensionIsInTab = useExtensionIsInTab()
-  const { actions } = useActions()
+  const actions = useActions()
 
   const [action] = actions
   const isLastAction = actions.length === 1
@@ -36,12 +39,12 @@ export const ActionScreen: FC = () => {
   }, [isLastAction])
 
   const onSubmit = useCallback(async () => {
-    approveAction(action)
+    await approveAction(action)
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
 
   const onReject = useCallback(async () => {
-    rejectAction(action)
+    await rejectAction(action)
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
 
@@ -53,9 +56,9 @@ export const ActionScreen: FC = () => {
       }
     }
     init()
-  }, [extensionIsInTab, action.type])
+  }, [extensionIsInTab, action?.type])
 
-  switch (action.type) {
+  switch (action?.type) {
     case "CONNECT_DAPP":
       return (
         <ConnectDappScreen
@@ -63,24 +66,21 @@ export const ActionScreen: FC = () => {
           onConnect={async (selectedAccount: Account) => {
             useAppState.setState({ isLoading: true })
             // switch UI to the account that was selected
-            useAccounts.setState({
+            useSelectedAccountStore.setState({
               selectedAccount,
             })
             // switch background wallet to the account that was selected
             connectAccount(selectedAccount)
             await waitForMessage("CONNECT_ACCOUNT_RES")
             // continue with approval with selected account
-            approveAction(action)
+            await approveAction(action)
             await waitForMessage("CONNECT_DAPP_RES")
             useAppState.setState({ isLoading: false })
             closePopupIfLastAction()
           }}
           onDisconnect={async (selectedAccount: Account) => {
-            await removePreAuthorization({
-              host: action.payload.host,
-              accountAddress: selectedAccount.address,
-            })
-            rejectAction(action)
+            await removePreAuthorization(action.payload.host, selectedAccount)
+            await rejectAction(action)
             closePopupIfLastAction()
           }}
           onReject={onReject}
@@ -127,7 +127,7 @@ export const ActionScreen: FC = () => {
             analytics.track("signedTransaction", {
               networkId: account?.networkId || "unknown",
             })
-            approveAction(action)
+            await approveAction(action)
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([
               waitForMessage(
@@ -165,7 +165,7 @@ export const ActionScreen: FC = () => {
         <ApproveSignatureScreen
           dataToSign={action.payload}
           onSubmit={async () => {
-            approveAction(action)
+            await approveAction(action)
             useAppState.setState({ isLoading: true })
             await waitForMessage(
               "SIGNATURE_SUCCESS",

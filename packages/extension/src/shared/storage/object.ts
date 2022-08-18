@@ -8,7 +8,7 @@ type AllowPromise<T> = T | Promise<T>
 
 export interface ObjectStorageOptions<T> extends StorageOptions {
   serialize?: (value: T) => any
-  deserialize?: (value: any) => T
+  deserialize?: (value: any) => AllowPromise<T>
   merge?: (oldValue: T, newValue: T) => T
 }
 
@@ -28,16 +28,23 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
 
   private storageImplementation: KeyValueStorage<{ inner: T }>
   private serialize: (value: T) => any
-  private deserialize: (value: any) => T
+  private deserialize: (value: any) => AllowPromise<T>
   private merge: (oldValue: T, newValue: T) => T
 
+  /**
+   * ObjectStorage constructor
+   *
+   * @note default values must always be serialized
+   * @param defaults default value for the storage (must be already serialized)
+   * @param optionsOrNamespace options for the storage
+   */
   constructor(
     public readonly defaults: T,
     optionsOrNamespace: StorageOptionsOrNameSpace<ObjectStorageOptions<T>>,
   ) {
     const passThrough = (value: any) => value
     function defaultMerge(oldValue: T, newValue: T) {
-      if (isPlainObject(oldValue)) {
+      if (isPlainObject(oldValue) && isPlainObject(newValue)) {
         return merge(oldValue, newValue)
       }
       return newValue
@@ -67,25 +74,27 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   }
 
   public async get(): Promise<T> {
-    return this.deserialize(await this.storageImplementation.getItem("inner"))
+    return this.deserialize(await this.storageImplementation.get("inner"))
   }
 
   public async set(setter: Partial<T> | SetterFn<T>): Promise<void> {
     const oldState = await this.get()
     const value = typeof setter === "function" ? setter(oldState) : setter
-    return this.storageImplementation.setItem(
+    return this.storageImplementation.set(
       "inner",
-      this.serialize(this.merge(oldState, value as T)),
+      await this.serialize(this.merge(oldState, value as T)),
     )
   }
 
-  private deserializeChangeSet(changeSet: StorageChange): StorageChange<T> {
+  private async deserializeChangeSet(
+    changeSet: StorageChange,
+  ): Promise<StorageChange<T>> {
     return {
       ...(changeSet.oldValue && {
-        oldValue: this.deserialize(changeSet.oldValue),
+        oldValue: await this.deserialize(changeSet.oldValue),
       }),
       ...(changeSet.newValue && {
-        newValue: this.deserialize(changeSet.newValue),
+        newValue: await this.deserialize(changeSet.newValue),
       }),
     }
   }
@@ -93,8 +102,11 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
   public subscribe(
     callback: (value: T, changeSet: StorageChange<T>) => AllowPromise<void>,
   ): () => void {
-    return this.storageImplementation.subscribe("inner", (t, c) => {
-      return callback(this.deserialize(t), this.deserializeChangeSet(c))
+    return this.storageImplementation.subscribe("inner", async (t, c) => {
+      return callback(
+        await this.deserialize(t),
+        await this.deserializeChangeSet(c),
+      )
     })
   }
 }

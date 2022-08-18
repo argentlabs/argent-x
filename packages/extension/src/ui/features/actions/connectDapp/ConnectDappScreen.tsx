@@ -1,6 +1,13 @@
 import { FC, useCallback, useMemo, useState } from "react"
 import styled from "styled-components"
 
+import {
+  equalPreAuthorization,
+  useIsPreauthorized,
+  usePreAuthorizations,
+} from "../../../../shared/preAuthorizations"
+import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import { accountsEqual } from "../../../../shared/wallet.service"
 import { ColumnCenter } from "../../../components/Column"
 import { LinkIcon } from "../../../components/Icons/MuiIcons"
 import { Account } from "../../accounts/Account"
@@ -9,12 +16,14 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../../accounts/accountMetadata.state"
-import { useAccounts, useVisibleAccounts } from "../../accounts/accounts.state"
+import {
+  useAccounts,
+  useSelectedAccountStore,
+} from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import { ConfirmPageProps, ConfirmScreen } from "../ConfirmScreen"
 import { DappIcon } from "./DappIcon"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
-import { usePreAuthorizations } from "./usePreAuthorizations"
 
 interface ConnectDappProps extends Omit<ConfirmPageProps, "onSubmit"> {
   onConnect: (selectedAccount: Account) => void
@@ -22,39 +31,32 @@ interface ConnectDappProps extends Omit<ConfirmPageProps, "onSubmit"> {
   host: string
 }
 
-export const useAccountAddressIsConnected = (host: string) => {
-  const { preAuthorizations } = usePreAuthorizations()
-  const getIsConnected = useCallback(
-    (accountAddress: string) => {
-      return (
-        preAuthorizations?.accountsByHost[host] &&
-        preAuthorizations?.accountsByHost[host].includes(accountAddress)
-      )
-    },
-    [host, preAuthorizations],
-  )
-  return getIsConnected
-}
-
 export interface IConnectDappAccountSelect {
   accounts: Account[]
-  selectedAccountAddress?: string
-  onSelectedAccountAddressChange?: (accountAddress: string) => void
+  selectedAccount?: BaseWalletAccount
+  onSelectedAccountChange?: (account: BaseWalletAccount) => void
   host: string
 }
 
 export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
   accounts = [],
-  selectedAccountAddress,
-  onSelectedAccountAddressChange,
+  selectedAccount,
+  onSelectedAccountChange,
   host,
 }) => {
-  const getIsConnected = useAccountAddressIsConnected(host)
   const { accountNames } = useAccountMetadata()
+  const preAuths = usePreAuthorizations()
   const makeAccountListItem = useCallback(
     (account: Account): IAccountListItem => {
       const accountName = getAccountName(account, accountNames)
-      const connected = getIsConnected(account.address)
+      const connected = Boolean(
+        preAuths.some((preAuth) =>
+          equalPreAuthorization(preAuth, {
+            host,
+            account,
+          }),
+        ),
+      )
       return {
         accountName,
         accountAddress: account.address,
@@ -62,7 +64,7 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
         connected,
       }
     },
-    [accountNames, getIsConnected],
+    [accountNames, host, preAuths],
   )
   const accountItems = useMemo(
     () => accounts.map(makeAccountListItem),
@@ -71,16 +73,27 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
   const selectedAccountItem = useMemo(
     () =>
       accountItems.find(
-        (accountItem) => accountItem.accountAddress === selectedAccountAddress,
+        (accountItem) =>
+          selectedAccount &&
+          accountsEqual(
+            {
+              address: accountItem.accountAddress,
+              networkId: accountItem.networkId,
+            },
+            selectedAccount,
+          ),
       ),
-    [accountItems, selectedAccountAddress],
+    [accountItems, selectedAccount],
   )
   const onSelectedAccountItemChange = useCallback(
     (accountItem: IAccountListItem) => {
-      onSelectedAccountAddressChange &&
-        onSelectedAccountAddressChange(accountItem.accountAddress)
+      onSelectedAccountChange &&
+        onSelectedAccountChange({
+          address: accountItem.accountAddress,
+          networkId: accountItem.networkId,
+        })
     },
-    [onSelectedAccountAddressChange],
+    [onSelectedAccountChange],
   )
   return (
     <AccountSelect
@@ -159,28 +172,27 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
   host,
   ...rest
 }) => {
-  const { selectedAccount: initiallySelectedAccount } = useAccounts()
-  const visibleAccounts = useVisibleAccounts()
-  const [connectAccountAddress, setConnectAccountAddress] = useState(
-    initiallySelectedAccount?.address,
-  )
-  const getIsConnected = useAccountAddressIsConnected(host)
-
-  const selectedAccountIsAlreadyConnected = useMemo(() => {
-    return connectAccountAddress && getIsConnected(connectAccountAddress)
-  }, [connectAccountAddress, getIsConnected])
+  const { selectedAccount: initiallySelectedAccount } =
+    useSelectedAccountStore()
+  const visibleAccounts = useAccounts()
+  const [connectAccount, setConnectAccount] = useState<
+    BaseWalletAccount | undefined
+  >(initiallySelectedAccount)
+  const isConnected = useIsPreauthorized(host, initiallySelectedAccount)
 
   const selectedAccount = useMemo(() => {
-    if (connectAccountAddress) {
-      const account = visibleAccounts.find(
-        ({ address }) => address === connectAccountAddress,
+    if (connectAccount) {
+      const account = visibleAccounts.find((account) =>
+        accountsEqual(account, connectAccount),
       )
       return account
     }
-  }, [visibleAccounts, connectAccountAddress])
+  }, [visibleAccounts, connectAccount])
 
-  const onSelectedAccountChange = useCallback((accountAddress: string) => {
-    setConnectAccountAddress(accountAddress)
+  console.log(connectAccount, selectedAccount, initiallySelectedAccount)
+
+  const onSelectedAccountChange = useCallback((account: BaseWalletAccount) => {
+    setConnectAccount(account)
   }, [])
 
   const onConnect = useCallback(() => {
@@ -195,14 +207,10 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
 
   return (
     <ConfirmScreen
-      confirmButtonText={
-        selectedAccountIsAlreadyConnected ? "Continue" : "Connect"
-      }
-      rejectButtonText={
-        selectedAccountIsAlreadyConnected ? "Disconnect" : "Reject"
-      }
+      confirmButtonText={isConnected ? "Continue" : "Connect"}
+      rejectButtonText={isConnected ? "Disconnect" : "Reject"}
       onSubmit={onConnect}
-      onReject={selectedAccountIsAlreadyConnected ? onDisconnect : onRejectProp}
+      onReject={isConnected ? onDisconnect : onRejectProp}
       {...rest}
     >
       <ColumnCenter gap={"4px"}>
@@ -217,11 +225,11 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
       <SelectContainer>
         <ConnectDappAccountSelect
           accounts={visibleAccounts}
-          selectedAccountAddress={connectAccountAddress}
-          onSelectedAccountAddressChange={onSelectedAccountChange}
+          selectedAccount={connectAccount}
+          onSelectedAccountChange={onSelectedAccountChange}
           host={host}
         />
-        {selectedAccountIsAlreadyConnected && (
+        {isConnected && (
           <ConnectedStatusWrapper>
             <ConnectedIcon />
             <span> This account is already connected</span>

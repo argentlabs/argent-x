@@ -8,6 +8,7 @@ import {
   FieldValue,
   LeftPaddedField,
 } from "../../../../components/Fields"
+import { isEqualAddress } from "../../../../services/addresses"
 import { TokenIcon } from "../../../accountTokens/TokenIcon"
 
 export interface ITokenField {
@@ -26,8 +27,8 @@ export const TokenField: FC<ITokenField> = ({
   if (!contractAddress || !amount) {
     return null
   }
-  const token = tokensByNetwork.find(
-    ({ address }) => address.toLowerCase() === contractAddress.toLowerCase(),
+  const token = tokensByNetwork.find(({ address }) =>
+    isEqualAddress(address, contractAddress),
   )
   const displayAmount = token
     ? prettifyTokenAmount({

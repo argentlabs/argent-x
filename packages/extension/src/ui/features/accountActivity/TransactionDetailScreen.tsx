@@ -3,13 +3,15 @@ import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
 
-import { compareTransactions } from "../../../shared/transactions"
+import { Network } from "../../../shared/network"
+import { Transaction, compareTransactions } from "../../../shared/transactions"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import {
   Field,
   FieldGroup,
   FieldKey,
   FieldValue,
+  LeftPaddedField,
 } from "../../components/Fields"
 import { CloseIcon } from "../../components/Icons/CloseIcon"
 import { ContentCopyIcon, OpenInNewIcon } from "../../components/Icons/MuiIcons"
@@ -83,14 +85,12 @@ const TransactionLogKey = styled(FieldKey)`
   align-items: center;
   gap: 7px;
 `
-export const TransactionDetail: FC = () => {
-  const navigate = useNavigate()
+export const TransactionDetailScreen: FC = () => {
   const network = useCurrentNetwork()
   const { txHash } = useParams()
 
   const account = useSelectedAccount()
 
-  const theme = useTheme()
   const { transactions } = useAccountTransactions(account)
 
   if (!account) {
@@ -111,7 +111,25 @@ export const TransactionDetail: FC = () => {
   if (!transaction) {
     return <Navigate to={routes.accountTokens()} />
   }
+  return <TransactionDetail transaction={transaction} network={network} />
+}
 
+interface ITransactionDetail {
+  transaction: Transaction
+  network: Network
+}
+
+/**
+ * TODO: rename - this currently displays a 'voyager' transaction shape,
+ * should eventually be differentiated from 'rich' transaction from API
+ */
+
+export const TransactionDetail: FC<ITransactionDetail> = ({
+  transaction,
+  network,
+}) => {
+  const navigate = useNavigate()
+  const theme = useTheme()
   const isRejected = transaction.status === "REJECTED"
 
   const errorMessage =
@@ -140,7 +158,7 @@ export const TransactionDetail: FC = () => {
           {errorMessage && (
             <Field>
               <FieldKey>Reason</FieldKey>
-              <FieldValue>{errorMessage}</FieldValue>
+              <LeftPaddedField>{errorMessage}</LeftPaddedField>
             </Field>
           )}
           <Field>

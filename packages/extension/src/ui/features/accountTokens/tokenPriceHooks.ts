@@ -1,17 +1,16 @@
 import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 
-import { settingsStorage } from "./../../../shared/settings/storage"
 import {
   ARGENT_API_ENABLED,
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
 } from "../../../shared/api/constants"
 import {
-  ISettingsStorage,
   isPrivacySettingsEnabled,
+  settingsStore,
 } from "../../../shared/settings"
-import { useObjectStorage } from "../../../shared/storage/hooks"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
@@ -31,13 +30,15 @@ import { TokenDetailsWithBalance } from "./tokens.state"
 
 export const useCurrencyDisplayEnabled = () => {
   const isMainnet = useIsMainnet()
-  const { privacyUseArgentServices } =
-    useObjectStorage<ISettingsStorage>(settingsStorage)
+  const privacyUseArgentServicesEnabled = useKeyValueStorage(
+    settingsStore,
+    "privacyUseArgentServices",
+  )
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_API_ENABLED && isMainnet
   }
-  return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServices
+  return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServicesEnabled
 }
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */

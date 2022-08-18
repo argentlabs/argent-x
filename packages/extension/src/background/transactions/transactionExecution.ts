@@ -1,7 +1,9 @@
 import { constants, number } from "starknet"
 
-import { TransactionActionPayload } from "../../shared/actionQueue"
-import { ExtQueueItem } from "../actionQueue"
+import {
+  ExtQueueItem,
+  TransactionActionPayload,
+} from "../../shared/actionQueue/types"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce } from "../nonce"
 import { nameTransaction } from "../transactions/transactionNames"
@@ -34,7 +36,7 @@ export const executeTransaction = async (
   { wallet }: BackgroundService,
 ) => {
   const { transactions, abis, transactionsDetail } = action.payload
-  if (!wallet.isSessionOpen()) {
+  if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
   const selectedAccount = await wallet.getSelectedAccount()
@@ -71,7 +73,7 @@ export const executeTransaction = async (
   })
 
   if (!nonceWasProvidedByUI) {
-    increaseStoredNonce(selectedAccount)
+    await increaseStoredNonce(selectedAccount)
   }
   return transaction
 }

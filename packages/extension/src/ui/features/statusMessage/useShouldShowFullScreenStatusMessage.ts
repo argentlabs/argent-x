@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 
-import { getShouldShowMessage } from "./getShouldShowMessage"
+import { getShouldShowMessage } from "./statusMessageVisibility"
 import {
   useLastFullScreenMessageClosedId,
   useStatusMessage,

@@ -1,6 +1,6 @@
 import { stark } from "starknet"
 
-import { ActionItem } from "../shared/actionQueue"
+import { ActionItem } from "../shared/actionQueue/types"
 import { getNetwork } from "../shared/network"
 import { BaseWalletAccount } from "../shared/wallet.model"
 import { Queue } from "./actionQueue"

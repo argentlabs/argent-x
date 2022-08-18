@@ -5,7 +5,7 @@ import { useTheme } from "styled-components"
 import { routes } from "../../routes"
 import { resetAll } from "../../services/background"
 import { P } from "../../theme/Typography"
-import { initialState, useAccounts } from "../accounts/accounts.state"
+import { useSelectedAccountStore } from "../accounts/accounts.state"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 
 export const ResetScreen: FC = () => {
@@ -21,7 +21,7 @@ export const ResetScreen: FC = () => {
       onSubmit={() => {
         resetAll()
         localStorage.clear()
-        useAccounts.setState(initialState)
+        useSelectedAccountStore.setState({})
         navigate(routes.welcome())
       }}
     >

@@ -40,7 +40,7 @@ export const getAddressBookByNames = async () => {
 
 export const addAddressBookContact = async (contact: AddressBookContact) => {
   await assertSchema(addressBookContactSchema, contact)
-  await addressBookStore.add(contact)
+  await addressBookStore.push(contact)
   return contact
 }
 

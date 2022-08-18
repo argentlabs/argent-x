@@ -2,10 +2,11 @@ import { FC } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
+import { hideAccount } from "../../../shared/account/store"
 import { useAppState } from "../../app.state"
 import { AccountAddress, AccountName } from "../../components/Address"
 import { formatFullAddress } from "../../services/addresses"
-import { deleteAccount, hideAccount } from "../../services/backgroundAccounts"
+import { deleteAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
@@ -52,7 +53,10 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
 
   const handleSubmit = async () => {
     if (mode === "hide") {
-      await hideAccount(accountAddress, switcherNetworkId)
+      await hideAccount({
+        address: accountAddress,
+        networkId: switcherNetworkId,
+      })
     }
     if (mode === "delete") {
       await deleteAccount(accountAddress, switcherNetworkId)

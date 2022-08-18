@@ -1,3 +1,4 @@
+import { getChecksumAddress } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import { addressSchema } from "../src/ui/services/addresses"
@@ -34,13 +35,13 @@ describe("address input", () => {
   })
   test("should allow valid checksum starknet address", async () => {
     const address =
-      "0x033D2A165d2a2aE64cBaF8e6DFF7F0c1974d0f41cD4F0c24d273373D4837BcFd"
+      "0x033d2A165d2a2ae64CBaf8e6Dff7F0C1974D0f41CD4F0c24D273373d4837bcFd"
     const result = await addressSchema.isValid(address)
     expect(result).toBe(true)
   })
   test("should not allow invalid starknet address", async () => {
     const address =
-      "0x033d2A165d2a2aE64cBaF8e6DFF7F0c1974d0f41cD4F0c24d273373D4837BcFd"
+      "0x033D2A165d2a2aE64cBaF8e6DFF7F0c1974d0f41cD4F0c24d273373D4837BcFd"
     const result = await addressSchema.isValid(address)
     expect(result).toBe(false)
   })

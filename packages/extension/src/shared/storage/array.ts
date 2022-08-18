@@ -22,12 +22,13 @@ export function mergeArrayStableWith<T>(
   source: T[],
   other: T[],
   compareFn: (a: T, b: T) => boolean = isEqual,
+  insertMode: "unshift" | "push" = "push",
 ): T[] {
   const result = reverse(uniqWith(reverse(source), compareFn)) // 2x reverse to keep the order while keeping the last occurence of duplicates
   for (const element of other) {
     const index = result.findIndex((e) => compareFn(e, element))
     if (index === -1) {
-      result.push(element)
+      result[insertMode](element)
     } else {
       result[index] = element
     }
@@ -41,7 +42,8 @@ interface ArrayStorageOptions<T> extends ObjectStorageOptions<T[]> {
 
 export interface IArrayStorage<T> extends BaseStorage<T[]> {
   get(selector?: SelectorFn<T>): Promise<T[]>
-  add(value: AllowArray<T> | SetterFn<T>): Promise<void>
+  push(value: AllowArray<T> | SetterFn<T>): Promise<void>
+  unshift(value: AllowArray<T> | SetterFn<T>): Promise<void>
   remove(value: AllowArray<T> | SelectorFn<T>): Promise<T[]>
   subscribe(
     callback: (value: T[], changeSet: StorageChange<T[]>) => AllowPromise<void>,
@@ -79,14 +81,28 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
     return all
   }
 
-  public async add(value: AllowArray<T> | SetterFn<T>): Promise<void> {
+  private setterOrArrayToValue(
+    setterOrArray: AllowArray<T> | SetterFn<T>,
+    setterArg: T[],
+  ): T[] {
+    return isFunction(setterOrArray)
+      ? setterOrArray(setterArg)
+      : Array.isArray(setterOrArray)
+      ? setterOrArray
+      : [setterOrArray]
+  }
+
+  public async push(value: AllowArray<T> | SetterFn<T>): Promise<void> {
     const all = await this.get()
-    const newValue = isFunction(value)
-      ? value(all)
-      : Array.isArray(value)
-      ? value
-      : [value]
+    const newValue = this.setterOrArrayToValue(value, all)
     const newAll = mergeArrayStableWith(all, newValue, this.compare)
+    await this.storageImplementation.set(newAll)
+  }
+
+  public async unshift(value: AllowArray<T> | SetterFn<T>): Promise<void> {
+    const all = await this.get()
+    const newValue = this.setterOrArrayToValue(value, all)
+    const newAll = mergeArrayStableWith(all, newValue, this.compare, "unshift")
     await this.storageImplementation.set(newAll)
   }
 

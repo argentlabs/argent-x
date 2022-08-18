@@ -12,7 +12,6 @@ import { analytics, usePageTracking } from "../../services/analytics"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { FormError, H2, P } from "../../theme/Typography"
 import { deployAccount } from "../accounts/accounts.service"
-import { useAccounts } from "../accounts/accounts.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
 import { validatePassword } from "../recovery/seedRecovery.state"
@@ -51,7 +50,6 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
 }) => {
   usePageTracking("createWallet")
   const navigate = useNavigate()
-  const { addAccount } = useAccounts()
   const { switcherNetworkId } = useAppState()
   const { control, handleSubmit, formState, watch } = useForm<FieldValues>({
     criteriaMode: "firstError",
@@ -76,7 +74,6 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
         setDeployFailed(false)
         try {
           const newAccount = await deployAccount(switcherNetworkId, password)
-          addAccount(newAccount)
           connectAccount(newAccount)
           analytics.track("createWallet", {
             status: "success",
@@ -95,7 +92,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
         }
       }
     },
-    [addAccount, navigate, overrideSubmit, switcherNetworkId],
+    [navigate, overrideSubmit, switcherNetworkId],
   )
 
   const buttonText = useMemo(() => {
