@@ -1,12 +1,11 @@
 import { Collapse } from "@mui/material"
 import * as Sentry from "@sentry/react"
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import styled from "styled-components"
 
 import { settingsStore } from "../../shared/settings"
 import { useKeyValueStorage } from "../../shared/storage/hooks"
 import { coerceErrorToString } from "../../shared/utils/error"
-import { ResponsiveBehaviour, ScrollBehaviour } from "../AppRoutes"
 import { SettingsItem, Title } from "../features/settings/SettingsScreen"
 import { makeClickable } from "../services/a11y"
 import { useHardResetAndReload } from "../services/resetAndReload"
@@ -30,7 +29,7 @@ const MessageContainer = styled.div`
   justify-content: center;
   gap: 15px;
 
-  padding: 62px 16px 21px;
+  padding: 21px 16px 21px;
 `
 
 const ErrorMessageContainer = styled.div`
@@ -133,105 +132,118 @@ ${displayStack}
     return fallbackErrorPayload
   }, [error, errorInfo])
 
-  const reportToSentry = useCallback(() => {
-    Sentry.withScope((scope) => {
-      Object.keys(errorInfo).forEach((key) => {
-        scope.setExtra(key, errorInfo[key])
+  const reportToSentry = useCallback(
+    (manuallySubmitted = true) => {
+      Sentry.withScope((scope) => {
+        try {
+          Object.keys(errorInfo).forEach((key) => {
+            scope.setExtra(key, errorInfo[key])
+          })
+        } catch {
+          // noop
+        }
+        scope.setExtra("submittedManually", manuallySubmitted)
+        Sentry.captureException(error)
       })
-      Sentry.captureException(error)
-    })
-  }, [error, errorInfo])
+    },
+    [error, errorInfo],
+  )
 
   const privacyErrorReporting = useKeyValueStorage(
     settingsStore,
     "privacyErrorReporting",
   )
 
+  const privacyAutomaticErrorReporting = useKeyValueStorage(
+    settingsStore,
+    "privacyAutomaticErrorReporting",
+  )
+
+  useEffect(() => {
+    if (privacyErrorReporting && privacyAutomaticErrorReporting) {
+      reportToSentry(false)
+    }
+  }, [privacyErrorReporting, privacyAutomaticErrorReporting, reportToSentry])
+
   return (
-    <ScrollBehaviour>
-      <ResponsiveBehaviour>
-        <MessageContainer>
-          <AlertIcon style={{ marginBottom: "15px" }} />
-          <ErrorMessageContainer>
-            <P style={{ textAlign: "center" }}>{message}</P>
+    <MessageContainer>
+      <AlertIcon style={{ marginBottom: "15px" }} />
+      <ErrorMessageContainer>
+        <P style={{ textAlign: "center" }}>{message}</P>
 
-            <ErrorLogsContainer>
-              <ShowLogsToggle
-                {...makeClickable(() => setViewLogs(!viewLogs), {
-                  label: "Show error logs",
-                })}
-              >
-                View Logs
-                <KeyboardArrowDownRounded
-                  style={{
-                    transition: "transform 0.2s ease-in-out",
-                    transform: viewLogs ? "rotate(-180deg)" : "rotate(0deg)",
-                    height: 13,
-                    width: 13,
-                  }}
-                />
-              </ShowLogsToggle>
-            </ErrorLogsContainer>
-            <Collapse
-              in={viewLogs}
-              timeout="auto"
-              style={{ borderRadius: "8px" }}
+        <ErrorLogsContainer>
+          <ShowLogsToggle
+            {...makeClickable(() => setViewLogs(!viewLogs), {
+              label: "Show error logs",
+            })}
+          >
+            View Logs
+            <KeyboardArrowDownRounded
+              style={{
+                transition: "transform 0.2s ease-in-out",
+                transform: viewLogs ? "rotate(-180deg)" : "rotate(0deg)",
+                height: 13,
+                width: 13,
+              }}
+            />
+          </ShowLogsToggle>
+        </ErrorLogsContainer>
+        <Collapse in={viewLogs} timeout="auto" style={{ borderRadius: "8px" }}>
+          <Logs>
+            <pre style={{ whiteSpace: "pre-wrap", lineBreak: "anywhere" }}>
+              {errorPayload}
+            </pre>
+          </Logs>
+        </Collapse>
+      </ErrorMessageContainer>
+
+      <ActionsWrapper>
+        <CopyTooltip message="Copied" copyValue={errorPayload}>
+          <ActionContainer>
+            <ContentCopyIcon />
+            <span>Copy error</span>
+          </ActionContainer>
+        </CopyTooltip>
+        <ActionContainer {...makeClickable(hardResetAndReload)}>
+          <RefreshIcon />
+          <span>Retry</span>
+        </ActionContainer>
+        {privacyErrorReporting && (
+          <ActionContainer {...makeClickable(reportToSentry)}>
+            <WarningIcon />
+            <span>Report error</span>
+          </ActionContainer>
+        )}
+      </ActionsWrapper>
+
+      {privacyErrorReporting && (
+        <StyledSettingsItem>
+          <Title>
+            <span
+              style={{
+                fontSize: "12px",
+                lineHeight: "16px",
+                fontWeight: 600,
+              }}
             >
-              <Logs>
-                <pre style={{ whiteSpace: "pre-wrap", lineBreak: "anywhere" }}>
-                  {errorPayload}
-                </pre>
-              </Logs>
-            </Collapse>
-          </ErrorMessageContainer>
-
-          <ActionsWrapper>
-            <CopyTooltip message="Copied" copyValue={errorPayload}>
-              <ActionContainer>
-                <ContentCopyIcon />
-                <span>Copy error</span>
-              </ActionContainer>
-            </CopyTooltip>
-            <ActionContainer {...makeClickable(hardResetAndReload)}>
-              <RefreshIcon />
-              <span>Retry</span>
-            </ActionContainer>
-            <ActionContainer {...makeClickable(reportToSentry)}>
-              <WarningIcon />
-              <span>Report error</span>
-            </ActionContainer>
-          </ActionsWrapper>
-
-          {!privacyErrorReporting && (
-            <StyledSettingsItem>
-              <Title>
-                <span
-                  style={{
-                    fontSize: "12px",
-                    lineHeight: "16px",
-                    fontWeight: 600,
-                  }}
-                >
-                  Automatic Error Reporting.{" "}
-                  <span style={{ fontWeight: 400 }}>
-                    Be aware that shared logs might contain sensitive data
-                  </span>
-                </span>
-                <IOSSwitch
-                  checked={privacyErrorReporting}
-                  onClick={() =>
-                    settingsStore.set(
-                      "privacyErrorReporting",
-                      !privacyErrorReporting,
-                    )
-                  }
-                />
-              </Title>
-            </StyledSettingsItem>
-          )}
-        </MessageContainer>
-      </ResponsiveBehaviour>
-    </ScrollBehaviour>
+              Automatic Error Reporting.{" "}
+              <span style={{ fontWeight: 400 }}>
+                Be aware that shared logs might contain sensitive data
+              </span>
+            </span>
+            <IOSSwitch
+              checked={privacyAutomaticErrorReporting}
+              onClick={() =>
+                settingsStore.set(
+                  "privacyAutomaticErrorReporting",
+                  !privacyAutomaticErrorReporting,
+                )
+              }
+            />
+          </Title>
+        </StyledSettingsItem>
+      )}
+    </MessageContainer>
   )
 }
 
