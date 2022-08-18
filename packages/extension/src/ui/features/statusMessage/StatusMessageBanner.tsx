@@ -25,10 +25,7 @@ export const StatusMessageBannerContainer: FC = () => {
   const shouldShowStatusMessage = useShouldShowStatusMessage()
   const statusMessage = useStatusMessage()
   const onDismiss = useCallback(async () => {
-    await statusMessageStore.setItem(
-      "lastDismissedMessageId",
-      statusMessage?.id,
-    )
+    await statusMessageStore.set("lastDismissedMessageId", statusMessage?.id)
   }, [statusMessage?.id])
   if (!shouldShowStatusMessage) {
     return null

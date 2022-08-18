@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill"
 
+import { MockStorage } from "./__test__/chrome-storage.mock"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
 import {
   AllowPromise,
@@ -12,9 +13,9 @@ import {
 export interface IKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
 > extends BaseStorage<T> {
-  getItem<K extends keyof T>(key: K): Promise<T[K]>
-  setItem<K extends keyof T>(key: K, value: T[K]): Promise<void>
-  removeItem<K extends keyof T>(key: K): Promise<void>
+  get<K extends keyof T>(key: K): Promise<T[K]>
+  set<K extends keyof T>(key: K, value: T[K]): Promise<void>
+  delete<K extends keyof T>(key: K): Promise<void>
   subscribe<K extends keyof T>(
     key: K,
     callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
@@ -36,9 +37,20 @@ export class KeyValueStorage<
     const options = getOptionsWithDefaults(optionsOrNamespace)
     this.namespace = options.namespace
     this.areaName = options.areaName
-    this.storageImplementation = browser.storage[options.areaName]
-
-    if (!this.storageImplementation) {
+    try {
+      this.storageImplementation = browser.storage[options.areaName]
+      if (!this.storageImplementation) {
+        throw new Error()
+      }
+    } catch (e) {
+      if (options.areaName === "session") {
+        const { manifest_version } = browser.runtime.getManifest()
+        if (manifest_version === 2) {
+          console.log("[v2] Polyfill for browser.storage.session")
+          this.storageImplementation = new MockStorage("session") // for manifest v2
+          return
+        }
+      }
       throw new Error(`Unknown storage area: ${options.areaName}`)
     }
   }
@@ -47,7 +59,7 @@ export class KeyValueStorage<
     return this.namespace + ":" + key.toString()
   }
 
-  public async getItem<K extends keyof T>(key: K): Promise<T[K]> {
+  public async get<K extends keyof T>(key: K): Promise<T[K]> {
     const storageKey = this.getStorageKey(key)
     try {
       const valueFromStorage = await this.storageImplementation.get(storageKey)
@@ -59,12 +71,12 @@ export class KeyValueStorage<
       throw e
     }
   }
-  public async setItem<K extends keyof T>(key: K, value: T[K]): Promise<void> {
+  public async set<K extends keyof T>(key: K, value: T[K]): Promise<void> {
     const storageKey = this.getStorageKey(key)
     return this.storageImplementation.set({ [storageKey]: value })
   }
 
-  public async removeItem<K extends keyof T>(key: K): Promise<void> {
+  public async delete<K extends keyof T>(key: K): Promise<void> {
     const storageKey = this.getStorageKey(key)
     return this.storageImplementation.remove(storageKey)
   }
@@ -80,7 +92,10 @@ export class KeyValueStorage<
       areaName: browser.storage.AreaName,
     ) => {
       if (this.areaName === areaName && changes[storageKey]) {
-        callback(changes[storageKey].newValue, changes[storageKey])
+        callback(
+          changes[storageKey].newValue ?? this.defaults[key], // if newValue is undefined, it means the value was deleted from storage, so we use the default value
+          changes[storageKey],
+        )
       }
     }
 

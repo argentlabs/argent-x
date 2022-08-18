@@ -20,10 +20,40 @@ function getChangeMap(oldValue?: any, newValue?: any): StorageChange {
   return changeMap
 }
 
-class TestStore implements StorageArea {
+export class MockStorage implements StorageArea, chrome.storage.StorageArea {
   private store = new Map()
 
+  public QUOTA_BYTES = 1024 * 1024 * 1024
+
   constructor(private readonly area: AreaName) {}
+
+  getBytesInUse(callback: (bytesInUse: number) => void): void
+  getBytesInUse(keys?: string | string[] | null | undefined): Promise<number>
+  getBytesInUse(
+    keys: string | string[] | null,
+    callback: (bytesInUse: number) => void,
+  ): void
+  getBytesInUse(keys?: unknown, callback?: unknown): void | Promise<number> {
+    if (isFunction(keys)) {
+      callback = keys as (bytesInUse: number) => void
+      keys = undefined
+    }
+    if (isFunction(callback)) {
+      return callback(0)
+    }
+    return Promise.resolve(0)
+  }
+
+  clear(): Promise<void>
+  clear(callback?: (() => void) | undefined): void
+  clear(callback?: unknown): void | Promise<void> {
+    this.store.clear()
+    emitter.emit(this.area, {})
+    if (isFunction(callback)) {
+      return callback()
+    }
+    return Promise.resolve()
+  }
 
   remove(keys: string | string[]): Promise<void>
   remove(keys: string | string[], callback?: (() => void) | undefined): void
@@ -128,9 +158,9 @@ const onStorageChange: OnChanged = {
 }
 
 export const chromeStorageMock: Implementations = {
-  local: new TestStore("local"),
-  sync: new TestStore("sync"),
-  managed: new TestStore("managed"),
-  // session: new TestStore("session"), // FIXME: session storage is not supported in manifest v2
+  local: new MockStorage("local"),
+  sync: new MockStorage("sync"),
+  managed: new MockStorage("managed"),
+  session: new MockStorage("session"),
   onChanged: onStorageChange,
 }

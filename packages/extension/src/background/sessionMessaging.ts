@@ -4,7 +4,6 @@ import { encode } from "starknet"
 import { SessionMessage } from "../shared/messages/SessionMessage"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { hasLegacy } from "./legacy"
 
 export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
   msg,
@@ -37,7 +36,7 @@ export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
       const { body } = msg.data
       const { plaintext } = await compactDecrypt(body, privateKey)
       const password = encode.arrayBufferToString(plaintext)
-      if (wallet.checkPassword(password)) {
+      if (await wallet.checkPassword(password)) {
         return sendToTabAndUi({ type: "CHECK_PASSWORD_RES" })
       }
       return sendToTabAndUi({ type: "CHECK_PASSWORD_REJ" })
@@ -46,21 +45,20 @@ export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
     case "HAS_SESSION": {
       return sendToTabAndUi({
         type: "HAS_SESSION_RES",
-        data: wallet.isSessionOpen(),
+        data: await wallet.isSessionOpen(),
       })
     }
 
     case "STOP_SESSION": {
-      wallet.lock()
+      await wallet.lock()
       return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
     }
 
     case "IS_INITIALIZED": {
-      const initialized = wallet.isInitialized()
-      const legacy = initialized ? false : await hasLegacy()
+      const initialized = await wallet.isInitialized()
       return sendToTabAndUi({
         type: "IS_INITIALIZED_RES",
-        data: { initialized, hasLegacy: legacy },
+        data: { initialized },
       })
     }
   }

@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { Call, number } from "starknet"
+import { Call } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
@@ -25,17 +25,6 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
     amount: BigNumber.from(response.amount),
     suggestedMaxFee: BigNumber.from(response.suggestedMaxFee),
   }
-}
-
-export const updateTransactionFee = async (
-  actionHash: string,
-  maxFee: number.BigNumberish,
-) => {
-  sendMessage({ type: "UPDATE_TRANSACTION_FEE", data: { actionHash, maxFee } })
-  return waitForMessage(
-    "UPDATE_TRANSACTION_FEE_RES",
-    (x) => x.data.actionHash === actionHash,
-  )
 }
 
 // for debugging purposes

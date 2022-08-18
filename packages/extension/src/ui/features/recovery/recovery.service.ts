@@ -12,20 +12,12 @@ import {
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
 import {
   mapWalletAccountsToAccounts,
-  useAccounts,
+  useSelectedAccountStore,
 } from "../accounts/accounts.state"
 
 interface RecoveryOptions {
   networkId?: string
   showAccountList?: boolean
-}
-
-// TODO: refactor - currently explicit sync wallet state into UI store, should be reactive
-export const updateAccountsStateFromWallet = async (networkId: string) => {
-  const allAccounts = await getAccounts(true)
-  const walletAccounts = accountsOnNetwork(allAccounts, networkId)
-  const accounts = mapWalletAccountsToAccounts(walletAccounts)
-  useAccounts.setState({ accounts })
 }
 
 export const recover = async ({
@@ -47,7 +39,7 @@ export const recover = async ({
     const accounts = mapWalletAccountsToAccounts(walletAccounts)
 
     setDefaultAccountNames(accounts)
-    useAccounts.setState({ accounts, selectedAccount })
+    useSelectedAccountStore.setState({ selectedAccount })
     useAppState.setState({ switcherNetworkId: networkId })
 
     // this needs to be after changing the state, otherwise the migration screen would deploy on the network that was selected before the switch

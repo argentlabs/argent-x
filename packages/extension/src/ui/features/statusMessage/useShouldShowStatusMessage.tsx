@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 
-import { getShouldShowMessage } from "./getShouldShowMessage"
+import { getShouldShowMessage } from "./statusMessageVisibility"
 import { useLastDismissedMessageId, useStatusMessage } from "./useStatusMessage"
 
 export const useShouldShowStatusMessage = () => {

@@ -20,7 +20,7 @@ export type OnlyOptionalPropertiesOf<T extends object> = Required<
   Pick<T, OptionalPropertiesOf<T>>
 >
 
-export type AreaName = Exclude<browser.storage.AreaName, "session"> // FIXME: session storage is not supported in manifest v2
+export type AreaName = browser.storage.AreaName
 
 export interface BaseStorage<T> {
   defaults: T

@@ -23,6 +23,21 @@ function attach() {
   } catch {
     // ignore
   }
+  try {
+    delete (window as any)["starknet-argentX"]
+    // set read only property to window
+    Object.defineProperty(window, "starknet-argentX", {
+      value: starknetWindowObject,
+      writable: false,
+    })
+  } catch {
+    // ignore
+  }
+  try {
+    ;(window as any)["starknet-argentX"] = starknetWindowObject
+  } catch {
+    // ignore
+  }
 }
 
 function attachHandler() {
@@ -51,8 +66,12 @@ window.addEventListener(
         // TODO: better UX would be to also re-connect when user selects pre-authorized account
         await disconnectAccount()
       } else {
-        if (address !== starknet.selectedAddress) {
+        if (
+          address !== starknet.selectedAddress ||
+          network.chainId !== starknet.chainId
+        ) {
           starknet.selectedAddress = address
+          starknet.chainId = network.chainId
           starknet.provider = getProvider(network)
           starknet.account = new ArgentXAccount(address, starknet.provider)
           for (const userEvent of userEventHandlers) {

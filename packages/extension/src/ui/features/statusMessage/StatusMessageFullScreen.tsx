@@ -22,7 +22,7 @@ export interface IStatusMessageFullScreen {
 export const StatusMessageFullScreenContainer: FC = () => {
   const statusMessage = useStatusMessage()
   const onClose = useCallback(async () => {
-    await statusMessageStore.setItem(
+    await statusMessageStore.set(
       "lastFullScreenMessageClosedId",
       statusMessage?.id,
     )

@@ -25,14 +25,13 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
       try {
-        const { amount, unit, suggestedMaxFee } =
+        const { overall_fee, suggestedMaxFee } =
           await starknetAccount.estimateFee(msg.data)
 
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
-            amount: number.toHex(amount),
-            unit,
+            amount: number.toHex(overall_fee),
             suggestedMaxFee: number.toHex(suggestedMaxFee),
           },
         })
@@ -48,18 +47,6 @@ export const handleTransactionMessage: HandleMessage<
           },
         })
       }
-    }
-
-    case "UPDATE_TRANSACTION_FEE": {
-      const { actionHash } = msg.data
-      await actionQueue.override(actionHash, {
-        maxFee: msg.data.maxFee,
-      })
-
-      return sendToTabAndUi({
-        type: "UPDATE_TRANSACTION_FEE_RES",
-        data: { actionHash },
-      })
     }
 
     case "TRANSACTION_FAILED": {

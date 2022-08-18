@@ -1,10 +1,17 @@
 import { number } from "starknet"
 
+import { KeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount } from "../shared/wallet.model"
 import { getAccountIdentifier } from "../shared/wallet.service"
 import { Wallet } from "./wallet"
 
-const nonceStore: Record<string, string> = {}
+const nonceStore = new KeyValueStorage<Record<string, string>>(
+  {},
+  {
+    namespace: "core:nonceManager",
+    areaName: "session",
+  },
+)
 
 export async function getNonce(
   baseWallet: BaseWalletAccount,
@@ -14,11 +21,11 @@ export async function getNonce(
   const storageAddress = getAccountIdentifier(baseWallet)
   const result = await account.getNonce()
   const nonceBn = number.toBN(result)
-  const storedNonce = nonceStore[storageAddress]
+  const storedNonce = await nonceStore.get(storageAddress)
 
   // If there's no nonce stored or the fetched nonce is bigger than the stored one, store the fetched nonce
   if (!storedNonce || nonceBn.gt(number.toBN(storedNonce))) {
-    nonceStore[storageAddress] = number.toHex(nonceBn)
+    await nonceStore.set(storageAddress, number.toHex(nonceBn))
   }
 
   // If the stored nonce is greater than the fetched nonce, use the stored nonce
@@ -30,17 +37,22 @@ export async function getNonce(
   return number.toHex(nonceBn)
 }
 
-export function increaseStoredNonce(account: BaseWalletAccount): void {
+export async function increaseStoredNonce(
+  account: BaseWalletAccount,
+): Promise<void> {
   const storageAddress = getAccountIdentifier(account)
-  const currentNonce = nonceStore[storageAddress]
-  if (currentNonce) {
-    nonceStore[storageAddress] = number.toHex(
-      number.toBN(currentNonce).add(number.toBN(1)),
+  const storedNonce = await nonceStore.get(storageAddress)
+  if (storedNonce) {
+    nonceStore.set(
+      storageAddress,
+      number.toHex(number.toBN(storedNonce).add(number.toBN(1))),
     )
   }
 }
 
-export function resetStoredNonce(account: BaseWalletAccount): void {
+export async function resetStoredNonce(
+  account: BaseWalletAccount,
+): Promise<void> {
   const storageAddress = getAccountIdentifier(account)
-  delete nonceStore[storageAddress]
+  await nonceStore.delete(storageAddress)
 }

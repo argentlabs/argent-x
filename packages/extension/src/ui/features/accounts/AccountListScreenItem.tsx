@@ -1,7 +1,8 @@
-import { FC, useMemo } from "react"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
+import { useIsPreauthorized } from "../../../shared/preAuthorizations"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import {
   getAccountIdentifier,
@@ -11,13 +12,12 @@ import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
-import { usePreAuthorizations } from "../actions/connectDapp/usePreAuthorizations"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useAccounts } from "./accounts.state"
+import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
 interface IAccountListScreenItem {
@@ -35,22 +35,11 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const { accountClassHash, id: networkId } = useCurrentNetwork()
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
-  const { preAuthorizations } = usePreAuthorizations()
 
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
 
-  const isConnected = useMemo(() => {
-    if (!originatingHost || !account) {
-      return false
-    }
-    return (
-      preAuthorizations?.accountsByHost[originatingHost] &&
-      preAuthorizations?.accountsByHost[originatingHost].includes(
-        account.address,
-      )
-    )
-  }, [account, originatingHost, preAuthorizations?.accountsByHost])
+  const isConnected = useIsPreauthorized(originatingHost || "", account)
 
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), networkId, "feeTokenBalance"],
@@ -69,7 +58,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   return (
     <AccountListItem
       {...makeClickable(() => {
-        useAccounts.setState({
+        useSelectedAccountStore.setState({
           selectedAccount: account,
           showMigrationScreen: account ? isDeprecated(account) : false,
         })

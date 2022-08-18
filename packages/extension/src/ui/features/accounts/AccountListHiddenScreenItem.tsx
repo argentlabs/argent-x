@@ -1,8 +1,7 @@
 import { FC } from "react"
 
+import { unhideAccount } from "../../../shared/account/store"
 import { makeClickable } from "../../services/a11y"
-import { unhideAccount } from "../../services/backgroundAccounts"
-import { updateAccountsStateFromWallet } from "../recovery/recovery.service"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
@@ -20,9 +19,7 @@ export const AccountListHiddenScreenItem: FC<IAccountListHiddenScreenItem> = ({
     <AccountListItem
       {...makeClickable(async () => {
         // update the state in the wallet
-        await unhideAccount(account.address, account.networkId)
-        // TODO: refactor - currently explicit sync wallet state into UI store, should be reactive
-        await updateAccountsStateFromWallet(account.networkId)
+        await unhideAccount(account)
       })}
       accountName={accountName}
       accountAddress={account.address}

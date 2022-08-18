@@ -6,8 +6,8 @@ import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
+  chainId,
   connectWallet,
-  networkUrl,
   removeWalletChangeListener,
   silentConnectWallet,
 } from "../services/wallet.service"
@@ -15,21 +15,22 @@ import styles from "../styles/Home.module.css"
 
 const Home: NextPage = () => {
   const [address, setAddress] = useState<string>()
+  const [chain, setChain] = useState(chainId())
   const [isConnected, setConnected] = useState(false)
 
   useEffect(() => {
-    ;(async () => {
-      const wallet = await silentConnectWallet()
-      setAddress(wallet?.selectedAddress)
-      setConnected(!!wallet?.isConnected)
-    })()
-
     const handler = async () => {
       const wallet = await silentConnectWallet()
       setAddress(wallet?.selectedAddress)
+      setChain(chainId())
       setConnected(!!wallet?.isConnected)
     }
-    addWalletChangeListener(handler)
+
+    ;(async () => {
+      await handler()
+      addWalletChangeListener(handler)
+    })()
+
     return () => {
       removeWalletChangeListener(handler)
     }
@@ -38,6 +39,7 @@ const Home: NextPage = () => {
   const handleConnectClick = async () => {
     const wallet = await connectWallet()
     setAddress(wallet?.selectedAddress)
+    setChain(chainId())
     setConnected(!!wallet?.isConnected)
   }
 
@@ -55,7 +57,7 @@ const Home: NextPage = () => {
               Wallet address: <code>{address && truncateAddress(address)}</code>
             </h3>
             <h3 style={{ margin: 0 }}>
-              Url: <code>{networkUrl()}</code>
+              Url: <code>{chain}</code>
             </h3>
             <TokenDapp />
           </>

@@ -4,7 +4,6 @@ import { Transaction } from "../transactions"
 
 export interface EstimateFeeResponse {
   amount: string
-  unit: string
   suggestedMaxFee: string
 }
 
@@ -34,12 +33,4 @@ export type TransactionMessage =
   | {
       type: "ESTIMATE_TRANSACTION_FEE_RES"
       data: EstimateFeeResponse
-    }
-  | {
-      type: "UPDATE_TRANSACTION_FEE"
-      data: { actionHash: string; maxFee?: InvocationsDetails["maxFee"] }
-    }
-  | {
-      type: "UPDATE_TRANSACTION_FEE_RES"
-      data: { actionHash: string }
     }

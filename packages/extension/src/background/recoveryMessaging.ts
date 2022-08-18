@@ -1,11 +1,11 @@
 import { compactDecrypt } from "jose"
 import { encode } from "starknet"
 
+import { getAccounts } from "../shared/account/store"
 import { RecoveryMessage } from "../shared/messages/RecoveryMessage"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { downloadFile } from "./download"
-import { exportLegacyBackup } from "./legacy"
 
 export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
   msg,
@@ -27,13 +27,8 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
     }
 
     case "DOWNLOAD_BACKUP_FILE": {
-      await downloadFile(wallet.exportBackup())
+      await downloadFile(await wallet.exportBackup())
       return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
-    }
-
-    case "DOWNLOAD_LEGACY_BACKUP_FILE": {
-      await downloadFile(await exportLegacyBackup())
-      return sendToTabAndUi({ type: "DOWNLOAD_LEGACY_BACKUP_FILE_RES" })
     }
 
     case "RECOVER_SEEDPHRASE": {
@@ -52,7 +47,7 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
         } = JSON.parse(encode.arrayBufferToString(plaintext))
 
         await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-        transactionTracker.loadHistory(await wallet.getAccounts())
+        transactionTracker.loadHistory(await getAccounts())
 
         return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
       } catch (error) {

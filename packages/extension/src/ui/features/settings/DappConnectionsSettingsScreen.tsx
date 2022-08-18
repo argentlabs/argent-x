@@ -6,11 +6,11 @@ import styled from "styled-components"
 import {
   removePreAuthorization,
   resetPreAuthorizations,
+  usePreAuthorizations,
 } from "../../../shared/preAuthorizations"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { H2, P } from "../../theme/Typography"
-import { usePreAuthorizations } from "../actions/connectDapp/usePreAuthorizations"
 import { DappConnection } from "./DappConnection"
 
 const Wrapper = styled.div`
@@ -34,17 +34,12 @@ const Wrapper = styled.div`
 export const DappConnectionsSettingsScreen: FC = () => {
   const navigate = useNavigate()
 
-  const { preAuthorizations, refreshPreAuthorizations } = usePreAuthorizations()
+  const preAuthorizations = usePreAuthorizations()
 
-  const preauthorizedHosts = useMemo<string[] | null>(() => {
-    if (!preAuthorizations) {
-      return null
-    }
-    const preauthorizedHosts = uniq([
-      ...Object.keys(preAuthorizations.accountsByHost),
-      ...preAuthorizations.allAccounts,
-    ])
-    return preauthorizedHosts
+  const preauthorizedHosts = useMemo<string[]>(() => {
+    return uniq(
+      preAuthorizations.map((preAuthorization) => preAuthorization.host),
+    )
   }, [preAuthorizations])
 
   return (
@@ -63,8 +58,7 @@ export const DappConnectionsSettingsScreen: FC = () => {
                 host={host}
                 onRemoveClick={async () => {
                   /** passing null as accountAddress will remove all accounts */
-                  await removePreAuthorization({ host, accountAddress: null })
-                  refreshPreAuthorizations()
+                  await removePreAuthorization(host)
                 }}
               />
             ))}
@@ -73,7 +67,6 @@ export const DappConnectionsSettingsScreen: FC = () => {
             <Button
               onClick={() => {
                 resetPreAuthorizations()
-                refreshPreAuthorizations()
                 navigate(-1)
               }}
             >

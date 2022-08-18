@@ -1,49 +1,56 @@
 import { memoize } from "lodash-es"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { swrCacheProvider } from "../../ui/services/swr"
 import { IArrayStorage } from "./array"
 import { IKeyValueStorage } from "./keyvalue"
 import { IObjectStorage } from "./object"
 import { SelectorFn } from "./types"
-
-const clientCache = new Map<string, any>()
 
 export function useKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
   K extends keyof T = keyof T,
 >(storage: IKeyValueStorage<T>, key: K): T[K] {
   const [value, setValue] = useState<T[K]>(
-    clientCache.get(storage.namespace + ":" + key.toString()) ??
+    swrCacheProvider.get(storage.namespace + ":" + key.toString()) ??
       storage.defaults[key],
   )
 
-  useEffect(() => {
-    storage.getItem(key).then(setValue)
-    const sub = storage.subscribe(key, setValue)
-    return () => sub()
-  }, [storage, key])
+  const set = useCallback(
+    (value: T[K]) => {
+      swrCacheProvider.set(storage.namespace + ":" + key.toString(), value)
+      setValue(value)
+    },
+    [key, storage.namespace],
+  )
 
   useEffect(() => {
-    clientCache.set(storage.namespace + ":" + key.toString(), value)
-  }, [value, storage.namespace, key])
+    storage.get(key).then(set)
+    const sub = storage.subscribe(key, set)
+    return () => sub()
+  }, [storage, key, set])
 
   return value
 }
 
 export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
   const [value, setValue] = useState<T>(
-    clientCache.get(storage.namespace) ?? storage.defaults,
+    swrCacheProvider.get(storage.namespace) ?? storage.defaults,
+  )
+
+  const set = useCallback(
+    (value: T) => {
+      swrCacheProvider.set(storage.namespace, value)
+      setValue(value)
+    },
+    [storage.namespace],
   )
 
   useEffect(() => {
-    storage.get().then(setValue)
-    const sub = storage.subscribe(setValue)
+    storage.get().then(set)
+    const sub = storage.subscribe(set)
     return () => sub()
-  }, [storage])
-
-  useEffect(() => {
-    clientCache.set(storage.namespace, value)
-  }, [value, storage.namespace])
+  }, [set, storage])
 
   return value
 }
@@ -58,18 +65,22 @@ export function useArrayStorage<T>(
   selector: SelectorFn<T> = defaultSelector,
 ): T[] {
   const [value, setValue] = useState<T[]>(
-    clientCache.get(storage.namespace) ?? storage.defaults,
+    swrCacheProvider.get(storage.namespace) ?? storage.defaults,
+  )
+
+  const set = useCallback(
+    (value: T[]) => {
+      swrCacheProvider.set(storage.namespace, value)
+      setValue(value)
+    },
+    [storage.namespace],
   )
 
   useEffect(() => {
-    storage.get().then(setValue)
-    const sub = storage.subscribe(setValue)
+    storage.get().then(set)
+    const sub = storage.subscribe(set)
     return () => sub()
-  }, [selector, storage])
-
-  useEffect(() => {
-    clientCache.set(storage.namespace, value)
-  }, [value, storage.namespace])
+  }, [selector, storage, set])
 
   const filteredValue = useMemo(() => value.filter(selector), [value, selector])
 

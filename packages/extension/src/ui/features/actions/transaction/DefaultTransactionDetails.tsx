@@ -16,7 +16,7 @@ import {
   ContentCopyIcon,
 } from "../../../components/Icons/MuiIcons"
 import { ContractField } from "./fields/ContractField"
-import { TransactionItemProps } from "./TransactionItem"
+import { TransactionDetailsProps } from "./TransactionDetails"
 
 const DisclosureIconContainer = styled.div<{ expanded: boolean }>`
   transition: transform 0.2s;
@@ -42,7 +42,7 @@ const TransactionJson = styled.pre`
   color: ${({ theme }) => theme.text2};
 `
 
-export const DefaultTransactionDetails: FC<TransactionItemProps> = ({
+export const DefaultTransactionDetails: FC<TransactionDetailsProps> = ({
   transaction,
 }) => {
   const [expanded, setExpanded] = useState(false)

@@ -1,20 +1,19 @@
+import { useMemo } from "react"
+
 import {
   ARGENT_X_STATUS_ENABLED,
   ARGENT_X_STATUS_URL,
 } from "../../../shared/api/constants"
 import {
-  ISettingsStorage,
   isPrivacySettingsEnabled,
-  settingsStorage,
+  settingsStore,
 } from "../../../shared/settings"
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import { IStatusMessage } from "../../../shared/statusMessage/types"
-import {
-  useKeyValueStorage,
-  useObjectStorage,
-} from "../../../shared/storage/hooks"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
 import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
+import { getMessageForVersion } from "./statusMessageVisibility"
 
 export const useLastDismissedMessageId = () =>
   useKeyValueStorage(statusMessageStore, "lastDismissedMessageId")
@@ -23,8 +22,10 @@ export const useLastFullScreenMessageClosedId = () =>
   useKeyValueStorage(statusMessageStore, "lastFullScreenMessageClosedId")
 
 export const useStatusMessageEnabled = () => {
-  const { privacyUseArgentServices } =
-    useObjectStorage<ISettingsStorage>(settingsStorage)
+  const privacyUseArgentServices = useKeyValueStorage(
+    settingsStore,
+    "privacyUseArgentServices",
+  )
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_X_STATUS_ENABLED
@@ -35,12 +36,17 @@ export const useStatusMessageEnabled = () => {
 export const useStatusMessage = () => {
   const fetcher = useArgentApiFetcher()
   const statusMessageEnabled = useStatusMessageEnabled()
-  const { data: statusMessage } = useConditionallyEnabledSWR<IStatusMessage>(
+  const { data } = useConditionallyEnabledSWR<
+    IStatusMessage | IStatusMessage[]
+  >(
     statusMessageEnabled,
     ARGENT_X_STATUS_URL,
     fetcher,
     withPolling(5 * 60 * 60 * 1000) /** 5 minutes */,
   )
+  const statusMessage = useMemo(() => {
+    return getMessageForVersion({ statusMessage: data })
+  }, [data])
   return statusMessage
 }
 

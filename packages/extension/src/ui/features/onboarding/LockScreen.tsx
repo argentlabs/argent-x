@@ -48,6 +48,7 @@ export const greetings = [
 
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
+  const actions = useActions()
 
   return (
     <LockScreenWrapper>
@@ -64,7 +65,7 @@ export const LockScreen: FC = () => {
             const target = await recover()
 
             // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close
-            if (EXTENSION_IS_POPUP && !useActions.getState().actions.length) {
+            if (EXTENSION_IS_POPUP && !actions.length) {
               window.close()
             }
 

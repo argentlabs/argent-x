@@ -13,6 +13,7 @@ export async function checkIfUpgradeAvailable(
 
   const currentImplementation = await account.getCurrentImplementation()
 
+  // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
   const oldAccount = isDeprecated(account)
 
   return (

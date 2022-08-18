@@ -26,7 +26,6 @@ import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
-import { useIsPreauthorized } from "./connectDapp/useIsPreauthorized"
 import { FeeEstimation } from "./FeeEstimation"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
@@ -72,7 +71,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const { accountNames } = useAccountMetadata()
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
-  const isPreauthorized = useIsPreauthorized()
 
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
@@ -86,12 +84,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
-  }
-
-  /** will be undefined while initialising */
-  if (isPreauthorized === false) {
-    /** FIXME: somehow the user has created a transaction with a non-connected account */
-    /** they should be prompted to pick a different account here */
   }
 
   const accountName = getAccountName(selectedAccount, accountNames)

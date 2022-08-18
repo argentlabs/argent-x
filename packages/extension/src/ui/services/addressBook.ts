@@ -2,7 +2,7 @@ import { accountNetworkSelector } from "./../../shared/addressBook/selectors"
 import { AddressBookContact, addressBookStore } from "../../shared/addressBook"
 import { useArrayStorage } from "../../shared/storage/hooks"
 import { Account } from "../features/accounts/Account"
-import { useVisibleAccounts } from "../features/accounts/accounts.state"
+import { useAccounts } from "../features/accounts/accounts.state"
 
 export interface AddressBook {
   userAccounts: Account[]
@@ -15,7 +15,7 @@ export const useAddressBook = (networkId?: string): AddressBook => {
     networkId ? accountNetworkSelector(networkId) : undefined,
   )
 
-  const userAccounts = useVisibleAccounts()
+  const userAccounts = useAccounts()
 
   if (!networkId) {
     return { userAccounts, contacts: contactsOnNetwork }

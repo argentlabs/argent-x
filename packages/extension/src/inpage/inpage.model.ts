@@ -1,6 +1,8 @@
-import type { AccountInterface, Provider } from "starknet"
-
-import type { Network } from "../shared/network"
+import type { AccountInterface, ProviderInterface } from "starknet"
+import type {
+  AccountInterface as AccountInterface3,
+  ProviderInterface as ProviderInterface3,
+} from "starknet3"
 
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
@@ -54,7 +56,7 @@ export interface AddStarknetChainParameters {
 }
 
 export interface SwitchStarknetChainParameter {
-  chainId: Network["chainId"] // A 0x-prefixed hexadecimal string
+  chainId: string // A 0x-prefixed hexadecimal string
 }
 
 export type RpcMessage =
@@ -79,12 +81,19 @@ export type RpcMessage =
       result: never
     }
 
+type StarknetJsVersion = "v3" | "v4"
+
 interface IStarketWindowObject {
-  id: "argent-x"
+  id: string
+  name: string
+  version: string
+  icon: string
   request: <T extends RpcMessage>(
     call: Omit<T, "result">,
   ) => Promise<T["result"]>
-  enable: (options?: { showModal?: boolean }) => Promise<string[]>
+  enable: (options?: {
+    starknetVersion?: StarknetJsVersion
+  }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
   on: (
     event: WalletEvents["type"],
@@ -94,19 +103,34 @@ interface IStarketWindowObject {
     event: WalletEvents["type"],
     handleEvent: WalletEvents["handler"],
   ) => void
-  account?: AccountInterface
-  provider: Provider
+  starknetJsVersion?: StarknetJsVersion
+  account?: AccountInterface | AccountInterface3
+  provider?: ProviderInterface | ProviderInterface3
   selectedAddress?: string
   chainId?: string
-  version: string
 }
 
-interface ConnectedStarketWindowObject extends IStarketWindowObject {
+interface ConnectedStarketWindowObjectV3 extends IStarketWindowObject {
   isConnected: true
-  account: AccountInterface
+  starknetJsVersion: "v3"
+  account: AccountInterface3
+  provider: ProviderInterface3
   selectedAddress: string
   chainId: string
 }
+
+interface ConnectedStarketWindowObjectV4 extends IStarketWindowObject {
+  isConnected: true
+  starknetJsVersion: "v4"
+  account: AccountInterface
+  provider: ProviderInterface
+  selectedAddress: string
+  chainId: string
+}
+
+type ConnectedStarketWindowObject =
+  | ConnectedStarketWindowObjectV3
+  | ConnectedStarketWindowObjectV4
 
 interface DisconnectedStarketWindowObject extends IStarketWindowObject {
   isConnected: false

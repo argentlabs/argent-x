@@ -1,10 +1,18 @@
-import type { BrowserContext, Page } from "@playwright/test"
+import type { BrowserContext, Page, Worker } from "@playwright/test"
 
+// supports manifest v2 and v3
 export async function openExtension(page: Page, context: BrowserContext) {
-  await page.waitForTimeout(1000) // give the extension time to startup
-  const extension = context.backgroundPages()[0]
-  const url = await extension.evaluate(() =>
-    chrome.runtime.getURL("index.html"),
-  )
-  await page.goto(url)
+  let background: Page | Worker | undefined
+  const [bp] = context.backgroundPages()
+  const [sw] = context.serviceWorkers()
+  background = bp || sw
+  if (!background) {
+    background = await Promise.race([
+      context.waitForEvent("backgroundpage"),
+      context.waitForEvent("serviceworker"),
+    ])
+  }
+  const url = new URL(background.url())
+  url.pathname = "/index.html"
+  await page.goto(url.toString())
 }

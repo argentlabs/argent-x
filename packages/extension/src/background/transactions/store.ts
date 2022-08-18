@@ -6,10 +6,7 @@ import {
   TransactionRequest,
   compareTransactions,
 } from "../../shared/transactions"
-import {
-  notifyAboutCompletedTransactions,
-  showNotificationBadge,
-} from "./onupdate/notifications"
+import { notifyAboutCompletedTransactions } from "./onupdate/notifications"
 import { checkTransactionHash } from "./transactionExecution"
 
 export const transactionsStore = new ArrayStorage<Transaction>([], {
@@ -32,7 +29,7 @@ export const addTransaction = async (transaction: TransactionRequest) => {
     ...transaction,
   }
 
-  return transactionsStore.add(newTransaction)
+  return transactionsStore.push(newTransaction)
 }
 
 const equalTransactionWithStatus = (
@@ -49,11 +46,7 @@ transactionsStore.subscribe((allTransactions, changeSet) => {
     equalTransactionWithStatus,
   )
 
-  // TODO: add badge to extension icon
-
   if (updatedTransactions.length > 0) {
     notifyAboutCompletedTransactions(updatedTransactions)
   }
-
-  showNotificationBadge(allTransactions)
 })

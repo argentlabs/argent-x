@@ -1,6 +1,6 @@
 import type { BrowserContext, Page } from "@playwright/test"
 
-import { sendDevnetEthToAccount } from "../apis/sendDevnetEthToAccount"
+import { mintDevnetEthToAccount } from "../apis/sendDevnetEthToAccount"
 import { getAccountAddressFromAccountPage } from "../selectors/getAccountAddressFromAccountPage"
 import { getBalanceFromAccountPage } from "../selectors/getBalanceFromAccountPage"
 import { disableNetworkIssuesWarning } from "../steps/disableNetworkIssuesWarning"
@@ -22,7 +22,7 @@ export async function setupNewAccountWithTestnetEth(
   await switchNetwork(page, "Localhost")
   await newAccount(page)
   const address = await getAccountAddressFromAccountPage(page)
-  await sendDevnetEthToAccount(address)
+  await mintDevnetEthToAccount(address)
   const balance = await getBalanceFromAccountPage(page, "Ethereum")
 
   console.log(

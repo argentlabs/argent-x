@@ -3,7 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "./app.state"
-import { TransactionDetail } from "./features/accountActivity/TransactionDetail"
+import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
@@ -15,10 +15,7 @@ import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKe
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
-import {
-  useActions,
-  useActionsSubscription,
-} from "./features/actions/actions.state"
+import { useActions } from "./features/actions/actions.state"
 import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
@@ -29,7 +26,6 @@ import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
-import { LegacyScreen } from "./features/onboarding/LegacyWalletScreen"
 import { LockScreen } from "./features/onboarding/LockScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
@@ -103,7 +99,6 @@ const nonWalletRoutes = (
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
     />
-    <Route path={routes.legacy.path} element={<LegacyScreen />} />
     <Route path={routes.error.path} element={<ErrorScreen />} />
   </>
 )
@@ -130,7 +125,7 @@ const walletRoutes = (
     />
     <Route
       path={routes.transactionDetail.path}
-      element={<TransactionDetail />}
+      element={<TransactionDetailScreen />}
     />
     <Route
       path={routes.accountHideConfirm.path}
@@ -220,10 +215,9 @@ const walletRoutes = (
 
 export const AppRoutes: FC = () => {
   useEntryRoute()
-  useActionsSubscription()
 
   const { isLoading } = useAppState()
-  const { actions } = useActions()
+  const actions = useActions()
 
   if (isLoading) {
     return <LoadingScreen />

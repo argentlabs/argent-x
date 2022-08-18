@@ -56,34 +56,6 @@ export const deleteAccount = async (address: string, networkId: string) => {
   }
 }
 
-export const hideAccount = async (address: string, networkId: string) => {
-  sendMessage({
-    type: "HIDE_ACCOUNT",
-    data: { address, networkId },
-  })
-
-  await Promise.race([
-    waitForMessage("HIDE_ACCOUNT_RES"),
-    waitForMessage("HIDE_ACCOUNT_REJ").then(() => {
-      throw new Error("Rejected")
-    }),
-  ])
-}
-
-export const unhideAccount = async (address: string, networkId: string) => {
-  sendMessage({
-    type: "UNHIDE_ACCOUNT",
-    data: { address, networkId },
-  })
-
-  await Promise.race([
-    waitForMessage("UNHIDE_ACCOUNT_RES"),
-    waitForMessage("UNHIDE_ACCOUNT_REJ").then(() => {
-      throw new Error("Rejected")
-    }),
-  ])
-}
-
 export const upgradeAccount = async (data: BaseWalletAccount) => {
   sendMessage({ type: "UPGRADE_ACCOUNT", data })
   try {

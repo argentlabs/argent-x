@@ -1,15 +1,14 @@
 import { useCallback } from "react"
 import { Call } from "starknet"
 
-import { settingsStorage } from "./../../../../shared/settings/storage"
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
 import { PublicNetworkIds } from "../../../../shared/network/public"
 import {
-  ISettingsStorage,
   isPrivacySettingsEnabled,
+  settingsStore,
 } from "../../../../shared/settings"
-import { useObjectStorage } from "../../../../shared/storage/hooks"
+import { useKeyValueStorage } from "../../../../shared/storage/hooks"
 import {
   ApiTransactionReviewResponse,
   fetchTransactionReview,
@@ -25,13 +24,17 @@ export interface IUseTransactionReview {
 }
 
 export const useTransactionReviewEnabled = () => {
-  const { privacyUseArgentServices } =
-    useObjectStorage<ISettingsStorage>(settingsStorage)
+  const privacyUseArgentServicesEnabled = useKeyValueStorage(
+    settingsStore,
+    "privacyUseArgentServices",
+  )
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_TRANSACTION_REVIEW_API_ENABLED
   }
-  return ARGENT_TRANSACTION_REVIEW_API_ENABLED && privacyUseArgentServices
+  return (
+    ARGENT_TRANSACTION_REVIEW_API_ENABLED && privacyUseArgentServicesEnabled
+  )
 }
 
 export const useTransactionReview = ({

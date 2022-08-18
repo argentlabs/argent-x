@@ -18,7 +18,7 @@ import {
   connectAccount,
   redeployAccount,
 } from "../../services/backgroundAccounts"
-import { PendingTransactions } from "../accountActivity/PendingTransactions"
+import { PendingTransactionsContainer } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -151,7 +151,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         </Link>
       )}
       {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
-      <PendingTransactions account={account} />
+      <PendingTransactionsContainer account={account} />
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
       <ErrorBoundary
         fallback={

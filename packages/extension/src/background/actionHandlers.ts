@@ -1,11 +1,10 @@
-import { ActionItem } from "../shared/actionQueue"
+import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
+import { preAuthorize } from "../shared/preAuthorizations"
 import { assertNever } from "../ui/services/assertNever"
-import { ExtQueueItem } from "./actionQueue"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
-import { preAuthorize } from "./preAuthorizations"
 import { executeTransaction } from "./transactions/transactionExecution"
 
 export const handleActionApproval = async (
@@ -30,10 +29,7 @@ export const handleActionApproval = async (
         networkId: selectedAccount.networkId,
       })
 
-      await preAuthorize({
-        host,
-        accountAddress: selectedAccount.address,
-      })
+      await preAuthorize(selectedAccount, host)
 
       return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }
@@ -56,7 +52,7 @@ export const handleActionApproval = async (
 
     case "SIGN": {
       const typedData = action.payload
-      if (!wallet.isSessionOpen()) {
+      if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }
       const starknetAccount = await wallet.getSelectedStarknetAccount()
