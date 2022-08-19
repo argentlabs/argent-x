@@ -139,12 +139,12 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
         <H2>Add tokens</H2>
 
         <form
-          onSubmit={(e: React.FormEvent) => {
+          onSubmit={async (e: React.FormEvent) => {
             e.preventDefault()
             compiledData.address = addressFormat64Byte(compiledData.address)
             if (isDataComplete(compiledData)) {
               try {
-                addToken(compiledData)
+                await addToken(compiledData)
                 onSubmit?.()
                 navigate(routes.accountTokens())
               } catch (e) {
