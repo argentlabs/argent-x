@@ -18,7 +18,7 @@ export const useIsPlugin = (
   }
 
   return useSWR(
-    [pluginAccount.address, pluginClassHash],
+    [pluginAccount.address, pluginClassHash, "getIsPlugin"],
     () => getIsPlugin(pluginAccount, pluginClassHash),
     {
       suspense: false,

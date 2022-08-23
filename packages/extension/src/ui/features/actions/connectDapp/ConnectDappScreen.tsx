@@ -190,8 +190,6 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
     }
   }, [visibleAccounts, connectAccount])
 
-  console.log(connectAccount, selectedAccount, initiallySelectedAccount)
-
   const onSelectedAccountChange = useCallback((account: BaseWalletAccount) => {
     setConnectAccount(account)
   }, [])

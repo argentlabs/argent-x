@@ -9,6 +9,7 @@ import Row, { RowBetween } from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
 import { H5 } from "../../theme/Typography"
 import { useAccount } from "../accounts/accounts.state"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { PluginAccount } from "./PluginAccount"
 import { IPlugin } from "./Plugins"
@@ -60,25 +61,27 @@ export const Plugin: FC<IPlugin & { accountAddress: string }> = ({
 }) => {
   const networkId = useCurrentNetwork().id
   const account = useAccount({ address: accountAddress, networkId })
+  const { pendingTransactions } = useAccountTransactions(account)
 
   const pluginAccount = PluginAccount.accountToPluginAccount(account)
 
-  const {
-    data: isPlugin,
-    error: isPluginError,
-    isValidating: isPluginLoading,
-  } = useIsPlugin(classHash, pluginAccount)
-  console.log("🚀 ~ file: Plugin.tsx ~ line 59 ~ isPlugin", isPlugin)
+  const { data: isPlugin, error: isPluginError } = useIsPlugin(
+    classHash,
+    pluginAccount,
+  )
+
+  const isPluginLoading =
+    isPlugin === undefined || pendingTransactions.length > 0
 
   if (isPluginError) {
-    throw new Error("Unable to fetch plugin data")
+    throw isPluginError
   }
 
   const handleAddRemovePlugin = useCallback(async () => {
     if (isPlugin) {
-      return await pluginAccount.removePlugin(classHash)
+      return pluginAccount.removePlugin(classHash)
     }
-    return await pluginAccount.addPlugin(classHash)
+    return pluginAccount.addPlugin(classHash)
   }, [classHash, isPlugin, pluginAccount])
 
   return (

@@ -1,24 +1,20 @@
-import {
-  Account,
-  Call,
-  KeyPair,
-  ProviderInterface,
-  ProviderOptions,
-  SignerInterface,
-  hash,
-  number,
-} from "starknet"
+import { Abi, Call, Contract, hash, number } from "starknet"
 
+import ArgentPluginCompiledContractAbi from "../../../abis/ArgentPluginAccount.json"
 import { executeTransaction } from "../../services/backgroundTransactions"
 import { Account as ArgentXAccount } from "../accounts/Account"
 
-export class PluginAccount extends Account {
-  constructor(
-    providerOrOptions: ProviderOptions | ProviderInterface,
-    public address: string,
-    keyPairOrSigner: KeyPair | SignerInterface,
-  ) {
-    super(providerOrOptions, address, keyPairOrSigner)
+export class PluginAccount extends ArgentXAccount {
+  constructor(account: ArgentXAccount) {
+    super({
+      ...account,
+      type: "argent-plugin",
+      contract: new Contract(
+        ArgentPluginCompiledContractAbi as Abi,
+        account.address,
+        account.provider,
+      ),
+    })
   }
 
   public static accountToPluginAccount(account?: ArgentXAccount) {
@@ -26,17 +22,14 @@ export class PluginAccount extends Account {
       throw new Error("Cannot convert to Plugin Account")
     }
 
-    return new PluginAccount(account.provider, account.address, account.signer)
+    return new PluginAccount(account)
   }
 
   public async isPlugin(pluginClassHash: string): Promise<boolean> {
-    const res = await this.callContract({
-      contractAddress: this.address,
-      entrypoint: "is_plugin",
-      calldata: [number.hexToDecimalString(pluginClassHash)],
-    })
-
-    return Boolean(parseInt(res.result[0], 16))
+    const [result] = await this.contract.call("is_plugin", [
+      number.hexToDecimalString(pluginClassHash),
+    ])
+    return !result.isZero()
   }
 
   public addPlugin(pluginClassHash: string) {
@@ -71,7 +64,7 @@ export class PluginAccount extends Account {
           pluginClassHash,
           hash.getSelectorFromName(call.entrypoint),
           call.calldata?.length ?? 0,
-          call.calldata,
+          ...number.bigNumberishArrayToDecimalStringArray(call.calldata ?? []),
         ],
       },
     })

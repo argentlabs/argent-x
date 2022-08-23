@@ -584,7 +584,7 @@ export class Wallet {
       session.secret,
     )
 
-    return starkPair.priv.toString()
+    return starkPair.getPrivate().toString()
   }
 
   public static validateBackup(backupString: string): boolean {

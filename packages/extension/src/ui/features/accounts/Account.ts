@@ -28,16 +28,18 @@ export class Account {
     address,
     network,
     signer,
+    type,
     deployTransaction,
     hidden,
-    type,
+    contract,
   }: {
     address: string
     network: Network
     signer: WalletAccountSigner
+    type: ArgentAccountType
     deployTransaction?: string
     hidden?: boolean
-    type: ArgentAccountType
+    contract?: Contract
   }) {
     this.address = address
     this.network = network
@@ -47,11 +49,9 @@ export class Account {
     this.deployTransaction = deployTransaction
     this.type = type
     this.provider = getProvider(network)
-    this.contract = new Contract(
-      ArgentCompiledContractAbi as Abi,
-      address,
-      this.provider,
-    )
+    this.contract =
+      contract ??
+      new Contract(ArgentCompiledContractAbi as Abi, address, this.provider)
     this.proxyContract = new Contract(
       ProxyCompiledContractAbi as Abi,
       address,
