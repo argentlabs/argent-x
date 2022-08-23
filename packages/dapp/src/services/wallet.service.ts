@@ -1,6 +1,5 @@
 import { connect, getStarknet } from "@argent/get-starknet"
 import { constants, shortString } from "starknet"
-import { StarknetChainId } from "starknet/dist/constants"
 
 import { Network } from "./token.service"
 

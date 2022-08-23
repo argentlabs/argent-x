@@ -1,11 +1,6 @@
+import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
-import {
-  Abi,
-  AccountInterface,
-  Contract,
-  SessionAccount,
-  session,
-} from "starknet"
+import { Abi, AccountInterface, Contract } from "starknet"
 import { genKeyPair, getStarkKey } from "starknet/dist/utils/ellipticCurve"
 
 import Erc20Abi from "../../abi/ERC20.json"
@@ -135,7 +130,7 @@ export const TokenDapp: FC<{
 
   const handleOpenSessionSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const signedSession = await session.createSession(
+    const signedSession = await createSession(
       {
         key: getStarkKey(sessionSigner),
         expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds

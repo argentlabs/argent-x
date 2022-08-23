@@ -1,4 +1,4 @@
-import { session } from "starknet"
+import { SESSION_PLUGIN_CLASS_HASH } from "@argent/x-sessions"
 
 import { SessionPluginIcon } from "../../components/Icons/SessionPluginIcon"
 
@@ -11,7 +11,7 @@ export interface IPlugin {
 
 export const plugins: IPlugin[] = [
   {
-    classHash: session.SESSION_PLUGIN_CLASS_HASH,
+    classHash: SESSION_PLUGIN_CLASS_HASH,
     title: "User sessions",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lectus nisl, diam iaculis porttitor.",

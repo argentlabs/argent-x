@@ -73,6 +73,7 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
+    "@argent/x-sessions": "^4.7.0",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^1.11.1",
     "@mui/icons-material": "^5.3.1",

@@ -1,7 +1,8 @@
+import { supportsSessions } from "@argent/x-sessions"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { AccountInterface, session } from "starknet"
+import { AccountInterface } from "starknet"
 
 import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
@@ -16,7 +17,7 @@ import styles from "../styles/Home.module.css"
 
 const Home: NextPage = () => {
   const [address, setAddress] = useState<string>()
-  const [supportsSessions, setSupportsSessions] = useState<boolean | null>(null)
+  const [supportSessions, setSupportsSessions] = useState<boolean | null>(null)
   const [chain, setChain] = useState(chainId())
   const [isConnected, setConnected] = useState(false)
   const [account, setAccount] = useState<AccountInterface | null>(null)
@@ -32,7 +33,7 @@ const Home: NextPage = () => {
       }
       setSupportsSessions(null)
       if (wallet?.selectedAddress) {
-        const sessionSupport = await session.supportsSessions(
+        const sessionSupport = await supportsSessions(
           wallet.selectedAddress,
           wallet.provider,
         )
@@ -60,7 +61,7 @@ const Home: NextPage = () => {
     }
     setSupportsSessions(null)
     if (wallet?.selectedAddress) {
-      const sessionSupport = await session.supportsSessions(
+      const sessionSupport = await supportsSessions(
         wallet.selectedAddress,
         wallet.provider,
       )
@@ -82,13 +83,13 @@ const Home: NextPage = () => {
               Wallet address: <code>{address && truncateAddress(address)}</code>
             </h3>
             <h3 style={{ margin: 0 }}>
-              supports sessions: <code>{`${supportsSessions}`}</code>
+              supports sessions: <code>{`${supportSessions}`}</code>
             </h3>
             <h3 style={{ margin: 0 }}>
               Url: <code>{chain}</code>
             </h3>
             {account && (
-              <TokenDapp showSession={supportsSessions} account={account} />
+              <TokenDapp showSession={supportSessions} account={account} />
             )}
           </>
         ) : (
