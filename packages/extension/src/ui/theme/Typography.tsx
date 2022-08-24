@@ -52,6 +52,12 @@ export const DialogContentText = styled.p`
   text-align: center;
 `
 
+export const WarningText = styled.p`
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.yellow1};
+`
+
 export const FormError = styled.p`
   margin-top: 2px;
   font-size: 12px;
