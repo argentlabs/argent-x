@@ -7,7 +7,10 @@ import styled, { css, keyframes } from "styled-components"
 import { DefaultTheme } from "styled-components"
 import useSWR from "swr"
 
-import { prettifyCurrencyValue } from "../../../shared/token/price"
+import {
+  prettifyCurrencyValue,
+  prettifyTokenAmount,
+} from "../../../shared/token/price"
 import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../components/CopyTooltip"
@@ -78,15 +81,6 @@ const FeeErrorContainer = styled.div`
   overflow: auto;
   cursor: pointer;
 `
-
-function displayEther(value: BigNumber) {
-  const formattedValue = utils.formatEther(value)
-  const [int, dec] = formattedValue.split(".")
-  const shortenedValue = `${int}.${dec.slice(0, 5)}`
-  return shortenedValue === formattedValue
-    ? formattedValue
-    : `~${shortenedValue}`
-}
 
 interface FeeEstimationProps {
   transactions: Call | Call[]
@@ -219,22 +213,40 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             <FieldValue>
               {amountCurrencyValue !== undefined ? (
                 <FeeEstimationValue>
-                  {prettifyCurrencyValue(amountCurrencyValue)}
+                  ~{prettifyCurrencyValue(amountCurrencyValue)}
                 </FeeEstimationValue>
               ) : (
                 <FeeEstimationValue>
-                  {displayEther(fee.amount)} ETH
+                  ~
+                  {feeToken ? (
+                    prettifyTokenAmount({
+                      amount: fee.amount,
+                      decimals: feeToken.decimals,
+                      symbol: feeToken.symbol,
+                    })
+                  ) : (
+                    <>{fee.amount} Unknown</>
+                  )}
                 </FeeEstimationValue>
               )}
             </FieldValue>
             <FieldValueMeta>
               {suggestedMaxFeeCurrencyValue !== undefined ? (
                 <FeeEstimationValue>
-                  Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
+                  Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
                 </FeeEstimationValue>
               ) : (
                 <FeeEstimationValue>
-                  Max {displayEther(fee.suggestedMaxFee)} ETH
+                  Max ~
+                  {feeToken ? (
+                    prettifyTokenAmount({
+                      amount: fee.suggestedMaxFee,
+                      decimals: feeToken.decimals,
+                      symbol: feeToken.symbol,
+                    })
+                  ) : (
+                    <>{fee.suggestedMaxFee} Unknown</>
+                  )}
                 </FeeEstimationValue>
               )}
             </FieldValueMeta>
