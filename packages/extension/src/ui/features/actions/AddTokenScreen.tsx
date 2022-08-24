@@ -10,13 +10,16 @@ import { useAppState } from "../../app.state"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupVertical } from "../../components/Button"
 import { Header } from "../../components/Header"
+import { InfoCircle } from "../../components/Icons/InfoCircle"
 import { InputText } from "../../components/InputText"
+import Row from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { isValidAddress } from "../../services/addresses"
-import { FormError, H2 } from "../../theme/Typography"
+import { FormError, H2, WarningText } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { fetchTokenDetails } from "../accountTokens/tokens.service"
+import { useTokensInNetwork } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -33,6 +36,14 @@ const AddTokenScreenWrapper = styled.div`
   ${Button} {
     margin-top: 64px;
   }
+`
+
+const TokenWarningWrapper = styled(Row)`
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 191, 61, 0.1);
+  gap: 12px;
 `
 
 const isDataComplete = (data: Partial<Token>): data is Token => {
@@ -78,10 +89,19 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   const [error, setError] = useState("")
   const [tokenDetails, setTokenDetails] = useState<Token>()
   const prevValidAddress = useRef("")
+  const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
 
   const validAddress = useMemo(() => {
     return isValidAddress(tokenAddress)
   }, [tokenAddress])
+
+  const tokenExist = useMemo(
+    () =>
+      tokensInNetwork.some(
+        (token) => defaultToken && token.address === defaultToken.address,
+      ),
+    [defaultToken, tokensInNetwork],
+  )
 
   useEffect(() => {
     if (
@@ -137,6 +157,17 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
 
       <AddTokenScreenWrapper>
         <H2>Add tokens</H2>
+
+        {tokenExist && (
+          <TokenWarningWrapper>
+            <InfoCircle />
+            <WarningText>
+              This action will edit tokens that are already listed in your
+              wallet, which can be used to phish you. Only approve if you are
+              certain that you mean to change what these tokens represent.
+            </WarningText>
+          </TokenWarningWrapper>
+        )}
 
         <form
           onSubmit={async (e: React.FormEvent) => {
