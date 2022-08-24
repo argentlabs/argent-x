@@ -8,8 +8,6 @@ export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
 }) => {
   switch (msg.type) {
     case "REQUEST_TOKEN": {
-      // TODO: Check if token already exists
-
       const { meta } = await actionQueue.push({
         type: "REQUEST_TOKEN",
         payload: msg.data,
