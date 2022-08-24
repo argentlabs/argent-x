@@ -84,14 +84,18 @@ export const useTokensWithBalance = (
     {
       refreshInterval: 30000,
       shouldRetryOnError: (error) => {
-        const suppressError = SUPPRESS_ERROR_STATUS.includes(error?.status)
+        const errorCode = error?.status || error?.errorCode
+        const suppressError =
+          errorCode && SUPPRESS_ERROR_STATUS.includes(errorCode)
         return suppressError
       },
     },
   )
 
   const error = useMemo(() => {
-    if (!SUPPRESS_ERROR_STATUS.includes(maybeSuppressError?.status)) {
+    const errorCode =
+      maybeSuppressError?.status || maybeSuppressError?.errorCode
+    if (!SUPPRESS_ERROR_STATUS.includes(errorCode)) {
       return maybeSuppressError
     }
   }, [maybeSuppressError])
