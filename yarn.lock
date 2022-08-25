@@ -3109,12 +3109,12 @@
     node-gyp-build "^4.3.0"
 
 "@playwright/test@^1.23.0":
-  version "1.25.0"
-  resolved "https://registry.npmjs.org/@playwright/test/-/test-1.25.0.tgz#e0de134651e78e45e986c5f16578188dd5937331"
-  integrity sha512-j4EZhTTQI3dBeWblE21EV//swwmBtOpIrLdOIJIRv4uqsLdHgBg1z+JtTg+AeC5o2bAXIE26kDNW5A0TimG8Bg==
+  version "1.25.1"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.25.1.tgz#9847234b6f2b0cca71962b338da7db366a1e9720"
+  integrity sha512-IJ4X0yOakXtwkhbnNzKkaIgXe6df7u3H3FnuhI9Jqh+CdO0e/lYQlDLYiyI9cnXK8E7UAppAWP+VqAv6VX7HQg==
   dependencies:
     "@types/node" "*"
-    playwright-core "1.25.0"
+    playwright-core "1.25.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
   version "0.5.7"
@@ -3238,15 +3238,6 @@
     "@sentry/utils" "7.11.1"
     tslib "^1.9.3"
 
-"@sentry/hub@7.10.0":
-  version "7.10.0"
-  resolved "https://registry.npmjs.org/@sentry/hub/-/hub-7.10.0.tgz#41a32c1e68efaedaebc1dca10b8e22d12937715f"
-  integrity sha512-9Appy7J87EU7Xu2BDY1cLK79nsuE72geeYmG71lgdttTD3XOMcQBOxET4/2sAI+d/ansurXnURx+DAQ9FOKT+w==
-  dependencies:
-    "@sentry/types" "7.10.0"
-    "@sentry/utils" "7.10.0"
-    tslib "^1.9.3"
-
 "@sentry/hub@7.11.1":
   version "7.11.1"
   resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-7.11.1.tgz#1749b2b102ea1892ff388d65d66d3b402b393958"
@@ -3268,32 +3259,19 @@
     tslib "^1.9.3"
 
 "@sentry/tracing@^7.6.0":
-  version "7.10.0"
-  resolved "https://registry.npmjs.org/@sentry/tracing/-/tracing-7.10.0.tgz#084019c6ab841dff1722ed5eb397ee80fb36af51"
-  integrity sha512-ojuBYS1bL/IGWKt/ItY4HmC8NElJrYtTUvm73VbhylhIO4zcn5ICHmgMFj1lqL9gQ1nCnAlifKiWIjL9qUatTA==
+  version "7.11.1"
+  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.11.1.tgz#50cbe82dd5b9a1307b31761cdd4b0d71132cf5c7"
+  integrity sha512-ilgnHfpdYUWKG/5yAXIfIbPVsCfrC4ONFBR/wN25/hdAyVfXMa3AJx7NCCXxZBOPDWH3hMW8rl4La5yuDbXofg==
   dependencies:
-    "@sentry/hub" "7.10.0"
-    "@sentry/types" "7.10.0"
-    "@sentry/utils" "7.10.0"
+    "@sentry/hub" "7.11.1"
+    "@sentry/types" "7.11.1"
+    "@sentry/utils" "7.11.1"
     tslib "^1.9.3"
-
-"@sentry/types@7.10.0":
-  version "7.10.0"
-  resolved "https://registry.npmjs.org/@sentry/types/-/types-7.10.0.tgz#c91d634768336238ac30ed750fa918326c384cbb"
-  integrity sha512-1UBwdbS0xXzANzp63g4eNQly/qKIXp0swP5OTKWoADvKBtL4anroLUA/l8ADMtuwFZYtVANc8WRGxM2+YmaXtg==
 
 "@sentry/types@7.11.1":
   version "7.11.1"
   resolved "https://registry.yarnpkg.com/@sentry/types/-/types-7.11.1.tgz#06e2827f6ba37159c33644208a0453b86d25e232"
   integrity sha512-gIEhOPxC2cjrxQ0+K2SFJ1P6e/an5osSxVc9OOtekN28eHtVsXFCLB8XVWeNQnS7N2VkrVrkqORMBz1kvIcvVQ==
-
-"@sentry/utils@7.10.0":
-  version "7.10.0"
-  resolved "https://registry.npmjs.org/@sentry/utils/-/utils-7.10.0.tgz#237cfcfa300f65fad45ec703d4acb4f02f22093b"
-  integrity sha512-/aD2DnfyOhV0Wdbb6VF78vu4fQIZJyuReDpBI7MV/EqcEB6FxUKq2YjinfKZF/exHEPig6Ag/Yt+CRFgvtVFuw==
-  dependencies:
-    "@sentry/types" "7.10.0"
-    tslib "^1.9.3"
 
 "@sentry/utils@7.11.1":
   version "7.11.1"
@@ -13138,10 +13116,10 @@ pkg-dir@^5.0.0:
   dependencies:
     find-up "^5.0.0"
 
-playwright-core@1.25.0:
-  version "1.25.0"
-  resolved "https://registry.npmjs.org/playwright-core/-/playwright-core-1.25.0.tgz#54dc867c6c2cc5e4233905e249206a02914d14f1"
-  integrity sha512-kZ3Jwaf3wlu0GgU0nB8UMQ+mXFTqBIFz9h1svTlNduNKjnbPXFxw7mJanLVjqxHJRn62uBfmgBj93YHidk2N5Q==
+playwright-core@1.25.1:
+  version "1.25.1"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.25.1.tgz#abe56aec8bef645fba988320d9f9328fafab0446"
+  integrity sha512-lSvPCmA2n7LawD2Hw7gSCLScZ+vYRkhU8xH0AapMyzwN+ojoDqhkH/KIEUxwNu2PjPoE/fcE0wLAksdOhJ2O5g==
 
 pnp-webpack-plugin@1.6.4:
   version "1.6.4"
@@ -14281,9 +14259,9 @@ rollup-plugin-generate-declarations@^1.1.1:
     fsevents "~2.3.2"
 
 rollup@^2.3.4:
-  version "2.78.0"
-  resolved "https://registry.npmjs.org/rollup/-/rollup-2.78.0.tgz#00995deae70c0f712ea79ad904d5f6b033209d9e"
-  integrity sha512-4+YfbQC9QEVvKTanHhIAFVUFSRsezvQF8vFOJwtGfb9Bb+r014S+qryr9PSmw8x6sMnPkmFBGAvIFVQxvJxjtg==
+  version "2.78.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.78.1.tgz#52fe3934d9c83cb4f7c4cb5fb75d88591be8648f"
+  integrity sha512-VeeCgtGi4P+o9hIg+xz4qQpRl6R401LWEXBmxYKOV4zlF82lyhgh2hTZnheFUbANE8l2A41F458iwj2vEYaXJg==
   optionalDependencies:
     fsevents "~2.3.2"
 
