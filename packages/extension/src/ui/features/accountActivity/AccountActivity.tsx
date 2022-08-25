@@ -1,4 +1,4 @@
-import { FC, Fragment, Suspense, useMemo } from "react"
+import { FC, Fragment, Suspense, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -22,6 +22,7 @@ import {
   TransactionsListWrapper,
 } from "./TransactionListItem"
 import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
+import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactions } from "./useArgentExplorer"
 
@@ -44,6 +45,9 @@ interface IAccountActivity {
   account: Account
   tokensByNetwork?: Token[]
   activity: Record<string, Array<ActivityTransaction | IExplorerTransaction>>
+  lastExplorerTransactionHash: string | null
+  lastExplorerTransactionWithoutTimestampHash: string | null
+  onLoadMore: () => void
 }
 
 export const isActivityTransaction = (
@@ -73,6 +77,9 @@ export const AccountActivity: FC<IAccountActivity> = ({
   account,
   tokensByNetwork,
   activity,
+  lastExplorerTransactionHash,
+  lastExplorerTransactionWithoutTimestampHash,
+  onLoadMore,
 }) => {
   const navigate = useNavigate()
   return (
@@ -102,20 +109,29 @@ export const AccountActivity: FC<IAccountActivity> = ({
                     tokensByNetwork,
                   })
                 if (explorerTransactionTransformed) {
+                  const loadMore =
+                    transaction.transactionHash ===
+                      lastExplorerTransactionHash ||
+                    transaction.transactionHash ===
+                      lastExplorerTransactionWithoutTimestampHash
                   return (
-                    <ExplorerTransactionListItem
-                      key={transaction.transactionHash}
-                      explorerTransaction={transaction}
-                      explorerTransactionTransformed={
-                        explorerTransactionTransformed
-                      }
-                      network={account.network}
-                      onClick={() =>
-                        navigate(
-                          routes.transactionDetail(transaction.transactionHash),
-                        )
-                      }
-                    />
+                    <Fragment key={transaction.transactionHash}>
+                      <ExplorerTransactionListItem
+                        explorerTransaction={transaction}
+                        explorerTransactionTransformed={
+                          explorerTransactionTransformed
+                        }
+                        network={account.network}
+                        onClick={() =>
+                          navigate(
+                            routes.transactionDetail(
+                              transaction.transactionHash,
+                            ),
+                          )
+                        }
+                      />
+                      {loadMore && <LoadMoreTrigger onLoadMore={onLoadMore} />}
+                    </Fragment>
                   )
                 }
               } else {
@@ -195,12 +211,18 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
     }
   }, [explorerTransactions, voyagerTransactions])
 
-  const mergedActivity = useMemo(() => {
+  const {
+    mergedActivity,
+    lastExplorerTransactionHash,
+    lastExplorerTransactionWithoutTimestampHash,
+  } = useMemo(() => {
     const mergedActivity: Record<
       string,
       Array<ActivityTransaction | IExplorerTransaction>
     > = {}
     const { transactions, transactionsWithoutTimestamp } = mergedTransactions
+    let lastExplorerTransactionHash = null
+    let lastExplorerTransactionWithoutTimestampHash = null
     for (const transaction of transactions) {
       const date = new Date(transaction.timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
@@ -217,13 +239,25 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
         mergedActivity[dateLabel].push(activityTransaction)
       } else {
         mergedActivity[dateLabel].push(transaction)
+        lastExplorerTransactionHash = transaction.transactionHash
       }
     }
     if (transactionsWithoutTimestamp && transactionsWithoutTimestamp.length) {
       mergedActivity["Unknown date"] = transactionsWithoutTimestamp
+      lastExplorerTransactionWithoutTimestampHash =
+        transactionsWithoutTimestamp[transactionsWithoutTimestamp.length - 1]
+          .transactionHash
     }
-    return mergedActivity
+    return {
+      mergedActivity,
+      lastExplorerTransactionHash,
+      lastExplorerTransactionWithoutTimestampHash,
+    }
   }, [mergedTransactions])
+
+  const onLoadMore = useCallback(() => {
+    console.log("onLoadMore")
+  }, [])
 
   return (
     <Container>
@@ -237,9 +271,24 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <AccountActivity
             activity={mergedActivity}
+            lastExplorerTransactionHash={lastExplorerTransactionHash}
+            lastExplorerTransactionWithoutTimestampHash={
+              lastExplorerTransactionWithoutTimestampHash
+            }
             account={account}
             tokensByNetwork={tokensByNetwork}
+            onLoadMore={onLoadMore}
           />
+          <pre>
+            {JSON.stringify(
+              {
+                lastExplorerTransactionHash,
+                lastExplorerTransactionWithoutTimestampHash,
+              },
+              null,
+              2,
+            )}
+          </pre>
         </Suspense>
       </ErrorBoundary>
     </Container>
