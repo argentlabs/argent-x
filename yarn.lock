@@ -8418,9 +8418,9 @@ eslint-plugin-react-hooks@^4.5.0, eslint-plugin-react-hooks@^4.6.0:
   integrity sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==
 
 eslint-plugin-react@^7.28.0, eslint-plugin-react@^7.29.4:
-  version "7.30.1"
-  resolved "https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-7.30.1.tgz#2be4ab23ce09b5949c6631413ba64b2810fd3e22"
-  integrity sha512-NbEvI9jtqO46yJA3wcRF9Mo0lF9T/jhdHqhCHXiXtD+Zcb98812wvokjWpU7Q4QH5edo6dmqrukxVvWWXHlsUg==
+  version "7.31.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.31.0.tgz#fd3f81c9db5971095b3521ede22781afd37442b0"
+  integrity sha512-BWriBttYYCnfb4RO9SB91Og8uA9CPcBMl5UlCOCtuYW1UjhN3QypzEcEHky4ZIRZDKjbO2Blh9BjP8E7W/b1SA==
   dependencies:
     array-includes "^3.1.5"
     array.prototype.flatmap "^1.3.0"
@@ -10879,9 +10879,9 @@ jest-worker@^28.0.2:
     supports-color "^8.0.0"
 
 jose@^4.3.6:
-  version "4.8.3"
-  resolved "https://registry.npmjs.org/jose/-/jose-4.8.3.tgz#5a754fb4aa5f2806608d083f438e6916b11087da"
-  integrity sha512-7rySkpW78d8LBp4YU70Wb7+OTgE3OwAALNVZxhoIhp4Kscp+p/fBkdpxGAMKxvCAMV4QfXBU9m6l9nX/vGwd2g==
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.9.0.tgz#98ecaf81b13361d1931c0126e3f765549c782f92"
+  integrity sha512-RgaqEOZLkVO+ViN3KkN44XJt9g7+wMveUv59sVLaTxONcUPc8ZpfqOCeLphVBZyih2dgkvZ0Ap1CNcokvY7Uyw==
 
 joycon@^3.0.1:
   version "3.1.1"
@@ -16289,10 +16289,10 @@ web-namespaces@^1.0.0:
   resolved "https://registry.npmjs.org/web-namespaces/-/web-namespaces-1.1.4.tgz#bc98a3de60dadd7faefc403d1076d529f5e030ec"
   integrity sha512-wYxSGajtmoP4WxfejAPIr4l0fVh+jeMXZb08wNc0tMg6xsfZXj3cECqIK0G7ZAqUq0PP8WlMDtaOGVBTAWztNw==
 
-webextension-polyfill@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/webextension-polyfill/-/webextension-polyfill-0.9.0.tgz#de6c1941d0ef1b0858b20e9c7b46bbc042c5a960"
-  integrity sha512-LTtHb0yR49xa9irkstDxba4GATDAcDw3ncnFH9RImoFwDlW47U95ME5sn5IiQX2ghfaECaf6xyXM8yvClIBkkw==
+webextension-polyfill@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.10.0.tgz#ccb28101c910ba8cf955f7e6a263e662d744dbb8"
+  integrity sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
