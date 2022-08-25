@@ -10879,9 +10879,9 @@ jest-worker@^28.0.2:
     supports-color "^8.0.0"
 
 jose@^4.3.6:
-  version "4.8.3"
-  resolved "https://registry.npmjs.org/jose/-/jose-4.8.3.tgz#5a754fb4aa5f2806608d083f438e6916b11087da"
-  integrity sha512-7rySkpW78d8LBp4YU70Wb7+OTgE3OwAALNVZxhoIhp4Kscp+p/fBkdpxGAMKxvCAMV4QfXBU9m6l9nX/vGwd2g==
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.9.0.tgz#98ecaf81b13361d1931c0126e3f765549c782f92"
+  integrity sha512-RgaqEOZLkVO+ViN3KkN44XJt9g7+wMveUv59sVLaTxONcUPc8ZpfqOCeLphVBZyih2dgkvZ0Ap1CNcokvY7Uyw==
 
 joycon@^3.0.1:
   version "3.1.1"
