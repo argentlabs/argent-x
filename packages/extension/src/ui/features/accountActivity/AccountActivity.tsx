@@ -24,7 +24,7 @@ import {
 import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
-import { useArgentExplorerAccountTransactions } from "./useArgentExplorer"
+import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
 
 const Container = styled.div`
   display: flex;
@@ -45,8 +45,7 @@ interface IAccountActivity {
   account: Account
   tokensByNetwork?: Token[]
   activity: Record<string, Array<ActivityTransaction | IExplorerTransaction>>
-  lastExplorerTransactionHash: string | null
-  lastExplorerTransactionWithoutTimestampHash: string | null
+  loadMoreHashes: string[]
   onLoadMore: () => void
 }
 
@@ -77,8 +76,7 @@ export const AccountActivity: FC<IAccountActivity> = ({
   account,
   tokensByNetwork,
   activity,
-  lastExplorerTransactionHash,
-  lastExplorerTransactionWithoutTimestampHash,
+  loadMoreHashes = [],
   onLoadMore,
 }) => {
   const navigate = useNavigate()
@@ -109,13 +107,10 @@ export const AccountActivity: FC<IAccountActivity> = ({
                     tokensByNetwork,
                   })
                 if (explorerTransactionTransformed) {
-                  const loadMore =
-                    transaction.transactionHash ===
-                      lastExplorerTransactionHash ||
-                    transaction.transactionHash ===
-                      lastExplorerTransactionWithoutTimestampHash
+                  const { transactionHash } = transaction
+                  const loadMore = loadMoreHashes.includes(transactionHash)
                   return (
-                    <Fragment key={transaction.transactionHash}>
+                    <Fragment key={transactionHash}>
                       <ExplorerTransactionListItem
                         explorerTransaction={transaction}
                         explorerTransactionTransformed={
@@ -123,11 +118,7 @@ export const AccountActivity: FC<IAccountActivity> = ({
                         }
                         network={account.network}
                         onClick={() =>
-                          navigate(
-                            routes.transactionDetail(
-                              transaction.transactionHash,
-                            ),
-                          )
+                          navigate(routes.transactionDetail(transactionHash))
                         }
                       />
                       {loadMore && <LoadMoreTrigger onLoadMore={onLoadMore} />}
@@ -149,14 +140,29 @@ interface IAccountActivityContainer {
   account: Account
 }
 
+const PAGE_SIZE = 10
+
 export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
   account,
 }) => {
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
-  const { data: explorerTransactions } = useArgentExplorerAccountTransactions({
+  const { data, setSize } = useArgentExplorerAccountTransactionsInfinite({
     accountAddress: account.address,
+    pageSize: PAGE_SIZE,
   })
+
+  const explorerTransactions = useMemo(() => {
+    if (!data) {
+      return
+    }
+    return data.flat()
+  }, [data])
+
+  const isEmpty = data?.[0]?.length === 0
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE)
+
   const { transactions } = useAccountTransactions(account)
   const voyagerTransactions = useMemo(() => {
     // RECEIVED transactions are already shown as pending
@@ -211,18 +217,13 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
     }
   }, [explorerTransactions, voyagerTransactions])
 
-  const {
-    mergedActivity,
-    lastExplorerTransactionHash,
-    lastExplorerTransactionWithoutTimestampHash,
-  } = useMemo(() => {
+  const { mergedActivity, loadMoreHashes } = useMemo(() => {
     const mergedActivity: Record<
       string,
       Array<ActivityTransaction | IExplorerTransaction>
     > = {}
     const { transactions, transactionsWithoutTimestamp } = mergedTransactions
-    let lastExplorerTransactionHash = null
-    let lastExplorerTransactionWithoutTimestampHash = null
+    let lastExplorerTransactionHash
     for (const transaction of transactions) {
       const date = new Date(transaction.timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
@@ -242,22 +243,31 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
         lastExplorerTransactionHash = transaction.transactionHash
       }
     }
+
+    const loadMoreHashes = []
+
+    if (lastExplorerTransactionHash) {
+      loadMoreHashes.push(lastExplorerTransactionHash)
+    }
+
     if (transactionsWithoutTimestamp && transactionsWithoutTimestamp.length) {
       mergedActivity["Unknown date"] = transactionsWithoutTimestamp
-      lastExplorerTransactionWithoutTimestampHash =
+      loadMoreHashes.push(
         transactionsWithoutTimestamp[transactionsWithoutTimestamp.length - 1]
-          .transactionHash
+          .transactionHash,
+      )
     }
     return {
       mergedActivity,
-      lastExplorerTransactionHash,
-      lastExplorerTransactionWithoutTimestampHash,
+      loadMoreHashes,
     }
   }, [mergedTransactions])
 
   const onLoadMore = useCallback(() => {
-    console.log("onLoadMore")
-  }, [])
+    if (!isReachingEnd) {
+      setSize((size) => size + 1)
+    }
+  }, [isReachingEnd, setSize])
 
   return (
     <Container>
@@ -271,24 +281,11 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
           <AccountActivity
             activity={mergedActivity}
-            lastExplorerTransactionHash={lastExplorerTransactionHash}
-            lastExplorerTransactionWithoutTimestampHash={
-              lastExplorerTransactionWithoutTimestampHash
-            }
+            loadMoreHashes={loadMoreHashes}
             account={account}
             tokensByNetwork={tokensByNetwork}
             onLoadMore={onLoadMore}
           />
-          <pre>
-            {JSON.stringify(
-              {
-                lastExplorerTransactionHash,
-                lastExplorerTransactionWithoutTimestampHash,
-              },
-              null,
-              2,
-            )}
-          </pre>
         </Suspense>
       </ErrorBoundary>
     </Container>

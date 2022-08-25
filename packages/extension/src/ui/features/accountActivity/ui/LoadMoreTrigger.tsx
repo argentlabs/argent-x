@@ -1,15 +1,17 @@
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef } from "react"
 
 interface ILoadMore {
   onLoadMore: () => void
   oneShot?: boolean
 }
 
-const options = {
+const options: IntersectionObserverInit = {
   root: null,
   rootMargin: "0px",
   threshold: 1.0,
 }
+
+/** invokes onLoadMore callback when visible in the viewport */
 
 export const LoadMoreTrigger: FC<ILoadMore> = ({
   onLoadMore,
@@ -18,7 +20,6 @@ export const LoadMoreTrigger: FC<ILoadMore> = ({
   const ref = useRef(null)
   const intersectionObserver = useRef<IntersectionObserver | null>(null)
   const didInvokeOnLoadMore = useRef(false)
-  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const callback = (
@@ -37,7 +38,6 @@ export const LoadMoreTrigger: FC<ILoadMore> = ({
             didInvokeOnLoadMore.current = true
           }
         }
-        setVisible(currentRefEntry.isIntersecting)
       }
     }
 
@@ -51,5 +51,5 @@ export const LoadMoreTrigger: FC<ILoadMore> = ({
     }
   }, [onLoadMore, oneShot])
 
-  return <div ref={ref}>LOAD MORE {visible ? "VISIBLE" : "HIDDEN"}</div>
+  return <div ref={ref} />
 }

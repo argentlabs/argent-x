@@ -1,4 +1,5 @@
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
+import useSWRInfinite from "swr/infinite"
 import urlJoin from "url-join"
 
 import {
@@ -41,7 +42,7 @@ export const useArgentExplorerTransaction = (txHash?: string) => {
 export interface IUseArgentExplorerAccountTransactions {
   accountAddress?: string
   page?: number
-  size?: number
+  pageSize?: number
   direction?: "DESC" | "ASC"
   withTransfers?: boolean
 }
@@ -49,7 +50,7 @@ export interface IUseArgentExplorerAccountTransactions {
 export const useArgentExplorerAccountTransactions = ({
   accountAddress,
   page = 0,
-  size = 100,
+  pageSize = 100,
   direction = "DESC",
   withTransfers = true,
 }: IUseArgentExplorerAccountTransactions) => {
@@ -67,17 +68,54 @@ export const useArgentExplorerAccountTransactions = ({
         ],
         {
           page,
-          size,
+          size: pageSize,
           direction,
           withTransfers,
         },
       )
     )
-  }, [accountAddress, direction, page, size, withTransfers])
+  }, [accountAddress, direction, page, pageSize, withTransfers])
   return useConditionallyEnabledSWR<IExplorerTransaction[]>(
     argentExplorerEnabled,
     key,
     fetcher,
     withPolling(15 * 1000) /** 15 seconds */,
   )
+}
+
+export const useArgentExplorerAccountTransactionsInfinite = ({
+  accountAddress,
+  pageSize = 10,
+  direction = "DESC",
+  withTransfers = true,
+}: IUseArgentExplorerAccountTransactions) => {
+  const fetcher = useArgentApiFetcher()
+  const argentExplorerEnabled = useArgentExplorerEnabled()
+  const key = useCallback(
+    (index: number) => {
+      return (
+        argentExplorerEnabled &&
+        accountAddress &&
+        urlWithQuery(
+          [
+            ARGENT_EXPLORER_BASE_URL,
+            "accounts",
+            stripAddressZeroPadding(accountAddress),
+            "transactions",
+          ],
+          {
+            page: index,
+            size: pageSize,
+            direction,
+            withTransfers,
+          },
+        )
+      )
+    },
+    [accountAddress, argentExplorerEnabled, direction, pageSize, withTransfers],
+  )
+  return useSWRInfinite<IExplorerTransaction[]>(key, fetcher, {
+    revalidateAll: true,
+    ...withPolling(15 * 1000) /** 15 seconds */,
+  })
 }
