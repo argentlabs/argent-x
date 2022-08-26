@@ -2,6 +2,8 @@ import { FC, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { settingsStore } from "../../../shared/settings"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
@@ -84,6 +86,10 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const navigate = useNavigate()
 
   const account = useSelectedAccount()
+  const experimentalPluginAccount = useKeyValueStorage(
+    settingsStore,
+    "experimentalPluginAccount",
+  )
 
   useOnClickOutside(ref, () => setMenuOpen(false))
 
@@ -104,6 +110,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   }
 
   const canUpgradeToPluginAccount =
+    experimentalPluginAccount &&
     account &&
     currentNetwork.accountClassHash?.argentPluginAccount &&
     account.type !== "argent-plugin"
