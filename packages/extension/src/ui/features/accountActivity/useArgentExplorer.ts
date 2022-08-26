@@ -13,8 +13,8 @@ import {
 } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { urlWithQuery } from "../../../shared/utils/url"
+import { argentApiFetcher } from "../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
-import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { stripAddressZeroPadding } from "../accounts/accounts.service"
 
 export const useArgentExplorerEnabled = () => {
@@ -30,14 +30,13 @@ export const useArgentExplorerEnabled = () => {
 }
 
 export const useArgentExplorerTransaction = (txHash?: string) => {
-  const fetcher = useArgentApiFetcher()
   const argentExplorerEnabled = useArgentExplorerEnabled()
   return useConditionallyEnabledSWR<IExplorerTransaction>(
     argentExplorerEnabled,
     txHash &&
       ARGENT_EXPLORER_BASE_URL &&
       urlJoin(ARGENT_EXPLORER_BASE_URL, "transactions", txHash),
-    fetcher,
+    argentApiFetcher,
   )
 }
 
@@ -56,7 +55,6 @@ export const useArgentExplorerAccountTransactions = ({
   direction = "DESC",
   withTransfers = true,
 }: IUseArgentExplorerAccountTransactions) => {
-  const fetcher = useArgentApiFetcher()
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const key = useMemo(() => {
     return (
@@ -81,7 +79,7 @@ export const useArgentExplorerAccountTransactions = ({
   return useConditionallyEnabledSWR<IExplorerTransaction[]>(
     argentExplorerEnabled,
     key,
-    fetcher,
+    argentApiFetcher,
     withPolling(15 * 1000) /** 15 seconds */,
   )
 }
@@ -92,13 +90,13 @@ export const useArgentExplorerAccountTransactionsInfinite = ({
   direction = "DESC",
   withTransfers = true,
 }: IUseArgentExplorerAccountTransactions) => {
-  const fetcher = useArgentApiFetcher()
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const key = useCallback(
     (index: number) => {
       return (
         argentExplorerEnabled &&
         accountAddress &&
+        ARGENT_EXPLORER_BASE_URL &&
         urlWithQuery(
           [
             ARGENT_EXPLORER_BASE_URL,
@@ -117,7 +115,7 @@ export const useArgentExplorerAccountTransactionsInfinite = ({
     },
     [accountAddress, argentExplorerEnabled, direction, pageSize, withTransfers],
   )
-  return useSWRInfinite<IExplorerTransaction[]>(key, fetcher, {
+  return useSWRInfinite<IExplorerTransaction[]>(key, argentApiFetcher, {
     revalidateAll: true,
     ...withPolling(15 * 1000) /** 15 seconds */,
   })
