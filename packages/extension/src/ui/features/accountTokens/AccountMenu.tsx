@@ -8,6 +8,7 @@ import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
+import { upgradeAccount } from "../../services/backgroundAccounts"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
@@ -102,6 +103,11 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
     }
   }
 
+  const canUpgradeToPluginAccount =
+    account &&
+    currentNetwork.accountClassHash?.argentPluginAccount &&
+    account.type !== "argent-plugin"
+
   return (
     <MenuContainer ref={ref}>
       <StyledMoreVert onClick={() => setMenuOpen(!isMenuOpen)} />
@@ -123,16 +129,35 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
               <EditIcon /> Edit name
             </MenuItem>
           </MenuItemWrapper>
-          <Separator />
           {account && (
-            <MenuItemWrapper onClick={() => handleHideOrDeleteAccount(account)}>
-              <MenuItem>
-                <IconWrapper>
-                  <VisibilityOff fontSize="inherit" htmlColor="white" />
-                </IconWrapper>
-                {showDelete ? "Delete" : "Hide"} account
-              </MenuItem>
-            </MenuItemWrapper>
+            <>
+              <Separator />
+              <MenuItemWrapper
+                onClick={() => handleHideOrDeleteAccount(account)}
+              >
+                <MenuItem>
+                  <IconWrapper>
+                    <VisibilityOff fontSize="inherit" htmlColor="white" />
+                  </IconWrapper>
+                  {showDelete ? "Delete" : "Hide"} account
+                </MenuItem>
+              </MenuItemWrapper>
+            </>
+          )}
+          {canUpgradeToPluginAccount && (
+            <>
+              <Separator />
+              <MenuItemWrapper
+                onClick={() => upgradeAccount(account, "argent-plugin")}
+              >
+                <MenuItem>
+                  <IconWrapper>
+                    <VisibilityOff fontSize="inherit" htmlColor="white" />
+                  </IconWrapper>
+                  Use Plugins
+                </MenuItem>
+              </MenuItemWrapper>
+            </>
           )}
           <Separator />
           <MenuItemWrapper onClick={() => navigate(routes.exportPrivateKey())}>

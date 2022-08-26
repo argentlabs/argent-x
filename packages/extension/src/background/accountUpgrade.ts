@@ -2,7 +2,7 @@ import { stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue/types"
 import { getNetwork } from "../shared/network"
-import { BaseWalletAccount } from "../shared/wallet.model"
+import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
 import { Queue } from "./actionQueue"
 import { Wallet } from "./wallet"
 
@@ -10,16 +10,18 @@ export interface IUpgradeAccount {
   account: BaseWalletAccount
   wallet: Wallet
   actionQueue: Queue<ActionItem>
+  targetImplementationType?: ArgentAccountType
 }
 
 export const upgradeAccount = async ({
   account,
   wallet,
   actionQueue,
+  targetImplementationType,
 }: IUpgradeAccount) => {
   const fullAccount = await wallet.getAccount(account)
 
-  const accountType = fullAccount.type
+  const accountType = targetImplementationType ?? fullAccount.type
 
   const { accountClassHash: newImplementation } = await getNetwork(
     fullAccount.network.id,

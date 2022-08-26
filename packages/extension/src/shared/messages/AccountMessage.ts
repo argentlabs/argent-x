@@ -1,4 +1,8 @@
-import { BaseWalletAccount, WalletAccount } from "../wallet.model"
+import {
+  ArgentAccountType,
+  BaseWalletAccount,
+  WalletAccount,
+} from "../wallet.model"
 
 export type AccountMessage =
   | { type: "NEW_ACCOUNT"; data: string }
@@ -24,7 +28,10 @@ export type AccountMessage =
   | { type: "DELETE_ACCOUNT_REJ" }
   | {
       type: "UPGRADE_ACCOUNT"
-      data: BaseWalletAccount
+      data: {
+        wallet: BaseWalletAccount
+        targetImplementationType?: ArgentAccountType
+      }
     }
   | { type: "UPGRADE_ACCOUNT_RES" }
   | { type: "UPGRADE_ACCOUNT_REJ" }
