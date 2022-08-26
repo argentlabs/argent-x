@@ -33,7 +33,9 @@ export const useArgentExplorerTransaction = (txHash?: string) => {
   const argentExplorerEnabled = useArgentExplorerEnabled()
   return useConditionallyEnabledSWR<IExplorerTransaction>(
     argentExplorerEnabled,
-    txHash && urlJoin(ARGENT_EXPLORER_BASE_URL, "transactions", txHash),
+    txHash &&
+      ARGENT_EXPLORER_BASE_URL &&
+      urlJoin(ARGENT_EXPLORER_BASE_URL, "transactions", txHash),
     fetcher,
   )
 }
@@ -58,6 +60,7 @@ export const useArgentExplorerAccountTransactions = ({
   const key = useMemo(() => {
     return (
       accountAddress &&
+      ARGENT_EXPLORER_BASE_URL &&
       urlWithQuery(
         [
           ARGENT_EXPLORER_BASE_URL,
