@@ -11,8 +11,8 @@ import {
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import { IStatusMessage } from "../../../shared/statusMessage/types"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { argentApiFetcher } from "../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
-import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { getMessageForVersion } from "./statusMessageVisibility"
 
 export const useLastDismissedMessageId = () =>
@@ -34,14 +34,13 @@ export const useStatusMessageEnabled = () => {
 }
 
 export const useStatusMessage = () => {
-  const fetcher = useArgentApiFetcher()
   const statusMessageEnabled = useStatusMessageEnabled()
   const { data } = useConditionallyEnabledSWR<
     IStatusMessage | IStatusMessage[]
   >(
     statusMessageEnabled,
     ARGENT_X_STATUS_URL,
-    fetcher,
+    argentApiFetcher,
     withPolling(5 * 60 * 60 * 1000) /** 5 minutes */,
   )
   const statusMessage = useMemo(() => {
