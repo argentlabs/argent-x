@@ -16,7 +16,6 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/network"
-import { settingsStore } from "../shared/settings"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -201,14 +200,11 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    const shouldUsePluginAccount = await settingsStore.get(
-      "experimentalPluginAccount",
-    )
-    const accountType = shouldUsePluginAccount ? "argent-plugin" : "argent"
-
     const accountClassHashes = union(
       ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash ? [network.accountClassHash.argentAccount] : [],
+      network?.accountClassHash?.argentAccount
+        ? [network.accountClassHash.argentAccount]
+        : [],
     )
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
@@ -259,7 +255,7 @@ export class Wallet {
                 type: "local_secret",
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
-              type: accountType,
+              type: "argent",
             })
           }
 
@@ -358,10 +354,6 @@ export class Wallet {
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.walletStore.get(withHiddenSelector)
-    const shouldUsePluginAccount = await settingsStore.get(
-      "experimentalPluginAccount",
-    )
-    const accountType = shouldUsePluginAccount ? "argent-plugin" : "argent"
 
     const currentPaths = accounts
       .filter(
@@ -378,7 +370,6 @@ export class Wallet {
     const payload = await this.getDeployContractPayloadForAccountIndex(
       index,
       networkId,
-      accountType,
     )
 
     const deployTransaction = await provider.deployContract(payload)
@@ -393,7 +384,7 @@ export class Wallet {
         type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
-      type: accountType,
+      type: "argent",
     }
 
     await this.walletStore.push([account])
@@ -417,15 +408,9 @@ export class Wallet {
       baseDerivationPath,
     )
 
-    const shouldUsePluginAccount = await settingsStore.get(
-      "experimentalPluginAccount",
-    )
-    const accountType = shouldUsePluginAccount ? "argent-plugin" : "argent"
-
     const payload = await this.getDeployContractPayloadForAccountIndex(
       index,
       networkId,
-      accountType,
     )
 
     const deployTransaction = await provider.deployContract(payload)
@@ -436,7 +421,6 @@ export class Wallet {
   public async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
-    accountType: ArgentAccountType,
   ): Promise<DeployContractPayload> {
     const hasSession = await this.isSessionOpen()
     const session = await this.sessionStore.get()
@@ -456,7 +440,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       network,
-      accountType,
+      "argent",
     )
 
     const payload = {
