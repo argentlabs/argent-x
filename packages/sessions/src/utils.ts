@@ -91,7 +91,7 @@ export async function createSession(
     message: {
       key,
       expires,
-      root: session.policies,
+      root: policies, // we can pass the policy to the message, when argent x works with type merkletree (starknet.js update)
     },
   })
   return {
