@@ -21,8 +21,8 @@ import {
 } from "../../../shared/token/price"
 import { Token } from "../../../shared/token/type"
 import { isNumeric } from "../../../shared/utils/number"
+import { argentApiFetcher } from "../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
-import { useArgentApiFetcher } from "../../services/useArgentApiFetcher"
 import { useIsMainnet } from "../networks/useNetworks"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
@@ -44,18 +44,17 @@ export const useCurrencyDisplayEnabled = () => {
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
-  const fetcher = useArgentApiFetcher()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const { data: pricesData } = useConditionallyEnabledSWR<ApiPriceDataResponse>(
     !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
-    fetcher,
+    argentApiFetcher,
     withPolling(60 * 1000) /** 60 seconds */,
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
     !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
-    fetcher,
+    argentApiFetcher,
     withPolling(5 * 60 * 1000) /** 5 minutes */,
   )
   return {

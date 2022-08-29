@@ -127,7 +127,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [account])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
-
+  const tokensEnabled = status.code !== "DEPLOYING" && status.code !== "ERROR"
   return (
     <Container data-testid="account-tokens">
       <AccountSubHeader
@@ -153,41 +153,43 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
       <PendingTransactionsContainer account={account} />
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
-      <ErrorBoundary
-        fallback={
-          <ErrorBoundaryFallbackWithCopyError
-            message={"Sorry, an error occurred fetching tokens"}
-          />
-        }
-      >
-        {error ? (
-          <ErrorBoundaryFallbackWithCopyError
-            error={error}
-            message={"Sorry, an error occurred fetching tokens"}
-          />
-        ) : (
-          <>
-            <TokenList
-              showTitle={showPendingTransactions}
-              isValidating={isValidating}
-              tokenList={tokenDetails}
-              variant={tokenListVariant}
+      {tokensEnabled && (
+        <ErrorBoundary
+          fallback={
+            <ErrorBoundaryFallbackWithCopyError
+              message={"Sorry, an error occurred fetching tokens"}
             />
-            {tokenDetailsIsInitialising ? (
-              <Spinner size={64} style={{ marginTop: 40 }} />
-            ) : (
-              <TokenWrapper
-                {...makeClickable(() => navigate(routes.newToken()))}
-              >
-                <AddTokenIconButton size={40}>
-                  <AddIcon />
-                </AddTokenIconButton>
-                <TokenTitle>Add token</TokenTitle>
-              </TokenWrapper>
-            )}
-          </>
-        )}
-      </ErrorBoundary>
+          }
+        >
+          {error ? (
+            <ErrorBoundaryFallbackWithCopyError
+              error={error}
+              message={"Sorry, an error occurred fetching tokens"}
+            />
+          ) : (
+            <>
+              <TokenList
+                showTitle={showPendingTransactions}
+                isValidating={isValidating}
+                tokenList={tokenDetails}
+                variant={tokenListVariant}
+              />
+              {tokenDetailsIsInitialising ? (
+                <Spinner size={64} style={{ marginTop: 40 }} />
+              ) : (
+                <TokenWrapper
+                  {...makeClickable(() => navigate(routes.newToken()))}
+                >
+                  <AddTokenIconButton size={40}>
+                    <AddIcon />
+                  </AddTokenIconButton>
+                  <TokenTitle>Add token</TokenTitle>
+                </TokenWrapper>
+              )}
+            </>
+          )}
+        </ErrorBoundary>
+      )}
     </Container>
   )
 }

@@ -28,6 +28,7 @@ import { handleNetworkMessage } from "./networkMessaging"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
+import { handleTokenMessaging } from "./tokenMessaging"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { Wallet, sessionStore, walletStore } from "./wallet"
@@ -76,6 +77,7 @@ const handlers = [
   handleRecoveryMessage,
   handleSessionMessage,
   handleTransactionMessage,
+  handleTokenMessaging,
 ] as Array<HandleMessage<MessageType>>
 
 messageStream.subscribe(async ([msg, sender]) => {
