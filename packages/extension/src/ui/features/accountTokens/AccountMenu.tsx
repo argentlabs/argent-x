@@ -7,6 +7,7 @@ import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
+import { PluginIcon } from "../../components/Icons/PluginIcon"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
@@ -159,7 +160,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
               >
                 <MenuItem>
                   <IconWrapper>
-                    <VisibilityOff fontSize="inherit" htmlColor="white" />
+                    <PluginIcon fontSize="inherit" />
                   </IconWrapper>
                   Use Plugins
                 </MenuItem>

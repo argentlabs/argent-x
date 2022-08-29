@@ -82,6 +82,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           account: msg.data.wallet,
           wallet,
           actionQueue,
+          targetImplementationType: msg.data.targetImplementationType,
         })
         return sendToTabAndUi({ type: "UPGRADE_ACCOUNT_RES" })
       } catch {

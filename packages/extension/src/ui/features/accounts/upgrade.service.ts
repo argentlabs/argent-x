@@ -17,14 +17,13 @@ export async function checkIfUpgradeAvailable(
   // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
   const oldAccount = isDeprecated(account)
 
-  const targetImplementation =
-    account.type === "argent-plugin"
-      ? targetClassHash.argentPluginAccount
-      : targetClassHash.argentAccount
+  // matches all current target implementations. If you want to change the account type please do it using a different flow than this banner
+  const targetImplementations = Object.values(targetClassHash)
 
-  return (
-    !oldAccount &&
-    !!targetImplementation &&
-    !number.toBN(currentImplementation).eq(number.toBN(targetImplementation))
+  const isInKnownImplementationsList = targetImplementations.some(
+    (targetImplementation) =>
+      number.toBN(currentImplementation).eq(number.toBN(targetImplementation)),
   )
+
+  return !oldAccount && !!targetImplementations && !isInKnownImplementationsList
 }

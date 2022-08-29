@@ -572,8 +572,9 @@ export class Wallet {
   }
 
   public async getAccount(selector: BaseWalletAccount): Promise<WalletAccount> {
-    const accounts = await this.walletStore.get()
-    const hit = find(accounts, (account) => accountsEqual(account, selector))
+    const [hit] = await this.walletStore.get((account) =>
+      accountsEqual(account, selector),
+    )
     if (!hit) {
       throw Error("account not found")
     }

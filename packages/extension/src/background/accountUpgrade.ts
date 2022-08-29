@@ -1,5 +1,6 @@
 import { stark } from "starknet"
 
+import { updateAccountType } from "../shared/account/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { getNetwork } from "../shared/network"
 import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
@@ -36,18 +37,21 @@ export const upgradeAccount = async ({
       ? newImplementation.argentPluginAccount
       : newImplementation.argentAccount
 
-  const payload = {
-    transactions: {
-      contractAddress: fullAccount.address,
-      entrypoint: "upgrade",
-      calldata: stark.compileCalldata({
-        implementation: implementationClassHash,
-      }),
-    },
+  const isChangingAccountType = accountType !== fullAccount.type
+  if (isChangingAccountType) {
+    await updateAccountType(account, accountType)
   }
 
   await actionQueue.push({
     type: "TRANSACTION",
-    payload,
+    payload: {
+      transactions: {
+        contractAddress: fullAccount.address,
+        entrypoint: "upgrade",
+        calldata: stark.compileCalldata({
+          implementation: implementationClassHash,
+        }),
+      },
+    },
   })
 }
