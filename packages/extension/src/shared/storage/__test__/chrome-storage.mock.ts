@@ -132,6 +132,32 @@ export class MockStorage implements StorageArea, chrome.storage.StorageArea {
     }
     return Promise.resolve()
   }
+
+  onChanged: chrome.storage.StorageAreaChangedEvent = {
+    addListener: (callback) => {
+      emitter.on(this.area, callback)
+    },
+    hasListener: (callback) => {
+      return Boolean(
+        emitter.all.get(this.area)?.some((handler) => handler === callback),
+      )
+    },
+    hasListeners: () => {
+      return Boolean(emitter.all.get(this.area)?.length)
+    },
+    removeListener: (callback) => {
+      emitter.off(this.area, callback)
+    },
+    addRules: () => {
+      throw new Error("Method not implemented.")
+    },
+    getRules: () => {
+      throw new Error("Method not implemented.")
+    },
+    removeRules: () => {
+      throw new Error("Method not implemented.")
+    },
+  }
 }
 
 type Callback = (
