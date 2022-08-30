@@ -22,6 +22,7 @@ export const AccountFooter = styled.div`
 `
 
 export const FooterTab = styled(Link)`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,4 +45,24 @@ export const FooterTab = styled(Link)`
     outline: 0;
     background: rgba(255, 255, 255, 0.05);
   }
+`
+
+export const FooterTabBadge = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  margin-left: 12px;
+  padding: 6px;
+  border-radius: 500px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.blue1};
 `

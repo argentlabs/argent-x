@@ -13,8 +13,8 @@ import {
   ApiTransactionReviewResponse,
   fetchTransactionReview,
 } from "../../../../shared/transactionReview.service"
+import { argentApiFetcher } from "../../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
-import { useArgentApiFetcher } from "../../../services/useArgentApiFetcher"
 import { Account } from "../../accounts/Account"
 
 export interface IUseTransactionReview {
@@ -42,7 +42,6 @@ export const useTransactionReview = ({
   transactions,
   actionHash,
 }: IUseTransactionReview) => {
-  const fetcher = useArgentApiFetcher()
   const transactionReviewEnabled = useTransactionReviewEnabled()
   const transactionReviewFetcher = useCallback(async () => {
     if (!account) {
@@ -56,7 +55,7 @@ export const useTransactionReview = ({
       network,
       accountAddress,
       transactions,
-      fetcher,
+      fetcher: argentApiFetcher,
     })
     // TODO: come back - dont rerender when fetcher reference changes
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
