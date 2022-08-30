@@ -10,11 +10,12 @@ import {
 } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
-import { AccountFooter, FooterTab } from "./AccountFooter"
+import { AccountFooter, FooterTab, FooterTabBadge } from "./AccountFooter"
 import { AccountHeader } from "./AccountHeader"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { getAccountImageUrl } from "./accounts.service"
 import { useSelectedAccount } from "./accounts.state"
+import { useAccountTransactions } from "./accountTransactions.state"
 import { ProfilePicture } from "./ProfilePicture"
 
 export const Container = styled.div<{
@@ -47,6 +48,8 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
 }) => {
   const { accountNames } = useAccountMetadata()
   const account = useSelectedAccount()
+  const { pendingTransactions } = useAccountTransactions(account)
+  const hasPendingTransactions = !!pendingTransactions.length
 
   if (!account) {
     return <></>
@@ -82,6 +85,9 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
         <FooterTab to={routes.accountActivity()}>
           <FormatListBulletedIcon />
           <span>Activity</span>
+          {hasPendingTransactions && (
+            <FooterTabBadge>{pendingTransactions.length}</FooterTabBadge>
+          )}
         </FooterTab>
       </AccountFooter>
     </Container>
