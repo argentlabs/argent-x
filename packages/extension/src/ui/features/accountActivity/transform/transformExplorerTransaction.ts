@@ -153,6 +153,7 @@ export const transformExplorerTransaction = ({
         break
       }
       case "events[Upgraded] calls[upgrade]":
+      case "events[account_upgraded] calls[upgrade]":
         action = "UPGRADE"
         entity = "ACCOUNT"
         displayName = "Upgrade account"
