@@ -75,5 +75,15 @@
         "0x35401b96dc690eda2716068d3b03732d7c18af7c0327787660179108789d84f"
       ]
     }
+  },
+  {
+    "host": "game-goerli.influenceth.io",
+    "title": "Influence",
+    "contracts": {
+      "mainnet-alpha": [],
+      "goerli-alpha": [
+        "0x4a472fe795cc40e9dc838fe4f1608cb91bf027854d016675ec81e172a2e3599"
+      ]
+    }
   }
 ]
