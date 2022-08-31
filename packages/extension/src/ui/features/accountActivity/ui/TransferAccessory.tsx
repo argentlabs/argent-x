@@ -3,7 +3,10 @@ import styled from "styled-components"
 
 import { TokenTextGroup, TokenTitle } from "../../accountTokens/TokenListItem"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
-import { TokenTransferTransaction } from "../transform/type"
+import {
+  TokenMintTransaction,
+  TokenTransferTransaction,
+} from "../transform/type"
 
 export const TokenAmount = styled(TokenTitle)`
   text-align: right;
@@ -18,7 +21,7 @@ const TokenValue = styled.div`
 `
 
 export interface ITransferAccessory {
-  transaction: TokenTransferTransaction
+  transaction: TokenTransferTransaction | TokenMintTransaction
 }
 
 export const TransferAccessory: FC<ITransferAccessory> = ({ transaction }) => {

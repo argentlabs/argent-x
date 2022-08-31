@@ -14,6 +14,7 @@ import {
 import {
   isNFTTransaction,
   isSwapTransaction,
+  isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "./transform/is"
 import { TransformedTransaction } from "./transform/type"
@@ -81,6 +82,7 @@ export const ExplorerTransactionListItem: FC<IExplorerTransactionListItem> = ({
   const isNFT = isNFTTransaction(explorerTransactionTransformed)
   const isTransfer = isTokenTransferTransaction(explorerTransactionTransformed)
   const isSwap = isSwapTransaction(explorerTransactionTransformed)
+  const isTokenMint = isTokenMintTransaction(explorerTransactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer) {
@@ -117,14 +119,21 @@ export const ExplorerTransactionListItem: FC<IExplorerTransactionListItem> = ({
         />
       )
     }
-    if (isTransfer) {
+    if (isTransfer || isTokenMint) {
       return <TransferAccessory transaction={explorerTransactionTransformed} />
     }
     if (isSwap) {
       return <SwapAccessory transaction={explorerTransactionTransformed} />
     }
     return null
-  }, [explorerTransactionTransformed, isNFT, isSwap, isTransfer, network.id])
+  }, [
+    explorerTransactionTransformed,
+    isNFT,
+    isSwap,
+    isTokenMint,
+    isTransfer,
+    network.id,
+  ])
 
   return (
     <Container {...makeClickable(onClick)} highlighted={highlighted} {...props}>

@@ -55,7 +55,9 @@ export const transformExplorerTransaction = ({
       result.date = new Date(timestamp * 1000).toISOString()
     }
     const callNames = calls?.map(({ name }) => name)
-    let displayName = callNames ? transactionNamesToTitle(callNames) : "Unknown"
+    let displayName = callNames?.length
+      ? transactionNamesToTitle(callNames)
+      : "Unknown"
     if (maxFee && actualFee) {
       result = {
         ...result,

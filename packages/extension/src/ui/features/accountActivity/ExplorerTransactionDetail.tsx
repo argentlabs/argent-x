@@ -28,6 +28,7 @@ import { TransactionDetailWrapper } from "./TransactionDetailWrapper"
 import {
   isNFTTransaction,
   isSwapTransaction,
+  isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "./transform/is"
 import { TransformedTransaction } from "./transform/type"
@@ -103,8 +104,9 @@ export const ExplorerTransactionDetail: FC<IExplorerTransactionDetail> = ({
   const isTransfer = isTokenTransferTransaction(explorerTransactionTransformed)
   const isNFT = isNFTTransaction(explorerTransactionTransformed)
   const isSwap = isSwapTransaction(explorerTransactionTransformed)
+  const isTokenMint = isTokenMintTransaction(explorerTransactionTransformed)
   const title = useMemo(() => {
-    if (isTransfer) {
+    if (isTransfer || isTokenMint) {
       const { amount, tokenAddress } = explorerTransactionTransformed
       return (
         <TransferTitle
@@ -132,6 +134,7 @@ export const ExplorerTransactionDetail: FC<IExplorerTransactionDetail> = ({
     displayName,
     explorerTransactionTransformed,
     isNFT,
+    isTokenMint,
     isTransfer,
     network.id,
   ])
