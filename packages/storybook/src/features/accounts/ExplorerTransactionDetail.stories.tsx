@@ -5,6 +5,7 @@ import {
   accountUpgrade,
   dappAspectBuyNft,
   dappBriq,
+  dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
   erc20MintTestToken,
@@ -91,6 +92,13 @@ DappAspectBuyNft.args = {
 export const DappBriq = Template.bind({})
 DappBriq.args = {
   explorerTransaction: dappBriq as IExplorerTransaction,
+  network,
+  tokensByNetwork,
+}
+
+export const DappInfluenceCrewmatePurchaseNft = Template.bind({})
+DappInfluenceCrewmatePurchaseNft.args = {
+  explorerTransaction: dappInfluenceCrewmatePurchaseNft as IExplorerTransaction,
   network,
   tokensByNetwork,
 }

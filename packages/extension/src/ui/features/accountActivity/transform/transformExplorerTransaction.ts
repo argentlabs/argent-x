@@ -225,24 +225,42 @@ export const transformExplorerTransaction = ({
         break
       }
       case "events[Approval,Transfer,Transfer] calls[approve]": {
-        /** mySwap swap */
         const call = getEntityWithName(calls, "approve")
         if (call) {
-          action = "SWAP"
-          entity = "TOKEN"
           const dappContractAddress = getParameter(call.parameters, "spender")
-          const fromTokenAddress = events[1].address
-          const toTokenAddress = events[2].address
-          const fromAmount = getParameter(events[1].parameters, "value")
-          const toAmount = getParameter(events[2].parameters, "value")
-          result = {
-            ...result,
-            dappContractAddress,
-            fromTokenAddress,
-            toTokenAddress,
-            fromAmount,
-            toAmount,
-          } as SwapTransaction
+          const dapp = getKnownDappForContractAddress(dappContractAddress)
+          /** TODO: implement an unchanging id instead of relying on host to be consistent */
+          if (dapp?.host.endsWith("influenceth.io")) {
+            /** influence nft purchase */
+            action = "BUY"
+            entity = "NFT"
+            displayName = "Buy NFT"
+            const dappContractAddress = getParameter(call.parameters, "spender")
+            const contractAddress = events[2].address
+            const tokenId = getParameter(events[2].parameters, "value")
+            result = {
+              ...result,
+              dappContractAddress,
+              contractAddress,
+              tokenId,
+            } as NFTTransaction
+          } else {
+            /** mySwap swap */
+            action = "SWAP"
+            entity = "TOKEN"
+            const fromTokenAddress = events[1].address
+            const toTokenAddress = events[2].address
+            const fromAmount = getParameter(events[1].parameters, "value")
+            const toAmount = getParameter(events[2].parameters, "value")
+            result = {
+              ...result,
+              dappContractAddress,
+              fromTokenAddress,
+              toTokenAddress,
+              fromAmount,
+              toAmount,
+            } as SwapTransaction
+          }
         }
         break
       }

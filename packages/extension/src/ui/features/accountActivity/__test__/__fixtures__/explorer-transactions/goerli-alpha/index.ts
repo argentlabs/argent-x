@@ -11,6 +11,7 @@ import erc721MintMintSquare from "./erc721-mint-mint-square.json"
 import erc721Transfer from "./erc721-transfer.json"
 import dappAspectBuyNft from "./novel-dapp-aspect-buy-nft.json"
 import dappBriq from "./novel-dapp-briq.json"
+import dappInfluenceCrewmatePurchaseNft from "./novel-dapp-influence-crewmate-purchase-nft.json"
 import dappMintSquareBuyNft from "./novel-dapp-mint-square-buy-nft.json"
 import dappNoGame from "./novel-dapp-no-game.json"
 
@@ -30,4 +31,5 @@ export {
   dappBriq,
   dappMintSquareBuyNft,
   dappNoGame,
+  dappInfluenceCrewmatePurchaseNft,
 }

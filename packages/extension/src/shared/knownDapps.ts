@@ -26,9 +26,12 @@ export const isKnownDappForContractAddress = (
 }
 
 export const getKnownDappForContractAddress = (
-  address: string,
+  address?: string,
   network?: PublicNetworkIds,
 ) => {
+  if (!address) {
+    return
+  }
   try {
     const knownContract = knownDapps.find(({ contracts }) => {
       if (network) {

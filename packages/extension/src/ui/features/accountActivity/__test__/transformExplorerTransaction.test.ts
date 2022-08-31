@@ -8,6 +8,7 @@ import {
   accountUpgrade,
   dappAspectBuyNft,
   dappBriq,
+  dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
   erc20MintTestToken,
@@ -435,6 +436,28 @@ describe("transformExplorerTransaction", () => {
           "entity": "NFT",
           "maxFee": "25832999948334",
           "tokenId": "3462",
+        }
+      `)
+      expect(
+        transformExplorerTransaction({
+          explorerTransaction:
+            dappInfluenceCrewmatePurchaseNft as IExplorerTransaction,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "BUY",
+          "actualFee": "4557033777702",
+          "contractAddress": "0x41c4e86a03480313547a04e13fc4d43d7fb7bcb5244fd0cb93f793f304f6124",
+          "dapp": {
+            "host": "game-goerli.influenceth.io",
+            "title": "Influence",
+          },
+          "dappContractAddress": "0x4a472fe795cc40e9dc838fe4f1608cb91bf027854d016675ec81e172a2e3599",
+          "date": "2022-08-31T10:55:59.000Z",
+          "displayName": "Buy NFT",
+          "entity": "NFT",
+          "maxFee": "7742757880620",
+          "tokenId": "9099",
         }
       `)
 

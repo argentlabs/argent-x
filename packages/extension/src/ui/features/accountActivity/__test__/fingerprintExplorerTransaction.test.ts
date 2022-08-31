@@ -8,6 +8,7 @@ import {
   accountUpgrade,
   dappAspectBuyNft,
   dappBriq,
+  dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
   erc20MintTestToken,
@@ -52,6 +53,13 @@ describe("fingerprintExplorerTransaction", () => {
         ),
       ).toMatchInlineSnapshot(
         '"events[Transfer,Transfer,Approval,Transfer,TakerBid] calls[matchAskWithTakerBid]"',
+      )
+      expect(
+        fingerprintExplorerTransaction(
+          dappInfluenceCrewmatePurchaseNft as IExplorerTransaction,
+        ),
+      ).toMatchInlineSnapshot(
+        '"events[Approval,Transfer,Transfer] calls[approve]"',
       )
       expect(
         fingerprintExplorerTransaction(dappNoGame as IExplorerTransaction),
