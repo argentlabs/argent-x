@@ -45,8 +45,12 @@ export const routes = {
   confirmSeedRecovery: routeWithReturnTo("/recovery/seed/confirm"),
   lockScreen: route("/lock-screen"),
   accountTokens: route("/account/tokens"),
-  accountNfts: route("/account/nfts"),
+  accountCollections: route("/account/collections"),
   accountActivity: route("/account/activity"),
+  collectionNfts: route(
+    (contractAddress: string) => `/account/collection/${contractAddress}`,
+    `/account/collection/:contractAddress`,
+  ),
   accountNft: route(
     (contractAddress: string, tokenId: string) =>
       `/account/nfts/${contractAddress}/${tokenId}`,

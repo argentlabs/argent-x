@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 import { useAppState } from "./app.state"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
+import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
@@ -116,13 +117,14 @@ const walletRoutes = (
       element={<AccountScreen tab="tokens" />}
     />
     <Route
-      path={routes.accountNfts.path}
-      element={<AccountScreen tab="nfts" />}
+      path={routes.accountCollections.path}
+      element={<AccountScreen tab="collections" />}
     />
     <Route
       path={routes.accountActivity.path}
       element={<AccountScreen tab="activity" />}
     />
+    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
