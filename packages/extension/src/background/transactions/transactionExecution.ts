@@ -1,4 +1,4 @@
-import { constants, number } from "starknet"
+import { constants, number, stark } from "starknet"
 
 import {
   ExtQueueItem,
@@ -54,7 +54,7 @@ export const executeTransaction = async (
   // estimate fee with onchain nonce even tho transaction nonce may be different
   const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
 
-  const maxFee = number.toHex(suggestedMaxFee)
+  const maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
 
   const transaction = await starknetAccount.execute(transactions, abis, {
     ...transactionsDetail,

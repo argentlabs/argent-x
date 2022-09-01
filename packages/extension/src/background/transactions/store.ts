@@ -51,10 +51,10 @@ const equalTransactionWithStatus = (
   return compareTransactions(a, b) && a.status === b.status
 }
 
-transactionsStore.subscribe((allTransactions, changeSet) => {
+transactionsStore.subscribe((_, changeSet) => {
   const updatedTransactions = differenceWith(
-    changeSet.oldValue ?? [],
     changeSet.newValue ?? [],
+    changeSet.oldValue ?? [],
     equalTransactionWithStatus,
   )
 

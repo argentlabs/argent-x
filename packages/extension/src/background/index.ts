@@ -29,6 +29,7 @@ import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { handleTokenMessaging } from "./tokenMessaging"
+import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { Wallet, sessionStore, walletStore } from "./wallet"
@@ -65,6 +66,10 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     }
   }
 })
+
+// badge shown on extension icon
+
+initBadgeText()
 
 // runs on startup
 
