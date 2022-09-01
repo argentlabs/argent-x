@@ -166,7 +166,7 @@ export const TokenDapp: FC<{
         sessionAccount,
       )
 
-      const result = erc20Contract.mint(
+      const result = await erc20Contract.mint(
         account.address,
         parseInputAmountToUint256("666"),
       )
