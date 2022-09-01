@@ -1,6 +1,6 @@
 # Sessions
 
-Sessions can be used to send transactions from a dapp on behalf of a user without requiring his confirmation with a wallet.
+Sessions can be used to send transactions from a dapp on behalf of a user without requiring their confirmation with a wallet.
 
 The user is guaranteed that the dapp can only execute transactions that comply to the policies of the session and until the session expires.
 
