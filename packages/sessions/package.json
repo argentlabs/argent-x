@@ -54,6 +54,6 @@
   },
   "dependencies": {
     "minimalistic-assert": "^1.0.1",
-    "starknet": "https://github.com/0xs34n/starknet.js#feature/merkle-tree"
+    "starknet": "^4.4.0"
   }
 }
