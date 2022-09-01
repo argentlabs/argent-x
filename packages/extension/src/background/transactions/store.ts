@@ -6,7 +6,7 @@ import {
   TransactionRequest,
   compareTransactions,
 } from "../../shared/transactions"
-import { notifyAboutCompletedTransactions } from "./onupdate/notifications"
+import { runUpdateHandlers } from "./onupdate"
 import { checkTransactionHash } from "./transactionExecution"
 
 export const transactionsStore = new ArrayStorage<Transaction>([], {
@@ -47,6 +47,6 @@ transactionsStore.subscribe((allTransactions, changeSet) => {
   )
 
   if (updatedTransactions.length > 0) {
-    notifyAboutCompletedTransactions(updatedTransactions)
+    runUpdateHandlers(updatedTransactions)
   }
 })

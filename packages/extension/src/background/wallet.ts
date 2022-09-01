@@ -1,15 +1,7 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { find, flatten, groupBy, toPairs, union } from "lodash-es"
-import {
-  Account,
-  DeployContractPayload,
-  Invocation,
-  ec,
-  hash,
-  number,
-  stark,
-} from "starknet"
+import { find, union } from "lodash-es"
+import { Account, DeployContractPayload, ec, stark } from "starknet"
 import {
   calculateContractAddressFromHash,
   getSelectorFromName,
@@ -17,6 +9,7 @@ import {
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
+import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
 import { withHiddenSelector } from "../shared/account/selectors"
 import {
   Network,
@@ -33,8 +26,6 @@ import {
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
-import { isEqualAddress } from "../ui/services/addresses"
-import { getMulticallContract } from "../ui/services/multicall.service"
 import { LoadContracts } from "./accounts"
 import {
   getIndexForPath,
@@ -201,111 +192,6 @@ export class Wallet {
     return declareResponse.class_hash || ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
   }
 
-  private async getAccountTypesFromChain(accounts: WalletAccount[]) {
-    const accountsByNetwork = toPairs(groupBy(accounts, (a) => a.networkId))
-
-    const accountTypeCallsByNetwork = accountsByNetwork.map(
-      ([network, as]) =>
-        [
-          network,
-          as.map((account): Invocation => {
-            return {
-              contractAddress: account.address,
-              entrypoint: "get_implementation",
-            }
-          }),
-        ] as const,
-    )
-
-    const newAccountTypes = flatten(
-      await Promise.all(
-        accountTypeCallsByNetwork.map(
-          async ([networkId, calls]): Promise<
-            Array<{
-              address: string
-              type: ArgentAccountType
-            }>
-          > => {
-            const network = await this.getNetwork(networkId)
-
-            if (!network.accountClassHash?.argentPluginAccount) {
-              return calls.map((call) => ({
-                address: call.contractAddress,
-                type: "argent",
-              }))
-            }
-
-            const multicallContract = getMulticallContract(network)
-
-            if (!multicallContract) {
-              const provider = getProvider(network)
-              const responses = await Promise.all(
-                calls.map((call) => provider.callContract(call)),
-              )
-              const results: string[] = responses.map((res) =>
-                number.toHex(number.toBN(res.result[0])),
-              )
-              return calls.map((call, i) => ({
-                address: call.contractAddress,
-                type: isEqualAddress(
-                  results[i],
-                  network.accountClassHash?.argentPluginAccount || "0x0",
-                )
-                  ? "argent-plugin"
-                  : "argent",
-              }))
-            }
-
-            const multicallCall = calls.flatMap(
-              (call) =>
-                [
-                  call.contractAddress,
-                  hash.getSelectorFromName(call.entrypoint),
-                  0,
-                ] as const,
-            )
-
-            const response = await multicallContract.aggregate(multicallCall)
-
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const results: string[] = response.result.map((res: any) =>
-              number.toHex(res),
-            )
-
-            return calls.map((call, i) => {
-              const type = isEqualAddress(
-                results[i],
-                network.accountClassHash?.argentPluginAccount || "0x0",
-              )
-                ? "argent-plugin"
-                : "argent"
-              console.log(
-                "isEqualAddress",
-                results[i],
-                network.accountClassHash?.argentPluginAccount,
-                type,
-              )
-              return {
-                address: call.contractAddress,
-                type,
-              }
-            })
-          },
-        ),
-      ),
-    )
-
-    return accounts.map((account) => {
-      const accountType = newAccountTypes.find((x) =>
-        isEqualAddress(x.address, account.address),
-      )?.type
-      return {
-        ...account,
-        type: accountType || account.type || "argent",
-      }
-    })
-  }
-
   private async restoreAccountsFromWallet(
     secret: string,
     network: Network,
@@ -381,7 +267,7 @@ export class Wallet {
 
     await Promise.all(promises)
 
-    return this.getAccountTypesFromChain(accounts)
+    return getAccountTypesFromChain(accounts)
   }
 
   public async startSession(
