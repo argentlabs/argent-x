@@ -2674,12 +2674,12 @@
     "@mui/utils" "^5.9.3"
     prop-types "^15.8.1"
 
-"@mui/styled-engine-sc@^5.1.0", "@mui/styled-engine@npm:@mui/styled-engine-sc@latest":
-  version "5.10.1"
-  resolved "https://registry.npmjs.org/@mui/styled-engine-sc/-/styled-engine-sc-5.10.1.tgz#b8dc43365db4adc1b8626f7d2a1323ac6ea61cea"
-  integrity sha512-SCaZYUUofRDsA35zRIyDy7yzF7M1efaPeTo/TtyZIgVq5raWuiOXvKOo4Bus+mnpT/3H+I5tsR2rlozWL5tQdA==
+"@mui/styled-engine-sc@^5.1.0":
+  version "5.10.3"
+  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.10.3.tgz#4ba9b6db83c40ebe4622586abf786cb8952f5ae2"
+  integrity sha512-IHcNTnGEcFCQgghHqBo6BXOzMOpqGXxSu5JEoVCncPVxVZ3/CEtFTyUqnMaiFkpK5DY1Qx1YnqdNBSMhzP1IhQ==
   dependencies:
-    "@babel/runtime" "^7.17.2"
+    "@babel/runtime" "^7.18.9"
     prop-types "^15.8.1"
 
 "@mui/styled-engine@^5.10.2":
@@ -2690,6 +2690,14 @@
     "@babel/runtime" "^7.17.2"
     "@emotion/cache" "^11.10.1"
     csstype "^3.1.0"
+    prop-types "^15.8.1"
+
+"@mui/styled-engine@npm:@mui/styled-engine-sc@latest":
+  version "5.10.1"
+  resolved "https://registry.npmjs.org/@mui/styled-engine-sc/-/styled-engine-sc-5.10.1.tgz#b8dc43365db4adc1b8626f7d2a1323ac6ea61cea"
+  integrity sha512-SCaZYUUofRDsA35zRIyDy7yzF7M1efaPeTo/TtyZIgVq5raWuiOXvKOo4Bus+mnpT/3H+I5tsR2rlozWL5tQdA==
+  dependencies:
+    "@babel/runtime" "^7.17.2"
     prop-types "^15.8.1"
 
 "@mui/system@^5.10.2":
