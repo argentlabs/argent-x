@@ -72,7 +72,6 @@ export async function getAccountTypesFromChain(accounts: WalletAccount[]) {
 
           const response = await multicallContract.aggregate(multicallCall)
 
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const results: string[] = response.result.map((res: any) =>
             number.toHex(res),
           )
