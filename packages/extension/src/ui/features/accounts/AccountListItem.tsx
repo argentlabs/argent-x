@@ -1,21 +1,15 @@
 import { FC, HTMLProps, ReactNode } from "react"
-import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
-import { ButtonOutline } from "../../components/Button"
 import {
-  AddRoundedIcon,
   ArrowCircleDownIcon,
   LinkIcon,
   VisibilityIcon,
 } from "../../components/Icons/MuiIcons"
-import { PluginIcon } from "../../components/Icons/PluginIcon"
 import Row from "../../components/Row"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
-import { routes } from "../../routes"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { useHover } from "../../services/useHover"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
@@ -155,14 +149,6 @@ const PluginTextContainer = styled(NetworkContainer)`
   top: 7.5px;
   right: 8px;
 `
-const AddPluginButton = styled(ButtonOutline)`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: center;
-  justify-content: center;
-  gap: 4.28px;
-  padding: 5px 6px;
-  font-size: 8px;
-`
 
 const StyledContactAddress = styled.p`
   font-weight: 400;
@@ -186,16 +172,12 @@ export const AccountListItem: FC<IAccountListItem> = ({
   style,
   ...rest
 }) => {
-  const [hoverRef, isHovered] = useHover<HTMLDivElement>()
-  const navigate = useNavigate()
-
   return (
     <AccountListItemWrapper
       dark={hidden}
       style={style}
       {...rest}
       onClick={onClick}
-      ref={hoverRef}
     >
       <AccountAvatar
         src={getNetworkAccountImageUrl({
@@ -223,21 +205,9 @@ export const AccountListItem: FC<IAccountListItem> = ({
           )}
         </AccountColumn>
         <AccountColumn>
-          {accountType === "argent-plugin" ? (
-            isHovered ? (
-              <AddPluginButton
-                onClick={(e) => {
-                  e.stopPropagation()
-                  navigate(routes.addPlugin(accountAddress))
-                }}
-              >
-                <AddRoundedIcon style={{ fontSize: "12px" }} />
-                <PluginIcon />
-              </AddPluginButton>
-            ) : (
-              <PluginTextContainer>Plugin</PluginTextContainer>
-            )
-          ) : undefined}
+          {accountType === "argent-plugin" && (
+            <PluginTextContainer>Plugin</PluginTextContainer>
+          )}
           {deploying ? (
             <NetworkStatusWrapper>
               <TransactionStatusIndicator color="orange" />
