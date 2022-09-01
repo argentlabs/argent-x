@@ -705,8 +705,8 @@ export class Wallet {
       }
     })
 
-    const alarm = await browser.alarms.get("session-timeout")
-    if (alarm?.name !== "session-timeout") {
+    const alarm = await browser.alarms.get("session_timeout")
+    if (alarm?.name !== "session_timeout") {
       browser.alarms.create("session_timeout", {
         delayInMinutes: SESSION_DURATION,
       })
