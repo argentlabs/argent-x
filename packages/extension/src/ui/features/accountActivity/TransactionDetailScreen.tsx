@@ -70,7 +70,7 @@ export const TransactionDetailScreen: FC = () => {
   const network = useCurrentNetwork()
   const { txHash } = useParams()
   const { data: explorerTransaction, isValidating } =
-    useArgentExplorerTransaction(txHash)
+    useArgentExplorerTransaction({ hash: txHash, network: network.chainId })
   const account = useSelectedAccount()
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)

@@ -6,7 +6,9 @@ import {
   ARGENT_EXPLORER_BASE_URL,
   ARGENT_EXPLORER_ENABLED,
 } from "../../../shared/api/constants"
+import { argentApiNetworkForNetwork } from "../../../shared/api/fetcher"
 import { IExplorerTransaction } from "../../../shared/explorer/type"
+import { PublicNetworkIds } from "../../../shared/network/public"
 import {
   isPrivacySettingsEnabled,
   settingsStore,
@@ -29,19 +31,27 @@ export const useArgentExplorerEnabled = () => {
   return ARGENT_EXPLORER_ENABLED && privacyUseArgentServices
 }
 
-export const useArgentExplorerTransaction = (txHash?: string) => {
+export const useArgentExplorerTransaction = ({
+  hash,
+  network,
+}: {
+  hash?: string
+  network: PublicNetworkIds | string
+}) => {
   const argentExplorerEnabled = useArgentExplorerEnabled()
+  const apiNetwork = argentApiNetworkForNetwork(network)
   return useConditionallyEnabledSWR<IExplorerTransaction>(
     argentExplorerEnabled,
-    txHash &&
+    hash &&
       ARGENT_EXPLORER_BASE_URL &&
-      urlJoin(ARGENT_EXPLORER_BASE_URL, "transactions", txHash),
+      urlJoin(ARGENT_EXPLORER_BASE_URL, "transactions", apiNetwork, hash),
     argentApiFetcher,
   )
 }
 
 export interface IUseArgentExplorerAccountTransactions {
   accountAddress?: string
+  network: PublicNetworkIds
   page?: number
   pageSize?: number
   direction?: "DESC" | "ASC"
@@ -50,12 +60,14 @@ export interface IUseArgentExplorerAccountTransactions {
 
 export const useArgentExplorerAccountTransactions = ({
   accountAddress,
+  network,
   page = 0,
   pageSize = 100,
   direction = "DESC",
   withTransfers = true,
 }: IUseArgentExplorerAccountTransactions) => {
   const argentExplorerEnabled = useArgentExplorerEnabled()
+  const apiNetwork = argentApiNetworkForNetwork(network)
   const key = useMemo(() => {
     return (
       accountAddress &&
@@ -64,6 +76,7 @@ export const useArgentExplorerAccountTransactions = ({
         [
           ARGENT_EXPLORER_BASE_URL,
           "accounts",
+          apiNetwork,
           stripAddressZeroPadding(accountAddress),
           "transactions",
         ],
@@ -75,7 +88,7 @@ export const useArgentExplorerAccountTransactions = ({
         },
       )
     )
-  }, [accountAddress, direction, page, pageSize, withTransfers])
+  }, [accountAddress, apiNetwork, direction, page, pageSize, withTransfers])
   return useConditionallyEnabledSWR<IExplorerTransaction[]>(
     argentExplorerEnabled,
     key,
@@ -86,11 +99,13 @@ export const useArgentExplorerAccountTransactions = ({
 
 export const useArgentExplorerAccountTransactionsInfinite = ({
   accountAddress,
+  network,
   pageSize = 10,
   direction = "DESC",
   withTransfers = true,
 }: IUseArgentExplorerAccountTransactions) => {
   const argentExplorerEnabled = useArgentExplorerEnabled()
+  const apiNetwork = argentApiNetworkForNetwork(network)
   const key = useCallback(
     (index: number) => {
       return (
@@ -101,6 +116,7 @@ export const useArgentExplorerAccountTransactionsInfinite = ({
           [
             ARGENT_EXPLORER_BASE_URL,
             "accounts",
+            apiNetwork,
             stripAddressZeroPadding(accountAddress),
             "transactions",
           ],
@@ -113,7 +129,14 @@ export const useArgentExplorerAccountTransactionsInfinite = ({
         )
       )
     },
-    [accountAddress, argentExplorerEnabled, direction, pageSize, withTransfers],
+    [
+      accountAddress,
+      apiNetwork,
+      argentExplorerEnabled,
+      direction,
+      pageSize,
+      withTransfers,
+    ],
   )
   return useSWRInfinite<IExplorerTransaction[]>(key, argentApiFetcher, {
     revalidateAll: true,
