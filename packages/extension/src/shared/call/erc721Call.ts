@@ -40,19 +40,23 @@ export const validateERC721Call = (call: Erc721Call) => {
 
 export const parseErc721Call = (call: Erc721Call) => {
   const { contractAddress, calldata } = call
-  const [address1Decimal, address2Decimal, tokenIdLowFelt, tokenIdHighFelt] =
-    calldata
-  const recipientAddress1 = normalizeAddress(address1Decimal)
-  const recipientAddress2 = normalizeAddress(address2Decimal)
+  const [
+    fromAddressDecimal,
+    toAddressDecimal,
+    tokenIdLowFelt,
+    tokenIdHighFelt,
+  ] = calldata
+  const fromAddress = normalizeAddress(fromAddressDecimal)
+  const toAddress = normalizeAddress(toAddressDecimal)
   const tokenIdUnit256: Uint256 = {
     low: tokenIdLowFelt,
     high: tokenIdHighFelt,
   }
-  const tokenId = uint256ToBN(tokenIdUnit256)
+  const tokenId = uint256ToBN(tokenIdUnit256).toString(10)
   return {
     contractAddress,
-    recipientAddress1,
-    recipientAddress2,
+    fromAddress,
+    toAddress,
     tokenId,
   }
 }
