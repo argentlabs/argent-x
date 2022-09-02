@@ -1,0 +1,55 @@
+{
+  "name": "@argent/ledger-signer",
+  "version": "4.7.3",
+  "description": "Ledger Signer for Starknet",
+  "keywords": [
+    "starknet",
+    "starkware",
+    "ledger",
+    "signer",
+    "argent",
+    "argentx",
+    "wallet"
+  ],
+  "author": "Janek Rahrt <janek.rahrt@me.com>",
+  "homepage": "https://github.com/argentlabs/argent-x/tree/main/packages/ledger-signer#readme",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/ledger-signer.js",
+      "require": "./dist/ledger-signer.umd.cjs"
+    }
+  },
+  "main": "./dist/ledger-signer.umd.cjs",
+  "module": "./dist/ledger-signer.js",
+  "types": "./dist/ledger-signer.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/argentlabs/argent-x.git"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "bugs": {
+    "url": "https://github.com/argentlabs/argent-x/issues"
+  },
+  "devDependencies": {
+    "@ledgerhq/hw-transport": "^6.27.2",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "vite": "^3.0.9",
+    "vite-plugin-dts": "^1.4.1",
+    "vitest": "^0.22.1"
+  },
+  "dependencies": {
+    "@ledgerhq/hw-app-starknet": "^1.0.2",
+    "starknet": "^4.4.0"
+  }
+}
