@@ -4,7 +4,7 @@ import {
   Erc20TransferCall,
   isErc20TransferCall,
   parseErc20TransferCall,
-} from "../../../../shared/call"
+} from "../../../../shared/call/erc20TransferCall"
 import { Token } from "../../../../shared/token/type"
 import { FieldGroup } from "../../../components/Fields"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"

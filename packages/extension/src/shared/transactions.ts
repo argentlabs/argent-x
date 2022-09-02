@@ -18,6 +18,7 @@ export const TRANSACTION_STATUSES_TO_TRACK: Status[] = [
 export interface TransactionMeta {
   title?: string
   subTitle?: string
+  transactions?: Call | Call[]
 }
 
 export interface TransactionBase {
@@ -58,12 +59,10 @@ export const getInFlightTransactions = (
     TRANSACTION_STATUSES_TO_TRACK.includes(status),
   )
 
-export function nameTransaction(calls: Call | Call[]): TransactionMeta {
+export function nameTransaction(calls: Call | Call[]) {
   const callsArray = Array.isArray(calls) ? calls : [calls]
   const entrypointNames = callsArray.map((call) => call.entrypoint)
-  return {
-    title: transactionNamesToTitle(entrypointNames),
-  }
+  return transactionNamesToTitle(entrypointNames)
 }
 
 export function transactionNamesToTitle(

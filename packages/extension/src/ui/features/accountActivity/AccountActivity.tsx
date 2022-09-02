@@ -4,7 +4,6 @@ import styled from "styled-components"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { Token } from "../../../shared/token/type"
-import { Transaction } from "../../../shared/transactions"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
@@ -21,6 +20,11 @@ import {
   TransactionListItem,
   TransactionsListWrapper,
 } from "./TransactionListItem"
+import {
+  isActivityTransaction,
+  isExplorerTransaction,
+  isVoyagerTransaction,
+} from "./transform/is"
 import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
@@ -47,29 +51,6 @@ interface IAccountActivity {
   activity: Record<string, Array<ActivityTransaction | IExplorerTransaction>>
   loadMoreHashes: string[]
   onLoadMore: () => void
-}
-
-export const isActivityTransaction = (
-  transaction: any,
-): transaction is ActivityTransaction => {
-  return !!(transaction.hash && transaction.date)
-}
-
-export const isVoyagerTransaction = (
-  transaction: any,
-): transaction is Transaction => {
-  return !!(
-    transaction.hash &&
-    transaction.timestamp &&
-    transaction.account &&
-    transaction.status
-  )
-}
-
-export const isExplorerTransaction = (
-  transaction: any,
-): transaction is IExplorerTransaction => {
-  return !!(!isVoyagerTransaction(transaction) && transaction.transactionHash)
 }
 
 export const AccountActivity: FC<IAccountActivity> = ({
@@ -170,6 +151,7 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
       (transaction) => transaction.status !== "RECEIVED",
     )
   }, [transactions])
+  console.log(JSON.stringify(transactions, null, 2))
   const mergedTransactions = useMemo(() => {
     if (!explorerTransactions) {
       return {

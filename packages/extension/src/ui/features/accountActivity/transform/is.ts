@@ -1,3 +1,6 @@
+import { IExplorerTransaction } from "../../../../shared/explorer/type"
+import { Transaction } from "../../../../shared/transactions"
+import { ActivityTransaction } from "../useActivity"
 import {
   NFTTransaction,
   SwapTransaction,
@@ -35,4 +38,27 @@ export const isSwapTransaction = (
 ): transaction is SwapTransaction => {
   const { action } = transaction
   return action === "SWAP"
+}
+
+export const isActivityTransaction = (
+  transaction: any,
+): transaction is ActivityTransaction => {
+  return !!(transaction.hash && transaction.date)
+}
+
+export const isVoyagerTransaction = (
+  transaction: any,
+): transaction is Transaction => {
+  return !!(
+    transaction.hash &&
+    transaction.timestamp &&
+    transaction.account &&
+    transaction.status
+  )
+}
+
+export const isExplorerTransaction = (
+  transaction: any,
+): transaction is IExplorerTransaction => {
+  return !!(!isVoyagerTransaction(transaction) && transaction.transactionHash)
 }

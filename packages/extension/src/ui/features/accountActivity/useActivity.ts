@@ -8,6 +8,7 @@ export interface ActivityTransaction {
   date: string
   meta?: TransactionMeta
   isRejected?: boolean
+  timestamp?: number
 }
 
 export type DailyActivity = Record<string, ActivityTransaction[]>

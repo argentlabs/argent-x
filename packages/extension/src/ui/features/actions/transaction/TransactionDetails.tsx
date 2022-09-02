@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { Call } from "starknet"
 
-import { isErc20TransferCall } from "../../../../shared/call"
+import { isErc20TransferCall } from "../../../../shared/call/erc20TransferCall"
 import { Token } from "../../../../shared/token/type"
 import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
 import { ERC20TransferTransactionDetails } from "./ERC20TransferTransactionDetails"

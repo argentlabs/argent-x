@@ -36,6 +36,7 @@ export const executeTransaction = async (
   { wallet }: BackgroundService,
 ) => {
   const { transactions, abis, transactionsDetail } = action.payload
+  console.log(JSON.stringify(transactions, null, 2))
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
@@ -61,15 +62,21 @@ export const executeTransaction = async (
     nonce,
     maxFee,
   })
+  console.log(JSON.stringify(transaction, null, 2))
 
   if (!checkTransactionHash(transaction.transaction_hash)) {
     throw Error("Transaction could not get added to the sequencer")
   }
 
+  const title = nameTransaction(transactions)
+
   await addTransaction({
     hash: transaction.transaction_hash,
     account: selectedAccount,
-    meta: nameTransaction(transactions),
+    meta: {
+      title,
+      transactions,
+    },
   })
 
   if (!nonceWasProvidedByUI) {
