@@ -8,6 +8,7 @@ import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
 import { Spinner } from "../../components/Spinner"
+import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
 import { formatDate, formatDateTime } from "../../services/dates"
 import { Account } from "../accounts/Account"
@@ -26,6 +27,7 @@ import {
   isVoyagerTransaction,
 } from "./transform/is"
 import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
+import { transformTransaction } from "./transform/transformTransaction"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
@@ -70,6 +72,26 @@ export const AccountActivity: FC<IAccountActivity> = ({
             {transactions.map((transaction) => {
               if (isActivityTransaction(transaction)) {
                 const { hash, date, meta, isRejected } = transaction
+                const transactionTransformed = transformTransaction({
+                  transaction,
+                  accountAddress: account.address,
+                  tokensByNetwork,
+                })
+                if (transactionTransformed) {
+                  return (
+                    <ExplorerTransactionListItem
+                      explorerTransactionTransformed={transactionTransformed}
+                      network={account.network}
+                      onClick={() => navigate(routes.transactionDetail(hash))}
+                    >
+                      {isRejected ? (
+                        <div style={{ display: "flex" }}>
+                          <TransactionStatusIndicator color={"red"} />
+                        </div>
+                      ) : null}
+                    </ExplorerTransactionListItem>
+                  )
+                }
                 return (
                   <TransactionListItem
                     key={hash}
@@ -93,7 +115,6 @@ export const AccountActivity: FC<IAccountActivity> = ({
                   return (
                     <Fragment key={transactionHash}>
                       <ExplorerTransactionListItem
-                        explorerTransaction={transaction}
                         explorerTransactionTransformed={
                           explorerTransactionTransformed
                         }

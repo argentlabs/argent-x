@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react"
+import { FC, ReactNode, useMemo } from "react"
 import styled, { css } from "styled-components"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
@@ -63,19 +63,19 @@ const TitleAddressPrefix = styled.div`
 const TitleAddress = styled.div``
 
 export interface IExplorerTransactionListItem {
-  explorerTransaction: IExplorerTransaction
   explorerTransactionTransformed: TransformedTransaction
   network: Network
   highlighted?: boolean
   onClick?: () => void
+  children?: ReactNode | ReactNode[]
 }
 
 export const ExplorerTransactionListItem: FC<IExplorerTransactionListItem> = ({
-  explorerTransaction,
   explorerTransactionTransformed,
   network,
   highlighted,
   onClick,
+  children,
   ...props
 }) => {
   const { action, displayName, dapp } = explorerTransactionTransformed
@@ -145,6 +145,7 @@ export const ExplorerTransactionListItem: FC<IExplorerTransactionListItem> = ({
         </TokenTextGroup>
       </TokenDetailsWrapper>
       {accessory}
+      {children}
     </Container>
   )
 }

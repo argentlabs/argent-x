@@ -1,11 +1,3 @@
-import {
-  erc20MintTestToken,
-  erc20SwapAlphaRoad,
-  erc20SwapJediswap,
-  erc20SwapMySwap,
-  erc20Transfer,
-  erc721Transfer,
-} from "@argent-x/extension/src/ui/features/accountActivity/__test__/__fixtures__/transaction-calls/goerli-alpha"
 import { TransactionListItem } from "@argent-x/extension/src/ui/features/accountActivity/TransactionListItem"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 

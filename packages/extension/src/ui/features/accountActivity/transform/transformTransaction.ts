@@ -21,7 +21,10 @@ import {
   Transaction,
   transactionNamesToTitle,
 } from "../../../../shared/transactions"
-import { isEqualAddress } from "../../../services/addresses"
+import {
+  formatTruncatedAddress,
+  isEqualAddress,
+} from "../../../services/addresses"
 import { ActivityTransaction } from "../useActivity"
 import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
 import { getEntityWithName } from "./getEntityWithName"
@@ -57,7 +60,7 @@ export const transformTransaction = ({
     return
   }
   try {
-    const { meta, timestamp } = transaction
+    const { meta, timestamp, hash } = transaction
     let action: TransformedTransactionAction = "UNKNOWN"
     let entity: TransformedTransactionEntity = "UNKNOWN"
     let result: TransformedTransaction = {
@@ -67,7 +70,7 @@ export const transformTransaction = ({
     if (timestamp) {
       result.date = new Date(timestamp * 1000).toISOString()
     }
-    let displayName = "Unknown"
+    let displayName = meta?.title || formatTruncatedAddress(hash)
     if (meta?.transactions) {
       const { transactions } = meta
       const calls = Array.isArray(transactions) ? transactions : [transactions]
