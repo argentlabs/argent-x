@@ -51,7 +51,7 @@ export const useArgentExplorerTransaction = ({
 
 export interface IUseArgentExplorerAccountTransactions {
   accountAddress?: string
-  network: PublicNetworkIds
+  network: PublicNetworkIds | string
   page?: number
   pageSize?: number
   direction?: "DESC" | "ASC"

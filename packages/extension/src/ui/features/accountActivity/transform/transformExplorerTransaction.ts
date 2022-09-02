@@ -20,6 +20,7 @@ import {
 } from "./is"
 import {
   NFTTransaction,
+  NFTTransferTransaction,
   SwapTransaction,
   TokenMintTransaction,
   TokenTransferTransaction,
@@ -119,7 +120,7 @@ export const transformExplorerTransaction = ({
           toAddress,
           tokenId,
           contractAddress,
-        } as NFTTransaction
+        } as NFTTransferTransaction
         break
       }
       case "events[] calls[mint]": {

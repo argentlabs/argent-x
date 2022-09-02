@@ -1,44 +1,22 @@
-import { isArray } from "lodash-es"
-import { number } from "starknet"
-
 import { isErc20MintCall } from "../../../../shared/call"
 import { parseErc20Call } from "../../../../shared/call/erc20Call"
-import {
-  isErc20TransferCall,
-  parseErc20TransferCall,
-} from "../../../../shared/call/erc20TransferCall"
+import { isErc20TransferCall } from "../../../../shared/call/erc20TransferCall"
 import {
   isErc721TransferCall,
   parseErc721TransferCall,
 } from "../../../../shared/call/erc721TransferCall"
-import { IExplorerTransaction } from "../../../../shared/explorer/type"
-import {
-  getKnownDappForContractAddress,
-  isKnownDappForContractAddress,
-} from "../../../../shared/knownDapps"
+import { getKnownDappForContractAddress } from "../../../../shared/knownDapps"
 import { Token } from "../../../../shared/token/type"
 import {
   Transaction,
   transactionNamesToTitle,
 } from "../../../../shared/transactions"
-import {
-  formatTruncatedAddress,
-  isEqualAddress,
-} from "../../../services/addresses"
+import { formatTruncatedAddress } from "../../../services/addresses"
 import { ActivityTransaction } from "../useActivity"
-import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
-import { getEntityWithName } from "./getEntityWithName"
-import { getParameter } from "./getParameter"
 import { getTokenForContractAddress } from "./getTokenForContractAddress"
+import { isTokenMintTransaction, isTokenTransferTransaction } from "./is"
 import {
-  isSwapTransaction,
-  isTokenMintTransaction,
-  isTokenTransferTransaction,
-} from "./is"
-import {
-  NFTTransaction,
-  SwapTransaction,
-  TokenMintTransaction,
+  NFTTransferTransaction,
   TokenTransferTransaction,
   TransformedTransaction,
   TransformedTransactionAction,
@@ -120,7 +98,7 @@ export const transformTransaction = ({
             toAddress,
             tokenId,
             contractAddress,
-          } as NFTTransaction
+          } as NFTTransferTransaction
         }
       }
     }

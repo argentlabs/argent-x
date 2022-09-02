@@ -1,4 +1,5 @@
 import { FC } from "react"
+import { Call } from "starknet"
 import styled from "styled-components"
 
 import { IExplorerTransactionCall } from "../../../../shared/explorer/type"
@@ -37,7 +38,7 @@ const CallDataContainer = styled.pre`
 
 export interface ITransactionCallDataBottomSheet
   extends CustomBottomSheetProps {
-  calls?: IExplorerTransactionCall[]
+  calls?: IExplorerTransactionCall[] | Call[] | Call
 }
 
 export const TransactionCallDataBottomSheet: FC<

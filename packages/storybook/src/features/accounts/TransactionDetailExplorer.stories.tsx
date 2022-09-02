@@ -16,53 +16,21 @@ import {
   erc721MintAspect,
   erc721Transfer,
 } from "@argent-x/extension/src/ui/features/accountActivity/__test__/__fixtures__/explorer-transactions/goerli-alpha"
-import {
-  ExplorerTransactionDetail,
-  IExplorerTransactionDetail,
-} from "@argent-x/extension/src/ui/features/accountActivity/ExplorerTransactionDetail"
-import { transformExplorerTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform/transformExplorerTransaction"
+import { TransactionDetail } from "@argent-x/extension/src/ui/features/accountActivity/TransactionDetail"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { FC } from "react"
 import { MemoryRouter } from "react-router-dom"
 
 import { tokensByNetwork } from "../../tokensByNetwork"
-
-interface IExplorerTransactionDetailWrapped
-  extends Omit<IExplorerTransactionDetail, "explorerTransactionTransformed"> {
-  accountAddress: string
-}
-
-const ExplorerTransactionDetailWrapped: FC<
-  IExplorerTransactionDetailWrapped
-> = ({ explorerTransaction, accountAddress, ...rest }) => {
-  const explorerTransactionTransformed = transformExplorerTransaction({
-    explorerTransaction,
-    accountAddress,
-  })
-  if (!explorerTransactionTransformed) {
-    return null
-  }
-  return (
-    <ExplorerTransactionDetail
-      explorerTransaction={explorerTransaction}
-      explorerTransactionTransformed={explorerTransactionTransformed}
-      {...rest}
-    ></ExplorerTransactionDetail>
-  )
-}
+import { TransactionDetailWrapped } from "./TransactionDetailWrapped"
 
 export default {
-  title: "accounts/ExplorerTransactionDetail",
-  component: ExplorerTransactionDetail,
-} as ComponentMeta<typeof ExplorerTransactionDetail>
+  title: "accounts/TransactionDetail (Explorer)",
+  component: TransactionDetail,
+} as ComponentMeta<typeof TransactionDetail>
 
-const Template: ComponentStory<typeof ExplorerTransactionDetailWrapped> = (
-  props,
-) => (
+const Template: ComponentStory<typeof TransactionDetailWrapped> = (props) => (
   <MemoryRouter initialEntries={["/"]}>
-    <ExplorerTransactionDetailWrapped
-      {...props}
-    ></ExplorerTransactionDetailWrapped>
+    <TransactionDetailWrapped {...props}></TransactionDetailWrapped>
   </MemoryRouter>
 )
 
@@ -191,13 +159,4 @@ Erc721Send.args = {
   tokensByNetwork,
   accountAddress:
     "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
-}
-
-export const Erc721Receive = Template.bind({})
-Erc721Receive.args = {
-  explorerTransaction: erc721Transfer as IExplorerTransaction,
-  network,
-  tokensByNetwork,
-  accountAddress:
-    "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
 }

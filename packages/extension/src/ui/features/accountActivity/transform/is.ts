@@ -3,6 +3,7 @@ import { Transaction } from "../../../../shared/transactions"
 import { ActivityTransaction } from "../useActivity"
 import {
   NFTTransaction,
+  NFTTransferTransaction,
   SwapTransaction,
   TokenMintTransaction,
   TokenTransferTransaction,
@@ -31,6 +32,16 @@ export const isNFTTransaction = (
 ): transaction is NFTTransaction => {
   const { entity } = transaction
   return entity === "NFT"
+}
+
+export const isNFTTransferTransaction = (
+  transaction: TransformedTransaction,
+): transaction is NFTTransferTransaction => {
+  const { entity, action } = transaction
+  return (
+    entity === "NFT" &&
+    (action === "SEND" || action === "RECEIVE" || action === "TRANSFER")
+  )
 }
 
 export const isSwapTransaction = (

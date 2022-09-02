@@ -51,9 +51,13 @@ export interface TokenMintTransaction extends BaseTransformedTransaction {
 export interface NFTTransaction extends BaseTransformedTransaction {
   entity: "NFT"
   contractAddress: string
+  tokenId: string
+}
+
+export interface NFTTransferTransaction extends NFTTransaction {
+  action: "TRANSFER" | "SEND" | "RECEIVE"
   fromAddress: string
   toAddress: string
-  tokenId: string
 }
 
 export interface SwapTransaction extends BaseTransformedTransaction {
@@ -74,4 +78,5 @@ export type TransformedTransaction =
   | TokenTransferTransaction
   | TokenMintTransaction
   | NFTTransaction
+  | NFTTransferTransaction
   | SwapTransaction

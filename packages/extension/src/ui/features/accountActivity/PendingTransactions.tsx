@@ -11,11 +11,8 @@ import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { ExplorerTransactionListItem } from "./ExplorerTransactionListItem"
-import {
-  TransactionListItem,
-  TransactionsListWrapper,
-} from "./TransactionListItem"
+import { TransactionListItem } from "./TransactionListItem"
+import { TransactionsListWrapper } from "./TransactionsListWrapper"
 import { transformTransaction } from "./transform/transformTransaction"
 
 interface IPendingTransactionsContainer {
@@ -61,7 +58,6 @@ export const PendingTransactions: FC<IPendingTransactions> = ({
       <SectionHeader>Pending transactions</SectionHeader>
       <TransactionsListWrapper>
         {pendingTransactions.map((transaction) => {
-          const { hash, meta } = transaction
           const transactionTransformed = transformTransaction({
             transaction,
             accountAddress,
@@ -70,28 +66,19 @@ export const PendingTransactions: FC<IPendingTransactions> = ({
           if (transactionTransformed) {
             const { hash } = transaction
             return (
-              <ExplorerTransactionListItem
-                explorerTransactionTransformed={transactionTransformed}
+              <TransactionListItem
+                key={hash}
+                transactionTransformed={transactionTransformed}
                 network={network}
                 onClick={() => openVoyagerTransaction(hash, network)}
               >
                 <div style={{ display: "flex" }}>
                   <TransactionStatusIndicator color={"orange"} />
                 </div>
-              </ExplorerTransactionListItem>
+              </TransactionListItem>
             )
           }
-          return (
-            <TransactionListItem
-              key={hash}
-              hash={hash}
-              status="orange"
-              highlighted
-              meta={meta}
-              showExternalOpenIcon
-              onClick={() => openVoyagerTransaction(hash, network)}
-            />
-          )
+          return null
         })}
       </TransactionsListWrapper>
     </>

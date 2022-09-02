@@ -10,17 +10,14 @@ import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
 import { Spinner } from "../../components/Spinner"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
-import { formatDate, formatDateTime } from "../../services/dates"
+import { formatDate } from "../../services/dates"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { ExplorerTransactionListItem } from "./ExplorerTransactionListItem"
 import { PendingTransactionsContainer } from "./PendingTransactions"
-import {
-  TransactionListItem,
-  TransactionsListWrapper,
-} from "./TransactionListItem"
+import { TransactionListItem } from "./TransactionListItem"
+import { TransactionsListWrapper } from "./TransactionsListWrapper"
 import {
   isActivityTransaction,
   isExplorerTransaction,
@@ -71,7 +68,7 @@ export const AccountActivity: FC<IAccountActivity> = ({
           <TransactionsListWrapper>
             {transactions.map((transaction) => {
               if (isActivityTransaction(transaction)) {
-                const { hash, date, meta, isRejected } = transaction
+                const { hash, isRejected } = transaction
                 const transactionTransformed = transformTransaction({
                   transaction,
                   accountAddress: account.address,
@@ -79,8 +76,9 @@ export const AccountActivity: FC<IAccountActivity> = ({
                 })
                 if (transactionTransformed) {
                   return (
-                    <ExplorerTransactionListItem
-                      explorerTransactionTransformed={transactionTransformed}
+                    <TransactionListItem
+                      key={hash}
+                      transactionTransformed={transactionTransformed}
                       network={account.network}
                       onClick={() => navigate(routes.transactionDetail(hash))}
                     >
@@ -89,18 +87,10 @@ export const AccountActivity: FC<IAccountActivity> = ({
                           <TransactionStatusIndicator color={"red"} />
                         </div>
                       ) : null}
-                    </ExplorerTransactionListItem>
+                    </TransactionListItem>
                   )
                 }
-                return (
-                  <TransactionListItem
-                    key={hash}
-                    hash={hash}
-                    status={isRejected ? "red" : undefined}
-                    meta={{ subTitle: formatDateTime(date), ...meta }}
-                    onClick={() => navigate(routes.transactionDetail(hash))}
-                  />
-                )
+                return null
               } else if (isExplorerTransaction(transaction)) {
                 const explorerTransactionTransformed =
                   transaction &&
@@ -114,10 +104,8 @@ export const AccountActivity: FC<IAccountActivity> = ({
                   const loadMore = loadMoreHashes.includes(transactionHash)
                   return (
                     <Fragment key={transactionHash}>
-                      <ExplorerTransactionListItem
-                        explorerTransactionTransformed={
-                          explorerTransactionTransformed
-                        }
+                      <TransactionListItem
+                        transactionTransformed={explorerTransactionTransformed}
                         network={account.network}
                         onClick={() =>
                           navigate(routes.transactionDetail(transactionHash))
@@ -151,6 +139,7 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data, setSize } = useArgentExplorerAccountTransactionsInfinite({
     accountAddress: account.address,
+    network: switcherNetworkId,
     pageSize: PAGE_SIZE,
   })
 
@@ -172,7 +161,6 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
       (transaction) => transaction.status !== "RECEIVED",
     )
   }, [transactions])
-  console.log(JSON.stringify(transactions, null, 2))
   const mergedTransactions = useMemo(() => {
     if (!explorerTransactions) {
       return {
