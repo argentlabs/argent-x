@@ -51,6 +51,8 @@ export interface TokenMintTransaction extends BaseTransformedTransaction {
 export interface NFTTransaction extends BaseTransformedTransaction {
   entity: "NFT"
   contractAddress: string
+  fromAddress: string
+  toAddress: string
   tokenId: string
 }
 

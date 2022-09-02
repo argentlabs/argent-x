@@ -9,6 +9,7 @@ import {
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc721MintAspect,
   erc721Transfer,
 } from "./__fixtures__/transaction-calls/goerli-alpha"
 import { tokensByNetwork } from "./tokensByNetwork"
@@ -105,6 +106,99 @@ describe("transformTransaction", () => {
             "symbol": "TEST",
           },
           "tokenAddress": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+        }
+      `)
+
+      /** erc721 transfer */
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(erc721Transfer),
+          accountAddress,
+          tokensByNetwork,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "TRANSFER",
+          "contractAddress": "0x03090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Transfer NFT",
+          "entity": "NFT",
+          "fromAddress": "0x05F1f0a38429dcaB9FFD8A786c0d827e84C1CBd8f60243E6d25d066A13aF4a25",
+          "toAddress": "0x05417Fc252d9b7B6EA311485a9e946cC814E3AA4D00F740F7e5F6b11Ce0db9fa",
+          "tokenId": "4734",
+        }
+      `)
+
+      /** dapps */
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(erc20SwapAlphaRoad),
+          accountAddress,
+          tokensByNetwork,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "UNKNOWN",
+          "dapp": {
+            "host": "testnet.app.alpharoad.fi",
+            "title": "Alpha Road",
+          },
+          "dappContractAddress": "0x4aec73f0611a9be0524e7ef21ab1679bdf9c97dc7d72614f15373d431226b6a",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Approve and swap exact tokens for tokens",
+          "entity": "DAPP",
+        }
+      `)
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(erc20SwapJediswap),
+          accountAddress,
+          tokensByNetwork,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "UNKNOWN",
+          "dapp": {
+            "host": "app.testnet.jediswap.xyz",
+            "title": "Jediswap",
+          },
+          "dappContractAddress": "0x012b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Approve and swap exact tokens for tokens",
+          "entity": "DAPP",
+        }
+      `)
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(erc20SwapMySwap),
+          accountAddress,
+          tokensByNetwork,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "UNKNOWN",
+          "dapp": {
+            "host": "www.myswap.xyz",
+            "title": "mySwap",
+          },
+          "dappContractAddress": "0x018a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Approve and swap",
+          "entity": "DAPP",
+        }
+      `)
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(erc721MintAspect),
+          accountAddress,
+          tokensByNetwork,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "UNKNOWN",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Mint",
+          "entity": "UNKNOWN",
         }
       `)
     })
