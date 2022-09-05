@@ -70,6 +70,17 @@ export interface ITransformExplorerTransaction {
   tokensByNetwork?: Token[]
 }
 
+/**
+ *
+ * Takes an explorer transaction {@link ITransformExplorerTransaction}
+ * and passes it through the transformers defined above
+ *
+ * The result includes rich information about the transaction {@link TransformedTransaction}
+ *
+ * @returns the transformation result, or undefined if transformation failed
+ *
+ */
+
 export const transformExplorerTransaction = ({
   explorerTransaction,
   accountAddress,
