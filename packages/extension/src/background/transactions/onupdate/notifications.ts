@@ -1,12 +1,11 @@
-import { SUCCESS_STATUSES, Transaction } from "../../../shared/transactions"
+import { SUCCESS_STATUSES } from "../../../shared/transactions"
 import { resetStoredNonce } from "../../nonce"
 import {
   addToAlreadyShown,
   hasShownNotification,
   sentTransactionNotification,
 } from "../../notification"
-
-type TransactionUpdateListener = (updates: Transaction[]) => void
+import { TransactionUpdateListener } from "./type"
 
 export const notifyAboutCompletedTransactions: TransactionUpdateListener =
   async (transactions) => {

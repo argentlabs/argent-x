@@ -2,7 +2,10 @@ import { FC } from "react"
 import { Link, useLocation } from "react-router-dom"
 import styled from "styled-components"
 
-import { isPrivacySettingsEnabled } from "../../../shared/settings"
+import {
+  isExperimentalSettingsEnabled,
+  isPrivacySettingsEnabled,
+} from "../../../shared/settings"
 import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { DiscordIcon } from "../../components/Icons/DiscordIcon"
@@ -212,6 +215,17 @@ export const SettingsScreen: FC = () => {
             <SettingsLinkItem to={routes.settingsPrivacy()}>
               <Title>
                 <span>Privacy</span>
+                <ArrowForwardIosIcon fontSize="inherit" />
+              </Title>
+            </SettingsLinkItem>
+            <hr />
+          </>
+        )}
+        {isExperimentalSettingsEnabled && (
+          <>
+            <SettingsLinkItem to={routes.settingsExperimental()}>
+              <Title>
+                <span>Experimental</span>
                 <ArrowForwardIosIcon fontSize="inherit" />
               </Title>
             </SettingsLinkItem>

@@ -3,6 +3,7 @@ export interface ISettingsStorage {
   privacyShareAnalyticsData: boolean
   privacyErrorReporting: boolean
   privacyAutomaticErrorReporting: boolean
+  experimentalPluginAccount: boolean
 }
 
 export type SettingsStorageKey = keyof ISettingsStorage

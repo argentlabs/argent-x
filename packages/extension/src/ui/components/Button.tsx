@@ -167,3 +167,15 @@ export const ButtonTransparent = styled(BaseButton)`
     color: rgba(255, 255, 255, 0.5);
   }
 `
+
+export const ButtonOutline = styled(BaseButton)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.text1};
+  border: 0.5px solid #ffffff;
+  border-radius: 4px;
+
+  &:hover,
+  &:focus {
+    outline: 0;
+  }
+`

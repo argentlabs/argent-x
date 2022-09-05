@@ -95,6 +95,10 @@ export const routes = {
     (tokenAddress: string) => `/tokens/${tokenAddress}/hide`,
     "/tokens/:tokenAddress/hide",
   ),
+  addPlugin: route(
+    (accountAddress) => `/add-plugin/${accountAddress}`,
+    "/add-plugin/:accountAddress",
+  ),
   reset: route("/reset"),
   disclaimer: route("/disclaimer"),
   migrationDisclaimer: route("/migration-disclaimer"),
@@ -107,6 +111,7 @@ export const routes = {
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
+  settingsExperimental: route("/settings/experimental"),
   settingsAddressbook: route("/settings/addressbook"),
   settingsAddressbookEdit: route(
     (contactId) => `/settings/addressbook/add-or-edit/${contactId}`,

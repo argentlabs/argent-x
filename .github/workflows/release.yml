@@ -41,6 +41,8 @@ jobs:
       - run: cp Readme.md ./packages/get-starknet/README.md
       - run: yarn --cwd packages/get-starknet publish --access public
         continue-on-error: true
+      - run: yarn --cwd packages/sessions publish --access public
+        continue-on-error: true
       - run: yarn --cwd packages/dapp export
       - name: Check bundlesize for chrome
         run: yarn run bundlewatch

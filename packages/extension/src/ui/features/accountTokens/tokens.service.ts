@@ -124,7 +124,7 @@ export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
   account: Account,
 ) => {
-  const multicallContract = getMulticallContract(account)
+  const multicallContract = getMulticallContract(account.network)
 
   if (!multicallContract) {
     // if no multicall contract is found, fallback to Promises

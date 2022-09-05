@@ -1,14 +1,18 @@
 import { Abi, Contract } from "starknet"
 
 import MULTICALL_ABI from "../../abis/Mulitcall.json"
-import { Account } from "../features/accounts/Account"
+import { Network, getProvider } from "../../shared/network"
 
-export const getMulticallContract = (account: Account): Contract | null => {
-  const multicallAddress = account.network.multicallAddress
+export const getMulticallContract = (network: Network): Contract | null => {
+  const multicallAddress = network.multicallAddress
 
   if (!multicallAddress) {
     return null
   }
 
-  return new Contract(MULTICALL_ABI as Abi, multicallAddress, account.provider)
+  return new Contract(
+    MULTICALL_ABI as Abi,
+    multicallAddress,
+    getProvider(network),
+  )
 }
