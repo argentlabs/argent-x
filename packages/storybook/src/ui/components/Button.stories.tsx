@@ -43,6 +43,13 @@ Warn.args = {
   disabled: false,
 }
 
+export const Inverted = Template.bind({})
+Inverted.args = {
+  children: "Button",
+  variant: "inverted",
+  disabled: false,
+}
+
 export const Info = Template.bind({})
 Info.args = {
   children: "Button",

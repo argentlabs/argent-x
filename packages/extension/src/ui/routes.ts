@@ -80,6 +80,7 @@ export const routes = {
   ),
   upgrade: route("/account/upgrade"),
   accounts: route("/accounts"),
+  addAccount: route("/accounts/new"),
   accountsHidden: route("/accounts/hidden"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
@@ -126,4 +127,5 @@ export const routes = {
   ),
   privacyStatement: route("/privacy-statement"),
   error: route("/error"),
+  ledgerEntry: route("/ledger/start"),
 }

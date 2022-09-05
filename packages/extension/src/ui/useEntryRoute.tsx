@@ -17,7 +17,7 @@ export const useEntryRoute = () => {
     ;(async () => {
       if (isFirstRender) {
         const query = new URLSearchParams(window.location.search)
-        const entry = await determineEntry()
+        const entry = await determineEntry(query)
         useAppState.setState({ isLoading: false, isFirstRender: false })
         navigate(entry)
         if (IS_DEV) {
@@ -32,7 +32,11 @@ export const useEntryRoute = () => {
   }, [isFirstRender, navigate])
 }
 
-const determineEntry = async () => {
+const determineEntry = async (query: URLSearchParams) => {
+  if (query.get("goto") === "ledger") {
+    return routes.ledgerEntry()
+  }
+
   const { initialized } = await isInitialized()
   if (!initialized) {
     return routes.welcome()

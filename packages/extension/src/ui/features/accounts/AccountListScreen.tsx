@@ -1,10 +1,9 @@
 import { partition, some } from "lodash-es"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { isDeprecated } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
 import {
@@ -12,19 +11,15 @@ import {
   SettingsIcon,
   VisibilityOff,
 } from "../../components/Icons/MuiIcons"
-import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
-import { connectAccount } from "../../services/backgroundAccounts"
 import { H1, P } from "../../theme/Typography"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { useBackupRequired } from "../recovery/backupDownload.state"
-import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListScreenItem } from "./AccountListScreenItem"
-import { deployAccount } from "./accounts.service"
 import {
   isHiddenAccount,
   useAccounts,
@@ -62,28 +57,8 @@ const IconButtonCenter = styled(IconButton)`
   margin: auto;
 `
 
-const IconButtonCenterDisabled = styled(IconButtonCenter)`
-  pointer-events: none;
-`
-
 const Paragraph = styled(P)`
   text-align: center;
-`
-
-const ErrorText = styled.div`
-  text-align: center;
-  font-size: 12px;
-  color: ${({ theme }) => theme.red2};
-`
-
-const DimmingContainer = styled.div`
-  background-color: ${({ theme }) => theme.bg1};
-  opacity: 0.5;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
 `
 
 const Footer = styled.div`
@@ -134,7 +109,6 @@ const HiddenAccountsButtonIcon = styled.div`
 
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
   const { selectedAccount } = useSelectedAccountStore()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
@@ -142,8 +116,6 @@ export const AccountListScreen: FC = () => {
     isHiddenAccount,
   )
   const { isBackupRequired } = useBackupRequired()
-  const [isDeploying, setIsDeploying] = useState(false)
-  const [deployFailed, setDeployFailed] = useState(false)
 
   const [deprecatedAccounts, newAccounts] = partition(
     visibleAccounts,
@@ -152,18 +124,8 @@ export const AccountListScreen: FC = () => {
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
   const handleAddAccount = useCallback(async () => {
-    setIsDeploying(true)
-    setDeployFailed(false)
-    try {
-      const newAccount = await deployAccount(switcherNetworkId)
-      connectAccount(newAccount)
-      navigate(await recover())
-    } catch {
-      setDeployFailed(true)
-    } finally {
-      setIsDeploying(false)
-    }
-  }, [navigate, switcherNetworkId])
+    navigate(routes.addAccount())
+  }, [navigate])
 
   return (
     <AccountListWrapper header>
@@ -211,26 +173,13 @@ export const AccountListScreen: FC = () => {
             ))}
           </>
         )}
-        {isDeploying ? (
-          <>
-            <DimmingContainer />
-            <IconButtonCenterDisabled size={48}>
-              <Spinner size={24} />
-            </IconButtonCenterDisabled>
-          </>
-        ) : (
-          <IconButtonCenter
-            size={48}
-            {...makeClickable(handleAddAccount, { label: "Create new wallet" })}
-          >
-            <AddIcon fontSize="large" />
-          </IconButtonCenter>
-        )}
-        {deployFailed && (
-          <ErrorText>
-            Sorry, unable to create wallet. Please try again later.
-          </ErrorText>
-        )}
+
+        <IconButtonCenter
+          size={48}
+          {...makeClickable(handleAddAccount, { label: "Create new wallet" })}
+        >
+          <AddIcon fontSize="large" />
+        </IconButtonCenter>
       </AccountList>
       {hasHiddenAccounts && (
         <Footer>

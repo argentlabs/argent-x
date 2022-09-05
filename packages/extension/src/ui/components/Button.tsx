@@ -3,65 +3,18 @@ import { DefaultTheme } from "styled-components"
 
 export type ButtonVariant =
   | "default"
-  | "primary"
   | "warn"
   | "warn-high"
   | "danger"
   | "info"
+  | "inverted"
 
 export type ButtonSize = "default" | "xs" | "s" | "m" | "l" | "xl"
 
 interface IButton {
-  theme: DefaultTheme
   variant?: ButtonVariant
   size?: ButtonSize
 }
-
-/** TODO: move color tokens into theme */
-
-export const getVariantColor =
-  ({
-    theme,
-    hover = false,
-    disabled = false,
-  }: {
-    theme: DefaultTheme
-    hover?: boolean
-    disabled?: boolean
-  }) =>
-  ({ variant }: IButton) => {
-    switch (variant) {
-      case "danger":
-        return hover
-          ? theme.button.danger.bg.hover
-          : disabled
-          ? theme.button.danger.bg.disabled
-          : theme.button.danger.bg.base
-      case "warn-high":
-        return hover
-          ? theme.button["warn-high"].bg.hover
-          : disabled
-          ? theme.button["warn-high"].bg.disabled
-          : theme.button["warn-high"].bg.base
-      case "warn":
-        return hover
-          ? theme.button.warn.bg.hover
-          : disabled
-          ? theme.button.warn.bg.disabled
-          : theme.button.warn.bg.base
-      case "info":
-        return hover
-          ? theme.button.info.bg.hover
-          : disabled
-          ? theme.button.info.bg.disabled
-          : theme.button.info.bg.base
-    }
-    return hover
-      ? theme.button.default.bg.hover
-      : disabled
-      ? theme.button.default.bg.disabled
-      : theme.button.default.bg.base
-  }
 
 export const getSizeStyle = (size: ButtonSize = "default") => {
   switch (size) {
@@ -86,7 +39,22 @@ export const getSizeStyle = (size: ButtonSize = "default") => {
   `
 }
 
-const BaseButton = styled.button`
+export function getButtonColor(
+  layer: "bg" | "fg",
+  state: "base" | "hover" | "disabled",
+): (props: { theme: DefaultTheme; variant?: ButtonVariant }) => string {
+  return ({ theme, variant = "default" }) => {
+    const v = theme.button[variant] ?? theme.button.default
+    const l = (v as any)[layer] ?? theme.button.default[layer]
+    console.log(
+      (l as any)[state] ?? l.base,
+      `theme.button.${variant}.${layer}.${state}`,
+    )
+    return (l as any)[state] ?? l.base
+  }
+}
+
+const BaseButton = styled.button<IButton>`
   margin: 0;
   padding: 13.5px;
   font-weight: 600;
@@ -94,12 +62,12 @@ const BaseButton = styled.button`
   line-height: 21px;
   text-align: center;
 
-  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  background-color: ${getButtonColor("bg", "base")};
   border-radius: ${({ theme }) => theme.button.radius};
   width: 100%;
   outline: none;
   border: none;
-  color: ${({ theme }) => theme.button.default.fg.base};
+  color: ${getButtonColor("fg", "base")};
   cursor: pointer;
   width: 100%;
   outline: none;
@@ -114,23 +82,21 @@ export const Button = styled(BaseButton)<IButton>`
   font-weight: 600;
   text-align: center;
 
-  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  background-color: ${getButtonColor("bg", "base")};
   border-radius: 100px;
-  color: ${({ theme, variant }) =>
-    variant === "warn" ? theme.bg1 : theme.text1};
+  color: ${getButtonColor("fg", "base")};
 
   &:hover,
   &:focus {
     outline: 0;
-    background-color: ${({ theme }) => getVariantColor({ theme, hover: true })};
+    background-color: ${getButtonColor("bg", "hover")};
   }
 
   &:disabled {
     cursor: auto;
     cursor: not-allowed;
-    color: ${({ theme }) => theme.button.default.fg.disabled};
-    background-color: ${({ theme }) =>
-      getVariantColor({ theme, disabled: true })};
+    color: ${getButtonColor("fg", "disabled")};
+    background-color: ${getButtonColor("bg", "disabled")};
   }
 `
 

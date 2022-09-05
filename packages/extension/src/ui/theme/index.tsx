@@ -83,6 +83,17 @@ export const components = {
         disabled: colord(colors.blue0).alpha(0.5).toRgbString(),
       },
     },
+    inverted: {
+      fg: {
+        base: colors.bg2,
+        disabled: colord(colors.bg2).alpha(0.5).toRgbString(),
+      },
+      bg: {
+        base: colors.white,
+        hover: colord(colors.white).darken(0.075).toRgbString(),
+        disabled: colord(colors.white).alpha(0.5).toRgbString(),
+      },
+    },
     radius: "500px",
     transition: "color 200ms ease-in-out, background-color 200ms ease-in-out",
   },

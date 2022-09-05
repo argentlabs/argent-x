@@ -11,6 +11,7 @@ import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
+import { AddAccount } from "./features/accounts/AddAccount"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
@@ -26,6 +27,7 @@ import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
+import { LedgerStartScreen } from "./features/ledger/start"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
 import { LockScreen } from "./features/onboarding/LockScreen"
@@ -218,6 +220,8 @@ const walletRoutes = (
       path={routes.privacyStatement.path}
       element={<PrivacyStatementScreen />}
     />
+    <Route path={routes.addAccount.path} element={<AddAccount />} />
+    <Route path={routes.ledgerEntry.path} element={<LedgerStartScreen />} />
   </>
 )
 
