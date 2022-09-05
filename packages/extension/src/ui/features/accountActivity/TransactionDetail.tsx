@@ -420,7 +420,6 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
           </Field>
         </FieldGroup>
       )}
-      <pre>{JSON.stringify({ transactionTransformed }, null, 2)}</pre>
     </StyledTransactionDetailWrapper>
   )
 }
