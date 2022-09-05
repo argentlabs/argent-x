@@ -1,5 +1,6 @@
 import { defaultNetwork } from "@argent-x/extension/src/shared/network"
 import { Transaction } from "@argent-x/extension/src/shared/transactions"
+import { TransactionDetail } from "@argent-x/extension/src/ui/features/accountActivity/TransactionDetail"
 import {
   erc20MintTestToken,
   erc20SwapAlphaRoad,
@@ -8,8 +9,7 @@ import {
   erc20Transfer,
   erc721MintAspect,
   erc721Transfer,
-} from "@argent-x/extension/src/ui/features/accountActivity/__test__/__fixtures__/transaction-calls/goerli-alpha"
-import { TransactionDetail } from "@argent-x/extension/src/ui/features/accountActivity/TransactionDetail"
+} from "@argent-x/extension/src/ui/features/accountActivity/transform/transaction/__test__/__fixtures__/transaction-calls/goerli-alpha"
 import { Account } from "@argent-x/extension/src/ui/features/accounts/Account"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { MemoryRouter } from "react-router-dom"

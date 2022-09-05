@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { erc721Transfer } from "../../../ui/features/accountActivity/__test__/__fixtures__/transaction-calls/goerli-alpha"
+import { erc721Transfer } from "../../../ui/features/accountActivity/transform/transaction/__test__/__fixtures__/transaction-calls/goerli-alpha"
 import {
   Erc721TransferCall,
   parseErc721TransferCall,

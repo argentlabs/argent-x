@@ -18,13 +18,12 @@ import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { PendingTransactionsContainer } from "./PendingTransactions"
 import { TransactionListItem } from "./TransactionListItem"
 import { TransactionsListWrapper } from "./TransactionsListWrapper"
+import { transformExplorerTransaction, transformTransaction } from "./transform"
 import {
   isActivityTransaction,
   isExplorerTransaction,
   isVoyagerTransaction,
 } from "./transform/is"
-import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
-import { transformTransaction } from "./transform/transformTransaction"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"

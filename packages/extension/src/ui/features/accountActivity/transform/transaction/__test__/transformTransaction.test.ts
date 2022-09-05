@@ -1,8 +1,9 @@
 import { Call } from "starknet"
 import { describe, expect, test } from "vitest"
 
-import { Transaction } from "../../../../shared/transactions"
-import { transformTransaction } from "../transform/transformTransaction"
+import { Transaction } from "../../../../../../shared/transactions"
+import { tokensByNetwork } from "../../__test__/tokensByNetwork"
+import { transformTransaction } from "../transformTransaction"
 import {
   erc20MintTestToken,
   erc20SwapAlphaRoad,
@@ -12,7 +13,6 @@ import {
   erc721MintAspect,
   erc721Transfer,
 } from "./__fixtures__/transaction-calls/goerli-alpha"
-import { tokensByNetwork } from "./tokensByNetwork"
 
 const accountAddress =
   "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"

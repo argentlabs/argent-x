@@ -1,27 +1,27 @@
-import { isErc20MintCall } from "../../../../shared/call"
-import { parseErc20Call } from "../../../../shared/call/erc20Call"
-import { isErc20TransferCall } from "../../../../shared/call/erc20TransferCall"
+import { isErc20MintCall } from "../../../../../shared/call"
+import { parseErc20Call } from "../../../../../shared/call/erc20Call"
+import { isErc20TransferCall } from "../../../../../shared/call/erc20TransferCall"
 import {
   isErc721TransferCall,
   parseErc721TransferCall,
-} from "../../../../shared/call/erc721TransferCall"
-import { getKnownDappForContractAddress } from "../../../../shared/knownDapps"
-import { Token } from "../../../../shared/token/type"
+} from "../../../../../shared/call/erc721TransferCall"
+import { getKnownDappForContractAddress } from "../../../../../shared/knownDapps"
+import { Token } from "../../../../../shared/token/type"
 import {
   Transaction,
   transactionNamesToTitle,
-} from "../../../../shared/transactions"
-import { formatTruncatedAddress } from "../../../services/addresses"
-import { ActivityTransaction } from "../useActivity"
-import { getTokenForContractAddress } from "./getTokenForContractAddress"
-import { isTokenMintTransaction, isTokenTransferTransaction } from "./is"
+} from "../../../../../shared/transactions"
+import { formatTruncatedAddress } from "../../../../services/addresses"
+import { ActivityTransaction } from "../../useActivity"
+import { getTokenForContractAddress } from "../getTokenForContractAddress"
+import { isTokenMintTransaction, isTokenTransferTransaction } from "../is"
 import {
   NFTTransferTransaction,
   TokenTransferTransaction,
   TransformedTransaction,
   TransformedTransactionAction,
   TransformedTransactionEntity,
-} from "./type"
+} from "../type"
 
 export interface ITransformExplorerTransaction {
   transaction: ActivityTransaction | Transaction

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 
-import { IExplorerTransaction } from "../../../../shared/explorer/type"
-import { fingerprintExplorerTransaction } from "../transform/fingerprintExplorerTransaction"
+import { IExplorerTransaction } from "../../../../../../shared/explorer/type"
+import { fingerprintExplorerTransaction } from "..//fingerprintExplorerTransaction"
 import {
   accountCreated,
   accountCreatedAlt,

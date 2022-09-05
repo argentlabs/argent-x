@@ -13,7 +13,7 @@ import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { TransactionListItem } from "./TransactionListItem"
 import { TransactionsListWrapper } from "./TransactionsListWrapper"
-import { transformTransaction } from "./transform/transformTransaction"
+import { transformTransaction } from "./transform"
 
 interface IPendingTransactionsContainer {
   account: BaseWalletAccount

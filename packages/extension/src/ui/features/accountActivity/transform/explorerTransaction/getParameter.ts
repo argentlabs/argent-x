@@ -1,6 +1,6 @@
 import { isArray } from "lodash-es"
 
-import { IExplorerTransactionParameters } from "../../../../shared/explorer/type"
+import { IExplorerTransactionParameters } from "../../../../../shared/explorer/type"
 
 export const getParameter = (
   parameters: IExplorerTransactionParameters[] | undefined,

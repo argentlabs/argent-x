@@ -1,6 +1,11 @@
 import { IExplorerTransaction } from "@argent-x/extension/src/shared/explorer/type"
 import { defaultNetwork } from "@argent-x/extension/src/shared/network"
 import {
+  ITransactionListItem,
+  TransactionListItem,
+} from "@argent-x/extension/src/ui/features/accountActivity/TransactionListItem"
+import { transformExplorerTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform"
+import {
   accountCreated,
   accountUpgrade,
   dappAspectBuyNft,
@@ -15,12 +20,7 @@ import {
   erc20Transfer,
   erc721MintAspect,
   erc721Transfer,
-} from "@argent-x/extension/src/ui/features/accountActivity/__test__/__fixtures__/explorer-transactions/goerli-alpha"
-import {
-  ITransactionListItem,
-  TransactionListItem,
-} from "@argent-x/extension/src/ui/features/accountActivity/TransactionListItem"
-import { transformExplorerTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform/transformExplorerTransaction"
+} from "@argent-x/extension/src/ui/features/accountActivity/transform/explorerTransaction/__test__/__fixtures__/explorer-transactions/goerli-alpha"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"
 import { MemoryRouter } from "react-router-dom"

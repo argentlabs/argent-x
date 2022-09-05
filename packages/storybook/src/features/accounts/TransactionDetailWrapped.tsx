@@ -2,8 +2,10 @@ import {
   TransactionDetail,
   TransactionDetailProps,
 } from "@argent-x/extension/src/ui/features/accountActivity/TransactionDetail"
-import { transformExplorerTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform/transformExplorerTransaction"
-import { transformTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform/transformTransaction"
+import {
+  transformExplorerTransaction,
+  transformTransaction,
+} from "@argent-x/extension/src/ui/features/accountActivity/transform"
 import { FC } from "react"
 
 interface ITransactionDetailWrapped

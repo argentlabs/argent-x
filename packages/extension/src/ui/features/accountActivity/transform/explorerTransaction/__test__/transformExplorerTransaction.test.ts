@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 
-import { IExplorerTransaction } from "../../../../shared/explorer/type"
-import { transformExplorerTransaction } from "../transform/transformExplorerTransaction"
+import { IExplorerTransaction } from "../../../../../../shared/explorer/type"
+import { transformExplorerTransaction } from "../transformExplorerTransaction"
 import {
   accountCreated,
   accountCreatedAlt,

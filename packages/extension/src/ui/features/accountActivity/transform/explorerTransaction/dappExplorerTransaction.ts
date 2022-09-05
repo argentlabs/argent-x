@@ -2,9 +2,9 @@ import {
   IExplorerTransaction,
   IExplorerTransactionCall,
   IExplorerTransactionEvent,
-} from "../../../../shared/explorer/type"
-import { getKnownDappForContractAddress } from "../../../../shared/knownDapps"
-import { PublicNetworkIds } from "../../../../shared/network/public"
+} from "../../../../../shared/explorer/type"
+import { getKnownDappForContractAddress } from "../../../../../shared/knownDapps"
+import { PublicNetworkIds } from "../../../../../shared/network/public"
 
 /**
  * Crude test if any event or call `address` or parameter value is a known dapp

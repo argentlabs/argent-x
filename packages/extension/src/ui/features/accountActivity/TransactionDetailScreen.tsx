@@ -10,8 +10,7 @@ import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { TransactionDetail } from "./TransactionDetail"
-import { transformExplorerTransaction } from "./transform/transformExplorerTransaction"
-import { transformTransaction } from "./transform/transformTransaction"
+import { transformExplorerTransaction, transformTransaction } from "./transform"
 import { useArgentExplorerTransaction } from "./useArgentExplorer"
 
 export const TransactionDetailScreen: FC = () => {

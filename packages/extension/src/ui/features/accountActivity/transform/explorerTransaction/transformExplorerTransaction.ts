@@ -1,20 +1,16 @@
 import { isArray } from "lodash-es"
 import { number } from "starknet"
 
-import { IExplorerTransaction } from "../../../../shared/explorer/type"
-import { Token } from "../../../../shared/token/type"
-import { transactionNamesToTitle } from "../../../../shared/transactions"
-import { isEqualAddress } from "../../../services/addresses"
-import { getKnownDappForExplorerTransaction } from "./dappExplorerTransaction"
-import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
-import { getEntityWithName } from "./getEntityWithName"
-import { getParameter } from "./getParameter"
-import { getTokenForContractAddress } from "./getTokenForContractAddress"
+import { IExplorerTransaction } from "../../../../../shared/explorer/type"
+import { Token } from "../../../../../shared/token/type"
+import { transactionNamesToTitle } from "../../../../../shared/transactions"
+import { isEqualAddress } from "../../../../services/addresses"
+import { getTokenForContractAddress } from "../getTokenForContractAddress"
 import {
   isSwapTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
-} from "./is"
+} from "../is"
 import {
   NFTTransaction,
   NFTTransferTransaction,
@@ -24,7 +20,11 @@ import {
   TransformedTransaction,
   TransformedTransactionAction,
   TransformedTransactionEntity,
-} from "./type"
+} from "../type"
+import { getKnownDappForExplorerTransaction } from "./dappExplorerTransaction"
+import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
+import { getEntityWithName } from "./getEntityWithName"
+import { getParameter } from "./getParameter"
 
 export interface ITransformExplorerTransaction {
   explorerTransaction: IExplorerTransaction
