@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { Call, stark } from "starknet"
+import { Call, number, stark } from "starknet"
 import useSWR from "swr"
 
 import { getFeeToken } from "../../../shared/token/utils"
@@ -71,7 +71,11 @@ export const useMaxFeeEstimateForTransfer = (
       estimatedFee.suggestedMaxFee.toString(),
       0.2,
     )
-    return { maxFee, error: undefined, loading: false }
+    return {
+      maxFee: BigNumber.from(number.toHex(maxFee)),
+      error: undefined,
+      loading: false,
+    }
   }
 
   return { maxFee: undefined, error: undefined, loading: isValidating }

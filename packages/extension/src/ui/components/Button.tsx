@@ -188,6 +188,18 @@ export const ButtonTransparent = styled(BaseButton)`
   }
 `
 
+export const ButtonOutline = styled(BaseButton)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.text1};
+  border: 0.5px solid #ffffff;
+  border-radius: 4px;
+
+  &:hover,
+  &:focus {
+    outline: 0;
+  }
+`
+
 /** TODO: rationalise variants */
 
 export interface IIconButton extends IButton {

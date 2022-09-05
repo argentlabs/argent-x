@@ -1,5 +1,7 @@
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
+import { TransactionMeta } from "../transactions"
+
 export interface QueueItem {
   meta: {
     hash: string
@@ -13,6 +15,7 @@ export interface TransactionActionPayload {
   transactions: Call | Call[]
   abis?: Abi[]
   transactionsDetail?: InvocationsDetails
+  meta?: TransactionMeta
 }
 
 export type ActionItem =

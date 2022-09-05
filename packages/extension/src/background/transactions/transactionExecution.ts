@@ -35,7 +35,7 @@ export const executeTransaction = async (
   action: TransactionAction,
   { wallet }: BackgroundService,
 ) => {
-  const { transactions, abis, transactionsDetail } = action.payload
+  const { transactions, abis, transactionsDetail, meta = {} } = action.payload
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
@@ -72,6 +72,7 @@ export const executeTransaction = async (
     hash: transaction.transaction_hash,
     account: selectedAccount,
     meta: {
+      ...meta,
       title,
       transactions,
     },

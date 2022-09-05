@@ -4,12 +4,13 @@ import styled from "styled-components"
 
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
+import { RowCentered } from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { A, P } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
-import { AspectNft } from "./aspect.model"
-import { getNftPicture } from "./aspect.service"
+import { Collections } from "./aspect.service"
+import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
 const Container = styled.div`
@@ -31,13 +32,14 @@ const Header = styled.h2`
   text-align: center;
 `
 
-const NftItem = styled.figure`
+export const NftItem = styled.figure`
   display: inline-block;
   overflow: hidden;
   margin: 8px;
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.15);
   cursor: pointer;
+  position: relative;
 
   img {
     width: 148px;
@@ -46,6 +48,8 @@ const NftItem = styled.figure`
   }
 
   figcaption {
+    ${({ theme }) => theme.flexRowNoWrap}
+    justify-content: space-between;
     width: 148px;
     font-weight: 600;
     font-size: 15px;
@@ -62,24 +66,36 @@ const NftItem = styled.figure`
   }
 `
 
-interface AccountNftsProps {
+const CollectiblesNumber = styled(RowCentered)`
+  background-color: ${({ theme }) => theme.bg1};
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  color: ${({ theme }) => theme.white};
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+`
+
+interface AccountCollectionsProps {
   account: Account
   withHeader?: boolean
-  customList?: AspectNft[]
+  customList?: Collections
   navigateToSend?: boolean
 }
 
-const Nfts: FC<AccountNftsProps> = ({
+const Collections: FC<AccountCollectionsProps> = ({
   account,
   customList,
   navigateToSend = false,
 }) => {
   const navigate = useNavigate()
-  const { nfts = [] } = useNfts(account)
+  const collectibles = useCollections(account)
 
   return (
     <div>
-      {nfts.length === 0 && (
+      {collectibles.length === 0 && (
         <>
           <P>No collectibles to show</P>
           {account.networkId === "goerli-alpha" && (
@@ -114,26 +130,27 @@ const Nfts: FC<AccountNftsProps> = ({
           )}
         </>
       )}
-      {(customList || nfts).map((nft) => (
+      {(customList || collectibles).map((collectible) => (
         <NftItem
-          key={`${nft.contract_address}-${nft.token_id}`}
+          key={collectible.contractAddress}
           onClick={() =>
-            navigate(
-              navigateToSend
-                ? routes.sendNft(nft.contract_address, nft.token_id)
-                : routes.accountNft(nft.contract_address, nft.token_id),
-            )
+            navigate(routes.collectionNfts(collectible.contractAddress), {
+              state: { navigateToSend },
+            })
           }
         >
-          <img src={getNftPicture(nft)} />
-          <figcaption>{nft.name}</figcaption>
+          <img src={collectible.imageUri} />
+          <figcaption>
+            {collectible.name}
+            <CollectiblesNumber>{collectible.nfts.length}</CollectiblesNumber>
+          </figcaption>
         </NftItem>
       ))}
     </div>
   )
 }
 
-const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
+const CollectionsFallback: FC<AccountCollectionsProps> = ({ account }) => {
   // this is needed to keep swr mounted so it can retry the request
   useNfts(account, {
     suspense: false,
@@ -143,7 +160,7 @@ const NftsFallback: FC<AccountNftsProps> = ({ account }) => {
   return <ErrorBoundaryFallback title="Seems like Aspect API is down..." />
 }
 
-export const AccountNfts: FC<AccountNftsProps> = ({
+export const AccountCollections: FC<AccountCollectionsProps> = ({
   account,
   withHeader = true,
   customList,
@@ -152,10 +169,10 @@ export const AccountNfts: FC<AccountNftsProps> = ({
 }) => {
   return (
     <Container {...rest}>
-      {withHeader && <Header>Collectibles</Header>}
-      <ErrorBoundary fallback={<NftsFallback account={account} />}>
+      {withHeader && <Header>NFTs</Header>}
+      <ErrorBoundary fallback={<CollectionsFallback account={account} />}>
         <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <Nfts
+          <Collections
             account={account}
             customList={customList}
             navigateToSend={navigateToSend}

@@ -79,9 +79,10 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     case "UPGRADE_ACCOUNT": {
       try {
         await upgradeAccount({
-          account: msg.data,
+          account: msg.data.wallet,
           wallet,
           actionQueue,
+          targetImplementationType: msg.data.targetImplementationType,
         })
         return sendToTabAndUi({ type: "UPGRADE_ACCOUNT_RES" })
       } catch {

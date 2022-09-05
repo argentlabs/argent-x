@@ -23,7 +23,10 @@ export const networkSchema: Schema<Network> = object()
       .required()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
     accountImplementation: string().optional().matches(REGEX_HEXSTRING),
-    accountClassHash: string().optional().matches(REGEX_HEXSTRING),
+    accountClassHash: object({
+      argentAccount: string().required().matches(REGEX_HEXSTRING),
+      argentPluginAccount: string().optional().matches(REGEX_HEXSTRING),
+    }).optional(),
     explorerUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),

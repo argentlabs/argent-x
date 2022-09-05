@@ -24,7 +24,6 @@ export const useSentryInit = () => {
         if (automaticErrorReporting) {
           return event
         }
-        console.log(event.extra)
         if (event.extra?.submittedManually) {
           return event
         }

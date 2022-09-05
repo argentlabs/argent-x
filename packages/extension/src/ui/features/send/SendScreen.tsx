@@ -14,9 +14,10 @@ import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { H3 } from "../../theme/Typography"
-import { AccountNfts } from "../accountNfts/AccountNfts"
+import { AccountCollections } from "../accountNfts/AccountCollections"
 import { AspectNft } from "../accountNfts/aspect.model"
-import { useNfts } from "../accountNfts/useNfts"
+import { Collection, Collections } from "../accountNfts/aspect.service"
+import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddTokenIconButton } from "../accountTokens/AccountTokens"
 import { TokenList } from "../accountTokens/TokenList"
@@ -71,7 +72,7 @@ const TabView = styled.div`
   margin: 24px -24px 0;
 `
 
-const StyledAccountNfts = styled(AccountNfts)`
+const StyledAccountCollections = styled(AccountCollections)`
   padding-top: 0;
 `
 
@@ -94,9 +95,12 @@ export const SendScreen: FC = () => {
 
   const tokenList = useCustomTokenList(tokenDetails, currentQueryValue)
 
-  const { nfts = [] } = useNfts(account)
+  const collectibles = useCollections(account)
 
-  const customNftList = useCustomNftList(nfts, currentQueryValue)
+  const customCollectiblesList = useCustomCollectiblesList(
+    collectibles,
+    currentQueryValue,
+  )
 
   if (!account) {
     return <></>
@@ -162,10 +166,10 @@ export const SendScreen: FC = () => {
             )}
 
             {selectedTab === "nfts" && (
-              <StyledAccountNfts
+              <StyledAccountCollections
                 account={account}
                 withHeader={false}
-                customList={customNftList}
+                customList={customCollectiblesList}
                 navigateToSend
               />
             )}
@@ -208,4 +212,21 @@ const useCustomNftList = (nfts: AspectNft[], query?: string) => {
         nft.description?.includes(query),
     )
   }, [nfts, query])
+}
+
+const useCustomCollectiblesList = (
+  collectibles: Collections,
+  query?: string,
+) => {
+  return useMemo(() => {
+    if (!query) {
+      return collectibles
+    }
+
+    return collectibles.filter(
+      (collectible: Collection) =>
+        collectible.name?.includes(query) ||
+        collectible.contractAddress.includes(query),
+    )
+  }, [collectibles, query])
 }

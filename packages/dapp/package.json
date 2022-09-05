@@ -11,11 +11,12 @@
   },
   "dependencies": {
     "@argent/get-starknet": "^4.7.3",
+    "@argent/x-sessions": "^4.7.3",
     "ethers": "^5.5.1",
     "next": "^12.1.4",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "starknet": "^4.1.0"
+    "starknet": "^4.4.0"
   },
   "devDependencies": {
     "@types/node": "18.7.14",
