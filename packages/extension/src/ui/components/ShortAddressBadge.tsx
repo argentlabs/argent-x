@@ -1,4 +1,9 @@
+import { FC } from "react"
 import styled from "styled-components"
+
+import { formatTruncatedAddress, normalizeAddress } from "../services/addresses"
+import { CopyTooltip } from "./CopyTooltip"
+import { ContentCopyIcon } from "./Icons/MuiIcons"
 
 export const AccountAddressWrapper = styled.span`
   display: flex;
@@ -47,3 +52,23 @@ export const Address = styled.a`
     margin-left: 7px;
   }
 `
+
+interface ShortAddressBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+  address: string
+}
+
+export const ShortAddressBadge: FC<ShortAddressBadgeProps> = ({
+  address,
+  ...htmlDiv
+}) => {
+  return (
+    <AccountAddressWrapper {...htmlDiv}>
+      <CopyTooltip copyValue={normalizeAddress(address)} message="Copied!">
+        <Address>
+          {formatTruncatedAddress(address)}
+          <ContentCopyIcon style={{ fontSize: 12 }} />
+        </Address>
+      </CopyTooltip>
+    </AccountAddressWrapper>
+  )
+}

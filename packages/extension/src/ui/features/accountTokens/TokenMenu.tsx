@@ -1,12 +1,14 @@
 import { FC, useRef, useState } from "react"
+import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { VisibilityOff } from "../../components/Icons/MuiIcons"
+import { ContentCopyIcon, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { MoreVertSharp } from "../../components/Icons/MuiIcons"
 import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
 import Row, { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
+import { normalizeAddress } from "../../services/addresses"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openVoyagerAddress } from "../../services/voyager.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -55,6 +57,18 @@ export const TokenMenu: FC<{ tokenAddress: string }> = ({ tokenAddress }) => {
       </Row>
       {isMenuOpen && (
         <StyledMenu>
+          <CopyToClipboard
+            text={normalizeAddress(tokenAddress)}
+            onCopy={() => setMenuOpen(false)}
+          >
+            <MenuItemWrapper>
+              <MenuItem>
+                <ContentCopyIcon fontSize="inherit" htmlColor="white" />
+                Copy address
+              </MenuItem>
+            </MenuItemWrapper>
+          </CopyToClipboard>
+          <Separator />
           <MenuItemWrapper
             onClick={() => openVoyagerAddress(currentNetwork, tokenAddress)}
           >
