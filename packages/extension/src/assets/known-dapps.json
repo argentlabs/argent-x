@@ -1,5 +1,6 @@
 [
   {
+    "id": "briq-construction",
     "host": "briq.construction",
     "title": "briq",
     "contracts": {
@@ -11,6 +12,7 @@
     }
   },
   {
+    "id": "jediswap-xyz",
     "host": "app.testnet.jediswap.xyz",
     "title": "Jediswap",
     "contracts": {
@@ -25,6 +27,7 @@
     }
   },
   {
+    "id": "myswap-xyz",
     "host": "www.myswap.xyz",
     "title": "mySwap",
     "contracts": {
@@ -36,6 +39,7 @@
     }
   },
   {
+    "id": "alpharoad-fi",
     "host": "testnet.app.alpharoad.fi",
     "title": "Alpha Road",
     "contracts": {
@@ -46,6 +50,7 @@
     }
   },
   {
+    "id": "aspect-io",
     "host": "aspect.io",
     "title": "Aspect",
     "contracts": {
@@ -56,6 +61,7 @@
     }
   },
   {
+    "id": "mintsquare-io",
     "host": "mintsquare.io",
     "title": "Mint Square",
     "contracts": {
@@ -67,6 +73,7 @@
     }
   },
   {
+    "id": "nogame-app",
     "host": "nogamev0-1.netlify.app",
     "title": "NoGame",
     "contracts": {
@@ -77,6 +84,7 @@
     }
   },
   {
+    "id": "influenceth-io",
     "host": "game-goerli.influenceth.io",
     "title": "Influence",
     "contracts": {

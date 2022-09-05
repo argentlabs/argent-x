@@ -11,8 +11,8 @@ export default function ({
   fingerprint,
 }: IExplorerTransactionTransformer) {
   if (
-    fingerprint === "events[Approval,Transfer,Transfer] calls[approve]" &&
-    result.dapp?.host.endsWith("myswap.xyz")
+    result.dapp?.id === "myswap-xyz" &&
+    fingerprint === "events[Approval,Transfer,Transfer] calls[approve]"
   ) {
     const { calls, events } = explorerTransaction
     const call = getEntityWithName(calls, "approve")

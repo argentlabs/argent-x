@@ -144,6 +144,7 @@ describe("transformTransaction", () => {
           "action": "UNKNOWN",
           "dapp": {
             "host": "testnet.app.alpharoad.fi",
+            "id": "alpharoad-fi",
             "title": "Alpha Road",
           },
           "dappContractAddress": "0x4aec73f0611a9be0524e7ef21ab1679bdf9c97dc7d72614f15373d431226b6a",
@@ -163,6 +164,7 @@ describe("transformTransaction", () => {
           "action": "UNKNOWN",
           "dapp": {
             "host": "app.testnet.jediswap.xyz",
+            "id": "jediswap-xyz",
             "title": "Jediswap",
           },
           "dappContractAddress": "0x012b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
@@ -182,6 +184,7 @@ describe("transformTransaction", () => {
           "action": "UNKNOWN",
           "dapp": {
             "host": "www.myswap.xyz",
+            "id": "myswap-xyz",
             "title": "mySwap",
           },
           "dappContractAddress": "0x018a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",

@@ -11,8 +11,9 @@ export default function ({
   fingerprint,
 }: IExplorerTransactionTransformer) {
   if (
+    result.dapp?.id === "mintsquare-io" &&
     fingerprint ===
-    "events[Transfer,Transfer,Approval,Transfer,TakerBid] calls[matchAskWithTakerBid]"
+      "events[Transfer,Transfer,Approval,Transfer,TakerBid] calls[matchAskWithTakerBid]"
   ) {
     const { calls, events } = explorerTransaction
     const call = getEntityWithName(calls, "matchAskWithTakerBid")

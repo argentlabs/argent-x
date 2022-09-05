@@ -11,8 +11,9 @@ export default function ({
   fingerprint,
 }: IExplorerTransactionTransformer) {
   if (
+    result.dapp?.id === "aspect-io" &&
     fingerprint ===
-    "events[Approval,Approval,Transfer,Transfer,Transfer] calls[approve]"
+      "events[Approval,Approval,Transfer,Transfer,Transfer] calls[approve]"
   ) {
     const { calls, events } = explorerTransaction
     const call = getEntityWithName(calls, "approve")

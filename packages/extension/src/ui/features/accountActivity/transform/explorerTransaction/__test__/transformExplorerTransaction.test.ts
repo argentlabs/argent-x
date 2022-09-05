@@ -169,6 +169,7 @@ describe("transformExplorerTransaction", () => {
           "contractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
           "dapp": {
             "host": "mintsquare.io",
+            "id": "mintsquare-io",
             "title": "Mint Square",
           },
           "dappContractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
@@ -292,6 +293,7 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "49915215635677",
           "dapp": {
             "host": "testnet.app.alpharoad.fi",
+            "id": "alpharoad-fi",
             "title": "Alpha Road",
           },
           "dappContractAddress": "0x4aec73f0611a9be0524e7ef21ab1679bdf9c97dc7d72614f15373d431226b6a",
@@ -325,6 +327,7 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "36750992760053",
           "dapp": {
             "host": "app.testnet.jediswap.xyz",
+            "id": "jediswap-xyz",
             "title": "Jediswap",
           },
           "dappContractAddress": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
@@ -367,6 +370,7 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "35172000035172",
           "dapp": {
             "host": "www.myswap.xyz",
+            "id": "myswap-xyz",
             "title": "mySwap",
           },
           "dappContractAddress": "0x18a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",
@@ -412,6 +416,7 @@ describe("transformExplorerTransaction", () => {
           "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
           "dapp": {
             "host": "aspect.io",
+            "id": "aspect-io",
             "title": "Aspect",
           },
           "dappContractAddress": "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890",
@@ -433,6 +438,7 @@ describe("transformExplorerTransaction", () => {
           "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
           "dapp": {
             "host": "mintsquare.io",
+            "id": "mintsquare-io",
             "title": "Mint Square",
           },
           "dappContractAddress": "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786",
@@ -455,6 +461,7 @@ describe("transformExplorerTransaction", () => {
           "contractAddress": "0x41c4e86a03480313547a04e13fc4d43d7fb7bcb5244fd0cb93f793f304f6124",
           "dapp": {
             "host": "game-goerli.influenceth.io",
+            "id": "influenceth-io",
             "title": "Influence",
           },
           "dappContractAddress": "0x4a472fe795cc40e9dc838fe4f1608cb91bf027854d016675ec81e172a2e3599",
@@ -477,6 +484,7 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "13666550163999",
           "dapp": {
             "host": "nogamev0-1.netlify.app",
+            "id": "nogame-app",
             "title": "NoGame",
           },
           "dappContractAddress": "0x35401b96dc690eda2716068d3b03732d7c18af7c0327787660179108789d84f",
@@ -496,6 +504,7 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "17607000123249",
           "dapp": {
             "host": "briq.construction",
+            "id": "briq-construction",
             "title": "briq",
           },
           "dappContractAddress": "0x1317354276941f7f799574c73fd8fe53fa3f251084b4c04d88cf601b6bd915e",

@@ -11,8 +11,9 @@ export default function ({
   fingerprint,
 }: IExplorerTransactionTransformer) {
   if (
+    result.dapp?.id === "alpharoad-fi" &&
     fingerprint ===
-    "events[Approval,Transfer,Transfer,Swap] calls[approve,swapExactTokensForTokens]"
+      "events[Approval,Transfer,Transfer,Swap] calls[approve,swapExactTokensForTokens]"
   ) {
     const { events, calls } = explorerTransaction
     const event = getEntityWithName(events, "Swap")
