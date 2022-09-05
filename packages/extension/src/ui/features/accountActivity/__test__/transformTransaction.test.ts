@@ -21,9 +21,12 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
     account: {
       address: accountAddress,
+      type: "argent",
       network: {
-        accountClassHash:
-          "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+        accountClassHash: {
+          argentAccount:
+            "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
+        },
         baseUrl: "https://alpha4.starknet.io",
         chainId: "SN_GOERLI",
         explorerUrl: "https://goerli.voyager.online",
