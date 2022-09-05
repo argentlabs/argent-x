@@ -167,6 +167,11 @@ describe("transformExplorerTransaction", () => {
           "action": "MINT",
           "actualFee": "12404500000000",
           "contractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
+          "dapp": {
+            "host": "mintsquare.io",
+            "title": "Mint Square",
+          },
+          "dappContractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
           "date": "2022-08-18T11:50:28.000Z",
           "displayName": "Mint NFT",
           "entity": "NFT",

@@ -2,13 +2,10 @@ import { isArray } from "lodash-es"
 import { number } from "starknet"
 
 import { IExplorerTransaction } from "../../../../shared/explorer/type"
-import {
-  getKnownDappForContractAddress,
-  isKnownDappForContractAddress,
-} from "../../../../shared/knownDapps"
 import { Token } from "../../../../shared/token/type"
 import { transactionNamesToTitle } from "../../../../shared/transactions"
 import { isEqualAddress } from "../../../services/addresses"
+import { getKnownDappForExplorerTransaction } from "./dappExplorerTransaction"
 import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
 import { getEntityWithName } from "./getEntityWithName"
 import { getParameter } from "./getParameter"
@@ -44,7 +41,6 @@ export const transformExplorerTransaction = ({
     return
   }
   try {
-    const fingerprint = fingerprintExplorerTransaction(explorerTransaction)
     const { calls, events, maxFee, actualFee, timestamp } = explorerTransaction
     let action: TransformedTransactionAction = "UNKNOWN"
     let entity: TransformedTransactionEntity = "UNKNOWN"
@@ -52,9 +48,13 @@ export const transformExplorerTransaction = ({
       action,
       entity,
     }
+
+    // date
     if (timestamp) {
       result.date = new Date(timestamp * 1000).toISOString()
     }
+
+    // title from call names
     const callNames = calls?.map(({ name }) => name)
     let displayName = callNames?.length
       ? transactionNamesToTitle(callNames)
@@ -66,6 +66,23 @@ export const transformExplorerTransaction = ({
         actualFee: number.hexToDecimalString(actualFee),
       }
     }
+
+    // dapp
+    const knownDapp = getKnownDappForExplorerTransaction(explorerTransaction)
+    if (knownDapp) {
+      entity = "DAPP"
+      const { dapp, dappContractAddress } = knownDapp
+      /** omit the contracts */
+      const { contracts: _contracts, ...rest } = dapp
+      result = {
+        ...result,
+        dapp: rest,
+        dappContractAddress,
+      }
+    }
+
+    // fingerprint
+    const fingerprint = fingerprintExplorerTransaction(explorerTransaction)
     switch (fingerprint) {
       case "events[Transfer] calls[transfer]": {
         action = "TRANSFER"
@@ -229,9 +246,8 @@ export const transformExplorerTransaction = ({
         const call = getEntityWithName(calls, "approve")
         if (call) {
           const dappContractAddress = getParameter(call.parameters, "spender")
-          const dapp = getKnownDappForContractAddress(dappContractAddress)
           /** TODO: implement an unchanging id instead of relying on host to be consistent */
-          if (dapp?.host.endsWith("influenceth.io")) {
+          if (result.dapp?.host.endsWith("influenceth.io")) {
             /** influence nft purchase */
             action = "BUY"
             entity = "NFT"
@@ -304,19 +320,7 @@ export const transformExplorerTransaction = ({
         break
       }
       default: {
-        /** still unknow - crude test if any event or call `address` is a known dapp */
-        const eventsAndCalls = calls ? [...events, ...calls] : events
-        for (const eventsOrCall of eventsAndCalls) {
-          const dappContractAddress = eventsOrCall.address
-          if (isKnownDappForContractAddress(dappContractAddress)) {
-            entity = "DAPP"
-            result = {
-              ...result,
-              dappContractAddress,
-            }
-            break
-          }
-        }
+        /** still unknow - add additional transformer for dapp / fingerprint */
       }
     }
 
@@ -353,15 +357,6 @@ export const transformExplorerTransaction = ({
       }
       if (toToken) {
         result.toToken = toToken
-      }
-    }
-
-    if (result.dappContractAddress) {
-      const dapp = getKnownDappForContractAddress(result.dappContractAddress)
-      if (dapp) {
-        /** omit the contracts */
-        const { contracts: _contracts, ...rest } = dapp
-        result.dapp = rest
       }
     }
 

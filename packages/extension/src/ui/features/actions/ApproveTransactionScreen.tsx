@@ -67,6 +67,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     actionHash,
   })
 
+  console.log(JSON.stringify({ transactions, transactionReview }, null, 2))
+
   const title = useMemo(() => {
     return titleForTransactionsAndReview(transactions, transactionReview)
   }, [transactionReview, transactions])
