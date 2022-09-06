@@ -26,7 +26,7 @@ interface Policy {
   selector: string
 }
 
-interface Session {
+interface RequestSession {
   key: string
   expires: number
   policies: Policy[]
@@ -49,7 +49,7 @@ import { Signer, ec } from "starknet"
 // gets signer with random private key you need to store if you want to reuse the session
 const sessionSigner = new Signer()
 
-const session: Session = {
+const requestSession: RequestSession = {
   key: await sessionSigner.getPublicKey(),
   expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
   policies: [
@@ -67,7 +67,7 @@ Now you can sign the session with the account you have. Depending on how your ac
 import { session } from "starknet"
 
 // calls account.signMessage internally
-const signedSession = await session.createSession(session, account)
+const signedSession = await session.createSession(requestSession, account)
 ```
 
 ### Using established sessions
