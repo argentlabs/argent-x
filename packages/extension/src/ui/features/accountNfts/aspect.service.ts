@@ -57,7 +57,7 @@ export const fetchAspectNftsByUrl = async (
 export const fetchNextAspectNftsByUrl = async (
   url: string,
   address: string,
-): Promise<any> => {
+): Promise<AspectNft[]> => {
   const response = await fetch(url)
   if (!response.ok) {
     return []
@@ -77,7 +77,7 @@ export const fetchNextAspectNftsByUrl = async (
 export const fetchAspectCollection = async (
   account?: BaseWalletAccount,
   contractAddress?: string,
-): Promise<Collection | null> => {
+): Promise<Collection> => {
   if (!account || !contractAddress) {
     throw new Error("Account and Contract Address are required")
   }
@@ -111,7 +111,7 @@ export const fetchNextAspectCollection = async (
   url: string,
   account: BaseWalletAccount,
   contractAddress: string,
-): Promise<any> => {
+): Promise<AspectNft[]> => {
   const response = await fetch(url)
   if (!response.ok) {
     return []
