@@ -18,11 +18,10 @@ export const useCollections = (
   config?: SWRConfigCommon,
 ): Collections => {
   const { nfts = [] } = useNfts(account, config)
-
   return useMemo(
     () =>
       Object.values(
-        nfts.reduce<SerialisedCollectibles>((acc, nft) => {
+        nfts.filter(Boolean).reduce<SerialisedCollectibles>((acc, nft) => {
           if (acc[nft.contract_address]) {
             acc[nft.contract_address].nfts.push(nft)
             return acc
@@ -31,7 +30,7 @@ export const useCollections = (
           return {
             ...acc,
             [nft.contract_address]: {
-              name: nft.contract.name_custom,
+              name: nft.contract.name_custom || nft.contract.name || "Untitled",
               contractAddress: nft.contract.contract_address,
               imageUri: nft.contract.image_url,
               nfts: [nft],

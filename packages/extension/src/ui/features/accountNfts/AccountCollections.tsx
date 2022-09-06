@@ -92,7 +92,6 @@ const Collections: FC<AccountCollectionsProps> = ({
 }) => {
   const navigate = useNavigate()
   const collectibles = useCollections(account)
-
   return (
     <div>
       {collectibles.length === 0 && (
