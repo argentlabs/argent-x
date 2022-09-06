@@ -1,0 +1,161 @@
+{
+  "id": "0x7b4e06e33fa8afb3a054512c77d94163b80f50df760cae09aacc1f729448cdd",
+  "blockNumber": 300703,
+  "timestamp": 1660823428,
+  "transactionHash": "0x7b4e06e33fa8afb3a054512c77d94163b80f50df760cae09aacc1f729448cdd",
+  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "entryPoint": "__execute__",
+  "maxFee": "0x322322cd8b6f",
+  "actualFee": "0x216cc1de5cf5",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Approval",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "owner",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "spender",
+          "value": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341"
+        },
+        {
+          "name": "value",
+          "value": "1000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "to",
+          "value": "0x749e31eee7101051df8d3e4f9d653d78c44392f8dd86a4ddfa8833ce5945c35"
+        },
+        {
+          "name": "value",
+          "value": "1000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "Sync",
+      "address": "0x749e31eee7101051df8d3e4f9d653d78c44392f8dd86a4ddfa8833ce5945c35",
+      "parameters": [
+        {
+          "name": "reserve0",
+          "value": "300244605"
+        },
+        {
+          "name": "reserve1",
+          "value": "30286707522351362728"
+        }
+      ]
+    },
+    {
+      "name": "Swap",
+      "address": "0x749e31eee7101051df8d3e4f9d653d78c44392f8dd86a4ddfa8833ce5945c35",
+      "parameters": [
+        {
+          "name": "sender",
+          "value": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341"
+        },
+        {
+          "name": "amount0In",
+          "value": "0"
+        },
+        {
+          "name": "amount1In",
+          "value": "1000000000000000"
+        },
+        {
+          "name": "amount0Out",
+          "value": "9883"
+        },
+        {
+          "name": "amount1Out",
+          "value": "0"
+        },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x7b4e06e33fa8afb3a054512c77d94163b80f50df760cae09aacc1f729448cdd"
+        },
+        {
+          "name": "response_len",
+          "value": "0x6"
+        },
+        {
+          "name": "response",
+          "value": ["0x1", "0x2", "0x38d7ea4c68000", "0x0", "0x269b", "0x0"]
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "approve",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "spender",
+          "value": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341"
+        },
+        {
+          "name": "amount",
+          "value": "1000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "swap_exact_tokens_for_tokens",
+      "address": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
+      "parameters": [
+        {
+          "name": "amountIn",
+          "value": "1000000000000000"
+        },
+        {
+          "name": "amountOutMin",
+          "value": "9864"
+        },
+        {
+          "name": "path_len",
+          "value": "0x2"
+        },
+        {
+          "name": "path",
+          "value": [
+            "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x5a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426"
+          ]
+        },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "deadline",
+          "value": "0x62fd02bd"
+        }
+      ]
+    }
+  ]
+}

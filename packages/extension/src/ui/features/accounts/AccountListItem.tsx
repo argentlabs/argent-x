@@ -1,6 +1,7 @@
 import { FC, HTMLProps, ReactNode } from "react"
 import styled from "styled-components"
 
+import { ArgentAccountType } from "../../../shared/wallet.model"
 import {
   ArrowCircleDownIcon,
   LinkIcon,
@@ -17,6 +18,7 @@ export interface IAccountListItem {
   accountAddress: string
   networkId: string
   networkName?: string
+  accountType: ArgentAccountType
   outline?: boolean
   highlight?: boolean
   deploying?: boolean
@@ -37,6 +39,7 @@ type AccountListItemWrapperProps = Pick<
 }
 
 export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
+  position: relative;
   cursor: pointer;
   background-color: ${({ highlight, transparent, dark }) =>
     transparent || dark
@@ -140,6 +143,13 @@ const NetworkContainer = styled.div`
   color: ${({ theme }) => theme.text2};
 `
 
+const PluginTextContainer = styled(NetworkContainer)`
+  font-size: 10px;
+  position: absolute;
+  top: 7.5px;
+  right: 8px;
+`
+
 const StyledContactAddress = styled.p`
   font-weight: 400;
   font-size: 10px;
@@ -152,6 +162,7 @@ export const AccountListItem: FC<IAccountListItem> = ({
   accountAddress,
   networkId,
   networkName,
+  accountType,
   deploying,
   upgrade,
   connected,
@@ -194,6 +205,9 @@ export const AccountListItem: FC<IAccountListItem> = ({
           )}
         </AccountColumn>
         <AccountColumn>
+          {accountType === "argent-plugin" && (
+            <PluginTextContainer>Plugin</PluginTextContainer>
+          )}
           {deploying ? (
             <NetworkStatusWrapper>
               <TransactionStatusIndicator color="orange" />

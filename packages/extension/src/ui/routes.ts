@@ -45,8 +45,12 @@ export const routes = {
   confirmSeedRecovery: routeWithReturnTo("/recovery/seed/confirm"),
   lockScreen: route("/lock-screen"),
   accountTokens: route("/account/tokens"),
-  accountNfts: route("/account/nfts"),
+  accountCollections: route("/account/collections"),
   accountActivity: route("/account/activity"),
+  collectionNfts: route(
+    (contractAddress: string) => `/account/collection/${contractAddress}`,
+    `/account/collection/:contractAddress`,
+  ),
   accountNft: route(
     (contractAddress: string, tokenId: string) =>
       `/account/nfts/${contractAddress}/${tokenId}`,
@@ -91,6 +95,10 @@ export const routes = {
     (tokenAddress: string) => `/tokens/${tokenAddress}/hide`,
     "/tokens/:tokenAddress/hide",
   ),
+  addPlugin: route(
+    (accountAddress) => `/add-plugin/${accountAddress}`,
+    "/add-plugin/:accountAddress",
+  ),
   reset: route("/reset"),
   disclaimer: route("/disclaimer"),
   migrationDisclaimer: route("/migration-disclaimer"),
@@ -103,6 +111,7 @@ export const routes = {
   settingsRemoveCustomNetwork: route("/settings/networks/remove"),
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
+  settingsExperimental: route("/settings/experimental"),
   settingsAddressbook: route("/settings/addressbook"),
   settingsAddressbookEdit: route(
     (contactId) => `/settings/addressbook/add-or-edit/${contactId}`,

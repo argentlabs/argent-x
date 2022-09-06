@@ -1,9 +1,14 @@
+import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
+import { Abi, AccountInterface, Contract } from "starknet"
+import { genKeyPair, getStarkKey } from "starknet/dist/utils/ellipticCurve"
 
+import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
 import {
   getErc20TokenAddress,
   mintToken,
+  parseInputAmountToUint256,
   transfer,
 } from "../services/token.service"
 import {
@@ -17,7 +22,10 @@ import styles from "../styles/Home.module.css"
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
 
-export const TokenDapp: FC = () => {
+export const TokenDapp: FC<{
+  showSession: null | boolean
+  account: AccountInterface
+}> = ({ showSession, account }) => {
   const [mintAmount, setMintAmount] = useState("10")
   const [transferTo, setTransferTo] = useState("")
   const [transferAmount, setTransferAmount] = useState("1")
@@ -27,6 +35,11 @@ export const TokenDapp: FC = () => {
   const [transactionStatus, setTransactionStatus] = useState<Status>("idle")
   const [transactionError, setTransactionError] = useState("")
   const [addTokenError, setAddTokenError] = useState("")
+
+  const [sessionSigner] = useState(genKeyPair())
+  const [sessionAccount, setSessionAccount] = useState<
+    SessionAccount | undefined
+  >()
 
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
 
@@ -115,6 +128,57 @@ export const TokenDapp: FC = () => {
     }
   }
 
+  const handleOpenSessionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const signedSession = await createSession(
+      {
+        key: getStarkKey(sessionSigner),
+        expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
+        policies: [
+          {
+            contractAddress: getErc20TokenAddress(network),
+            selector: "mint",
+          },
+        ],
+      },
+      account,
+    )
+
+    setSessionAccount(
+      new SessionAccount(
+        account,
+        account.address,
+        sessionSigner,
+        signedSession,
+      ),
+    )
+  }
+
+  const handleSessionTransactionSubmit = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault()
+      if (!sessionAccount) {
+        throw new Error("No open session")
+      }
+      const erc20Contract = new Contract(
+        Erc20Abi as Abi,
+        getErc20TokenAddress(network),
+        sessionAccount,
+      )
+
+      const result = await erc20Contract.mint(
+        account.address,
+        parseInputAmountToUint256("666"),
+      )
+      console.log(result)
+
+      setLastTransactionHash(result.transaction_hash)
+      setTransactionStatus("pending")
+    } catch (e) {
+      console.error(e)
+      setTransactionStatus("idle")
+    }
+  }
   const tokenAddress = getErc20TokenAddress(network as any)
   const ethAddress =
     network === "goerli-alpha"
@@ -227,6 +291,35 @@ export const TokenDapp: FC = () => {
           />
         </form>
       </div>
+      {showSession && (
+        <div className="columns">
+          <form onSubmit={handleOpenSessionSubmit}>
+            <h2 className={styles.title}>Sessions</h2>
+
+            <p>
+              Random session signer:{" "}
+              <code>{truncateHex(getStarkKey(sessionSigner))}</code>
+            </p>
+
+            <input
+              type="submit"
+              value="Open session"
+              disabled={Boolean(sessionAccount)}
+            />
+          </form>
+          <form onSubmit={handleSessionTransactionSubmit}>
+            <h2 className={styles.title}>Open session</h2>
+
+            <p>Mint some test tokens using the session!</p>
+
+            <input
+              type="submit"
+              value="Use session"
+              disabled={Boolean(!sessionAccount) || buttonsDisabled}
+            />
+          </form>
+        </div>
+      )}
       <h3 style={{ margin: 0 }}>
         ERC-20 token address
         <button

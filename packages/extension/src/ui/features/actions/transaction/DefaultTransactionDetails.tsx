@@ -1,9 +1,10 @@
+import { Collapse } from "@mui/material"
 import { FC, useCallback, useState } from "react"
 import styled from "styled-components"
 
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
 import { CopyTooltip } from "../../../components/CopyTooltip"
-import { ExpandableHeightBox } from "../../../components/ExpandableHeightBox"
+import { DisclosureIcon } from "../../../components/DisclosureIcon"
 import {
   Field,
   FieldGroup,
@@ -11,17 +12,10 @@ import {
   FieldValue,
   LeftPaddedField,
 } from "../../../components/Fields"
-import {
-  ArrowForwardIosIcon,
-  ContentCopyIcon,
-} from "../../../components/Icons/MuiIcons"
+import { ContentCopyIcon } from "../../../components/Icons/MuiIcons"
 import { ContractField } from "./fields/ContractField"
+import { MaybeDappContractField } from "./fields/DappContractField"
 import { TransactionDetailsProps } from "./TransactionDetails"
-
-const DisclosureIconContainer = styled.div<{ expanded: boolean }>`
-  transition: transform 0.2s;
-  transform: rotate(${({ expanded }) => (expanded ? "90deg" : "0deg")});
-`
 
 const TransactionDetailsField = styled(Field)`
   flex-direction: column;
@@ -56,6 +50,7 @@ export const DefaultTransactionDetails: FC<TransactionDetailsProps> = ({
   )
   return (
     <FieldGroup>
+      <MaybeDappContractField contractAddress={transaction.contractAddress} />
       <ContractField contractAddress={transaction.contractAddress} />
       <Field>
         <FieldKey>Action</FieldKey>
@@ -66,12 +61,10 @@ export const DefaultTransactionDetails: FC<TransactionDetailsProps> = ({
       <Field clickable onClick={toggleExpanded}>
         <FieldKey>View details</FieldKey>
         <FieldValue>
-          <DisclosureIconContainer expanded={expanded}>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </DisclosureIconContainer>
+          <DisclosureIcon expanded={expanded} />
         </FieldValue>
       </Field>
-      <ExpandableHeightBox expanded={expanded}>
+      <Collapse in={expanded} timeout="auto">
         <TransactionDetailsField>
           <TransactionDetailKey>
             <div>Transaction details</div>
@@ -83,7 +76,7 @@ export const DefaultTransactionDetails: FC<TransactionDetailsProps> = ({
             <TransactionJson>{displayTransactionDetails}</TransactionJson>
           </FieldValue>
         </TransactionDetailsField>
-      </ExpandableHeightBox>
+      </Collapse>
     </FieldGroup>
   )
 }

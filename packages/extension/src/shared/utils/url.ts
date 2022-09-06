@@ -16,8 +16,13 @@ export const getBaseUrlForHost = (host: string) => {
   throw "Unable to make a base url from host"
 }
 
-export const urlWithQuery = (url: string, query: Record<string, string>) => {
+export const urlWithQuery = (
+  url: string | string[],
+  query: Record<string, any>,
+) => {
   const searchParams = new URLSearchParams(query)
-  const urlWithQuery = urlJoin(url, `?${searchParams}`)
+  const urlWithQuery = Array.isArray(url)
+    ? urlJoin(...url, `?${searchParams}`)
+    : urlJoin(url, `?${searchParams}`)
   return urlWithQuery
 }

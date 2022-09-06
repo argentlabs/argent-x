@@ -2,6 +2,7 @@ import { ApiTransactionReviewResponse } from "@argent-x/extension/src/shared/tra
 import { TransactionsList } from "@argent-x/extension/src/ui/features/actions/transaction/TransactionsList"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
+import { tokensByNetwork } from "../../../tokensByNetwork"
 import erc20TransferResponse from "./__fixtures__/neutral/erc20-transfer-response.json"
 import erc20Transfer from "./__fixtures__/neutral/erc20-transfer.json"
 import jediSwapMintResponse from "./__fixtures__/neutral/jedi-swap-mint-response.json"
@@ -17,7 +18,6 @@ import erc20TransferIsTokenAddress from "./__fixtures__/warn/erc20-transfer-reci
 import erc20TransferWarnResponse from "./__fixtures__/warn/erc20-transfer-warn-response.json"
 import jediSwapApproveAndSwapWarnResponse from "./__fixtures__/warn/jedi-swap-approve-and-swap-warn-response.json"
 import jediSwapApproveAndSwapWarn from "./__fixtures__/warn/jedi-swap-approve-and-swap-warn.json"
-import { tokensByNetwork } from "./tokensByNetwork"
 
 export default {
   title: "features/TransactionsList",

@@ -51,6 +51,7 @@ import {
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
+import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
@@ -87,6 +88,7 @@ export const SendNftScreen: FC = () => {
   const account = useSelectedAccount()
 
   const { nfts = [] } = useNfts(account)
+
   const nft = nfts.find(
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,

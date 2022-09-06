@@ -21,7 +21,10 @@ function getUint256CalldataFromBN(bn: number.BigNumberish) {
   return { type: "struct" as const, ...uint256.bnToUint256(bn) }
 }
 
-function parseInputAmountToUint256(input: string, decimals: number = 18) {
+export function parseInputAmountToUint256(
+  input: string,
+  decimals: number = 18,
+) {
   return getUint256CalldataFromBN(utils.parseUnits(input, decimals).toString())
 }
 

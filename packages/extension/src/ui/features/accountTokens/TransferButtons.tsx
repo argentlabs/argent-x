@@ -6,7 +6,9 @@ import { getFeeToken } from "../../../shared/token/utils"
 import { useAppState } from "../../app.state"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
+import { PluginIcon } from "../../components/Icons/PluginIcon"
 import { routes } from "../../routes"
+import { useSelectedAccount } from "../accounts/accounts.state"
 
 const Container = styled.div`
   margin: 8px 0 24px 0;
@@ -45,6 +47,7 @@ export const TransferButtons: FC = () => {
   const { switcherNetworkId } = useAppState()
 
   const sendToken = getFeeToken(switcherNetworkId)
+  const account = useSelectedAccount()
 
   return (
     <Container>
@@ -60,6 +63,14 @@ export const TransferButtons: FC = () => {
             <SendIcon fontSize="medium" />
           </IconButton>
           <label>Send</label>
+        </LabeledLink>
+      )}
+      {account?.type === "argent-plugin" && (
+        <LabeledLink to={routes.addPlugin(account?.address)}>
+          <IconButton size={40}>
+            <PluginIcon style={{ width: 16, height: 16 }} />
+          </IconButton>
+          <label>Plugins</label>
         </LabeledLink>
       )}
     </Container>

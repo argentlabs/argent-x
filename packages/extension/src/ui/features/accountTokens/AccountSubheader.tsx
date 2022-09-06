@@ -3,17 +3,12 @@ import styled from "styled-components"
 
 import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { CopyTooltip } from "../../components/CopyTooltip"
 import { ActionContainer } from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { ContentCopyIcon, RefreshIcon } from "../../components/Icons/MuiIcons"
-import {
-  formatTruncatedAddress,
-  normalizeAddress,
-} from "../../services/addresses"
+import { RefreshIcon } from "../../components/Icons/MuiIcons"
+import { ShortAddressBadge } from "../../components/ShortAddressBadge"
 import { AccountStatus } from "../accounts/accounts.service"
 import { AccountMenu } from "./AccountMenu"
 import { AccountName } from "./AccountName"
-import { AccountAddressWrapper, Address } from "./Address"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
 
@@ -112,17 +107,10 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
           {prettifyCurrencyValue(sumCurrencyValue)}
         </AccountBalance>
       )}
-      <AccountAddressWrapper style={{ marginBottom: 18 }}>
-        <CopyTooltip
-          copyValue={normalizeAddress(accountAddress)}
-          message="Copied!"
-        >
-          <Address>
-            {formatTruncatedAddress(accountAddress)}
-            <ContentCopyIcon style={{ fontSize: 12 }} />
-          </Address>
-        </CopyTooltip>
-      </AccountAddressWrapper>
+      <ShortAddressBadge
+        style={{ marginBottom: 18 }}
+        address={accountAddress}
+      />
     </>
   )
 }

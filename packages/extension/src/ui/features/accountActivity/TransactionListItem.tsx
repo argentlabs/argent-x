@@ -1,21 +1,27 @@
-import { FC } from "react"
+import { FC, ReactNode, useMemo } from "react"
 import styled, { css } from "styled-components"
 
-import { TransactionMeta } from "../../../shared/transactions"
-import { OpenInNewIcon } from "../../components/Icons/MuiIcons"
-import {
-  StatusIndicatorColor,
-  TransactionStatusIndicator,
-} from "../../components/StatusIndicator"
+import { Network } from "../../../shared/network"
 import { makeClickable } from "../../services/a11y"
-import { formatTruncatedAddress } from "../../services/addresses"
-import { TokenIcon } from "../accountTokens/TokenIcon"
+import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
   TokenDetailsWrapper,
   TokenTextGroup,
   TokenTitle,
   TokenWrapper,
 } from "../accountTokens/TokenListItem"
+import {
+  isNFTTransaction,
+  isNFTTransferTransaction,
+  isSwapTransaction,
+  isTokenMintTransaction,
+  isTokenTransferTransaction,
+} from "./transform/is"
+import { TransformedTransaction } from "./transform/type"
+import { NFTAccessory } from "./ui/NFTAccessory"
+import { SwapAccessory } from "./ui/SwapAccessory"
+import { TransactionIcon } from "./ui/TransactionIcon"
+import { TransferAccessory } from "./ui/TransferAccessory"
 
 export const TransactionsListWrapper = styled.div`
   display: flex;
@@ -38,46 +44,117 @@ const Container = styled(TokenWrapper)<{
   }
 `
 
-const TransactionSubtitle = styled.p`
+const TransactionSubtitle = styled.div`
   font-size: 13px;
   line-height: 18px;
   color: ${({ theme }) => theme.text2};
   margin: 0;
 `
 
-interface ITransactionListItem {
-  hash: string
-  status?: StatusIndicatorColor
-  showExternalOpenIcon?: boolean
+const TitleAddressContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const TitleAddressPrefix = styled.div`
+  margin-right: 8px;
+`
+
+const TitleAddress = styled.div``
+
+export interface ITransactionListItem {
+  transactionTransformed: TransformedTransaction
+  network: Network
   highlighted?: boolean
-  meta?: TransactionMeta
   onClick?: () => void
+  children?: ReactNode | ReactNode[]
 }
 
 export const TransactionListItem: FC<ITransactionListItem> = ({
-  hash,
-  status = "transparent",
+  transactionTransformed,
+  network,
   highlighted,
-  meta,
-  showExternalOpenIcon = false,
   onClick,
+  children,
   ...props
-}) => (
-  <Container {...makeClickable(onClick)} highlighted={highlighted} {...props}>
-    <TokenIcon name={meta?.title || hash.substring(2)} />
-    <TokenDetailsWrapper>
-      <TokenTextGroup>
-        <TokenTitle>
-          {meta?.title || formatTruncatedAddress(hash)}
-          {showExternalOpenIcon && (
-            <OpenInNewIcon style={{ fontSize: "0.8rem", marginLeft: 5 }} />
-          )}
-        </TokenTitle>
-        <TransactionSubtitle>
-          {meta?.subTitle || formatTruncatedAddress(hash)}
-        </TransactionSubtitle>
-      </TokenTextGroup>
-      <TransactionStatusIndicator color={status} />
-    </TokenDetailsWrapper>
-  </Container>
-)
+}) => {
+  const { action, displayName, dapp } = transactionTransformed
+  const isNFT = isNFTTransaction(transactionTransformed)
+  const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
+  const isTransfer = isTokenTransferTransaction(transactionTransformed)
+  const isSwap = isSwapTransaction(transactionTransformed)
+  const isTokenMint = isTokenMintTransaction(transactionTransformed)
+
+  const subtitle = useMemo(() => {
+    if (isTransfer || isNFTTransfer) {
+      const titleShowsTo =
+        (isTransfer || isNFTTransfer) &&
+        (action === "SEND" || action === "TRANSFER")
+      const { toAddress, fromAddress } = transactionTransformed
+      return (
+        <TitleAddressContainer>
+          <TitleAddressPrefix>
+            {titleShowsTo ? "To:" : "From:"}
+          </TitleAddressPrefix>
+          <TitleAddress>
+            <PrettyAccountAddress
+              accountAddress={titleShowsTo ? toAddress : fromAddress}
+              networkId={network.id}
+              size={15}
+            />
+          </TitleAddress>
+        </TitleAddressContainer>
+      )
+    }
+    if (dapp) {
+      return <>{dapp.title}</>
+    }
+    return null
+  }, [
+    isTransfer,
+    dapp,
+    isNFTTransfer,
+    action,
+    transactionTransformed,
+    network.id,
+  ])
+
+  const accessory = useMemo(() => {
+    if (isNFT) {
+      return (
+        <NFTAccessory
+          transaction={transactionTransformed}
+          networkId={network.id}
+        />
+      )
+    }
+    if (isTransfer || isTokenMint) {
+      return <TransferAccessory transaction={transactionTransformed} />
+    }
+    if (isSwap) {
+      return <SwapAccessory transaction={transactionTransformed} />
+    }
+    return null
+  }, [
+    transactionTransformed,
+    isNFT,
+    isSwap,
+    isTokenMint,
+    isTransfer,
+    network.id,
+  ])
+
+  return (
+    <Container {...makeClickable(onClick)} highlighted={highlighted} {...props}>
+      <TransactionIcon transaction={transactionTransformed} size={40} />
+      <TokenDetailsWrapper>
+        <TokenTextGroup>
+          <TokenTitle>{displayName}</TokenTitle>
+          <TransactionSubtitle>{subtitle}</TransactionSubtitle>
+        </TokenTextGroup>
+      </TokenDetailsWrapper>
+      {accessory}
+      {children}
+    </Container>
+  )
+}

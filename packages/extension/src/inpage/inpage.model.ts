@@ -4,6 +4,8 @@ import type {
   ProviderInterface as ProviderInterface3,
 } from "starknet3"
 
+import { Network } from "../shared/network"
+
 export type AccountChangeEventHandler = (accounts: string[]) => void
 
 export type NetworkChangeEventHandler = (network?: string) => void
@@ -45,7 +47,7 @@ export interface AddStarknetChainParameters {
   baseUrl: string
   rpcUrl?: string
   blockExplorerUrl?: string
-  accountImplementation?: string
+  accountImplementation?: Network["accountClassHash"]
 
   nativeCurrency?: {
     name: string

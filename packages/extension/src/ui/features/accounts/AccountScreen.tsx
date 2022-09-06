@@ -2,7 +2,7 @@ import { FC, ReactNode } from "react"
 
 import { assertNever } from "../../services/assertNever"
 import { AccountActivityContainer } from "../accountActivity/AccountActivity"
-import { AccountNfts } from "../accountNfts/AccountNfts"
+import { AccountCollections } from "../accountNfts/AccountCollections"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
 import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShouldShowFullScreenStatusMessage"
@@ -11,7 +11,7 @@ import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
 import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
 
 interface AccountScreenProps {
-  tab: "tokens" | "nfts" | "activity"
+  tab: "tokens" | "collections" | "activity"
 }
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
@@ -37,8 +37,8 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
     return <StatusMessageFullScreenContainer />
   } else if (tab === "tokens") {
     body = <AccountTokens account={account} />
-  } else if (tab === "nfts") {
-    body = <AccountNfts account={account} />
+  } else if (tab === "collections") {
+    body = <AccountCollections account={account} />
   } else if (tab === "activity") {
     body = <AccountActivityContainer account={account} />
   } else {

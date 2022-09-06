@@ -1,12 +1,13 @@
 import { differenceWith } from "lodash-es"
 
 import { ArrayStorage } from "../../shared/storage"
+import { StorageChange } from "../../shared/storage/types"
 import {
   Transaction,
   TransactionRequest,
   compareTransactions,
 } from "../../shared/transactions"
-import { notifyAboutCompletedTransactions } from "./onupdate/notifications"
+import { runUpdateHandlers } from "./onupdate"
 import { checkTransactionHash } from "./transactionExecution"
 
 export const transactionsStore = new ArrayStorage<Transaction>([], {
@@ -32,6 +33,17 @@ export const addTransaction = async (transaction: TransactionRequest) => {
   return transactionsStore.push(newTransaction)
 }
 
+export const getUpdatedTransactionsForChangeSet = (
+  changeSet: StorageChange<Transaction[]>,
+) => {
+  const updatedTransactions = differenceWith(
+    changeSet.oldValue ?? [],
+    changeSet.newValue ?? [],
+    equalTransactionWithStatus,
+  )
+  return updatedTransactions
+}
+
 const equalTransactionWithStatus = (
   a: Transaction,
   b: Transaction,
@@ -47,6 +59,6 @@ transactionsStore.subscribe((_, changeSet) => {
   )
 
   if (updatedTransactions.length > 0) {
-    notifyAboutCompletedTransactions(updatedTransactions)
+    runUpdateHandlers(updatedTransactions)
   }
 })

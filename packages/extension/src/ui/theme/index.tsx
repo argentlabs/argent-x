@@ -40,6 +40,7 @@ export const colors = {
   yellow1: "#ffbf3d",
 
   green1: "#02bba8",
+  green2: "#02a697",
 }
 
 export const components = {
@@ -81,6 +82,13 @@ export const components = {
         base: colors.blue0,
         hover: colord(colors.blue0).lighten(0.075).toRgbString(),
         disabled: colord(colors.blue0).alpha(0.5).toRgbString(),
+      },
+    },
+    transparent: {
+      bg: {
+        base: "transparent",
+        hover: "rgba(255, 255, 255, 0.075)",
+        disabled: "transaprent",
       },
     },
     radius: "500px",
@@ -182,6 +190,22 @@ const flexColumnNoWrap = css`
 const flexRowNoWrap = css`
   display: flex;
   flex-flow: row nowrap;
+`
+
+export const scrollbarStyle = css`
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
 `
 
 export const theme: DefaultTheme = {

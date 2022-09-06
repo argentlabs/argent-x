@@ -4,7 +4,10 @@ export interface Network {
   chainId: string
   baseUrl: string
   explorerUrl?: string
-  accountClassHash?: string
+  accountClassHash?: {
+    argentAccount: string
+    argentPluginAccount?: string
+  }
   rpcUrl?: string
   readonly?: boolean
   multicallAddress?: string

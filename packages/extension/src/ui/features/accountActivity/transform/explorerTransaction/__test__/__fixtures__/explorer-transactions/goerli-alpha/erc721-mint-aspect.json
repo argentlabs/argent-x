@@ -1,0 +1,66 @@
+{
+  "id": "0x6cab4326cb0a13715650bd84964cb2b0347874379114e7eac933c296c66be21",
+  "blockNumber": 299492,
+  "timestamp": 1660823428,
+  "transactionHash": "0x6cab4326cb0a13715650bd84964cb2b0347874379114e7eac933c296c66be21",
+  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "entryPoint": "__execute__",
+  "maxFee": "0xe6f05b66c00",
+  "actualFee": "0x99f59244800",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Transfer",
+      "address": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x0"
+        },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "value",
+          "value": "3462"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x6cab4326cb0a13715650bd84964cb2b0347874379114e7eac933c296c66be21"
+        },
+        {
+          "name": "response_len",
+          "value": "0x0"
+        },
+        {
+          "name": "response",
+          "value": []
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "mint",
+      "address": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+      "parameters": [
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "tokenId",
+          "value": "63392801270941832000732985165499822346083713696479538964563601281878796807126510642815097366440156772366140047362"
+        }
+      ]
+    }
+  ]
+}

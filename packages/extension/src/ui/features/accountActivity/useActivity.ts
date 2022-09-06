@@ -8,6 +8,7 @@ export interface ActivityTransaction {
   date: string
   meta?: TransactionMeta
   isRejected?: boolean
+  timestamp?: number
 }
 
 export type DailyActivity = Record<string, ActivityTransaction[]>
@@ -18,7 +19,7 @@ export function useActivity(account: BaseWalletAccount): DailyActivity {
   for (const { hash, timestamp, meta, status } of transactions) {
     // RECEIVED transactions are already shown as pending
     if (status !== "RECEIVED") {
-      const date = new Date(timestamp * 1000).toString()
+      const date = new Date(timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
       const isRejected = status === "REJECTED"
       activity[dateLabel] ||= []

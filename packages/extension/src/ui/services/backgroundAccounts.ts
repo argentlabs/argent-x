@@ -1,5 +1,9 @@
 import { sendMessage, waitForMessage } from "../../shared/messages"
-import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
+import {
+  ArgentAccountType,
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../shared/wallet.model"
 import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
@@ -31,10 +35,11 @@ export const connectAccount = ({
   network,
   networkId,
   signer,
+  type,
 }: Account) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
-    data: { address, network, networkId, signer },
+    data: { address, network, networkId, signer, type },
   })
 }
 
@@ -56,8 +61,14 @@ export const deleteAccount = async (address: string, networkId: string) => {
   }
 }
 
-export const upgradeAccount = async (data: BaseWalletAccount) => {
-  sendMessage({ type: "UPGRADE_ACCOUNT", data })
+export const upgradeAccount = async (
+  wallet: BaseWalletAccount,
+  targetImplementationType?: ArgentAccountType,
+) => {
+  sendMessage({
+    type: "UPGRADE_ACCOUNT",
+    data: { wallet, targetImplementationType },
+  })
   try {
     await Promise.race([
       waitForMessage("UPGRADE_ACCOUNT_RES"),

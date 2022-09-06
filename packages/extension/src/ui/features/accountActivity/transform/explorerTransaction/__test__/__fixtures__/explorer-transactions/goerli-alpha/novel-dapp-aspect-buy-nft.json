@@ -1,0 +1,138 @@
+{
+  "id": "0x4fec860cee16dc2ec562be33e56b593a3c6bfc4410b302889e9fdd1e4991a75",
+  "blockNumber": 299553,
+  "timestamp": 1660823428,
+  "transactionHash": "0x4fec860cee16dc2ec562be33e56b593a3c6bfc4410b302889e9fdd1e4991a75",
+  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "entryPoint": "__execute__",
+  "maxFee": "0x18ece5fe5980",
+  "actualFee": "0x109deea99100",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Approval",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "owner",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "spender",
+          "value": "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890"
+        },
+        {
+          "name": "value",
+          "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+        }
+      ]
+    },
+    {
+      "name": "Approval",
+      "address": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+      "parameters": [
+        {
+          "name": "owner",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "spender",
+          "value": "0x0"
+        },
+        {
+          "name": "value",
+          "value": "3462"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "value",
+          "value": "3462"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "to",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "value",
+          "value": "97000000000"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "to",
+          "value": "0x4c83d3fa770187d7b0a23b3aa7132c7c8273fb4ec3db416f86e4a385596769a"
+        },
+        {
+          "name": "value",
+          "value": "3000000000"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x4fec860cee16dc2ec562be33e56b593a3c6bfc4410b302889e9fdd1e4991a75"
+        },
+        {
+          "name": "response_len",
+          "value": "0x1"
+        },
+        {
+          "name": "response",
+          "value": ["0x1"]
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "approve",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "spender",
+          "value": "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890"
+        },
+        {
+          "name": "amount",
+          "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+        }
+      ]
+    }
+  ]
+}

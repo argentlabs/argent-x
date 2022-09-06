@@ -124,7 +124,7 @@ export const useTokenUnitAmountToCurrencyValue = (
  */
 
 export const useTokenAmountToCurrencyValue = (
-  token?: Token | TokenDetailsWithBalance,
+  token?: Token | TokenDetailsWithBalance | undefined,
   amount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {

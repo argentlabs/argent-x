@@ -4,8 +4,10 @@ import styled from "styled-components"
 
 import { useAppState } from "./app.state"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
+import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
+import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
@@ -43,6 +45,7 @@ import { SendScreen } from "./features/send/SendScreen"
 import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
 import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
+import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
@@ -116,13 +119,14 @@ const walletRoutes = (
       element={<AccountScreen tab="tokens" />}
     />
     <Route
-      path={routes.accountNfts.path}
-      element={<AccountScreen tab="nfts" />}
+      path={routes.accountCollections.path}
+      element={<AccountScreen tab="collections" />}
     />
     <Route
       path={routes.accountActivity.path}
       element={<AccountScreen tab="activity" />}
     />
+    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
@@ -135,7 +139,6 @@ const walletRoutes = (
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
     />
-
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
@@ -164,6 +167,7 @@ const walletRoutes = (
     <Route path={routes.newToken.path} element={<AddTokenScreen />} />
     <Route path={routes.token.path} element={<TokenScreen />} />
     <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
+    <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
     <Route path={routes.settings.path} element={<SettingsScreen />} />
     <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
     <Route
@@ -205,6 +209,10 @@ const walletRoutes = (
     <Route
       path={routes.settingsPrivacy.path}
       element={<PrivacySettingsScreen />}
+    />
+    <Route
+      path={routes.settingsExperimental.path}
+      element={<PrivacyExperimentalSettings />}
     />
     <Route
       path={routes.privacyStatement.path}
