@@ -20,7 +20,7 @@ jobs:
       NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       FILENAME: argent-extension-${{ github.ref_name }}
       SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
-      # SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
       UPLOAD_SENTRY_SOURCEMAPS: true
