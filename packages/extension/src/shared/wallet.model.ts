@@ -1,6 +1,6 @@
 import { Network } from "./network"
 
-export type ArgentAccountType = "argent" | "argent-plugin"
+export type ArgentAccountType = "argent" | "argent-plugin" | "argent-ledger"
 export interface WalletAccountSigner {
   type: "local_secret"
   derivationPath: string

@@ -128,4 +128,6 @@ export const routes = {
   privacyStatement: route("/privacy-statement"),
   error: route("/error"),
   ledgerEntry: route("/ledger/start"),
+  ledgerSelect: route("/ledger/select"),
+  ledgerDone: route("/ledger/done"),
 }

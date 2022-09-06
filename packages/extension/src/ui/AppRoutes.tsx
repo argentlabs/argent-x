@@ -27,6 +27,8 @@ import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
+import { LedgerDoneScreen } from "./features/ledger/done"
+import { LedgerSelectScreen } from "./features/ledger/select"
 import { LedgerStartScreen } from "./features/ledger/start"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
@@ -222,6 +224,8 @@ const walletRoutes = (
     />
     <Route path={routes.addAccount.path} element={<AddAccount />} />
     <Route path={routes.ledgerEntry.path} element={<LedgerStartScreen />} />
+    <Route path={routes.ledgerSelect.path} element={<LedgerSelectScreen />} />
+    <Route path={routes.ledgerDone.path} element={<LedgerDoneScreen />} />
   </>
 )
 

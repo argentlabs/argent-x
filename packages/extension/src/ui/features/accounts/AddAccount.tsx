@@ -50,7 +50,7 @@ export const AddAccount: FC = () => {
             }}
           >
             <Option
-              title="From another StarkNet account"
+              title="Connect Ledger"
               description="Use a Ledger hardware wallet"
               icon={<LedgerIcon />}
               hideArrow

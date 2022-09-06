@@ -208,6 +208,9 @@ export const AccountListItem: FC<IAccountListItem> = ({
           {accountType === "argent-plugin" && (
             <PluginTextContainer>Plugin</PluginTextContainer>
           )}
+          {accountType === "argent-ledger" && (
+            <PluginTextContainer>Ledger</PluginTextContainer>
+          )}
           {deploying ? (
             <NetworkStatusWrapper>
               <TransactionStatusIndicator color="orange" />
