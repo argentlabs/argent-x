@@ -9,6 +9,7 @@ import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { NftItem } from "./AccountCollections"
 import { getNftPicture } from "./aspect.service"
+import { NftThumbnailImage } from "./NftThumbnailImage"
 import { useCollection } from "./useCollections"
 
 const TitleContainer = styled.div`
@@ -70,7 +71,7 @@ export const CollectionNfts: FC = () => {
                 )
               }
             >
-              <img src={getNftPicture(nft)} />
+              <NftThumbnailImage src={getNftPicture(nft)} />
               <figcaption>
                 {nft.name ||
                   nft.contract.name_custom ||

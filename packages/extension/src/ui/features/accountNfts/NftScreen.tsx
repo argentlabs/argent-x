@@ -10,12 +10,13 @@ import { AspectLogo } from "../../components/Icons/AspectLogo"
 import { MintSquareLogo } from "../../components/Icons/MintSquareLogo"
 import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
-import { addressSchema } from "../../services/addresses"
+import { addressSchema, isEqualAddress } from "../../services/addresses"
 import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { openAspectNft } from "./aspect.service"
 import { openMintSquareNft } from "./mint-square.service"
+import { NftThumbnailImage } from "./NftThumbnailImage"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
@@ -82,40 +83,55 @@ export const NftScreen: FC = () => {
   const account = useSelectedAccount()
 
   const { nfts = [] } = useNfts(account)
-  const nft = nfts.find(
-    ({ contract_address, token_id }) =>
-      contract_address === contractAddress && token_id === tokenId,
-  )
+  const nft = nfts
+    .filter(Boolean)
+    .find(
+      ({ contract_address, token_id }) =>
+        contractAddress &&
+        isEqualAddress(contract_address, contractAddress) &&
+        token_id === tokenId,
+    )
 
-  if (!account || !nft || !contractAddress || !tokenId) {
+  if (!account || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />
   }
 
   return (
     <>
-      <IconBar
-        back
-        childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
-      >
-        <H3>{nft.name}</H3>
-      </IconBar>
+      {nft ? (
+        <IconBar
+          back
+          childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
+        >
+          <H3>
+            {nft.name ||
+              nft.contract.name_custom ||
+              nft.contract.name ||
+              "Untitled"}
+          </H3>
+        </IconBar>
+      ) : (
+        <IconBar back>
+          <H3>Not found</H3>
+        </IconBar>
+      )}
       <Container>
-        {nft.animation_uri ? (
-          <LazyNftModelViewer nft={nft} />
-        ) : (
-          <img src={nft.image_url_copy} alt={nft.name} />
-        )}
-        <NftDescription>{nft.description}</NftDescription>
+        {nft ? (
+          <>
+            {nft.animation_uri ? (
+              <LazyNftModelViewer nft={nft} />
+            ) : (
+              <NftThumbnailImage src={nft.image_url_copy} alt={nft.name} />
+            )}
+            <NftDescription>{nft.description}</NftDescription>
+          </>
+        ) : null}
 
         <ColumnCenter gap="20px" style={{ marginBottom: "32px" }}>
           <RowCentered gap="8px">
             <ViewOnButton
               onClick={() =>
-                openAspectNft(
-                  nft.contract_address,
-                  nft.token_id,
-                  account.networkId,
-                )
+                openAspectNft(contractAddress, tokenId, account.networkId)
               }
             >
               <RowCentered gap="5px">
@@ -126,11 +142,7 @@ export const NftScreen: FC = () => {
 
             <ViewOnButton
               onClick={() =>
-                openMintSquareNft(
-                  nft.contract_address,
-                  nft.token_id,
-                  account.networkId,
-                )
+                openMintSquareNft(contractAddress, tokenId, account.networkId)
               }
             >
               <RowCentered gap="5px">

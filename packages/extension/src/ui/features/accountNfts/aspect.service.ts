@@ -46,20 +46,32 @@ export const fetchAspectNftsByUrl = async (
   url: string,
   address: string,
 ): Promise<AspectNft[]> => {
-  try {
-    const params = new URLSearchParams({ owner_address: address })
-    const response = await fetch(join(url, `?${params}`, "&limit=50"))
-    const data = await response.json()
+  const params = new URLSearchParams({ owner_address: address })
+  const assets = await fetchNextAspectNftsByUrl(
+    join(url, `?${params}`, "&limit=50"),
+    address,
+  )
+  return assets
+}
 
-    if (data.next_url) {
-      return data.assets.concat(
-        await fetchAspectNftsByUrl(data.next_url, address),
-      )
-    }
-    return data.assets
-  } catch {
+export const fetchNextAspectNftsByUrl = async (
+  url: string,
+  address: string,
+): Promise<any> => {
+  const response = await fetch(url)
+  if (!response.ok) {
     return []
   }
+
+  const data = await response.json()
+
+  if (isString(data.next_url)) {
+    return data.assets.concat(
+      await fetchNextAspectNftsByUrl(data.next_url, address),
+    )
+  }
+
+  return data.assets
 }
 
 export const fetchAspectCollection = async (
