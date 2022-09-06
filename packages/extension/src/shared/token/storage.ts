@@ -35,6 +35,12 @@ export async function addToken(token: Token) {
   return tokenStore.push(newToken)
 }
 
+export async function hasToken(token: BaseToken) {
+  await assertSchema(baseTokenSchema, token)
+  const [hit] = await tokenStore.get((t) => equalToken(t, token))
+  return Boolean(hit)
+}
+
 export async function removeToken(token: BaseToken) {
   await assertSchema(baseTokenSchema, token)
   return tokenStore.remove((t) => equalToken(t, token))
