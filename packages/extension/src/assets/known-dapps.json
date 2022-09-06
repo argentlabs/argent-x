@@ -1,7 +1,7 @@
 [
   {
     "id": "briq-construction",
-    "host": "briq.construction",
+    "hosts": ["briq.construction"],
     "title": "briq",
     "contracts": {
       "mainnet-alpha": [],
@@ -13,7 +13,7 @@
   },
   {
     "id": "jediswap-xyz",
-    "host": "app.testnet.jediswap.xyz",
+    "hosts": ["app.testnet.jediswap.xyz"],
     "title": "Jediswap",
     "contracts": {
       "mainnet-alpha": [],
@@ -28,7 +28,7 @@
   },
   {
     "id": "myswap-xyz",
-    "host": "www.myswap.xyz",
+    "hosts": ["www.myswap.xyz"],
     "title": "mySwap",
     "contracts": {
       "mainnet-alpha": [],
@@ -40,7 +40,7 @@
   },
   {
     "id": "alpharoad-fi",
-    "host": "testnet.app.alpharoad.fi",
+    "hosts": ["testnet.app.alpharoad.fi"],
     "title": "Alpha Road",
     "contracts": {
       "mainnet-alpha": [],
@@ -50,8 +50,8 @@
     }
   },
   {
-    "id": "aspect-io",
-    "host": "aspect.io",
+    "id": "aspect-co",
+    "hosts": ["aspect.co", "testnet.aspect.co"],
     "title": "Aspect",
     "contracts": {
       "mainnet-alpha": [],
@@ -62,7 +62,7 @@
   },
   {
     "id": "mintsquare-io",
-    "host": "mintsquare.io",
+    "hosts": ["mintsquare.io"],
     "title": "Mint Square",
     "contracts": {
       "mainnet-alpha": [],
@@ -74,7 +74,7 @@
   },
   {
     "id": "nogame-app",
-    "host": "nogamev0-1.netlify.app",
+    "hosts": ["nogamev0-1.netlify.app"],
     "title": "NoGame",
     "contracts": {
       "mainnet-alpha": [],
@@ -85,7 +85,7 @@
   },
   {
     "id": "influenceth-io",
-    "host": "game-goerli.influenceth.io",
+    "hosts": ["game-goerli.influenceth.io"],
     "title": "Influence",
     "contracts": {
       "mainnet-alpha": [],

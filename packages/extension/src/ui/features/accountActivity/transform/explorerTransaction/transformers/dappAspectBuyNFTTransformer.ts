@@ -11,7 +11,7 @@ export default function ({
   fingerprint,
 }: IExplorerTransactionTransformer) {
   if (
-    result.dapp?.id === "aspect-io" &&
+    result.dapp?.id === "aspect-co" &&
     fingerprint ===
       "events[Approval,Approval,Transfer,Transfer,Transfer] calls[approve]"
   ) {

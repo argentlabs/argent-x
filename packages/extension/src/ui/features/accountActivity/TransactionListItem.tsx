@@ -1,7 +1,6 @@
 import { FC, ReactNode, useMemo } from "react"
 import styled, { css } from "styled-components"
 
-import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { Network } from "../../../shared/network"
 import { makeClickable } from "../../services/a11y"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"

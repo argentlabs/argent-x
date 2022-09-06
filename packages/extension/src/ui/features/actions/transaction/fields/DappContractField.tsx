@@ -32,16 +32,17 @@ export const MaybeDappContractField: FC<{ contractAddress: string }> = ({
 export const DappContractField: FC<{
   knownContract: Omit<KnownDapp, "contracts">
 }> = ({ knownContract }) => {
-  const dappDisplayAttributes = useDappDisplayAttributes(knownContract.host)
+  const host = knownContract.hosts[0]
+  const dappDisplayAttributes = useDappDisplayAttributes(host)
   return (
     <Field>
       <FieldKey>Dapp</FieldKey>
       <FieldValue>
         <DappIconContainer>
-          <DappIcon host={knownContract.host} />
+          <DappIcon host={host} />
         </DappIconContainer>
         <LeftPaddedField>
-          {dappDisplayAttributes?.title || knownContract.host}
+          {dappDisplayAttributes?.title || host}
         </LeftPaddedField>
       </FieldValue>
     </Field>

@@ -142,7 +142,9 @@ describe("transformTransaction", () => {
         {
           "action": "UNKNOWN",
           "dapp": {
-            "host": "testnet.app.alpharoad.fi",
+            "hosts": [
+              "testnet.app.alpharoad.fi",
+            ],
             "id": "alpharoad-fi",
             "title": "Alpha Road",
           },
@@ -162,7 +164,9 @@ describe("transformTransaction", () => {
         {
           "action": "UNKNOWN",
           "dapp": {
-            "host": "app.testnet.jediswap.xyz",
+            "hosts": [
+              "app.testnet.jediswap.xyz",
+            ],
             "id": "jediswap-xyz",
             "title": "Jediswap",
           },
@@ -182,7 +186,9 @@ describe("transformTransaction", () => {
         {
           "action": "UNKNOWN",
           "dapp": {
-            "host": "www.myswap.xyz",
+            "hosts": [
+              "www.myswap.xyz",
+            ],
             "id": "myswap-xyz",
             "title": "mySwap",
           },

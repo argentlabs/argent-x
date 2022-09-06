@@ -168,7 +168,9 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "12404500000000",
           "contractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
           "dapp": {
-            "host": "mintsquare.io",
+            "hosts": [
+              "mintsquare.io",
+            ],
             "id": "mintsquare-io",
             "title": "Mint Square",
           },
@@ -292,7 +294,9 @@ describe("transformExplorerTransaction", () => {
           "action": "SWAP",
           "actualFee": "49915215635677",
           "dapp": {
-            "host": "testnet.app.alpharoad.fi",
+            "hosts": [
+              "testnet.app.alpharoad.fi",
+            ],
             "id": "alpharoad-fi",
             "title": "Alpha Road",
           },
@@ -326,7 +330,9 @@ describe("transformExplorerTransaction", () => {
           "action": "SWAP",
           "actualFee": "36750992760053",
           "dapp": {
-            "host": "app.testnet.jediswap.xyz",
+            "hosts": [
+              "app.testnet.jediswap.xyz",
+            ],
             "id": "jediswap-xyz",
             "title": "Jediswap",
           },
@@ -369,7 +375,9 @@ describe("transformExplorerTransaction", () => {
           "action": "SWAP",
           "actualFee": "35172000035172",
           "dapp": {
-            "host": "www.myswap.xyz",
+            "hosts": [
+              "www.myswap.xyz",
+            ],
             "id": "myswap-xyz",
             "title": "mySwap",
           },
@@ -415,8 +423,11 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "18270500000000",
           "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
           "dapp": {
-            "host": "aspect.io",
-            "id": "aspect-io",
+            "hosts": [
+              "aspect.co",
+              "testnet.aspect.co",
+            ],
+            "id": "aspect-co",
             "title": "Aspect",
           },
           "dappContractAddress": "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890",
@@ -437,7 +448,9 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "17222000000000",
           "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
           "dapp": {
-            "host": "mintsquare.io",
+            "hosts": [
+              "mintsquare.io",
+            ],
             "id": "mintsquare-io",
             "title": "Mint Square",
           },
@@ -460,7 +473,9 @@ describe("transformExplorerTransaction", () => {
           "actualFee": "4557033777702",
           "contractAddress": "0x41c4e86a03480313547a04e13fc4d43d7fb7bcb5244fd0cb93f793f304f6124",
           "dapp": {
-            "host": "game-goerli.influenceth.io",
+            "hosts": [
+              "game-goerli.influenceth.io",
+            ],
             "id": "influenceth-io",
             "title": "Influence",
           },
@@ -483,7 +498,9 @@ describe("transformExplorerTransaction", () => {
           "action": "UNKNOWN",
           "actualFee": "13666550163999",
           "dapp": {
-            "host": "nogamev0-1.netlify.app",
+            "hosts": [
+              "nogamev0-1.netlify.app",
+            ],
             "id": "nogame-app",
             "title": "NoGame",
           },
@@ -503,7 +520,9 @@ describe("transformExplorerTransaction", () => {
           "action": "UNKNOWN",
           "actualFee": "17607000123249",
           "dapp": {
-            "host": "briq.construction",
+            "hosts": [
+              "briq.construction",
+            ],
             "id": "briq-construction",
             "title": "briq",
           },

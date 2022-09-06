@@ -111,7 +111,7 @@ export const TransactionIcon: FC<ITransactionIcon> = ({
     }
   }
   if (dapp && !badgeComponent) {
-    badgeComponent = <DappIcon host={dapp.host} />
+    badgeComponent = <DappIcon host={dapp.hosts[0]} />
   }
   return (
     <Container size={size} outline={outline}>

@@ -3,10 +3,10 @@ import { isEqualAddress } from "../ui/services/addresses"
 import { PublicNetworkIds } from "./network/public"
 
 export interface KnownDapp {
-  /** a unique internal id for this dapp e.g. my-dapp-xyz */
+  /** a unique internal id for this dapp e.g. mydapp-example-xyz */
   id: string
-  /** the dapp hostname e.g. mydapp.example.xyz */
-  host: string
+  /** the dapp hostnames e.g. mydapp.example.xyz */
+  hosts: string[]
   /** the display title */
   title: string
   /** known contract addresses per network */
@@ -53,7 +53,7 @@ export const getKnownDappForContractAddress = (
 }
 
 export const getKnownDappForHost = (host: string) => {
-  return knownDapps.find((knownDapp) => host === knownDapp.host)
+  return knownDapps.find((knownDapp) => knownDapp.hosts.includes(host))
 }
 
 export const getKnownDappForId = (id: string) => {
