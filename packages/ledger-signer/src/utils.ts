@@ -17,7 +17,6 @@ export async function getPublicKeys(
 ) {
   const ledger = getLedger(transportOrLedger)
   const pks = await Promise.all(derivationPaths.map((p) => ledger.getPubKey(p)))
-  console.log(pks)
   if (pks.some((pk) => pk.errorMessage)) {
     throw new Error(
       pks

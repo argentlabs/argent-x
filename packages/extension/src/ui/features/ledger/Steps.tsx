@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, HTMLProps } from "react"
 import styled from "styled-components"
 
 export const StepGroup = styled.div`
@@ -78,9 +78,15 @@ export const Step: FC<StepProps> = ({ number, title, description }) => {
   )
 }
 
-export const Steps: FC<{ steps: Step[] }> = ({ steps }) => {
+interface StepsProps {
+  steps: Step[]
+  className?: string
+  style?: HTMLProps<HTMLDivElement>["style"]
+}
+
+export const Steps: FC<StepsProps> = ({ steps, ...divProps }) => {
   return (
-    <StepGroup>
+    <StepGroup {...divProps}>
       {steps.map((step, index) => (
         <Step key={index} number={index + 1} {...step} />
       ))}

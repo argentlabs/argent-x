@@ -46,10 +46,6 @@ export function getButtonColor(
   return ({ theme, variant = "default" }) => {
     const v = theme.button[variant] ?? theme.button.default
     const l = (v as any)[layer] ?? theme.button.default[layer]
-    console.log(
-      (l as any)[state] ?? l.base,
-      `theme.button.${variant}.${layer}.${state}`,
-    )
     return (l as any)[state] ?? l.base
   }
 }
