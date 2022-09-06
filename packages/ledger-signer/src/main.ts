@@ -12,6 +12,8 @@ import {
   typedData,
 } from "starknet"
 
+import { getPublicKeys } from "./utils"
+
 class LedgerSigner implements SignerInterface {
   public derivationPath: string
 
@@ -23,8 +25,8 @@ class LedgerSigner implements SignerInterface {
   }
 
   async getPubKey(): Promise<string> {
-    const { publicKey } = await this.ledger.getPubKey(this.derivationPath)
-    return encode.addHexPrefix(encode.buf2hex(publicKey))
+    const [response] = await getPublicKeys(this.ledger, [this.derivationPath])
+    return response
   }
   /**
    * Sign a Starknet transaction
@@ -85,6 +87,9 @@ class LedgerSigner implements SignerInterface {
 
   private async sign(msg: string): Promise<Signature> {
     const response = await this.ledger.signFelt(this.derivationPath, msg, true)
+    if (response.errorMessage) {
+      throw new Error(response.errorMessage)
+    }
     return [
       encode.addHexPrefix(encode.buf2hex(response.r)),
       encode.addHexPrefix(encode.buf2hex(response.s)),

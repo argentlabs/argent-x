@@ -15,9 +15,9 @@ export default defineConfig({
     emptyOutDir: false,
     lib: {
       entry: resolvePath(__dirname, "src/main.ts"),
-      name: "ledger-signer",
+      name: "ledgerSigner",
       // the proper extensions will be added
-      fileName: "ledger-signer",
+      fileName: "ledgerSigner",
     },
   },
   optimizeDeps: {

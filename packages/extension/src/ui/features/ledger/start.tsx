@@ -1,6 +1,10 @@
+import LedgerSigner from "@argent/ledger-signer"
+import LedgerUsbTransport from "@ledgerhq/hw-transport-webusb"
 import { FC } from "react"
+import { StarknetChainId } from "starknet/dist/constants"
 import styled from "styled-components"
 
+import { baseDerivationPath } from "../../../shared/wallet.service"
 import { Button } from "../../components/Button"
 import { ArgentXBanner } from "../../components/Icons/ArgentXBanner"
 import { Title } from "../../components/Page"
@@ -57,7 +61,39 @@ export const LedgerStartScreen: FC = () => {
             },
           ]}
         />
-        <StyledButton variant="inverted">Continue</StyledButton>
+        <StyledButton
+          onClick={async () => {
+            const tp = await LedgerUsbTransport.create()
+            const signer = new LedgerSigner(
+              "m/2645'/1195502025'/1148870696'/0'/0'/0",
+              tp,
+            )
+            console.log(signer)
+            console.log(await signer.getPubKey())
+            const tx = await signer.signTransaction(
+              [
+                {
+                  contractAddress:
+                    "0x04483e2798fb2763773775d9b055a87deca913806b9e41c18ffa67bd6d826641",
+                  entrypoint: "__execute__",
+                  calldata: ["0x0", "0x1", "0x2", "0x3"],
+                },
+              ],
+              {
+                chainId: StarknetChainId.TESTNET,
+                maxFee: "0x10000",
+                nonce: "0x0",
+                version: "0x0",
+                walletAddress:
+                  "0x04483e2798fb2763773775d9b055a87deca913806b9e41c18ffa67bd6d826641",
+              },
+            )
+            console.log(tx)
+          }}
+          variant="inverted"
+        >
+          Continue
+        </StyledButton>
       </Content>
     </PageWrapper>
   )

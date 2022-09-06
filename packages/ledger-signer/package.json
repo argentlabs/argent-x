@@ -17,13 +17,13 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/ledger-signer.js",
-      "require": "./dist/ledger-signer.umd.cjs"
+      "import": "./dist/ledgerSigner.js",
+      "require": "./dist/ledgerSigner.umd.cjs"
     }
   },
-  "main": "./dist/ledger-signer.umd.cjs",
-  "module": "./dist/ledger-signer.js",
-  "types": "./dist/ledger-signer.d.ts",
+  "main": "./dist/ledgerSigner.umd.cjs",
+  "module": "./dist/ledgerSigner.js",
+  "types": "./dist/ledgerSigner.d.ts",
   "files": [
     "dist"
   ],
