@@ -30,6 +30,7 @@
     "id": "myswap-xyz",
     "hosts": ["www.myswap.xyz"],
     "title": "mySwap",
+    "icon": "https://www.myswap.xyz/favicon.ico",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [
@@ -53,6 +54,7 @@
     "id": "aspect-co",
     "hosts": ["aspect.co", "testnet.aspect.co"],
     "title": "Aspect",
+    "icon": "https://aspect.co/img/company/logo512.png",
     "contracts": {
       "mainnet-alpha": [
         "0x03090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c"
@@ -90,6 +92,7 @@
     "id": "influenceth-io",
     "hosts": ["game-goerli.influenceth.io"],
     "title": "Influence",
+    "icon": "https://uploads-ssl.webflow.com/60c209ffee9cc9e89d505549/60c8fea5c9d9a170d2f9b5e0_logo-256.png",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [
@@ -112,6 +115,7 @@
     "id": "starknet-id",
     "hosts": ["goerli.app.starknet.id"],
     "title": "Starknet.id",
+    "icon": "https://www.starknet.id/visuals/StarknetIdLogo.png",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [
@@ -123,6 +127,7 @@
     "id": "serity-finance",
     "hosts": ["alpha.serity.finance"],
     "title": "Serity",
+    "icon": "https://alpha.serity.finance/favicon.png",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [

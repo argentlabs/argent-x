@@ -18,7 +18,9 @@ export const getDappDisplayAttributes = async (
   const title = knownDapp?.title || host
   const result: IDappDisplayAttributes = {
     title,
-    iconUrl: `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
+    iconUrl:
+      knownDapp?.icon ||
+      `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
   }
 
   try {
