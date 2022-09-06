@@ -1,3 +1,12 @@
+import {
+  ButtonHTMLAttributes,
+  FC,
+  MouseEvent,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react"
 import styled, { css } from "styled-components"
 import { DefaultTheme } from "styled-components"
 
@@ -8,11 +17,11 @@ export type ButtonVariant =
   | "warn-high"
   | "danger"
   | "info"
+  | "transparent"
 
 export type ButtonSize = "default" | "xs" | "s" | "m" | "l" | "xl"
 
-interface IButton {
-  theme: DefaultTheme
+interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   size?: ButtonSize
 }
@@ -29,7 +38,7 @@ export const getVariantColor =
     hover?: boolean
     disabled?: boolean
   }) =>
-  ({ variant }: IButton) => {
+  ({ variant }: { variant?: ButtonVariant }) => {
     switch (variant) {
       case "danger":
         return hover
@@ -55,6 +64,12 @@ export const getVariantColor =
           : disabled
           ? theme.button.info.bg.disabled
           : theme.button.info.bg.base
+      case "transparent":
+        return hover
+          ? theme.button.transparent.bg.hover
+          : disabled
+          ? theme.button.transparent.bg.disabled
+          : theme.button.transparent.bg.base
     }
     return hover
       ? theme.button.default.bg.hover
@@ -104,7 +119,9 @@ const BaseButton = styled.button`
   width: 100%;
   outline: none;
   border: none;
-  transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out,
+    transform 100ms ease-in-out;
+
   cursor: pointer;
 `
 
@@ -119,10 +136,13 @@ export const Button = styled(BaseButton)<IButton>`
   color: ${({ theme, variant }) =>
     variant === "warn" ? theme.bg1 : theme.text1};
 
+  &:hover {
+    background-color: ${({ theme }) => getVariantColor({ theme, hover: true })};
+  }
+
   &:hover,
   &:focus {
     outline: 0;
-    background-color: ${({ theme }) => getVariantColor({ theme, hover: true })};
   }
 
   &:disabled {
@@ -179,3 +199,90 @@ export const ButtonOutline = styled(BaseButton)`
     outline: 0;
   }
 `
+
+/** TODO: rationalise variants */
+
+export interface IIconButton extends IButton {
+  icon: ReactNode
+  clickedIcon: ReactNode
+  clickedTimeout?: number
+}
+
+export const PressableButton = styled(Button)`
+  &:active {
+    transform: scale(
+      ${({ size }) => (size === "s" || size === "xs" ? 0.95 : 0.975)}
+    );
+  }
+`
+
+const IconButtonContent = styled.div`
+  flex-direction: row;
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+interface IClicked {
+  clicked: boolean
+}
+
+const IconWrapper = styled.div`
+  position: relative;
+`
+
+const IconContainer = styled.div<IClicked>`
+  opacity: ${({ clicked }) => (clicked ? 0 : 1)};
+  transition: opacity 0.15s ease-in-out;
+`
+
+const ClickedIconContainer = styled.div<IClicked>`
+  opacity: ${({ clicked }) => (clicked ? 1 : 0)};
+  transition: opacity 0.15s ease-in-out;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+export const IconButton: FC<IIconButton> = ({
+  icon,
+  clickedIcon,
+  clickedTimeout = 1000,
+  onClick: onClickProp,
+  children,
+  ...rest
+}) => {
+  const timeoutId = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [clicked, setClicked] = useState(false)
+  const clearClicked = useCallback(() => {
+    setClicked(false)
+  }, [])
+  const onClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      timeoutId.current && clearTimeout(timeoutId.current)
+      timeoutId.current = setTimeout(clearClicked, clickedTimeout)
+      setClicked(true)
+      onClickProp && onClickProp(e)
+    },
+    [clearClicked, clickedTimeout, onClickProp],
+  )
+  return (
+    <PressableButton {...rest} onClick={onClick}>
+      <IconButtonContent>
+        <IconWrapper>
+          <IconContainer clicked={clicked}>{icon}</IconContainer>
+          <ClickedIconContainer clicked={clicked}>
+            {clickedIcon}
+          </ClickedIconContainer>
+        </IconWrapper>
+        {children}
+      </IconButtonContent>
+    </PressableButton>
+  )
+}

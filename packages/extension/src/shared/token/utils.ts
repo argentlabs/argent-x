@@ -1,10 +1,9 @@
 import defaultTokens from "../../assets/default-tokens.json"
 import { isEqualAddress } from "../../ui/services/addresses"
-import { PublicNetworkIds } from "../network/public"
 import { BaseToken, Token } from "./type"
 
 export const equalToken = (a: BaseToken, b: BaseToken) =>
-  a.address === b.address && a.networkId === b.networkId
+  a.networkId === b.networkId && isEqualAddress(a.address, b.address)
 
 export const parsedDefaultTokens: Token[] = defaultTokens.map((token) => ({
   ...token,
@@ -22,19 +21,3 @@ export const getFeeToken = (networkId: string) =>
     ({ symbol, networkId: network }) =>
       symbol === "ETH" && network === networkId,
   )
-
-export const getTokenForContractAddress = (
-  contractAddress: string,
-  networkId?: PublicNetworkIds,
-) => {
-  if (networkId) {
-    return parsedDefaultTokens.find(
-      ({ networkId: network, address }) =>
-        network === networkId && isEqualAddress(address, contractAddress),
-    )
-  } else {
-    return parsedDefaultTokens.find(({ address }) =>
-      isEqualAddress(address, contractAddress),
-    )
-  }
-}

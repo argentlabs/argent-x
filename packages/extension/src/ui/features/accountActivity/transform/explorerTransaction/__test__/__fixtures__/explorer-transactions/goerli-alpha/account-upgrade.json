@@ -1,0 +1,36 @@
+{
+  "id": "0x72fd5a4cf9e4d18de4716e3f68803da0dbb60ea8ec5e0a226deef1c1901c293",
+  "blockNumber": 266825,
+  "timestamp": 1660823428,
+  "transactionHash": "0x72fd5a4cf9e4d18de4716e3f68803da0dbb60ea8ec5e0a226deef1c1901c293",
+  "contractAddress": "0x5da8675178256fb969b69c7abb7107184c192a889879b54a1e712e63153df54",
+  "entryPoint": "__execute__",
+  "maxFee": "0x574fbde6000",
+  "actualFee": "0x37c113ce1bc",
+  "status": "ACCEPTED_ON_L1",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Upgraded",
+      "address": "0x5da8675178256fb969b69c7abb7107184c192a889879b54a1e712e63153df54",
+      "parameters": [
+        {
+          "name": "implementation",
+          "value": "0x69577e6756a99b584b5d1ce8e60650ae33b6e2b13541783458268f07da6b38a"
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "upgrade",
+      "address": "0x5da8675178256fb969b69c7abb7107184c192a889879b54a1e712e63153df54",
+      "parameters": [
+        {
+          "name": "implementation",
+          "value": "0x69577e6756a99b584b5d1ce8e60650ae33b6e2b13541783458268f07da6b38a"
+        }
+      ]
+    }
+  ]
+}

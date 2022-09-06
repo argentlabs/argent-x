@@ -1,6 +1,7 @@
 import useSWRImmutable from "swr/immutable"
 import urlJoin from "url-join"
 
+import { getKnownDappForHost } from "../../../../shared/knownDapps"
 import { getBaseUrlForHost } from "../../../../shared/utils/url"
 import { getColor } from "../../accounts/accounts.service"
 
@@ -13,9 +14,11 @@ export const getDappDisplayAttributes = async (
   host: string,
 ): Promise<IDappDisplayAttributes> => {
   const color = getColor(host)
+  const knownDapp = getKnownDappForHost(host)
+  const title = knownDapp?.title || host
   const result: IDappDisplayAttributes = {
-    title: host,
-    iconUrl: `https://eu.ui-avatars.com/api?name=${host}&background=${color}&color=fff`,
+    title,
+    iconUrl: `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
   }
 
   try {
@@ -26,9 +29,11 @@ export const getDappDisplayAttributes = async (
     const parser = new DOMParser()
     const doc = parser.parseFromString(source, "text/html")
 
-    const titleTag = doc.querySelector("title")
-    if (titleTag) {
-      result.title = titleTag.innerText
+    if (!knownDapp?.title) {
+      const titleTag = doc.querySelector("title")
+      if (titleTag) {
+        result.title = titleTag.innerText
+      }
     }
 
     const favIcon = doc.querySelector('link[rel="shortcut icon"]')

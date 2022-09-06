@@ -5,7 +5,7 @@ import {
   Erc20TransferCall,
   isErc20TransferCall,
   parseErc20TransferCall,
-} from "../src/shared/call"
+} from "../erc20TransferCall"
 
 /** Typical transfer call - no secrets */
 
@@ -82,7 +82,7 @@ const Erc20TransferCallInvalidEntrypoint: Call = {
   ],
 }
 
-describe("call", () => {
+describe("erc20transferCall", () => {
   describe("isErc20TransferCall()", () => {
     describe("when valid", () => {
       test("returns true when Call is ERC20 transfer", () => {
