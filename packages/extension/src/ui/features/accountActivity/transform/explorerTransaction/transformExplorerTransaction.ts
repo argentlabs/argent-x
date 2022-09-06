@@ -48,18 +48,18 @@ const mainTransformers = [
 /** all are executed */
 const postTransformers = [postTransferTransformer, postSwapTransformer]
 
-/** describes the sequence and which are exclusive */
-const transformerDefinitions = [
+/** describes the sequence and which are 'one of' */
+const transformerSequence = [
   {
-    exclusive: false,
+    oneOf: false,
     transformers: preTransformers,
   },
   {
-    exclusive: true,
+    oneOf: true,
     transformers: mainTransformers,
   },
   {
-    exclusive: false,
+    oneOf: false,
     transformers: postTransformers,
   },
 ]
@@ -97,7 +97,7 @@ export const transformExplorerTransaction = ({
 
     const fingerprint = fingerprintExplorerTransaction(explorerTransaction)
 
-    for (const { exclusive, transformers } of transformerDefinitions) {
+    for (const { oneOf, transformers } of transformerSequence) {
       for (const transformer of transformers) {
         const transformedResult = transformer({
           explorerTransaction,
@@ -106,7 +106,7 @@ export const transformExplorerTransaction = ({
           result,
           fingerprint,
         })
-        if (transformedResult && exclusive) {
+        if (transformedResult && oneOf) {
           /** only take a single result from this set */
           result = transformedResult
           continue

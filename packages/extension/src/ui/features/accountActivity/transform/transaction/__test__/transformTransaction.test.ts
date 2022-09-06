@@ -98,7 +98,6 @@ describe("transformTransaction", () => {
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
           "entity": "TOKEN",
-          "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
           "toAddress": "0x05F1f0a38429dcaB9FFD8A786c0d827e84C1CBd8f60243E6d25d066A13aF4a25",
           "token": {
             "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",

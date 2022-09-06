@@ -44,6 +44,7 @@ export interface TokenMintTransaction extends BaseTransformedTransaction {
   action: "MINT"
   entity: "TOKEN"
   amount: string
+  toAddress: string
   tokenAddress: string
   token: Token
 }
