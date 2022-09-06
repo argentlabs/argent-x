@@ -54,7 +54,9 @@
     "hosts": ["aspect.co", "testnet.aspect.co"],
     "title": "Aspect",
     "contracts": {
-      "mainnet-alpha": [],
+      "mainnet-alpha": [
+        "0x03090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c"
+      ],
       "goerli-alpha": [
         "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890"
       ]
@@ -65,10 +67,11 @@
     "hosts": ["mintsquare.io"],
     "title": "Mint Square",
     "contracts": {
-      "mainnet-alpha": [],
+      "mainnet-alpha": [
+        "0x7861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488"
+      ],
       "goerli-alpha": [
-        "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786",
-        "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c"
+        "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786"
       ]
     }
   },
@@ -91,6 +94,39 @@
       "mainnet-alpha": [],
       "goerli-alpha": [
         "0x4a472fe795cc40e9dc838fe4f1608cb91bf027854d016675ec81e172a2e3599"
+      ]
+    }
+  },
+  {
+    "id": "astraly-xyz",
+    "hosts": ["testnet.astraly.xyz"],
+    "title": "Astraly",
+    "contracts": {
+      "mainnet-alpha": [],
+      "goerli-alpha": [
+        "0x0552b530aacef8e7338c9a8f0fd4e9ad06100a67befc2f4e9246219a4e41da04"
+      ]
+    }
+  },
+  {
+    "id": "starknet-id",
+    "hosts": ["goerli.app.starknet.id"],
+    "title": "Starknet.id",
+    "contracts": {
+      "mainnet-alpha": [],
+      "goerli-alpha": [
+        "0x0798e884450c19e072d6620fefdbeb7387d0453d3fd51d95f5ace1f17633d88b"
+      ]
+    }
+  },
+  {
+    "id": "serity-finance",
+    "hosts": ["alpha.serity.finance"],
+    "title": "Serity",
+    "contracts": {
+      "mainnet-alpha": [],
+      "goerli-alpha": [
+        "0x010a4c7ffd9de72a6c689de516574205190541f34b5444f25e54c9fe96a2f69d"
       ]
     }
   }
