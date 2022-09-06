@@ -10,6 +10,7 @@ import { routes } from "../../routes"
 import { A, P } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import { Collections } from "./aspect.service"
+import { NftThumbnailImage } from "./NftThumbnailImage"
 import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
@@ -92,7 +93,6 @@ const Collections: FC<AccountCollectionsProps> = ({
 }) => {
   const navigate = useNavigate()
   const collectibles = useCollections(account)
-
   return (
     <div>
       {collectibles.length === 0 && (
@@ -139,7 +139,7 @@ const Collections: FC<AccountCollectionsProps> = ({
             })
           }
         >
-          <img src={collectible.imageUri} />
+          <NftThumbnailImage src={collectible.imageUri} />
           <figcaption>
             {collectible.name}
             <CollectiblesNumber>{collectible.nfts.length}</CollectiblesNumber>
