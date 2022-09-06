@@ -18,9 +18,15 @@ export const getDappDisplayAttributes = async (
   const title = knownDapp?.title || host
   const result: IDappDisplayAttributes = {
     title,
-    iconUrl:
-      knownDapp?.icon ||
-      `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
+    iconUrl: `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
+  }
+
+  /** check if the icon still exists at the url */
+  if (knownDapp?.icon) {
+    const response = await fetch(knownDapp.icon, { method: "HEAD" })
+    if (response.ok) {
+      result.iconUrl = knownDapp.icon
+    }
   }
 
   try {
