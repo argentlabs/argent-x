@@ -44,7 +44,7 @@ Next you need to come up with the permissions you would like for your session. Y
 This example session will allow the dapp to execute an example endpoint on an example contract without asking the user to approve the transaction again. After signing the session the dapp can execute all transactions listed in `policies` whenever it wants and as many times as it wants.
 
 ```typescript
-import { Signer, ec } from "starknet"
+import { Signer, ec } from "@argent/x-sessions"
 
 // gets signer with random private key you need to store if you want to reuse the session
 const sessionSigner = new Signer()
@@ -64,10 +64,10 @@ const requestSession: RequestSession = {
 Now you can sign the session with the account you have. Depending on how your account works, the user may get asked to sign a message
 
 ```typescript
-import { session } from "starknet"
+import { createSession } from "@argent/x-sessions"
 
 // calls account.signMessage internally
-const signedSession = await session.createSession(requestSession, account)
+const signedSession = await createSession(requestSession, account)
 ```
 
 ### Using established sessions
@@ -75,7 +75,7 @@ const signedSession = await session.createSession(requestSession, account)
 With your signed session you can now use it with your dapp to do transactions without the user having to approve again.
 
 ```typescript
-import { SessionAccount } from "starknet"
+import { SessionAccount } from "@argent/x-sessions"
 
 const sessionAccount = new SessionAccount(
   account,
