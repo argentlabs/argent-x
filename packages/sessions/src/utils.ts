@@ -9,7 +9,7 @@ import {
   typedData,
 } from "starknet"
 
-interface Policy {
+export interface Policy {
   contractAddress: string
   selector: string
 }
