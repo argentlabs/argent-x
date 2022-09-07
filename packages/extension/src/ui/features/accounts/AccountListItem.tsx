@@ -80,6 +80,12 @@ const AccountAvatar = styled.img`
 const AccountColumn = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+`
+
+const AccountColumnAccessory = styled.div`
+  display: flex;
+  flex-direction: column;
 `
 
 const AccountRow = styled.div`
@@ -87,6 +93,7 @@ const AccountRow = styled.div`
   flex-grow: 1;
   align-items: center;
   justify-content: space-between;
+  overflow: hidden;
 `
 
 const AccountStatusText = styled.p`
@@ -101,6 +108,9 @@ const AccountName = styled.h1`
   font-size: 18px;
   line-height: 18px;
   margin: 0 0 5px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const AccountAddress = styled.div`
@@ -204,7 +214,7 @@ export const AccountListItem: FC<IAccountListItem> = ({
             </AccountAddress>
           )}
         </AccountColumn>
-        <AccountColumn>
+        <AccountColumnAccessory>
           {accountType === "argent-plugin" && (
             <PluginTextContainer>Plugin</PluginTextContainer>
           )}
@@ -231,7 +241,7 @@ export const AccountListItem: FC<IAccountListItem> = ({
             )
           )}
           {children}
-        </AccountColumn>
+        </AccountColumnAccessory>
       </AccountRow>
     </AccountListItemWrapper>
   )
