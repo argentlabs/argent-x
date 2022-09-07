@@ -189,6 +189,7 @@ describe("transformTransaction", () => {
             "hosts": [
               "www.myswap.xyz",
             ],
+            "icon": "https://www.myswap.xyz/favicon.ico",
             "id": "myswap-xyz",
             "title": "mySwap",
           },

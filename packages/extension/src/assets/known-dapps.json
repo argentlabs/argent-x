@@ -56,9 +56,7 @@
     "title": "Aspect",
     "icon": "https://aspect.co/img/company/logo512.png",
     "contracts": {
-      "mainnet-alpha": [
-        "0x03090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c"
-      ],
+      "mainnet-alpha": [],
       "goerli-alpha": [
         "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890"
       ]
@@ -69,9 +67,7 @@
     "hosts": ["mintsquare.io"],
     "title": "Mint Square",
     "contracts": {
-      "mainnet-alpha": [
-        "0x7861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488"
-      ],
+      "mainnet-alpha": [],
       "goerli-alpha": [
         "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786"
       ]
