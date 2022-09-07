@@ -15,10 +15,14 @@ export const handleMiscellaneousMessage: HandleMessage<
     }
 
     case "RESET_ALL": {
-      browser.storage.local.clear()
-      browser.storage.sync.clear()
-      browser.storage.managed.clear()
-      browser.storage.session.clear()
+      try {
+        browser.storage.local.clear()
+        browser.storage.sync.clear()
+        browser.storage.managed.clear()
+        browser.storage.session.clear()
+      } catch {
+        // Ignore browser.storage.session error "This is a read-only store"
+      }
       return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
     }
 
