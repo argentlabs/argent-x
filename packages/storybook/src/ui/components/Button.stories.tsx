@@ -22,6 +22,13 @@ Disabled.args = {
   disabled: true,
 }
 
+export const Primary = Template.bind({})
+Primary.args = {
+  children: "Button",
+  variant: "primary",
+  disabled: false,
+}
+
 export const Danger = Template.bind({})
 Danger.args = {
   children: "Button",

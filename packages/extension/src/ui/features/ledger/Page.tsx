@@ -27,13 +27,13 @@ const PageWrapper = styled.div`
   flex-direction: column-reverse;
   align-items: center;
   justify-content: flex-end;
-  height: 100vh;
   width: 100%;
   margin-top: max(120px, 15vh);
 
-  ${({ theme }) => theme.mediaMinWidth.lg`
+  ${({ theme }) => theme.mediaMinWidth.md`
     flex-direction: row;
     margin-top: 0;
+    height: 100vh;
 
     > ${Panel}:last-child {
       width: 50%;

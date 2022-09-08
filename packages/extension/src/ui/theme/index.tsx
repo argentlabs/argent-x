@@ -16,6 +16,8 @@ export const colors = {
   white,
   black,
 
+  primary: "#F36A3D",
+
   bg1: "#161616",
   bg2: "#333332",
   bg3: "#474747",
@@ -55,11 +57,11 @@ export const components = {
         disabled: "rgba(255, 255, 255, 0.15)",
       },
     },
-    "warn-high": {
+    primary: {
       bg: {
-        base: colors.red4,
-        hover: colord(colors.red4).saturate(1).lighten(0.075).toRgbString(),
-        disabled: colord(colors.red4).alpha(0.5).toRgbString(),
+        base: colors.primary,
+        hover: colord(colors.primary).saturate(1).lighten(0.075).toRgbString(),
+        disabled: colord(colors.primary).alpha(0.5).toRgbString(),
       },
     },
     warn: {
@@ -67,6 +69,13 @@ export const components = {
         base: colors.yellow1,
         hover: colord(colors.yellow1).saturate(1).lighten(0.075).toRgbString(),
         disabled: colord(colors.yellow1).alpha(0.5).toRgbString(),
+      },
+    },
+    "warn-high": {
+      bg: {
+        base: colors.red4,
+        hover: colord(colors.red4).saturate(1).lighten(0.075).toRgbString(),
+        disabled: colord(colors.red4).alpha(0.5).toRgbString(),
       },
     },
     danger: {

@@ -3,6 +3,7 @@ import { DefaultTheme } from "styled-components"
 
 export type ButtonVariant =
   | "default"
+  | "primary"
   | "warn"
   | "warn-high"
   | "danger"
