@@ -8,6 +8,7 @@ import { ProfilePicture } from "../accounts/ProfilePicture"
 import { BlackCircle } from "./assets/BlackCircle"
 import { ContentWrapper, LedgerPage } from "./Page"
 import { StyledButton } from "./start"
+import { StepIndicator } from "./StepIndicator"
 import { useSelectedLedgerAccount } from "./store"
 
 const SP = styled(P)`
@@ -32,6 +33,8 @@ export const LedgerDoneScreen: FC = () => {
         />
       </BlackCircle>
       <ContentWrapper>
+        <StepIndicator length={3} currentIndex={2} />
+
         <Title style={{ margin: "32px 0" }}>Account added</Title>
 
         <SP>
