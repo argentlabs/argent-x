@@ -1820,9 +1820,9 @@
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
 "@google/model-viewer@^1.11.1":
-  version "1.12.0"
-  resolved "https://registry.npmjs.org/@google/model-viewer/-/model-viewer-1.12.0.tgz#d67f983f6ab65c1c97db2be431eef7878293d57a"
-  integrity sha512-z6fn13vkY2ffQVEO2mtNK3zexqezsr57mO0SrSIJwvPSJnLPLLLCdSvR+2xNFUEbbbejBrgERV07kjcMReu87Q==
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/@google/model-viewer/-/model-viewer-1.12.1.tgz#0abe0166f649199557c291734f4d2c02db65cd75"
+  integrity sha512-GOf/By81rbxSmwWRVxBtlY5b3050msJ+BDWqonPj7M0/I7rNS/vVNjbLxTofbGjZObS3n0ELHj8TZ47UtkZbtg==
   dependencies:
     lit "^2.2.3"
     three "^0.139.2"
