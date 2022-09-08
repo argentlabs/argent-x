@@ -27,23 +27,6 @@ export class MockStorage implements StorageArea, chrome.storage.StorageArea {
 
   constructor(private readonly area: AreaName) {}
 
-  getBytesInUse(callback: (bytesInUse: number) => void): void
-  getBytesInUse(keys?: string | string[] | null | undefined): Promise<number>
-  getBytesInUse(
-    keys: string | string[] | null,
-    callback: (bytesInUse: number) => void,
-  ): void
-  getBytesInUse(keys?: unknown, callback?: unknown): void | Promise<number> {
-    if (isFunction(keys)) {
-      callback = keys as (bytesInUse: number) => void
-      keys = undefined
-    }
-    if (isFunction(callback)) {
-      return callback(0)
-    }
-    return Promise.resolve(0)
-  }
-
   clear(): Promise<void>
   clear(callback?: (() => void) | undefined): void
   clear(callback?: unknown): void | Promise<void> {
@@ -157,6 +140,42 @@ export class MockStorage implements StorageArea, chrome.storage.StorageArea {
     removeRules: () => {
       throw new Error("Method not implemented.")
     },
+  }
+
+  getBytesInUse(callback: (bytesInUse: number) => void): void
+  getBytesInUse(keys?: string | string[] | null | undefined): Promise<number>
+  getBytesInUse(
+    keys: string | string[] | null,
+    callback: (bytesInUse: number) => void,
+  ): void
+  getBytesInUse(keys?: unknown, callback?: unknown): void | Promise<number> {
+    if (isFunction(keys)) {
+      callback = keys as (bytesInUse: number) => void
+      keys = undefined
+    }
+    if (isFunction(callback)) {
+      return callback(0)
+    }
+    return Promise.resolve(0)
+  }
+
+  setAccessLevel(accessOptions: {
+    accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS" | "TRUSTED_CONTEXTS"
+  }): Promise<void>
+  setAccessLevel(
+    accessOptions: {
+      accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS" | "TRUSTED_CONTEXTS"
+    },
+    callback: () => void,
+  ): void
+  setAccessLevel(
+    accessOptions: unknown,
+    callback?: unknown,
+  ): void | Promise<void> {
+    if (isFunction(callback)) {
+      return callback()
+    }
+    return Promise.resolve()
   }
 }
 

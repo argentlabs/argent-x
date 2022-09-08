@@ -8,7 +8,7 @@
     "@sentry/webpack-plugin": "^1.18.9",
     "@svgr/webpack": "^6.0.0",
     "@testing-library/react": "^13.3.0",
-    "@types/chrome": "^0.0.195",
+    "@types/chrome": "^0.0.196",
     "@types/lodash-es": "^4.17.6",
     "@types/object-hash": "^2.2.1",
     "@types/react": "^18.0.0",
