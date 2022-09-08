@@ -12,28 +12,15 @@ import { routes } from "../../routes"
 import { FormError } from "../../theme/Typography"
 import { BlackCircle } from "./assets/BlackCircle"
 import { LedgerStartIllustration } from "./assets/LedgerStart"
-import { LedgerPage } from "./Page"
+import { ContentWrapper, LedgerPage } from "./Page"
 import { StepIndicator } from "./StepIndicator"
 import { Steps } from "./Steps"
 
-const StyledButton = styled(Button)`
+export const StyledButton = styled(Button)`
   width: fit-content;
   padding-left: 32px;
   padding-right: 32px;
   margin: 8px auto 0;
-`
-
-const StyledStepIndicator = styled(StepIndicator)`
-  margin-top: 32px;
-`
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  max-width: 600px;
 `
 
 export const LedgerStartScreen: FC = () => {
@@ -51,7 +38,7 @@ export const LedgerStartScreen: FC = () => {
         <LedgerStartIllustration />
       )}
       <ContentWrapper>
-        <StyledStepIndicator length={3} currentIndex={0} />
+        <StepIndicator length={3} currentIndex={0} />
         <Title style={{ margin: "32px 0" }}>
           {detecting ? "Detecting Ledger..." : "Connect a new Ledger"}
         </Title>

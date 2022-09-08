@@ -58,3 +58,13 @@ export const LedgerPage: FC<PropsWithChildren> = ({ children }) => {
     </>
   )
 }
+
+export const ContentWrapper = styled.div`
+  margin: 32px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+`
