@@ -1,42 +1,60 @@
-import { FC, PropsWithChildren } from "react"
+import React, { Children, FC, PropsWithChildren } from "react"
 import styled from "styled-components"
 
 import { ArgentXBanner } from "../../components/Icons/ArgentXBanner"
-import { HelpIcon } from "./assets/Help"
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  padding: 46px 0;
-`
 
 const Header = styled.div`
+  position: absolute;
+  left: 56px;
+  top: 46px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 `
 
-const Content = styled.div`
+const Panel = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: max(32px, 15vh);
+  width: 100%;
+  padding: 0 56px;
+`
+
+const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100vh;
+  width: 100%;
+  margin-top: max(120px, 15vh);
+
+  ${({ theme }) => theme.mediaMinWidth.lg`
+    flex-direction: row;
+    margin-top: 0;
+
+    > ${Panel}:last-child {
+      width: 50%;
+      display: flex;
+      background-color: black;
+      height: 100%;
+    }
+  `}
 `
 
 export const LedgerPage: FC<PropsWithChildren> = ({ children }) => {
+  const [panel, ...restChildren] = Children.toArray(children)
   return (
-    <PageWrapper>
+    <>
       <Header>
         <ArgentXBanner />
-        <HelpIcon style={{ cursor: "pointer" }} />
       </Header>
-      <Content>{children}</Content>
-    </PageWrapper>
+      <PageWrapper>
+        <Panel>{restChildren}</Panel>
+        <Panel>{panel}</Panel>
+      </PageWrapper>
+    </>
   )
 }

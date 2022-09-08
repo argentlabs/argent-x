@@ -7,7 +7,7 @@ export const StepGroup = styled.div`
   align-items: center;
   justify-content: center;
   gap: 24px;
-  max-width: 380px;
+  max-width: 600px;
   width: 100%;
 `
 
@@ -22,19 +22,11 @@ interface StepProps extends Step {
 
 const StepWrapper = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: start;
   border-radius: 8px;
   border: 1px solid #333332;
-  background: linear-gradient(
-    to right,
-    #333332 0%,
-    #333332 33px,
-    transparent 33px,
-    transparent 100%
-  );
-  width: 100%;
   overflow: hidden;
+  width: 100%;
 `
 
 const StepNumber = styled.div`
@@ -43,7 +35,8 @@ const StepNumber = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
+  padding: 16px;
+  background-color: #333332;
 `
 
 const StepContent = styled.div`

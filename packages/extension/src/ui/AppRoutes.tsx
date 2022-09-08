@@ -223,6 +223,11 @@ const walletRoutes = (
       element={<PrivacyStatementScreen />}
     />
     <Route path={routes.addAccount.path} element={<AddAccount />} />
+  </>
+)
+
+const fullscreenRoutes = (
+  <>
     <Route path={routes.ledgerEntry.path} element={<LedgerStartScreen />} />
     <Route path={routes.ledgerSelect.path} element={<LedgerSelectScreen />} />
     <Route path={routes.ledgerDone.path} element={<LedgerDoneScreen />} />
@@ -249,6 +254,7 @@ export const AppRoutes: FC = () => {
           walletRoutes
         )}
       </Route>
+      {fullscreenRoutes}
     </Routes>
   )
 }
