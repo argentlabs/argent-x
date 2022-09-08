@@ -36,7 +36,7 @@ const PageWrapper = styled.div`
     height: 100vh;
 
     > ${Panel}:last-child {
-      width: 50%;
+      width: 40%;
       display: flex;
       background-color: black;
       height: 100%;
