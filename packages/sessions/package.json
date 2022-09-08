@@ -50,7 +50,7 @@
     "happy-dom": "^6.0.4",
     "vite": "^3.0.9",
     "vite-plugin-dts": "^1.4.1",
-    "vitest": "^0.22.1"
+    "vitest": "^0.23.1"
   },
   "dependencies": {
     "minimalistic-assert": "^1.0.1",
