@@ -7,6 +7,7 @@ import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { HeartFilled } from "../../components/Icons/HeartFilled"
+import { analytics } from "../../services/analytics"
 import { H2 } from "../../theme/Typography"
 
 const MainWrapper = styled.div`
@@ -62,15 +63,28 @@ export const ReviewFeedbackScreen: FC = () => {
 
   const handleButtonClick = () => {
     if (state.rating === 5) {
+      analytics.track("userFeedbackAction", {
+        action: "REVIEWED_ON_CHROME_STORE",
+      })
       window.open(CHROME_STORE_LINK, "_blank")?.focus()
     } else {
       window.open(ZENDESK_LINK, "_blank")?.focus()
+      analytics.track("userFeedbackAction", {
+        action: "REVIEWED_ON_ZENDESK",
+      })
     }
   }
 
   return (
     <MainWrapper>
-      <IconBar close />
+      <IconBar
+        close
+        onClick={() =>
+          analytics.track("userFeedbackAction", {
+            action: "FEEDBACK_DISMISSED",
+          })
+        }
+      />
       <Container>
         <HeartFilled />
         <ThankYouText>Thank You!</ThankYouText>

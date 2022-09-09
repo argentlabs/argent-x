@@ -34,12 +34,6 @@ const RatingContainer = styled.div`
 export const ReviewRatingScreen: FC = () => {
   const navigate = useNavigate()
 
-  const [closeLink, setCloseLink] = useState<string | undefined>()
-
-  useEffect(() => {
-    recover().then((s) => setCloseLink(s))
-  }, [])
-
   const onRating = async (
     _: SyntheticEvent<Element, Event>,
     value: number | null,
@@ -57,7 +51,14 @@ export const ReviewRatingScreen: FC = () => {
 
   return (
     <>
-      <IconBar close={closeLink} />
+      <IconBar
+        close
+        onClick={() =>
+          analytics.track("userFeedbackAction", {
+            action: "RATING_DISMISSED",
+          })
+        }
+      />
       <Container>
         <H2>Enjoying ArgentX?</H2>
         <RateText>How would you rate your experience</RateText>

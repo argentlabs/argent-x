@@ -30,6 +30,7 @@ interface IconBarProps {
   close?: boolean | string
   childAfter?: React.ReactNode
   children?: React.ReactNode
+  onClick?: () => void
 }
 
 export const IconBar: FC<IconBarProps> = ({
@@ -37,11 +38,12 @@ export const IconBar: FC<IconBarProps> = ({
   close,
   childAfter,
   children,
+  onClick,
   ...rest
 }) => (
   <Bar {...rest}>
     {back ? (
-      <BackLink aria-label="Back">
+      <BackLink aria-label="Back" onClick={onClick}>
         <BackIcon />
       </BackLink>
     ) : (
@@ -57,6 +59,7 @@ export const IconBar: FC<IconBarProps> = ({
         to={isString(close) ? close : routes.accountTokens()}
         aria-label="Close"
         style={{ textAlign: "right" }}
+        onClick={onClick}
       >
         <CloseIcon />
       </Link>
