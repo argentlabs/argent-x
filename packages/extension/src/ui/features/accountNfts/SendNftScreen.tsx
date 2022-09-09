@@ -51,7 +51,6 @@ import {
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))

@@ -15,7 +15,6 @@ import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { H3 } from "../../theme/Typography"
 import { AccountCollections } from "../accountNfts/AccountCollections"
-import { AspectNft } from "../accountNfts/aspect.model"
 import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
@@ -196,22 +195,6 @@ const useCustomTokenList = (
         token.symbol.includes(query),
     )
   }, [query, tokenDetails])
-}
-
-const useCustomNftList = (nfts: AspectNft[], query?: string) => {
-  return useMemo(() => {
-    if (!query) {
-      return nfts
-    }
-
-    return nfts.filter(
-      (nft) =>
-        nft.name?.includes(query) ||
-        nft.token_id.includes(query) ||
-        nft.contract_address.includes(query) ||
-        nft.description?.includes(query),
-    )
-  }, [nfts, query])
 }
 
 const useCustomCollectiblesList = (
