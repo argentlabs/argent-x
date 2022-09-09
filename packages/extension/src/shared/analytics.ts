@@ -55,6 +55,9 @@ export interface Events {
     networkId: string
     service: AddFundsServices
   }
+  userRating: {
+    rating: number
+  }
 }
 
 export interface Pages {

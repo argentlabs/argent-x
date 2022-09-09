@@ -1,3 +1,4 @@
+import { decrementTransactionsBeforeReview } from "../../../shared/misc"
 import { SUCCESS_STATUSES } from "../../../shared/transactions"
 import {
   addToAlreadyShown,
@@ -15,6 +16,8 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
         !(await hasShownNotification(hash))
       ) {
         addToAlreadyShown(hash)
+
+        await decrementTransactionsBeforeReview()
 
         if (!account.hidden) {
           sentTransactionNotification(hash, status, meta)

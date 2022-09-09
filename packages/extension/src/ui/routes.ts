@@ -125,5 +125,7 @@ export const routes = {
     "/backup-download",
   ),
   privacyStatement: route("/privacy-statement"),
+  userReview: route("/user-review"),
+  userReviewFeedback: route("/user-review/feedback"),
   error: route("/error"),
 }
