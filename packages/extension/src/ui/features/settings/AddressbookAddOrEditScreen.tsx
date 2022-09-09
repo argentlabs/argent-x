@@ -240,6 +240,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
               minRows={3}
               maxRows={3}
               spellCheck={false}
+              onlyAddressHex
             />
             {errors.address && (
               <FormErrorAlt>{errors.address.message}</FormErrorAlt>

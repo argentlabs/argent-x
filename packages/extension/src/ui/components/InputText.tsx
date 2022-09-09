@@ -193,6 +193,7 @@ export const ControlledInputText = styled(
 
 interface AdditionalControlledInputProps {
   onlyNumeric?: boolean
+  onlyAddressHex?: boolean
   children?: React.ReactNode
 }
 
@@ -210,6 +211,17 @@ export const isAllowedNumericInputValue = (value: string, maxDecimals = 16) => {
   return false
 }
 
+export const isAllowedAddressHexInputValue = (value: string) => {
+  const hexRegex = /^(|0|0x([a-f0-9A-F]+)?)$/
+  if (value === "") {
+    return true
+  }
+  if (hexRegex.test(value)) {
+    return true
+  }
+  return false
+}
+
 export type ControlledInputProps<T extends FieldValues> = InputFieldProps &
   Omit<ControllerProps<T>, "render"> &
   AdditionalControlledInputProps
@@ -220,6 +232,7 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   defaultValue,
   rules,
   onlyNumeric,
+  onlyAddressHex,
   children,
   ...props
 }: ControlledInputProps<T>) => (
@@ -240,6 +253,10 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           if (onlyNumeric) {
             if (isAllowedNumericInputValue(e.target.value)) {
+              return onValueChange(e)
+            }
+          } else if (onlyAddressHex) {
+            if (isAllowedAddressHexInputValue(e.target.value)) {
               return onValueChange(e)
             }
           } else {
@@ -322,6 +339,7 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
   defaultValue,
   rules,
   onlyNumeric,
+  onlyAddressHex,
   maxRows,
   children,
   onChange,
@@ -341,6 +359,11 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
           if (onlyNumeric) {
             if (isAllowedNumericInputValue(e.target.value)) {
+              onValueChange(e)
+              return isFunction(onChange) && onChange(e)
+            }
+          } else if (onlyAddressHex) {
+            if (isAllowedAddressHexInputValue(e.target.value)) {
               onValueChange(e)
               return isFunction(onChange) && onChange(e)
             }

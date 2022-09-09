@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { addressSchema } from "../src/ui/services/addresses"
+import { addressSchema, isEqualAddress } from "../src/ui/services/addresses"
 
 describe("address input", () => {
   test("should not allow ethereum addresses", async () => {
@@ -43,5 +43,51 @@ describe("address input", () => {
       "0x033D2A165d2a2aE64cBaF8e6DFF7F0c1974d0f41cD4F0c24d273373D4837BcFd"
     const result = await addressSchema.isValid(address)
     expect(result).toBe(false)
+  })
+})
+
+describe("isEqualAddress", () => {
+  describe("when valid", () => {
+    test("should match same address", () => {
+      expect(
+        isEqualAddress(
+          "0x033d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+          "0x033d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+        ),
+      ).toBe(true)
+    })
+    test("should match same address regardless of zero padding", () => {
+      expect(
+        isEqualAddress(
+          "0x33d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+          "0x033d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+        ),
+      ).toBe(true)
+      expect(
+        isEqualAddress(
+          "33d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+          "0x033d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+        ),
+      ).toBe(true)
+    })
+    test("should match regardless of case", () => {
+      expect(
+        isEqualAddress(
+          "0x033d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+          "0x033D2A165D2A2AE64CBAF8E6DFF7F0C1974D0F41CD4F0C24D273373D4837BCFD",
+        ),
+      ).toBe(true)
+    })
+  })
+  describe("when invalid", () => {
+    test("should return false without throwing", () => {
+      expect(
+        isEqualAddress(
+          "0x033d2a165d2a2ae64cbaf8e6dff7f0c1974d0f41cd4f0c24d273373d4837bcfd",
+          "foo",
+        ),
+      ).toBe(false)
+      expect(isEqualAddress("foo", "foo")).toBe(false)
+    })
   })
 })

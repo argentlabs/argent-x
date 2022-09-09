@@ -470,6 +470,7 @@ export const SendTokenScreen: FC = () => {
                       paddingRight: "50px",
                       borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
                     }}
+                    onlyAddressHex
                     onChange={(e) => {
                       if (validateStarknetAddress(e.target.value)) {
                         const account = addressBook.contacts.find((c) =>
