@@ -3,6 +3,7 @@ import { FC, SyntheticEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { toggleUserHasReviewed } from "../../../shared/userReview"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { StarRounded } from "../../components/Icons/MuiIcons"
@@ -10,7 +11,6 @@ import { routes } from "../../routes"
 import { analytics } from "../../services/analytics"
 import { H2 } from "../../theme/Typography"
 import { recover } from "../recovery/recovery.service"
-import { useReviewStatus } from "./Review.state"
 
 const Container = styled(ColumnCenter)`
   padding-top: 112px;
@@ -40,13 +40,13 @@ export const ReviewRatingScreen: FC = () => {
     recover().then((s) => setCloseLink(s))
   }, [])
 
-  const onRating = (
+  const onRating = async (
     _: SyntheticEvent<Element, Event>,
     value: number | null,
   ) => {
     if (value) {
       analytics.track("userRating", { rating: value })
-      useReviewStatus.setState({ hasReviewed: true })
+      await toggleUserHasReviewed()
       navigate(routes.userReviewFeedback(), {
         state: {
           rating: value,

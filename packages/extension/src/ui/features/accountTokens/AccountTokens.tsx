@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
-import { miscStore } from "../../../shared/misc"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { userReviewStore } from "../../../shared/userReview"
 import {
   getAccountIdentifier,
   isDeprecated,
@@ -32,7 +32,6 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
-import { useReviewStatus } from "../userReview/Review.state"
 import { AccountSubHeader } from "./AccountSubheader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
@@ -73,18 +72,19 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
-  const { hasReviewed } = useReviewStatus()
   const transactionsBeforeReview = useKeyValueStorage(
-    miscStore,
+    userReviewStore,
     "transactionsBeforeReview",
   )
+
+  const userHasReviewed = useKeyValueStorage(userReviewStore, "hasReviewed")
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
   const network = useCurrentNetwork()
 
   useEffect(() => {
-    if (!hasReviewed && transactionsBeforeReview === 0) {
+    if (!userHasReviewed && transactionsBeforeReview === 0) {
       setTimeout(() => navigate(routes.userReview()), 1000)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

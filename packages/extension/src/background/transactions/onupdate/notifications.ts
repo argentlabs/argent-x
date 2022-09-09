@@ -1,5 +1,5 @@
-import { decrementTransactionsBeforeReview } from "../../../shared/misc"
 import { SUCCESS_STATUSES } from "../../../shared/transactions"
+import { decrementTransactionsBeforeReview } from "../../../shared/userReview"
 import {
   addToAlreadyShown,
   hasShownNotification,
