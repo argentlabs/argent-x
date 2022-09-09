@@ -92,6 +92,7 @@
     "qr-code-styling": "^1.6.0-rc.1",
     "react": "^18.0.0",
     "react-copy-to-clipboard": "^5.0.4",
+    "react-device-detect": "^2.2.2",
     "react-dom": "^18.0.0",
     "react-dropzone": "^14.0.0",
     "react-hook-form": "^7.33.0",
