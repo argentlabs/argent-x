@@ -19,9 +19,29 @@ describe("omitEmpty", () => {
           },
           e: 0,
           f: null,
-          g: [0, null, "", {}, "baz"],
+          g: [
+            0,
+            null,
+            "",
+            {
+              a: "",
+            },
+            "baz",
+          ],
           h: true,
           i: false,
+          j: {
+            a: "",
+            b: {},
+            c: [],
+          },
+          k: [
+            "",
+            {
+              a: "",
+            },
+          ],
+          l: [[[[""]]]],
         }),
       ).toMatchInlineSnapshot(`
         {

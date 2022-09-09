@@ -11,7 +11,7 @@ export const isEmptyValue = (value: any) => {
   return result
 }
 
-export const omitEmpty = (value: Record<string, any>) => {
+export const omitEmpty = (value: any): any => {
   if (isPlainObject(value)) {
     const result: Record<string, any> = {}
     Object.entries(value).forEach(([key, value]) => {
@@ -20,9 +20,14 @@ export const omitEmpty = (value: Record<string, any>) => {
         result[key] = omitted
       }
     })
-    return result
+    if (!isEmptyValue(result)) {
+      return result
+    }
   } else if (isArray(value)) {
-    const omitted = value.filter((entry) => !isEmptyValue(entry))
+    const omitted = value.filter((entry) => {
+      const entryOmitted = omitEmpty(entry)
+      return !isEmptyValue(entryOmitted)
+    })
     if (!isEmptyValue(omitted)) {
       return omitted
     }
