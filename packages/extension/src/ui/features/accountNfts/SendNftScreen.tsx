@@ -305,7 +305,10 @@ export const SendNftScreen: FC = () => {
                     </>
                   </StyledControlledTextArea>
                   {showSaveAddressButton && (
-                    <SaveAddressButton type="button">
+                    <SaveAddressButton
+                      type="button"
+                      onClick={() => setBottomSheetOpen(true)}
+                    >
                       <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
                       Save address
                     </SaveAddressButton>
