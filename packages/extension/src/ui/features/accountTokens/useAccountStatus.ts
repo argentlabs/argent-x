@@ -49,3 +49,13 @@ export const useAccountStatus = (
 
   return status
 }
+
+export const useAccountIsDeployed = (
+  account: Account,
+  activeAccount?: BaseWalletAccount,
+) => {
+  const status = useAccountStatus(account, activeAccount)
+  const accountIsDeployed =
+    status.code !== "DEPLOYING" && status.code !== "ERROR"
+  return accountIsDeployed
+}
