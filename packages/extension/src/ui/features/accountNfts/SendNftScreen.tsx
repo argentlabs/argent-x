@@ -51,7 +51,6 @@ import {
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
@@ -266,6 +265,7 @@ export const SendNftScreen: FC = () => {
                       paddingRight: "50px",
                       borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
                     }}
+                    onlyAddressHex
                     onChange={(e: any) => {
                       if (validateStarknetAddress(e.target.value)) {
                         const account = addressBook.contacts.find((c) =>
@@ -304,7 +304,10 @@ export const SendNftScreen: FC = () => {
                     </>
                   </StyledControlledTextArea>
                   {showSaveAddressButton && (
-                    <SaveAddressButton type="button">
+                    <SaveAddressButton
+                      type="button"
+                      onClick={() => setBottomSheetOpen(true)}
+                    >
                       <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
                       Save address
                     </SaveAddressButton>
