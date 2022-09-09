@@ -89,8 +89,9 @@ export const ReviewFeedbackScreen: FC = () => {
         <HeartFilled />
         <ThankYouText>Thank You!</ThankYouText>
         <RateText>
-          We’re thrilled to hear you’re enjoying Argent X, but it sounds like we
-          could still be doing better
+          {state.rating === 5
+            ? "We’re thrilled to hear you’re enjoying Argent X. We would really appreciate if you could help spread the word by also rating us on the Chrome store"
+            : "We’re thrilled to hear you’re enjoying Argent X, but it sounds like we could still be doing better"}
         </RateText>
       </Container>
 
