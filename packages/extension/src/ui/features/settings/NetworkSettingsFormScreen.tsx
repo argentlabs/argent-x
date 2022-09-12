@@ -175,6 +175,14 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             <ControlledInputText
               autoComplete="off"
               control={control}
+              placeholder="Plugin account class hash"
+              name="accountClassHash.argentPluginAccount"
+              type="text"
+              disabled={defaultNetwork.readonly}
+            />
+            <ControlledInputText
+              autoComplete="off"
+              control={control}
               placeholder="RPC URL"
               name="rpcUrl"
               type="url"

@@ -24,9 +24,17 @@ export const networkSchema: Schema<Network> = object()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
     accountImplementation: string().optional().matches(REGEX_HEXSTRING),
     accountClassHash: object({
-      argentAccount: string().required().matches(REGEX_HEXSTRING),
-      argentPluginAccount: string().optional().matches(REGEX_HEXSTRING),
-    }).optional(),
+      argentAccount: string()
+        .label("Account class hash")
+        .required()
+        .matches(REGEX_HEXSTRING),
+      argentPluginAccount: string()
+        .label("Plugin account class hash")
+        .optional()
+        .matches(REGEX_HEXSTRING),
+    }).default(
+      undefined,
+    ) /** default(undefined) for an optional object with required children {@see https://github.com/jquense/yup/issues/772#issuecomment-743270211} */,
     explorerUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
