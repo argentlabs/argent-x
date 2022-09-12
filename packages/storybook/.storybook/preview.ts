@@ -1,3 +1,15 @@
+import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport"
+
+const CUSTOM_VIEWPORTS = {
+  extension: {
+    name: "Extension",
+    styles: {
+      width: "360px",
+      height: "600px",
+    },
+  },
+}
+
 export const parameters = {
   backgrounds: {
     default: "Extension",
@@ -26,6 +38,13 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+  },
+  viewport: {
+    viewports: {
+      ...INITIAL_VIEWPORTS,
+      ...CUSTOM_VIEWPORTS,
+    },
+    defaultViewport: "extension",
   },
 }
 
