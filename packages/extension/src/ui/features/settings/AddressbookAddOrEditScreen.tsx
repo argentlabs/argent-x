@@ -15,9 +15,9 @@ import {
   AddressBookContact,
   AddressBookContactNoId,
 } from "../../../shared/addressBook/type"
+import { AlertDialog } from "../../components/AlertDialog"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
-import { DeleteDialog } from "../../components/DeleteDialog"
 import { AddRoundedIcon } from "../../components/Icons/MuiIcons"
 import { EditRoundedIcon } from "../../components/Icons/MuiIcons"
 import { StyledControlledSelect } from "../../components/InputSelect"
@@ -184,11 +184,11 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
 
   return (
     <Wrapper {...props}>
-      <DeleteDialog
+      <AlertDialog
         isOpen={deleteDialogOpen}
         title="Delete contact"
-        content="Are you sure you want to delete this contact from your address book?"
-        onDelete={handleDelete}
+        message="Are you sure you want to delete this contact from your address book?"
+        onDestroy={handleDelete}
         onCancel={() => setDeleteDialogOpen(false)}
       />
       <ColumnCenter gap="16px">
