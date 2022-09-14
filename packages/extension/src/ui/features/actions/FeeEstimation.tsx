@@ -108,10 +108,7 @@ export const useMaxFeeEstimation = (
   return { fee, error }
 }
 
-function getTooltipText(
-  suggestedMaxFee?: BigNumber,
-  feeTokenBalance?: BigNumber,
-) {
+function getTooltipText(suggestedMaxFee?: string, feeTokenBalance?: BigNumber) {
   if (!suggestedMaxFee || !feeTokenBalance) {
     return "Network fee is still loading."
   }
@@ -119,7 +116,7 @@ function getTooltipText(
     return "Network fees are paid to the network to include transactions in blocks"
   }
   return `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-    suggestedMaxFee.sub(feeTokenBalance),
+    BigNumber.from(suggestedMaxFee).sub(feeTokenBalance),
   )} ETH more.`
 }
 
