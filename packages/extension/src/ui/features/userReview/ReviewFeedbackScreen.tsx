@@ -1,5 +1,4 @@
 import { FC } from "react"
-import { isFirefox } from "react-device-detect"
 import { Location, useLocation } from "react-router-dom"
 import styled from "styled-components"
 
@@ -48,7 +47,7 @@ const ActionButton = styled(Button)`
 
 interface LocationWithState extends Location {
   state: {
-    rating: number
+    rating?: number
   }
 }
 
@@ -67,7 +66,7 @@ export const ReviewFeedbackScreen: FC = () => {
   const [browserName, storeLink] = useBrowserStore()
 
   const handleButtonClick = () => {
-    if (state.rating === 5) {
+    if (state?.rating === 5) {
       analytics.track("userFeedbackAction", {
         action: "REVIEWED_ON_CHROME_STORE",
       })
@@ -94,7 +93,7 @@ export const ReviewFeedbackScreen: FC = () => {
         <HeartFilled />
         <ThankYouText>Thank You!</ThankYouText>
         <RateText>
-          {state.rating === 5
+          {state?.rating === 5
             ? `We’re thrilled to hear you’re enjoying Argent X. We would really appreciate if you could help spread the word by also rating us on the ${browserName} store`
             : "We’re thrilled to hear you’re enjoying Argent X, but it sounds like we could still be doing better"}
         </RateText>
@@ -102,7 +101,7 @@ export const ReviewFeedbackScreen: FC = () => {
 
       <ButtonsContainer>
         <ActionButton onClick={handleButtonClick}>
-          {state.rating === 5
+          {state?.rating === 5
             ? `Rate on ${browserName} store`
             : "Give Feedback"}
         </ActionButton>
@@ -110,6 +109,8 @@ export const ReviewFeedbackScreen: FC = () => {
     </MainWrapper>
   )
 }
+
+const isFirefox = navigator.userAgent.indexOf("Firefox") !== -1
 
 const useBrowserStore = (): [string, string] => {
   // This works because we only support 2 browsers for now

@@ -17,9 +17,8 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
       ) {
         addToAlreadyShown(hash)
 
-        await decrementTransactionsBeforeReview()
-
         if (!account.hidden) {
+          await decrementTransactionsBeforeReview()
           sentTransactionNotification(hash, status, meta)
         }
       }

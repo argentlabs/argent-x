@@ -84,11 +84,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const network = useCurrentNetwork()
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>
     if (!userHasReviewed && transactionsBeforeReview === 0) {
-      setTimeout(() => navigate(routes.userReview()), 1000)
+      timeoutId = setTimeout(() => navigate(routes.userReview()), 1000)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    return () => timeoutId && clearTimeout(timeoutId)
+  }, [navigate, transactionsBeforeReview, userHasReviewed])
 
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), network.id, "feeTokenBalance"],

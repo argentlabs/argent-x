@@ -1,5 +1,5 @@
 import { Rating } from "@mui/material"
-import { FC, SyntheticEvent, useEffect, useState } from "react"
+import { FC, SyntheticEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -10,7 +10,6 @@ import { StarRounded } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 import { analytics } from "../../services/analytics"
 import { H2 } from "../../theme/Typography"
-import { recover } from "../recovery/recovery.service"
 
 const Container = styled(ColumnCenter)`
   padding-top: 112px;
