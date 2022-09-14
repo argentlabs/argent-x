@@ -45,21 +45,19 @@ export const DappContractField: FC<{
   const host = knownContract.hosts[0]
   const dappDisplayAttributes = useDappDisplayAttributesImpl(host)
   return (
-    <>
-      <Field>
-        <FieldKey>Dapp</FieldKey>
-        <DappFieldValue>
-          <DappIconContainer>
-            <DappIcon
-              host={host}
-              useDappDisplayAttributesImpl={useDappDisplayAttributesImpl}
-            />
-          </DappIconContainer>
-          <LeftPaddedField>
-            {dappDisplayAttributes?.title || host}
-          </LeftPaddedField>
-        </DappFieldValue>
-      </Field>
-    </>
+    <Field>
+      <FieldKey>Dapp</FieldKey>
+      <DappFieldValue>
+        <DappIconContainer>
+          <DappIcon
+            host={host}
+            useDappDisplayAttributesImpl={useDappDisplayAttributesImpl}
+          />
+        </DappIconContainer>
+        <LeftPaddedField>
+          {dappDisplayAttributes?.title || host}
+        </LeftPaddedField>
+      </DappFieldValue>
+    </Field>
   )
 }
