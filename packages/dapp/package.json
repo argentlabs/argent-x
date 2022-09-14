@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/dapp",
-  "version": "4.8.0",
+  "version": "4.8.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,8 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@argent/get-starknet": "^4.8.0",
-    "@argent/x-sessions": "^4.8.0",
+    "@argent/get-starknet": "^4.8.1",
+    "@argent/x-sessions": "^4.8.1",
     "ethers": "^5.5.1",
     "next": "^12.1.4",
     "react": "^18.0.0",
