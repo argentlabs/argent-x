@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { userReviewStore } from "../../../shared/userReview"
 import {
   getAccountIdentifier,
   isDeprecated,
@@ -70,10 +72,24 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { accountNames, setAccountName } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
+  const transactionsBeforeReview = useKeyValueStorage(
+    userReviewStore,
+    "transactionsBeforeReview",
+  )
+
+  const userHasReviewed = useKeyValueStorage(userReviewStore, "hasReviewed")
 
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
   const network = useCurrentNetwork()
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>
+    if (!userHasReviewed && transactionsBeforeReview === 0) {
+      timeoutId = setTimeout(() => navigate(routes.userReview()), 1000)
+    }
+    return () => timeoutId && clearTimeout(timeoutId)
+  }, [navigate, transactionsBeforeReview, userHasReviewed])
 
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), network.id, "feeTokenBalance"],
