@@ -21,7 +21,7 @@ import { TransactionDetailWrapped } from "./TransactionDetailWrapped"
 
 const network = defaultNetwork
 
-const makeTransaction = (transactions: Call | Call[]): Transaction => {
+const makeTransaction = (transactions?: Call | Call[]): Transaction => {
   return {
     account: account as Account,
     hash: "0x535aa7c68e99011c090d3a2d277005dd9fe073ab6dc354a0c5d67f12505a5fc",
@@ -122,6 +122,14 @@ Unknown location (pc=0:802)
 Unknown location (pc=0:655)`,
     },
   },
+  accountAddress,
+  network,
+  tokensByNetwork,
+}
+
+export const EmptyCallData = Template.bind({})
+EmptyCallData.args = {
+  transaction: makeTransaction(),
   accountAddress,
   network,
   tokensByNetwork,

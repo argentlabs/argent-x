@@ -1,5 +1,5 @@
 import { Collapse } from "@mui/material"
-import { FC, ReactNode, useCallback, useState } from "react"
+import { Children, FC, ReactNode, useCallback, useState } from "react"
 import styled from "styled-components"
 
 import { DisclosureIcon } from "../../../components/DisclosureIcon"
@@ -56,10 +56,10 @@ export const ExpandableFieldGroup: FC<IExpandableFieldGroup> = ({
   const toggleExpanded = useCallback(() => {
     setExpanded((expanded) => !expanded)
   }, [])
-
+  const hasChildren = Children.toArray(children).length > 0
   return (
     <StyledFieldGroup>
-      <Field clickable onClick={toggleExpanded}>
+      <Field clickable={hasChildren} onClick={toggleExpanded}>
         <IconAndTitleContainer>
           {icon && <IconContainer>{icon}</IconContainer>}
           <FieldKeyGroup>
@@ -67,13 +67,17 @@ export const ExpandableFieldGroup: FC<IExpandableFieldGroup> = ({
             <SubTitle>{subtitle}</SubTitle>
           </FieldKeyGroup>
         </IconAndTitleContainer>
-        <FieldValue>
-          <DisclosureIcon expanded={expanded} />
-        </FieldValue>
+        {hasChildren && (
+          <FieldValue>
+            <DisclosureIcon expanded={expanded} />
+          </FieldValue>
+        )}
       </Field>
-      <StyledCollapse in={expanded} timeout="auto">
-        {children}
-      </StyledCollapse>
+      {hasChildren && (
+        <StyledCollapse in={expanded} timeout="auto">
+          {children}
+        </StyledCollapse>
+      )}
     </StyledFieldGroup>
   )
 }
