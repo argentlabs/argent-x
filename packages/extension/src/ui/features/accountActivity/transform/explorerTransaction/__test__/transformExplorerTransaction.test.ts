@@ -167,14 +167,6 @@ describe("transformExplorerTransaction", () => {
           "action": "MINT",
           "actualFee": "12404500000000",
           "contractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
-          "dapp": {
-            "hosts": [
-              "mintsquare.io",
-            ],
-            "id": "mintsquare-io",
-            "title": "Mint Square",
-          },
-          "dappContractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
           "date": "2022-08-18T11:50:28.000Z",
           "displayName": "Mint NFT",
           "entity": "NFT",
@@ -378,6 +370,7 @@ describe("transformExplorerTransaction", () => {
             "hosts": [
               "www.myswap.xyz",
             ],
+            "icon": "https://www.myswap.xyz/favicon.ico",
             "id": "myswap-xyz",
             "title": "mySwap",
           },
@@ -427,6 +420,7 @@ describe("transformExplorerTransaction", () => {
               "aspect.co",
               "testnet.aspect.co",
             ],
+            "icon": "https://aspect.co/img/company/logo512.png",
             "id": "aspect-co",
             "title": "Aspect",
           },
@@ -476,6 +470,7 @@ describe("transformExplorerTransaction", () => {
             "hosts": [
               "game-goerli.influenceth.io",
             ],
+            "icon": "https://uploads-ssl.webflow.com/60c209ffee9cc9e89d505549/60c8fea5c9d9a170d2f9b5e0_logo-256.png",
             "id": "influenceth-io",
             "title": "Influence",
           },

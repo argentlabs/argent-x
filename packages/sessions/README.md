@@ -26,7 +26,7 @@ interface Policy {
   selector: string
 }
 
-interface Session {
+interface RequestSession {
   key: string
   expires: number
   policies: Policy[]
@@ -49,7 +49,7 @@ import { Signer, ec } from "starknet"
 // gets signer with random private key you need to store if you want to reuse the session
 const sessionSigner = new Signer()
 
-const session: Session = {
+const requestSession: RequestSession = {
   key: await sessionSigner.getPublicKey(),
   expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
   policies: [
@@ -64,10 +64,10 @@ const session: Session = {
 Now you can sign the session with the account you have. Depending on how your account works, the user may get asked to sign a message
 
 ```typescript
-import { session } from "starknet"
+import { createSession } from "@argent/x-sessions"
 
 // calls account.signMessage internally
-const signedSession = await session.createSession(session, account)
+const signedSession = await createSession(requestSession, account)
 ```
 
 ### Using established sessions
@@ -75,7 +75,7 @@ const signedSession = await session.createSession(session, account)
 With your signed session you can now use it with your dapp to do transactions without the user having to approve again.
 
 ```typescript
-import { SessionAccount } from "starknet"
+import { SessionAccount } from "@argent/x-sessions"
 
 const sessionAccount = new SessionAccount(
   account,

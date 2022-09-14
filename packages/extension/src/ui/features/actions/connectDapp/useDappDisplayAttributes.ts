@@ -21,6 +21,14 @@ export const getDappDisplayAttributes = async (
     iconUrl: `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
   }
 
+  /** check if the icon still exists at the url */
+  if (knownDapp?.icon) {
+    const response = await fetch(knownDapp.icon, { method: "HEAD" })
+    if (response.ok) {
+      result.iconUrl = knownDapp.icon
+    }
+  }
+
   try {
     /** TODO: this will fail for sites without CORS, could proxy through e.g. https://www.npmjs.com/package/cors-anywhere */
     const baseUrl = getBaseUrlForHost(host)

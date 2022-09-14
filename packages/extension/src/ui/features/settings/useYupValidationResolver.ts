@@ -2,13 +2,7 @@ import { useCallback } from "react"
 import { Resolver } from "react-hook-form"
 import { InferType, Schema, ValidationError } from "yup"
 
-function deleteEmptyStringFields(
-  obj: Record<string, string>,
-): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([, value]) => value !== ""),
-  )
-}
+import { omitEmpty } from "../../../shared/utils/object"
 
 export const useYupValidationResolver = <S extends Schema>(
   validationSchema: S,
@@ -16,13 +10,10 @@ export const useYupValidationResolver = <S extends Schema>(
   useCallback<Resolver<InferType<S>>>(
     async (data) => {
       try {
-        const values = await validationSchema.validate(
-          deleteEmptyStringFields(data),
-          {
-            abortEarly: false,
-          },
-        )
-
+        const cleanedData = omitEmpty(data)
+        const values = await validationSchema.validate(cleanedData, {
+          abortEarly: false,
+        })
         return {
           values,
           errors: {},

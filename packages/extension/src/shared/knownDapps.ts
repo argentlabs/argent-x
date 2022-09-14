@@ -9,6 +9,8 @@ export interface KnownDapp {
   hosts: string[]
   /** the display title */
   title: string
+  /** default icon if one cannot be retrieved automatically by {@link getDappDisplayAttributes} */
+  icon?: string
   /** known contract addresses per network */
   contracts: {
     [network in PublicNetworkIds]: string[]

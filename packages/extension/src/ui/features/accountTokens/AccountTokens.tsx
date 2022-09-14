@@ -39,7 +39,7 @@ import { fetchFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
-import { useAccountStatus } from "./useAccountStatus"
+import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
 
 const Container = styled.div`
   display: flex;
@@ -127,7 +127,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [account])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
-  const tokensEnabled = status.code !== "DEPLOYING" && status.code !== "ERROR"
+  const accountIsDeployed = useAccountIsDeployed(account)
   return (
     <Container data-testid="account-tokens">
       <AccountSubHeader
@@ -139,7 +139,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           setAccountName(account.networkId, account.address, name)
         }
       />
-      <TransferButtons />
+      <TransferButtons account={account} />
       <StatusMessage>
         <StatusMessageBannerContainer />
       </StatusMessage>
@@ -153,7 +153,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
       <PendingTransactionsContainer account={account} />
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
-      {tokensEnabled && (
+      {accountIsDeployed && (
         <ErrorBoundary
           fallback={
             <ErrorBoundaryFallbackWithCopyError
