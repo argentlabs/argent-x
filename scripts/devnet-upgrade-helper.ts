@@ -1,5 +1,5 @@
 import { declareUpgradeContract } from "@argent-x/extension/e2e/apis/declareUpgradeContract"
-import { sendDevnetEthToAccount } from "@argent-x/extension/e2e/apis/sendDevnetEthToAccount"
+import { mintDevnetEthToAccount } from "@argent-x/extension/e2e/apis/sendDevnetEthToAccount"
 import { validateAndParseAddress } from "starknet"
 
 import prompt from "./utils/prompt"
@@ -33,7 +33,7 @@ import prompt from "./utils/prompt"
     if (addressIsValid) {
       previousAddress = address
       console.log(`Transferring Ξ1 to ${address}`)
-      await sendDevnetEthToAccount(address)
+      await mintDevnetEthToAccount(address)
     } else {
       console.log(`"${address}" is not valid wallet address`)
     }
