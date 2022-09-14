@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers"
 import { memoize } from "lodash-es"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import useSWR from "swr"
 
 import { useArrayStorage } from "../../../shared/storage/hooks"
@@ -10,6 +10,7 @@ import { equalToken } from "../../../shared/token/utils"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { useAccount } from "../accounts/accounts.state"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { fetchAllTokensBalance } from "./tokens.service"
 
 export interface TokenDetailsWithBalance extends Token {
@@ -47,6 +48,9 @@ export const useTokensWithBalance = (
   account?: BaseWalletAccount,
 ): UseTokens => {
   const selectedAccount = useAccount(account)
+  const { pendingTransactions } = useAccountTransactions(account)
+  const pendingTransactionsLengthRef = useRef(pendingTransactions.length)
+
   const networkId = useMemo(() => {
     return selectedAccount?.networkId ?? ""
   }, [selectedAccount?.networkId])
@@ -102,7 +106,13 @@ export const useTokensWithBalance = (
 
   const tokenDetailsIsInitialising = !error && !data
 
-  // TODO: refetch balances on transaction success
+  // refetch when number of pending transactions goes down
+  useEffect(() => {
+    if (pendingTransactionsLengthRef.current > pendingTransactions.length) {
+      mutate()
+    }
+    pendingTransactionsLengthRef.current = pendingTransactions.length
+  }, [mutate, pendingTransactions.length])
 
   // refetch balances on token edit (token was added or removed)
   useEffect(() => {

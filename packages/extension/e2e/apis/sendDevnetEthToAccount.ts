@@ -1,3 +1,5 @@
+import fetch from "cross-fetch"
+
 import { BASE_URL } from "./account"
 
 export async function mintDevnetEthToAccount(address: string) {
