@@ -15,6 +15,7 @@ import { routes } from "../../routes"
 import { H2, H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenIcon } from "./TokenIcon"
+import { IIsLoading, isLoadingPulse } from "./TokenListItem"
 import { TokenMenu } from "./TokenMenu"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
@@ -68,11 +69,23 @@ const ComingSoonText = styled.div`
   color: ${({ theme }) => theme.text3};
 `
 
+const TokenBalanceContainer = styled(RowCentered)<IIsLoading>`
+  gap: 8px;
+  margin-top: 12px;
+  align-items: baseline;
+  ${isLoadingPulse}
+`
+
+const StyledH2 = styled(H2)`
+  margin-bottom: 0;
+`
+
 export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
   const account = useSelectedAccount()
-  const { tokenDetails } = useTokensWithBalance(account)
+  const { tokenDetails, tokenDetailsIsInitialising, isValidating } =
+    useTokensWithBalance(account)
   const token = useMemo(
     () => tokenDetails.find(({ address }) => address === tokenAddress),
     [tokenAddress, tokenDetails],
@@ -85,6 +98,7 @@ export const TokenScreen: FC = () => {
 
   const { address, name, symbol, image } = toTokenView(token)
   const displayBalance = prettifyTokenBalance(token, false)
+  const isLoading = isValidating || tokenDetailsIsInitialising
 
   return (
     <>
@@ -95,16 +109,16 @@ export const TokenScreen: FC = () => {
         <TokenHeader hasCurrencyValue={!!currencyValue}>
           <ColumnCenter>
             <TokenIcon name={name} url={image} large />
-            <RowCentered
-              gap="8px"
-              align="baseline"
-              style={{ marginTop: "12px" }}
-            >
-              <H2 style={{ marginBottom: "0px" }} data-testid="tokenBalance">
+            <TokenBalanceContainer isLoading={isLoading}>
+              <StyledH2
+                data-testid={
+                  isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
+                }
+              >
                 {displayBalance}
-              </H2>
+              </StyledH2>
               <H3>{symbol}</H3>
-            </RowCentered>
+            </TokenBalanceContainer>
             {currencyValue && (
               <CurrencyValueText>
                 {prettifyCurrencyValue(currencyValue)}

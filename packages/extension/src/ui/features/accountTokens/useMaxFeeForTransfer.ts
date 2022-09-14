@@ -14,7 +14,7 @@ export const useMaxFeeEstimateForTransfer = (
   balance?: BigNumber,
   account?: Account,
 ): {
-  maxFee?: BigNumber
+  maxFee?: string
   error?: any
   loading: boolean
 } => {
@@ -72,7 +72,7 @@ export const useMaxFeeEstimateForTransfer = (
       0.2,
     )
     return {
-      maxFee: BigNumber.from(number.toHex(maxFee)),
+      maxFee: number.toHex(maxFee),
       error: undefined,
       loading: false,
     }

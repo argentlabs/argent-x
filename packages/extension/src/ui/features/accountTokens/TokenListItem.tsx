@@ -59,7 +59,7 @@ const TokenSymbol = styled.div`
   text-transform: uppercase;
 `
 
-interface IIsLoading {
+export interface IIsLoading {
   isLoading?: boolean
 }
 
