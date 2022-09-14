@@ -14,7 +14,7 @@ const integrationNetwork: Network = {
 export const defaultNetworks: Network[] = [
   {
     id: "mainnet-alpha",
-    name: "Ethereum Mainnet",
+    name: "Mainnet",
     chainId: "SN_MAIN",
     baseUrl: "https://alpha-mainnet.starknet.io",
     explorerUrl: "https://voyager.online",
@@ -28,7 +28,7 @@ export const defaultNetworks: Network[] = [
   },
   {
     id: "goerli-alpha",
-    name: "Goerli Testnet",
+    name: "Testnet",
     chainId: "SN_GOERLI",
     baseUrl: "https://alpha4.starknet.io",
     explorerUrl: "https://goerli.voyager.online",
