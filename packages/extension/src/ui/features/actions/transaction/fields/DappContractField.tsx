@@ -14,9 +14,15 @@ import {
 import { DappIcon } from "../../connectDapp/DappIcon"
 import { useDappDisplayAttributes } from "../../connectDapp/useDappDisplayAttributes"
 
+const DappFieldValue = styled(FieldValue)`
+  margin-left: 8px;
+`
+
 const DappIconContainer = styled.div`
   width: 24px;
   height: 24px;
+  display: flex;
+  flex-shrink: 0;
 `
 
 export const MaybeDappContractField: FC<{ contractAddress: string }> = ({
@@ -31,20 +37,27 @@ export const MaybeDappContractField: FC<{ contractAddress: string }> = ({
 
 export const DappContractField: FC<{
   knownContract: Omit<KnownDapp, "contracts">
-}> = ({ knownContract }) => {
+  useDappDisplayAttributesImpl?: typeof useDappDisplayAttributes
+}> = ({
+  knownContract,
+  useDappDisplayAttributesImpl = useDappDisplayAttributes,
+}) => {
   const host = knownContract.hosts[0]
-  const dappDisplayAttributes = useDappDisplayAttributes(host)
+  const dappDisplayAttributes = useDappDisplayAttributesImpl(host)
   return (
     <Field>
       <FieldKey>Dapp</FieldKey>
-      <FieldValue>
+      <DappFieldValue>
         <DappIconContainer>
-          <DappIcon host={host} />
+          <DappIcon
+            host={host}
+            useDappDisplayAttributesImpl={useDappDisplayAttributesImpl}
+          />
         </DappIconContainer>
         <LeftPaddedField>
           {dappDisplayAttributes?.title || host}
         </LeftPaddedField>
-      </FieldValue>
+      </DappFieldValue>
     </Field>
   )
 }
