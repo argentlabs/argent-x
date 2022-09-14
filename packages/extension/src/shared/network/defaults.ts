@@ -14,7 +14,7 @@ const integrationNetwork: Network = {
 export const defaultNetworks: Network[] = [
   {
     id: "mainnet-alpha",
-    name: "Ethereum Mainnet",
+    name: "Mainnet",
     chainId: "SN_MAIN",
     baseUrl: "https://alpha-mainnet.starknet.io",
     explorerUrl: "https://voyager.online",
