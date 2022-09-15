@@ -7,6 +7,7 @@ import TextareaAutosize, {
 import styled, { css } from "styled-components"
 
 import { isNumeric } from "../../shared/utils/number"
+import { scrollbarStyle } from "../theme"
 
 export const Container = styled.div`
   display: flex;
@@ -235,40 +236,48 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   onlyAddressHex,
   children,
   ...props
-}: ControlledInputProps<T>) => (
-  <Controller
-    name={name}
-    control={control}
-    defaultValue={defaultValue}
-    rules={rules}
-    render={({ field: { ref, value, onChange: onValueChange, ...field } }) => (
-      <InputTextAlt
-        style={{ position: "relative" }}
-        {...props}
-        value={value || ""}
-        {...field}
-        inputRef={ref}
-        inputMode="decimal"
-        type="text"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          if (onlyNumeric) {
-            if (isAllowedNumericInputValue(e.target.value)) {
+}: ControlledInputProps<T>) => {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({
+        field: { ref, value, onChange: onValueChange, ...field },
+      }) => (
+        <InputTextAlt
+          style={{ position: "relative" }}
+          {...props}
+          value={value || ""}
+          {...field}
+          inputRef={ref}
+          inputMode="decimal"
+          type="text"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e.target.value.length < value?.length) {
+              /** always allow delete whether resulting value is invalid or not */
+              return onValueChange(e)
+            } else if (onlyNumeric) {
+              if (isAllowedNumericInputValue(e.target.value)) {
+                return onValueChange(e)
+              }
+            } else if (onlyAddressHex) {
+              if (isAllowedAddressHexInputValue(e.target.value)) {
+                return onValueChange(e)
+              }
+            } else {
               return onValueChange(e)
             }
-          } else if (onlyAddressHex) {
-            if (isAllowedAddressHexInputValue(e.target.value)) {
-              return onValueChange(e)
-            }
-          } else {
-            return onValueChange(e)
-          }
-        }}
-      >
-        {children}
-      </InputTextAlt>
-    )}
-  />
-)
+            /** don't allow change */
+          }}
+        >
+          {children}
+        </InputTextAlt>
+      )}
+    />
+  )
+}
 
 export type ControlledInputType = typeof ControlledInputTextAlt
 
@@ -292,6 +301,7 @@ export const TextAreaAlt = styled(TextareaAutosize)`
   ${InputCssAlt}
   resize: none;
   width: 100%;
+  ${scrollbarStyle}
 `
 
 export type InputTextAreaProps = Omit<TextareaAutosizeProps, "ref" | "as">
@@ -357,7 +367,10 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
         inputRef={ref}
         maxRows={maxRows}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-          if (onlyNumeric) {
+          if (e.target.value.length < value?.length) {
+            /** always allow delete whether resulting value is invalid or not */
+            return onValueChange(e)
+          } else if (onlyNumeric) {
             if (isAllowedNumericInputValue(e.target.value)) {
               onValueChange(e)
               return isFunction(onChange) && onChange(e)
@@ -371,6 +384,7 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
             onValueChange(e)
             return isFunction(onChange) && onChange(e)
           }
+          /** don't allow change */
         }}
         {...field}
         {...props}
