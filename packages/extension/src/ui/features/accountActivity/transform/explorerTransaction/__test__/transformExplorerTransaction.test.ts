@@ -16,6 +16,7 @@ import {
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc20TransferWithSequencerEvent,
   erc721MintAspect,
   erc721MintMintSquare,
   erc721Transfer,
@@ -28,6 +29,36 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc20Transfer as IExplorerTransaction,
+          accountAddress: "0x0",
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "TRANSFER",
+          "actualFee": "10089999979820",
+          "amount": "1000000000000000",
+          "date": "2022-08-18T11:50:28.000Z",
+          "displayName": "Transfer",
+          "entity": "TOKEN",
+          "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          "maxFee": "15134999954595",
+          "toAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          "token": {
+            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "decimals": 18,
+            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "name": "Ether",
+            "network": "mainnet-alpha",
+            "networkId": "mainnet-alpha",
+            "showAlways": true,
+            "symbol": "ETH",
+          },
+          "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        }
+      `)
+      expect(
+        transformExplorerTransaction({
+          explorerTransaction:
+            erc20TransferWithSequencerEvent as IExplorerTransaction,
           accountAddress: "0x0",
         }),
       ).toMatchInlineSnapshot(`
