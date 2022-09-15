@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers"
 import { Call } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
@@ -20,11 +19,7 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
     throw response.error
   }
 
-  return {
-    ...response,
-    amount: BigNumber.from(response.amount),
-    suggestedMaxFee: BigNumber.from(response.suggestedMaxFee),
-  }
+  return response
 }
 
 // for debugging purposes
