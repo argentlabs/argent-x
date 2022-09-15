@@ -6,8 +6,9 @@ import TextareaAutosize, {
 } from "react-textarea-autosize"
 import styled, { css } from "styled-components"
 
-import { isNumeric } from "../../shared/utils/number"
 import { scrollbarStyle } from "../theme"
+import { isAllowedAddressHexInputValue } from "./utils/isAllowedAddressHexInputValue"
+import { isAllowedNumericInputValue } from "./utils/isAllowedNumericInputValue"
 
 export const Container = styled.div`
   display: flex;
@@ -196,31 +197,6 @@ interface AdditionalControlledInputProps {
   onlyNumeric?: boolean
   onlyAddressHex?: boolean
   children?: React.ReactNode
-}
-
-export const isAllowedNumericInputValue = (value: string, maxDecimals = 16) => {
-  const numericalRegex = new RegExp(`^[0-9]*.?[0-9]{0,${maxDecimals}}$`)
-  if (value === "") {
-    return true
-  }
-  if (!isNumeric(value)) {
-    return false
-  }
-  if (numericalRegex.test(value)) {
-    return true
-  }
-  return false
-}
-
-export const isAllowedAddressHexInputValue = (value: string) => {
-  const hexRegex = /^(|0|0x([a-f0-9A-F]+)?)$/
-  if (value === "") {
-    return true
-  }
-  if (hexRegex.test(value)) {
-    return true
-  }
-  return false
 }
 
 export type ControlledInputProps<T extends FieldValues> = InputFieldProps &
