@@ -3795,17 +3795,6 @@
     qs "^6.10.0"
     telejson "^6.0.8"
 
-"@storybook/channel-websocket@6.5.10":
-  version "6.5.10"
-  resolved "https://registry.npmjs.org/@storybook/channel-websocket/-/channel-websocket-6.5.10.tgz#bd1316a9b555229b215e5054a76b57c503dd8adc"
-  integrity sha512-RTXMZbMWCS3xU+4GVIdfnUXsKcwg/WTozy88/5OxaKjGw6KgRedqLAQJKJ6Y5XlnwIcWelirkHj/COwTTXhbPg==
-  dependencies:
-    "@storybook/channels" "6.5.10"
-    "@storybook/client-logger" "6.5.10"
-    core-js "^3.8.2"
-    global "^4.4.0"
-    telejson "^6.0.8"
-
 "@storybook/channel-websocket@6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/channel-websocket/-/channel-websocket-6.5.12.tgz#4796e2436900d73fb867591f7d7cf8f94898d51b"
@@ -3929,32 +3918,6 @@
     memoizerific "^1.11.3"
     qs "^6.10.0"
     regenerator-runtime "^0.13.7"
-    util-deprecate "^1.0.2"
-
-"@storybook/core-client@6.5.10":
-  version "6.5.10"
-  resolved "https://registry.npmjs.org/@storybook/core-client/-/core-client-6.5.10.tgz#90c86923236c8efff33d454a0dc552f6df4346b1"
-  integrity sha512-THsIjNrOrampTl0Lgfjvfjk1JnktKb4CQLOM80KpQb4cjDqorBjJmErzUkUQ2y3fXvrDmQ/kUREkShET4XEdtA==
-  dependencies:
-    "@storybook/addons" "6.5.10"
-    "@storybook/channel-postmessage" "6.5.10"
-    "@storybook/channel-websocket" "6.5.10"
-    "@storybook/client-api" "6.5.10"
-    "@storybook/client-logger" "6.5.10"
-    "@storybook/core-events" "6.5.10"
-    "@storybook/csf" "0.0.2--canary.4566f4d.1"
-    "@storybook/preview-web" "6.5.10"
-    "@storybook/store" "6.5.10"
-    "@storybook/ui" "6.5.10"
-    airbnb-js-shims "^2.2.1"
-    ansi-to-html "^0.6.11"
-    core-js "^3.8.2"
-    global "^4.4.0"
-    lodash "^4.17.21"
-    qs "^6.10.0"
-    regenerator-runtime "^0.13.7"
-    ts-dedent "^2.0.0"
-    unfetch "^4.2.0"
     util-deprecate "^1.0.2"
 
 "@storybook/core-client@6.5.12":
@@ -4281,19 +4244,19 @@
     webpack-virtual-modules "^0.2.2"
 
 "@storybook/manager-webpack5@^6.5.9":
-  version "6.5.10"
-  resolved "https://registry.npmjs.org/@storybook/manager-webpack5/-/manager-webpack5-6.5.10.tgz#dff8e53615906284b68df013935e8a6234ddaafe"
-  integrity sha512-uRo+6e5MiVOtyFVMYIKVqvpDveCjHyzXBfetSYR7rKEZoaDMEnLLiuF7DIH12lzxwmzCJ1gIc4lf5HFiTMNkgw==
+  version "6.5.12"
+  resolved "https://registry.yarnpkg.com/@storybook/manager-webpack5/-/manager-webpack5-6.5.12.tgz#77c98a63ef6c8d2ae0b1e69eb432818d0c25e672"
+  integrity sha512-F+KgoINhfo1ArbirCc9L+EyADYD8Z4t0LyZYDVcBiZ8DlRIMIoUSye6tDsnyEm+OPloLVAcGwRMYgFhuHB70Lg==
   dependencies:
     "@babel/core" "^7.12.10"
     "@babel/plugin-transform-template-literals" "^7.12.1"
     "@babel/preset-react" "^7.12.10"
-    "@storybook/addons" "6.5.10"
-    "@storybook/core-client" "6.5.10"
-    "@storybook/core-common" "6.5.10"
-    "@storybook/node-logger" "6.5.10"
-    "@storybook/theming" "6.5.10"
-    "@storybook/ui" "6.5.10"
+    "@storybook/addons" "6.5.12"
+    "@storybook/core-client" "6.5.12"
+    "@storybook/core-common" "6.5.12"
+    "@storybook/node-logger" "6.5.12"
+    "@storybook/theming" "6.5.12"
+    "@storybook/ui" "6.5.12"
     "@types/node" "^14.0.10 || ^16.0.0"
     babel-loader "^8.0.0"
     case-sensitive-paths-webpack-plugin "^2.3.0"
@@ -4598,26 +4561,6 @@
     core-js "^3.8.2"
     memoizerific "^1.11.3"
     regenerator-runtime "^0.13.7"
-
-"@storybook/ui@6.5.10":
-  version "6.5.10"
-  resolved "https://registry.npmjs.org/@storybook/ui/-/ui-6.5.10.tgz#f56095a1a39ae5a203f2ac7f3dba86341a5927d5"
-  integrity sha512-6iaoaRAiTqB1inTw35vao+5hjcDE0Qa0A3a9ZIeNa6yHvpB1k0lO/N/0PMrRdVvySYpXVD1iry4z4QYdo1rU+w==
-  dependencies:
-    "@storybook/addons" "6.5.10"
-    "@storybook/api" "6.5.10"
-    "@storybook/channels" "6.5.10"
-    "@storybook/client-logger" "6.5.10"
-    "@storybook/components" "6.5.10"
-    "@storybook/core-events" "6.5.10"
-    "@storybook/router" "6.5.10"
-    "@storybook/semver" "^7.3.2"
-    "@storybook/theming" "6.5.10"
-    core-js "^3.8.2"
-    memoizerific "^1.11.3"
-    qs "^6.10.0"
-    regenerator-runtime "^0.13.7"
-    resolve-from "^5.0.0"
 
 "@storybook/ui@6.5.12":
   version "6.5.12"
