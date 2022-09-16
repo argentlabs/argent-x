@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 import { Button, ButtonGroup } from "../../components/Button"
 import { Title } from "../../components/Page"
+import Row from "../../components/Row"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { P, P3 } from "../../theme/Typography"
@@ -65,18 +66,20 @@ export const OnboardingStartScreen: FC = () => {
 
   return (
     <LedgerPage>
-      <h1>Logo in here</h1>
+      <LogoSvg />
       <ContentWrapper>
         <StepIndicator length={3} currentIndex={0} />
         <Title style={{ marginTop: "32px" }}>Welcome to Argent X</Title>
         <P3>Enjoy the security of Ethereum with the scale of StarkNet</P3>
-        <ButtonGroup>
+        <Row gap={"12px"}>
           <Button onClick={() => navigate(routes.onboardingDisclaimer())}>
             New wallet
           </Button>
           <Button onClick={() => navigate(routes.seedRecovery())}>
             Restore wallet
           </Button>
+        </Row>
+        <ButtonGroup>
           <Button onClick={() => navigate(routes.ledgerEntry())}>Ledger</Button>
         </ButtonGroup>
       </ContentWrapper>

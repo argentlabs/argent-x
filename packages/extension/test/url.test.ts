@@ -32,6 +32,15 @@ describe("url", () => {
         expect(
           urlWithQuery("https://foo.bar.xyz", { foo: "bar baz", bar: "foo" }),
         ).toEqual("https://foo.bar.xyz?foo=bar+baz&bar=foo")
+        expect(
+          urlWithQuery(["https://foo.bar.xyz", "baz", "qux"], { foo: "bar" }),
+        ).toEqual("https://foo.bar.xyz/baz/qux?foo=bar")
+        expect(
+          urlWithQuery(["https://foo.bar.xyz", "baz", "qux"], {
+            foo: "bar baz",
+            bar: "foo",
+          }),
+        ).toEqual("https://foo.bar.xyz/baz/qux?foo=bar+baz&bar=foo")
       })
     })
     describe("when invalid", () => {

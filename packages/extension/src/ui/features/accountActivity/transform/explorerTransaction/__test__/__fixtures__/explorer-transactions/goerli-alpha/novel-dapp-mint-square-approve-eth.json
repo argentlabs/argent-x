@@ -1,0 +1,66 @@
+{
+  "id": "0xd55acca7bbe427c2b796218588e020acf0d301b48bab8137c61ae0b0aaec54",
+  "blockNumber": 299542,
+  "timestamp": 1660823428,
+  "transactionHash": "0xd55acca7bbe427c2b796218588e020acf0d301b48bab8137c61ae0b0aaec54",
+  "contractAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+  "entryPoint": "__execute__",
+  "maxFee": "0x5310e36aa80",
+  "actualFee": "0x3760979a945",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Approval",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "owner",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "spender",
+          "value": "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786"
+        },
+        {
+          "name": "value",
+          "value": "1000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0xd55acca7bbe427c2b796218588e020acf0d301b48bab8137c61ae0b0aaec54"
+        },
+        {
+          "name": "response_len",
+          "value": "0x1"
+        },
+        {
+          "name": "response",
+          "value": ["0x1"]
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "approve",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "spender",
+          "value": "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786"
+        },
+        {
+          "name": "amount",
+          "value": "1000000000000000000000000"
+        }
+      ]
+    }
+  ]
+}

@@ -57,6 +57,8 @@ import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen
 import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
+import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
+import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
 
@@ -245,6 +247,11 @@ const fullscreenRoutes = (
     <Route path={routes.ledgerEntry.path} element={<LedgerStartScreen />} />
     <Route path={routes.ledgerSelect.path} element={<LedgerSelectScreen />} />
     <Route path={routes.ledgerDone.path} element={<LedgerDoneScreen />} />
+    <Route path={routes.userReview.path} element={<ReviewRatingScreen />} />
+    <Route
+      path={routes.userReviewFeedback.path}
+      element={<ReviewFeedbackScreen />}
+    />
   </>
 )
 

@@ -5,21 +5,12 @@ import { FC, useState } from "react"
 import styled from "styled-components"
 
 import { KeyboardArrowDownRounded } from "../../components/Icons/MuiIcons"
+import { scrollbarStyle } from "../../theme"
 import { AccountListItem, IAccountListItem } from "./AccountListItem"
 
 const StyledPaper = styled(Paper)`
   max-height: 220px;
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-  &::-webkit-scrollbar {
-    width: 6px;
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-  }
+  ${scrollbarStyle}
 `
 
 const StyledMenuList = styled(MenuList)`

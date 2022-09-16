@@ -1,5 +1,8 @@
+import { isString } from "lodash-es"
+import useSWR from "swr"
 import join from "url-join"
 
+import { fetcher } from "../../../shared/api/fetcher"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AspectNft } from "./aspect.model"
 
@@ -10,7 +13,7 @@ export interface Collection {
   name: string
   contractAddress: string
   nfts: AspectNft[]
-  imageUri: string
+  imageUri?: string
 }
 
 export type Collections = Collection[]
@@ -45,56 +48,98 @@ export const fetchAspectNftsByUrl = async (
   url: string,
   address: string,
 ): Promise<AspectNft[]> => {
-  try {
-    const params = new URLSearchParams({ owner_address: address })
-    const response = await fetch(join(url, `?${params}`, "&limit=50"))
-    const data = await response.json()
+  const params = new URLSearchParams({ owner_address: address })
+  const assets = await fetchNextAspectNftsByUrl(
+    join(url, `?${params}`, "&limit=50"),
+    address,
+  )
+  return assets
+}
 
-    if (data.next_url) {
-      return data.assets.concat(
-        await fetchAspectNftsByUrl(data.next_url, address),
-      )
-    }
-    return data.assets
-  } catch {
+export const fetchNextAspectNftsByUrl = async (
+  url: string,
+  address: string,
+): Promise<AspectNft[]> => {
+  const response = await fetch(url)
+  if (!response.ok) {
     return []
   }
+
+  const data = await response.json()
+
+  if (isString(data.next_url)) {
+    return data.assets.concat(
+      await fetchNextAspectNftsByUrl(data.next_url, address),
+    )
+  }
+
+  return data.assets
 }
 
 export const fetchAspectCollection = async (
   account?: BaseWalletAccount,
   contractAddress?: string,
-): Promise<Collection | null> => {
-  try {
-    if (!account || !contractAddress) {
-      throw new Error("Account and Contract Address are required")
-    }
-
-    const baseUrl = getAspectBaseUrl(account)
-
-    const params = new URLSearchParams({
-      owner_address: account.address,
-      contract_address: contractAddress,
-    })
-
-    const response = await fetch(join(baseUrl, `?${params}`, "&limit=50"))
-    const data = await response.json()
-
-    if (data.next_url) {
-      return data.assets.concat(
-        await fetchAspectCollection(data.next_url, account.address),
-      )
-    }
-
-    return {
-      name: data.assets[0].contract.name_custom,
-      contractAddress,
-      imageUri: data.assets[0].contract.image_url,
-      nfts: data.assets,
-    }
-  } catch {
-    return null
+): Promise<Collection> => {
+  if (!account || !contractAddress) {
+    throw new Error("Account and Contract Address are required")
   }
+  const { address } = account
+  const baseUrl = getAspectBaseUrl(account)
+
+  const params = new URLSearchParams({
+    owner_address: address,
+    contract_address: contractAddress,
+  })
+
+  const url = join(baseUrl, `?${params}`, "&limit=50")
+  const assets = await fetchNextAspectCollection(url, account, contractAddress)
+  if (Array.isArray(assets) && assets.length > 0) {
+    return {
+      name:
+        assets[0].contract.name_custom || assets[0].contract.name || "Untitled",
+      contractAddress,
+      imageUri: assets[0].contract.image_url,
+      nfts: assets,
+    }
+  }
+  return {
+    name: "No collectibles",
+    contractAddress,
+    nfts: [],
+  }
+}
+
+export const fetchNextAspectCollection = async (
+  url: string,
+  account: BaseWalletAccount,
+  contractAddress: string,
+): Promise<AspectNft[]> => {
+  const response = await fetch(url)
+  if (!response.ok) {
+    return []
+  }
+
+  const data = await response.json()
+
+  if (isString(data.next_url)) {
+    return data.assets.concat(
+      await fetchNextAspectCollection(data.next_url, account, contractAddress),
+    )
+  }
+
+  return data.assets
+}
+
+export const useAspectNft = (
+  contractAddress: string | undefined,
+  tokenId: string | undefined,
+  networkId: string,
+) => {
+  const url =
+    networkId === "goerli-alpha"
+      ? `https://api-testnet.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
+      : `https://api.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
+  return useSWR<AspectNft>(contractAddress && tokenId && url, fetcher)
 }
 
 export const openAspectNft = (

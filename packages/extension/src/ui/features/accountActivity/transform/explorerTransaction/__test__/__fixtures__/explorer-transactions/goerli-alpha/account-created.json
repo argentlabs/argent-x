@@ -1,0 +1,22 @@
+{
+  "id": "0x1c04a449562071f6b89fae30c5d4f3f2a1c53e208b87ede1abe17db00cd0e22",
+  "blockNumber": 247178,
+  "timestamp": 1660823428,
+  "transactionHash": "0x1c04a449562071f6b89fae30c5d4f3f2a1c53e208b87ede1abe17db00cd0e22",
+  "contractAddress": "0x5da8675178256fb969b69c7abb7107184c192a889879b54a1e712e63153df54",
+  "actualFee": "0x0",
+  "status": "ACCEPTED_ON_L1",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Upgraded",
+      "address": "0x5da8675178256fb969b69c7abb7107184c192a889879b54a1e712e63153df54",
+      "parameters": [
+        {
+          "name": "implementation",
+          "value": "0x222f474bc7de126c517bf7954cb421932f4fa16de4666971df5b1154ea0ed37"
+        }
+      ]
+    }
+  ]
+}

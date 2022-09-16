@@ -1,5 +1,5 @@
 import { SUCCESS_STATUSES } from "../../../shared/transactions"
-import { resetStoredNonce } from "../../nonce"
+import { decrementTransactionsBeforeReview } from "../../../shared/userReview"
 import {
   addToAlreadyShown,
   hasShownNotification,
@@ -18,12 +18,9 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
         addToAlreadyShown(hash)
 
         if (!account.hidden) {
+          await decrementTransactionsBeforeReview()
           sentTransactionNotification(hash, status, meta)
         }
-      }
-      // on error remove stored (increased) nonce
-      if (transaction.account && status === "REJECTED") {
-        await resetStoredNonce(transaction.account)
       }
     }
   }

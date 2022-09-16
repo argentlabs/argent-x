@@ -127,6 +127,8 @@ export const routes = {
       `/backup-download${isFromSettings ? "?settings" : ""}`,
     "/backup-download",
   ),
+  userReview: route("/user-review"),
+  userReviewFeedback: route("/user-review/feedback"),
   error: route("/error"),
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),

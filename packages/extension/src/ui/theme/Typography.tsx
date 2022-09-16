@@ -50,7 +50,7 @@ export const P3 = styled.p`
   color: ${({ theme }) => theme.neutrals100};
 `
 
-export const DialogContentText = styled.p`
+export const DialogMessageText = styled.p`
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;

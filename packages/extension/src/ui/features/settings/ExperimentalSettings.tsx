@@ -31,7 +31,7 @@ export const PrivacyExperimentalSettings: FC = () => {
               }
             />
           </Title>
-          <P>Use the experimental Argent Plugin Account</P>
+          <P>Use the experimental Argent Plugin account on testnet</P>
         </SettingsItem>
       </SettingsScreenWrapper>
     </>
