@@ -2,7 +2,11 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Button, ButtonGroup } from "../../components/Button"
+import { Button, ButtonGroup, PressableButton } from "../../components/Button"
+import {
+  AccountBalanceWalletIcon,
+  RefreshIcon,
+} from "../../components/Icons/MuiIcons"
 import { Title } from "../../components/Page"
 import Row from "../../components/Row"
 import { routes } from "../../routes"
@@ -47,6 +51,35 @@ const greetings = [
   "hi fren",
 ]
 
+const IconContainer = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const CreateWalletIcon = styled(IconContainer)`
+  background-color: ${({ theme }) => theme.primary};
+`
+
+const RestoreWalletIcon = styled(IconContainer)`
+  background-color: ${({ theme }) => theme.neutrals700};
+`
+
+const RectButton = styled(PressableButton).attrs(() => ({
+  variant: "neutrals800",
+}))`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 18px;
+`
+
 export const OnboardingStartScreen: FC = () => {
   const navigate = useNavigate()
   usePageTracking("welcome")
@@ -71,13 +104,19 @@ export const OnboardingStartScreen: FC = () => {
         <StepIndicator length={3} currentIndex={0} />
         <Title style={{ marginTop: "32px" }}>Welcome to Argent X</Title>
         <P3>Enjoy the security of Ethereum with the scale of StarkNet</P3>
-        <Row gap={"12px"}>
-          <Button onClick={() => navigate(routes.onboardingDisclaimer())}>
-            New wallet
-          </Button>
-          <Button onClick={() => navigate(routes.seedRecovery())}>
-            Restore wallet
-          </Button>
+        <Row gap={"12px"} align="stretch">
+          <RectButton onClick={() => navigate(routes.onboardingDisclaimer())}>
+            <CreateWalletIcon>
+              <AccountBalanceWalletIcon />
+            </CreateWalletIcon>
+            Create a new wallet
+          </RectButton>
+          <RectButton onClick={() => navigate(routes.seedRecovery())}>
+            <RestoreWalletIcon>
+              <RefreshIcon />
+            </RestoreWalletIcon>
+            Restore an existing wallet
+          </RectButton>
         </Row>
         <ButtonGroup>
           <Button onClick={() => navigate(routes.ledgerEntry())}>Ledger</Button>

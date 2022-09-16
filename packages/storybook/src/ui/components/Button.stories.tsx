@@ -63,3 +63,10 @@ Info.args = {
   variant: "info",
   disabled: false,
 }
+
+export const Neutrals800 = Template.bind({})
+Neutrals800.args = {
+  children: "Button",
+  variant: "neutrals800",
+  disabled: false,
+}

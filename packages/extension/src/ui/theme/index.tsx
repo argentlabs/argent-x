@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles"
-import { colord } from "colord"
+import { colord, extend } from "colord"
+import mixPlugin from "colord/plugins/mix"
 import React, { FC } from "react"
 import {
   DefaultTheme,
@@ -8,6 +9,8 @@ import {
   css,
 } from "styled-components"
 import { normalize } from "styled-normalize"
+
+extend([mixPlugin])
 
 const white = "#FFFFFF"
 const black = "#000000"
@@ -119,6 +122,15 @@ export const components = {
         base: colors.white,
         hover: colord(colors.white).darken(0.075).toRgbString(),
         disabled: colord(colors.white).alpha(0.5).toRgbString(),
+      },
+    },
+    neutrals800: {
+      bg: {
+        base: colors.neutrals800,
+        hover: colord(colors.neutrals800)
+          .mix(colors.neutrals700, 0.75)
+          .toRgbString(),
+        disabled: colors.neutrals900,
       },
     },
     radius: "500px",

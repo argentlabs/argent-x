@@ -19,6 +19,7 @@ export type ButtonVariant =
   | "info"
   | "transparent"
   | "inverted"
+  | "neutrals800"
 
 export type ButtonSize = "default" | "xs" | "s" | "m" | "l" | "xl"
 
@@ -71,6 +72,12 @@ export const getVariantColor =
           : disabled
           ? theme.button.transparent.bg.disabled
           : theme.button.transparent.bg.base
+      case "neutrals800":
+        return hover
+          ? theme.button.neutrals800.bg.hover
+          : disabled
+          ? theme.button.neutrals800.bg.disabled
+          : theme.button.neutrals800.bg.base
     }
     return hover
       ? theme.button.default.bg.hover
