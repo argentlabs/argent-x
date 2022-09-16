@@ -1,9 +1,7 @@
 import { describe, expect, test } from "vitest"
 
-import {
-  isAllowedAddressHexInputValue,
-  isAllowedNumericInputValue,
-} from "../src/ui/components/InputText"
+import { isAllowedAddressHexInputValue } from "../src/ui/components/utils/isAllowedAddressHexInputValue"
+import { isAllowedNumericInputValue } from "../src/ui/components/utils/isAllowedNumericInputValue"
 
 describe("isAllowedNumericInputValue()", () => {
   describe("when valid", () => {
