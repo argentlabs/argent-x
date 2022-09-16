@@ -1,7 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-interface StepIndicatorProps {
+export interface StepIndicatorProps {
   length: number
   currentIndex: number
 
