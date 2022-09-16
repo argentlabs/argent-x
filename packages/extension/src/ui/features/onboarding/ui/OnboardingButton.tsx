@@ -5,5 +5,5 @@ import { PressableButton } from "../../../components/Button"
 export const OnboardingButton = styled(PressableButton).attrs(() => ({
   variant: "primary",
 }))`
-  min-width: 200px;
+  width: 200px;
 `
