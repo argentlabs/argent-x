@@ -29,7 +29,7 @@ const StyledPrivacyStatement = styled(PrivacyStatement)`
   text-align: center;
 `
 
-export const DisclaimerScreen: FC = () => {
+export const OnboardingDisclaimerScreen: FC = () => {
   usePageTracking("disclaimer")
   const navigate = useNavigate()
   const [conditions, setConditions] = useState({
@@ -51,7 +51,7 @@ export const DisclaimerScreen: FC = () => {
         !conditions.lossOfFunds || !conditions.alphaVersion
       }
       singleButton
-      onSubmit={() => navigate(routes.newWallet())}
+      onSubmit={() => navigate(routes.onboardingPassword())}
       footer={<StyledPrivacyStatement />}
     >
       <SP>

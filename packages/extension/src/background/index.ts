@@ -25,6 +25,7 @@ import {
 import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
+import { initOnboarding } from "./onboarding"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
@@ -33,6 +34,12 @@ import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { Wallet, sessionStore, walletStore } from "./wallet"
+
+// onboarding on first install
+
+initOnboarding()
+
+// transaction polling
 
 browser.alarms.create("core:transactionTracker:history", {
   periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager

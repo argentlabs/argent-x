@@ -43,7 +43,7 @@ interface NewWalletScreenProps {
   overrideSubmitText?: string
 }
 
-export const NewWalletScreen: FC<NewWalletScreenProps> = ({
+export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
   overrideSubmit,
   overrideTitle,
   overrideSubmitText,
@@ -80,7 +80,8 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
             networkId: newAccount.networkId,
           })
           setIsDeploying(false)
-          navigate(await recover())
+          // navigate(await recover())
+          navigate(routes.onboardingFinish())
         } catch (error: any) {
           analytics.track("createWallet", {
             status: "failure",
@@ -107,7 +108,7 @@ export const NewWalletScreen: FC<NewWalletScreenProps> = ({
 
   return (
     <>
-      <IconBar back={routes.welcome()} />
+      <IconBar back={routes.onboardingStart()} />
       <Container>
         <H2>{overrideTitle || "New wallet"}</H2>
         <P>Enter a password to protect your wallet</P>

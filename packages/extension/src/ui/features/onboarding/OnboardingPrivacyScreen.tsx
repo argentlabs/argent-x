@@ -18,7 +18,7 @@ const PrivacyStatementText = styled.span`
   }
 `
 
-export const PrivacyStatementScreen: FC = () => {
+export const OnboardingPrivacyScreen: FC = () => {
   return (
     <>
       <IconBar back />

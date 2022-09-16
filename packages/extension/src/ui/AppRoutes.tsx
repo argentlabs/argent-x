@@ -30,14 +30,15 @@ import { FundingScreen } from "./features/funding/FundingScreen"
 import { LedgerDoneScreen } from "./features/ledger/done"
 import { LedgerSelectScreen } from "./features/ledger/select"
 import { LedgerStartScreen } from "./features/ledger/start"
+import { LockScreen } from "./features/lock/LockScreen"
+import { ResetScreen } from "./features/lock/ResetScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
-import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
-import { LockScreen } from "./features/onboarding/LockScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
-import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
-import { PrivacyStatementScreen } from "./features/onboarding/PrivacyStatementScreen"
-import { ResetScreen } from "./features/onboarding/ResetScreen"
-import { WelcomeScreen } from "./features/onboarding/WelcomeScreen"
+import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisclaimerScreen"
+import { OnboardingFinishScreen } from "./features/onboarding/OnboardingFinishScreen"
+import { OnboardingPasswordScreen } from "./features/onboarding/OnboardingPasswordScreen"
+import { OnboardingPrivacyScreen } from "./features/onboarding/OnboardingPrivacyScreen"
+import { OnboardingStartScreen } from "./features/onboarding/OnboardingStartScreen"
 import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
 import { BackupRecoveryScreen } from "./features/recovery/BackupRecoveryScreen"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
@@ -88,8 +89,26 @@ const Viewport: FC = () => (
 // Routes which don't need an unlocked wallet
 const nonWalletRoutes = (
   <>
-    <Route path={routes.welcome.path} element={<WelcomeScreen />} />
-    <Route path={routes.newWallet.path} element={<NewWalletScreen />} />
+    <Route
+      path={routes.onboardingStart.path}
+      element={<OnboardingStartScreen />}
+    />
+    <Route
+      path={routes.onboardingDisclaimer.path}
+      element={<OnboardingDisclaimerScreen />}
+    />
+    <Route
+      path={routes.onboardingPrivacy.path}
+      element={<OnboardingPrivacyScreen />}
+    />
+    <Route
+      path={routes.onboardingPassword.path}
+      element={<OnboardingPasswordScreen />}
+    />
+    <Route
+      path={routes.onboardingFinish.path}
+      element={<OnboardingFinishScreen />}
+    />
     <Route
       path={routes.backupRecovery.path}
       element={<BackupRecoveryScreen />}
@@ -101,7 +120,6 @@ const nonWalletRoutes = (
     />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
-    <Route path={routes.disclaimer.path} element={<DisclaimerScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
@@ -217,10 +235,6 @@ const walletRoutes = (
     <Route
       path={routes.settingsExperimental.path}
       element={<PrivacyExperimentalSettings />}
-    />
-    <Route
-      path={routes.privacyStatement.path}
-      element={<PrivacyStatementScreen />}
     />
     <Route path={routes.addAccount.path} element={<AddAccount />} />
   </>

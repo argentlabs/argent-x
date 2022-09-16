@@ -20,7 +20,7 @@ export const focusExtensionTab = async () => {
 }
 
 export const useExtensionIsInTab = () => {
-  const [isInTab, setIsInTab] = useState(false)
+  const [isInTab, setIsInTab] = useState<boolean | undefined>()
   useEffect(() => {
     const init = async () => {
       const inTab = await extensionIsInTab()

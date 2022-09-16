@@ -35,8 +35,11 @@ export const useReturnTo = () => {
 }
 
 export const routes = {
-  welcome: route("/index.html"),
-  newWallet: route("/wallets/new"),
+  onboardingStart: route("/index.html"),
+  onboardingDisclaimer: route("/onboarding/disclaimer"),
+  onboardingPrivacy: route("/onboarding/privacy"),
+  onboardingPassword: route("/onboarding/password"),
+  onboardingFinish: route("/onboarding/finish"),
   backupRecovery: route("/recover/backup"),
   seedRecovery: route("/recover/seed"),
   seedRecoveryPassword: route("/recover/seed/password"),
@@ -101,7 +104,6 @@ export const routes = {
     "/add-plugin/:accountAddress",
   ),
   reset: route("/reset"),
-  disclaimer: route("/disclaimer"),
   migrationDisclaimer: route("/migration-disclaimer"),
   legacy: route("/legacy"),
   settings: route("/settings"),
@@ -125,7 +127,6 @@ export const routes = {
       `/backup-download${isFromSettings ? "?settings" : ""}`,
     "/backup-download",
   ),
-  privacyStatement: route("/privacy-statement"),
   error: route("/error"),
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),

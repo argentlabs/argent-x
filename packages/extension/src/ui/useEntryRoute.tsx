@@ -39,7 +39,7 @@ const determineEntry = async (query: URLSearchParams) => {
 
   const { initialized } = await isInitialized()
   if (!initialized) {
-    return routes.welcome()
+    return routes.onboardingStart()
   }
 
   const hasSession = await hasActiveSession()

@@ -2,7 +2,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { recoverBySeedPhrase } from "../../services/backgroundRecovery"
-import { NewWalletScreen } from "../onboarding/NewWalletScreen"
+import { OnboardingPasswordScreen } from "../onboarding/OnboardingPasswordScreen"
 import { useBackupRequired } from "./backupDownload.state"
 import { recover } from "./recovery.service"
 import {
@@ -15,7 +15,7 @@ export const SeedRecoveryPasswordScreen: FC = () => {
   const navigate = useNavigate()
 
   return (
-    <NewWalletScreen
+    <OnboardingPasswordScreen
       overrideTitle="New password"
       overrideSubmitText="Continue"
       overrideSubmit={async ({ password }) => {

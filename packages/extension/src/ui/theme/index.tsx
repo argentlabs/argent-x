@@ -228,7 +228,7 @@ export const ThemeProvider: FC<{
 }
 
 export interface GlobalStyleProps {
-  extensionIsInTab: boolean
+  extensionIsInTab: boolean | undefined
 }
 
 export const FixedGlobalStyle = createGlobalStyle<GlobalStyleProps>`
