@@ -2,7 +2,6 @@ import LedgerSigner from "@argent/ledger-signer"
 import LedgerUsbTransport from "@ledgerhq/hw-transport-webusb"
 import { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { StarknetChainId } from "starknet/dist/constants"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
@@ -50,54 +49,38 @@ export const LedgerStartScreen: FC = () => {
               description: "The StarkNet app can be installed via Ledger Live",
             },
           ]}
-          style={{ marginBottom: 32 }}
+          style={{ marginBottom: 8 }}
         />
         {error && <FormError>{error}</FormError>}
         <StyledButton
+          style={{ marginTop: 32 }}
           onClick={async () => {
             setDetecting(true)
             setError("")
             try {
-              const tp = await LedgerUsbTransport.create()
+              const tp = await LedgerUsbTransport.create().catch((e) => {
+                console.error(e)
+                throw new Error("No Ledger device found")
+              })
+
               const signer = new LedgerSigner(
                 "m/2645'/1195502025'/1148870696'/0'/0'/0",
                 tp,
               )
-              console.log(signer)
-              try {
-                console.log(await signer.getPubKey())
-                const tx = await signer.signTransaction(
-                  [
-                    {
-                      contractAddress:
-                        "0x04483e2798fb2763773775d9b055a87deca913806b9e41c18ffa67bd6d826641",
-                      entrypoint: "transfer",
-                      calldata: ["0x0", "0x1", "0x2", "0x3"],
-                    },
-                  ],
-                  {
-                    chainId: StarknetChainId.TESTNET,
-                    maxFee: "0x10000",
-                    nonce: "0x0",
-                    version: "0x0",
-                    walletAddress:
-                      "0x04483e2798fb2763773775d9b055a87deca913806b9e41c18ffa67bd6d826641",
-                  },
-                )
-                console.log(tx)
-                navigate(routes.ledgerSelect())
-              } catch (e) {
+              await signer.getPubKey().catch((e) => {
                 console.error(e)
-                if (e instanceof Error) {
-                  setError(`Ledger: ${e.message}`)
-                }
-              }
+                throw new Error(
+                  "Make sure your Ledger is unlocked and StarkNet app is open",
+                )
+              })
+              navigate(routes.ledgerSelect())
             } catch (e) {
               console.error(e)
               if (e instanceof Error) {
-                setError(`Transport: ${e.message}`)
+                setError(e.message)
               }
             }
+
             setDetecting(false)
           }}
           variant="primary"

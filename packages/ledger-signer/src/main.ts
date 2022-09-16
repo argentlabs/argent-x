@@ -14,6 +14,8 @@ import {
 
 import { getPublicKeys, hasResponseError } from "./utils"
 
+export * from "./utils"
+
 class LedgerSigner implements SignerInterface {
   public derivationPath: string
 

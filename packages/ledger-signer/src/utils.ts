@@ -22,15 +22,15 @@ export async function getPublicKeys(
   derivationPaths: string[],
 ) {
   const ledger = getLedger(transportOrLedger)
-  const pks = await Promise.all(derivationPaths.map((p) => ledger.getPubKey(p)))
-  if (pks.some(hasResponseError)) {
-    throw new Error(
-      pks
-        .filter(hasResponseError)
-        .map((pk) => pk.errorMessage)
-        .join(" & "),
-    )
+
+  const pks: Uint8Array[] = []
+  for (const path of derivationPaths) {
+    const response = await ledger.getPubKey(path)
+    if (hasResponseError(response)) {
+      throw new Error(response.errorMessage)
+    }
+    pks.push(response.publicKey)
   }
-  console.log("pks", pks)
-  return pks.map((pk) => encode.addHexPrefix(encode.buf2hex(pk.publicKey)))
+
+  return pks.map((pk) => encode.addHexPrefix(encode.buf2hex(pk)))
 }
