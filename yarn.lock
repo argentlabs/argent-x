@@ -1906,10 +1906,10 @@
   resolved "https://registry.npmjs.org/@ledgerhq/errors/-/errors-6.10.1.tgz#510688251b6261744c6b1cde6cfd2dfb13fc27b2"
   integrity sha512-92d1zRQleR1AQ4CAXgWgDtKUms+8EwShLVUcajI+BLWvgJ1Vclmq6PsBIDEQbsm+riVu/Ji3LcHdmgFgmi0VGw==
 
-"@ledgerhq/hw-app-starknet@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/@ledgerhq/hw-app-starknet/-/hw-app-starknet-1.0.2.tgz#0b623f9d1584b2723de904b59973fde777e926e6"
-  integrity sha512-4VwktOMmrbDOlO+65f3K1sJ8UJuyBP039/y5RVd718QMxkW3q5j5/qcno6Q0UE6FqBpHPapO2I+TrOJnQeHbcg==
+"@ledgerhq/hw-app-starknet@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/@ledgerhq/hw-app-starknet/-/hw-app-starknet-1.1.1.tgz#60ea0ad7bcbc2924a724ef462d638a0c8f8c89a6"
+  integrity sha512-CHUgSTCBIBynvhVEspqywaoiHzt/azRqCk/Q16WG8Y60PjiVrZlGAtDObvL7F+Uo23N/tzLMbc4m1xTYLXJPLw==
   dependencies:
     "@ledgerhq/hw-transport" "^6.27.1"
 

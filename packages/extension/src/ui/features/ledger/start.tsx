@@ -55,7 +55,6 @@ export const LedgerStartScreen: FC = () => {
         {error && <FormError>{error}</FormError>}
         <StyledButton
           onClick={async () => {
-            navigate(routes.ledgerSelect())
             setDetecting(true)
             setError("")
             try {
@@ -86,6 +85,7 @@ export const LedgerStartScreen: FC = () => {
                   },
                 )
                 console.log(tx)
+                navigate(routes.ledgerSelect())
               } catch (e) {
                 console.error(e)
                 if (e instanceof Error) {
