@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { ArgentXBanner } from "../../components/Icons/ArgentXBanner"
 
-const Header = styled.div`
+export const Header = styled.div`
   position: absolute;
   left: 56px;
   top: 46px;
@@ -13,7 +13,7 @@ const Header = styled.div`
   width: 100%;
 `
 
-const Panel = styled.div`
+export const Panel = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,7 +22,7 @@ const Panel = styled.div`
   padding: 0 56px;
 `
 
-const PageWrapper = styled.div`
+export const PageWrapper = styled.div`
   display: flex;
   flex-direction: column-reverse;
   align-items: center;

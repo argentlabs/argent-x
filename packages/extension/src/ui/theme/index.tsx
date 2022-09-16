@@ -42,6 +42,16 @@ export const colors = {
   yellow1: "#ffbf3d",
 
   green1: "#02bba8",
+
+  neutrals100: "#B7B7B9",
+  neutrals200: "#9F9FA1",
+  neutrals300: "#88888A",
+  neutrals400: "#707072",
+  neutrals500: "#58585B",
+  neutrals600: "#404043",
+  neutrals700: "#28282C",
+  neutrals800: "#1D1F22",
+  neutrals900: "#101014",
 }
 
 export const components = {

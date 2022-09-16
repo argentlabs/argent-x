@@ -2,6 +2,12 @@ import LedgerStark from "@ledgerhq/hw-app-starknet"
 import type Transport from "@ledgerhq/hw-transport"
 import { encode } from "starknet"
 
+export function hasResponseError<T extends { errorMessage?: string }>(
+  response: T,
+): boolean {
+  return Boolean(response.errorMessage && response.errorMessage !== "No errors")
+}
+
 export function getLedger(
   transportOrLedger: Transport | LedgerStark,
 ): LedgerStark {
@@ -16,14 +22,15 @@ export async function getPublicKeys(
   derivationPaths: string[],
 ) {
   const ledger = getLedger(transportOrLedger)
-  const pks = await Promise.all(derivationPaths.map((p) => ledger.getPubKey(p)))
-  if (pks.some((pk) => pk.errorMessage)) {
-    throw new Error(
-      pks
-        .map((pk) => pk.errorMessage)
-        .filter(Boolean)
-        .join(" & "),
-    )
+
+  const pks: Uint8Array[] = []
+  for (const path of derivationPaths) {
+    const response = await ledger.getPubKey(path)
+    if (hasResponseError(response)) {
+      throw new Error(response.errorMessage)
+    }
+    pks.push(response.publicKey)
   }
-  return pks.map((pk) => encode.addHexPrefix(encode.buf2hex(pk.publicKey)))
+
+  return pks.map((pk) => encode.addHexPrefix(encode.buf2hex(pk)))
 }

@@ -1,4 +1,5 @@
 import { FC } from "react"
+import { Navigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Title } from "../../components/Page"
@@ -20,6 +21,10 @@ const SP = styled(P)`
 
 export const LedgerDoneScreen: FC = () => {
   const [selectedAccount] = useSelectedLedgerAccount()
+
+  if (!selectedAccount) {
+    return <Navigate to={"-1"} />
+  }
 
   return (
     <LedgerPage>

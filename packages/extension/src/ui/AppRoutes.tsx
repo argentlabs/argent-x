@@ -90,26 +90,6 @@ const Viewport: FC = () => (
 const nonWalletRoutes = (
   <>
     <Route
-      path={routes.onboardingStart.path}
-      element={<OnboardingStartScreen />}
-    />
-    <Route
-      path={routes.onboardingDisclaimer.path}
-      element={<OnboardingDisclaimerScreen />}
-    />
-    <Route
-      path={routes.onboardingPrivacy.path}
-      element={<OnboardingPrivacyScreen />}
-    />
-    <Route
-      path={routes.onboardingPassword.path}
-      element={<OnboardingPasswordScreen />}
-    />
-    <Route
-      path={routes.onboardingFinish.path}
-      element={<OnboardingFinishScreen />}
-    />
-    <Route
       path={routes.backupRecovery.path}
       element={<BackupRecoveryScreen />}
     />
@@ -242,6 +222,26 @@ const walletRoutes = (
 
 const fullscreenRoutes = (
   <>
+    <Route
+      path={routes.onboardingStart.path}
+      element={<OnboardingStartScreen />}
+    />
+    <Route
+      path={routes.onboardingDisclaimer.path}
+      element={<OnboardingDisclaimerScreen />}
+    />
+    <Route
+      path={routes.onboardingPrivacy.path}
+      element={<OnboardingPrivacyScreen />}
+    />
+    <Route
+      path={routes.onboardingPassword.path}
+      element={<OnboardingPasswordScreen />}
+    />
+    <Route
+      path={routes.onboardingFinish.path}
+      element={<OnboardingFinishScreen />}
+    />
     <Route path={routes.ledgerEntry.path} element={<LedgerStartScreen />} />
     <Route path={routes.ledgerSelect.path} element={<LedgerSelectScreen />} />
     <Route path={routes.ledgerDone.path} element={<LedgerDoneScreen />} />

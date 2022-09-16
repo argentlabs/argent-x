@@ -12,7 +12,9 @@ import {
   typedData,
 } from "starknet"
 
-import { getPublicKeys } from "./utils"
+import { getPublicKeys, hasResponseError } from "./utils"
+
+export * from "./utils"
 
 class LedgerSigner implements SignerInterface {
   public derivationPath: string
@@ -86,8 +88,8 @@ class LedgerSigner implements SignerInterface {
   }
 
   private async sign(msg: string): Promise<Signature> {
-    const response = await this.ledger.signFelt(this.derivationPath, msg, true)
-    if (response.errorMessage) {
+    const response = await this.ledger.sign(this.derivationPath, msg, true)
+    if (hasResponseError(response)) {
       throw new Error(response.errorMessage)
     }
     return [

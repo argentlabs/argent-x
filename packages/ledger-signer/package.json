@@ -49,7 +49,7 @@
     "vitest": "^0.22.1"
   },
   "dependencies": {
-    "@ledgerhq/hw-app-starknet": "^1.0.2",
+    "@ledgerhq/hw-app-starknet": "^1.1.1",
     "starknet": "^4.4.0"
   }
 }
