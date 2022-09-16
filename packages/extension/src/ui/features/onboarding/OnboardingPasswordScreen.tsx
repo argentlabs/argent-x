@@ -5,6 +5,7 @@ import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
 import { StyledControlledInput } from "../../components/InputText"
+import { routes } from "../../routes"
 import { analytics, usePageTracking } from "../../services/analytics"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { FormError } from "../../theme/Typography"
