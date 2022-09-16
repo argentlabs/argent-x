@@ -29,6 +29,7 @@ export const PageWrapper = styled.div`
   justify-content: flex-end;
   width: 100%;
   margin-top: max(120px, 15vh);
+  position: relative;
 
   ${({ theme }) => theme.mediaMinWidth.md`
     flex-direction: row;
@@ -41,7 +42,7 @@ export const PageWrapper = styled.div`
       background-color: black;
       height: 100%;
     }
-  `}
+  `};
 `
 
 export const LedgerPage: FC<PropsWithChildren> = ({ children }) => {

@@ -6,7 +6,7 @@ import {
 } from "@mui/material"
 import { ChangeEventHandler, FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import styled, { useTheme } from "styled-components"
+import styled from "styled-components"
 
 import {
   CheckCircleIcon,
@@ -15,18 +15,27 @@ import {
 import { PrivacyStatement } from "../../components/PrivacyStatement"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
-import { P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
-
-const SP = styled(P)`
-  font-family: "Barlow", sans-serif; // explicit, as applied to MUI
-  font-size: 16px;
-  line-height: 20px;
-`
+import { P3 } from "../../theme/Typography"
+import { OnboardingButton } from "./ui/OnboardingButton"
+import { OnboardingScreen } from "./ui/OnboardingScreen"
 
 const StyledPrivacyStatement = styled(PrivacyStatement)`
-  display: block;
-  text-align: center;
+  display: flex;
+  text-align: right;
+  margin-left: auto;
+  margin-top: 8px;
+`
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  margin: 0 0 8px 0;
+  border: 1px solid ${({ theme }) => theme.neutrals600};
+  border-radius: 8px;
+  padding: 24px 20px 24px 12px;
+  gap: 8px;
+  &:active {
+    transform: scale(0.975);
+  }
+  transition: transform 100ms ease-in-out;
 `
 
 export const OnboardingDisclaimerScreen: FC = () => {
@@ -37,31 +46,20 @@ export const OnboardingDisclaimerScreen: FC = () => {
     alphaVersion: false,
   })
 
-  const theme = useTheme()
-
   const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) =>
     setConditions({ ...conditions, [target.name]: target.checked })
 
   return (
-    <ConfirmScreen
+    <OnboardingScreen
+      back
+      length={4}
+      currentIndex={1}
       title="Disclaimer"
-      confirmButtonText="Continue"
-      confirmButtonBackgroundColor={theme.red1}
-      confirmButtonDisabled={
-        !conditions.lossOfFunds || !conditions.alphaVersion
-      }
-      singleButton
-      onSubmit={() => navigate(routes.onboardingPassword())}
-      footer={<StyledPrivacyStatement />}
+      subtitle="StarkNet is in Alpha and may experience technical issues or introduce breaking changes from time to time. Please accept this before continuing."
     >
-      <SP>
-        StarkNet is in Alpha and may experience technical issues or introduce
-        breaking changes from time to time. Please accept this before
-        continuing.
-      </SP>
       <FormControl component="fieldset" variant="standard">
         <FormGroup>
-          <FormControlLabel
+          <StyledFormControlLabel
             control={
               <Checkbox
                 checked={conditions.lossOfFunds}
@@ -73,14 +71,13 @@ export const OnboardingDisclaimerScreen: FC = () => {
               />
             }
             label={
-              <SP>
+              <P3>
                 I understand that StarkNet may introduce changes that make my
                 existing account unusable and force to create new ones.
-              </SP>
+              </P3>
             }
-            style={{ marginTop: 30 }}
           />
-          <FormControlLabel
+          <StyledFormControlLabel
             control={
               <Checkbox
                 checked={conditions.alphaVersion}
@@ -92,15 +89,23 @@ export const OnboardingDisclaimerScreen: FC = () => {
               />
             }
             label={
-              <SP>
+              <P3>
                 I understand that StarkNet may experience performance issues and
                 my transactions may fail for various reasons.
-              </SP>
+              </P3>
             }
-            style={{ marginTop: 30 }}
           />
         </FormGroup>
       </FormControl>
-    </ConfirmScreen>
+      <StyledPrivacyStatement />
+      <div>
+        <OnboardingButton
+          disabled={!conditions.lossOfFunds || !conditions.alphaVersion}
+          onClick={() => navigate(routes.onboardingPassword())}
+        >
+          Continue
+        </OnboardingButton>
+      </div>
+    </OnboardingScreen>
   )
 }

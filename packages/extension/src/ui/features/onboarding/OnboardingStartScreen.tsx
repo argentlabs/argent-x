@@ -6,11 +6,9 @@ import {
   AccountBalanceWalletIcon,
   RefreshIcon,
 } from "../../components/Icons/MuiIcons"
-import { Title } from "../../components/Page"
 import Row from "../../components/Row"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
-import { P3 } from "../../theme/Typography"
 import { extensionIsInTab, openExtensionInTab } from "../browser/tabs"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import { RectButton } from "./ui/RectButton"
