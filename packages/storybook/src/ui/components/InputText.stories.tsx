@@ -40,7 +40,9 @@ const Template: ComponentStory<typeof StyledControlledInput> = (props) => {
 }
 
 export const Default = Template.bind({})
-Default.args = {}
+Default.args = {
+  variant: "neutrals800",
+}
 
 export const OnlyNumeric = Template.bind({})
 OnlyNumeric.args = {

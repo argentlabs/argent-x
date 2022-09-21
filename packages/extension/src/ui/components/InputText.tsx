@@ -196,6 +196,7 @@ export const ControlledInputText = styled(
 interface AdditionalControlledInputProps {
   onlyNumeric?: boolean
   onlyAddressHex?: boolean
+  variant?: InputVariant
   children?: React.ReactNode
 }
 
@@ -255,15 +256,37 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   )
 }
 
-export type ControlledInputType = typeof ControlledInputTextAlt
+export type InputVariant = "default" | "outline" | "neutrals800"
+
+export type ControlledInputType = typeof ControlledInputTextAlt & {
+  variant?: InputVariant
+}
+
+export const getVariantStyle = ({
+  variant = "default",
+}: {
+  variant?: InputVariant
+}) => {
+  return css`
+    padding: 12px 16px;
+    border: 1px solid
+      ${({ theme }) =>
+        variant === "neutrals800" ? theme.neutrals800 : theme.bg2};
+    border-radius: 8px;
+    background-color: ${({ theme }) =>
+      variant === "neutrals800" ? theme.neutrals800 : theme.black};
+    &:focus-within {
+      background-color: ${({ theme }) =>
+        variant === "neutrals800" ? theme.neutrals700 : theme.black};
+    }
+    transition: background-color 200ms ease-in-out;
+  `
+}
 
 export const StyledControlledInput: ControlledInputType = styled(
   ControlledInputTextAlt,
-)`
-  padding: 12px 16px;
-  border: 1px solid ${({ theme }) => theme.bg2};
-  border-radius: 8px;
-  background-color: black;
+)<{ variant?: InputVariant }>`
+  ${getVariantStyle}
 `
 
 export const TextArea = styled.textarea`

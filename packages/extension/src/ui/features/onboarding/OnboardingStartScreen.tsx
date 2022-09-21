@@ -1,3 +1,4 @@
+import { colord } from "colord"
 import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -27,7 +28,8 @@ const CreateWalletIcon = styled(IconContainer)`
 `
 
 const RestoreWalletIcon = styled(IconContainer)`
-  background-color: ${({ theme }) => theme.neutrals700};
+  background-color: ${({ theme }) =>
+    colord(theme.neutrals600).alpha(0.5).toRgbString()};
 `
 
 export const OnboardingStartScreen: FC = () => {

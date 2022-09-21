@@ -112,6 +112,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
           type="password"
           placeholder="Password"
           disabled={isDeploying}
+          variant="neutrals800"
         />
         {errors.password?.type === "required" && (
           <FormError>A new password is required</FormError>
@@ -127,6 +128,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
           type="password"
           placeholder="Repeat password"
           disabled={isDeploying}
+          variant="neutrals800"
         />
         {errors.repeatPassword?.type === "validate" && (
           <FormError>Passwords do not match</FormError>
