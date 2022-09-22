@@ -32,5 +32,7 @@ export async function getPublicKeys(
     pks.push(response.publicKey)
   }
 
-  return pks.map((pk) => encode.addHexPrefix(encode.buf2hex(pk)))
+  return pks
+    .map((pk) => encode.addHexPrefix(encode.buf2hex(pk))) // convert to hex
+    .map((xy) => xy.slice(0, 66)) // remove y coordinate and keep only x
 }
