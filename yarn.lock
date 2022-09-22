@@ -15898,9 +15898,9 @@ tr46@~0.0.3:
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
 
 tracking-link@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.npmjs.org/tracking-link/-/tracking-link-4.0.1.tgz#c8c9127d7c35606d5f5e4bee4d3888408aadd582"
-  integrity sha512-RXQo6IMDZ3dDUI7+nZa2ZmcW402vlcvh2YE2Y59eE+MeoTYGjiiaxr14FjanCOMo2G4dDNP6bG5vXdU0m4fFIg==
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/tracking-link/-/tracking-link-4.0.2.tgz#f37c7daa20396c794d5b9da19ce433eddda053f1"
+  integrity sha512-ONExIMer5PNouw4OL8l5XX6dEQmMnSnux6uHtMeqUVvS/ctnwGu9A20jh5K599ORpiFW80p4OIRhvCjJ3KN2rw==
   dependencies:
     classnames "^2.2.5"
     prop-types "^15.6.1"
