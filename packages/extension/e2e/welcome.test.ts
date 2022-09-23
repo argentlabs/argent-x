@@ -6,12 +6,9 @@ import { openExtension } from "./steps/openExtension"
 test("Welcome page is shown correctly", async ({ page, context }) => {
   await openExtension(page, context)
 
-  await expect(page.locator("text=Get started")).toBeVisible({
+  await expect(page.locator("text=Welcome to Argent X")).toBeVisible({
     timeout: 8000,
   }) // page is live
-  await expect(page.locator("text=Welcome!")).toBeVisible({
-    timeout: 8000,
-  }) // and alternates between greetings
-  await expect(page.locator("text=New Wallet")).toBeVisible() // has a button to create a new wallet
-  await expect(page.locator("text=Restore Wallet")).toBeVisible() // has a button to restore a wallet
+  await expect(page.locator("text=Create a new wallet")).toBeVisible() // has a button to create a new wallet
+  await expect(page.locator("text=Restore an existing wallet")).toBeVisible() // has a button to restore a wallet
 })
