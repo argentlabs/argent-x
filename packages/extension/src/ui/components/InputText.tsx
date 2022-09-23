@@ -212,6 +212,7 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   onlyNumeric,
   onlyAddressHex,
   children,
+  autoComplete = "off",
   ...props
 }: ControlledInputProps<T>) => {
   return (
@@ -229,8 +230,7 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
           value={value || ""}
           {...field}
           inputRef={ref}
-          inputMode="decimal"
-          type="text"
+          autoComplete={autoComplete}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.value.length < value?.length) {
               /** always allow delete whether resulting value is invalid or not */
