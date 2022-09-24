@@ -1,7 +1,13 @@
 import { describe, expect, test } from "vitest"
 
-import { IExplorerTransaction } from "../../../../../../shared/explorer/type"
-import { fingerprintExplorerTransaction } from "..//fingerprintExplorerTransaction"
+import {
+  IExplorerTransaction,
+  IExplorerTransactionEvent,
+} from "../../../../../../shared/explorer/type"
+import {
+  fingerprintExplorerTransaction,
+  isEthTransferToSequencer,
+} from "../fingerprintExplorerTransaction"
 import {
   accountCreated,
   accountCreatedAlt,
@@ -16,10 +22,37 @@ import {
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc20TransferWithSequencerEvent,
   erc721MintAspect,
   erc721MintMintSquare,
   erc721Transfer,
 } from "./__fixtures__/explorer-transactions/goerli-alpha"
+
+describe("isEthTransferToSequencer", () => {
+  describe("when valid", () => {
+    describe("when the event is a Transfer to sequencer", () => {
+      test("should return true", () => {
+        const event = erc20TransferWithSequencerEvent
+          .events[2] as IExplorerTransactionEvent
+        expect(isEthTransferToSequencer(event)).toBe(true)
+      })
+    })
+    describe("when the event is not a Transfer to sequencer", () => {
+      test("should return false", () => {
+        const event = erc20TransferWithSequencerEvent
+          .events[0] as IExplorerTransactionEvent
+        expect(isEthTransferToSequencer(event)).toBe(false)
+      })
+    })
+  })
+  describe("when invalid", () => {
+    test("should return false", () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expect(isEthTransferToSequencer({})).toBe(false)
+    })
+  })
+})
 
 describe("fingerprintExplorerTransaction", () => {
   describe("when valid", () => {
@@ -92,6 +125,11 @@ describe("fingerprintExplorerTransaction", () => {
       )
       expect(
         fingerprintExplorerTransaction(erc20Transfer as IExplorerTransaction),
+      ).toMatchInlineSnapshot('"events[Transfer] calls[transfer]"')
+      expect(
+        fingerprintExplorerTransaction(
+          erc20TransferWithSequencerEvent as IExplorerTransaction,
+        ),
       ).toMatchInlineSnapshot('"events[Transfer] calls[transfer]"')
       expect(
         fingerprintExplorerTransaction(

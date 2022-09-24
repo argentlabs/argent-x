@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -72,12 +72,12 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
-    "@argent/x-sessions": "^4.8.2",
+    "@argent/x-sessions": "^4.8.3",
     "@extend-chrome/messages": "^1.2.2",
-    "@google/model-viewer": "^1.11.1",
+    "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.1.0",
-    "@mui/styled-engine-sc": "^5.1.0",
+    "@mui/styled-engine-sc": "^5.10.3",
     "@sentry/react": "^7.6.0",
     "@sentry/tracing": "^7.6.0",
     "@tippyjs/react": "^4.2.6",
