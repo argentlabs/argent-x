@@ -1,17 +1,17 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { routes } from "../../routes"
 import { recoverBySeedPhrase } from "../../services/backgroundRecovery"
-import { OnboardingPasswordScreen } from "../onboarding/OnboardingPasswordScreen"
-import { useBackupRequired } from "./backupDownload.state"
-import { recover } from "./recovery.service"
+import { useBackupRequired } from "../recovery/backupDownload.state"
 import {
   useSeedRecovery,
   validateAndSetPassword,
   validateSeedRecoveryCompletion,
-} from "./seedRecovery.state"
+} from "../recovery/seedRecovery.state"
+import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
 
-export const SeedRecoveryPasswordScreen: FC = () => {
+export const OnboardingRestorePassword: FC = () => {
   const navigate = useNavigate()
 
   return (
@@ -25,7 +25,7 @@ export const SeedRecoveryPasswordScreen: FC = () => {
           if (validateSeedRecoveryCompletion(state)) {
             await recoverBySeedPhrase(state.seedPhrase, state.password)
             useBackupRequired.setState({ isBackupRequired: false }) // as the user recovered their seed, we can assume they have a backup
-            navigate(await recover())
+            navigate(routes.onboardingFinish())
           }
         } catch {
           console.error("seed phrase is invalid")

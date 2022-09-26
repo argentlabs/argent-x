@@ -38,13 +38,13 @@ import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisc
 import { OnboardingFinishScreen } from "./features/onboarding/OnboardingFinishScreen"
 import { OnboardingPasswordScreen } from "./features/onboarding/OnboardingPasswordScreen"
 import { OnboardingPrivacyScreen } from "./features/onboarding/OnboardingPrivacyScreen"
+import { OnboardingRestoreBackup } from "./features/onboarding/OnboardingRestoreBackup"
+import { OnboardingRestorePassword } from "./features/onboarding/OnboardingRestorePassword"
+import { OnboardingRestoreSeed } from "./features/onboarding/OnboardingRestoreSeed"
 import { OnboardingStartScreen } from "./features/onboarding/OnboardingStartScreen"
 import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
-import { BackupRecoveryScreen } from "./features/recovery/BackupRecoveryScreen"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
 import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
-import { SeedRecoveryPasswordScreen } from "./features/recovery/SeedRecoveryPasswordScreen"
-import { SeedRecoveryScreen } from "./features/recovery/SeedRecoveryScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
 import { SendScreen } from "./features/send/SendScreen"
 import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
@@ -91,15 +91,6 @@ const Viewport: FC = () => (
 // Routes which don't need an unlocked wallet
 const nonWalletRoutes = (
   <>
-    <Route
-      path={routes.backupRecovery.path}
-      element={<BackupRecoveryScreen />}
-    />
-    <Route path={routes.seedRecovery.path} element={<SeedRecoveryScreen />} />
-    <Route
-      path={routes.seedRecoveryPassword.path}
-      element={<SeedRecoveryPasswordScreen />}
-    />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
@@ -239,6 +230,18 @@ const fullscreenRoutes = (
     <Route
       path={routes.onboardingPassword.path}
       element={<OnboardingPasswordScreen />}
+    />
+    <Route
+      path={routes.onboardingRestoreBackup.path}
+      element={<OnboardingRestoreBackup />}
+    />
+    <Route
+      path={routes.onboardingRestoreSeed.path}
+      element={<OnboardingRestoreSeed />}
+    />
+    <Route
+      path={routes.onboardingRestorePassword.path}
+      element={<OnboardingRestorePassword />}
     />
     <Route
       path={routes.onboardingFinish.path}

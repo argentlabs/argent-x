@@ -63,7 +63,7 @@ export const OnboardingStartScreen: FC = () => {
           </CreateWalletIcon>
           Create a new wallet
         </RectButton>
-        <RectButton onClick={() => navigate(routes.seedRecovery())}>
+        <RectButton onClick={() => navigate(routes.onboardingRestoreSeed())}>
           <RestoreWalletIcon>
             <RefreshIcon />
           </RestoreWalletIcon>

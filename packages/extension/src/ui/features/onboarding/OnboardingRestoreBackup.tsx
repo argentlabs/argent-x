@@ -33,7 +33,7 @@ const DropZone = styled.div`
   }
 `
 
-export const BackupRecoveryScreen: FC = () => {
+export const OnboardingRestoreBackup: FC = () => {
   usePageTracking("restoreWalletWithFile")
   const navigate = useNavigate()
   const {

@@ -6,10 +6,10 @@ import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { A, FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { validateAndSetSeedPhrase } from "./seedRecovery.state"
-import { useCustomNavigate } from "./useCustomNavigate"
+import { validateAndSetSeedPhrase } from "../recovery/seedRecovery.state"
+import { useCustomNavigate } from "../recovery/useCustomNavigate"
 
-export const SeedRecoveryScreen: FC = () => {
+export const OnboardingRestoreSeed: FC = () => {
   usePageTracking("restoreWallet")
   const textAreaElement = useRef<HTMLTextAreaElement>(null)
   const [seedPhraseInput, setSeedPhraseInput] = useState("")
@@ -26,7 +26,7 @@ export const SeedRecoveryScreen: FC = () => {
       if (textAreaElement.current !== null) {
         textAreaElement.current.value = ""
       }
-      customNavigate(routes.seedRecoveryPassword())
+      customNavigate(routes.onboardingRestorePassword())
     } catch {
       setError("Invalid seed phrase")
     }
@@ -64,7 +64,7 @@ export const SeedRecoveryScreen: FC = () => {
         <A
           style={{ padding: "0", marginTop: "16px" }}
           onClick={() => {
-            customNavigate(routes.backupRecovery())
+            customNavigate(routes.onboardingRestoreBackup())
           }}
         >
           Recover using a backup file
