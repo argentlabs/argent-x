@@ -21,6 +21,10 @@ const Form = styled.form`
   align-self: stretch;
 `
 
+const StyledOnboardingButton = styled(OnboardingButton)`
+  margin-top: 20px;
+`
+
 interface FieldValues {
   password: string
   repeatPassword: string
@@ -138,9 +142,12 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
             Sorry, unable to create wallet. Please try again later.
           </FormError>
         )}
-        <OnboardingButton type="submit" disabled={!isDirty || isDeploying}>
+        <StyledOnboardingButton
+          type="submit"
+          disabled={!isDirty || isDeploying}
+        >
           {buttonText}
-        </OnboardingButton>
+        </StyledOnboardingButton>
       </Form>
     </OnboardingScreen>
   )

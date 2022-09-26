@@ -1,13 +1,28 @@
 import { FC, useMemo, useRef, useState } from "react"
+import styled from "styled-components"
 
-import { IconBar } from "../../components/IconBar"
 import { TextArea } from "../../components/InputText"
+import { RowBetween } from "../../components/Row"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
-import { A, FormError, P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { FormError } from "../../theme/Typography"
 import { validateAndSetSeedPhrase } from "../recovery/seedRecovery.state"
 import { useCustomNavigate } from "../recovery/useCustomNavigate"
+import { OnboardingButton } from "./ui/OnboardingButton"
+import { OnboardingScreen } from "./ui/OnboardingScreen"
+
+const StyledTextArea = styled(TextArea)`
+  margin-bottom: 32px;
+`
+
+const RestoreBackupLink = styled.span`
+  padding: 0;
+  color: ${({ theme }) => theme.text3};
+  font-weight: 400;
+  font-size: 12px;
+  text-decoration-line: underline;
+  cursor: pointer;
+`
 
 export const OnboardingRestoreSeed: FC = () => {
   usePageTracking("restoreWallet")
@@ -33,43 +48,39 @@ export const OnboardingRestoreSeed: FC = () => {
   }
 
   return (
-    <>
-      <IconBar back />
-      <ConfirmScreen
-        title="Restore accounts"
-        confirmButtonText="Continue"
-        singleButton
-        confirmButtonDisabled={disableSubmit}
-        onSubmit={handleRestoreClick}
-        smallTopPadding
-      >
-        <P>
-          Enter each of the 12 words from your recovery phrase separated by a
-          space
-        </P>
-        <TextArea
-          ref={textAreaElement}
-          placeholder="Enter the 12 words"
-          value={seedPhraseInput}
-          onChange={(e: any) => {
-            setError("")
-            setSeedPhraseInput(e.target.value)
-          }}
-          style={{
-            margin: "40px 0 8px",
-          }}
-          autoComplete="off"
-        />
-        {error && <FormError>{error}</FormError>}
-        <A
-          style={{ padding: "0", marginTop: "16px" }}
+    <OnboardingScreen
+      back
+      length={4}
+      currentIndex={1}
+      title={"Restore accounts"}
+      subtitle="Enter each of the 12 words from your recovery phrase separated by a
+      space"
+    >
+      <StyledTextArea
+        autoFocus
+        ref={textAreaElement}
+        placeholder="Enter the 12 words"
+        value={seedPhraseInput}
+        onChange={(e: any) => {
+          setError("")
+          setSeedPhraseInput(e.target.value)
+        }}
+        autoComplete="off"
+        variant="neutrals800"
+      />
+      {error && <FormError>{error}</FormError>}
+      <RowBetween>
+        <OnboardingButton onClick={handleRestoreClick} disabled={disableSubmit}>
+          Continue
+        </OnboardingButton>
+        <RestoreBackupLink
           onClick={() => {
             customNavigate(routes.onboardingRestoreBackup())
           }}
         >
           Recover using a backup file
-        </A>
-      </ConfirmScreen>
-    </>
+        </RestoreBackupLink>
+      </RowBetween>
+    </OnboardingScreen>
   )
 }

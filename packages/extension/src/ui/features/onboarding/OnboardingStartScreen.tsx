@@ -1,7 +1,5 @@
-import { colord } from "colord"
 import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import {
   AccountBalanceWalletIcon,
@@ -12,25 +10,11 @@ import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { extensionIsInTab, openExtensionInTab } from "../browser/tabs"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
-import { RectButton } from "./ui/RectButton"
-
-const IconContainer = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const CreateWalletIcon = styled(IconContainer)`
-  background-color: ${({ theme }) => theme.primary};
-`
-
-const RestoreWalletIcon = styled(IconContainer)`
-  background-color: ${({ theme }) =>
-    colord(theme.neutrals600).alpha(0.5).toRgbString()};
-`
+import {
+  CreateWalletRectButtonIcon,
+  RectButton,
+  RestoreWalletRectButtonIcon,
+} from "./ui/RectButton"
 
 export const OnboardingStartScreen: FC = () => {
   const navigate = useNavigate()
@@ -58,15 +42,15 @@ export const OnboardingStartScreen: FC = () => {
     >
       <Row gap={"12px"} align="stretch">
         <RectButton onClick={() => navigate(routes.onboardingDisclaimer())}>
-          <CreateWalletIcon>
+          <CreateWalletRectButtonIcon>
             <AccountBalanceWalletIcon />
-          </CreateWalletIcon>
+          </CreateWalletRectButtonIcon>
           Create a new wallet
         </RectButton>
         <RectButton onClick={() => navigate(routes.onboardingRestoreSeed())}>
-          <RestoreWalletIcon>
+          <RestoreWalletRectButtonIcon>
             <RefreshIcon />
-          </RestoreWalletIcon>
+          </RestoreWalletRectButtonIcon>
           Restore an existing wallet
         </RectButton>
       </Row>

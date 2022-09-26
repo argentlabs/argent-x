@@ -1,5 +1,5 @@
 import { isNumber } from "lodash-es"
-import { FC, PropsWithChildren } from "react"
+import { FC, PropsWithChildren, ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -17,6 +17,7 @@ export interface IOnboardingScreen extends PropsWithChildren {
   subtitle?: string
   length?: number
   currentIndex?: number
+  icon?: ReactNode
 }
 
 const Header = styled.div`
@@ -49,6 +50,7 @@ export const OnboardingScreen: FC<IOnboardingScreen> = ({
   children,
   length,
   currentIndex,
+  icon = <LogoSvg />,
 }) => {
   const navigate = useNavigate()
   const indicator = isNumber(length) && isNumber(currentIndex)
@@ -71,9 +73,7 @@ export const OnboardingScreen: FC<IOnboardingScreen> = ({
           {children}
         </ContentWrapper>
       </Panel>
-      <Panel>
-        <LogoSvg />
-      </Panel>
+      <Panel>{icon}</Panel>
     </PageWrapper>
   )
 }

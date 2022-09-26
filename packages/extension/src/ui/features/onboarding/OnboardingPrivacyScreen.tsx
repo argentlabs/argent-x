@@ -1,12 +1,15 @@
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { A } from "../../theme/Typography"
+import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
 const PrivacyStatementText = styled.span`
   font-size: 16px;
   line-height: 21px;
+  margin-bottom: 32px;
 
   > ${A} {
     padding: 0;
@@ -14,6 +17,7 @@ const PrivacyStatementText = styled.span`
 `
 
 export const OnboardingPrivacyScreen: FC = () => {
+  const naviagte = useNavigate()
   return (
     <OnboardingScreen back title="Privacy statement">
       <PrivacyStatementText>
@@ -33,6 +37,7 @@ export const OnboardingPrivacyScreen: FC = () => {
           https://www.argent.xyz/
         </A>
       </PrivacyStatementText>
+      <OnboardingButton onClick={() => naviagte(-1)}>Back</OnboardingButton>
     </OnboardingScreen>
   )
 }

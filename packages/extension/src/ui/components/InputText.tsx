@@ -289,11 +289,21 @@ export const StyledControlledInput: ControlledInputType = styled(
   ${getVariantStyle}
 `
 
-export const TextArea = styled.textarea`
-  ${InputCss}
+export const TextArea = styled.textarea<{ variant?: InputVariant }>`
+  font-size: 17px;
+  line-height: 25px;
+  text-shadow: none;
+
+  color: ${({ theme }) => theme.text1};
+
   resize: none;
   min-height: 116px;
   width: 100%;
+  ${getVariantStyle}
+  ${scrollbarStyle}
+  &:focus {
+    outline: 0;
+  }
 `
 
 export const TextAreaAlt = styled(TextareaAutosize)`
