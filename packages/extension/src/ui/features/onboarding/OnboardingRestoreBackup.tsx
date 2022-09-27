@@ -54,7 +54,7 @@ export const OnboardingRestoreBackup: FC = () => {
     try {
       const data = await fileToString(acceptedFile)
       await recoverBackup(data)
-      navigate(routes.onboardingFinish())
+      navigate(routes.onboardingFinish.path, { replace: true })
     } catch (err: any) {
       const error = `${err}`
       const legacyError = "legacy backup file cannot be imported"

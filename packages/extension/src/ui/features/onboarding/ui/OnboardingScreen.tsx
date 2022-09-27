@@ -1,6 +1,6 @@
 import { isNumber } from "lodash-es"
-import { FC, PropsWithChildren, ReactNode } from "react"
-import { useNavigate } from "react-router-dom"
+import { FC, PropsWithChildren, ReactNode, useCallback, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { PressableButton } from "../../../components/Button"
@@ -12,6 +12,8 @@ import {
 import { ArrowBackIcon } from "../../../components/Icons/MuiIcons"
 import { Title } from "../../../components/Page"
 import { StepIndicator } from "../../../components/StepIndicator"
+import { routes } from "../../../routes"
+import { isInitialized } from "../../../services/backgroundSessions"
 import { P3 } from "../../../theme/Typography"
 import LogoSvg from "../../lock/logo.svg"
 
@@ -57,7 +59,22 @@ export const OnboardingScreen: FC<IOnboardingScreen> = ({
   icon = <LogoSvg />,
 }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const indicator = isNumber(length) && isNumber(currentIndex)
+  useEffect(() => {
+    /** on window focus, check if the wallet was initialised elsewhere and redirect to finish screen */
+    const onFocus = async () => {
+      const { initialized } = await isInitialized()
+      if (initialized && location.pathname !== routes.onboardingFinish.path) {
+        navigate(routes.onboardingFinish.path, { replace: true })
+      }
+    }
+    window.addEventListener("focus", onFocus)
+    onFocus()
+    return () => {
+      window.removeEventListener("focus", onFocus)
+    }
+  }, [location.pathname, navigate])
   return (
     <PageWrapper>
       {back && (

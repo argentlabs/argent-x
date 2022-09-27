@@ -73,7 +73,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
             networkId: newAccount.networkId,
           })
           setIsDeploying(false)
-          navigate(routes.onboardingFinish())
+          navigate(routes.onboardingFinish.path, { replace: true })
         } catch (error: any) {
           analytics.track("createWallet", {
             status: "failure",

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react"
+import { FC, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import {
@@ -17,17 +17,22 @@ import {
 } from "./ui/RectButton"
 
 export const OnboardingStartScreen: FC = () => {
+  const didRunInit = useRef(false)
   const navigate = useNavigate()
   usePageTracking("welcome")
 
   useEffect(() => {
     const init = async () => {
-      /** When user clicks extension icon, open onboarding in full screen */
-      const inTab = await extensionIsInTab()
-      if (!inTab) {
-        /** Note: cannot detect and focus an existing extension tab here, so open a new one */
-        await openExtensionInTab()
-        window.close()
+      /** prevent opening more than once when useEffect is called multiple times in dev */
+      if (!didRunInit.current) {
+        didRunInit.current = true
+        /** When user clicks extension icon, open onboarding in full screen */
+        const inTab = await extensionIsInTab()
+        if (!inTab) {
+          /** Note: cannot detect and focus an existing extension tab here, so open a new one */
+          await openExtensionInTab()
+          window.close()
+        }
       }
     }
     init()

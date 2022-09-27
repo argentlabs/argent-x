@@ -25,7 +25,7 @@ export const OnboardingRestorePassword: FC = () => {
           if (validateSeedRecoveryCompletion(state)) {
             await recoverBySeedPhrase(state.seedPhrase, state.password)
             useBackupRequired.setState({ isBackupRequired: false }) // as the user recovered their seed, we can assume they have a backup
-            navigate(routes.onboardingFinish())
+            navigate(routes.onboardingFinish.path, { replace: true })
           }
         } catch {
           console.error("seed phrase is invalid")
