@@ -1,19 +1,6 @@
-import React, { Children, FC, PropsWithChildren } from "react"
 import styled from "styled-components"
 
-import { ArgentXBanner } from "../../components/Icons/ArgentXBanner"
-
-const Header = styled.div`
-  position: absolute;
-  left: 56px;
-  top: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-`
-
-const Panel = styled.div`
+export const Panel = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,7 +9,7 @@ const Panel = styled.div`
   padding: 0 56px;
 `
 
-const PageWrapper = styled.div`
+export const PageWrapper = styled.div`
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
@@ -43,21 +30,6 @@ const PageWrapper = styled.div`
     }
   `}
 `
-
-export const LedgerPage: FC<PropsWithChildren> = ({ children }) => {
-  const [panel, ...restChildren] = Children.toArray(children)
-  return (
-    <>
-      <Header>
-        <ArgentXBanner />
-      </Header>
-      <PageWrapper>
-        <Panel>{restChildren}</Panel>
-        <Panel>{panel}</Panel>
-      </PageWrapper>
-    </>
-  )
-}
 
 export const ContentWrapper = styled.div`
   margin: 32px auto;

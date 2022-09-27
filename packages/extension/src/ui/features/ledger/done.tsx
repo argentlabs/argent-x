@@ -2,14 +2,15 @@ import { FC } from "react"
 import { Navigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { ContentWrapper } from "../../components/FullScreenPage"
 import { Title } from "../../components/Page"
+import { StepIndicator } from "../../components/StepIndicator"
 import { P } from "../../theme/Typography"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { BlackCircle } from "./assets/BlackCircle"
-import { ContentWrapper, LedgerPage } from "./Page"
+import { LedgerPage } from "./LedgerPage"
 import { StyledButton } from "./start"
-import { StepIndicator } from "./StepIndicator"
 import { useSelectedLedgerAccount } from "./store"
 
 const SP = styled(P)`

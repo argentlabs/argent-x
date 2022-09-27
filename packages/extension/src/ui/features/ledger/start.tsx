@@ -5,14 +5,15 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
+import { ContentWrapper } from "../../components/FullScreenPage"
 import { Title } from "../../components/Page"
 import { Spinner } from "../../components/Spinner"
+import { StepIndicator } from "../../components/StepIndicator"
 import { routes } from "../../routes"
 import { FormError } from "../../theme/Typography"
 import { BlackCircle } from "./assets/BlackCircle"
 import { LedgerStartIllustration } from "./assets/LedgerStart"
-import { ContentWrapper, LedgerPage } from "./Page"
-import { StepIndicator } from "./StepIndicator"
+import { LedgerPage } from "./LedgerPage"
 import { Steps } from "./Steps"
 
 export const StyledButton = styled(Button)`

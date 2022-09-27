@@ -1,7 +1,9 @@
 import { FC, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { ContentWrapper } from "../../components/FullScreenPage"
 import { Title } from "../../components/Page"
+import { StepIndicator } from "../../components/StepIndicator"
 import { routes } from "../../routes"
 import { IAccountListItem } from "../accounts/AccountListItem"
 import { getAccountImageUrl } from "../accounts/accounts.service"
@@ -9,9 +11,8 @@ import { AccountSelect } from "../accounts/AccountSelect"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { BlackCircle } from "./assets/BlackCircle"
-import { ContentWrapper, LedgerPage } from "./Page"
+import { LedgerPage } from "./LedgerPage"
 import { StyledButton } from "./start"
-import { StepIndicator } from "./StepIndicator"
 import { getListOfAccounts, useSelectedLedgerAccount } from "./store"
 
 export const LedgerSelectScreen: FC = () => {
