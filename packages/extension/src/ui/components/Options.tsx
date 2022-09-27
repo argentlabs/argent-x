@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react"
 import styled from "styled-components"
 
-import { ButtonVariant, getVariantColor } from "./Button"
+import { ButtonVariant, getButtonColor } from "./Button"
 
 export const OptionsWrapper = styled.div`
   display: grid;
@@ -22,8 +22,8 @@ const OptionWrapper = styled.div<{
   color: ${({ theme, disabled }) =>
     disabled ? theme.button.default.fg.disabled : theme.button.default.fg.base};
 
-  background-color: ${({ theme, disabled }) =>
-    getVariantColor({ theme, disabled, hover: false })};
+  background-color: ${({ disabled }) =>
+    getButtonColor("bg", disabled ? "disabled" : "base")};
   cursor: ${({ disabled }) => (disabled ? "auto" : "pointer")};
   transition: ${({ theme }) => theme.button.transition};
   pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
@@ -31,8 +31,8 @@ const OptionWrapper = styled.div<{
   &:hover,
   &:focus {
     outline: 0;
-    background-color: ${({ theme, disabled }) =>
-      getVariantColor({ theme, disabled, hover: true })};
+    background-color: ${({ disabled }) =>
+      getButtonColor("bg", disabled ? "disabled" : "hover")};
   }
 `
 

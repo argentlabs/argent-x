@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
-import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { recoverBackup } from "../../services/backgroundRecovery"
 import { fileToString } from "../../services/files"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { OnboardingButton } from "./ui/OnboardingButton"
+import { OnboardingScreen } from "./ui/OnboardingScreen"
 
 const DropZone = styled.div`
   width: 100%;
@@ -18,6 +18,7 @@ const DropZone = styled.div`
   align-items: center;
   justify-content: center;
   padding: 32px;
+  margin-bottom: 32px;
   font-size: 18px;
   font-weight: bold;
   line-height: 24px;
@@ -25,6 +26,7 @@ const DropZone = styled.div`
   cursor: pointer;
   border-radius: 8px;
   border: 2px dashed rgba(255, 255, 255, 0.5);
+  background-color: ${({ theme }) => theme.black};
 
   code {
     font-size: 14px;
@@ -33,7 +35,7 @@ const DropZone = styled.div`
   }
 `
 
-export const BackupRecoveryScreen: FC = () => {
+export const OnboardingRestoreBackup: FC = () => {
   usePageTracking("restoreWalletWithFile")
   const navigate = useNavigate()
   const {
@@ -52,7 +54,7 @@ export const BackupRecoveryScreen: FC = () => {
     try {
       const data = await fileToString(acceptedFile)
       await recoverBackup(data)
-      navigate(routes.lockScreen())
+      navigate(routes.onboardingFinish())
     } catch (err: any) {
       const error = `${err}`
       const legacyError = "legacy backup file cannot be imported"
@@ -66,28 +68,21 @@ export const BackupRecoveryScreen: FC = () => {
   }
 
   return (
-    <>
-      <IconBar back />
-      <ConfirmScreen
-        title="Select backup"
-        confirmButtonText="Restore backup"
-        confirmButtonDisabled={disableSubmit}
-        singleButton
-        onSubmit={handleRestoreClick}
-        smallTopPadding
-      >
-        <DropZone {...getRootProps()}>
-          <input {...getInputProps()} />
-          {disableSubmit ? (
-            <p>Drag &amp; drop your backup file here, or click to select it</p>
-          ) : (
-            <div>
-              <p>Backup selected:</p>
-              <code>{acceptedFile.name}</code>
-            </div>
-          )}
-        </DropZone>
-      </ConfirmScreen>
-    </>
+    <OnboardingScreen back length={4} currentIndex={2} title={"Select backup"}>
+      <DropZone {...getRootProps()}>
+        <input {...getInputProps()} />
+        {disableSubmit ? (
+          <p>Drag &amp; drop your backup file here, or click to select it</p>
+        ) : (
+          <div>
+            <p>Backup selected:</p>
+            <code>{acceptedFile.name}</code>
+          </div>
+        )}
+      </DropZone>
+      <OnboardingButton onClick={handleRestoreClick} disabled={disableSubmit}>
+        Restore backup
+      </OnboardingButton>
+    </OnboardingScreen>
   )
 }
