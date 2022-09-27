@@ -11,7 +11,7 @@ export default function ({
   const callNames = calls?.map(({ name }) => name)
   const displayName = callNames?.length
     ? transactionNamesToTitle(callNames)
-    : "Unknown"
+    : "Contract interaction"
   result = {
     ...result,
     displayName,
