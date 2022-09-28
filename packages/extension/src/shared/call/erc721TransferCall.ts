@@ -19,7 +19,6 @@ export const isErc721TransferCall = (
 ): call is Erc721TransferCall => {
   try {
     if (
-      call &&
       call.contractAddress &&
       call.entrypoint === "transferFrom" &&
       call.calldata?.length === 4
