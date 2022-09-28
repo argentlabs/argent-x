@@ -34,7 +34,7 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://goerli.voyager.online",
     accountClassHash: {
       argentAccount:
-        "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+        "0x2a99800326efd46f5c8066c17dcace4069a294a9044f6f767894d6bfdf9580",
       argentPluginAccount:
         "0x7e28fb0161d10d1cf7fe1f13e7ca57bce062731a3bd04494dfd2d0412699727",
     },
