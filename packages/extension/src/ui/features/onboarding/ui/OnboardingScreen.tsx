@@ -49,6 +49,15 @@ const BackButton = styled(PressableButton)`
   padding: 16px 24px;
 `
 
+const StyledPageWrapper = styled(PageWrapper)`
+  ${({ theme }) => theme.mediaMinWidth.md`
+    > ${Panel}:last-child {
+      background:url('./assets/onboarding-background.svg') no-repeat center;
+      background-size: cover;
+    }
+  `}
+`
+
 export const OnboardingScreen: FC<IOnboardingScreen> = ({
   back,
   title,
@@ -76,7 +85,7 @@ export const OnboardingScreen: FC<IOnboardingScreen> = ({
     }
   }, [location.pathname, navigate])
   return (
-    <PageWrapper>
+    <StyledPageWrapper>
       {back && (
         <BackButton variant="neutrals800" onClick={() => navigate(-1)}>
           <ArrowBackIcon />
@@ -95,6 +104,6 @@ export const OnboardingScreen: FC<IOnboardingScreen> = ({
         </ContentWrapper>
       </Panel>
       <Panel>{icon}</Panel>
-    </PageWrapper>
+    </StyledPageWrapper>
   )
 }
