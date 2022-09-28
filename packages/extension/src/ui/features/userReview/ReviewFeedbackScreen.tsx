@@ -57,8 +57,7 @@ const CHROME_STORE_LINK =
 const FIREFOX_STORE_LINK =
   "https://addons.mozilla.org/en-GB/firefox/addon/argent-x/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search"
 
-const ZENDESK_LINK =
-  "https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
+const ZENDESK_LINK = "https://support.argent.xyz/hc/en-us/requests/new"
 
 export const ReviewFeedbackScreen: FC = () => {
   const { state } = useLocation() as LocationWithState
