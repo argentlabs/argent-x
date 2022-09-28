@@ -1,10 +1,9 @@
 import { FC } from "react"
 
 import {
-  Erc20TransferCall,
-  isErc20TransferCall,
-  parseErc20TransferCall,
-} from "../../../../shared/call/erc20TransferCall"
+  Erc20ApproveCall,
+  parseErc20ApproveCall,
+} from "../../../../shared/call/erc20ApproveCall"
 import { Token } from "../../../../shared/token/type"
 import {
   Field,
@@ -13,22 +12,20 @@ import {
   FieldValue,
 } from "../../../components/Fields"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
-import { AccountAddressField } from "./fields/AccountAddressField"
 import { TokenField } from "./fields/TokenField"
 
-/** Renders an ERC20 transfer transaction */
+/** Renders an ERC20 approve transaction */
 
-export interface Erc20TransferCallTransactionItemProps {
-  transaction: Erc20TransferCall
+export interface Erc20ApproveCallTransactionItemProps {
+  transaction: Erc20ApproveCall
   tokensByNetwork: Token[]
   networkId: string
 }
 
-export const ERC20TransferTransactionDetails: FC<
-  Erc20TransferCallTransactionItemProps
-> = ({ transaction, tokensByNetwork, networkId }) => {
-  const { contractAddress, recipientAddress, amount } =
-    parseErc20TransferCall(transaction)
+export const ERC20ApproveTransactionDetails: FC<
+  Erc20ApproveCallTransactionItemProps
+> = ({ transaction, tokensByNetwork }) => {
+  const { contractAddress, amount } = parseErc20ApproveCall(transaction)
 
   const { displayValue } = useDisplayTokenAmountAndCurrencyValue({
     amount,
@@ -38,7 +35,7 @@ export const ERC20TransferTransactionDetails: FC<
   return (
     <FieldGroup>
       <TokenField
-        label="Send"
+        label="Approve"
         amount={amount}
         contractAddress={contractAddress}
         tokensByNetwork={tokensByNetwork}
@@ -49,11 +46,6 @@ export const ERC20TransferTransactionDetails: FC<
           <FieldValue>{displayValue}</FieldValue>
         </Field>
       )}
-      <AccountAddressField
-        title="To"
-        accountAddress={recipientAddress}
-        networkId={networkId}
-      />
     </FieldGroup>
   )
 }

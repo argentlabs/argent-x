@@ -103,7 +103,7 @@ export const fetchAspectCollection = async (
     }
   }
   return {
-    name: "No collectibles",
+    name: "No NFTs",
     contractAddress,
     nfts: [],
   }
