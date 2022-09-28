@@ -1,5 +1,5 @@
 import { flatten, groupBy, toPairs } from "lodash-es"
-import { Invocation, hash, number } from "starknet"
+import { Call, hash, number } from "starknet"
 
 import { isEqualAddress } from "../../../ui/services/addresses"
 import { getMulticallContract } from "../../../ui/services/multicall.service"
@@ -13,7 +13,7 @@ export async function getAccountTypesFromChain(accounts: WalletAccount[]) {
     ([network, as]) =>
       [
         network,
-        as.map((account): Invocation => {
+        as.map((account): Call => {
           return {
             contractAddress: account.address,
             entrypoint: "get_implementation",
