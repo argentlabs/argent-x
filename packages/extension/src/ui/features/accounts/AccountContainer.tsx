@@ -80,7 +80,7 @@ export const AccountContainer: FC<AccountScreenContentProps> = ({
         </FooterTab>
         <FooterTab to={routes.accountCollections()}>
           <PhotoLibraryIcon />
-          <span>Collectibles</span>
+          <span>NFTs</span>
         </FooterTab>
         <FooterTab to={routes.accountActivity()}>
           <FormatListBulletedIcon />
