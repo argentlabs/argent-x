@@ -16,6 +16,7 @@ import {
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc20TransferNoEvents,
   erc20TransferWithSequencerEvent,
   erc721MintAspect,
   erc721MintMintSquare,
@@ -143,6 +144,33 @@ describe("transformExplorerTransaction", () => {
             "symbol": "ETH",
           },
           "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        }
+      `)
+      expect(
+        transformExplorerTransaction({
+          explorerTransaction: erc20TransferNoEvents as IExplorerTransaction,
+          accountAddress:
+            "0x06eDF9F7045Ae05BA00BEe5fbC3224d526735B7f10351A51F4c295f3C5b6dA21",
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "SEND",
+          "actualFee": "15571701038740",
+          "amount": "100000000000000000000",
+          "displayName": "Send",
+          "entity": "TOKEN",
+          "fromAddress": "0x6edf9f7045ae05ba00bee5fbc3224d526735b7f10351a51f4c295f3c5b6da21",
+          "maxFee": "23357551558110",
+          "toAddress": "0x1530359354ca4c9d2584cd45ff21fb8a257b90dc1abdd593172b2fb9c223e94",
+          "token": {
+            "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+            "decimals": 18,
+            "name": "Test Token",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
+            "symbol": "TEST",
+          },
+          "tokenAddress": "0x7394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
         }
       `)
 
