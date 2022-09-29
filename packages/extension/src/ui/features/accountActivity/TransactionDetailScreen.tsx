@@ -4,6 +4,7 @@ import { Navigate, useParams } from "react-router-dom"
 import { compareTransactions } from "../../../shared/transactions"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
+import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
@@ -29,6 +30,7 @@ export const TransactionDetailScreen: FC = () => {
   const account = useSelectedAccount()
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const { data: nftContractAddresses } = useAspectContractAddresses()
 
   const { transactions } = useAccountTransactions(account)
 
@@ -55,9 +57,16 @@ export const TransactionDetailScreen: FC = () => {
         explorerTransaction,
         accountAddress: account.address,
         tokensByNetwork,
+        nftContractAddresses,
       })
     }
-  }, [account, explorerTransaction, tokensByNetwork, transaction])
+  }, [
+    account,
+    explorerTransaction,
+    nftContractAddresses,
+    tokensByNetwork,
+    transaction,
+  ])
 
   const transactionTransformed = useMemo(() => {
     if (transaction && account) {
@@ -65,9 +74,10 @@ export const TransactionDetailScreen: FC = () => {
         transaction,
         accountAddress: account.address,
         tokensByNetwork,
+        nftContractAddresses,
       })
     }
-  }, [account, tokensByNetwork, transaction])
+  }, [account, nftContractAddresses, tokensByNetwork, transaction])
 
   if (!account) {
     return <Navigate to={routes.accounts()} />

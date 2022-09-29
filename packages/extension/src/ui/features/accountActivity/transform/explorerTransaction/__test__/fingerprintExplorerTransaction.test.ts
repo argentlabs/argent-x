@@ -111,7 +111,7 @@ describe("fingerprintExplorerTransaction", () => {
       ).toMatchInlineSnapshot('"events[Transfer] calls[mint]"')
       expect(
         fingerprintExplorerTransaction(erc721Transfer as IExplorerTransaction),
-      ).toMatchInlineSnapshot('"events[Approve,Transfer] calls[transferFrom]"')
+      ).toMatchInlineSnapshot('"events[Approval,Transfer] calls[transferFrom]"')
     })
   })
   describe("when invalid", () => {

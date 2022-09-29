@@ -11,6 +11,7 @@ import { Spinner } from "../../components/Spinner"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
 import { formatDate } from "../../services/dates"
+import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { SectionHeader } from "../accounts/SectionHeader"
@@ -46,6 +47,7 @@ const Header = styled.h2`
 interface IAccountActivity {
   account: Account
   tokensByNetwork?: Token[]
+  nftContractAddresses?: string[]
   activity: Record<string, Array<ActivityTransaction | IExplorerTransaction>>
   loadMoreHashes: string[]
   onLoadMore: () => void
@@ -54,6 +56,7 @@ interface IAccountActivity {
 export const AccountActivity: FC<IAccountActivity> = ({
   account,
   tokensByNetwork,
+  nftContractAddresses,
   activity,
   loadMoreHashes = [],
   onLoadMore,
@@ -72,6 +75,7 @@ export const AccountActivity: FC<IAccountActivity> = ({
                   transaction,
                   accountAddress: account.address,
                   tokensByNetwork,
+                  nftContractAddresses,
                 })
                 if (transactionTransformed) {
                   return (
@@ -97,6 +101,7 @@ export const AccountActivity: FC<IAccountActivity> = ({
                     explorerTransaction: transaction,
                     accountAddress: account.address,
                     tokensByNetwork,
+                    nftContractAddresses,
                   })
                 if (explorerTransactionTransformed) {
                   const { transactionHash } = transaction
@@ -136,6 +141,7 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
 }) => {
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const { data: nftContractAddresses } = useAspectContractAddresses()
   const { data, setSize } = useArgentExplorerAccountTransactionsInfinite({
     accountAddress: account.address,
     network: switcherNetworkId,
@@ -274,6 +280,7 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
             loadMoreHashes={loadMoreHashes}
             account={account}
             tokensByNetwork={tokensByNetwork}
+            nftContractAddresses={nftContractAddresses}
             onLoadMore={onLoadMore}
           />
         </Suspense>

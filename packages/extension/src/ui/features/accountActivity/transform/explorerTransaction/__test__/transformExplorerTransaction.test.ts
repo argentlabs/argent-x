@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest"
 
 import { IExplorerTransaction } from "../../../../../../shared/explorer/type"
+import { nftContractAddresses } from "../../__test__/nftContractAddresses"
+import { tokensByNetwork } from "../../__test__/tokensByNetwork"
 import { transformExplorerTransaction } from "../transformExplorerTransaction"
 import {
   accountCreated,
@@ -30,6 +32,8 @@ describe("transformExplorerTransaction", () => {
         transformExplorerTransaction({
           explorerTransaction: erc20Transfer as IExplorerTransaction,
           accountAddress: "0x0",
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -47,8 +51,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -60,6 +64,8 @@ describe("transformExplorerTransaction", () => {
           explorerTransaction:
             erc20TransferWithSequencerEvent as IExplorerTransaction,
           accountAddress: "0x0",
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -77,8 +83,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -90,6 +96,8 @@ describe("transformExplorerTransaction", () => {
           explorerTransaction: erc20Transfer as IExplorerTransaction,
           accountAddress:
             "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -107,8 +115,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -120,6 +128,8 @@ describe("transformExplorerTransaction", () => {
           explorerTransaction: erc20Transfer as IExplorerTransaction,
           accountAddress:
             "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -137,8 +147,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -150,6 +160,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc20MintTestToken as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -176,6 +188,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc721MintAspect as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -192,12 +206,14 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc721MintMintSquare as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
           "action": "MINT",
           "actualFee": "12404500000000",
-          "contractAddress": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
+          "contractAddress": "0x07861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488",
           "date": "2022-08-18T11:50:28.000Z",
           "displayName": "Mint NFT",
           "entity": "NFT",
@@ -211,39 +227,21 @@ describe("transformExplorerTransaction", () => {
         transformExplorerTransaction({
           explorerTransaction: erc721Transfer as IExplorerTransaction,
           accountAddress: "0x0",
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
           "action": "TRANSFER",
-          "actualFee": "20494725109306",
-          "contractAddress": "0x25c1d0a3cfab1f5464b2e6a38c91c89bea77397744a7eb24b3f3645108d4abb",
-          "date": "2022-08-18T11:50:28.000Z",
+          "actualFee": "81748141466442",
+          "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+          "date": "2022-09-29T10:02:23.000Z",
           "displayName": "Transfer NFT",
           "entity": "NFT",
-          "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
-          "maxFee": "30742087663959",
-          "toAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
-          "tokenId": "143",
-        }
-      `)
-      expect(
-        transformExplorerTransaction({
-          explorerTransaction: erc721Transfer as IExplorerTransaction,
-          accountAddress:
-            "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
-        }),
-      ).toMatchInlineSnapshot(`
-        {
-          "action": "RECEIVE",
-          "actualFee": "20494725109306",
-          "contractAddress": "0x25c1d0a3cfab1f5464b2e6a38c91c89bea77397744a7eb24b3f3645108d4abb",
-          "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Receive NFT",
-          "entity": "NFT",
-          "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
-          "maxFee": "30742087663959",
-          "toAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
-          "tokenId": "143",
+          "fromAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          "maxFee": "372489156285048",
+          "toAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          "tokenId": "9240",
         }
       `)
       expect(
@@ -251,19 +249,43 @@ describe("transformExplorerTransaction", () => {
           explorerTransaction: erc721Transfer as IExplorerTransaction,
           accountAddress:
             "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          tokensByNetwork,
+          nftContractAddresses,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "RECEIVE",
+          "actualFee": "81748141466442",
+          "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+          "date": "2022-09-29T10:02:23.000Z",
+          "displayName": "Receive NFT",
+          "entity": "NFT",
+          "fromAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          "maxFee": "372489156285048",
+          "toAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          "tokenId": "9240",
+        }
+      `)
+      expect(
+        transformExplorerTransaction({
+          explorerTransaction: erc721Transfer as IExplorerTransaction,
+          accountAddress:
+            "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
           "action": "SEND",
-          "actualFee": "20494725109306",
-          "contractAddress": "0x25c1d0a3cfab1f5464b2e6a38c91c89bea77397744a7eb24b3f3645108d4abb",
-          "date": "2022-08-18T11:50:28.000Z",
+          "actualFee": "81748141466442",
+          "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+          "date": "2022-09-29T10:02:23.000Z",
           "displayName": "Send NFT",
           "entity": "NFT",
-          "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
-          "maxFee": "30742087663959",
-          "toAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
-          "tokenId": "143",
+          "fromAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          "maxFee": "372489156285048",
+          "toAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          "tokenId": "9240",
         }
       `)
 
@@ -271,30 +293,36 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: accountCreated as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
           "action": "CREATE",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Create acount",
+          "displayName": "Create account",
           "entity": "ACCOUNT",
         }
       `)
       expect(
         transformExplorerTransaction({
           explorerTransaction: accountCreatedAlt as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
           "action": "CREATE",
           "date": "2022-08-25T10:35:52.000Z",
-          "displayName": "Create acount",
+          "displayName": "Create account",
           "entity": "ACCOUNT",
         }
       `)
       expect(
         transformExplorerTransaction({
           explorerTransaction: accountUpgrade as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -311,6 +339,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc20SwapAlphaRoad as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -333,8 +363,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -347,6 +377,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc20SwapJediswap as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -369,8 +401,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -392,6 +424,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: erc20SwapMySwap as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -415,8 +449,8 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
-            "network": "mainnet-alpha",
-            "networkId": "mainnet-alpha",
+            "network": "goerli-alpha",
+            "networkId": "goerli-alpha",
             "showAlways": true,
             "symbol": "ETH",
           },
@@ -440,6 +474,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: dappAspectBuyNft as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -466,6 +502,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: dappMintSquareBuyNft as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -491,6 +529,8 @@ describe("transformExplorerTransaction", () => {
         transformExplorerTransaction({
           explorerTransaction:
             dappInfluenceCrewmatePurchaseNft as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -518,6 +558,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: dappNoGame as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -540,6 +582,8 @@ describe("transformExplorerTransaction", () => {
       expect(
         transformExplorerTransaction({
           explorerTransaction: dappBriq as IExplorerTransaction,
+          tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {

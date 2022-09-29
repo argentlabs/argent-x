@@ -65,9 +65,6 @@ export const TransactionIcon: FC<ITransactionIcon> = ({
     case "ACCOUNT":
       iconComponent = <TransactionArgentX />
       break
-    case "NFT":
-      iconComponent = <TransactionArgentX />
-      break
   }
   switch (action) {
     case "SEND":
