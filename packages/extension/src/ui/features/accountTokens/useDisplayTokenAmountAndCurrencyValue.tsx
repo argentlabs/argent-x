@@ -1,6 +1,8 @@
 import { BigNumberish } from "ethers"
 
 import {
+  PRETTY_UNLIMITED,
+  isUnlimitedAmount,
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../shared/token/price"
@@ -12,11 +14,13 @@ import { useTokensInNetwork } from "./tokens.state"
 export interface IUseDisplayTokenAmountAndCurrencyValue {
   amount: BigNumberish
   tokenAddress?: string
+  currencySymbol?: string
 }
 
 export const useDisplayTokenAmountAndCurrencyValue = ({
   amount,
   tokenAddress,
+  currencySymbol = "$",
 }: IUseDisplayTokenAmountAndCurrencyValue) => {
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
@@ -37,7 +41,12 @@ export const useDisplayTokenAmountAndCurrencyValue = ({
     decimals: token?.decimals,
     symbol: token?.symbol || "Unknown token",
   })
-  const displayValue = prettifyCurrencyValue(amountCurrencyValue)
+  let displayValue = null
+  if (amountCurrencyValue && isUnlimitedAmount(amount)) {
+    displayValue = [currencySymbol, PRETTY_UNLIMITED].filter(Boolean).join("")
+  } else {
+    displayValue = prettifyCurrencyValue(amountCurrencyValue, currencySymbol)
+  }
   return {
     displayAmount,
     displayValue,

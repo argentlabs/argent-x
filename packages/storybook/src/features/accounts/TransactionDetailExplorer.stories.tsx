@@ -9,6 +9,8 @@ import {
   dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
+  erc20Approve,
+  erc20ApproveUnlimited,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,
@@ -136,6 +138,20 @@ Erc20Receive.args = {
   tokensByNetwork,
   accountAddress:
     "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+}
+
+export const Erc20Approve = Template.bind({})
+Erc20Approve.args = {
+  explorerTransaction: erc20Approve as IExplorerTransaction,
+  network,
+  tokensByNetwork,
+}
+
+export const Erc20ApproveUnlimited = Template.bind({})
+Erc20ApproveUnlimited.args = {
+  explorerTransaction: erc20ApproveUnlimited as IExplorerTransaction,
+  network,
+  tokensByNetwork,
 }
 
 export const Erc721MintAspect = Template.bind({})

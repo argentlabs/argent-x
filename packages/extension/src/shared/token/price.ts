@@ -1,5 +1,6 @@
 import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber, BigNumberish, utils } from "ethers"
+import { UINT_256_MAX } from "starknet/dist/utils/uint256"
 
 import { TokenDetailsWithBalance } from "../../ui/features/accountTokens/tokens.state"
 import {
@@ -189,6 +190,12 @@ export const prettifyTokenBalance = (
   })
 }
 
+export const PRETTY_UNLIMITED = "Unlimited"
+
+export const isUnlimitedAmount = (amount: BigNumberish) => {
+  return String(amount) === String(UINT_256_MAX)
+}
+
 export interface IPrettifyTokenAmount {
   amount: BigNumberish
   decimals: BigNumberish
@@ -203,10 +210,15 @@ export const prettifyTokenAmount = ({
   if (!isNumeric(amount)) {
     return null
   }
-  const decimalsNumber = Number(decimals)
-  const balanceBn = BigNumber.from(amount)
-  const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
-  const prettyValue = prettifyTokenNumber(balanceFullString)
+  let prettyValue
+  if (isUnlimitedAmount(amount)) {
+    prettyValue = PRETTY_UNLIMITED
+  } else {
+    const decimalsNumber = Number(decimals)
+    const balanceBn = BigNumber.from(amount)
+    const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
+    prettyValue = prettifyTokenNumber(balanceFullString)
+  }
   const prettyValueWithSymbol = [prettyValue, symbol].filter(Boolean).join(" ")
   return prettyValueWithSymbol
 }
