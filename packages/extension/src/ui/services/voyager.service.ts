@@ -1,3 +1,4 @@
+import { addAddressPadding } from "starknet"
 import join from "url-join"
 
 import { Network } from "../../shared/network"
@@ -29,5 +30,8 @@ export const openVoyagerTransaction = (hash: string, network: Network) => {
 }
 
 export const openVoyagerAddress = (network: Network, address: string) => {
-  window.open(`${network.explorerUrl}/contract/${address}`, "_blank")?.focus()
+  const paddedAddress = addAddressPadding(address)
+  window
+    .open(`${network.explorerUrl}/contract/${paddedAddress}`, "_blank")
+    ?.focus()
 }
