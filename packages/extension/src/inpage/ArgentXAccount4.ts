@@ -8,15 +8,18 @@ import {
   defaultProvider,
   ec,
   typedData,
-} from "starknet"
+} from "starknet4"
 
 import { sendMessage, waitForMessage } from "./messageActions"
 
 /**
- *  This is the latest Account Object that is imported from starknet.js.
- *  Currently, this Account Object supports transaction v1 introduced with starknet v0.10.0
+ *  This is Account Object is imported from pre-starknet v4.5 update.
+ *  As a result, this Account Object is still on transaction v0 which is backwards compatible until starknet v0.11.
+ *  The main reason to use this Account Object is to "upgrade" old Accounts which supported transaction v0 to new Accounts with transaction v1
+ *  This class becomes deprecated and should be removed once all accounts are on transaction v1 or when starknet v0.11 is introduced breaking the support
+ *  for transaction v0
  */
-export class ArgentXAccount extends Account {
+export class ArgentXAccount4 extends Account {
   constructor(address: string, provider?: ProviderInterface) {
     // since account constructor is taking a KeyPair,
     // we set a dummy one (never used anyway)

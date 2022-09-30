@@ -1,14 +1,24 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, union } from "lodash-es"
-import { Account, DeployContractPayload, ec, stark } from "starknet"
+import {
+  Abi,
+  Account,
+  Contract,
+  DeployContractPayload,
+  ec,
+  number,
+  stark,
+} from "starknet"
 import {
   calculateContractAddressFromHash,
   getSelectorFromName,
 } from "starknet/dist/utils/hash"
+import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
+import ProxyCompiledContractAbi from "../abis/Proxy.json"
 import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
 import { withHiddenSelector } from "../shared/account/selectors"
 import {
@@ -17,6 +27,7 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/network"
+import { getProviderv4 } from "../shared/network/provider"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -477,7 +488,7 @@ export class Wallet {
 
   public async getStarknetAccount(
     selector: BaseWalletAccount,
-  ): Promise<Account> {
+  ): Promise<Account | Accountv4> {
     if (!(await this.isSessionOpen())) {
       throw Error("no open session")
     }
@@ -489,11 +500,42 @@ export class Wallet {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
-    const provider = getProvider(account.network)
-    return new Account(provider, account.address, keyPair)
+
+    const currentImplementation = await this.getCurrentImplementation(account)
+
+    if (!account.network.accountClassHash) {
+      throw Error("Account Class Hash not found")
+    }
+
+    if (
+      Object.values(account.network.accountClassHash).includes(
+        currentImplementation,
+      )
+    ) {
+      const provider = getProvider(account.network)
+      return new Account(provider, account.address, keyPair)
+    }
+
+    const providerv4 = getProviderv4(account.network)
+    return new Accountv4(providerv4, account.address, keyPair)
   }
 
-  public async getSelectedStarknetAccount(): Promise<Account> {
+  public async getCurrentImplementation(
+    account: WalletAccount,
+  ): Promise<string> {
+    const provider = getProvider(account.network)
+
+    const proxyContract = new Contract(
+      ProxyCompiledContractAbi as Abi,
+      account.address,
+      provider,
+    )
+
+    const { implementation } = await proxyContract.call("get_implementation")
+    return stark.makeAddress(number.toHex(implementation))
+  }
+
+  public async getSelectedStarknetAccount(): Promise<Account | Accountv4> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
