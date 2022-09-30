@@ -4,7 +4,7 @@ import styled from "styled-components"
 
 import { Network, addNetwork } from "../../../shared/network"
 import { BackButton } from "../../components/BackButton"
-import { Button, ButtonGroupVertical } from "../../components/Button"
+import { Button, ButtonGroupHorizontal } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
 import { routes } from "../../routes"
@@ -127,7 +127,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
             </>
           )}
           {error && <FormError>{error}</FormError>}
-          <ButtonGroupVertical>
+          <ButtonGroupHorizontal>
             {onReject && (
               <Button onClick={onReject} type="button">
                 Reject
@@ -136,7 +136,7 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
             <Button type="submit">
               {mode === "add" ? "Add" : "Switch"} Network
             </Button>
-          </ButtonGroupVertical>
+          </ButtonGroupHorizontal>
         </form>
       </AddTokenScreenWrapper>
     </>

@@ -5,7 +5,7 @@ import styled from "styled-components"
 
 import {
   Button,
-  ButtonGroupVertical,
+  ButtonGroupHorizontal,
   ButtonVariant,
 } from "../../components/Button"
 import { Header } from "../../components/Header"
@@ -151,7 +151,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
         {({ measureRef }) => (
           <StickyGroup ref={measureRef}>
             {footer}
-            <ButtonGroupVertical switchButtonOrder={switchButtonOrder}>
+            <ButtonGroupHorizontal switchButtonOrder={switchButtonOrder}>
               {!singleButton && (
                 <Button onClick={onReject} type="button">
                   {rejectButtonText}
@@ -169,7 +169,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               >
                 {confirmButtonText}
               </Button>
-            </ButtonGroupVertical>
+            </ButtonGroupHorizontal>
           </StickyGroup>
         )}
       </Measure>
