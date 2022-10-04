@@ -1748,9 +1748,9 @@
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
 "@google/model-viewer@^2.0.0":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@google/model-viewer/-/model-viewer-2.0.1.tgz#ccc836d81926e1bde5f88a8c0c5ec48ffe9a74a1"
-  integrity sha512-6Z7lW6P0MgJX1H2oJ0huMn5+mKkTWziIjgyOL8v3TwnjsIU5pFSRH+zIk/40VinGgyV8uwCG8REiGJsDS0Wbiw==
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@google/model-viewer/-/model-viewer-2.0.2.tgz#1d1c60240d3ea1e7853875a9110c8e73d6276314"
+  integrity sha512-Se4jrspwc4xX3M1xfKynT30sPIO1VeeXgrYPhdZxUDtn2od9yXR7A6gQ06mf6rZ078l8OQfmGL8FHr24K2oCWA==
   dependencies:
     lit "^2.2.3"
     three "^0.144.0"
