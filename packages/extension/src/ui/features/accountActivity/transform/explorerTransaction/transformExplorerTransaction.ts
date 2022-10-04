@@ -18,6 +18,7 @@ import nftMintTransformer from "./transformers/nftMintTransformer"
 import nftTransferTransformer from "./transformers/nftTransferTransformer"
 import postSwapTransformer from "./transformers/postSwapTransformer"
 import postTransferTransformer from "./transformers/postTransferTransformer"
+import tokenApproveTransformer from "./transformers/tokenApproveTransformer"
 import tokenMintTransformer from "./transformers/tokenMintTransformer"
 import tokenTransferTransformer from "./transformers/tokenTransferTransformer"
 
@@ -43,6 +44,7 @@ const mainTransformers = [
   nftTransferTransformer,
   tokenMintTransformer,
   tokenTransferTransformer,
+  tokenApproveTransformer,
 ]
 
 /** all are executed */

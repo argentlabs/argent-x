@@ -11,6 +11,7 @@ import {
   dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
+  erc20ApproveUnlimited,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,
@@ -132,6 +133,35 @@ describe("transformExplorerTransaction", () => {
           "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
           "maxFee": "15134999954595",
           "toAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+          "token": {
+            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "decimals": 18,
+            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "name": "Ether",
+            "network": "mainnet-alpha",
+            "networkId": "mainnet-alpha",
+            "showAlways": true,
+            "symbol": "ETH",
+          },
+          "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        }
+      `)
+
+      /** erc20 approve */
+      expect(
+        transformExplorerTransaction({
+          explorerTransaction: erc20ApproveUnlimited as IExplorerTransaction,
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "APPROVE",
+          "actualFee": "78640023328647",
+          "amount": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "date": "2022-09-07T08:56:31.000Z",
+          "displayName": "Approve",
+          "entity": "TOKEN",
+          "maxFee": "235920069985940",
+          "spenderAddress": "0x2a92f0f860bf7c63fb9ef42cff4137006b309e0e6e1484e42d0b5511959414d",
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,

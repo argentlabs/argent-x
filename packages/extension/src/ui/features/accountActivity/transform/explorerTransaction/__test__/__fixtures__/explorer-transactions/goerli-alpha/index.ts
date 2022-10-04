@@ -1,6 +1,8 @@
 import accountCreatedAlt from "./account-created-alt.json"
 import accountCreated from "./account-created.json"
 import accountUpgrade from "./account-upgrade.json"
+import erc20ApproveUnlimited from "./erc20-approve-unlimited.json"
+import erc20Approve from "./erc20-approve.json"
 import erc20MintTestToken from "./erc20-mint-test-token.json"
 import erc20SwapAlphaRoad from "./erc20-swap-alpha-road.json"
 import erc20SwapJediswap from "./erc20-swap-jediswap.json"
@@ -20,6 +22,8 @@ export {
   accountCreated,
   accountCreatedAlt,
   accountUpgrade,
+  erc20Approve,
+  erc20ApproveUnlimited,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,

@@ -13,6 +13,8 @@ import {
   dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
+  erc20Approve,
+  erc20ApproveUnlimited,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,
@@ -24,6 +26,8 @@ import {
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"
 import { MemoryRouter } from "react-router-dom"
+
+import { tokensByNetwork } from "../../tokensByNetwork"
 
 interface ITransactionListItemWrapped
   extends Omit<ITransactionListItem, "transactionTransformed"> {
@@ -39,6 +43,7 @@ const TransactionListItemWrapped: FC<ITransactionListItemWrapped> = ({
   const transactionTransformed = transformExplorerTransaction({
     explorerTransaction,
     accountAddress,
+    tokensByNetwork,
   })
   if (!transactionTransformed) {
     return null
@@ -150,6 +155,18 @@ Erc20Receive.args = {
   network,
   accountAddress:
     "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+}
+
+export const Erc20Approve = Template.bind({})
+Erc20Approve.args = {
+  explorerTransaction: erc20Approve as IExplorerTransaction,
+  network,
+}
+
+export const Erc20ApproveUnlimited = Template.bind({})
+Erc20ApproveUnlimited.args = {
+  explorerTransaction: erc20ApproveUnlimited as IExplorerTransaction,
+  network,
 }
 
 export const Erc721MintAspect = Template.bind({})
