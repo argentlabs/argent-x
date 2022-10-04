@@ -11,16 +11,6 @@ jobs:
     if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v2
-      - env:
-          MY_CLIENT_SECRET: ${{ secrets.PAT }}
-          MY_OPENSSL_PASSWORD: ${{ secrets.MY_OPENSSL_PASSWORD }}
-          MY_OPENSSL_ITER: ${{ secrets.MY_OPENSSL_ITER }}
-        run: |
-          echo "MY_CLIENT_SECRET (***)     = ${MY_CLIENT_SECRET}"
-          echo "MY_CLIENT_SECRET (length)  = ${#MY_CLIENT_SECRET}"
-          echo "MY_CLIENT_SECRET (openssl) = $(echo "${MY_CLIENT_SECRET}" | openssl enc -e -aes-256-cbc -a -pbkdf2 -iter ${MY_OPENSSL_ITER} -k "${MY_OPENSSL_PASSWORD}")"
-          echo "Copy the above value, and then execute locally:"
-          echo "echo PASTE_HERE | openssl base64 -d | openssl enc -d -pbkdf2 -iter \$MY_OPENSSL_ITER -aes-256-cbc -k \$MY_OPENSSL_PASSWORD"
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
