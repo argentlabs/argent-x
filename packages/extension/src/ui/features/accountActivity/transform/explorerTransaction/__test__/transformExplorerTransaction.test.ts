@@ -195,6 +195,16 @@ describe("transformExplorerTransaction", () => {
           "action": "APPROVE",
           "actualFee": "78640023328647",
           "amount": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "dapp": {
+            "hosts": [
+              "aspect.co",
+              "testnet.aspect.co",
+            ],
+            "icon": "https://aspect.co/img/company/logo512.png",
+            "id": "aspect-co",
+            "title": "Aspect",
+          },
+          "dappContractAddress": "0x2a92f0f860bf7c63fb9ef42cff4137006b309e0e6e1484e42d0b5511959414d",
           "date": "2022-09-07T08:56:31.000Z",
           "displayName": "Approve",
           "entity": "TOKEN",
