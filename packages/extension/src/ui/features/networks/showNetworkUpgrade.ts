@@ -9,6 +9,7 @@ interface ShowNetworkUpgradeMessage {
 }
 
 const useShowNetworkUpgradeMessage = create<ShowNetworkUpgradeMessage>(
+  // TODO: Add persist before merge
   //   persist(
   (set, _get) => ({
     lastShown: 0,
@@ -20,18 +21,20 @@ const useShowNetworkUpgradeMessage = create<ShowNetworkUpgradeMessage>(
 
 export const useShouldShowNetworkUpgradeMessage = () => {
   const { lastShown, updateLastShown } = useShowNetworkUpgradeMessage()
-  //   const network = useCurrentNetwork()
 
   const shouldShow = Date.now() - lastShown > 1000 * 60 * 60 * 24 * 2 // Should show if not shown within last two days
 
-  const { data: v4UpgradeAvailableOnTestnet } =
-    useCheckV4UpgradeAvailable("goerli-alpha")
+  const v4UpgradeAvailableOnTestnet = useCheckV4UpgradeAvailable("goerli-alpha")
 
-  const { data: v4UpgradeAvailableOnMainnet } =
+  const v4UpgradeAvailableOnMainnet =
     useCheckV4UpgradeAvailable("mainnet-alpha")
 
-  return [
-    shouldShow && (v4UpgradeAvailableOnTestnet || v4UpgradeAvailableOnMainnet),
+  return {
+    shouldShow:
+      shouldShow &&
+      (v4UpgradeAvailableOnTestnet || v4UpgradeAvailableOnMainnet),
     updateLastShown,
-  ] as const
+    v4UpgradeAvailableOnTestnet,
+    v4UpgradeAvailableOnMainnet,
+  } as const
 }

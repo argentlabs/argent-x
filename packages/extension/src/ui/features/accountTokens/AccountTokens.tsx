@@ -83,10 +83,16 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
   const network = useCurrentNetwork()
-  const [
-    shouldShowNetworkUpgradeMessage,
-    updateLastShownNetworkUpgradeMessage,
-  ] = useShouldShowNetworkUpgradeMessage()
+  const {
+    shouldShow: shouldShowNetworkUpgradeMessage,
+    updateLastShown: updateLastShownNetworkUpgradeMessage,
+    v4UpgradeAvailableOnTestnet,
+    v4UpgradeAvailableOnMainnet,
+  } = useShouldShowNetworkUpgradeMessage()
+  console.log(
+    "🚀 ~ file: AccountTokens.tsx ~ line 92 ~ v4UpgradeAvailableOnTestnet",
+    v4UpgradeAvailableOnTestnet,
+  )
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
@@ -153,7 +159,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   useEffect(() => {
     if (shouldShowNetworkUpgradeMessage) {
       updateLastShownNetworkUpgradeMessage()
-      navigate(routes.networkUpgradeV4())
+      navigate(routes.networkUpgradeV4(), {
+        state: {
+          v4UpgradeAvailableOnTestnet,
+          v4UpgradeAvailableOnMainnet,
+        },
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldShowNetworkUpgradeMessage])

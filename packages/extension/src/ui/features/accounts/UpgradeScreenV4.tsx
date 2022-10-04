@@ -1,7 +1,7 @@
 import { colord } from "colord"
 import { FC, useState } from "react"
 import Measure from "react-measure"
-import { useNavigate } from "react-router-dom"
+import { Location, useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button, ButtonGroupVertical } from "../../components/Button"
@@ -12,7 +12,6 @@ import { H2, P } from "../../theme/Typography"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
 import { recover } from "../recovery/recovery.service"
 import { useSelectedAccountStore } from "./accounts.state"
-import { useCheckV4UpgradeAvailable } from "./upgrade.service"
 
 const StyledP = styled(P)`
   margin-bottom: 16px;
@@ -60,6 +59,13 @@ interface UpgradeScreenV4Props extends Omit<ConfirmPageProps, "onSubmit"> {
   upgradeType: "account" | "network"
 }
 
+interface LocationWithState extends Location {
+  state: {
+    v4UpgradeAvailableOnTestnet: boolean
+    v4UpgradeAvailableOnMainnet: boolean
+  }
+}
+
 export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
   upgradeType,
   onReject,
@@ -69,11 +75,9 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
   const { selectedAccount } = useSelectedAccountStore()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
 
-  const { data: v4UpgradeAvailableOnTestnet } =
-    useCheckV4UpgradeAvailable("goerli-alpha")
+  const { state } = useLocation() as LocationWithState
 
-  const { data: v4UpgradeAvailableOnMainnet } =
-    useCheckV4UpgradeAvailable("mainnet-alpha")
+  const { v4UpgradeAvailableOnTestnet, v4UpgradeAvailableOnMainnet } = state
 
   if (!selectedAccount) {
     return <></>

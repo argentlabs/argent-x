@@ -1,12 +1,13 @@
 import { partition } from "lodash-es"
+import { useCallback, useEffect, useState } from "react"
 import { hash, number } from "starknet"
 import useSWR from "swr"
-import useSWRImmutable from "swr/immutable"
 
 import { getNetworkSelector } from "./../../../shared/account/selectors"
 import { getAccounts } from "../../../shared/account/store"
 import { Network } from "../../../shared/network"
 import { getMulticallContract } from "../../services/multicall.service"
+import { fetchFeeTokenBalanceForAccounts } from "./../accountTokens/tokens.service"
 import { useNetwork } from "./../networks/useNetworks"
 import { Account } from "./Account"
 
@@ -65,9 +66,18 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
     (ti) => number.toBN(ti),
   )
 
-  return implementations.some(
-    (impl) => !targetImplementations.some((ti) => ti.eq(number.toBN(impl))),
+  const oldAccountAddresses = implementations
+    .filter(
+      (impl) => !targetImplementations.some((ti) => ti.eq(number.toBN(impl))),
+    )
+    .map((_, i) => accounts[i].address)
+
+  const feeTokenBalances = await fetchFeeTokenBalanceForAccounts(
+    oldAccountAddresses,
+    network,
   )
+
+  return Object.values(feeTokenBalances).some((balance) => balance.gt(0))
 }
 
 export async function partitionDeprecatedAccount(
@@ -84,7 +94,9 @@ export async function partitionDeprecatedAccount(
     throw Error("Mulitcall contract is required to check for upgrade")
   }
 
-  const calls = accounts.flatMap((acc) => [
+  const deployedAccounts = accounts.filter((acc) => !acc.deployTransaction)
+
+  const calls = deployedAccounts.flatMap((acc) => [
     acc.address,
     hash.getSelectorFromName("get_implementation"),
     0,
@@ -96,13 +108,26 @@ export async function partitionDeprecatedAccount(
     number.toHex(r),
   ) as string[]
 
-  const implementationsToAccountsMap = accounts.reduce<Record<string, string>>(
-    (acc, account, i) => ({
+  const { argentAccount, argentPluginAccount } = network.accountClassHash
+
+  const implementationsToAccountsMap = accounts.reduce<
+    Record<string, string | undefined>
+  >((acc, account, i) => {
+    if (implementations[i]) {
+      return {
+        ...acc,
+        [account.address]: implementations[i],
+      }
+    }
+
+    const currentImpl =
+      account.type === "argent" ? argentAccount : argentPluginAccount
+
+    return {
       ...acc,
-      [account.address]: implementations[i],
-    }),
-    {},
-  )
+      [account.address]: currentImpl,
+    }
+  }, {})
 
   const targetImplementations = Object.values(network.accountClassHash).map(
     (ti) => number.toBN(ti),
@@ -111,8 +136,10 @@ export async function partitionDeprecatedAccount(
   return partition(
     accounts,
     (account) =>
-      !targetImplementations.some((ti) =>
-        ti.eq(number.toBN(implementationsToAccountsMap[account.address])),
+      !targetImplementations.some(
+        (ti) =>
+          implementationsToAccountsMap[account.address] &&
+          ti.eq(number.toBN(implementationsToAccountsMap[account.address])),
       ),
   )
 }
@@ -120,10 +147,26 @@ export async function partitionDeprecatedAccount(
 export const useCheckV4UpgradeAvailable = (networkId: string) => {
   const network = useNetwork(networkId)
 
-  return useSWRImmutable(
-    [networkId, "v4-upgrade-check"],
-    async () => await checkIfV4UpgradeAvailableOnNetwork(network),
-  )
+  const [upgradeAvailable, setUpgradeAvailable] = useState(false)
+
+  const checkV4UpgradeAvailableCallback = useCallback(async () => {
+    const available = await checkIfV4UpgradeAvailableOnNetwork(network)
+
+    setUpgradeAvailable(available)
+  }, [network])
+
+  useEffect(() => {
+    checkV4UpgradeAvailableCallback()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return upgradeAvailable
+
+  // TODO: remove before merge
+  // return useSWR(
+  //   [networkId, "v4-upgrade-check-2"],
+  //   async () => await checkIfV4UpgradeAvailableOnNetwork(network),
+  // )
 }
 
 export const usePartitionDeprecatedAccounts = (

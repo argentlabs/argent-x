@@ -1,3 +1,4 @@
+import { isFunction } from "lodash-es"
 import { useEffect, useMemo, useState } from "react"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
@@ -21,7 +22,7 @@ export const useAccountStatus = (
   const [isDeployed, setIsDeployed] = useState(true)
 
   useEffect(() => {
-    if (deployStatus === "SUCCESS") {
+    if (deployStatus === "SUCCESS" && isFunction(account.completeDeployTx)) {
       account.completeDeployTx()
     }
   }, [account, deployStatus])

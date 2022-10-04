@@ -11,6 +11,7 @@ import {
   uint256,
 } from "starknet"
 
+import { Network } from "./../../../shared/network/type"
 import parsedErc20Abi from "../../../abis/ERC20.json"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
@@ -187,4 +188,48 @@ export const fetchFeeTokenBalance = async (
     return BigNumber.from(0)
   }
   return fetchTokenBalance(token.address, account)
+}
+
+export const fetchFeeTokenBalanceForAccounts = async (
+  accountAddresses: string[],
+  network: Network,
+) => {
+  const multicallContract = getMulticallContract(network)
+
+  if (!multicallContract) {
+    throw new Error("Multicall contract is required")
+  }
+
+  const token = getFeeToken(network.id)
+
+  if (!token) {
+    throw new Error("Fee token not found")
+  }
+
+  const calls = accountAddresses.flatMap((address) => [
+    token.address,
+    hash.getSelectorFromName("balanceOf"),
+    1,
+    address,
+  ])
+
+  const response = await multicallContract.aggregate(calls)
+
+  const results: string[] = response.result.map((res: any) => number.toHex(res))
+
+  const resultChunks = chunk(results, 2)
+
+  const balances = resultChunks.map((result) =>
+    BigNumber.from(
+      uint256.uint256ToBN({ low: result[0], high: result[1] }).toString(),
+    ),
+  )
+
+  return accountAddresses.reduce<Record<string, BigNumber>>(
+    (acc, accountAddress, i) => ({
+      ...acc,
+      [accountAddress]: balances[i],
+    }),
+    {},
+  )
 }
