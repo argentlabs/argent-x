@@ -15217,9 +15217,9 @@ store2@^2.12.0:
   integrity sha512-siT1RiqlfQnGqgT/YzXVUNsom9S0H1OX+dpdGN1xkyYATo4I6sep5NmsRD/40s3IIOvlCq6akxkqG82urIZW1w==
 
 storybook-addon-swc@^1.1.7:
-  version "1.1.8"
-  resolved "https://registry.npmjs.org/storybook-addon-swc/-/storybook-addon-swc-1.1.8.tgz#ff999d2f1360db345e7da0de19e9ff64db46ced8"
-  integrity sha512-z34Y9ugbkmpvCoXuhoXcVDKgkK8mWjnkhvXXo2n+iomE9+GFiY2KRqBsPhtuQDnpJU/aTdL1aNaBiIkLX5bB/w==
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/storybook-addon-swc/-/storybook-addon-swc-1.1.9.tgz#9f5c583be497582475d2b25b6c1e98eb90d11eb7"
+  integrity sha512-JmoPzJ5RA7ytPi58r5dKcRYNEESe57ZAMzJcUqnkMOwBuq0MZvBUH6gHWZxVagQe64RitS83ZOmZEJNxxc0ZWQ==
   dependencies:
     "@babel/runtime" "^7.17.2"
     "@swc/core" "^1.2.152"
