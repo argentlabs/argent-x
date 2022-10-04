@@ -4,6 +4,7 @@ import styled from "styled-components"
 import { TokenTextGroup, TokenTitle } from "../../accountTokens/TokenListItem"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 import {
+  TokenApproveTransaction,
   TokenMintTransaction,
   TokenTransferTransaction,
 } from "../transform/type"
@@ -21,7 +22,10 @@ const TokenValue = styled.div`
 `
 
 export interface ITransferAccessory {
-  transaction: TokenTransferTransaction | TokenMintTransaction
+  transaction:
+    | TokenTransferTransaction
+    | TokenMintTransaction
+    | TokenApproveTransaction
 }
 
 export const TransferAccessory: FC<ITransferAccessory> = ({ transaction }) => {

@@ -15,7 +15,6 @@ export interface Erc20TransferCall extends Erc20Call {
 export const isErc20TransferCall = (call: Call): call is Erc20TransferCall => {
   try {
     if (
-      call &&
       call.contractAddress &&
       call.entrypoint === "transfer" &&
       call.calldata?.length === 3

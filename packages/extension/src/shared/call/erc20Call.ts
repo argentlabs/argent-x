@@ -28,11 +28,11 @@ export const validateERC20Call = (call: Erc20Call) => {
     const [recipientAddressDecimal, amountLowFelt, amountHighFelt] = calldata
     validateAndParseAddress(recipientAddressDecimal)
     /** validate uint256 input amount */
-    const amountUnit256: Uint256 = {
+    const amountUint256: Uint256 = {
       low: amountLowFelt,
       high: amountHighFelt,
     }
-    const amount = uint256ToBN(amountUnit256)
+    const amount = uint256ToBN(amountUint256)
     /** final check for valid Unit256 that is > 0 */
     if (isUint256(amount) && toBN(amount).gt(toBN(0))) {
       return true
@@ -47,11 +47,11 @@ export const parseErc20Call = (call: Erc20Call) => {
   const { contractAddress, calldata } = call
   const [recipientAddressDecimal, amountLowFelt, amountHighFelt] = calldata
   const recipientAddress = normalizeAddress(recipientAddressDecimal)
-  const amountUnit256: Uint256 = {
+  const amountUint256: Uint256 = {
     low: amountLowFelt,
     high: amountHighFelt,
   }
-  const amount = uint256ToBN(amountUnit256).toString(10)
+  const amount = uint256ToBN(amountUint256).toString(10)
   return {
     contractAddress,
     recipientAddress,

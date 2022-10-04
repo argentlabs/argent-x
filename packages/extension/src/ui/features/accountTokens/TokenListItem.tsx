@@ -31,6 +31,8 @@ export const TokenDetailsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  overflow: hidden;
 `
 
 export const TokenTextGroup = styled.div`
