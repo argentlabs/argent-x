@@ -36,6 +36,7 @@ import {
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
+  isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "./transform/is"
@@ -160,9 +161,10 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
+  const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
   const theme = useTheme()
   const title = useMemo(() => {
-    if (isTransfer || isTokenMint) {
+    if (isTransfer || isTokenMint || isTokenApprove) {
       const { amount, tokenAddress } = transactionTransformed
       return (
         <TransferTitle
@@ -188,6 +190,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   }, [
     isTransfer,
     isTokenMint,
+    isTokenApprove,
     isNFT,
     isNFTTransfer,
     displayName,

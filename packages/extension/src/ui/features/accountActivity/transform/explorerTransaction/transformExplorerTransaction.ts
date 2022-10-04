@@ -17,6 +17,7 @@ import knownDappTransformer from "./transformers/knownDappTransformer"
 import knownNftTransformer from "./transformers/knownNftTransformer"
 import postSwapTransformer from "./transformers/postSwapTransformer"
 import postTransferTransformer from "./transformers/postTransferTransformer"
+import tokenApproveTransformer from "./transformers/tokenApproveTransformer"
 import tokenMintTransformer from "./transformers/tokenMintTransformer"
 import tokenTransferTransformer from "./transformers/tokenTransferTransformer"
 
@@ -41,6 +42,7 @@ const mainTransformers = [
   knownNftTransformer,
   tokenMintTransformer,
   tokenTransferTransformer,
+  tokenApproveTransformer,
 ]
 
 /** all are executed */

@@ -11,36 +11,42 @@ export default function ({
   result,
   fingerprint,
 }: IExplorerTransactionTransformer) {
-  if (fingerprint === "events[Transfer] calls[transfer]") {
-    const { events } = explorerTransaction
-    const entity = "TOKEN"
-    let action = "TRANSFER"
-    let displayName = "Transfer"
-    const tokenAddress = events[0].address
-    const parameters = events[0].parameters
-    const fromAddress = getParameter(parameters, "from_")
-    const toAddress = getParameter(parameters, "to")
-    const amount = getParameter(parameters, "value")
-    if (accountAddress && toAddress && fromAddress) {
-      if (isEqualAddress(toAddress, accountAddress)) {
-        action = "RECEIVE"
-        displayName = "Receive"
+  /** Some transfers have no events */
+  if (
+    fingerprint === "events[Transfer] calls[transfer]" ||
+    fingerprint === "events[] calls[transfer]"
+  ) {
+    const { calls } = explorerTransaction
+    if (calls?.length === 1) {
+      const entity = "TOKEN"
+      let action = "TRANSFER"
+      let displayName = "Transfer"
+      const tokenAddress = calls[0].address
+      const parameters = calls[0].parameters
+      const fromAddress = explorerTransaction.contractAddress
+      const toAddress = getParameter(parameters, "recipient")
+      const amount = getParameter(parameters, "amount")
+      if (accountAddress && toAddress && fromAddress) {
+        if (isEqualAddress(toAddress, accountAddress)) {
+          action = "RECEIVE"
+          displayName = "Receive"
+        }
+        if (isEqualAddress(fromAddress, accountAddress)) {
+          action = "SEND"
+          displayName = "Send"
+        }
       }
-      if (isEqualAddress(fromAddress, accountAddress)) {
-        action = "SEND"
-        displayName = "Send"
-      }
+      result = {
+        ...result,
+        action,
+        entity,
+        displayName,
+        fromAddress,
+        toAddress,
+        amount,
+        tokenAddress,
+      } as TokenTransferTransaction
+      return result
     }
-    result = {
-      ...result,
-      action,
-      entity,
-      displayName,
-      fromAddress,
-      toAddress,
-      amount,
-      tokenAddress,
-    } as TokenTransferTransaction
-    return result
   }
 }

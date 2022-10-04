@@ -1,6 +1,7 @@
 import { FC } from "react"
 import styled from "styled-components"
 
+import { TransactionApprove } from "../../../components/Icons/TransactionApprove"
 import { TransactionArgentX } from "../../../components/Icons/TransactionArgentX"
 import { TransactionNFT } from "../../../components/Icons/TransactionNFT"
 import { TransactionReceive } from "../../../components/Icons/TransactionReceive"
@@ -11,6 +12,7 @@ import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import { DappIcon } from "../../actions/connectDapp/DappIcon"
 import {
   isSwapTransaction,
+  isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "../transform/is"
@@ -84,10 +86,14 @@ export const TransactionIcon: FC<ITransactionIcon> = ({
       iconComponent =
         entity === "TOKEN" ? <TransactionReceive /> : <TransactionNFT />
       break
+    case "APPROVE":
+      iconComponent = <TransactionApprove />
+      break
   }
   if (
     isTokenTransferTransaction(transaction) ||
-    isTokenMintTransaction(transaction)
+    isTokenMintTransaction(transaction) ||
+    isTokenApproveTransaction(transaction)
   ) {
     const { token } = transaction
     if (token) {

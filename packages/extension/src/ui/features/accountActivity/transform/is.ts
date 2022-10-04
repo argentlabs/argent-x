@@ -5,6 +5,7 @@ import {
   NFTTransaction,
   NFTTransferTransaction,
   SwapTransaction,
+  TokenApproveTransaction,
   TokenMintTransaction,
   TokenTransferTransaction,
   TransformedTransaction,
@@ -18,6 +19,13 @@ export const isTokenTransferTransaction = (
     entity === "TOKEN" &&
     (action === "SEND" || action === "RECEIVE" || action === "TRANSFER")
   )
+}
+
+export const isTokenApproveTransaction = (
+  transaction: TransformedTransaction,
+): transaction is TokenApproveTransaction => {
+  const { entity, action } = transaction
+  return entity === "TOKEN" && action === "APPROVE"
 }
 
 export const isTokenMintTransaction = (

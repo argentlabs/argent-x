@@ -14,6 +14,7 @@ import {
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
+  isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "./transform/is"
@@ -84,6 +85,7 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
+  const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer) {
@@ -128,7 +130,7 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
         />
       )
     }
-    if (isTransfer || isTokenMint) {
+    if (isTransfer || isTokenMint || isTokenApprove) {
       return <TransferAccessory transaction={transactionTransformed} />
     }
     if (isSwap) {
@@ -136,11 +138,12 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
     }
     return null
   }, [
-    transactionTransformed,
     isNFT,
-    isSwap,
-    isTokenMint,
     isTransfer,
+    isTokenMint,
+    isTokenApprove,
+    isSwap,
+    transactionTransformed,
     network.id,
   ])
 

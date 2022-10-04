@@ -6,7 +6,7 @@
 
 import { IExplorerTransaction } from "../../../../../shared/explorer/type"
 
-export const fingerprintExplorerTransaction = (
+export const getPreExecutionEventNames = (
   explorerTransaction: IExplorerTransaction,
 ) => {
   /**
@@ -25,14 +25,26 @@ export const fingerprintExplorerTransaction = (
       }
       events.push(event.name)
     }
+    return events
   }
+}
+
+export const getCallNames = (explorerTransaction: IExplorerTransaction) => {
   const calls = explorerTransaction.calls?.map((call) => call.name)
+  return calls
+}
+
+export const fingerprintExplorerTransaction = (
+  explorerTransaction: IExplorerTransaction,
+) => {
+  const eventNames = getPreExecutionEventNames(explorerTransaction)
+  const callNames = getCallNames(explorerTransaction)
   const elements = []
-  if (events !== undefined) {
-    elements.push(`events[${events.join(",")}]`)
+  if (eventNames !== undefined) {
+    elements.push(`events[${eventNames.join(",")}]`)
   }
-  if (calls !== undefined) {
-    elements.push(`calls[${calls.join(",")}]`)
+  if (callNames !== undefined) {
+    elements.push(`calls[${callNames.join(",")}]`)
   }
   if (elements.length) {
     return elements.join(" ")
