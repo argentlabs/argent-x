@@ -11,6 +11,7 @@ import {
   dappInfluenceCrewmatePurchaseNft,
   dappMintSquareBuyNft,
   dappNoGame,
+  erc20ApproveUnlimited,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,
@@ -67,6 +68,11 @@ describe("fingerprintExplorerTransaction", () => {
       ).toMatchInlineSnapshot(
         '"events[structure_updated] calls[crystal_upgrade_complete]"',
       )
+      expect(
+        fingerprintExplorerTransaction(
+          erc20ApproveUnlimited as IExplorerTransaction,
+        ),
+      ).toMatchInlineSnapshot('"events[Approval] calls[approve]"')
       expect(
         fingerprintExplorerTransaction(
           erc20MintTestToken as IExplorerTransaction,
