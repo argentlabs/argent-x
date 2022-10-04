@@ -3,7 +3,6 @@ import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
@@ -17,7 +16,9 @@ import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { H1, P } from "../../theme/Typography"
+import { LoadingScreen } from "../actions/LoadingScreen"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
@@ -31,6 +32,7 @@ import {
   useSelectedAccountStore,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
+import { usePartitionDeprecatedAccounts } from "./upgrade.service"
 
 interface IAccountList {
   hasHiddenAccounts: boolean
@@ -144,10 +146,11 @@ export const AccountListScreen: FC = () => {
   const { isBackupRequired } = useBackupRequired()
   const [isDeploying, setIsDeploying] = useState(false)
   const [deployFailed, setDeployFailed] = useState(false)
+  const currentNetwork = useCurrentNetwork()
 
-  const [deprecatedAccounts, newAccounts] = partition(
+  const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
     visibleAccounts,
-    (account) => isDeprecated(account),
+    currentNetwork,
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
@@ -164,6 +167,12 @@ export const AccountListScreen: FC = () => {
       setIsDeploying(false)
     }
   }, [navigate, switcherNetworkId])
+
+  if (!partitionedAccounts) {
+    return <LoadingScreen />
+  }
+
+  const [deprecatedAccounts, newAccounts] = partitionedAccounts
 
   return (
     <AccountListWrapper header>
@@ -195,7 +204,6 @@ export const AccountListScreen: FC = () => {
             key={account.address}
             account={account}
             selectedAccount={selectedAccount}
-            canShowUpgrade
           />
         ))}
         {some(deprecatedAccounts) && (
@@ -206,7 +214,6 @@ export const AccountListScreen: FC = () => {
                 key={account.address}
                 account={account}
                 selectedAccount={selectedAccount}
-                canShowUpgrade
               />
             ))}
           </>

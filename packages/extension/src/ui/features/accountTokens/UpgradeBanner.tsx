@@ -11,11 +11,11 @@ export const UpgradeBanner: FC<UpgradeBannerProps> = ({
   canNotPay = false,
 }) => (
   <Banner
-    title="Upgrade Available"
+    title="Upgrade Required"
     description={
       canNotPay
-        ? "You need ETH to cover transaction fees!"
-        : "This update is required to use this wallet."
+        ? "Add ETH to upgrade and use this account"
+        : "Upgrade to continue using this account"
     }
     icon={<UpdateIcon />}
   />

@@ -31,7 +31,7 @@ type TransactionAction = ExtQueueItem<{
   payload: TransactionActionPayload
 }>
 
-export const executeTransaction = async (
+export const executeTransactionAction = async (
   action: TransactionAction,
   { wallet }: BackgroundService,
 ) => {

@@ -5,7 +5,7 @@ import { assertNever } from "../ui/services/assertNever"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
-import { executeTransaction } from "./transactions/transactionExecution"
+import { executeTransactionAction } from "./transactions/transactionExecution"
 
 export const handleActionApproval = async (
   action: ExtQueueItem<ActionItem>,
@@ -36,7 +36,7 @@ export const handleActionApproval = async (
 
     case "TRANSACTION": {
       try {
-        const response = await executeTransaction(action, background)
+        const response = await executeTransactionAction(action, background)
 
         return {
           type: "TRANSACTION_SUBMITTED",

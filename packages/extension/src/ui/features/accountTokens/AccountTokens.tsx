@@ -28,6 +28,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
+import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
@@ -82,6 +83,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
   const network = useCurrentNetwork()
+  const [
+    shouldShowNetworkUpgradeMessage,
+    updateLastShownNetworkUpgradeMessage,
+  ] = useShouldShowNetworkUpgradeMessage()
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
@@ -123,7 +128,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showUpgradeBanner = Boolean(
     needsUpgrade && !showPendingTransactions && feeTokenBalance?.gt(0),
   )
-  const showNoBalanceForUpgrade = !showUpgradeBanner && needsUpgrade
+  const showNoBalanceForUpgrade = Boolean(
+    needsUpgrade && !showPendingTransactions && feeTokenBalance?.lte(0),
+  )
+
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
@@ -141,6 +149,14 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   useEffect(() => {
     connectAccount(account)
   }, [account])
+
+  useEffect(() => {
+    if (shouldShowNetworkUpgradeMessage) {
+      updateLastShownNetworkUpgradeMessage()
+      navigate(routes.networkUpgradeV4())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
   const accountIsDeployed = useAccountIsDeployed(account)
@@ -162,7 +178,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && (
-        <Link to={routes.upgrade()}>
+        <Link to={routes.accountUpgradeV4()}>
           <UpgradeBanner />
         </Link>
       )}

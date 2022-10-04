@@ -2,13 +2,14 @@ import { isArray } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
+import useSWR from "swr"
 
 import { isErc20TransferCall } from "../../../shared/call"
 import {
   ApiTransactionReviewResponse,
   getTransactionReviewHasSwap,
 } from "../../../shared/transactionReview.service"
-import { useAppState } from "../../app.state"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import {
   Field,
   FieldGroup,
@@ -17,14 +18,18 @@ import {
 } from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
+import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
+import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
 
-interface ApproveTransactionScreenProps
+export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
   transactions: Call | Call[]
@@ -58,8 +63,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
-  const { switcherNetworkId } = useAppState()
-  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const { accountClassHash, id: networkId } = useCurrentNetwork()
+  const tokensByNetwork = useTokensInNetwork(networkId)
 
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
@@ -71,8 +76,34 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return titleForTransactionsAndReview(transactions, transactionReview)
   }, [transactionReview, transactions])
 
+  const accountIdentifier =
+    selectedAccount && getAccountIdentifier(selectedAccount)
+
+  const { data: feeTokenBalance } = useSWR(
+    [accountIdentifier, networkId, "feeTokenBalance"],
+    () => selectedAccount && fetchFeeTokenBalance(selectedAccount, networkId),
+    { suspense: false },
+  )
+
+  const { data: needsUpgrade = false } = useSWR(
+    [accountIdentifier, accountClassHash, "showUpgradeBanner"],
+    () =>
+      selectedAccount &&
+      checkIfUpgradeAvailable(selectedAccount, accountClassHash),
+    { suspense: false },
+  )
+
+  const shouldBeUpgraded = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
+
+  const isUpgradeTransaction =
+    !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
+
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
+  }
+
+  if (shouldBeUpgraded && !isUpgradeTransaction) {
+    return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
   const confirmButtonVariant =
@@ -101,7 +132,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       {...props}
     >
       <TransactionsList
-        networkId={switcherNetworkId}
+        networkId={networkId}
         transactions={transactions}
         transactionReview={transactionReview}
         tokensByNetwork={tokensByNetwork}

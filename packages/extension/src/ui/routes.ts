@@ -79,6 +79,8 @@ export const routes = {
     `/account/activity/transaction-detail/:txHash`,
   ),
   upgrade: route("/account/upgrade"),
+  networkUpgradeV4: route("/account/network-upgradeV4"),
+  accountUpgradeV4: route("/account/account-upgradeV4"),
   accounts: route("/accounts"),
   accountsHidden: route("/accounts/hidden"),
   newToken: route("/tokens/new"),

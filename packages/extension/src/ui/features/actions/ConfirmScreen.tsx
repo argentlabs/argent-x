@@ -6,6 +6,7 @@ import styled from "styled-components"
 import {
   Button,
   ButtonGroupHorizontal,
+  ButtonGroupVertical,
   ButtonVariant,
 } from "../../components/Button"
 import { Header } from "../../components/Header"
@@ -19,7 +20,7 @@ import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 
-const ConfirmScreenWrapper = styled.form<{
+export const ConfirmScreenWrapper = styled.form<{
   accountShown: boolean
   smallTopPadding: boolean
 }>`
@@ -49,6 +50,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   confirmButtonVariant?: ButtonVariant
   singleButton?: boolean
   switchButtonOrder?: boolean
+  buttonGroup?: "horizontal" | "vertical"
   smallTopPadding?: boolean
   showHeader?: boolean
   footer?: ReactNode
@@ -94,6 +96,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonBackgroundColor,
   confirmButtonVariant,
   rejectButtonText = "Reject",
+  buttonGroup = "horizontal",
   onSubmit,
   onReject,
   selectedAccount,
@@ -151,25 +154,49 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
         {({ measureRef }) => (
           <StickyGroup ref={measureRef}>
             {footer}
-            <ButtonGroupHorizontal switchButtonOrder={switchButtonOrder}>
-              {!singleButton && (
-                <Button onClick={onReject} type="button">
-                  {rejectButtonText}
+            {buttonGroup === "horizontal" && (
+              <ButtonGroupHorizontal switchButtonOrder={switchButtonOrder}>
+                {!singleButton && (
+                  <Button onClick={onReject} type="button">
+                    {rejectButtonText}
+                  </Button>
+                )}
+                <Button
+                  disabled={confirmButtonDisabled}
+                  style={{
+                    backgroundColor: confirmButtonDisabled
+                      ? undefined
+                      : confirmButtonBackgroundColor,
+                  }}
+                  variant={confirmButtonVariant}
+                  type="submit"
+                >
+                  {confirmButtonText}
                 </Button>
-              )}
-              <Button
-                disabled={confirmButtonDisabled}
-                style={{
-                  backgroundColor: confirmButtonDisabled
-                    ? undefined
-                    : confirmButtonBackgroundColor,
-                }}
-                variant={confirmButtonVariant}
-                type="submit"
-              >
-                {confirmButtonText}
-              </Button>
-            </ButtonGroupHorizontal>
+              </ButtonGroupHorizontal>
+            )}
+
+            {buttonGroup === "vertical" && (
+              <ButtonGroupVertical switchButtonOrder={switchButtonOrder}>
+                {!singleButton && (
+                  <Button onClick={onReject} type="button">
+                    {rejectButtonText}
+                  </Button>
+                )}
+                <Button
+                  disabled={confirmButtonDisabled}
+                  style={{
+                    backgroundColor: confirmButtonDisabled
+                      ? undefined
+                      : confirmButtonBackgroundColor,
+                  }}
+                  variant={confirmButtonVariant}
+                  type="submit"
+                >
+                  {confirmButtonText}
+                </Button>
+              </ButtonGroupVertical>
+            )}
           </StickyGroup>
         )}
       </Measure>

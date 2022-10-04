@@ -29,10 +29,10 @@ const Alert = styled.div`
 
 export const DeprecatedAccountsWarning: FC = () => (
   <Container>
-    <Title>Deprecated accounts</Title>
+    <Title>Upgrade Required</Title>
     <Alert>
       <WarningIcon />
-      These accounts will disappear soon
+      These accounts need to be upgraded
     </Alert>
   </Container>
 )
