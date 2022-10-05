@@ -1,8 +1,9 @@
 import { colord } from "colord"
 import { FC, useState } from "react"
 import Measure from "react-measure"
-import { Location, useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { useSWRConfig } from "swr"
 
 import { Button, ButtonGroupVertical } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
@@ -10,6 +11,7 @@ import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
+import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { recover } from "../recovery/recovery.service"
 import { useSelectedAccountStore } from "./accounts.state"
 
@@ -59,13 +61,6 @@ interface UpgradeScreenV4Props extends Omit<ConfirmPageProps, "onSubmit"> {
   upgradeType: "account" | "network"
 }
 
-interface LocationWithState extends Location {
-  state: {
-    v4UpgradeAvailableOnTestnet: boolean
-    v4UpgradeAvailableOnMainnet: boolean
-  }
-}
-
 export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
   upgradeType,
   onReject,
@@ -75,23 +70,42 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
   const { selectedAccount } = useSelectedAccountStore()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
 
-  const { state } = useLocation() as LocationWithState
+  const { cache } = useSWRConfig()
 
-  const { v4UpgradeAvailableOnTestnet, v4UpgradeAvailableOnMainnet } = state
+  const {
+    v4UpgradeAvailableOnTestnet,
+    v4UpgradeAvailableOnMainnet,
+    v4UpgradeAvailableOnHiddenMainnet,
+  } = useShouldShowNetworkUpgradeMessage()
 
-  if (!selectedAccount) {
-    return <></>
+  const removeUpgradeCache = () => {
+    cache.delete(["goerli-alpha", false, "v4-upgrade-check"])
+    cache.delete(["mainnet-alpha", false, "v4-upgrade-check"])
+    cache.delete(["mainnet-alpha", true, "v4-upgrade-check"])
   }
 
   const openAccountList = async (networkId: string) => {
+    removeUpgradeCache()
     navigate(await recover({ networkId, showAccountList: true }))
+  }
+
+  if (!selectedAccount) {
+    return <></>
   }
 
   return (
     <div {...props}>
       <IconBar
         close
-        onClick={() => upgradeType === "account" && onReject && onReject()}
+        onClick={() => {
+          if (upgradeType === "account") {
+            return onReject && onReject()
+          }
+
+          if (upgradeType === "network") {
+            removeUpgradeCache()
+          }
+        }}
       />
       <Container>
         <H2>
@@ -133,18 +147,21 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
               <StickyGroup ref={measureRef}>
                 {upgradeType === "network" ? (
                   <ButtonGroupVertical>
-                    {v4UpgradeAvailableOnMainnet && (
+                    {(v4UpgradeAvailableOnMainnet ||
+                      v4UpgradeAvailableOnHiddenMainnet) && (
                       <PrimaryButton
                         onClick={() => {
                           openAccountList("mainnet-alpha")
                         }}
                         type="button"
                       >
-                        Go to mainnet accounts
+                        Go to {!v4UpgradeAvailableOnMainnet ? "hidden " : ""}
+                        mainnet accounts
                       </PrimaryButton>
                     )}
                     {v4UpgradeAvailableOnTestnet &&
-                      (v4UpgradeAvailableOnMainnet ? (
+                      (v4UpgradeAvailableOnMainnet ||
+                      v4UpgradeAvailableOnHiddenMainnet ? (
                         <Button
                           onClick={() => {
                             openAccountList("goerli-alpha")

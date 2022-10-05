@@ -24,17 +24,27 @@ export const useShouldShowNetworkUpgradeMessage = () => {
 
   const shouldShow = Date.now() - lastShown > 1000 * 60 * 60 * 24 * 2 // Should show if not shown within last two days
 
-  const v4UpgradeAvailableOnTestnet = useCheckV4UpgradeAvailable("goerli-alpha")
-
-  const v4UpgradeAvailableOnMainnet =
+  const { data: v4UpgradeAvailableOnMainnet, isValidating: isMainnetLoading } =
     useCheckV4UpgradeAvailable("mainnet-alpha")
+
+  const { data: v4UpgradeAvailableOnTestnet, isValidating: isTestnetLoading } =
+    useCheckV4UpgradeAvailable("goerli-alpha")
+
+  const {
+    data: v4UpgradeAvailableOnHiddenMainnet,
+    isValidating: isHiddenMainnetLoading,
+  } = useCheckV4UpgradeAvailable("mainnet-alpha", true)
 
   return {
     shouldShow:
       shouldShow &&
-      (v4UpgradeAvailableOnTestnet || v4UpgradeAvailableOnMainnet),
+      !(isMainnetLoading || isTestnetLoading || isHiddenMainnetLoading) &&
+      (v4UpgradeAvailableOnTestnet ||
+        v4UpgradeAvailableOnMainnet ||
+        v4UpgradeAvailableOnHiddenMainnet),
     updateLastShown,
     v4UpgradeAvailableOnTestnet,
     v4UpgradeAvailableOnMainnet,
-  } as const
+    v4UpgradeAvailableOnHiddenMainnet,
+  }
 }

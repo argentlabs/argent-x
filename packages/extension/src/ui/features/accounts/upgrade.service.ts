@@ -1,9 +1,7 @@
 import { partition } from "lodash-es"
-import { useCallback, useEffect, useState } from "react"
 import { hash, number } from "starknet"
 import useSWR from "swr"
 
-import { getNetworkSelector } from "./../../../shared/account/selectors"
 import { getAccounts } from "../../../shared/account/store"
 import { Network } from "../../../shared/network"
 import { getMulticallContract } from "../../services/multicall.service"
@@ -37,6 +35,7 @@ export async function checkIfUpgradeAvailable(
 
 export async function checkIfV4UpgradeAvailableOnNetwork(
   network: Network,
+  onlyHidden = false,
 ): Promise<boolean> {
   if (!network.accountClassHash) {
     return false
@@ -48,7 +47,9 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
     throw Error("Multicall contract is required to check for upgrade")
   }
 
-  const accounts = await getAccounts(getNetworkSelector(network.id))
+  const accounts = await getAccounts(
+    (acc) => acc.networkId === network.id && onlyHidden === Boolean(acc.hidden),
+  )
 
   const calls = accounts.flatMap((acc) => [
     acc.address,
@@ -91,7 +92,7 @@ export async function partitionDeprecatedAccount(
   const multicallContract = getMulticallContract(network)
 
   if (!multicallContract) {
-    throw Error("Mulitcall contract is required to check for upgrade")
+    throw Error("Multicall contract is required to check for upgrade")
   }
 
   const deployedAccounts = accounts.filter((acc) => !acc.deployTransaction)
@@ -144,29 +145,16 @@ export async function partitionDeprecatedAccount(
   )
 }
 
-export const useCheckV4UpgradeAvailable = (networkId: string) => {
+export const useCheckV4UpgradeAvailable = (
+  networkId: string,
+  onlyHidden = false,
+) => {
   const network = useNetwork(networkId)
 
-  const [upgradeAvailable, setUpgradeAvailable] = useState(false)
-
-  const checkV4UpgradeAvailableCallback = useCallback(async () => {
-    const available = await checkIfV4UpgradeAvailableOnNetwork(network)
-
-    setUpgradeAvailable(available)
-  }, [network])
-
-  useEffect(() => {
-    checkV4UpgradeAvailableCallback()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  return upgradeAvailable
-
-  // TODO: remove before merge
-  // return useSWR(
-  //   [networkId, "v4-upgrade-check-2"],
-  //   async () => await checkIfV4UpgradeAvailableOnNetwork(network),
-  // )
+  return useSWR(
+    [networkId, onlyHidden, "v4-upgrade-check"],
+    async () => await checkIfV4UpgradeAvailableOnNetwork(network, onlyHidden),
+  )
 }
 
 export const usePartitionDeprecatedAccounts = (

@@ -86,8 +86,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const {
     shouldShow: shouldShowNetworkUpgradeMessage,
     updateLastShown: updateLastShownNetworkUpgradeMessage,
-    v4UpgradeAvailableOnTestnet,
-    v4UpgradeAvailableOnMainnet,
   } = useShouldShowNetworkUpgradeMessage()
 
   useEffect(() => {
@@ -155,12 +153,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   useEffect(() => {
     if (shouldShowNetworkUpgradeMessage) {
       updateLastShownNetworkUpgradeMessage()
-      navigate(routes.networkUpgradeV4(), {
-        state: {
-          v4UpgradeAvailableOnTestnet,
-          v4UpgradeAvailableOnMainnet,
-        },
-      })
+      navigate(routes.networkUpgradeV4())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldShowNetworkUpgradeMessage])
