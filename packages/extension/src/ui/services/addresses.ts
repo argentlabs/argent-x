@@ -1,4 +1,3 @@
-import { isHexString } from "ethers/lib/utils"
 import {
   constants,
   getChecksumAddress,
