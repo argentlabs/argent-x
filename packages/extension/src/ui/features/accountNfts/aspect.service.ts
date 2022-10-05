@@ -4,7 +4,8 @@ import join from "url-join"
 
 import { fetcher } from "../../../shared/api/fetcher"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { AspectNft } from "./aspect.model"
+import { withPolling } from "../../services/swr"
+import { AspectContract, AspectNft } from "./aspect.model"
 
 const baseUrlGoerli = "https://api-testnet.aspect.co/api/v0/assets"
 const baseUrlMainnet = "https://api.aspect.co/api/v0/assets"
@@ -128,6 +129,44 @@ export const fetchNextAspectCollection = async (
   }
 
   return data.assets
+}
+
+export const fetchNextAspectContractAddresses = async (
+  url: string,
+): Promise<string[]> => {
+  const response = await fetch(url)
+  if (!response.ok) {
+    return []
+  }
+
+  const data = await response.json()
+  const contractAddresses = data.contracts.map(
+    (contract: AspectContract) => contract.contract_address,
+  )
+
+  if (isString(data.next_url)) {
+    return contractAddresses.concat(
+      await fetchNextAspectContractAddresses(data.next_url),
+    )
+  }
+
+  return contractAddresses
+}
+
+export const fetchAspectContractAddresses = async () => {
+  /** there are a huge number of contracts on testnet, we only really care about and fetch mainnet */
+  const contractAddresses = await fetchNextAspectContractAddresses(
+    "https://api.aspect.co/api/v0/contracts",
+  )
+  return contractAddresses
+}
+
+export const useAspectContractAddresses = () => {
+  return useSWR(
+    "aspectContractAddresses",
+    fetchAspectContractAddresses,
+    withPolling(24 * 60 * 60 * 1000) /** 1 day */,
+  )
 }
 
 export const useAspectNft = (

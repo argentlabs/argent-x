@@ -14,8 +14,7 @@ import dateTransformer from "./transformers/dateTransformer"
 import defaultDisplayNameTransformer from "./transformers/defaultDisplayNameTransformer"
 import feesTransformer from "./transformers/feesTransformer"
 import knownDappTransformer from "./transformers/knownDappTransformer"
-import nftMintTransformer from "./transformers/nftMintTransformer"
-import nftTransferTransformer from "./transformers/nftTransferTransformer"
+import knownNftTransformer from "./transformers/knownNftTransformer"
 import postSwapTransformer from "./transformers/postSwapTransformer"
 import postTransferTransformer from "./transformers/postTransferTransformer"
 import tokenApproveTransformer from "./transformers/tokenApproveTransformer"
@@ -40,8 +39,7 @@ const mainTransformers = [
   dappJediswapSwapTransformer,
   dappMintSquareBuyNFTTransformer,
   dappMySwapSwapTransformer,
-  nftMintTransformer,
-  nftTransferTransformer,
+  knownNftTransformer,
   tokenMintTransformer,
   tokenTransferTransformer,
   tokenApproveTransformer,
@@ -70,6 +68,7 @@ export interface ITransformExplorerTransaction {
   explorerTransaction: IExplorerTransaction
   accountAddress?: string
   tokensByNetwork?: Token[]
+  nftContractAddresses?: string[]
 }
 
 /**
@@ -87,6 +86,7 @@ export const transformExplorerTransaction = ({
   explorerTransaction,
   accountAddress,
   tokensByNetwork,
+  nftContractAddresses,
 }: ITransformExplorerTransaction): TransformedTransaction | undefined => {
   if (!explorerTransaction) {
     return
@@ -105,13 +105,14 @@ export const transformExplorerTransaction = ({
           explorerTransaction,
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
           result,
           fingerprint,
         })
         if (transformedResult && oneOf) {
           /** only take a single result from this set */
           result = transformedResult
-          continue
+          break
         } else {
           result = {
             ...result,
