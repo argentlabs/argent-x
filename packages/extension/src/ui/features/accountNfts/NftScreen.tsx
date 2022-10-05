@@ -101,7 +101,12 @@ export const NftScreen: FC = () => {
       {nft ? (
         <IconBar
           back
-          childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
+          childAfter={
+            <TokenMenu
+              tokenAddress={nft.contract_address}
+              canHideToken={false}
+            />
+          }
         >
           <H3>
             {nft.name ||

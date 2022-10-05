@@ -40,7 +40,15 @@ const MoreVertWrapper = styled(RowCentered)`
   background: rgba(255, 255, 255, 0.1);
 `
 
-export const TokenMenu: FC<{ tokenAddress: string }> = ({ tokenAddress }) => {
+export interface TokenMenuProps {
+  tokenAddress: string
+  canHideToken?: boolean
+}
+
+export const TokenMenu: FC<TokenMenuProps> = ({
+  tokenAddress,
+  canHideToken = true,
+}) => {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -77,17 +85,21 @@ export const TokenMenu: FC<{ tokenAddress: string }> = ({ tokenAddress }) => {
               View on Voyager
             </MenuItem>
           </MenuItemWrapper>
-          <Separator />
-          <MenuItemWrapper
-            onClick={() => navigate(routes.hideToken(tokenAddress))}
-          >
-            <MenuItem>
-              <IconWrapper>
-                <VisibilityOff fontSize="inherit" htmlColor="white" />
-              </IconWrapper>
-              Hide this token
-            </MenuItem>
-          </MenuItemWrapper>
+          {canHideToken && (
+            <>
+              <Separator />
+              <MenuItemWrapper
+                onClick={() => navigate(routes.hideToken(tokenAddress))}
+              >
+                <MenuItem>
+                  <IconWrapper>
+                    <VisibilityOff fontSize="inherit" htmlColor="white" />
+                  </IconWrapper>
+                  Hide this token
+                </MenuItem>
+              </MenuItemWrapper>
+            </>
+          )}
         </StyledMenu>
       )}
     </StyledMenuContainer>
