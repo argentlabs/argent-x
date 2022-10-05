@@ -6,7 +6,7 @@ import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useAppState } from "../../app.state"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
-import { openVoyagerTransaction } from "../../services/voyager.service"
+import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { SectionHeader } from "../accounts/SectionHeader"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
@@ -70,7 +70,7 @@ export const PendingTransactions: FC<IPendingTransactions> = ({
                 key={hash}
                 transactionTransformed={transactionTransformed}
                 network={network}
-                onClick={() => openVoyagerTransaction(hash, network)}
+                onClick={() => openBlockExplorerTransaction(hash, network)}
               >
                 <div style={{ display: "flex" }}>
                   <TransactionStatusIndicator color={"orange"} />

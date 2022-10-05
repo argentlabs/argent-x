@@ -116,6 +116,14 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
                   readonly
                 />
               )}
+              {requestedNetwork.blockExplorerUrl && (
+                <InputText
+                  placeholder="Explorer redirect URL"
+                  type="text"
+                  value={requestedNetwork.blockExplorerUrl}
+                  readonly
+                />
+              )}
               {requestedNetwork.rpcUrl && (
                 <InputText
                   placeholder="RPC URL"

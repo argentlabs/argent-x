@@ -38,6 +38,9 @@ export const networkSchema: Schema<Network> = object()
     explorerUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
+    blockExplorerUrl: string()
+      .optional()
+      .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
     rpcUrl: string()
       .optional()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
