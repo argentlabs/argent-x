@@ -23,3 +23,23 @@ export interface AspectNftContract {
   name_custom: string // Collection Name
   image_url: string
 }
+
+export interface AspectContract {
+  contract_address: string
+  name: string
+  symbol: string
+  schema: string
+  name_custom: string
+  image_url: string
+  banner_image_url: string
+  total_volume_all_time: string
+  total_volume_720_hours: string
+  total_volume_168_hours: string
+  total_volume_24_hours: string
+  volume_change_basis_points_720_hours: string
+  volume_change_basis_points_168_hours: string | null
+  volume_change_basis_points_24_hours: string | null
+  number_of_owners: string
+  number_of_assets: string
+  floor_list_price: string
+}
