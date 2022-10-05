@@ -2,6 +2,7 @@ import { Call } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import { Transaction } from "../../../../../../shared/transactions"
+import { nftContractAddresses } from "../../__test__/nftContractAddresses"
 import { tokensByNetwork } from "../../__test__/tokensByNetwork"
 import { transformTransaction } from "../transformTransaction"
 import {
@@ -60,6 +61,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc20Transfer),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -90,6 +92,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc20MintTestToken),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -117,6 +120,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc721Transfer),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -137,6 +141,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc20SwapAlphaRoad),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -159,6 +164,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc20SwapJediswap),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -181,6 +187,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc20SwapMySwap),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -204,6 +211,7 @@ describe("transformTransaction", () => {
           transaction: makeTransaction(erc721MintAspect),
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
         }),
       ).toMatchInlineSnapshot(`
         {
