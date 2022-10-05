@@ -89,10 +89,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     v4UpgradeAvailableOnTestnet,
     v4UpgradeAvailableOnMainnet,
   } = useShouldShowNetworkUpgradeMessage()
-  console.log(
-    "🚀 ~ file: AccountTokens.tsx ~ line 92 ~ v4UpgradeAvailableOnTestnet",
-    v4UpgradeAvailableOnTestnet,
-  )
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
@@ -193,7 +189,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           <UpgradeBanner />
         </Link>
       )}
-      {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
+      {showNoBalanceForUpgrade && (
+        <Link to={routes.funding()}>
+          <UpgradeBanner canNotPay />
+        </Link>
+      )}
       <PendingTransactionsContainer account={account} />
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
       {accountIsDeployed && (
