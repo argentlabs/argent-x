@@ -7,6 +7,7 @@ import { useSWRConfig } from "swr"
 
 import { Button, ButtonGroupVertical } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
+import { StarknetIcon } from "../../components/Icons/StarknetIcon"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
@@ -14,6 +15,12 @@ import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { recover } from "../recovery/recovery.service"
 import { useSelectedAccountStore } from "./accounts.state"
+
+const StyledIconBar = styled(IconBar)`
+  background: url("../../../assets/StarknetStars.png");
+  background-color: #18185f;
+  padding-bottom: 45px;
+`
 
 const StyledP = styled(P)`
   margin-bottom: 16px;
@@ -37,8 +44,14 @@ const LearnMoreLink = styled.a`
   }
 `
 
+const HeaderText = styled(H2)`
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 34px;
+`
+
 const Container = styled.div`
-  padding: 12px 32px 32px;
+  padding: 72px 32px 32px;
 `
 
 const Placeholder = styled.div`
@@ -57,6 +70,14 @@ const PrimaryButton = styled(Button)`
   }
 `
 
+const IconBarContainer = styled.div`
+  position: relative;
+`
+const StyledStarknetIcon = styled(StarknetIcon)`
+  position: absolute;
+  top: 60%;
+  left: 32px;
+`
 interface UpgradeScreenV4Props extends Omit<ConfirmPageProps, "onSubmit"> {
   upgradeType: "account" | "network"
 }
@@ -101,24 +122,23 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
 
   return (
     <div {...props}>
-      <IconBar
-        close
-        onClick={() => {
-          if (upgradeType === "account") {
-            return onReject && onReject()
-          }
+      <IconBarContainer>
+        <StyledIconBar
+          close
+          onClick={() => {
+            if (upgradeType === "account") {
+              return onReject && onReject()
+            }
 
-          if (upgradeType === "network") {
-            removeUpgradeCache()
-          }
-        }}
-      />
+            if (upgradeType === "network") {
+              removeUpgradeCache()
+            }
+          }}
+        />
+        <StyledStarknetIcon />
+      </IconBarContainer>
       <Container>
-        <H2>
-          {upgradeType === "account"
-            ? "Account Upgrade Required"
-            : "Network Upgrade"}
-        </H2>
+        <HeaderText>StarkNet is improving</HeaderText>
         {upgradeType === "account" && (
           <StyledPBold>
             You have X days to upgrade your accounts. After that, you won’t be
