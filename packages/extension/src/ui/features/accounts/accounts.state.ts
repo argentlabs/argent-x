@@ -53,6 +53,28 @@ export const useAccounts = ({
   }, [filteredAccounts])
 }
 
+export const useAccountsOnNetwork = ({
+  networkId,
+  showHidden = false,
+}: {
+  networkId: string
+  showHidden: boolean
+}) => {
+  const accounts = useArrayStorage(accountStore)
+
+  const filteredAccounts = useMemo(
+    () =>
+      accounts
+        .filter(getNetworkSelector(networkId))
+        .filter(showHidden ? withHiddenSelector : withoutHiddenSelector),
+    [accounts, networkId, showHidden],
+  )
+
+  return useMemo(() => {
+    return mapWalletAccountsToAccounts(filteredAccounts)
+  }, [filteredAccounts])
+}
+
 export const useAccount = (
   account?: BaseWalletAccount,
 ): Account | undefined => {

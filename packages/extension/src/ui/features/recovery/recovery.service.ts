@@ -18,11 +18,13 @@ import {
 interface RecoveryOptions {
   networkId?: string
   showAccountList?: boolean
+  showHiddenAccountList?: boolean
 }
 
 export const recover = async ({
   networkId,
   showAccountList,
+  showHiddenAccountList,
 }: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
@@ -51,6 +53,11 @@ export const recover = async ({
     if (showAccountList || !selectedAccount) {
       return routes.accounts()
     }
+
+    if (showHiddenAccountList && networkId) {
+      return routes.accountsHidden(networkId)
+    }
+
     return routes.accountTokens()
   } catch (e: any) {
     console.error("Recovery error:", e)

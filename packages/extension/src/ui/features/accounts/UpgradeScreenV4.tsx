@@ -84,9 +84,15 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
     cache.delete(["mainnet-alpha", true, "v4-upgrade-check"])
   }
 
-  const openAccountList = async (networkId: string) => {
+  const openAccountList = async (networkId: string, showHidden = false) => {
     removeUpgradeCache()
-    navigate(await recover({ networkId, showAccountList: true }))
+    navigate(
+      await recover({
+        networkId,
+        showAccountList: !showHidden,
+        showHiddenAccountList: showHidden,
+      }),
+    )
   }
 
   if (!selectedAccount) {
@@ -151,7 +157,10 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
                       v4UpgradeAvailableOnHiddenMainnet) && (
                       <PrimaryButton
                         onClick={() => {
-                          openAccountList("mainnet-alpha")
+                          openAccountList(
+                            "mainnet-alpha",
+                            !v4UpgradeAvailableOnMainnet,
+                          )
                         }}
                         type="button"
                       >

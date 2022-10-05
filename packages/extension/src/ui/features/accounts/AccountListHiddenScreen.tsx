@@ -1,13 +1,14 @@
 import { FC } from "react"
-import { Navigate } from "react-router-dom"
+import { Navigate, useParams } from "react-router-dom"
 import styled from "styled-components"
+import { useAppState } from "../../app.state"
 
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
 import { H1 } from "../../theme/Typography"
 import { Container } from "./AccountContainer"
 import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
-import { isHiddenAccount, useAccounts } from "./accounts.state"
+import { isHiddenAccount, useAccountsOnNetwork } from "./accounts.state"
 
 const AccountList = styled.div`
   display: flex;
@@ -30,9 +31,14 @@ const AccountListWrapper = styled(Container)`
 `
 
 export const AccountListHiddenScreen: FC = () => {
-  const hiddenAccounts = useAccounts({ showHidden: true }).filter(
-    isHiddenAccount,
-  )
+  const { networkId } = useParams()
+  const { switcherNetworkId } = useAppState()
+
+  const hiddenAccounts = useAccountsOnNetwork({
+    showHidden: true,
+    networkId: networkId ?? switcherNetworkId,
+  }).filter(isHiddenAccount)
+
   const hasHiddenAccounts = hiddenAccounts.length > 0
   if (!hasHiddenAccounts) {
     return <Navigate to={routes.accounts()} />

@@ -242,7 +242,7 @@ export const AccountListScreen: FC = () => {
       {hasHiddenAccounts && (
         <Footer>
           <HiddenAccountsButton
-            onClick={() => navigate(routes.accountsHidden())}
+            onClick={() => navigate(routes.accountsHidden(switcherNetworkId))}
           >
             <HiddenAccountsButtonIcon>
               <VisibilityOff fontSize="inherit" />
