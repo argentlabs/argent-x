@@ -7,5 +7,6 @@ export interface IExplorerTransactionTransformer {
   explorerTransaction: IExplorerTransaction
   accountAddress?: string
   tokensByNetwork?: Token[]
+  nftContractAddresses?: string[]
   fingerprint?: string
 }

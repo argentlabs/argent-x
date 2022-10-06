@@ -11,6 +11,7 @@ export type TransformedTransactionAction =
   | "RECEIVE"
   | "SWAP"
   | "BUY"
+  | "APPROVE"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -36,6 +37,15 @@ export interface TokenTransferTransaction extends BaseTransformedTransaction {
   amount: string
   fromAddress: string
   toAddress: string
+  tokenAddress: string
+  token: Token
+}
+
+export interface TokenApproveTransaction extends BaseTransformedTransaction {
+  action: "APPROVE"
+  entity: "TOKEN"
+  amount: string
+  spenderAddress: string
   tokenAddress: string
   token: Token
 }
@@ -77,6 +87,7 @@ export interface SwapTransaction extends BaseTransformedTransaction {
 export type TransformedTransaction =
   | BaseTransformedTransaction
   | TokenTransferTransaction
+  | TokenApproveTransaction
   | TokenMintTransaction
   | NFTTransaction
   | NFTTransferTransaction

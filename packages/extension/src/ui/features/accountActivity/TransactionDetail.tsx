@@ -23,8 +23,8 @@ import {
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
 import { TransactionUnknownInline } from "../../components/Icons/TransactionUnknownInline"
 import { formatTruncatedAddress } from "../../services/addresses"
+import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { formatDateTime } from "../../services/dates"
-import { openVoyagerTransaction } from "../../services/voyager.service"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import { AccountAddressField } from "../actions/transaction/fields/AccountAddressField"
 import { DappContractField } from "../actions/transaction/fields/DappContractField"
@@ -36,6 +36,7 @@ import {
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
+  isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "./transform/is"
@@ -160,9 +161,10 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
+  const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
   const theme = useTheme()
   const title = useMemo(() => {
-    if (isTransfer || isTokenMint) {
+    if (isTransfer || isTokenMint || isTokenApprove) {
       const { amount, tokenAddress } = transactionTransformed
       return (
         <TransferTitle
@@ -188,6 +190,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   }, [
     isTransfer,
     isTokenMint,
+    isTokenApprove,
     isNFT,
     isNFTTransfer,
     displayName,
@@ -411,7 +414,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         <FieldGroup>
           <Field
             clickable
-            onClick={() => openVoyagerTransaction(hash, network)}
+            onClick={() => openBlockExplorerTransaction(hash, network)}
           >
             <FieldKey>Transaction ID</FieldKey>
             <FieldValue>

@@ -2,12 +2,16 @@ import { FC } from "react"
 
 import {
   Erc20TransferCall,
-  isErc20TransferCall,
   parseErc20TransferCall,
 } from "../../../../shared/call/erc20TransferCall"
 import { Token } from "../../../../shared/token/type"
-import { FieldGroup } from "../../../components/Fields"
-import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
+import {
+  Field,
+  FieldGroup,
+  FieldKey,
+  FieldValue,
+} from "../../../components/Fields"
+import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 import { AccountAddressField } from "./fields/AccountAddressField"
 import { TokenField } from "./fields/TokenField"
 
@@ -22,17 +26,13 @@ export interface Erc20TransferCallTransactionItemProps {
 export const ERC20TransferTransactionDetails: FC<
   Erc20TransferCallTransactionItemProps
 > = ({ transaction, tokensByNetwork, networkId }) => {
-  if (!isErc20TransferCall(transaction)) {
-    return (
-      <DefaultTransactionDetails
-        transaction={transaction}
-        tokensByNetwork={tokensByNetwork}
-        networkId={networkId}
-      />
-    )
-  }
   const { contractAddress, recipientAddress, amount } =
     parseErc20TransferCall(transaction)
+
+  const { displayValue } = useDisplayTokenAmountAndCurrencyValue({
+    amount,
+    tokenAddress: contractAddress,
+  })
 
   return (
     <FieldGroup>
@@ -42,6 +42,12 @@ export const ERC20TransferTransactionDetails: FC<
         contractAddress={contractAddress}
         tokensByNetwork={tokensByNetwork}
       />
+      {!!displayValue && (
+        <Field>
+          <FieldKey>Value</FieldKey>
+          <FieldValue>{displayValue}</FieldValue>
+        </Field>
+      )}
       <AccountAddressField
         title="To"
         accountAddress={recipientAddress}

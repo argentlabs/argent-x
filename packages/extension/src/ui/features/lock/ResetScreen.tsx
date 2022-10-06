@@ -22,7 +22,7 @@ export const ResetScreen: FC = () => {
         resetAll()
         localStorage.clear()
         useSelectedAccountStore.setState({})
-        navigate(routes.welcome())
+        navigate(routes.onboardingStart())
       }}
     >
       <P>

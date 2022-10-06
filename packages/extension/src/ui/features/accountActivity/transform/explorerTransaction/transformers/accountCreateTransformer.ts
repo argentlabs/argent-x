@@ -10,7 +10,7 @@ export default function ({
     if (!maxFee && actualFee === "0x0") {
       const entity = "ACCOUNT"
       const action = "CREATE"
-      const displayName = "Create acount"
+      const displayName = "Create account"
       result = {
         ...result,
         action,

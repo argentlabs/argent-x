@@ -210,6 +210,13 @@ export const SettingsScreen: FC = () => {
           <P>Here you can add, edit and remove custom networks.</P>
         </SettingsLinkItem>
         <hr />
+        <SettingsLinkItem to={routes.settingsBlockExplorer()}>
+          <Title>
+            <span>Block explorer</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
+        </SettingsLinkItem>
+        <hr />
         {isPrivacySettingsEnabled && (
           <>
             <SettingsLinkItem to={routes.settingsPrivacy()}>

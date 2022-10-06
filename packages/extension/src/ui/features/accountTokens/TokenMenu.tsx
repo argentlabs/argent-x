@@ -5,12 +5,15 @@ import styled from "styled-components"
 
 import { ContentCopyIcon, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { MoreVertSharp } from "../../components/Icons/MuiIcons"
-import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
+import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
 import Row, { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
+import {
+  openBlockExplorerAddress,
+  useBlockExplorerTitle,
+} from "../../services/blockExplorer.service"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
-import { openVoyagerAddress } from "../../services/voyager.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import {
   IconWrapper,
@@ -40,11 +43,20 @@ const MoreVertWrapper = styled(RowCentered)`
   background: rgba(255, 255, 255, 0.1);
 `
 
-export const TokenMenu: FC<{ tokenAddress: string }> = ({ tokenAddress }) => {
+export interface TokenMenuProps {
+  tokenAddress: string
+  canHideToken?: boolean
+}
+
+export const TokenMenu: FC<TokenMenuProps> = ({
+  tokenAddress,
+  canHideToken = true,
+}) => {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const currentNetwork = useCurrentNetwork()
+  const blockExplorerTitle = useBlockExplorerTitle()
 
   useOnClickOutside(ref, () => setMenuOpen(false))
 
@@ -70,24 +82,30 @@ export const TokenMenu: FC<{ tokenAddress: string }> = ({ tokenAddress }) => {
           </CopyToClipboard>
           <Separator />
           <MenuItemWrapper
-            onClick={() => openVoyagerAddress(currentNetwork, tokenAddress)}
+            onClick={() =>
+              openBlockExplorerAddress(currentNetwork, tokenAddress)
+            }
           >
             <MenuItem>
-              <ViewOnVoyagerIcon />
-              View on Voyager
+              <ViewOnBlockExplorerIcon />
+              View on {blockExplorerTitle}
             </MenuItem>
           </MenuItemWrapper>
-          <Separator />
-          <MenuItemWrapper
-            onClick={() => navigate(routes.hideToken(tokenAddress))}
-          >
-            <MenuItem>
-              <IconWrapper>
-                <VisibilityOff fontSize="inherit" htmlColor="white" />
-              </IconWrapper>
-              Hide this token
-            </MenuItem>
-          </MenuItemWrapper>
+          {canHideToken && (
+            <>
+              <Separator />
+              <MenuItemWrapper
+                onClick={() => navigate(routes.hideToken(tokenAddress))}
+              >
+                <MenuItem>
+                  <IconWrapper>
+                    <VisibilityOff fontSize="inherit" htmlColor="white" />
+                  </IconWrapper>
+                  Hide this token
+                </MenuItem>
+              </MenuItemWrapper>
+            </>
+          )}
         </StyledMenu>
       )}
     </StyledMenuContainer>

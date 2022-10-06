@@ -1,4 +1,5 @@
-import defaultTokens from "@argent-x/extension/src/assets/default-tokens.json"
+import { Token } from "@argent-x/extension/src/shared/token/type"
+import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/utils"
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
 import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
@@ -13,15 +14,23 @@ const Template: ComponentStory<typeof TokenListItem> = (props) => (
   <TokenListItem {...props}></TokenListItem>
 )
 
-const token = defaultTokens[0]
+const tokenWithSymbol = (symbol: string): Token => {
+  const token = parsedDefaultTokens.find((token) => token.symbol === symbol)
+  if (!token) {
+    throw `No token found for symbol ${symbol}`
+  }
+  return token
+}
+
+const ethToken = tokenWithSymbol("ETH")
+const testToken = tokenWithSymbol("TEST")
 
 const tokenWithBalance = (
   balance?: number | string,
+  token = ethToken,
 ): TokenDetailsWithBalance => {
   return {
     ...token,
-    networkId: token.network,
-    decimals: Number(token.decimals),
     balance: balance ? BigNumber.from(balance) : undefined,
   }
 }
@@ -86,6 +95,14 @@ export const MissingCurrencyValueNoCurrencyVariant = Template.bind({})
 MissingCurrencyValueNoCurrencyVariant.args = {
   isLoading: false,
   token: tokenWithBalance("100000000000000"),
+  currencyValue: undefined,
+  variant: "no-currency",
+}
+
+export const LongTokenNameAndBalance = Template.bind({})
+LongTokenNameAndBalance.args = {
+  isLoading: false,
+  token: tokenWithBalance("400", testToken),
   currencyValue: undefined,
   variant: "no-currency",
 }

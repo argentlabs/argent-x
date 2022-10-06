@@ -1,10 +1,13 @@
 import accountCreatedAlt from "./account-created-alt.json"
 import accountCreated from "./account-created.json"
 import accountUpgrade from "./account-upgrade.json"
+import erc20ApproveUnlimited from "./erc20-approve-unlimited.json"
+import erc20Approve from "./erc20-approve.json"
 import erc20MintTestToken from "./erc20-mint-test-token.json"
 import erc20SwapAlphaRoad from "./erc20-swap-alpha-road.json"
 import erc20SwapJediswap from "./erc20-swap-jediswap.json"
 import erc20SwapMySwap from "./erc20-swap-my-swap.json"
+import erc20TransferNoEvents from "./erc20-transfer-no-events.json"
 import erc20TransferWithSequencerEvent from "./erc20-transfer-with-sequencer-event.json"
 import erc20Transfer from "./erc20-transfer.json"
 import erc721MintAspect from "./erc721-mint-aspect.json"
@@ -20,11 +23,14 @@ export {
   accountCreated,
   accountCreatedAlt,
   accountUpgrade,
+  erc20Approve,
+  erc20ApproveUnlimited,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc20TransferNoEvents,
   erc20TransferWithSequencerEvent /** {@link https://github.com/eqlabs/pathfinder/issues/569} */,
   erc721MintAspect,
   erc721MintMintSquare,

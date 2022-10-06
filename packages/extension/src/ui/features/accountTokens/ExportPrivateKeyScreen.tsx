@@ -9,7 +9,7 @@ import { Paragraph } from "../../components/Page"
 import { checkPassword } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/ConfirmScreen"
-import { PasswordForm } from "../onboarding/PasswordForm"
+import { PasswordForm } from "../lock/PasswordForm"
 import { usePrivateKey } from "./usePrivateKey"
 
 const Container = styled.div`

@@ -9,7 +9,6 @@ export interface Erc20MintCall extends Erc20Call {
 export const isErc20MintCall = (call: Call): call is Erc20MintCall => {
   try {
     if (
-      call &&
       call.contractAddress &&
       call.entrypoint === "mint" &&
       call.calldata?.length === 3

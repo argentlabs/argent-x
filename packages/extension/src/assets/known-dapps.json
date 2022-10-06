@@ -56,7 +56,9 @@
     "title": "Aspect",
     "icon": "https://aspect.co/img/company/logo512.png",
     "contracts": {
-      "mainnet-alpha": [],
+      "mainnet-alpha": [
+        "0x2a92f0f860bf7c63fb9ef42cff4137006b309e0e6e1484e42d0b5511959414d"
+      ],
       "goerli-alpha": [
         "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890"
       ]
@@ -128,6 +130,18 @@
       "mainnet-alpha": [],
       "goerli-alpha": [
         "0x010a4c7ffd9de72a6c689de516574205190541f34b5444f25e54c9fe96a2f69d"
+      ]
+    }
+  },
+  {
+    "id": "age-of-eykar",
+    "hosts": ["eykar.org"],
+    "title": "Age of Eykar",
+    "icon": "https://eykar.org/favicon.ico",
+    "contracts": {
+      "mainnet-alpha": [],
+      "goerli-alpha": [
+        "0x01742bada34b0a17dfa019a84073e4a275fc9dd6e3d7899adf8507970feb31c9"
       ]
     }
   }

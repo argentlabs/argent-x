@@ -6,7 +6,10 @@ import { getBalanceFromAccountPage } from "../selectors/getBalanceFromAccountPag
 import { disableNetworkIssuesWarning } from "../steps/disableNetworkIssuesWarning"
 import { navigateFromAccountToAccountList } from "../steps/navigateFromAccountToAccountList"
 import { newAccount } from "../steps/newAccount"
-import { newWallet } from "../steps/newWallet"
+import {
+  continueNewWalletAfterOnboarding,
+  newWalletOnboarding,
+} from "../steps/newWallet"
 import { openExtension } from "../steps/openExtension"
 import { switchNetwork } from "../steps/switchNetwork"
 import { formatTruncatedAddress } from "../utils"
@@ -17,7 +20,11 @@ export async function setupNewAccountWithTestnetEth(
 ) {
   await disableNetworkIssuesWarning(page)
   await openExtension(page, context)
-  await newWallet(page)
+  await newWalletOnboarding(page)
+
+  // page is now closed
+  await openExtension(page, context)
+  await continueNewWalletAfterOnboarding(page)
   await navigateFromAccountToAccountList(page)
   await switchNetwork(page, "Localhost")
   await newAccount(page)

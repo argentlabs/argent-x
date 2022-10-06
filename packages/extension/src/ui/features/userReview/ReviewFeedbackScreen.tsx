@@ -57,8 +57,7 @@ const CHROME_STORE_LINK =
 const FIREFOX_STORE_LINK =
   "https://addons.mozilla.org/en-GB/firefox/addon/argent-x/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search"
 
-const ZENDESK_LINK =
-  "https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
+const ZENDESK_LINK = "https://support.argent.xyz/hc/en-us/requests/new"
 
 export const ReviewFeedbackScreen: FC = () => {
   const { state } = useLocation() as LocationWithState
@@ -92,11 +91,18 @@ export const ReviewFeedbackScreen: FC = () => {
       <Container>
         <HeartFilled />
         <ThankYouText>Thank You!</ThankYouText>
-        <RateText>
-          {state?.rating === 5
-            ? `We’re thrilled to hear you’re enjoying Argent X. We would really appreciate if you could help spread the word by also rating us on the ${browserName} store`
-            : "We’re thrilled to hear you’re enjoying Argent X, but it sounds like we could still be doing better"}
-        </RateText>
+        {state?.rating === 5 ? (
+          <RateText>
+            We’re thrilled to hear you’re enjoying Argent&nbsp;X. We would
+            really appreciate if you could help spread the word by also rating
+            us on the {browserName} store
+          </RateText>
+        ) : (
+          <RateText>
+            We’re thrilled to hear you’re enjoying Argent&nbsp;X, but it sounds
+            like we could still be doing better
+          </RateText>
+        )}
       </Container>
 
       <ButtonsContainer>

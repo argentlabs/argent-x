@@ -12,7 +12,7 @@
   "events": [
     {
       "name": "Transfer",
-      "address": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
+      "address": "0x07861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488",
       "parameters": [
         {
           "name": "from_",
@@ -50,7 +50,7 @@
   "calls": [
     {
       "name": "mint",
-      "address": "0x2f13075210b7252c826eafdc09d9d77ef272f582947f7adbd44ef79eae0062c",
+      "address": "0x07861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488",
       "parameters": [
         {
           "name": "to",

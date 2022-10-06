@@ -8,4 +8,5 @@ export interface ITransactionTransformer {
   transaction: ActivityTransaction | Transaction
   accountAddress?: string
   tokensByNetwork?: Token[]
+  nftContractAddresses?: string[]
 }
