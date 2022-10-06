@@ -45,6 +45,7 @@ import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupSc
 import { SendScreen } from "./features/send/SendScreen"
 import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
 import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
+import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
@@ -164,6 +165,10 @@ const walletRoutes = (
     <Route
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsBlockExplorer.path}
+      element={<BlockExplorerSettingsScreen />}
     />
     <Route
       path={routes.settingsAddCustomNetwork.path}

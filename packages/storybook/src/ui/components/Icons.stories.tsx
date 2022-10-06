@@ -24,7 +24,7 @@ import { TransactionSwap } from "@argent-x/extension/src/ui/components/Icons/Tra
 import { TransactionUnknown } from "@argent-x/extension/src/ui/components/Icons/TransactionUnknown"
 import { TransactionUpgrade } from "@argent-x/extension/src/ui/components/Icons/TransactionUpgrade"
 import { UpdateIcon } from "@argent-x/extension/src/ui/components/Icons/UpdateIcon"
-import { ViewOnVoyagerIcon } from "@argent-x/extension/src/ui/components/Icons/ViewOnVoyagerIcon"
+import { ViewOnBlockExplorerIcon } from "@argent-x/extension/src/ui/components/Icons/ViewOnBlockExplorerIcon"
 import { WarningIcon } from "@argent-x/extension/src/ui/components/Icons/WarningIcon"
 import { WarningIconRounded } from "@argent-x/extension/src/ui/components/Icons/WarningIconRounded"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
@@ -71,7 +71,7 @@ const Icons: FC = () => (
     <TransactionUnknown />
     <TransactionUpgrade />
     <UpdateIcon />
-    <ViewOnVoyagerIcon />
+    <ViewOnBlockExplorerIcon />
     <WarningIcon />
     <WarningIconRounded />
   </Container>

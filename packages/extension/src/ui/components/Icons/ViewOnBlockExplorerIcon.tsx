@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-export const ViewOnVoyagerIcon: FC = () => {
+export const ViewOnBlockExplorerIcon: FC = () => {
   return (
     <svg
       width="12"

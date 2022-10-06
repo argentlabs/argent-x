@@ -5,12 +5,15 @@ import styled from "styled-components"
 
 import { ContentCopyIcon, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { MoreVertSharp } from "../../components/Icons/MuiIcons"
-import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
+import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
 import Row, { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
+import {
+  openBlockExplorerAddress,
+  useBlockExplorerTitle,
+} from "../../services/blockExplorer.service"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
-import { openVoyagerAddress } from "../../services/voyager.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import {
   IconWrapper,
@@ -53,6 +56,7 @@ export const TokenMenu: FC<TokenMenuProps> = ({
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const currentNetwork = useCurrentNetwork()
+  const blockExplorerTitle = useBlockExplorerTitle()
 
   useOnClickOutside(ref, () => setMenuOpen(false))
 
@@ -78,11 +82,13 @@ export const TokenMenu: FC<TokenMenuProps> = ({
           </CopyToClipboard>
           <Separator />
           <MenuItemWrapper
-            onClick={() => openVoyagerAddress(currentNetwork, tokenAddress)}
+            onClick={() =>
+              openBlockExplorerAddress(currentNetwork, tokenAddress)
+            }
           >
             <MenuItem>
-              <ViewOnVoyagerIcon />
-              View on Voyager
+              <ViewOnBlockExplorerIcon />
+              View on {blockExplorerTitle}
             </MenuItem>
           </MenuItemWrapper>
           {canHideToken && (
