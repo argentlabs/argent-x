@@ -503,21 +503,18 @@ export class Wallet {
 
     const currentImplementation = await this.getCurrentImplementation(account)
 
-    if (!account.network.accountClassHash) {
-      throw Error("Account Class Hash not found")
-    }
+    const { accountClassHash } = account.network
 
     if (
-      Object.values(account.network.accountClassHash).includes(
-        currentImplementation,
-      )
+      accountClassHash &&
+      !Object.values(accountClassHash).includes(currentImplementation)
     ) {
-      const provider = getProvider(account.network)
-      return new Account(provider, account.address, keyPair)
+      const providerv4 = getProviderv4(account.network)
+      return new Accountv4(providerv4, account.address, keyPair)
     }
 
-    const providerv4 = getProviderv4(account.network)
-    return new Accountv4(providerv4, account.address, keyPair)
+    const provider = getProvider(account.network)
+    return new Account(provider, account.address, keyPair)
   }
 
   public async getCurrentImplementation(
