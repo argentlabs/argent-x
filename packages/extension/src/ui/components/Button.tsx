@@ -18,6 +18,8 @@ export type ButtonVariant =
   | "danger"
   | "info"
   | "transparent"
+  | "inverted"
+  | "neutrals800"
 
 export type ButtonSize = "default" | "xs" | "s" | "m" | "l" | "xl"
 
@@ -70,6 +72,12 @@ export const getVariantColor =
           : disabled
           ? theme.button.transparent.bg.disabled
           : theme.button.transparent.bg.base
+      case "neutrals800":
+        return hover
+          ? theme.button.neutrals800.bg.hover
+          : disabled
+          ? theme.button.neutrals800.bg.disabled
+          : theme.button.neutrals800.bg.base
     }
     return hover
       ? theme.button.default.bg.hover
@@ -101,7 +109,18 @@ export const getSizeStyle = (size: ButtonSize = "default") => {
   `
 }
 
-const BaseButton = styled.button`
+export function getButtonColor(
+  layer: "bg" | "fg",
+  state: "base" | "hover" | "disabled",
+): (props: { theme: DefaultTheme; variant?: ButtonVariant }) => string {
+  return ({ theme, variant = "default" }) => {
+    const v = theme.button[variant] ?? theme.button.default
+    const l = (v as any)[layer] ?? theme.button.default[layer]
+    return (l as any)[state] ?? l.base
+  }
+}
+
+const BaseButton = styled.button<IButton>`
   margin: 0;
   padding: 13.5px;
   font-weight: 600;
@@ -109,12 +128,12 @@ const BaseButton = styled.button`
   line-height: 21px;
   text-align: center;
 
-  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  background-color: ${getButtonColor("bg", "base")};
   border-radius: ${({ theme }) => theme.button.radius};
   width: 100%;
   outline: none;
   border: none;
-  color: ${({ theme }) => theme.button.default.fg.base};
+  color: ${getButtonColor("fg", "base")};
   cursor: pointer;
   width: 100%;
   outline: none;
@@ -131,10 +150,9 @@ export const Button = styled(BaseButton)<IButton>`
   font-weight: 600;
   text-align: center;
 
-  background-color: ${({ theme }) => getVariantColor({ theme, hover: false })};
+  background-color: ${getButtonColor("bg", "base")};
   border-radius: 100px;
-  color: ${({ theme, variant }) =>
-    variant === "warn" ? theme.bg1 : theme.text1};
+  color: ${getButtonColor("fg", "base")};
 
   &:hover {
     background-color: ${({ theme }) => getVariantColor({ theme, hover: true })};
@@ -143,14 +161,14 @@ export const Button = styled(BaseButton)<IButton>`
   &:hover,
   &:focus {
     outline: 0;
+    background-color: ${getButtonColor("bg", "hover")};
   }
 
   &:disabled {
     cursor: auto;
     cursor: not-allowed;
-    color: ${({ theme }) => theme.button.default.fg.disabled};
-    background-color: ${({ theme }) =>
-      getVariantColor({ theme, disabled: true })};
+    color: ${getButtonColor("fg", "disabled")};
+    background-color: ${getButtonColor("bg", "disabled")};
   }
 `
 

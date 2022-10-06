@@ -15,7 +15,7 @@ const StyledLink = styled(Link)`
 
 export const PrivacyStatement: FC = ({ ...props }) => {
   return (
-    <StyledLink to={routes.privacyStatement()} {...props}>
+    <StyledLink to={routes.onboardingPrivacy()} {...props}>
       Privacy Statement
     </StyledLink>
   )

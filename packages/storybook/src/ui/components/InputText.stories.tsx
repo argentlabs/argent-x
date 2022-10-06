@@ -29,7 +29,6 @@ const Template: ComponentStory<typeof StyledControlledInput> = (props) => {
           control={control}
           {...props}
           name="test"
-          type="text"
           placeholder="Placeholder"
         ></StyledControlledInput>
         <Button type="submit">Submit</Button>
@@ -40,7 +39,9 @@ const Template: ComponentStory<typeof StyledControlledInput> = (props) => {
 }
 
 export const Default = Template.bind({})
-Default.args = {}
+Default.args = {
+  variant: "neutrals800",
+}
 
 export const OnlyNumeric = Template.bind({})
 OnlyNumeric.args = {
@@ -50,4 +51,10 @@ OnlyNumeric.args = {
 export const OnlyAddressHex = Template.bind({})
 OnlyAddressHex.args = {
   onlyAddressHex: true,
+}
+
+export const Password = Template.bind({})
+Password.args = {
+  variant: "neutrals800",
+  type: "password",
 }

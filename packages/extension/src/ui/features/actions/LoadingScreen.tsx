@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { useLoadingProgress } from "../../app.state"
 import { Spinner } from "../../components/Spinner"
-import { Greetings } from "../onboarding/Greetings"
+import { Greetings } from "../lock/Greetings"
 
 const LoadingScreenWrapper = styled.div`
   display: flex;
