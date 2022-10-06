@@ -47,12 +47,14 @@ export interface ITransformExplorerTransaction {
   transaction: ActivityTransaction | Transaction
   accountAddress?: string
   tokensByNetwork?: Token[]
+  nftContractAddresses?: string[]
 }
 
 export const transformTransaction = ({
   transaction,
   accountAddress,
   tokensByNetwork,
+  nftContractAddresses,
 }: ITransformExplorerTransaction): TransformedTransaction | undefined => {
   if (!transaction) {
     return
@@ -69,6 +71,7 @@ export const transformTransaction = ({
           transaction,
           accountAddress,
           tokensByNetwork,
+          nftContractAddresses,
           result,
         })
         if (transformedResult && oneOf) {
