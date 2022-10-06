@@ -3,7 +3,10 @@ import { FC, SyntheticEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { toggleUserHasReviewed } from "../../../shared/userReview"
+import {
+  resetTransactionsBeforeReview,
+  toggleUserHasReviewed,
+} from "../../../shared/userReview"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { StarRounded } from "../../components/Icons/MuiIcons"
@@ -52,11 +55,12 @@ export const ReviewRatingScreen: FC = () => {
     <>
       <IconBar
         close
-        onClick={() =>
+        onClick={async () => {
+          await resetTransactionsBeforeReview()
           analytics.track("userFeedbackAction", {
             action: "RATING_DISMISSED",
           })
-        }
+        }}
       />
       <Container>
         <H2>Enjoying ArgentX?</H2>
