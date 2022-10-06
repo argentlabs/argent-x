@@ -22,6 +22,13 @@ Disabled.args = {
   disabled: true,
 }
 
+export const Primary = Template.bind({})
+Primary.args = {
+  children: "Button",
+  variant: "primary",
+  disabled: false,
+}
+
 export const Danger = Template.bind({})
 Danger.args = {
   children: "Button",
@@ -43,9 +50,23 @@ Warn.args = {
   disabled: false,
 }
 
+export const Inverted = Template.bind({})
+Inverted.args = {
+  children: "Button",
+  variant: "inverted",
+  disabled: false,
+}
+
 export const Info = Template.bind({})
 Info.args = {
   children: "Button",
   variant: "info",
+  disabled: false,
+}
+
+export const Neutrals800 = Template.bind({})
+Neutrals800.args = {
+  children: "Button",
+  variant: "neutrals800",
   disabled: false,
 }
