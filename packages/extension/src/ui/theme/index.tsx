@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles"
-import { colord } from "colord"
+import { colord, extend } from "colord"
+import mixPlugin from "colord/plugins/mix"
 import React, { FC } from "react"
 import {
   DefaultTheme,
@@ -9,12 +10,16 @@ import {
 } from "styled-components"
 import { normalize } from "styled-normalize"
 
+extend([mixPlugin])
+
 const white = "#FFFFFF"
 const black = "#000000"
 
 export const colors = {
   white,
   black,
+
+  primary: "#F36A3D",
 
   bg1: "#161616",
   bg2: "#333332",
@@ -41,6 +46,16 @@ export const colors = {
 
   green1: "#02bba8",
   green2: "#02a697",
+
+  neutrals100: "#B7B7B9",
+  neutrals200: "#9F9FA1",
+  neutrals300: "#88888A",
+  neutrals400: "#707072",
+  neutrals500: "#58585B",
+  neutrals600: "#404043",
+  neutrals700: "#28282C",
+  neutrals800: "#1D1F22",
+  neutrals900: "#101014",
 }
 
 export const components = {
@@ -56,11 +71,11 @@ export const components = {
         disabled: "rgba(255, 255, 255, 0.15)",
       },
     },
-    "warn-high": {
+    primary: {
       bg: {
-        base: colors.red4,
-        hover: colord(colors.red4).saturate(1).lighten(0.075).toRgbString(),
-        disabled: colord(colors.red4).alpha(0.5).toRgbString(),
+        base: colors.primary,
+        hover: colord(colors.primary).saturate(1).lighten(0.075).toRgbString(),
+        disabled: colord(colors.primary).alpha(0.5).toRgbString(),
       },
     },
     warn: {
@@ -68,6 +83,13 @@ export const components = {
         base: colors.yellow1,
         hover: colord(colors.yellow1).saturate(1).lighten(0.075).toRgbString(),
         disabled: colord(colors.yellow1).alpha(0.5).toRgbString(),
+      },
+    },
+    "warn-high": {
+      bg: {
+        base: colors.red4,
+        hover: colord(colors.red4).saturate(1).lighten(0.075).toRgbString(),
+        disabled: colord(colors.red4).alpha(0.5).toRgbString(),
       },
     },
     danger: {
@@ -89,6 +111,26 @@ export const components = {
         base: "transparent",
         hover: "rgba(255, 255, 255, 0.075)",
         disabled: "transaprent",
+      },
+    },
+    inverted: {
+      fg: {
+        base: colors.bg2,
+        disabled: colord(colors.bg2).alpha(0.5).toRgbString(),
+      },
+      bg: {
+        base: colors.white,
+        hover: colord(colors.white).darken(0.075).toRgbString(),
+        disabled: colord(colors.white).alpha(0.5).toRgbString(),
+      },
+    },
+    neutrals800: {
+      bg: {
+        base: colors.neutrals800,
+        hover: colord(colors.neutrals800)
+          .mix(colors.neutrals700, 0.75)
+          .toRgbString(),
+        disabled: colors.neutrals900,
       },
     },
     radius: "500px",
@@ -232,7 +274,7 @@ export const ThemeProvider: FC<{
 }
 
 export interface GlobalStyleProps {
-  extensionIsInTab: boolean
+  extensionIsInTab: boolean | undefined
 }
 
 export const FixedGlobalStyle = createGlobalStyle<GlobalStyleProps>`

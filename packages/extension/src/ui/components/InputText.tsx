@@ -196,6 +196,7 @@ export const ControlledInputText = styled(
 interface AdditionalControlledInputProps {
   onlyNumeric?: boolean
   onlyAddressHex?: boolean
+  variant?: InputVariant
   children?: React.ReactNode
 }
 
@@ -211,6 +212,7 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   onlyNumeric,
   onlyAddressHex,
   children,
+  autoComplete = "off",
   ...props
 }: ControlledInputProps<T>) => {
   return (
@@ -228,8 +230,7 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
           value={value || ""}
           {...field}
           inputRef={ref}
-          inputMode="decimal"
-          type="text"
+          autoComplete={autoComplete}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.value.length < value?.length) {
               /** always allow delete whether resulting value is invalid or not */
@@ -255,22 +256,54 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   )
 }
 
-export type ControlledInputType = typeof ControlledInputTextAlt
+export type InputVariant = "default" | "outline" | "neutrals800"
+
+export type ControlledInputType = typeof ControlledInputTextAlt & {
+  variant?: InputVariant
+}
+
+export const getVariantStyle = ({
+  variant = "default",
+}: {
+  variant?: InputVariant
+}) => {
+  return css`
+    padding: 12px 16px;
+    border: 1px solid
+      ${({ theme }) =>
+        variant === "neutrals800" ? theme.neutrals800 : theme.bg2};
+    border-radius: 8px;
+    background-color: ${({ theme }) =>
+      variant === "neutrals800" ? theme.neutrals800 : theme.black};
+    &:focus-within {
+      background-color: ${({ theme }) =>
+        variant === "neutrals800" ? theme.neutrals700 : theme.black};
+    }
+    transition: background-color 200ms ease-in-out;
+  `
+}
 
 export const StyledControlledInput: ControlledInputType = styled(
   ControlledInputTextAlt,
-)`
-  padding: 12px 16px;
-  border: 1px solid ${({ theme }) => theme.bg2};
-  border-radius: 8px;
-  background-color: black;
+)<{ variant?: InputVariant }>`
+  ${getVariantStyle}
 `
 
-export const TextArea = styled.textarea`
-  ${InputCss}
+export const TextArea = styled.textarea<{ variant?: InputVariant }>`
+  font-size: 17px;
+  line-height: 25px;
+  text-shadow: none;
+
+  color: ${({ theme }) => theme.text1};
+
   resize: none;
   min-height: 116px;
   width: 100%;
+  ${getVariantStyle}
+  ${scrollbarStyle}
+  &:focus {
+    outline: 0;
+  }
 `
 
 export const TextAreaAlt = styled(TextareaAutosize)`

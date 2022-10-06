@@ -65,12 +65,15 @@ export interface IAccountSelect {
   selectedAccount?: IAccountListItem
   accounts: IAccountListItem[]
   onSelectedAccountChange?: (selectedAccount: IAccountListItem) => void
+  style?: React.CSSProperties
+  className?: string
 }
 
 export const AccountSelect: FC<IAccountSelect> = ({
   selectedAccount,
   accounts = [],
   onSelectedAccountChange,
+  ...divProps
 }) => {
   const [value, setValue] = useState(
     selectedAccount && selectedAccount.accountAddress,
@@ -93,6 +96,7 @@ export const AccountSelect: FC<IAccountSelect> = ({
       IconComponent={KeyboardArrowDownRounded}
       /* @ts-expect-error valid 'component' key is missing in MUI types @see https://github.com/mui/material-ui/pull/32404 */
       MenuProps={SelectMenuProps}
+      {...divProps}
     >
       {accounts.map((account) => (
         <StyledMenuItem
