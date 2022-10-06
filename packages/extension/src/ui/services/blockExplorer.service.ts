@@ -19,8 +19,7 @@ export const getBlockExplorerUrlForNetwork = async (network: Network) => {
   const blockExplorerKey = await settingsStore.get("blockExplorerKey")
   const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
   if (network.id === "mainnet-alpha" || network.id === "goerli-alpha") {
-    const blockExplorerUrl = settingsBlockExplorer.url[network.id]
-    return blockExplorerUrl
+    return settingsBlockExplorer.url[network.id]
   }
   return defaultBlockExplorers[defaultBlockExplorerKey].url["mainnet-alpha"]
 }
