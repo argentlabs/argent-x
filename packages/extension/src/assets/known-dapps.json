@@ -132,5 +132,17 @@
         "0x010a4c7ffd9de72a6c689de516574205190541f34b5444f25e54c9fe96a2f69d"
       ]
     }
+  },
+  {
+    "id": "age-of-eykar",
+    "hosts": ["eykar.org"],
+    "title": "Age of Eykar",
+    "icon": "https://eykar.org/favicon.ico",
+    "contracts": {
+      "mainnet-alpha": [],
+      "goerli-alpha": [
+        "0x01742bada34b0a17dfa019a84073e4a275fc9dd6e3d7899adf8507970feb31c9"
+      ]
+    }
   }
 ]
