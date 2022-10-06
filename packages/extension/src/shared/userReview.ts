@@ -24,3 +24,7 @@ export const decrementTransactionsBeforeReview = async () => {
 export const toggleUserHasReviewed = async () => {
   await userReviewStore.set("hasReviewed", true)
 }
+
+export const resetTransactionsBeforeReview = async () => {
+  await userReviewStore.set("transactionsBeforeReview", 2)
+}
