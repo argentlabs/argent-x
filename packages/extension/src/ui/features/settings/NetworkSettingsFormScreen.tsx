@@ -27,16 +27,9 @@ const ExtendableControl = styled.div`
 `
 
 const Wrapper = styled.div`
-  /* margin-top: -8px; */
   display: flex;
   flex-direction: column;
   gap: 8px;
-  /* > * + * {
-    margin-top: 8px;
-  }
-  > ${ExtendableControl} + * {
-    margin-top: 0;
-  } */
 `
 
 type NetworkSettingsFormScreenProps =
