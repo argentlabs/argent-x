@@ -16,4 +16,4 @@ We automated some parts of the release process to make things easier. This file 
 - Create GitHub pull request to merge the new branch `release/vX.Y.Z` into `main`
 - Create GitHub pull request to back-merge `main` into `develop`
 - Edit release to contain a bit more than just the auto generated notes and maybe a proper title
-- Submit to Chrome Web Store (ask Julien)
+- Submit to Chrome Web Store (ask Ismael)
