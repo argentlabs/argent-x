@@ -8,12 +8,15 @@ import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
 import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { PluginIcon } from "../../components/Icons/PluginIcon"
-import { ViewOnVoyagerIcon } from "../../components/Icons/ViewOnVoyagerIcon"
+import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
+import {
+  openBlockExplorerAddress,
+  useBlockExplorerTitle,
+} from "../../services/blockExplorer.service"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
-import { openVoyagerAddress } from "../../services/voyager.service"
 import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -85,6 +88,7 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
   const ref = useRef<HTMLDivElement>(null)
   const currentNetwork = useCurrentNetwork()
   const navigate = useNavigate()
+  const blockExplorerTitle = useBlockExplorerTitle()
 
   const account = useSelectedAccount()
   const experimentalPluginAccount = useKeyValueStorage(
@@ -123,12 +127,13 @@ export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
         <Menu>
           <MenuItemWrapper
             onClick={() =>
-              account && openVoyagerAddress(currentNetwork, account.address)
+              account &&
+              openBlockExplorerAddress(currentNetwork, account.address)
             }
           >
             <MenuItem>
-              <ViewOnVoyagerIcon />
-              View on Voyager
+              <ViewOnBlockExplorerIcon />
+              View on {blockExplorerTitle}
             </MenuItem>
           </MenuItemWrapper>
           <Separator />

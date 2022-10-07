@@ -120,6 +120,7 @@ export const routes = {
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
   settingsExperimental: route("/settings/experimental"),
+  settingsBlockExplorer: route("/settings/block-explorer"),
   settingsAddressbook: route("/settings/addressbook"),
   settingsAddressbookEdit: route(
     (contactId) => `/settings/addressbook/add-or-edit/${contactId}`,
