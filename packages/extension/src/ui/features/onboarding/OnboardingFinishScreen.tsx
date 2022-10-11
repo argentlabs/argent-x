@@ -122,7 +122,7 @@ export const OnboardingFinishScreen: FC = () => {
           </RectButton>
           <RectButton
             as="a"
-            href="https://discord.com/channels/598897994477207572/984804615696564265"
+            href="https://discord.gg/T4PDFHxm6T"
             title="Join the Argent X Discord"
             target="_blank"
           >
