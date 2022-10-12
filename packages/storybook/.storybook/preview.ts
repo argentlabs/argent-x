@@ -7,6 +7,7 @@ const CUSTOM_VIEWPORTS = {
       width: "360px",
       height: "600px",
     },
+    type: "desktop",
   },
 }
 
@@ -38,6 +39,7 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+    exclude: [],
   },
   viewport: {
     viewports: {

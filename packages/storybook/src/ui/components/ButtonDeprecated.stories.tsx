@@ -1,23 +1,9 @@
-import { ArrowBackIcon } from "@argent-x/extension/src/ui/components/Icons/MuiIcons"
-import { Button } from "@argent-x/ui/src/components/Button"
+import { Button } from "@argent-x/extension/src/ui/components/Button"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "components/Button",
+  title: "components/ButtonDeprecated",
   component: Button,
-  argTypes: {
-    disabled: {
-      control: "boolean",
-    },
-    size: {
-      options: ["2xs", "xs", "sm", "md", "lg"],
-      control: { type: "inline-radio" },
-    },
-    variant: {
-      options: ["solid", "outline"],
-      control: { type: "inline-radio" },
-    },
-  },
 } as ComponentMeta<typeof Button>
 
 const Template: ComponentStory<typeof Button> = (props) => (
@@ -27,6 +13,7 @@ const Template: ComponentStory<typeof Button> = (props) => (
 export const Default = Template.bind({})
 Default.args = {
   children: "Button",
+  disabled: false,
 }
 
 export const Disabled = Template.bind({})
@@ -38,51 +25,48 @@ Disabled.args = {
 export const Primary = Template.bind({})
 Primary.args = {
   children: "Button",
-  colorScheme: "primary",
+  variant: "primary",
+  disabled: false,
 }
 
 export const Danger = Template.bind({})
 Danger.args = {
   children: "Button",
-  colorScheme: "danger",
+  variant: "danger",
+  disabled: false,
 }
 
 export const WarnHigh = Template.bind({})
 WarnHigh.args = {
   children: "Button",
-  colorScheme: "warn-high",
+  variant: "warn-high",
+  disabled: false,
 }
 
 export const Warn = Template.bind({})
 Warn.args = {
   children: "Button",
-  colorScheme: "warn",
+  variant: "warn",
+  disabled: false,
 }
 
 export const Inverted = Template.bind({})
 Inverted.args = {
   children: "Button",
-  colorScheme: "inverted",
+  variant: "inverted",
+  disabled: false,
 }
 
 export const Info = Template.bind({})
 Info.args = {
   children: "Button",
-  colorScheme: "info",
+  variant: "info",
+  disabled: false,
 }
 
 export const Neutrals800 = Template.bind({})
 Neutrals800.args = {
   children: "Button",
-  colorScheme: "neutrals800",
-}
-
-export const OnboardingBack = Template.bind({})
-OnboardingBack.args = {
-  children: (
-    <>
-      <ArrowBackIcon />
-    </>
-  ),
-  colorScheme: "neutrals800",
+  variant: "neutrals800",
+  disabled: false,
 }

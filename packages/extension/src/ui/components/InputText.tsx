@@ -1,3 +1,4 @@
+import { scrollbarStyle } from "@argent-x/ui/src/theme"
 import { isFunction } from "lodash-es"
 import { useId } from "react"
 import { Controller, ControllerProps, FieldValues } from "react-hook-form"
@@ -6,7 +7,6 @@ import TextareaAutosize, {
 } from "react-textarea-autosize"
 import styled, { css } from "styled-components"
 
-import { scrollbarStyle } from "../theme"
 import { isAllowedAddressHexInputValue } from "./utils/isAllowedAddressHexInputValue"
 import { isAllowedNumericInputValue } from "./utils/isAllowedNumericInputValue"
 

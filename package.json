@@ -30,7 +30,7 @@
     "test:watch": "lerna run test:watch --stream",
     "test:e2e": "lerna run test:e2e --stream",
     "prepare": "yarn --cwd packages/get-starknet build && yarn --cwd packages/sessions build && husky install",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && lerna run postinstall --stream",
     "storybook": "cd packages/storybook && yarn storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts"
   },

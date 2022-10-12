@@ -1,11 +1,14 @@
 import { chromeStorageMock } from "@argent-x/extension/src/shared/storage/__test__/chrome-storage.mock"
 import {
   FixedGlobalStyle,
-  ThemeProvider as StyledComponentsThemeProvider,
+  ThemeProvider,
   ThemedGlobalStyle,
+  chakraTheme,
   muiTheme,
-} from "@argent-x/extension/src/ui/theme"
+} from "@argent-x/ui/src/theme"
+import { ChakraProvider } from "@chakra-ui/react"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
+import { Story } from "@storybook/react"
 import React from "react"
 import { createGlobalStyle } from "styled-components"
 
@@ -30,18 +33,20 @@ const StorybookGlobalStyle = createGlobalStyle`
 `
 
 export const decorators = [
-  (Story) => (
-    <MuiThemeProvider theme={muiTheme}>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
-        rel="stylesheet"
-      />
-      <FixedGlobalStyle extensionIsInTab />
-      <StorybookGlobalStyle />
-      <StyledComponentsThemeProvider>
-        <ThemedGlobalStyle />
-        <Story />
-      </StyledComponentsThemeProvider>
-    </MuiThemeProvider>
+  (Story: Story) => (
+    <ChakraProvider theme={chakraTheme}>
+      <MuiThemeProvider theme={muiTheme}>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+          rel="stylesheet"
+        />
+        <FixedGlobalStyle extensionIsInTab />
+        <StorybookGlobalStyle />
+        <ThemeProvider>
+          <ThemedGlobalStyle />
+          <Story />
+        </ThemeProvider>
+      </MuiThemeProvider>
+    </ChakraProvider>
   ),
 ]
