@@ -5,6 +5,11 @@ import { MemoryRouter } from "react-router-dom"
 export default {
   title: "onboarding/OnboardingPasswordScreen",
   component: OnboardingPasswordScreen,
+  parameters: {
+    viewport: {
+      defaultViewport: "desktop",
+    },
+  },
 } as ComponentMeta<typeof OnboardingPasswordScreen>
 
 const Template: ComponentStory<typeof OnboardingPasswordScreen> = (props) => (

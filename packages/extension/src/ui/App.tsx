@@ -1,3 +1,9 @@
+import {
+  FixedGlobalStyle,
+  ThemeProvider,
+  ThemedGlobalStyle,
+  muiTheme,
+} from "@argent-x/ui/src/theme"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
@@ -12,12 +18,6 @@ import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
 import { useSentryInit } from "./services/sentry"
 import { swrCacheProvider } from "./services/swr"
-import {
-  FixedGlobalStyle,
-  ThemeProvider as StyledComponentsThemeProvider,
-  ThemedGlobalStyle,
-  muiTheme,
-} from "./theme"
 
 export const App: FC = () => {
   useTracking()
@@ -35,14 +35,14 @@ export const App: FC = () => {
           />
           <FixedGlobalStyle extensionIsInTab={extensionIsInTab} />
           {process.env.SHOW_DEV_UI && <DevUI />}
-          <StyledComponentsThemeProvider>
+          <ThemeProvider>
             <ThemedGlobalStyle />
             <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
               <Suspense fallback={<LoadingScreen />}>
                 <AppRoutes />
               </Suspense>
             </ErrorBoundary>
-          </StyledComponentsThemeProvider>
+          </ThemeProvider>
         </MuiThemeProvider>
       </SWRConfig>
     </SoftReloadProvider>

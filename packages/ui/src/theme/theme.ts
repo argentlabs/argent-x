@@ -1,25 +1,54 @@
-import { createTheme } from "@mui/material/styles"
 import { colord, extend } from "colord"
 import mixPlugin from "colord/plugins/mix"
-import React, { FC } from "react"
-import {
-  DefaultTheme,
-  ThemeProvider as StyledComponentsThemeProvider,
-  createGlobalStyle,
-  css,
-} from "styled-components"
-import { normalize } from "styled-normalize"
+import { css } from "styled-components"
 
 extend([mixPlugin])
 
-const white = "#FFFFFF"
+const white = "#ffffff"
 const black = "#000000"
 
 export const colors = {
   white,
-  black,
+  white50: colord(white).alpha(0.5).toRgbString(),
+  white30: colord(white).alpha(0.3).toRgbString(),
 
-  primary: "#F36A3D",
+  black,
+  black50: colord(black).alpha(0.5).toRgbString(),
+  black30: colord(black).alpha(0.3).toRgbString(),
+
+  primary: "#f36a3d",
+  primaryLight: "#fcf1ed",
+  primaryDark: "#803820",
+
+  secondary: "#08a681",
+  secondaryLight: "#edfcf9",
+  secondaryDark: "#068063",
+
+  accent: "#197aa6",
+  accentLight: "#edf8fc",
+  accentDark: "#135E80",
+
+  warning: "#f4bc54",
+  warningLight: "#fcf1ed",
+  warningDark: "#803820",
+
+  error: "#cc3247",
+  errorLight: "#fcf1ed",
+  errorDark: "#803820",
+
+  success: "#51a55f",
+  successLight: "#fcf1ed",
+  successDark: "#803820",
+
+  neutrals100: "#b7b7b9",
+  neutrals200: "#9f9fa1",
+  neutrals300: "#88888a",
+  neutrals400: "#707072",
+  neutrals500: "#58585b",
+  neutrals600: "#404043",
+  neutrals700: "#28282c",
+  neutrals800: "#1d1f22",
+  neutrals900: "#101014",
 
   bg1: "#161616",
   bg2: "#333332",
@@ -46,16 +75,57 @@ export const colors = {
 
   green1: "#02bba8",
   green2: "#02a697",
+}
 
-  neutrals100: "#B7B7B9",
-  neutrals200: "#9F9FA1",
-  neutrals300: "#88888A",
-  neutrals400: "#707072",
-  neutrals500: "#58585B",
-  neutrals600: "#404043",
-  neutrals700: "#28282C",
-  neutrals800: "#1D1F22",
-  neutrals900: "#101014",
+export const fontWeights = {
+  light: "300",
+  normal: "400",
+  semibold: "500",
+  bold: "600",
+  extrabold: "700",
+}
+
+export const pxToRem = (value: number | string) => `${Number(value) / 16}rem`
+
+const fontSizes = {
+  "2xs": pxToRem(12),
+  xs: pxToRem(13),
+  sm: pxToRem(14),
+  base: pxToRem(16),
+  lg: pxToRem(18),
+  xl: pxToRem(20),
+  "2xl": pxToRem(24),
+  "3xl": pxToRem(28),
+  "4xl": pxToRem(32),
+  "5xl": pxToRem(40),
+}
+
+const letterSpacing = {
+  tighter: "-0.05em",
+  tight: "-0.025em",
+  normal: "0em",
+  wide: "0.025em",
+  wider: "0.05em",
+  widest: "0.1em",
+}
+
+const spacings = {
+  0: pxToRem(0),
+  1: pxToRem(4),
+  2: pxToRem(8),
+  3: pxToRem(12),
+  "3.5": pxToRem(14),
+  4: pxToRem(16),
+  5: pxToRem(20),
+  6: pxToRem(24),
+  7: pxToRem(28),
+  8: pxToRem(32),
+  9: pxToRem(36),
+  10: pxToRem(40),
+  12: pxToRem(48),
+  14: pxToRem(56),
+  16: pxToRem(64),
+  24: pxToRem(96),
 }
 
 export const components = {
@@ -138,11 +208,12 @@ export const components = {
   },
 }
 
-const MEDIA_WIDTHS = {
-  sm: 600,
-  md: 900,
-  lg: 1200,
-  xl: 1536,
+/** TODO: rename back to 'breakpoints' once Mui is no longer needed */
+const customBreakpoints = {
+  sm: pxToRem(600),
+  md: pxToRem(900),
+  lg: pxToRem(1200),
+  xl: pxToRem(1536),
 }
 
 /**
@@ -159,10 +230,10 @@ const MEDIA_WIDTHS = {
  *
  */
 const mediaMaxWidthTemplates: {
-  [width in keyof typeof MEDIA_WIDTHS]: typeof css
-} = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
+  [width in keyof typeof customBreakpoints]: typeof css
+} = Object.keys(customBreakpoints).reduce((accumulator, size) => {
   ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
-    @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
+    @media (max-width: ${(customBreakpoints as any)[size]}) {
       ${css(a, b, c)}
     }
   `
@@ -183,10 +254,10 @@ const mediaMaxWidthTemplates: {
  *
  */
 const mediaMinWidthTemplates: {
-  [width in keyof typeof MEDIA_WIDTHS]: typeof css
-} = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
+  [width in keyof typeof customBreakpoints]: typeof css
+} = Object.keys(customBreakpoints).reduce((accumulator, size) => {
   ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
-    @media (min-width: ${(MEDIA_WIDTHS as any)[size]}px) {
+    @media (min-width: ${(customBreakpoints as any)[size]}) {
       ${css(a, b, c)}
     }
   `
@@ -234,25 +305,44 @@ const flexRowNoWrap = css`
   flex-flow: row nowrap;
 `
 
-export const scrollbarStyle = css`
-  &::-webkit-scrollbar-track,
-  &::-webkit-scrollbar-corner {
-    background-color: transparent;
-  }
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-  }
-`
+export type FontSizeKey = keyof typeof fontSizes
+export type FontWeightKey = keyof typeof fontWeights
+export type SpacingKey = keyof typeof spacings | "auto" | "inherit"
+export type ColorKey = keyof typeof colors | "none" | "transparent"
+export type LetterSpacingKey = keyof typeof letterSpacing
 
-export const theme: DefaultTheme = {
+type Colors = typeof colors
+type Components = typeof components
+
+export interface CustomTheme extends Colors, Components {
+  colors: typeof colors
+  customBreakpoints: typeof customBreakpoints
+  spacings: typeof spacings
+  fontSizes: typeof fontSizes
+  fontWeights: typeof fontWeights
+  letterSpacing: typeof letterSpacing
+
+  // css snippets
+  flexColumnNoWrap: typeof flexColumnNoWrap
+  flexRowNoWrap: typeof flexRowNoWrap
+
+  // media queries
+  mediaMaxWidth: typeof mediaMaxWidthTemplates
+  mediaMinWidth: typeof mediaMinWidthTemplates
+
+  margin: { extensionInTab: string }
+}
+
+export const theme: CustomTheme = {
+  /** TODO: remove the colors spread in favour of accessing colors explicitly */
   ...colors,
   ...components,
+  colors,
+  customBreakpoints,
+  spacings,
+  fontSizes,
+  fontWeights,
+  letterSpacing,
   flexColumnNoWrap,
   flexRowNoWrap,
   // media queries
@@ -262,72 +352,3 @@ export const theme: DefaultTheme = {
     extensionInTab: "10%",
   },
 }
-
-export const ThemeProvider: FC<{
-  children: React.ReactNode
-}> = ({ children }) => {
-  return (
-    <StyledComponentsThemeProvider theme={theme}>
-      {children}
-    </StyledComponentsThemeProvider>
-  )
-}
-
-export interface GlobalStyleProps {
-  extensionIsInTab: boolean | undefined
-}
-
-export const FixedGlobalStyle = createGlobalStyle<GlobalStyleProps>`
-  ${normalize}
-
-  body {
-    font-family: 'Barlow', sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  html, body {
-    min-width: 360px;
-    min-height: 600px;
-
-    width: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "360px")};
-    height: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "600px")};
-    
-    overscroll-behavior: none;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    &::-webkit-scrollbar { /* Chrome, Safari, Opera */
-      display: none;
-    }
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    margin-block: 0;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-`
-
-export const ThemedGlobalStyle = createGlobalStyle`
-  body {
-    color: ${({ theme }) => theme.text1};
-    background-color: ${({ theme }) => theme.bg1};
-  }
-`
-
-export const muiTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-  typography: {
-    allVariants: {
-      /** unset default Roboto font */
-      fontFamily: undefined,
-    },
-  },
-})
