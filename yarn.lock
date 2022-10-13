@@ -16761,9 +16761,9 @@ vi-fetch@^0.8.0:
     tinyspy "^1.0.0"
 
 vite-plugin-dts@^1.4.1:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/vite-plugin-dts/-/vite-plugin-dts-1.6.4.tgz#6c691652b66f7566cd42f4bd50fa58191f453b05"
-  integrity sha512-NaCkdhb9f+0jvmIMQRXbRkSokz6AANbTLjoZOhbeXw3IyLhkM0pTguicM14X8/XEAruZ8XdOM/1MyRgEi70P/Q==
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/vite-plugin-dts/-/vite-plugin-dts-1.6.5.tgz#c7dec7a38063e48986cd5118d198a7b166d75b50"
+  integrity sha512-5X6itICUfV8AT0WkHKkE573KMRQE30j4tKzDyvZ770VEZbkGBt87b3j99ENKsW9PZJfI/9br96juq9NbuWoYFg==
   dependencies:
     "@microsoft/api-extractor" "^7.32.0"
     "@rushstack/node-core-library" "^3.53.0"
