@@ -45,7 +45,7 @@
     "url": "https://github.com/argentlabs/argent-x/issues"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^14.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/minimalistic-assert": "^1.0.1",
     "happy-dom": "^7.0.0",
     "vite": "^3.0.9",
