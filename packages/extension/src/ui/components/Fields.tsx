@@ -9,10 +9,14 @@ export const Field = styled.div<{ clickable?: boolean }>`
   font-weight: 600;
   line-height: 20px;
 
-  ${({ clickable }) =>
+  ${({ theme, clickable }) =>
     clickable &&
     css`
       cursor: pointer;
+      &:hover {
+        background-color: ${theme.button.transparent.bg.hover};
+      }
+      transition: background-color 200ms ease-in-out;
     `}
 `
 
@@ -31,7 +35,6 @@ export const FieldError = styled.div<{ justify?: string }>`
 export const FieldGroup = styled.section<{ error?: boolean }>`
   background: ${({ theme }) => theme.bg2};
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.bg2};
   display: flex;
   flex-direction: column;
   margin-bottom: 12px;
@@ -87,4 +90,12 @@ export const FieldValueMeta = styled(FieldKeyMeta)``
 export const LeftPaddedField = styled.div`
   margin-left: 8px;
   text-align: right;
+`
+
+export const SectionHeader = styled.div`
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.text1};
 `

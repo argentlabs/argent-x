@@ -118,7 +118,7 @@ export const SupportFooter: FC = () => (
         </IconWrapper>
       </a>
       <a
-        href="https://discord.com/channels/598897994477207572/984804615696564265"
+        href="https://discord.gg/T4PDFHxm6T"
         title="Ask a question on the argent-x-support channel on Discord"
         target="_blank"
       >
@@ -208,6 +208,13 @@ export const SettingsScreen: FC = () => {
             <ArrowForwardIosIcon fontSize="inherit" />
           </Title>
           <P>Here you can add, edit and remove custom networks.</P>
+        </SettingsLinkItem>
+        <hr />
+        <SettingsLinkItem to={routes.settingsBlockExplorer()}>
+          <Title>
+            <span>Block explorer</span>
+            <ArrowForwardIosIcon fontSize="inherit" />
+          </Title>
         </SettingsLinkItem>
         <hr />
         {isPrivacySettingsEnabled && (

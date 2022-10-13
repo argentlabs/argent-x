@@ -1,5 +1,5 @@
 import { isString } from "@sentry/utils"
-import { colord } from "colord"
+// import { colord } from "colord"
 import { FC } from "react"
 import { Navigate } from "react-router-dom"
 import styled from "styled-components"
@@ -26,16 +26,17 @@ const Title = styled.h1`
   margin: 0 0 36px 0;
 `
 
-const RecommendedText = styled.span`
-  background-color: ${({ theme }) =>
-    colord(theme.green1).alpha(0.2).toRgbString()};
-  color: ${({ theme }) => theme.green1};
-  border-radius: 4px;
-  padding: 2px 4px;
-  font-size: 11px;
-  margin-left: 4px;
-  font-weight: 500;
-`
+// // Can be used to highlight a specific option with a recommended badge
+// const RecommendedText = styled.span`
+//   background-color: ${({ theme }) =>
+//     colord(theme.green1).alpha(0.2).toRgbString()};
+//   color: ${({ theme }) => theme.green1};
+//   border-radius: 4px;
+//   padding: 2px 4px;
+//   font-size: 11px;
+//   margin-left: 4px;
+//   font-weight: 500;
+// `
 
 const BANXA_ENABLED = (process.env.FEATURE_BANXA || "false") === "true"
 const RAMP_ENABLED =
@@ -77,11 +78,7 @@ export const FundingProviderScreen: FC = () => {
               onClick={trackAddFundsService("ramp", account.networkId)}
             >
               <Option
-                title={
-                  <>
-                    Ramp<RecommendedText>Recommended</RecommendedText>
-                  </>
-                }
+                title="Ramp"
                 description="Card or bank transfer"
                 icon={<RampSvg />}
               />

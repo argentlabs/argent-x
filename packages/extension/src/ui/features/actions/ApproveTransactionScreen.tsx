@@ -2,7 +2,6 @@ import { isArray } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
-import styled from "styled-components"
 
 import { isErc20TransferCall } from "../../../shared/call"
 import {
@@ -18,15 +17,10 @@ import {
 } from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
-import { getAccountImageUrl } from "../accounts/accounts.service"
-import { ProfilePicture } from "../accounts/ProfilePicture"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { FeeEstimation } from "./FeeEstimation"
+import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
 
@@ -36,10 +30,6 @@ interface ApproveTransactionScreenProps
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
 }
-
-const LeftPaddedField = styled.div`
-  margin-left: 8px;
-`
 
 export const titleForTransactionsAndReview = (
   transactions: Call | Call[] = [],
@@ -68,7 +58,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
-  const { accountNames } = useAccountMetadata()
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
 
@@ -86,7 +75,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return <Navigate to={routes.accounts()} />
   }
 
-  const accountName = getAccountName(selectedAccount, accountNames)
   const confirmButtonVariant =
     transactionReview?.assessment === "warn" ? "warn-high" : undefined
 
@@ -119,17 +107,11 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         tokensByNetwork={tokensByNetwork}
       />
       <FieldGroup>
-        <Field>
-          <FieldKey>From</FieldKey>
-          <FieldValue>
-            <ProfilePicture
-              src={getAccountImageUrl(accountName, selectedAccount)}
-              size="sm"
-              disabled
-            />
-            <LeftPaddedField>{accountName}</LeftPaddedField>
-          </FieldValue>
-        </Field>
+        <AccountAddressField
+          title="From"
+          accountAddress={selectedAccount.address}
+          networkId={selectedAccount.network.id}
+        />
         <Field>
           <FieldKey>Network</FieldKey>
           <FieldValue>{selectedAccount.network.name}</FieldValue>

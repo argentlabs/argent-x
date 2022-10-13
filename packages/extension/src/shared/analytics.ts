@@ -18,6 +18,12 @@ export type AddFundsServices =
   | "orbiter"
   | "ramp"
 
+export type UserFeedbackAction =
+  | "REVIEWED_ON_CHROME_STORE"
+  | "REVIEWED_ON_ZENDESK"
+  | "RATING_DISMISSED"
+  | "FEEDBACK_DISMISSED"
+
 export interface Events {
   sessionStart: undefined
   sessionEnded: {
@@ -54,6 +60,12 @@ export interface Events {
   addFunds: {
     networkId: string
     service: AddFundsServices
+  }
+  userRating: {
+    rating: number
+  }
+  userFeedbackAction: {
+    action: UserFeedbackAction
   }
 }
 

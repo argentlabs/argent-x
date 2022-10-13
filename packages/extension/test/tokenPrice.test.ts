@@ -1,7 +1,9 @@
 import { BigNumber } from "ethers"
+import { UINT_256_MAX } from "starknet/dist/utils/uint256"
 import { describe, expect, test } from "vitest"
 
 import {
+  PRETTY_UNLIMITED,
   convertTokenAmountToCurrencyValue,
   convertTokenUnitAmountWithDecimals,
   lookupTokenPriceDetails,
@@ -244,6 +246,12 @@ describe("prettifyTokenAmount()", () => {
           decimals: 18,
         }),
       ).toEqual("0.0000000000000001")
+      expect(
+        prettifyTokenAmount({
+          amount: UINT_256_MAX,
+          decimals: 18,
+        }),
+      ).toEqual(PRETTY_UNLIMITED)
     })
   })
   describe("when invalid", () => {

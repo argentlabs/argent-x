@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles"
-import { colord } from "colord"
+import { colord, extend } from "colord"
+import mixPlugin from "colord/plugins/mix"
 import React, { FC } from "react"
 import {
   DefaultTheme,
@@ -8,6 +9,8 @@ import {
   css,
 } from "styled-components"
 import { normalize } from "styled-normalize"
+
+extend([mixPlugin])
 
 const white = "#FFFFFF"
 const black = "#000000"
@@ -42,6 +45,17 @@ export const colors = {
   yellow1: "#ffbf3d",
 
   green1: "#02bba8",
+  green2: "#02a697",
+
+  neutrals100: "#B7B7B9",
+  neutrals200: "#9F9FA1",
+  neutrals300: "#88888A",
+  neutrals400: "#707072",
+  neutrals500: "#58585B",
+  neutrals600: "#404043",
+  neutrals700: "#28282C",
+  neutrals800: "#1D1F22",
+  neutrals900: "#101014",
 }
 
 export const components = {
@@ -92,6 +106,13 @@ export const components = {
         disabled: colord(colors.blue0).alpha(0.5).toRgbString(),
       },
     },
+    transparent: {
+      bg: {
+        base: "transparent",
+        hover: "rgba(255, 255, 255, 0.075)",
+        disabled: "transaprent",
+      },
+    },
     inverted: {
       fg: {
         base: colors.bg2,
@@ -101,6 +122,15 @@ export const components = {
         base: colors.white,
         hover: colord(colors.white).darken(0.075).toRgbString(),
         disabled: colord(colors.white).alpha(0.5).toRgbString(),
+      },
+    },
+    neutrals800: {
+      bg: {
+        base: colors.neutrals800,
+        hover: colord(colors.neutrals800)
+          .mix(colors.neutrals700, 0.75)
+          .toRgbString(),
+        disabled: colors.neutrals900,
       },
     },
     radius: "500px",
@@ -204,6 +234,22 @@ const flexRowNoWrap = css`
   flex-flow: row nowrap;
 `
 
+export const scrollbarStyle = css`
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+`
+
 export const theme: DefaultTheme = {
   ...colors,
   ...components,
@@ -228,7 +274,7 @@ export const ThemeProvider: FC<{
 }
 
 export interface GlobalStyleProps {
-  extensionIsInTab: boolean
+  extensionIsInTab: boolean | undefined
 }
 
 export const FixedGlobalStyle = createGlobalStyle<GlobalStyleProps>`

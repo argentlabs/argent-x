@@ -1,3 +1,4 @@
+import { Collapse } from "@mui/material"
 import { colord } from "colord"
 import { FC, useCallback, useState } from "react"
 import styled from "styled-components"
@@ -8,7 +9,6 @@ import {
   IStatusMessageLevel,
 } from "../../../shared/statusMessage/types"
 import { Button } from "../../components/Button"
-import { ExpandableHeightBox } from "../../components/ExpandableHeightBox"
 import { CloseRoundedIcon } from "../../components/Icons/MuiIcons"
 import { getColorForLevel } from "./getColorForLevel"
 import { StatusMessageIcon } from "./StatusMessageIcon"
@@ -139,7 +139,7 @@ export const StatusMessageBanner: FC<IStatusMessageBanner> = ({
           </DismissButton>
         )}
       </SummaryContainer>
-      <ExpandableHeightBox expanded={expanded}>
+      <Collapse in={expanded} timeout="auto">
         <MessageContainer>{message}</MessageContainer>
         {linkTitle && linkUrl && (
           <MessageContainer>
@@ -154,7 +154,7 @@ export const StatusMessageBanner: FC<IStatusMessageBanner> = ({
             </Button>
           </MessageContainer>
         )}
-      </ExpandableHeightBox>
+      </Collapse>
     </Container>
   )
 }

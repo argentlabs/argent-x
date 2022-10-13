@@ -1,3 +1,4 @@
+import { BigNumberish } from "ethers"
 import { FC } from "react"
 
 import { prettifyTokenAmount } from "../../../../../shared/token/price"
@@ -14,7 +15,7 @@ import { TokenIcon } from "../../../accountTokens/TokenIcon"
 export interface ITokenField {
   label: string
   contractAddress?: string
-  amount?: string
+  amount?: BigNumberish
   tokensByNetwork: Token[]
 }
 
@@ -34,9 +35,9 @@ export const TokenField: FC<ITokenField> = ({
     ? prettifyTokenAmount({
         amount,
         decimals: token?.decimals,
-        symbol: token?.symbol || "Unknown token",
+        symbol: token?.symbol || "Unknown",
       })
-    : amount.toString()
+    : `${amount} Unknown`
   return (
     <Field>
       <FieldKey>{label}</FieldKey>

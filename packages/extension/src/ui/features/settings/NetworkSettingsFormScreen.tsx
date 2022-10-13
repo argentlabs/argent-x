@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Network, addNetwork, networkSchema } from "../../../shared/network"
+import { settingsStore } from "../../../shared/settings"
+import { defaultBlockExplorers } from "../../../shared/settings/defaultBlockExplorers"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
@@ -20,18 +23,13 @@ const ExtendableControl = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
+  margin-top: 8px;
 `
 
 const Wrapper = styled.div`
-  margin-top: -8px;
   display: flex;
   flex-direction: column;
-  > * + * {
-    margin-top: 8px;
-  }
-  > ${ExtendableControl} + * {
-    margin-top: 0;
-  }
+  gap: 8px;
 `
 
 type NetworkSettingsFormScreenProps =
@@ -48,9 +46,25 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
 ) => {
   const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
+
+  const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
+  const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
+
   const defaultNetwork = useMemo<Network>(() => {
     if (props.mode === "add") {
       return { id: "", name: "", chainId: "", baseUrl: "" }
+    }
+    /** display selected block explorer url from settings for readonly network */
+    if (
+      props.network.readonly &&
+      (props.network.id === "mainnet-alpha" ||
+        props.network.id === "goerli-alpha")
+    ) {
+      const blockExplorerUrl = settingsBlockExplorer.url[props.network.id]
+      return {
+        ...props.network,
+        blockExplorerUrl,
+      }
     }
     return props.network
     // due to an or type we need to check different values depending on the mode
@@ -148,46 +162,64 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             <A>Advanced settings</A>
           </ExtendableControl>
           <Collapse in={expanded} timeout="auto">
-            <ControlledInputText
-              autoComplete="off"
-              control={control}
-              placeholder="Explorer URL"
-              name="explorerUrl"
-              type="url"
-              disabled={defaultNetwork.readonly}
-            />
-            <ControlledInputText
-              autoComplete="off"
-              control={control}
-              placeholder="Account implementation address"
-              name="accountImplementation"
-              type="text"
-              disabled={defaultNetwork.readonly}
-            />
-            <ControlledInputText
-              autoComplete="off"
-              control={control}
-              placeholder="Account class hash"
-              name="accountClassHash.argentAccount"
-              type="text"
-              disabled={defaultNetwork.readonly}
-            />
-            <ControlledInputText
-              autoComplete="off"
-              control={control}
-              placeholder="RPC URL"
-              name="rpcUrl"
-              type="url"
-              disabled={defaultNetwork.readonly}
-            />
-            <ControlledInputText
-              autoComplete="off"
-              control={control}
-              placeholder="Multicall Address"
-              name="multicallAddress"
-              type="text"
-              disabled={defaultNetwork.readonly}
-            />
+            <Wrapper>
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="Explorer API URL"
+                name="explorerUrl"
+                type="url"
+                disabled={defaultNetwork.readonly}
+              />
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="Block explorer URL"
+                name="blockExplorerUrl"
+                type="url"
+                disabled={defaultNetwork.readonly}
+              />
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="Account implementation address"
+                name="accountImplementation"
+                type="text"
+                disabled={defaultNetwork.readonly}
+              />
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="Account class hash"
+                name="accountClassHash.argentAccount"
+                type="text"
+                disabled={defaultNetwork.readonly}
+              />
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="Plugin account class hash"
+                name="accountClassHash.argentPluginAccount"
+                type="text"
+                disabled={defaultNetwork.readonly}
+              />
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="RPC URL"
+                name="rpcUrl"
+                type="url"
+                disabled={defaultNetwork.readonly}
+              />
+              <ControlledInputText
+                autoComplete="off"
+                control={control}
+                placeholder="Multicall Address"
+                name="multicallAddress"
+                type="text"
+                disabled={defaultNetwork.readonly}
+              />
+            </Wrapper>
           </Collapse>
 
           {Object.keys(errors).length > 0 && (

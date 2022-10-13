@@ -1,0 +1,285 @@
+{
+  "id": "0x5c5197096bce9bb99f1f573992c54fb980811bd9f9c844e28cb07672f3a2b9e",
+  "blockNumber": 299545,
+  "timestamp": 1660823428,
+  "transactionHash": "0x5c5197096bce9bb99f1f573992c54fb980811bd9f9c844e28cb07672f3a2b9e",
+  "contractAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+  "entryPoint": "__execute__",
+  "maxFee": "0x177eb6c9102e",
+  "actualFee": "0xfa9cf313c00",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "to",
+          "value": "0x3a5960a712fa2008c038da68c5f57ecd0bae0c596056946c36ba4800771a24d"
+        },
+        {
+          "name": "value",
+          "value": "15000000"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "value",
+          "value": "985000000"
+        }
+      ]
+    },
+    {
+      "name": "Approval",
+      "address": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+      "parameters": [
+        {
+          "name": "owner",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "spender",
+          "value": "0x0"
+        },
+        {
+          "name": "value",
+          "value": "3462"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "to",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "value",
+          "value": "3462"
+        }
+      ]
+    },
+    {
+      "name": "TakerBid",
+      "address": "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786",
+      "parameters": [
+        {
+          "name": "orderHash",
+          "value": "0x738db52e63ca3df79e20c7daa97c5237b651605a56b8c8bb21f731fc385f222"
+        },
+        {
+          "name": "orderNonce",
+          "value": "0x1"
+        },
+        {
+          "name": "taker",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "maker",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "strategy",
+          "value": "0x7dfebeae55b7f345c0be5194560e64135c866fe77e4c90d2233327202841732"
+        },
+        {
+          "name": "currency",
+          "value": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+        },
+        {
+          "name": "collection",
+          "value": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c"
+        },
+        {
+          "name": "tokenId",
+          "value": "3462"
+        },
+        {
+          "name": "amount",
+          "value": "0x1"
+        },
+        {
+          "name": "price",
+          "value": "0x3b9aca00"
+        },
+        {
+          "name": "originalTaker",
+          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+        },
+        {
+          "name": "timestamp",
+          "value": "0x62fba95e"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x5c5197096bce9bb99f1f573992c54fb980811bd9f9c844e28cb07672f3a2b9e"
+        },
+        {
+          "name": "response_len",
+          "value": "0x0"
+        },
+        {
+          "name": "response",
+          "value": []
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "matchAskWithTakerBid",
+      "address": "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786",
+      "parameters": [
+        {
+          "name": "takerBid",
+          "value": [
+            {
+              "name": "isOrderAsk",
+              "value": "0x0",
+              "type": "felt"
+            },
+            {
+              "name": "taker",
+              "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+              "type": "felt"
+            },
+            {
+              "name": "price",
+              "value": "0x3b9aca00",
+              "type": "felt"
+            },
+            {
+              "name": "tokenId",
+              "value": "3462",
+              "type": "Uint256"
+            },
+            {
+              "name": "minPercentageToAsk",
+              "value": "0x2134",
+              "type": "felt"
+            },
+            {
+              "name": "params",
+              "value": "0x0",
+              "type": "felt"
+            }
+          ]
+        },
+        {
+          "name": "makerAsk",
+          "value": [
+            {
+              "name": "isOrderAsk",
+              "value": "0x1",
+              "type": "felt"
+            },
+            {
+              "name": "signer",
+              "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+              "type": "felt"
+            },
+            {
+              "name": "collection",
+              "value": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
+              "type": "felt"
+            },
+            {
+              "name": "price",
+              "value": "0x3b9aca00",
+              "type": "felt"
+            },
+            {
+              "name": "tokenId",
+              "value": "3462",
+              "type": "Uint256"
+            },
+            {
+              "name": "amount",
+              "value": "0x1",
+              "type": "felt"
+            },
+            {
+              "name": "strategy",
+              "value": "0x7dfebeae55b7f345c0be5194560e64135c866fe77e4c90d2233327202841732",
+              "type": "felt"
+            },
+            {
+              "name": "currency",
+              "value": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "felt"
+            },
+            {
+              "name": "nonce",
+              "value": "0x1",
+              "type": "felt"
+            },
+            {
+              "name": "startTime",
+              "value": "0x0",
+              "type": "felt"
+            },
+            {
+              "name": "endTime",
+              "value": "0x64dcdb69",
+              "type": "felt"
+            },
+            {
+              "name": "minPercentageToAsk",
+              "value": "0x2134",
+              "type": "felt"
+            },
+            {
+              "name": "params",
+              "value": "0x0",
+              "type": "felt"
+            },
+            {
+              "name": "r",
+              "value": "0x1dd7972d51fc038417df8977d90d5a8bdaabf2d4870e1dbb0735e75b89f82ec",
+              "type": "felt"
+            },
+            {
+              "name": "s",
+              "value": "0x6549bc34092b922f65f161d08be5460c7e8fd6c279a1562fa9c2679f8335c4e",
+              "type": "felt"
+            }
+          ]
+        },
+        {
+          "name": "customNonFungibleTokenRecipient",
+          "value": "0x0"
+        }
+      ]
+    }
+  ]
+}

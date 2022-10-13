@@ -3,7 +3,9 @@
     "account": {
       "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
       "network": {
-        "accountClassHash": "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
+        "accountClassHash": {
+          "argentAccount": "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328"
+        },
         "baseUrl": "https://alpha4.starknet.io",
         "chainId": "SN_GOERLI",
         "explorerUrl": "https://goerli.voyager.online",

@@ -27,15 +27,18 @@ export const TokenWrapper = styled.div`
 `
 
 export const TokenDetailsWrapper = styled.div`
-  width: 100%;
+  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  overflow: hidden;
 `
 
 export const TokenTextGroup = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `
 
 export const TokenTitle = styled.h3`
@@ -58,7 +61,7 @@ const TokenSymbol = styled.div`
   text-transform: uppercase;
 `
 
-interface IIsLoading {
+export interface IIsLoading {
   isLoading?: boolean
 }
 

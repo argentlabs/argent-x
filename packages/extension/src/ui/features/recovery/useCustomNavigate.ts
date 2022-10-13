@@ -16,7 +16,7 @@ export const useCustomNavigate = () => {
     const isLinux = (await getPlatformOS()) === "linux"
     const isAlreadyInTab = await extensionIsInTab()
 
-    if (to === routes.backupRecovery() && isLinux && !isAlreadyInTab) {
+    if (to === routes.onboardingRestoreBackup() && isLinux && !isAlreadyInTab) {
       return openExtensionInTab()
     }
     return navigate(to, options)

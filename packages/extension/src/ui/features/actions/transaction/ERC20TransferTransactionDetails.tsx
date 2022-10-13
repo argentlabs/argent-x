@@ -2,9 +2,8 @@ import { FC } from "react"
 
 import {
   Erc20TransferCall,
-  isErc20TransferCall,
   parseErc20TransferCall,
-} from "../../../../shared/call"
+} from "../../../../shared/call/erc20TransferCall"
 import { Token } from "../../../../shared/token/type"
 import {
   Field,
@@ -12,12 +11,9 @@ import {
   FieldKey,
   FieldValue,
 } from "../../../components/Fields"
-import { formatTruncatedAddress } from "../../../services/addresses"
-import { useAccounts } from "../../accounts/accounts.state"
-import { DefaultTransactionDetails } from "./DefaultTransactionDetails"
-import { AccountField } from "./fields/AccountField"
+import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
+import { AccountAddressField } from "./fields/AccountAddressField"
 import { TokenField } from "./fields/TokenField"
-import { getKnownWalletAddress } from "./getKnownWalletAddress"
 
 /** Renders an ERC20 transfer transaction */
 
@@ -30,23 +26,12 @@ export interface Erc20TransferCallTransactionItemProps {
 export const ERC20TransferTransactionDetails: FC<
   Erc20TransferCallTransactionItemProps
 > = ({ transaction, tokensByNetwork, networkId }) => {
-  const allAccounts = useAccounts()
-  if (!isErc20TransferCall(transaction)) {
-    return (
-      <DefaultTransactionDetails
-        transaction={transaction}
-        tokensByNetwork={tokensByNetwork}
-        networkId={networkId}
-      />
-    )
-  }
   const { contractAddress, recipientAddress, amount } =
     parseErc20TransferCall(transaction)
 
-  const displaySendAddress = formatTruncatedAddress(recipientAddress)
-  const knownAccount = getKnownWalletAddress(allAccounts, {
-    address: recipientAddress,
-    networkId,
+  const { displayValue } = useDisplayTokenAmountAndCurrencyValue({
+    amount,
+    tokenAddress: contractAddress,
   })
 
   return (
@@ -57,14 +42,17 @@ export const ERC20TransferTransactionDetails: FC<
         contractAddress={contractAddress}
         tokensByNetwork={tokensByNetwork}
       />
-      <Field>
-        <FieldKey>To</FieldKey>
-        {knownAccount ? (
-          <AccountField account={knownAccount} />
-        ) : (
-          <FieldValue>{displaySendAddress}</FieldValue>
-        )}
-      </Field>
+      {!!displayValue && (
+        <Field>
+          <FieldKey>Value</FieldKey>
+          <FieldValue>{displayValue}</FieldValue>
+        </Field>
+      )}
+      <AccountAddressField
+        title="To"
+        accountAddress={recipientAddress}
+        networkId={networkId}
+      />
     </FieldGroup>
   )
 }

@@ -7,6 +7,7 @@ import {
 } from "@argent-x/extension/src/ui/theme"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import React from "react"
+import { createGlobalStyle } from "styled-components"
 
 /** polyfill browser extension storage  */
 global.chrome = {
@@ -20,6 +21,14 @@ global.chrome = {
   storage: chromeStorageMock,
 }
 
+/** remove explicit width and height constraints which otherwise impact Docs */
+const StorybookGlobalStyle = createGlobalStyle`
+  html, body {
+    min-width: unset;
+    min-height: unset;
+  }
+`
+
 export const decorators = [
   (Story) => (
     <MuiThemeProvider theme={muiTheme}>
@@ -27,7 +36,8 @@ export const decorators = [
         href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
         rel="stylesheet"
       />
-      <FixedGlobalStyle extensionIsInTab={false} />
+      <FixedGlobalStyle extensionIsInTab />
+      <StorybookGlobalStyle />
       <StyledComponentsThemeProvider>
         <ThemedGlobalStyle />
         <Story />

@@ -10,6 +10,7 @@ import { routes } from "../../routes"
 import { A, P } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import { Collections } from "./aspect.service"
+import { NftThumbnailImage } from "./NftThumbnailImage"
 import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
@@ -92,16 +93,15 @@ const Collections: FC<AccountCollectionsProps> = ({
 }) => {
   const navigate = useNavigate()
   const collectibles = useCollections(account)
-
   return (
     <div>
       {collectibles.length === 0 && (
         <>
-          <P>No collectibles to show</P>
+          <P>No NFTs to show</P>
           {account.networkId === "goerli-alpha" && (
             <P style={{ marginTop: 120 }}>
               <small>
-                You can browse collectibles on
+                You can browse NFTs on
                 <A href="https://testnet.aspect.co" target="_blank">
                   Aspect
                 </A>
@@ -111,7 +111,7 @@ const Collections: FC<AccountCollectionsProps> = ({
           {account.networkId === "mainnet-alpha" && (
             <P style={{ marginTop: 120 }}>
               <small>
-                You can browse collectibles on
+                You can browse NFTs on
                 <A href="https://aspect.co" target="_blank">
                   Aspect
                 </A>
@@ -121,7 +121,7 @@ const Collections: FC<AccountCollectionsProps> = ({
           {account.networkId === "goerli-alpha" && (
             <P style={{ marginTop: 16 }}>
               <small>
-                Or build your own 3D collectible on
+                Or build your own 3D NFTs on
                 <A href="https://briq.construction/" target="_blank">
                   briq
                 </A>
@@ -139,7 +139,7 @@ const Collections: FC<AccountCollectionsProps> = ({
             })
           }
         >
-          <img src={collectible.imageUri} />
+          <NftThumbnailImage src={collectible.imageUri} />
           <figcaption>
             {collectible.name}
             <CollectiblesNumber>{collectible.nfts.length}</CollectiblesNumber>

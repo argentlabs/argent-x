@@ -6,7 +6,9 @@ import TextareaAutosize, {
 } from "react-textarea-autosize"
 import styled, { css } from "styled-components"
 
-import { isNumeric } from "../../shared/utils/number"
+import { scrollbarStyle } from "../theme"
+import { isAllowedAddressHexInputValue } from "./utils/isAllowedAddressHexInputValue"
+import { isAllowedNumericInputValue } from "./utils/isAllowedNumericInputValue"
 
 export const Container = styled.div`
   display: flex;
@@ -193,21 +195,9 @@ export const ControlledInputText = styled(
 
 interface AdditionalControlledInputProps {
   onlyNumeric?: boolean
+  onlyAddressHex?: boolean
+  variant?: InputVariant
   children?: React.ReactNode
-}
-
-export const isAllowedNumericInputValue = (value: string, maxDecimals = 16) => {
-  const numericalRegex = new RegExp(`^[0-9]*.?[0-9]{0,${maxDecimals}}$`)
-  if (value === "") {
-    return true
-  }
-  if (!isNumeric(value)) {
-    return false
-  }
-  if (numericalRegex.test(value)) {
-    return true
-  }
-  return false
 }
 
 export type ControlledInputProps<T extends FieldValues> = InputFieldProps &
@@ -220,61 +210,107 @@ export const ControlledInputTextAlt = <T extends FieldValues>({
   defaultValue,
   rules,
   onlyNumeric,
+  onlyAddressHex,
   children,
+  autoComplete = "off",
   ...props
-}: ControlledInputProps<T>) => (
-  <Controller
-    name={name}
-    control={control}
-    defaultValue={defaultValue}
-    rules={rules}
-    render={({ field: { ref, value, onChange: onValueChange, ...field } }) => (
-      <InputTextAlt
-        style={{ position: "relative" }}
-        {...props}
-        value={value || ""}
-        {...field}
-        inputRef={ref}
-        inputMode="decimal"
-        type="text"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          if (onlyNumeric) {
-            if (isAllowedNumericInputValue(e.target.value)) {
+}: ControlledInputProps<T>) => {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({
+        field: { ref, value, onChange: onValueChange, ...field },
+      }) => (
+        <InputTextAlt
+          style={{ position: "relative" }}
+          {...props}
+          value={value || ""}
+          {...field}
+          inputRef={ref}
+          autoComplete={autoComplete}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e.target.value.length < value?.length) {
+              /** always allow delete whether resulting value is invalid or not */
+              return onValueChange(e)
+            } else if (onlyNumeric) {
+              if (isAllowedNumericInputValue(e.target.value)) {
+                return onValueChange(e)
+              }
+            } else if (onlyAddressHex) {
+              if (isAllowedAddressHexInputValue(e.target.value)) {
+                return onValueChange(e)
+              }
+            } else {
               return onValueChange(e)
             }
-          } else {
-            return onValueChange(e)
-          }
-        }}
-      >
-        {children}
-      </InputTextAlt>
-    )}
-  />
-)
+            /** don't allow change */
+          }}
+        >
+          {children}
+        </InputTextAlt>
+      )}
+    />
+  )
+}
 
-export type ControlledInputType = typeof ControlledInputTextAlt
+export type InputVariant = "default" | "outline" | "neutrals800"
+
+export type ControlledInputType = typeof ControlledInputTextAlt & {
+  variant?: InputVariant
+}
+
+export const getVariantStyle = ({
+  variant = "default",
+}: {
+  variant?: InputVariant
+}) => {
+  return css`
+    padding: 12px 16px;
+    border: 1px solid
+      ${({ theme }) =>
+        variant === "neutrals800" ? theme.neutrals800 : theme.bg2};
+    border-radius: 8px;
+    background-color: ${({ theme }) =>
+      variant === "neutrals800" ? theme.neutrals800 : theme.black};
+    &:focus-within {
+      background-color: ${({ theme }) =>
+        variant === "neutrals800" ? theme.neutrals700 : theme.black};
+    }
+    transition: background-color 200ms ease-in-out;
+  `
+}
 
 export const StyledControlledInput: ControlledInputType = styled(
   ControlledInputTextAlt,
-)`
-  padding: 12px 16px;
-  border: 1px solid ${({ theme }) => theme.bg2};
-  border-radius: 8px;
-  background-color: black;
+)<{ variant?: InputVariant }>`
+  ${getVariantStyle}
 `
 
-export const TextArea = styled.textarea`
-  ${InputCss}
+export const TextArea = styled.textarea<{ variant?: InputVariant }>`
+  font-size: 17px;
+  line-height: 25px;
+  text-shadow: none;
+
+  color: ${({ theme }) => theme.text1};
+
   resize: none;
   min-height: 116px;
   width: 100%;
+  ${getVariantStyle}
+  ${scrollbarStyle}
+  &:focus {
+    outline: 0;
+  }
 `
 
 export const TextAreaAlt = styled(TextareaAutosize)`
   ${InputCssAlt}
   resize: none;
   width: 100%;
+  ${scrollbarStyle}
 `
 
 export type InputTextAreaProps = Omit<TextareaAutosizeProps, "ref" | "as">
@@ -322,6 +358,7 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
   defaultValue,
   rules,
   onlyNumeric,
+  onlyAddressHex,
   maxRows,
   children,
   onChange,
@@ -339,8 +376,16 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
         inputRef={ref}
         maxRows={maxRows}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-          if (onlyNumeric) {
+          if (e.target.value.length < value?.length) {
+            /** always allow delete whether resulting value is invalid or not */
+            return onValueChange(e)
+          } else if (onlyNumeric) {
             if (isAllowedNumericInputValue(e.target.value)) {
+              onValueChange(e)
+              return isFunction(onChange) && onChange(e)
+            }
+          } else if (onlyAddressHex) {
+            if (isAllowedAddressHexInputValue(e.target.value)) {
               onValueChange(e)
               return isFunction(onChange) && onChange(e)
             }
@@ -348,6 +393,7 @@ export const ControlledTextAreaAlt = <T extends FieldValues>({
             onValueChange(e)
             return isFunction(onChange) && onChange(e)
           }
+          /** don't allow change */
         }}
         {...field}
         {...props}

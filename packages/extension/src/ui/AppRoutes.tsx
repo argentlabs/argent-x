@@ -30,24 +30,26 @@ import { FundingScreen } from "./features/funding/FundingScreen"
 import { LedgerDoneScreen } from "./features/ledger/done"
 import { LedgerSelectScreen } from "./features/ledger/select"
 import { LedgerStartScreen } from "./features/ledger/start"
+import { LockScreen } from "./features/lock/LockScreen"
+import { ResetScreen } from "./features/lock/ResetScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
-import { DisclaimerScreen } from "./features/onboarding/DisclaimerScreen"
-import { LockScreen } from "./features/onboarding/LockScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
-import { NewWalletScreen } from "./features/onboarding/NewWalletScreen"
-import { PrivacyStatementScreen } from "./features/onboarding/PrivacyStatementScreen"
-import { ResetScreen } from "./features/onboarding/ResetScreen"
-import { WelcomeScreen } from "./features/onboarding/WelcomeScreen"
+import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisclaimerScreen"
+import { OnboardingFinishScreen } from "./features/onboarding/OnboardingFinishScreen"
+import { OnboardingPasswordScreen } from "./features/onboarding/OnboardingPasswordScreen"
+import { OnboardingPrivacyScreen } from "./features/onboarding/OnboardingPrivacyScreen"
+import { OnboardingRestoreBackup } from "./features/onboarding/OnboardingRestoreBackup"
+import { OnboardingRestorePassword } from "./features/onboarding/OnboardingRestorePassword"
+import { OnboardingRestoreSeed } from "./features/onboarding/OnboardingRestoreSeed"
+import { OnboardingStartScreen } from "./features/onboarding/OnboardingStartScreen"
 import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
-import { BackupRecoveryScreen } from "./features/recovery/BackupRecoveryScreen"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
 import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
-import { SeedRecoveryPasswordScreen } from "./features/recovery/SeedRecoveryPasswordScreen"
-import { SeedRecoveryScreen } from "./features/recovery/SeedRecoveryScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
 import { SendScreen } from "./features/send/SendScreen"
 import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
 import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
+import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
@@ -56,6 +58,8 @@ import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen
 import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
+import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
+import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
 
@@ -88,20 +92,8 @@ const Viewport: FC = () => (
 // Routes which don't need an unlocked wallet
 const nonWalletRoutes = (
   <>
-    <Route path={routes.welcome.path} element={<WelcomeScreen />} />
-    <Route path={routes.newWallet.path} element={<NewWalletScreen />} />
-    <Route
-      path={routes.backupRecovery.path}
-      element={<BackupRecoveryScreen />}
-    />
-    <Route path={routes.seedRecovery.path} element={<SeedRecoveryScreen />} />
-    <Route
-      path={routes.seedRecoveryPassword.path}
-      element={<SeedRecoveryPasswordScreen />}
-    />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
-    <Route path={routes.disclaimer.path} element={<DisclaimerScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
@@ -179,6 +171,10 @@ const walletRoutes = (
       element={<NetworkSettingsScreen />}
     />
     <Route
+      path={routes.settingsBlockExplorer.path}
+      element={<BlockExplorerSettingsScreen />}
+    />
+    <Route
       path={routes.settingsAddCustomNetwork.path}
       element={<NetworkSettingsFormScreen mode="add" />}
     />
@@ -218,16 +214,49 @@ const walletRoutes = (
       path={routes.settingsExperimental.path}
       element={<PrivacyExperimentalSettings />}
     />
-    <Route
-      path={routes.privacyStatement.path}
-      element={<PrivacyStatementScreen />}
-    />
-    <Route path={routes.addAccount.path} element={<AddAccount />} />
   </>
 )
 
 const fullscreenRoutes = (
   <>
+    <Route
+      path={routes.onboardingStart.path}
+      element={<OnboardingStartScreen />}
+    />
+    <Route
+      path={routes.onboardingDisclaimer.path}
+      element={<OnboardingDisclaimerScreen />}
+    />
+    <Route
+      path={routes.onboardingPrivacy.path}
+      element={<OnboardingPrivacyScreen />}
+    />
+    <Route
+      path={routes.onboardingPassword.path}
+      element={<OnboardingPasswordScreen />}
+    />
+    <Route
+      path={routes.onboardingRestoreBackup.path}
+      element={<OnboardingRestoreBackup />}
+    />
+    <Route
+      path={routes.onboardingRestoreSeed.path}
+      element={<OnboardingRestoreSeed />}
+    />
+    <Route
+      path={routes.onboardingRestorePassword.path}
+      element={<OnboardingRestorePassword />}
+    />
+    <Route
+      path={routes.onboardingFinish.path}
+      element={<OnboardingFinishScreen />}
+    />
+    <Route path={routes.userReview.path} element={<ReviewRatingScreen />} />
+    <Route
+      path={routes.userReviewFeedback.path}
+      element={<ReviewFeedbackScreen />}
+    />
+    <Route path={routes.addAccount.path} element={<AddAccount />} />
     <Route path={routes.ledgerEntry.path} element={<LedgerStartScreen />} />
     <Route path={routes.ledgerSelect.path} element={<LedgerSelectScreen />} />
     <Route path={routes.ledgerDone.path} element={<LedgerDoneScreen />} />

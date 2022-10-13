@@ -4,7 +4,13 @@ export default {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     "@storybook/addon-links",
-    "@storybook/addon-essentials",
+    {
+      name: "@storybook/addon-essentials",
+      options: {
+        actions:
+          false /** disable mock functions in props, which break component checks for undefined */,
+      },
+    },
     "@storybook/addon-interactions",
     "storybook-addon-swc",
   ],

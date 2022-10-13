@@ -14,12 +14,23 @@ const Icon = styled.img<{ size: number }>`
   min-width: ${({ size }) => size}px;
 `
 
-interface TokenIconProps {
+export interface TokenIconProps {
   name: string
   url?: string
   large?: boolean
   small?: boolean
   size?: number
+}
+
+export const getTokenIconUrl = ({
+  url,
+  name,
+}: Pick<TokenIconProps, "url" | "name">) => {
+  if (url && url.length) {
+    return url
+  }
+  const color = getColor(name)
+  return `https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`
 }
 
 export const TokenIcon: FC<TokenIconProps> = ({
@@ -29,15 +40,12 @@ export const TokenIcon: FC<TokenIconProps> = ({
   small = false,
   size,
 }) => {
-  const color = getColor(name)
+  const src = getTokenIconUrl({ url, name })
   return (
     <Icon
       size={size ? size : large ? 48 : small ? 24 : 40}
       alt={name}
-      src={
-        url ||
-        `https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`
-      }
+      src={src}
     />
   )
 }

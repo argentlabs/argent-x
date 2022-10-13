@@ -9,6 +9,7 @@ import { navigateFromAccountToAccountList } from "./steps/navigateFromAccountToA
 import { navigateFromAccountToTokenDetails } from "./steps/navigateFromAccountToTokenDetails"
 import { newAccount } from "./steps/newAccount"
 import { selectAccountFromAccountList } from "./steps/selectAccountFromAccountList"
+import { dismissUserReview } from "./steps/userReview"
 import { waitForAllPendingTransactionsInAccount } from "./steps/waitForAllPendingTransactionsInAccount"
 import { formatTruncatedAddress } from "./utils"
 
@@ -25,14 +26,16 @@ test("send max eth flow", async ({ page, context }) => {
   expect(b2).toBe("0.0")
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, a1)
-  await navigateFromAccountToTokenDetails(page, "Ethereum")
 
+  await navigateFromAccountToTokenDetails(page, "Ethereum")
   await page.click("button:has-text('Send')")
   await page.click("button:has-text('MAX')")
   await page.fill(`textarea[placeholder="Recipient's address"]`, a2)
   await page.click("button:has-text('Next'):not([disabled])")
 
   await approveTransaction(page)
+
+  await dismissUserReview(page)
 
   await page.waitForSelector("h3:has-text('Pending transactions')")
   await waitForAllPendingTransactionsInAccount(page)

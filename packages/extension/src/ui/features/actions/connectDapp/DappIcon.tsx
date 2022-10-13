@@ -5,6 +5,7 @@ import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 
 interface IDappIcon {
   host: string
+  useDappDisplayAttributesImpl?: typeof useDappDisplayAttributes
 }
 
 interface IContainer {
@@ -21,7 +22,11 @@ const Container = styled.div<IContainer>`
   background-image: ${({ iconUrl }) => (iconUrl ? `url(${iconUrl})` : "none")};
 `
 
-export const DappIcon: FC<IDappIcon> = ({ host, ...rest }) => {
-  const dappDisplayAttributes = useDappDisplayAttributes(host)
+export const DappIcon: FC<IDappIcon> = ({
+  host,
+  useDappDisplayAttributesImpl = useDappDisplayAttributes,
+  ...rest
+}) => {
+  const dappDisplayAttributes = useDappDisplayAttributesImpl(host)
   return <Container iconUrl={dappDisplayAttributes?.iconUrl} {...rest} />
 }

@@ -1,4 +1,4 @@
-import { BigNumber, utils } from "ethers"
+import { utils } from "ethers"
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
@@ -247,20 +247,23 @@ export const SendTokenScreen: FC = () => {
   } = useMaxFeeEstimateForTransfer(token?.address, token?.balance, account)
 
   const setMaxInputAmount = useCallback(
-    (token: TokenDetailsWithBalance, maxFee?: BigNumber) => {
+    (token: TokenDetailsWithBalance, maxFee?: string) => {
       const tokenDecimals = token.decimals ?? 18
       const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
 
       if (token.balance && maxFee) {
         const balanceBn = token.balance
 
-        const maxAmount = balanceBn.sub(maxFee.toString())
+        const maxAmount = balanceBn.sub(maxFee)
 
-        const formattedMaxAmount = utils.formatUnits(
-          maxAmount.toString(),
-          tokenDecimals,
+        const formattedMaxAmount = utils.formatUnits(maxAmount, tokenDecimals)
+        setValue(
+          "amount",
+          maxAmount.lte(0) ? tokenBalance : formattedMaxAmount,
+          {
+            shouldDirty: true,
+          },
         )
-        setValue("amount", maxAmount.lte(0) ? tokenBalance : formattedMaxAmount)
       }
     },
     [setValue],
@@ -470,6 +473,7 @@ export const SendTokenScreen: FC = () => {
                       paddingRight: "50px",
                       borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
                     }}
+                    onlyAddressHex
                     onChange={(e) => {
                       if (validateStarknetAddress(e.target.value)) {
                         const account = addressBook.contacts.find((c) =>

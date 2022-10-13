@@ -1,0 +1,66 @@
+{
+  "id": "0x1dc7e8750b5f24c00518d94e08bcf7634f9441e061cfccafed02eb7714a63de",
+  "blockNumber": 299563,
+  "timestamp": 1660823428,
+  "transactionHash": "0x1dc7e8750b5f24c00518d94e08bcf7634f9441e061cfccafed02eb7714a63de",
+  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "entryPoint": "__execute__",
+  "maxFee": "0x10ec38b9f4dd",
+  "actualFee": "0xb4825d0ed00",
+  "status": "ACCEPTED_ON_L2",
+  "statusData": "",
+  "events": [
+    {
+      "name": "Transfer",
+      "address": "0x07861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x0"
+        },
+        {
+          "name": "to",
+          "value": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+        },
+        {
+          "name": "tokenId",
+          "value": "45416"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x1dc7e8750b5f24c00518d94e08bcf7634f9441e061cfccafed02eb7714a63de"
+        },
+        {
+          "name": "response_len",
+          "value": "0x0"
+        },
+        {
+          "name": "response",
+          "value": []
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "mint",
+      "address": "0x07861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488",
+      "parameters": [
+        {
+          "name": "to",
+          "value": "0x697066733a2f2f516d5a79526158544e3362367a3563374759654a48414c77"
+        },
+        {
+          "name": "tokenId",
+          "value": "37938221286999491987112380141738331633664082371113839"
+        }
+      ]
+    }
+  ]
+}

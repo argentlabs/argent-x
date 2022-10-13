@@ -72,7 +72,9 @@ export const fetcherWithArgentApiHeadersForNetwork = (
 
 /** convert KnownNetworksType to 'goerli' or 'mainnet' expected by API */
 
-export const argentApiNetworkForNetwork = (network: PublicNetworkIds) => {
+export const argentApiNetworkForNetwork = (
+  network: PublicNetworkIds | string,
+) => {
   return network === "goerli-alpha" ? "goerli" : "mainnet"
 }
 
