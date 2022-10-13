@@ -7,9 +7,7 @@ import { getPathForIndex } from "../../../background/keys/keyDerivation"
 import { IAccountListItem } from "../accounts/AccountListItem"
 import { getAccountByPubKey } from "./utils"
 
-export const getListOfAccounts = async (
-  prevAccounts?: IAccountListItem[],
-): Promise<IAccountListItem[]> => {
+export const getListOfAccounts = async (): Promise<IAccountListItem[]> => {
   const tp = await LedgerUsbTransport.create().catch((e) => {
     console.error(e)
     throw new Error("No Ledger device found")
@@ -38,7 +36,7 @@ export const getListOfAccounts = async (
     networkId: a.networkId,
   }))
 
-  return prevAccounts ? [...prevAccounts, ...listOfAccounts] : listOfAccounts
+  return listOfAccounts
 }
 
 const useSelectedLedgerAccountStore = create<{ selected?: IAccountListItem }>(
