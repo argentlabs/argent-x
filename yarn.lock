@@ -3210,12 +3210,12 @@
     esquery "^1.0.1"
 
 "@playwright/test@^1.23.0":
-  version "1.26.1"
-  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.26.1.tgz#73ada4e70f618bca69ba7509c4ba65b5a41c4b10"
-  integrity sha512-bNxyZASVt2adSZ9gbD7NCydzcb5JaI0OR9hc7s+nmPeH604gwp0zp17NNpwXY4c8nvuBGQQ9oGDx72LE+cUWvw==
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.27.1.tgz#9364d1e02021261211c8ff586d903faa79ce95c4"
+  integrity sha512-mrL2q0an/7tVqniQQF6RBL2saskjljXzqNcCOVMUjRIgE6Y38nCNaP+Dc2FBW06bcpD3tqIws/HT9qiMHbNU0A==
   dependencies:
     "@types/node" "*"
-    playwright-core "1.26.1"
+    playwright-core "1.27.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
   version "0.5.7"
@@ -8824,9 +8824,9 @@ eslint-plugin-react-hooks@^4.5.0, eslint-plugin-react-hooks@^4.6.0:
   integrity sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==
 
 eslint-plugin-react@^7.28.0, eslint-plugin-react@^7.31.7:
-  version "7.31.8"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.31.8.tgz#3a4f80c10be1bcbc8197be9e8b641b2a3ef219bf"
-  integrity sha512-5lBTZmgQmARLLSYiwI71tiGVTLUuqXantZM6vlSY39OaDSV0M7+32K5DnLkmFrwTe+Ksz0ffuLUC91RUviVZfw==
+  version "7.31.10"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.31.10.tgz#6782c2c7fe91c09e715d536067644bbb9491419a"
+  integrity sha512-e4N/nc6AAlg4UKW/mXeYWd3R++qUano5/o+t+wnWxIf+bLsOaH3a4q74kX3nDjYym3VBN4HyO9nEn1GcAqgQOA==
   dependencies:
     array-includes "^3.1.5"
     array.prototype.flatmap "^1.3.0"
@@ -8844,9 +8844,9 @@ eslint-plugin-react@^7.28.0, eslint-plugin-react@^7.31.7:
     string.prototype.matchall "^4.0.7"
 
 eslint-plugin-storybook@^0.6.1:
-  version "0.6.4"
-  resolved "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-0.6.4.tgz#4b4f077fcc0cf3b3f4ebc730426497e814e38e49"
-  integrity sha512-wxwbAZqlgjj6MbS/llY7wnXCCUsuFcLB1XnahbgBtjmsFUggpiECt01Dt8huaKvriVXg2w4d7Ye+GzA00rdcKg==
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-storybook/-/eslint-plugin-storybook-0.6.6.tgz#f8865ad6b2a25143fea0a17e8096352a526afe4e"
+  integrity sha512-nqYq802vJABpaV0n9cpIZl4Mlmy1yStxa8T3sPqvqbByOpXXtA9ZKRqVv2faSDp0DKVC0B3ItTNU7iMX3Et8VQ==
   dependencies:
     "@storybook/csf" "^0.0.1"
     "@typescript-eslint/experimental-utils" "^5.3.0"
@@ -13622,10 +13622,10 @@ pkg-dir@^5.0.0:
   dependencies:
     find-up "^5.0.0"
 
-playwright-core@1.26.1:
-  version "1.26.1"
-  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.26.1.tgz#a162f476488312dcf12638d97685144de6ada512"
-  integrity sha512-hzFchhhxnEiPc4qVPs9q2ZR+5eKNifY2hQDHtg1HnTTUuphYCBP8ZRb2si+B1TR7BHirgXaPi48LIye5SgrLAA==
+playwright-core@1.27.1:
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.27.1.tgz#840ef662e55a3ed759d8b5d3d00a5f885a7184f4"
+  integrity sha512-9EmeXDncC2Pmp/z+teoVYlvmPWUC6ejSSYZUln7YaP89Z6lpAaiaAnqroUt/BoLo8tn7WYShcfaCh+xofZa44Q==
 
 pnp-webpack-plugin@1.6.4:
   version "1.6.4"
@@ -14181,9 +14181,9 @@ react-element-to-jsx-string@^14.3.4:
     react-is "17.0.2"
 
 react-hook-form@^7.33.0:
-  version "7.36.1"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.36.1.tgz#82a311fe8cbe75e689fd4529f083b7c983da6520"
-  integrity sha512-EbYYkCG2p8ywe7ikOH2l02lAFMrrrslZi1I8fqd8ifDGNAkhomHZQzQsP6ksvzrWBKntRe8b5L5L7Zsd+Gm02Q==
+  version "7.37.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.37.0.tgz#4d1738f092d3d8a3ade34ee892d97350b1032b19"
+  integrity sha512-6NFTxsnw+EXSpNNvLr5nFMjPdYKRryQcelTHg7zwBB6vAzfPIcZq4AExP4heVlwdzntepQgwiOQW4z7Mr99Lsg==
 
 react-inspector@^5.1.0:
   version "5.1.1"
@@ -16761,9 +16761,9 @@ vi-fetch@^0.8.0:
     tinyspy "^1.0.0"
 
 vite-plugin-dts@^1.4.1:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/vite-plugin-dts/-/vite-plugin-dts-1.6.4.tgz#6c691652b66f7566cd42f4bd50fa58191f453b05"
-  integrity sha512-NaCkdhb9f+0jvmIMQRXbRkSokz6AANbTLjoZOhbeXw3IyLhkM0pTguicM14X8/XEAruZ8XdOM/1MyRgEi70P/Q==
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/vite-plugin-dts/-/vite-plugin-dts-1.6.5.tgz#c7dec7a38063e48986cd5118d198a7b166d75b50"
+  integrity sha512-5X6itICUfV8AT0WkHKkE573KMRQE30j4tKzDyvZ770VEZbkGBt87b3j99ENKsW9PZJfI/9br96juq9NbuWoYFg==
   dependencies:
     "@microsoft/api-extractor" "^7.32.0"
     "@rushstack/node-core-library" "^3.53.0"
