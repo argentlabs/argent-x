@@ -10,6 +10,7 @@
     "import-sort-style-module": "^6.0.0",
     "lerna": "^6.0.0",
     "lint-staged": ">=10",
+    "patch-package": "^6.4.7",
     "prettier": ">=2",
     "prettier-plugin-import-sort": "^0.0.7",
     "ts-node": "^10.8.1"
@@ -29,6 +30,7 @@
     "test:watch": "lerna run test:watch --stream",
     "test:e2e": "lerna run test:e2e --stream",
     "prepare": "yarn --cwd packages/get-starknet build && yarn --cwd packages/sessions build && husky install",
+    "postinstall": "patch-package",
     "storybook": "cd packages/storybook && yarn storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts"
   },
