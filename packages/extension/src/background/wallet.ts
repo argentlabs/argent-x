@@ -38,6 +38,7 @@ import backupSchema from "./schema/backup.schema"
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
 const isDevOrTest = isDev || isTest
+const SCRYPT_N = isDevOrTest ? 64 : 262144 // 131072 is the default value used by ethers
 
 const CURRENT_BACKUP_VERSION = 1
 export const SESSION_DURATION = isDev ? 24 * 60 * 60 : 30 * 60 // 30 mins in prod, 24 hours in dev
@@ -99,11 +100,11 @@ export class Wallet {
     if (await this.isInitialized()) {
       return
     }
-    const N = isDevOrTest ? 64 : 32768
+
     const ethersWallet = ethers.Wallet.createRandom()
     const encryptedBackup = await ethersWallet.encrypt(
       password,
-      { scrypt: { N } },
+      { scrypt: { N: SCRYPT_N } },
       progressCallback,
     )
 
@@ -134,9 +135,8 @@ export class Wallet {
       throw new Error("Wallet is already initialized")
     }
     const ethersWallet = ethers.Wallet.fromMnemonic(seedPhrase)
-    const N = isDevOrTest ? 64 : 32768
     const encryptedBackup = await ethersWallet.encrypt(newPassword, {
-      scrypt: { N },
+      scrypt: { N: SCRYPT_N },
     })
 
     await this.importBackup(encryptedBackup)
