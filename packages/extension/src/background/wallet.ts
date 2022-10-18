@@ -280,14 +280,14 @@ export class Wallet {
       return true
     }
 
-    const throtteledProgressCallback = throttle(progressCallback ?? noop, 50, {
+    const throttledProgressCallback = throttle(progressCallback ?? noop, 50, {
       leading: true,
       trailing: true,
     })
 
     // wallet is not initialized: let's initialise it
     if (!(await this.isInitialized())) {
-      await this.generateNewLocalSecret(password, throtteledProgressCallback)
+      await this.generateNewLocalSecret(password, throttledProgressCallback)
       return true
     }
 
@@ -301,7 +301,7 @@ export class Wallet {
       const wallet = await ethers.Wallet.fromEncryptedJson(
         backup,
         password,
-        throtteledProgressCallback,
+        throttledProgressCallback,
       )
 
       await this.setSession(wallet.privateKey, password)
