@@ -1,6 +1,6 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { find, union } from "lodash-es"
+import { find, noop, throttle, union } from "lodash-es"
 import { Account, DeployContractPayload, ec, stark } from "starknet"
 import {
   calculateContractAddressFromHash,
@@ -280,9 +280,14 @@ export class Wallet {
       return true
     }
 
+    const throtteledProgressCallback = throttle(progressCallback ?? noop, 50, {
+      leading: true,
+      trailing: true,
+    })
+
     // wallet is not initialized: let's initialise it
     if (!(await this.isInitialized())) {
-      await this.generateNewLocalSecret(password, progressCallback)
+      await this.generateNewLocalSecret(password, throtteledProgressCallback)
       return true
     }
 
@@ -296,7 +301,7 @@ export class Wallet {
       const wallet = await ethers.Wallet.fromEncryptedJson(
         backup,
         password,
-        progressCallback,
+        throtteledProgressCallback,
       )
 
       await this.setSession(wallet.privateKey, password)
