@@ -15,4 +15,5 @@ export async function openExtension(page: Page, context: BrowserContext) {
   const url = new URL(background.url())
   url.pathname = "/index.html"
   await page.goto(url.toString())
+  await page.bringToFront()
 }
