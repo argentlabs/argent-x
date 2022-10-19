@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/storybook",
-  "version": "4.8.4",
+  "version": "4.8.5",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.18.5",
