@@ -254,7 +254,11 @@ export const SendTokenScreen: FC = () => {
       if (token.balance && maxFee) {
         const balanceBn = token.balance
 
-        const maxAmount = balanceBn.sub(maxFee)
+        const maxAmount =
+          account?.networkId ===
+          "localhost" /** FIXME: workaround for localhost fee estimate with devnet 0.3.4 */
+            ? balanceBn.sub(maxFee + 1)
+            : balanceBn.sub(maxFee)
 
         const formattedMaxAmount = utils.formatUnits(maxAmount, tokenDecimals)
         setValue(
@@ -266,7 +270,7 @@ export const SendTokenScreen: FC = () => {
         )
       }
     },
-    [setValue],
+    [account?.networkId, setValue],
   )
 
   const [addressBookOpen, setAddressBookOpen] = useState(false)
