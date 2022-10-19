@@ -118,7 +118,7 @@ export const SupportFooter: FC = () => (
         </IconWrapper>
       </a>
       <a
-        href="https://discord.com/channels/598897994477207572/984804615696564265"
+        href="https://discord.gg/T4PDFHxm6T"
         title="Ask a question on the argent-x-support channel on Discord"
         target="_blank"
       >

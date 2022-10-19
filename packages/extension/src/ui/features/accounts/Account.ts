@@ -51,7 +51,8 @@ export class Account {
   }: AccountConstructorProps) {
     this.address = address
     this.network = network
-    this.networkId = network.id
+    this.networkId =
+      network?.id /** network is sometimes undefined here in the wild */
     this.signer = signer
     this.hidden = hidden
     this.deployTransaction = deployTransaction
