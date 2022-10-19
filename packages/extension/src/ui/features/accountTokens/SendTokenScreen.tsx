@@ -257,7 +257,7 @@ export const SendTokenScreen: FC = () => {
         const maxAmount =
           account?.networkId ===
           "localhost" /** FIXME: workaround for localhost fee estimate with devnet 0.3.4 */
-            ? balanceBn.sub(maxFee + 1)
+            ? balanceBn.sub(maxFee).sub(100000000000000)
             : balanceBn.sub(maxFee)
 
         const formattedMaxAmount = utils.formatUnits(maxAmount, tokenDecimals)
