@@ -7,12 +7,12 @@ import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
-export const deployAccount = async (networkId: string, password?: string) => {
+export const createAccount = async (networkId: string, password?: string) => {
   if (password) {
     await startSession(password)
   }
 
-  return Account.fromDeploy(networkId)
+  return Account.create(networkId)
 }
 
 const argentColorsArray = [

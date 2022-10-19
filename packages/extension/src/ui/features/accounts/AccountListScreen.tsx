@@ -25,7 +25,7 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { Container } from "./AccountContainer"
 import { AccountHeader } from "./AccountHeader"
 import { AccountListScreenItem } from "./AccountListScreenItem"
-import { deployAccount } from "./accounts.service"
+import { createAccount } from "./accounts.service"
 import {
   isHiddenAccount,
   useAccounts,
@@ -158,7 +158,7 @@ export const AccountListScreen: FC = () => {
     setIsDeploying(true)
     setDeployFailed(false)
     try {
-      const newAccount = await deployAccount(switcherNetworkId)
+      const newAccount = await createAccount(switcherNetworkId)
       connectAccount(newAccount)
       navigate(await recover())
     } catch {

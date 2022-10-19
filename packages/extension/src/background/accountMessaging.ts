@@ -35,20 +35,15 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
       const network = msg.data
       try {
-        const { account, txHash } = await wallet.addAccount(network)
-        addTransaction({
-          hash: txHash,
-          account,
-          meta: { title: "Deploy wallet" },
-        })
+        const account = await wallet.newAccount(network)
+
+        const accounts = await getAccounts()
 
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_RES",
           data: {
-            txHash,
-            address: account.address,
-            account: account,
-            accounts: await getAccounts(),
+            account,
+            accounts,
           },
         })
       } catch (exception: unknown) {
@@ -63,6 +58,47 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         }
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_REJ",
+          data: { error },
+        })
+      }
+    }
+
+    case "DEPLOY_ACCOUNT": {
+      if (!(await wallet.isSessionOpen())) {
+        throw Error("you need an open session")
+      }
+
+      const account = msg.data
+      const fullAccount = await wallet.getAccount(account)
+
+      try {
+        const { account, txHash } = await wallet.deployAccount(fullAccount)
+        addTransaction({
+          hash: txHash,
+          account,
+          meta: { title: "Deploy wallet", isDeployAccount: true },
+        })
+
+        return sendToTabAndUi({
+          type: "DEPLOY_ACCOUNT_RES",
+          data: {
+            txHash,
+            account,
+            accounts: await getAccounts(),
+          },
+        })
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (account.networkId.includes("localhost")) {
+          if (error.toLowerCase().includes("network error")) {
+            error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
+          }
+          if (error.includes("403")) {
+            error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+          }
+        }
+        return sendToTabAndUi({
+          type: "DEPLOY_ACCOUNT_REJ",
           data: { error },
         })
       }

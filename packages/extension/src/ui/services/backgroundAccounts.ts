@@ -15,6 +15,15 @@ export const createNewAccount = async (networkId: string) => {
   ])
 }
 
+export const deployNewAccount = async (wallet: BaseWalletAccount) => {
+  sendMessage({ type: "DEPLOY_ACCOUNT", data: wallet })
+
+  return await Promise.race([
+    waitForMessage("DEPLOY_ACCOUNT_RES"),
+    waitForMessage("DEPLOY_ACCOUNT_REJ"),
+  ])
+}
+
 export const getLastSelectedAccount = async () => {
   sendMessage({ type: "GET_SELECTED_ACCOUNT" })
   return waitForMessage("GET_SELECTED_ACCOUNT_RES")
@@ -36,10 +45,11 @@ export const connectAccount = ({
   networkId,
   signer,
   type,
+  needsDeploy,
 }: Account) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
-    data: { address, network, networkId, signer, type },
+    data: { address, network, networkId, signer, type, needsDeploy },
   })
 }
 

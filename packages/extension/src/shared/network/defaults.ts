@@ -7,8 +7,10 @@ const integrationNetwork: Network = {
   baseUrl: "https://external.integration.starknet.io",
   accountClassHash: {
     argentAccount:
-      "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
+      "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
   },
+  multicallAddress:
+    "0x02acfa68f063b35ffd9e6a6b77ba0d7ad231d1a64f9fa8c5770e0be376e17ef9",
 }
 
 export const defaultNetworks: Network[] = [

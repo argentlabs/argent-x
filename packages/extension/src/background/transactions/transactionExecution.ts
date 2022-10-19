@@ -1,4 +1,5 @@
 import { constants, number, stark } from "starknet"
+import { BigNumberish } from "starknet/dist/utils/number"
 
 import {
   ExtQueueItem,
@@ -40,21 +41,50 @@ export const executeTransactionAction = async (
     throw Error("you need an open session")
   }
   const selectedAccount = await wallet.getSelectedAccount()
-  const starknetAccount = await wallet.getSelectedStarknetAccount()
   if (!selectedAccount) {
     throw Error("no accounts")
   }
 
+  const accountNeedsDeploy = selectedAccount.needsDeploy
+
+  const starknetAccount = await wallet.getSelectedStarknetAccount()
+
   // if nonce doesnt get provided by the UI, we can use the stored nonce to allow transaction queueing
   const nonceWasProvidedByUI = transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
-  const nonce = nonceWasProvidedByUI
+  const nonce = accountNeedsDeploy
+    ? number.toHex(number.toBN(1))
+    : nonceWasProvidedByUI
     ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
     : await getNonce(selectedAccount, wallet)
 
-  // estimate fee with onchain nonce even tho transaction nonce may be different
-  const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
+  let maxFee: BigNumberish
 
-  const maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+  if (accountNeedsDeploy) {
+    const { account, txHash } = await wallet.deployAccount(selectedAccount)
+
+    if (!checkTransactionHash(txHash)) {
+      throw Error(
+        "Deploy Account Transaction could not get added to the sequencer",
+      )
+    }
+
+    await addTransaction({
+      hash: txHash,
+      account,
+      meta: {
+        ...meta,
+        title: "Activate Account",
+        isDeployAccount: true,
+      },
+    })
+
+    // TODO: estimate fee from past transactions
+    maxFee = number.toHex(number.toBN(100000000000000))
+  } else {
+    // estimate fee with onchain nonce even tho transaction nonce may be different
+    const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
+    maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+  }
 
   const transaction = await starknetAccount.execute(transactions, abis, {
     ...transactionsDetail,

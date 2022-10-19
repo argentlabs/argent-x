@@ -10,7 +10,21 @@ import {
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { createNewAccount } from "../../services/backgroundAccounts"
+import {
+  createNewAccount,
+  deployNewAccount,
+} from "../../services/backgroundAccounts"
+
+export interface AccountConstructorProps {
+  address: string
+  network: Network
+  signer: WalletAccountSigner
+  type: ArgentAccountType
+  deployTransaction?: string
+  hidden?: boolean
+  needsDeploy?: boolean
+  contract?: Contract
+}
 
 export class Account {
   address: string
@@ -23,6 +37,7 @@ export class Account {
   proxyContract: Contract
   provider: ProviderInterface
   hidden?: boolean
+  needsDeploy?: boolean
 
   constructor({
     address,
@@ -31,22 +46,16 @@ export class Account {
     type,
     deployTransaction,
     hidden,
+    needsDeploy = false,
     contract,
-  }: {
-    address: string
-    network: Network
-    signer: WalletAccountSigner
-    type: ArgentAccountType
-    deployTransaction?: string
-    hidden?: boolean
-    contract?: Contract
-  }) {
+  }: AccountConstructorProps) {
     this.address = address
     this.network = network
     this.networkId = network.id
     this.signer = signer
     this.hidden = hidden
     this.deployTransaction = deployTransaction
+    this.needsDeploy = needsDeploy
     this.type = type
     this.provider = getProvider(network)
     this.contract =
@@ -88,14 +97,20 @@ export class Account {
     return nonce.toString()
   }
 
-  public async getCurrentImplementation(): Promise<string> {
+  public async getCurrentImplementation(): Promise<string | undefined> {
+    if (this.needsDeploy) {
+      return this.type === "argent"
+        ? this.network.accountClassHash?.argentAccount
+        : this.network.accountClassHash?.argentPluginAccount
+    }
+
     const { implementation } = await this.proxyContract.call(
       "get_implementation",
     )
     return stark.makeAddress(number.toHex(implementation))
   }
 
-  public static async fromDeploy(networkId: string): Promise<Account> {
+  public static async create(networkId: string): Promise<Account> {
     const result = await createNewAccount(networkId)
     if ("error" in result) {
       throw new Error(result.error)
@@ -108,22 +123,39 @@ export class Account {
     }
 
     return new Account({
-      address: result.address,
+      address: result.account.address,
       network,
       signer: result.account.signer,
-      deployTransaction: result.txHash,
       type: result.account.type,
+      needsDeploy: result.account.needsDeploy,
     })
   }
 
+  // Currently not used anywhere. Might be useful in the future
+  public async deploy(): Promise<Account> {
+    if (!this.needsDeploy) {
+      throw new Error("Account already deployed")
+    }
+
+    const result = await deployNewAccount(this)
+    if ("error" in result) {
+      throw new Error(result.error)
+    }
+
+    this.updateDeployTx(result.txHash)
+
+    return this
+  }
+
   public toWalletAccount(): WalletAccount {
-    const { networkId, address, network, signer, type } = this
+    const { networkId, address, network, signer, type, needsDeploy } = this
     return {
       networkId,
       address,
       network,
       signer,
       type,
+      needsDeploy,
     }
   }
 

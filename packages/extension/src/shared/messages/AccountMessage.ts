@@ -9,13 +9,21 @@ export type AccountMessage =
   | {
       type: "NEW_ACCOUNT_RES"
       data: {
-        txHash: string
-        address: string
         account: WalletAccount
         accounts: WalletAccount[]
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
+  | { type: "DEPLOY_ACCOUNT"; data: BaseWalletAccount }
+  | {
+      type: "DEPLOY_ACCOUNT_RES"
+      data: {
+        txHash: string
+        account: WalletAccount
+        accounts: WalletAccount[]
+      }
+    }
+  | { type: "DEPLOY_ACCOUNT_REJ"; data: { error: string } }
   | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }

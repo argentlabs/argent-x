@@ -27,6 +27,7 @@ export async function checkIfUpgradeAvailable(
 
   const isInKnownImplementationsList = targetImplementations.some(
     (targetImplementation) =>
+      currentImplementation &&
       number.toBN(currentImplementation).eq(number.toBN(targetImplementation)),
   )
 
@@ -48,7 +49,10 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
   }
 
   const accounts = await getAccounts(
-    (acc) => acc.networkId === network.id && onlyHidden === Boolean(acc.hidden),
+    (acc) =>
+      acc.networkId === network.id &&
+      onlyHidden === Boolean(acc.hidden) &&
+      !acc.needsDeploy,
   )
 
   const calls = accounts.flatMap((acc) => [
@@ -95,7 +99,7 @@ export async function partitionDeprecatedAccount(
     throw Error("Multicall contract is required to check for upgrade")
   }
 
-  const deployedAccounts = accounts.filter((acc) => !acc.deployTransaction)
+  const deployedAccounts = accounts.filter((acc) => !acc.needsDeploy)
 
   const calls = deployedAccounts.flatMap((acc) => [
     acc.address,
@@ -137,11 +141,13 @@ export async function partitionDeprecatedAccount(
   return partition(
     accounts,
     (account) =>
-      !targetImplementations.some(
-        (ti) =>
-          implementationsToAccountsMap[account.address] &&
-          ti.eq(number.toBN(implementationsToAccountsMap[account.address])),
-      ),
+      !targetImplementations.some((ti) => {
+        const impl = implementationsToAccountsMap[account.address]
+        if (impl) {
+          return ti.eq(number.toBN(impl))
+        }
+        return false
+      }),
   )
 }
 
