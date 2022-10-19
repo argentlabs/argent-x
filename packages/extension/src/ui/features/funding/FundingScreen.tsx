@@ -1,11 +1,11 @@
 import { FC } from "react"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import A from "tracking-link"
 
 import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
+import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import { trackAddFundsService, usePageTracking } from "../../services/analytics"

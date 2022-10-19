@@ -25,6 +25,7 @@ import {
 import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
+import { initOnboarding } from "./onboarding"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
@@ -133,3 +134,7 @@ messageStream.subscribe(async ([msg, sender]) => {
     break
   }
 })
+
+// open onboarding flow on initial install
+
+initOnboarding()
