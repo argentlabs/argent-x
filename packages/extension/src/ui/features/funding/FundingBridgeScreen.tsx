@@ -1,11 +1,11 @@
 import { FC } from "react"
 import { Navigate } from "react-router-dom"
-import A from "tracking-link"
 
 import { isDeprecated } from "../../../shared/wallet.service"
 import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
+import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
 import { trackAddFundsService } from "../../services/analytics"
 import { useSelectedAccount } from "../accounts/accounts.state"
