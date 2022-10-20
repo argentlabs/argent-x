@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "@argent-x/extension": "*",
-    "@argent-x/ui": "*",
+    "@argent/ui": "*",
     "@babel/core": "^7.18.5",
     "@storybook/addon-actions": "^6.5.9",
     "@storybook/addon-essentials": "^6.5.9",

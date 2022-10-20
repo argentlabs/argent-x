@@ -73,7 +73,7 @@
   },
   "dependencies": {
     "@argent/x-sessions": "^4.8.5",
-    "@argent-x/ui": "*",
+    "@argent/ui": "*",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",
