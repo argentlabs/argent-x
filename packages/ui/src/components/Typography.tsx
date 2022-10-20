@@ -129,7 +129,7 @@ export const L2 = chakra("label", {
 
 export const FieldError = chakra(L1, {
   baseStyle: {
-    color: "error",
+    color: "error.500",
     textTransform: "none",
   },
 })

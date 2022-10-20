@@ -1,4 +1,3 @@
-import { scrollbarStyle } from "@argent-x/ui/src/theme"
 import { FC } from "react"
 import { Call } from "starknet"
 import styled from "styled-components"
@@ -11,6 +10,7 @@ import {
 import { Button } from "../../../components/Button"
 import { CopyIconButton } from "../../../components/CopyIconButton"
 import Row from "../../../components/Row"
+import { scrollbarStyle } from "../../../theme"
 import { H3 } from "../../../theme/Typography"
 
 const Container = styled.div`

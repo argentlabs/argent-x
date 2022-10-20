@@ -1,56 +1,25 @@
+import { createTheme } from "@mui/material/styles"
 import { colord, extend } from "colord"
 import mixPlugin from "colord/plugins/mix"
-import { css } from "styled-components"
-
-import { pxToRem } from "./utilities/pxToRem"
+import React, { FC } from "react"
+import {
+  DefaultTheme,
+  ThemeProvider as StyledComponentsThemeProvider,
+  createGlobalStyle,
+  css,
+} from "styled-components"
+import { normalize } from "styled-normalize"
 
 extend([mixPlugin])
 
-const white = "#ffffff"
+const white = "#FFFFFF"
 const black = "#000000"
 
 export const colors = {
   white,
-  white50: colord(white).alpha(0.5).toRgbString(),
-  white30: colord(white).alpha(0.3).toRgbString(),
-
   black,
-  black50: colord(black).alpha(0.5).toRgbString(),
-  black30: colord(black).alpha(0.3).toRgbString(),
 
-  primary: "#f36a3d",
-  primaryLight: "#fcf1ed",
-  primaryDark: "#803820",
-
-  secondary: "#08a681",
-  secondaryLight: "#edfcf9",
-  secondaryDark: "#068063",
-
-  accent: "#197aa6",
-  accentLight: "#edf8fc",
-  accentDark: "#135E80",
-
-  warning: "#f4bc54",
-  warningLight: "#fcf1ed",
-  warningDark: "#803820",
-
-  error: "#cc3247",
-  errorLight: "#fcf1ed",
-  errorDark: "#803820",
-
-  success: "#51a55f",
-  successLight: "#fcf1ed",
-  successDark: "#803820",
-
-  neutrals100: "#b7b7b9",
-  neutrals200: "#9f9fa1",
-  neutrals300: "#88888a",
-  neutrals400: "#707072",
-  neutrals500: "#58585b",
-  neutrals600: "#404043",
-  neutrals700: "#28282c",
-  neutrals800: "#1d1f22",
-  neutrals900: "#101014",
+  primary: "#F36A3D",
 
   bg1: "#161616",
   bg2: "#333332",
@@ -77,6 +46,16 @@ export const colors = {
 
   green1: "#02bba8",
   green2: "#02a697",
+
+  neutrals100: "#B7B7B9",
+  neutrals200: "#9F9FA1",
+  neutrals300: "#88888A",
+  neutrals400: "#707072",
+  neutrals500: "#58585B",
+  neutrals600: "#404043",
+  neutrals700: "#28282C",
+  neutrals800: "#1D1F22",
+  neutrals900: "#101014",
 }
 
 export const components = {
@@ -159,11 +138,11 @@ export const components = {
   },
 }
 
-export const breakpoints = {
-  sm: pxToRem(600),
-  md: pxToRem(900),
-  lg: pxToRem(1200),
-  xl: pxToRem(1536),
+const MEDIA_WIDTHS = {
+  sm: 600,
+  md: 900,
+  lg: 1200,
+  xl: 1536,
 }
 
 /**
@@ -180,10 +159,10 @@ export const breakpoints = {
  *
  */
 const mediaMaxWidthTemplates: {
-  [width in keyof typeof breakpoints]: typeof css
-} = Object.keys(breakpoints).reduce((accumulator, size) => {
+  [width in keyof typeof MEDIA_WIDTHS]: typeof css
+} = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
   ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
-    @media (max-width: ${(breakpoints as any)[size]}) {
+    @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
       ${css(a, b, c)}
     }
   `
@@ -204,10 +183,10 @@ const mediaMaxWidthTemplates: {
  *
  */
 const mediaMinWidthTemplates: {
-  [width in keyof typeof breakpoints]: typeof css
-} = Object.keys(breakpoints).reduce((accumulator, size) => {
+  [width in keyof typeof MEDIA_WIDTHS]: typeof css
+} = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
   ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
-    @media (min-width: ${(breakpoints as any)[size]}) {
+    @media (min-width: ${(MEDIA_WIDTHS as any)[size]}px) {
       ${css(a, b, c)}
     }
   `
@@ -255,22 +234,23 @@ const flexRowNoWrap = css`
   flex-flow: row nowrap;
 `
 
-type Colors = typeof colors
-type Components = typeof components
+export const scrollbarStyle = css`
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+`
 
-export interface CustomTheme extends Colors, Components {
-  // css snippets
-  flexColumnNoWrap: typeof flexColumnNoWrap
-  flexRowNoWrap: typeof flexRowNoWrap
-
-  // media queries
-  mediaMaxWidth: typeof mediaMaxWidthTemplates
-  mediaMinWidth: typeof mediaMinWidthTemplates
-
-  margin: { extensionInTab: string }
-}
-
-export const theme: CustomTheme = {
+export const theme: DefaultTheme = {
   ...colors,
   ...components,
   flexColumnNoWrap,
@@ -282,3 +262,72 @@ export const theme: CustomTheme = {
     extensionInTab: "10%",
   },
 }
+
+export const ThemeProvider: FC<{
+  children: React.ReactNode
+}> = ({ children }) => {
+  return (
+    <StyledComponentsThemeProvider theme={theme}>
+      {children}
+    </StyledComponentsThemeProvider>
+  )
+}
+
+export interface GlobalStyleProps {
+  extensionIsInTab: boolean | undefined
+}
+
+export const FixedGlobalStyle = createGlobalStyle<GlobalStyleProps>`
+  ${normalize}
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html, body {
+    min-width: 360px;
+    min-height: 600px;
+
+    width: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "360px")};
+    height: ${({ extensionIsInTab }) => (extensionIsInTab ? "unset" : "600px")};
+    
+    overscroll-behavior: none;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    &::-webkit-scrollbar { /* Chrome, Safari, Opera */
+      display: none;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    margin-block: 0;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+`
+
+export const ThemedGlobalStyle = createGlobalStyle`
+  body {
+    color: ${({ theme }) => theme.text1};
+    background-color: ${({ theme }) => theme.bg1};
+  }
+`
+
+export const muiTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+  typography: {
+    allVariants: {
+      /** unset default Roboto font */
+      fontFamily: undefined,
+    },
+  },
+})

@@ -1,9 +1,3 @@
-import {
-  FixedGlobalStyle,
-  ThemeProvider,
-  ThemedGlobalStyle,
-  muiTheme,
-} from "@argent-x/ui/src/theme"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
@@ -18,6 +12,12 @@ import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
 import { useSentryInit } from "./services/sentry"
 import { swrCacheProvider } from "./services/swr"
+import {
+  FixedGlobalStyle,
+  ThemeProvider,
+  ThemedGlobalStyle,
+  muiTheme,
+} from "./theme"
 
 export const App: FC = () => {
   useTracking()

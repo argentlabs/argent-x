@@ -1,4 +1,3 @@
-import { scrollbarStyle } from "@argent-x/ui/src/theme"
 import { MenuItem, MenuList, Paper } from "@mui/material"
 import OutlinedInput from "@mui/material/OutlinedInput"
 import Select, { SelectChangeEvent } from "@mui/material/Select"
@@ -6,6 +5,7 @@ import { FC, useState } from "react"
 import styled from "styled-components"
 
 import { KeyboardArrowDownRounded } from "../../components/Icons/MuiIcons"
+import { scrollbarStyle } from "../../theme"
 import { AccountListItem, IAccountListItem } from "./AccountListItem"
 
 const StyledPaper = styled(Paper)`

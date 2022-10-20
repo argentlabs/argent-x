@@ -3,9 +3,9 @@ import {
   FixedGlobalStyle,
   ThemeProvider,
   ThemedGlobalStyle,
-  chakraTheme,
   muiTheme,
-} from "@argent-x/ui/src/theme"
+} from "@argent-x/extension/src/ui/theme"
+import { theme as chakraTheme } from "@argent-x/ui/src/theme"
 import { ChakraProvider } from "@chakra-ui/react"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { Story } from "@storybook/react"
