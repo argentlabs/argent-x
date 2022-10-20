@@ -14266,9 +14266,9 @@ react-router@6.4.2:
     "@remix-run/router" "1.0.2"
 
 react-select@^5.4.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/react-select/-/react-select-5.5.0.tgz#c82286e20b26194738186ada54cc8a0c677dfc6e"
-  integrity sha512-yzA+eavdxpF5Onf0u9KZ84qxr8r/CwPPn777bRkslbDtEUYx2+m13OrhP3WVa30+aWYxwkO/pkLcZ7q7r/6OhQ==
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/react-select/-/react-select-5.5.2.tgz#40ac709338860b836feda5e43bdab56cb8ae5b57"
+  integrity sha512-zbcxtiqXvFW2Wh+dd8zAqMY6QaqX9Ez0WlcjSXycXn1ASpKdc17LcGJj7gAJiUcHI/UVlo6wfg44hgBsUPyEBQ==
   dependencies:
     "@babel/runtime" "^7.12.0"
     "@emotion/cache" "^11.4.0"
