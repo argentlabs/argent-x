@@ -2,12 +2,14 @@ import { colord } from "colord"
 import { interpolate, linear } from "popmotion"
 
 /** Where 500 is 'unmodified' */
-const colorKeys = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
+const colorKeys = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900] as const
+
+type ColorVariantKey = typeof colorKeys[number]
 
 /** Make colour variants for Chakra from a single colour */
 
 export const makeColorVariants = (baseColor: string, inverse = false) => {
-  const colorVariants: Record<number, string> = {}
+  const colorVariants = {} as Record<ColorVariantKey, string>
   const { h, s, l, a } = colord(baseColor).toHsl()
   // interpolate lightness from baseColor lightness
   // colorKey =  0   ...        500         ... 1000

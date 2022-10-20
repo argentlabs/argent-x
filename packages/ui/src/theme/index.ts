@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react"
+import { theme as baseTheme, extendTheme } from "@chakra-ui/react"
 
 import { buttonTheme } from "../components/Button"
 import { breakpoints } from "./breakpoints"
@@ -23,7 +23,11 @@ const extendedTheme = extendTheme({
   },
 })
 
+type UITheme = Omit<typeof baseTheme, "colors"> & {
+  colors: typeof colors
+}
+
 export const theme = {
   ...extendedTheme,
   colors /** omits default chakra colours */,
-}
+} as UITheme

@@ -14,13 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    // output .d.ts declaration files for consumers
-    "declaration": true,
-    "declarationDir": "dist",
-    // output .js.map sourcemap files for consumers
-    "sourceMap": true,
-    "rootDir": "src"
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }
