@@ -58,6 +58,7 @@
     "dev": "concurrently -k -r \"webpack --color --watch\" \"yarn dev:hot-reload-server\"",
     "dev:ui": "SHOW_DEV_UI=true yarn dev",
     "dev:hot-reload-server": "ts-node ./scripts/hot-reload-server.ts",
+    "generate:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "test": "vitest run",
     "test:watch": "vitest",
