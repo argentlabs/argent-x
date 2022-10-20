@@ -6383,7 +6383,7 @@ boolbase@^1.0.0:
 
 bowser@^2.11.0:
   version "2.11.0"
-  resolved "https://registry.npmjs.org/bowser/-/bowser-2.11.0.tgz#5ca3c35757a7aa5771500c70a73a9f91ef420a8f"
+  resolved "https://registry.yarnpkg.com/bowser/-/bowser-2.11.0.tgz#5ca3c35757a7aa5771500c70a73a9f91ef420a8f"
   integrity sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==
 
 boxen@^5.1.2:
@@ -9777,7 +9777,7 @@ get-port@^5.1.1:
 
 get-starknet@^1.0.0:
   version "1.5.0"
-  resolved "https://registry.npmjs.org/get-starknet/-/get-starknet-1.5.0.tgz#b6df1b18cd8cb33c9277b75c32aa71c412c79ed0"
+  resolved "https://registry.yarnpkg.com/get-starknet/-/get-starknet-1.5.0.tgz#b6df1b18cd8cb33c9277b75c32aa71c412c79ed0"
   integrity sha512-6A14mdPoMwO4orETjG5D+wwaZOzuAyNp/5+ZlDJnU+UU7QRGMYILUo8WjgqeVTg0mcN0BZoUE0C/Qhgd7dBvVQ==
   dependencies:
     bowser "^2.11.0"
@@ -15404,6 +15404,23 @@ starknet@^4.4.0:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.4.2.tgz#3da5df044c4aa2607b8f282dd34ad1e167ae3a5e"
   integrity sha512-tSQNwsx0+27pf2oi1fc1bgGDQO7cHFTWBIm+HLT6yAGs53Y/YRrc6jaxbcEl/826gv36ck53pqmF+85t1ILNMg==
+  dependencies:
+    "@ethersproject/bytes" "^5.6.1"
+    bn.js "^5.2.1"
+    elliptic "^6.5.4"
+    ethereum-cryptography "^1.0.3"
+    hash.js "^1.1.7"
+    isomorphic-fetch "^3.0.0"
+    json-bigint "^1.0.0"
+    minimalistic-assert "^1.0.1"
+    pako "^2.0.4"
+    ts-custom-error "^3.2.0"
+    url-join "^4.0.1"
+
+starknet@^4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.9.0.tgz#1d0b5a1ff532a41b84a619f3d7c3f833f67dad2d"
+  integrity sha512-0Y9Nce0msMs1k3jid93ZuPD2e3yW42FUuMFChRTaq1qcjP8G/fL+5+/zuq441VQ82/JxAHnVqBMvpmMgn5yJSA==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     bn.js "^5.2.1"

@@ -50,10 +50,13 @@
     "happy-dom": "^7.0.0",
     "vite": "^3.0.9",
     "vite-plugin-dts": "^1.4.1",
-    "vitest": "^0.24.1"
+    "vitest": "^0.24.1",
+    "starknet": "^4.9.0"
   },
   "dependencies": {
-    "minimalistic-assert": "^1.0.1",
-    "starknet": "^4.4.0"
+    "minimalistic-assert": "^1.0.1"
+  },
+  "peerDependencies": {
+    "starknet": "^4.9.0"
   }
 }

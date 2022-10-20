@@ -68,7 +68,7 @@ export function prepareSession(session: RequestSession): PreparedSession {
 
 export async function createSession(
   session: RequestSession,
-  account: AccountInterface,
+  account: Pick<AccountInterface, "signMessage" | "chainId">,
 ): Promise<SignedSession> {
   const { expires, key, policies, root } = prepareSession(session)
   const signature = await account.signMessage({

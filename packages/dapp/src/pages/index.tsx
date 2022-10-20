@@ -65,11 +65,15 @@ const Home: NextPage = () => {
     }
     setSupportsSessions(null)
     if (wallet?.selectedAddress) {
-      const sessionSupport = await supportsSessions(
-        wallet.selectedAddress,
-        wallet.provider,
-      )
-      setSupportsSessions(sessionSupport)
+      try {
+        const sessionSupport = await supportsSessions(
+          wallet.selectedAddress,
+          wallet.provider,
+        )
+        setSupportsSessions(sessionSupport)
+      } catch {
+        setSupportsSessions(false)
+      }
     }
   }
 

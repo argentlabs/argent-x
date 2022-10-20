@@ -122,7 +122,6 @@ export class SessionAccount extends Account implements AccountInterface {
     const response = await super.getEstimateFee(
       {
         contractAddress: this.address,
-        entrypoint: "__execute__",
         calldata,
         signature,
       },
@@ -197,13 +196,13 @@ export class SessionAccount extends Account implements AccountInterface {
     return this.invokeFunction(
       {
         contractAddress: this.address,
-        entrypoint: "__execute__",
         calldata,
         signature,
       },
       {
         maxFee,
         version,
+        nonce,
       },
     )
   }
