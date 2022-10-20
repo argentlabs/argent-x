@@ -1,9 +1,15 @@
+import fs from "fs"
+import path from "path"
+
 import fetch from "cross-fetch"
 import * as dotenv from "dotenv"
 
 dotenv.config()
 
-console.log("here:", process.env.FIGMA_ACCESS_TOKEN)
+const OUTPUT_FOLDER = path.join(
+  __dirname,
+  "../src/ui/components/Icons/generated",
+)
 
 const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN
 const FIGMA_ICONS_FILE_KEY = "LHwepHSS4bouYQjbMOZJjW"
@@ -49,12 +55,11 @@ const getIconNodesAndNames = async () => {
   )
   const iconsNode = Object.values(json.nodes)[0] as IconsNode
   const components = iconsNode.components
-  return Object.entries(components).flatMap(([id, component]) => {
-    return {
-      id,
-      name: component.name,
-    }
+  const nodesAndNames: Record<string, string> = {}
+  Object.entries(components).forEach(([id, component]) => {
+    nodesAndNames[id] = component.name
   })
+  return nodesAndNames
 }
 
 type ImageResponse = {
@@ -63,9 +68,8 @@ type ImageResponse = {
 }
 
 const generateIcons = async () => {
-  const iconNodesAndNames = await getIconNodesAndNames()
-  console.log(iconNodesAndNames)
-  const ids = iconNodesAndNames.map(({ id }) => id)
+  const nodesAndNames = await getIconNodesAndNames()
+  const ids = Object.keys(nodesAndNames)
   const json: ImageResponse = await fetcher(
     `https://api.figma.com/v1/images/${FIGMA_ICONS_FILE_KEY}/?ids=${encodeURIComponent(
       ids.join(","),
@@ -75,17 +79,9 @@ const generateIcons = async () => {
     const reponse = await fetcher(url, true)
     const text = await reponse.text()
     console.log("reponse", text)
+    const fileName = path.join(OUTPUT_FOLDER, `${nodesAndNames[id]}.svg`)
+    fs.writeFileSync(fileName, text, "utf8")
   }
-  // console.log(JSON.stringify(json))
-  // for (const { id, name } of iconNodesAndNames) {
-  //   /** request the svg image information for this icon node */
-  //   const json: ImageResponse = await fetcher(
-  //     `https://api.figma.com/v1/images/${FIGMA_ICONS_FILE_KEY}/?ids=${encodeURIComponent(
-  //       id,
-  //     )}&format=svg`,
-  //   )
-  //   console.log(JSON.stringify(json))
-  // }
 }
 
 ;(async () => {
