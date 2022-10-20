@@ -17,6 +17,12 @@ const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN
 const FIGMA_ICONS_FILE_KEY = "LHwepHSS4bouYQjbMOZJjW"
 const FIGMA_ICONS_NODE_ID = decodeURIComponent("0%3A1")
 
+if (!FIGMA_ACCESS_TOKEN) {
+  throw "process.env.FIGMA_ACCESS_TOKEN is not defined - you can get a token from https://www.figma.com/developers/api#access-tokens"
+}
+
+/** sparse types for Figma API */
+
 type Components = Record<
   string,
   {
@@ -48,6 +54,8 @@ type ImageResponse = {
   images: Record<string, string>
 }
 
+/** pass a raw svg text throgh svgr and return tsx component source code */
+
 const svgCodeToIconComponentCode = async (svgCode: string) => {
   return transform(svgCode, {
     icon: true,
@@ -58,10 +66,9 @@ const svgCodeToIconComponentCode = async (svgCode: string) => {
   })
 }
 
+/** Figma API fetcher which sets the `X-Figma-Token` header */
+
 const fetcher = async (url: string, raw = false) => {
-  if (!FIGMA_ACCESS_TOKEN) {
-    throw "process.env.FIGMA_ACCESS_TOKEN is not defined - you can get a token from https://www.figma.com/developers/api#access-tokens"
-  }
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -146,6 +153,15 @@ const generateIcons = async () => {
   console.log("Done")
 }
 
+const cleanOutputFolder = () => {
+  const files = fs.readdirSync(OUTPUT_FOLDER)
+  for (const file of files) {
+    const filePath = path.join(OUTPUT_FOLDER, file)
+    fs.unlinkSync(filePath)
+  }
+}
+
 ;(async () => {
+  cleanOutputFolder()
   await generateIcons()
 })()
