@@ -19,10 +19,19 @@ export default {
 } as ComponentMeta<typeof Input>
 
 const Template: ComponentStory<typeof Input> = (props) => (
-  <Input {...props}></Input>
+  <Input placeholder="Placeholder" {...props}></Input>
 )
 
 export const Default = Template.bind({})
-Default.args = {
-  placeholder: "Placeholder",
+Default.args = {}
+
+export const Filled = Template.bind({})
+Filled.args = {
+  value: "Lorem ipsum dolor",
+}
+
+export const IsInvalid = Template.bind({})
+IsInvalid.args = {
+  value: "Lorem ipsum dolor",
+  isInvalid: true,
 }

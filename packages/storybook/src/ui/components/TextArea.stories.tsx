@@ -3,7 +3,7 @@ import { getThemingArgTypes } from "@chakra-ui/storybook-addon"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "components/TextArea",
+  title: "components/Textarea",
   component: Textarea,
   argTypes: {
     disabled: {
@@ -19,10 +19,19 @@ export default {
 } as ComponentMeta<typeof Textarea>
 
 const Template: ComponentStory<typeof Textarea> = (props) => (
-  <Textarea {...props}></Textarea>
+  <Textarea placeholder="Placeholder" {...props}></Textarea>
 )
 
 export const Default = Template.bind({})
-Default.args = {
-  placeholder: "Placeholder",
+Default.args = {}
+
+export const Filled = Template.bind({})
+Filled.args = {
+  value: "Lorem ipsum dolor",
+}
+
+export const IsInvalid = Template.bind({})
+IsInvalid.args = {
+  value: "Lorem ipsum dolor",
+  isInvalid: true,
 }
