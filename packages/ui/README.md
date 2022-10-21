@@ -2,36 +2,21 @@
 
 Shared theme and components using [chakra](https://chakra-ui.com/)
 
-This library also contains legacy global styles, styled-components and Mui themes which will eventually be removed.
-
 ## Usage
 
 ### Set up the global theme
 
 ```tsx
-import {
-  FixedGlobalStyle,
-  ThemeProvider,
-  ThemedGlobalStyle,
-  chakraTheme,
-  muiTheme
-} from "@argent-x/ui/src/theme"
+import { Button, H1, theme } from "@argent/ui"
 import { ChakraProvider } from "@chakra-ui/react"
-import { ThemeProvider as MuiThemeProvider } from "@mui/material"
+import { FC } from "react"
 
 export const App: FC = () => {
   return (
-    <>
-      <FixedGlobalStyle />
-      <ChakraProvider theme={chakraTheme}>
-        <MuiThemeProvider theme={muiTheme}>
-          <ThemeProvider>
-            <ThemedGlobalStyle />
-            <MyApp />
-          </ThemeProvider>
-        </MuiThemeProvider>
-      </ChakraProvider>
-    </>
+    <ChakraProvider theme={theme}>
+      <H1>Hello world</H1>
+      <Button>Click me</Button>
+    </ChakraProvider>
   )
 }
 ```
