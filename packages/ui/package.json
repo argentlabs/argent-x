@@ -31,6 +31,7 @@
   },
   "scripts": {
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
+    "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "postinstall": "yarn gen:theme-typings",
     "dev": "vite",

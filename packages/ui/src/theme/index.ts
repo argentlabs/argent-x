@@ -33,5 +33,3 @@ export const theme = {
   ...extendedTheme,
   colors /** omits default chakra colours */,
 } as UITheme
-
-console.log(JSON.stringify(theme, null, 2))
