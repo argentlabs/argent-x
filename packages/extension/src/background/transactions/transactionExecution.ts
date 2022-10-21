@@ -1,10 +1,13 @@
-import { constants, number, stark } from "starknet"
-import { BigNumberish } from "starknet/dist/utils/number"
+import { BigNumber } from "ethers"
+import { Call, EstimateFee, constants, number, stark } from "starknet"
 
+import { AllowArray } from "./../../../../storybook/storybook-static/shared/storage/types"
+import { WalletAccount } from "./../../../../storybook/storybook-static/shared/wallet.model"
 import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
+import { getL1GasPrice } from "../../shared/ethersUtils"
 import { nameTransaction } from "../../shared/transactions"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce } from "../nonce"
@@ -57,7 +60,7 @@ export const executeTransactionAction = async (
     ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
     : await getNonce(selectedAccount, wallet)
 
-  let maxFee: BigNumberish
+  let maxFee = "0"
 
   if (accountNeedsDeploy) {
     const { account, txHash } = await wallet.deployAccount(selectedAccount)
@@ -78,8 +81,11 @@ export const executeTransactionAction = async (
       },
     })
 
-    // TODO: estimate fee from past transactions
-    maxFee = number.toHex(number.toBN(100000000000000))
+    const { suggestedMaxFee } = await calculateEstimateFeeFromL1Gas(
+      account,
+      transactions,
+    )
+    maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
   } else {
     // estimate fee with onchain nonce even tho transaction nonce may be different
     const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
@@ -112,4 +118,33 @@ export const executeTransactionAction = async (
     await increaseStoredNonce(selectedAccount)
   }
   return transaction
+}
+
+export const calculateEstimateFeeFromL1Gas = async (
+  account: WalletAccount,
+  transactions: AllowArray<Call>,
+): Promise<EstimateFee> => {
+  try {
+    const l1GasPrice = await getL1GasPrice(account.networkId)
+
+    const callsLen = Array.isArray(transactions) ? transactions.length : 1
+    const multiplier = BigNumber.from(3744)
+    console.log(
+      "🚀 ~ file: transactionExecution.ts ~ line 140 ~ multiplier",
+      multiplier.toString(),
+    )
+
+    const price = l1GasPrice.mul(callsLen).mul(multiplier).toString()
+    return {
+      overall_fee: number.toBN(price),
+      suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
+    }
+  } catch {
+    const price = number.toBN(100000000000000)
+
+    return {
+      overall_fee: price,
+      suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
+    }
+  }
 }

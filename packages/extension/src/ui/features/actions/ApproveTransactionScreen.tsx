@@ -24,7 +24,8 @@ import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
-import { FeeEstimation } from "./FeeEstimation"
+import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
+import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
@@ -121,13 +122,23 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }}
       showHeader={false}
       footer={
-        <FeeEstimation
-          onErrorChange={setDisableConfirm}
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.networkId}
-          transactions={transactions}
-          actionHash={actionHash}
-        />
+        selectedAccount.needsDeploy ? (
+          <AccountDeploymentFeeEstimation
+            onErrorChange={setDisableConfirm}
+            accountAddress={selectedAccount.address}
+            networkId={selectedAccount.networkId}
+            transactions={transactions}
+            actionHash={actionHash}
+          />
+        ) : (
+          <FeeEstimation
+            onErrorChange={setDisableConfirm}
+            accountAddress={selectedAccount.address}
+            networkId={selectedAccount.networkId}
+            transactions={transactions}
+            actionHash={actionHash}
+          />
+        )
       }
       {...props}
     >

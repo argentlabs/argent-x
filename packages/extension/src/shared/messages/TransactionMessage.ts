@@ -5,6 +5,8 @@ import { Transaction } from "../transactions"
 export interface EstimateFeeResponse {
   amount: string
   suggestedMaxFee: string
+  accountDeploymentFee?: string
+  maxADFee?: string
 }
 
 export interface ExecuteTransactionRequest {

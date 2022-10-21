@@ -2,6 +2,7 @@ import { number, stark } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { HandleMessage, UnhandledMessage } from "../background"
+import { calculateEstimateFeeFromL1Gas } from "./transactionExecution"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -21,34 +22,48 @@ export const handleTransactionMessage: HandleMessage<
     case "ESTIMATE_TRANSACTION_FEE": {
       const selectedAccount = await wallet.getSelectedAccount()
       const starknetAccount = await wallet.getSelectedStarknetAccount()
+      const transactions = msg.data
       if (!selectedAccount) {
         throw Error("no accounts")
       }
       try {
-        let overallFee: string, maxFee: string
+        let txFee = "0",
+          maxTxFee = "0",
+          accountDeploymentFee: string | undefined,
+          maxADFee: string | undefined
 
         if (selectedAccount.needsDeploy) {
-          const { overall_fee, suggestedMaxFee } =
+          const { overall_fee: adFee, suggestedMaxFee: suggestedADFee } =
             await wallet.getAccountDeploymentFee(selectedAccount)
 
-          overallFee = number.toHex(overall_fee)
-          maxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
+          const { overall_fee, suggestedMaxFee } =
+            await calculateEstimateFeeFromL1Gas(selectedAccount, transactions)
+
+          txFee = number.toHex(overall_fee)
+          maxTxFee = number.toHex(suggestedMaxFee)
+          accountDeploymentFee = number.toHex(adFee) // Here, accountDeploymentFee = estimatedFee * 1.5x
+          maxADFee = number.toHex(
+            stark.estimatedFeeToMaxFee(suggestedADFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+          )
         } else {
           const { overall_fee, suggestedMaxFee } =
-            await starknetAccount.estimateFee(msg.data)
-          overallFee = number.toHex(overall_fee)
-          maxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
+            await starknetAccount.estimateFee(transactions)
+
+          txFee = number.toHex(overall_fee)
+          maxTxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
         }
 
         const suggestedMaxFee = number.toHex(
-          stark.estimatedFeeToMaxFee(maxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+          stark.estimatedFeeToMaxFee(maxTxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )
 
         return sendToTabAndUi({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
-            amount: overallFee,
+            amount: txFee,
             suggestedMaxFee,
+            accountDeploymentFee,
+            maxADFee,
           },
         })
       } catch (error) {

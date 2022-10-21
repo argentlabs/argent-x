@@ -20,6 +20,10 @@ export const Field = styled.div<{ clickable?: boolean }>`
     `}
 `
 
+export const FieldAlt = styled(Field)`
+  padding: 16px 10px;
+`
+
 export const FieldError = styled.div<{ justify?: string }>`
   color: ${({ theme }) => theme.text1};
   background-color: ${({ theme }) => theme.red1};
@@ -77,6 +81,16 @@ export const FieldKey = styled(FieldValue)<{ withoutColor?: boolean }>`
     css`
       color: ${({ theme }) => theme.text2};
     `}
+`
+
+export const FieldKeySub = styled(FieldKey)`
+  font-size: 13px;
+  line-height: 18px;
+`
+
+export const FieldValueSub = styled(FieldValue)`
+  font-size: 13px;
+  line-height: 18px;
 `
 
 export const FieldKeyMeta = styled(FieldKey)`

@@ -46,9 +46,8 @@ export const useMaxFeeEstimateForTransfer = (
 
       if (feeToken?.address !== tokenAddress) {
         return {
-          amount: BigNumber.from(0),
-          suggestedMaxFee: BigNumber.from(0),
-          unit: "wei",
+          amount: "0",
+          suggestedMaxFee: "0",
         }
       }
 
@@ -67,10 +66,15 @@ export const useMaxFeeEstimateForTransfer = (
 
   // Add Overhead to estimatedFee
   if (estimatedFee) {
-    const maxFee = addOverheadToFee(
-      estimatedFee.suggestedMaxFee.toString(),
-      0.2,
-    )
+    const { suggestedMaxFee, maxADFee } = estimatedFee
+
+    const totalMaxFee =
+      account.needsDeploy && maxADFee
+        ? number.toHex(number.toBN(maxADFee).add(number.toBN(suggestedMaxFee)))
+        : suggestedMaxFee
+
+    const maxFee = addOverheadToFee(totalMaxFee.toString(), 0.2)
+
     return {
       maxFee: number.toHex(maxFee),
       error: undefined,
