@@ -7,6 +7,7 @@ export const spacing = {
   3: pxToRem(12),
   "3.5": pxToRem(14),
   4: pxToRem(16),
+  "4.5": pxToRem(18),
   5: pxToRem(20),
   6: pxToRem(24),
   7: pxToRem(28),

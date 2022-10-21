@@ -1,6 +1,7 @@
 import { theme as baseTheme, extendTheme } from "@chakra-ui/react"
 
 import { buttonTheme } from "../components/Button"
+import { inputTheme } from "../components/Input"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
 import { shadows } from "./shadows"
@@ -22,10 +23,11 @@ const extendedTheme = extendTheme({
   space: spacing,
   components: {
     Button: buttonTheme,
+    Input: inputTheme,
   },
 })
 
-type UITheme = Omit<typeof baseTheme, "colors"> & {
+export type UITheme = Omit<typeof baseTheme, "colors"> & {
   colors: typeof colors
 }
 
