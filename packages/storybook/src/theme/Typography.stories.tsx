@@ -15,7 +15,7 @@ import {
   P2,
   P3,
   P4,
-} from "@argent-x/ui/src/components/Typography"
+} from "@argent/ui"
 import { StackDivider, VStack } from "@chakra-ui/layout"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"

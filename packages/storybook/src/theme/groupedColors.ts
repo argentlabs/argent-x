@@ -1,4 +1,4 @@
-import { theme } from "@argent-x/ui/src/theme"
+import { theme } from "@argent/ui"
 import { upperFirst } from "lodash-es"
 
 const groupedColors: Record<string, Record<string, string>> = {}

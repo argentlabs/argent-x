@@ -1,5 +1,5 @@
 import { ArrowBackIcon } from "@argent-x/extension/src/ui/components/Icons/MuiIcons"
-import { Button } from "@argent-x/ui/src/components/Button"
+import { Button } from "@argent/ui"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
