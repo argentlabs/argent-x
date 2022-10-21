@@ -1,7 +1,6 @@
 import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
-import { number } from "starknet"
 import useSWR from "swr"
 
 import {
@@ -32,7 +31,6 @@ import {
   FeeErrorContainer,
   FeeEstimationValue,
   LoadingInput,
-  Separator,
   StyledInfoRoundedIcon,
   StyledReportGmailerrorredRoundedIcon,
 } from "./styled"
@@ -62,28 +60,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
 
   const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
 
-  if (fee) {
-    console.log(
-      `🚀 ~ file: FeeEstimation.tsx ~ line 162 ~ fee: Overall: ${number.hexToDecimalString(
-        fee.amount,
-      )}, 
-      Suggested: ${number.hexToDecimalString(fee.suggestedMaxFee)}
-      `,
-    )
-  }
-
-  const totalMaxFee = useMemo(() => {
-    if (account.needsDeploy && fee?.maxADFee) {
-      return number.toHex(
-        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
-      )
-    }
-    return fee?.suggestedMaxFee
-  }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
-
   const enoughBalance = useMemo(
-    () => Boolean(totalMaxFee && feeTokenBalance?.gte(totalMaxFee)),
-    [feeTokenBalance, totalMaxFee],
+    () => Boolean(fee && feeTokenBalance?.gte(fee.suggestedMaxFee)),
+    [fee, feeTokenBalance],
   )
 
   const showFeeError = Boolean(fee && feeTokenBalance && !enoughBalance)
@@ -106,89 +85,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     feeToken,
     fee?.suggestedMaxFee,
   )
-  const accountDeploymentCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.accountDeploymentFee,
-  )
-
-  const maxADCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.maxADFee,
-  )
 
   return (
     <FieldGroup error={showError}>
-      {account.needsDeploy && (
-        <Field>
-          <FieldKeyGroup>
-            <FieldKey>
-              Activation fee
-              <Tippy
-                content={
-                  <Tooltip as="div">
-                    {getTooltipText(fee?.maxADFee, feeTokenBalance)}
-                  </Tooltip>
-                }
-              >
-                {enoughBalance ? (
-                  <StyledInfoRoundedIcon />
-                ) : (
-                  <StyledReportGmailerrorredRoundedIcon />
-                )}
-              </Tippy>
-            </FieldKey>
-          </FieldKeyGroup>
-          {fee && fee.accountDeploymentFee && fee.maxADFee ? (
-            <FieldValueGroup>
-              <FieldValue>
-                {accountDeploymentCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <FeeEstimationValue>
-                    ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.accountDeploymentFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.accountDeploymentFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
-                )}
-              </FieldValue>
-              <FieldValueMeta>
-                {maxADCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    Max ~{prettifyCurrencyValue(maxADCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <FeeEstimationValue>
-                    Max ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.maxADFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.maxADFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
-                )}
-              </FieldValueMeta>
-            </FieldValueGroup>
-          ) : showEstimateError ? (
-            <FeeEstimationValue>Error</FeeEstimationValue>
-          ) : (
-            <LoadingInput />
-          )}
-        </Field>
-      )}
-      <Separator />
       <Field>
         <FieldKeyGroup>
           <FieldKey>
