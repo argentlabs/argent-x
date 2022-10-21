@@ -12,7 +12,7 @@ const OUTPUT_FOLDER = path.join(__dirname, "../src/components/icons")
 
 const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN
 const FIGMA_ICONS_FILE_KEY = "LHwepHSS4bouYQjbMOZJjW"
-const FIGMA_ICONS_NODE_ID = decodeURIComponent("0%3A1")
+const FIGMA_ICONS_NODE_ID = decodeURIComponent("2%3A51")
 
 if (!FIGMA_ACCESS_TOKEN) {
   throw "process.env.FIGMA_ACCESS_TOKEN is not defined - you can get a token from https://www.figma.com/developers/api#access-tokens"
@@ -59,7 +59,7 @@ const svgCodeToIconComponentCode = async (svgCode: string) => {
     typescript: true,
     jsxRuntime: "automatic",
     replaceAttrValues: { "#fff": "currentColor" },
-    plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
+    plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx", "@svgr/plugin-prettier"],
   })
 }
 
@@ -138,7 +138,7 @@ const generateIcons = async () => {
     const componentFileName = path.join(OUTPUT_FOLDER, `${componentName}.tsx`)
     fs.writeFileSync(componentFileName, componentCode, "utf8")
     lines.push(
-      `export { default as ${componentName} } from "./${componentName}";`,
+      `export { default as ${componentName} } from "./${componentName}"`,
     )
     index++
   }
