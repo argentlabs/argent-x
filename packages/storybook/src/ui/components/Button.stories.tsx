@@ -1,5 +1,7 @@
 import { ArrowBackIcon } from "@argent-x/extension/src/ui/components/Icons/MuiIcons"
 import { Button } from "@argent/ui"
+import { theme } from "@argent/ui"
+import { getThemingArgTypes } from "@chakra-ui/storybook-addon"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
@@ -8,15 +10,9 @@ export default {
   argTypes: {
     disabled: {
       control: "boolean",
+      defaultValue: false,
     },
-    size: {
-      options: ["2xs", "xs", "sm", "md", "lg"],
-      control: { type: "inline-radio" },
-    },
-    variant: {
-      options: ["solid", "outline"],
-      control: { type: "inline-radio" },
-    },
+    ...getThemingArgTypes(theme, "Button"),
   },
 } as ComponentMeta<typeof Button>
 

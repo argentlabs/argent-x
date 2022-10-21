@@ -3,6 +3,7 @@ import { theme as baseTheme, extendTheme } from "@chakra-ui/react"
 import { buttonTheme } from "../components/Button"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
+import { shadows } from "./shadows"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
 
@@ -17,6 +18,7 @@ const extendedTheme = extendTheme({
   },
   breakpoints,
   ...typography,
+  shadows,
   space: spacing,
   components: {
     Button: buttonTheme,
@@ -31,3 +33,5 @@ export const theme = {
   ...extendedTheme,
   colors /** omits default chakra colours */,
 } as UITheme
+
+console.log(JSON.stringify(theme, null, 2))

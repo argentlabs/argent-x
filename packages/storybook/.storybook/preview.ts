@@ -1,5 +1,5 @@
+import { theme } from "@argent/ui"
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport"
-
 const CUSTOM_VIEWPORTS = {
   extension: {
     name: "Extension",
@@ -12,6 +12,9 @@ const CUSTOM_VIEWPORTS = {
 }
 
 export const parameters = {
+  chakra: {
+    theme,
+  },
   backgrounds: {
     default: "Extension",
     values: [

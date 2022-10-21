@@ -5,8 +5,6 @@ import {
   ThemedGlobalStyle,
   muiTheme,
 } from "@argent-x/extension/src/ui/theme"
-import { theme } from "@argent/ui"
-import { ChakraProvider } from "@chakra-ui/react"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { Story } from "@storybook/react"
 import React from "react"
@@ -34,19 +32,17 @@ const StorybookGlobalStyle = createGlobalStyle`
 
 export const decorators = [
   (Story: Story) => (
-    <ChakraProvider theme={theme}>
-      <MuiThemeProvider theme={muiTheme}>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
-          rel="stylesheet"
-        />
-        <FixedGlobalStyle extensionIsInTab />
-        <StorybookGlobalStyle />
-        <ThemeProvider>
-          <ThemedGlobalStyle />
-          <Story />
-        </ThemeProvider>
-      </MuiThemeProvider>
-    </ChakraProvider>
+    <MuiThemeProvider theme={muiTheme}>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+        rel="stylesheet"
+      />
+      <FixedGlobalStyle extensionIsInTab />
+      <StorybookGlobalStyle />
+      <ThemeProvider>
+        <ThemedGlobalStyle />
+        <Story />
+      </ThemeProvider>
+    </MuiThemeProvider>
   ),
 ]
