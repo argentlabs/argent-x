@@ -24,7 +24,7 @@ const variantOutline = definePartsStyle(() => {
   }
 })
 
-const variantFilled = definePartsStyle(({ theme }) => {
+const variantFilled = definePartsStyle(() => {
   return {
     field: {
       bg: "neutrals.800",
@@ -33,8 +33,7 @@ const variantFilled = definePartsStyle(({ theme }) => {
         bg: "neutrals.700",
       },
       _invalid: {
-        /** using large values gives a 2px inner shadow with no visual influence from the border radius */
-        boxShadow: `inset 0 -20px 0 -18px ${theme.colors.error[500]}`,
+        boxShadow: "error",
       },
       _focusVisible: {
         bg: "neutrals.700",
