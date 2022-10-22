@@ -1,10 +1,10 @@
-import { Textarea, theme } from "@argent/ui"
+import { Input, theme } from "@argent/ui"
 import { getThemingArgTypes } from "@chakra-ui/storybook-addon"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "components/Textarea",
-  component: Textarea,
+  title: "components/Input",
+  component: Input,
   argTypes: {
     disabled: {
       control: "boolean",
@@ -14,12 +14,12 @@ export default {
       control: "boolean",
       defaultValue: false,
     },
-    ...getThemingArgTypes(theme, "Textarea"),
+    ...getThemingArgTypes(theme, "Input"),
   },
-} as ComponentMeta<typeof Textarea>
+} as ComponentMeta<typeof Input>
 
-const Template: ComponentStory<typeof Textarea> = (props) => (
-  <Textarea placeholder="Placeholder" {...props}></Textarea>
+const Template: ComponentStory<typeof Input> = (props) => (
+  <Input placeholder="Placeholder" {...props}></Input>
 )
 
 export const Default = Template.bind({})
