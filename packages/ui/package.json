@@ -1,0 +1,55 @@
+{
+  "name": "@argent/ui",
+  "version": "4.8.5",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/ui.umd.js",
+  "module": "./dist/ui.es.js",
+  "types": "./dist/ui.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/ui.es.js",
+      "require": "./dist/ui.umd.js"
+    }
+  },
+  "devDependencies": {
+    "@chakra-ui/cli": "^2.1.8",
+    "@svgr/core": "^6.5.0",
+    "@svgr/plugin-jsx": "^6.5.0",
+    "@svgr/plugin-prettier": "^6.5.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.7.0",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jsdom": "^20.0.0",
+    "typescript": "^4.6.3",
+    "vite": "^3.0.9",
+    "vite-plugin-dts": "^1.6.6"
+  },
+  "scripts": {
+    "gen:theme-typings": "chakra-cli tokens ./src/theme",
+    "gen:icons": "ts-node ./scripts/generate-icons.ts",
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "postinstall": "yarn gen:theme-typings",
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.3.6",
+    "@emotion/styled": "^11.10.4",
+    "framer-motion": "^7.6.1"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.10.4",
+    "colord": "^2.9.2",
+    "lodash-es": "^4.17.21",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}

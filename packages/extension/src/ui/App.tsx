@@ -14,7 +14,7 @@ import { useSentryInit } from "./services/sentry"
 import { swrCacheProvider } from "./services/swr"
 import {
   FixedGlobalStyle,
-  ThemeProvider as StyledComponentsThemeProvider,
+  ThemeProvider,
   ThemedGlobalStyle,
   muiTheme,
 } from "./theme"
@@ -35,14 +35,14 @@ export const App: FC = () => {
           />
           <FixedGlobalStyle extensionIsInTab={extensionIsInTab} />
           {process.env.SHOW_DEV_UI && <DevUI />}
-          <StyledComponentsThemeProvider>
+          <ThemeProvider>
             <ThemedGlobalStyle />
             <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
               <Suspense fallback={<LoadingScreen />}>
                 <AppRoutes />
               </Suspense>
             </ErrorBoundary>
-          </StyledComponentsThemeProvider>
+          </ThemeProvider>
         </MuiThemeProvider>
       </SWRConfig>
     </SoftReloadProvider>
