@@ -1,4 +1,5 @@
 export * from "./Button"
 export * from "./Typography"
-
+export * from "./Input"
+export * from "./Textarea"
 export * as icons from "./icons"
