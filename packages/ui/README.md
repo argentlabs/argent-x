@@ -36,3 +36,11 @@ Custom components and examples unique to this package are in storybook
 ```bash
 yarn storybook
 ```
+
+### Icons
+
+The icons in `/src/components/icons` are generated from master artwork in Figma. To regenerate these (requires an access key - see `.env`):
+
+```bash
+yarn gen:icons
+```
