@@ -1,8 +1,6 @@
-import { FC } from "react"
+import { ComponentProps, FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
-
-import { routes } from "../routes"
 
 const StyledLink = styled(Link)`
   color: ${({ theme }) => theme.text3};
@@ -13,10 +11,8 @@ const StyledLink = styled(Link)`
   text-decoration-line: underline;
 `
 
-export const PrivacyStatement: FC = ({ ...props }) => {
-  return (
-    <StyledLink to={routes.onboardingPrivacy()} {...props}>
-      Privacy Statement
-    </StyledLink>
-  )
+export const PrivacyStatementLink: FC<ComponentProps<typeof StyledLink>> = ({
+  ...props
+}) => {
+  return <StyledLink {...props}>Privacy Statement</StyledLink>
 }

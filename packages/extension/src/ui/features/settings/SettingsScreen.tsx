@@ -12,7 +12,7 @@ import { DiscordIcon } from "../../components/Icons/DiscordIcon"
 import { GithubIcon } from "../../components/Icons/GithubIcon"
 import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
 import { SupportIcon } from "../../components/Icons/SupportIcon"
-import { PrivacyStatement } from "../../components/PrivacyStatement"
+import { PrivacyStatementLink } from "../../components/PrivacyStatementLink"
 import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
@@ -99,7 +99,7 @@ const IconText = styled.span`
   color: ${({ theme }) => theme.text1};
 `
 
-const StyledPrivacyStatement = styled(PrivacyStatement)`
+const StyledPrivacyStatementLink = styled(PrivacyStatementLink)`
   margin-top: 20px;
 `
 
@@ -138,7 +138,7 @@ export const SupportFooter: FC = () => (
         </IconWrapper>
       </a>
     </RowCentered>
-    <StyledPrivacyStatement />
+    <StyledPrivacyStatementLink to={routes.settingsPrivacyStatement()} />
     <P style={{ marginTop: "8px" }}>Version: v{process.env.VERSION}</P>
   </Footer>
 )

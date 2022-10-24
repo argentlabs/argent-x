@@ -1,20 +1,24 @@
-import { OnboardingPrivacyScreen } from "@argent-x/extension/src/ui/features/onboarding/OnboardingPrivacyScreen"
+import { OnboardingPrivacyStatementScreen } from "@argent-x/extension/src/ui/features/onboarding/OnboardingPrivacyStatementScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { MemoryRouter } from "react-router-dom"
 
 export default {
-  title: "onboarding/OnboardingPrivacyScreen",
-  component: OnboardingPrivacyScreen,
+  title: "onboarding/OnboardingPrivacyStatementScreen",
+  component: OnboardingPrivacyStatementScreen,
   parameters: {
     viewport: {
       defaultViewport: "reset",
     },
   },
-} as ComponentMeta<typeof OnboardingPrivacyScreen>
+} as ComponentMeta<typeof OnboardingPrivacyStatementScreen>
 
-const Template: ComponentStory<typeof OnboardingPrivacyScreen> = (props) => (
+const Template: ComponentStory<typeof OnboardingPrivacyStatementScreen> = (
+  props,
+) => (
   <MemoryRouter initialEntries={["/"]}>
-    <OnboardingPrivacyScreen {...props}></OnboardingPrivacyScreen>
+    <OnboardingPrivacyStatementScreen
+      {...props}
+    ></OnboardingPrivacyStatementScreen>
   </MemoryRouter>
 )
 
