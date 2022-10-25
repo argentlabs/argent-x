@@ -18,6 +18,7 @@ export default defineConfig({
       formats: ["es", "umd"],
       fileName: (format) => `ui.${format}.js`,
     },
+    emptyOutDir: false,
     rollupOptions: {
       external: ["react", "react-dom", "@chakra-ui/react"],
       output: {

@@ -1,7 +1,7 @@
-import { FC, useMemo, useRef, useState } from "react"
+import { SeedInput } from "@argent/ui"
+import { FC, useMemo, useState } from "react"
 import styled from "styled-components"
 
-import { TextArea } from "../../components/InputText"
 import { RowBetween } from "../../components/Row"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
@@ -10,10 +10,6 @@ import { validateAndSetSeedPhrase } from "../recovery/seedRecovery.state"
 import { useCustomNavigate } from "../recovery/useCustomNavigate"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
-
-const StyledTextArea = styled(TextArea)`
-  margin-bottom: 32px;
-`
 
 const RestoreBackupLink = styled.span`
   padding: 0;
@@ -26,7 +22,6 @@ const RestoreBackupLink = styled.span`
 
 export const OnboardingRestoreSeed: FC = () => {
   usePageTracking("restoreWallet")
-  const textAreaElement = useRef<HTMLTextAreaElement>(null)
   const [seedPhraseInput, setSeedPhraseInput] = useState("")
   const [error, setError] = useState("")
   const customNavigate = useCustomNavigate()
@@ -38,9 +33,6 @@ export const OnboardingRestoreSeed: FC = () => {
   const handleRestoreClick = async () => {
     try {
       validateAndSetSeedPhrase(seedPhraseInput)
-      if (textAreaElement.current !== null) {
-        textAreaElement.current.value = ""
-      }
       customNavigate(routes.onboardingRestorePassword())
     } catch {
       setError("Invalid seed phrase")
@@ -56,17 +48,12 @@ export const OnboardingRestoreSeed: FC = () => {
       subtitle="Enter each of the 12 words from your recovery phrase separated by a
       space"
     >
-      <StyledTextArea
-        autoFocus
-        ref={textAreaElement}
-        placeholder="Enter the 12 words"
-        value={seedPhraseInput}
-        onChange={(e: any) => {
+      <SeedInput
+        mb="8"
+        onChange={(seed) => {
           setError("")
-          setSeedPhraseInput(e.target.value)
+          setSeedPhraseInput(seed)
         }}
-        autoComplete="off"
-        variant="neutrals800"
       />
       {error && <FormError>{error}</FormError>}
       <RowBetween>
