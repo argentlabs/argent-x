@@ -82,7 +82,7 @@ export const routes = {
     `/account/activity/transaction-detail/:txHash`,
   ),
   upgrade: route("/account/upgrade"),
-  accounts: route("/accounts"),
+  accounts: routeWithReturnTo("/accounts"),
   addAccount: route("/accounts/new"),
   accountsHidden: route("/accounts/hidden"),
   newToken: route("/tokens/new"),

@@ -18,6 +18,7 @@ export const colors = {
   danger: makeColorVariants("#c12026"),
   error: makeColorVariants("#cc3247"),
   neutrals800: makeColorVariants("#1d1f22"),
+  skyBlue: makeColorVariants("#29c5ff"),
   neutrals: {
     100: "#b7b7b9",
     200: "#9f9fa1",

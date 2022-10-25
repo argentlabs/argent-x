@@ -1,10 +1,5 @@
 import { chromeStorageMock } from "@argent-x/extension/src/shared/storage/__test__/chrome-storage.mock"
-import {
-  FixedGlobalStyle,
-  ThemeProvider,
-  ThemedGlobalStyle,
-  muiTheme,
-} from "@argent-x/extension/src/ui/theme"
+import { ThemeProvider, muiTheme } from "@argent-x/extension/src/ui/theme"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { Story } from "@storybook/react"
 import React from "react"
@@ -22,14 +17,6 @@ global.chrome = {
   storage: chromeStorageMock,
 }
 
-/** remove explicit width and height constraints which otherwise impact Docs */
-const StorybookGlobalStyle = createGlobalStyle`
-  html, body {
-    min-width: unset;
-    min-height: unset;
-  }
-`
-
 export const decorators = [
   (Story: Story) => (
     <MuiThemeProvider theme={muiTheme}>
@@ -37,10 +24,7 @@ export const decorators = [
         href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
         rel="stylesheet"
       />
-      <FixedGlobalStyle extensionIsInTab />
-      <StorybookGlobalStyle />
       <ThemeProvider>
-        <ThemedGlobalStyle />
         <Story />
       </ThemeProvider>
     </MuiThemeProvider>

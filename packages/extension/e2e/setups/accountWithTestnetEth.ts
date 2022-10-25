@@ -25,8 +25,8 @@ export async function setupNewAccountWithTestnetEth(
   // page is now closed
   await openExtension(page, context)
   await continueNewWalletAfterOnboarding(page)
-  await navigateFromAccountToAccountList(page)
   await switchNetwork(page, "Localhost")
+  // await navigateFromAccountToAccountList(page)
   await newAccount(page)
   const address = await getAccountAddressFromAccountPage(page)
   await mintDevnetEthToAccount(address)

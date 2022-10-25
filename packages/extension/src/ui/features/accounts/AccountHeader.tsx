@@ -1,18 +1,60 @@
-import styled from "styled-components"
+import { icons } from "@argent/ui"
+import { Button, Text } from "@chakra-ui/react"
+import { FC, useCallback } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
-import { ResponsiveFixedBox } from "../../components/Responsive"
+import {
+  BarIconButton,
+  NavigationBar,
+  NavigationBarProps,
+} from "../../components/NavigationBar"
+import { routes } from "../../routes"
+import { NetworkSwitcher } from "../networks/NetworkSwitcher"
+import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
+import { useSelectedAccount } from "./accounts.state"
 
-export const AccountHeader = styled(ResponsiveFixedBox)`
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(
-    0deg,
-    rgba(16, 16, 16, 0.4) 0%,
-    ${({ theme }) => theme.bg1} 73.72%
-  );
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(10px);
-  height: 68px;
-  z-index: 100;
-`
+const { SettingsIcon, DropdownDownIcon, DropdownUpIcon } = icons
+
+export type AccountHeaderProps = Pick<NavigationBarProps, "scroll">
+
+export const AccountHeader: FC<AccountHeaderProps> = ({ scroll }) => {
+  const { accountNames } = useAccountMetadata()
+  const account = useSelectedAccount()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const isAccountListScreen = location.pathname === routes.accounts()
+
+  const openAccountList = useCallback(() => {
+    navigate(routes.accounts(location.pathname))
+  }, [location.pathname, navigate])
+
+  const showSettings = useCallback(() => {
+    navigate(routes.settings())
+  }, [navigate])
+
+  if (!account) {
+    return <></>
+  }
+  const accountName = getAccountName(account, accountNames)
+  return (
+    <NavigationBar scroll={scroll}>
+      <Button
+        aria-label={isAccountListScreen ? "Show account" : "Show account list"}
+        colorScheme={"neutrals800"}
+        size={"2xs"}
+        mr={"auto"}
+        onClick={openAccountList}
+      >
+        <Text noOfLines={1}>{accountName}</Text>
+        <Text fontSize={"sm"} ml={1}>
+          {isAccountListScreen ? <DropdownUpIcon /> : <DropdownDownIcon />}
+        </Text>
+      </Button>
+      <NetworkSwitcher />
+      <BarIconButton aria-label="Show settings" onClick={showSettings}>
+        <SettingsIcon />
+      </BarIconButton>
+    </NavigationBar>
+  )
+}
