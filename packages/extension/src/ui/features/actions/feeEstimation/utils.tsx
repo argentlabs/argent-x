@@ -5,12 +5,12 @@ import useSWR from "swr"
 import { getEstimatedFee } from "../../../services/backgroundTransactions"
 
 export const useMaxFeeEstimation = (
-  transactions: Call | Call[],
+  transactions: Call | Call[] | undefined,
   actionHash: string,
 ) => {
   const { data: fee, error } = useSWR(
     [actionHash, "feeEstimation"],
-    () => getEstimatedFee(transactions),
+    () => transactions && getEstimatedFee(transactions),
     {
       suspense: false,
       refreshInterval: 20 * 1000, // 20 seconds

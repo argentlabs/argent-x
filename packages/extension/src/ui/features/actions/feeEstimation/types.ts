@@ -1,6 +1,8 @@
 import { BigNumber } from "ethers"
 import { Call } from "starknet"
 
+import { AllowArray } from "../../../../shared/storage/types"
+
 export interface FeeEstimationProps {
   transactions: Call | Call[]
   defaultMaxFee?: BigNumber
@@ -9,4 +11,11 @@ export interface FeeEstimationProps {
   accountAddress: string
   networkId: string
   actionHash: string
+}
+
+export type DeployAccountFeeEstimationProps = Omit<
+  FeeEstimationProps,
+  "transactions"
+> & {
+  transactions?: AllowArray<Call>
 }

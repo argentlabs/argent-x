@@ -1,5 +1,6 @@
 import { getAccounts, removeAccount } from "../shared/account/store"
 import { AccountMessage } from "../shared/messages/AccountMessage"
+import { deployAccountAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
@@ -47,15 +48,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           },
         })
       } catch (exception: unknown) {
-        let error = `${exception}`
-        if (network.includes("localhost")) {
-          if (error.toLowerCase().includes("network error")) {
-            error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
-          }
-          if (error.includes("403")) {
-            error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
-          }
-        }
+        const error = `${exception}`
+
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_REJ",
           data: { error },
@@ -64,43 +58,14 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "DEPLOY_ACCOUNT": {
-      if (!(await wallet.isSessionOpen())) {
-        throw Error("you need an open session")
-      }
-
-      const account = msg.data
-      const fullAccount = await wallet.getAccount(account)
-
       try {
-        const { account, txHash } = await wallet.deployAccount(fullAccount)
-        addTransaction({
-          hash: txHash,
-          account,
-          meta: { title: "Deploy wallet", isDeployAccount: true },
+        await deployAccountAction({
+          account: msg.data,
+          actionQueue,
         })
-
-        return sendToTabAndUi({
-          type: "DEPLOY_ACCOUNT_RES",
-          data: {
-            txHash,
-            account,
-            accounts: await getAccounts(),
-          },
-        })
-      } catch (exception: unknown) {
-        let error = `${exception}`
-        if (account.networkId.includes("localhost")) {
-          if (error.toLowerCase().includes("network error")) {
-            error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
-          }
-          if (error.includes("403")) {
-            error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
-          }
-        }
-        return sendToTabAndUi({
-          type: "DEPLOY_ACCOUNT_REJ",
-          data: { error },
-        })
+        return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_RES" })
+      } catch {
+        return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_REJ" })
       }
     }
 

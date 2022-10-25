@@ -28,52 +28,21 @@ import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
 
-export interface ApproveTransactionScreenProps
+export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
-  transactions: Call | Call[]
-  onSubmit: (transactions: Call | Call[]) => void
+  onSubmit: () => void
 }
 
-export const titleForTransactionsAndReview = (
-  transactions: Call | Call[] = [],
-  transactionReview: ApiTransactionReviewResponse | undefined,
-) => {
-  const transactionsArray: Call[] = isArray(transactions)
-    ? transactions
-    : [transactions]
-  const hasErc20Transfer = transactionsArray.some(isErc20TransferCall)
-  const hasSwap = getTransactionReviewHasSwap(transactionReview)
-  return hasErc20Transfer
-    ? "Review send"
-    : hasSwap
-    ? "Review trade"
-    : "Check transactions"
-}
-
-export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
-  transactions,
-  selectedAccount,
-  actionHash,
-  onSubmit,
-  ...props
-}) => {
+export const ApproveDeployAccountScreen: FC<
+  ApproveDeployAccountScreenProps
+> = ({ selectedAccount, actionHash, onSubmit, ...props }) => {
   usePageTracking("signTransaction", {
     networkId: selectedAccount?.networkId || "unknown",
   })
-  const [disableConfirm, setDisableConfirm] = useState(true)
+  const [disableConfirm, setDisableConfirm] = useState(false)
   const { accountClassHash, id: networkId } = useCurrentNetwork()
   const tokensByNetwork = useTokensInNetwork(networkId)
-
-  const { data: transactionReview } = useTransactionReview({
-    account: selectedAccount,
-    transactions,
-    actionHash,
-  })
-
-  const title = useMemo(() => {
-    return titleForTransactionsAndReview(transactions, transactionReview)
-  }, [transactionReview, transactions])
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -81,58 +50,36 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   const shouldBeUpgraded = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
-  const isUpgradeTransaction =
-    !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
-
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
 
-  if (shouldBeUpgraded && !isUpgradeTransaction) {
-    return <UpgradeScreenV4 upgradeType="account" {...props} />
-  }
-
-  const confirmButtonVariant =
-    transactionReview?.assessment === "warn" ? "warn-high" : undefined
-
   return (
     <ConfirmScreen
-      title={title}
+      title="Review activation"
       confirmButtonText="Approve"
       confirmButtonDisabled={disableConfirm}
-      confirmButtonVariant={confirmButtonVariant}
       selectedAccount={selectedAccount}
-      onSubmit={() => {
-        onSubmit(transactions)
-      }}
+      onSubmit={onSubmit}
       showHeader={false}
-      footer={
-        selectedAccount.needsDeploy ? (
-          <AccountDeploymentFeeEstimation
-            onErrorChange={setDisableConfirm}
-            accountAddress={selectedAccount.address}
-            networkId={selectedAccount.networkId}
-            transactions={transactions}
-            actionHash={actionHash}
-          />
-        ) : (
-          <FeeEstimation
-            onErrorChange={setDisableConfirm}
-            accountAddress={selectedAccount.address}
-            networkId={selectedAccount.networkId}
-            transactions={transactions}
-            actionHash={actionHash}
-          />
-        )
-      }
+      //   footer={
+      //     selectedAccount.needsDeploy && (
+      //       <AccountDeploymentFeeEstimation
+      //         onErrorChange={setDisableConfirm}
+      //         accountAddress={selectedAccount.address}
+      //         networkId={selectedAccount.networkId}
+      //         actionHash={actionHash}
+      //       />
+      //     )
+      //   }
       {...props}
     >
-      <TransactionsList
+      {/* <TransactionsList
         networkId={networkId}
         transactions={transactions}
         transactionReview={transactionReview}
         tokensByNetwork={tokensByNetwork}
-      />
+      /> */}
       <FieldGroup>
         <AccountAddressField
           title="From"

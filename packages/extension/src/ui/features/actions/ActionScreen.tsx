@@ -19,6 +19,7 @@ import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
+import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
@@ -48,6 +49,15 @@ export const ActionScreen: FC = () => {
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
 
+  const rejectAllActions = useCallback(async () => {
+    actions.forEach((act) => {
+      rejectAction(act)
+      closePopupIfLastAction()
+    })
+    // closePopupIfLastAction()
+    console.log("Actions: ", actions.length)
+  }, [actions, closePopupIfLastAction])
+
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {
     const init = async () => {
@@ -57,7 +67,6 @@ export const ActionScreen: FC = () => {
     }
     init()
   }, [extensionIsInTab, action?.type])
-
   switch (action?.type) {
     case "CONNECT_DAPP":
       return (
@@ -156,6 +165,50 @@ export const ActionScreen: FC = () => {
             }
           }}
           onReject={onReject}
+          selectedAccount={account}
+        />
+      )
+
+    case "DEPLOY_ACCOUNT_ACTION":
+      return (
+        <ApproveDeployAccountScreen
+          actionHash={action.meta.hash}
+          onSubmit={async () => {
+            analytics.track("signedTransaction", {
+              networkId: account?.networkId || "unknown",
+            })
+            await approveAction(action)
+            useAppState.setState({ isLoading: true })
+            const result = await Promise.race([
+              waitForMessage(
+                "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+              waitForMessage(
+                "DEPLOY_ACCOUNT_ACTION_FAILED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+            ])
+            // (await) blocking as the window may closes afterwards
+            await analytics.track("sentTransaction", {
+              success: !("error" in result),
+              networkId: account?.networkId || "unknown",
+            })
+            if ("error" in result) {
+              useAppState.setState({
+                error: `Sending transaction failed: ${result.error}`,
+                isLoading: false,
+              })
+              navigate(routes.error())
+            } else {
+              if ("txHash" in result) {
+                account?.updateDeployTx(result.txHash)
+              }
+              closePopupIfLastAction()
+              useAppState.setState({ isLoading: false })
+            }
+          }}
+          onReject={rejectAllActions}
           selectedAccount={account}
         />
       )

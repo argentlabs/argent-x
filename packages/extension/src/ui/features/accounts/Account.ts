@@ -132,22 +132,6 @@ export class Account {
     })
   }
 
-  // Currently not used anywhere. Might be useful in the future
-  public async deploy(): Promise<Account> {
-    if (!this.needsDeploy) {
-      throw new Error("Account already deployed")
-    }
-
-    const result = await deployNewAccount(this)
-    if ("error" in result) {
-      throw new Error(result.error)
-    }
-
-    this.updateDeployTx(result.txHash)
-
-    return this
-  }
-
   public toWalletAccount(): WalletAccount {
     const { networkId, address, network, signer, type, needsDeploy } = this
     return {

@@ -15,15 +15,16 @@ export type AccountMessage =
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
   | { type: "DEPLOY_ACCOUNT"; data: BaseWalletAccount }
+  | { type: "DEPLOY_ACCOUNT_RES" }
+  | { type: "DEPLOY_ACCOUNT_REJ" }
   | {
-      type: "DEPLOY_ACCOUNT_RES"
-      data: {
-        txHash: string
-        account: WalletAccount
-        accounts: WalletAccount[]
-      }
+      type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED"
+      data: { txHash: string; actionHash: string }
     }
-  | { type: "DEPLOY_ACCOUNT_REJ"; data: { error: string } }
+  | {
+      type: "DEPLOY_ACCOUNT_ACTION_FAILED"
+      data: { actionHash: string; error?: string }
+    }
   | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data: WalletAccount }

@@ -2,6 +2,7 @@ import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
 import { preAuthorize } from "../shared/preAuthorizations"
 import { assertNever } from "../ui/services/assertNever"
+import { accountDeployAction } from "./accounDeployAction"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
@@ -45,6 +46,27 @@ export const handleActionApproval = async (
       } catch (error: unknown) {
         return {
           type: "TRANSACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
+      }
+    }
+
+    case "DEPLOY_ACCOUNT_ACTION": {
+      try {
+        const txHash = await accountDeployAction(action, background)
+
+        return {
+          type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
+          data: { txHash, actionHash },
+        }
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        return {
+          type: "DEPLOY_ACCOUNT_ACTION_FAILED",
           data: { actionHash, error: `${error}` },
         }
       }
@@ -115,6 +137,13 @@ export const handleActionRejection = async (
     case "TRANSACTION": {
       return {
         type: "TRANSACTION_FAILED",
+        data: { actionHash },
+      }
+    }
+
+    case "DEPLOY_ACCOUNT_ACTION": {
+      return {
+        type: "DEPLOY_ACCOUNT_ACTION_FAILED",
         data: { actionHash },
       }
     }

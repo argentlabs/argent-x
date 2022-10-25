@@ -2,11 +2,12 @@ import { partition } from "lodash-es"
 import { hash, number } from "starknet"
 import useSWR from "swr"
 
+import { getAccountIdentifier } from "./../../../shared/wallet.service"
 import { getAccounts } from "../../../shared/account/store"
 import { Network } from "../../../shared/network"
 import { getMulticallContract } from "../../services/multicall.service"
 import { fetchFeeTokenBalanceForAccounts } from "./../accountTokens/tokens.service"
-import { useNetwork } from "./../networks/useNetworks"
+import { useCurrentNetwork, useNetwork } from "./../networks/useNetworks"
 import { Account } from "./Account"
 
 export async function checkIfUpgradeAvailable(
@@ -172,4 +173,23 @@ export const usePartitionDeprecatedAccounts = (
     async () => await partitionDeprecatedAccount(accounts, network),
     { refreshInterval: 30000, revalidateIfStale: true },
   )
+}
+
+export const useCheckUpgradeAvailable = (account?: Account) => {
+  const { accountClassHash } = useCurrentNetwork()
+
+  const accountIdentifier = account && getAccountIdentifier(account)
+
+  const {
+    data: needsUpgrade,
+    error: needsUpgradeError,
+    isValidating: needsUpgradeValidating,
+  } = useSWR(
+    [accountIdentifier, accountClassHash, "showUpgradeBanner"],
+    async () =>
+      account && (await checkIfUpgradeAvailable(account, accountClassHash)),
+    { suspense: false },
+  )
+
+  return { needsUpgrade, needsUpgradeError, needsUpgradeValidating }
 }

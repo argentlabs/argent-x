@@ -15,9 +15,8 @@ export const createNewAccount = async (networkId: string) => {
   ])
 }
 
-export const deployNewAccount = async (wallet: BaseWalletAccount) => {
-  sendMessage({ type: "DEPLOY_ACCOUNT", data: wallet })
-
+export const deployNewAccount = async (account: BaseWalletAccount) => {
+  sendMessage({ type: "DEPLOY_ACCOUNT", data: account })
   return await Promise.race([
     waitForMessage("DEPLOY_ACCOUNT_RES"),
     waitForMessage("DEPLOY_ACCOUNT_REJ"),

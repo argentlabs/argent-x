@@ -40,10 +40,12 @@ import {
   StyledInfoRoundedIcon,
   StyledReportGmailerrorredRoundedIcon,
 } from "./styled"
-import { FeeEstimationProps } from "./types"
+import { DeployAccountFeeEstimationProps } from "./types"
 import { getParsedError, getTooltipText, useMaxFeeEstimation } from "./utils"
 
-export const AccountDeploymentFeeEstimation: FC<FeeEstimationProps> = ({
+export const AccountDeploymentFeeEstimation: FC<
+  DeployAccountFeeEstimationProps
+> = ({
   accountAddress,
   transactions,
   actionHash,
@@ -125,6 +127,12 @@ export const AccountDeploymentFeeEstimation: FC<FeeEstimationProps> = ({
     feeToken,
     totalMaxFee,
   )
+
+  const hasTransactions = typeof transactions !== undefined
+
+  if (!hasTransactions) {
+    return <></>
+  }
 
   return (
     <FieldGroup error={showError}>

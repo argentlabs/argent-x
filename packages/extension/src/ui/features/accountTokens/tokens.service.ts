@@ -10,13 +10,16 @@ import {
   stark,
   uint256,
 } from "starknet"
+import useSWR from "swr"
 
 import { Network } from "./../../../shared/network/type"
 import parsedErc20Abi from "../../../abis/ERC20.json"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
 export interface TokenView {
@@ -232,4 +235,22 @@ export const fetchFeeTokenBalanceForAccounts = async (
     }),
     {},
   )
+}
+
+export const useFeeTokenBalance = (account?: Account) => {
+  const { id: networkId } = useCurrentNetwork()
+
+  const accountIdentifier = account && getAccountIdentifier(account)
+
+  const {
+    data: feeTokenBalance,
+    error: feeTokenBalanceError,
+    isValidating: feeTokenBalanceValidating,
+  } = useSWR(
+    [accountIdentifier, networkId, "feeTokenBalance"],
+    () => account && fetchFeeTokenBalance(account, networkId),
+    { suspense: false },
+  )
+
+  return { feeTokenBalance, feeTokenBalanceError, feeTokenBalanceValidating }
 }
