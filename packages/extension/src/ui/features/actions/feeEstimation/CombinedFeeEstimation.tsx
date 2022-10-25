@@ -12,21 +12,25 @@ import { getFeeToken } from "../../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
 import {
-  Field,
+  FieldAlt,
   FieldError,
   FieldGroup,
   FieldKey,
   FieldKeyGroup,
+  FieldKeySub,
   FieldValue,
   FieldValueGroup,
   FieldValueMeta,
+  FieldValueSub,
 } from "../../../components/Fields"
 import { KeyboardArrowDownRounded } from "../../../components/Icons/MuiIcons"
+import Row from "../../../components/Row"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { fetchFeeTokenBalance } from "../../accountTokens/tokens.service"
 import {
+  CaptionText,
   DetailsText,
   ExtendableControl,
   FeeErrorContainer,
@@ -37,10 +41,9 @@ import {
   StyledReportGmailerrorredRoundedIcon,
 } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
-import { getTooltipText, useMaxFeeEstimation } from "./utils"
-import { getParsedError } from "./utils"
+import { getParsedError, getTooltipText, useMaxFeeEstimation } from "./utils"
 
-export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
+export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   accountAddress,
   transactions,
   actionHash,
@@ -53,6 +56,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   }
 
   const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
+  const [feeErrorExpanded, setFeeErrorExpanded] = useState(false)
 
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
@@ -61,6 +65,20 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   )
 
   const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
+
+  const totalFee = useMemo(() => {
+    if (account.needsDeploy && fee?.accountDeploymentFee) {
+      return number.toHex(
+        number.toBN(fee.accountDeploymentFee).add(number.toBN(fee.amount)),
+      )
+    }
+    return fee?.suggestedMaxFee
+  }, [
+    account.needsDeploy,
+    fee?.accountDeploymentFee,
+    fee?.amount,
+    fee?.suggestedMaxFee,
+  ])
 
   const totalMaxFee = useMemo(() => {
     if (account.needsDeploy && fee?.maxADFee) {
@@ -92,45 +110,148 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     feeToken,
     fee?.amount,
   )
-  const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.suggestedMaxFee,
-  )
+
   const accountDeploymentCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
     fee?.accountDeploymentFee,
   )
 
-  const maxADCurrencyValue = useTokenAmountToCurrencyValue(
+  const totalFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
-    fee?.maxADFee,
+    totalFee,
   )
+
+  const totalMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
+    feeToken,
+    totalMaxFee,
+  )
+
+  const hasTransactions = typeof transactions !== undefined
+
+  if (!hasTransactions) {
+    return <></>
+  }
 
   return (
     <FieldGroup error={showError}>
-      {account.needsDeploy && (
-        <Field>
-          <FieldKeyGroup>
-            <FieldKey>
-              Activation fee
-              <Tippy
-                content={
-                  <Tooltip as="div">
-                    {getTooltipText(fee?.maxADFee, feeTokenBalance)}
-                  </Tooltip>
-                }
-              >
-                {enoughBalance ? (
-                  <StyledInfoRoundedIcon />
+      <FieldAlt
+        {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+          label: "Show Fee Estimate details",
+        })}
+        style={{ cursor: "pointer", paddingRight: "5px" }}
+      >
+        <FieldKeyGroup>
+          <FieldKey>
+            Network fees
+            <Tippy
+              content={
+                <Tooltip as="div">
+                  {getTooltipText(totalMaxFee, feeTokenBalance)}
+                </Tooltip>
+              }
+            >
+              {enoughBalance ? (
+                <StyledInfoRoundedIcon />
+              ) : (
+                <StyledReportGmailerrorredRoundedIcon />
+              )}
+            </Tippy>
+          </FieldKey>
+          <CaptionText>Includes one-time activation fee</CaptionText>
+        </FieldKeyGroup>
+        {totalFee && totalMaxFee ? (
+          <Row style={{ width: "auto" }}>
+            <FieldValueGroup>
+              <FieldValue>
+                {totalFeeCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    {prettifyCurrencyValue(totalFeeCurrencyValue)}
+                  </FeeEstimationValue>
                 ) : (
-                  <StyledReportGmailerrorredRoundedIcon />
+                  <FeeEstimationValue>
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: totalFee,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{totalFee} Unknown</>
+                    )}
+                  </FeeEstimationValue>
                 )}
-              </Tippy>
-            </FieldKey>
+              </FieldValue>
+              <FieldValueMeta style={{ marginTop: "4px" }}>
+                {totalMaxFeeCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    Max {prettifyCurrencyValue(totalMaxFeeCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <FeeEstimationValue>
+                    Max &nbsp;
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: totalMaxFee,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{totalMaxFee} Unknown</>
+                    )}
+                  </FeeEstimationValue>
+                )}
+              </FieldValueMeta>
+            </FieldValueGroup>
+
+            <KeyboardArrowDownRounded
+              style={{
+                transition: "transform 0.2s ease-in-out",
+                transform: feeEstimateExpanded
+                  ? "rotate(-180deg)"
+                  : "rotate(0deg)",
+                height: 24,
+                width: 24,
+              }}
+            />
+          </Row>
+        ) : showEstimateError ? (
+          <FeeEstimationValue>Error</FeeEstimationValue>
+        ) : (
+          <LoadingInput />
+        )}
+      </FieldAlt>
+
+      <Collapse in={feeEstimateExpanded}>
+        <Separator />
+
+        <FieldAlt>
+          <FieldKeyGroup>
+            <FieldKeySub>Transaction fee</FieldKeySub>
+            <FieldKeySub>One-time activation fee</FieldKeySub>
           </FieldKeyGroup>
           {fee && fee.accountDeploymentFee && fee.maxADFee ? (
             <FieldValueGroup>
-              <FieldValue>
+              <FieldValueSub>
+                {amountCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    ~{prettifyCurrencyValue(amountCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <FeeEstimationValue>
+                    ~
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: fee.amount,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{fee.amount} Unknown</>
+                    )}
+                  </FeeEstimationValue>
+                )}
+              </FieldValueSub>
+              <FieldValueSub>
                 {accountDeploymentCurrencyValue !== undefined ? (
                   <FeeEstimationValue>
                     ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
@@ -149,111 +270,22 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                     )}
                   </FeeEstimationValue>
                 )}
-              </FieldValue>
-              <FieldValueMeta>
-                {maxADCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    Max ~{prettifyCurrencyValue(maxADCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <FeeEstimationValue>
-                    Max ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.maxADFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.maxADFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
-                )}
-              </FieldValueMeta>
+              </FieldValueSub>
             </FieldValueGroup>
           ) : showEstimateError ? (
             <FeeEstimationValue>Error</FeeEstimationValue>
           ) : (
             <LoadingInput />
           )}
-        </Field>
-      )}
-      <Separator />
-      <Field>
-        <FieldKeyGroup>
-          <FieldKey>
-            Network fee
-            <Tippy
-              content={
-                <Tooltip as="div">
-                  {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
-                </Tooltip>
-              }
-            >
-              {enoughBalance ? (
-                <StyledInfoRoundedIcon />
-              ) : (
-                <StyledReportGmailerrorredRoundedIcon />
-              )}
-            </Tippy>
-          </FieldKey>
-        </FieldKeyGroup>
-        {fee ? (
-          <FieldValueGroup>
-            <FieldValue>
-              {amountCurrencyValue !== undefined ? (
-                <FeeEstimationValue>
-                  ~{prettifyCurrencyValue(amountCurrencyValue)}
-                </FeeEstimationValue>
-              ) : (
-                <FeeEstimationValue>
-                  ~
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.amount,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.amount} Unknown</>
-                  )}
-                </FeeEstimationValue>
-              )}
-            </FieldValue>
-            <FieldValueMeta>
-              {suggestedMaxFeeCurrencyValue !== undefined ? (
-                <FeeEstimationValue>
-                  Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
-                </FeeEstimationValue>
-              ) : (
-                <FeeEstimationValue>
-                  Max ~
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.suggestedMaxFee,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.suggestedMaxFee} Unknown</>
-                  )}
-                </FeeEstimationValue>
-              )}
-            </FieldValueMeta>
-          </FieldValueGroup>
-        ) : showEstimateError ? (
-          <FeeEstimationValue>Error</FeeEstimationValue>
-        ) : (
-          <LoadingInput />
-        )}
-      </Field>
+        </FieldAlt>
+      </Collapse>
       {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
       {showEstimateError && (
         <>
           <FieldError justify="space-between">
             Transaction failure predicted
             <ExtendableControl
-              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+              {...makeClickable(() => setFeeErrorExpanded((x) => !x), {
                 label: "Show error details",
               })}
             >
@@ -261,7 +293,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
               <KeyboardArrowDownRounded
                 style={{
                   transition: "transform 0.2s ease-in-out",
-                  transform: feeEstimateExpanded
+                  transform: feeErrorExpanded
                     ? "rotate(-180deg)"
                     : "rotate(0deg)",
                   height: 13,
@@ -271,7 +303,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
             </ExtendableControl>
           </FieldError>
 
-          <Collapse in={feeEstimateExpanded} timeout="auto">
+          <Collapse in={feeErrorExpanded} timeout="auto">
             {parsedFeeEstimationError && (
               <CopyTooltip
                 copyValue={parsedFeeEstimationError}

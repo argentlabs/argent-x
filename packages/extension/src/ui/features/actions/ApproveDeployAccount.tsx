@@ -1,13 +1,6 @@
-import { isArray } from "lodash-es"
-import { FC, useMemo, useState } from "react"
+import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { Call } from "starknet"
 
-import { isErc20TransferCall } from "../../../shared/call"
-import {
-  ApiTransactionReviewResponse,
-  getTransactionReviewHasSwap,
-} from "../../../shared/transactionReview.service"
 import {
   Field,
   FieldGroup,
@@ -16,17 +9,9 @@ import {
 } from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
-import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
-import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
-import { useFeeTokenBalance } from "../accountTokens/tokens.service"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
-import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
-import { TransactionsList } from "./transaction/TransactionsList"
-import { useTransactionReview } from "./transaction/useTransactionReview"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -41,14 +26,6 @@ export const ApproveDeployAccountScreen: FC<
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(false)
-  const { accountClassHash, id: networkId } = useCurrentNetwork()
-  const tokensByNetwork = useTokensInNetwork(networkId)
-
-  const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
-
-  const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
-
-  const shouldBeUpgraded = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
@@ -62,24 +39,16 @@ export const ApproveDeployAccountScreen: FC<
       selectedAccount={selectedAccount}
       onSubmit={onSubmit}
       showHeader={false}
-      //   footer={
-      //     selectedAccount.needsDeploy && (
-      //       <AccountDeploymentFeeEstimation
-      //         onErrorChange={setDisableConfirm}
-      //         accountAddress={selectedAccount.address}
-      //         networkId={selectedAccount.networkId}
-      //         actionHash={actionHash}
-      //       />
-      //     )
-      //   }
+      footer={
+        <AccountDeploymentFeeEstimation
+          onErrorChange={setDisableConfirm}
+          accountAddress={selectedAccount.address}
+          networkId={selectedAccount.networkId}
+          actionHash={actionHash}
+        />
+      }
       {...props}
     >
-      {/* <TransactionsList
-        networkId={networkId}
-        transactions={transactions}
-        transactionReview={transactionReview}
-        tokensByNetwork={tokensByNetwork}
-      /> */}
       <FieldGroup>
         <AccountAddressField
           title="From"

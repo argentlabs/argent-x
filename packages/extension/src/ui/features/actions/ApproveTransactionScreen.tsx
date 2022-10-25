@@ -22,7 +22,7 @@ import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
-import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
+import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 import { TransactionsList } from "./transaction/TransactionsList"
@@ -62,7 +62,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
-  const { accountClassHash, id: networkId } = useCurrentNetwork()
+  const { id: networkId } = useCurrentNetwork()
   const tokensByNetwork = useTokensInNetwork(networkId)
 
   const { data: transactionReview } = useTransactionReview({
@@ -108,7 +108,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       showHeader={false}
       footer={
         selectedAccount.needsDeploy ? (
-          <AccountDeploymentFeeEstimation
+          <CombinedFeeEstimation
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}

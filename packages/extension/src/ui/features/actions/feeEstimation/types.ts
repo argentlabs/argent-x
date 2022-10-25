@@ -1,9 +1,7 @@
 import { BigNumber } from "ethers"
 import { Call } from "starknet"
 
-import { AllowArray } from "../../../../shared/storage/types"
-
-export interface FeeEstimationProps {
+export interface TransactionsFeeEstimationProps {
   transactions: Call | Call[]
   defaultMaxFee?: BigNumber
   onChange?: (fee: BigNumber) => void
@@ -14,8 +12,6 @@ export interface FeeEstimationProps {
 }
 
 export type DeployAccountFeeEstimationProps = Omit<
-  FeeEstimationProps,
+  TransactionsFeeEstimationProps,
   "transactions"
-> & {
-  transactions?: AllowArray<Call>
-}
+>

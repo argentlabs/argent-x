@@ -2,15 +2,35 @@ import { BigNumber, utils } from "ethers"
 import { Call } from "starknet"
 import useSWR from "swr"
 
-import { getEstimatedFee } from "../../../services/backgroundTransactions"
+import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import {
+  getAccountDeploymentEstimatedFee,
+  getEstimatedFee,
+} from "../../../services/backgroundTransactions"
 
 export const useMaxFeeEstimation = (
-  transactions: Call | Call[] | undefined,
+  transactions: Call | Call[],
   actionHash: string,
 ) => {
   const { data: fee, error } = useSWR(
     [actionHash, "feeEstimation"],
     () => transactions && getEstimatedFee(transactions),
+    {
+      suspense: false,
+      refreshInterval: 20 * 1000, // 20 seconds
+      shouldRetryOnError: false,
+    },
+  )
+  return { fee, error }
+}
+
+export const useMaxAccountDeploymentFeeEstimation = (
+  account: BaseWalletAccount | undefined,
+  actionHash: string,
+) => {
+  const { data: fee, error } = useSWR(
+    [actionHash, "accountDeploymentFeeEstimation"],
+    () => getAccountDeploymentEstimatedFee(account),
     {
       suspense: false,
       refreshInterval: 20 * 1000, // 20 seconds

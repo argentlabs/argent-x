@@ -80,6 +80,45 @@ export const handleTransactionMessage: HandleMessage<
       }
     }
 
+    case "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE": {
+      const providedAccount = msg.data
+      const account = providedAccount
+        ? await wallet.getAccount(providedAccount)
+        : await wallet.getSelectedAccount()
+
+      if (!account) {
+        throw Error("no accounts")
+      }
+
+      try {
+        const { overall_fee, suggestedMaxFee } =
+          await wallet.getAccountDeploymentFee(account)
+
+        const maxADFee = number.toHex(
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        )
+
+        return sendToTabAndUi({
+          type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
+          data: {
+            accountDeploymentFee: number.toHex(overall_fee),
+            maxADFee,
+          },
+        })
+      } catch (error) {
+        console.error(error)
+        return sendToTabAndUi({
+          type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString?.() ??
+              (error as any)?.toString?.() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
     case "TRANSACTION_FAILED": {
       return await actionQueue.remove(msg.data.actionHash)
     }
