@@ -12,8 +12,12 @@ export default {
       },
     },
     "@storybook/addon-interactions",
+    "@chakra-ui/storybook-addon",
     "storybook-addon-swc",
   ],
+  features: {
+    emotionAlias: false,
+  },
   framework: "@storybook/react",
   core: {
     builder: "@storybook/builder-webpack5",

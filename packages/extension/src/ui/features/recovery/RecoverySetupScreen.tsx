@@ -1,10 +1,26 @@
+import { icons } from "@argent/ui"
 import { FC } from "react"
 import { Link } from "react-router-dom"
+import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper, Paragraph, Title } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
+
+const { RestoreIcon } = icons
+
+const CircleIconContainer = styled.div`
+  border-radius: 500px;
+  display: flex;
+  font-size: 24px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: ${({ theme }) => theme.neutrals600};
+  background-color: ${({ theme }) => theme.white};
+`
 
 export const RecoverySetupScreen: FC = () => {
   const returnTo = useReturnTo()
@@ -19,7 +35,7 @@ export const RecoverySetupScreen: FC = () => {
         </Paragraph>
         <OptionsWrapper>
           <Option
-            title="High security"
+            title="With Argent guardian"
             description="Coming soon"
             disabled
             icon={
@@ -43,24 +59,11 @@ export const RecoverySetupScreen: FC = () => {
           />
           <Link to={routes.setupSeedRecovery(returnTo)}>
             <Option
-              title="Low security"
-              description="Save a recovery phrase"
-              variant="danger"
+              title="Save the recovery phrase"
               icon={
-                <svg
-                  width="32"
-                  height="32"
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M32 16C32 24.8366 24.8366 32 16 32C7.16344 32 0 24.8366 0 16C0 7.16344 7.16344 0 16 0C24.8366 0 32 7.16344 32 16ZM14.6668 16.6667V8.66667C14.6668 8.31305 14.8073 7.97391 15.0573 7.72386C15.3073 7.47381 15.6465 7.33334 16.0001 7.33334C16.3537 7.33334 16.6929 7.47381 16.9429 7.72386C17.193 7.97391 17.3334 8.31305 17.3334 8.66667V16.6667C17.3334 17.0203 17.193 17.3594 16.9429 17.6095C16.6929 17.8595 16.3537 18 16.0001 18C15.6465 18 15.3073 17.8595 15.0573 17.6095C14.8073 17.3594 14.6668 17.0203 14.6668 16.6667ZM14.1254 21.2891C14.0331 21.5338 13.9905 21.7946 14.0001 22.056C14.0204 22.5816 14.243 23.0789 14.6215 23.4442C14.9999 23.8095 15.5048 24.0143 16.0308 24.016H16.0668C16.3284 24.0116 16.5865 23.955 16.826 23.8495C17.0655 23.7441 17.2815 23.5919 17.4614 23.4019C17.6413 23.212 17.7815 22.988 17.8738 22.7431C17.9661 22.4983 18.0086 22.2375 17.9988 21.976C17.9791 21.4502 17.7567 20.9525 17.3781 20.5871C16.9996 20.2217 16.4943 20.017 15.9681 20.016H15.9321C15.6705 20.0206 15.4125 20.0773 15.1731 20.1828C14.9337 20.2883 14.7178 20.4405 14.5379 20.6304C14.358 20.8204 14.2178 21.0443 14.1254 21.2891Z"
-                    fill="currentColor"
-                  />
-                </svg>
+                <CircleIconContainer>
+                  <RestoreIcon />
+                </CircleIconContainer>
               }
             />
           </Link>

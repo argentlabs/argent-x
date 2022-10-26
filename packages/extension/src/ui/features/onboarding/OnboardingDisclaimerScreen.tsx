@@ -12,14 +12,14 @@ import {
   CheckCircleIcon,
   RadioButtonUncheckedIcon,
 } from "../../components/Icons/MuiIcons"
-import { PrivacyStatement } from "../../components/PrivacyStatement"
+import { PrivacyStatementLink } from "../../components/PrivacyStatementLink"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { P3 } from "../../theme/Typography"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
-const StyledPrivacyStatement = styled(PrivacyStatement)`
+const StyledPrivacyStatementLink = styled(PrivacyStatementLink)`
   display: flex;
   text-align: right;
   margin-left: auto;
@@ -97,7 +97,7 @@ export const OnboardingDisclaimerScreen: FC = () => {
           />
         </FormGroup>
       </FormControl>
-      <StyledPrivacyStatement />
+      <StyledPrivacyStatementLink to={routes.onboardingPrivacyStatement()} />
       <div>
         <OnboardingButton
           disabled={!conditions.lossOfFunds || !conditions.alphaVersion}
