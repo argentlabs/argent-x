@@ -6,38 +6,31 @@ import { ArgentXAccount } from "./ArgentXAccount"
 import { getIsPreauthorized } from "./preAuthorization"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
+const INJECT_NAMES = ["starknet", "starknet_argentX"]
+
 function attach() {
-  try {
-    delete window.starknet
-    // set read only property to window
-    Object.defineProperty(window, "starknet", {
-      value: starknetWindowObject,
-      writable: false,
-    })
-  } catch {
-    // ignore
-  }
-  // we need 2 different try catch blocks because we want to execute both even if one of them fails
-  try {
-    window.starknet = starknetWindowObject
-  } catch {
-    // ignore
-  }
-  try {
-    delete (window as any)["starknet-argentX"]
-    // set read only property to window
-    Object.defineProperty(window, "starknet-argentX", {
-      value: starknetWindowObject,
-      writable: false,
-    })
-  } catch {
-    // ignore
-  }
-  try {
-    ;(window as any)["starknet-argentX"] = starknetWindowObject
-  } catch {
-    // ignore
-  }
+  INJECT_NAMES.forEach((name) => {
+    // we need 2 different try catch blocks because we want to execute both even if one of them fails
+    try {
+      delete (window as any)[name]
+    } catch (e) {
+      // ignore
+    }
+    try {
+      // set read only property to window
+      Object.defineProperty(window, name, {
+        value: starknetWindowObject,
+        writable: false,
+      })
+    } catch {
+      // ignore
+    }
+    try {
+      ;(window as any)[name] = starknetWindowObject
+    } catch {
+      // ignore
+    }
+  })
 }
 
 function attachHandler() {
