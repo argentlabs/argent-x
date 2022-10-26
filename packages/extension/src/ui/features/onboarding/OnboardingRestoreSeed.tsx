@@ -8,6 +8,7 @@ import { usePageTracking } from "../../services/analytics"
 import { FormError } from "../../theme/Typography"
 import { validateAndSetSeedPhrase } from "../recovery/seedRecovery.state"
 import { useCustomNavigate } from "../recovery/useCustomNavigate"
+import { StatusMessageBanner } from "../statusMessage/StatusMessageBanner"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
@@ -56,6 +57,26 @@ export const OnboardingRestoreSeed: FC = () => {
         }}
       />
       {error && <FormError>{error}</FormError>}
+
+      <StatusMessageBanner
+        extendable={false}
+        statusMessage={{
+          message: "Never shown",
+          dismissable: false,
+          summary:
+            "You can paste your recovery phrase at once, but typing the words individually is safer",
+          level: "warn",
+        }}
+        onDismiss={() => {
+          // not possible
+        }}
+        style={{
+          marginTop: "32px",
+          width: "100%",
+          padding: "12px 16px",
+        }}
+      />
+
       <RowBetween style={{ paddingTop: "32px" }}>
         <OnboardingButton onClick={handleRestoreClick} disabled={disableSubmit}>
           Continue
