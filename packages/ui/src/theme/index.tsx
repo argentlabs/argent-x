@@ -1,4 +1,9 @@
-import { theme as baseTheme, extendTheme } from "@chakra-ui/react"
+import {
+  ChakraProvider,
+  ChakraProviderProps,
+  theme as baseTheme,
+  extendTheme,
+} from "@chakra-ui/react"
 
 import { textareaTheme } from "../components"
 import { buttonTheme } from "../components/Button"
@@ -37,3 +42,7 @@ export const theme = {
   ...extendedTheme,
   colors /** omits default chakra colours */,
 } as UITheme
+
+export const ThemeProvider = ({ children }: ChakraProviderProps) => (
+  <ChakraProvider theme={theme}>{children}</ChakraProvider>
+)

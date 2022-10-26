@@ -1,5 +1,4 @@
-import { theme } from "@argent/ui"
-import { ChakraProvider } from "@chakra-ui/react"
+import { ThemeProvider as ArgentTheme } from "@argent/ui"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
@@ -30,7 +29,7 @@ export const App: FC = () => {
             rel="stylesheet"
           />
           <ThemeProvider>
-            <ChakraProvider theme={theme}>
+            <ArgentTheme>
               <AppDimensions>
                 {process.env.SHOW_DEV_UI && <DevUI />}
                 <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
@@ -39,7 +38,7 @@ export const App: FC = () => {
                   </Suspense>
                 </ErrorBoundary>
               </AppDimensions>
-            </ChakraProvider>
+            </ArgentTheme>
           </ThemeProvider>
         </MuiThemeProvider>
       </SWRConfig>

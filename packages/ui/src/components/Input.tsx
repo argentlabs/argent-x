@@ -56,12 +56,25 @@ const size = {
     borderRadius: "lg",
     minHeight: "14",
   }),
+  pill: defineStyle({
+    px: "4",
+    py: "1",
+    fontSize: "sm",
+    fontWeight: "semibold",
+    borderRadius: "full",
+    minHeight: "8",
+    textAlign: "right",
+  }),
 }
 
 const sizes = {
   md: definePartsStyle({
     field: size.md,
     addon: size.md,
+  }),
+  pill: definePartsStyle({
+    field: size.pill,
+    addon: size.pill,
   }),
 }
 
