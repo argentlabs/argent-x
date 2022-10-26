@@ -41,7 +41,7 @@ type ComponentSet = Record<
 >
 
 type IconsNode = {
-  document: any /** we don't care about this currently */
+  document: unknown /** we don't care about this currently */
   components: Components
   componentSets: ComponentSet
 }

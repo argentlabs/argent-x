@@ -1,0 +1,3 @@
+{
+  "extends": ["./.eslintrc.react.json", "next", "next/core-web-vitals"]
+}

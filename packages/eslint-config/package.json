@@ -1,0 +1,28 @@
+{
+  "name": "@argent/eslint-config",
+  "version": "4.8.6",
+  "license": "MIT",
+  "dependencies": {
+    "eslint": "^8.26.0",
+    "eslint-config-next": "^12.0.8",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-turbo": "latest",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "exports": {
+    ".": {
+      "default": "./.eslintrc.json"
+    },
+    "./react": {
+      "default": "./.eslintrc.react.json"
+    },
+    "./next": {
+      "default": "./.eslintrc.next.json"
+    }
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0"
+  }
+}

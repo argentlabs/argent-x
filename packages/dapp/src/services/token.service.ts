@@ -21,17 +21,14 @@ function getUint256CalldataFromBN(bn: number.BigNumberish) {
   return { type: "struct" as const, ...uint256.bnToUint256(bn) }
 }
 
-export function parseInputAmountToUint256(
-  input: string,
-  decimals: number = 18,
-) {
+export function parseInputAmountToUint256(input: string, decimals = 18) {
   return getUint256CalldataFromBN(utils.parseUnits(input, decimals).toString())
 }
 
 export const mintToken = async (
   mintAmount: string,
   network: PublicNetwork,
-): Promise<any> => {
+): Promise<{ transaction_hash: string }> => {
   const starknet = getStarknet()
   if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")

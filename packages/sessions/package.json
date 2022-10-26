@@ -39,12 +39,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "lint": "eslint . --cache --ext .ts,.tsx"
   },
   "bugs": {
     "url": "https://github.com/argentlabs/argent-x/issues"
   },
   "devDependencies": {
+    "@argent/eslint-config": "^4.8.6",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/minimalistic-assert": "^1.0.1",
     "happy-dom": "^7.0.0",

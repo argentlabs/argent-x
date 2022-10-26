@@ -44,7 +44,9 @@ export const networkId = (): Network | undefined => {
     } else {
       return "localhost"
     }
-  } catch {}
+  } catch {
+    // ignore
+  }
 }
 
 export const addToken = async (address: string): Promise<void> => {
@@ -79,12 +81,16 @@ export const chainId = (): string | undefined => {
   }
   try {
     return shortString.decodeShortString(starknet.provider.chainId)
-  } catch {}
+  } catch {
+    // ignore
+  }
 }
 
 export const signMessage = async (message: string) => {
   const starknet = getStarknet()
-  if (!starknet?.isConnected) throw Error("starknet wallet not connected")
+  if (!starknet?.isConnected) {
+    throw Error("starknet wallet not connected")
+  }
   if (!shortString.isShortString(message)) {
     throw Error("message must be a short string")
   }

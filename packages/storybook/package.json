@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "@argent-x/extension": "^4.8.6",
+    "@argent/eslint-config": "^4.8.6",
     "@argent/ui": "^4.8.6",
     "@babel/core": "^7.18.5",
     "@chakra-ui/storybook-addon": "^4.0.12",
