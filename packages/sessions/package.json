@@ -38,7 +38,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev": "vite",
+    "dev": "vite build --watch",
     "build": "vite build"
   },
   "bugs": {

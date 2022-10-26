@@ -49,14 +49,14 @@ export const OnboardingRestoreSeed: FC = () => {
       space"
     >
       <SeedInput
-        mb="8"
+        mb="1"
         onChange={(seed) => {
           setError("")
           setSeedPhraseInput(seed)
         }}
       />
       {error && <FormError>{error}</FormError>}
-      <RowBetween>
+      <RowBetween style={{ paddingTop: "32px" }}>
         <OnboardingButton onClick={handleRestoreClick} disabled={disableSubmit}>
           Continue
         </OnboardingButton>

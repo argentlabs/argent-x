@@ -7,7 +7,14 @@ import {
   SimpleGridProps,
 } from "@chakra-ui/react"
 import { wordlists } from "@ethersproject/wordlists"
-import { FC, SetStateAction, useCallback, useMemo, useState } from "react"
+import {
+  FC,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 
 interface SeedInputProps extends Omit<SimpleGridProps, "onChange"> {
   length?: 12
@@ -22,6 +29,7 @@ export const SeedInput: FC<SeedInputProps> = ({
   onChange,
   ...rest
 }) => {
+  const refInputs = useRef(new Array(length).fill(null))
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
   const [seedInput, _setSeedInput] = useState([...Array(length)].map(() => ""))
   const setSeedInput = useCallback(
@@ -123,6 +131,21 @@ export const SeedInput: FC<SeedInputProps> = ({
 
               if (words.length === length) {
                 setSeedInput(words)
+              }
+            }}
+            ref={(el) => (refInputs.current[i] = el)}
+            onKeyDown={(e) => {
+              if (e.key === "Backspace" && word === "" && i > 0) {
+                // switch focus to previous input
+                e.preventDefault()
+                refInputs.current[i - 1]?.focus()
+              }
+              if (e.key === " " || e.key === "Enter") {
+                // switch focus to next input
+                e.preventDefault()
+                if (word !== "") {
+                  refInputs.current[i + 1]?.focus() // if next input exists, focus it
+                }
               }
             }}
             onChange={(e) => {
