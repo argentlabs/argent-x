@@ -40,6 +40,7 @@
     "test:watch": "vitest",
     "dev": "vite build --watch",
     "build": "vite build",
+    "prepare": "vite build",
     "lint": "eslint . --cache --ext .ts,.tsx"
   },
   "bugs": {

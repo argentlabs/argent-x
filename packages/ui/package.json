@@ -37,7 +37,7 @@
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "prepare": "yarn gen:theme-typings",
+    "prepare": "concurrently --raw \"yarn gen:theme-typings\" \"yarn build\"",
     "dev": "vite build --watch",
     "build": "tsc && vite build"
   },

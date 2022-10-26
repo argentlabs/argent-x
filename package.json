@@ -23,18 +23,16 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "turbo dev",
+    "dev:ui": "SHOW_DEV_UI=true yarn dev",
+    "build": "turbo build",
+    "build:sourcemaps": "GEN_SOURCE_MAPS=true yarn build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e",
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
-    "dev": "lerna run dev --stream",
-    "dev:ui": "lerna run dev:ui --stream",
-    "build": "lerna run build --stream",
-    "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
-    "lint": "lerna run lint --stream",
-    "test": "lerna run test --stream",
-    "test:watch": "lerna run test:watch --stream",
-    "test:e2e": "lerna run test:e2e --stream",
-    "prepare": "concurrently --raw \"husky install\" \"patch-package\" \"yarn build-deps\"",
-    "build-deps": "lerna run build --stream --scope @argent/get-starknet --scope @argent/x-sessions --scope @argent/ui",
-    "storybook": "cd packages/storybook && yarn storybook",
+    "prepare": "concurrently --raw \"husky install\" \"patch-package\" \"turbo prepare\"",
+    "storybook": "yarn --cwd packages/storybook storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts"
   },
   "importSort": {
