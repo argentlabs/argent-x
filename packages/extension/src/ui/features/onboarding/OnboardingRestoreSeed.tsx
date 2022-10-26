@@ -73,7 +73,6 @@ export const OnboardingRestoreSeed: FC = () => {
         style={{
           marginTop: "32px",
           width: "100%",
-          padding: "12px 16px",
         }}
       />
 
