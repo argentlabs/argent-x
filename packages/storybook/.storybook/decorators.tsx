@@ -1,11 +1,12 @@
 import { chromeStorageMock } from "@argent-x/extension/src/shared/storage/__test__/chrome-storage.mock"
 import {
   FixedGlobalStyle,
-  ThemeProvider as StyledComponentsThemeProvider,
+  ThemeProvider,
   ThemedGlobalStyle,
   muiTheme,
 } from "@argent-x/extension/src/ui/theme"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
+import { Story } from "@storybook/react"
 import React from "react"
 import { createGlobalStyle } from "styled-components"
 
@@ -30,7 +31,7 @@ const StorybookGlobalStyle = createGlobalStyle`
 `
 
 export const decorators = [
-  (Story) => (
+  (Story: Story) => (
     <MuiThemeProvider theme={muiTheme}>
       <link
         href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
@@ -38,10 +39,10 @@ export const decorators = [
       />
       <FixedGlobalStyle extensionIsInTab />
       <StorybookGlobalStyle />
-      <StyledComponentsThemeProvider>
+      <ThemeProvider>
         <ThemedGlobalStyle />
         <Story />
-      </StyledComponentsThemeProvider>
+      </ThemeProvider>
     </MuiThemeProvider>
   ),
 ]

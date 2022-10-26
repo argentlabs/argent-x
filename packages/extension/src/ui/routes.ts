@@ -37,7 +37,7 @@ export const useReturnTo = () => {
 export const routes = {
   onboardingStart: route("/index.html"),
   onboardingDisclaimer: route("/onboarding/disclaimer"),
-  onboardingPrivacy: route("/onboarding/privacy"),
+  onboardingPrivacyStatement: route("/onboarding/privacy"),
   onboardingPassword: route("/onboarding/password"),
   onboardingFinish: route("/onboarding/finish"),
   onboardingRestoreBackup: route("/onboarding/restore/backup"),
@@ -127,6 +127,7 @@ export const routes = {
     "/settings/addressbook/add-or-edit/:contactId",
   ),
   settingsAddressbookAdd: route("/settings/addressbook/add-or-edit"),
+  settingsPrivacyStatement: route("/settings/privacy-policy"),
   networkWarning: route("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>

@@ -16,6 +16,9 @@ const Bar = styled.div`
 
   a {
     flex: 1;
+    svg {
+      display: inline;
+    }
   }
 
   hr {

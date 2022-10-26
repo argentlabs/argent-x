@@ -1,3 +1,4 @@
+import { ThemeProvider as ArgentTheme } from "@argent/ui"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
@@ -5,24 +6,18 @@ import { SWRConfig } from "swr"
 import AppErrorBoundaryFallback from "./AppErrorBoundaryFallback"
 import { AppRoutes } from "./AppRoutes"
 import { ErrorBoundary } from "./components/ErrorBoundary"
+import { AppDimensions } from "./components/Responsive"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
-import { useExtensionIsInTab } from "./features/browser/tabs"
 import DevUI from "./features/dev/DevUI"
 import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
 import { useSentryInit } from "./services/sentry"
 import { swrCacheProvider } from "./services/swr"
-import {
-  FixedGlobalStyle,
-  ThemeProvider as StyledComponentsThemeProvider,
-  ThemedGlobalStyle,
-  muiTheme,
-} from "./theme"
+import { ThemeProvider, muiTheme } from "./theme"
 
 export const App: FC = () => {
   useTracking()
   useSentryInit()
-  const extensionIsInTab = useExtensionIsInTab()
   return (
     <SoftReloadProvider>
       <SWRConfig value={{ provider: () => swrCacheProvider }}>
@@ -33,16 +28,18 @@ export const App: FC = () => {
             href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
             rel="stylesheet"
           />
-          <FixedGlobalStyle extensionIsInTab={extensionIsInTab} />
-          {process.env.SHOW_DEV_UI && <DevUI />}
-          <StyledComponentsThemeProvider>
-            <ThemedGlobalStyle />
-            <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
-              <Suspense fallback={<LoadingScreen />}>
-                <AppRoutes />
-              </Suspense>
-            </ErrorBoundary>
-          </StyledComponentsThemeProvider>
+          <ThemeProvider>
+            <ArgentTheme>
+              <AppDimensions>
+                {process.env.SHOW_DEV_UI && <DevUI />}
+                <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
+                  <Suspense fallback={<LoadingScreen />}>
+                    <AppRoutes />
+                  </Suspense>
+                </ErrorBoundary>
+              </AppDimensions>
+            </ArgentTheme>
+          </ThemeProvider>
         </MuiThemeProvider>
       </SWRConfig>
     </SoftReloadProvider>

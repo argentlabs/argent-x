@@ -5,6 +5,11 @@ import { MemoryRouter } from "react-router-dom"
 export default {
   title: "onboarding/OnboardingRestoreSeed",
   component: OnboardingRestoreSeed,
+  parameters: {
+    viewport: {
+      defaultViewport: "reset",
+    },
+  },
 } as ComponentMeta<typeof OnboardingRestoreSeed>
 
 const Template: ComponentStory<typeof OnboardingRestoreSeed> = (props) => (

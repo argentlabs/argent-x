@@ -3,6 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "./app.state"
+import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
@@ -34,7 +35,7 @@ import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDiscla
 import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisclaimerScreen"
 import { OnboardingFinishScreen } from "./features/onboarding/OnboardingFinishScreen"
 import { OnboardingPasswordScreen } from "./features/onboarding/OnboardingPasswordScreen"
-import { OnboardingPrivacyScreen } from "./features/onboarding/OnboardingPrivacyScreen"
+import { OnboardingPrivacyStatementScreen } from "./features/onboarding/OnboardingPrivacyStatementScreen"
 import { OnboardingRestoreBackup } from "./features/onboarding/OnboardingRestoreBackup"
 import { OnboardingRestorePassword } from "./features/onboarding/OnboardingRestorePassword"
 import { OnboardingRestoreSeed } from "./features/onboarding/OnboardingRestoreSeed"
@@ -54,6 +55,7 @@ import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFo
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
 import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
+import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
@@ -72,17 +74,11 @@ export const ScrollBehaviour = styled.div`
   }
 `
 
-export const ResponsiveBehaviour = styled.div`
-  ${({ theme }) => theme.mediaMinWidth.sm` 
-    margin: 0 ${theme.margin.extensionInTab};
-  `}
-`
-
-const Viewport: FC = () => (
+const ResponsiveViewport: FC = () => (
   <ScrollBehaviour>
-    <ResponsiveBehaviour>
+    <ResponsiveBox>
       <Outlet />
-    </ResponsiveBehaviour>
+    </ResponsiveBox>
   </ScrollBehaviour>
 )
 
@@ -219,6 +215,10 @@ const walletRoutes = (
       path={routes.settingsExperimental.path}
       element={<PrivacyExperimentalSettings />}
     />
+    <Route
+      path={routes.settingsPrivacyStatement.path}
+      element={<SettingsPrivacyStatementScreen />}
+    />
   </>
 )
 
@@ -233,8 +233,8 @@ const fullscreenRoutes = (
       element={<OnboardingDisclaimerScreen />}
     />
     <Route
-      path={routes.onboardingPrivacy.path}
-      element={<OnboardingPrivacyScreen />}
+      path={routes.onboardingPrivacyStatement.path}
+      element={<OnboardingPrivacyStatementScreen />}
     />
     <Route
       path={routes.onboardingPassword.path}
@@ -276,7 +276,7 @@ export const AppRoutes: FC = () => {
 
   return (
     <Routes>
-      <Route element={<Viewport />}>
+      <Route element={<ResponsiveViewport />}>
         {nonWalletRoutes}
         {actions[0] ? (
           <Route path="*" element={<ActionScreen />} />
