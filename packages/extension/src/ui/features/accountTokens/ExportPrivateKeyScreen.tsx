@@ -10,6 +10,7 @@ import { checkPassword } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { PasswordForm } from "../lock/PasswordForm"
+import { StatusMessageBanner } from "../statusMessage/StatusMessageBanner"
 import { usePrivateKey } from "./usePrivateKey"
 
 const Container = styled.div`
@@ -93,6 +94,25 @@ export const ExportPrivateKeyScreen: FC = () => {
   return (
     <Wrapper>
       <Paragraph>This is your private key (click to copy)</Paragraph>
+
+      <StatusMessageBanner
+        extendable={false}
+        statusMessage={{
+          message: "Never shown",
+          dismissable: false,
+          summary:
+            "This is a feature for developers only. You wont be able to recover your account with the private key! Please backup your Seed Phrase instead.",
+          level: "warn",
+        }}
+        onDismiss={() => {
+          // not possible
+        }}
+        style={{
+          marginBottom: "16px",
+          width: "100%",
+        }}
+      />
+
       {privateKey && (
         <CopyTooltip copyValue={privateKey} message="Copied">
           <KeyContainer>{privateKey}</KeyContainer>

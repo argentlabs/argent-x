@@ -1,7 +1,11 @@
 import { Collapse } from "@mui/material"
 import { colord } from "colord"
 import { FC, useCallback, useState } from "react"
-import styled from "styled-components"
+import styled, {
+  DefaultTheme,
+  StyledComponentProps,
+  css,
+} from "styled-components"
 
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import {
@@ -15,10 +19,22 @@ import { StatusMessageIcon } from "./StatusMessageIcon"
 import { useShouldShowStatusMessage } from "./useShouldShowStatusMessage"
 import { useStatusMessage } from "./useStatusMessage"
 
-export interface IStatusMessageBanner {
-  statusMessage: IStatusMessage | undefined
-  lastDismissedMessageId?: string
+export interface IStatusMessageBanner
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  extends StyledComponentProps<"div", DefaultTheme, {}, never> {
+  statusMessage:
+    | Pick<
+        IStatusMessage,
+        | "summary"
+        | "message"
+        | "linkTitle"
+        | "linkUrl"
+        | "level"
+        | "dismissable"
+      >
+    | undefined
   onDismiss: () => void
+  extendable?: boolean
 }
 
 export const StatusMessageBannerContainer: FC = () => {
@@ -55,6 +71,7 @@ const Container = styled.div<{
   line-height: 1.2;
   color: ${({ theme }) => theme.text1};
   font-weight: 600;
+  padding: 12px 16px;
   &:hover {
     ${ToggleButton} {
       opacity: ${({ expanded }) => (expanded ? 0 : 1)};
@@ -73,19 +90,22 @@ const IconContainer = styled.div<{ level: IStatusMessageLevel }>`
 const SummaryContainer = styled.div`
   display: flex;
   flex-direction: row;
-  padding: 12px 16px;
   align-items: center;
   gap: 12px;
 `
 
-const ClickableSummary = styled.div`
+const ClickableSummary = styled.div<{ extendable?: boolean }>`
   display: flex;
   flex: 1;
   flex-direction: row;
   gap: 6px;
   align-items: center;
-  cursor: pointer;
-  user-select: none;
+  ${({ extendable }) =>
+    extendable &&
+    css`
+      user-select: none;
+      cursor: pointer;
+    `}
 `
 
 const SummaryText = styled.div`
@@ -101,7 +121,7 @@ const DismissButton = styled.div`
 `
 
 const MessageContainer = styled.div`
-  padding: 0 16px 12px 16px;
+  padding-top: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -110,20 +130,24 @@ const MessageContainer = styled.div`
 export const StatusMessageBanner: FC<IStatusMessageBanner> = ({
   statusMessage,
   onDismiss,
+  extendable = true,
+  ...rest
 }) => {
   const [expanded, setExpanded] = useState(false)
   const toggleExpanded = useCallback(() => {
-    setExpanded((expanded) => !expanded)
-  }, [])
+    if (extendable) {
+      setExpanded((expanded) => !expanded)
+    }
+  }, [extendable])
   if (!statusMessage || !statusMessage.message) {
     return null
   }
   const { summary, message, linkTitle, linkUrl, level, dismissable } =
     statusMessage
   return (
-    <Container level={level} expanded={expanded}>
+    <Container level={level} expanded={expanded} {...rest}>
       <SummaryContainer>
-        <ClickableSummary onClick={toggleExpanded}>
+        <ClickableSummary extendable={extendable} onClick={toggleExpanded}>
           <IconContainer level={level}>
             <StatusMessageIcon
               level={level}
@@ -131,7 +155,7 @@ export const StatusMessageBanner: FC<IStatusMessageBanner> = ({
             ></StatusMessageIcon>
           </IconContainer>
           <SummaryText>{summary}</SummaryText>
-          <ToggleButton>More</ToggleButton>
+          {extendable && <ToggleButton>More</ToggleButton>}
         </ClickableSummary>
         {dismissable && (
           <DismissButton onClick={onDismiss}>
@@ -140,20 +164,21 @@ export const StatusMessageBanner: FC<IStatusMessageBanner> = ({
         )}
       </SummaryContainer>
       <Collapse in={expanded} timeout="auto">
-        <MessageContainer>{message}</MessageContainer>
-        {linkTitle && linkUrl && (
-          <MessageContainer>
+        <MessageContainer>
+          {message}
+          {linkTitle && linkUrl && (
             <Button
               as="a"
               size="s"
               variant={level}
               href={linkUrl}
               target="_blank"
+              style={{ marginTop: 16 }}
             >
               {linkTitle}
             </Button>
-          </MessageContainer>
-        )}
+          )}
+        </MessageContainer>
       </Collapse>
     </Container>
   )
