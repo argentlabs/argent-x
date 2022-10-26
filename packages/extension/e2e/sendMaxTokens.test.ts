@@ -1,5 +1,7 @@
 import { expect } from "@playwright/test"
 
+import { declareProxyContract } from "./apis/declareProxyContract"
+import { declareUpgradeContract } from "./apis/declareUpgradeContract"
 import { test } from "./fixture"
 import { getAccountAddressFromAccountPage } from "./selectors/getAccountAddressFromAccountPage"
 import { getBalanceFromAccountPage } from "./selectors/getBalanceFromAccountPage"
@@ -9,7 +11,6 @@ import { navigateFromAccountToAccountList } from "./steps/navigateFromAccountToA
 import { navigateFromAccountToTokenDetails } from "./steps/navigateFromAccountToTokenDetails"
 import { newAccount } from "./steps/newAccount"
 import { selectAccountFromAccountList } from "./steps/selectAccountFromAccountList"
-import { dismissUserReview } from "./steps/userReview"
 import { waitForAllPendingTransactionsInAccount } from "./steps/waitForAllPendingTransactionsInAccount"
 import { formatTruncatedAddress } from "./utils"
 
@@ -18,6 +19,10 @@ test("send max eth flow", async ({ page, context }) => {
     page,
     context,
   )
+
+  await declareProxyContract()
+
+  await declareUpgradeContract()
 
   await navigateFromAccountToAccountList(page)
   await newAccount(page)
@@ -35,7 +40,7 @@ test("send max eth flow", async ({ page, context }) => {
 
   await approveTransaction(page)
 
-  await dismissUserReview(page)
+  // await dismissUserReview(page)
 
   await page.waitForSelector("h3:has-text('Pending transactions')")
   await waitForAllPendingTransactionsInAccount(page)
