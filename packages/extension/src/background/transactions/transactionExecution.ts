@@ -124,27 +124,30 @@ export const calculateEstimateFeeFromL1Gas = async (
   account: WalletAccount,
   transactions: AllowArray<Call>,
 ): Promise<EstimateFee> => {
+  const fallbackPrice = number.toBN(10e14).toString()
   try {
+    if (account.networkId === "localhost") {
+      return {
+        overall_fee: fallbackPrice,
+        suggestedMaxFee: stark.estimatedFeeToMaxFee(fallbackPrice),
+      }
+    }
+
     const l1GasPrice = await getL1GasPrice(account.networkId)
 
     const callsLen = Array.isArray(transactions) ? transactions.length : 1
     const multiplier = BigNumber.from(3744)
-    console.log(
-      "🚀 ~ file: transactionExecution.ts ~ line 140 ~ multiplier",
-      multiplier.toString(),
-    )
 
     const price = l1GasPrice.mul(callsLen).mul(multiplier).toString()
+
     return {
       overall_fee: number.toBN(price),
       suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
     }
   } catch {
-    const price = number.toBN(100000000000000)
-
     return {
-      overall_fee: price,
-      suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
+      overall_fee: fallbackPrice,
+      suggestedMaxFee: stark.estimatedFeeToMaxFee(fallbackPrice),
     }
   }
 }
