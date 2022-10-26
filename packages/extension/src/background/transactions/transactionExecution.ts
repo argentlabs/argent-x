@@ -1,14 +1,14 @@
 import { BigNumber } from "ethers"
 import { Call, EstimateFee, constants, number, stark } from "starknet"
 
-import { AllowArray } from "./../../../../storybook/storybook-static/shared/storage/types"
-import { WalletAccount } from "./../../../../storybook/storybook-static/shared/wallet.model"
 import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
 import { getL1GasPrice } from "../../shared/ethersUtils"
+import { AllowArray } from "../../shared/storage/types"
 import { nameTransaction } from "../../shared/transactions"
+import { WalletAccount } from "../../shared/wallet.model"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce } from "../nonce"
 import { addTransaction } from "./store"
