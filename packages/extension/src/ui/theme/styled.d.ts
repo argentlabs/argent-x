@@ -6,12 +6,6 @@ export type Color = string
 export type Colors = typeof colors
 export type Components = typeof components
 
-interface ThemeOptions {
-  margin?: {
-    extensionInTab?: string
-  }
-}
-
 interface StyledBreakpoints {
   sm: ThemedCssFunction<DefaultTheme>
   md: ThemedCssFunction<DefaultTheme>
@@ -28,7 +22,5 @@ declare module "styled-components" {
     // media queries
     mediaMaxWidth: StyledBreakpoints
     mediaMinWidth: StyledBreakpoints
-
-    margin: { extensionInTab: string }
   }
 }

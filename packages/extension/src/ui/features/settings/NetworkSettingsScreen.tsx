@@ -11,6 +11,7 @@ import { defaultCustomNetworks } from "../../../shared/network/storage"
 import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, RefreshIcon } from "../../components/Icons/MuiIcons"
+import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { H2, P } from "../../theme/Typography"
@@ -54,8 +55,7 @@ const List = styled.div`
   }
 `
 
-const Footer = styled.div`
-  position: fixed;
+const Footer = styled(ResponsiveFixedBox)`
   bottom: 0;
   left: 0;
   right: 0;
@@ -72,10 +72,6 @@ const Footer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.mediaMinWidth.sm`
-    left: ${theme.margin.extensionInTab};
-    right: ${theme.margin.extensionInTab};
-  `}
 `
 
 const RestoreDefaultsButton = styled.button`
