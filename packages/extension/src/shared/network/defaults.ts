@@ -38,7 +38,7 @@ export const defaultNetworks: Network[] = [
       argentAccount:
         "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
       argentPluginAccount:
-        "0x29b5f9c24e0eb4f057af58416787f2370bb572d42532adceba5ff5a96cfa044",
+        "0xebe4b44d154bc07eacad202ee19757cdc73e7d4c672bc20d9031450c6db3ad",
     },
     multicallAddress:
       "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
