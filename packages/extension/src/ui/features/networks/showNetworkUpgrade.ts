@@ -9,14 +9,13 @@ interface ShowNetworkUpgradeMessage {
 }
 
 const useShowNetworkUpgradeMessage = create<ShowNetworkUpgradeMessage>(
-  // TODO: Add persist before merge
-  //   persist(
-  (set, _get) => ({
-    lastShown: 0,
-    updateLastShown: () => set({ lastShown: Date.now() }),
-  }),
-  //   { name: "networkUpgradeMessageState" },
-  //   ),
+  persist(
+    (set, _get) => ({
+      lastShown: 0,
+      updateLastShown: () => set({ lastShown: Date.now() }),
+    }),
+    { name: "networkUpgradeMessageState" },
+  ),
 )
 
 export const useShouldShowNetworkUpgradeMessage = () => {
