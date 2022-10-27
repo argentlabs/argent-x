@@ -141,19 +141,16 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
         <HeaderText>StarkNet is improving</HeaderText>
         {upgradeType === "account" && (
           <StyledPBold>
-            You have X days to upgrade your accounts. After that, you won’t be
-            able to access your old accounts.
+            To do this transaction, you need to first upgrade the account.
           </StyledPBold>
         )}
         <StyledP>
-          StarkNet has released an update to their network with breaking
-          changes. As a result we require you to upgrade each of your accounts
-          to support these changes
+          StarkNet has updated their network with important changes. We require
+          you to do a simple upgrade of your accounts to support these changes.
         </StyledP>
         {upgradeType === "network" && (
           <StyledPBold>
-            You have X days to upgrade your accounts. After that, you won’t be
-            able to access your old accounts.
+            Please upgrade your accounts now as they will soon stop working.
           </StyledPBold>
         )}
 
