@@ -441,7 +441,7 @@ export class Wallet {
       deployerAccount,
     )
 
-    if (starknetAccount instanceof Accountv4) {
+    if (!("deployAccount" in starknetAccount)) {
       throw Error("Cannot deploy old accounts")
     }
 
@@ -482,7 +482,7 @@ export class Wallet {
       deployerAccount,
     )
 
-    if (starknetAccount instanceof Accountv4) {
+    if (!("deployAccount" in starknetAccount)) {
       throw Error("Cannot estimate fee to deploy old accounts")
     }
 
