@@ -1,26 +1,14 @@
 import { colord } from "colord"
 import { FC, useState } from "react"
 import Measure from "react-measure"
-import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { useSWRConfig } from "swr"
 
-import { accountDeployAction } from "../../../background/accounDeployAction"
-import { Button, ButtonGroupVertical } from "../../components/Button"
+import { Button } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { RocketLaunchIcon } from "../../components/Icons/RocketLaunchIcon"
-import { StarknetIcon } from "../../components/Icons/StarknetIcon"
-import { routes } from "../../routes"
-import {
-  deployNewAccount,
-  upgradeAccount,
-} from "../../services/backgroundAccounts"
-import { rejectAction } from "../../services/backgroundActions"
+import { deployNewAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
-import { useActions } from "../actions/actions.state"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
-import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
-import { recover } from "../recovery/recovery.service"
 import { useSelectedAccountStore } from "./accounts.state"
 
 const StyledIconBar = styled(IconBar)`
@@ -92,19 +80,11 @@ export const DeployAccountScreen: FC<DeployAccountScreenProps> = ({
   onReject,
   ...props
 }) => {
-  const navigate = useNavigate()
-  const [action] = useActions()
   const { selectedAccount } = useSelectedAccountStore()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
 
   if (!selectedAccount) {
     return <></>
-  }
-
-  const rejectSignAction = async () => {
-    if (action && action.type === "SIGN") {
-      await rejectAction(action)
-    }
   }
 
   return (
@@ -141,9 +121,6 @@ export const DeployAccountScreen: FC<DeployAccountScreenProps> = ({
               <StickyGroup ref={measureRef}>
                 <PrimaryButton
                   onClick={async () => {
-                    // setTimeout(() => {
-                    //   onReject && rejectSignAction()
-                    // }, 1000)
                     await deployNewAccount(selectedAccount)
                   }}
                   type="button"
