@@ -617,18 +617,22 @@ export class Wallet {
       return new Account(provider, account.address, keyPair)
     }
 
-    const currentImplementation = await this.getCurrentImplementation(account)
+    const oldAccount = new Accountv4(providerV4, account.address, keyPair)
 
-    const { accountClassHash } = account.network
+    const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
 
-    if (
-      accountClassHash &&
-      !Object.values(accountClassHash).includes(currentImplementation)
-    ) {
-      return new Accountv4(providerV4, account.address, keyPair)
+    return isOldAccount
+      ? oldAccount
+      : new Account(provider, account.address, keyPair)
+  }
+
+  public async isNonceManagedOnAccountContract(account: Accountv4) {
+    try {
+      const nonce = await account.getNonce()
+      return !!nonce
+    } catch {
+      return false
     }
-
-    return new Account(provider, account.address, keyPair)
   }
 
   public async getCurrentImplementation(
