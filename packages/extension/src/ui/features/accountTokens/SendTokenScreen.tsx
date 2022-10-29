@@ -8,7 +8,6 @@ import { Schema, object } from "yup"
 import { AddressBookContact } from "../../../shared/addressBook"
 import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
 import { prettifyCurrencyValue } from "../../../shared/token/price"
-import { getFeeToken } from "../../../shared/token/utils"
 import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -53,7 +52,11 @@ import { TokenIcon } from "./TokenIcon"
 import { TokenMenu } from "./TokenMenu"
 import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
-import { TokenDetailsWithBalance, useTokensWithBalance } from "./tokens.state"
+import {
+  TokenDetailsWithBalance,
+  useNetworkFeeToken,
+  useTokensWithBalance,
+} from "./tokens.state"
 import { useMaxFeeEstimateForTransfer } from "./useMaxFeeForTransfer"
 
 export const BalanceText = styled.div`
@@ -197,7 +200,7 @@ export const SendTokenScreen: FC = () => {
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
-  const feeToken = account && getFeeToken(account.networkId)
+  const feeToken = useNetworkFeeToken(account?.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
   const [addressBookRecipient, setAddressBookRecipient] = useState<
     Account | AddressBookContact
