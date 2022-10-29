@@ -1,10 +1,10 @@
 {
   "name": "@argent-x/storybook",
-  "version": "4.8.7",
+  "version": "4.8.8",
   "private": true,
   "devDependencies": {
-    "@argent-x/extension": "^4.8.7",
-    "@argent/ui": "^4.8.7",
+    "@argent-x/extension": "^4.8.8",
+    "@argent/ui": "^4.8.8",
     "@babel/core": "^7.18.5",
     "@chakra-ui/storybook-addon": "^4.0.12",
     "@storybook/addon-actions": "^6.5.9",
