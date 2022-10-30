@@ -2,6 +2,7 @@ import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { BigNumber, utils } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
+import React from "react"
 import { Call } from "starknet"
 import styled, { css, keyframes } from "styled-components"
 import { DefaultTheme } from "styled-components"
@@ -13,6 +14,7 @@ import {
 } from "../../../shared/token/price"
 import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
+import { Button, ButtonGroupVertical } from "../../components/Button"
 import { CopyTooltip, Tooltip } from "../../components/CopyTooltip"
 import {
   Field,
@@ -34,6 +36,7 @@ import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { useAccount } from "../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
+import { StickyGroup } from "./ConfirmScreen"
 
 const FeeEstimationValue = styled.p`
   display: inline-block;
@@ -147,6 +150,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   if (!account) {
     throw new Error("Account not found")
   }
+  console.log("Fee Estimation!")
 
   const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
 
@@ -184,117 +188,134 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
     fee?.suggestedMaxFee,
   )
 
-  return (
-    <FieldGroup error={showError}>
-      <Field>
-        <FieldKeyGroup>
-          <FieldKey>
-            Network fee
-            <Tippy
-              content={
-                <Tooltip as="div">
-                  {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
-                </Tooltip>
-              }
-            >
-              {enoughBalance ? (
-                <StyledInfoRoundedIcon />
-              ) : (
-                <StyledReportGmailerrorredRoundedIcon />
-              )}
-            </Tippy>
-          </FieldKey>
-        </FieldKeyGroup>
-        {fee ? (
-          <FieldValueGroup>
-            <FieldValue>
-              {amountCurrencyValue !== undefined ? (
-                <FeeEstimationValue>
-                  ~{prettifyCurrencyValue(amountCurrencyValue)}
-                </FeeEstimationValue>
-              ) : (
-                <FeeEstimationValue>
-                  ~
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.amount,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.amount} Unknown</>
-                  )}
-                </FeeEstimationValue>
-              )}
-            </FieldValue>
-            <FieldValueMeta>
-              {suggestedMaxFeeCurrencyValue !== undefined ? (
-                <FeeEstimationValue>
-                  Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
-                </FeeEstimationValue>
-              ) : (
-                <FeeEstimationValue>
-                  Max ~
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.suggestedMaxFee,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.suggestedMaxFee} Unknown</>
-                  )}
-                </FeeEstimationValue>
-              )}
-            </FieldValueMeta>
-          </FieldValueGroup>
-        ) : showEstimateError ? (
-          <FeeEstimationValue>Error</FeeEstimationValue>
-        ) : (
-          <LoadingInput />
-        )}
-      </Field>
-      {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
-      {showEstimateError && (
-        <>
-          <FieldError justify="space-between">
-            Transaction failure predicted
-            <ExtendableControl
-              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
-                label: "Show error details",
-              })}
-            >
-              <DetailsText>Details</DetailsText>
-              <KeyboardArrowDownRounded
-                style={{
-                  transition: "transform 0.2s ease-in-out",
-                  transform: feeEstimateExpanded
-                    ? "rotate(-180deg)"
-                    : "rotate(0deg)",
-                  height: 13,
-                  width: 13,
-                }}
-              />
-            </ExtendableControl>
-          </FieldError>
+  function inspect() {
+    const trace = (fee as any).trace
+    console.log("trace", trace)
+    window.open(
+      `http://localhost:5000/inspect/?trace=${encodeURIComponent(
+        JSON.stringify(trace, null, 4),
+      )}`,
+      "_blank",
+      "noopener,noreferrer",
+    )
+  }
 
-          <Collapse in={feeEstimateExpanded} timeout="auto">
-            {parsedFeeEstimationError && (
-              <CopyTooltip
-                copyValue={parsedFeeEstimationError}
-                message="Copied"
+  return (
+    <React.Fragment>
+      <FieldGroup error={showError}>
+        <Field>
+          <FieldKeyGroup>
+            <FieldKey>
+              Network fee
+              <Tippy
+                content={
+                  <Tooltip as="div">
+                    {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
+                  </Tooltip>
+                }
               >
-                <FeeErrorContainer>
-                  <pre style={{ whiteSpace: "pre-wrap" }}>
-                    {parsedFeeEstimationError}
-                  </pre>
-                </FeeErrorContainer>
-              </CopyTooltip>
-            )}
-          </Collapse>
-        </>
-      )}
-    </FieldGroup>
+                {enoughBalance ? (
+                  <StyledInfoRoundedIcon />
+                ) : (
+                  <StyledReportGmailerrorredRoundedIcon />
+                )}
+              </Tippy>
+            </FieldKey>
+          </FieldKeyGroup>
+          {fee ? (
+            <FieldValueGroup>
+              <FieldValue>
+                {amountCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    ~{prettifyCurrencyValue(amountCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <FeeEstimationValue>
+                    ~
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: fee.amount,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{fee.amount} Unknown</>
+                    )}
+                  </FeeEstimationValue>
+                )}
+              </FieldValue>
+              <FieldValueMeta>
+                {suggestedMaxFeeCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <FeeEstimationValue>
+                    Max ~
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: fee.suggestedMaxFee,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{fee.suggestedMaxFee} Unknown</>
+                    )}
+                  </FeeEstimationValue>
+                )}
+              </FieldValueMeta>
+            </FieldValueGroup>
+          ) : showEstimateError ? (
+            <FeeEstimationValue>Error</FeeEstimationValue>
+          ) : (
+            <LoadingInput />
+          )}
+        </Field>
+        {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
+        {showEstimateError && (
+          <>
+            <FieldError justify="space-between">
+              Transaction failure predicted
+              <ExtendableControl
+                {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+                  label: "Show error details",
+                })}
+              >
+                <DetailsText>Details</DetailsText>
+                <KeyboardArrowDownRounded
+                  style={{
+                    transition: "transform 0.2s ease-in-out",
+                    transform: feeEstimateExpanded
+                      ? "rotate(-180deg)"
+                      : "rotate(0deg)",
+                    height: 13,
+                    width: 13,
+                  }}
+                />
+              </ExtendableControl>
+            </FieldError>
+
+            <Collapse in={feeEstimateExpanded} timeout="auto">
+              {parsedFeeEstimationError && (
+                <CopyTooltip
+                  copyValue={parsedFeeEstimationError}
+                  message="Copied"
+                >
+                  <FeeErrorContainer>
+                    <pre style={{ whiteSpace: "pre-wrap" }}>
+                      {parsedFeeEstimationError}
+                    </pre>
+                  </FeeErrorContainer>
+                </CopyTooltip>
+              )}
+            </Collapse>
+          </>
+        )}
+      </FieldGroup>
+      <Button disabled={!fee} onClick={inspect} type="button">
+        Inspect
+      </Button>
+    </React.Fragment>
   )
 }
 
