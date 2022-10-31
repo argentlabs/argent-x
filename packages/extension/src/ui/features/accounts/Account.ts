@@ -93,11 +93,6 @@ export class Account {
     this.deployTransaction = undefined
   }
 
-  public async getCurrentNonce(): Promise<string> {
-    const { nonce } = await this.contract.call("get_nonce")
-    return nonce.toString()
-  }
-
   public async getCurrentImplementation(): Promise<string | undefined> {
     if (this.needsDeploy) {
       return this.type === "argent"
