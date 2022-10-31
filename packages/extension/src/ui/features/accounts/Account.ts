@@ -10,10 +10,7 @@ import {
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import {
-  createNewAccount,
-  deployNewAccount,
-} from "../../services/backgroundAccounts"
+import { createNewAccount } from "../../services/backgroundAccounts"
 
 export interface AccountConstructorProps {
   address: string
@@ -95,9 +92,7 @@ export class Account {
 
   public async getCurrentImplementation(): Promise<string | undefined> {
     if (this.needsDeploy) {
-      return this.type === "argent"
-        ? this.network.accountClassHash?.argentAccount
-        : this.network.accountClassHash?.argentPluginAccount
+      return this.network.accountClassHash?.argentAccount // cuz we always deploy regular accounts
     }
 
     const { implementation } = await this.proxyContract.call(
