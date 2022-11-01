@@ -1,95 +1,26 @@
-import { FC, useEffect } from "react"
+import { B3, L2 } from "@argent/ui"
+import {
+  Button,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/react"
+import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import styled, { css } from "styled-components"
+import styled from "styled-components"
 
 import { NetworkStatus } from "../../../shared/network"
-import { equalNetwork } from "../../../shared/network/storage"
 import { useAppState } from "../../app.state"
 import {
-  NetworkStatusIndicator,
+  StatusIndicator,
   mapNetworkStatusToColor,
 } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
-import { recover } from "../recovery/recovery.service"
+import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 import { useNetwork, useNetworkStatuses, useNetworks } from "./useNetworks"
-
-const NetworkName = styled.span`
-  text-align: right;
-`
-
-const Network = styled.div<{ selected?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: right;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 14.4px;
-
-  background-color: rgba(255, 255, 255, 0.15);
-  padding: 8px 12px;
-
-  font-weight: ${({ selected }) => (selected ? 600 : 400)};
-  font-size: 12px;
-  line-height: 14.4px;
-
-  color: ${({ theme, selected }) =>
-    selected ? theme.text1 : "rgba(255, 255, 255, 0.7)"};
-  &:hover {
-    color: ${({ theme }) => theme.text1};
-  }
-
-  cursor: ${({ selected }) => (selected ? "default" : "pointer")};
-
-  > span {
-    padding-right: 5px;
-  }
-`
-
-const NetworkList = styled.div`
-  display: none;
-  position: absolute;
-  width: 100%;
-  z-index: 1;
-  background: ${({ theme }) => theme.bg1};
-  border-radius: 0 0 15px 15px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-
-  & > ${Network} {
-    border-top: 1px #525252 solid;
-  }
-
-  & > ${Network}:last-child {
-    border-radius: 0 0 15px 15px;
-  }
-`
-
-const NetworkSwitcherWrapper = styled.div<{
-  disabled?: boolean
-}>`
-  position: relative;
-
-  & > ${Network} {
-    border-radius: 30px;
-  }
-
-  ${({ disabled }) =>
-    !disabled &&
-    css`
-      &:hover ${NetworkList} {
-        display: block;
-      }
-
-      &:hover > ${Network} {
-        border-radius: 15px 15px 0 0;
-      }
-
-      &:hover ${NetworkName} {
-        min-width: 110px;
-      }
-    `}
-`
 
 export const NetworkStatusWrapper = styled.div`
   display: flex;
@@ -111,9 +42,6 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const currentNetwork = useNetwork(switcherNetworkId)
   const { networkStatuses } = useNetworkStatuses()
   const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
-  const otherNetworks = allNetworks.filter(
-    (n) => !equalNetwork(n, currentNetwork),
-  )
   const currentNetworkStatus = networkStatuses[currentNetwork.id]
 
   useEffect(() => {
@@ -127,29 +55,79 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
     // just trigger on network status change
   }, [currentNetworkStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const onChangeNetwork = useCallback(async (networkId: string) => {
+    await autoSelectAccountOnNetwork(networkId)
+  }, [])
+
   return (
-    <NetworkSwitcherWrapper disabled={disabled}>
-      <Network selected role="button" aria-label="Selected network">
-        <NetworkName>{currentNetwork.name}</NetworkName>
-        <NetworkStatusIndicator
-          color={mapNetworkStatusToColor(currentNetworkStatus)}
-        />
-      </Network>
-      <NetworkList>
-        {otherNetworks.map(({ id, name }) => (
-          <Network
-            key={id}
-            onClick={async () =>
-              navigate(await recover({ networkId: id, showAccountList: true }))
-            }
-          >
-            <NetworkName>{name}</NetworkName>
-            <NetworkStatusIndicator
-              color={mapNetworkStatusToColor(networkStatuses[id])}
-            />
-          </Network>
-        ))}
-      </NetworkList>
-    </NetworkSwitcherWrapper>
+    <Menu>
+      <MenuButton
+        isDisabled={disabled}
+        colorScheme={"neutrals800"}
+        size={"2xs"}
+        as={Button}
+        rightIcon={
+          <StatusIndicator
+            color={mapNetworkStatusToColor(currentNetworkStatus)}
+          />
+        }
+      >
+        {currentNetwork.name}
+      </MenuButton>
+      <MenuList>
+        {allNetworks.map(({ id, name, baseUrl }) => {
+          const isCurrent = id === currentNetwork.id
+          return (
+            <MenuItem
+              key={id}
+              onClick={() => onChangeNetwork(id)}
+              sx={
+                isCurrent
+                  ? {
+                      backgroundColor: "neutrals.600",
+                    }
+                  : {}
+              }
+              data-group
+            >
+              <Flex
+                ml={"auto"}
+                justifyContent={"flex-end"}
+                alignItems={"center"}
+                pointerEvents={"none"}
+              >
+                <Flex
+                  direction={"column"}
+                  alignItems={"flex-end"}
+                  textAlign={"right"}
+                  mr={2}
+                >
+                  <B3
+                    sx={{
+                      color: "neutrals.100",
+                      _groupHover: { color: "white" },
+                    }}
+                  >
+                    {name}
+                  </B3>
+                  <L2
+                    sx={{
+                      color: "neutrals.400",
+                      _groupHover: { color: "neutrals.300" },
+                    }}
+                    noOfLines={1}
+                  >
+                    {baseUrl}
+                  </L2>
+                </Flex>
+                <StatusIndicator
+                  color={mapNetworkStatusToColor(networkStatuses[id])}
+                />
+              </Flex>
+            </MenuItem>
+          )
+        })}
+      </MenuList>
+    </Menu>
   )
 }
