@@ -4,7 +4,11 @@ export const colors = {
   transparent: "transparent",
   current: "currentColor",
   black: "#000000",
+  black30: "rgba(0,0,0,0.3)",
+  black50: "rgba(0,0,0,0.5)",
   white: "#ffffff",
+  white30: "rgba(255,255,255,0.3)",
+  white50: "rgba(255,255,255,0.5)",
   gray: makeColorVariants(
     "#707072" /** neutrals.400 */,
     true,

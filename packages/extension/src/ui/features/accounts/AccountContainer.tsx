@@ -1,11 +1,9 @@
-import { AbsoluteBox, icons } from "@argent/ui"
-import { useScroll } from "@argent/ui"
+import { ScrollContainer, Tab, TabBar, icons, useScroll } from "@argent/ui"
 import { FC, PropsWithChildren } from "react"
+import { NavLink } from "react-router-dom"
 import styled, { css } from "styled-components"
 
-import { ContentContainer } from "../../components/ContentContainer"
 import { Header } from "../../components/Header"
-import { Tab, TabBar } from "../../components/TabBar"
 import { routes } from "../../routes"
 import { AccountHeader } from "./AccountHeader"
 import { useSelectedAccount } from "./accounts.state"
@@ -44,21 +42,30 @@ export const AccountContainer: FC<PropsWithChildren> = ({ children }) => {
   }
 
   return (
-    <AbsoluteBox>
-      <ContentContainer ref={scrollRef} navigationBarInset tabBarInset>
-        {children}
-      </ContentContainer>
+    <>
       <AccountHeader scroll={scroll} />
+      <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
       <TabBar>
-        <Tab to={routes.accountTokens()} icon={<WalletIcon />} label="Tokens" />
-        <Tab to={routes.accountCollections()} icon={<NftIcon />} label="NFTs" />
         <Tab
+          as={NavLink}
+          to={routes.accountTokens()}
+          icon={<WalletIcon />}
+          label="Tokens"
+        />
+        <Tab
+          as={NavLink}
+          to={routes.accountCollections()}
+          icon={<NftIcon />}
+          label="NFTs"
+        />
+        <Tab
+          as={NavLink}
           to={routes.accountActivity()}
           icon={<ActivityIcon />}
           badgeLabel={pendingTransactions.length}
           label="Activity"
         />
       </TabBar>
-    </AbsoluteBox>
+    </>
   )
 }

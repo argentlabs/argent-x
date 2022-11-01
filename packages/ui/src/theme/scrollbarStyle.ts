@@ -6,12 +6,13 @@ export const scrollbarStyle = {
     backgroundColor: "transparent",
   },
   "&::-webkit-scrollbar": {
-    width: "6px",
-    height: "6px",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    width: 1.5,
+    height: 1.5,
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    backgroundColor: "black30",
     borderRadius: "3px",
+    border: "1px solid",
+    borderColor: "white30",
   },
 }

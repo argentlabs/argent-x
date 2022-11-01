@@ -1,15 +1,16 @@
-import { AbsoluteFlex, H6, IScroll, icons } from "@argent/ui"
-import { Button, chakra } from "@chakra-ui/react"
+import { Button, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
-import { useNavigate } from "react-router-dom"
 
-import { navigateBack } from "../../../e2e/steps/navigateBack"
+import { IScroll } from "../hooks"
+import { AbsoluteFlex } from "./Absolute"
+import * as icons from "./icons"
+import { H6 } from "./Typography"
 
 const { CloseIcon } = icons
 
 export const NavigationBarHeight = 14
 
-const Container = chakra(AbsoluteFlex, {
+const Container = chakra(Flex, {
   baseStyle: {
     position: "relative",
     alignItems: "center",
@@ -20,6 +21,7 @@ const Container = chakra(AbsoluteFlex, {
     transitionProperty: "background",
     transitionDuration: "fast",
     flexShrink: 0,
+    zIndex: 1 /** shadow should appear over siblings regardless of DOM order */,
   },
 })
 
@@ -63,17 +65,11 @@ export const BarIconButton: FC<ComponentProps<typeof Button>> = ({
   </Button>
 )
 
-export interface BarCloseButtonProps {
-  onClick?: () => void
-}
-
-export const BarCloseButton: FC<BarCloseButtonProps> = ({
-  onClick: onClickProp,
-}) => {
-  const navigate = useNavigate()
-  const onClick = onClickProp ? onClickProp : () => navigate(-1)
+export const BarCloseButton: FC<ComponentProps<typeof BarIconButton>> = (
+  props,
+) => {
   return (
-    <BarIconButton onClick={onClick}>
+    <BarIconButton {...props}>
       <CloseIcon />
     </BarIconButton>
   )

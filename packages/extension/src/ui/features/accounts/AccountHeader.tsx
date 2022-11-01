@@ -1,13 +1,13 @@
-import { icons } from "@argent/ui"
-import { Button, Text } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-
 import {
   BarIconButton,
   NavigationBar,
   NavigationBarProps,
-} from "../../components/NavigationBar"
+  icons,
+} from "@argent/ui"
+import { Button, Text } from "@chakra-ui/react"
+import { FC, useCallback } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+
 import { routes } from "../../routes"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
@@ -52,7 +52,12 @@ export const AccountHeader: FC<AccountHeaderProps> = ({ scroll }) => {
         </Text>
       </Button>
       <NetworkSwitcher />
-      <BarIconButton aria-label="Show settings" onClick={showSettings}>
+      <BarIconButton
+        ml={1}
+        aria-label="Show settings"
+        onClick={showSettings}
+        colorScheme={"neutrals800"}
+      >
         <SettingsIcon />
       </BarIconButton>
     </NavigationBar>

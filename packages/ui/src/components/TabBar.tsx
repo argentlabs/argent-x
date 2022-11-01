@@ -1,11 +1,10 @@
-import { AbsoluteFlex } from "@argent/ui"
-import { Center, Circle, chakra } from "@chakra-ui/react"
+import { Center, Circle, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode } from "react"
 import { NavLink } from "react-router-dom"
 
 export const TabBarHeight = 16
 
-export const TabBar = chakra(AbsoluteFlex, {
+export const TabBar = chakra(Flex, {
   baseStyle: {
     top: "initial",
     bottom: 0,
@@ -62,16 +61,22 @@ export const TabBadge = chakra(Circle, {
   },
 })
 
-export interface TabProps extends ComponentProps<typeof NavLink> {
+export interface TabProps extends ComponentProps<typeof TabContainer> {
   icon: ReactNode
   label?: string
   badgeLabel?: string | number
 }
 
-export const Tab: FC<TabProps> = ({ icon, label, badgeLabel, ...rest }) => {
+export const Tab: FC<TabProps> = ({
+  icon,
+  label,
+  badgeLabel,
+  as = NavLink,
+  ...rest
+}) => {
   const showBadgeLabel = Number(badgeLabel) > 0
   return (
-    <TabContainer aria-label={label} as={NavLink} role="group" {...rest}>
+    <TabContainer aria-label={label} role="group" as={as} {...rest}>
       {showBadgeLabel && <TabBadge size={2} />}
       <TabIconContainer size={10}>{icon}</TabIconContainer>
     </TabContainer>

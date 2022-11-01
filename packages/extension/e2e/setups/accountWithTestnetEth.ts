@@ -4,7 +4,6 @@ import { mintDevnetEthToAccount } from "../apis/sendDevnetEthToAccount"
 import { getAccountAddressFromAccountPage } from "../selectors/getAccountAddressFromAccountPage"
 import { getBalanceFromAccountPage } from "../selectors/getBalanceFromAccountPage"
 import { disableNetworkIssuesWarning } from "../steps/disableNetworkIssuesWarning"
-import { navigateFromAccountToAccountList } from "../steps/navigateFromAccountToAccountList"
 import { newAccount } from "../steps/newAccount"
 import {
   continueNewWalletAfterOnboarding,

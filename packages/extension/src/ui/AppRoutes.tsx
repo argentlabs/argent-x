@@ -88,6 +88,8 @@ const LegacyResponsiveViewport: FC = () => (
 
 export const ResponsiveContainer = chakra(ResponsiveBox, {
   baseStyle: {
+    display: "flex",
+    flexDirection: "column",
     position: "relative",
     height: "100vh",
     overflowY: "hidden",

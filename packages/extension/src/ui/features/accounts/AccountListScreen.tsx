@@ -1,4 +1,11 @@
-import { AbsoluteFlex, icons, useScroll } from "@argent/ui"
+import {
+  BarCloseButton,
+  BarIconButton,
+  NavigationBar,
+  ScrollContainer,
+  icons,
+  useScroll,
+} from "@argent/ui"
 import { partition, some } from "lodash-es"
 import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -6,14 +13,8 @@ import styled from "styled-components"
 
 import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
-import { ContentContainer } from "../../components/ContentContainer"
 import { IconButton } from "../../components/IconButton"
 import { VisibilityOff } from "../../components/Icons/MuiIcons"
-import {
-  BarCloseButton,
-  BarIconButton,
-  NavigationBar,
-} from "../../components/NavigationBar"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
 import { routes, useReturnTo } from "../../routes"
@@ -119,7 +120,6 @@ const HiddenAccountsButtonIcon = styled.div`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  console.log({ returnTo })
   const { switcherNetworkId } = useAppState()
   const { selectedAccount } = useSelectedAccountStore()
   const allAccounts = useAccounts({ showHidden: true })
@@ -154,8 +154,27 @@ export const AccountListScreen: FC = () => {
   const { scrollRef, scroll } = useScroll()
 
   return (
-    <AbsoluteFlex flexDirection={"column"}>
-      <ContentContainer navigationBarInset ref={scrollRef}>
+    <>
+      <NavigationBar
+        scroll={scroll}
+        leftButton={
+          <BarCloseButton
+            onClick={returnTo ? () => navigate(returnTo) : undefined}
+            disabled={isDeploying}
+          />
+        }
+        title={"My accounts"}
+        rightButton={
+          <BarIconButton
+            aria-label="Create new wallet"
+            onClick={handleAddAccount}
+            isLoading={isDeploying}
+          >
+            <AddIcon />
+          </BarIconButton>
+        }
+      />
+      <ScrollContainer ref={scrollRef}>
         <AccountList hasHiddenAccounts={hasHiddenAccounts}>
           {isBackupRequired && <RecoveryBanner noMargins />}
           {visibleAccounts.length === 0 && (
@@ -220,25 +239,7 @@ export const AccountListScreen: FC = () => {
             </HiddenAccountsButton>
           </Footer>
         )}
-      </ContentContainer>
-      <NavigationBar
-        scroll={scroll}
-        leftButton={
-          <BarCloseButton
-            onClick={returnTo ? () => navigate(returnTo) : undefined}
-          />
-        }
-        title={"My accounts"}
-        rightButton={
-          <BarIconButton
-            aria-label="Create new wallet"
-            onClick={handleAddAccount}
-            isLoading={isDeploying}
-          >
-            <AddIcon />
-          </BarIconButton>
-        }
-      />
-    </AbsoluteFlex>
+      </ScrollContainer>
+    </>
   )
 }
