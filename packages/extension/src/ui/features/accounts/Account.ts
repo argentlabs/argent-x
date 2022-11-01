@@ -103,8 +103,8 @@ export class Account {
 
   public static async create(networkId: string): Promise<Account> {
     const result = await createNewAccount(networkId)
-    if ("error" in result) {
-      throw new Error(result.error)
+    if (result === "error") {
+      throw new Error(result)
     }
 
     const network = await getNetwork(networkId)

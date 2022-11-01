@@ -10,11 +10,9 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 export const createNewAccount = async (networkId: string) => {
   sendMessage({ type: "NEW_ACCOUNT", data: networkId })
   try {
-    await Promise.race([
+    return await Promise.race([
       waitForMessage("NEW_ACCOUNT_RES"),
-      waitForMessage("NEW_ACCOUNT_REJ").then(() => {
-        throw new Error("Rejected")
-      }),
+      waitForMessage("NEW_ACCOUNT_REJ").then(() => "error" as const),
     ])
   } catch {
     throw Error("Could add new account")
