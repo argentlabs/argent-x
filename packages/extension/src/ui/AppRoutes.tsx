@@ -1,3 +1,4 @@
+import { chakra } from "@chakra-ui/system"
 import { FC } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
@@ -61,7 +62,9 @@ import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
 
-export const ScrollBehaviour = styled.div`
+/** Screens using legacy UI should remain inside this container */
+
+export const LegacyScrollBehaviour = styled.div`
   height: 100vh;
   overflow-y: auto;
 
@@ -73,12 +76,36 @@ export const ScrollBehaviour = styled.div`
   }
 `
 
-const ResponsiveViewport: FC = () => (
-  <ScrollBehaviour>
+const LegacyResponsiveViewport: FC = () => (
+  <LegacyScrollBehaviour>
     <ResponsiveBox>
       <Outlet />
     </ResponsiveBox>
-  </ScrollBehaviour>
+  </LegacyScrollBehaviour>
+)
+
+/** Screens using new UI should moved inside this container */
+
+export const ResponsiveContainer = chakra(ResponsiveBox, {
+  baseStyle: {
+    display: "flex",
+    flexDirection: "column",
+    position: "relative",
+    height: "100vh",
+    overflowY: "hidden",
+    overscrollBehavior: "none",
+    msOverflowStyle: "none",
+    scrollbarWidth: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
+  },
+})
+
+const ResponsiveRoutes: FC = () => (
+  <ResponsiveContainer>
+    <Outlet />
+  </ResponsiveContainer>
 )
 
 // Routes which don't need an unlocked wallet
@@ -95,25 +122,14 @@ const nonWalletRoutes = (
 )
 
 // Routes which need an unlocked wallet and therefore can also sign actions
-const walletRoutes = (
+const legacyUiWalletRoutes = (
   <>
     <Route
       path={routes.networkWarning.path}
       element={<NetworkWarningScreen />}
     />
     <Route path={routes.accountNft.path} element={<NftScreen />} />
-    <Route
-      path={routes.accountTokens.path}
-      element={<AccountScreen tab="tokens" />}
-    />
-    <Route
-      path={routes.accountCollections.path}
-      element={<AccountScreen tab="collections" />}
-    />
-    <Route
-      path={routes.accountActivity.path}
-      element={<AccountScreen tab="activity" />}
-    />
+
     <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
@@ -131,7 +147,6 @@ const walletRoutes = (
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
-    <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route
       path={routes.accountsHidden.path}
       element={<AccountListHiddenScreen />}
@@ -213,6 +228,25 @@ const walletRoutes = (
   </>
 )
 
+/** Screens using new UI */
+const walletRoutes = (
+  <>
+    <Route
+      path={routes.accountTokens.path}
+      element={<AccountScreen tab="tokens" />}
+    />
+    <Route
+      path={routes.accountCollections.path}
+      element={<AccountScreen tab="collections" />}
+    />
+    <Route
+      path={routes.accountActivity.path}
+      element={<AccountScreen tab="activity" />}
+    />
+    <Route path={routes.accounts.path} element={<AccountListScreen />} />
+  </>
+)
+
 const fullscreenRoutes = (
   <>
     <Route
@@ -265,16 +299,21 @@ export const AppRoutes: FC = () => {
     return <LoadingScreen />
   }
 
+  const hasActions = !!actions[0]
+
   return (
     <Routes>
-      <Route element={<ResponsiveViewport />}>
+      <Route element={<LegacyResponsiveViewport />}>
         {nonWalletRoutes}
-        {actions[0] ? (
+        {hasActions ? (
           <Route path="*" element={<ActionScreen />} />
         ) : (
-          walletRoutes
+          legacyUiWalletRoutes
         )}
       </Route>
+      {!hasActions && (
+        <Route element={<ResponsiveRoutes />}>{walletRoutes}</Route>
+      )}
       {fullscreenRoutes}
     </Routes>
   )

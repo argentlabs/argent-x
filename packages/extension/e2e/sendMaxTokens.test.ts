@@ -27,6 +27,8 @@ test("send max eth flow", async ({ page, context }) => {
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, a1)
 
+  await dismissUserReview(page)
+
   await navigateFromAccountToTokenDetails(page, "Ethereum")
   await page.click("button:has-text('Send')")
   await page.click("button:has-text('MAX')")
@@ -34,8 +36,6 @@ test("send max eth flow", async ({ page, context }) => {
   await page.click("button:has-text('Next'):not([disabled])")
 
   await approveTransaction(page)
-
-  await dismissUserReview(page)
 
   await page.waitForSelector("h3:has-text('Pending transactions')")
   await waitForAllPendingTransactionsInAccount(page)

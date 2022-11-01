@@ -1,3 +1,11 @@
+import {
+  BarCloseButton,
+  BarIconButton,
+  NavigationBar,
+  ScrollContainer,
+  icons,
+  useScroll,
+} from "@argent/ui"
 import { partition, some } from "lodash-es"
 import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -5,25 +13,17 @@ import styled from "styled-components"
 
 import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
-import { Header } from "../../components/Header"
 import { IconButton } from "../../components/IconButton"
-import {
-  AddIcon,
-  SettingsIcon,
-  VisibilityOff,
-} from "../../components/Icons/MuiIcons"
+import { VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { connectAccount } from "../../services/backgroundAccounts"
-import { H1, P } from "../../theme/Typography"
-import { NetworkSwitcher } from "../networks/NetworkSwitcher"
+import { P } from "../../theme/Typography"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
-import { Container } from "./AccountContainer"
-import { AccountHeader } from "./AccountHeader"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import { deployAccount } from "./accounts.service"
 import {
@@ -32,6 +32,8 @@ import {
   useSelectedAccountStore,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
+
+const { AddIcon } = icons
 
 interface IAccountList {
   hasHiddenAccounts: boolean
@@ -43,20 +45,6 @@ const AccountList = styled.div<IAccountList>`
   gap: 24px;
   padding: 48px 32px
     ${({ hasHiddenAccounts }) => (hasHiddenAccounts ? "64px" : "48px")} 32px;
-`
-
-const AccountListWrapper = styled(Container)`
-  display: flex;
-  flex-direction: column;
-  position: relative;
-
-  ${H1} {
-    text-align: center;
-  }
-
-  > ${AccountList} {
-    width: 100%;
-  }
 `
 
 const IconButtonCenter = styled(IconButton)`
@@ -131,6 +119,7 @@ const HiddenAccountsButtonIcon = styled.div`
 
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
+  const returnTo = useReturnTo()
   const { switcherNetworkId } = useAppState()
   const { selectedAccount } = useSelectedAccountStore()
   const allAccounts = useAccounts({ showHidden: true })
@@ -162,85 +151,95 @@ export const AccountListScreen: FC = () => {
     }
   }, [navigate, switcherNetworkId])
 
+  const { scrollRef, scroll } = useScroll()
+
   return (
-    <AccountListWrapper header>
-      <AccountHeader>
-        <Header>
-          <IconButton
-            size={36}
-            {...makeClickable(() => navigate(routes.settings()), {
-              label: "Settings",
-              tabIndex: 99,
-            })}
-          >
-            <SettingsIcon />
-          </IconButton>
-          <NetworkSwitcher />
-        </Header>
-      </AccountHeader>
-      <H1>Accounts</H1>
-      <AccountList hasHiddenAccounts={hasHiddenAccounts}>
-        {isBackupRequired && <RecoveryBanner noMargins />}
-        {visibleAccounts.length === 0 && (
-          <Paragraph>
-            No {hasHiddenAccounts ? "visible" : ""} accounts on this network,
-            click below to add one.
-          </Paragraph>
-        )}
-        {newAccounts.map((account) => (
-          <AccountListScreenItem
-            key={account.address}
-            account={account}
-            selectedAccount={selectedAccount}
-            canShowUpgrade
+    <>
+      <NavigationBar
+        scroll={scroll}
+        leftButton={
+          <BarCloseButton
+            onClick={returnTo ? () => navigate(returnTo) : undefined}
+            disabled={isDeploying}
           />
-        ))}
-        {some(deprecatedAccounts) && (
-          <>
-            <DeprecatedAccountsWarning />
-            {deprecatedAccounts.map((account) => (
-              <AccountListScreenItem
-                key={account.address}
-                account={account}
-                selectedAccount={selectedAccount}
-                canShowUpgrade
-              />
-            ))}
-          </>
-        )}
-        {isDeploying ? (
-          <>
-            <DimmingContainer />
-            <IconButtonCenterDisabled size={48}>
-              <Spinner size={24} />
-            </IconButtonCenterDisabled>
-          </>
-        ) : (
-          <IconButtonCenter
-            size={48}
-            {...makeClickable(handleAddAccount, { label: "Create new wallet" })}
+        }
+        title={"My accounts"}
+        rightButton={
+          <BarIconButton
+            aria-label="Create new wallet"
+            onClick={handleAddAccount}
+            isLoading={isDeploying}
           >
-            <AddIcon fontSize="large" />
-          </IconButtonCenter>
+            <AddIcon />
+          </BarIconButton>
+        }
+      />
+      <ScrollContainer ref={scrollRef}>
+        <AccountList hasHiddenAccounts={hasHiddenAccounts}>
+          {isBackupRequired && <RecoveryBanner noMargins />}
+          {visibleAccounts.length === 0 && (
+            <Paragraph>
+              No {hasHiddenAccounts ? "visible" : ""} accounts on this network,
+              click below to add one.
+            </Paragraph>
+          )}
+          {newAccounts.map((account) => (
+            <AccountListScreenItem
+              key={account.address}
+              account={account}
+              selectedAccount={selectedAccount}
+              canShowUpgrade
+            />
+          ))}
+          {some(deprecatedAccounts) && (
+            <>
+              <DeprecatedAccountsWarning />
+              {deprecatedAccounts.map((account) => (
+                <AccountListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  canShowUpgrade
+                />
+              ))}
+            </>
+          )}
+          {isDeploying ? (
+            <>
+              <DimmingContainer />
+              <IconButtonCenterDisabled size={48}>
+                <Spinner size={24} />
+              </IconButtonCenterDisabled>
+            </>
+          ) : (
+            <IconButtonCenter
+              size={48}
+              {...makeClickable(handleAddAccount, {
+                label: "Create new wallet",
+              })}
+            >
+              <AddIcon fontSize="large" />
+            </IconButtonCenter>
+          )}
+          {deployFailed && (
+            <ErrorText>
+              Sorry, unable to create wallet. Please try again later.
+            </ErrorText>
+          )}
+        </AccountList>
+        {hasHiddenAccounts && (
+          <Footer>
+            <HiddenAccountsButton
+              onClick={() => navigate(routes.accountsHidden())}
+            >
+              <HiddenAccountsButtonIcon>
+                <VisibilityOff fontSize="inherit" />
+              </HiddenAccountsButtonIcon>
+              <div>Hidden accounts</div>
+            </HiddenAccountsButton>
+          </Footer>
         )}
-        {deployFailed && (
-          <ErrorText>
-            Sorry, unable to create wallet. Please try again later.
-          </ErrorText>
-        )}
-      </AccountList>
-      {hasHiddenAccounts && (
-        <Footer>
-          <HiddenAccountsButton
-            onClick={() => navigate(routes.accountsHidden())}
-          >
-            <HiddenAccountsButtonIcon>
-              <VisibilityOff fontSize="inherit" />
-            </HiddenAccountsButtonIcon>
-            <div>Hidden accounts</div>
-          </HiddenAccountsButton>
-        </Footer>
-      )}
-    </AccountListWrapper>
+      </ScrollContainer>
+    </>
   )
 }

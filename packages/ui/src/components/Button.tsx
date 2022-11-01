@@ -1,5 +1,4 @@
-import { chakra, defineStyleConfig } from "@chakra-ui/react"
-import { Button } from "@chakra-ui/react"
+import { Button, chakra, defineStyleConfig } from "@chakra-ui/react"
 
 /** as a convenience */
 export { Button }
@@ -23,6 +22,7 @@ export const buttonTheme = defineStyleConfig({
     },
   },
   sizes: {
+    auto: {},
     "2xs": {
       minHeight: 8,
       fontSize: "sm",

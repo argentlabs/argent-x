@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
 import { H1 } from "../../theme/Typography"
-import { Container } from "./AccountContainer"
+import { DeprecatedContainer } from "./AccountContainer"
 import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
 import { isHiddenAccount, useAccounts } from "./accounts.state"
 
@@ -16,7 +16,7 @@ const AccountList = styled.div`
   padding: 48px 32px;
 `
 
-const AccountListWrapper = styled(Container)`
+const AccountListWrapper = styled(DeprecatedContainer)`
   display: flex;
   flex-direction: column;
 
