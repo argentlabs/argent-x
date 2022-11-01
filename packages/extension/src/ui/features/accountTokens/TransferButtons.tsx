@@ -2,7 +2,6 @@ import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { getFeeToken } from "../../../shared/token/utils"
 import { useAppState } from "../../app.state"
 import { AlertDialog } from "../../components/AlertDialog"
 import { IconButton } from "../../components/IconButton"
@@ -10,7 +9,7 @@ import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
 import { PluginIcon } from "../../components/Icons/PluginIcon"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
-import { useTokensWithBalance } from "./tokens.state"
+import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
 
 const Container = styled.div`
@@ -54,7 +53,7 @@ export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
 
-  const sendToken = getFeeToken(switcherNetworkId)
+  const sendToken = useNetworkFeeToken(switcherNetworkId)
   const { tokenDetails, tokenDetailsIsInitialising } =
     useTokensWithBalance(account)
   const accountIsDeployed = useAccountIsDeployed(account)
