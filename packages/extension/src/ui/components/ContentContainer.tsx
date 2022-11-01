@@ -7,7 +7,7 @@ import { TabBarHeight } from "./TabBar"
 interface ContentContainerProps extends ComponentProps<typeof AbsoluteBox> {
   /** top should be inset for NavigationBar component */
   navigationBarInset?: boolean
-  /** top should be inset for TabBar component */
+  /** bottom should be inset for TabBar component */
   tabBarInset?: boolean
 }
 
