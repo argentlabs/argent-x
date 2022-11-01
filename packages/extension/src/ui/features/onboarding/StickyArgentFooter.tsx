@@ -1,8 +1,9 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-const StickyArgentFooterP = styled.p`
-  position: fixed;
+import { ResponsiveFixedBox } from "../../components/Responsive"
+
+const Container = styled(ResponsiveFixedBox)`
   bottom: 50px;
   left: 0;
   right: 0;
@@ -12,11 +13,6 @@ const StickyArgentFooterP = styled.p`
   line-height: 14px;
   text-align: center;
   color: #fff;
-
-  ${({ theme }) => theme.mediaMinWidth.sm`
-    left: ${theme.margin.extensionInTab};
-    right: ${theme.margin.extensionInTab};
-  `}
 `
 
 const EmojiWrapper = styled.span`
@@ -24,8 +20,8 @@ const EmojiWrapper = styled.span`
 `
 
 export const StickyArgentFooter: FC = () => (
-  <StickyArgentFooterP>
+  <Container as="p">
     Built with <EmojiWrapper aria-label="heart">❤️</EmojiWrapper>
     by Argent
-  </StickyArgentFooterP>
+  </Container>
 )

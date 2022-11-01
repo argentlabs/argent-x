@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
-export const AccountFooter = styled.div`
-  position: fixed;
+import { ResponsiveFixedBox } from "../../components/Responsive"
+
+export const AccountFooter = styled(ResponsiveFixedBox)`
   display: flex;
   bottom: 0;
   left: 0;
@@ -15,10 +16,6 @@ export const AccountFooter = styled.div`
   );
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
-  ${({ theme }) => theme.mediaMinWidth.sm`
-    left: ${theme.margin.extensionInTab};
-    right: ${theme.margin.extensionInTab};
-  `}
 `
 
 export const FooterTab = styled(Link)`

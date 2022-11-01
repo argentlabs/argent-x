@@ -12,6 +12,7 @@ import {
   SettingsIcon,
   VisibilityOff,
 } from "../../components/Icons/MuiIcons"
+import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
@@ -86,7 +87,7 @@ const DimmingContainer = styled.div`
   bottom: 0;
 `
 
-const Footer = styled.div`
+const Footer = styled(ResponsiveFixedBox)`
   position: fixed;
   bottom: 0;
   left: 0;
@@ -104,10 +105,6 @@ const Footer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.mediaMinWidth.sm`
-    left: ${theme.margin.extensionInTab};
-    right: ${theme.margin.extensionInTab};
-  `}
 `
 
 const HiddenAccountsButton = styled.button`

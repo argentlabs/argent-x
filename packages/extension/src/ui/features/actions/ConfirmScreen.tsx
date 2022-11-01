@@ -9,6 +9,7 @@ import {
   ButtonVariant,
 } from "../../components/Button"
 import { Header } from "../../components/Header"
+import { ResponsiveFixedBox } from "../../components/Responsive"
 import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
@@ -55,8 +56,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   children: ReactNode
 }
 
-export const StickyGroup = styled.div`
-  position: fixed;
+export const StickyGroup = styled(ResponsiveFixedBox)`
   bottom: 0;
   left: 0;
   right: 0;
@@ -75,11 +75,6 @@ export const StickyGroup = styled.div`
   > * + * {
     margin-top: 24px;
   }
-
-  ${({ theme }) => theme.mediaMinWidth.sm`
-    left: ${theme.margin.extensionInTab};
-    right: ${theme.margin.extensionInTab};
-  `}
 `
 
 const Placeholder = styled.div`

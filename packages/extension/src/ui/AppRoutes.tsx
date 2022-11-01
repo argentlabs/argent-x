@@ -3,6 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import styled from "styled-components"
 
 import { useAppState } from "./app.state"
+import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
@@ -72,17 +73,11 @@ export const ScrollBehaviour = styled.div`
   }
 `
 
-export const ResponsiveBehaviour = styled.div`
-  ${({ theme }) => theme.mediaMinWidth.sm` 
-    margin: 0 ${theme.margin.extensionInTab};
-  `}
-`
-
-const Viewport: FC = () => (
+const ResponsiveViewport: FC = () => (
   <ScrollBehaviour>
-    <ResponsiveBehaviour>
+    <ResponsiveBox>
       <Outlet />
-    </ResponsiveBehaviour>
+    </ResponsiveBox>
   </ScrollBehaviour>
 )
 
@@ -272,7 +267,7 @@ export const AppRoutes: FC = () => {
 
   return (
     <Routes>
-      <Route element={<Viewport />}>
+      <Route element={<ResponsiveViewport />}>
         {nonWalletRoutes}
         {actions[0] ? (
           <Route path="*" element={<ActionScreen />} />

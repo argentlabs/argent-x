@@ -13,10 +13,9 @@ import {
 
 import parsedErc20Abi from "../../../abis/ERC20.json"
 import { Token } from "../../../shared/token/type"
-import { getFeeToken } from "../../../shared/token/utils"
 import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
-import { TokenDetailsWithBalance } from "./tokens.state"
+import { TokenDetailsWithBalance, getNetworkFeeToken } from "./tokens.state"
 
 export interface TokenView {
   address: string
@@ -182,7 +181,7 @@ export const fetchFeeTokenBalance = async (
   account: Account,
   networkId: string,
 ): Promise<BigNumber> => {
-  const token = getFeeToken(networkId)
+  const token = await getNetworkFeeToken(networkId)
   if (!token) {
     return BigNumber.from(0)
   }
