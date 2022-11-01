@@ -628,8 +628,9 @@ export class Wallet {
 
   public async isNonceManagedOnAccountContract(account: Accountv4) {
     try {
-      const nonce = await account.getNonce()
-      return !!nonce
+      // This will fetch nonce from account contract instead of Starknet OS
+      await account.getNonce()
+      return true
     } catch {
       return false
     }

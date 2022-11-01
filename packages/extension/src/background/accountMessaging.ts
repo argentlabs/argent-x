@@ -155,6 +155,10 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         data: { encryptedSeedPhrase },
       })
     }
+
+    case "DEPLOY_ACCOUNT_ACTION_FAILED": {
+      return await actionQueue.remove(msg.data.actionHash)
+    }
   }
 
   throw new UnhandledMessage()

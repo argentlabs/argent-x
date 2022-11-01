@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect } from "react"
+import { FC, useCallback, useEffect, useId } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
@@ -29,11 +29,23 @@ export const ActionScreen: FC = () => {
   const account = useSelectedAccount()
   const extensionIsInTab = useExtensionIsInTab()
   const actions = useActions()
+  const idRef = useId()
 
   const [action] = actions
   const isLastAction = actions.length === 1
 
+  console.log("🚀 ~ file: ActionScreen.tsx ~ line 33 ~ idRef", idRef, action)
+
+  // console.log(
+  //   "🚀 ~ file: ActionScreen.tsx ~ line 35 ~ isLastAction",
+  //   isLastAction,
+  // )
+
   const closePopupIfLastAction = useCallback(() => {
+    console.log(
+      "🚀 ~ file: ActionScreen.tsx ~ line 42 ~ closePopupIfLastAction ~ isLastAction",
+      isLastAction,
+    )
     if (EXTENSION_IS_POPUP && isLastAction) {
       window.close()
     }
@@ -45,17 +57,14 @@ export const ActionScreen: FC = () => {
   }, [action, closePopupIfLastAction])
 
   const onReject = useCallback(async () => {
-    await rejectAction(action)
+    await rejectAction(action.meta.hash)
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
 
   const rejectAllActions = useCallback(async () => {
-    actions.forEach((act) => {
-      rejectAction(act)
-      closePopupIfLastAction()
-    })
-    // closePopupIfLastAction()
-    console.log("Actions: ", actions.length)
+    await rejectAction(actions.map((act) => act.meta.hash))
+    closePopupIfLastAction()
+    console.log("Actions: ", actions)
   }, [actions, closePopupIfLastAction])
 
   /** Focus the extension if it is running in a tab  */
@@ -89,7 +98,7 @@ export const ActionScreen: FC = () => {
           }}
           onDisconnect={async (selectedAccount: Account) => {
             await removePreAuthorization(action.payload.host, selectedAccount)
-            await rejectAction(action)
+            await rejectAction(action.meta.hash)
             closePopupIfLastAction()
           }}
           onReject={onReject}

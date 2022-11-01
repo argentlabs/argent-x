@@ -33,14 +33,34 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
     }
 
     case "REJECT_ACTION": {
-      const { actionHash } = msg.data
-      const action = await actionQueue.remove(actionHash)
-      if (!action) {
+      const payload = msg.data.actionHash
+
+      const actionHashes = Array.isArray(payload) ? payload : [payload]
+
+      const actions = await Promise.all(
+        actionHashes.map((actionHash) => actionQueue.remove(actionHash)),
+      )
+
+      if (!actions) {
         throw new Error("Action not found")
       }
-      const resultMessage = await handleActionRejection(action, background)
-      if (resultMessage) {
-        sendToTabAndUi(resultMessage)
+
+      const resultMessages = (
+        await Promise.all(
+          actions.map(
+            // Using conditional here to stop TS from complaining
+            (action) => action && handleActionRejection(action, background),
+          ),
+        )
+      ).filter((res) => !!res)
+
+      if (resultMessages) {
+        await Promise.all(
+          resultMessages.map(
+            // Using conditional here to stop TS from complaining
+            (resultMessage) => resultMessage && sendToTabAndUi(resultMessage),
+          ),
+        )
       }
       return
     }

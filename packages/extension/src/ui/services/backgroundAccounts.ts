@@ -9,18 +9,30 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
 export const createNewAccount = async (networkId: string) => {
   sendMessage({ type: "NEW_ACCOUNT", data: networkId })
-  return await Promise.race([
-    waitForMessage("NEW_ACCOUNT_RES"),
-    waitForMessage("NEW_ACCOUNT_REJ"),
-  ])
+  try {
+    await Promise.race([
+      waitForMessage("NEW_ACCOUNT_RES"),
+      waitForMessage("NEW_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could add new account")
+  }
 }
 
 export const deployNewAccount = async (account: BaseWalletAccount) => {
   sendMessage({ type: "DEPLOY_ACCOUNT", data: account })
-  return await Promise.race([
-    waitForMessage("DEPLOY_ACCOUNT_RES"),
-    waitForMessage("DEPLOY_ACCOUNT_REJ"),
-  ])
+  try {
+    await Promise.race([
+      waitForMessage("DEPLOY_ACCOUNT_RES"),
+      waitForMessage("DEPLOY_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could not deploy account")
+  }
 }
 
 export const getLastSelectedAccount = async () => {
