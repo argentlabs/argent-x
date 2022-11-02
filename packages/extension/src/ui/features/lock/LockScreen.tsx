@@ -18,7 +18,7 @@ import { PasswordForm } from "./PasswordForm"
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
   const actions = useActions()
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   return (
     <Box
