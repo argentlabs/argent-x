@@ -8,8 +8,6 @@ import { camelCase, upperFirst } from "lodash"
 
 dotenv.config()
 
-const OUTPUT_FOLDER = path.join(__dirname, "../src/components/icons")
-
 const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN
 const FIGMA_ICONS_FILE_KEY = "LHwepHSS4bouYQjbMOZJjW"
 
@@ -26,8 +24,9 @@ const ICONS_CONFIG: IconsConfig[] = [
     displayName: "Icons",
     figmaNodeId: decodeURIComponent("2%3A51"),
     additionalSvgConfig: {
-      icon: true,
-      replaceAttrValues: { "#fff": "currentColor" },
+      replaceAttrValues: {
+        "#fff": "currentColor",
+      } /** allows icons to be coloured using current css color */,
     },
     componentSuffix: "icon",
     outputFolder: path.join(__dirname, "../src/components/icons"),
@@ -84,10 +83,34 @@ const svgCodeToIconComponentCode = async (
 ) => {
   return transform(svgCode, {
     typescript: true,
+    icon: true,
     jsxRuntime: "automatic",
     plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx", "@svgr/plugin-prettier"],
     ...additionalSvgConfig,
   })
+}
+
+/**
+ * svgr with `icon=true` forces `height="1em"` and `width="1em"` regardless of proportions.
+ * This function parses the SVG `viewBox` and computes `width=`
+ * with an expected proportional em value
+ */
+
+const fixIconComponentCodeEmWidth = (iconComponentCode: string) => {
+  const viewBoxRegEx = /viewBox="(.+)"/
+  const matches = iconComponentCode.match(viewBoxRegEx)
+  if (!matches) {
+    return iconComponentCode
+  }
+  const viewBox = matches[1]
+  const [, , width, height] = viewBox.split(" ").map(parseFloat)
+  const widthEm = width / height
+  const widthRegEx = /width="(.+)"/
+  const fixedIconComponentCode = iconComponentCode.replace(
+    widthRegEx,
+    `width="${widthEm}em"`,
+  )
+  return fixedIconComponentCode
 }
 
 /** Figma API fetcher which sets the `X-Figma-Token` header */
@@ -162,7 +185,7 @@ const generateIconsWithConfig = async (config: IconsConfig) => {
     const name = nodesAndNames[id]
     const componentName = upperFirst(camelCase(name))
     console.log(
-      `${index}/${count} Downloading icon SVG and creating component ${componentName}…`,
+      `${index}/${count} Downloading SVG and creating component ${componentName}…`,
     )
     const reponse = await fetcher(url, true)
     const svgCode = await reponse.text()
@@ -170,8 +193,9 @@ const generateIconsWithConfig = async (config: IconsConfig) => {
       svgCode,
       additionalSvgConfig,
     )
+    const fileContents = fixIconComponentCodeEmWidth(componentCode)
     const componentFileName = path.join(outputFolder, `${componentName}.tsx`)
-    fs.writeFileSync(componentFileName, componentCode, "utf8")
+    fs.writeFileSync(componentFileName, fileContents, "utf8")
     lines.push(
       `export { default as ${componentName} } from "./${componentName}"`,
     )
@@ -179,7 +203,7 @@ const generateIconsWithConfig = async (config: IconsConfig) => {
   }
   lines.push("")
   const fileContents = lines.join("\r\n")
-  const indexFileName = path.join(OUTPUT_FOLDER, `index.ts`)
+  const indexFileName = path.join(outputFolder, `index.ts`)
   fs.writeFileSync(indexFileName, fileContents, "utf8")
   console.log("Done")
 }
