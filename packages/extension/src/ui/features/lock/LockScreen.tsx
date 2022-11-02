@@ -31,7 +31,7 @@ export const LockScreen: FC = () => {
       textAlign="center"
       position="relative"
     >
-      <Box position="absolute" right="5" top="4">
+      <Box position="absolute" right="8" top="4">
         <Link to={routes.reset()}>
           <P4 color="neutrals.300">Reset</P4>
         </Link>
