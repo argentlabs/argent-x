@@ -6,6 +6,7 @@ import { getFeeToken } from "../../../shared/token/utils"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
+import { getNetworkFeeToken } from "./tokens.state"
 
 const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
 
@@ -42,7 +43,7 @@ export const useMaxFeeEstimateForTransfer = (
       account.networkId,
     ],
     async () => {
-      const feeToken = getFeeToken(account.networkId)
+      const feeToken = await getNetworkFeeToken(account.networkId)
 
       if (feeToken?.address !== tokenAddress) {
         return {

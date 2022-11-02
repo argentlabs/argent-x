@@ -32,6 +32,8 @@ test("send max eth flow", async ({ page, context }) => {
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, a1)
 
+  // await dismissUserReview(page)
+
   await navigateFromAccountToTokenDetails(page, "Ethereum")
   await page.click("button:has-text('Send')")
   await page.click("button:has-text('MAX')")

@@ -7,6 +7,6 @@ export async function selectAccountFromAccountList(
   page: Page,
   address: string,
 ) {
-  await expect(page.locator("h1:has-text('Accounts')")).toBeVisible()
+  await expect(page.locator("h6:has-text('My accounts')")).toBeVisible()
   await page.click(`text=${formatTruncatedAddressOriginal(address)}`)
 }

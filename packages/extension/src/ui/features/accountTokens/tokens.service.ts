@@ -20,7 +20,7 @@ import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { TokenDetailsWithBalance } from "./tokens.state"
+import { TokenDetailsWithBalance, getNetworkFeeToken } from "./tokens.state"
 
 export interface TokenView {
   address: string
@@ -186,7 +186,7 @@ export const fetchFeeTokenBalance = async (
   account: Account,
   networkId: string,
 ): Promise<BigNumber> => {
-  const token = getFeeToken(networkId)
+  const token = await getNetworkFeeToken(networkId)
   if (!token) {
     return BigNumber.from(0)
   }

@@ -8,7 +8,6 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { getFeeToken } from "../../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
 import {
@@ -26,6 +25,7 @@ import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { fetchFeeTokenBalance } from "../../accountTokens/tokens.service"
+import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 import {
   DetailsText,
   ExtendableControl,
@@ -87,7 +87,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   }, [hasError]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const parsedFeeEstimationError = showEstimateError && getParsedError(error)
-  const feeToken = getFeeToken(networkId)
+  const feeToken = useNetworkFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
     fee?.amount,

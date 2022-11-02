@@ -28,6 +28,24 @@ const networkIdSelector = memoize(
   (networkId: string) => (token: Token) => token.networkId === networkId,
 )
 
+const feeTokenSelector = memoize(
+  (networkId: string) => (token: Token) =>
+    token.networkId === networkId && token.symbol === "ETH",
+)
+
+export const getNetworkFeeToken = async (networkId: string) => {
+  const [feeToken] = await tokenStore.get(feeTokenSelector(networkId))
+  return feeToken ?? null
+}
+
+export const useNetworkFeeToken = (networkId?: string) => {
+  const [feeToken] = useArrayStorage(
+    tokenStore,
+    networkId ? feeTokenSelector(networkId) : () => false,
+  )
+  return feeToken ?? null
+}
+
 const tokenSelector = memoize(
   (baseToken: BaseToken) => (token: Token) => equalToken(token, baseToken),
   (baseToken) => getAccountIdentifier(baseToken),

@@ -4,7 +4,11 @@ export const colors = {
   transparent: "transparent",
   current: "currentColor",
   black: "#000000",
+  black30: "rgba(0,0,0,0.3)",
+  black50: "rgba(0,0,0,0.5)",
   white: "#ffffff",
+  white30: "rgba(255,255,255,0.3)",
+  white50: "rgba(255,255,255,0.5)",
   gray: makeColorVariants(
     "#707072" /** neutrals.400 */,
     true,
@@ -18,6 +22,7 @@ export const colors = {
   danger: makeColorVariants("#c12026"),
   error: makeColorVariants("#cc3247"),
   neutrals800: makeColorVariants("#1d1f22"),
+  skyBlue: makeColorVariants("#29c5ff"),
   neutrals: {
     100: "#b7b7b9",
     200: "#9f9fa1",

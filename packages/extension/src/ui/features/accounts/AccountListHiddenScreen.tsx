@@ -1,12 +1,12 @@
 import { FC } from "react"
 import { Navigate, useParams } from "react-router-dom"
 import styled from "styled-components"
-import { useAppState } from "../../app.state"
 
+import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
 import { routes } from "../../routes"
 import { H1 } from "../../theme/Typography"
-import { Container } from "./AccountContainer"
+import { DeprecatedContainer } from "./AccountContainer"
 import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
 import { isHiddenAccount, useAccountsOnNetwork } from "./accounts.state"
 
@@ -17,7 +17,7 @@ const AccountList = styled.div`
   padding: 48px 32px;
 `
 
-const AccountListWrapper = styled(Container)`
+const AccountListWrapper = styled(DeprecatedContainer)`
   display: flex;
   flex-direction: column;
 

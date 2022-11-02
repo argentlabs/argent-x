@@ -84,11 +84,11 @@ export const routes = {
   upgrade: route("/account/upgrade"),
   networkUpgradeV4: route("/account/network-upgradeV4"),
   accountUpgradeV4: route("/account/account-upgradeV4"),
-  accounts: route("/accounts"),
   accountsHidden: route(
     (networkId: string) => `/accounts/hidden/${networkId}`,
     "/accounts/hidden/:networkId",
   ),
+  accounts: routeWithReturnTo("/accounts"),
   addAccount: route("/accounts/new"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),

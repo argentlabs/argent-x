@@ -1,8 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { getFeeToken } from "../../../../../shared/token/utils"
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
+import { useNetworkFeeToken } from "../../../accountTokens/tokens.state"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 
 const FeeAmount = styled.div`
@@ -27,7 +27,7 @@ export const FeeField: FC<IFeeField> = ({
   fee,
   networkId,
 }) => {
-  const feeToken = getFeeToken(networkId)
+  const feeToken = useNetworkFeeToken(networkId)
   const { displayAmount, displayValue } = useDisplayTokenAmountAndCurrencyValue(
     { amount: fee, tokenAddress: feeToken?.address },
   )
