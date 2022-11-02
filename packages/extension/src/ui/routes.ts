@@ -84,7 +84,7 @@ export const routes = {
   upgrade: route("/account/upgrade"),
   accounts: routeWithReturnTo("/accounts"),
   addAccount: route("/accounts/new"),
-  accountsHidden: route("/accounts/hidden"),
+  accountsHidden: routeWithReturnTo("/accounts/hidden"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),

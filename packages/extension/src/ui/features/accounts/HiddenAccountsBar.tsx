@@ -1,7 +1,7 @@
 import { Button, icons } from "@argent/ui"
 import { Center, chakra } from "@chakra-ui/react"
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
 
@@ -18,10 +18,11 @@ const Container = chakra(Center, {
 
 export const HiddenAccountsBar: FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   return (
     <Container>
       <Button
-        onClick={() => navigate(routes.accountsHidden())}
+        onClick={() => navigate(routes.accountsHidden(location.pathname))}
         leftIcon={<HideIcon />}
         size="sm"
         colorScheme="transparent"
