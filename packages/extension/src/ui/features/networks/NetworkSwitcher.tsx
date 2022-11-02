@@ -62,6 +62,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   return (
     <Menu>
       <MenuButton
+        aria-label="Selected network"
         isDisabled={disabled}
         colorScheme={"neutrals800"}
         size={"2xs"}

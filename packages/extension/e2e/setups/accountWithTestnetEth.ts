@@ -4,7 +4,7 @@ import { mintDevnetEthToAccount } from "../apis/sendDevnetEthToAccount"
 import { getAccountAddressFromAccountPage } from "../selectors/getAccountAddressFromAccountPage"
 import { getBalanceFromAccountPage } from "../selectors/getBalanceFromAccountPage"
 import { disableNetworkIssuesWarning } from "../steps/disableNetworkIssuesWarning"
-import { newAccount } from "../steps/newAccount"
+import { newAccount, newAccountWhenEmpty } from "../steps/newAccount"
 import {
   continueNewWalletAfterOnboarding,
   newWalletOnboarding,
@@ -25,7 +25,7 @@ export async function setupNewAccountWithTestnetEth(
   await openExtension(page, context)
   await continueNewWalletAfterOnboarding(page)
   await switchNetwork(page, "Localhost")
-  await newAccount(page)
+  await newAccountWhenEmpty(page)
   const address = await getAccountAddressFromAccountPage(page)
   await mintDevnetEthToAccount(address)
   const balance = await getBalanceFromAccountPage(page, "Ethereum")
