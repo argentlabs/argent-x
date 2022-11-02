@@ -1,5 +1,5 @@
-import { Button, H2, P3, P4 } from "@argent/ui"
-import { Box, Spinner } from "@chakra-ui/react"
+import { Button, H2, P3, P4, logos } from "@argent/ui"
+import { Box, Spinner, Text } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
@@ -12,13 +12,13 @@ import { useActions } from "../actions/actions.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { recover } from "../recovery/recovery.service"
-import LogoSvg from "./logo.svg"
 import { PasswordForm } from "./PasswordForm"
 
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
   const actions = useActions()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { ArgentXLogo } = logos
 
   return (
     <Box
@@ -36,7 +36,9 @@ export const LockScreen: FC = () => {
           <P4 color="neutrals.300">Reset</P4>
         </Link>
       </Box>
-      <LogoSvg />
+      <Text fontSize="10xl">
+        <ArgentXLogo />
+      </Text>
       <Box mt="8" mb="8" width="100%">
         <H2>Welcome back</H2>
         <P3 color="neutrals.300">Unlock your wallet to continue</P3>

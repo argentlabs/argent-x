@@ -1,5 +1,5 @@
 import { FieldError, Input, icons } from "@argent/ui"
-import { Box } from "@chakra-ui/react"
+import { Box, Text } from "@chakra-ui/react"
 import { isEmpty, isString } from "lodash-es"
 import { FC, ReactNode, useEffect } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
@@ -23,6 +23,7 @@ export const PasswordForm: FC<PasswordFormProps> = ({
   const { control, formState, handleSubmit, clearErrors, setError } =
     useForm<FieldValues>()
   const { errors, isDirty, isSubmitting } = formState
+  const { InfoIcon } = icons
 
   const { error } = useAppState() // FIXME: as a hack we need to use global storage here, as the password form unmounts for the loading screen
   useEffect(() => {
@@ -66,7 +67,9 @@ export const PasswordForm: FC<PasswordFormProps> = ({
           gap="5px"
           mt="3"
         >
-          <icons.InfoIcon fill="error.500" fontSize="sm" />
+          <Text fontSize="sm" color="error.500">
+            <InfoIcon />
+          </Text>
           {errors.password?.type === "validate" && (
             <FieldError>Password is too short</FieldError>
           )}
