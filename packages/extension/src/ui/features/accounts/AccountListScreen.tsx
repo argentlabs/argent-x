@@ -153,16 +153,19 @@ export const AccountListScreen: FC = () => {
 
   const { scrollRef, scroll } = useScroll()
 
+  const onClose = useCallback(() => {
+    if (returnTo) {
+      navigate(returnTo)
+    } else {
+      navigate(-1)
+    }
+  }, [navigate, returnTo])
+
   return (
     <>
       <NavigationBar
         scroll={scroll}
-        leftButton={
-          <BarCloseButton
-            onClick={returnTo ? () => navigate(returnTo) : undefined}
-            disabled={isDeploying}
-          />
-        }
+        leftButton={<BarCloseButton onClick={onClose} disabled={isDeploying} />}
         title={"My accounts"}
         rightButton={
           <BarIconButton

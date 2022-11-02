@@ -1,5 +1,7 @@
 import { FC, ReactNode } from "react"
+import { useNavigate } from "react-router-dom"
 
+import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
 import { AccountActivityContainer } from "../accountActivity/AccountActivity"
 import { AccountCollections } from "../accountNfts/AccountCollections"
@@ -21,10 +23,11 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   )
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
+  const navigate = useNavigate()
 
   let body: ReactNode
   if (!account) {
-    body = <></>
+    navigate(routes.accounts())
   } else if (showMigrationScreen) {
     return (
       <DeprecatedAccountScreen
