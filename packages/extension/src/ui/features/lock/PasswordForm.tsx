@@ -1,10 +1,10 @@
-import { isString } from "lodash-es"
+import { FieldError, Input, icons } from "@argent/ui"
+import { Box } from "@chakra-ui/react"
+import { isEmpty, isString } from "lodash-es"
 import { FC, ReactNode, useEffect } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { useAppState } from "../../app.state"
-import { InputText } from "../../components/InputText"
-import { FormError } from "../../theme/Typography"
 import { validatePassword } from "../recovery/seedRecovery.state"
 
 interface FieldValues {
@@ -32,7 +32,11 @@ export const PasswordForm: FC<PasswordFormProps> = ({
     }
   }, [error, setError])
 
-  const handlePassword: SubmitHandler<FieldValues> = async ({ password }) => {
+  const handlePassword: SubmitHandler<FieldValues> = async (
+    { password },
+    e,
+  ) => {
+    e?.preventDefault()
     clearErrors("password")
     await verifyPassword(password)
   }
@@ -45,22 +49,34 @@ export const PasswordForm: FC<PasswordFormProps> = ({
         rules={{ required: true, validate: validatePassword }}
         defaultValue=""
         render={({ field: { ref, ...field } }) => (
-          <InputText
+          <Input
             autoFocus
             placeholder="Password"
             type="password"
             {...field}
+            isInvalid={!isEmpty(errors.password)}
           />
         )}
       />
-      {errors.password?.type === "validate" && (
-        <FormError>Password is too short</FormError>
-      )}
-      {errors.password?.type === "required" && (
-        <FormError>Password is required</FormError>
-      )}
-      {errors.password?.message && (
-        <FormError>{errors.password.message}</FormError>
+      {!isEmpty(errors.password) && (
+        <Box
+          position="relative"
+          display="flex"
+          justifyContent="flex-start"
+          gap="5px"
+          mt="3"
+        >
+          <icons.InfoIcon fill="error.500" fontSize="sm" />
+          {errors.password?.type === "validate" && (
+            <FieldError>Password is too short</FieldError>
+          )}
+          {errors.password?.type === "required" && (
+            <FieldError>Password is required</FieldError>
+          )}
+          {errors.password?.message && (
+            <FieldError>{errors.password.message}</FieldError>
+          )}
+        </Box>
       )}
       {children?.({ isDirty, isSubmitting })}
     </form>
