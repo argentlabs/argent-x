@@ -16,6 +16,7 @@ import {
 } from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
@@ -78,17 +79,25 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
   const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
-
-  const shouldBeUpgraded = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
+  const { pendingTransactions = [] } = useAccountTransactions(selectedAccount)
 
   const isUpgradeTransaction =
     !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
+  const hasUpgradeTransactionPending = pendingTransactions.some(
+    (t) => t.meta?.isUpgrade,
+  )
+  const shouldShowUpgrade = Boolean(
+    needsUpgrade &&
+      feeTokenBalance?.gt(0) &&
+      !hasUpgradeTransactionPending &&
+      !isUpgradeTransaction,
+  )
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
 
-  if (shouldBeUpgraded && !isUpgradeTransaction) {
+  if (shouldShowUpgrade) {
     return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
