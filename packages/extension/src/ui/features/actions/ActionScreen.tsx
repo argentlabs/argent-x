@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useId } from "react"
+import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
@@ -29,27 +29,20 @@ export const ActionScreen: FC = () => {
   const account = useSelectedAccount()
   const extensionIsInTab = useExtensionIsInTab()
   const actions = useActions()
-  const idRef = useId()
 
   const [action] = actions
   const isLastAction = actions.length === 1
 
-  console.log("🚀 ~ file: ActionScreen.tsx ~ line 33 ~ idRef", idRef, action)
-
-  // console.log(
-  //   "🚀 ~ file: ActionScreen.tsx ~ line 35 ~ isLastAction",
-  //   isLastAction,
-  // )
-
-  const closePopupIfLastAction = useCallback(() => {
-    console.log(
-      "🚀 ~ file: ActionScreen.tsx ~ line 42 ~ closePopupIfLastAction ~ isLastAction",
-      isLastAction,
-    )
-    if (EXTENSION_IS_POPUP && isLastAction) {
+  const closePopup = useCallback(() => {
+    if (EXTENSION_IS_POPUP) {
       window.close()
     }
-  }, [isLastAction])
+  }, [])
+  const closePopupIfLastAction = useCallback(() => {
+    if (isLastAction) {
+      closePopup()
+    }
+  }, [closePopup, isLastAction])
 
   const onSubmit = useCallback(async () => {
     await approveAction(action)
@@ -63,9 +56,8 @@ export const ActionScreen: FC = () => {
 
   const rejectAllActions = useCallback(async () => {
     await rejectAction(actions.map((act) => act.meta.hash))
-    closePopupIfLastAction()
-    console.log("Actions: ", actions)
-  }, [actions, closePopupIfLastAction])
+    closePopup()
+  }, [actions, closePopup])
 
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {

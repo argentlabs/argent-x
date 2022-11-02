@@ -8,7 +8,6 @@ import { useSWRConfig } from "swr"
 import { Button, ButtonGroupVertical } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { StarknetIcon } from "../../components/Icons/StarknetIcon"
-import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
@@ -210,7 +209,6 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
                 ) : (
                   <PrimaryButton
                     onClick={async () => {
-                      onReject ? onReject() : navigate(routes.accountTokens())
                       await upgradeAccount(selectedAccount)
                     }}
                     type="button"

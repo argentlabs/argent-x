@@ -91,22 +91,6 @@ describe("Wallet", () => {
     expect(backupWithoutAccount).toBeDefined()
     expect(Wallet.validateBackup(backupWithoutAccount as string)).toBe(true)
 
-    // const proxyClassHash = await declareProxyContract()
-    // console.log(
-    //   "🚀 ~ file: wallet.test.ts ~ line 100 ~ test ~ proxyClassHash",
-    //   proxyClassHash,
-    // )
-
-    // expect(proxyClassHash).not.toBeUndefined()
-
-    // const argentAccountClassHash = await declareArgentAccountContract()
-    // console.log(
-    //   "🚀 ~ file: wallet.test.ts ~ line 104 ~ test ~ argentAccountClassHash",
-    //   argentAccountClassHash,
-    // )
-
-    // expect(argentAccountClassHash).not.toBeUndefined()
-
     const account = await wallet.newAccount(NETWORK)
 
     const { txHash } = await wallet.deployAccount(account, testAccount)
