@@ -2,7 +2,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { H2, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { CongestionIcon } from "./CongestionIcon"
@@ -30,6 +30,7 @@ const CenterP = styled(P)`
 
 export const NetworkWarningScreen: FC = () => {
   const navigate = useNavigate()
+  const returnTo = useReturnTo()
   const [, updateNeedsToShowNetworkStatusWarning] =
     useNeedsToShowNetworkStatusWarning()
 
@@ -40,7 +41,7 @@ export const NetworkWarningScreen: FC = () => {
       confirmButtonBackgroundColor="#C12026"
       onSubmit={() => {
         updateNeedsToShowNetworkStatusWarning()
-        navigate(routes.accounts())
+        navigate(returnTo ? returnTo : routes.accounts())
       }}
     >
       <Wrapper>

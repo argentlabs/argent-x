@@ -8,7 +8,7 @@ import {
   MenuList,
 } from "@chakra-ui/react"
 import { FC, useCallback, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { NetworkStatus } from "../../../shared/network"
@@ -37,6 +37,7 @@ interface NetworkSwitcherProps {
 
 export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { switcherNetworkId } = useAppState()
   const allNetworks = useNetworks()
   const currentNetwork = useNetwork(switcherNetworkId)
@@ -50,7 +51,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
       valuesToShowNetwortWarning.includes(currentNetworkStatus) &&
       needsToShowNetworkStatusWarning
     ) {
-      navigate(routes.networkWarning())
+      navigate(routes.networkWarning(location.pathname))
     }
     // just trigger on network status change
   }, [currentNetworkStatus]) // eslint-disable-line react-hooks/exhaustive-deps

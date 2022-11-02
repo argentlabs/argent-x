@@ -1,11 +1,26 @@
 import { getAccounts } from "../../../shared/account/store"
 import { useAppState } from "../../app.state"
-import { useSelectedAccountStore } from "./accounts.state"
+import { setDefaultAccountNames } from "./accountMetadata.state"
+import {
+  mapWalletAccountsToAccounts,
+  useSelectedAccountStore,
+} from "./accounts.state"
 
 /** Switches to the first visible account on network, otherwise sets selectedAccount to undefined */
 
 export const autoSelectAccountOnNetwork = async (networkId: string) => {
-  useAppState.setState({ switcherNetworkId: networkId })
+  const { switcherNetworkId } = useAppState.getState()
+
+  /** switch network and set default account names */
+  if (switcherNetworkId !== networkId) {
+    const allAccountsOnNetwork = await getAccounts((account) => {
+      return account.networkId === networkId
+    })
+    const accounts = mapWalletAccountsToAccounts(allAccountsOnNetwork)
+    setDefaultAccountNames(accounts)
+    useAppState.setState({ switcherNetworkId: networkId })
+  }
+
   const visibleAccountsOnNetwork = await getAccounts((account) => {
     return account.networkId === networkId && !account.hidden
   })
