@@ -18,7 +18,7 @@ import { PasswordForm } from "./PasswordForm"
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
   const actions = useActions()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   return (
     <Box
@@ -72,7 +72,7 @@ export const LockScreen: FC = () => {
             <>
               <StickyGroup>
                 <Button
-                  gap="5px"
+                  gap="2"
                   colorScheme="primary"
                   type="submit"
                   disabled={!isDirty || isSubmitting}
