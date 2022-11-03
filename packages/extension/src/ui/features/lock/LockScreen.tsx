@@ -1,5 +1,5 @@
 import { Button, H2, P3, P4, logos } from "@argent/ui"
-import { Box, Spinner, Text } from "@chakra-ui/react"
+import { Box, Text } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
