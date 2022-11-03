@@ -21,6 +21,7 @@ export const colors = {
   info: makeColorVariants("#0078a4"),
   danger: makeColorVariants("#c12026"),
   warning: makeColorVariants("#f4bc54"),
+  success: makeColorVariants("#08a681"),
   error: makeColorVariants("#cc3247"),
   neutrals600: makeColorVariants("#404043"),
   neutrals800: makeColorVariants("#1d1f22"),

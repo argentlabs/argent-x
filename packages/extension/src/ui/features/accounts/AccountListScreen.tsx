@@ -13,9 +13,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { isDeprecated } from "../../../shared/wallet.service"
-import { IconButton } from "../../components/IconButton"
 import { ResponsiveFixedBox } from "../../components/Responsive"
-import { Spinner } from "../../components/Spinner"
 import { useReturnTo } from "../../routes"
 import { P } from "../../theme/Typography"
 import { useBackupRequired } from "../recovery/backupDownload.state"
@@ -32,22 +30,8 @@ import { useAddAccount } from "./useAddAccount"
 
 const { AddIcon } = icons
 
-const IconButtonCenter = styled(IconButton)`
-  margin: auto;
-`
-
-const IconButtonCenterDisabled = styled(IconButtonCenter)`
-  pointer-events: none;
-`
-
 const Paragraph = styled(P)`
   text-align: center;
-`
-
-const ErrorText = styled.div`
-  text-align: center;
-  font-size: 12px;
-  color: ${({ theme }) => theme.red2};
 `
 
 const DimmingContainer = styled.div`
@@ -85,7 +69,7 @@ export const AccountListScreen: FC = () => {
     isHiddenAccount,
   )
   const { isBackupRequired } = useBackupRequired()
-  const { addAccount, isDeploying, deployFailed } = useAddAccount()
+  const { addAccount, isDeploying } = useAddAccount()
 
   const [deprecatedAccounts, newAccounts] = partition(
     visibleAccounts,
