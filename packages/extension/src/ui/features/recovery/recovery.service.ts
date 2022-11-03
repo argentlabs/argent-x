@@ -31,10 +31,16 @@ export const recover = async ({
     const allAccounts = await getAccounts(true)
     const walletAccounts = accountsOnNetwork(allAccounts, networkId)
 
-    const selectedAccount = walletAccounts.find(
+    const selectedWalletAccount = walletAccounts.find(
       (account) =>
         lastSelectedAccount && accountsEqual(account, lastSelectedAccount),
     )
+
+    const firstUnhiddenAccount = walletAccounts.find((wa) => !wa.hidden)
+
+    const selectedAccount = !selectedWalletAccount?.hidden
+      ? selectedWalletAccount
+      : firstUnhiddenAccount
 
     const accounts = mapWalletAccountsToAccounts(walletAccounts)
 
