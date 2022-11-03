@@ -1,4 +1,4 @@
-import { Button } from "@argent/ui"
+import { Button, icons } from "@argent/ui"
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
 import {
   ComponentProps,
@@ -27,6 +27,8 @@ import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
+
+const { MoreIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
@@ -101,14 +103,14 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       <Menu>
         <MenuButton
           aria-label={`${accountName} options`}
-          colorScheme={"neutrals800"}
+          colorScheme="transparent"
           padding="1.5"
           fontSize="xl"
           size="auto"
           rounded="full"
           as={CaptureClickButton}
         >
-          DOTS
+          <MoreIcon />
         </MenuButton>
         <MenuList>
           <MenuItem>Item</MenuItem>

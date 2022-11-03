@@ -54,6 +54,7 @@ export const BarIconButton: FC<ComponentProps<typeof Button>> = ({
 }) => (
   <Button
     color="neutrals.200"
+    backgroundColor="black"
     colorScheme="transparent"
     padding="1.5"
     fontSize="xl"
