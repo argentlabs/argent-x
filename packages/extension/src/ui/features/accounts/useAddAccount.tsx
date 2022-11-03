@@ -26,6 +26,7 @@ export const useAddAccount = () => {
       toast({
         title: "Unable to create account. Please try again later.",
         status: "error",
+        duration: 3000,
       })
     } finally {
       setIsDeploying(false)

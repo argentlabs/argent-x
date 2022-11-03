@@ -1,6 +1,6 @@
 import { ButtonRect, H6, P4 } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
-import { ComponentProps, FC, HTMLProps, ReactNode } from "react"
+import { Box, Circle, Flex, Image } from "@chakra-ui/react"
+import { ComponentProps, FC } from "react"
 import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
@@ -14,28 +14,25 @@ import { formatTruncatedAddress } from "../../services/addresses"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
-export interface IAccountListItem {
+export interface AccountListItemWrapperProps
+  extends ComponentProps<typeof ButtonRect> {
+  highlighted?: boolean
+  transparent?: boolean
+  dark?: boolean
+  outlined?: boolean
+}
+
+export interface AccountListItemProps extends AccountListItemWrapperProps {
   accountName: string
   accountAddress: string
   networkId: string
   networkName?: string
   accountType: ArgentAccountType
-  outlined?: boolean
-  highlighted?: boolean
   deploying?: boolean
   upgrade?: boolean
   connected?: boolean
-  transparent?: boolean
   hidden?: boolean
-  children?: ReactNode
-  onClick?: () => void
-  style?: HTMLProps<HTMLDivElement>["style"]
-}
-
-interface AccountListItemWrapperProps
-  extends ComponentProps<typeof ButtonRect>,
-    Pick<IAccountListItem, "highlighted" | "outlined" | "transparent"> {
-  dark?: boolean
+  avatarOutlined?: boolean
 }
 
 const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
@@ -66,11 +63,35 @@ const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
   )
 }
 
-const AccountAvatar = styled.img`
-  border-radius: 500px;
-  width: 40px;
-  height: 40px;
-`
+interface AccountAvatarProps extends ComponentProps<"img"> {
+  outlined?: boolean
+}
+
+const AccountAvatar: FC<AccountAvatarProps> = ({ outlined, ...rest }) => {
+  return (
+    <Box position={"relative"}>
+      <Image borderRadius={"full"} width={12} height={12} {...rest} />
+      {outlined && (
+        <>
+          <Circle
+            position={"absolute"}
+            top={0}
+            size={12}
+            borderWidth={"0.25rem"}
+            borderColor={"black"}
+          />
+          <Circle
+            position={"absolute"}
+            top={0}
+            size={12}
+            borderWidth={"0.125rem"}
+            borderColor={"white"}
+          />
+        </>
+      )}
+    </Box>
+  )
+}
 
 const AccountColumn = styled.div`
   display: flex;
@@ -140,7 +161,7 @@ const PluginTextContainer = styled(NetworkContainer)`
   right: 8px;
 `
 
-export const AccountListItem: FC<IAccountListItem> = ({
+export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
   accountAddress,
   networkId,
@@ -150,12 +171,14 @@ export const AccountListItem: FC<IAccountListItem> = ({
   upgrade,
   connected,
   hidden,
+  avatarOutlined,
   children,
   ...rest
 }) => {
   return (
     <AccountListItemWrapper dark={hidden} {...rest}>
       <AccountAvatar
+        outlined={avatarOutlined}
         src={getNetworkAccountImageUrl({
           accountName,
           accountAddress,

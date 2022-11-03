@@ -66,3 +66,9 @@ Children.args = {
   ...account,
   children: <span>Child in here</span>,
 }
+
+export const AvatarOutlined = Template.bind({})
+AvatarOutlined.args = {
+  ...account,
+  avatarOutlined: true,
+}

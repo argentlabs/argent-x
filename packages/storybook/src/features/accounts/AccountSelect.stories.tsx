@@ -1,4 +1,4 @@
-import { IAccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
+import { AccountListItemProps } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
 import { AccountSelect } from "@argent-x/extension/src/ui/features/accounts/AccountSelect"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
@@ -62,7 +62,7 @@ const accounts = [
   },
 ]
 
-const onSelectedAccountChange = (selectedAccount: IAccountListItem) => {
+const onSelectedAccountChange = (selectedAccount: AccountListItemProps) => {
   console.log("onSelectedAccountChange", selectedAccount)
 }
 

@@ -127,7 +127,7 @@ export const AddressbookSettingsScreen: FC = () => {
                     networkName={networkName}
                     outlined
                     transparent
-                    style={{ padding: "16px" }}
+                    p={3}
                     {...makeClickable(() =>
                       navigate(routes.settingsAddressbookEdit(contact.id)),
                     )}
