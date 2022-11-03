@@ -1,6 +1,6 @@
 import { ButtonRect, H6, P4 } from "@argent/ui"
 import { Box, Circle, Flex, Image } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { ComponentProps, FC, MouseEvent, useCallback } from "react"
 import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
@@ -35,6 +35,22 @@ export interface AccountListItemProps extends AccountListItemWrapperProps {
   avatarOutlined?: boolean
 }
 
+export const CaptureClickButtonRect: FC<ComponentProps<typeof ButtonRect>> = ({
+  onClick: onClickProp,
+  ...rest
+}) => {
+  const onClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (e.target == e.currentTarget) {
+        e.stopPropagation()
+        onClickProp && onClickProp(e)
+      }
+    },
+    [onClickProp],
+  )
+  return <ButtonRect onClick={onClick} {...rest} />
+}
+
 const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
   highlighted,
   transparent,
@@ -49,7 +65,7 @@ const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
     : "neutrals800"
   const borderColor = outlined ? "neutrals.600" : "transparent"
   return (
-    <ButtonRect
+    <CaptureClickButtonRect
       gap={3}
       p={4}
       h={"initial"}

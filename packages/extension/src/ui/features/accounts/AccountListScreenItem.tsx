@@ -1,4 +1,12 @@
-import { FC } from "react"
+import { Button } from "@argent/ui"
+import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
+import {
+  ComponentProps,
+  FC,
+  MouseEvent,
+  MouseEventHandler,
+  useCallback,
+} from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
@@ -24,6 +32,22 @@ interface IAccountListScreenItem {
   account: Account
   selectedAccount?: BaseWalletAccount
   canShowUpgrade?: boolean
+}
+
+export const CaptureClickButton: FC<ComponentProps<typeof Button>> = ({
+  onClick: onClickProp,
+  ...rest
+}) => {
+  const onClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (e.target == e.currentTarget) {
+        e.stopPropagation()
+        onClickProp && onClickProp(e)
+      }
+    },
+    [onClickProp],
+  )
+  return <Button onClick={onClick} {...rest} />
 }
 
 export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
@@ -57,13 +81,14 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   return (
     <AccountListItem
-      {...makeClickable(() => {
+      aria-label={`Select ${accountName}`}
+      onClick={() => {
         useSelectedAccountStore.setState({
           selectedAccount: account,
           showMigrationScreen: account ? isDeprecated(account) : false,
         })
         navigate(routes.accountTokens())
-      })}
+      }}
       accountName={accountName}
       accountAddress={account.address}
       networkId={account.networkId}
@@ -72,6 +97,23 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       deploying={status.code === "DEPLOYING"}
       upgrade={canShowUpgrade && showUpgradeBanner}
       connected={isConnected}
-    />
+    >
+      <Menu>
+        <MenuButton
+          aria-label={`${accountName} options`}
+          colorScheme={"neutrals800"}
+          padding="1.5"
+          fontSize="xl"
+          size="auto"
+          rounded="full"
+          as={CaptureClickButton}
+        >
+          DOTS
+        </MenuButton>
+        <MenuList>
+          <MenuItem>Item</MenuItem>
+        </MenuList>
+      </Menu>
+    </AccountListItem>
   )
 }
