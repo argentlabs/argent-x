@@ -112,7 +112,7 @@ export const L1 = chakra("label", {
     fontSize: "xs",
     lineHeight: "3.5",
     fontWeight: "bold",
-    letterSpacing: "wider",
+    letterSpacing: "wide",
     textTransform: "uppercase",
   },
 })

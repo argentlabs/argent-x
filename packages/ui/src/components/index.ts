@@ -1,4 +1,5 @@
 export * from "./Absolute"
+export * from "./Alert"
 export * from "./Button"
 export * from "./Empty"
 export * from "./Input"

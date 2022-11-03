@@ -17,7 +17,6 @@ import { IconButton } from "../../components/IconButton"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
 import { useReturnTo } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import { P } from "../../theme/Typography"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
@@ -32,18 +31,6 @@ import { HiddenAccountsBar } from "./HiddenAccountsBar"
 import { useAddAccount } from "./useAddAccount"
 
 const { AddIcon } = icons
-
-interface IAccountList {
-  hasHiddenAccounts: boolean
-}
-
-const AccountList = styled.div<IAccountList>`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 48px 32px
-    ${({ hasHiddenAccounts }) => (hasHiddenAccounts ? "64px" : "48px")} 32px;
-`
 
 const IconButtonCenter = styled(IconButton)`
   margin: auto;
@@ -162,19 +149,7 @@ export const AccountListScreen: FC = () => {
               ))}
             </>
           )}
-          {isDeploying && (
-            <>
-              <DimmingContainer />
-              <IconButtonCenterDisabled size={48}>
-                <Spinner size={24} />
-              </IconButtonCenterDisabled>
-            </>
-          )}
-          {deployFailed && (
-            <ErrorText>
-              Sorry, unable to create wallet. Please try again later.
-            </ErrorText>
-          )}
+          {isDeploying && <DimmingContainer />}
         </Flex>
         {hasHiddenAccounts && (
           <Footer>

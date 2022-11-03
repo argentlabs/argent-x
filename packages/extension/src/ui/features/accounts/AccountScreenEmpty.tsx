@@ -1,4 +1,4 @@
-import { Empty, EmptyButton, FieldError, icons } from "@argent/ui"
+import { Empty, EmptyButton, icons } from "@argent/ui"
 import { partition } from "lodash-es"
 import { FC, useEffect } from "react"
 
@@ -13,7 +13,7 @@ const { WalletIcon, AddIcon } = icons
 
 export const AccountScreenEmpty: FC = () => {
   const currentNetwork = useCurrentNetwork()
-  const { addAccount, isDeploying, deployFailed } = useAddAccount()
+  const { addAccount, isDeploying } = useAddAccount()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
@@ -45,11 +45,6 @@ export const AccountScreenEmpty: FC = () => {
         >
           Create account
         </EmptyButton>
-        {deployFailed && (
-          <FieldError pt={1}>
-            Sorry, unable to create wallet. Please try again later.
-          </FieldError>
-        )}
       </Empty>
       {hasHiddenAccounts && <HiddenAccountsBar />}
     </>

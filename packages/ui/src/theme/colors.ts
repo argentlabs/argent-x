@@ -36,4 +36,9 @@ export const colors = {
     800: "#1d1f22",
     900: "#101014",
   },
+  /** used by Chakra Alert and Toast */
+  blue: makeColorVariants("#0078a4"),
+  orange: makeColorVariants("#f4bc54"),
+  red: makeColorVariants("#cc3247"),
+  green: makeColorVariants("#08a681"),
 }

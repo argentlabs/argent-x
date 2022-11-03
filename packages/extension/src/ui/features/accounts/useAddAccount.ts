@@ -1,3 +1,4 @@
+import { useToast } from "@chakra-ui/react"
 import { useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -11,6 +12,7 @@ export const useAddAccount = () => {
   const { switcherNetworkId } = useAppState()
   const [isDeploying, setIsDeploying] = useState(false)
   const [deployFailed, setDeployFailed] = useState(false)
+  const toast = useToast()
 
   const addAccount = useCallback(async () => {
     setIsDeploying(true)
@@ -21,10 +23,14 @@ export const useAddAccount = () => {
       navigate(await recover())
     } catch {
       setDeployFailed(true)
+      toast({
+        title: "Unable to create account. Please try again later.",
+        status: "error",
+      })
     } finally {
       setIsDeploying(false)
     }
-  }, [navigate, switcherNetworkId])
+  }, [navigate, switcherNetworkId, toast])
 
   return { addAccount, isDeploying, deployFailed }
 }
