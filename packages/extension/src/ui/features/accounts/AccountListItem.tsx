@@ -1,6 +1,6 @@
-import { ButtonRect, H6, P4 } from "@argent/ui"
+import { ButtonRect, H6, L2, P4 } from "@argent/ui"
 import { Box, Circle, Flex, Image } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { ComponentProps, FC, ReactNode } from "react"
 import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
@@ -58,7 +58,6 @@ const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
       colorScheme={colorScheme}
       border={"1px solid"}
       borderColor={borderColor}
-      pressable={false}
       {...rest}
     />
   )
@@ -189,7 +188,21 @@ export const AccountListItem: FC<AccountListItemProps> = ({
       />
       <AccountRow>
         <AccountColumn>
-          <H6>{accountName}</H6>
+          <Flex gap={1} alignItems={"center"}>
+            <H6>{accountName}</H6>
+            {accountType === "argent-plugin" && (
+              <L2
+                backgroundColor={"black"}
+                p={1}
+                textTransform="uppercase"
+                fontWeight={"extrabold"}
+                color={"neutrals.200"}
+                borderRadius={"base"}
+              >
+                Plugin
+              </L2>
+            )}
+          </Flex>
           <Flex gap={2} color={"neutrals.400"}>
             <P4 fontWeight={"bold"}>
               {formatTruncatedAddress(accountAddress)}
@@ -198,9 +211,6 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           </Flex>
         </AccountColumn>
         <AccountColumnAccessory>
-          {accountType === "argent-plugin" && (
-            <PluginTextContainer>Plugin</PluginTextContainer>
-          )}
           {deploying ? (
             <NetworkStatusWrapper>
               <TransactionStatusIndicator color="orange" />

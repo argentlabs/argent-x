@@ -1,6 +1,9 @@
 import { Button, icons } from "@argent/ui"
 import {
+  Box,
   ButtonProps,
+  Circle,
+  Flex,
   Menu,
   MenuButton,
   MenuItem,
@@ -44,21 +47,6 @@ interface IAccountListScreenItem {
   canShowUpgrade?: boolean
 }
 
-export const CaptureClickButton = forwardRef<ButtonProps, "button">(
-  ({ onClick: onClickProp, ...rest }, ref) => {
-    const onClick = useCallback(
-      (e: MouseEvent<HTMLButtonElement>) => {
-        if (e.target == e.currentTarget) {
-          e.stopPropagation()
-          onClickProp && onClickProp(e)
-        }
-      },
-      [onClickProp],
-    )
-    return <Button ref={ref} onClick={onClick} {...rest} />
-  },
-)
-
 export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   account,
   selectedAccount,
@@ -89,43 +77,51 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   return (
-    <Menu isLazy>
-      {({ isOpen }) => (
-        <AccountListItem
-          aria-label={`Select ${accountName}`}
-          pointerEvents={isOpen ? "none" : "initial"}
-          onClick={() => {
-            useSelectedAccountStore.setState({
-              selectedAccount: account,
-              showMigrationScreen: account ? isDeprecated(account) : false,
-            })
-            navigate(routes.accountTokens())
-          }}
-          accountName={accountName}
-          accountAddress={account.address}
-          networkId={account.networkId}
-          accountType={account.type}
-          avatarOutlined={status.code === "CONNECTED"}
-          deploying={status.code === "DEPLOYING"}
-          upgrade={canShowUpgrade && showUpgradeBanner}
-          connected={isConnected}
-        >
+    <Flex position={"relative"} direction={"column"}>
+      <AccountListItem
+        aria-label={`Select ${accountName}`}
+        onClick={() => {
+          useSelectedAccountStore.setState({
+            selectedAccount: account,
+            showMigrationScreen: account ? isDeprecated(account) : false,
+          })
+          navigate(routes.accountTokens())
+        }}
+        accountName={accountName}
+        accountAddress={account.address}
+        networkId={account.networkId}
+        accountType={account.type}
+        avatarOutlined={status.code === "CONNECTED"}
+        deploying={status.code === "DEPLOYING"}
+        upgrade={canShowUpgrade && showUpgradeBanner}
+        connected={isConnected}
+        pr={14}
+      />
+      <Flex
+        position={"absolute"}
+        right={4}
+        top={"50%"}
+        transform={"translateY(-50%)"}
+        zIndex={1} /** menu appears over top of siblings */
+      >
+        <Menu isLazy>
           <MenuButton
             aria-label={`${accountName} options`}
+            backgroundColor="black"
             colorScheme="transparent"
             padding="1.5"
             fontSize="xl"
             size="auto"
             rounded="full"
-            as={CaptureClickButton}
+            as={Button}
           >
             <MoreIcon />
           </MenuButton>
           <MenuList>
             <MenuItem>Item</MenuItem>
           </MenuList>
-        </AccountListItem>
-      )}
-    </Menu>
+        </Menu>
+      </Flex>
+    </Flex>
   )
 }
