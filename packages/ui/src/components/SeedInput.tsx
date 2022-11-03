@@ -127,7 +127,7 @@ export const SeedInput: FC<SeedInputProps> = ({
               e.preventDefault()
               const pasted = e.clipboardData.getData("text")
               // split by space or newline regex
-              const words = pasted.split(/\s+/)
+              const words = pasted.split(/\s+/).filter((s) => s)
 
               if (words.length === length) {
                 setSeedInput(words)
