@@ -72,3 +72,9 @@ AvatarOutlined.args = {
   ...account,
   avatarOutlined: true,
 }
+
+export const PluginAccount = Template.bind({})
+PluginAccount.args = {
+  ...account,
+  accountType: "argent-plugin",
+}
