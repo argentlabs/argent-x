@@ -4,22 +4,26 @@ import { Button, chakra, defineStyleConfig } from "@chakra-ui/react"
 export { Button }
 
 export const buttonTheme = defineStyleConfig({
-  baseStyle: {
-    display: "flex",
-    alignIitems: "center",
-    justifyContent: "center",
-    outline: "none",
-    border: "none",
-    textAlign: "center",
-    rounded: "full",
-    fontWeight: "bold",
-    _active: {
-      transform: "scale(0.975)",
-    },
-    cursor: "pointer",
-    _disabled: {
-      pointerEvents: "none",
-    },
+  baseStyle: ({ pressable = true }) => {
+    return {
+      display: "flex",
+      alignIitems: "center",
+      justifyContent: "center",
+      outline: "none",
+      border: "none",
+      textAlign: "center",
+      rounded: "full",
+      fontWeight: "bold",
+      _active: pressable
+        ? {
+            transform: "scale(0.975)",
+          }
+        : "initial",
+      cursor: "pointer",
+      _disabled: {
+        pointerEvents: "none",
+      },
+    }
   },
   sizes: {
     auto: {},

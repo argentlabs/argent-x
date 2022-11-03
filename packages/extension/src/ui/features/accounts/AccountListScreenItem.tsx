@@ -1,7 +1,15 @@
 import { Button, icons } from "@argent/ui"
-import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
+import {
+  ButtonProps,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  forwardRef,
+} from "@chakra-ui/react"
 import {
   ComponentProps,
+  ComponentPropsWithRef,
   FC,
   MouseEvent,
   MouseEventHandler,
@@ -36,21 +44,20 @@ interface IAccountListScreenItem {
   canShowUpgrade?: boolean
 }
 
-export const CaptureClickButton: FC<ComponentProps<typeof Button>> = ({
-  onClick: onClickProp,
-  ...rest
-}) => {
-  const onClick = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      if (e.target == e.currentTarget) {
-        e.stopPropagation()
-        onClickProp && onClickProp(e)
-      }
-    },
-    [onClickProp],
-  )
-  return <Button onClick={onClick} {...rest} />
-}
+export const CaptureClickButton = forwardRef<ButtonProps, "button">(
+  ({ onClick: onClickProp, ...rest }, ref) => {
+    const onClick = useCallback(
+      (e: MouseEvent<HTMLButtonElement>) => {
+        if (e.target == e.currentTarget) {
+          e.stopPropagation()
+          onClickProp && onClickProp(e)
+        }
+      },
+      [onClickProp],
+    )
+    return <Button ref={ref} onClick={onClick} {...rest} />
+  },
+)
 
 export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   account,
@@ -82,40 +89,43 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   return (
-    <AccountListItem
-      aria-label={`Select ${accountName}`}
-      onClick={() => {
-        useSelectedAccountStore.setState({
-          selectedAccount: account,
-          showMigrationScreen: account ? isDeprecated(account) : false,
-        })
-        navigate(routes.accountTokens())
-      }}
-      accountName={accountName}
-      accountAddress={account.address}
-      networkId={account.networkId}
-      accountType={account.type}
-      avatarOutlined={status.code === "CONNECTED"}
-      deploying={status.code === "DEPLOYING"}
-      upgrade={canShowUpgrade && showUpgradeBanner}
-      connected={isConnected}
-    >
-      <Menu>
-        <MenuButton
-          aria-label={`${accountName} options`}
-          colorScheme="transparent"
-          padding="1.5"
-          fontSize="xl"
-          size="auto"
-          rounded="full"
-          as={CaptureClickButton}
+    <Menu isLazy>
+      {({ isOpen }) => (
+        <AccountListItem
+          aria-label={`Select ${accountName}`}
+          pointerEvents={isOpen ? "none" : "initial"}
+          onClick={() => {
+            useSelectedAccountStore.setState({
+              selectedAccount: account,
+              showMigrationScreen: account ? isDeprecated(account) : false,
+            })
+            navigate(routes.accountTokens())
+          }}
+          accountName={accountName}
+          accountAddress={account.address}
+          networkId={account.networkId}
+          accountType={account.type}
+          avatarOutlined={status.code === "CONNECTED"}
+          deploying={status.code === "DEPLOYING"}
+          upgrade={canShowUpgrade && showUpgradeBanner}
+          connected={isConnected}
         >
-          <MoreIcon />
-        </MenuButton>
-        <MenuList>
-          <MenuItem>Item</MenuItem>
-        </MenuList>
-      </Menu>
-    </AccountListItem>
+          <MenuButton
+            aria-label={`${accountName} options`}
+            colorScheme="transparent"
+            padding="1.5"
+            fontSize="xl"
+            size="auto"
+            rounded="full"
+            as={CaptureClickButton}
+          >
+            <MoreIcon />
+          </MenuButton>
+          <MenuList>
+            <MenuItem>Item</MenuItem>
+          </MenuList>
+        </AccountListItem>
+      )}
+    </Menu>
   )
 }
