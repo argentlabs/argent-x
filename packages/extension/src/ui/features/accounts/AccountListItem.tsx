@@ -1,4 +1,6 @@
-import { FC, HTMLProps, ReactNode } from "react"
+import { ButtonRect, H6, P4 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
+import { ComponentProps, FC, HTMLProps, ReactNode } from "react"
 import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
@@ -7,7 +9,6 @@ import {
   LinkIcon,
   VisibilityIcon,
 } from "../../components/Icons/MuiIcons"
-import Row from "../../components/Row"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
@@ -19,8 +20,8 @@ export interface IAccountListItem {
   networkId: string
   networkName?: string
   accountType: ArgentAccountType
-  outline?: boolean
-  highlight?: boolean
+  outlined?: boolean
+  highlighted?: boolean
   deploying?: boolean
   upgrade?: boolean
   connected?: boolean
@@ -31,45 +32,39 @@ export interface IAccountListItem {
   style?: HTMLProps<HTMLDivElement>["style"]
 }
 
-type AccountListItemWrapperProps = Pick<
-  IAccountListItem,
-  "highlight" | "outline" | "transparent"
-> & {
+interface AccountListItemWrapperProps
+  extends ComponentProps<typeof ButtonRect>,
+    Pick<IAccountListItem, "highlighted" | "outlined" | "transparent"> {
   dark?: boolean
 }
 
-export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
-  position: relative;
-  cursor: pointer;
-  background-color: ${({ highlight, transparent, dark }) =>
-    transparent || dark
-      ? "transparent"
-      : highlight
-      ? "rgba(255, 255, 255, 0.15)"
-      : "rgba(255, 255, 255, 0.1)"};
-  border-radius: 4px;
-  padding: 20px 16px;
-  border: 1px solid
-    ${({ outline, dark }) =>
-      outline || dark ? "rgba(255, 255, 255, 0.3)" : "transparent"};
-
-  display: flex;
-  gap: 12px;
-  align-items: center;
-
-  transition: all 200ms ease-in-out;
-
-  &:hover,
-  &:focus {
-    background: ${({ transparent, dark }) =>
-      transparent
-        ? "transparent"
-        : dark
-        ? "rgba(255, 255, 255, 0.1)"
-        : "rgba(255, 255, 255, 0.15)"};
-    outline: 0;
-  }
-`
+const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
+  highlighted,
+  transparent,
+  dark,
+  outlined,
+  ...rest
+}) => {
+  const colorScheme = transparent
+    ? "transparent"
+    : highlighted
+    ? "neutrals600"
+    : "neutrals800"
+  const borderColor = outlined ? "neutrals.600" : "transparent"
+  return (
+    <ButtonRect
+      gap={3}
+      p={4}
+      h={"initial"}
+      textAlign={"left"}
+      fontWeight={"initial"}
+      colorScheme={colorScheme}
+      border={"1px solid"}
+      borderColor={borderColor}
+      {...rest}
+    />
+  )
+}
 
 const AccountAvatar = styled.img`
   border-radius: 500px;
@@ -101,21 +96,6 @@ const AccountStatusText = styled.p`
   font-weight: 400;
   line-height: 12px;
   text-align: center;
-`
-
-const AccountName = styled.h1`
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 18px;
-  margin: 0 0 5px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
-const AccountAddress = styled.div`
-  font-size: 13px;
-  line-height: 13px;
 `
 
 const UpgradeIcon = styled(ArrowCircleDownIcon)`
@@ -160,13 +140,6 @@ const PluginTextContainer = styled(NetworkContainer)`
   right: 8px;
 `
 
-const StyledContactAddress = styled.p`
-  font-weight: 400;
-  font-size: 10px;
-  line-height: 12px;
-  color: ${({ theme }) => theme.text1};
-`
-
 export const AccountListItem: FC<IAccountListItem> = ({
   accountName,
   accountAddress,
@@ -178,17 +151,10 @@ export const AccountListItem: FC<IAccountListItem> = ({
   connected,
   hidden,
   children,
-  onClick,
-  style,
   ...rest
 }) => {
   return (
-    <AccountListItemWrapper
-      dark={hidden}
-      style={style}
-      {...rest}
-      onClick={onClick}
-    >
+    <AccountListItemWrapper dark={hidden} {...rest}>
       <AccountAvatar
         src={getNetworkAccountImageUrl({
           accountName,
@@ -199,20 +165,13 @@ export const AccountListItem: FC<IAccountListItem> = ({
       />
       <AccountRow>
         <AccountColumn>
-          <AccountName>{accountName}</AccountName>
-
-          {networkName ? (
-            <Row gap="8px">
-              <StyledContactAddress>
-                {formatTruncatedAddress(accountAddress)}
-              </StyledContactAddress>
-              <NetworkContainer>{networkName}</NetworkContainer>
-            </Row>
-          ) : (
-            <AccountAddress>
+          <H6>{accountName}</H6>
+          <Flex gap={2} color={"neutrals.400"}>
+            <P4 fontWeight={"bold"}>
               {formatTruncatedAddress(accountAddress)}
-            </AccountAddress>
-          )}
+            </P4>
+            {networkName && <P4 noOfLines={1}>{networkName}</P4>}
+          </Flex>
         </AccountColumn>
         <AccountColumnAccessory>
           {accountType === "argent-plugin" && (

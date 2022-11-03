@@ -6,6 +6,7 @@ import {
   icons,
   useScroll,
 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { partition, some } from "lodash-es"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
@@ -132,7 +133,7 @@ export const AccountListScreen: FC = () => {
         }
       />
       <ScrollContainer ref={scrollRef}>
-        <AccountList hasHiddenAccounts={hasHiddenAccounts}>
+        <Flex p={4} gap={2} direction="column">
           {isBackupRequired && <RecoveryBanner noMargins />}
           {visibleAccounts.length === 0 && (
             <Paragraph>
@@ -161,29 +162,20 @@ export const AccountListScreen: FC = () => {
               ))}
             </>
           )}
-          {isDeploying ? (
+          {isDeploying && (
             <>
               <DimmingContainer />
               <IconButtonCenterDisabled size={48}>
                 <Spinner size={24} />
               </IconButtonCenterDisabled>
             </>
-          ) : (
-            <IconButtonCenter
-              size={48}
-              {...makeClickable(addAccount, {
-                label: "Create new wallet",
-              })}
-            >
-              <AddIcon fontSize="large" />
-            </IconButtonCenter>
           )}
           {deployFailed && (
             <ErrorText>
               Sorry, unable to create wallet. Please try again later.
             </ErrorText>
           )}
-        </AccountList>
+        </Flex>
         {hasHiddenAccounts && (
           <Footer>
             <HiddenAccountsBar />

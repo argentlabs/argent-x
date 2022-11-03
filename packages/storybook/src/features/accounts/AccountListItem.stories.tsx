@@ -1,4 +1,5 @@
 import { AccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
+import { Flex } from "@chakra-ui/layout"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
@@ -7,7 +8,9 @@ export default {
 } as ComponentMeta<typeof AccountListItem>
 
 const Template: ComponentStory<typeof AccountListItem> = (props) => (
-  <AccountListItem {...props}></AccountListItem>
+  <Flex flex={1} flexDirection="column">
+    <AccountListItem {...props}></AccountListItem>
+  </Flex>
 )
 
 const account = {
@@ -25,13 +28,13 @@ Default.args = {
 export const Outline = Template.bind({})
 Outline.args = {
   ...account,
-  outline: true,
+  outlined: true,
 }
 
 export const Highlight = Template.bind({})
 Highlight.args = {
   ...account,
-  highlight: true,
+  highlighted: true,
 }
 
 export const Deploying = Template.bind({})

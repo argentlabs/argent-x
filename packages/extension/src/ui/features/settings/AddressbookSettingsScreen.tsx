@@ -125,7 +125,7 @@ export const AddressbookSettingsScreen: FC = () => {
                     networkId={contact.networkId}
                     accountName={contact.name}
                     networkName={networkName}
-                    outline
+                    outlined
                     transparent
                     style={{ padding: "16px" }}
                     {...makeClickable(() =>
