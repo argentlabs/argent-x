@@ -69,7 +69,7 @@ interface AccountAvatarProps extends ComponentProps<"img"> {
 
 const AccountAvatar: FC<AccountAvatarProps> = ({ outlined, ...rest }) => {
   return (
-    <Box position={"relative"}>
+    <Flex position={"relative"} flexShrink={0}>
       <Image borderRadius={"full"} width={12} height={12} {...rest} />
       {outlined && (
         <>
@@ -89,7 +89,7 @@ const AccountAvatar: FC<AccountAvatarProps> = ({ outlined, ...rest }) => {
           />
         </>
       )}
-    </Box>
+    </Flex>
   )
 }
 
@@ -142,25 +142,6 @@ const HiddenStatusWrapper = styled.div`
   justify-content: center;
 `
 
-const NetworkContainer = styled.div`
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-  padding: 0px 3px 1px;
-  font-weight: 600;
-  font-size: 9px;
-  line-height: 14px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.text2};
-`
-
-const PluginTextContainer = styled(NetworkContainer)`
-  font-size: 10px;
-  position: absolute;
-  top: 7.5px;
-  right: 8px;
-`
-
 export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
   accountAddress,
@@ -187,9 +168,9 @@ export const AccountListItem: FC<AccountListItemProps> = ({
         })}
       />
       <AccountRow>
-        <AccountColumn>
-          <Flex gap={1} alignItems={"center"}>
-            <H6>{accountName}</H6>
+        <Flex direction={"column"} overflow={"hidden"}>
+          <Flex gap={1} alignItems={"center"} overflow={"hidden"}>
+            <H6 noOfLines={1}>{accountName}</H6>
             {accountType === "argent-plugin" && (
               <L2
                 backgroundColor={"neutrals.900"}
@@ -212,7 +193,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>
-        </AccountColumn>
+        </Flex>
         <AccountColumnAccessory>
           {deploying ? (
             <NetworkStatusWrapper>
