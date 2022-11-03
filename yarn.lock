@@ -4494,20 +4494,20 @@
     ts-dedent "^2.0.0"
 
 "@storybook/addon-interactions@^6.5.9":
-  version "6.5.12"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-interactions/-/addon-interactions-6.5.12.tgz#b9b7ae50de4c41ea2c9023dcaacf3f318a072ea4"
-  integrity sha512-wAkKqUX57qZMzgykMIltjDrFfA0II+pKz2SchK4hXHK3/2rtOe+Ah0Sj5nTQo++Ee5oC1PVZWIq/Y1kufCTBJQ==
+  version "6.5.13"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-interactions/-/addon-interactions-6.5.13.tgz#622d6672785045fa71a7677f49076ae2beae351a"
+  integrity sha512-FPOeS7AT/Odxl6z7E0qYI4F0Sh06jFRttRvSgpKC5P2lYUWUstLP5TC8N+F5ijBeLfIdIsf5zBK7l5Y/cluueg==
   dependencies:
     "@devtools-ds/object-inspector" "^1.1.2"
-    "@storybook/addons" "6.5.12"
-    "@storybook/api" "6.5.12"
-    "@storybook/client-logger" "6.5.12"
-    "@storybook/components" "6.5.12"
-    "@storybook/core-common" "6.5.12"
-    "@storybook/core-events" "6.5.12"
+    "@storybook/addons" "6.5.13"
+    "@storybook/api" "6.5.13"
+    "@storybook/client-logger" "6.5.13"
+    "@storybook/components" "6.5.13"
+    "@storybook/core-common" "6.5.13"
+    "@storybook/core-events" "6.5.13"
     "@storybook/csf" "0.0.2--canary.4566f4d.1"
-    "@storybook/instrumenter" "6.5.12"
-    "@storybook/theming" "6.5.12"
+    "@storybook/instrumenter" "6.5.13"
+    "@storybook/theming" "6.5.13"
     core-js "^3.8.2"
     global "^4.4.0"
     jest-mock "^27.0.6"
@@ -5139,14 +5139,14 @@
     lodash "^4.17.21"
     regenerator-runtime "^0.13.7"
 
-"@storybook/instrumenter@6.5.12", "@storybook/instrumenter@^6.4.0":
-  version "6.5.12"
-  resolved "https://registry.yarnpkg.com/@storybook/instrumenter/-/instrumenter-6.5.12.tgz#acd721c50b65183a53fb5913fe7cdb35b06e2433"
-  integrity sha512-VMl+Yg6ab79A1VqlhC69sBFI6ySw4Lganqdf9JJf6Y7uNRcZwsjfGpGfYiL4WGH1q72tGiq/25XKGIJV0jgi1Q==
+"@storybook/instrumenter@6.5.13", "@storybook/instrumenter@^6.4.0":
+  version "6.5.13"
+  resolved "https://registry.yarnpkg.com/@storybook/instrumenter/-/instrumenter-6.5.13.tgz#bcb743e2a2c92ba284b2d5cac41bbe3d2c8e8d12"
+  integrity sha512-izRF64BU+gGCP7qE1N3kOVLSv5Xk4M0OWcRmFIXoIS46qNDzmd8hmbkkx3M9wrvw0kcQ97kIyADF+UInbcr/dQ==
   dependencies:
-    "@storybook/addons" "6.5.12"
-    "@storybook/client-logger" "6.5.12"
-    "@storybook/core-events" "6.5.12"
+    "@storybook/addons" "6.5.13"
+    "@storybook/client-logger" "6.5.13"
+    "@storybook/core-events" "6.5.13"
     core-js "^3.8.2"
     global "^4.4.0"
 
