@@ -192,12 +192,15 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6>{accountName}</H6>
             {accountType === "argent-plugin" && (
               <L2
-                backgroundColor={"black"}
-                p={1}
+                backgroundColor={"neutrals.900"}
+                px={1}
+                py={0.5}
                 textTransform="uppercase"
                 fontWeight={"extrabold"}
                 color={"neutrals.200"}
                 borderRadius={"base"}
+                border={"1px solid"}
+                borderColor={"neutrals.700"}
               >
                 Plugin
               </L2>
