@@ -79,14 +79,10 @@ export const LockScreen: FC = () => {
                   type="submit"
                   disabled={!isDirty || isSubmitting}
                   width="100%"
+                  isLoading={isLoading}
+                  loadingText="Unlocking"
                 >
-                  {isLoading && (
-                    <>
-                      <Spinner />
-                      Unlocking
-                    </>
-                  )}
-                  {!isLoading && "Unlock"}
+                  Unlock
                 </Button>
               </StickyGroup>
             </>
