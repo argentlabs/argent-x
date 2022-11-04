@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom"
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
-import { EditIcon } from "../../components/Icons/EditIcon"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
@@ -17,7 +16,8 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 
-const { MoreIcon, ExpandIcon, HideIcon, PluginIcon, AlertIcon } = icons
+const { MoreIcon, ExpandIcon, HideIcon, PluginIcon, AlertIcon, EditIcon } =
+  icons
 
 export interface AccountListScreenItemMenuProps {
   account: Account
