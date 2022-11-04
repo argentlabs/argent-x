@@ -11,7 +11,6 @@ import {
 } from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
 export interface AccountListItemWrapperProps
@@ -92,6 +91,13 @@ const AccountAvatar: FC<AccountAvatarProps> = ({ outlined, ...rest }) => {
     </Flex>
   )
 }
+
+export const NetworkStatusWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 4px;
+`
 
 const AccountColumn = styled.div`
   display: flex;

@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react"
 import { FC, useCallback, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { NetworkStatus } from "../../../shared/network"
 import { useAppState } from "../../app.state"
@@ -21,13 +20,6 @@ import { routes } from "../../routes"
 import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 import { useNetwork, useNetworkStatuses, useNetworks } from "./useNetworks"
-
-export const NetworkStatusWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: right;
-  gap: 4px;
-`
 
 const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
 
