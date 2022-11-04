@@ -28,7 +28,6 @@ import {
   isDeprecated,
 } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
@@ -74,19 +73,21 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
     { suspense: false },
   )
 
+  const onClick = useCallback(() => {
+    useSelectedAccountStore.setState({
+      selectedAccount: account,
+      showMigrationScreen: account ? isDeprecated(account) : false,
+    })
+    navigate(routes.accountTokens())
+  }, [account, navigate])
+
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   return (
     <Flex position={"relative"} direction={"column"}>
       <AccountListItem
         aria-label={`Select ${accountName}`}
-        onClick={() => {
-          useSelectedAccountStore.setState({
-            selectedAccount: account,
-            showMigrationScreen: account ? isDeprecated(account) : false,
-          })
-          navigate(routes.accountTokens())
-        }}
+        onClick={onClick}
         accountName={accountName}
         accountAddress={account.address}
         networkId={account.networkId}
