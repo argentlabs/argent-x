@@ -68,12 +68,27 @@ jobs:
           cd ../../../
       - name: Check bundlesize for firefox
         run: yarn run bundlewatch
+
+      - name: Upload artifacts for chrome
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: chrome
+          path: $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip
+          retention-days: 14
+      - name: Upload artifacts for firefox
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: firefox
+          path: $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip
+          retention-days: 14
+
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
-          # prerelease if not triggered by a tag
-          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
           files: |
             ${{ env.FILENAME }}-chrome.zip
             ${{ env.FILENAME }}-firefox.zip
