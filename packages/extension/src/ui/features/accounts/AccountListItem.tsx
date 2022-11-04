@@ -10,7 +10,6 @@ import {
 import Row from "../../components/Row"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { NetworkStatusWrapper } from "../networks/NetworkSwitcher"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
 export interface IAccountListItem {
@@ -37,6 +36,13 @@ type AccountListItemWrapperProps = Pick<
 > & {
   dark?: boolean
 }
+
+export const NetworkStatusWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 4px;
+`
 
 export const AccountListItemWrapper = styled.div<AccountListItemWrapperProps>`
   position: relative;
