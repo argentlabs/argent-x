@@ -34,6 +34,7 @@ import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
+import { AccountListScreenItemMenu } from "./AccountListScreenItemMenu"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
@@ -83,6 +84,10 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
+  const onAccountNameEdit = useCallback(() => {
+    console.log("onAccountNameEdit")
+  }, [])
+
   return (
     <Flex position={"relative"} direction={"column"}>
       <AccountListItem
@@ -103,25 +108,11 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         right={4}
         top={"50%"}
         transform={"translateY(-50%)"}
-        zIndex={1} /** menu appears over top of siblings */
       >
-        <Menu isLazy>
-          <MenuButton
-            aria-label={`${accountName} options`}
-            backgroundColor="black"
-            colorScheme="transparent"
-            padding="1.5"
-            fontSize="xl"
-            size="auto"
-            rounded="full"
-            as={Button}
-          >
-            <MoreIcon />
-          </MenuButton>
-          <MenuList>
-            <MenuItem>Item</MenuItem>
-          </MenuList>
-        </Menu>
+        <AccountListScreenItemMenu
+          account={account}
+          onAccountNameEdit={onAccountNameEdit}
+        />
       </Flex>
     </Flex>
   )

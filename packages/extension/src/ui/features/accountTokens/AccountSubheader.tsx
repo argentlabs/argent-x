@@ -7,7 +7,7 @@ import { ActionContainer } from "../../components/ErrorBoundaryFallbackWithCopyE
 import { RefreshIcon } from "../../components/Icons/MuiIcons"
 import { ShortAddressBadge } from "../../components/ShortAddressBadge"
 import { AccountStatus } from "../accounts/accounts.service"
-import { AccountMenu } from "./AccountMenu"
+// import { AccountMenu } from "./AccountMenu"
 import { AccountName } from "./AccountName"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
@@ -83,7 +83,7 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
               inputRef={inputRef}
             />
 
-            <AccountMenu onAccountNameEdit={() => inputRef.current?.focus()} />
+            {/* <AccountMenu onAccountNameEdit={() => inputRef.current?.focus()} /> */}
           </Header>
         </div>
         {status.code !== "CONNECTED" && status.code !== "DEFAULT" && (
