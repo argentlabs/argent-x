@@ -17,13 +17,9 @@ import {
 
 interface RecoveryOptions {
   networkId?: string
-  showAccountList?: boolean
 }
 
-export const recover = async ({
-  networkId,
-  showAccountList,
-}: RecoveryOptions = {}) => {
+export const recover = async ({ networkId }: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ??= lastSelectedAccount?.networkId ?? defaultNetwork.id
@@ -54,9 +50,6 @@ export const recover = async ({
       return routes.migrationDisclaimer()
     }
 
-    if (showAccountList || !selectedAccount) {
-      return routes.accounts()
-    }
     return routes.accountTokens()
   } catch (e: any) {
     console.error("Recovery error:", e)
