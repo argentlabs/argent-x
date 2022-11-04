@@ -55,16 +55,16 @@ jobs:
       - name: Create chrome zip
         run: |
           cd packages/extension/dist
-          zip -r ${{ env.FILENAME }}-chrome.zip ./*
-          mv ${{ env.FILENAME }}-chrome.zip ../../../
+          zip -r $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ./*
+          mv $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ../../../
           cd ../../../
       - name: Build Firefox version
         run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
       - name: Create firefox zip
         run: |
           cd packages/extension/dist
-          zip -r ${{ env.FILENAME }}-firefox.zip ./*
-          mv ${{ env.FILENAME }}-firefox.zip ../../../
+          zip -r $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ./*
+          mv $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ../../../
           cd ../../../
       - name: Check bundlesize for firefox
         run: yarn run bundlewatch
