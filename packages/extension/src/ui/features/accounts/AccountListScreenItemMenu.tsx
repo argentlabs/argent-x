@@ -1,42 +1,23 @@
 import { Button, icons } from "@argent/ui"
-import {
-  Box,
-  ButtonProps,
-  Circle,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  MenuProps,
-  Portal,
-  forwardRef,
-} from "@chakra-ui/react"
-import { ComponentProps, FC, useRef, useState } from "react"
+import { Menu, MenuButton, MenuItem, MenuList, Portal } from "@chakra-ui/react"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { EditIcon } from "../../components/Icons/EditIcon"
-import { MoreVertSharp, VisibilityOff } from "../../components/Icons/MuiIcons"
-import { PluginIcon } from "../../components/Icons/PluginIcon"
-import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
-import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
-import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useSelectedAccount } from "./accounts.state"
 
-const { MoreIcon, ExpandIcon } = icons
+const { MoreIcon, ExpandIcon, HideIcon, PluginIcon, AlertIcon } = icons
 
 export interface AccountListScreenItemMenuProps {
   account: Account
@@ -100,21 +81,28 @@ export const AccountListScreenItemMenu: FC<AccountListScreenItemMenuProps> = ({
           >
             View on {blockExplorerTitle}
           </MenuItem>
-          <MenuItem onClick={onAccountNameEdit}>
-            <EditIcon /> Edit name
+          <MenuItem onClick={onAccountNameEdit} icon={<EditIcon />}>
+            Edit name
           </MenuItem>
-          <MenuItem onClick={() => handleHideOrDeleteAccount(account)}>
-            <VisibilityOff fontSize="inherit" htmlColor="white" />
+          <MenuItem
+            onClick={() => handleHideOrDeleteAccount(account)}
+            icon={<HideIcon />}
+          >
             {showDelete ? "Delete" : "Hide"} account
           </MenuItem>
           {canUpgradeToPluginAccount && (
-            <MenuItem onClick={() => upgradeAccount(account, "argent-plugin")}>
-              <PluginIcon fontSize="inherit" />
+            <MenuItem
+              onClick={() => upgradeAccount(account, "argent-plugin")}
+              icon={<PluginIcon />}
+            >
               Use Plugins
             </MenuItem>
           )}
-          <MenuItem onClick={() => navigate(routes.exportPrivateKey())}>
-            <WarningIcon /> Export private key
+          <MenuItem
+            onClick={() => navigate(routes.exportPrivateKey())}
+            icon={<AlertIcon />}
+          >
+            Export private key
           </MenuItem>
         </MenuList>
       </Portal>
