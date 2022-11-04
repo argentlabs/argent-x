@@ -74,15 +74,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: chrome
-          path: $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip
+          path: "*-chrome.zip"
           retention-days: 14
+          if-no-files-found: error
       - name: Upload artifacts for firefox
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         uses: actions/upload-artifact@v2
         with:
           name: firefox
-          path: $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip
+          path: "*-firefox.zip"
           retention-days: 14
+          if-no-files-found: error
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
