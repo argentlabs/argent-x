@@ -7,13 +7,19 @@ import { AccountHeader } from "./AccountHeader"
 import { isHiddenAccount, useAccounts } from "./accounts.state"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
 import { autoSelectAccountOnNetwork } from "./switchAccount"
-import { useAddAccount } from "./useAddAccount"
 
 const { WalletIcon, AddIcon } = icons
 
-export const AccountScreenEmpty: FC = () => {
+export interface AccountScreenEmptyProps {
+  onAddAccount: () => void
+  isDeploying?: boolean
+}
+
+export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
+  onAddAccount,
+  isDeploying,
+}) => {
   const currentNetwork = useCurrentNetwork()
-  const { addAccount, isDeploying } = useAddAccount()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
@@ -38,7 +44,7 @@ export const AccountScreenEmpty: FC = () => {
       >
         <EmptyButton
           leftIcon={<AddIcon />}
-          onClick={addAccount}
+          onClick={onAddAccount}
           isLoading={isDeploying}
           isDisabled={isDeploying}
           loadingText={"Creating"}

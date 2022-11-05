@@ -10,6 +10,7 @@ import { AccountContainer } from "./AccountContainer"
 import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
 import { AccountScreenEmpty } from "./AccountScreenEmpty"
 import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
+import { useAddAccount } from "./useAddAccount"
 
 interface AccountScreenProps {
   tab: "tokens" | "collections" | "activity"
@@ -22,9 +23,13 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   )
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
+  const { addAccount, isDeploying } = useAddAccount()
+
   let body: ReactNode
-  if (!account) {
-    return <AccountScreenEmpty />
+  if (!account || isDeploying) {
+    return (
+      <AccountScreenEmpty onAddAccount={addAccount} isDeploying={isDeploying} />
+    )
   } else if (showMigrationScreen) {
     return (
       <DeprecatedAccountScreen
