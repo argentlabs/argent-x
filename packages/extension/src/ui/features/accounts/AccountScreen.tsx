@@ -25,8 +25,11 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
     useShouldShowFullScreenStatusMessage()
   const { addAccount, isDeploying, deployFailed } = useAddAccount()
 
+  const hasAcccount = !!account
+  const showEmpty = !hasAcccount || (hasAcccount && isDeploying)
+
   let body: ReactNode
-  if (!account || isDeploying) {
+  if (showEmpty) {
     return (
       <AccountScreenEmpty
         onAddAccount={addAccount}

@@ -54,7 +54,7 @@ export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
           Create account
         </EmptyButton>
         {deployFailed && (
-          <FieldError pt={1}>
+          <FieldError pt={1} textAlign={"center"}>
             Sorry, unable to create wallet. Please try again later.
           </FieldError>
         )}

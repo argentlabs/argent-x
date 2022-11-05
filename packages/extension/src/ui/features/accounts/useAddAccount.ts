@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
@@ -13,6 +13,11 @@ export const useAddAccount = () => {
   const { switcherNetworkId } = useAppState()
   const [isDeploying, setIsDeploying] = useState(false)
   const [deployFailed, setDeployFailed] = useState(false)
+
+  useEffect(() => {
+    // clear deploy status when network changes
+    setDeployFailed(false)
+  }, [switcherNetworkId])
 
   const addAccount = useCallback(async () => {
     setIsDeploying(true)
