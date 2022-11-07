@@ -1,9 +1,11 @@
 import {
   ChakraProvider,
   ChakraProviderProps,
+  ThemeConfig,
   theme as baseTheme,
   extendTheme,
 } from "@chakra-ui/react"
+import { mode } from "@chakra-ui/theme-tools"
 
 import { textareaTheme } from "../components"
 import { buttonTheme } from "../components/Button"
@@ -16,14 +18,20 @@ import { typography } from "./typography"
 
 export { scrollbarStyle } from "./scrollbarStyle"
 
+const config: ThemeConfig = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+}
+
 const extendedTheme = extendTheme({
+  config,
   styles: {
-    global: {
+    global: (props: any) => ({
       "html, body": {
-        color: "white",
-        bg: "neutrals.900",
+        color: mode("neutrals.700", "white")(props),
+        bg: mode("white", "neutrals.900")(props),
       },
-    },
+    }),
   },
   breakpoints,
   ...typography,
