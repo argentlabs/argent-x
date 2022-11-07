@@ -156,11 +156,11 @@ export const AccountListScreen: FC = () => {
 
   const { scrollRef, scroll } = useScroll()
 
-  const onClose = useCallback(() => {
+  const onClose = useCallback(async () => {
     if (returnTo) {
       navigate(returnTo)
     } else {
-      navigate(-1)
+      navigate(await recover())
     }
   }, [navigate, returnTo])
 
