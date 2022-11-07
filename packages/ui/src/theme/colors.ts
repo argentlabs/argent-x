@@ -20,7 +20,9 @@ export const colors = {
   "warn-high": makeColorVariants("#f36a3d"),
   info: makeColorVariants("#0078a4"),
   danger: makeColorVariants("#c12026"),
+  warning: makeColorVariants("#f4bc54"),
   error: makeColorVariants("#cc3247"),
+  neutrals600: makeColorVariants("#404043"),
   neutrals800: makeColorVariants("#1d1f22"),
   skyBlue: makeColorVariants("#29c5ff"),
   neutrals: {

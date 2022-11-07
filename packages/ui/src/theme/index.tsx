@@ -5,7 +5,7 @@ import {
   extendTheme,
 } from "@chakra-ui/react"
 
-import { textareaTheme } from "../components"
+import { menuTheme, textareaTheme } from "../components"
 import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
 import { breakpoints } from "./breakpoints"
@@ -32,6 +32,7 @@ const extendedTheme = extendTheme({
   components: {
     Button: buttonTheme,
     Input: inputTheme,
+    Menu: menuTheme,
     Textarea: textareaTheme,
   },
 })

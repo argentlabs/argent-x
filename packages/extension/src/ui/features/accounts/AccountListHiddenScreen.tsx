@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { H1 } from "../../theme/Typography"
 import { DeprecatedContainer } from "./AccountContainer"
 import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
@@ -30,16 +30,17 @@ const AccountListWrapper = styled(DeprecatedContainer)`
 `
 
 export const AccountListHiddenScreen: FC = () => {
+  const returnTo = useReturnTo()
   const hiddenAccounts = useAccounts({ showHidden: true }).filter(
     isHiddenAccount,
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
   if (!hasHiddenAccounts) {
-    return <Navigate to={routes.accounts()} />
+    return <Navigate to={returnTo ? returnTo : routes.accounts()} />
   }
   return (
     <AccountListWrapper>
-      <IconBar back />
+      <IconBar back close={returnTo} />
       <H1>Hidden Accounts</H1>
       <AccountList>
         {hiddenAccounts.map((account) => (

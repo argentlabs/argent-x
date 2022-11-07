@@ -5,13 +5,14 @@ import styled from "styled-components"
 import { hideAccount } from "../../../shared/account/store"
 import { useAppState } from "../../app.state"
 import { AccountAddress, AccountName } from "../../components/Address"
+import { routes } from "../../routes"
 import { formatFullAddress } from "../../services/addresses"
 import { deleteAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { recover } from "../recovery/recovery.service"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useAccount } from "./accounts.state"
+import { autoSelectAccountOnNetwork } from "./switchAccount"
 
 const StyledP = styled(P)`
   margin-bottom: 16px;
@@ -62,9 +63,8 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
       await deleteAccount(accountAddress, switcherNetworkId)
     }
 
-    navigate(
-      await recover({ showAccountList: true, networkId: switcherNetworkId }),
-    )
+    await autoSelectAccountOnNetwork(switcherNetworkId)
+    navigate(routes.accountTokens())
   }
 
   return (

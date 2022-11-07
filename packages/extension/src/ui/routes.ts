@@ -84,7 +84,7 @@ export const routes = {
   upgrade: route("/account/upgrade"),
   accounts: routeWithReturnTo("/accounts"),
   addAccount: route("/accounts/new"),
-  accountsHidden: route("/accounts/hidden"),
+  accountsHidden: routeWithReturnTo("/accounts/hidden"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),
@@ -123,7 +123,7 @@ export const routes = {
   ),
   settingsAddressbookAdd: route("/settings/addressbook/add-or-edit"),
   settingsPrivacyStatement: route("/settings/privacy-policy"),
-  networkWarning: route("/network-warning"),
+  networkWarning: routeWithReturnTo("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>
       `/backup-download${isFromSettings ? "?settings" : ""}`,
