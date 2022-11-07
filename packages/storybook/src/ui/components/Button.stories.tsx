@@ -82,3 +82,9 @@ OnboardingBack.args = {
   ),
   colorScheme: "neutrals",
 }
+
+export const Transparent = Template.bind({})
+Transparent.args = {
+  children: "Button",
+  colorScheme: "transparent",
+}
