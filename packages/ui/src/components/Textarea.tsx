@@ -10,10 +10,10 @@ const baseStyle = defineStyle({
 })
 
 const variantFilled = defineStyle((props) => ({
-  bg: mode("gray.900", "neutrals.800")(props),
+  bg: mode("gray.50", "neutrals.800")(props),
   border: "none",
   _hover: {
-    bg: mode("gray.800", "neutrals.700")(props),
+    bg: mode("gray.100", "neutrals.700")(props),
   },
   _invalid: {
     boxShadow: "error",

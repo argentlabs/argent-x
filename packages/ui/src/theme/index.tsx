@@ -12,6 +12,7 @@ import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
+import { semanticTokens } from "./semanticTokens"
 import { shadows } from "./shadows"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
@@ -25,13 +26,14 @@ const config: ThemeConfig = {
 
 const extendedTheme = extendTheme({
   config,
+  semanticTokens,
   styles: {
-    global: (props: any) => ({
+    global: {
       "html, body": {
-        color: mode("neutrals.700", "white")(props),
-        bg: mode("white", "neutrals.900")(props),
+        color: "text",
+        bg: "bg",
       },
-    }),
+    },
   },
   breakpoints,
   ...typography,

@@ -9,10 +9,7 @@ export const colors = {
   white: "#ffffff",
   white30: "rgba(255,255,255,0.3)",
   white50: "rgba(255,255,255,0.5)",
-  gray: makeColorVariants(
-    "#707072" /** neutrals.400 */,
-    true,
-  ) /** inverse since we are on a black background, but in chakra 'light' mode */,
+  gray: makeColorVariants("#58585b"),
   primary: makeColorVariants("#f36a3d"),
   secondary: makeColorVariants("#08a681"),
   accent: makeColorVariants("#197aa6"),

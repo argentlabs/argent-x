@@ -69,10 +69,10 @@ export const buttonTheme = defineStyleConfig({
           bg: mode("black", "white")(props),
           color: mode("white", "black")(props),
           _hover: {
-            bg: mode("gray.100", "gray.900")(props),
+            bg: mode("gray.800", "gray.100")(props),
           },
           _active: {
-            bg: mode("gray.200", "gray.800")(props),
+            bg: mode("gray.700", "gray.200")(props),
           },
         }
       } else if (c === "neutrals") {
@@ -81,10 +81,10 @@ export const buttonTheme = defineStyleConfig({
           color: mode(`${c}.700`, "white")(props),
           boxShadow: mode("neutralsButtonLight", "initial")(props),
           _hover: {
-            bg: mode(`gray.900`, `${c}.700`)(props),
+            bg: mode(`gray.50`, `${c}.700`)(props),
           },
           _active: {
-            bg: mode(`gray.9800`, `${c}.600`)(props),
+            bg: mode(`gray.100`, `${c}.600`)(props),
           },
         }
       }
