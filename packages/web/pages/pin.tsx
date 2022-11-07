@@ -1,4 +1,11 @@
-import { H5, Input, L2, icons } from "@argent/ui"
+import {
+  H5,
+  L2,
+  PinInput,
+  PinInputField,
+  PinInputWrapper,
+  icons,
+} from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 
 import { Layout } from "../components/Layout"
@@ -29,11 +36,21 @@ export default function Pin() {
         </Box>
         <H5 textAlign="center">Enter the code we sent to itamar@argent.xyz</H5>
       </Box>
-      <Input
-        placeholder="[TBD] replace by pin input"
-        autoFocus
-        onChange={(e) => console.log(e.target.value)}
-      />
+      <PinInputWrapper>
+        <PinInput
+          autoFocus
+          type="number"
+          otp
+          onComplete={(x) => console.log("PIN:", x)}
+        >
+          <PinInputField />
+          <PinInputField />
+          <PinInputField />
+          <PinInputField />
+          <PinInputField />
+          <PinInputField />
+        </PinInput>
+      </PinInputWrapper>
       <L2 as="a" href="#" mt={6} color={"accent.500"}>
         Not received an email?
       </L2>
