@@ -95,7 +95,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), network.id, "feeTokenBalance"],
     () => fetchFeeTokenBalance(account, network.id),
-    { suspense: false, ...withPolling(10000) },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
   const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
@@ -108,7 +108,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       "showUpgradeBanner",
     ],
     () => checkIfUpgradeAvailable(account, network.accountClassHash),
-    { suspense: false, ...withPolling(10000) },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
   const onRedeploy = useCallback(async () => {

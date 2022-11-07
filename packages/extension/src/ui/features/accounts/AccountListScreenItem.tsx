@@ -45,13 +45,13 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), networkId, "feeTokenBalance"],
     () => fetchFeeTokenBalance(account, networkId),
-    { suspense: false, ...withPolling(10000) },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
   const { data: needsUpgrade = false } = useSWR(
     [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
     () => checkIfUpgradeAvailable(account, accountClassHash),
-    { suspense: false, ...withPolling(10000) },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
