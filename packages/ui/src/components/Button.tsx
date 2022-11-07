@@ -1,25 +1,31 @@
 import { Button, chakra, defineStyleConfig } from "@chakra-ui/react"
+import { mode } from "@chakra-ui/theme-tools"
 
 /** as a convenience */
 export { Button }
 
 export const buttonTheme = defineStyleConfig({
-  baseStyle: {
-    display: "flex",
-    alignIitems: "center",
-    justifyContent: "center",
-    outline: "none",
-    border: "none",
-    textAlign: "center",
-    rounded: "full",
-    fontWeight: "bold",
-    _active: {
-      transform: "scale(0.975)",
-    },
-    cursor: "pointer",
-    _disabled: {
-      pointerEvents: "none",
-    },
+  baseStyle: (props) => {
+    return {
+      display: "flex",
+      alignIitems: "center",
+      justifyContent: "center",
+      outline: "none",
+      border: "none",
+      textAlign: "center",
+      rounded: "full",
+      fontWeight: "bold",
+      _active: {
+        transform: "scale(0.975)",
+      },
+      cursor: "pointer",
+      _disabled: {
+        pointerEvents: "none",
+      },
+      _focusVisible: {
+        boxShadow: mode("outlineAccent", "outline")(props),
+      },
+    }
   },
   sizes: {
     auto: {},
@@ -56,26 +62,52 @@ export const buttonTheme = defineStyleConfig({
   },
   variants: {
     outline: {},
-    solid: ({ colorScheme }) => {
-      if (colorScheme === "inverted") {
+    solid: (props) => {
+      const { colorScheme: c } = props
+      if (c === "inverted") {
         return {
-          bg: "white",
-          color: "black",
+          bg: mode("black", "white")(props),
+          color: mode("white", "black")(props),
           _hover: {
-            bg: "gray.900",
+            bg: mode("gray.800", "gray.100")(props),
           },
           _active: {
-            bg: "gray.800",
+            bg: mode("gray.700", "gray.200")(props),
+          },
+        }
+      } else if (c === "neutrals") {
+        return {
+          bg: mode(`white`, `${c}.800`)(props),
+          color: mode(`${c}.700`, "white")(props),
+          boxShadow: mode("neutralsButtonLight", "initial")(props),
+          _hover: {
+            bg: mode(`gray.50`, `${c}.700`)(props),
+          },
+          _active: {
+            bg: mode(`gray.100`, `${c}.600`)(props),
           },
         }
       }
-      return {}
+      /** same for dark or light mode */
+      return {
+        bg: `${c}.500`,
+        color: "white",
+        _hover: {
+          bg: `${c}.600`,
+          _disabled: {
+            bg: `${c}.500`,
+          },
+        },
+        _active: {
+          bg: `${c}.700`,
+        },
+      }
     },
   },
   defaultProps: {
     size: "md",
     variant: "solid",
-    colorScheme: "neutrals800",
+    colorScheme: "neutrals",
   },
 })
 

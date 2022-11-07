@@ -124,11 +124,11 @@ export const components = {
     },
     neutrals800: {
       bg: {
-        base: colors.neutrals800,
-        hover: colord(colors.neutrals800)
+        base: colors.neutrals["800"],
+        hover: colord(colors.neutrals["800"])
           .mix(colors.neutrals700, 0.75)
           .toRgbString(),
-        disabled: colors.neutrals900,
+        disabled: colors.neutrals["900"],
       },
     },
     radius: "500px",

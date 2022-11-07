@@ -271,13 +271,13 @@ export const getVariantStyle = ({
     padding: 12px 16px;
     border: 1px solid
       ${({ theme }) =>
-        variant === "neutrals800" ? theme.neutrals800 : theme.bg2};
+        variant === "neutrals800" ? theme.neutrals["800"] : theme.bg2};
     border-radius: 8px;
     background-color: ${({ theme }) =>
-      variant === "neutrals800" ? theme.neutrals800 : theme.black};
+      variant === "neutrals800" ? theme.neutrals["800"] : theme.black};
     &:focus-within {
       background-color: ${({ theme }) =>
-        variant === "neutrals800" ? theme.neutrals700 : theme.black};
+        variant === "neutrals800" ? theme.neutrals["700"] : theme.black};
     }
     transition: background-color 200ms ease-in-out;
   `

@@ -28,6 +28,8 @@ import {
   isDeprecated,
 } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
+import { makeClickable } from "../../services/a11y"
+import { withPolling } from "../../services/swr"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
@@ -65,13 +67,13 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const { data: feeTokenBalance } = useSWR(
     [getAccountIdentifier(account), networkId, "feeTokenBalance"],
     () => fetchFeeTokenBalance(account, networkId),
-    { suspense: false },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
   const { data: needsUpgrade = false } = useSWR(
     [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
     () => checkIfUpgradeAvailable(account, accountClassHash),
-    { suspense: false },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
   const onClick = useCallback(() => {

@@ -42,7 +42,7 @@ export const AccountHeader: FC<AccountHeaderProps> = ({
       {showAccountButton && account && (
         <Button
           aria-label={"Show account list"}
-          colorScheme={"neutrals800"}
+          colorScheme={"neutrals"}
           size={"2xs"}
           onClick={openAccountList}
         >
@@ -58,7 +58,7 @@ export const AccountHeader: FC<AccountHeaderProps> = ({
           ml={1}
           aria-label="Show settings"
           onClick={showSettings}
-          colorScheme={"neutrals800"}
+          colorScheme={"neutrals"}
         >
           <SettingsIcon />
         </BarIconButton>
