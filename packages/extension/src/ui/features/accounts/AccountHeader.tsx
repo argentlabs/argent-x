@@ -41,7 +41,7 @@ export const AccountHeader: FC<AccountHeaderProps> = ({ scroll }) => {
     <NavigationBar scroll={scroll}>
       <Button
         aria-label={isAccountListScreen ? "Show account" : "Show account list"}
-        colorScheme={"neutrals800"}
+        colorScheme={"neutrals"}
         size={"2xs"}
         mr={"auto"}
         onClick={openAccountList}
@@ -56,7 +56,7 @@ export const AccountHeader: FC<AccountHeaderProps> = ({ scroll }) => {
         ml={1}
         aria-label="Show settings"
         onClick={showSettings}
-        colorScheme={"neutrals800"}
+        colorScheme={"neutrals"}
       >
         <SettingsIcon />
       </BarIconButton>
