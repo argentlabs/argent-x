@@ -5,7 +5,6 @@ import {
   theme as baseTheme,
   extendTheme,
 } from "@chakra-ui/react"
-import { mode } from "@chakra-ui/theme-tools"
 
 import { alertTheme, menuTheme, textareaTheme } from "../components"
 import { buttonTheme } from "../components/Button"
