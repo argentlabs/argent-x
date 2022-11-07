@@ -62,28 +62,41 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
     0,
   ])
 
-  const response = await multicallContract.aggregate(calls)
+  try {
+    const implementationMulticall = multicallContract.aggregate(calls)
 
-  const implementations = response.result.map((r: any) =>
-    number.toHex(r),
-  ) as string[]
+    const response = await Promise.race([
+      implementationMulticall,
+      new Promise(
+        (_, reject) =>
+          setTimeout(() => reject(new Error("multicall timeout")), 5000), // as it takes around 30s for multicall to fail
+      ),
+    ])
 
-  const targetImplementations = Object.values(network.accountClassHash).map(
-    (ti) => number.toBN(ti),
-  )
+    const implementations = response.result.map((r: any) =>
+      number.toHex(r),
+    ) as string[]
 
-  const oldAccountAddresses = implementations
-    .filter(
-      (impl) => !targetImplementations.some((ti) => ti.eq(number.toBN(impl))),
+    const targetImplementations = Object.values(network.accountClassHash).map(
+      (ti) => number.toBN(ti),
     )
-    .map((_, i) => accounts[i].address)
 
-  const feeTokenBalances = await fetchFeeTokenBalanceForAccounts(
-    oldAccountAddresses,
-    network,
-  )
+    const oldAccountAddresses = implementations
+      .filter(
+        (impl) => !targetImplementations.some((ti) => ti.eq(number.toBN(impl))),
+      )
+      .map((_, i) => accounts[i].address)
 
-  return Object.values(feeTokenBalances).some((balance) => balance.gt(0))
+    const feeTokenBalances = await fetchFeeTokenBalanceForAccounts(
+      oldAccountAddresses,
+      network,
+    )
+
+    return Object.values(feeTokenBalances).some((balance) => balance.gt(0))
+  } catch (error) {
+    console.error("Error checking for account upgrade on network", error)
+    return false
+  }
 }
 
 export async function partitionDeprecatedAccount(
@@ -108,48 +121,60 @@ export async function partitionDeprecatedAccount(
     0,
   ])
 
-  const response = await multicallContract.aggregate(calls)
+  try {
+    const implementationMulticall = multicallContract.aggregate(calls)
 
-  const implementations = response.result.map((r: any) =>
-    number.toHex(r),
-  ) as string[]
+    const response = await Promise.race([
+      implementationMulticall,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("multicall timeout")), 5000),
+      ),
+    ])
 
-  const { argentAccount, argentPluginAccount } = network.accountClassHash
+    const implementations = response.result.map((r: any) =>
+      number.toHex(r),
+    ) as string[]
 
-  const implementationsToAccountsMap = accounts.reduce<
-    Record<string, string | undefined>
-  >((acc, account, i) => {
-    if (implementations[i]) {
+    const { argentAccount, argentPluginAccount } = network.accountClassHash
+
+    const implementationsToAccountsMap = accounts.reduce<
+      Record<string, string | undefined>
+    >((acc, account, i) => {
+      if (implementations[i]) {
+        return {
+          ...acc,
+          [account.address]: implementations[i],
+        }
+      }
+
+      const currentImpl =
+        account.type === "argent" ? argentAccount : argentPluginAccount
+
       return {
         ...acc,
-        [account.address]: implementations[i],
+        [account.address]: currentImpl,
       }
-    }
+    }, {})
 
-    const currentImpl =
-      account.type === "argent" ? argentAccount : argentPluginAccount
+    const targetImplementations = Object.values(network.accountClassHash).map(
+      (ti) => number.toBN(ti),
+    )
 
-    return {
-      ...acc,
-      [account.address]: currentImpl,
-    }
-  }, {})
-
-  const targetImplementations = Object.values(network.accountClassHash).map(
-    (ti) => number.toBN(ti),
-  )
-
-  return partition(
-    accounts,
-    (account) =>
-      !targetImplementations.some((ti) => {
-        const impl = implementationsToAccountsMap[account.address]
-        if (impl) {
-          return ti.eq(number.toBN(impl))
-        }
-        return false
-      }),
-  )
+    return partition(
+      accounts,
+      (account) =>
+        !targetImplementations.some((ti) => {
+          const impl = implementationsToAccountsMap[account.address]
+          if (impl) {
+            return ti.eq(number.toBN(impl))
+          }
+          return false
+        }),
+    )
+  } catch (error) {
+    console.error("Error while checking for deprecated accounts", error)
+    return [[], accounts]
+  }
 }
 
 export const useCheckV4UpgradeAvailable = (
@@ -170,7 +195,7 @@ export const usePartitionDeprecatedAccounts = (
 ) => {
   return useSWR(
     [network.id, accounts.length, "partition-deprecated-accounts"],
-    async () => await partitionDeprecatedAccount(accounts, network),
+    () => partitionDeprecatedAccount(accounts, network),
     { refreshInterval: 30000, revalidateIfStale: true },
   )
 }
@@ -186,8 +211,7 @@ export const useCheckUpgradeAvailable = (account?: Account) => {
     isValidating: needsUpgradeValidating,
   } = useSWR(
     [accountIdentifier, accountClassHash, "showUpgradeBanner"],
-    async () =>
-      account && (await checkIfUpgradeAvailable(account, accountClassHash)),
+    () => account && checkIfUpgradeAvailable(account, accountClassHash),
     { suspense: false },
   )
 

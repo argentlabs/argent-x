@@ -295,7 +295,13 @@ export class Wallet {
 
     await Promise.all(promises)
 
-    return getAccountTypesFromChain(accounts)
+    try {
+      const accountWithTypes = await getAccountTypesFromChain(accounts)
+      return accountWithTypes
+    } catch (error) {
+      console.error("Error getting account types from chain", error)
+      return accounts
+    }
   }
 
   public async startSession(
