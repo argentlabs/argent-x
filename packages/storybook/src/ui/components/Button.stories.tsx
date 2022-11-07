@@ -67,10 +67,10 @@ Info.args = {
   colorScheme: "info",
 }
 
-export const Neutrals800 = Template.bind({})
-Neutrals800.args = {
+export const Neutrals = Template.bind({})
+Neutrals.args = {
   children: "Button",
-  colorScheme: "neutrals800",
+  colorScheme: "neutrals",
 }
 
 export const OnboardingBack = Template.bind({})
@@ -80,7 +80,7 @@ OnboardingBack.args = {
       <ArrowBackIcon />
     </>
   ),
-  colorScheme: "neutrals800",
+  colorScheme: "neutrals",
 }
 
 export const Transparent = Template.bind({})
