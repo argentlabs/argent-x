@@ -52,7 +52,7 @@ export const colors = {
   neutrals500: "#58585B",
   neutrals600: "#404043",
   neutrals700: "#28282C",
-  neutrals: "#1D1F22",
+  neutrals800: "#1D1F22",
   neutrals900: "#101014",
 }
 
@@ -124,11 +124,11 @@ export const components = {
     },
     neutrals800: {
       bg: {
-        base: colors.neutrals["800"],
-        hover: colord(colors.neutrals["800"])
+        base: colors.neutrals800,
+        hover: colord(colors.neutrals800)
           .mix(colors.neutrals700, 0.75)
           .toRgbString(),
-        disabled: colors.neutrals["900"],
+        disabled: colors.neutrals900,
       },
     },
     radius: "500px",
