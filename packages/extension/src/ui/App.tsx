@@ -20,8 +20,10 @@ export const App: FC = () => {
   useTracking()
   useSentryInit()
   useEffect(() => {
-    /** workaround for initialColorMode='dark' not working */
-    localStorageManager.set("dark")
+    /** Ensure colour mode is dark - may previously have defaulted to 'white' */
+    if (localStorageManager.get() !== "dark") {
+      localStorageManager.set("dark")
+    }
   }, [])
   return (
     <SoftReloadProvider>
