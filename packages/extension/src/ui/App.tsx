@@ -21,9 +21,7 @@ export const App: FC = () => {
   useSentryInit()
   useEffect(() => {
     /** Ensure colour mode is dark - may previously have defaulted to 'white' */
-    if (localStorageManager.get() !== "dark") {
-      localStorageManager.set("dark")
-    }
+    localStorageManager.set("dark")
   }, [])
   return (
     <SoftReloadProvider>
