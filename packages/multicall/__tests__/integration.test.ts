@@ -18,7 +18,7 @@ describe("Multicall", () => {
   })
 
   test("should aggregate multiple calls into one multicall", async () => {
-    const [res, res2] = await Promise.all([
+    const results = await Promise.all([
       // promises resolve at the same time as they use multicall contract
       mc.call({
         contractAddress:
@@ -38,10 +38,10 @@ describe("Multicall", () => {
       }),
     ])
 
-    expect([res, res2]).toMatchSnapshot()
+    expect(results).toMatchSnapshot()
   })
   test("should partially error with a single error", async () => {
-    const [res, res2] = await Promise.allSettled([
+    const results = await Promise.allSettled([
       // promises resolve at the same time as they use multicall contract
       mc.call({
         contractAddress:
@@ -61,7 +61,7 @@ describe("Multicall", () => {
       }),
     ])
 
-    expect([res, res2].map((x) => x.status)).toMatchInlineSnapshot(`
+    expect(results.map((x) => x.status)).toMatchInlineSnapshot(`
       [
         "fulfilled",
         "rejected",
@@ -69,7 +69,7 @@ describe("Multicall", () => {
     `)
   })
   test("should partially error with multiple errors", async () => {
-    const [res, res2] = await Promise.allSettled([
+    const results = await Promise.allSettled([
       // promises resolve at the same time as they use multicall contract
       mc.call({
         contractAddress:
@@ -97,15 +97,16 @@ describe("Multicall", () => {
       }),
     ])
 
-    expect([res, res2].map((x) => x.status)).toMatchInlineSnapshot(`
+    expect(results.map((x) => x.status)).toMatchInlineSnapshot(`
       [
         "rejected",
         "fulfilled",
+        "rejected",
       ]
     `)
   })
   test("should error when all fail", async () => {
-    const [res, res2] = await Promise.allSettled([
+    const results = await Promise.allSettled([
       // promises resolve at the same time as they use multicall contract
       mc.call({
         contractAddress:
@@ -125,7 +126,7 @@ describe("Multicall", () => {
       }),
     ])
 
-    expect([res, res2].map((x) => x.status)).toMatchInlineSnapshot(`
+    expect(results.map((x) => x.status)).toMatchInlineSnapshot(`
       [
         "rejected",
         "rejected",
