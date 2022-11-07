@@ -45,7 +45,7 @@ const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
     ? "transparent"
     : highlighted
     ? "neutrals600"
-    : "neutrals800"
+    : "neutrals"
   const borderColor = outlined ? "neutrals.600" : "transparent"
   return (
     <ButtonRect
@@ -57,6 +57,7 @@ const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
       colorScheme={colorScheme}
       border={"1px solid"}
       borderColor={borderColor}
+      borderRadius={"lg"}
       {...rest}
     />
   )
