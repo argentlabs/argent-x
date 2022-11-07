@@ -1,7 +1,7 @@
 export const globalTypes = {
   colorMode: {
     title: "Color Mode",
-    defaultValue: "light",
+    defaultValue: "dark",
     toolbar: {
       items: [
         { title: "Light", value: "light" },
