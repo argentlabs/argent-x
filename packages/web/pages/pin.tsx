@@ -7,12 +7,21 @@ import {
   icons,
 } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
+import { useRouter } from "next/router"
 
 import { Layout } from "../components/Layout"
+import { Navigate } from "../components/Navigate"
 
 const { EmailIcon } = icons
 
 export default function Pin() {
+  const navigate = useRouter()
+
+  const email = navigate.query["email"]
+  if (!email) {
+    return <Navigate to="/email" />
+  }
+
   return (
     <Layout maxW={330}>
       <Box
@@ -34,7 +43,7 @@ export default function Pin() {
         >
           <EmailIcon width={32} height={32} />
         </Box>
-        <H5 textAlign="center">Enter the code we sent to itamar@argent.xyz</H5>
+        <H5 textAlign="center">Enter the code we sent to {email}</H5>
       </Box>
       <PinInputWrapper>
         <PinInput
