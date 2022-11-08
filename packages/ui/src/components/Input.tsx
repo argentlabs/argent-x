@@ -17,10 +17,33 @@ const baseStyle = definePartsStyle({
   },
 })
 
-const variantOutline = definePartsStyle(() => {
+const variantOutline = definePartsStyle((props) => {
   return {
     field: {
-      /** placeholder */
+      bg: mode("white", "black")(props),
+      border: "1px solid",
+      borderColor: "border",
+      _placeholder: {
+        color: mode("gray.200", "neutrals.500")(props),
+      },
+      _hover: {
+        borderColor: mode("gray.100", "neutrals.600")(props),
+      },
+      _invalid: {
+        borderColor: "error.500",
+        boxShadow: mode("inherit", "none")(props),
+        _hover: {
+          borderColor: mode("error.400", "error.600")(props),
+        },
+        _focusVisible: {
+          borderColor: "error.500",
+          boxShadow: mode("outlineError", "none")(props),
+        },
+      },
+      _focusVisible: {
+        borderColor: mode("accent.500", "neutrals.400")(props),
+        boxShadow: mode("outlineAccent", "none")(props),
+      },
     },
   }
 })
@@ -30,11 +53,17 @@ export const variantFilled = definePartsStyle((props) => {
     field: {
       bg: mode("gray.50", "neutrals.800")(props),
       border: "none",
+      _placeholder: {
+        color: mode("gray.300", "neutrals.400")(props),
+      },
       _hover: {
         bg: mode("gray.100", "neutrals.700")(props),
       },
       _invalid: {
         boxShadow: "error",
+        _focusVisible: {
+          boxShadow: mode("outlineError", "error")(props),
+        },
       },
       _focusVisible: {
         bg: mode("white", "neutrals.700")(props),
@@ -86,6 +115,6 @@ export const inputTheme = defineMultiStyleConfig({
   sizes,
   defaultProps: {
     size: "md",
-    variant: "filled",
+    variant: "outline",
   },
 })

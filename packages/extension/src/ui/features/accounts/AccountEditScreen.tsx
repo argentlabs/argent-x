@@ -4,7 +4,6 @@ import {
   BarIconButton,
   ButtonCell,
   CellStack,
-  Input,
   NavigationContainer,
   icons,
 } from "@argent/ui"
