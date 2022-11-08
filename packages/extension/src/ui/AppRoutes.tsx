@@ -10,6 +10,7 @@ import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
+import { AccountEditScreen } from "./features/accounts/AccountEditScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
@@ -244,6 +245,7 @@ const walletRoutes = (
       element={<AccountScreen tab="activity" />}
     />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
+    <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
   </>
 )
 

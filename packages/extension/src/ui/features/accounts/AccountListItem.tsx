@@ -44,7 +44,7 @@ const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
   const colorScheme = transparent
     ? "transparent"
     : highlighted
-    ? "neutrals600"
+    ? "tertiary"
     : "neutrals"
   const borderColor = outlined ? "neutrals.600" : "transparent"
   return (

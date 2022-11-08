@@ -86,9 +86,10 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
-  const onAccountNameEdit = useCallback(() => {
-    console.log("onAccountNameEdit")
-  }, [])
+  const onAccountEdit = useCallback(() => {
+    console.log("onAccountEdit")
+    navigate(routes.editAccount(account.address))
+  }, [account.address, navigate])
 
   return (
     <Flex position={"relative"} direction={"column"}>
@@ -111,10 +112,18 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         top={"50%"}
         transform={"translateY(-50%)"}
       >
-        <AccountListScreenItemMenu
-          account={account}
-          onAccountNameEdit={onAccountNameEdit}
-        />
+        <Button
+          aria-label={`${accountName} options`}
+          backgroundColor="black"
+          colorScheme="transparent"
+          padding="1.5"
+          fontSize="xl"
+          size="auto"
+          rounded="full"
+          onClick={onAccountEdit}
+        >
+          <MoreIcon />
+        </Button>
       </Flex>
     </Flex>
   )

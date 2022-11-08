@@ -1,6 +1,7 @@
 export * from "./Absolute"
 export * from "./Alert"
 export * from "./Button"
+export * from "./CellStack"
 export * from "./Empty"
 export * from "./Input"
 export * from "./Menu"
