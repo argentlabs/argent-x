@@ -17,13 +17,20 @@ export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
   )
 }
 
+export const addressesEquals = (a: BaseWalletAccount, b: BaseWalletAccount) => {
+  try {
+    return BigNumber.from(a.address.toLowerCase()).eq(
+      BigNumber.from(b.address.toLowerCase()),
+    )
+  } catch (e) {
+    console.error("~ addressesEquals", e)
+    return false
+  }
+}
+
 export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) => {
   try {
-    return (
-      BigNumber.from(a.address.toLowerCase()).eq(
-        BigNumber.from(b.address.toLowerCase()),
-      ) && a.networkId === b.networkId
-    )
+    return addressesEquals(a, b) && a.networkId === b.networkId
   } catch (e) {
     console.error("~ accountsEqual", e)
     return false
