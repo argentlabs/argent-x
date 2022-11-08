@@ -12,6 +12,7 @@ export const colors = {
   gray: makeColorVariants("#58585b"),
   primary: makeColorVariants("#f36a3d"),
   secondary: makeColorVariants("#08a681"),
+  tertiary: makeColorVariants("#404043"),
   accent: makeColorVariants("#197aa6"),
   warn: makeColorVariants("#ffbf3d"),
   "warn-high": makeColorVariants("#f36a3d"),
@@ -20,7 +21,6 @@ export const colors = {
   warning: makeColorVariants("#f4bc54"),
   success: makeColorVariants("#08a681"),
   error: makeColorVariants("#cc3247"),
-  neutrals600: makeColorVariants("#404043"),
   skyBlue: makeColorVariants("#29c5ff"),
   neutrals: {
     100: "#b7b7b9",

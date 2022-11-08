@@ -87,16 +87,25 @@ export const buttonTheme = defineStyleConfig({
             bg: mode(`gray.100`, `${c}.600`)(props),
           },
         }
+      } else if (c === "tertiary") {
+        return {
+          bg: mode(`${c}.200`, `${c}.800`)(props),
+          color: mode(`white`, `${c}300`)(props),
+          _hover: {
+            bg: mode(`${c}.300`, `${c}.700`)(props),
+          },
+          _active: {
+            bg: mode(`${c}.400`, `${c}.600`)(props),
+          },
+        }
       }
+
       /** same for dark or light mode */
       return {
         bg: `${c}.500`,
         color: "white",
         _hover: {
           bg: `${c}.600`,
-          _disabled: {
-            bg: `${c}.500`,
-          },
         },
         _active: {
           bg: `${c}.700`,
