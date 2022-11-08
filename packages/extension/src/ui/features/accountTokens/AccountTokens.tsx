@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useRef } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
@@ -68,6 +68,7 @@ interface AccountTokensProps {
 
 export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames, setAccountName } = useAccountMetadata()
@@ -178,7 +179,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && (
-        <Link to={routes.accountUpgradeV4()}>
+        <Link
+          to={routes.accountUpgradeV4()}
+          state={{ from: location.pathname }}
+        >
           <UpgradeBanner />
         </Link>
       )}

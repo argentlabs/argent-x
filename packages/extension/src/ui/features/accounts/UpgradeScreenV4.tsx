@@ -1,13 +1,14 @@
 import { colord } from "colord"
 import { FC, useState } from "react"
 import Measure from "react-measure"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { useSWRConfig } from "swr"
 
 import { Button, ButtonGroupVertical } from "../../components/Button"
 import { IconBar } from "../../components/IconBar"
 import { StarknetIcon } from "../../components/Icons/StarknetIcon"
+import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
@@ -90,6 +91,8 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
   const { selectedAccount } = useSelectedAccountStore()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
 
+  const { state } = useLocation()
+
   const { cache } = useSWRConfig()
 
   const {
@@ -115,6 +118,8 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
     )
   }
 
+  const fromAccountTokens = state && state.from === routes.accountTokens() // state can be null
+
   if (!selectedAccount) {
     return <></>
   }
@@ -138,7 +143,7 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
       </IconBarContainer>
       <Container>
         <HeaderText>StarkNet is improving</HeaderText>
-        {upgradeType === "account" && (
+        {upgradeType === "account" && !fromAccountTokens && (
           <StyledPBold>
             To do this transaction, you need to first upgrade the account.
           </StyledPBold>
