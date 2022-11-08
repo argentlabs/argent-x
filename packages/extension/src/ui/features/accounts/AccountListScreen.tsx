@@ -1,10 +1,8 @@
 import {
   BarCloseButton,
   BarIconButton,
-  NavigationBar,
-  ScrollContainer,
+  NavigationContainer,
   icons,
-  useScroll,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { partition, some } from "lodash-es"
@@ -77,8 +75,6 @@ export const AccountListScreen: FC = () => {
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
-  const { scrollRef, scroll } = useScroll()
-
   const onClose = useCallback(() => {
     if (returnTo) {
       navigate(returnTo)
@@ -89,8 +85,7 @@ export const AccountListScreen: FC = () => {
 
   return (
     <>
-      <NavigationBar
-        scroll={scroll}
+      <NavigationContainer
         leftButton={<BarCloseButton onClick={onClose} disabled={isDeploying} />}
         title={"My accounts"}
         rightButton={
@@ -102,8 +97,7 @@ export const AccountListScreen: FC = () => {
             <AddIcon />
           </BarIconButton>
         }
-      />
-      <ScrollContainer ref={scrollRef}>
+      >
         <Flex p={4} gap={2} direction="column">
           {isBackupRequired && <RecoveryBanner noMargins />}
           {visibleAccounts.length === 0 && (
@@ -135,12 +129,12 @@ export const AccountListScreen: FC = () => {
           )}
           {isDeploying && <DimmingContainer />}
         </Flex>
-        {hasHiddenAccounts && (
-          <Footer>
-            <HiddenAccountsBar />
-          </Footer>
-        )}
-      </ScrollContainer>
+      </NavigationContainer>
+      {hasHiddenAccounts && (
+        <Footer>
+          <HiddenAccountsBar />
+        </Footer>
+      )}
     </>
   )
 }
