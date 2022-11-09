@@ -1,9 +1,7 @@
 import {
   BarBackButton,
-  Button,
   ButtonCell,
   CellStack,
-  CopyTooltip,
   NavigationContainer,
   SpacerCell,
   icons,
@@ -15,11 +13,8 @@ import { useNavigate, useParams } from "react-router-dom"
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
+import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
-import {
-  formatTruncatedAddress,
-  normalizeAddress,
-} from "../../services/addresses"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
   openBlockExplorerAddress,
@@ -47,7 +42,6 @@ export const AccountEditScreen: FC = () => {
     address: accountAddress,
     networkId: currentNetwork.id,
   })
-  const copyAccountAddress = account ? normalizeAddress(account.address) : ""
   const accountName = account
     ? getAccountName(account, accountNames)
     : "Not found"
@@ -138,19 +132,7 @@ export const AccountEditScreen: FC = () => {
               borderBottomRightRadius="lg"
               p={2}
             >
-              <CopyTooltip
-                prompt="Click to copy address"
-                copyValue={copyAccountAddress}
-              >
-                <Button
-                  size="3xs"
-                  color={"white50"}
-                  bg={"transparent"}
-                  _hover={{ bg: "neutrals.700", color: "text" }}
-                >
-                  {formatTruncatedAddress(accountAddress)}
-                </Button>
-              </CopyTooltip>
+              <AddressCopyButton address={accountAddress} />
             </Center>
           </Flex>
           <SpacerCell />
