@@ -63,11 +63,11 @@ export interface WalletStorageProps {
   selected?: BaseWalletAccount
   discoveredOnce?: boolean
 }
-
+/*
 export const walletStore = new KeyValueStorage<WalletStorageProps>(
   {},
   "core:wallet",
-)
+) */
 
 export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
   namespace: "core:wallet:session",

@@ -7,7 +7,7 @@ import {
 import { Transaction } from "../../shared/transactions"
 import { BaseWalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/wallet.service"
-import { walletStore } from "../wallet"
+import { walletStore } from "../../shared/wallet/walletStore"
 import { transactionsStore } from "./store"
 
 // selects transactions that are pending and match the provided account

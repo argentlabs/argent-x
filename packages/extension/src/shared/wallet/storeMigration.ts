@@ -1,7 +1,8 @@
 import { isBoolean, isPlainObject } from "lodash-es"
 import browser from "webextension-polyfill"
 
-import { Wallet, walletStore } from "../../background/wallet"
+import { Wallet } from "../../background/wallet"
+import { walletStore } from "../../shared/wallet/walletStore"
 import { migrateWalletAccounts } from "../account/storeMigration"
 
 export async function migrateWallet() {
