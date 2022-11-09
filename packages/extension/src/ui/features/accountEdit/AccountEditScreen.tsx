@@ -5,11 +5,12 @@ import {
   Button,
   ButtonCell,
   CellStack,
+  CopyTooltip,
   NavigationContainer,
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Center, Flex, Image } from "@chakra-ui/react"
+import { Center, Flex, Image, Tooltip } from "@chakra-ui/react"
 import { partition, some } from "lodash-es"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -169,14 +170,19 @@ export const AccountEditScreen: FC = () => {
               borderBottomRightRadius="lg"
               p={2}
             >
-              <Button
-                size="3xs"
-                color={"white50"}
-                bg={"transparent"}
-                _hover={{ bg: "neutrals.700", color: "text" }}
+              <CopyTooltip
+                prompt="Click to copy address"
+                copyValue={copyAccountAddress}
               >
-                {formatTruncatedAddress(accountAddress)}
-              </Button>
+                <Button
+                  size="3xs"
+                  color={"white50"}
+                  bg={"transparent"}
+                  _hover={{ bg: "neutrals.700", color: "text" }}
+                >
+                  {formatTruncatedAddress(accountAddress)}
+                </Button>
+              </CopyTooltip>
             </Center>
           </Flex>
           <SpacerCell />
