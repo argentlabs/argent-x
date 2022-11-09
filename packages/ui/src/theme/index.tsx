@@ -55,6 +55,20 @@ export const theme = {
   colors /** omits default chakra colours */,
 } as UITheme
 
+export const initiallyDarkTheme = {
+  ...theme,
+  config: {
+    ...theme.config,
+    initialColorMode: "dark",
+  },
+} as UITheme
+
 export const ThemeProvider = ({ children }: ChakraProviderProps) => (
   <ChakraProvider theme={theme}>{children}</ChakraProvider>
+)
+
+export const InitiallyDarkThemeProvider = ({
+  children,
+}: ChakraProviderProps) => (
+  <ChakraProvider theme={initiallyDarkTheme}>{children}</ChakraProvider>
 )
