@@ -79,7 +79,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
   const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
-  const { pendingTransactions = [] } = useAccountTransactions(selectedAccount)
+  const { pendingTransactions } = useAccountTransactions(selectedAccount)
 
   const isUpgradeTransaction =
     !Array.isArray(transactions) && transactions.entrypoint === "upgrade"

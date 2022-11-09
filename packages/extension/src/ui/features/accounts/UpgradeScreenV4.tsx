@@ -118,7 +118,9 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
     )
   }
 
-  const fromAccountTokens = state && state.from === routes.accountTokens() // state can be null
+  const fromAccountTokens = Boolean(
+    state && state.from === routes.accountTokens(),
+  ) // state can be null
 
   if (!selectedAccount) {
     return <></>
@@ -214,6 +216,7 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
                 ) : (
                   <PrimaryButton
                     onClick={async () => {
+                      fromAccountTokens && navigate(routes.accountTokens())
                       await upgradeAccount(selectedAccount)
                     }}
                     type="button"

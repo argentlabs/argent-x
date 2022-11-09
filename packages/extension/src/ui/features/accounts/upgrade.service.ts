@@ -69,7 +69,7 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
       implementationMulticall,
       new Promise(
         (_, reject) =>
-          setTimeout(() => reject(new Error("multicall timeout")), 5000), // as it takes around 30s for multicall to fail
+          setTimeout(() => reject(new Error("multicall timeout")), 15000), // as it takes around 30s for multicall to fail
       ),
     ])
 
@@ -127,7 +127,7 @@ export async function partitionDeprecatedAccount(
     const response = await Promise.race([
       implementationMulticall,
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("multicall timeout")), 5000),
+        setTimeout(() => reject(new Error("multicall timeout")), 15000),
       ),
     ])
 
@@ -194,7 +194,12 @@ export const usePartitionDeprecatedAccounts = (
   network: Network,
 ) => {
   return useSWR(
-    [network.id, accounts.length, "partition-deprecated-accounts"],
+    [
+      network.id,
+      accounts.length,
+      "partition-deprecated-accounts",
+      "whatever___",
+    ],
     () => partitionDeprecatedAccount(accounts, network),
     { refreshInterval: 30000, revalidateIfStale: true },
   )
