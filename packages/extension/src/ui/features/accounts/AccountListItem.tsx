@@ -1,17 +1,13 @@
-import { ButtonRect, H6, L2, P4 } from "@argent/ui"
-import { Circle, Flex, Image } from "@chakra-ui/react"
+import { ButtonRect, H6, L2, P4, icons, typographyStyles } from "@argent/ui"
+import { Circle, Flex, Image, Text, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
-import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
-import {
-  ArrowCircleDownIcon,
-  LinkIcon,
-  VisibilityIcon,
-} from "../../components/Icons/MuiIcons"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
+
+const { LinkIcon, DeployIcon, ViewIcon } = icons
 
 export interface AccountListItemWrapperProps
   extends ComponentProps<typeof ButtonRect> {
@@ -93,55 +89,16 @@ const AccountAvatar: FC<AccountAvatarProps> = ({ outlined, ...rest }) => {
   )
 }
 
-export const NetworkStatusWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: right;
-  gap: 4px;
-`
-
-const AccountColumnAccessory = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const AccountRow = styled.div`
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: space-between;
-  overflow: hidden;
-`
-
-const AccountStatusText = styled.p`
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 12px;
-  text-align: center;
-`
-
-const UpgradeIcon = styled(ArrowCircleDownIcon)`
-  font-size: 16px;
-`
-
-const ConnectedStatusWrapper = styled(NetworkStatusWrapper)`
-  color: ${({ theme }) => theme.blue1};
-`
-
-const ConnectedIcon = styled(LinkIcon)`
-  transform: rotate(-45deg);
-  font-size: 16px;
-`
-
-const HiddenStatusWrapper = styled.div`
-  background-color: ${({ theme }) => theme.bg2};
-  width: 40px;
-  height: 40px;
-  border-radius: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
+const NetworkStatusWrapper = chakra(Flex, {
+  baseStyle: {
+    alignItems: "center",
+    justifyContent: "right",
+    gap: 1,
+    ml: 1,
+    pointerEvents: "none",
+    ...typographyStyles.L1,
+  },
+})
 
 export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
@@ -168,10 +125,17 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           backgroundColor: hidden ? "333332" : undefined,
         })}
       />
-      <AccountRow>
+      <Flex
+        flex={1}
+        overflow={"hidden"}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+      >
         <Flex direction={"column"} overflow={"hidden"}>
-          <Flex gap={1} alignItems={"center"} overflow={"hidden"}>
-            <H6 noOfLines={1}>{accountName}</H6>
+          <Flex gap={1} alignItems={"center"}>
+            <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
+              {accountName}
+            </H6>
             {accountType === "argent-plugin" && (
               <L2
                 backgroundColor={"neutrals.900"}
@@ -195,32 +159,32 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>
         </Flex>
-        <AccountColumnAccessory>
+        <Flex direction={"column"}>
           {deploying ? (
             <NetworkStatusWrapper>
               <TransactionStatusIndicator color="orange" />
-              <AccountStatusText>Deploying</AccountStatusText>
+              Deploying
             </NetworkStatusWrapper>
           ) : upgrade ? (
             <NetworkStatusWrapper>
-              <UpgradeIcon />
-              <AccountStatusText>Upgrade</AccountStatusText>
+              <DeployIcon /> Upgrade
             </NetworkStatusWrapper>
           ) : connected ? (
-            <ConnectedStatusWrapper>
-              <ConnectedIcon />
-              <AccountStatusText>Connected</AccountStatusText>
-            </ConnectedStatusWrapper>
+            <NetworkStatusWrapper color="secondary.500">
+              <LinkIcon /> Connected
+            </NetworkStatusWrapper>
           ) : (
             hidden && (
-              <HiddenStatusWrapper>
-                <VisibilityIcon />
-              </HiddenStatusWrapper>
+              <Circle size={10} bg={"neutrals.600"}>
+                <Text fontSize={"2xl"}>
+                  <ViewIcon />
+                </Text>
+              </Circle>
             )
           )}
           {children}
-        </AccountColumnAccessory>
-      </AccountRow>
+        </Flex>
+      </Flex>
     </AccountListItemWrapper>
   )
 }
