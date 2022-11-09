@@ -9,7 +9,7 @@ import {
 } from "@argent/ui"
 import { Center, Image, Input } from "@chakra-ui/react"
 import { partition, some } from "lodash-es"
-import { FC, useCallback } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
@@ -26,22 +26,27 @@ import {
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { P } from "../../theme/Typography"
-import { useCurrentNetwork } from "../networks/useNetworks"
-import { useBackupRequired } from "../recovery/backupDownload.state"
-import { RecoveryBanner } from "../recovery/RecoveryBanner"
-import { Account } from "./Account"
-import { AccountListScreenItem } from "./AccountListScreenItem"
-import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { getNetworkAccountImageUrl } from "./accounts.service"
+import { Account } from "../accounts/Account"
+import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
+import {
+  defaultAccountName,
+  getAccountName,
+  useAccountMetadata,
+} from "../accounts/accountMetadata.state"
+import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import {
   isHiddenAccount,
   useAccount,
   useAccounts,
   useSelectedAccountStore,
-} from "./accounts.state"
-import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
-import { HiddenAccountsBar } from "./HiddenAccountsBar"
-import { useAddAccount } from "./useAddAccount"
+} from "../accounts/accounts.state"
+import { DeprecatedAccountsWarning } from "../accounts/DeprecatedAccountsWarning"
+import { HiddenAccountsBar } from "../accounts/HiddenAccountsBar"
+import { useAddAccount } from "../accounts/useAddAccount"
+import { useCurrentNetwork } from "../networks/useNetworks"
+import { useBackupRequired } from "../recovery/backupDownload.state"
+import { RecoveryBanner } from "../recovery/RecoveryBanner"
+import { AccountEditName } from "./AccountEditName"
 
 const {
   AddIcon,
@@ -58,7 +63,7 @@ export const AccountEditScreen: FC = () => {
   const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { accountNames } = useAccountMetadata()
+  const { accountNames, setAccountName } = useAccountMetadata()
   const account = useAccount({
     address: accountAddress,
     networkId: currentNetwork.id,
@@ -68,6 +73,9 @@ export const AccountEditScreen: FC = () => {
     ? getAccountName(account, accountNames)
     : "Not found"
   const blockExplorerTitle = useBlockExplorerTitle()
+
+  const [liveEditingAccountName, setLiveEditingAccountName] =
+    useState(accountName)
 
   const onClose = useCallback(() => {
     if (returnTo) {
@@ -103,11 +111,25 @@ export const AccountEditScreen: FC = () => {
     console.log("onAccountNameChange", e)
   }, [])
 
+  const onChangeName = useCallback((name: string) => {
+    // account && setAccountName(account.networkId, account.address, name)
+    setLiveEditingAccountName(name)
+  }, [])
+
+  const onSubmitChangeName = useCallback(() => {
+    account &&
+      setAccountName(account.networkId, account.address, liveEditingAccountName)
+  }, [account, liveEditingAccountName, setAccountName])
+
+  const onCancelChangeName = useCallback(() => {
+    setLiveEditingAccountName(accountName)
+  }, [accountName])
+
   return (
     <>
       <NavigationContainer
         leftButton={<BarBackButton onClick={onClose} />}
-        title={accountName}
+        title={liveEditingAccountName}
       >
         <Center p={4}>
           <Image
@@ -115,7 +137,7 @@ export const AccountEditScreen: FC = () => {
             width={20}
             height={20}
             src={getNetworkAccountImageUrl({
-              accountName,
+              accountName: liveEditingAccountName,
               accountAddress,
               networkId: currentNetwork.id,
               backgroundColor: account?.hidden ? "333332" : undefined,
@@ -123,11 +145,14 @@ export const AccountEditScreen: FC = () => {
           />
         </Center>
         <CellStack>
-          <Input
-            placeholder="Account name"
-            value={accountName}
-            onChange={onAccountNameChange}
-          ></Input>
+          <AccountEditName
+            value={liveEditingAccountName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChangeName(e.target.value)
+            }
+            onSubmit={onSubmitChangeName}
+            onCancel={onCancelChangeName}
+          />
           <ButtonCell
             onClick={() =>
               account &&
