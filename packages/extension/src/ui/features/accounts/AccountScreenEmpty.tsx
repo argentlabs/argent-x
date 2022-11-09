@@ -3,7 +3,7 @@ import { partition } from "lodash-es"
 import { FC, useEffect } from "react"
 
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { AccountHeader } from "./AccountHeader"
+import { AccountNavigationBar } from "./AccountNavigationBar"
 import { isHiddenAccount, useAccounts } from "./accounts.state"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
 import { autoSelectAccountOnNetwork } from "./switchAccount"
@@ -35,7 +35,7 @@ export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
   }, [currentNetwork.id, hasVisibleAccounts])
   return (
     <>
-      <AccountHeader showAccountButton={false} />
+      <AccountNavigationBar showAccountButton={false} />
       <Empty
         icon={<WalletIcon />}
         title={`You have no ${hasHiddenAccounts ? "visible " : ""}accounts on ${

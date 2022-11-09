@@ -18,7 +18,7 @@ interface AccountSubheaderProps {
   onRedeploy: () => void
 }
 
-export const AccountSubHeader: FC<AccountSubheaderProps> = ({
+export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
   status,
   account,
   accountName,

@@ -1,3 +1,5 @@
+import { Button, icons } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -5,12 +7,13 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { AlertDialog } from "../../components/AlertDialog"
 import { IconButton } from "../../components/IconButton"
-import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
 import { PluginIcon } from "../../components/Icons/PluginIcon"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
+
+const { AddIcon, SendIcon } = icons
 
 const Container = styled.div`
   margin: 8px 0 24px 0;
@@ -45,11 +48,13 @@ const LabeledLink = styled(Link)`
   }
 `
 
-interface TransferButtonsProps {
+interface AccountTokensButtonsProps {
   account: Account
 }
 
-export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
+export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
+  account,
+}) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
 
@@ -97,38 +102,62 @@ export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
   } before you can send`
 
   return (
-    <Container>
-      <AlertDialog
-        isOpen={alertDialogIsOpen}
-        title={title}
-        message={message}
-        cancelTitle={accountIsDeployed ? undefined : "OK"}
-        onCancel={onCancel}
-        confirmTitle="Add funds"
-        onConfirm={accountIsDeployed ? onAddFunds : undefined}
-      />
-      <LabeledLink as="div" onClick={onAddFunds}>
-        <IconButton size={40}>
-          <AddIcon fontSize="large" />
-        </IconButton>
-        <label>Add funds</label>
-      </LabeledLink>
-      {sendToken && (
-        <LabeledLink as="div" onClick={onSend}>
+    <>
+      {/* <Center> */}
+      <Flex gap={2} mx={"auto"}>
+        <Button
+          colorScheme={"tertiary"}
+          size="sm"
+          flexBasis={0}
+          flexGrow={"1"}
+          leftIcon={<AddIcon />}
+        >
+          Add funds
+        </Button>
+        <Button
+          colorScheme={"tertiary"}
+          size="sm"
+          flexBasis={0}
+          flexGrow={"1"}
+          leftIcon={<SendIcon />}
+        >
+          Send
+        </Button>
+      </Flex>
+      {/* </Center> */}
+      <Container>
+        <AlertDialog
+          isOpen={alertDialogIsOpen}
+          title={title}
+          message={message}
+          cancelTitle={accountIsDeployed ? undefined : "OK"}
+          onCancel={onCancel}
+          confirmTitle="Add funds"
+          onConfirm={accountIsDeployed ? onAddFunds : undefined}
+        />
+        <LabeledLink as="div" onClick={onAddFunds}>
           <IconButton size={40}>
-            <SendIcon fontSize="medium" />
+            <AddIcon fontSize="large" />
           </IconButton>
-          <label>Send</label>
+          <label>Add funds</label>
         </LabeledLink>
-      )}
-      {account?.type === "argent-plugin" && (
-        <LabeledLink to={routes.addPlugin(account?.address)}>
-          <IconButton size={40}>
-            <PluginIcon style={{ width: 16, height: 16 }} />
-          </IconButton>
-          <label>Plugins</label>
-        </LabeledLink>
-      )}
-    </Container>
+        {sendToken && (
+          <LabeledLink as="div" onClick={onSend}>
+            <IconButton size={40}>
+              <SendIcon fontSize="medium" />
+            </IconButton>
+            <label>Send</label>
+          </LabeledLink>
+        )}
+        {account?.type === "argent-plugin" && (
+          <LabeledLink to={routes.addPlugin(account?.address)}>
+            <IconButton size={40}>
+              <PluginIcon style={{ width: 16, height: 16 }} />
+            </IconButton>
+            <label>Plugins</label>
+          </LabeledLink>
+        )}
+      </Container>
+    </>
   )
 }

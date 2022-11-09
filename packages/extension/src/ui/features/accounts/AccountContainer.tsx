@@ -5,7 +5,7 @@ import styled, { css } from "styled-components"
 
 import { Header } from "../../components/Header"
 import { routes } from "../../routes"
-import { AccountHeader } from "./AccountHeader"
+import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
 import { useAccountTransactions } from "./accountTransactions.state"
 
@@ -43,7 +43,7 @@ export const AccountContainer: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      <AccountHeader scroll={scroll} />
+      <AccountNavigationBar scroll={scroll} />
       <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
       <TabBar>
         <Tab
