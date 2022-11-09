@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { ErrorBoundaryState } from "./components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "./components/ErrorBoundaryFallbackWithCopyError"
-import { SupportFooter } from "./features/settings/SettingsScreen"
+import { SupportFooter } from "./features/settings/SupportFooter"
 
 const FullscreenFallbackContainer = styled.div`
   width: 100vw;
