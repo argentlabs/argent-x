@@ -1,6 +1,8 @@
 import { alertAnatomy } from "@chakra-ui/anatomy"
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react"
 
+import { typographyStyles } from "./Typography"
+
 const { definePartsStyle, defineMultiStyleConfig } =
   createMultiStyleConfigHelpers(alertAnatomy.keys)
 
@@ -11,10 +13,7 @@ const baseStyle = definePartsStyle({
     alignItems: "center",
   },
   title: {
-    fontSize: "xs",
-    lineHeight: "3.5",
-    fontWeight: "bold",
-    letterSpacing: "wide",
+    ...typographyStyles.L1,
   },
 })
 
