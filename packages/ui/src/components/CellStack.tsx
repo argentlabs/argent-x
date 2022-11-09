@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react"
+import { Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren } from "react"
 
 import { Button } from "./Button"
@@ -10,6 +10,12 @@ import { H6 } from "./Typography"
 export const CellStack: FC<PropsWithChildren> = (props) => {
   return <Flex p={4} gap={2} direction="column" {...props} />
 }
+
+export const SpacerCell = chakra(Flex, {
+  baseStyle: {
+    h: 2,
+  },
+})
 
 export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
   leftIcon,

@@ -2,12 +2,14 @@ import {
   BarBackButton,
   BarCloseButton,
   BarIconButton,
+  Button,
   ButtonCell,
   CellStack,
   NavigationContainer,
+  SpacerCell,
   icons,
 } from "@argent/ui"
-import { Center, Image, Input } from "@chakra-ui/react"
+import { Center, Flex, Image } from "@chakra-ui/react"
 import { partition, some } from "lodash-es"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -19,7 +21,10 @@ import { isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { routes, useQuery, useReturnTo } from "../../routes"
-import { normalizeAddress } from "../../services/addresses"
+import {
+  formatTruncatedAddress,
+  normalizeAddress,
+} from "../../services/addresses"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
   openBlockExplorerAddress,
@@ -145,14 +150,36 @@ export const AccountEditScreen: FC = () => {
           />
         </Center>
         <CellStack>
-          <AccountEditName
-            value={liveEditingAccountName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              onChangeName(e.target.value)
-            }
-            onSubmit={onSubmitChangeName}
-            onCancel={onCancelChangeName}
-          />
+          <Flex direction={"column"}>
+            <AccountEditName
+              value={liveEditingAccountName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChangeName(e.target.value)
+              }
+              onSubmit={onSubmitChangeName}
+              onCancel={onCancelChangeName}
+              borderBottomLeftRadius={0}
+              borderBottomRightRadius={0}
+            />
+            <Center
+              border={"1px solid"}
+              borderColor={"border"}
+              borderTop={"none"}
+              borderBottomLeftRadius="lg"
+              borderBottomRightRadius="lg"
+              p={2}
+            >
+              <Button
+                size="3xs"
+                color={"white50"}
+                bg={"transparent"}
+                _hover={{ bg: "neutrals.700", color: "text" }}
+              >
+                {formatTruncatedAddress(accountAddress)}
+              </Button>
+            </Center>
+          </Flex>
+          <SpacerCell />
           <ButtonCell
             onClick={() =>
               account &&
@@ -177,6 +204,7 @@ export const AccountEditScreen: FC = () => {
             </ButtonCell>
           )}
           <ButtonCell
+            color={"error.500"}
             onClick={() => navigate(routes.exportPrivateKey())}
             icon={<AlertIcon />}
           >

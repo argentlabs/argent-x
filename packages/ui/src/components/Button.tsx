@@ -29,6 +29,11 @@ export const buttonTheme = defineStyleConfig({
   },
   sizes: {
     auto: {},
+    "3xs": {
+      fontSize: "sm",
+      px: "1.5",
+      py: 0,
+    },
     "2xs": {
       minHeight: 8,
       fontSize: "sm",
