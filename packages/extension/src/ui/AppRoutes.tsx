@@ -51,6 +51,7 @@ import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOr
 import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
 import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
+import { DeveloperSettings } from "./features/settings/DeveloperSettings"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
@@ -180,6 +181,10 @@ const legacyUiWalletRoutes = (
     <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
     <Route path={routes.settings.path} element={<SettingsScreen />} />
     <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
+    <Route
+      path={routes.settingsDeveloper.path}
+      element={<DeveloperSettings />}
+    />
     <Route
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreen />}
