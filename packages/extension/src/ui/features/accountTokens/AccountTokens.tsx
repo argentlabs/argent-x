@@ -47,7 +47,6 @@ import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding-top: 16px;
 `
 
 export const AddTokenIconButton = styled(IconButton)`
@@ -70,7 +69,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
-  const { accountNames, setAccountName } = useAccountMetadata()
+  const { accountNames } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
@@ -152,9 +151,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         account={account}
         accountName={accountName}
         onRedeploy={onRedeploy}
-        onChangeName={(name) =>
-          setAccountName(account.networkId, account.address, name)
-        }
       />
       <TransferButtons account={account} />
       <StatusMessage>
