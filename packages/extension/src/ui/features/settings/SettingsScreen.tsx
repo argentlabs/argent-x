@@ -1,8 +1,8 @@
 import { BarBackButton, NavigationBar } from "@argent/ui"
-import { Stack, chakra } from "@chakra-ui/react"
+import { Stack } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import { Link as RouterLink, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
@@ -34,6 +34,10 @@ export const P = styled.p`
   font-size: 15px;
   color: ${({ theme }) => theme.text2};
   margin-top: 16px;
+`
+
+export const SettingsItem = styled.div`
+  padding: 24px 32px;
 `
 
 // TODO: remove this when we have a proper settings page
