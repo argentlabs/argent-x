@@ -41,5 +41,11 @@ jobs:
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
 
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: packages/extension/test-results/
+
       - name: Check bundlesize
         run: yarn run bundlewatch

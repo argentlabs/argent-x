@@ -4,6 +4,7 @@ import {
   createMultiStyleConfigHelpers,
   defineStyle,
 } from "@chakra-ui/styled-system"
+import { mode } from "@chakra-ui/theme-tools"
 
 export { Input }
 
@@ -24,19 +25,20 @@ const variantOutline = definePartsStyle(() => {
   }
 })
 
-const variantFilled = definePartsStyle(() => {
+export const variantFilled = definePartsStyle((props) => {
   return {
     field: {
-      bg: "neutrals.800",
+      bg: mode("gray.50", "neutrals.800")(props),
       border: "none",
       _hover: {
-        bg: "neutrals.700",
+        bg: mode("gray.100", "neutrals.700")(props),
       },
       _invalid: {
         boxShadow: "error",
       },
       _focusVisible: {
-        bg: "neutrals.700",
+        bg: mode("white", "neutrals.700")(props),
+        boxShadow: mode("outlineAccent", "none")(props),
       },
     },
   }

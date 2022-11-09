@@ -40,7 +40,7 @@ const Template: ComponentStory<typeof StyledControlledInput> = (props) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  variant: "neutrals800",
+  variant: "neutrals",
 }
 
 export const OnlyNumeric = Template.bind({})
@@ -55,6 +55,6 @@ OnlyAddressHex.args = {
 
 export const Password = Template.bind({})
 Password.args = {
-  variant: "neutrals800",
+  variant: "neutrals",
   type: "password",
 }

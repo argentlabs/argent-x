@@ -29,7 +29,7 @@ export function mapNetworkStatusToColor(
   }
 }
 
-const StatusIndicator = styled.span<StatusIndicatorProps>`
+export const StatusIndicator = styled.span<StatusIndicatorProps>`
   height: 8px;
   width: 8px;
   border-radius: 8px;

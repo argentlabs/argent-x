@@ -8,6 +8,10 @@ export async function switchNetwork(page: Page, targetNetworkName: string) {
   if (!networkSwitcher) {
     return expect(networkSwitcher).toBeTruthy()
   }
-  await networkSwitcher.hover()
-  await page.locator(`text=${targetNetworkName}`).click()
+  await networkSwitcher.click()
+  const networkToSelect = await networkSwitcher.$(`text=${targetNetworkName}`)
+  if (!networkToSelect) {
+    return expect(networkToSelect).toBeTruthy()
+  }
+  await networkToSelect.click()
 }

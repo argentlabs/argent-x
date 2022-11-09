@@ -1,5 +1,6 @@
 import { theme } from "@argent/ui"
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport"
+
 const CUSTOM_VIEWPORTS = {
   extension: {
     name: "Extension",
@@ -28,7 +29,6 @@ export const parameters = {
       },
       {
         name: "Extension",
-        value: "#161616",
       },
       {
         name: "Black",
@@ -54,3 +54,5 @@ export const parameters = {
 }
 
 export { decorators } from "./decorators"
+
+export { globalTypes } from "./globalTypes"

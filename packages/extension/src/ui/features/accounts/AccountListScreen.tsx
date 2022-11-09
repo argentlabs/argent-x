@@ -7,18 +7,15 @@ import {
   useScroll,
 } from "@argent/ui"
 import { partition, some } from "lodash-es"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { useAppState } from "../../app.state"
 import { IconButton } from "../../components/IconButton"
-import { VisibilityOff } from "../../components/Icons/MuiIcons"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
-import { routes, useReturnTo } from "../../routes"
+import { useReturnTo } from "../../routes"
 import { makeClickable } from "../../services/a11y"
-import { connectAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -26,14 +23,15 @@ import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountListScreenItem } from "./AccountListScreenItem"
-import { createAccount } from "./accounts.service"
 import {
   isHiddenAccount,
   useAccounts,
   useSelectedAccountStore,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
+import { HiddenAccountsBar } from "./HiddenAccountsBar"
 import { usePartitionDeprecatedAccounts } from "./upgrade.service"
+import { useAddAccount } from "./useAddAccount"
 
 const { AddIcon } = icons
 
@@ -78,10 +76,7 @@ const DimmingContainer = styled.div`
 `
 
 const Footer = styled(ResponsiveFixedBox)`
-  position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
   background-color: ${({ theme }) => theme.bg1};
   background: linear-gradient(
     180deg,
@@ -91,38 +86,13 @@ const Footer = styled(ResponsiveFixedBox)`
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
   z-index: 100;
-  height: 56px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const HiddenAccountsButton = styled.button`
-  appearance: none;
-  border: none;
-  background: none;
-  color: ${({ theme }) => theme.text3};
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 200ms ease-in-out;
-  &:hover {
-    color: ${({ theme }) => theme.text2};
-  }
-`
-
-const HiddenAccountsButtonIcon = styled.div`
-  font-size: 14px;
+  flex-direction: column;
 `
 
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { switcherNetworkId } = useAppState()
   const { selectedAccount } = useSelectedAccountStore()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
@@ -130,29 +100,14 @@ export const AccountListScreen: FC = () => {
     isHiddenAccount,
   )
   const { isBackupRequired } = useBackupRequired()
-  const [isDeploying, setIsDeploying] = useState(false)
-  const [deployFailed, setDeployFailed] = useState(false)
   const currentNetwork = useCurrentNetwork()
+  const { addAccount, isDeploying, deployFailed } = useAddAccount()
 
   const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
     visibleAccounts,
     currentNetwork,
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
-
-  const handleAddAccount = useCallback(async () => {
-    setIsDeploying(true)
-    setDeployFailed(false)
-    try {
-      const newAccount = await createAccount(switcherNetworkId)
-      connectAccount(newAccount)
-      navigate(await recover())
-    } catch {
-      setDeployFailed(true)
-    } finally {
-      setIsDeploying(false)
-    }
-  }, [navigate, switcherNetworkId])
 
   const { scrollRef, scroll } = useScroll()
 
@@ -179,7 +134,7 @@ export const AccountListScreen: FC = () => {
         rightButton={
           <BarIconButton
             aria-label="Create new wallet"
-            onClick={handleAddAccount}
+            onClick={addAccount}
             isLoading={isDeploying}
           >
             <AddIcon />
@@ -226,7 +181,7 @@ export const AccountListScreen: FC = () => {
           ) : (
             <IconButtonCenter
               size={48}
-              {...makeClickable(handleAddAccount, {
+              {...makeClickable(addAccount, {
                 label: "Create new wallet",
               })}
             >
@@ -241,14 +196,7 @@ export const AccountListScreen: FC = () => {
         </AccountList>
         {hasHiddenAccounts && (
           <Footer>
-            <HiddenAccountsButton
-              onClick={() => navigate(routes.accountsHidden(switcherNetworkId))}
-            >
-              <HiddenAccountsButtonIcon>
-                <VisibilityOff fontSize="inherit" />
-              </HiddenAccountsButtonIcon>
-              <div>Hidden accounts</div>
-            </HiddenAccountsButton>
+            <HiddenAccountsBar />
           </Footer>
         )}
       </ScrollContainer>
