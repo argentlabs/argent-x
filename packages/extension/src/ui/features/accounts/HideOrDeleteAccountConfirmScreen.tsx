@@ -65,7 +65,7 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
 
     const account = await autoSelectAccountOnNetwork(switcherNetworkId)
     if (account) {
-      navigate(-1)
+      navigate(routes.accounts())
     } else {
       /** no accounts, return to empty account screen */
       navigate(routes.accountTokens())

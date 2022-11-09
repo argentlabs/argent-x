@@ -1,23 +1,6 @@
 import { Button, icons } from "@argent/ui"
-import {
-  Box,
-  ButtonProps,
-  Circle,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  forwardRef,
-} from "@chakra-ui/react"
-import {
-  ComponentProps,
-  ComponentPropsWithRef,
-  FC,
-  MouseEvent,
-  MouseEventHandler,
-  useCallback,
-} from "react"
+import { Flex } from "@chakra-ui/react"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
@@ -28,7 +11,6 @@ import {
   isDeprecated,
 } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import { withPolling } from "../../services/swr"
 import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
@@ -36,12 +18,11 @@ import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
-import { AccountListScreenItemMenu } from "./AccountListScreenItemMenu"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
-const { MoreIcon, ChevronRightIcon } = icons
+const { ChevronRightIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
@@ -87,7 +68,6 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   const onAccountEdit = useCallback(() => {
-    console.log("onAccountEdit")
     navigate(routes.editAccount(account.address))
   }, [account.address, navigate])
 

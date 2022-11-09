@@ -1,6 +1,6 @@
 import { ButtonRect, H6, L2, P4 } from "@argent/ui"
-import { Box, Circle, Flex, Image } from "@chakra-ui/react"
-import { ComponentProps, FC, ReactNode } from "react"
+import { Circle, Flex, Image } from "@chakra-ui/react"
+import { ComponentProps, FC } from "react"
 import styled from "styled-components"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
@@ -98,12 +98,6 @@ export const NetworkStatusWrapper = styled.div`
   align-items: center;
   justify-content: right;
   gap: 4px;
-`
-
-const AccountColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 `
 
 const AccountColumnAccessory = styled.div`

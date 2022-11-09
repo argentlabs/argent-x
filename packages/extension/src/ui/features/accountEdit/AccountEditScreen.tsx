@@ -1,7 +1,5 @@
 import {
   BarBackButton,
-  BarCloseButton,
-  BarIconButton,
   Button,
   ButtonCell,
   CellStack,
@@ -10,18 +8,14 @@ import {
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Center, Flex, Image, Tooltip } from "@chakra-ui/react"
-import { partition, some } from "lodash-es"
-import { FC, useCallback, useEffect, useState } from "react"
+import { Center, Flex, Image } from "@chakra-ui/react"
+import { FC, useCallback, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import styled from "styled-components"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
-import { ResponsiveFixedBox } from "../../components/Responsive"
-import { routes, useQuery, useReturnTo } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import {
   formatTruncatedAddress,
   normalizeAddress,
@@ -31,38 +25,17 @@ import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
-import { P } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
-import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
 import {
-  defaultAccountName,
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import {
-  isHiddenAccount,
-  useAccount,
-  useAccounts,
-  useSelectedAccountStore,
-} from "../accounts/accounts.state"
-import { DeprecatedAccountsWarning } from "../accounts/DeprecatedAccountsWarning"
-import { HiddenAccountsBar } from "../accounts/HiddenAccountsBar"
-import { useAddAccount } from "../accounts/useAddAccount"
+import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { useBackupRequired } from "../recovery/backupDownload.state"
-import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountEditName } from "./AccountEditName"
 
-const {
-  AddIcon,
-  MoreIcon,
-  ExpandIcon,
-  HideIcon,
-  PluginIcon,
-  AlertIcon,
-  EditIcon,
-} = icons
+const { ExpandIcon, HideIcon, PluginIcon, AlertIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -113,12 +86,7 @@ export const AccountEditScreen: FC = () => {
     currentNetwork.accountClassHash?.argentPluginAccount &&
     account.type !== "argent-plugin"
 
-  const onAccountNameChange = useCallback((e: any) => {
-    console.log("onAccountNameChange", e)
-  }, [])
-
   const onChangeName = useCallback((name: string) => {
-    // account && setAccountName(account.networkId, account.address, name)
     setLiveEditingAccountName(name)
   }, [])
 
