@@ -1,3 +1,5 @@
+import { H2 } from "@argent/ui"
+import { Center } from "@chakra-ui/react"
 import { FC, useRef } from "react"
 import styled from "styled-components"
 
@@ -66,6 +68,13 @@ export const AccountSubHeader: FC<AccountSubheaderProps> = ({
 
   return (
     <>
+      <Center flexDirection={"column"}>
+        {sumCurrencyValue !== undefined ? (
+          <H2>{prettifyCurrencyValue(sumCurrencyValue)}</H2>
+        ) : (
+          <H2>{accountName}</H2>
+        )}
+      </Center>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div
           style={{
