@@ -1,9 +1,9 @@
-name: Release
+name: Pre-release
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - prerelease/*
 
 env:
   FEATURE_PRIVACY_SETTINGS: "true"
@@ -38,13 +38,20 @@ jobs:
           node-version: "16"
           cache: "yarn"
       - run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Run e2e tests
+        run: xvfb-run --auto-servernum yarn test:e2e
+
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: packages/extension/test-results/
+
       - run: yarn build
-      - name: Release npm packages
-        run: |
-          npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
-          cp Readme.md ./packages/get-starknet/README.md
-          yarn --cwd packages/get-starknet publish --access public || exit 0
-          yarn --cwd packages/sessions publish --access public || exit 0
       - run: yarn --cwd packages/dapp export
       - name: Check bundlesize for chrome
         run: yarn run bundlewatch
@@ -65,10 +72,17 @@ jobs:
       - name: Check bundlesize for firefox
         run: yarn run bundlewatch
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload artifacts for chrome
+        uses: actions/upload-artifact@v2
         with:
-          generate_release_notes: true
-          files: |
-            ${{ env.FILENAME }}-chrome.zip
-            ${{ env.FILENAME }}-firefox.zip
+          name: chrome
+          path: "*-chrome.zip"
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload artifacts for firefox
+        uses: actions/upload-artifact@v2
+        with:
+          name: firefox
+          path: "*-firefox.zip"
+          retention-days: 14
+          if-no-files-found: error
