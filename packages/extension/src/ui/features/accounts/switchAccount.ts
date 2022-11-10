@@ -35,9 +35,11 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
       : null
 
     // if the selected account is not on the network, switch to the first visible account
+    const account = existingAccountOnNetwork || visibleAccountsOnNetwork[0]
     useSelectedAccountStore.setState({
-      selectedAccount: existingAccountOnNetwork || visibleAccountsOnNetwork[0],
+      selectedAccount: account,
     })
+    return account
   } else {
     useSelectedAccountStore.setState({ selectedAccount: undefined })
   }
