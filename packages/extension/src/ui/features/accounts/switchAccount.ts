@@ -1,5 +1,5 @@
 import { getAccounts } from "../../../shared/account/store"
-import { addressesEquals } from "../../../shared/wallet.service"
+import { isEqualWalletAddress } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { setDefaultAccountNames } from "./accountMetadata.state"
 import {
@@ -28,15 +28,15 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
   })
 
   if (visibleAccountsOnNetwork.length) {
-    const existingAccoutnOnNetwork = selectedAccount
+    const existingAccountOnNetwork = selectedAccount
       ? visibleAccountsOnNetwork.find((account) =>
-          addressesEquals(account, selectedAccount),
+          isEqualWalletAddress(account, selectedAccount),
         )
       : null
 
     // if the selected account is not on the network, switch to the first visible account
     useSelectedAccountStore.setState({
-      selectedAccount: existingAccoutnOnNetwork || visibleAccountsOnNetwork[0],
+      selectedAccount: existingAccountOnNetwork || visibleAccountsOnNetwork[0],
     })
   } else {
     useSelectedAccountStore.setState({ selectedAccount: undefined })
