@@ -22,7 +22,7 @@ import {
   MenuItem,
   MenuItemWrapper,
   Separator,
-} from "./AccountMenu"
+} from "./DeprecatedAccountMenu"
 
 const StyledMenuContainer = styled(MenuContainer)`
   flex: 1;

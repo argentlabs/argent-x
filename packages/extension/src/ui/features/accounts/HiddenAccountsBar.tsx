@@ -12,7 +12,8 @@ const Container = chakra(Center, {
   baseStyle: {
     height: 16,
     borderTop: "1px solid",
-    borderTopColor: "neutrals.700",
+    borderTopColor: "border",
+    background: "bg",
     boxShadow: "menu",
   },
 })

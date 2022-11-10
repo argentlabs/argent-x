@@ -89,6 +89,10 @@ export const routes = {
     "/accounts/hidden/:networkId",
   ),
   accounts: routeWithReturnTo("/accounts"),
+  editAccount: route(
+    (accountAddress) => `/accounts/${accountAddress}`,
+    "/accounts/:accountAddress",
+  ),
   addAccount: route("/accounts/new"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),

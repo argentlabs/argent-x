@@ -1,6 +1,6 @@
-import { CopyTooltip } from "@argent-x/extension/src/ui/components/CopyTooltip"
+import { Button, CopyTooltip } from "@argent/ui"
+import { Center } from "@chakra-ui/react"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
-import styled from "styled-components"
 
 export default {
   title: "components/CopyTooltip",
@@ -8,18 +8,14 @@ export default {
 } as ComponentMeta<typeof CopyTooltip>
 
 const Template: ComponentStory<typeof CopyTooltip> = (props) => (
-  <CopyTooltip {...props}></CopyTooltip>
+  <Center>
+    <CopyTooltip {...props}></CopyTooltip>
+  </Center>
 )
-
-const Message = styled.div`
-  color: ${({ theme }) => theme.text1};
-  cursor: pointer;
-  text-align: center;
-`
 
 export const Default = Template.bind({})
 Default.args = {
   message: "Copied",
   copyValue: "Will be copied to clipboard",
-  children: <Message>Some content in here</Message>,
+  children: <Button>Some content in here</Button>,
 }

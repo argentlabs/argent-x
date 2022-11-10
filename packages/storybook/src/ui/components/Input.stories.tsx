@@ -27,11 +27,26 @@ Default.args = {}
 
 export const Filled = Template.bind({})
 Filled.args = {
+  variant: "filled",
   value: "Lorem ipsum dolor",
 }
 
-export const IsInvalid = Template.bind({})
-IsInvalid.args = {
+export const FilledIsInvalid = Template.bind({})
+FilledIsInvalid.args = {
+  variant: "filled",
+  value: "Lorem ipsum dolor",
+  isInvalid: true,
+}
+
+export const Outline = Template.bind({})
+Outline.args = {
+  variant: "outline",
+  value: "Lorem ipsum dolor",
+}
+
+export const OutlineIsInvalid = Template.bind({})
+OutlineIsInvalid.args = {
+  variant: "outline",
   value: "Lorem ipsum dolor",
   isInvalid: true,
 }

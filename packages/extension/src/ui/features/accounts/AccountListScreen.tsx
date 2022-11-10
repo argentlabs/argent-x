@@ -1,21 +1,17 @@
 import {
   BarCloseButton,
   BarIconButton,
-  NavigationBar,
-  ScrollContainer,
+  NavigationContainer,
   icons,
-  useScroll,
 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { partition, some } from "lodash-es"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { IconButton } from "../../components/IconButton"
 import { ResponsiveFixedBox } from "../../components/Responsive"
-import { Spinner } from "../../components/Spinner"
 import { useReturnTo } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -35,34 +31,8 @@ import { useAddAccount } from "./useAddAccount"
 
 const { AddIcon } = icons
 
-interface IAccountList {
-  hasHiddenAccounts: boolean
-}
-
-const AccountList = styled.div<IAccountList>`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 48px 32px
-    ${({ hasHiddenAccounts }) => (hasHiddenAccounts ? "64px" : "48px")} 32px;
-`
-
-const IconButtonCenter = styled(IconButton)`
-  margin: auto;
-`
-
-const IconButtonCenterDisabled = styled(IconButtonCenter)`
-  pointer-events: none;
-`
-
 const Paragraph = styled(P)`
   text-align: center;
-`
-
-const ErrorText = styled.div`
-  text-align: center;
-  font-size: 12px;
-  color: ${({ theme }) => theme.red2};
 `
 
 const DimmingContainer = styled.div`
@@ -101,15 +71,13 @@ export const AccountListScreen: FC = () => {
   )
   const { isBackupRequired } = useBackupRequired()
   const currentNetwork = useCurrentNetwork()
-  const { addAccount, isDeploying, deployFailed } = useAddAccount()
+  const { addAccount, isDeploying } = useAddAccount()
 
   const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
     visibleAccounts,
     currentNetwork,
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
-
-  const { scrollRef, scroll } = useScroll()
 
   const onClose = useCallback(async () => {
     if (returnTo) {
@@ -127,8 +95,7 @@ export const AccountListScreen: FC = () => {
 
   return (
     <>
-      <NavigationBar
-        scroll={scroll}
+      <NavigationContainer
         leftButton={<BarCloseButton onClick={onClose} disabled={isDeploying} />}
         title={"My accounts"}
         rightButton={
@@ -140,9 +107,8 @@ export const AccountListScreen: FC = () => {
             <AddIcon />
           </BarIconButton>
         }
-      />
-      <ScrollContainer ref={scrollRef}>
-        <AccountList hasHiddenAccounts={hasHiddenAccounts}>
+      >
+        <Flex p={4} gap={2} direction="column">
           {isBackupRequired && <RecoveryBanner noMargins />}
           {visibleAccounts.length === 0 && (
             <Paragraph>
@@ -171,35 +137,14 @@ export const AccountListScreen: FC = () => {
               ))}
             </>
           )}
-          {isDeploying ? (
-            <>
-              <DimmingContainer />
-              <IconButtonCenterDisabled size={48}>
-                <Spinner size={24} />
-              </IconButtonCenterDisabled>
-            </>
-          ) : (
-            <IconButtonCenter
-              size={48}
-              {...makeClickable(addAccount, {
-                label: "Create new wallet",
-              })}
-            >
-              <AddIcon fontSize="large" />
-            </IconButtonCenter>
-          )}
-          {deployFailed && (
-            <ErrorText>
-              Sorry, unable to create wallet. Please try again later.
-            </ErrorText>
-          )}
-        </AccountList>
-        {hasHiddenAccounts && (
-          <Footer>
-            <HiddenAccountsBar />
-          </Footer>
-        )}
-      </ScrollContainer>
+          {isDeploying && <DimmingContainer />}
+        </Flex>
+      </NavigationContainer>
+      {hasHiddenAccounts && (
+        <Footer>
+          <HiddenAccountsBar />
+        </Footer>
+      )}
     </>
   )
 }

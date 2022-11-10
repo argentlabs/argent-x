@@ -12,5 +12,9 @@ export const semanticTokens = {
       default: "gray.50",
       _dark: "neutrals.800",
     },
+    panel: {
+      default: "gray.50",
+      _dark: "black",
+    },
   },
 }

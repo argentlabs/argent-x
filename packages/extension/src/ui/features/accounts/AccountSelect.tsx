@@ -6,7 +6,7 @@ import styled from "styled-components"
 
 import { KeyboardArrowDownRounded } from "../../components/Icons/MuiIcons"
 import { scrollbarStyle } from "../../theme"
-import { AccountListItem, IAccountListItem } from "./AccountListItem"
+import { AccountListItem, AccountListItemProps } from "./AccountListItem"
 
 const StyledPaper = styled(Paper)`
   max-height: 220px;
@@ -62,9 +62,9 @@ const StyledAccountListItem = styled(AccountListItem)`
 `
 
 export interface IAccountSelect {
-  selectedAccount?: IAccountListItem
-  accounts: IAccountListItem[]
-  onSelectedAccountChange?: (selectedAccount: IAccountListItem) => void
+  selectedAccount?: AccountListItemProps
+  accounts: AccountListItemProps[]
+  onSelectedAccountChange?: (selectedAccount: AccountListItemProps) => void
   style?: React.CSSProperties
   className?: string
 }

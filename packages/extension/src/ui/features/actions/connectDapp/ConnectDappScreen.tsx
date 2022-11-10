@@ -11,7 +11,7 @@ import { accountsEqual } from "../../../../shared/wallet.service"
 import { ColumnCenter } from "../../../components/Column"
 import { LinkIcon } from "../../../components/Icons/MuiIcons"
 import { Account } from "../../accounts/Account"
-import { IAccountListItem } from "../../accounts/AccountListItem"
+import { AccountListItemProps } from "../../accounts/AccountListItem"
 import {
   getAccountName,
   useAccountMetadata,
@@ -47,7 +47,7 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
   const { accountNames } = useAccountMetadata()
   const preAuths = usePreAuthorizations()
   const makeAccountListItem = useCallback(
-    (account: Account): IAccountListItem => {
+    (account: Account): AccountListItemProps => {
       const accountName = getAccountName(account, accountNames)
       const connected = Boolean(
         preAuths.some((preAuth) =>
@@ -87,7 +87,7 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
     [accountItems, selectedAccount],
   )
   const onSelectedAccountItemChange = useCallback(
-    (accountItem: IAccountListItem) => {
+    (accountItem: AccountListItemProps) => {
       onSelectedAccountChange &&
         onSelectedAccountChange({
           address: accountItem.accountAddress,

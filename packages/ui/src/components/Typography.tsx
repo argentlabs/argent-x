@@ -1,51 +1,130 @@
 import { chakra } from "@chakra-ui/react"
 
-export const H1 = chakra("h1", {
-  baseStyle: {
+export const typographyStyles = {
+  H1: {
     fontSize: "5xl",
     lineHeight: 12,
     fontWeight: "extrabold",
     margin: 0,
   },
+  H2: {
+    fontSize: "4xl",
+    lineHeight: 10,
+    fontWeight: "extrabold",
+  },
+  H3: {
+    fontSize: "3xl",
+    lineHeight: 8,
+    fontWeight: "bold",
+  },
+  H4: {
+    fontSize: "2xl",
+    lineHeight: 7,
+    fontWeight: "bold",
+  },
+  H5: {
+    fontSize: "xl",
+    lineHeight: 6,
+    fontWeight: "bold",
+  },
+  H6: {
+    fontSize: "base",
+    lineHeight: 5,
+    fontWeight: "bold",
+  },
+
+  // paragraphs
+
+  P1: {
+    fontSize: "2xl",
+    lineHeight: 8,
+  },
+  P2: {
+    fontSize: "xl",
+    lineHeight: 7,
+  },
+  P3: {
+    fontSize: "base",
+    lineHeight: 5,
+  },
+  P4: {
+    fontSize: "xs",
+    lineHeight: 4,
+  },
+
+  // button text
+
+  B1: {
+    fontSize: "lg",
+    lineHeight: "1em",
+    fontWeight: "bold",
+  },
+  B2: {
+    fontSize: "base",
+    lineHeight: "1em",
+    fontWeight: "bold",
+  },
+  B3: {
+    fontSize: "sm",
+    lineHeight: "1em",
+    fontWeight: "bold",
+  },
+
+  // labels
+
+  L1: {
+    fontSize: "xs",
+    lineHeight: "3.5",
+    fontWeight: "bold",
+    letterSpacing: "wide",
+  },
+  L2: {
+    fontSize: "2xs",
+    lineHeight: "3.5",
+    fontWeight: "semibold",
+  },
+
+  // form
+
+  FieldError: {
+    color: "error.500",
+    textTransform: "none",
+  },
+}
+
+export const H1 = chakra("h1", {
+  baseStyle: {
+    ...typographyStyles.H1,
+  },
 })
 
 export const H2 = chakra("h2", {
   baseStyle: {
-    fontSize: "4xl",
-    lineHeight: 10,
-    fontWeight: "extrabold",
+    ...typographyStyles.H2,
   },
 })
 
 export const H3 = chakra("h3", {
   baseStyle: {
-    fontSize: "3xl",
-    lineHeight: 8,
-    fontWeight: "bold",
+    ...typographyStyles.H3,
   },
 })
 
 export const H4 = chakra("h4", {
   baseStyle: {
-    fontSize: "2xl",
-    lineHeight: 7,
-    fontWeight: "bold",
+    ...typographyStyles.H4,
   },
 })
 
 export const H5 = chakra("h5", {
   baseStyle: {
-    fontSize: "xl",
-    lineHeight: 6,
-    fontWeight: "bold",
+    ...typographyStyles.H5,
   },
 })
 
 export const H6 = chakra("h6", {
   baseStyle: {
-    fontSize: "base",
-    lineHeight: 5,
-    fontWeight: "bold",
+    ...typographyStyles.H6,
   },
 })
 
@@ -53,29 +132,25 @@ export const H6 = chakra("h6", {
 
 export const P1 = chakra("p", {
   baseStyle: {
-    fontSize: "2xl",
-    lineHeight: 8,
+    ...typographyStyles.P1,
   },
 })
 
 export const P2 = chakra("p", {
   baseStyle: {
-    fontSize: "xl",
-    lineHeight: 7,
+    ...typographyStyles.P2,
   },
 })
 
 export const P3 = chakra("p", {
   baseStyle: {
-    fontSize: "base",
-    lineHeight: 5,
+    ...typographyStyles.P3,
   },
 })
 
 export const P4 = chakra("p", {
   baseStyle: {
-    fontSize: "xs",
-    lineHeight: 4,
+    ...typographyStyles.P4,
   },
 })
 
@@ -83,25 +158,19 @@ export const P4 = chakra("p", {
 
 export const B1 = chakra("span", {
   baseStyle: {
-    fontSize: "lg",
-    lineHeight: "1em",
-    fontWeight: "bold",
+    ...typographyStyles.B1,
   },
 })
 
 export const B2 = chakra("span", {
   baseStyle: {
-    fontSize: "base",
-    lineHeight: "1em",
-    fontWeight: "bold",
+    ...typographyStyles.B2,
   },
 })
 
 export const B3 = chakra("span", {
   baseStyle: {
-    fontSize: "sm",
-    lineHeight: "1em",
-    fontWeight: "bold",
+    ...typographyStyles.B3,
   },
 })
 
@@ -109,19 +178,13 @@ export const B3 = chakra("span", {
 
 export const L1 = chakra("label", {
   baseStyle: {
-    fontSize: "xs",
-    lineHeight: "3.5",
-    fontWeight: "bold",
-    letterSpacing: "wider",
-    textTransform: "uppercase",
+    ...typographyStyles.L1,
   },
 })
 
 export const L2 = chakra("label", {
   baseStyle: {
-    fontSize: "2xs",
-    lineHeight: "3.5",
-    fontWeight: "semibold",
+    ...typographyStyles.L2,
   },
 })
 
@@ -129,7 +192,6 @@ export const L2 = chakra("label", {
 
 export const FieldError = chakra(L1, {
   baseStyle: {
-    color: "error.500",
-    textTransform: "none",
+    ...typographyStyles.FieldError,
   },
 })
