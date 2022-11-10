@@ -9,9 +9,10 @@ import { getL1GasPrice } from "../../shared/ethersUtils"
 import { AllowArray } from "../../shared/storage/types"
 import { nameTransaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
+import { accountsEqual } from "../../shared/wallet.service"
 import { BackgroundService } from "../background"
-import { getNonce, increaseStoredNonce } from "../nonce"
-import { addTransaction } from "./store"
+import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
+import { addTransaction, transactionsStore } from "./store"
 
 export const checkTransactionHash = (
   transactionHash?: number.BigNumberish,
@@ -40,6 +41,8 @@ export const executeTransactionAction = async (
   { wallet }: BackgroundService,
 ) => {
   const { transactions, abis, transactionsDetail, meta = {} } = action.payload
+  const allTransactions = await transactionsStore.get()
+
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
@@ -48,9 +51,21 @@ export const executeTransactionAction = async (
     throw Error("no accounts")
   }
 
+  const pendingAccountTransactions = allTransactions.filter(
+    (tx) =>
+      tx.status === "RECEIVED" && accountsEqual(tx.account, selectedAccount),
+  )
+
+  const hasUpgradePending = pendingAccountTransactions.some(
+    (tx) => tx.meta?.isUpgrade,
+  )
+
   const accountNeedsDeploy = selectedAccount.needsDeploy
 
-  const starknetAccount = await wallet.getSelectedStarknetAccount()
+  const starknetAccount = await wallet.getStarknetAccount(
+    selectedAccount,
+    hasUpgradePending,
+  )
 
   // if nonce doesnt get provided by the UI, we can use the stored nonce to allow transaction queueing
   const nonceWasProvidedByUI = transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
@@ -87,9 +102,23 @@ export const executeTransactionAction = async (
     )
     maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
   } else {
-    // estimate fee with onchain nonce even tho transaction nonce may be different
-    const { suggestedMaxFee } = await starknetAccount.estimateFee(transactions)
-    maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+    if (hasUpgradePending) {
+      const oldStarknetAccount = await wallet.getStarknetAccount(
+        selectedAccount,
+        false,
+      )
+      // Use old starknet account to calculate the max fee if upgrade is in progress
+      const { suggestedMaxFee } = await oldStarknetAccount.estimateFee(
+        transactions,
+      )
+      maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+    } else {
+      // estimate fee with onchain nonce even tho transaction nonce may be different
+      const { suggestedMaxFee } = await starknetAccount.estimateFee(
+        transactions,
+      )
+      maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+    }
   }
 
   const transaction = await starknetAccount.execute(transactions, abis, {
@@ -117,6 +146,11 @@ export const executeTransactionAction = async (
   if (!nonceWasProvidedByUI) {
     await increaseStoredNonce(selectedAccount)
   }
+
+  if (meta.isUpgrade) {
+    await resetStoredNonce(selectedAccount) // reset nonce after upgrade. This is needed because nonce was managed by AccountContract before 0.10.0
+  }
+
   return transaction
 }
 

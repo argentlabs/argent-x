@@ -594,6 +594,7 @@ export class Wallet {
 
   public async getStarknetAccount(
     selector: BaseWalletAccount,
+    useLatest = false,
   ): Promise<Account | Accountv4> {
     if (!(await this.isSessionOpen())) {
       throw Error("no open session")
@@ -619,7 +620,7 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
-    if (account.needsDeploy) {
+    if (account.needsDeploy || useLatest) {
       return new Account(provider, account.address, keyPair)
     }
 
