@@ -19,7 +19,6 @@ import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
-import { useCurrentNetwork } from "../networks/useNetworks"
 import { TokenDetailsWithBalance, getNetworkFeeToken } from "./tokens.state"
 
 export interface TokenView {
@@ -184,9 +183,8 @@ export const fetchTokenBalancesWithoutMulticall = async (
 
 export const fetchFeeTokenBalance = async (
   account: Account,
-  networkId: string,
 ): Promise<BigNumber> => {
-  const token = await getNetworkFeeToken(networkId)
+  const token = await getNetworkFeeToken(account.networkId)
   if (!token) {
     return BigNumber.from(0)
   }
@@ -238,8 +236,6 @@ export const fetchFeeTokenBalanceForAccounts = async (
 }
 
 export const useFeeTokenBalance = (account?: Account) => {
-  const { id: networkId } = useCurrentNetwork()
-
   const accountIdentifier = account && getAccountIdentifier(account)
 
   const {
@@ -247,9 +243,13 @@ export const useFeeTokenBalance = (account?: Account) => {
     error: feeTokenBalanceError,
     isValidating: feeTokenBalanceValidating,
   } = useSWR(
-    [accountIdentifier, networkId, "feeTokenBalance"],
-    () => account && fetchFeeTokenBalance(account, networkId),
-    { suspense: false },
+    [accountIdentifier, "feeTokenBalance"],
+    () => account && fetchFeeTokenBalance(account),
+    {
+      suspense: false,
+      refreshInterval: 30 * 1000, // 30 seconds
+      shouldRetryOnError: false,
+    },
   )
 
   return { feeTokenBalance, feeTokenBalanceError, feeTokenBalanceValidating }

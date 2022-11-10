@@ -28,7 +28,7 @@ import Row from "../../../components/Row"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { fetchFeeTokenBalance } from "../../accountTokens/tokens.service"
+import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import {
   CaptionText,
   DetailsText,
@@ -58,11 +58,7 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
   const [feeErrorExpanded, setFeeErrorExpanded] = useState(false)
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, account.networkId),
-    { suspense: false },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
 
@@ -72,13 +68,8 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
         number.toBN(fee.accountDeploymentFee).add(number.toBN(fee.amount)),
       )
     }
-    return fee?.suggestedMaxFee
-  }, [
-    account.needsDeploy,
-    fee?.accountDeploymentFee,
-    fee?.amount,
-    fee?.suggestedMaxFee,
-  ])
+    return fee?.amount
+  }, [account.needsDeploy, fee?.accountDeploymentFee, fee?.amount])
 
   const totalMaxFee = useMemo(() => {
     if (account.needsDeploy && fee?.maxADFee) {

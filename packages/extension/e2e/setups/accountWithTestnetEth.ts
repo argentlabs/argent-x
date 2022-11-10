@@ -20,7 +20,7 @@ export async function setupNewAccountWithTestnetEth(
 
   // page is now closed
   await openExtension(page, context)
-  await switchNetwork(page, "Localhost")
+  await switchNetwork(page, "Localhost 5050")
   await newAccountWhenEmpty(page)
   const address = await getAccountAddressFromAccountPage(page)
   await mintDevnetEthToAccount(address)

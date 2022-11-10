@@ -39,7 +39,7 @@ import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
-import { fetchFeeTokenBalance } from "./tokens.service"
+import { useFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
@@ -98,11 +98,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     return () => timeoutId && clearTimeout(timeoutId)
   }, [navigate, transactionsBeforeReview, userHasReviewed])
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), network.id, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, network.id),
-    { suspense: false, ...withPolling(60 * 1000) },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
     useTokensWithBalance(account)

@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test"
 
 export async function switchNetwork(page: Page, targetNetworkName: string) {
   const networkSelector = "button[aria-label='Selected network']"
-  const networkSelectorItem = `span:has-text("${targetNetworkName}")`
+  const networkSelectorItem = `button[data-testid='${targetNetworkName}']`
 
   await page.waitForSelector(networkSelector)
 
