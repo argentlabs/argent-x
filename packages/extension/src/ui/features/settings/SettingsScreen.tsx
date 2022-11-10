@@ -125,6 +125,12 @@ export const SettingsScreen: FC = () => {
             title="Show recovery phrase"
           />
 
+          <SettingsMenuItem
+            leftIcon={<CodeIcon />}
+            to={routes.settingsDeveloper()}
+            title="Developer settings"
+          />
+
           {isPrivacySettingsEnabled && (
             <SettingsMenuItem
               leftIcon={<ShieldIcon />}
@@ -132,12 +138,6 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
-
-          <SettingsMenuItem
-            leftIcon={<CodeIcon />}
-            to={routes.settingsDeveloper()}
-            title="Developer settings"
-          />
         </Stack>
       </NavigationContainer>
       <Link onClick={stopSession} to={routes.lockScreen()}>
