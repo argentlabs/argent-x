@@ -1,4 +1,4 @@
-import { ThemeProvider as ArgentTheme } from "@argent/ui"
+import { InitiallyDarkThemeProvider as ArgentTheme } from "@argent/ui"
 import { localStorageManager } from "@chakra-ui/react"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense, useEffect } from "react"
