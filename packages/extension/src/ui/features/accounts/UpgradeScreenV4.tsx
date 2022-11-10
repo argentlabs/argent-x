@@ -160,7 +160,11 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
           </StyledPBold>
         )}
 
-        <LearnMoreLink href="" target="_blank" rel="noreferrer">
+        <LearnMoreLink
+          href="https://medium.com/starkware/starknet-alpha-0-10-0-923007290470"
+          target="_blank"
+          rel="noreferrer"
+        >
           Learn more about this change
         </LearnMoreLink>
 
