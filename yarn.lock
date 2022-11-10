@@ -2579,12 +2579,12 @@
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
 "@google/model-viewer@^2.0.0":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@google/model-viewer/-/model-viewer-2.0.2.tgz#1d1c60240d3ea1e7853875a9110c8e73d6276314"
-  integrity sha512-Se4jrspwc4xX3M1xfKynT30sPIO1VeeXgrYPhdZxUDtn2od9yXR7A6gQ06mf6rZ078l8OQfmGL8FHr24K2oCWA==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@google/model-viewer/-/model-viewer-2.1.0.tgz#4b2fa2b0153f09c726fd6f2e0b3a6dacd3d97f1d"
+  integrity sha512-TuNGZqJeRzG/SbGPZzP9GuuYMiu+PbYjQz2ywe5dGNEc7UvZFif5hO1sOFd55R4JM2ehl0gtUUyTyqZlwxeuPw==
   dependencies:
     lit "^2.2.3"
-    three "^0.144.0"
+    three "^0.146.0"
 
 "@humanwhocodes/config-array@^0.10.5":
   version "0.10.7"
@@ -17388,10 +17388,10 @@ then-request@^6.0.0:
     promise "^8.0.0"
     qs "^6.4.0"
 
-three@^0.144.0:
-  version "0.144.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.144.0.tgz#2818517169f8ff94eea5f664f6ff1fcdcd436cc8"
-  integrity sha512-R8AXPuqfjfRJKkYoTQcTK7A6i3AdO9++2n8ubya/GTU+fEHhYKu1ZooRSCPkx69jbnzT7dD/xEo6eROQTt2lJw==
+three@^0.146.0:
+  version "0.146.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.146.0.tgz#fd80f0d128ab4bb821a02191ae241e4e6326f17a"
+  integrity sha512-1lvNfLezN6OJ9NaFAhfX4sm5e9YCzHtaRgZ1+B4C+Hv6TibRMsuBAM5/wVKzxjpYIlMymvgsHEFrrigEfXnb2A==
 
 through2@^2.0.0:
   version "2.0.5"
