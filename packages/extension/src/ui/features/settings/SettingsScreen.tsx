@@ -106,6 +106,7 @@ export const SettingsScreen: FC = () => {
         {isPrivacySettingsEnabled && (
           <SettingsMenuItem to={routes.settingsPrivacy()} title="Privacy" />
         )}
+
         <SettingsMenuItem
           to={routes.settingsDeveloper()}
           title="Developer settings"

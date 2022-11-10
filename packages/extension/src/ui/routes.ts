@@ -137,6 +137,15 @@ export const routes = {
   ),
   settingsAddressbookAdd: route("/settings/addressbook/add-or-edit"),
   settingsPrivacyStatement: route("/settings/privacy-policy"),
+  settingsSmartContractDevelopment: route(
+    "/settings/smart-contract-development",
+  ),
+  settingsSmartContractDeclare: route(
+    "/settings/smart-contract-development/declare",
+  ),
+  settingsSmartContractDeploy: route(
+    "/settings/smart-contract-development/deploy",
+  ),
   networkWarning: routeWithReturnTo("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>

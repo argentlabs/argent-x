@@ -28,7 +28,7 @@ const DeveloperSettings: FC = () => {
         />
 
         <SettingsMenuItem
-          to={routes.settingsBlockExplorer()}
+          to={routes.settingsSmartContractDevelopment()}
           title="Smart contract development"
         />
         {isExperimentalSettingsEnabled && (
