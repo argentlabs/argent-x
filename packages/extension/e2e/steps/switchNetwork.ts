@@ -2,16 +2,19 @@ import { expect } from "@playwright/test"
 import type { Page } from "@playwright/test"
 
 export async function switchNetwork(page: Page, targetNetworkName: string) {
-  const networkSwitcher = await page
-    .locator("[aria-label='Selected network']")
-    .elementHandle()
+  const networkSelector = "button[aria-label='Selected network']"
+  const networkSelectorItem = `span:has-text("${targetNetworkName}")`
+
+  await page.waitForSelector(networkSelector)
+
+  const networkSwitcher = await page.locator(networkSelector).elementHandle()
+
   if (!networkSwitcher) {
     return expect(networkSwitcher).toBeTruthy()
   }
   await networkSwitcher.click()
-  const networkToSelect = await networkSwitcher.$(`text=${targetNetworkName}`)
-  if (!networkToSelect) {
-    return expect(networkToSelect).toBeTruthy()
-  }
+
+  const networkToSelect = await page.waitForSelector(networkSelectorItem)
+
   await networkToSelect.click()
 }
