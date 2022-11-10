@@ -11199,9 +11199,9 @@ handlebars@^4.7.7:
     uglify-js "^3.1.4"
 
 happy-dom@^7.0.0:
-  version "7.6.6"
-  resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-7.6.6.tgz#f94ce99c5a32d1ea8578b75e8f584e8fcd162513"
-  integrity sha512-28NxRiHXjzhr+BGciLNUoQW4OaBnQPRT/LPYLufh0Fj3Iwh1j9qJaozjBm/Uqdj5Ps4cukevQ7ERieA6Ddwf1g==
+  version "7.6.7"
+  resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-7.6.7.tgz#cce90413ae33f42a2a7e704b928de1b84efeebf1"
+  integrity sha512-9pOslsClyF5JX9ZM3dzRhLjTHqc4dha7v+ZB94u4PHMVTdLplXAnh5e5WXtPUU1n0J4tDUavslJqitqt/1W45g==
   dependencies:
     css.escape "^1.5.1"
     he "^1.2.0"
