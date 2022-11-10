@@ -18,7 +18,7 @@ export const Empty: FC<EmptyProps> = ({
 }) => (
   <Center flex={1} py={4} px={14}>
     <Center flexDirection={"column"} color={"neutrals.500"}>
-      <Circle backgroundColor={"black"} size={20}>
+      <Circle backgroundColor={"panel"} size={20}>
         <Text fontSize={"5xl"}>{icon}</Text>
       </Circle>
       <H5 textAlign={"center"} pt={4} pb={12}>
@@ -30,5 +30,5 @@ export const Empty: FC<EmptyProps> = ({
 )
 
 export const EmptyButton: FC<ComponentProps<typeof Button>> = (props) => (
-  <Button colorScheme={"neutrals600"} size={"sm"} {...props} />
+  <Button colorScheme={"tertiary"} size={"sm"} {...props} />
 )

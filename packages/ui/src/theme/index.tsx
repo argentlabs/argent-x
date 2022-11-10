@@ -6,7 +6,12 @@ import {
   extendTheme,
 } from "@chakra-ui/react"
 
-import { menuTheme, textareaTheme } from "../components"
+import {
+  alertTheme,
+  menuTheme,
+  textareaTheme,
+  tooltipTheme,
+} from "../components"
 import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
 import { breakpoints } from "./breakpoints"
@@ -39,10 +44,12 @@ const extendedTheme = extendTheme({
   shadows,
   space: spacing,
   components: {
+    Alert: alertTheme,
     Button: buttonTheme,
     Input: inputTheme,
     Menu: menuTheme,
     Textarea: textareaTheme,
+    Tooltip: tooltipTheme,
   },
 })
 

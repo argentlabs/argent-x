@@ -83,7 +83,9 @@ interface AccountNameProps {
   onAccountNameEdit: () => void
 }
 
-export const AccountMenu: FC<AccountNameProps> = ({ onAccountNameEdit }) => {
+export const DeprecatedAccountMenu: FC<AccountNameProps> = ({
+  onAccountNameEdit,
+}) => {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const currentNetwork = useCurrentNetwork()

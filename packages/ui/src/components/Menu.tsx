@@ -41,10 +41,12 @@ const baseStyle = definePartsStyle({
       color: "white",
       bg: "neutrals.600",
     },
+    ".chakra-menu__icon-wrapper": {
+      fontSize: "inherit",
+    },
   },
 })
 
-// export the base styles in the component theme
 export const menuTheme = defineMultiStyleConfig({
   baseStyle,
   sizes,

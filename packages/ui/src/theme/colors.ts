@@ -12,15 +12,16 @@ export const colors = {
   gray: makeColorVariants("#58585b"),
   primary: makeColorVariants("#f36a3d"),
   secondary: makeColorVariants("#08a681"),
+  tertiary: makeColorVariants("#404043"),
   accent: makeColorVariants("#197aa6"),
   warn: makeColorVariants("#ffbf3d"),
   "warn-high": makeColorVariants("#f36a3d"),
   info: makeColorVariants("#0078a4"),
   danger: makeColorVariants("#c12026"),
   warning: makeColorVariants("#f4bc54"),
+  success: makeColorVariants("#08a681"),
   error: makeColorVariants("#cc3247"),
   skyBlue: makeColorVariants("#29c5ff"),
-  neutrals600: makeColorVariants("#404043"),
   neutrals: {
     100: "#b7b7b9",
     200: "#9f9fa1",
@@ -32,4 +33,9 @@ export const colors = {
     800: "#1d1f22",
     900: "#101014",
   },
+  /** used by Chakra Alert and Toast */
+  blue: makeColorVariants("#0078a4"),
+  orange: makeColorVariants("#f4bc54"),
+  red: makeColorVariants("#cc3247"),
+  green: makeColorVariants("#08a681"),
 }

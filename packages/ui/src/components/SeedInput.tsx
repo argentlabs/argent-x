@@ -87,6 +87,7 @@ export const SeedInput: FC<SeedInputProps> = ({
             left={1}
             height="100%"
             zIndex={1}
+            border="none"
           >
             <Box
               as="span"
@@ -107,6 +108,7 @@ export const SeedInput: FC<SeedInputProps> = ({
             </Box>
           </InputLeftAddon>
           <Input
+            variant={"filled"}
             autoFocus={i === 0}
             value={word}
             size="pill"

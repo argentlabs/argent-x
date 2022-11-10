@@ -83,6 +83,10 @@ export const routes = {
   ),
   upgrade: route("/account/upgrade"),
   accounts: routeWithReturnTo("/accounts"),
+  editAccount: route(
+    (accountAddress) => `/accounts/${accountAddress}`,
+    "/accounts/:accountAddress",
+  ),
   addAccount: route("/accounts/new"),
   accountsHidden: routeWithReturnTo("/accounts/hidden"),
   newToken: route("/tokens/new"),

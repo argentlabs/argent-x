@@ -3,7 +3,7 @@ import { FC } from "react"
 import { Account } from "../../accounts/Account"
 import {
   AccountListItem,
-  IAccountListItem,
+  AccountListItemProps,
 } from "../../accounts/AccountListItem"
 import {
   getAccountName,
@@ -12,7 +12,7 @@ import {
 
 interface IConnectDappAccountListItem
   extends Omit<
-    IAccountListItem,
+    AccountListItemProps,
     "accountName" | "accountAddress" | "networkId"
   > {
   account: Account

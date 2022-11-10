@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { useAppState } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
+import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
 import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
@@ -244,6 +245,7 @@ const walletRoutes = (
       element={<AccountScreen tab="activity" />}
     />
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
+    <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
   </>
 )
 
