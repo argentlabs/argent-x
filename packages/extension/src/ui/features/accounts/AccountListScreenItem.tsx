@@ -22,7 +22,7 @@ import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
-const { ChevronRightIcon } = icons
+const { MoreIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
@@ -98,7 +98,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
           rounded="full"
           onClick={onAccountEdit}
         >
-          <ChevronRightIcon />
+          <MoreIcon />
         </Button>
       </Flex>
     </Flex>
