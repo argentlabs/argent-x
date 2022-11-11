@@ -20,4 +20,9 @@ export const pinInputFieldTheme = defineStyleConfig({})
 
 export { PinInputField, PinInput } from "@chakra-ui/react"
 
-export const PinInputWrapper = chakra(HStack, {})
+export const PinInputWrapper = chakra(HStack, {
+  baseStyle: {
+    gap: 2,
+    display: "flex",
+  },
+})
