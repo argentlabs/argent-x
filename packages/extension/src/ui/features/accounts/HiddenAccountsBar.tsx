@@ -3,6 +3,7 @@ import { Center, chakra } from "@chakra-ui/react"
 import { FC } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
+import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 
 const { HideIcon } = icons
@@ -19,11 +20,12 @@ const Container = chakra(Center, {
 
 export const HiddenAccountsBar: FC = () => {
   const navigate = useNavigate()
-  const location = useLocation()
+  const { switcherNetworkId } = useAppState()
+
   return (
     <Container>
       <Button
-        onClick={() => navigate(routes.accountsHidden(location.pathname))}
+        onClick={() => navigate(routes.accountsHidden(switcherNetworkId))}
         leftIcon={<HideIcon />}
         size="sm"
         colorScheme="transparent"

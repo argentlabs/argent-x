@@ -16,6 +16,7 @@ import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
+import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
@@ -148,6 +149,15 @@ const legacyUiWalletRoutes = (
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
+    <Route
+      path={routes.networkUpgradeV4.path}
+      element={<UpgradeScreenV4 upgradeType={"network"} />}
+    />
+    <Route
+      path={routes.accountUpgradeV4.path}
+      element={<UpgradeScreenV4 upgradeType={"account"} />}
+    />
+    <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route
       path={routes.accountsHidden.path}
       element={<AccountListHiddenScreen />}

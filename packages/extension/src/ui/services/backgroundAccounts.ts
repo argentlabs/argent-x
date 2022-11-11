@@ -9,10 +9,28 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
 export const createNewAccount = async (networkId: string) => {
   sendMessage({ type: "NEW_ACCOUNT", data: networkId })
-  return await Promise.race([
-    waitForMessage("NEW_ACCOUNT_RES"),
-    waitForMessage("NEW_ACCOUNT_REJ"),
-  ])
+  try {
+    return await Promise.race([
+      waitForMessage("NEW_ACCOUNT_RES"),
+      waitForMessage("NEW_ACCOUNT_REJ").then(() => "error" as const),
+    ])
+  } catch {
+    throw Error("Could add new account")
+  }
+}
+
+export const deployNewAccount = async (account: BaseWalletAccount) => {
+  sendMessage({ type: "DEPLOY_ACCOUNT", data: account })
+  try {
+    await Promise.race([
+      waitForMessage("DEPLOY_ACCOUNT_RES"),
+      waitForMessage("DEPLOY_ACCOUNT_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could not deploy account")
+  }
 }
 
 export const getLastSelectedAccount = async () => {
@@ -36,10 +54,11 @@ export const connectAccount = ({
   networkId,
   signer,
   type,
+  needsDeploy,
 }: Account) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
-    data: { address, network, networkId, signer, type },
+    data: { address, network, networkId, signer, type, needsDeploy },
   })
 }
 

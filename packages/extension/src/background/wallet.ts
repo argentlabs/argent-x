@@ -1,14 +1,25 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, noop, throttle, union } from "lodash-es"
-import { Account, DeployContractPayload, ec, stark } from "starknet"
+import {
+  Abi,
+  Account,
+  Contract,
+  DeployContractPayload,
+  EstimateFee,
+  ec,
+  number,
+  stark,
+} from "starknet"
 import {
   calculateContractAddressFromHash,
   getSelectorFromName,
 } from "starknet/dist/utils/hash"
+import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
+import ProxyCompiledContractAbi from "../abis/Proxy.json"
 import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
 import { withHiddenSelector } from "../shared/account/selectors"
 import {
@@ -17,6 +28,7 @@ import {
   defaultNetworks,
   getProvider,
 } from "../shared/network"
+import { getProviderv4 } from "../shared/network/provider"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -45,10 +57,11 @@ export const SESSION_DURATION = isDev ? 24 * 60 * 60 : 30 * 60 // 30 mins in pro
 
 const CHECK_OFFSET = 10
 
-const PROXY_CONTRACT_CLASS_HASHES = [
+export const PROXY_CONTRACT_CLASS_HASHES = [
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918",
 ]
-const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
+export const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
+  "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
   "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
   "0x7e28fb0161d10d1cf7fe1f13e7ca57bce062731a3bd04494dfd2d0412699727",
 ]
@@ -174,6 +187,7 @@ export class Wallet {
   private async getAccountClassHashForNetwork(
     network: Network,
     accountType: ArgentAccountType,
+    deployerAccount?: Account, // Only for use with devnet
   ): Promise<string> {
     if (network.accountClassHash) {
       if (
@@ -184,12 +198,25 @@ export class Wallet {
       }
       return network.accountClassHash.argentAccount
     }
-    const [, accountContract] = await this.loadContracts(network.id)
-    const provider = getProvider(network)
-    const declareResponse = await provider.declareContract({
-      contract: accountContract,
-    })
-    return declareResponse.class_hash || ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
+    const [proxyContract, accountContract] = await this.loadContracts(
+      network.id,
+    )
+
+    if (deployerAccount) {
+      await deployerAccount.declare({
+        classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+        contract: proxyContract,
+      })
+
+      const declareResponse = await deployerAccount.declare({
+        classHash: ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0],
+        contract: accountContract,
+      })
+
+      return declareResponse.class_hash
+    }
+
+    return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
   }
 
   private async restoreAccountsFromWallet(
@@ -257,6 +284,7 @@ export class Wallet {
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
               type: "argent",
+              needsDeploy: false, // Only deployed accounts will be recovered
             })
           }
 
@@ -267,7 +295,13 @@ export class Wallet {
 
     await Promise.all(promises)
 
-    return getAccountTypesFromChain(accounts)
+    try {
+      const accountWithTypes = await getAccountTypesFromChain(accounts)
+      return accountWithTypes
+    } catch (error) {
+      console.error("Error getting account types from chain", error)
+      return accounts
+    }
   }
 
   public async startSession(
@@ -347,9 +381,7 @@ export class Wallet {
     await this.walletStore.push(accounts)
   }
 
-  public async addAccount(
-    networkId: string,
-  ): Promise<{ account: WalletAccount; txHash: string }> {
+  public async newAccount(networkId: string): Promise<WalletAccount> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session) {
       throw Error("no open session")
@@ -371,16 +403,19 @@ export class Wallet {
 
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
 
-    const provider = getProvider(network)
-
     const payload = await this.getDeployContractPayloadForAccountIndex(
       index,
       networkId,
     )
 
-    const deployTransaction = await provider.deployContract(payload)
+    const proxyClassHash = PROXY_CONTRACT_CLASS_HASHES[0]
 
-    const proxyAddress = deployTransaction.contract_address
+    const proxyAddress = calculateContractAddressFromHash(
+      payload.addressSalt,
+      proxyClassHash,
+      payload.constructorCalldata,
+      0,
+    )
 
     const account: WalletAccount = {
       network,
@@ -391,13 +426,90 @@ export class Wallet {
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
       type: "argent",
+      needsDeploy: true,
     }
 
     await this.walletStore.push([account])
 
     await this.selectAccount(account)
 
-    return { account, txHash: deployTransaction.transaction_hash }
+    return account
+  }
+
+  public async deployAccount(
+    walletAccount: WalletAccount,
+    deployerAccount?: Account,
+  ): Promise<{ account: WalletAccount; txHash: string }> {
+    const starknetAccount = await this.getStarknetAccount(walletAccount)
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      walletAccount.network,
+      "argent",
+      deployerAccount,
+    )
+
+    if (!("deployAccount" in starknetAccount)) {
+      throw Error("Cannot deploy old accounts")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      walletAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const deployAccountPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contractAddress: starknetAccount.address,
+      constructorCalldata: stark.compileCalldata({
+        implementation: accountClassHash,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      }),
+      addressSalt: starkPub,
+    }
+
+    const { transaction_hash } = await starknetAccount.deployAccount(
+      deployAccountPayload,
+    )
+
+    await this.selectAccount(walletAccount)
+
+    return { account: walletAccount, txHash: transaction_hash }
+  }
+
+  public async getAccountDeploymentFee(
+    walletAccount: WalletAccount,
+    deployerAccount?: Account,
+  ): Promise<EstimateFee> {
+    const starknetAccount = await this.getStarknetAccount(walletAccount)
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      walletAccount.network,
+      "argent",
+      deployerAccount,
+    )
+
+    if (!("deployAccount" in starknetAccount)) {
+      throw Error("Cannot estimate fee to deploy old accounts")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      walletAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const deployAccountPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contractAddress: starknetAccount.address,
+      constructorCalldata: stark.compileCalldata({
+        implementation: accountClassHash,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      }),
+      addressSalt: starkPub,
+    }
+
+    return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
   }
 
   public async redeployAccount(account: WalletAccount) {
@@ -427,7 +539,7 @@ export class Wallet {
   public async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
-  ): Promise<DeployContractPayload> {
+  ): Promise<Required<DeployContractPayload>> {
     const hasSession = await this.isSessionOpen()
     const session = await this.sessionStore.get()
     const initialised = await this.isInitialized()
@@ -482,7 +594,8 @@ export class Wallet {
 
   public async getStarknetAccount(
     selector: BaseWalletAccount,
-  ): Promise<Account> {
+    useLatest = false,
+  ): Promise<Account | Accountv4> {
     if (!(await this.isSessionOpen())) {
       throw Error("no open session")
     }
@@ -494,11 +607,58 @@ export class Wallet {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
-    const provider = getProvider(account.network)
-    return new Account(provider, account.address, keyPair)
+
+    const provider = getProvider(
+      account.network && account.network.baseUrl
+        ? account.network
+        : await this.getNetwork(selector.networkId),
+    )
+
+    const providerV4 = getProviderv4(
+      account.network && account.network.baseUrl
+        ? account.network
+        : await this.getNetwork(selector.networkId),
+    )
+
+    if (account.needsDeploy || useLatest) {
+      return new Account(provider, account.address, keyPair)
+    }
+
+    const oldAccount = new Accountv4(providerV4, account.address, keyPair)
+
+    const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
+
+    return isOldAccount
+      ? oldAccount
+      : new Account(provider, account.address, keyPair)
   }
 
-  public async getSelectedStarknetAccount(): Promise<Account> {
+  public async isNonceManagedOnAccountContract(account: Accountv4) {
+    try {
+      // This will fetch nonce from account contract instead of Starknet OS
+      await account.getNonce()
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public async getCurrentImplementation(
+    account: WalletAccount,
+  ): Promise<string> {
+    const provider = getProvider(account.network)
+
+    const proxyContract = new Contract(
+      ProxyCompiledContractAbi as Abi,
+      account.address,
+      provider,
+    )
+
+    const { implementation } = await proxyContract.call("get_implementation")
+    return stark.makeAddress(number.toHex(implementation))
+  }
+
+  public async getSelectedStarknetAccount(): Promise<Account | Accountv4> {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }

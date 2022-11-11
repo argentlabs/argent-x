@@ -1,3 +1,4 @@
+import { handleDeployAccountTransaction } from "./deployAccount"
 import { checkResetStoredNonce } from "./nonce"
 import { notifyAboutCompletedTransactions } from "./notifications"
 import { TransactionUpdateListener } from "./type"
@@ -5,6 +6,7 @@ import { handleUpgradeTransaction } from "./upgrade"
 
 const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
   handleUpgradeTransaction,
+  handleDeployAccountTransaction,
   checkResetStoredNonce,
 ]
 

@@ -163,7 +163,8 @@ export const AccountActivityContainer: FC<IAccountActivityContainer> = ({
   const voyagerTransactions = useMemo(() => {
     // RECEIVED transactions are already shown as pending
     return transactions.filter(
-      (transaction) => transaction.status !== "RECEIVED",
+      (transaction) =>
+        transaction.status !== "RECEIVED" && !transaction.meta?.isDeployAccount,
     )
   }, [transactions])
   const mergedTransactions = useMemo(() => {

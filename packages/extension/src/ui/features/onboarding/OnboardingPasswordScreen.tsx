@@ -9,7 +9,7 @@ import { routes } from "../../routes"
 import { analytics, usePageTracking } from "../../services/analytics"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { FormError } from "../../theme/Typography"
-import { deployAccount } from "../accounts/accounts.service"
+import { createAccount } from "../accounts/accounts.service"
 import { validatePassword } from "../recovery/seedRecovery.state"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
@@ -66,7 +66,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
         setIsDeploying(true)
         setDeployFailed(false)
         try {
-          const newAccount = await deployAccount(switcherNetworkId, password)
+          const newAccount = await createAccount(switcherNetworkId, password)
           connectAccount(newAccount)
           analytics.track("createWallet", {
             status: "success",

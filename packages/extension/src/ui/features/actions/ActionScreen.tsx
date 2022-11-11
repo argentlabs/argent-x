@@ -19,6 +19,7 @@ import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
+import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
@@ -32,11 +33,16 @@ export const ActionScreen: FC = () => {
   const [action] = actions
   const isLastAction = actions.length === 1
 
-  const closePopupIfLastAction = useCallback(() => {
-    if (EXTENSION_IS_POPUP && isLastAction) {
+  const closePopup = useCallback(() => {
+    if (EXTENSION_IS_POPUP) {
       window.close()
     }
-  }, [isLastAction])
+  }, [])
+  const closePopupIfLastAction = useCallback(() => {
+    if (isLastAction) {
+      closePopup()
+    }
+  }, [closePopup, isLastAction])
 
   const onSubmit = useCallback(async () => {
     await approveAction(action)
@@ -44,9 +50,14 @@ export const ActionScreen: FC = () => {
   }, [action, closePopupIfLastAction])
 
   const onReject = useCallback(async () => {
-    await rejectAction(action)
+    await rejectAction(action.meta.hash)
     closePopupIfLastAction()
   }, [action, closePopupIfLastAction])
+
+  const rejectAllActions = useCallback(async () => {
+    await rejectAction(actions.map((act) => act.meta.hash))
+    closePopup()
+  }, [actions, closePopup])
 
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {
@@ -57,7 +68,6 @@ export const ActionScreen: FC = () => {
     }
     init()
   }, [extensionIsInTab, action?.type])
-
   switch (action?.type) {
     case "CONNECT_DAPP":
       return (
@@ -80,7 +90,7 @@ export const ActionScreen: FC = () => {
           }}
           onDisconnect={async (selectedAccount: Account) => {
             await removePreAuthorization(action.payload.host, selectedAccount)
-            await rejectAction(action)
+            await rejectAction(action.meta.hash)
             closePopupIfLastAction()
           }}
           onReject={onReject}
@@ -156,6 +166,50 @@ export const ActionScreen: FC = () => {
             }
           }}
           onReject={onReject}
+          selectedAccount={account}
+        />
+      )
+
+    case "DEPLOY_ACCOUNT_ACTION":
+      return (
+        <ApproveDeployAccountScreen
+          actionHash={action.meta.hash}
+          onSubmit={async () => {
+            analytics.track("signedTransaction", {
+              networkId: account?.networkId || "unknown",
+            })
+            await approveAction(action)
+            useAppState.setState({ isLoading: true })
+            const result = await Promise.race([
+              waitForMessage(
+                "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+              waitForMessage(
+                "DEPLOY_ACCOUNT_ACTION_FAILED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+            ])
+            // (await) blocking as the window may closes afterwards
+            await analytics.track("sentTransaction", {
+              success: !("error" in result),
+              networkId: account?.networkId || "unknown",
+            })
+            if ("error" in result) {
+              useAppState.setState({
+                error: `Sending transaction failed: ${result.error}`,
+                isLoading: false,
+              })
+              navigate(routes.error())
+            } else {
+              if ("txHash" in result) {
+                account?.updateDeployTx(result.txHash)
+              }
+              closePopupIfLastAction()
+              useAppState.setState({ isLoading: false })
+            }
+          }}
+          onReject={rejectAllActions}
           selectedAccount={account}
         />
       )

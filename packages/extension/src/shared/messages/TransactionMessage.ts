@@ -1,10 +1,18 @@
 import type { Abi, Call, InvocationsDetails } from "starknet"
 
 import { Transaction } from "../transactions"
+import { BaseWalletAccount } from "../wallet.model"
 
 export interface EstimateFeeResponse {
   amount: string
   suggestedMaxFee: string
+  accountDeploymentFee?: string
+  maxADFee?: string
+}
+
+export interface AccountDeploymentEstimateFeeResponse {
+  accountDeploymentFee: string
+  maxADFee: string
 }
 
 export interface ExecuteTransactionRequest {
@@ -33,4 +41,10 @@ export type TransactionMessage =
   | {
       type: "ESTIMATE_TRANSACTION_FEE_RES"
       data: EstimateFeeResponse
+    }
+  | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE"; data?: BaseWalletAccount }
+  | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"; data: { error: string } }
+  | {
+      type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES"
+      data: AccountDeploymentEstimateFeeResponse
     }

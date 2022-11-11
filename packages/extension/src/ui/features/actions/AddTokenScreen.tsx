@@ -8,7 +8,7 @@ import { addToken } from "../../../shared/token/storage"
 import { RequestToken, Token } from "../../../shared/token/type"
 import { useAppState } from "../../app.state"
 import { BackButton } from "../../components/BackButton"
-import { Button, ButtonGroupVertical } from "../../components/Button"
+import { Button, ButtonGroupHorizontal } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InfoCircle } from "../../components/Icons/InfoCircle"
 import { InputText } from "../../components/InputText"
@@ -230,7 +230,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             </>
           )}
           {loading && <Spinner size={64} style={{ marginTop: 50 }} />}
-          <ButtonGroupVertical>
+          <ButtonGroupHorizontal>
             {onReject && (
               <Button onClick={onReject} type="button">
                 Reject
@@ -242,7 +242,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             >
               Continue
             </Button>
-          </ButtonGroupVertical>
+          </ButtonGroupHorizontal>
         </form>
       </AddTokenScreenWrapper>
     </>
