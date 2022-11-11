@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react"
+import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -141,13 +141,15 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const accountIsDeployed = useAccountIsDeployed(account)
   return (
     <Flex direction={"column"} data-testid="account-tokens">
-      <AccountTokensHeader
-        status={status}
-        account={account}
-        accountName={accountName}
-        onRedeploy={onRedeploy}
-      />
-      <AccountTokensButtons account={account} />
+      <VStack spacing={6} mb={6}>
+        <AccountTokensHeader
+          status={status}
+          account={account}
+          accountName={accountName}
+          onRedeploy={onRedeploy}
+        />
+        <AccountTokensButtons account={account} />
+      </VStack>
       <StatusMessage>
         <StatusMessageBannerContainer />
       </StatusMessage>

@@ -1,52 +1,16 @@
 import { Button, icons } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { useNavigate } from "react-router-dom"
 
 import { useAppState } from "../../app.state"
 import { AlertDialog } from "../../components/AlertDialog"
-import { IconButton } from "../../components/IconButton"
-import { PluginIcon } from "../../components/Icons/PluginIcon"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
 
-const { AddIcon, SendIcon } = icons
-
-const Container = styled.div`
-  margin: 8px 0 24px 0;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  gap: 36px;
-`
-
-const LabeledLink = styled(Link)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 70px;
-  color: inherit;
-  text-decoration: inherit;
-  cursor: pointer;
-
-  ${IconButton} {
-    background-color: rgba(255, 255, 255, 0.25);
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.4);
-    }
-  }
-
-  & > label {
-    margin-top: 12px;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 20px;
-  }
-`
+const { AddIcon, SendIcon, PluginIcon } = icons
 
 interface AccountTokensButtonsProps {
   account: Account
@@ -94,6 +58,10 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
     navigate(routes.funding())
   }, [navigate])
 
+  const onPlugins = useCallback(() => {
+    navigate(routes.addPlugin(account?.address))
+  }, [account?.address, navigate])
+
   const title = accountIsDeployed ? "Add funds" : "Deploying"
   const message = `You need to ${
     accountIsDeployed
@@ -102,62 +70,41 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
   } before you can send`
 
   return (
-    <>
-      {/* <Center> */}
-      <Flex gap={2} mx={"auto"}>
+    <Flex gap={2} mx={"auto"}>
+      <AlertDialog
+        isOpen={alertDialogIsOpen}
+        title={title}
+        message={message}
+        cancelTitle={accountIsDeployed ? undefined : "OK"}
+        onCancel={onCancel}
+        confirmTitle="Add funds"
+        onConfirm={accountIsDeployed ? onAddFunds : undefined}
+      />
+      <SimpleGrid columns={sendToken ? 2 : 1} spacing={2}>
         <Button
+          onClick={onAddFunds}
           colorScheme={"tertiary"}
           size="sm"
-          flexBasis={0}
-          flexGrow={"1"}
           leftIcon={<AddIcon />}
         >
           Add funds
         </Button>
-        <Button
-          colorScheme={"tertiary"}
-          size="sm"
-          flexBasis={0}
-          flexGrow={"1"}
-          leftIcon={<SendIcon />}
-        >
-          Send
-        </Button>
-      </Flex>
-      {/* </Center> */}
-      <Container>
-        <AlertDialog
-          isOpen={alertDialogIsOpen}
-          title={title}
-          message={message}
-          cancelTitle={accountIsDeployed ? undefined : "OK"}
-          onCancel={onCancel}
-          confirmTitle="Add funds"
-          onConfirm={accountIsDeployed ? onAddFunds : undefined}
-        />
-        <LabeledLink as="div" onClick={onAddFunds}>
-          <IconButton size={40}>
-            <AddIcon fontSize="large" />
-          </IconButton>
-          <label>Add funds</label>
-        </LabeledLink>
         {sendToken && (
-          <LabeledLink as="div" onClick={onSend}>
-            <IconButton size={40}>
-              <SendIcon fontSize="medium" />
-            </IconButton>
-            <label>Send</label>
-          </LabeledLink>
+          <Button
+            onClick={onSend}
+            colorScheme={"tertiary"}
+            size="sm"
+            leftIcon={<SendIcon />}
+          >
+            Send
+          </Button>
         )}
-        {account?.type === "argent-plugin" && (
-          <LabeledLink to={routes.addPlugin(account?.address)}>
-            <IconButton size={40}>
-              <PluginIcon style={{ width: 16, height: 16 }} />
-            </IconButton>
-            <label>Plugins</label>
-          </LabeledLink>
-        )}
-      </Container>
-    </>
+      </SimpleGrid>
+      {account?.type === "argent-plugin" && (
+        <Button onClick={onPlugins} colorScheme={"tertiary"} size="sm">
+          <PluginIcon />
+        </Button>
+      )}
+    </Flex>
   )
 }

@@ -1,5 +1,5 @@
 import { Button, FieldError, H2, icons } from "@argent/ui"
-import { Center } from "@chakra-ui/react"
+import { VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { prettifyCurrencyValue } from "../../../shared/token/price"
@@ -29,7 +29,7 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
   const accountAddress = account.address
 
   return (
-    <Center flexDirection={"column"} gap={0.5} py={6}>
+    <VStack spacing={0.5}>
       {sumCurrencyValue !== undefined ? (
         <H2>{prettifyCurrencyValue(sumCurrencyValue)}</H2>
       ) : (
@@ -37,13 +37,13 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
       )}
       <AddressCopyButton address={accountAddress} />
       {status.code === "ERROR" && (
-        <Center flexDirection={"column"} gap={2} pt={2}>
+        <VStack spacing={2} pt={2}>
           <FieldError>{status.text}</FieldError>
           <Button size="2xs" onClick={onRedeploy} leftIcon={<DeployIcon />}>
             Redeploy
           </Button>
-        </Center>
+        </VStack>
       )}
-    </Center>
+    </VStack>
   )
 }
