@@ -1,10 +1,9 @@
-import { Button, icons } from "@argent/ui"
+import { AlertDialog, Button, icons } from "@argent/ui"
 import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useAppState } from "../../app.state"
-import { AlertDialog } from "../../components/AlertDialog"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"

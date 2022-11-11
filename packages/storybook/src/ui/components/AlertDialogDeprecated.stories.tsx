@@ -1,17 +1,27 @@
-import { AlertDialog } from "@argent/ui"
+import { AlertDialog } from "@argent-x/extension/src/ui/components/AlertDialog"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
+import styled from "styled-components"
 
 export default {
-  title: "components/AlertDialog",
+  title: "components/AlertDialogDeprecated",
   component: AlertDialog,
 } as ComponentMeta<typeof AlertDialog>
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`
 
 const onCancel = () => console.log("onCancel")
 const onDestroy = () => console.log("onDestroy")
 const onConfirm = () => console.log("onConfirm")
 
 const Template: ComponentStory<typeof AlertDialog> = (props) => {
-  return <AlertDialog {...props} isOpen onCancel={onCancel}></AlertDialog>
+  return (
+    <Container>
+      <AlertDialog {...props} isOpen onCancel={onCancel}></AlertDialog>
+    </Container>
+  )
 }
 
 export const Cancel = Template.bind({})
