@@ -1,19 +1,24 @@
-import { FieldError, Select, icons } from "@argent/ui"
+import { FieldError, Input, Select, icons } from "@argent/ui"
 import { Box, Stack, Text } from "@chakra-ui/react"
-import { isEmpty } from "lodash-es"
-import { FC, ReactNode, useMemo } from "react"
+import { get, isEmpty } from "lodash-es"
+import { FC, ReactNode, useMemo, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { accountStore } from "../../../../shared/account/store"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
+import { sendTransaction } from "../../../services/transactions"
 import {
   getAccountName,
   useAccountMetadata,
 } from "../../accounts/accountMetadata.state"
 import { useNetworks } from "../../networks/useNetworks"
 
+const { InfoIcon } = icons
+
 interface FieldValues {
   account: string
+  classHash: string
+  contract: string
   network: string
 }
 
@@ -21,24 +26,46 @@ interface DeclareSmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
 }
 
+const Error: FC<{ message: string }> = ({ message }) => (
+  <Box
+    position="relative"
+    display="flex"
+    justifyContent="flex-start"
+    gap="5px"
+    mt="3"
+  >
+    <Text fontSize="sm" color="error.500">
+      <InfoIcon />
+    </Text>
+    <FieldError>{message}</FieldError>
+  </Box>
+)
+
 const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   children,
 }) => {
-  const networks = useNetworks()
-  const accounts = useArrayStorage(accountStore)
-  const { control, formState, handleSubmit, clearErrors, watch } =
+  const { control, formState, handleSubmit, clearErrors, watch, setValue } =
     useForm<FieldValues>({
       mode: "onSubmit",
     })
   const { errors, isDirty, isSubmitting } = formState
-  const { InfoIcon } = icons
-  const { accountNames } = useAccountMetadata()
-
   const selectedNetwork = watch("network")
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
+  const [contractJSON, setContractJSON] = useState("")
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const networks = useNetworks()
+  const accounts = useArrayStorage(accountStore)
+  const { accountNames } = useAccountMetadata()
+
+  const onSubmit: SubmitHandler<FieldValues> = async ({
+    account,
+    classHash,
+    contract,
+    network,
+  }: FieldValues) => {
     clearErrors()
-    console.log(data)
+    //sendTransaction({})
   }
 
   const networkOptions = useMemo(
@@ -65,6 +92,64 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack direction="column" mx="4">
         <Controller
+          name="contract"
+          control={control}
+          rules={{ required: true }}
+          defaultValue=""
+          render={({
+            field: { ref, value, /* value, */ onChange, ...inputProps },
+          }) => (
+            <>
+              <input
+                type="file"
+                accept="application/json"
+                ref={fileInputRef}
+                {...inputProps}
+                onChange={async () => {
+                  const file = get(fileInputRef, "current.files[0]")
+                  const reader = new FileReader()
+                  reader.onload = function () {
+                    if (reader.result) {
+                      setContractJSON(reader.result.toString())
+                      setValue("contract", file.name)
+                    }
+                  }
+                  reader.readAsText(file)
+                }}
+                style={{ display: "none" }}
+              ></input>
+              <Input
+                _placeholder={{ color: "white" }}
+                placeholder={value || "Upload contract JSON"}
+                isInvalid={!isEmpty(errors.contract)}
+                onClick={() => fileInputRef?.current?.click()}
+                cursor="pointer"
+                readOnly
+              />
+            </>
+          )}
+        />
+        {!isEmpty(errors.contract) && <Error message="Contract is required" />}
+
+        <Controller
+          name="classHash"
+          control={control}
+          rules={{ required: true }}
+          defaultValue=""
+          render={({ field: { ref, ...field } }) => (
+            <Input
+              autoFocus
+              placeholder="Classhash"
+              {...field}
+              isInvalid={!isEmpty(errors.classHash)}
+            />
+          )}
+        />
+        {!isEmpty(errors.classHash) && (
+          <Error message="Classhash is required" />
+        )}
+
+        <Controller
           name="network"
           control={control}
           rules={{ required: true }}
@@ -72,7 +157,6 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           render={({ field: { onChange, name, value } }) => (
             <Select
               placeholder="Network"
-              control={control}
               name={name}
               isInvalid={!isEmpty(errors.network)}
               onChange={(v: any) => onChange(v)}
@@ -81,22 +165,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             />
           )}
         />
-        {!isEmpty(errors.network) && (
-          <Box
-            position="relative"
-            display="flex"
-            justifyContent="flex-start"
-            gap="5px"
-            mt="3"
-          >
-            <Text fontSize="sm" color="error.500">
-              <InfoIcon />
-            </Text>
-            {errors.network?.type === "required" && (
-              <FieldError>network is required</FieldError>
-            )}
-          </Box>
-        )}
+        {!isEmpty(errors.network) && <Error message="Network is required" />}
 
         <Controller
           name="account"
@@ -105,8 +174,9 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           defaultValue=""
           render={({ field: { onChange, name, value } }) => (
             <Select
+              disabled={!selectedNetwork}
               placeholder="Account"
-              control={control}
+              emptyMessage="No accounts available on this network"
               name={name}
               isInvalid={!isEmpty(errors.account)}
               onChange={(v: any) => onChange(v)}
@@ -115,6 +185,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             />
           )}
         />
+        {!isEmpty(errors.account) && <Error message="Account is required" />}
 
         {children?.({ isDirty, isSubmitting })}
       </Stack>

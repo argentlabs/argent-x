@@ -7,6 +7,7 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react"
+import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import { ChevronDownIcon } from "./icons"
@@ -19,19 +20,22 @@ type Option = {
 }
 
 interface SelectProps {
-  placeholder: string
+  disabled?: boolean
+  emptyMessage?: string
   isInvalid?: boolean
-  control: any
-  options: Option[]
-  onChange: (e: string) => void
   name: string
+  onChange: (e: string) => void
+  placeholder: string
+  options: Option[]
   value: string
 }
 
 const Select: FC<SelectProps> = ({
-  placeholder,
+  disabled,
+  emptyMessage,
   isInvalid,
   options,
+  placeholder,
   onChange,
   value,
   name,
@@ -42,7 +46,12 @@ const Select: FC<SelectProps> = ({
 
   return (
     <Menu matchWidth isLazy>
-      <MenuButton aria-label={placeholder} w="100%" type="button">
+      <MenuButton
+        aria-label={placeholder}
+        w="100%"
+        type="button"
+        disabled={disabled}
+      >
         <InputGroup>
           <Input
             name={name}
@@ -61,7 +70,7 @@ const Select: FC<SelectProps> = ({
             alignItems="center"
             zIndex={0}
           >
-            <H6>{selectedOption || ""}</H6>
+            <H6 color="neutrals.200">{selectedOption || ""}</H6>
             <Text color="neutrals.200">
               <ChevronDownIcon />
             </Text>
@@ -81,6 +90,13 @@ const Select: FC<SelectProps> = ({
             </B3>
           </MenuItem>
         ))}
+        {isEmpty(options) && (
+          <MenuItem disabled>
+            <B3 color='"neutrals.100"' py={3}>
+              {emptyMessage}
+            </B3>
+          </MenuItem>
+        )}
       </MenuList>
     </Menu>
   )
