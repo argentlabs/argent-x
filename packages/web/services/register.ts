@@ -1,6 +1,11 @@
 import retry from "async-retry"
 
-import { isEnsFree, requestEmailVerification, reserveEns } from "./account"
+import {
+  isEnsFree,
+  requestEmailAuthentication,
+  reserveEns,
+  verifyEmail,
+} from "./account"
 import { generateArgentName } from "./genArgentName"
 
 export const requestEmail = async (email: string) => {
@@ -29,5 +34,12 @@ export const requestEmail = async (email: string) => {
 
   console.log("reservedEns", reservedEns)
 
-  return requestEmailVerification(email)
+  return requestEmailAuthentication(email)
+}
+
+export const confirmEmail = async (code: string) => {
+  const status = await verifyEmail(code)
+  if (status !== "verified") {
+    throw new Error("failed to verify email", { cause: status })
+  }
 }

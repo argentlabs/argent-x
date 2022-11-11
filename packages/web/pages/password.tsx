@@ -1,9 +1,18 @@
 import { Button, H4, H6, Input, L2 } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
+import { useRouter } from "next/router"
 
 import { Layout } from "../components/Layout"
+import { Navigate } from "../components/Navigate"
 
-export default function Pin() {
+export default function Password() {
+  const navigate = useRouter()
+
+  const email = navigate.query["email"]
+  if (!email) {
+    return <Navigate to="/email" />
+  }
+
   return (
     <Layout maxW={330}>
       <Box
@@ -15,7 +24,7 @@ export default function Pin() {
         mb={8}
       >
         <H4 textAlign="center">Enter your password</H4>
-        <H6 textAlign="center">To log in to itamar@argent.xyz</H6>
+        <H6 textAlign="center">To log in to {email}</H6>
       </Box>
       <Input
         placeholder="Password"
