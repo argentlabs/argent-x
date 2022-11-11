@@ -82,9 +82,18 @@ export const routes = {
     `/account/activity/transaction-detail/:txHash`,
   ),
   upgrade: route("/account/upgrade"),
+  networkUpgradeV4: route("/account/network-upgradeV4"),
+  accountUpgradeV4: route("/account/account-upgradeV4"),
+  accountsHidden: route(
+    (networkId: string) => `/accounts/hidden/${networkId}`,
+    "/accounts/hidden/:networkId",
+  ),
   accounts: routeWithReturnTo("/accounts"),
+  editAccount: route(
+    (accountAddress) => `/accounts/${accountAddress}`,
+    "/accounts/:accountAddress",
+  ),
   addAccount: route("/accounts/new"),
-  accountsHidden: route("/accounts/hidden"),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),
@@ -123,7 +132,7 @@ export const routes = {
   ),
   settingsAddressbookAdd: route("/settings/addressbook/add-or-edit"),
   settingsPrivacyStatement: route("/settings/privacy-policy"),
-  networkWarning: route("/network-warning"),
+  networkWarning: routeWithReturnTo("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>
       `/backup-download${isFromSettings ? "?settings" : ""}`,

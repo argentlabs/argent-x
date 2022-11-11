@@ -1,27 +1,64 @@
 import { Textarea, defineStyleConfig } from "@chakra-ui/react"
 import { defineStyle } from "@chakra-ui/styled-system"
+import { mode } from "@chakra-ui/theme-tools"
 
 export { Textarea }
 
 const baseStyle = defineStyle({
-  /** placeholder */
+  transitionProperty: "common",
+  transitionDuration: "normal",
 })
 
-const variantFilled = defineStyle({
-  bg: "neutrals.800",
-  border: "none",
+const variantOutline = defineStyle((props) => ({
+  bg: mode("white", "black")(props),
+  border: "1px solid",
+  borderColor: "border",
+  _placeholder: {
+    color: mode("gray.200", "neutrals.500")(props),
+  },
   _hover: {
-    bg: "neutrals.700",
+    borderColor: mode("gray.100", "neutrals.600")(props),
+  },
+  _invalid: {
+    borderColor: "error.500",
+    boxShadow: mode("inherit", "none")(props),
+    _hover: {
+      borderColor: mode("error.400", "error.600")(props),
+    },
+    _focusVisible: {
+      borderColor: "error.500",
+      boxShadow: mode("outlineError", "none")(props),
+    },
+  },
+  _focusVisible: {
+    borderColor: mode("accent.500", "neutrals.400")(props),
+    boxShadow: mode("outlineAccent", "none")(props),
+  },
+}))
+
+const variantFilled = defineStyle((props) => ({
+  bg: mode("gray.50", "neutrals.800")(props),
+  border: "none",
+  _placeholder: {
+    color: mode("gray.300", "neutrals.400")(props),
+  },
+  _hover: {
+    bg: mode("gray.100", "neutrals.700")(props),
   },
   _invalid: {
     boxShadow: "error",
+    _focusVisible: {
+      boxShadow: mode("outlineError", "error")(props),
+    },
   },
   _focusVisible: {
-    bg: "neutrals.700",
+    bg: mode("white", "neutrals.700")(props),
+    boxShadow: mode("outlineAccent", "none")(props),
   },
-})
+}))
 
 const variants = {
+  outline: variantOutline,
   filled: variantFilled,
 }
 
@@ -43,6 +80,6 @@ export const textareaTheme = defineStyleConfig({
   variants,
   defaultProps: {
     size: "md",
-    variant: "filled",
+    variant: "outline",
   },
 })

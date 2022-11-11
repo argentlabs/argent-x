@@ -19,6 +19,7 @@ export interface TransactionMeta {
   title?: string
   subTitle?: string
   isUpgrade?: boolean
+  isDeployAccount?: boolean
   transactions?: Call | Call[]
 }
 
@@ -56,8 +57,10 @@ export function entryPointToHumanReadable(entryPoint: string): string {
 export const getInFlightTransactions = (
   transactions: Transaction[],
 ): Transaction[] =>
-  transactions.filter(({ status }) =>
-    TRANSACTION_STATUSES_TO_TRACK.includes(status),
+  transactions.filter(
+    ({ status, meta }) =>
+      TRANSACTION_STATUSES_TO_TRACK.includes(status) ||
+      (meta?.isDeployAccount && status === "PENDING"),
   )
 
 export function nameTransaction(calls: Call | Call[]) {

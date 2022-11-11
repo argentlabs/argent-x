@@ -12,7 +12,7 @@ export default {
       },
     },
     "@storybook/addon-interactions",
-    "@chakra-ui/storybook-addon",
+    // "@chakra-ui/storybook-addon", /** TODO: Color mode toggle currently broken - reinstate when fixed https://github.com/chakra-ui/chakra-ui/issues/6855 */
     "storybook-addon-swc",
   ],
   features: {

@@ -6,7 +6,7 @@ import { AbsoluteFlex } from "./Absolute"
 import * as icons from "./icons"
 import { H6 } from "./Typography"
 
-const { CloseIcon } = icons
+const { CloseIcon, ArrowLeftIcon } = icons
 
 export const NavigationBarHeight = 14
 
@@ -65,6 +65,16 @@ export const BarIconButton: FC<ComponentProps<typeof Button>> = ({
   </Button>
 )
 
+export const BarBackButton: FC<ComponentProps<typeof BarIconButton>> = (
+  props,
+) => {
+  return (
+    <BarIconButton {...props}>
+      <ArrowLeftIcon />
+    </BarIconButton>
+  )
+}
+
 export const BarCloseButton: FC<ComponentProps<typeof BarIconButton>> = (
   props,
 ) => {
@@ -74,7 +84,6 @@ export const BarCloseButton: FC<ComponentProps<typeof BarIconButton>> = (
     </BarIconButton>
   )
 }
-
 export const NavigationBar: FC<NavigationBarProps> = ({
   leftButton,
   rightButton,

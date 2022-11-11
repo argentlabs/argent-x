@@ -8,7 +8,6 @@ import {
   ApiTransactionReviewResponse,
   getTransactionReviewHasSwap,
 } from "../../../shared/transactionReview.service"
-import { useAppState } from "../../app.state"
 import {
   Field,
   FieldGroup,
@@ -17,14 +16,20 @@ import {
 } from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
+import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
+import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
+import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
-import { FeeEstimation } from "./FeeEstimation"
+import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
+import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
 
-interface ApproveTransactionScreenProps
+export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
   transactions: Call | Call[]
@@ -58,8 +63,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
-  const { switcherNetworkId } = useAppState()
-  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const { id: networkId } = useCurrentNetwork()
+  const tokensByNetwork = useTokensInNetwork(networkId)
 
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
@@ -71,8 +76,29 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return titleForTransactionsAndReview(transactions, transactionReview)
   }, [transactionReview, transactions])
 
+  const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
+
+  const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
+  const { pendingTransactions } = useAccountTransactions(selectedAccount)
+
+  const isUpgradeTransaction =
+    !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
+  const hasUpgradeTransactionPending = pendingTransactions.some(
+    (t) => t.meta?.isUpgrade,
+  )
+  const shouldShowUpgrade = Boolean(
+    needsUpgrade &&
+      feeTokenBalance?.gt(0) &&
+      !hasUpgradeTransactionPending &&
+      !isUpgradeTransaction,
+  )
+
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
+  }
+
+  if (shouldShowUpgrade) {
+    return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
   const confirmButtonVariant =
@@ -90,18 +116,28 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }}
       showHeader={false}
       footer={
-        <FeeEstimation
-          onErrorChange={setDisableConfirm}
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.networkId}
-          transactions={transactions}
-          actionHash={actionHash}
-        />
+        selectedAccount.needsDeploy ? (
+          <CombinedFeeEstimation
+            onErrorChange={setDisableConfirm}
+            accountAddress={selectedAccount.address}
+            networkId={selectedAccount.networkId}
+            transactions={transactions}
+            actionHash={actionHash}
+          />
+        ) : (
+          <FeeEstimation
+            onErrorChange={setDisableConfirm}
+            accountAddress={selectedAccount.address}
+            networkId={selectedAccount.networkId}
+            transactions={transactions}
+            actionHash={actionHash}
+          />
+        )
       }
       {...props}
     >
       <TransactionsList
-        networkId={switcherNetworkId}
+        networkId={networkId}
         transactions={transactions}
         transactionReview={transactionReview}
         tokensByNetwork={tokensByNetwork}

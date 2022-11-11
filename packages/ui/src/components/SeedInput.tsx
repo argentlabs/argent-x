@@ -87,6 +87,7 @@ export const SeedInput: FC<SeedInputProps> = ({
             left={1}
             height="100%"
             zIndex={1}
+            border="none"
           >
             <Box
               as="span"
@@ -107,6 +108,7 @@ export const SeedInput: FC<SeedInputProps> = ({
             </Box>
           </InputLeftAddon>
           <Input
+            variant={"filled"}
             autoFocus={i === 0}
             value={word}
             size="pill"
@@ -127,7 +129,7 @@ export const SeedInput: FC<SeedInputProps> = ({
               e.preventDefault()
               const pasted = e.clipboardData.getData("text")
               // split by space or newline regex
-              const words = pasted.split(/\s+/)
+              const words = pasted.split(/\s+/).filter((s) => s)
 
               if (words.length === length) {
                 setSeedInput(words)

@@ -1,5 +1,6 @@
 import { getAccounts, removeAccount } from "../shared/account/store"
 import { AccountMessage } from "../shared/messages/AccountMessage"
+import { deployAccountAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { HandleMessage, UnhandledMessage } from "./background"
@@ -35,36 +36,36 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
       const network = msg.data
       try {
-        const { account, txHash } = await wallet.addAccount(network)
-        addTransaction({
-          hash: txHash,
-          account,
-          meta: { title: "Deploy wallet" },
-        })
+        const account = await wallet.newAccount(network)
+
+        const accounts = await getAccounts()
 
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_RES",
           data: {
-            txHash,
-            address: account.address,
-            account: account,
-            accounts: await getAccounts(),
+            account,
+            accounts,
           },
         })
       } catch (exception: unknown) {
-        let error = `${exception}`
-        if (network.includes("localhost")) {
-          if (error.toLowerCase().includes("network error")) {
-            error = `${error}\n\nTo deploy an account to localhost, you need to run a local development node. Lookup 'starknet-devnet' and 'nile'.`
-          }
-          if (error.includes("403")) {
-            error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
-          }
-        }
+        const error = `${exception}`
+
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_REJ",
           data: { error },
         })
+      }
+    }
+
+    case "DEPLOY_ACCOUNT": {
+      try {
+        await deployAccountAction({
+          account: msg.data,
+          actionQueue,
+        })
+        return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_RES" })
+      } catch {
+        return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_REJ" })
       }
     }
 
@@ -153,6 +154,10 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         type: "GET_ENCRYPTED_SEED_PHRASE_RES",
         data: { encryptedSeedPhrase },
       })
+    }
+
+    case "DEPLOY_ACCOUNT_ACTION_FAILED": {
+      return await actionQueue.remove(msg.data.actionHash)
     }
   }
 

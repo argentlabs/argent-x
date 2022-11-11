@@ -12,6 +12,10 @@ import {
 
 import { sendMessage, waitForMessage } from "./messageActions"
 
+/**
+ *  This is the latest Account Object that is imported from starknet.js.
+ *  Currently, this Account Object supports transaction v1 introduced with starknet v0.10.0
+ */
 export class ArgentXAccount extends Account {
   constructor(address: string, provider?: ProviderInterface) {
     // since account constructor is taking a KeyPair,

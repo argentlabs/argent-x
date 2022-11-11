@@ -3,6 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { WarningIcon } from "../../components/Icons/WarningIcon"
+import Row from "../../components/Row"
 
 const Container = styled.div`
   display: flex;
@@ -16,23 +17,21 @@ const Title = styled.div`
   line-height: 22px;
 `
 
-const Alert = styled.div`
+const Alert = styled(Row)`
+  width: auto;
   background: ${({ theme }) => theme.red1};
   margin-top: 8px;
   border-radius: 13px;
   padding: 5px 10px;
-
-  svg {
-    margin-right: 5px;
-  }
+  gap: 5px;
 `
 
 export const DeprecatedAccountsWarning: FC = () => (
   <Container>
-    <Title>Deprecated accounts</Title>
+    <Title>Upgrade Required</Title>
     <Alert>
       <WarningIcon />
-      These accounts will disappear soon
+      These accounts need to be upgraded
     </Alert>
   </Container>
 )

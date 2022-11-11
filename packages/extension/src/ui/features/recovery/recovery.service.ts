@@ -18,11 +18,13 @@ import {
 interface RecoveryOptions {
   networkId?: string
   showAccountList?: boolean
+  showHiddenAccountList?: boolean
 }
 
 export const recover = async ({
   networkId,
   showAccountList,
+  showHiddenAccountList,
 }: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
@@ -31,10 +33,16 @@ export const recover = async ({
     const allAccounts = await getAccounts(true)
     const walletAccounts = accountsOnNetwork(allAccounts, networkId)
 
-    const selectedAccount = walletAccounts.find(
+    const selectedWalletAccount = walletAccounts.find(
       (account) =>
         lastSelectedAccount && accountsEqual(account, lastSelectedAccount),
     )
+
+    const firstUnhiddenAccount = walletAccounts.find((wa) => !wa.hidden)
+
+    const selectedAccount = !selectedWalletAccount?.hidden
+      ? selectedWalletAccount
+      : firstUnhiddenAccount
 
     const accounts = mapWalletAccountsToAccounts(walletAccounts)
 
@@ -51,6 +59,11 @@ export const recover = async ({
     if (showAccountList || !selectedAccount) {
       return routes.accounts()
     }
+
+    if (showHiddenAccountList && networkId) {
+      return routes.accountsHidden(networkId)
+    }
+
     return routes.accountTokens()
   } catch (e: any) {
     console.error("Recovery error:", e)

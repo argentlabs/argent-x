@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - prerelease/*
 
 env:
   FEATURE_PRIVACY_SETTINGS: "true"
@@ -39,32 +41,53 @@ jobs:
           cache: "yarn"
       - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
-      - run: cp Readme.md ./packages/get-starknet/README.md
-      - run: yarn --cwd packages/get-starknet publish --access public
-        continue-on-error: true
-      - run: yarn --cwd packages/sessions publish --access public
-        continue-on-error: true
+      - name: Release npm packages
+        # if flow is triggered by a tag, publish to npm
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
+          cp Readme.md ./packages/get-starknet/README.md
+          yarn --cwd packages/get-starknet publish --access public || exit 0
+          yarn --cwd packages/sessions publish --access public || exit 0
       - run: yarn --cwd packages/dapp export
       - name: Check bundlesize for chrome
         run: yarn run bundlewatch
       - name: Create chrome zip
         run: |
           cd packages/extension/dist
-          zip -r ${{ env.FILENAME }}-chrome.zip ./*
-          mv ${{ env.FILENAME }}-chrome.zip ../../../
+          zip -r $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ./*
+          mv $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ../../../
           cd ../../../
       - name: Build Firefox version
         run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
       - name: Create firefox zip
         run: |
           cd packages/extension/dist
-          zip -r ${{ env.FILENAME }}-firefox.zip ./*
-          mv ${{ env.FILENAME }}-firefox.zip ../../../
+          zip -r $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ./*
+          mv $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ../../../
           cd ../../../
       - name: Check bundlesize for firefox
         run: yarn run bundlewatch
+
+      - name: Upload artifacts for chrome
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: chrome
+          path: "*-chrome.zip"
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload artifacts for firefox
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: firefox
+          path: "*-firefox.zip"
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true

@@ -10,9 +10,9 @@ export const TabBar = chakra(Flex, {
     bottom: 0,
     height: TabBarHeight,
     color: "neutrals.600",
-    backgroundColor: "neutrals.900",
+    backgroundColor: "bg",
     borderTop: "1px solid",
-    borderTopColor: "neutrals.700",
+    borderTopColor: "border",
     boxShadow: "menu",
   },
 })

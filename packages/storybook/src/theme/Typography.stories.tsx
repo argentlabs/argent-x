@@ -23,7 +23,7 @@ import { FC } from "react"
 const TypographyStory: FC = () => {
   return (
     <VStack
-      divider={<StackDivider borderColor="gray.200" />}
+      divider={<StackDivider borderColor="border" />}
       spacing={3}
       align="stretch"
     >
