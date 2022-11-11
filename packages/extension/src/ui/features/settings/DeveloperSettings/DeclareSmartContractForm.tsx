@@ -61,8 +61,6 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     [accounts, accountNames, selectedNetwork],
   )
 
-  console.log(errors)
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack direction="column" mx="4">
