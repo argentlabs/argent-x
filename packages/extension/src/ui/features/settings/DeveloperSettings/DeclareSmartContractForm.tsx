@@ -1,7 +1,7 @@
-import { FieldError, Input, Select, icons } from "@argent/ui"
+import { FieldError, Select, icons } from "@argent/ui"
 import { Box, Stack, Text } from "@chakra-ui/react"
-import { isEmpty, isString } from "lodash-es"
-import { FC, ReactNode, useEffect, useMemo } from "react"
+import { isEmpty } from "lodash-es"
+import { FC, ReactNode, useMemo } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { accountStore } from "../../../../shared/account/store"
@@ -26,7 +26,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
 }) => {
   const networks = useNetworks()
   const accounts = useArrayStorage(accountStore)
-  const { control, formState, handleSubmit, clearErrors, watch, setValue } =
+  const { control, formState, handleSubmit, clearErrors, watch } =
     useForm<FieldValues>({
       mode: "onSubmit",
     })
