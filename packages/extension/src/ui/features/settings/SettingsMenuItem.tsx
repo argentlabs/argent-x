@@ -1,5 +1,4 @@
-import { ButtonCell, H6, icons } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
+import { ButtonCell, icons } from "@argent/ui"
 import { FC, ReactNode } from "react"
 import { Link } from "react-router-dom"
 
@@ -20,15 +19,16 @@ const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
   to,
   title,
 }) => (
-  <Link to={to} onClick={onClick}>
-    <ButtonCell
-      leftIcon={<>{leftIcon}</>}
-      rightIcon={<>{rightIcon}</>}
-      width="100%"
-    >
-      {title}
-    </ButtonCell>
-  </Link>
+  <ButtonCell
+    as={Link}
+    leftIcon={<>{leftIcon}</>}
+    rightIcon={<>{rightIcon}</>}
+    width="100%"
+    to={to}
+    onClick={onClick}
+  >
+    {title}
+  </ButtonCell>
 )
 
 export { SettingsMenuItem }

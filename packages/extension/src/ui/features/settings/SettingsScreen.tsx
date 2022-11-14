@@ -3,9 +3,10 @@ import {
   BarBackButton,
   CellStack,
   NavigationContainer,
+  SpacerCell,
   icons,
 } from "@argent/ui"
-import { Box, Flex, Text } from "@chakra-ui/react"
+import { Flex, Text } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
@@ -93,10 +94,13 @@ export const SettingsScreen: FC = () => {
         leftButton={<BarBackButton onClick={() => navigate(-1)} />}
         title={"Settings"}
       >
-        <Box mx="4" my="4">
-          {account && <AccountListScreenItem account={account} />}
-        </Box>
         <CellStack>
+          {account && (
+            <>
+              <AccountListScreenItem account={account} />
+              <SpacerCell />
+            </>
+          )}
           {!extensionIsInTab && (
             <SettingsMenuItem
               leftIcon={<ExtendedIcon />}
@@ -138,23 +142,24 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
+          <Link onClick={stopSession} to={routes.lockScreen()}>
+            <SpacerCell />
+            <Flex
+              py={2}
+              gap={2}
+              cursor="pointer"
+              justifyContent="center"
+              alignItems="center"
+              color="white50"
+            >
+              <Text fontSize="base">
+                <LockIcon />
+              </Text>
+              <B2>Lock wallet</B2>
+            </Flex>
+          </Link>
         </CellStack>
       </NavigationContainer>
-      <Link onClick={stopSession} to={routes.lockScreen()}>
-        <Flex
-          py={6}
-          gap={2}
-          cursor="pointer"
-          justifyContent="center"
-          alignItems="center"
-          color="white50"
-        >
-          <Text fontSize="base">
-            <LockIcon />
-          </Text>
-          <B2>Lock wallet</B2>
-        </Flex>
-      </Link>
     </>
   )
 }
