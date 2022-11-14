@@ -8,14 +8,16 @@ import {
   Text,
 } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
-import { FC, useMemo } from "react"
+import { FC, ReactElement, ReactNode, useMemo } from "react"
 
 import { ChevronDownIcon } from "./icons"
 import { Input } from "./Input"
-import { B3, H6 } from "./Typography"
+import { H6 } from "./Typography"
 
 type Option = {
-  label: string
+  icon?: ReactElement
+  label: string | ReactNode
+  labelSelected: string
   value: string
 }
 
@@ -23,6 +25,7 @@ interface SelectProps {
   disabled?: boolean
   emptyMessage?: string
   isInvalid?: boolean
+  maxH?: string
   name: string
   onChange: (e: string) => void
   placeholder: string
@@ -34,18 +37,25 @@ const Select: FC<SelectProps> = ({
   disabled,
   emptyMessage,
   isInvalid,
+  maxH,
+  name,
   options,
   placeholder,
   onChange,
   value,
-  name,
 }) => {
   const selectedOption = useMemo(() => {
-    return options.find((option) => option.value === value)?.label || ""
+    return options.find((option) => option.value === value)?.labelSelected || ""
   }, [options, value])
 
   return (
-    <Menu matchWidth isLazy>
+    <Menu
+      matchWidth
+      gutter={0}
+      flip={false}
+      placement="bottom"
+      preventOverflow={false}
+    >
       <MenuButton
         aria-label={placeholder}
         w="100%"
@@ -55,7 +65,6 @@ const Select: FC<SelectProps> = ({
         <InputGroup>
           <Input
             name={name}
-            pointerEvents="none"
             _placeholder={{ color: "white" }}
             colorScheme={"neutrals"}
             placeholder={placeholder}
@@ -77,24 +86,24 @@ const Select: FC<SelectProps> = ({
           </InputRightElement>
         </InputGroup>
       </MenuButton>
-      <MenuList borderRadius={0}>
-        {options.map(({ label, value: optionValue }) => (
+
+      <MenuList borderRadius={0} overflow="auto" maxH={maxH || "100%"}>
+        {options.map(({ icon, label, value: optionValue }) => (
           <MenuItem
+            icon={icon || undefined}
             key={optionValue}
             onClick={() => onChange(optionValue)}
             bgColor={optionValue === value ? "neutrals.600" : ""}
             data-group
           >
-            <B3 color='"neutrals.100"' _groupHover={{ color: "white" }} py={3}>
-              {label}
-            </B3>
+            {label}
           </MenuItem>
         ))}
         {isEmpty(options) && (
           <MenuItem disabled>
-            <B3 color='"neutrals.100"' py={3}>
+            <H6 color='"neutrals.100"' py={3}>
               {emptyMessage}
-            </B3>
+            </H6>
           </MenuItem>
         )}
       </MenuList>
