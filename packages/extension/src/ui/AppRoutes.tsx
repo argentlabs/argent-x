@@ -51,6 +51,9 @@ import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOr
 import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
 import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
+import { DeclareSmartContractScreen } from "./features/settings/DeclareSmartContractScreen"
+import { DeploySmartContractScreen } from "./features/settings/DeploySmartContractScreen"
+import { DeveloperSettings } from "./features/settings/DeveloperSettings"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
@@ -59,6 +62,7 @@ import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
+import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
 import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
@@ -184,6 +188,22 @@ const legacyUiWalletRoutes = (
     <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
     <Route path={routes.settings.path} element={<SettingsScreen />} />
     <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
+    <Route
+      path={routes.settingsDeveloper.path}
+      element={<DeveloperSettings />}
+    />
+    <Route
+      path={routes.settingsSmartContractDevelopment.path}
+      element={<SmartContractDevelopmentScreen />}
+    />
+    <Route
+      path={routes.settingsSmartContractDeclare.path}
+      element={<DeclareSmartContractScreen />}
+    />
+    <Route
+      path={routes.settingsSmartContractDeploy.path}
+      element={<DeploySmartContractScreen />}
+    />
     <Route
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreen />}
