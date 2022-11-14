@@ -1,25 +1,41 @@
 import {
   ChakraProvider,
   ChakraProviderProps,
+  ThemeConfig,
   theme as baseTheme,
   extendTheme,
 } from "@chakra-ui/react"
 
-import { textareaTheme } from "../components"
+import {
+  alertTheme,
+  menuTheme,
+  textareaTheme,
+  tooltipTheme,
+} from "../components"
 import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
+import { semanticTokens } from "./semanticTokens"
 import { shadows } from "./shadows"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
 
+export { scrollbarStyle } from "./scrollbarStyle"
+
+const config: ThemeConfig = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+}
+
 const extendedTheme = extendTheme({
+  config,
+  semanticTokens,
   styles: {
     global: {
       "html, body": {
-        color: "white",
-        bg: "neutrals.900",
+        color: "text",
+        bg: "bg",
       },
     },
   },
@@ -28,9 +44,12 @@ const extendedTheme = extendTheme({
   shadows,
   space: spacing,
   components: {
+    Alert: alertTheme,
     Button: buttonTheme,
     Input: inputTheme,
+    Menu: menuTheme,
     Textarea: textareaTheme,
+    Tooltip: tooltipTheme,
   },
 })
 
@@ -43,6 +62,22 @@ export const theme = {
   colors /** omits default chakra colours */,
 } as UITheme
 
+export const initiallyDarkTheme = {
+  ...theme,
+  config: {
+    ...theme.config,
+    initialColorMode: "dark",
+  },
+} as UITheme
+
+/** Theme with initial color mode "light" also see {@link InitiallyDarkThemeProvider} */
 export const ThemeProvider = ({ children }: ChakraProviderProps) => (
   <ChakraProvider theme={theme}>{children}</ChakraProvider>
+)
+
+/** In a production build this ensures that global styles are initially "dark" */
+export const InitiallyDarkThemeProvider = ({
+  children,
+}: ChakraProviderProps) => (
+  <ChakraProvider theme={initiallyDarkTheme}>{children}</ChakraProvider>
 )

@@ -12,6 +12,17 @@ import {
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { createNewAccount } from "../../services/backgroundAccounts"
 
+export interface AccountConstructorProps {
+  address: string
+  network: Network
+  signer: WalletAccountSigner
+  type: ArgentAccountType
+  deployTransaction?: string
+  hidden?: boolean
+  needsDeploy?: boolean
+  contract?: Contract
+}
+
 export class Account {
   address: string
   network: Network
@@ -23,6 +34,7 @@ export class Account {
   proxyContract: Contract
   provider: ProviderInterface
   hidden?: boolean
+  needsDeploy?: boolean
 
   constructor({
     address,
@@ -31,16 +43,9 @@ export class Account {
     type,
     deployTransaction,
     hidden,
+    needsDeploy = false,
     contract,
-  }: {
-    address: string
-    network: Network
-    signer: WalletAccountSigner
-    type: ArgentAccountType
-    deployTransaction?: string
-    hidden?: boolean
-    contract?: Contract
-  }) {
+  }: AccountConstructorProps) {
     this.address = address
     this.network = network
     this.networkId =
@@ -48,6 +53,7 @@ export class Account {
     this.signer = signer
     this.hidden = hidden
     this.deployTransaction = deployTransaction
+    this.needsDeploy = needsDeploy
     this.type = type
     this.provider = getProvider(network)
     this.contract =
@@ -84,22 +90,21 @@ export class Account {
     this.deployTransaction = undefined
   }
 
-  public async getCurrentNonce(): Promise<string> {
-    const { nonce } = await this.contract.call("get_nonce")
-    return nonce.toString()
-  }
+  public async getCurrentImplementation(): Promise<string | undefined> {
+    if (this.needsDeploy) {
+      return this.network.accountClassHash?.argentAccount // cuz we always deploy regular accounts
+    }
 
-  public async getCurrentImplementation(): Promise<string> {
     const { implementation } = await this.proxyContract.call(
       "get_implementation",
     )
     return stark.makeAddress(number.toHex(implementation))
   }
 
-  public static async fromDeploy(networkId: string): Promise<Account> {
+  public static async create(networkId: string): Promise<Account> {
     const result = await createNewAccount(networkId)
-    if ("error" in result) {
-      throw new Error(result.error)
+    if (result === "error") {
+      throw new Error(result)
     }
 
     const network = await getNetwork(networkId)
@@ -109,22 +114,23 @@ export class Account {
     }
 
     return new Account({
-      address: result.address,
+      address: result.account.address,
       network,
       signer: result.account.signer,
-      deployTransaction: result.txHash,
       type: result.account.type,
+      needsDeploy: result.account.needsDeploy,
     })
   }
 
   public toWalletAccount(): WalletAccount {
-    const { networkId, address, network, signer, type } = this
+    const { networkId, address, network, signer, type, needsDeploy } = this
     return {
       networkId,
       address,
       network,
       signer,
       type,
+      needsDeploy,
     }
   }
 

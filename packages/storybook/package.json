@@ -1,10 +1,10 @@
 {
   "name": "@argent-x/storybook",
-  "version": "4.8.7",
+  "version": "4.8.8",
   "private": true,
   "devDependencies": {
-    "@argent-x/extension": "^4.8.7",
-    "@argent/ui": "^4.8.7",
+    "@argent-x/extension": "^4.8.8",
+    "@argent/ui": "^4.8.8",
     "@babel/core": "^7.18.5",
     "@chakra-ui/storybook-addon": "^4.0.12",
     "@storybook/addon-actions": "^6.5.9",
@@ -17,6 +17,7 @@
     "@storybook/testing-library": "^0.0.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "chromatic": "^6.11.4",
     "eslint": "^8.7.0",
     "eslint-plugin-storybook": "^0.6.1",
     "lodash-es": "^4.17.21",
@@ -28,6 +29,7 @@
   "scripts": {
     "storybook": "start-storybook -p 6006",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "chromatic": "chromatic --exit-zero-on-changes --exit-once-uploaded"
   }
 }

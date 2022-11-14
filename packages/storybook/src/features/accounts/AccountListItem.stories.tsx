@@ -1,4 +1,5 @@
 import { AccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
+import { Flex } from "@chakra-ui/layout"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
@@ -7,11 +8,13 @@ export default {
 } as ComponentMeta<typeof AccountListItem>
 
 const Template: ComponentStory<typeof AccountListItem> = (props) => (
-  <AccountListItem {...props}></AccountListItem>
+  <Flex flex={1} flexDirection="column">
+    <AccountListItem {...props}></AccountListItem>
+  </Flex>
 )
 
 const account = {
-  accountName: "Account 1",
+  accountName: "Account 1 Lorem Ipsum Dolor Sit Amet",
   accountAddress:
     "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
   networkId: "goerli-alpha",
@@ -25,13 +28,13 @@ Default.args = {
 export const Outline = Template.bind({})
 Outline.args = {
   ...account,
-  outline: true,
+  outlined: true,
 }
 
 export const Highlight = Template.bind({})
 Highlight.args = {
   ...account,
-  highlight: true,
+  highlighted: true,
 }
 
 export const Deploying = Template.bind({})
@@ -62,4 +65,16 @@ export const Children = Template.bind({})
 Children.args = {
   ...account,
   children: <span>Child in here</span>,
+}
+
+export const AvatarOutlined = Template.bind({})
+AvatarOutlined.args = {
+  ...account,
+  avatarOutlined: true,
+}
+
+export const PluginAccount = Template.bind({})
+PluginAccount.args = {
+  ...account,
+  accountType: "argent-plugin",
 }

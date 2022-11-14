@@ -1,18 +1,68 @@
-import styled from "styled-components"
+import {
+  BarIconButton,
+  NavigationBar,
+  NavigationBarProps,
+  icons,
+} from "@argent/ui"
+import { Button, Flex, Text } from "@chakra-ui/react"
+import { FC, useCallback } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
-import { ResponsiveFixedBox } from "../../components/Responsive"
+import { routes } from "../../routes"
+import { NetworkSwitcher } from "../networks/NetworkSwitcher"
+import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
+import { useSelectedAccount } from "./accounts.state"
 
-export const AccountHeader = styled(ResponsiveFixedBox)`
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(
-    0deg,
-    rgba(16, 16, 16, 0.4) 0%,
-    ${({ theme }) => theme.bg1} 73.72%
-  );
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(10px);
-  height: 68px;
-  z-index: 100;
-`
+const { SettingsIcon, DropdownDownIcon } = icons
+
+export interface AccountHeaderProps extends Pick<NavigationBarProps, "scroll"> {
+  showAccountButton?: boolean
+}
+
+export const AccountHeader: FC<AccountHeaderProps> = ({
+  scroll,
+  showAccountButton = true,
+}) => {
+  const { accountNames } = useAccountMetadata()
+  const account = useSelectedAccount()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const openAccountList = useCallback(() => {
+    navigate(routes.accounts(location.pathname))
+  }, [location.pathname, navigate])
+
+  const showSettings = useCallback(() => {
+    navigate(routes.settings())
+  }, [navigate])
+
+  const accountName = account && getAccountName(account, accountNames)
+  return (
+    <NavigationBar scroll={scroll}>
+      {showAccountButton && account && (
+        <Button
+          aria-label={"Show account list"}
+          colorScheme={"neutrals"}
+          size={"2xs"}
+          onClick={openAccountList}
+        >
+          <Text noOfLines={1}>{accountName}</Text>
+          <Text fontSize={"sm"} ml={1}>
+            <DropdownDownIcon />
+          </Text>
+        </Button>
+      )}
+      <Flex ml={"auto"}>
+        <NetworkSwitcher />
+        <BarIconButton
+          ml={1}
+          aria-label="Show settings"
+          onClick={showSettings}
+          colorScheme={"neutrals"}
+        >
+          <SettingsIcon />
+        </BarIconButton>
+      </Flex>
+    </NavigationBar>
+  )
+}

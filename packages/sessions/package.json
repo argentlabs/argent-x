@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-sessions",
-  "version": "4.8.7",
+  "version": "4.8.8",
   "description": "Manage sessions for Argent X wallets",
   "keywords": [
     "starknet",
@@ -54,6 +54,6 @@
   },
   "dependencies": {
     "minimalistic-assert": "^1.0.1",
-    "starknet": "^4.4.0"
+    "starknet": "^4.9.0"
   }
 }

@@ -1,5 +1,4 @@
-import { BigNumber } from "ethers"
-
+import { isEqualAddress } from "../ui/services/addresses"
 import { BaseWalletAccount, WalletAccount } from "./wallet.model"
 
 // from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2645.md
@@ -17,13 +16,24 @@ export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
   )
 }
 
+export const isEqualWalletAddress = (
+  a: BaseWalletAccount,
+  b: BaseWalletAccount,
+) => {
+  try {
+    return isEqualAddress(
+      a.address.toLowerCase(),
+      b.address.toLocaleLowerCase(),
+    )
+  } catch (e) {
+    console.error("~ isEqualWalletAddress", e)
+    return false
+  }
+}
+
 export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) => {
   try {
-    return (
-      BigNumber.from(a.address.toLowerCase()).eq(
-        BigNumber.from(b.address.toLowerCase()),
-      ) && a.networkId === b.networkId
-    )
+    return isEqualWalletAddress(a, b) && a.networkId === b.networkId
   } catch (e) {
     console.error("~ accountsEqual", e)
     return false

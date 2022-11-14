@@ -33,14 +33,20 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
     }
 
     case "REJECT_ACTION": {
-      const { actionHash } = msg.data
-      const action = await actionQueue.remove(actionHash)
-      if (!action) {
-        throw new Error("Action not found")
-      }
-      const resultMessage = await handleActionRejection(action, background)
-      if (resultMessage) {
-        sendToTabAndUi(resultMessage)
+      const payload = msg.data.actionHash
+
+      const actionHashes = Array.isArray(payload) ? payload : [payload]
+
+      console.log("REJECT_ACTION", actionHashes)
+      for (const actionHash of actionHashes) {
+        const action = await actionQueue.remove(actionHash)
+        if (!action) {
+          throw new Error("Action not found")
+        }
+        const resultMessage = await handleActionRejection(action, background)
+        if (resultMessage) {
+          sendToTabAndUi(resultMessage)
+        }
       }
       return
     }

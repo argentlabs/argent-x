@@ -1,6 +1,7 @@
 import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
 
 import { TransactionMeta } from "../transactions"
+import { BaseWalletAccount } from "../wallet.model"
 
 export interface QueueItem {
   meta: {
@@ -28,6 +29,10 @@ export type ActionItem =
   | {
       type: "TRANSACTION"
       payload: TransactionActionPayload
+    }
+  | {
+      type: "DEPLOY_ACCOUNT_ACTION"
+      payload: BaseWalletAccount
     }
   | {
       type: "SIGN"

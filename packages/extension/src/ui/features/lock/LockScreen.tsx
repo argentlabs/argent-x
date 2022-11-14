@@ -1,97 +1,94 @@
-import { FC } from "react"
+import { Button, H2, P3, P4, logos } from "@argent/ui"
+import { Box, Text } from "@chakra-ui/react"
+import { FC, useState } from "react"
+import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
-import { Button } from "../../components/Button"
 import { routes } from "../../routes"
 import { unlockedExtensionTracking } from "../../services/analytics"
 import { startSession } from "../../services/backgroundSessions"
-import { P, StyledLink } from "../../theme/Typography"
 import { useActions } from "../actions/actions.state"
 import { StickyGroup } from "../actions/ConfirmScreen"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { recover } from "../recovery/recovery.service"
-import { Greetings, GreetingsWrapper } from "./Greetings"
-import LogoSvg from "./logo.svg"
 import { PasswordForm } from "./PasswordForm"
-
-const LockScreenWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 48px 32px;
-  text-align: center;
-
-  > ${GreetingsWrapper} {
-    margin: 48px 0 32px;
-  }
-
-  > form {
-    margin-top: 32px;
-    width: 100%;
-  }
-
-  ${StyledLink} {
-    margin-top: 16px;
-  }
-`
-
-export const greetings = [
-  "gm!",
-  "Hello!",
-  "Guten Tag!",
-  "Привет!",
-  "gm, ser!",
-  "hi fren",
-]
 
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
   const actions = useActions()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { ArgentXLogo } = logos
 
   return (
-    <LockScreenWrapper>
-      <LogoSvg />
-      <Greetings greetings={greetings} />
-      <P>Unlock your wallet to continue.</P>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      pt="24"
+      pb="12"
+      px="8"
+      textAlign="center"
+      position="relative"
+    >
+      <Box position="absolute" right="8" top="4">
+        <Link to={routes.reset()}>
+          <P4 color="neutrals.300">Reset</P4>
+        </Link>
+      </Box>
+      <Text fontSize="10xl">
+        <ArgentXLogo />
+      </Text>
+      <Box mt="8" mb="8" width="100%">
+        <H2>Welcome back</H2>
+        <P3 color="neutrals.300">Unlock your wallet to continue</P3>
+      </Box>
 
-      <PasswordForm
-        verifyPassword={async (password) => {
-          useAppState.setState({ isLoading: true })
-          try {
-            await startSession(password)
-            unlockedExtensionTracking()
-            const target = await recover()
+      <Box width="100%">
+        <PasswordForm
+          verifyPassword={async (password) => {
+            setIsLoading(true)
+            try {
+              await startSession(password)
+              unlockedExtensionTracking()
+              const target = await recover()
 
-            // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close
-            if (EXTENSION_IS_POPUP && !actions.length) {
-              window.close()
+              // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close
+              if (EXTENSION_IS_POPUP && !actions.length) {
+                window.close()
+              }
+
+              navigate(target)
+              return true
+            } catch {
+              useAppState.setState({
+                error: "Incorrect password",
+              })
+              return false
+            } finally {
+              setIsLoading(false)
             }
-
-            useAppState.setState({ isLoading: false })
-            navigate(target)
-            return true
-          } catch {
-            useAppState.setState({
-              isLoading: false,
-              error: "Incorrect password",
-            })
-            return false
-          }
-        }}
-      >
-        {({ isDirty, isSubmitting }) => (
-          <>
-            <StyledLink to={routes.reset()}>reset or recover</StyledLink>
-            <StickyGroup>
-              <Button type="submit" disabled={!isDirty || isSubmitting}>
-                Unlock
-              </Button>
-            </StickyGroup>
-          </>
-        )}
-      </PasswordForm>
-    </LockScreenWrapper>
+          }}
+        >
+          {({ isDirty, isSubmitting }) => (
+            <>
+              <StickyGroup>
+                <Button
+                  gap="2"
+                  colorScheme="primary"
+                  type="submit"
+                  disabled={!isDirty || isSubmitting}
+                  width="100%"
+                  isLoading={isLoading}
+                  loadingText="Unlocking"
+                >
+                  Unlock
+                </Button>
+              </StickyGroup>
+            </>
+          )}
+        </PasswordForm>
+      </Box>
+    </Box>
   )
 }

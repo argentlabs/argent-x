@@ -1,14 +1,10 @@
 import { chromeStorageMock } from "@argent-x/extension/src/shared/storage/__test__/chrome-storage.mock"
-import {
-  FixedGlobalStyle,
-  ThemeProvider,
-  ThemedGlobalStyle,
-  muiTheme,
-} from "@argent-x/extension/src/ui/theme"
+import { ThemeProvider, muiTheme } from "@argent-x/extension/src/ui/theme"
+import { ThemeProvider as ArgentTheme } from "@argent/ui"
+import { useColorMode } from "@chakra-ui/react"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { Story } from "@storybook/react"
-import React from "react"
-import { createGlobalStyle } from "styled-components"
+import React, { FC, PropsWithChildren, useEffect } from "react"
 
 /** polyfill browser extension storage  */
 global.chrome = {
@@ -22,26 +18,33 @@ global.chrome = {
   storage: chromeStorageMock,
 }
 
-/** remove explicit width and height constraints which otherwise impact Docs */
-const StorybookGlobalStyle = createGlobalStyle`
-  html, body {
-    min-width: unset;
-    min-height: unset;
-  }
-`
+interface ColorModeProps extends PropsWithChildren {
+  colorMode: "light" | "dark"
+}
+
+const ColorMode: FC<ColorModeProps> = ({ colorMode, children }) => {
+  const { setColorMode } = useColorMode()
+
+  useEffect(() => {
+    setColorMode(colorMode)
+  }, [colorMode])
+
+  return <>{children}</>
+}
 
 export const decorators = [
-  (Story: Story) => (
+  (Story: Story, context: any) => (
     <MuiThemeProvider theme={muiTheme}>
       <link
         href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
         rel="stylesheet"
       />
-      <FixedGlobalStyle extensionIsInTab />
-      <StorybookGlobalStyle />
       <ThemeProvider>
-        <ThemedGlobalStyle />
-        <Story />
+        <ArgentTheme>
+          <ColorMode colorMode={context.globals.colorMode}>
+            <Story />
+          </ColorMode>
+        </ArgentTheme>
       </ThemeProvider>
     </MuiThemeProvider>
   ),

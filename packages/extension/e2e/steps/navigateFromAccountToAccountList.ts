@@ -3,5 +3,5 @@ import type { Page } from "@playwright/test"
 
 export async function navigateFromAccountToAccountList(page: Page) {
   await page.locator('[aria-label="Show account list"]').click()
-  await expect(page.locator("h1:has-text('Accounts')")).toBeVisible()
+  await expect(page.locator("h6:has-text('My accounts')")).toBeVisible()
 }

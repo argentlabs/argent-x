@@ -1,4 +1,6 @@
-import { FC } from "react"
+import { Button, icons } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
@@ -9,8 +11,8 @@ import {
   isDeprecated,
 } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
-import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
+import { withPolling } from "../../services/swr"
+import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -19,6 +21,8 @@ import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
+
+const { MoreIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
@@ -32,7 +36,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   canShowUpgrade,
 }) => {
   const navigate = useNavigate()
-  const { accountClassHash, id: networkId } = useCurrentNetwork()
+  const { accountClassHash } = useCurrentNetwork()
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
 
@@ -41,37 +45,62 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), networkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, networkId),
-    { suspense: false },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { data: needsUpgrade = false } = useSWR(
     [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
     () => checkIfUpgradeAvailable(account, accountClassHash),
-    { suspense: false },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
+
+  const onClick = useCallback(() => {
+    useSelectedAccountStore.setState({
+      selectedAccount: account,
+      showMigrationScreen: account ? isDeprecated(account) : false,
+    })
+    navigate(routes.accountTokens())
+  }, [account, navigate])
 
   const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
+  const onAccountEdit = useCallback(() => {
+    navigate(routes.editAccount(account.address))
+  }, [account.address, navigate])
+
   return (
-    <AccountListItem
-      {...makeClickable(() => {
-        useSelectedAccountStore.setState({
-          selectedAccount: account,
-          showMigrationScreen: account ? isDeprecated(account) : false,
-        })
-        navigate(routes.accountTokens())
-      })}
-      accountName={accountName}
-      accountAddress={account.address}
-      networkId={account.networkId}
-      accountType={account.type}
-      outline={status.code === "CONNECTED"}
-      deploying={status.code === "DEPLOYING"}
-      upgrade={canShowUpgrade && showUpgradeBanner}
-      connected={isConnected}
-    />
+    <Flex position={"relative"} direction={"column"}>
+      <AccountListItem
+        aria-label={`Select ${accountName}`}
+        onClick={onClick}
+        accountName={accountName}
+        accountAddress={account.address}
+        networkId={account.networkId}
+        accountType={account.type}
+        avatarOutlined={status.code === "CONNECTED"}
+        deploying={status.code === "DEPLOYING"}
+        upgrade={canShowUpgrade && showUpgradeBanner}
+        connected={isConnected}
+        pr={14}
+      />
+      <Flex
+        position={"absolute"}
+        right={4}
+        top={"50%"}
+        transform={"translateY(-50%)"}
+      >
+        <Button
+          aria-label={`${accountName} options`}
+          backgroundColor="black"
+          colorScheme="transparent"
+          padding="1.5"
+          fontSize="xl"
+          size="auto"
+          rounded="full"
+          onClick={onAccountEdit}
+        >
+          <MoreIcon />
+        </Button>
+      </Flex>
+    </Flex>
   )
 }

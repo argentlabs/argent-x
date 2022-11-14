@@ -179,13 +179,23 @@ export const ButtonGroup = styled.div`
   width: 100%;
 `
 
-export const ButtonGroupVertical = styled.div<{
+export const ButtonGroupHorizontal = styled.div<{
   switchButtonOrder?: boolean
 }>`
   display: flex;
   flex-direction: ${({ switchButtonOrder = false }) =>
     switchButtonOrder ? "row-reverse" : "row"};
   gap: 12px;
+  width: 100%;
+`
+
+export const ButtonGroupVertical = styled.div<{
+  switchButtonOrder?: boolean
+}>`
+  display: flex;
+  flex-direction: ${({ switchButtonOrder = false }) =>
+    switchButtonOrder ? "column-reverse" : "column"};
+  gap: 8px;
   width: 100%;
 `
 

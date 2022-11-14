@@ -4,6 +4,11 @@ import styled from "styled-components"
 
 import { usePageTracking } from "../../services/analytics"
 import { P } from "../../theme/Typography"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
+import { DeployAccountScreen } from "../accounts/DeployAccount"
+import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
+import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
+import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
 interface ApproveSignatureScreenProps
@@ -24,9 +29,30 @@ export const Pre = styled.pre`
 export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
   dataToSign,
   onSubmit,
+  selectedAccount,
   ...props
 }) => {
   usePageTracking("signMessage")
+
+  const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
+  const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
+  const { pendingTransactions = [] } = useAccountTransactions(selectedAccount)
+
+  const hasUpgradeTransactionPending = pendingTransactions.some(
+    (t) => t.meta?.isUpgrade,
+  )
+  const shouldShowUpgrade = Boolean(
+    needsUpgrade && feeTokenBalance?.gt(0) && !hasUpgradeTransactionPending,
+  )
+
+  if (selectedAccount?.needsDeploy && !selectedAccount.deployTransaction) {
+    return <DeployAccountScreen {...props} />
+  }
+
+  if (shouldShowUpgrade) {
+    return <UpgradeScreenV4 upgradeType="account" {...props} />
+  }
+
   return (
     <ConfirmScreen
       title="Sign message"
