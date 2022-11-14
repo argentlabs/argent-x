@@ -26,7 +26,7 @@ test("switch network and keep account", async ({ page, context }) => {
   await switchNetwork(page, "Testnet")
   const address1_goerli = await getAccountAddressFromAccountPage(page)
 
-  await switchNetwork(page, "Localhost")
+  await switchNetwork(page, "Localhost 5050")
   expect(address1_localhost).toEqual(address1_goerli)
 
   await navigateFromAccountToAccountList(page)
