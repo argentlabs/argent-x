@@ -1,7 +1,6 @@
-import { InitiallyDarkThemeProvider as ArgentTheme } from "@argent/ui"
-import { localStorageManager } from "@chakra-ui/react"
+import { ThemeProvider as ArgentTheme, SetDarkMode } from "@argent/ui"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
-import { FC, Suspense, useEffect } from "react"
+import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
 
 import AppErrorBoundaryFallback from "./AppErrorBoundaryFallback"
@@ -19,10 +18,7 @@ import { ThemeProvider, muiTheme } from "./theme"
 export const App: FC = () => {
   useTracking()
   useSentryInit()
-  useEffect(() => {
-    /** Ensure colour mode is dark - may previously have defaulted to 'white' */
-    localStorageManager.set("dark")
-  }, [])
+
   return (
     <SoftReloadProvider>
       <SWRConfig value={{ provider: () => swrCacheProvider }}>
@@ -35,6 +31,7 @@ export const App: FC = () => {
           />
           <ThemeProvider>
             <ArgentTheme>
+              <SetDarkMode />
               <AppDimensions>
                 {process.env.SHOW_DEV_UI && <DevUI />}
                 <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>

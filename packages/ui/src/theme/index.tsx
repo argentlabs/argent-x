@@ -22,6 +22,7 @@ import { spacing } from "./spacing"
 import { typography } from "./typography"
 
 export { scrollbarStyle } from "./scrollbarStyle"
+export { SetDarkMode } from "./SetDarkMode"
 
 const config: ThemeConfig = {
   initialColorMode: "light",
@@ -62,22 +63,7 @@ export const theme = {
   colors /** omits default chakra colours */,
 } as UITheme
 
-export const initiallyDarkTheme = {
-  ...theme,
-  config: {
-    ...theme.config,
-    initialColorMode: "dark",
-  },
-} as UITheme
-
-/** Theme with initial color mode "light" also see {@link InitiallyDarkThemeProvider} */
+/** Theme with initial color mode "light" also see {@link SetDarkMode} */
 export const ThemeProvider = ({ children }: ChakraProviderProps) => (
   <ChakraProvider theme={theme}>{children}</ChakraProvider>
-)
-
-/** In a production build this ensures that global styles are initially "dark" */
-export const InitiallyDarkThemeProvider = ({
-  children,
-}: ChakraProviderProps) => (
-  <ChakraProvider theme={initiallyDarkTheme}>{children}</ChakraProvider>
 )
