@@ -1,5 +1,11 @@
-import { B2, BarBackButton, NavigationContainer, icons } from "@argent/ui"
-import { Box, Flex, Stack, Text } from "@chakra-ui/react"
+import {
+  B2,
+  BarBackButton,
+  CellStack,
+  NavigationContainer,
+  icons,
+} from "@argent/ui"
+import { Box, Flex, Text } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
@@ -90,13 +96,7 @@ export const SettingsScreen: FC = () => {
         <Box mx="4" my="4">
           {account && <AccountListScreenItem account={account} />}
         </Box>
-        <Stack direction="column" mx="4" h="60vh">
-          {/*   <SettingsMenuItem
-          onClick={stopSession}
-          to={routes.lockScreen()}
-          title="Lock wallet"
-        /> */}
-
+        <CellStack>
           {!extensionIsInTab && (
             <SettingsMenuItem
               leftIcon={<ExtendedIcon />}
@@ -138,7 +138,7 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
-        </Stack>
+        </CellStack>
       </NavigationContainer>
       <Link onClick={stopSession} to={routes.lockScreen()}>
         <Flex
