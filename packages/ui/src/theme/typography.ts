@@ -40,6 +40,7 @@ export const typography = {
     "3xl": pxToRem(28),
     "4xl": pxToRem(32),
     "5xl": pxToRem(40),
+    "6xl": pxToRem(72),
     "10xl": pxToRem(80),
   },
 }
