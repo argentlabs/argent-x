@@ -10,11 +10,13 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { isDeprecated } from "../../../shared/wallet.service"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { useReturnTo } from "../../routes"
 import { P } from "../../theme/Typography"
+import { LoadingScreen } from "../actions/LoadingScreen"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
+import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import {
@@ -24,6 +26,7 @@ import {
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
+import { usePartitionDeprecatedAccounts } from "./upgrade.service"
 import { useAddAccount } from "./useAddAccount"
 
 const { AddIcon } = icons
@@ -67,21 +70,28 @@ export const AccountListScreen: FC = () => {
     isHiddenAccount,
   )
   const { isBackupRequired } = useBackupRequired()
+  const currentNetwork = useCurrentNetwork()
   const { addAccount, isDeploying } = useAddAccount()
 
-  const [deprecatedAccounts, newAccounts] = partition(
+  const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
     visibleAccounts,
-    (account) => isDeprecated(account),
+    currentNetwork,
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
-  const onClose = useCallback(() => {
+  const onClose = useCallback(async () => {
     if (returnTo) {
       navigate(returnTo)
     } else {
-      navigate(-1)
+      navigate(await recover())
     }
   }, [navigate, returnTo])
+
+  if (!partitionedAccounts) {
+    return <LoadingScreen />
+  }
+
+  const [deprecatedAccounts, newAccounts] = partitionedAccounts
 
   return (
     <>

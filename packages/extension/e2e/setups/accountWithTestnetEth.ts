@@ -5,10 +5,7 @@ import { getAccountAddressFromAccountPage } from "../selectors/getAccountAddress
 import { getBalanceFromAccountPage } from "../selectors/getBalanceFromAccountPage"
 import { disableNetworkIssuesWarning } from "../steps/disableNetworkIssuesWarning"
 import { newAccountWhenEmpty } from "../steps/newAccount"
-import {
-  continueNewWalletAfterOnboarding,
-  newWalletOnboarding,
-} from "../steps/newWallet"
+import { newWalletOnboarding } from "../steps/newWallet"
 import { openExtension } from "../steps/openExtension"
 import { switchNetwork } from "../steps/switchNetwork"
 import { formatTruncatedAddress } from "../utils"
@@ -23,8 +20,7 @@ export async function setupNewAccountWithTestnetEth(
 
   // page is now closed
   await openExtension(page, context)
-  await continueNewWalletAfterOnboarding(page)
-  await switchNetwork(page, "Localhost")
+  await switchNetwork(page, "Localhost 5050")
   await newAccountWhenEmpty(page)
   const address = await getAccountAddressFromAccountPage(page)
   await mintDevnetEthToAccount(address)

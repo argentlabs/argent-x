@@ -1,6 +1,6 @@
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
@@ -29,6 +29,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
+import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
@@ -39,7 +40,7 @@ import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
-import { fetchFeeTokenBalance } from "./tokens.service"
+import { useFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
@@ -62,6 +63,7 @@ interface AccountTokensProps {
 
 export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames } = useAccountMetadata()
@@ -77,6 +79,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const hasPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
   const network = useCurrentNetwork()
+  const {
+    shouldShow: shouldShowNetworkUpgradeMessage,
+    updateLastShown: updateLastShownNetworkUpgradeMessage,
+  } = useShouldShowNetworkUpgradeMessage()
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
@@ -86,11 +92,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     return () => timeoutId && clearTimeout(timeoutId)
   }, [navigate, transactionsBeforeReview, userHasReviewed])
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), network.id, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, network.id),
-    { suspense: false, ...withPolling(60 * 1000) },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
     useTokensWithBalance(account)
@@ -118,7 +120,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showUpgradeBanner = Boolean(
     needsUpgrade && !hasPendingTransactions && feeTokenBalance?.gt(0),
   )
-  const showNoBalanceForUpgrade = !showUpgradeBanner && needsUpgrade
+  const showNoBalanceForUpgrade = Boolean(
+    needsUpgrade && !hasPendingTransactions && feeTokenBalance?.lte(0),
+  )
+
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
@@ -136,6 +141,14 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   useEffect(() => {
     connectAccount(account)
   }, [account])
+
+  useEffect(() => {
+    if (shouldShowNetworkUpgradeMessage) {
+      updateLastShownNetworkUpgradeMessage()
+      navigate(routes.networkUpgradeV4())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
   const accountIsDeployed = useAccountIsDeployed(account)
@@ -156,11 +169,18 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && (
-        <Link to={routes.upgrade()}>
+        <Link
+          to={routes.accountUpgradeV4()}
+          state={{ from: location.pathname }}
+        >
           <UpgradeBanner />
         </Link>
       )}
-      {showNoBalanceForUpgrade && <UpgradeBanner canNotPay />}
+      {showNoBalanceForUpgrade && (
+        <Link to={routes.funding()}>
+          <UpgradeBanner canNotPay />
+        </Link>
+      )}
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
       {accountIsDeployed && (
         <ErrorBoundary

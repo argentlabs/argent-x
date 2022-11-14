@@ -8,7 +8,6 @@ import { navigateFromAccountToAccountList } from "./steps/navigateFromAccountToA
 import { newAccount } from "./steps/newAccount"
 import { selectAccountFromAccountList } from "./steps/selectAccountFromAccountList"
 import { switchNetwork } from "./steps/switchNetwork"
-import { dismissUserReview } from "./steps/userReview"
 
 test("switch network and keep account", async ({ page, context }) => {
   const { address: address1_localhost } = await setupNewAccountWithTestnetEth(
@@ -23,12 +22,11 @@ test("switch network and keep account", async ({ page, context }) => {
   expect(b2).toBe("0.0")
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, address1_localhost)
-  await dismissUserReview(page)
 
   await switchNetwork(page, "Testnet")
   const address1_goerli = await getAccountAddressFromAccountPage(page)
 
-  await switchNetwork(page, "Localhost")
+  await switchNetwork(page, "Localhost 5050")
   expect(address1_localhost).toEqual(address1_goerli)
 
   await navigateFromAccountToAccountList(page)

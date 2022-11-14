@@ -17,9 +17,15 @@ import {
 
 interface RecoveryOptions {
   networkId?: string
+  showAccountList?: boolean
+  showHiddenAccountList?: boolean
 }
 
-export const recover = async ({ networkId }: RecoveryOptions = {}) => {
+export const recover = async ({
+  networkId,
+  showAccountList,
+  showHiddenAccountList,
+}: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
     networkId ??= lastSelectedAccount?.networkId ?? defaultNetwork.id
@@ -48,6 +54,14 @@ export const recover = async ({ networkId }: RecoveryOptions = {}) => {
     // shows deprecation screen depending on selected network
     if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
       return routes.migrationDisclaimer()
+    }
+
+    if (showAccountList || !selectedAccount) {
+      return routes.accounts()
+    }
+
+    if (showHiddenAccountList && networkId) {
+      return routes.accountsHidden(networkId)
     }
 
     return routes.accountTokens()

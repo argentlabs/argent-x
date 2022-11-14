@@ -1,5 +1,4 @@
-import { Call, ProviderInterface, transaction } from "starknet"
-import { toBN } from "starknet/dist/utils/number"
+import { Call, ProviderInterface, number, transaction } from "starknet"
 
 const partitionResponses = (responses: string[]): string[][] => {
   if (responses.length === 0) {
@@ -7,7 +6,7 @@ const partitionResponses = (responses: string[]): string[][] => {
   }
 
   const [responseLength, ...restResponses] = responses
-  const responseLengthInt = toBN(responseLength).toNumber()
+  const responseLengthInt = number.toBN(responseLength).toNumber()
   const response = restResponses.slice(0, responseLengthInt)
   const remainingResponses = restResponses.slice(responseLengthInt)
 

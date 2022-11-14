@@ -75,6 +75,7 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
             <MenuItem
               key={id}
               onClick={() => onChangeNetwork(id)}
+              data-testid={name}
               sx={
                 isCurrent
                   ? {

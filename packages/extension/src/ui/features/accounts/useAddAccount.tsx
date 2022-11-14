@@ -6,7 +6,7 @@ import { waitForMessage } from "../../../shared/messages"
 import { useAppState } from "../../app.state"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { recover } from "../recovery/recovery.service"
-import { deployAccount } from "./accounts.service"
+import { createAccount } from "./accounts.service"
 import { useSelectedAccountStore } from "./accounts.state"
 
 export const useAddAccount = () => {
@@ -25,7 +25,7 @@ export const useAddAccount = () => {
     setIsDeploying(true)
     setDeployFailed(false)
     try {
-      const newAccount = await deployAccount(switcherNetworkId)
+      const newAccount = await createAccount(switcherNetworkId)
       // switch UI to the account that was selected
       useSelectedAccountStore.setState({
         selectedAccount: newAccount,

@@ -122,12 +122,11 @@ export class SessionAccount extends Account implements AccountInterface {
     const response = await super.getEstimateFee(
       {
         contractAddress: this.address,
-        entrypoint: "__execute__",
         calldata,
         signature,
       },
+      { version, nonce },
       blockIdentifier,
-      { version },
     )
 
     const suggestedMaxFee = stark.estimatedFeeToMaxFee(response.overall_fee)
@@ -197,13 +196,13 @@ export class SessionAccount extends Account implements AccountInterface {
     return this.invokeFunction(
       {
         contractAddress: this.address,
-        entrypoint: "__execute__",
         calldata,
         signature,
       },
       {
         maxFee,
         version,
+        nonce,
       },
     )
   }

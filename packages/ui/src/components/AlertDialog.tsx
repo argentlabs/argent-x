@@ -6,14 +6,18 @@ import {
   HStack,
   VStack,
 } from "@chakra-ui/react"
-import { FC, useRef } from "react"
+import { FC, PropsWithChildren, useRef } from "react"
 
 import { pxToRem } from "../theme/utilities/pxToRem"
 import { Button } from "./Button"
 import { H5, P4 } from "./Typography"
 
 export interface AlertDialogProps
-  extends Omit<ChakraAlertDialogProps, "onClose" | "leastDestructiveRef"> {
+  extends PropsWithChildren,
+    Omit<
+      ChakraAlertDialogProps,
+      "onClose" | "leastDestructiveRef" | "children"
+    > {
   onCancel: () => void
   cancelTitle?: string
   onDestroy?: () => void

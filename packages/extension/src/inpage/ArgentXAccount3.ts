@@ -14,6 +14,10 @@ import {
 import type { Network } from "../shared/network"
 import { sendMessage, waitForMessage } from "./messageActions"
 
+/**
+ *  This is Account Object is imported from starknet v3.
+ *  It is used for very old accounts which are now deprecated and needs to be upgraded to v4.
+ */
 export class ArgentXAccount3 extends Account {
   constructor(address: string, provider?: ProviderInterface) {
     // since account constructor is taking a KeyPair,

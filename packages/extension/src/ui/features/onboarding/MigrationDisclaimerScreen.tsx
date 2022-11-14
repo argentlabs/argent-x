@@ -9,7 +9,7 @@ import { OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 import { connectAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
-import { deployAccount } from "../accounts/accounts.service"
+import { createAccount } from "../accounts/accounts.service"
 import { recover } from "../recovery/recovery.service"
 
 const Container = styled.div`
@@ -36,7 +36,7 @@ export const MigrationDisclaimerScreen: FC = () => {
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })
     try {
-      const newAccount = await deployAccount(switcherNetworkId)
+      const newAccount = await createAccount(switcherNetworkId)
       connectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {
