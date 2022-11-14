@@ -1,17 +1,10 @@
 import { FieldError, Input, Select, icons } from "@argent/ui"
-import { Box, Stack, Text } from "@chakra-ui/react"
+import { Box, Flex, Text } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
-import { FC, ReactNode, useMemo, useRef, useState } from "react"
+import { FC, ReactNode, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
-import { accountStore } from "../../../../shared/account/store"
-import { useArrayStorage } from "../../../../shared/storage/hooks"
-import { sendTransaction } from "../../../services/transactions"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
-import { useNetworks } from "../../networks/useNetworks"
+import { useFormSelects } from "./useFormSelects"
 
 const { InfoIcon } = icons
 
@@ -54,9 +47,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   const [contractJSON, setContractJSON] = useState("")
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const networks = useNetworks()
-  const accounts = useArrayStorage(accountStore)
-  const { accountNames } = useAccountMetadata()
+  const { accountOptions, networkOptions } = useFormSelects(selectedNetwork)
 
   const onSubmit: SubmitHandler<FieldValues> = async ({
     account,
@@ -65,40 +56,17 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     network,
   }: FieldValues) => {
     clearErrors()
-    //sendTransaction({})
   }
-
-  const networkOptions = useMemo(
-    () =>
-      networks.map((network: any) => ({
-        label: network.name,
-        value: network.id,
-      })),
-    [networks],
-  )
-
-  const accountOptions = useMemo(
-    () =>
-      accounts
-        .filter((account) => account.networkId === selectedNetwork)
-        .map((account: any) => ({
-          label: getAccountName(account, accountNames),
-          value: account.address,
-        })),
-    [accounts, accountNames, selectedNetwork],
-  )
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack direction="column" mx="4">
+      <Flex direction="column" mx="4" gap={1}>
         <Controller
           name="contract"
           control={control}
           rules={{ required: true }}
           defaultValue=""
-          render={({
-            field: { ref, value, /* value, */ onChange, ...inputProps },
-          }) => (
+          render={({ field: { ref, value, onChange, ...inputProps } }) => (
             <>
               <input
                 type="file"
@@ -139,7 +107,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           render={({ field: { ref, ...field } }) => (
             <Input
               autoFocus
-              placeholder="Classhash"
+              placeholder="Contract classhash"
               {...field}
               isInvalid={!isEmpty(errors.classHash)}
             />
@@ -157,6 +125,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           render={({ field: { onChange, name, value } }) => (
             <Select
               placeholder="Network"
+              maxH="45vh"
               name={name}
               isInvalid={!isEmpty(errors.network)}
               onChange={(v: any) => onChange(v)}
@@ -177,6 +146,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
               disabled={!selectedNetwork}
               placeholder="Account"
               emptyMessage="No accounts available on this network"
+              maxH="33vh"
               name={name}
               isInvalid={!isEmpty(errors.account)}
               onChange={(v: any) => onChange(v)}
@@ -188,7 +158,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
         {!isEmpty(errors.account) && <Error message="Account is required" />}
 
         {children?.({ isDirty, isSubmitting })}
-      </Stack>
+      </Flex>
     </form>
   )
 }
