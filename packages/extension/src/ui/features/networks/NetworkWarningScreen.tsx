@@ -1,32 +1,12 @@
+import { H3, P3, icons } from "@argent/ui"
+import { Button, Center, Circle, Text } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { routes, useReturnTo } from "../../routes"
-import { H2, P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { CongestionIcon } from "./CongestionIcon"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  margin-top: 20px;
-
-  > ${H2} {
-    margin: 40px 0 16px;
-  }
-`
-
-const CenterP = styled(P)`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 21px;
-  text-align: center;
-`
+const { NetworkIcon } = icons
 
 export const NetworkWarningScreen: FC = () => {
   const navigate = useNavigate()
@@ -35,23 +15,41 @@ export const NetworkWarningScreen: FC = () => {
     useNeedsToShowNetworkStatusWarning()
 
   return (
-    <ConfirmScreen
-      confirmButtonText="I understand"
-      singleButton
-      confirmButtonBackgroundColor="#C12026"
-      onSubmit={() => {
-        updateNeedsToShowNetworkStatusWarning()
-        navigate(returnTo ? returnTo : routes.accounts())
-      }}
-    >
-      <Wrapper>
-        <CongestionIcon />
-        <H2>Network issues</H2>
-        <CenterP>
+    <Center flex={1} flexDirection={"column"} py={6} px={5}>
+      <Center flex={1} flexDirection={"column"} textAlign={"center"}>
+        <Circle backgroundColor={"panel"} size={24} position="relative">
+          <Text fontSize={"6xl"}>
+            <NetworkIcon />
+          </Text>
+          <Circle
+            position={"absolute"}
+            right={1}
+            bottom={1}
+            size={5}
+            bg={"warning.500"}
+            border={"4px"}
+            borderColor="neutrals.900"
+          />
+        </Circle>
+        <H3 pt={6} pb={3}>
+          Network issues
+        </H3>
+        <P3 color="neutrals.100">
           StarkNet is in Alpha and is experiencing degraded network performance.
           Your transactions may fail.
-        </CenterP>
-      </Wrapper>
-    </ConfirmScreen>
+        </P3>
+      </Center>
+      <Button
+        mt={6}
+        width={["100%", "initial"]}
+        colorScheme="primary"
+        onClick={() => {
+          updateNeedsToShowNetworkStatusWarning()
+          navigate(returnTo ? returnTo : routes.accounts())
+        }}
+      >
+        I understand
+      </Button>
+    </Center>
   )
 }
