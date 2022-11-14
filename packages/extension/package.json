@@ -74,6 +74,7 @@
   "dependencies": {
     "@argent/ui": "^4.8.8",
     "@argent/x-sessions": "^4.8.8",
+    "@argent/x-multicall": "^4.8.7",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",

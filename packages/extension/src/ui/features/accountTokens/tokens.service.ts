@@ -1,23 +1,15 @@
+import { Multicall } from "@argent/x-multicall"
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
-import { chunk } from "lodash-es"
-import {
-  Abi,
-  Contract,
-  hash,
-  number,
-  shortString,
-  stark,
-  uint256,
-} from "starknet"
+import { Abi, Contract, number, shortString, uint256 } from "starknet"
 import useSWR from "swr"
 
 import { Network } from "./../../../shared/network/type"
 import parsedErc20Abi from "../../../abis/ERC20.json"
+import { getProvider } from "../../../shared/network"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { getMulticallContract } from "../../services/multicall.service"
 import { Account } from "../accounts/Account"
 import { TokenDetailsWithBalance, getNetworkFeeToken } from "./tokens.state"
 
@@ -127,38 +119,36 @@ export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
   account: Account,
 ) => {
-  const multicallContract = getMulticallContract(account.network)
+  const { multicallAddress } = account.network
 
-  if (!multicallContract) {
+  if (!multicallAddress) {
     // if no multicall contract is found, fallback to Promises
     return fetchTokenBalancesWithoutMulticall(tokenAddresses, account)
   }
 
-  const compiledCalldata = stark.compileCalldata({
-    address: account.address,
-  })
+  const multicall = new Multicall(account.provider, multicallAddress)
 
-  const calls = tokenAddresses.flatMap((address) => [
-    address,
-    hash.getSelectorFromName("balanceOf"),
-    compiledCalldata.length,
-    ...compiledCalldata,
-  ])
+  const response = await Promise.all(
+    tokenAddresses.map((address) =>
+      multicall.call({
+        contractAddress: address,
+        entrypoint: "balanceOf",
+        calldata: [account.address],
+      }),
+    ),
+  )
 
-  const response = await multicallContract.aggregate(calls)
+  // Mapping Calls from tokenAddresses and reducing from tokenAddresses
+  // Can be reduced on response as well
+  return tokenAddresses.reduce<BalancesMap>((acc, addr, i) => {
+    const [res_low, res_high] = response[i]
 
-  const results: string[] = response.result.map((res: any) => number.toHex(res))
-
-  const resultChunks = chunk(results, 2)
-
-  return resultChunks.reduce<BalancesMap>((acc, result, i) => {
     const balance = BigNumber.from(
-      uint256.uint256ToBN({ low: result[0], high: result[1] }).toString(),
+      uint256.uint256ToBN({ low: res_low, high: res_high }).toString(),
     )
-
     return {
       ...acc,
-      [tokenAddresses[i]]: balance,
+      [addr]: balance,
     }
   }, {})
 }
@@ -195,9 +185,9 @@ export const fetchFeeTokenBalanceForAccounts = async (
   accountAddresses: string[],
   network: Network,
 ) => {
-  const multicallContract = getMulticallContract(network)
+  const { multicallAddress } = network
 
-  if (!multicallContract) {
+  if (!multicallAddress) {
     throw new Error("Multicall contract is required")
   }
 
@@ -207,32 +197,31 @@ export const fetchFeeTokenBalanceForAccounts = async (
     throw new Error("Fee token not found")
   }
 
-  const calls = accountAddresses.flatMap((address) => [
-    token.address,
-    hash.getSelectorFromName("balanceOf"),
-    1,
-    address,
-  ])
+  const provider = getProvider(network)
 
-  const response = await multicallContract.aggregate(calls)
+  const multicall = new Multicall(provider, multicallAddress)
 
-  const results: string[] = response.result.map((res: any) => number.toHex(res))
-
-  const resultChunks = chunk(results, 2)
-
-  const balances = resultChunks.map((result) =>
-    BigNumber.from(
-      uint256.uint256ToBN({ low: result[0], high: result[1] }).toString(),
+  const response = await Promise.all(
+    accountAddresses.map((address) =>
+      multicall.call({
+        contractAddress: token.address,
+        entrypoint: "balanceOf",
+        calldata: [address],
+      }),
     ),
   )
 
-  return accountAddresses.reduce<Record<string, BigNumber>>(
-    (acc, accountAddress, i) => ({
+  return accountAddresses.reduce<Record<string, BigNumber>>((acc, addr, i) => {
+    const [res_low, res_high] = response[i]
+
+    const balance = BigNumber.from(
+      uint256.uint256ToBN({ low: res_low, high: res_high }).toString(),
+    )
+    return {
       ...acc,
-      [accountAddress]: balances[i],
-    }),
-    {},
-  )
+      [addr]: balance,
+    }
+  }, {})
 }
 
 export const useFeeTokenBalance = (account?: Account) => {

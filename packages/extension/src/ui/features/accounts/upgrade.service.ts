@@ -1,11 +1,11 @@
+import { Multicall } from "@argent/x-multicall"
 import { partition } from "lodash-es"
-import { hash, number } from "starknet"
+import { number } from "starknet"
 import useSWR from "swr"
 
 import { getAccountIdentifier } from "./../../../shared/wallet.service"
 import { getAccounts } from "../../../shared/account/store"
-import { Network } from "../../../shared/network"
-import { getMulticallContract } from "../../services/multicall.service"
+import { Network, getProvider } from "../../../shared/network"
 import { fetchFeeTokenBalanceForAccounts } from "./../accountTokens/tokens.service"
 import { useCurrentNetwork, useNetwork } from "./../networks/useNetworks"
 import { Account } from "./Account"
@@ -43,11 +43,16 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
     return false
   }
 
-  const multicallContract = getMulticallContract(network)
+  const { multicallAddress } = network
 
-  if (!multicallContract) {
+  if (!multicallAddress) {
     throw Error("Multicall contract is required to check for upgrade")
   }
+
+  const multicall = new Multicall(
+    getProvider(network),
+    network.multicallAddress,
+  )
 
   const accounts = await getAccounts(
     (acc) =>
@@ -56,26 +61,27 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
       !acc.needsDeploy,
   )
 
-  const calls = accounts.flatMap((acc) => [
-    acc.address,
-    hash.getSelectorFromName("get_implementation"),
-    0,
-  ])
-
   try {
-    const implementationMulticall = multicallContract.aggregate(calls)
+    const implementationMulticall = Promise.all(
+      accounts.map((acc) =>
+        multicall.call({
+          contractAddress: acc.address,
+          entrypoint: "get_implementation",
+        }),
+      ),
+    )
 
     const response = await Promise.race([
       implementationMulticall,
       new Promise(
         (_, reject) =>
           setTimeout(() => reject(new Error("multicall timeout")), 15000), // as it takes around 30s for multicall to fail
-      ),
+      ).then((e) => {
+        throw Error(`${e}`)
+      }),
     ])
 
-    const implementations = response.result.map((r: any) =>
-      number.toHex(r),
-    ) as string[]
+    const implementations = response.flat()
 
     const targetImplementations = Object.values(network.accountClassHash).map(
       (ti) => number.toBN(ti),
@@ -107,33 +113,40 @@ export async function partitionDeprecatedAccount(
     return [[], accounts]
   }
 
-  const multicallContract = getMulticallContract(network)
+  const { multicallAddress } = network
 
-  if (!multicallContract) {
+  if (!multicallAddress) {
     throw Error("Multicall contract is required to check for upgrade")
   }
 
+  const multicall = new Multicall(
+    getProvider(network),
+    network.multicallAddress,
+  )
+
   const deployedAccounts = accounts.filter((acc) => !acc.needsDeploy)
 
-  const calls = deployedAccounts.flatMap((acc) => [
-    acc.address,
-    hash.getSelectorFromName("get_implementation"),
-    0,
-  ])
-
   try {
-    const implementationMulticall = multicallContract.aggregate(calls)
+    const implementationMulticall = Promise.all(
+      deployedAccounts.map((acc) =>
+        multicall.call({
+          contractAddress: acc.address,
+          entrypoint: "get_implementation",
+        }),
+      ),
+    )
 
     const response = await Promise.race([
       implementationMulticall,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("multicall timeout")), 15000),
-      ),
+      new Promise(
+        (_, reject) =>
+          setTimeout(() => reject(new Error("multicall timeout")), 15000), // as it takes around 30s for multicall to fail
+      ).then((e) => {
+        throw Error(`${e}`)
+      }),
     ])
 
-    const implementations = response.result.map((r: any) =>
-      number.toHex(r),
-    ) as string[]
+    const implementations = response.flat()
 
     const { argentAccount, argentPluginAccount } = network.accountClassHash
 
