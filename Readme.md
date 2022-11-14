@@ -156,7 +156,7 @@ Everyone is welcome to contribute. Please take a moment to review the [contribut
 
 Since this project would not have been possible without [starknet.js](https://github.com/seanjameshan/starknet.js), we would like to say a big thank you to all [starknet.js contributors](https://github.com/0xs34n/starknet.js/graphs/contributors) and [@0xs34n](https://github.com/0xs34n) for starting it.
 
-One more thank you to the StarkWare Team.
+One more thank you to the StarkWare Team
 
 ## 👨🏼‍🎨 Authors and license
 
