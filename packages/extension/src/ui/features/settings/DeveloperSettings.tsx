@@ -1,5 +1,4 @@
-import { BarBackButton, NavigationBar } from "@argent/ui"
-import { Stack } from "@chakra-ui/react"
+import { BarBackButton, CellStack, NavigationBar } from "@argent/ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -16,7 +15,7 @@ const DeveloperSettings: FC = () => {
         title={"Developer Settings"}
       />
 
-      <Stack direction="column" mx="4">
+      <CellStack>
         <SettingsMenuItem
           to={routes.settingsNetworks()}
           title="Manage networks"
@@ -37,7 +36,7 @@ const DeveloperSettings: FC = () => {
             title="Experimental"
           />
         )}
-      </Stack>
+      </CellStack>
     </>
   )
 }
