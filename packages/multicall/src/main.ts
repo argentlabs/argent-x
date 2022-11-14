@@ -4,7 +4,7 @@ import { Call, ProviderInterface } from "starknet"
 import { DataLoaderOptions, getDataLoader } from "./dataloader"
 
 const DEFAULT_MULTICALL_ADDRESS =
-  "0x023c0c3c23fc5d210aeed505e787fa28ccce2222d18c61846f987dea532b1a68"
+  "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4"
 
 export class Multicall {
   public readonly dataloader: DataLoader<Call, string[], Call>

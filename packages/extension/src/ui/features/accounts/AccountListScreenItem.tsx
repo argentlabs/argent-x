@@ -12,7 +12,7 @@ import {
 } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
 import { withPolling } from "../../services/swr"
-import { fetchFeeTokenBalance } from "../accountTokens/tokens.service"
+import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -22,7 +22,7 @@ import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
-const { ChevronRightIcon } = icons
+const { MoreIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
@@ -36,7 +36,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   canShowUpgrade,
 }) => {
   const navigate = useNavigate()
-  const { accountClassHash, id: networkId } = useCurrentNetwork()
+  const { accountClassHash } = useCurrentNetwork()
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
 
@@ -45,11 +45,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), networkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, networkId),
-    { suspense: false, ...withPolling(60 * 1000) },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { data: needsUpgrade = false } = useSWR(
     [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
@@ -102,7 +98,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
           rounded="full"
           onClick={onAccountEdit}
         >
-          <ChevronRightIcon />
+          <MoreIcon />
         </Button>
       </Flex>
     </Flex>

@@ -2,13 +2,11 @@ import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
-import useSWR from "swr"
 
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
 import {
   Field,
@@ -24,7 +22,7 @@ import { KeyboardArrowDownRounded } from "../../../components/Icons/MuiIcons"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { fetchFeeTokenBalance } from "../../accountTokens/tokens.service"
+import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 import {
   DetailsText,
@@ -32,7 +30,6 @@ import {
   FeeErrorContainer,
   FeeEstimationValue,
   LoadingInput,
-  Separator,
   StyledInfoRoundedIcon,
   StyledReportGmailerrorredRoundedIcon,
 } from "./styled"
@@ -54,11 +51,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
 
   const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, account.networkId),
-    { suspense: false },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
 
@@ -96,89 +89,9 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     feeToken,
     fee?.suggestedMaxFee,
   )
-  const accountDeploymentCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.accountDeploymentFee,
-  )
-
-  const maxADCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.maxADFee,
-  )
 
   return (
     <FieldGroup error={showError}>
-      {account.needsDeploy && (
-        <Field>
-          <FieldKeyGroup>
-            <FieldKey>
-              Activation fee
-              <Tippy
-                content={
-                  <Tooltip as="div">
-                    {getTooltipText(fee?.maxADFee, feeTokenBalance)}
-                  </Tooltip>
-                }
-              >
-                {enoughBalance ? (
-                  <StyledInfoRoundedIcon />
-                ) : (
-                  <StyledReportGmailerrorredRoundedIcon />
-                )}
-              </Tippy>
-            </FieldKey>
-          </FieldKeyGroup>
-          {fee && fee.accountDeploymentFee && fee.maxADFee ? (
-            <FieldValueGroup>
-              <FieldValue>
-                {accountDeploymentCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <FeeEstimationValue>
-                    ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.accountDeploymentFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.accountDeploymentFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
-                )}
-              </FieldValue>
-              <FieldValueMeta>
-                {maxADCurrencyValue !== undefined ? (
-                  <FeeEstimationValue>
-                    Max ~{prettifyCurrencyValue(maxADCurrencyValue)}
-                  </FeeEstimationValue>
-                ) : (
-                  <FeeEstimationValue>
-                    Max ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.maxADFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.maxADFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
-                )}
-              </FieldValueMeta>
-            </FieldValueGroup>
-          ) : showEstimateError ? (
-            <FeeEstimationValue>Error</FeeEstimationValue>
-          ) : (
-            <LoadingInput />
-          )}
-        </Field>
-      )}
-      <Separator />
       <Field>
         <FieldKeyGroup>
           <FieldKey>

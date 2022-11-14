@@ -2,7 +2,6 @@ import { BigNumber } from "ethers"
 import { Call, number, stark } from "starknet"
 import useSWR from "swr"
 
-import { getFeeToken } from "../../../shared/token/utils"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
@@ -52,7 +51,7 @@ export const useMaxFeeEstimateForTransfer = (
         }
       }
 
-      return await getEstimatedFee(call)
+      return getEstimatedFee(call)
     },
     {
       suspense: false,
@@ -74,7 +73,7 @@ export const useMaxFeeEstimateForTransfer = (
         ? number.toHex(number.toBN(maxADFee).add(number.toBN(suggestedMaxFee)))
         : suggestedMaxFee
 
-    const maxFee = addOverheadToFee(totalMaxFee.toString(), 0.2)
+    const maxFee = addOverheadToFee(totalMaxFee, 0.2)
 
     return {
       maxFee: number.toHex(maxFee),

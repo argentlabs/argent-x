@@ -1,14 +1,12 @@
 import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
-import useSWR from "swr"
 
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
 import { getFeeToken } from "../../../../shared/token/utils"
-import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
 import {
   Field,
@@ -24,7 +22,7 @@ import { KeyboardArrowDownRounded } from "../../../components/Icons/MuiIcons"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { fetchFeeTokenBalance } from "../../accountTokens/tokens.service"
+import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import {
   DetailsText,
   ExtendableControl,
@@ -48,11 +46,7 @@ export const AccountDeploymentFeeEstimation: FC<
 
   const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
 
-  const { data: feeTokenBalance } = useSWR(
-    [getAccountIdentifier(account), account.networkId, "feeTokenBalance"],
-    () => fetchFeeTokenBalance(account, account.networkId),
-    { suspense: false },
-  )
+  const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { fee, error } = useMaxAccountDeploymentFeeEstimation(
     account,

@@ -1,5 +1,3 @@
-import { BigNumber } from "ethers"
-
 import { isEqualAddress } from "../ui/services/addresses"
 import { BaseWalletAccount, WalletAccount } from "./wallet.model"
 
