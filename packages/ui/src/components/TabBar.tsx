@@ -65,19 +65,21 @@ export interface TabProps extends ComponentProps<typeof TabContainer> {
   icon: ReactNode
   label?: string
   badgeLabel?: string | number
+  badgeDescription?: string
 }
 
 export const Tab: FC<TabProps> = ({
   icon,
   label,
   badgeLabel,
+  badgeDescription,
   as = NavLink,
   ...rest
 }) => {
   const showBadgeLabel = Number(badgeLabel) > 0
   return (
     <TabContainer aria-label={label} role="group" as={as} {...rest}>
-      {showBadgeLabel && <TabBadge size={2} />}
+      {showBadgeLabel && <TabBadge aria-label={badgeDescription} size={2} />}
       <TabIconContainer size={10}>{icon}</TabIconContainer>
     </TabContainer>
   )

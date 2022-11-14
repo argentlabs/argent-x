@@ -63,6 +63,7 @@ export const AccountContainer: FC<PropsWithChildren> = ({ children }) => {
           to={routes.accountActivity()}
           icon={<ActivityIcon />}
           badgeLabel={pendingTransactions.length}
+          badgeDescription={"Pending transactions"}
           label="Activity"
         />
       </TabBar>
