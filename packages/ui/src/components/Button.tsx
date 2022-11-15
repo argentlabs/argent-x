@@ -69,7 +69,6 @@ export const buttonTheme = defineStyleConfig({
     outline: {},
     solid: (props) => {
       const { colorScheme: c } = props
-      console.log({ c })
       if (c === "inverted") {
         return {
           bg: mode("black", "white")(props),

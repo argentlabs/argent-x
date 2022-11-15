@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test"
 
 export async function addTokenFromAccount(page: Page, address: string) {
-  await page.click("Add token")
+  await page.click("New token")
   const addressInput = await page.waitForSelector(
     "input[placeholder='Contract address']",
   )
