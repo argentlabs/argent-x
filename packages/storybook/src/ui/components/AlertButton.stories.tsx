@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import { AlertButton, icons, theme } from "@argent/ui"
-import { AlertDescription, AlertIcon, AlertTitle, Box } from "@chakra-ui/react"
 import { getThemingArgTypes } from "@chakra-ui/storybook-addon"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
@@ -16,18 +15,8 @@ export default {
 
 const onClick = () => console.log("onClick")
 
-const Template: ComponentStory<any> = ({ title, description, ...rest }) => {
-  return (
-    <AlertButton onClick={onClick} {...rest}>
-      <AlertIcon>
-        <LockIcon />
-      </AlertIcon>
-      <Box>
-        <AlertTitle>{title}</AlertTitle>
-        <AlertDescription>{description}</AlertDescription>
-      </Box>
-    </AlertButton>
-  )
+const Template: ComponentStory<any> = (props) => {
+  return <AlertButton onClick={onClick} {...props} />
 }
 
 export const Default = Template.bind({})
@@ -35,6 +24,7 @@ Default.args = {
   title: "Setup account recovery",
   description: "Click to secure your assets.",
   colorScheme: "primary",
+  icon: <LockIcon />,
 }
 
 export const Large = Template.bind({})
@@ -43,4 +33,5 @@ Large.args = {
   description: "Click to secure your assets.",
   size: "lg",
   colorScheme: "warning",
+  icon: <LockIcon />,
 }

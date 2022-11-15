@@ -1,24 +1,24 @@
+import { AlertButton, icons } from "@argent/ui"
 import { FC } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
-import { Banner } from "../../components/Banner"
-import { DangerIcon } from "../../components/Icons/DangerIcon"
 import { routes } from "../../routes"
 
-interface RecoveryBannerProps {
-  noMargins?: boolean
-}
+const { LockIcon } = icons
 
-export const RecoveryBanner: FC<RecoveryBannerProps> = ({ noMargins }) => {
+export const RecoveryBanner: FC = () => {
+  const navigate = useNavigate()
   const { pathname: returnTo } = useLocation()
   return (
-    <Link to={routes.setupRecovery(returnTo)}>
-      <Banner
-        title="Set up account recovery"
-        description="Click here to secure your assets"
-        noMargins={noMargins}
-        icon={<DangerIcon />}
-      />
-    </Link>
+    <AlertButton
+      colorScheme={"warning"}
+      title="Set up account recovery"
+      description="Click here to secure your assets"
+      size="lg"
+      icon={<LockIcon />}
+      onClick={() => {
+        navigate(routes.setupRecovery(returnTo))
+      }}
+    />
   )
 }

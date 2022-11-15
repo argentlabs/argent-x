@@ -1,11 +1,15 @@
 import { alertAnatomy } from "@chakra-ui/anatomy"
 import {
-  Alert,
-  AlertProps,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Alert as ChakraAlert,
+  AlertProps as ChakraAlertProps,
   createMultiStyleConfigHelpers,
 } from "@chakra-ui/react"
 import { mode } from "@chakra-ui/theme-tools"
-import { FC } from "react"
+import { FC, PropsWithChildren, ReactNode } from "react"
 
 import { Button } from "./Button"
 import { typographyStyles } from "./Typography"
@@ -113,6 +117,40 @@ export const alertTheme = defineMultiStyleConfig({
   sizes,
 })
 
+export interface AlertProps
+  extends PropsWithChildren,
+    Omit<ChakraAlertProps, "children"> {
+  title?: string
+  description?: string
+  icon?: ReactNode
+}
+
+/**
+ * Wraps Chakra Alert {@link https://chakra-ui.com/docs/components/alert}
+ * with a simpler API for most common use cases of title, description and icon
+ */
+
+export const Alert: FC<AlertProps> = ({
+  title,
+  description,
+  icon,
+  children,
+  ...rest
+}) => {
+  return (
+    <ChakraAlert {...rest}>
+      {icon && <AlertIcon>{icon}</AlertIcon>}
+      <Box>
+        {title && <AlertTitle>{title}</AlertTitle>}
+        {description && <AlertDescription>{description}</AlertDescription>}
+      </Box>
+      {children}
+    </ChakraAlert>
+  )
+}
+
+/** Used by {@link AlertButton} - applies basic 'Alert' styling to Button for same appearance */
+
 const AsAlertButton: FC<typeof Button> = (props) => {
   return (
     <Button
@@ -125,6 +163,11 @@ const AsAlertButton: FC<typeof Button> = (props) => {
     />
   )
 }
+
+/**
+ * Wraps Chakra Alert {@link https://chakra-ui.com/docs/components/alert}
+ * with Button behaviour
+ */
 
 export const AlertButton: FC<AlertProps> = (props) => {
   return <Alert as={AsAlertButton} {...props} />
