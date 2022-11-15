@@ -1,16 +1,22 @@
 import { base64url, stringToBytes } from "@scure/base"
 import { Wallet, utils } from "ethers"
+import { generateKeyPair } from "jose"
 
 import { Device, idb } from "./idb"
+import { genKeyPairOpts } from "./jwt"
 
 let device: Device
 
 const createDevice = async (): Promise<Device> => {
   const newWallet = Wallet.createRandom()
   const signingKey = newWallet.privateKey
+
+  const encryptionKey = await generateKeyPair("ECDH-ES+A256KW", genKeyPairOpts)
+
   return {
     id: 0,
     signingKey,
+    encryptionKey,
   }
 }
 
@@ -33,7 +39,12 @@ export const getDevice = async () => {
 
 export const getJwt = async () => {
   const device = await getDevice()
-  const wallet = new Wallet(device.signingKey as string)
+
+  if (!(typeof device.signingKey === "string")) {
+    throw new Error("device signing key is not a string")
+  }
+
+  const wallet = new Wallet(device.signingKey)
   const time = Math.round((Date.now() - 1000) / 1000)
   const jwt = await argentJwt({ time, owner: wallet })
   return jwt

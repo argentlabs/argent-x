@@ -9,7 +9,7 @@ export default function Password() {
   const navigate = useRouter()
 
   const email = navigate.query["email"]
-  if (!email) {
+  if (typeof email !== "string") {
     return <Navigate to="/email" />
   }
 

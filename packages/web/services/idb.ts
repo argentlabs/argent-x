@@ -1,8 +1,10 @@
 import Dexie, { Table } from "dexie"
+import { GenerateKeyPairResult, KeyLike } from "jose"
 
 export interface Device {
   id?: number
-  signingKey: unknown
+  signingKey: KeyLike | string
+  encryptionKey: GenerateKeyPairResult
 }
 
 export class StoreDexie extends Dexie {
@@ -11,7 +13,7 @@ export class StoreDexie extends Dexie {
   constructor() {
     super("store")
     this.version(1).stores({
-      devices: "id, signingKey",
+      devices: "id, signingKey, encryptionKey",
     })
   }
 }
