@@ -20,8 +20,9 @@ import { confirmEmailPinForm } from "../schemas/forms/pin"
 import { isSubmitDisabled } from "../schemas/utils"
 import {
   EmailVerificationStatus,
+  getAccounts,
   getVerificationErrorMessage,
-} from "../services/account"
+} from "../services/backend/account"
 import { confirmEmail } from "../services/register"
 
 const { EmailIcon } = icons
@@ -38,7 +39,7 @@ export default function Pin() {
   })
 
   const email = navigate.query["email"]
-  if (!email) {
+  if (typeof email !== "string") {
     return <Navigate to="/email" />
   }
 
@@ -73,8 +74,22 @@ export default function Pin() {
           try {
             await confirmEmail(pin)
 
-            return navigate.push(`/password?email=${email}`, "/pin")
+            const accounts = await getAccounts()
+            console.log(accounts)
+
+            if (accounts.length === 0) {
+              return navigate.push(
+                `/new-password?email=${encodeURIComponent(email)}`,
+                "/new-password",
+              )
+            }
+
+            return navigate.push(
+              `/password?email=${encodeURIComponent(email)}`,
+              "/password",
+            )
           } catch (e) {
+            console.error(e)
             if (e instanceof Error) {
               return setError("pin", {
                 type: "manual",

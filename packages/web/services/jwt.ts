@@ -1,19 +1,23 @@
+import { generateKeyPair } from "jose"
+
 import { Device, idb } from "./idb"
 
 let device: Device
 
+export const genKeyPairOpts = Object.freeze({ extractable: false }) // important that it stays non-extractable
+
 const createDevice = async (): Promise<Device> => {
-  const signingKey = await window.crypto.subtle.generateKey(
-    {
-      name: "ECDSA",
-      namedCurve: "P-256",
-    },
-    false,
-    ["sign", "verify"],
+  const { privateKey: signingKey } = await generateKeyPair(
+    "ES256",
+    genKeyPairOpts,
   )
+
+  const encryptionKey = await generateKeyPair("ECDH-ES+A256KW", genKeyPairOpts)
+
   return {
     id: 0,
     signingKey,
+    encryptionKey,
   }
 }
 

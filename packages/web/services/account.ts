@@ -1,161 +1,94 @@
-import { getJwt } from "./__unsafe__oldJwt"
+import { stringToBytes } from "@scure/base"
+import { calculateJwkThumbprint, exportJWK } from "jose"
+import { Signature, keccak, pedersen, sign, utils } from "micro-starknet"
+import { hash, stark } from "starknet"
+import { addHexPrefix } from "starknet/dist/utils/encode"
 
-const ARGENT_API_BASE_URL = "https://cloud-dev.argent-api.com/v1"
+import { getDevice } from "./__unsafe__oldJwt"
+import { addAccount } from "./backend/account"
+import { postTextFile } from "./backend/file"
+import {
+  encryptPrivateKeyWithDeviceKey,
+  encryptPrivateKeyWithPassword,
+} from "./backup"
+import { getNewStarkKeypair } from "./generatePrivateKey"
 
-type EnsFreeStatus =
-  | "taken"
-  | "alreadyReserved"
-  | "blacklisted"
-  | "toBeReserved"
-  | "notUTS46"
-  | "userAlreadyRegistered"
-export const isEnsFree = async (ens: string): Promise<EnsFreeStatus> => {
-  const jwt = await getJwt()
-  const response = await fetch(
-    `${ARGENT_API_BASE_URL}/account/isEnsFree?ens=${ens}`,
-    {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-    },
-  )
-  const json = await response.json()
-  return json.status
-}
+export const ACCOUNT_IMPLEMENTATION_CLASS_HASH =
+  "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328"
+export const PROXY_CLASS_HASH =
+  "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918"
 
-type ReserveEnsStatus =
-  | "taken"
-  | "alreadyReserved"
-  | "blacklisted"
-  | "toBeReserved"
-  | "notUTS46"
-  | "userAlreadyRegistered"
-export const reserveEns = async (ens: string): Promise<ReserveEnsStatus> => {
-  const jwt = await getJwt()
-  const response = await fetch(`${ARGENT_API_BASE_URL}/account/reserveEns`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ens,
-    }),
-  })
-  const json = await response.json()
-  return json.status
-}
-
-export const requestEmailAuthentication = async (
-  email: string,
-  locale = "en-EN",
-): Promise<void> => {
-  const jwt = await getJwt()
-  const res = await fetch(
-    `${ARGENT_API_BASE_URL}/account/requestEmailAuthentication`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        locale,
-        application: "webwallet",
+export const calculateAccountAddress = (pubKey: string): string => {
+  console.time("calculateAccountAddress")
+  const accountAddress = hash.calculateContractAddressFromHash(
+    pubKey,
+    PROXY_CLASS_HASH,
+    stark.compileCalldata({
+      implementation: ACCOUNT_IMPLEMENTATION_CLASS_HASH,
+      selector: hash.getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({
+        signer: pubKey,
+        guardian: "0",
       }),
-    },
-  )
-  if (!res.ok) {
-    throw new Error("failed to request email verification")
-  }
-}
-
-export type EmailVerificationStatus =
-  | "expired"
-  | "maxAttemptsReached"
-  | "unverified"
-  | "verified"
-  | "notRequested"
-export const getEmailVerificationStatus =
-  async (): Promise<EmailVerificationStatus> => {
-    const jwt = await getJwt()
-    const response = await fetch(
-      `${ARGENT_API_BASE_URL}/account/emailVerificationStatus`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-      },
-    )
-    const json = await response.json()
-    return json.status
-  }
-
-export const getVerificationErrorMessage = (
-  status: EmailVerificationStatus,
-) => {
-  switch (status) {
-    case "expired":
-      return "Your verification code has expired. Please request a new one."
-    case "maxAttemptsReached":
-      return "You have reached the maximum number of attempts. Please wait 30 minutes and request a new code."
-    case "unverified":
-      return "Looks like the wrong code. Please try again."
-    case "notRequested":
-      return "You have not requested a verification code. Please request a new one."
-    default:
-      return "An error occurred. Please try again."
-  }
-}
-
-export const verifyEmail = async (
-  verificationCode: string,
-): Promise<EmailVerificationStatus> => {
-  const jwt = await getJwt()
-  const response = await fetch(`${ARGENT_API_BASE_URL}/verifyEmail`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      verificationCode,
     }),
-  })
-  const json = await response.json()
-  return json.status
-}
-
-export const register = async (): Promise<void> => {
-  const jwt = await getJwt()
-  const res = await fetch(`${ARGENT_API_BASE_URL}/account/asyncRegister`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  })
-  if (!res.ok) {
-    throw new Error("failed to register")
-  }
-}
-
-type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
-export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
-  const jwt = await getJwt()
-  const response = await fetch(
-    `${ARGENT_API_BASE_URL}/account/registrationStatus`,
-    {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-    },
+    0,
   )
-  const json = await response.json()
-  return json.status
+  console.timeEnd("calculateAccountAddress")
+
+  return accountAddress
+}
+
+export const createAccount = async (password: string) => {
+  const device = await getDevice()
+  // generate a new keypair
+  const { publicKey, privateKey } = await getNewStarkKeypair()
+  const accountAddress = calculateAccountAddress(publicKey)
+
+  // upload encrypted backups in parallel
+  const uploadEncryptedFilesPromises = [
+    encryptPrivateKeyWithPassword(privateKey, password).then(
+      (passwordEncryptedPrivateKey) =>
+        postTextFile(
+          `password-encypted-${accountAddress}`,
+          passwordEncryptedPrivateKey,
+        ),
+    ),
+    encryptPrivateKeyWithDeviceKey(
+      privateKey,
+      device.encryptionKey.publicKey,
+    ).then(async (deviceEncryptedPrivateKey) =>
+      postTextFile(
+        `device-${await calculateJwkThumbprint(
+          await exportJWK(device.encryptionKey.publicKey),
+        )}-encypted-${accountAddress}`,
+        deviceEncryptedPrivateKey,
+      ),
+    ),
+  ]
+
+  // signature = sign(
+  //   pedersen([starknetKeccak("starknet"), starkPub]))
+  const deploySignature = sign(
+    pedersen(keccak(stringToBytes("utf8", "starknet")), publicKey),
+    privateKey,
+  )
+  const { r, s } = Signature.fromHex(deploySignature)
+
+  // when one of the uploads is done we can optimistically request registration of the account
+  await Promise.race(uploadEncryptedFilesPromises)
+
+  const registration = await addAccount(publicKey, [
+    addHexPrefix(r.toString(16)),
+    addHexPrefix(s.toString(16)),
+  ])
+
+  // after registration we can wait for the other uploads to finish
+  await Promise.all(uploadEncryptedFilesPromises)
+
+  console.log(
+    "precalculated account address",
+    accountAddress,
+    "server calculated account address",
+    registration,
+  )
 }
