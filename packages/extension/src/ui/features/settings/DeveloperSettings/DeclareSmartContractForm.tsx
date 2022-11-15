@@ -1,7 +1,7 @@
 import { FieldError, Input, Select, icons } from "@argent/ui"
 import { Box, Flex, Text } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
-import { FC, ReactNode, useRef, useState } from "react"
+import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { useFormSelects } from "./useFormSelects"
@@ -49,6 +49,18 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const { accountOptions, networkOptions } = useFormSelects(selectedNetwork)
 
+  const uploadFile = useCallback(async () => {
+    const file = get(fileInputRef, "current.files[0]")
+    const reader = new FileReader()
+    reader.onload = function () {
+      if (reader.result) {
+        setContractJSON(reader.result.toString())
+        setValue("contract", file.name)
+      }
+    }
+    reader.readAsText(file)
+  }, [setValue])
+
   const onSubmit: SubmitHandler<FieldValues> = async ({
     account,
     classHash,
@@ -73,17 +85,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
                 accept="application/json"
                 ref={fileInputRef}
                 {...inputProps}
-                onChange={async () => {
-                  const file = get(fileInputRef, "current.files[0]")
-                  const reader = new FileReader()
-                  reader.onload = function () {
-                    if (reader.result) {
-                      setContractJSON(reader.result.toString())
-                      setValue("contract", file.name)
-                    }
-                  }
-                  reader.readAsText(file)
-                }}
+                onChange={uploadFile}
                 style={{ display: "none" }}
               ></input>
               <Input
@@ -128,7 +130,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
               maxH="45vh"
               name={name}
               isInvalid={!isEmpty(errors.network)}
-              onChange={(v: any) => onChange(v)}
+              onChange={(v) => onChange(v)}
               options={networkOptions}
               value={value}
             />
@@ -149,7 +151,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
               maxH="33vh"
               name={name}
               isInvalid={!isEmpty(errors.account)}
-              onChange={(v: any) => onChange(v)}
+              onChange={(v) => onChange(v)}
               options={accountOptions}
               value={value}
             />

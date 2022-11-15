@@ -4,7 +4,10 @@ import { useMemo } from "react"
 import { ComponentProps, FC } from "react"
 
 import { accountStore } from "../../../../shared/account/store"
+import { Network } from "../../../../shared/network/type"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
+import { WalletAccount } from "../../../../shared/wallet.model"
+import type { Account } from "../../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
@@ -50,7 +53,7 @@ const useFormSelects = (selectedNetwork: string) => {
 
   const networkOptions = useMemo(
     () =>
-      networks.map((network: any) => ({
+      networks.map((network: Network) => ({
         label: <SelectOption label={network.name} />,
         labelSelected: network.name,
         value: network.id,
@@ -62,19 +65,19 @@ const useFormSelects = (selectedNetwork: string) => {
     () =>
       accounts
         .filter((account) => account.networkId === selectedNetwork)
-        .map((account: any) => ({
+        .map((account: WalletAccount) => ({
           icon: (
             <AccountAvatar
               src={getNetworkAccountImageUrl({
-                accountName: getAccountName(account, accountNames),
+                accountName: getAccountName(account as Account, accountNames),
                 accountAddress: account.address,
                 networkId: account.networkId,
                 backgroundColor: undefined,
               })}
             />
           ),
-          label: <SelectOptionAccount account={account} />,
-          labelSelected: getAccountName(account, accountNames),
+          label: <SelectOptionAccount account={account as Account} />,
+          labelSelected: getAccountName(account as Account, accountNames),
           value: account.address,
         })),
     [accounts, accountNames, selectedNetwork],
