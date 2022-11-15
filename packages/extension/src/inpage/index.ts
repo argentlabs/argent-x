@@ -1,10 +1,9 @@
 import { assertNever } from "./../ui/services/assertNever"
 import type { WindowMessageType } from "../shared/messages"
-import { getNetwork } from "../shared/network"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
-import { getIsPreauthorized } from "./preAuthorization"
+import { getIsPreauthorized, getNetwork } from "./messaging"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
 const INJECT_NAMES = ["starknet", "starknet_argentX"]

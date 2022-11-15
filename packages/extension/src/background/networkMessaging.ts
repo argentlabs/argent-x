@@ -10,6 +10,28 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
   sendToTabAndUi,
 }) => {
   switch (msg.type) {
+    case "GET_NETWORKS": {
+      return sendToTabAndUi({
+        type: "GET_NETWORKS_RES",
+        data: await getNetworks(),
+      })
+    }
+
+    case "GET_NETWORK": {
+      const allNetworks = await getNetworks()
+
+      const network = allNetworks.find((n) => n.id === msg.data)
+
+      if (!network) {
+        throw new Error(`Network with id ${msg.data} not found`)
+      }
+
+      return sendToTabAndUi({
+        type: "GET_NETWORK_RES",
+        data: network,
+      })
+    }
+
     case "GET_NETWORK_STATUSES": {
       const networks = msg.data?.length ? msg.data : await getNetworks()
       const statuses = await getNetworkStatuses(networks)

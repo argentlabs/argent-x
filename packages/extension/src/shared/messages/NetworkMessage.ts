@@ -2,6 +2,10 @@ import { Network, NetworkStatus } from "../network"
 
 export type NetworkMessage =
   // ***** networks *****
+  | { type: "GET_NETWORKS" }
+  | { type: "GET_NETWORKS_RES"; data: Network[] }
+  | { type: "GET_NETWORK"; data: Network["id"] }
+  | { type: "GET_NETWORK_RES"; data: Network }
   | { type: "GET_CUSTOM_NETWORKS" }
   | { type: "GET_CUSTOM_NETWORKS_RES"; data: Network[] }
   | { type: "ADD_CUSTOM_NETWORKS"; data: Network[] }
