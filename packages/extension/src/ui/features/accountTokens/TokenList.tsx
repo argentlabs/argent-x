@@ -1,13 +1,15 @@
 import { CellStack } from "@argent/ui"
-import { FC } from "react"
+import { Button, icons } from "@argent/ui"
+import { ComponentProps, FC, PropsWithChildren } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { SectionHeader } from "../accounts/SectionHeader"
 import { TokenListItemContainer, TokenListItemVariant } from "./TokenListItem"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
-interface TokenListProps {
+const { AddIcon } = icons
+
+interface TokenListProps extends PropsWithChildren {
   showTitle?: boolean
   showTokenSymbol?: boolean
   variant?: TokenListItemVariant
@@ -22,6 +24,7 @@ export const TokenList: FC<TokenListProps> = ({
   variant,
   tokenList,
   navigateToSend = false,
+  children,
 }) => {
   const navigate = useNavigate()
   if (!tokenList) {
@@ -45,6 +48,25 @@ export const TokenList: FC<TokenListProps> = ({
           }}
         />
       ))}
+      {children}
     </CellStack>
+  )
+}
+
+export const NewTokenButton: FC<ComponentProps<typeof Button>> = (props) => {
+  return (
+    <Button
+      size={"sm"}
+      colorScheme={"transparent"}
+      mx={"auto"}
+      as={Link}
+      to={routes.newToken()}
+      leftIcon={<AddIcon />}
+      color="neutrals.400"
+      loadingText={"Fetching tokens"}
+      {...props}
+    >
+      New token
+    </Button>
   )
 }

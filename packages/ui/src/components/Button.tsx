@@ -69,6 +69,7 @@ export const buttonTheme = defineStyleConfig({
     outline: {},
     solid: (props) => {
       const { colorScheme: c } = props
+      console.log({ c })
       if (c === "inverted") {
         return {
           bg: mode("black", "white")(props),
@@ -101,6 +102,17 @@ export const buttonTheme = defineStyleConfig({
           },
           _active: {
             bg: mode(`${c}.400`, `${c}.300`)(props),
+          },
+        }
+      } else if (c === "transparent") {
+        return {
+          bg: "transparent",
+          color: mode(`gray.700`, "white")(props),
+          _hover: {
+            bg: mode(`gray.50`, `neutrals.700`)(props),
+          },
+          _active: {
+            bg: mode(`gray.100`, `neutrals.800`)(props),
           },
         }
       }

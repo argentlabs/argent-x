@@ -4,26 +4,18 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { IconBar } from "../../components/IconBar"
-import { AddIcon } from "../../components/Icons/MuiIcons"
 import { SearchIcon } from "../../components/Icons/SearchIcon"
 import {
   ControlledInputType,
   StyledControlledInput,
 } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import { H3 } from "../../theme/Typography"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { AddTokenIconButton } from "../accountTokens/AccountTokens"
-import { TokenList } from "../accountTokens/TokenList"
-import {
-  TokenTitle,
-  TokenWrapper,
-} from "../accountTokens/TokenListItemDeprecated"
+import { NewTokenButton, TokenList } from "../accountTokens/TokenList"
 import {
   TokenDetailsWithBalance,
   useTokensWithBalance,
@@ -84,8 +76,6 @@ export const SendScreen: FC = () => {
   const { control, watch } = useForm({
     defaultValues: { query: "" },
   })
-
-  const navigate = useNavigate()
 
   const account = useSelectedAccount()
 
@@ -148,23 +138,15 @@ export const SendScreen: FC = () => {
         <TabView>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             {selectedTab === "tokens" && (
-              <>
-                <TokenList
-                  variant="no-currency"
-                  isValidating={isValidating}
-                  tokenList={tokenList}
-                  showTokenSymbol
-                  navigateToSend
-                />
-                <TokenWrapper
-                  {...makeClickable(() => navigate(routes.newToken()))}
-                >
-                  <AddTokenIconButton size={40}>
-                    <AddIcon />
-                  </AddTokenIconButton>
-                  <TokenTitle>Add token</TokenTitle>
-                </TokenWrapper>
-              </>
+              <TokenList
+                variant="no-currency"
+                isValidating={isValidating}
+                tokenList={tokenList}
+                showTokenSymbol
+                navigateToSend
+              >
+                <NewTokenButton />
+              </TokenList>
             )}
 
             {selectedTab === "nfts" && (
