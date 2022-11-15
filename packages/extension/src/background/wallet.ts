@@ -33,7 +33,6 @@ import {
   IArrayStorage,
   IKeyValueStorage,
   IObjectStorage,
-  KeyValueStorage,
   ObjectStorage,
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"

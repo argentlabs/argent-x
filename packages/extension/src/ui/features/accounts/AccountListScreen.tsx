@@ -22,7 +22,7 @@ import { AccountListScreenItem } from "./AccountListScreenItem"
 import {
   isHiddenAccount,
   useAccounts,
-  useSelectedAccountStore,
+  useSelectedAccount,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
@@ -63,7 +63,7 @@ const Footer = styled(ResponsiveFixedBox)`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { selectedAccount } = useSelectedAccountStore()
+  const selectedAccount = useSelectedAccount()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,

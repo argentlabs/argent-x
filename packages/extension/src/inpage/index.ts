@@ -1,5 +1,6 @@
 import { assertNever } from "./../ui/services/assertNever"
 import type { WindowMessageType } from "../shared/messages"
+import { getNetwork } from "../shared/network"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
@@ -52,7 +53,8 @@ window.addEventListener(
     }
 
     if (starknet.account && data.type === "CONNECT_ACCOUNT") {
-      const { address, network } = data.data
+      const { address, networkId } = data.data
+      const network = await getNetwork(networkId)
       const isPreauthorized = await getIsPreauthorized()
       if (!isPreauthorized) {
         // disconnect so the user can see they are no longer connected

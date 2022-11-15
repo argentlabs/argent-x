@@ -16,10 +16,7 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../../accounts/accountMetadata.state"
-import {
-  useAccounts,
-  useSelectedAccountStore,
-} from "../../accounts/accounts.state"
+import { useAccounts, useSelectedAccount } from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import { ConfirmPageProps, ConfirmScreen } from "../ConfirmScreen"
 import { DappIcon } from "./DappIcon"
@@ -173,8 +170,7 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
   host,
   ...rest
 }) => {
-  const { selectedAccount: initiallySelectedAccount } =
-    useSelectedAccountStore()
+  const initiallySelectedAccount = useSelectedAccount()
   const visibleAccounts = useAccounts()
   const [connectAccount, setConnectAccount] = useState<
     BaseWalletAccount | undefined

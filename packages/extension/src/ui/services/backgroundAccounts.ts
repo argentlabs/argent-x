@@ -48,17 +48,10 @@ export const accountsOnNetwork = (
   networkId: string,
 ) => accounts.filter((account) => account.networkId === networkId)
 
-export const connectAccount = ({
-  address,
-  network,
-  networkId,
-  signer,
-  type,
-  needsDeploy,
-}: Account) => {
+export const connectAccount = ({ address, networkId }: BaseWalletAccount) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
-    data: { address, network, networkId, signer, type, needsDeploy },
+    data: { address, networkId },
   })
 }
 

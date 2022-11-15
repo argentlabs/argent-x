@@ -6,10 +6,7 @@ import useSWR from "swr"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import {
-  getAccountIdentifier,
-  isDeprecated,
-} from "../../../shared/wallet.service"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
 import { withPolling } from "../../services/swr"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
@@ -19,7 +16,7 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useSelectedAccountStore } from "./accounts.state"
+import { selectAccount } from "./accounts.service"
 import { checkIfUpgradeAvailable } from "./upgrade.service"
 
 const { MoreIcon } = icons
@@ -53,11 +50,8 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
     { suspense: false, ...withPolling(60 * 1000) },
   )
 
-  const onClick = useCallback(() => {
-    useSelectedAccountStore.setState({
-      selectedAccount: account,
-      showMigrationScreen: account ? isDeprecated(account) : false,
-    })
+  const onClick = useCallback(async () => {
+    await selectAccount(account)
     navigate(routes.accountTokens())
   }, [account, navigate])
 

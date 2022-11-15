@@ -2,8 +2,10 @@ import { ethers } from "ethers"
 import { number } from "starknet"
 import { toBN } from "starknet/dist/utils/number"
 
+import { waitForMessage } from "../../../shared/messages"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
+import { connectAccount } from "../../services/backgroundAccounts"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
@@ -13,6 +15,15 @@ export const createAccount = async (networkId: string, password?: string) => {
   }
 
   return Account.create(networkId)
+}
+
+export const selectAccount = async (account?: BaseWalletAccount) => {
+  if (!account) {
+    return
+  }
+
+  connectAccount(account)
+  await waitForMessage("CONNECT_ACCOUNT_RES")
 }
 
 const argentColorsArray = [

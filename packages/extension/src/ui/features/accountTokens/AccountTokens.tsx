@@ -5,10 +5,7 @@ import useSWR from "swr"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { userReviewStore } from "../../../shared/userReview"
-import {
-  getAccountIdentifier,
-  isDeprecated,
-} from "../../../shared/wallet.service"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { IconButton } from "../../components/IconButton"
@@ -35,7 +32,6 @@ import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountSubHeader } from "./AccountSubheader"
-import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
@@ -173,7 +169,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       <StatusMessage>
         <StatusMessageBannerContainer />
       </StatusMessage>
-      {isDeprecated(account) && <MigrationBanner />}
       {showBackupBanner && <RecoveryBanner />}
       {showUpgradeBanner && (
         <Link

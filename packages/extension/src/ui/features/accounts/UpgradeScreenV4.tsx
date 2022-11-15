@@ -14,7 +14,7 @@ import { H2, P } from "../../theme/Typography"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { recover } from "../recovery/recovery.service"
-import { useSelectedAccountStore } from "./accounts.state"
+import { useSelectedAccount } from "./accounts.state"
 
 const StyledIconBar = styled(IconBar)`
   background: url("../../../assets/StarknetStars.png");
@@ -88,7 +88,7 @@ export const UpgradeScreenV4: FC<UpgradeScreenV4Props> = ({
   ...props
 }) => {
   const navigate = useNavigate()
-  const { selectedAccount } = useSelectedAccountStore()
+  const selectedAccount = useSelectedAccount()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
 
   const { state } = useLocation()
