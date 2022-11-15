@@ -84,6 +84,7 @@ const useFormSelects = (selectedNetwork: string) => {
   )
 
   return {
+    accounts,
     accountOptions,
     networkOptions,
   }

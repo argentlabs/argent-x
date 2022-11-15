@@ -1,12 +1,13 @@
-import { FieldError, Input, Select, icons } from "@argent/ui"
-import { Box, Flex, Text } from "@chakra-ui/react"
+import { Error, Input, Select } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
+import { useAppState } from "../../../app.state"
+import { declareContract } from "../../../services/udp.service"
+import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { useFormSelects } from "./useFormSelects"
-
-const { InfoIcon } = icons
 
 interface FieldValues {
   account: string
@@ -19,41 +20,42 @@ interface DeclareSmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
 }
 
-const Error: FC<{ message: string }> = ({ message }) => (
-  <Box
-    position="relative"
-    display="flex"
-    justifyContent="flex-start"
-    gap="5px"
-    mt="3"
-  >
-    <Text fontSize="sm" color="error.500">
-      <InfoIcon />
-    </Text>
-    <FieldError>{message}</FieldError>
-  </Box>
-)
-
 const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   children,
 }) => {
-  const { control, formState, handleSubmit, clearErrors, watch, setValue } =
-    useForm<FieldValues>({
-      mode: "onSubmit",
-    })
+  const {
+    control,
+    formState,
+    handleSubmit,
+    clearErrors,
+    watch,
+    setValue,
+    setError,
+  } = useForm<FieldValues>({
+    mode: "onSubmit",
+  })
   const { errors, isDirty, isSubmitting } = formState
   const selectedNetwork = watch("network")
 
   const [contractJSON, setContractJSON] = useState("")
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const { accountOptions, networkOptions } = useFormSelects(selectedNetwork)
+  const { accounts, accountOptions, networkOptions } =
+    useFormSelects(selectedNetwork)
 
   const uploadFile = useCallback(async () => {
     const file = get(fileInputRef, "current.files[0]")
     const reader = new FileReader()
     reader.onload = function () {
       if (reader.result) {
+        try {
+          JSON.parse(reader.result.toString())
+        } catch (e) {
+          setError("contract", {
+            type: "invalid",
+          })
+          return
+        }
         setContractJSON(reader.result.toString())
         setValue("contract", file.name)
       }
@@ -64,9 +66,15 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   const onSubmit: SubmitHandler<FieldValues> = async ({
     account,
     classHash,
-    contract,
     network,
   }: FieldValues) => {
+    const selectedAccount = accounts.find((act: any) => act.address === account)
+    /* refactor useApp state and useSelectAccountStore -> to use */
+    useAppState.setState({ switcherNetworkId: network })
+    useSelectedAccountStore.setState({
+      selectedAccount,
+    })
+    await declareContract(account, classHash, contractJSON, network)
     clearErrors()
   }
 
@@ -99,7 +107,13 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             </>
           )}
         />
-        {!isEmpty(errors.contract) && <Error message="Contract is required" />}
+        {!isEmpty(errors.contract) && (
+          <Error
+            message={
+              errors.contract.type === "required" ? "Required" : "Invalid JSON"
+            }
+          />
+        )}
 
         <Controller
           name="classHash"
@@ -130,7 +144,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
               maxH="45vh"
               name={name}
               isInvalid={!isEmpty(errors.network)}
-              onChange={(v) => onChange(v)}
+              onChange={onChange}
               options={networkOptions}
               value={value}
             />
@@ -151,7 +165,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
               maxH="33vh"
               name={name}
               isInvalid={!isEmpty(errors.account)}
-              onChange={(v) => onChange(v)}
+              onChange={onChange}
               options={accountOptions}
               value={value}
             />

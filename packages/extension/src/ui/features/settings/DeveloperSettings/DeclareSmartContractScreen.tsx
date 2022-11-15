@@ -22,7 +22,6 @@ const DeclareSmartContractScreen: FC = () => {
               type="submit"
               disabled={!isDirty || isSubmitting}
               width="100%"
-              /* isLoading={isLoading} */
               loadingText="Unlocking"
             >
               Declare
