@@ -49,7 +49,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   const isNoCurrencyVariant = variant === "no-currency"
   return (
     <Button
-      rounded="lg"
+      rounded="xl"
       width="100%"
       h="initial"
       justifyContent="initial"
