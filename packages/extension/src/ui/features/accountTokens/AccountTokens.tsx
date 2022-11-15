@@ -160,7 +160,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         />
         <AccountTokensButtons account={account} />
       </VStack>
-      <CellStack>
+      <CellStack py={0}>
         <StatusMessageBannerContainer />
         {isDeprecated(account) && <MigrationBanner />}
         {showBackupBanner && <RecoveryBanner />}

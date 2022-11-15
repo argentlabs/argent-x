@@ -1,5 +1,6 @@
+import { CellStack } from "@argent/ui"
 import { FC } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
 import { SectionHeader } from "../accounts/SectionHeader"
@@ -16,37 +17,34 @@ interface TokenListProps {
 }
 
 export const TokenList: FC<TokenListProps> = ({
-  showTitle = false,
   showTokenSymbol = false,
   isValidating,
   variant,
   tokenList,
   navigateToSend = false,
 }) => {
+  const navigate = useNavigate()
   if (!tokenList) {
     return null
   }
-
   return (
-    <>
-      {showTitle && <SectionHeader>Tokens</SectionHeader>}
+    <CellStack>
       {tokenList.map((token) => (
-        <Link
+        <TokenListItemContainer
           key={token.address}
-          to={
-            navigateToSend
-              ? routes.sendToken(token.address)
-              : routes.token(token.address)
-          }
-        >
-          <TokenListItemContainer
-            token={token}
-            isLoading={isValidating}
-            variant={variant}
-            showTokenSymbol={showTokenSymbol}
-          />
-        </Link>
+          token={token}
+          isLoading={isValidating}
+          variant={variant}
+          showTokenSymbol={showTokenSymbol}
+          onClick={() => {
+            navigate(
+              navigateToSend
+                ? routes.sendToken(token.address)
+                : routes.token(token.address),
+            )
+          }}
+        />
       ))}
-    </>
+    </CellStack>
   )
 }
