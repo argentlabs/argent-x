@@ -1,3 +1,4 @@
+import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -21,7 +22,6 @@ import {
   redeployAccount,
 } from "../../services/backgroundAccounts"
 import { withPolling } from "../../services/swr"
-import { PendingTransactionsContainer } from "../accountActivity/PendingTransactions"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -34,22 +34,16 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
-import { AccountSubHeader } from "./AccountSubheader"
+import { AccountTokensButtons } from "./AccountTokensButtons"
+import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
-import { TransferButtons } from "./TransferButtons"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: 16px;
-`
 
 export const AddTokenIconButton = styled(IconButton)`
   &:hover,
@@ -72,7 +66,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const location = useLocation()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
-  const { accountNames, setAccountName } = useAccountMetadata()
+  const { accountNames } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
@@ -82,7 +76,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const userHasReviewed = useKeyValueStorage(userReviewStore, "hasReviewed")
 
-  const showPendingTransactions = pendingTransactions.length > 0
+  const hasPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
   const network = useCurrentNetwork()
   const {
@@ -124,25 +118,25 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [account])
 
   const showUpgradeBanner = Boolean(
-    needsUpgrade && !showPendingTransactions && feeTokenBalance?.gt(0),
+    needsUpgrade && !hasPendingTransactions && feeTokenBalance?.gt(0),
   )
   const showNoBalanceForUpgrade = Boolean(
-    needsUpgrade && !showPendingTransactions && feeTokenBalance?.lte(0),
+    needsUpgrade && !hasPendingTransactions && feeTokenBalance?.lte(0),
   )
 
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
-    if (showPendingTransactions) {
+    if (hasPendingTransactions) {
       hadPendingTransactions.current = true
     }
-    if (hadPendingTransactions.current && showPendingTransactions === false) {
+    if (hadPendingTransactions.current && hasPendingTransactions === false) {
       // switched from true to false
       hadPendingTransactions.current = false
       mutate(false) // update upgrade banner
     }
-  }, [mutate, showPendingTransactions])
+  }, [mutate, hasPendingTransactions])
 
   useEffect(() => {
     connectAccount(account)
@@ -159,17 +153,16 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
   const accountIsDeployed = useAccountIsDeployed(account)
   return (
-    <Container data-testid="account-tokens">
-      <AccountSubHeader
-        status={status}
-        account={account}
-        accountName={accountName}
-        onRedeploy={onRedeploy}
-        onChangeName={(name) =>
-          setAccountName(account.networkId, account.address, name)
-        }
-      />
-      <TransferButtons account={account} />
+    <Flex direction={"column"} data-testid="account-tokens">
+      <VStack spacing={6} mb={6}>
+        <AccountTokensHeader
+          status={status}
+          account={account}
+          accountName={accountName}
+          onRedeploy={onRedeploy}
+        />
+        <AccountTokensButtons account={account} />
+      </VStack>
       <StatusMessage>
         <StatusMessageBannerContainer />
       </StatusMessage>
@@ -188,7 +181,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           <UpgradeBanner canNotPay />
         </Link>
       )}
-      <PendingTransactionsContainer account={account} />
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
       {accountIsDeployed && (
         <ErrorBoundary
@@ -206,7 +198,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           ) : (
             <>
               <TokenList
-                showTitle={showPendingTransactions}
+                showTitle={hasPendingTransactions}
                 isValidating={isValidating}
                 tokenList={tokenDetails}
                 variant={tokenListVariant}
@@ -227,6 +219,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           )}
         </ErrorBoundary>
       )}
-    </Container>
+    </Flex>
   )
 }

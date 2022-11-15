@@ -94,13 +94,13 @@ export const buttonTheme = defineStyleConfig({
         }
       } else if (c === "tertiary") {
         return {
-          bg: mode(`${c}.200`, `${c}.800`)(props),
-          color: mode(`white`, `${c}300`)(props),
+          bg: mode(`${c}.200`, `${c}.500`)(props),
+          color: mode(`white`, `white`)(props),
           _hover: {
-            bg: mode(`${c}.300`, `${c}.700`)(props),
+            bg: mode(`${c}.300`, `${c}.400`)(props),
           },
           _active: {
-            bg: mode(`${c}.400`, `${c}.600`)(props),
+            bg: mode(`${c}.400`, `${c}.300`)(props),
           },
         }
       }
