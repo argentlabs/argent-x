@@ -1,6 +1,7 @@
+import { CellStack } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import useSWR from "swr"
 
@@ -163,24 +164,20 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         />
         <AccountTokensButtons account={account} />
       </VStack>
-      <StatusMessage>
+      <CellStack>
         <StatusMessageBannerContainer />
-      </StatusMessage>
-      {isDeprecated(account) && <MigrationBanner />}
-      {showBackupBanner && <RecoveryBanner />}
-      {showUpgradeBanner && (
-        <Link
-          to={routes.accountUpgradeV4()}
-          state={{ from: location.pathname }}
-        >
-          <UpgradeBanner />
-        </Link>
-      )}
-      {showNoBalanceForUpgrade && (
-        <Link to={routes.funding()}>
-          <UpgradeBanner canNotPay />
-        </Link>
-      )}
+        {isDeprecated(account) && <MigrationBanner />}
+        {showBackupBanner && <RecoveryBanner />}
+        {showUpgradeBanner && (
+          <UpgradeBanner
+            to={routes.accountUpgradeV4()}
+            state={{ from: location.pathname }}
+          />
+        )}
+        {showNoBalanceForUpgrade && (
+          <UpgradeBanner canNotPay to={routes.funding()} />
+        )}
+      </CellStack>
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
       {accountIsDeployed && (
         <ErrorBoundary

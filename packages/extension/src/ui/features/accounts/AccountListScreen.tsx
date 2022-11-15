@@ -109,7 +109,7 @@ export const AccountListScreen: FC = () => {
         }
       >
         <Flex p={4} gap={2} direction="column">
-          {isBackupRequired && <RecoveryBanner noMargins />}
+          {isBackupRequired && <RecoveryBanner />}
           {visibleAccounts.length === 0 && (
             <Paragraph>
               No {hasHiddenAccounts ? "visible" : ""} accounts on this network,
