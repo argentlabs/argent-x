@@ -20,7 +20,10 @@ import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddTokenIconButton } from "../accountTokens/AccountTokens"
 import { TokenList } from "../accountTokens/TokenList"
-import { TokenTitle, TokenWrapper } from "../accountTokens/TokenListItem"
+import {
+  TokenTitle,
+  TokenWrapper,
+} from "../accountTokens/TokenListItemDeprecated"
 import {
   TokenDetailsWithBalance,
   useTokensWithBalance,

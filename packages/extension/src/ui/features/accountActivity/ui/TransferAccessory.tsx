@@ -1,7 +1,10 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { TokenTextGroup, TokenTitle } from "../../accountTokens/TokenListItem"
+import {
+  TokenTextGroup,
+  TokenTitle,
+} from "../../accountTokens/TokenListItemDeprecated"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 import {
   TokenApproveTransaction,

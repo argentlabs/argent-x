@@ -39,7 +39,7 @@ import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
-import { TokenTitle, TokenWrapper } from "./TokenListItem"
+import { TokenTitle, TokenWrapper } from "./TokenListItemDeprecated"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
@@ -52,10 +52,6 @@ export const AddTokenIconButton = styled(IconButton)`
     background-color: rgba(255, 255, 255, 0.15);
     outline: 0;
   }
-`
-
-const StatusMessage = styled.div`
-  margin: 0 20px 16px 20px;
 `
 
 interface AccountTokensProps {
