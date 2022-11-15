@@ -23,7 +23,7 @@ export const selectAccount = async (account?: BaseWalletAccount) => {
   }
 
   connectAccount(account)
-  await waitForMessage("CONNECT_ACCOUNT_RES")
+  return await waitForMessage("CONNECT_ACCOUNT_RES")
 }
 
 const argentColorsArray = [

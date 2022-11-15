@@ -21,10 +21,9 @@ export const getNetwork = async (networkId: string) => {
       type: "GET_NETWORK",
       data: networkId,
     })
-    const network = await waitForMessage("GET_NETWORK_RES", 1000)
-    return network
+    return await waitForMessage("GET_NETWORK_RES", 2000)
   } catch (error) {
-    console.error(error)
+    console.error(`Error getting network: ${error} for networkId: ${networkId}`)
     throw error
   }
 }

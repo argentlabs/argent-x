@@ -7,9 +7,9 @@ import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { analytics } from "../../services/analytics"
 import { assertNever } from "../../services/assertNever"
-import { connectAccount } from "../../services/backgroundAccounts"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { Account } from "../accounts/Account"
+import { selectAccount } from "../accounts/accounts.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
@@ -72,9 +72,7 @@ export const ActionScreen: FC = () => {
           host={action.payload.host}
           onConnect={async (selectedAccount: Account) => {
             useAppState.setState({ isLoading: true })
-            // switch background wallet to the account that was selected
-            connectAccount(selectedAccount)
-            await waitForMessage("CONNECT_ACCOUNT_RES")
+            selectAccount(selectedAccount)
             // continue with approval with selected account
             await approveAction(action)
             await waitForMessage("CONNECT_DAPP_RES")
