@@ -34,7 +34,7 @@ export const Default = Template.bind({})
 Default.args = {
   title: "Setup account recovery",
   description: "Click to secure your assets.",
-  colorScheme: "danger",
+  colorScheme: "primary",
 }
 
 export const Large = Template.bind({})
