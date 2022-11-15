@@ -11,7 +11,10 @@ import { navigateFromAccountToAccountList } from "./steps/navigateFromAccountToA
 import { navigateFromAccountToTokenDetails } from "./steps/navigateFromAccountToTokenDetails"
 import { newAccount } from "./steps/newAccount"
 import { selectAccountFromAccountList } from "./steps/selectAccountFromAccountList"
-import { waitForAllPendingTransactionsInAccount } from "./steps/waitForAllPendingTransactionsInAccount"
+import {
+  HAS_PENDING_TRANSACTIONS_SELECTOR,
+  waitForAllPendingTransactionsInAccount,
+} from "./steps/waitForAllPendingTransactionsInAccount"
 import { formatTruncatedAddress } from "./utils"
 
 test("send max eth flow", async ({ page, context }) => {
@@ -44,7 +47,7 @@ test("send max eth flow", async ({ page, context }) => {
 
   // await dismissUserReview(page)
 
-  await page.waitForSelector("h3:has-text('Pending transactions')")
+  await page.waitForSelector(HAS_PENDING_TRANSACTIONS_SELECTOR)
   await waitForAllPendingTransactionsInAccount(page)
 
   const b1After = await getBalanceFromAccountPage(page, "Ethereum")

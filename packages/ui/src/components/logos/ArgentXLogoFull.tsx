@@ -1,5 +1,4 @@
 import { SVGProps } from "react"
-
 const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width="3.4166666666666665em"
@@ -20,5 +19,4 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     </defs>
   </svg>
 )
-
 export default SvgComponent

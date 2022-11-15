@@ -1,22 +1,35 @@
+import { AlertButton, icons } from "@argent/ui"
 import { FC } from "react"
+import { To, useNavigate } from "react-router-dom"
 
-import { Banner } from "../../components/Banner"
-import { UpdateIcon } from "../../components/Icons/UpdateIcon"
+const { UpgradeIcon } = icons
 
-interface UpgradeBannerProps {
+export interface UpgradeBannerProps {
+  to?: To
+  state?: any
   canNotPay?: boolean
 }
 
 export const UpgradeBanner: FC<UpgradeBannerProps> = ({
-  canNotPay = false,
-}) => (
-  <Banner
-    title="Upgrade Required"
-    description={
-      canNotPay
-        ? "Add ETH to upgrade and use this account"
-        : "Upgrade to continue using this account"
-    }
-    icon={<UpdateIcon />}
-  />
-)
+  to,
+  state,
+  canNotPay,
+}) => {
+  const navigate = useNavigate()
+  return (
+    <AlertButton
+      colorScheme={"primary"}
+      title="Upgrade Required"
+      description={
+        canNotPay
+          ? "Add ETH to upgrade and use this account"
+          : "Upgrade to continue using this account"
+      }
+      size="lg"
+      icon={<UpgradeIcon />}
+      onClick={() => {
+        to && navigate(to, { state })
+      }}
+    />
+  )
+}
