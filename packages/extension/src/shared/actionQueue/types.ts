@@ -1,4 +1,10 @@
-import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
+import type {
+  Abi,
+  Call,
+  DeclareContractTransaction,
+  InvocationsDetails,
+  typedData,
+} from "starknet"
 
 import { TransactionMeta } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
@@ -70,6 +76,14 @@ export type ActionItem =
         explorerUrl?: string
         accountImplementation?: string
         rpcUrl?: string
+      }
+    }
+  | {
+      type: "REQUEST_DECLARE_CONTRACT"
+      payload: {
+        classHash: string
+        contract: string
+        declareTransaction: DeclareContractTransaction
       }
     }
 

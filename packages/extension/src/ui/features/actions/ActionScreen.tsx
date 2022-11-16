@@ -19,6 +19,7 @@ import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
+import { ApproveDeclareContractScreen } from "./ApproveDeclareContractScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
@@ -232,6 +233,51 @@ export const ActionScreen: FC = () => {
             useAppState.setState({ isLoading: false })
           }}
           onReject={onReject}
+          selectedAccount={account}
+        />
+      )
+    case "REQUEST_DECLARE_CONTRACT":
+      return (
+        <ApproveDeclareContractScreen
+          actionHash={action.meta.hash}
+          classHash={action.payload.classHash}
+          contract={action.payload.contract}
+          onSubmit={async () => {
+            analytics.track("signedTransaction", {
+              networkId: account?.networkId || "unknown",
+            })
+
+            /* TODO: call background service -> wallet.starknetaccount.declare */
+
+            await approveAction(action)
+            useAppState.setState({ isLoading: true })
+            const result = await Promise.race([
+              waitForMessage(
+                "DECLARE_CONTRACT_ACTION_SUBMITTED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+              waitForMessage(
+                "DECLARE_CONTRACT_ACTION_FAILED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+            ])
+            // (await) blocking as the window may closes afterwards
+            await analytics.track("sentTransaction", {
+              success: !("error" in result),
+              networkId: account?.networkId || "unknown",
+            })
+            if ("error" in result) {
+              useAppState.setState({
+                error: `Sending transaction failed: ${result.error}`,
+                isLoading: false,
+              })
+              navigate(routes.error())
+            } else {
+              closePopupIfLastAction()
+              useAppState.setState({ isLoading: false })
+            }
+          }}
+          onReject={rejectAllActions}
           selectedAccount={account}
         />
       )
