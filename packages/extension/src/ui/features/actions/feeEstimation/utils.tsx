@@ -2,9 +2,11 @@ import { BigNumber, utils } from "ethers"
 import { Call } from "starknet"
 import useSWR from "swr"
 
+import { DeclareContract } from "../../../../shared/udp/type"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import {
   getAccountDeploymentEstimatedFee,
+  getDeclareContractEstimatedFee,
   getEstimatedFee,
 } from "../../../services/backgroundTransactions"
 
@@ -31,6 +33,22 @@ export const useMaxAccountDeploymentFeeEstimation = (
   const { data: fee, error } = useSWR(
     [actionHash, "accountDeploymentFeeEstimation"],
     () => getAccountDeploymentEstimatedFee(account),
+    {
+      suspense: false,
+      refreshInterval: 20 * 1000, // 20 seconds
+      shouldRetryOnError: false,
+    },
+  )
+  return { fee, error }
+}
+
+export const useMaxDeclareContractFeeEstimation = (
+  account: DeclareContract,
+  actionHash: string,
+) => {
+  const { data: fee, error } = useSWR(
+    [actionHash, "declareContractFeeEstimation"],
+    () => getDeclareContractEstimatedFee(account),
     {
       suspense: false,
       refreshInterval: 20 * 1000, // 20 seconds
