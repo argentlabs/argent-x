@@ -15,11 +15,12 @@ import { useSelectedAccount } from "./accounts.state"
 
 const { SettingsIcon, DropdownDownIcon } = icons
 
-export interface AccountHeaderProps extends Pick<NavigationBarProps, "scroll"> {
+export interface AccountNavigationBarProps
+  extends Pick<NavigationBarProps, "scroll"> {
   showAccountButton?: boolean
 }
 
-export const AccountHeader: FC<AccountHeaderProps> = ({
+export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   scroll,
   showAccountButton = true,
 }) => {

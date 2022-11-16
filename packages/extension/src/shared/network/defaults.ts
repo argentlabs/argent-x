@@ -11,7 +11,7 @@ const DEV_ONLY_NETWORKS: Network[] = [
         "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
     },
     multicallAddress:
-      "0x02acfa68f063b35ffd9e6a6b77ba0d7ad231d1a64f9fa8c5770e0be376e17ef9",
+      "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
   },
 ]
 
@@ -27,7 +27,7 @@ export const defaultNetworks: Network[] = [
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
     },
     multicallAddress:
-      "0x0740a7a14618bb7e4688d10059bc42104d22c315bb647130630c77d3b6d3ee50",
+      "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
     readonly: true,
   },
   {
@@ -43,7 +43,7 @@ export const defaultNetworks: Network[] = [
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
     },
     multicallAddress:
-      "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
+      "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
     readonly: true,
   },
   {
@@ -59,7 +59,7 @@ export const defaultNetworks: Network[] = [
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
     },
     multicallAddress:
-      "0x0648aa7b71687449382180c76fd2871e1e77ccb6775e8d29b79e3d8c8b512380",
+      "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
   },
   ...(process.env.NODE_ENV === "development" ? DEV_ONLY_NETWORKS : []),
   {
