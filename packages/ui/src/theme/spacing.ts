@@ -2,6 +2,7 @@ import { pxToRem } from "./utilities/pxToRem"
 
 export const spacing = {
   0: pxToRem(0),
+  "0.5": pxToRem(2),
   1: pxToRem(4),
   "1.5": pxToRem(6),
   2: pxToRem(8),
