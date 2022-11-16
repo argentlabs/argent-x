@@ -1,3 +1,5 @@
+import retry from "async-retry"
+
 import { getJwt } from "../__unsafe__oldJwt"
 
 export const ARGENT_API_BASE_URL = "https://cloud-dev.argent-api.com/v1"
@@ -128,7 +130,7 @@ export const getVerificationErrorMessage = (
 
 export const register = async (): Promise<void> => {
   const jwt = await getJwt()
-  const res = await fetch(`${ARGENT_API_BASE_URL}/account/register`, {
+  const res = await fetch(`${ARGENT_API_BASE_URL}/account/asyncRegister`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${jwt}`,
@@ -139,6 +141,25 @@ export const register = async (): Promise<void> => {
   if (!res.ok) {
     throw new Error("failed to register")
   }
+
+  await retry(
+    async (bail) => {
+      const registerStatus = await getRegistrationStatus()
+      if (registerStatus === "registering") {
+        throw new Error("not registered yet")
+      }
+      if (registerStatus !== "registered") {
+        bail(new Error("failed to register"))
+      }
+      // registered!
+    },
+    {
+      forever: true,
+      minTimeout: 1000,
+      maxTimeout: 10000,
+      factor: 1.5,
+    },
+  )
 }
 
 interface VerifyEmailResponse {
@@ -218,6 +239,7 @@ export const getAccounts = async (): Promise<Account[]> => {
   }
 
   const json = await response.json()
+  console.log("accounts", json.accounts)
   return json.accounts
 }
 
@@ -242,9 +264,7 @@ export const getAccount = async (): Promise<UserAccount> => {
   const json = await response.json()
 
   // TODO: [BE] make atomic
-  if (!json.accounts) {
-    json.accounts = await getAccounts()
-  }
+  json.accounts = await getAccounts()
 
   return json
 }

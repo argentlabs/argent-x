@@ -1,4 +1,5 @@
 import { getStarkKey, utils } from "micro-starknet"
+import { encode } from "starknet"
 
 export interface Keypair {
   publicKey: string
@@ -7,10 +8,12 @@ export interface Keypair {
 
 export const getNewStarkKeypair = async (): Promise<Keypair> => {
   const privateKey = utils.randomPrivateKey()
-  const publicKey = getStarkKey(privateKey)
+  const publicKey = encode.addHexPrefix(
+    encode.removeHexPrefix(getStarkKey(privateKey)).padStart(64, "0"),
+  )
 
   return {
     publicKey,
-    privateKey: utils.bytesToHex(privateKey),
+    privateKey: encode.addHexPrefix(utils.bytesToHex(privateKey)),
   }
 }

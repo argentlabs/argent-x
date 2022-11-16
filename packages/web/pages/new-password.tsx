@@ -22,7 +22,7 @@ export default function NewPassword() {
 
   const email = navigate.query["email"]
   if (typeof email !== "string") {
-    return <Navigate to="/email" />
+    return <Navigate to="/" />
   }
 
   return (
@@ -31,6 +31,7 @@ export default function NewPassword() {
       onSubmit={handleSubmit(async ({ password }) => {
         try {
           await createAccount(password)
+          return navigate.push("/dashboard")
         } catch (error) {
           console.error(error)
           if (error instanceof Error) {
