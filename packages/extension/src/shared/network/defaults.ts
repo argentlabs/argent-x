@@ -24,9 +24,7 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://voyager.online",
     accountClassHash: {
       argentAccount:
-        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
-      argentPluginAccount:
-        "0xebe4b44d154bc07eacad202ee19757cdc73e7d4c672bc20d9031450c6db3ad",
+        "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
     },
     multicallAddress:
       "0x0740a7a14618bb7e4688d10059bc42104d22c315bb647130630c77d3b6d3ee50",
@@ -40,9 +38,9 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://goerli.voyager.online",
     accountClassHash: {
       argentAccount:
-        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
+        "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
       argentPluginAccount:
-        "0xebe4b44d154bc07eacad202ee19757cdc73e7d4c672bc20d9031450c6db3ad",
+        "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
     },
     multicallAddress:
       "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
@@ -56,9 +54,9 @@ export const defaultNetworks: Network[] = [
     explorerUrl: "https://goerli-2.voyager.online/",
     accountClassHash: {
       argentAccount:
-        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
+        "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
       argentPluginAccount:
-        "0xebe4b44d154bc07eacad202ee19757cdc73e7d4c672bc20d9031450c6db3ad",
+        "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
     },
     multicallAddress:
       "0x0648aa7b71687449382180c76fd2871e1e77ccb6775e8d29b79e3d8c8b512380",
