@@ -112,10 +112,41 @@ export const handleActionApproval = async (
       }
     }
 
-    case "REQUEST_DECLARE_CONTRACT": {
-      return {
-        type: "REQUEST_DECLARE_CONTRACT_RES",
-        data: { actionHash },
+    case "DECLARE_CONTRACT_ACTION": {
+      try {
+        const account = await wallet.getSelectedAccount()
+        if (!account) {
+          throw new Error("No account selected")
+        }
+
+        const starknetAccount = await wallet.getStarknetAccount({
+          address: account.address,
+          networkId: account.networkId,
+        })
+        const { transaction_hash: txHash } =
+          await starknetAccount.declareContract(
+            {
+              contractDefinition: JSON.parse(action.payload.contract),
+              contract: action.payload.contract,
+              senderAddress: account.address,
+            },
+            { nonce: starknetAccount.getNonce() },
+          )
+
+        return {
+          type: "DECLARE_CONTRACT_ACTION_SUBMITTED",
+          data: { txHash, actionHash },
+        }
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        return {
+          type: "DECLARE_CONTRACT_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
       }
     }
 
@@ -185,7 +216,7 @@ export const handleActionRejection = async (
       }
     }
 
-    case "REQUEST_DECLARE_CONTRACT": {
+    case "DECLARE_CONTRACT_ACTION": {
       return {
         type: "REQUEST_DECLARE_CONTRACT_REJ",
         data: { actionHash },

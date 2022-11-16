@@ -236,7 +236,7 @@ export const ActionScreen: FC = () => {
           selectedAccount={account}
         />
       )
-    case "REQUEST_DECLARE_CONTRACT":
+    case "DECLARE_CONTRACT_ACTION":
       return (
         <ApproveDeclareContractScreen
           actionHash={action.meta.hash}
@@ -246,9 +246,6 @@ export const ActionScreen: FC = () => {
             analytics.track("signedTransaction", {
               networkId: account?.networkId || "unknown",
             })
-
-            /* TODO: call background service -> wallet.starknetaccount.declare */
-
             await approveAction(action)
             useAppState.setState({ isLoading: true })
             const result = await Promise.race([

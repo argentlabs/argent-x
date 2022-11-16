@@ -79,7 +79,7 @@ export type ActionItem =
       }
     }
   | {
-      type: "REQUEST_DECLARE_CONTRACT"
+      type: "DECLARE_CONTRACT_ACTION"
       payload: {
         classHash: string
         contract: string
