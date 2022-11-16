@@ -5,10 +5,7 @@ interface Metadata {
   [key: string]: string
 }
 
-type AccessPolicy =
-  | "WEB_WALLET_SESSION"
-  | "WEB_WALLET_USER"
-  | "WEB_WALLET_OWNER"
+type AccessPolicy = "WEB_WALLET_KEY" | "WEB_WALLET_SESSION" | "DEFAULT"
 
 interface PostFileRequest {
   metadata?: Metadata
@@ -56,7 +53,7 @@ export const postTextFile = async (
   return json
 }
 
-export const getJsonFile = async (name: string): Promise<string> => {
+export const getTextFile = async (name: string): Promise<string> => {
   const jwt = await getJwt()
   const response = await fetch(`${ARGENT_API_BASE_URL}/files/${name}.txt`, {
     method: "GET",
@@ -65,10 +62,17 @@ export const getJsonFile = async (name: string): Promise<string> => {
     },
   })
 
-  console.log("getJsonFile", "HTTP code", response.status)
+  console.log("getTextFile", "HTTP code", response.status)
 
   if (!response.ok) {
-    throw new Error(`Failed to get file ${name}`)
+    switch (response.status) {
+      case 404:
+        throw new Error("file not found")
+      case 401:
+        throw new Error("unauthorized")
+      default:
+        throw new Error(`failed to get file`)
+    }
   }
 
   const blob = await response.blob()

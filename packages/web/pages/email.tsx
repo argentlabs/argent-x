@@ -9,31 +9,7 @@ import { useForm } from "react-hook-form"
 import { Layout } from "../components/Layout"
 import { enterEmailFormSchema } from "../schemas/forms/email"
 import { isSubmitDisabled } from "../schemas/utils"
-import { getAccount } from "../services/backend/account"
 import { requestEmail } from "../services/register"
-
-const useAlreadyAuthenticatedGuard = async () => {
-  const router = useRouter()
-  useEffect(() => {
-    getAccount()
-      .then((account) => {
-        console.log(account)
-        if ((account.accounts?.length ?? 0) > 0) {
-          return router.push(
-            `/password?email=${encodeURIComponent(account.email)}`,
-            "/password",
-          )
-        }
-        return router.push(
-          `/new-password?email=${encodeURIComponent(account.email)}`,
-          "/new-password",
-        )
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [router])
-}
 
 export default function Email() {
   const navigate = useRouter()
@@ -43,8 +19,6 @@ export default function Email() {
     },
     resolver: zodResolver(enterEmailFormSchema),
   })
-
-  useAlreadyAuthenticatedGuard()
 
   return (
     <Layout

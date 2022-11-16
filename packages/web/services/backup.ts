@@ -1,5 +1,5 @@
 import { ScryptOpts, scryptAsync } from "@noble/hashes/scrypt"
-import { bytesToHex, randomBytes } from "@noble/hashes/utils"
+import { bytesToHex, hexToBytes, randomBytes } from "@noble/hashes/utils"
 import {
   EncryptJWT,
   KeyLike,
@@ -20,7 +20,10 @@ export const encryptPrivateKeyWithPassword = async (
   password: string,
 ): Promise<string> => {
   const salt = randomBytes(32)
+
+  console.time("scrypt")
   const key = await scryptAsync(password, salt, scryptOpts)
+  console.timeEnd("scrypt")
 
   const encryptedPrivateKey = await new EncryptJWT({
     privateKey,
@@ -45,7 +48,7 @@ export const decryptPrivateKeyWithPassword = async (
     throw new Error("salt is not provided in the protected header")
   }
 
-  const key = await scryptAsync(password, salt, scryptOpts)
+  const key = await scryptAsync(password, hexToBytes(salt), scryptOpts)
 
   const {
     payload: { privateKey },

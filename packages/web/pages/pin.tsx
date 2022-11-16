@@ -2,7 +2,6 @@ import {
   FieldError,
   H5,
   L2,
-  PinInput,
   PinInputField,
   PinInputWrapper,
   icons,
@@ -40,7 +39,7 @@ export default function Pin() {
 
   const email = navigate.query["email"]
   if (typeof email !== "string") {
-    return <Navigate to="/email" />
+    return <Navigate to="/" />
   }
 
   return (
