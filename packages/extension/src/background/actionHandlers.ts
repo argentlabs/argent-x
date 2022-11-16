@@ -112,6 +112,15 @@ export const handleActionApproval = async (
       }
     }
 
+    case "REQUEST_DECLARE_CONTRACT": {
+      return {
+        type: "REQUEST_DECLARE_CONTRACT_RES",
+        data: { actionHash },
+      }
+    }
+
+    /* TODO: add deploy */
+
     default:
       assertNever(action)
   }
@@ -175,6 +184,15 @@ export const handleActionRejection = async (
         data: { actionHash },
       }
     }
+
+    case "REQUEST_DECLARE_CONTRACT": {
+      return {
+        type: "REQUEST_DECLARE_CONTRACT_REJ",
+        data: { actionHash },
+      }
+    }
+
+    /* TODO: add deploy */
 
     default:
       assertNever(action)
