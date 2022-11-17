@@ -21,10 +21,8 @@ const baseStyle = definePartsStyle((props) => {
   const { colorScheme: c } = props
   return {
     container: {
-      p: 3,
       display: "flex",
       alignItems: "center",
-      rounded: "base",
     },
     icon: {
       rounded: "full",
@@ -93,7 +91,13 @@ const variants = {
 }
 
 const sizes = {
-  base: {},
+  base: definePartsStyle({
+    container: {
+      px: 3,
+      py: 3,
+      rounded: "base",
+    },
+  }),
   lg: definePartsStyle({
     container: {
       px: 4,
@@ -115,6 +119,9 @@ export const alertTheme = defineMultiStyleConfig({
   baseStyle,
   variants,
   sizes,
+  defaultProps: {
+    size: "base",
+  },
 })
 
 export interface AlertProps

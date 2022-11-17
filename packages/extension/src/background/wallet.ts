@@ -442,66 +442,15 @@ export class Wallet {
     deployerAccount?: Account,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
-    const accountClassHash = await this.getAccountClassHashForNetwork(
-      walletAccount.network,
-      "argent",
-      deployerAccount,
-    )
 
     if (!("deployAccount" in starknetAccount)) {
       throw Error("Cannot deploy old accounts")
     }
 
-    const starkPair = await this.getKeyPairByDerivationPath(
-      walletAccount.signer.derivationPath,
+    const deployAccountPayload = await this.getAccountDeploymentPayload(
+      walletAccount,
+      deployerAccount,
     )
-
-    const starkPub = ec.getStarkKey(starkPair)
-
-    const deployAccountPayload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      contractAddress: starknetAccount.address,
-      constructorCalldata: stark.compileCalldata({
-        implementation: accountClassHash,
-        selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-      }),
-      addressSalt: starkPub,
-    }
-
-    const calculatedAccountAddress = calculateContractAddressFromHash(
-      deployAccountPayload.addressSalt,
-      deployAccountPayload.classHash,
-      deployAccountPayload.constructorCalldata,
-      0,
-    )
-
-    if (!isEqualAddress(calculatedAccountAddress, walletAccount.address)) {
-      console.warn("Calculated address does not match account address")
-      const oldCalldata = stark.compileCalldata({
-        implementation:
-          "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f", // old implementation, ask @janek why
-        selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({
-          signer: starkPub,
-          guardian: "0",
-        }),
-      })
-      if (
-        isEqualAddress(
-          calculateContractAddressFromHash(
-            deployAccountPayload.addressSalt,
-            deployAccountPayload.classHash,
-            oldCalldata,
-            0,
-          ),
-          walletAccount.address,
-        )
-      ) {
-        console.warn("Address matches old implementation")
-        deployAccountPayload.constructorCalldata = oldCalldata
-      }
-    }
 
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
@@ -517,32 +466,15 @@ export class Wallet {
     deployerAccount?: Account,
   ): Promise<EstimateFee> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
-    const accountClassHash = await this.getAccountClassHashForNetwork(
-      walletAccount.network,
-      "argent",
-      deployerAccount,
-    )
 
     if (!("deployAccount" in starknetAccount)) {
       throw Error("Cannot estimate fee to deploy old accounts")
     }
 
-    const starkPair = await this.getKeyPairByDerivationPath(
-      walletAccount.signer.derivationPath,
+    const deployAccountPayload = await this.getAccountDeploymentPayload(
+      walletAccount,
+      deployerAccount,
     )
-
-    const starkPub = ec.getStarkKey(starkPair)
-
-    const deployAccountPayload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      contractAddress: starknetAccount.address,
-      constructorCalldata: stark.compileCalldata({
-        implementation: accountClassHash,
-        selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-      }),
-      addressSalt: starkPub,
-    }
 
     return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
   }
@@ -569,6 +501,75 @@ export class Wallet {
     const deployTransaction = await provider.deployContract(payload)
 
     return { account, txHash: deployTransaction.transaction_hash }
+  }
+  /** Get the Account Deployment Payload
+   * Use it in the deployAccount and getAccountDeploymentFee methods
+   * @param  {WalletAccount} walletAccount
+   * @param  {Account} deployerAccount?
+   */
+  public async getAccountDeploymentPayload(
+    walletAccount: WalletAccount,
+    deployerAccount?: Account,
+  ) {
+    const starkPair = await this.getKeyPairByDerivationPath(
+      walletAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      walletAccount.network,
+      "argent",
+      deployerAccount,
+    )
+
+    const constructorCallData = {
+      implementation: accountClassHash,
+      selector: getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+    }
+
+    const deployAccountPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contractAddress: walletAccount.address,
+      constructorCalldata: stark.compileCalldata(constructorCallData),
+      addressSalt: starkPub,
+    }
+
+    const calculatedAccountAddress = calculateContractAddressFromHash(
+      deployAccountPayload.addressSalt,
+      deployAccountPayload.classHash,
+      deployAccountPayload.constructorCalldata,
+      0,
+    )
+
+    if (isEqualAddress(walletAccount.address, calculatedAccountAddress)) {
+      return deployAccountPayload
+    }
+
+    console.warn("Calculated address does not match account address")
+
+    const oldCalldata = stark.compileCalldata({
+      ...constructorCallData,
+      implementation:
+        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f", // old implementation, ask @janek why
+    })
+
+    const oldCalculatedAddress = calculateContractAddressFromHash(
+      deployAccountPayload.addressSalt,
+      deployAccountPayload.classHash,
+      oldCalldata,
+      0,
+    )
+
+    if (isEqualAddress(oldCalculatedAddress, walletAccount.address)) {
+      console.warn("Address matches old implementation")
+      deployAccountPayload.constructorCalldata = oldCalldata
+    } else {
+      throw new Error("Calculated address does not match account address")
+    }
+
+    return deployAccountPayload
   }
 
   public async getDeployContractPayloadForAccountIndex(

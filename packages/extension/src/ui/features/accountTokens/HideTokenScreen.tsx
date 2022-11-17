@@ -8,7 +8,7 @@ import { Alert } from "../../components/Alert"
 import { routes } from "../../routes"
 import { FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
-import { TokenIcon } from "./TokenIcon"
+import { TokenIconDeprecated } from "./TokenIconDeprecated"
 import { toTokenView } from "./tokens.service"
 import { useToken } from "./tokens.state"
 
@@ -66,7 +66,7 @@ export const HideTokenScreen: FC = () => {
       onSubmit={handleSubmit}
     >
       <TokenTitle>
-        <TokenIcon url={image} name={name} large />
+        <TokenIconDeprecated url={image} name={name} large />
         <TokenName>{name}</TokenName>
       </TokenTitle>
       {error && <FormError>{error}</FormError>}

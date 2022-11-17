@@ -9,7 +9,7 @@ import {
   TokenTextGroup,
   TokenTitle,
   TokenWrapper,
-} from "../accountTokens/TokenListItem"
+} from "../accountTokens/TokenListItemDeprecated"
 import {
   isNFTTransaction,
   isNFTTransferTransaction,

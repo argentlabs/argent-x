@@ -2,7 +2,6 @@ import { CellStack } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import styled from "styled-components"
 import useSWR from "swr"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
@@ -13,11 +12,7 @@ import {
 } from "../../../shared/wallet.service"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { IconButton } from "../../components/IconButton"
-import { AddIcon } from "../../components/Icons/MuiIcons"
-import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import {
   connectAccount,
   redeployAccount,
@@ -38,25 +33,12 @@ import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBann
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
-import { TokenList } from "./TokenList"
-import { TokenTitle, TokenWrapper } from "./TokenListItem"
+import { NewTokenButton, TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
-
-export const AddTokenIconButton = styled(IconButton)`
-  &:hover,
-  &:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-    outline: 0;
-  }
-`
-
-const StatusMessage = styled.div`
-  margin: 0 20px 16px 20px;
-`
 
 interface AccountTokensProps {
   account: Account
@@ -164,7 +146,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         />
         <AccountTokensButtons account={account} />
       </VStack>
-      <CellStack>
+      <CellStack py={0}>
         <StatusMessageBannerContainer />
         {isDeprecated(account) && <MigrationBanner />}
         {showBackupBanner && <RecoveryBanner />}
@@ -193,26 +175,14 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
               message={"Sorry, an error occurred fetching tokens"}
             />
           ) : (
-            <>
-              <TokenList
-                showTitle={hasPendingTransactions}
-                isValidating={isValidating}
-                tokenList={tokenDetails}
-                variant={tokenListVariant}
-              />
-              {tokenDetailsIsInitialising ? (
-                <Spinner size={64} style={{ marginTop: 40 }} />
-              ) : (
-                <TokenWrapper
-                  {...makeClickable(() => navigate(routes.newToken()))}
-                >
-                  <AddTokenIconButton size={40}>
-                    <AddIcon />
-                  </AddTokenIconButton>
-                  <TokenTitle>Add token</TokenTitle>
-                </TokenWrapper>
-              )}
-            </>
+            <TokenList
+              showTitle={hasPendingTransactions}
+              isValidating={isValidating}
+              tokenList={tokenDetails}
+              variant={tokenListVariant}
+            >
+              <NewTokenButton isLoading={tokenDetailsIsInitialising} />
+            </TokenList>
           )}
         </ErrorBoundary>
       )}
