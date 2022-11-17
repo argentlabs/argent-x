@@ -43,6 +43,26 @@ export interface Events {
         errorMessage: string
         networkId: string
       }
+  createAccount:
+    | {
+        status: "success"
+        networkId: string
+      }
+    | {
+        status: "failure"
+        errorMessage: string
+        networkId: string
+      }
+  deployAccount:
+    | {
+        status: "success"
+        networkId: string
+      }
+    | {
+        status: "failure"
+        errorMessage: string
+        networkId: string
+      }
   preauthorizeDapp: {
     host: string
     networkId: string
