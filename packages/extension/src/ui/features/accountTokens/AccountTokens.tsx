@@ -33,7 +33,6 @@ import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBann
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
-import { NewTokenButton, TokenList } from "./TokenList"
 import { TokenListMulticall } from "./TokenListMulticall"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
@@ -162,32 +161,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         )}
         <TokenListMulticall variant={tokenListVariant} showNewTokenButton />
       </CellStack>
-      {/** TODO: remove this extra error boundary once TokenList issues are settled */}
-      {accountIsDeployed && (
-        <ErrorBoundary
-          fallback={
-            <ErrorBoundaryFallbackWithCopyError
-              message={"Sorry, an error occurred fetching tokens"}
-            />
-          }
-        >
-          {error ? (
-            <ErrorBoundaryFallbackWithCopyError
-              error={error}
-              message={"Sorry, an error occurred fetching tokens"}
-            />
-          ) : (
-            <TokenList
-              showTitle={hasPendingTransactions}
-              isValidating={isValidating}
-              tokenList={tokenDetails}
-              variant={tokenListVariant}
-            >
-              <NewTokenButton isLoading={tokenDetailsIsInitialising} />
-            </TokenList>
-          )}
-        </ErrorBoundary>
-      )}
     </Flex>
   )
 }

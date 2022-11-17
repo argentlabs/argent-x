@@ -1,6 +1,7 @@
 import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { Token } from "../../../shared/token/type"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { useSelectedAccount } from "../accounts/accounts.state"
@@ -10,6 +11,7 @@ import { TokenListItemMulticall } from "./TokenListItemMulticall"
 import { useTokensInNetwork } from "./tokens.state"
 
 interface TokenListMulticallProps {
+  tokenList?: Token[]
   showNewTokenButton?: boolean
   showTokenSymbol?: boolean
   variant?: TokenListItemVariant
@@ -17,6 +19,7 @@ interface TokenListMulticallProps {
 }
 
 export const TokenListMulticall: FC<TokenListMulticallProps> = ({
+  tokenList,
   showNewTokenButton = true,
   showTokenSymbol = false,
   variant,
@@ -29,9 +32,10 @@ export const TokenListMulticall: FC<TokenListMulticallProps> = ({
   if (!account) {
     return null
   }
+  const tokens = tokenList || tokensInNetwork
   return (
     <Suspense fallback={<NewTokenButton isLoading />}>
-      {tokensInNetwork.map((token) => (
+      {tokens.map((token) => (
         <TokenListItemMulticall
           key={token.address}
           account={account}
