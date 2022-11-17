@@ -122,6 +122,7 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
     isTransfer,
     dapp,
     isNFTTransfer,
+    isDeclareContract,
     action,
     transactionTransformed,
     network.id,
