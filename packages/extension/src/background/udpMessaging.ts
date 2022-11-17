@@ -1,5 +1,4 @@
 import { UdpMessage } from "../shared/messages/UdpMessage"
-import { handleActionRejection } from "./actionHandlers"
 import { HandleMessage, UnhandledMessage } from "./background"
 
 export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({

@@ -1,6 +1,7 @@
 import type {
   Abi,
   Call,
+  DeclareContractPayload,
   DeclareContractTransaction,
   InvocationsDetails,
   typedData,
@@ -23,6 +24,10 @@ export interface TransactionActionPayload {
   abis?: Abi[]
   transactionsDetail?: InvocationsDetails
   meta?: TransactionMeta
+}
+
+export type DeclareContractActionPayload = DeclareContractPayload & {
+  declareTransaction: DeclareContractTransaction
 }
 
 export type ActionItem =
@@ -80,11 +85,7 @@ export type ActionItem =
     }
   | {
       type: "DECLARE_CONTRACT_ACTION"
-      payload: {
-        classHash: string
-        contract: string
-        declareTransaction: DeclareContractTransaction
-      }
+      payload: DeclareContractActionPayload
     }
 
 export type ExtensionActionItem = ExtQueueItem<ActionItem>

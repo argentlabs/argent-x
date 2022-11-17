@@ -123,15 +123,54 @@ export const handleActionApproval = async (
           address: account.address,
           networkId: account.networkId,
         })
+
+        if ("declareContract" in starknetAccount) {
+          const { declareTransaction, contract } = action.payload
+          const { transaction_hash: txHash } =
+            await starknetAccount.declareContract(
+              { ...declareTransaction, contract },
+              {
+                nonce: starknetAccount.getNonce(),
+              },
+            )
+          return {
+            type: "DECLARE_CONTRACT_ACTION_SUBMITTED",
+            data: { txHash, actionHash },
+          }
+        }
+
+        throw new Error("Not a valid Starknet account")
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        return {
+          type: "DECLARE_CONTRACT_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
+      }
+    }
+
+    /* TODO: add deploy */
+    /*  case "DEPLOY_CONTRACT_ACTION": {
+      try {
+        const account = await wallet.getSelectedAccount()
+        if (!account) {
+          throw new Error("No account selected")
+        }
+
+        const starknetAccount = await wallet.getStarknetAccount({
+          address: account.address,
+          networkId: account.networkId,
+        })
         const { transaction_hash: txHash } =
-          await starknetAccount.declareContract(
-            {
-              contractDefinition: JSON.parse(action.payload.contract),
-              contract: action.payload.contract,
-              senderAddress: account.address,
-            },
-            { nonce: starknetAccount.getNonce() },
-          )
+          await starknetAccount.deployContract({
+            contract: action.payload.contract,
+            constructorCalldata: {},
+            addressSalt: "",
+          })
 
         return {
           type: "DECLARE_CONTRACT_ACTION_SUBMITTED",
@@ -148,9 +187,7 @@ export const handleActionApproval = async (
           data: { actionHash, error: `${error}` },
         }
       }
-    }
-
-    /* TODO: add deploy */
+    } */
 
     default:
       assertNever(action)

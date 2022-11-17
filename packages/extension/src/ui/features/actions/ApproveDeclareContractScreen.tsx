@@ -1,5 +1,6 @@
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
+import { CompiledContract } from "starknet"
 
 import {
   Field,
@@ -17,7 +18,7 @@ export interface ApproveDeclareContractScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
   classHash: string
-  contract: any
+  contract: string | CompiledContract
   onSubmit: () => void
 }
 
