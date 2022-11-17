@@ -1,6 +1,6 @@
 import { CellStack } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
-import { FC, useCallback, useEffect, useRef } from "react"
+import { FC, Suspense, useCallback, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
@@ -34,6 +34,7 @@ import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
 import { NewTokenButton, TokenList } from "./TokenList"
+import { TokenListMulticall } from "./TokenListMulticall"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
@@ -159,6 +160,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
+        <TokenListMulticall variant={tokenListVariant} showNewTokenButton />
       </CellStack>
       {/** TODO: remove this extra error boundary once TokenList issues are settled */}
       {accountIsDeployed && (

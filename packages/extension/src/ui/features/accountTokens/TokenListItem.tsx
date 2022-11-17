@@ -27,7 +27,7 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
 
 export type TokenListItemVariant = "default" | "no-currency"
 
-interface TokenListItemProps extends ComponentProps<typeof Button> {
+export interface TokenListItemProps extends ComponentProps<typeof Button> {
   token: TokenDetailsWithBalance
   variant?: TokenListItemVariant
   isLoading?: boolean

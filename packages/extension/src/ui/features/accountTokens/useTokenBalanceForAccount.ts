@@ -1,17 +1,26 @@
-import { uint256 } from "starknet"
-import useSWR from "swr"
+import { useEffect, useRef } from "react"
+import useSWR, { SWRConfiguration } from "swr"
 
-import {
-  NoMulticallAddressError,
-  getMulticallForNetwork,
-} from "../../../shared/multicall"
+import { getTokenBalanceForWalletAccount } from "../../../shared/multicall"
 import { BaseToken } from "../../../shared/token/type"
 import { Account } from "../accounts/Account"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
+
+/**
+ * Use Multicall to get the token balance for the account.
+ * This will also mutate when the number of pending transactions decreases
+ *
+ * Returns balance as a string, or the error so the UI can choose if / how to display it to the user
+ * this provides a way to handle errors using Suspense without ErrorBoundary
+ */
 
 export const useTokenBalanceForAccount = (
   token: BaseToken,
   account: Account,
+  config?: SWRConfiguration,
 ) => {
+  const { pendingTransactions } = useAccountTransactions(account)
+  const pendingTransactionsLengthRef = useRef(pendingTransactions.length)
   const key = [
     "balanceOf",
     token.address,
@@ -21,32 +30,33 @@ export const useTokenBalanceForAccount = (
   ]
     .filter(Boolean)
     .join("-")
-  const { data, ...rest } = useSWR(
+  const { data, mutate, ...rest } = useSWR<string | Error>(
     key,
     async () => {
-      // TODO: extract this fetcher into a shared async function
-      const multicall = getMulticallForNetwork(account.network)
-      const response = await multicall.call({
-        contractAddress: token.address,
-        entrypoint: "balanceOf",
-        calldata: [account.address],
-      })
-      const [low, high] = response
-      const balance = uint256.uint256ToBN({ low, high }).toString()
-      return balance
+      try {
+        const balance = await getTokenBalanceForWalletAccount(
+          token,
+          account.toBaseWalletAccount(),
+        )
+        return balance
+      } catch (error) {
+        return error
+      }
     },
-    {
-      shouldRetryOnError: (err) => {
-        if (err instanceof NoMulticallAddressError) {
-          /** no use retrying if there is no multicall address */
-          return false
-        }
-        return true
-      },
-    },
+    config,
   )
+
+  // refetch when number of pending transactions goes down
+  useEffect(() => {
+    if (pendingTransactionsLengthRef.current > pendingTransactions.length) {
+      mutate()
+    }
+    pendingTransactionsLengthRef.current = pendingTransactions.length
+  }, [mutate, pendingTransactions.length])
+
   return {
-    balance: data,
+    balanceOrError: data,
+    mutate,
     ...rest,
   }
 }
