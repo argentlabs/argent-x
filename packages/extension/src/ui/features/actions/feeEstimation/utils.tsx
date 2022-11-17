@@ -43,12 +43,12 @@ export const useMaxAccountDeploymentFeeEstimation = (
 }
 
 export const useMaxDeclareContractFeeEstimation = (
-  account: DeclareContract,
+  declareContractPayload: DeclareContract,
   actionHash: string,
 ) => {
   const { data: fee, error } = useSWR(
     [actionHash, "declareContractFeeEstimation"],
-    () => getDeclareContractEstimatedFee(account),
+    () => getDeclareContractEstimatedFee(declareContractPayload),
     {
       suspense: false,
       refreshInterval: 20 * 1000, // 20 seconds
