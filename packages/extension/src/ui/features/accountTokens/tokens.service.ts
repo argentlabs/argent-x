@@ -1,4 +1,3 @@
-import { Multicall } from "@argent/x-multicall"
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { utils } from "ethers"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
@@ -6,7 +5,7 @@ import useSWR from "swr"
 
 import { Network } from "./../../../shared/network/type"
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import { getProvider } from "../../../shared/network"
+import { getMulticallForNetwork } from "../../../shared/multicall"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
@@ -126,7 +125,7 @@ export const fetchAllTokensBalance = async (
     return fetchTokenBalancesWithoutMulticall(tokenAddresses, account)
   }
 
-  const multicall = new Multicall(account.provider, multicallAddress)
+  const multicall = getMulticallForNetwork(account.network)
 
   const response = await Promise.all(
     tokenAddresses.map((address) =>
@@ -197,9 +196,7 @@ export const fetchFeeTokenBalanceForAccounts = async (
     throw new Error("Fee token not found")
   }
 
-  const provider = getProvider(network)
-
-  const multicall = new Multicall(provider, multicallAddress)
+  const multicall = getMulticallForNetwork(network)
 
   const response = await Promise.all(
     accountAddresses.map((address) =>

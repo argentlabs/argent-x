@@ -10,8 +10,6 @@ import {
   getAccountIdentifier,
   isDeprecated,
 } from "../../../shared/wallet.service"
-import { ErrorBoundary } from "../../components/ErrorBoundary"
-import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { routes } from "../../routes"
 import {
   connectAccount,
@@ -36,9 +34,8 @@ import { MigrationBanner } from "./MigrationBanner"
 import { TokenListMulticall } from "./TokenListMulticall"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
-import { useTokensWithBalance } from "./tokens.state"
 import { UpgradeBanner } from "./UpgradeBanner"
-import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
+import { useAccountStatus } from "./useAccountStatus"
 
 interface AccountTokensProps {
   account: Account
@@ -76,9 +73,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [navigate, transactionsBeforeReview, userHasReviewed])
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
-
-  const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
-    useTokensWithBalance(account)
 
   const { data: needsUpgrade = false, mutate } = useSWR(
     [
@@ -134,7 +128,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
-  const accountIsDeployed = useAccountIsDeployed(account)
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mb={6}>
