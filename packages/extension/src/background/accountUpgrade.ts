@@ -20,6 +20,7 @@ export const upgradeAccount = async ({
   targetImplementationType,
 }: IUpgradeAccount) => {
   const fullAccount = await wallet.getAccount(account)
+  const starknetAccount = await wallet.getStarknetAccount(account)
 
   const accountType = targetImplementationType ?? fullAccount.type
 
@@ -36,15 +37,22 @@ export const upgradeAccount = async ({
       ? newImplementation.argentPluginAccount
       : newImplementation.argentAccount
 
+  const calldata = stark.compileCalldata({
+    implementation: implementationClassHash,
+  })
+
+  if ("estimateAccountDeployFee" in starknetAccount) {
+    // new starknet accounts have a new upgrade interface to allow for transactions right after upgrade
+    calldata.push("0")
+  }
+
   await actionQueue.push({
     type: "TRANSACTION",
     payload: {
       transactions: {
         contractAddress: fullAccount.address,
         entrypoint: "upgrade",
-        calldata: stark.compileCalldata({
-          implementation: implementationClassHash,
-        }),
+        calldata,
       },
       meta: { isUpgrade: true, title: "Switch account type" },
     },

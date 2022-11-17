@@ -3,6 +3,7 @@ export * as logos from "./logos"
 
 export * from "./Absolute"
 export * from "./Alert"
+export * from "./AlertDialog"
 export * from "./Button"
 export * from "./CellStack"
 export * from "./CopyTooltip"

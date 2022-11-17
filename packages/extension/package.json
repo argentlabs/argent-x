@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.0.1",
+  "version": "5.0.3",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -72,8 +72,9 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
-    "@argent/ui": "^5.0.1",
-    "@argent/x-sessions": "^5.0.1",
+    "@argent/ui": "^5.0.3",
+    "@argent/x-sessions": "^5.0.3",
+    "@argent/x-multicall": "^5.0.3",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",

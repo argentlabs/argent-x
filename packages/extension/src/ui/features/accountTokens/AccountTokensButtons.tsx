@@ -1,55 +1,23 @@
+import { AlertDialog, Button, icons } from "@argent/ui"
+import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { useNavigate } from "react-router-dom"
 
 import { useAppState } from "../../app.state"
-import { AlertDialog } from "../../components/AlertDialog"
-import { IconButton } from "../../components/IconButton"
-import { AddIcon, SendIcon } from "../../components/Icons/MuiIcons"
-import { PluginIcon } from "../../components/Icons/PluginIcon"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
 
-const Container = styled.div`
-  margin: 8px 0 24px 0;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  gap: 36px;
-`
+const { AddIcon, SendIcon, PluginIcon } = icons
 
-const LabeledLink = styled(Link)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 70px;
-  color: inherit;
-  text-decoration: inherit;
-  cursor: pointer;
-
-  ${IconButton} {
-    background-color: rgba(255, 255, 255, 0.25);
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.4);
-    }
-  }
-
-  & > label {
-    margin-top: 12px;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 20px;
-  }
-`
-
-interface TransferButtonsProps {
+interface AccountTokensButtonsProps {
   account: Account
 }
 
-export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
+export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
+  account,
+}) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
 
@@ -89,6 +57,10 @@ export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
     navigate(routes.funding())
   }, [navigate])
 
+  const onPlugins = useCallback(() => {
+    navigate(routes.addPlugin(account?.address))
+  }, [account?.address, navigate])
+
   const title = accountIsDeployed ? "Add funds" : "Deploying"
   const message = `You need to ${
     accountIsDeployed
@@ -97,7 +69,7 @@ export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
   } before you can send`
 
   return (
-    <Container>
+    <Flex gap={2} mx={"auto"}>
       <AlertDialog
         isOpen={alertDialogIsOpen}
         title={title}
@@ -107,28 +79,31 @@ export const TransferButtons: FC<TransferButtonsProps> = ({ account }) => {
         confirmTitle="Add funds"
         onConfirm={accountIsDeployed ? onAddFunds : undefined}
       />
-      <LabeledLink as="div" onClick={onAddFunds}>
-        <IconButton size={40}>
-          <AddIcon fontSize="large" />
-        </IconButton>
-        <label>Add funds</label>
-      </LabeledLink>
-      {sendToken && (
-        <LabeledLink as="div" onClick={onSend}>
-          <IconButton size={40}>
-            <SendIcon fontSize="medium" />
-          </IconButton>
-          <label>Send</label>
-        </LabeledLink>
-      )}
+      <SimpleGrid columns={sendToken ? 2 : 1} spacing={2}>
+        <Button
+          onClick={onAddFunds}
+          colorScheme={"tertiary"}
+          size="sm"
+          leftIcon={<AddIcon />}
+        >
+          Add funds
+        </Button>
+        {sendToken && (
+          <Button
+            onClick={onSend}
+            colorScheme={"tertiary"}
+            size="sm"
+            leftIcon={<SendIcon />}
+          >
+            Send
+          </Button>
+        )}
+      </SimpleGrid>
       {account?.type === "argent-plugin" && (
-        <LabeledLink to={routes.addPlugin(account?.address)}>
-          <IconButton size={40}>
-            <PluginIcon style={{ width: 16, height: 16 }} />
-          </IconButton>
-          <label>Plugins</label>
-        </LabeledLink>
+        <Button onClick={onPlugins} colorScheme={"tertiary"} size="sm">
+          <PluginIcon />
+        </Button>
       )}
-    </Container>
+    </Flex>
   )
 }

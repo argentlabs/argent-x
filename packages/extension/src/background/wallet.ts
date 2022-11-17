@@ -38,6 +38,7 @@ import {
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
+import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
 import {
   getIndexForPath,
@@ -466,6 +467,40 @@ export class Wallet {
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
       addressSalt: starkPub,
+    }
+
+    const calculatedAccountAddress = calculateContractAddressFromHash(
+      deployAccountPayload.addressSalt,
+      deployAccountPayload.classHash,
+      deployAccountPayload.constructorCalldata,
+      0,
+    )
+
+    if (!isEqualAddress(calculatedAccountAddress, walletAccount.address)) {
+      console.warn("Calculated address does not match account address")
+      const oldCalldata = stark.compileCalldata({
+        implementation:
+          "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f", // old implementation, ask @janek why
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({
+          signer: starkPub,
+          guardian: "0",
+        }),
+      })
+      if (
+        isEqualAddress(
+          calculateContractAddressFromHash(
+            deployAccountPayload.addressSalt,
+            deployAccountPayload.classHash,
+            oldCalldata,
+            0,
+          ),
+          walletAccount.address,
+        )
+      ) {
+        console.warn("Address matches old implementation")
+        deployAccountPayload.constructorCalldata = oldCalldata
+      }
     }
 
     const { transaction_hash } = await starknetAccount.deployAccount(
