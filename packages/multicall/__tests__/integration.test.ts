@@ -1,4 +1,5 @@
 import { SequencerProvider } from "starknet"
+import { uint256 } from "starknet"
 import { beforeAll, describe, expect, test } from "vitest"
 
 import { Multicall } from ".."
@@ -38,7 +39,11 @@ describe("Multicall", () => {
       }),
     ])
 
-    expect(results).toMatchSnapshot()
+    for (const result of results) {
+      const [low, high] = result
+      const balance = uint256.uint256ToBN({ low, high })
+      expect(balance.gt(0)).toBeTruthy()
+    }
   })
   test("should partially error with a single error", async () => {
     const results = await Promise.allSettled([
