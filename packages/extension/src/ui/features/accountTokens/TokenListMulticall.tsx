@@ -1,4 +1,3 @@
-import { Button } from "@argent/ui"
 import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 

@@ -83,6 +83,13 @@ MissingBalance.args = {
   token: tokenWithBalance(),
 }
 
+export const MissingBalanceAndError = Template.bind({})
+MissingBalanceAndError.args = {
+  isLoading: false,
+  token: tokenWithBalance(),
+  errorMessage: "Token not found",
+}
+
 export const NoCurrencyVariant = Template.bind({})
 NoCurrencyVariant.args = {
   isLoading: false,

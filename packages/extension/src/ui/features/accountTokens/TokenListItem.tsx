@@ -1,4 +1,4 @@
-import { Button, H6, P4 } from "@argent/ui"
+import { Button, FieldError, H6, P4, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
@@ -11,6 +11,8 @@ import { TokenIcon } from "./TokenIcon"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance } from "./tokens.state"
+
+const { AlertIcon } = icons
 
 interface TokenListItemContainerProps
   extends Omit<TokenListItemProps, "currencyValue"> {
@@ -33,6 +35,7 @@ export interface TokenListItemProps extends ComponentProps<typeof Button> {
   isLoading?: boolean
   currencyValue: string | undefined
   showTokenSymbol?: boolean
+  errorMessage?: string
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
@@ -41,6 +44,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   isLoading = false,
   showTokenSymbol = false,
   currencyValue,
+  errorMessage,
   ...rest
 }) => {
   const { name, image, symbol } = toTokenView(token)
@@ -91,9 +95,21 @@ export const TokenListItem: FC<TokenListItemProps> = ({
         </Flex>
         <Flex direction={"column"} overflow="hidden">
           <LoadingPulse isLoading={isLoading}>
-            <H6 overflow="hidden" textOverflow={"ellipsis"}>
-              {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
-            </H6>
+            {errorMessage ? (
+              <FieldError
+                overflow="hidden"
+                textOverflow={"ellipsis"}
+                display="flex"
+                gap="1"
+              >
+                <AlertIcon />
+                {errorMessage}
+              </FieldError>
+            ) : (
+              <H6 overflow="hidden" textOverflow={"ellipsis"}>
+                {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
+              </H6>
+            )}
           </LoadingPulse>
         </Flex>
       </Flex>

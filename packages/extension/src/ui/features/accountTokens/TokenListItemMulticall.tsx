@@ -1,7 +1,9 @@
 import { BigNumber } from "ethers"
-import { FC } from "react"
+import { get } from "lodash-es"
+import { FC, useMemo } from "react"
 
 import { Token } from "../../../shared/token/type"
+import { IS_DEV } from "../../../shared/utils/dev"
 import { isNumeric } from "../../../shared/utils/number"
 import { withPolling } from "../../services/swr"
 import { Account } from "../accounts/Account"
@@ -14,6 +16,14 @@ export interface TokenListItemMulticallProps
   extends Omit<TokenListItemProps, "currencyValue"> {
   token: Token
   account: Account
+}
+
+const isNetworkError = (errorCode: string | number) => {
+  if (!isNumeric(errorCode)) {
+    return false
+  }
+  const code = Number(errorCode)
+  return [429, 502].includes(code)
 }
 
 export const TokenListItemMulticall: FC<TokenListItemMulticallProps> = ({
@@ -29,14 +39,34 @@ export const TokenListItemMulticall: FC<TokenListItemMulticallProps> = ({
       ...withPolling(30 * 1000) /** 30 seconds */,
     },
   )
-  const tokenWithBalance: TokenDetailsWithBalance = {
-    ...token,
-  }
-  if (isNumeric(balanceOrError)) {
-    tokenWithBalance.balance = BigNumber.from(balanceOrError)
-  } else if (balanceOrError instanceof Error) {
-    // currently the ui does not surface error to the user - multicall should retry silently anyway
-  }
+  const { tokenWithBalance, errorMessage } = useMemo(() => {
+    const tokenWithBalance: TokenDetailsWithBalance = {
+      ...token,
+    }
+    let errorMessage: string | undefined
+    if (isNumeric(balanceOrError)) {
+      tokenWithBalance.balance = BigNumber.from(balanceOrError)
+    } else {
+      const errorCode = get(balanceOrError, "errorCode")
+      if (errorCode === "StarknetErrorCode.UNINITIALIZED_CONTRACT") {
+        /* token contract not found on this network */
+        errorMessage = "Token not found"
+      } else if (isNetworkError(errorCode)) {
+        errorMessage = "Network error"
+      } else {
+        IS_DEV &&
+          console.warn(
+            `TokenListItemMulticall - ignoring errorCode ${errorCode} with error:`,
+            balanceOrError,
+          )
+      }
+    }
+    return {
+      tokenWithBalance,
+      errorMessage,
+    }
+  }, [balanceOrError, token])
+
   const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
   const shouldShow =
     token.showAlways ||
@@ -49,6 +79,7 @@ export const TokenListItemMulticall: FC<TokenListItemMulticallProps> = ({
       token={tokenWithBalance}
       currencyValue={currencyValue}
       isLoading={isValidating}
+      errorMessage={errorMessage}
       {...rest}
     />
   )
