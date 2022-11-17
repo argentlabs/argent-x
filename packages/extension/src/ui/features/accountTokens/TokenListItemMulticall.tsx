@@ -31,7 +31,6 @@ export const TokenListItemMulticall: FC<TokenListItemMulticallProps> = ({
   )
   const tokenWithBalance: TokenDetailsWithBalance = {
     ...token,
-    balance: BigNumber.from(0),
   }
   if (isNumeric(balanceOrError)) {
     tokenWithBalance.balance = BigNumber.from(balanceOrError)

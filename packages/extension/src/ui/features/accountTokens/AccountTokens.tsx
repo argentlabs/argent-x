@@ -1,6 +1,6 @@
 import { CellStack } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
-import { FC, Suspense, useCallback, useEffect, useRef } from "react"
+import { FC, useCallback, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import useSWR from "swr"
 

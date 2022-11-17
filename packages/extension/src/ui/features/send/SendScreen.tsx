@@ -1,3 +1,4 @@
+import { CellStack } from "@argent/ui"
 import { FC, Suspense, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import styled from "styled-components"
@@ -15,6 +16,7 @@ import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { NewTokenButton, TokenList } from "../accountTokens/TokenList"
+import { TokenListMulticall } from "../accountTokens/TokenListMulticall"
 import {
   TokenDetailsWithBalance,
   useTokensWithBalance,
@@ -137,15 +139,24 @@ export const SendScreen: FC = () => {
         <TabView>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             {selectedTab === "tokens" && (
-              <TokenList
-                variant="no-currency"
-                isValidating={isValidating}
-                tokenList={tokenList}
-                showTokenSymbol
-                navigateToSend
-              >
-                <NewTokenButton />
-              </TokenList>
+              <>
+                <CellStack py={0}>
+                  <TokenListMulticall
+                    variant="no-currency"
+                    navigateToSend
+                    showNewTokenButton
+                  />
+                </CellStack>
+                <TokenList
+                  variant="no-currency"
+                  isValidating={isValidating}
+                  tokenList={tokenList}
+                  showTokenSymbol
+                  navigateToSend
+                >
+                  <NewTokenButton />
+                </TokenList>
+              </>
             )}
 
             {selectedTab === "nfts" && (
