@@ -6,6 +6,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
+import { isEqualAddress } from "../../../services/addresses"
 import { declareContract } from "../../../services/udp.service"
 import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { useFormSelects } from "./useFormSelects"
@@ -71,7 +72,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   }: FieldValues) => {
     const selectedAccount = accounts.find(
       (act: WalletAccount) =>
-        act.address === account && act.networkId === network,
+        isEqualAddress(act.address, account) && act.networkId === network,
     )
     useAppState.setState({ switcherNetworkId: network })
     useSelectedAccountStore.setState({
