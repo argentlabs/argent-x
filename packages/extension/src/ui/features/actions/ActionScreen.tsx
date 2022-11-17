@@ -272,6 +272,7 @@ export const ActionScreen: FC = () => {
             } else {
               closePopupIfLastAction()
               useAppState.setState({ isLoading: false })
+              navigate(routes.accountTokens())
             }
           }}
           onReject={rejectAllActions}

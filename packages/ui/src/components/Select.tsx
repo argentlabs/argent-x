@@ -7,7 +7,6 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react"
-import { isEmpty } from "lodash-es"
 import { FC, ReactElement, ReactNode, useMemo } from "react"
 
 import { ChevronDownIcon } from "./icons"
@@ -99,7 +98,7 @@ const Select: FC<SelectProps> = ({
             {label}
           </MenuItem>
         ))}
-        {isEmpty(options) && (
+        {emptyMessage && options?.length < 1 && (
           <MenuItem disabled>
             <H6 color='"neutrals.100"' py={3}>
               {emptyMessage}

@@ -20,10 +20,6 @@ export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
         payload: {
           classHash,
           contract,
-          declareTransaction: {
-            contractDefinition: JSON.parse(data.contract),
-            senderAddress: address,
-          },
         },
       })
 
