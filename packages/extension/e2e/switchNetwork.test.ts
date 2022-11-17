@@ -9,7 +9,7 @@ import { newAccount } from "./steps/newAccount"
 import { selectAccountFromAccountList } from "./steps/selectAccountFromAccountList"
 import { switchNetwork } from "./steps/switchNetwork"
 
-test("switch network and keep account", async ({ page, context }) => {
+test.skip("switch network and keep account", async ({ page, context }) => {
   const { address: address1_localhost } = await setupNewAccountWithTestnetEth(
     page,
     context,
