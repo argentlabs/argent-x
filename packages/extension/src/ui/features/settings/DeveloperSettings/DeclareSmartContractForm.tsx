@@ -4,6 +4,7 @@ import { get, isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
+import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { declareContract } from "../../../services/udp.service"
 import { useSelectedAccountStore } from "../../accounts/accounts.state"
@@ -68,8 +69,10 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     classHash,
     network,
   }: FieldValues) => {
-    const selectedAccount = accounts.find((act: any) => act.address === account)
-    /* refactor useApp state and useSelectAccountStore -> to use */
+    const selectedAccount = accounts.find(
+      (act: WalletAccount) =>
+        act.address === account && act.networkId === network,
+    )
     useAppState.setState({ switcherNetworkId: network })
     useSelectedAccountStore.setState({
       selectedAccount,
