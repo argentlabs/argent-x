@@ -7,7 +7,10 @@ import {
   formatTruncatedAddress,
   isEqualAddress,
 } from "../../services/addresses"
-import { TokenIcon, TokenIconProps } from "../accountTokens/TokenIcon"
+import {
+  TokenIconDeprecated,
+  TokenIconProps,
+} from "../accountTokens/TokenIconDeprecated"
 import { useAccountMetadata } from "./accountMetadata.state"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
@@ -108,7 +111,7 @@ export const PrettyAccountAddress: FC<IPrettyAccountAddress> = ({
     <Container>
       {accountName && (
         <TokenIconContainer>
-          <TokenIcon
+          <TokenIconDeprecated
             url={accountImageUrl}
             name={accountAddress}
             large={large}
