@@ -70,7 +70,6 @@ export const deployContract = async ({
 }
 
 export const fetchConstructorParams = async (
-  address: string,
   classHash: string,
   networkId: string,
 ): Promise<ContractClass> => {
@@ -78,7 +77,6 @@ export const fetchConstructorParams = async (
     type: "FETCH_CONSTRUCTOR_PARAMS",
     data: {
       classHash,
-      address,
       networkId,
     },
   })
@@ -91,6 +89,6 @@ export const fetchConstructorParams = async (
     ])
     return result.contract
   } catch {
-    throw Error("Could not declare contract")
+    throw Error("Could not fetch contract constructor params")
   }
 }

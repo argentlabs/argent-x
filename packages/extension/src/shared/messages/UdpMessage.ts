@@ -39,3 +39,15 @@ export type UdpMessage =
       type: "DEPLOY_CONTRACT_ACTION_FAILED"
       data: { actionHash: string; error?: string }
     }
+  | {
+      type: "FETCH_CONSTRUCTOR_PARAMS"
+      data: { classHash: string; networkId: string }
+    }
+  | {
+      type: "FETCH_CONSTRUCTOR_PARAMS_RES"
+      data: { contract: any } /* TODO:type */
+    }
+  | {
+      type: "FETCH_CONSTRUCTOR_PARAMS_REJ"
+      data: { error?: string }
+    }

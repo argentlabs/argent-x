@@ -12,7 +12,7 @@ const DeploySmartContractScreen: FC = () => {
   return (
     <NavigationContainer
       leftButton={<BarBackButton onClick={() => navigate(-1)} />}
-      title={"Declare smart contract"}
+      title={"Deploy smart contract"}
     >
       <DeploySmartContractForm setIsLoading={setIsLoading}>
         {({ isDirty, isSubmitting }) => (

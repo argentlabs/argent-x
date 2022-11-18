@@ -1,4 +1,6 @@
 import { UdpMessage } from "../shared/messages/UdpMessage"
+import { getNetwork } from "../shared/network"
+import { getProvider } from "../shared/network/provider"
 import { HandleMessage, UnhandledMessage } from "./background"
 
 export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
@@ -33,16 +35,15 @@ export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
 
     case "FETCH_CONSTRUCTOR_PARAMS": {
       const {
-        data: { address, networkId, classHash },
+        data: { networkId, classHash },
       } = msg
-      const starknetAccount = await wallet.getStarknetAccount({
-        address,
-        networkId,
-      })
+
+      const network = await getNetwork(networkId)
+      const provider = getProvider(network)
 
       try {
-        if ("getClassByHash" in starknetAccount) {
-          const contract = await starknetAccount.getClassByHash(classHash)
+        if ("getClassByHash" in provider) {
+          const contract = await provider.getClassByHash(classHash)
           return sendToTabAndUi({
             type: "FETCH_CONSTRUCTOR_PARAMS_RES",
             data: {

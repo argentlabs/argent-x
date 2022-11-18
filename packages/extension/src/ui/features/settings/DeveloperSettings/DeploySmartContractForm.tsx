@@ -1,14 +1,15 @@
-import { Error, Input, Select } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
-import { get, isEmpty } from "lodash-es"
-import { FC, ReactNode, useEffect } from "react"
+import { Alert, Error, Input, L2, P4, Select } from "@argent/ui"
+import { Box, Flex, FormControl, FormLabel, Switch } from "@chakra-ui/react"
+import { get, isEmpty, isEqual } from "lodash-es"
+import { FC, ReactNode, useCallback, useEffect, useState } from "react"
 import {
   Controller,
   SubmitHandler,
   useFieldArray,
   useForm,
 } from "react-hook-form"
-import { AbiEntry, FunctionAbi } from "starknet"
+import { AbiEntry } from "starknet"
+import { randomAddress } from "starknet/dist/utils/stark"
 
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
@@ -25,6 +26,8 @@ interface FieldValues {
   classHash: string
   network: string
   parameters: any
+  salt: string
+  unique: boolean
 }
 
 interface DeploySmartContractFormProps {
@@ -36,22 +39,30 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   setIsLoading,
   children,
 }) => {
-  const { register, control, formState, handleSubmit, clearErrors, watch } =
-    useForm<FieldValues>({
-      mode: "onSubmit",
-    })
+  const {
+    register,
+    resetField,
+    control,
+    formState,
+    handleSubmit,
+    clearErrors,
+    watch,
+    setValue,
+  } = useForm<FieldValues>({
+    mode: "onSubmit",
+  })
   const { errors, isDirty, isSubmitting } = formState
 
+  const [fetchError, setFetchError] = useState("")
+  const [currentAbi, setCurrentAbi] = useState()
+
   const currentNetwork = watch("network")
-  const currentAccount = watch("account")
   const currentClassHash = watch("classHash")
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control, // control props comes from useForm (optional: if you are using FormContext)
-      name: "parameters", // unique name for your Field Array
-    },
-  )
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "parameters",
+  })
 
   const { accounts, accountOptions, networkOptions } =
     useFormSelects(currentNetwork)
@@ -61,8 +72,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     classHash,
     network,
     parameters,
+    salt,
+    unique,
   }: FieldValues) => {
-    console.log(parameters)
     const selectedAccount = accounts.find(
       (act: WalletAccount) =>
         isEqualAddress(act.address, account) && act.networkId === network,
@@ -76,45 +88,62 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
       classHash,
       networkId: network,
       constructorCalldata: parameters,
-      salt: "123",
-      unique: false,
+      salt,
+      unique,
     })
-    // deployContract
     clearErrors()
   }
 
+  const resetAbiFields = useCallback(() => {
+    resetField("parameters")
+    fields.map((_, index) => remove(index))
+    resetField("salt")
+    resetField("unique")
+  }, [fields, remove, resetField])
+
   const getConstructorParams = async (
-    currentAccount: string,
     currentClassHash: string,
     currentNetwork: string,
   ) => {
     setIsLoading(true)
     try {
       const { abi } = await fetchConstructorParams(
-        currentAccount,
         currentClassHash,
         currentNetwork,
       )
       const constructorAbi = abi?.find((item) => item.type === "constructor")
+      setCurrentAbi(constructorAbi)
 
+      /* 
+        same constructor retrieved for network / classhash,
+        keep the fields 
+      */
+      if (isEqual(constructorAbi, currentAbi)) {
+        return
+      }
+
+      resetAbiFields()
       constructorAbi.inputs.map((input: AbiEntry) => {
         append({ name: input.name, type: input.type, value: "" })
       })
     } catch (error) {
-      console.log(error)
+      resetAbiFields()
+      setFetchError("Contract classhash not found in this network")
     } finally {
       setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    // if all 3 fields are filled, retrieve params
-    if (currentNetwork && currentAccount && currentClassHash) {
-      getConstructorParams(currentAccount, currentClassHash, currentNetwork)
-    }
-  }, [currentAccount, currentClassHash, currentNetwork])
+  const generateRandomSalt = useCallback(() => {
+    setValue("salt", randomAddress())
+  }, [setValue])
 
-  console.log(fields)
+  useEffect(() => {
+    if (currentNetwork && currentClassHash) {
+      setFetchError("")
+      getConstructorParams(currentClassHash, currentNetwork)
+    }
+  }, [currentClassHash, currentNetwork])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -170,51 +199,50 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         {!isEmpty(errors.account) && <Error message="Account is required" />}
 
         {fields.map((item, index) => (
-          <Input
-            key={item.id}
-            autoFocus
-            placeholder={`Constructor argument ${index + 1}`}
-            {...register(`parameters.${index}.value`)}
-            isInvalid={!isEmpty(get(errors, `parameters[0]`))}
-          />
-        ))}
-
-        {/* TODO: use array */}
-        {/*  <Controller
-          name={`parameters.${0}`}
-          control={control}
-          rules={{ required: true }}
-          defaultValue=""
-          render={({ field: { ref, ...field } }) => (
+          <>
             <Input
-              autoFocus
-              placeholder={`Paramter ${1}`}
-              {...field}
+              key={item.id}
+              autoFocus={index === 0}
+              placeholder={`Constructor argument ${index + 1}`}
+              {...register(`parameters.${index}.value`, { required: true })}
               isInvalid={!isEmpty(get(errors, `parameters[0]`))}
             />
-          )}
-        />
-        {!isEmpty(get(errors, `parameters[0]`)) && (
-          <Error message="Parameter is required" />
+            {!isEmpty(get(errors, `parameters[${index}]`)) && (
+              <Error message="Constructor argument is required" />
+            )}
+          </>
+        ))}
+
+        {fetchError && (
+          <Box mx="4">
+            <Alert backgroundColor="error.900" mt="6">
+              <P4 color="error.500">{fetchError}</P4>
+            </Alert>
+          </Box>
         )}
 
-        <Controller
-          name={`parameters.${1}`}
-          control={control}
-          rules={{ required: true }}
-          defaultValue=""
-          render={({ field: { ref, ...field } }) => (
+        {fields.length > 0 && (
+          <>
             <Input
-              autoFocus
-              placeholder={`Paramter ${2}`}
-              {...field}
-              isInvalid={!isEmpty(get(errors, `parameters[1]`))}
+              placeholder="Salt"
+              {...register("salt")}
+              isInvalid={!isEmpty(get(errors, "salt"))}
             />
-          )}
-        />
-        {!isEmpty(get(errors, `parameters[1]`)) && (
-          <Error message="Parameter is required" />
-        )} */}
+            <Flex justifyContent="flex-end">
+              <L2 onClick={generateRandomSalt}>Generate random</L2>
+            </Flex>
+            <FormControl
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <FormLabel htmlFor="unique" mb="0">
+                Unique address
+              </FormLabel>
+              <Switch id="unique" {...register("unique")} />
+            </FormControl>
+          </>
+        )}
 
         {children?.({ isDirty, isSubmitting })}
       </Flex>
