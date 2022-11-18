@@ -33,7 +33,7 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
       {
         suspense:
           true /** Suspense allows us to show an initial loader for all tokens */,
-        ...withPolling(60 * 1000) /** 30 seconds */,
+        ...withPolling(60 * 1000) /** 60 seconds */,
       },
     )
 
