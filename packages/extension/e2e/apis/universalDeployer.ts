@@ -5,7 +5,7 @@ import { account } from "./account"
 
 /** The address of the UDC, set to devnet by default - {@link https://shard-labs.github.io/starknet-devnet/docs/guide/udc} */
 const DEFAULT_UDC_ADDRESS =
-  "0x25fcb74260022bd8ed7e8d542408941826b53345e478b8303d6f31744838a36"
+  "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf"
 
 /**
  * Deploys a declared contract by using invoke on the Universal Deployer Contract (UDC)
