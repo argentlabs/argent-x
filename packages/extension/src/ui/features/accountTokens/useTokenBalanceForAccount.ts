@@ -42,7 +42,7 @@ export const useTokenBalanceForAccount = (
     async () => {
       try {
         const balance = await getTokenBalanceForWalletAccount(
-          token,
+          token.address,
           account.toBaseWalletAccount(),
         )
         return balance

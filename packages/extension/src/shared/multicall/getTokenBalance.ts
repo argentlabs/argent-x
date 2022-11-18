@@ -2,7 +2,6 @@ import { Abi, Contract, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abis/ERC20.json"
 import { getNetwork, getProvider } from "../network"
-import { BaseToken } from "../token/type"
 import { BaseWalletAccount } from "../wallet.model"
 import { getMulticallForNetwork } from "./getMulticall"
 
@@ -13,14 +12,14 @@ import { getMulticallForNetwork } from "./getMulticall"
  */
 
 export const getTokenBalanceForWalletAccount = async (
-  token: BaseToken,
+  tokenAddress: string,
   account: BaseWalletAccount,
 ): Promise<string> => {
   const network = await getNetwork(account.networkId)
   if (network.multicallAddress) {
     const multicall = getMulticallForNetwork(network)
     const response = await multicall.call({
-      contractAddress: token.address,
+      contractAddress: tokenAddress,
       entrypoint: "balanceOf",
       calldata: [account.address],
     })
@@ -32,7 +31,7 @@ export const getTokenBalanceForWalletAccount = async (
   const provider = getProvider(network)
   const tokenContract = new Contract(
     parsedErc20Abi as Abi,
-    token.address,
+    tokenAddress,
     provider,
   )
   const result = await tokenContract.balanceOf(account.address)

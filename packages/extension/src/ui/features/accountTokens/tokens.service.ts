@@ -5,7 +5,10 @@ import useSWR from "swr"
 
 import { Network } from "./../../../shared/network/type"
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import { getMulticallForNetwork } from "../../../shared/multicall"
+import {
+  getMulticallForNetwork,
+  getTokenBalanceForWalletAccount,
+} from "../../../shared/multicall"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
@@ -118,54 +121,16 @@ export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
   account: Account,
 ) => {
-  const { multicallAddress } = account.network
-
-  if (!multicallAddress) {
-    // if no multicall contract is found, fallback to Promises
-    return fetchTokenBalancesWithoutMulticall(tokenAddresses, account)
-  }
-
-  const multicall = getMulticallForNetwork(account.network)
-
   const response = await Promise.all(
-    tokenAddresses.map((address) =>
-      multicall.call({
-        contractAddress: address,
-        entrypoint: "balanceOf",
-        calldata: [account.address],
-      }),
-    ),
+    tokenAddresses.map((tokenAddress) => {
+      return getTokenBalanceForWalletAccount(tokenAddress, account)
+    }),
   )
-
-  // Mapping Calls from tokenAddresses and reducing from tokenAddresses
-  // Can be reduced on response as well
   return tokenAddresses.reduce<BalancesMap>((acc, addr, i) => {
-    const [res_low, res_high] = response[i]
-
-    const balance = BigNumber.from(
-      uint256.uint256ToBN({ low: res_low, high: res_high }).toString(),
-    )
+    const balance = response[i]
     return {
       ...acc,
-      [addr]: balance,
-    }
-  }, {})
-}
-
-export const fetchTokenBalancesWithoutMulticall = async (
-  tokenAddresses: string[],
-  account: Account,
-): Promise<BalancesMap> => {
-  const balances = await Promise.all(
-    tokenAddresses.map(async (address) =>
-      fetchTokenBalance(address, account).catch(() => undefined),
-    ),
-  )
-
-  return balances.reduce<BalancesMap>((acc, balance, i) => {
-    return {
-      ...acc,
-      [tokenAddresses[i]]: balance,
+      [addr]: BigNumber.from(balance),
     }
   }, {})
 }
@@ -177,7 +142,8 @@ export const fetchFeeTokenBalance = async (
   if (!token) {
     return BigNumber.from(0)
   }
-  return fetchTokenBalance(token.address, account)
+  const balance = await getTokenBalanceForWalletAccount(token.address, account)
+  return BigNumber.from(balance)
 }
 
 export const fetchFeeTokenBalanceForAccounts = async (
@@ -232,7 +198,6 @@ export const useFeeTokenBalance = (account?: Account) => {
     [accountIdentifier, "feeTokenBalance"],
     () => account && fetchFeeTokenBalance(account),
     {
-      suspense: false,
       refreshInterval: 30 * 1000, // 30 seconds
       shouldRetryOnError: false,
     },
