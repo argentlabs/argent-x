@@ -91,6 +91,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
                   textOverflow={"ellipsis"}
                   display="flex"
                   gap="1"
+                  title={errorMessage.description}
                 >
                   <AlertIcon />
                   {errorMessage.message}
