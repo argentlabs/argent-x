@@ -31,6 +31,36 @@ export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
       })
     }
 
+    case "FETCH_CONSTRUCTOR_PARAMS": {
+      const {
+        data: { address, networkId, classHash },
+      } = msg
+      const starknetAccount = await wallet.getStarknetAccount({
+        address,
+        networkId,
+      })
+
+      try {
+        if ("getClassByHash" in starknetAccount) {
+          const contract = await starknetAccount.getClassByHash(classHash)
+          return sendToTabAndUi({
+            type: "FETCH_CONSTRUCTOR_PARAMS_RES",
+            data: {
+              contract,
+            },
+          })
+        }
+      } catch (error) {
+        return sendToTabAndUi({
+          type: "FETCH_CONSTRUCTOR_PARAMS_REJ",
+          data: {
+            error: `${error}`,
+          },
+        })
+      }
+      return
+    }
+
     case "REQUEST_DEPLOY_CONTRACT": {
       const { data } = msg
       const {

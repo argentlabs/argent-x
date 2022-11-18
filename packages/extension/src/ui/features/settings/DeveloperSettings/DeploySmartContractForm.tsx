@@ -8,11 +8,15 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form"
+import { AbiEntry, FunctionAbi } from "starknet"
 
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { isEqualAddress } from "../../../services/addresses"
-import { deployContract } from "../../../services/udp.service"
+import {
+  deployContract,
+  fetchConstructorParams,
+} from "../../../services/udp.service"
 import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { useFormSelects } from "./useFormSelects"
 
@@ -25,12 +29,14 @@ interface FieldValues {
 
 interface DeploySmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
+  setIsLoading: (isLoading: boolean) => void
 }
 
 const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
+  setIsLoading,
   children,
 }) => {
-  const { control, formState, handleSubmit, clearErrors, watch } =
+  const { register, control, formState, handleSubmit, clearErrors, watch } =
     useForm<FieldValues>({
       mode: "onSubmit",
     })
@@ -77,26 +83,47 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     clearErrors()
   }
 
+  const getConstructorParams = async (
+    currentAccount: string,
+    currentClassHash: string,
+    currentNetwork: string,
+  ) => {
+    setIsLoading(true)
+    try {
+      const { abi } = await fetchConstructorParams(
+        currentAccount,
+        currentClassHash,
+        currentNetwork,
+      )
+      const constructorAbi = abi?.find((item) => item.type === "constructor")
+
+      constructorAbi.inputs.map((input: AbiEntry) => {
+        append({ name: input.name, type: input.type, value: "" })
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     // if all 3 fields are filled, retrieve params
+    if (currentNetwork && currentAccount && currentClassHash) {
+      getConstructorParams(currentAccount, currentClassHash, currentNetwork)
+    }
   }, [currentAccount, currentClassHash, currentNetwork])
+
+  console.log(fields)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Flex direction="column" mx="4" gap={1}>
-        <Controller
-          name="classHash"
-          control={control}
-          rules={{ required: true }}
-          defaultValue=""
-          render={({ field: { ref, ...field } }) => (
-            <Input
-              autoFocus
-              placeholder="Contract classhash"
-              {...field}
-              isInvalid={!isEmpty(errors.classHash)}
-            />
-          )}
+        <Input
+          {...register("classHash", { required: true })}
+          autoFocus
+          placeholder="Contract classhash"
+          isInvalid={!isEmpty(errors.classHash)}
         />
         {!isEmpty(errors.classHash) && (
           <Error message="Classhash is required" />
@@ -142,8 +169,18 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         />
         {!isEmpty(errors.account) && <Error message="Account is required" />}
 
+        {fields.map((item, index) => (
+          <Input
+            key={item.id}
+            autoFocus
+            placeholder={`Constructor argument ${index + 1}`}
+            {...register(`parameters.${index}.value`)}
+            isInvalid={!isEmpty(get(errors, `parameters[0]`))}
+          />
+        ))}
+
         {/* TODO: use array */}
-        <Controller
+        {/*  <Controller
           name={`parameters.${0}`}
           control={control}
           rules={{ required: true }}
@@ -177,7 +214,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         />
         {!isEmpty(get(errors, `parameters[1]`)) && (
           <Error message="Parameter is required" />
-        )}
+        )} */}
 
         {children?.({ isDirty, isSubmitting })}
       </Flex>

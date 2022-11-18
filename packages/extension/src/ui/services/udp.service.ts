@@ -1,3 +1,5 @@
+import { ContractClass } from "starknet"
+
 import { sendMessage, waitForMessage } from "../../shared/messages"
 
 export const declareContract = async (
@@ -67,9 +69,28 @@ export const deployContract = async ({
   }
 }
 
-export const fetchConstructorParams = async () => {
-  //TODO: implement
-  /*  sendMessage({
+export const fetchConstructorParams = async (
+  address: string,
+  classHash: string,
+  networkId: string,
+): Promise<ContractClass> => {
+  sendMessage({
     type: "FETCH_CONSTRUCTOR_PARAMS",
-  }) */
+    data: {
+      classHash,
+      address,
+      networkId,
+    },
+  })
+  try {
+    const result = await Promise.race([
+      waitForMessage("FETCH_CONSTRUCTOR_PARAMS_RES"),
+      waitForMessage("FETCH_CONSTRUCTOR_PARAMS_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+    return result.contract
+  } catch {
+    throw Error("Could not declare contract")
+  }
 }

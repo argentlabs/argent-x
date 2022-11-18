@@ -14,14 +14,14 @@ const DeploySmartContractScreen: FC = () => {
       leftButton={<BarBackButton onClick={() => navigate(-1)} />}
       title={"Declare smart contract"}
     >
-      <DeploySmartContractForm>
+      <DeploySmartContractForm setIsLoading={setIsLoading}>
         {({ isDirty, isSubmitting }) => (
           <StickyGroup>
             <Button
               gap="2"
               colorScheme="primary"
               type="submit"
-              disabled={!isDirty || isSubmitting}
+              disabled={!isDirty || isSubmitting || isLoading}
               width="100%"
               isLoading={isLoading}
               loadingText="Loading constructor fields"
