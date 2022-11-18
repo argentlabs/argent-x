@@ -1,5 +1,5 @@
 import { Button, FieldError, H6, P4, icons } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { Flex, Tooltip } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
 import {
@@ -35,7 +35,10 @@ export interface TokenListItemProps extends ComponentProps<typeof Button> {
   isLoading?: boolean
   currencyValue: string | undefined
   showTokenSymbol?: boolean
-  errorMessage?: string
+  errorMessage?: {
+    message: string
+    description: string
+  }
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
@@ -96,15 +99,17 @@ export const TokenListItem: FC<TokenListItemProps> = ({
         <Flex direction={"column"} overflow="hidden">
           <LoadingPulse isLoading={isLoading}>
             {errorMessage ? (
-              <FieldError
-                overflow="hidden"
-                textOverflow={"ellipsis"}
-                display="flex"
-                gap="1"
-              >
-                <AlertIcon />
-                {errorMessage}
-              </FieldError>
+              <Tooltip label={errorMessage.description}>
+                <FieldError
+                  overflow="hidden"
+                  textOverflow={"ellipsis"}
+                  display="flex"
+                  gap="1"
+                >
+                  <AlertIcon />
+                  {errorMessage.message}
+                </FieldError>
+              </Tooltip>
             ) : (
               <H6 overflow="hidden" textOverflow={"ellipsis"}>
                 {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
