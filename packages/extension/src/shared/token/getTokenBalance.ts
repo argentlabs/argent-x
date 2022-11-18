@@ -1,9 +1,9 @@
 import { Abi, Contract, uint256 } from "starknet"
 
 import parsedErc20Abi from "../../abis/ERC20.json"
+import { getMulticallForNetwork } from "../multicall/getMulticall"
 import { getNetwork, getProvider } from "../network"
 import { BaseWalletAccount } from "../wallet.model"
-import { getMulticallForNetwork } from "./getMulticall"
 
 /**
  * Get balance of token at account address on network.
@@ -11,7 +11,7 @@ import { getMulticallForNetwork } from "./getMulticall"
  * or falls back to single call on the token contract.
  */
 
-export const getTokenBalanceForWalletAccount = async (
+export const getTokenBalanceForAccount = async (
   tokenAddress: string,
   account: BaseWalletAccount,
 ): Promise<string> => {

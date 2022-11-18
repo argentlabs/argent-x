@@ -5,10 +5,8 @@ import useSWR from "swr"
 
 import { Network } from "./../../../shared/network/type"
 import parsedErc20Abi from "../../../abis/ERC20.json"
-import {
-  getMulticallForNetwork,
-  getTokenBalanceForWalletAccount,
-} from "../../../shared/multicall"
+import { getMulticallForNetwork } from "../../../shared/multicall"
+import { getTokenBalanceForAccount } from "../../../shared/token/getTokenBalance"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
@@ -123,7 +121,7 @@ export const fetchAllTokensBalance = async (
 ) => {
   const response = await Promise.all(
     tokenAddresses.map((tokenAddress) => {
-      return getTokenBalanceForWalletAccount(tokenAddress, account)
+      return getTokenBalanceForAccount(tokenAddress, account)
     }),
   )
   return tokenAddresses.reduce<BalancesMap>((acc, addr, i) => {
@@ -142,7 +140,7 @@ export const fetchFeeTokenBalance = async (
   if (!token) {
     return BigNumber.from(0)
   }
-  const balance = await getTokenBalanceForWalletAccount(token.address, account)
+  const balance = await getTokenBalanceForAccount(token.address, account)
   return BigNumber.from(balance)
 }
 

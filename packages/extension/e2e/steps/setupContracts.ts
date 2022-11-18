@@ -1,3 +1,4 @@
+import { IS_DEV } from "../../src/shared/utils/dev"
 import { declareMulticallContract } from "../apis/declareMulticallContract"
 import { declareProxyContract } from "../apis/declareProxyContract"
 import { declareUpgradeContract } from "../apis/declareUpgradeContract"
@@ -16,6 +17,7 @@ export async function setupContracts() {
   try {
     await universalDeployerDeployContract(multicallContractClassHash)
   } catch (e) {
-    console.log("Ingoring UDC deploy error - assuming already deployed")
+    IS_DEV &&
+      console.log("Ignoring UDC deploy error - assuming already deployed")
   }
 }

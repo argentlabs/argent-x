@@ -1,20 +1,22 @@
+import { BigNumber } from "ethers"
 import { get } from "lodash-es"
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import useSWR, { SWRConfiguration } from "swr"
 
-import { getTokenBalanceForWalletAccount } from "../../../shared/multicall"
-import { BaseToken } from "../../../shared/token/type"
+import { getTokenBalanceForAccount } from "../../../shared/token/getTokenBalance"
+import { Token } from "../../../shared/token/type"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { isNumeric } from "../../../shared/utils/number"
 import { isEqualAddress } from "../../services/addresses"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
+import { TokenDetailsWithBalance } from "./tokens.state"
 
 interface UseTokenBalanceForAccountArgs {
-  token: BaseToken
+  token: Token
   account: Account
-  /** Return {@link TokenBalanceErrorMessage} rather than throwing so the UI can choose if / how to display it to the user without `ErrorBoundary` */
+  /** Return `data` as {@link TokenBalanceErrorMessage} rather than throwing so the UI can choose if / how to display it to the user without `ErrorBoundary` */
   shouldReturnError?: boolean
 }
 
@@ -38,11 +40,11 @@ export const useTokenBalanceForAccount = (
   ]
     .filter(Boolean)
     .join("-")
-  const { mutate, ...rest } = useSWR<string | TokenBalanceErrorMessage>(
+  const { data, mutate, ...rest } = useSWR<string | TokenBalanceErrorMessage>(
     key,
     async () => {
       try {
-        const balance = await getTokenBalanceForWalletAccount(
+        const balance = await getTokenBalanceForAccount(
           token.address,
           account.toBaseWalletAccount(),
         )
@@ -70,7 +72,27 @@ export const useTokenBalanceForAccount = (
     pendingTransactionsLengthRef.current = pendingTransactions.length
   }, [mutate, pendingTransactions.length])
 
+  /** as a convenience, also return the token with balance and error message */
+  const { tokenWithBalance, errorMessage } = useMemo(() => {
+    const tokenWithBalance: TokenDetailsWithBalance = {
+      ...token,
+    }
+    let errorMessage: TokenBalanceErrorMessage | undefined
+    if (isNumeric(data)) {
+      tokenWithBalance.balance = BigNumber.from(data)
+    } else {
+      errorMessage = data as TokenBalanceErrorMessage
+    }
+    return {
+      tokenWithBalance,
+      errorMessage,
+    }
+  }, [data, token])
+
   return {
+    tokenWithBalance,
+    errorMessage,
+    data,
     mutate,
     ...rest,
   }
