@@ -8,7 +8,6 @@ import {
 } from "../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../shared/api/fetcher"
 import { IExplorerTransaction } from "../../../shared/explorer/type"
-import { PublicNetworkIds } from "../../../shared/network/public"
 import {
   isPrivacySettingsEnabled,
   settingsStore,
@@ -36,13 +35,14 @@ export const useArgentExplorerTransaction = ({
   network,
 }: {
   hash?: string
-  network: PublicNetworkIds | string
+  network: string
 }) => {
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const apiNetwork = argentApiNetworkForNetwork(network)
   return useConditionallyEnabledSWR<IExplorerTransaction>(
-    argentExplorerEnabled,
+    Boolean(apiNetwork && argentExplorerEnabled),
     hash &&
+      apiNetwork &&
       ARGENT_EXPLORER_BASE_URL &&
       urlJoin(ARGENT_EXPLORER_BASE_URL, "transactions", apiNetwork, hash),
     argentApiFetcher,
@@ -51,7 +51,7 @@ export const useArgentExplorerTransaction = ({
 
 export interface IUseArgentExplorerAccountTransactions {
   accountAddress?: string
-  network: PublicNetworkIds | string
+  network: string
   page?: number
   pageSize?: number
   direction?: "DESC" | "ASC"
@@ -71,6 +71,7 @@ export const useArgentExplorerAccountTransactions = ({
   const key = useMemo(() => {
     return (
       accountAddress &&
+      apiNetwork &&
       ARGENT_EXPLORER_BASE_URL &&
       urlWithQuery(
         [
@@ -90,7 +91,7 @@ export const useArgentExplorerAccountTransactions = ({
     )
   }, [accountAddress, apiNetwork, direction, page, pageSize, withTransfers])
   return useConditionallyEnabledSWR<IExplorerTransaction[]>(
-    argentExplorerEnabled,
+    Boolean(apiNetwork && argentExplorerEnabled),
     key,
     argentApiFetcher,
     withPolling(15 * 1000) /** 15 seconds */,
@@ -111,6 +112,7 @@ export const useArgentExplorerAccountTransactionsInfinite = ({
       return (
         argentExplorerEnabled &&
         accountAddress &&
+        apiNetwork &&
         ARGENT_EXPLORER_BASE_URL &&
         urlWithQuery(
           [

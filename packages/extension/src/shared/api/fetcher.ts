@@ -1,7 +1,5 @@
 /** generic json fetcher */
 
-import { PublicNetworkIds } from "../network/public"
-
 export type Fetcher = (
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -51,7 +49,7 @@ export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
 }
 
 export const fetcherWithArgentApiHeadersForNetwork = (
-  network: PublicNetworkIds,
+  network: string,
   fetcherImpl: Fetcher = fetcher,
 ) => {
   const fetcherWithArgentApiHeaders = (
@@ -72,16 +70,19 @@ export const fetcherWithArgentApiHeadersForNetwork = (
 
 /** convert KnownNetworksType to 'goerli' or 'mainnet' expected by API */
 
-export const argentApiNetworkForNetwork = (
-  network: PublicNetworkIds | string,
-) => {
-  return network === "goerli-alpha" ? "goerli" : "mainnet"
+export const argentApiNetworkForNetwork = (network: string) => {
+  return network === "goerli-alpha"
+    ? "goerli"
+    : network === "mainnet-alpha"
+    ? "mainnet"
+    : null
 }
 
-export const argentApiHeadersForNetwork = (network: PublicNetworkIds) => {
+export const argentApiHeadersForNetwork = (network: string) => {
+  const argentNetwork = argentApiNetworkForNetwork(network)
   return {
     "argent-version": process.env.VERSION || "Unknown version",
     "argent-client": "argent-x",
-    "argent-network": argentApiNetworkForNetwork(network),
+    ...(argentNetwork && { "argent-network": argentNetwork }),
   }
 }

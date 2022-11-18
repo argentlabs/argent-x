@@ -3,7 +3,6 @@ import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
-import { PublicNetworkIds } from "../../../../shared/network/public"
 import {
   isPrivacySettingsEnabled,
   settingsStore,
@@ -47,9 +46,10 @@ export const useTransactionReview = ({
     if (!account) {
       return
     }
-    const network = argentApiNetworkForNetwork(
-      account.networkId as PublicNetworkIds,
-    )
+    const network = argentApiNetworkForNetwork(account.networkId)
+    if (!network) {
+      return
+    }
     const accountAddress = account.address
     return fetchTransactionReview({
       network,
@@ -60,7 +60,7 @@ export const useTransactionReview = ({
     // TODO: come back - dont rerender when fetcher reference changes
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<ApiTransactionReviewResponse>(
-    !!transactionReviewEnabled,
+    Boolean(transactionReviewEnabled),
     [actionHash, "transactionReview"],
     transactionReviewFetcher,
   )
