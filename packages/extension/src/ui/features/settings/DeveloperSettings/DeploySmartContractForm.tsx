@@ -1,7 +1,14 @@
-import { Alert, Error, Input, L2, P4, Select } from "@argent/ui"
+import { Alert, CellStack, Error, H6, Input, L2, P4, Select } from "@argent/ui"
 import { Box, Flex, FormControl, FormLabel, Switch } from "@chakra-ui/react"
 import { get, isEmpty, isEqual } from "lodash-es"
-import { FC, ReactNode, useCallback, useEffect, useState } from "react"
+import {
+  FC,
+  Fragment,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react"
 import {
   Controller,
   SubmitHandler,
@@ -121,7 +128,6 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
       if (isEqual(constructorAbi, currentAbi)) {
         return
       }
-
       resetAbiFields()
       constructorAbi.inputs.map((input: AbiEntry) => {
         append({ name: input.name, type: input.type, value: "" })
@@ -147,7 +153,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Flex direction="column" mx="4" gap={1}>
+      <CellStack h="100vh">
         <Input
           {...register("classHash", { required: true })}
           autoFocus
@@ -198,8 +204,15 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         />
         {!isEmpty(errors.account) && <Error message="Account is required" />}
 
-        {fields.map((item, index) => (
+        {fields.length > 0 && (
           <>
+            <Flex borderTop="1px solid" borderTopColor="neutrals.600" my="5" />
+            <H6>Parameters</H6>
+          </>
+        )}
+
+        {fields.map((item, index) => (
+          <Fragment key={item.id}>
             <Input
               key={item.id}
               autoFocus={index === 0}
@@ -210,7 +223,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
             {!isEmpty(get(errors, `parameters[${index}]`)) && (
               <Error message="Constructor argument is required" />
             )}
-          </>
+          </Fragment>
         ))}
 
         {fetchError && (
@@ -235,17 +248,30 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
               display="flex"
               alignItems="center"
               justifyContent="space-between"
+              backgroundColor="neutrals.800"
+              borderRadius="8"
+              py="4.5"
+              px="5"
             >
               <FormLabel htmlFor="unique" mb="0">
                 Unique address
               </FormLabel>
-              <Switch id="unique" {...register("unique")} />
+              <Switch
+                id="unique"
+                {...register("unique")}
+                colorScheme="primary"
+                sx={{
+                  ".chakra-switch__track:not([data-checked])": {
+                    backgroundColor: "neutrals.600",
+                  },
+                }}
+              />
             </FormControl>
           </>
         )}
 
         {children?.({ isDirty, isSubmitting })}
-      </Flex>
+      </CellStack>
     </form>
   )
 }
