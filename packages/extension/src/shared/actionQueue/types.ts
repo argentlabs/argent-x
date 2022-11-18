@@ -82,5 +82,14 @@ export type ActionItem =
       type: "DECLARE_CONTRACT_ACTION"
       payload: DeclareContractPayload
     }
+  | {
+      type: "DEPLOY_CONTRACT_ACTION"
+      payload: {
+        classHash: string
+        constructorCalldata: any // TODO: type
+        salt: string
+        unique: boolean
+      }
+    }
 
 export type ExtensionActionItem = ExtQueueItem<ActionItem>

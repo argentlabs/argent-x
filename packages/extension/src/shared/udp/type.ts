@@ -8,5 +8,8 @@ export interface DeclareContract {
 export interface DeployContract {
   address: string
   networkId: string
-  /* TODO: add parameters */
+  classHash: string
+  constructorCalldata: any // TODO: type
+  salt: string
+  unique: boolean
 }

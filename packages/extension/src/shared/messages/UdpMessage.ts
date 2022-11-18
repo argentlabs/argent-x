@@ -31,4 +31,11 @@ export type UdpMessage =
       type: "REQUEST_DEPLOY_CONTRACT_REJ"
       data: { actionHash: string; error?: string }
     }
-  | { type: "APPROVE_REQUEST_DEPLOY_CONTRACT"; data: { actionHash: string } }
+  | {
+      type: "DEPLOY_CONTRACT_ACTION_SUBMITTED"
+      data: { txHash: string; actionHash: string }
+    }
+  | {
+      type: "DEPLOY_CONTRACT_ACTION_FAILED"
+      data: { actionHash: string; error?: string }
+    }

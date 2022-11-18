@@ -32,12 +32,33 @@ export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
     }
 
     case "REQUEST_DEPLOY_CONTRACT": {
-      /* TODO: complete */
+      const { data } = msg
+      const {
+        address,
+        networkId,
+        classHash,
+        constructorCalldata,
+        salt,
+        unique,
+      } = data
+      await wallet.selectAccount({ address, networkId })
 
-      /* account.estimateAccountDeployFee */
+      const action = await actionQueue.push({
+        type: "DEPLOY_CONTRACT_ACTION",
+        payload: {
+          classHash,
+          constructorCalldata,
+          salt,
+          unique,
+        },
+      })
 
-      /* return await actionQueue.remove(msg.data.actionHash) */
-      return
+      return sendToTabAndUi({
+        type: "REQUEST_DEPLOY_CONTRACT_RES",
+        data: {
+          actionHash: action.meta.hash,
+        },
+      })
     }
   }
 

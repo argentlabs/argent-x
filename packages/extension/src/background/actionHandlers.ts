@@ -134,6 +134,27 @@ export const handleActionApproval = async (
       }
     }
 
+    case "DEPLOY_CONTRACT_ACTION": {
+      try {
+        const txHash = "TODO" /*  await udpDeployContract(action, background) */
+
+        return {
+          type: "DEPLOY_CONTRACT_ACTION_SUBMITTED",
+          data: { txHash, actionHash },
+        }
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        return {
+          type: "DEPLOY_CONTRACT_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
+      }
+    }
+
     default:
       assertNever(action)
   }
@@ -201,6 +222,12 @@ export const handleActionRejection = async (
     case "DECLARE_CONTRACT_ACTION": {
       return {
         type: "REQUEST_DECLARE_CONTRACT_REJ",
+        data: { actionHash },
+      }
+    }
+    case "DEPLOY_CONTRACT_ACTION": {
+      return {
+        type: "REQUEST_DEPLOY_CONTRACT_REJ",
         data: { actionHash },
       }
     }
