@@ -38,6 +38,7 @@ import {
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
+import { fetchFeeTokenBalanceForAccounts } from "../ui/features/accountTokens/tokens.service"
 import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
 import {
@@ -225,9 +226,8 @@ export class Wallet {
     network: Network,
     offset: number = CHECK_OFFSET,
   ): Promise<WalletAccount[]> {
-    const provider = getProvider(network)
-
     const accounts: WalletAccount[] = []
+    const generatedAccounts: WalletAccount[] = []
 
     const accountClassHashes = union(
       ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
@@ -250,17 +250,17 @@ export class Wallet {
     )
 
     const promises = proxyClassHashAndAccountClassHash2DMap.map(
-      async ([contractClassHash, accountClassHash]) => {
+      async ([proxyClassHash, accountClassHash]) => {
         let lastHit = 0
         let lastCheck = 0
 
-        while (lastHit + offset > lastCheck) {
+        while (lastHit + offset >= lastCheck) {
           const starkPair = getStarkPair(lastCheck, secret, baseDerivationPath)
           const starkPub = ec.getStarkKey(starkPair)
 
           const address = calculateContractAddressFromHash(
             starkPub,
-            contractClassHash,
+            proxyClassHash,
             stark.compileCalldata({
               implementation: accountClassHash,
               selector: getSelectorFromName("initialize"),
@@ -272,21 +272,60 @@ export class Wallet {
             0,
           )
 
-          const code = await provider.getCode(address)
+          generatedAccounts.push({
+            address,
+            networkId: network.id,
+            network,
+            signer: {
+              type: "local_secret",
+              derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
+            },
+            type: "argent",
+          })
 
-          if (code.bytecode.length > 0) {
-            lastHit = lastCheck
-            accounts.push({
-              address,
-              networkId: network.id,
+          if (lastHit + offset === lastCheck) {
+            console.log(
+              "🚀 ~ file: wallet.ts ~ line 290 ~ Wallet ~ lastHit + offset === lastCheck",
+              lastHit,
+              lastCheck,
+              lastHit + offset === lastCheck,
+            )
+            const accountsSlice = generatedAccounts.slice(lastHit, lastCheck)
+            console.log(
+              "🚀 ~ file: wallet.ts ~ line 291 ~ Wallet ~ generatedAccounts",
+              generatedAccounts,
+            )
+            console.log(
+              "🚀 ~ file: wallet.ts ~ line 291 ~ Wallet ~ accountsSlice",
+              accountsSlice,
+            )
+
+            const accountBalances = await fetchFeeTokenBalanceForAccounts(
+              accountsSlice.map((acc) => acc.address),
               network,
-              signer: {
-                type: "local_secret",
-                derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
-              },
-              type: "argent",
-              needsDeploy: false, // Only deployed accounts will be recovered
-            })
+            )
+
+            // Check balances in the generated accounts
+
+            console.log(
+              "🚀 ~ file: wallet.ts ~ line 300 ~ Wallet ~ accountBalances",
+              accountBalances,
+              network.id,
+            )
+
+            // Populate Accounts Array with the ones that have a balance
+            const someHasBalance = Object.values(accountBalances).some(
+              (balance) => balance.gt(0),
+            )
+            console.log(
+              "🚀 ~ file: wallet.ts ~ line 317 ~ Wallet ~ someHasBalance",
+              someHasBalance,
+            )
+
+            if (someHasBalance) {
+              accounts.push(...accountsSlice)
+              lastHit = lastCheck
+            }
           }
 
           ++lastCheck
@@ -295,6 +334,14 @@ export class Wallet {
     )
 
     await Promise.all(promises)
+
+    // Generate all the possible accounts from the network
+    // const promises = proxyClassHashAndAccountClassHash2DMap.map(
+    //   async ([proxyClassHash, accountClassHash]) => {
+
+    // )
+
+    console.log("🚀 ~ file: wallet.ts ~ line 232 ~ Wallet ~ accounts", accounts)
 
     try {
       const accountWithTypes = await getAccountTypesFromChain(accounts)
