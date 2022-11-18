@@ -27,13 +27,32 @@ export const declareContract = async (
   }
 }
 
-/* TODO: complete */
-export const deployContract = async (address: string, networkId: string) => {
+interface DeployContractService {
+  address: string
+  networkId: string
+  classHash: string
+  constructorCalldata: any
+  salt: string
+  unique: boolean
+}
+
+export const deployContract = async ({
+  address,
+  networkId,
+  classHash,
+  constructorCalldata,
+  salt,
+  unique,
+}: DeployContractService) => {
   sendMessage({
     type: "REQUEST_DEPLOY_CONTRACT",
     data: {
       address,
       networkId,
+      classHash,
+      constructorCalldata,
+      salt,
+      unique,
     },
   })
   try {
@@ -46,4 +65,11 @@ export const deployContract = async (address: string, networkId: string) => {
   } catch {
     throw Error("Could not declare contract")
   }
+}
+
+export const fetchConstructorParams = async () => {
+  //TODO: implement
+  /*  sendMessage({
+    type: "FETCH_CONSTRUCTOR_PARAMS",
+  }) */
 }
