@@ -31,10 +31,10 @@ export const generateAvatarImage = (
   // get initials
   const initials = getInitials(name)
 
-  // generate 64x64 svg with initials in the center (horizontal and vertical) with font color and background color and font family Helvetica
+  // generate 64x64 svg with initials in the center (horizontal and vertical) with font color and background color and font family Helvetica (plus fallbacks)
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
     <rect width="64" height="64" fill="${background}" />
-    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="${color}" font-family="Helvetica" font-size="28">${initials}</text>
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="28" font-family="Helvetica, Arial, sans-serif" fill="${color}">${initials}</text>
     </svg>`
   return `data:image/svg+xml;base64,${btoa(svg)}`
 }
