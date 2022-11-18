@@ -143,6 +143,11 @@ export const routes = {
   settingsSmartContractDeclare: route(
     "/settings/smart-contract-development/declare",
   ),
+  settingsSmartContractDeclareClassHash: route(
+    (classhash) =>
+      `/settings/smart-contract-development/declare/classhash/${classhash}`,
+    "/settings/smart-contract-development/declare/classhash/:classhash",
+  ),
   settingsSmartContractDeploy: route(
     "/settings/smart-contract-development/deploy",
   ),

@@ -272,7 +272,11 @@ export const ActionScreen: FC = () => {
             } else {
               closePopupIfLastAction()
               useAppState.setState({ isLoading: false })
-              navigate(routes.accountTokens())
+              navigate(
+                routes.settingsSmartContractDeclareClassHash(
+                  action.payload.classHash,
+                ),
+              )
             }
           }}
           onReject={rejectAllActions}
