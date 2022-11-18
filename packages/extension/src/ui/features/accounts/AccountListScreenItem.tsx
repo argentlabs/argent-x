@@ -2,41 +2,32 @@ import { Button, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import useSWR from "swr"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import {
-  getAccountIdentifier,
-  isDeprecated,
-} from "../../../shared/wallet.service"
+import { isDeprecated } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
-import { withPolling } from "../../services/swr"
-import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
-import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
-import { checkIfUpgradeAvailable } from "./upgrade.service"
 
 const { MoreIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
   selectedAccount?: BaseWalletAccount
-  canShowUpgrade?: boolean
+  needsUpgrade?: boolean
 }
 
 export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   account,
   selectedAccount,
-  canShowUpgrade,
+  needsUpgrade,
 }) => {
   const navigate = useNavigate()
-  const { accountClassHash } = useCurrentNetwork()
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
 
@@ -45,13 +36,14 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
-  const { feeTokenBalance } = useFeeTokenBalance(account)
-
-  const { data: needsUpgrade = false } = useSWR(
-    [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
-    () => checkIfUpgradeAvailable(account, accountClassHash),
-    { suspense: false, ...withPolling(60 * 1000) },
-  )
+  // this is unnecessary for now, as we can easily source the upgrade status from the the list item (props)
+  // may be useful in the future if dont partition the list by upgrade status anymore
+  //
+  // const { data: needsUpgrade = false } = useSWR(
+  //   [getAccountIdentifier(account), accountClassHash, "showUpgradeBanner"],
+  //   () => checkIfUpgradeAvailable(account, accountClassHash),
+  //   { suspense: false, ...withPolling(60 * 1000) },
+  // )
 
   const onClick = useCallback(() => {
     useSelectedAccountStore.setState({
@@ -60,8 +52,6 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
     })
     navigate(routes.accountTokens())
   }, [account, navigate])
-
-  const showUpgradeBanner = Boolean(needsUpgrade && feeTokenBalance?.gt(0))
 
   const onAccountEdit = useCallback(() => {
     navigate(routes.editAccount(account.address))
@@ -78,7 +68,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         accountType={account.type}
         avatarOutlined={status.code === "CONNECTED"}
         deploying={status.code === "DEPLOYING"}
-        upgrade={canShowUpgrade && showUpgradeBanner}
+        upgrade={needsUpgrade}
         connected={isConnected}
         pr={14}
       />

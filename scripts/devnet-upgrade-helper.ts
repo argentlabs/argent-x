@@ -24,9 +24,9 @@ import prompt from "./utils/prompt"
       previousAddress.length &&
       console.log(`(Leave empty to use ${previousAddress}`)
     const address = ((await prompt("Address: ")) as string) || previousAddress
-    let addressIsValid
+    let addressIsValid = false
     try {
-      addressIsValid = address && validateAndParseAddress(address)
+      addressIsValid = !!(address && validateAndParseAddress(address))
     } catch (e) {
       // ignore validateAndParseAddress error
     }

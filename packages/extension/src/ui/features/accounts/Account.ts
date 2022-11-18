@@ -2,6 +2,7 @@ import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
+import { getMulticallForNetwork } from "../../../shared/multicall"
 import { Network, getNetwork, getProvider } from "../../../shared/network"
 import {
   ArgentAccountType,
@@ -95,9 +96,12 @@ export class Account {
       return this.network.accountClassHash?.argentAccount // cuz we always deploy regular accounts
     }
 
-    const { implementation } = await this.proxyContract.call(
-      "get_implementation",
-    )
+    const multicall = getMulticallForNetwork(this.network)
+    const [implementation] = await multicall.call({
+      contractAddress: this.address,
+      entrypoint: "get_implementation",
+    })
+
     return stark.makeAddress(number.toHex(implementation))
   }
 
