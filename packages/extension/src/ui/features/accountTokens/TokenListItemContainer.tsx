@@ -13,13 +13,17 @@ import {
   useTokenBalanceForAccount,
 } from "./useTokenBalanceForAccount"
 
-export interface TokenListItemMulticallProps
+export interface TokenListItemContainerProps
   extends Omit<TokenListItemProps, "currencyValue"> {
   token: Token
   account: Account
 }
 
-export const TokenListItemMulticall: FC<TokenListItemMulticallProps> = ({
+/**
+ * Fetches the token balance or error, currency value and renders them with {@link TokenListItem}
+ */
+
+export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
   token,
   account,
   ...rest

@@ -16,7 +16,7 @@ import { AccountCollections } from "../accountNfts/AccountCollections"
 import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { TokenListMulticall } from "../accountTokens/TokenListMulticall"
+import { TokenList } from "../accountTokens/TokenList"
 import {
   TokenDetailsWithBalance,
   useTokensInNetwork,
@@ -141,7 +141,7 @@ export const SendScreen: FC = () => {
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             {selectedTab === "tokens" && (
               <CellStack py={0}>
-                <TokenListMulticall
+                <TokenList
                   tokenList={tokenList}
                   variant="no-currency"
                   navigateToSend

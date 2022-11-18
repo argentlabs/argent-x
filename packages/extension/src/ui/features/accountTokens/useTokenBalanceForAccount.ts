@@ -5,6 +5,7 @@ import useSWR, { SWRConfiguration } from "swr"
 import { getTokenBalanceForWalletAccount } from "../../../shared/multicall"
 import { BaseToken } from "../../../shared/token/type"
 import { IS_DEV } from "../../../shared/utils/dev"
+import { coerceErrorToString } from "../../../shared/utils/error"
 import { isNumeric } from "../../../shared/utils/number"
 import { isEqualAddress } from "../../services/addresses"
 import { Account } from "../accounts/Account"
@@ -124,6 +125,14 @@ const errorToMessage = (
       message: "Missing contract",
       description: message,
     }
+  } else if (
+    errorCode === "StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"
+  ) {
+    /** not a token */
+    return {
+      message: "Invalid token",
+      description: `This is not a valid token contract`,
+    }
   } else if (isNetworkError(errorCode)) {
     /* some other network error */
     return {
@@ -134,8 +143,8 @@ const errorToMessage = (
     /* show a console message in dev for any unhandled errors that could be better handled here */
     IS_DEV &&
       console.warn(
-        `TokenListItemMulticall - ignoring errorCode ${errorCode} with error:`,
-        error,
+        `useTokenBalanceForAccount - ignoring errorCode ${errorCode} with error:`,
+        coerceErrorToString(error),
       )
   }
   return {

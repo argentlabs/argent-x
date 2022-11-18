@@ -9,10 +9,10 @@ import { routes } from "../../routes"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { NewTokenButton } from "./NewTokenButton"
 import { TokenListItemVariant } from "./TokenListItem"
-import { TokenListItemMulticall } from "./TokenListItemMulticall"
+import { TokenListItemContainer } from "./TokenListItemContainer"
 import { useTokensInNetwork } from "./tokens.state"
 
-interface TokenListMulticallProps {
+interface TokenListProps {
   tokenList?: Token[]
   showNewTokenButton?: boolean
   showTokenSymbol?: boolean
@@ -20,7 +20,7 @@ interface TokenListMulticallProps {
   navigateToSend?: boolean
 }
 
-export const TokenListMulticall: FC<TokenListMulticallProps> = ({
+export const TokenList: FC<TokenListProps> = ({
   tokenList,
   showNewTokenButton = true,
   showTokenSymbol = false,
@@ -45,7 +45,7 @@ export const TokenListMulticall: FC<TokenListMulticallProps> = ({
     >
       <Suspense fallback={<NewTokenButton isLoading />}>
         {tokens.map((token) => (
-          <TokenListItemMulticall
+          <TokenListItemContainer
             key={token.address}
             account={account}
             token={token}

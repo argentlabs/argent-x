@@ -31,7 +31,7 @@ import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBann
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
-import { TokenListMulticall } from "./TokenListMulticall"
+import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { UpgradeBanner } from "./UpgradeBanner"
@@ -152,7 +152,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
-        <TokenListMulticall variant={tokenListVariant} showNewTokenButton />
+        <TokenList variant={tokenListVariant} showNewTokenButton />
       </CellStack>
     </Flex>
   )

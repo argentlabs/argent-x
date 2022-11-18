@@ -8,24 +8,10 @@ import {
 } from "../../../shared/token/price"
 import { LoadingPulse } from "../../components/LoadingPulse"
 import { TokenIcon } from "./TokenIcon"
-import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
 const { AlertIcon } = icons
-
-interface TokenListItemContainerProps
-  extends Omit<TokenListItemProps, "currencyValue"> {
-  token: TokenDetailsWithBalance
-}
-
-export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
-  token,
-  ...rest
-}) => {
-  const currencyValue = useTokenBalanceToCurrencyValue(token)
-  return <TokenListItem token={token} currencyValue={currencyValue} {...rest} />
-}
 
 export type TokenListItemVariant = "default" | "no-currency"
 
