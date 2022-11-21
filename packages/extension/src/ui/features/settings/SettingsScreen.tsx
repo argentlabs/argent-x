@@ -97,7 +97,7 @@ export const SettingsScreen: FC = () => {
         <CellStack>
           {account && (
             <>
-              <AccountListScreenItem account={account} />
+              <AccountListScreenItem account={account} clickNavigateSettings />
               <SpacerCell />
             </>
           )}
