@@ -15,10 +15,7 @@ import { AddIcon } from "../../components/Icons/MuiIcons"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
-import {
-  connectAccount,
-  redeployAccount,
-} from "../../services/backgroundAccounts"
+import { redeployAccount } from "../../services/backgroundAccounts"
 import { withPolling } from "../../services/swr"
 import { Account } from "../accounts/Account"
 import {
@@ -130,10 +127,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       mutate(false) // update upgrade banner
     }
   }, [mutate, hasPendingTransactions])
-
-  useEffect(() => {
-    connectAccount(account)
-  }, [account])
 
   useEffect(() => {
     if (shouldShowNetworkUpgradeMessage) {
