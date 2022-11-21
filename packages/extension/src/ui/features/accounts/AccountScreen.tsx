@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react"
 
 import { assertNever } from "../../services/assertNever"
-import { AccountActivityContainer } from "../accountActivity/AccountActivity"
+import { AccountActivityContainer } from "../accountActivity/AccountActivityContainer"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"

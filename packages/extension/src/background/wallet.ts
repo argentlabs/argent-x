@@ -2,9 +2,7 @@ import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, noop, throttle, union } from "lodash-es"
 import {
-  Abi,
   Account,
-  Contract,
   DeployContractPayload,
   EstimateFee,
   ec,
@@ -19,9 +17,9 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
-import ProxyCompiledContractAbi from "../abis/Proxy.json"
 import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
 import { withHiddenSelector } from "../shared/account/selectors"
+import { getMulticallForNetwork } from "../shared/multicall"
 import {
   Network,
   defaultNetwork,
@@ -37,6 +35,7 @@ import {
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
+import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
 import {
   getIndexForPath,
@@ -440,32 +439,15 @@ export class Wallet {
     deployerAccount?: Account,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
-    const accountClassHash = await this.getAccountClassHashForNetwork(
-      walletAccount.network,
-      "argent",
-      deployerAccount,
-    )
 
     if (!("deployAccount" in starknetAccount)) {
       throw Error("Cannot deploy old accounts")
     }
 
-    const starkPair = await this.getKeyPairByDerivationPath(
-      walletAccount.signer.derivationPath,
+    const deployAccountPayload = await this.getAccountDeploymentPayload(
+      walletAccount,
+      deployerAccount,
     )
-
-    const starkPub = ec.getStarkKey(starkPair)
-
-    const deployAccountPayload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      contractAddress: starknetAccount.address,
-      constructorCalldata: stark.compileCalldata({
-        implementation: accountClassHash,
-        selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-      }),
-      addressSalt: starkPub,
-    }
 
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
@@ -481,32 +463,15 @@ export class Wallet {
     deployerAccount?: Account,
   ): Promise<EstimateFee> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
-    const accountClassHash = await this.getAccountClassHashForNetwork(
-      walletAccount.network,
-      "argent",
-      deployerAccount,
-    )
 
     if (!("deployAccount" in starknetAccount)) {
       throw Error("Cannot estimate fee to deploy old accounts")
     }
 
-    const starkPair = await this.getKeyPairByDerivationPath(
-      walletAccount.signer.derivationPath,
+    const deployAccountPayload = await this.getAccountDeploymentPayload(
+      walletAccount,
+      deployerAccount,
     )
-
-    const starkPub = ec.getStarkKey(starkPair)
-
-    const deployAccountPayload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      contractAddress: starknetAccount.address,
-      constructorCalldata: stark.compileCalldata({
-        implementation: accountClassHash,
-        selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
-      }),
-      addressSalt: starkPub,
-    }
 
     return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
   }
@@ -533,6 +498,75 @@ export class Wallet {
     const deployTransaction = await provider.deployContract(payload)
 
     return { account, txHash: deployTransaction.transaction_hash }
+  }
+  /** Get the Account Deployment Payload
+   * Use it in the deployAccount and getAccountDeploymentFee methods
+   * @param  {WalletAccount} walletAccount
+   * @param  {Account} deployerAccount?
+   */
+  public async getAccountDeploymentPayload(
+    walletAccount: WalletAccount,
+    deployerAccount?: Account,
+  ) {
+    const starkPair = await this.getKeyPairByDerivationPath(
+      walletAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      walletAccount.network,
+      "argent",
+      deployerAccount,
+    )
+
+    const constructorCallData = {
+      implementation: accountClassHash,
+      selector: getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+    }
+
+    const deployAccountPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contractAddress: walletAccount.address,
+      constructorCalldata: stark.compileCalldata(constructorCallData),
+      addressSalt: starkPub,
+    }
+
+    const calculatedAccountAddress = calculateContractAddressFromHash(
+      deployAccountPayload.addressSalt,
+      deployAccountPayload.classHash,
+      deployAccountPayload.constructorCalldata,
+      0,
+    )
+
+    if (isEqualAddress(walletAccount.address, calculatedAccountAddress)) {
+      return deployAccountPayload
+    }
+
+    console.warn("Calculated address does not match account address")
+
+    const oldCalldata = stark.compileCalldata({
+      ...constructorCallData,
+      implementation:
+        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f", // old implementation, ask @janek why
+    })
+
+    const oldCalculatedAddress = calculateContractAddressFromHash(
+      deployAccountPayload.addressSalt,
+      deployAccountPayload.classHash,
+      oldCalldata,
+      0,
+    )
+
+    if (isEqualAddress(oldCalculatedAddress, walletAccount.address)) {
+      console.warn("Address matches old implementation")
+      deployAccountPayload.constructorCalldata = oldCalldata
+    } else {
+      throw new Error("Calculated address does not match account address")
+    }
+
+    return deployAccountPayload
   }
 
   public async getDeployContractPayloadForAccountIndex(
@@ -645,15 +679,13 @@ export class Wallet {
   public async getCurrentImplementation(
     account: WalletAccount,
   ): Promise<string> {
-    const provider = getProvider(account.network)
+    const multicall = getMulticallForNetwork(account.network)
 
-    const proxyContract = new Contract(
-      ProxyCompiledContractAbi as Abi,
-      account.address,
-      provider,
-    )
+    const [implementation] = await multicall.call({
+      contractAddress: account.address,
+      entrypoint: "get_implementation",
+    })
 
-    const { implementation } = await proxyContract.call("get_implementation")
     return stark.makeAddress(number.toHex(implementation))
   }
 

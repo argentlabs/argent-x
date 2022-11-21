@@ -12,6 +12,7 @@ export type TransformedTransactionAction =
   | "SWAP"
   | "BUY"
   | "APPROVE"
+  | "DECLARE"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -19,6 +20,7 @@ export type TransformedTransactionEntity =
   | "DAPP"
   | "TOKEN"
   | "NFT"
+  | "CONTRACT"
 
 export interface BaseTransformedTransaction {
   action: TransformedTransactionAction
@@ -84,6 +86,12 @@ export interface SwapTransaction extends BaseTransformedTransaction {
   toToken: Token
 }
 
+export interface DeclareContractTransaction extends BaseTransformedTransaction {
+  action: "DECLARE"
+  entity: "CONTRACT"
+  classHash: string
+}
+
 export type TransformedTransaction =
   | BaseTransformedTransaction
   | TokenTransferTransaction
@@ -92,3 +100,4 @@ export type TransformedTransaction =
   | NFTTransaction
   | NFTTransferTransaction
   | SwapTransaction
+  | DeclareContractTransaction

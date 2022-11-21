@@ -34,6 +34,7 @@ import { handleTokenMessaging } from "./tokenMessaging"
 import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
+import { handleUdpMessaging } from "./udpMessaging"
 import { Wallet, sessionStore } from "./wallet"
 
 browser.alarms.create("core:transactionTracker:history", {
@@ -85,7 +86,12 @@ const handlers = [
   handleSessionMessage,
   handleTransactionMessage,
   handleTokenMessaging,
+  handleUdpMessaging,
 ] as Array<HandleMessage<MessageType>>
+
+getAccounts()
+  .then((x) => transactionTracker.loadHistory(x))
+  .catch(() => console.warn("failed to load transaction history"))
 
 messageStream.subscribe(async ([msg, sender]) => {
   await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages

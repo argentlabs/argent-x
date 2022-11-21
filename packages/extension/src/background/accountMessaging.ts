@@ -3,6 +3,7 @@ import { AccountMessage } from "../shared/messages/AccountMessage"
 import { deployAccountAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
+import { analytics } from "./analytics"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
 import { addTransaction } from "./transactions/store"
@@ -46,6 +47,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       try {
         const account = await wallet.newAccount(network)
 
+        analytics.track("createAccount", {
+          status: "success",
+          networkId: network,
+        })
+
         const accounts = await getAccounts()
 
         return sendToTabAndUi({
@@ -55,8 +61,14 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             accounts,
           },
         })
-      } catch (exception: unknown) {
+      } catch (exception) {
         const error = `${exception}`
+
+        analytics.track("createAccount", {
+          status: "failure",
+          networkId: network,
+          errorMessage: error,
+        })
 
         return sendToTabAndUi({
           type: "NEW_ACCOUNT_REJ",
@@ -71,8 +83,20 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           account: msg.data,
           actionQueue,
         })
+
+        analytics.track("deployAccount", {
+          status: "success",
+          networkId: msg.data.networkId,
+        })
+
         return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_RES" })
-      } catch {
+      } catch (e) {
+        analytics.track("deployAccount", {
+          status: "failure",
+          networkId: msg.data.networkId,
+          errorMessage: `${e}`,
+        })
+
         return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_REJ" })
       }
     }

@@ -1,4 +1,4 @@
-import { number, stark } from "starknet"
+import { Account, number, stark } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { HandleMessage, UnhandledMessage } from "../background"
@@ -109,6 +109,50 @@ export const handleTransactionMessage: HandleMessage<
         console.error(error)
         return sendToTabAndUi({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString?.() ??
+              (error as any)?.toString?.() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "ESTIMATE_DECLARE_CONTRACT_FEE": {
+      const { address, networkId, classHash, contract } = msg.data
+
+      const selectedAccount = await wallet.getStarknetAccount({
+        address,
+        networkId,
+      })
+
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+      try {
+        const { overall_fee, suggestedMaxFee } = await (
+          selectedAccount as Account
+        ).estimateDeclareFee({
+          classHash,
+          contract,
+        })
+
+        const maxADFee = number.toHex(
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        )
+
+        return sendToTabAndUi({
+          type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
+          data: {
+            accountDeploymentFee: number.toHex(overall_fee),
+            maxADFee,
+          },
+        })
+      } catch (error) {
+        console.error(error)
+        return sendToTabAndUi({
+          type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ",
           data: {
             error:
               (error as any)?.message?.toString?.() ??

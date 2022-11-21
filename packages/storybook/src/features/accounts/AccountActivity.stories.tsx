@@ -1,6 +1,7 @@
 import { AccountActivity } from "@argent-x/extension/src/ui/features/accountActivity/AccountActivity"
 import { DailyActivity } from "@argent-x/extension/src/ui/features/accountActivity/useActivity"
 import { Account } from "@argent-x/extension/src/ui/features/accounts/Account"
+import { CellStack } from "@argent/ui"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { MemoryRouter } from "react-router-dom"
 
@@ -15,7 +16,9 @@ export default {
 
 const Template: ComponentStory<typeof AccountActivity> = (props) => (
   <MemoryRouter initialEntries={["/"]}>
-    <AccountActivity {...props}></AccountActivity>
+    <CellStack>
+      <AccountActivity {...props}></AccountActivity>
+    </CellStack>
   </MemoryRouter>
 )
 

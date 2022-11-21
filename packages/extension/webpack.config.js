@@ -24,12 +24,18 @@ if (safeEnvVars) {
   console.log("Safe env vars enabled")
 }
 
+/**
+ * @type {import('webpack').Configuration}
+ */
 module.exports = {
   entry: {
     main: "./src/ui",
     inject: "./src/content",
     inpage: "./src/inpage",
     background: "./src/background",
+  },
+  experiments: {
+    asyncWebAssembly: true,
   },
   performance: {
     hints: false,

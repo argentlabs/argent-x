@@ -1,19 +1,34 @@
 import { Flex, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC, PropsWithChildren } from "react"
+import { ComponentProps, FC } from "react"
 
 import { Button } from "./Button"
 import { ChevronRightIcon } from "./icons"
 import { H6 } from "./Typography"
 
-/** A vertical collection of Cells with spacing */
+/** A vertical collection of Cells with standardised spacing */
 
-export const CellStack: FC<PropsWithChildren> = (props) => {
-  return <Flex p={4} gap={2} direction="column" {...props} />
-}
+export const CellStack = chakra(Flex, {
+  baseStyle: {
+    flexDirection: "column",
+    p: 4,
+    gap: 2,
+  },
+})
 
 export const SpacerCell = chakra(Flex, {
   baseStyle: {
     h: 2,
+  },
+})
+
+export const HeaderCell = chakra(H6, {
+  baseStyle: {
+    mt: 4,
+    mx: 2,
+    color: "neutrals.300",
+    "&:first-child": {
+      mt: 0,
+    },
   },
 })
 

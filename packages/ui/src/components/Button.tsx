@@ -103,6 +103,17 @@ export const buttonTheme = defineStyleConfig({
             bg: mode(`${c}.400`, `${c}.300`)(props),
           },
         }
+      } else if (c === "transparent") {
+        return {
+          bg: "transparent",
+          color: mode(`gray.700`, "white")(props),
+          _hover: {
+            bg: mode(`gray.50`, `neutrals.700`)(props),
+          },
+          _active: {
+            bg: mode(`gray.100`, `neutrals.800`)(props),
+          },
+        }
       }
 
       /** same for dark or light mode */

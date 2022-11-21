@@ -3,7 +3,6 @@ import {
   argentApiHeadersForNetwork,
   fetcher,
 } from "../../shared/api/fetcher"
-import { PublicNetworkIds } from "../../shared/network/public"
 import { useAppState } from "../app.state"
 
 /**
@@ -23,7 +22,7 @@ export const argentApiFetcher = (
     ...init,
     headers: {
       ...init?.headers,
-      ...argentApiHeadersForNetwork(switcherNetworkId as PublicNetworkIds),
+      ...argentApiHeadersForNetwork(switcherNetworkId),
     },
   }
   return fetcherImpl(input, initWithArgentApiHeaders)

@@ -121,7 +121,6 @@ export const AccountListScreen: FC = () => {
               key={account.address}
               account={account}
               selectedAccount={selectedAccount}
-              canShowUpgrade
             />
           ))}
           {some(deprecatedAccounts) && (
@@ -132,7 +131,7 @@ export const AccountListScreen: FC = () => {
                   key={account.address}
                   account={account}
                   selectedAccount={selectedAccount}
-                  canShowUpgrade
+                  needsUpgrade
                 />
               ))}
             </>

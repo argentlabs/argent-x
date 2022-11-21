@@ -1,16 +1,16 @@
 import { FC, ReactNode, useMemo } from "react"
-import styled, { css } from "styled-components"
+import styled from "styled-components"
 
 import { Network } from "../../../shared/network"
-import { makeClickable } from "../../services/a11y"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
   TokenDetailsWrapper,
   TokenTextGroup,
   TokenTitle,
-  TokenWrapper,
-} from "../accountTokens/TokenListItem"
+} from "../accountTokens/TokenListItemDeprecated"
 import {
+  isDeclareContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -23,27 +23,6 @@ import { NFTAccessory } from "./ui/NFTAccessory"
 import { SwapAccessory } from "./ui/SwapAccessory"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
-
-export const TransactionsListWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const Container = styled(TokenWrapper)<{
-  highlighted?: boolean
-}>`
-  cursor: pointer;
-
-  ${({ highlighted }) =>
-    highlighted &&
-    css`
-      background-color: rgba(255, 255, 255, 0.1);
-    `}
-
-  &:hover, &:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-`
 
 const TransactionSubtitle = styled.div`
   font-size: 13px;
@@ -63,7 +42,7 @@ const TitleAddressPrefix = styled.div`
 
 const TitleAddress = styled.div``
 
-export interface ITransactionListItem {
+export interface TransactionListItemProps {
   transactionTransformed: TransformedTransaction
   network: Network
   highlighted?: boolean
@@ -71,11 +50,10 @@ export interface ITransactionListItem {
   children?: ReactNode | ReactNode[]
 }
 
-export const TransactionListItem: FC<ITransactionListItem> = ({
+export const TransactionListItem: FC<TransactionListItemProps> = ({
   transactionTransformed,
   network,
   highlighted,
-  onClick,
   children,
   ...props
 }) => {
@@ -86,6 +64,7 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
+  const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer) {
@@ -111,11 +90,15 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
     if (dapp) {
       return <>{dapp.title}</>
     }
+    if (isDeclareContract) {
+      return <>{transactionTransformed.classHash}</>
+    }
     return null
   }, [
     isTransfer,
     dapp,
     isNFTTransfer,
+    isDeclareContract,
     action,
     transactionTransformed,
     network.id,
@@ -148,7 +131,7 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   ])
 
   return (
-    <Container {...makeClickable(onClick)} highlighted={highlighted} {...props}>
+    <CustomButtonCell highlighted={highlighted} {...props}>
       <TransactionIcon transaction={transactionTransformed} size={40} />
       <TokenDetailsWrapper>
         <TokenTextGroup>
@@ -158,6 +141,6 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
       </TokenDetailsWrapper>
       {accessory}
       {children}
-    </Container>
+    </CustomButtonCell>
   )
 }
