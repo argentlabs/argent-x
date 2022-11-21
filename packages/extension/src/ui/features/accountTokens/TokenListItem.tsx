@@ -1,5 +1,5 @@
-import { Button, H6, P4 } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { Button, FieldError, H6, P4, icons } from "@argent/ui"
+import { Flex, Tooltip } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
 import {
@@ -8,31 +8,23 @@ import {
 } from "../../../shared/token/price"
 import { LoadingPulse } from "../../components/LoadingPulse"
 import { TokenIcon } from "./TokenIcon"
-import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
-interface TokenListItemContainerProps
-  extends Omit<TokenListItemProps, "currencyValue"> {
-  token: TokenDetailsWithBalance
-}
-
-export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
-  token,
-  ...rest
-}) => {
-  const currencyValue = useTokenBalanceToCurrencyValue(token)
-  return <TokenListItem token={token} currencyValue={currencyValue} {...rest} />
-}
+const { AlertIcon } = icons
 
 export type TokenListItemVariant = "default" | "no-currency"
 
-interface TokenListItemProps extends ComponentProps<typeof Button> {
+export interface TokenListItemProps extends ComponentProps<typeof Button> {
   token: TokenDetailsWithBalance
   variant?: TokenListItemVariant
   isLoading?: boolean
   currencyValue: string | undefined
   showTokenSymbol?: boolean
+  errorMessage?: {
+    message: string
+    description: string
+  }
 }
 
 export const TokenListItem: FC<TokenListItemProps> = ({
@@ -41,6 +33,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   isLoading = false,
   showTokenSymbol = false,
   currencyValue,
+  errorMessage,
   ...rest
 }) => {
   const { name, image, symbol } = toTokenView(token)
@@ -91,9 +84,23 @@ export const TokenListItem: FC<TokenListItemProps> = ({
         </Flex>
         <Flex direction={"column"} overflow="hidden">
           <LoadingPulse isLoading={isLoading}>
-            <H6 overflow="hidden" textOverflow={"ellipsis"}>
-              {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
-            </H6>
+            {errorMessage ? (
+              <Tooltip label={errorMessage.description}>
+                <FieldError
+                  overflow="hidden"
+                  textOverflow={"ellipsis"}
+                  display="flex"
+                  gap="1"
+                >
+                  <AlertIcon />
+                  {errorMessage.message}
+                </FieldError>
+              </Tooltip>
+            ) : (
+              <H6 overflow="hidden" textOverflow={"ellipsis"}>
+                {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
+              </H6>
+            )}
           </LoadingPulse>
         </Flex>
       </Flex>
