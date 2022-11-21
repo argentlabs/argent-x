@@ -15,7 +15,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "wasm-pack build",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "wasm-pack test --chrome --headless",
     "postinstall": "yarn build",
     "prepare": "yarn build"
   },
