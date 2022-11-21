@@ -36,7 +36,7 @@ export const PrivacySettingsScreen: FC = () => {
             <Switch
               colorScheme="primary"
               isChecked={privacyUseArgentServices}
-              onClick={() =>
+              onChange={() =>
                 settingsStore.set(
                   "privacyUseArgentServices",
                   !privacyUseArgentServices,
@@ -56,7 +56,7 @@ export const PrivacySettingsScreen: FC = () => {
             <Switch
               colorScheme="primary"
               isChecked={privacyAutomaticErrorReporting}
-              onClick={() =>
+              onChange={() =>
                 settingsStore.set(
                   "privacyAutomaticErrorReporting",
                   !privacyAutomaticErrorReporting,
@@ -73,7 +73,7 @@ export const PrivacySettingsScreen: FC = () => {
             <Switch
               colorScheme="primary"
               isChecked={privacyShareAnalyticsData}
-              onClick={() =>
+              onChange={() =>
                 settingsStore.set(
                   "privacyShareAnalyticsData",
                   !privacyShareAnalyticsData,
