@@ -7,7 +7,7 @@ import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
 import { executeTransactionAction } from "./transactions/transactionExecution"
-import { udpDeclareContract } from "./udpAction"
+import { udpDeclareContract, udpDeployContract } from "./udpAction"
 
 export const handleActionApproval = async (
   action: ExtQueueItem<ActionItem>,
@@ -136,7 +136,7 @@ export const handleActionApproval = async (
 
     case "DEPLOY_CONTRACT_ACTION": {
       try {
-        const txHash = "TODO" /*  await udpDeployContract(action, background) */
+        const txHash = await udpDeployContract(action, background)
 
         return {
           type: "DEPLOY_CONTRACT_ACTION_SUBMITTED",
