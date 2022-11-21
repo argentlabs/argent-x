@@ -2,6 +2,8 @@ import { BigNumber, utils } from "ethers"
 import { Call, number, uint256 } from "starknet"
 
 import { addressSchema } from "../../schemas/primitives/address"
+import { formatAddress } from "../account"
+import { formatTokenAmount } from "../tokens/balances"
 import tokens from "../tokens/default-tokens.json"
 import { ReviewBlock } from "."
 
@@ -29,16 +31,19 @@ export async function reviewErc20Transfer(call: Call): Promise<ReviewBlock> {
         .toString(),
     )
 
-    const formattedAmount = utils.formatUnits(
-      BigNumber.from(amount.toString()),
-      token.decimals,
-    )
+    const formattedAmount = formatTokenAmount(amount, token.decimals)
+
+    const formattedAddress = formatAddress(to)
 
     return {
       rows: [
         {
           title: "Send",
           value: `${formattedAmount} ${token.symbol}`,
+        },
+        {
+          title: "To",
+          value: `${formattedAddress}`,
         },
       ],
     }
