@@ -14,7 +14,10 @@ const DeploySmartContractScreen: FC = () => {
       leftButton={<BarBackButton onClick={() => navigate(-1)} />}
       title={"Deploy smart contract"}
     >
-      <DeploySmartContractForm setIsLoading={setIsLoading}>
+      <DeploySmartContractForm
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+      >
         {({ isDirty, isSubmitting }) => (
           <StickyGroup>
             <Button

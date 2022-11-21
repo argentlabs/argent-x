@@ -1,5 +1,12 @@
 import { Alert, CellStack, Error, H6, Input, L2, P4, Select } from "@argent/ui"
-import { Box, Flex, FormControl, FormLabel, Switch } from "@chakra-ui/react"
+import {
+  Box,
+  Flex,
+  FormControl,
+  FormLabel,
+  Spinner,
+  Switch,
+} from "@chakra-ui/react"
 import { get, isEmpty, isEqual } from "lodash-es"
 import {
   FC,
@@ -39,12 +46,14 @@ interface FieldValues {
 
 interface DeploySmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
+  isLoading: boolean
   setIsLoading: (isLoading: boolean) => void
 }
 
 const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
-  setIsLoading,
   children,
+  isLoading,
+  setIsLoading,
 }) => {
   const {
     register,
@@ -207,7 +216,11 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         {fields.length > 0 && (
           <>
             <Flex borderTop="1px solid" borderTopColor="neutrals.600" my="5" />
-            <H6>Parameters</H6>
+
+            <Flex justifyContent="space-between">
+              <H6>Parameters </H6>
+              {isLoading && <Spinner />}
+            </Flex>
           </>
         )}
 
@@ -242,7 +255,14 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
               isInvalid={!isEmpty(get(errors, "salt"))}
             />
             <Flex justifyContent="flex-end">
-              <L2 onClick={generateRandomSalt}>Generate random</L2>
+              <L2
+                mb="3"
+                cursor="pointer"
+                color="neutrals.400"
+                onClick={generateRandomSalt}
+              >
+                Generate random
+              </L2>
             </Flex>
             <FormControl
               display="flex"
