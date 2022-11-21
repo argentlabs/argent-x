@@ -1,10 +1,9 @@
-import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { BarBackButton, NavigationContainer, Switch } from "@argent/ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import IOSSwitch from "../../components/IOSSwitch"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 export const PrivacySettingsScreen: FC = () => {
@@ -34,8 +33,9 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Use Argent services</span>
-            <IOSSwitch
-              checked={privacyUseArgentServices}
+            <Switch
+              colorScheme="primary"
+              isChecked={privacyUseArgentServices}
               onClick={() =>
                 settingsStore.set(
                   "privacyUseArgentServices",
@@ -53,8 +53,9 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Automatic Error Reporting</span>
-            <IOSSwitch
-              checked={privacyAutomaticErrorReporting}
+            <Switch
+              colorScheme="primary"
+              isChecked={privacyAutomaticErrorReporting}
               onClick={() =>
                 settingsStore.set(
                   "privacyAutomaticErrorReporting",
@@ -69,8 +70,9 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Share analytics data</span>
-            <IOSSwitch
-              checked={privacyShareAnalyticsData}
+            <Switch
+              colorScheme="primary"
+              isChecked={privacyShareAnalyticsData}
               onClick={() =>
                 settingsStore.set(
                   "privacyShareAnalyticsData",
