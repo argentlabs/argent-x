@@ -16,7 +16,7 @@ import { getNewStarkKeypair } from "./generatePrivateKey"
 import { provider } from "./provider"
 
 export const ACCOUNT_IMPLEMENTATION_CLASS_HASH =
-  "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328"
+  "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
 export const PROXY_CLASS_HASH =
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918"
 
