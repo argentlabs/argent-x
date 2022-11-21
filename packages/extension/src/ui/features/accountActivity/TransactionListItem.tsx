@@ -106,7 +106,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
 
   return (
     <CustomButtonCell highlighted={highlighted} {...props}>
-      <TransactionIcon transaction={transactionTransformed} size={40} />
+      <TransactionIcon transaction={transactionTransformed} size={9} />
       <Flex
         flexGrow={1}
         alignItems="center"

@@ -18,6 +18,7 @@ import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
 import { semanticTokens } from "./semanticTokens"
 import { shadows } from "./shadows"
+import { sizes } from "./sizes"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
 
@@ -42,6 +43,7 @@ const extendedTheme = extendTheme({
   },
   breakpoints,
   ...typography,
+  sizes,
   shadows,
   space: spacing,
   components: {
