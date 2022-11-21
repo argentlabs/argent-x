@@ -288,7 +288,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
                       : transactionTransformed.fromAddress
                   }
                   networkId={network.id}
-                  size={20}
+                  size={5}
                 />
               </TitleAddress>
             </TitleAddressContainer>
