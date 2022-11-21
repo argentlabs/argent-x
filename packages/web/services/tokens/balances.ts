@@ -30,6 +30,10 @@ interface Token {
   image?: string
 }
 
+export const getFeeToken = (): Token => {
+  return tokens.find((token) => token.symbol === "ETH")!
+}
+
 interface TokenWithBalance extends Token {
   balance: bigint
 }
@@ -44,4 +48,19 @@ export const getTokensBalances = async (
     })),
   )
   return balances
+}
+
+export const formatTokenAmount = (amount: bigint, decimals: number): string => {
+  const formattedAmount = amount.toString()
+  const decimalsIndex = formattedAmount.length - decimals
+  if (decimalsIndex <= 0) {
+    return `0.${"0".repeat(-decimalsIndex)}${formattedAmount}`
+  }
+  return `${formattedAmount.slice(0, decimalsIndex)}.${formattedAmount.slice(
+    decimalsIndex,
+  )}`
+}
+
+export const formatFeeTokenAmount = (amount: bigint): string => {
+  return formatTokenAmount(amount, getFeeToken().decimals)
 }

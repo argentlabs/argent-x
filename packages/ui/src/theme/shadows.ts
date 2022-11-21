@@ -7,4 +7,5 @@ export const shadows = {
     "inset 0 -20px 0 -18px var(--chakra-colors-error-500)" /** using large values gives a 2px inner shadow with no visual influence from the border radius */,
   menu: "0px 4px 20px rgba(0, 0, 0, 0.5);",
   neutralsButtonLight: "0px 4px 12px rgba(0, 0, 0, 0.06)",
+  box: "0px 0px 10px rgba(0, 0, 0, 0.03)",
 }

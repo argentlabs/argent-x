@@ -1,14 +1,18 @@
-import { P3 } from "@argent/ui"
+import { Button, P3 } from "@argent/ui"
 import { Box, Spinner } from "@chakra-ui/react"
 import { utils } from "ethers"
+import { UnsecuredJWT } from "jose"
 import Image from "next/image"
+import { useRouter } from "next/router"
 import { FC, PropsWithChildren } from "react"
+import { Call, number, uint256 } from "starknet"
+import { compileCalldata } from "starknet/dist/utils/stark"
 import useSwr from "swr"
 
 import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
 import { formatAddress, getAccount } from "../services/account"
-import { getTokensBalances } from "../services/tokens/balances"
+import { getFeeToken, getTokensBalances } from "../services/tokens/balances"
 import Home from "."
 
 const TokensBalances: FC<{ address: string }> = ({ address }) => {
@@ -89,7 +93,16 @@ const ClickToCopy: FC<PropsWithChildren<{ value: string }>> = ({
   )
 }
 
+const encodeTransactions = (transactions: Call[]): string => {
+  const unsignedJwt = new UnsecuredJWT({
+    transactions,
+  }).encode()
+
+  return unsignedJwt
+}
+
 export default function Dashboard() {
+  const navigate = useRouter()
   const { isValidating, data, error } = useSwr("services/account", () =>
     getAccount(),
   )
@@ -115,6 +128,32 @@ export default function Dashboard() {
         </ClickToCopy>
       </P3>
       <TokensBalances address={data.address} />
+      {/* Button to send 1 gwei to self */}
+      <Button
+        onClick={() => {
+          const encodedTransactions = encodeTransactions([
+            {
+              contractAddress: getFeeToken().address,
+              entrypoint: "transfer",
+              calldata: compileCalldata({
+                to: data.address,
+                value: {
+                  type: "struct",
+                  ...uint256.bnToUint256(number.toBN(1)),
+                },
+              }),
+            },
+          ])
+
+          console.log(`/review?transactions=${encodedTransactions}`)
+          return navigate.push(
+            `/review?transactions=${encodedTransactions}`,
+            "/review",
+          )
+        }}
+      >
+        Send 1 gwei to self
+      </Button>
     </Layout>
   )
 }
