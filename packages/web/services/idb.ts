@@ -3,7 +3,7 @@ import { GenerateKeyPairResult, KeyLike } from "jose"
 
 export interface Device {
   id?: number
-  signingKey: KeyLike | string
+  signingKey: GenerateKeyPairResult | string
   encryptionKey: GenerateKeyPairResult
 }
 
