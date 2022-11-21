@@ -1,4 +1,5 @@
 import { Account, number, stark } from "starknet"
+import { UDC } from "starknet/dist/constants"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { HandleMessage, UnhandledMessage } from "../background"
@@ -150,9 +151,62 @@ export const handleTransactionMessage: HandleMessage<
           },
         })
       } catch (error) {
-        console.error(error)
         return sendToTabAndUi({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString?.() ??
+              (error as any)?.toString?.() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "ESTIMATE_DEPLOY_CONTRACT_FEE": {
+      const { classHash, constructorCalldata, salt, unique } = msg.data
+
+      const selectedAccount = await wallet.getSelectedStarknetAccount()
+
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+      try {
+        const compiledConstructorCallData = stark.compileCalldata(
+          constructorCalldata || [],
+        )
+
+        /* TODO: use new method */
+        const { overall_fee, suggestedMaxFee } = await (
+          selectedAccount as Account
+        ).estimateInvokeFee([
+          {
+            contractAddress: UDC.ADDRESS,
+            entrypoint: UDC.ENTRYPOINT,
+            calldata: [
+              classHash,
+              salt,
+              unique,
+              compiledConstructorCallData.length,
+              ...compiledConstructorCallData,
+            ],
+          },
+        ])
+        const maxADFee = number.toHex(
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        )
+
+        return sendToTabAndUi({
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
+          data: {
+            accountDeploymentFee: number.toHex(overall_fee),
+            maxADFee,
+          },
+        })
+      } catch (error) {
+        console.log(error)
+        return sendToTabAndUi({
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
           data: {
             error:
               (error as any)?.message?.toString?.() ??

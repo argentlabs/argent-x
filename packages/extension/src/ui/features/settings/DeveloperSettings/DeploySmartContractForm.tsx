@@ -39,7 +39,11 @@ interface FieldValues {
   account: string
   classHash: string
   network: string
-  parameters: any
+  parameters: {
+    name: string
+    type: string
+    value: string
+  }[]
   salt: string
   unique: boolean
 }
@@ -99,11 +103,12 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     useSelectedAccountStore.setState({
       selectedAccount,
     })
+
     await deployContract({
       address: account,
       classHash,
       networkId: network,
-      constructorCalldata: parameters,
+      constructorCalldata: parameters.map((p) => p.value),
       salt,
       unique,
     })
@@ -280,11 +285,6 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
                 id="unique"
                 {...register("unique")}
                 colorScheme="primary"
-                sx={{
-                  ".chakra-switch__track:not([data-checked])": {
-                    backgroundColor: "neutrals.600",
-                  },
-                }}
               />
             </FormControl>
           </>

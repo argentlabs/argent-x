@@ -21,6 +21,7 @@ import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveDeclareContractScreen } from "./ApproveDeclareContractScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
+import { ApproveDeployContractScreen } from "./ApproveDeployContractScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
@@ -282,6 +283,51 @@ export const ActionScreen: FC = () => {
           onReject={rejectAllActions}
           selectedAccount={account}
         />
+      )
+    case "DEPLOY_CONTRACT_ACTION":
+      return (
+        <>
+          {/* TODO: move into single component for udp */}
+          <ApproveDeployContractScreen
+            actionHash={action.meta.hash}
+            {...action.payload}
+            onSubmit={async () => {
+              analytics.track("signedTransaction", {
+                networkId: account?.networkId || "unknown",
+              })
+              await approveAction(action)
+              useAppState.setState({ isLoading: true })
+              const result = await Promise.race([
+                waitForMessage(
+                  "DEPLOY_CONTRACT_ACTION_SUBMITTED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+                waitForMessage(
+                  "DEPLOY_CONTRACT_ACTION_FAILED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+              ])
+              // (await) blocking as the window may closes afterwards
+              await analytics.track("sentTransaction", {
+                success: !("error" in result),
+                networkId: account?.networkId || "unknown",
+              })
+              if ("error" in result) {
+                useAppState.setState({
+                  error: `Sending transaction failed: ${result.error}`,
+                  isLoading: false,
+                })
+                navigate(routes.error())
+              } else {
+                closePopupIfLastAction()
+                useAppState.setState({ isLoading: false })
+                navigate(routes.accountTokens())
+              }
+            }}
+            onReject={rejectAllActions}
+            selectedAccount={account}
+          />
+        </>
       )
 
     default:
