@@ -50,11 +50,6 @@ export const TransactionReview: FC<{
   const { data: deploymentFees } = useSwr(
     "services/estimateFee/estimateDeployment",
     () => estimateDeployment(),
-    {
-      onError: (error) => {
-        console.error(error)
-      },
-    },
   )
   const { data: executionFees } = useSwr(
     ["services/estimateFee/estimateTransactions", hash],
@@ -64,7 +59,6 @@ export const TransactionReview: FC<{
     return <Spinner />
   }
 
-  console.log(deploymentFees)
   return (
     <Flex w="100%" flexDirection="column" alignItems="center" gap={2} mb={8}>
       {review.blocks.map((block, index) => (
@@ -86,7 +80,7 @@ export const TransactionReview: FC<{
           {executionFees ? (
             <P4 ml={3}>{formatFeeTokenAmount(executionFees.fee)} ETH</P4>
           ) : (
-            <Spinner />
+            <Spinner size="sm" />
           )}
         </Row>
         {deploymentFees?.needsDeploy && (

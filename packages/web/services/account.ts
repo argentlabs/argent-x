@@ -21,7 +21,6 @@ export const PROXY_CLASS_HASH =
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918"
 
 export const calculateAccountAddress = (pubKey: string): string => {
-  console.time("calculateAccountAddress")
   const accountAddress = hash.calculateContractAddressFromHash(
     pubKey,
     PROXY_CLASS_HASH,
@@ -35,7 +34,6 @@ export const calculateAccountAddress = (pubKey: string): string => {
     }),
     0,
   )
-  console.timeEnd("calculateAccountAddress")
 
   return accountAddress
 }
@@ -90,9 +88,7 @@ export const createAccount = async (password: string) => {
     addHexPrefix(r.toString(16)),
     addHexPrefix(s.toString(16)),
   ])
-  console.log("privateKey", privateKey)
   const keyPair = ec.getKeyPair(privateKey)
-  console.log("public keys match:", ec.getStarkKey(keyPair), publicKey)
   account = new Account(provider, accountAddress, keyPair)
 
   console.log(
@@ -119,7 +115,6 @@ export const retrieveAccountWithPassword = async (password: string) => {
       password,
     )
     const keyPair = ec.getKeyPair(privateKey)
-    console.log("public key:", ec.getStarkKey(keyPair))
     account = new Account(provider, beAccount.address, keyPair)
     return account
   } catch (e) {

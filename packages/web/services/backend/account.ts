@@ -239,7 +239,6 @@ export const getAccounts = async (): Promise<Account[]> => {
   }
 
   const json = await response.json()
-  console.log("accounts", json.accounts)
   return json.accounts
 }
 

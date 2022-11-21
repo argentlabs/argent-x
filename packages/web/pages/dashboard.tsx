@@ -128,7 +128,6 @@ export default function Dashboard() {
         </ClickToCopy>
       </P3>
       <TokensBalances address={data.address} />
-      {/* Button to send 1 gwei to self */}
       <Button
         onClick={() => {
           const encodedTransactions = encodeTransactions([
@@ -139,7 +138,18 @@ export default function Dashboard() {
                 to: data.address,
                 value: {
                   type: "struct",
-                  ...uint256.bnToUint256(number.toBN(1)),
+                  ...uint256.bnToUint256(number.toBN(200000000000)),
+                },
+              }),
+            },
+            {
+              contractAddress: getFeeToken().address,
+              entrypoint: "transfer",
+              calldata: compileCalldata({
+                to: data.address,
+                value: {
+                  type: "struct",
+                  ...uint256.bnToUint256(number.toBN(400000000000)),
                 },
               }),
             },
@@ -152,7 +162,7 @@ export default function Dashboard() {
           )
         }}
       >
-        Send 1 gwei to self
+        Send funds to self
       </Button>
     </Layout>
   )

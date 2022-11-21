@@ -78,7 +78,9 @@ export default function ReviewScreen() {
             variant="solid"
             colorScheme="accent"
             w="100%"
-            onClick={() => navigate.push("/dashboard")}
+            onClick={async () => {
+              navigate.push(`/dashboard`)
+            }}
           >
             Confirm
           </Button>

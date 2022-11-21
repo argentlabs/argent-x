@@ -14,10 +14,8 @@ export const isContractDeployed = async (
 ): Promise<boolean> => {
   try {
     await provider.getClassHashAt(contractAddress)
-    console.log("contract deployed")
     return true
   } catch (e) {
-    console.log("contract not deployed")
     return false
   }
 }
