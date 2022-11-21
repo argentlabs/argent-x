@@ -6,6 +6,7 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../shared/token/price"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { LoadingPulse } from "../../components/LoadingPulse"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
@@ -41,17 +42,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
   const isNoCurrencyVariant = variant === "no-currency"
   return (
-    <Button
-      rounded="xl"
-      width="100%"
-      h="initial"
-      justifyContent="initial"
-      textAlign={"initial"}
-      px={4}
-      py={3.5}
-      gap={3}
-      {...rest}
-    >
+    <CustomButtonCell {...rest}>
       <TokenIcon size={9} url={image} name={name} />
       <Flex
         flexGrow={1}
@@ -104,6 +95,6 @@ export const TokenListItem: FC<TokenListItemProps> = ({
           </LoadingPulse>
         </Flex>
       </Flex>
-    </Button>
+    </CustomButtonCell>
   )
 }

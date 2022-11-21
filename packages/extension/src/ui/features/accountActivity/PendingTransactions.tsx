@@ -1,3 +1,4 @@
+import { HeaderCell } from "@argent/ui"
 import { FC } from "react"
 
 import { Network } from "../../../shared/network"
@@ -8,11 +9,9 @@ import { useAppState } from "../../app.state"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { SectionHeader } from "../accounts/SectionHeader"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { TransactionListItem } from "./TransactionListItem"
-import { TransactionsListWrapper } from "./TransactionsListWrapper"
 import { transformTransaction } from "./transform"
 
 interface IPendingTransactionsContainer {
@@ -55,32 +54,30 @@ export const PendingTransactions: FC<IPendingTransactions> = ({
 
   return (
     <>
-      <SectionHeader>Pending transactions</SectionHeader>
-      <TransactionsListWrapper>
-        {pendingTransactions.map((transaction) => {
-          const transactionTransformed = transformTransaction({
-            transaction,
-            accountAddress,
-            tokensByNetwork,
-          })
-          if (transactionTransformed) {
-            const { hash } = transaction
-            return (
-              <TransactionListItem
-                key={hash}
-                transactionTransformed={transactionTransformed}
-                network={network}
-                onClick={() => openBlockExplorerTransaction(hash, network)}
-              >
-                <div style={{ display: "flex" }}>
-                  <TransactionStatusIndicator color={"orange"} />
-                </div>
-              </TransactionListItem>
-            )
-          }
-          return null
-        })}
-      </TransactionsListWrapper>
+      <HeaderCell>Pending transactions</HeaderCell>
+      {pendingTransactions.map((transaction) => {
+        const transactionTransformed = transformTransaction({
+          transaction,
+          accountAddress,
+          tokensByNetwork,
+        })
+        if (transactionTransformed) {
+          const { hash } = transaction
+          return (
+            <TransactionListItem
+              key={hash}
+              transactionTransformed={transactionTransformed}
+              network={network}
+              onClick={() => openBlockExplorerTransaction(hash, network)}
+            >
+              <div style={{ display: "flex" }}>
+                <TransactionStatusIndicator color={"orange"} />
+              </div>
+            </TransactionListItem>
+          )
+        }
+        return null
+      })}
     </>
   )
 }
