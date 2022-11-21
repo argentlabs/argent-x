@@ -51,8 +51,15 @@ window.addEventListener(
       return
     }
 
-    if (data.type === "CONNECT_ACCOUNT_RES") {
-      const { address, network } = data.data
+    if (
+      data.type === "CONNECT_ACCOUNT_RES" ||
+      data.type === "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK"
+    ) {
+      const { address, network } =
+        data.type === "CONNECT_ACCOUNT_RES"
+          ? data.data
+          : data.data.selectedAccount
+
       const isPreauthorized = await getIsPreauthorized()
       if (!isPreauthorized) {
         // disconnect so the user can see they are no longer connected

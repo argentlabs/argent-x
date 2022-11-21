@@ -2,8 +2,8 @@ import { getAccounts } from "../../../shared/account/store"
 import { isEqualWalletAddress } from "../../../shared/wallet.service"
 import { walletStore } from "../../../shared/wallet/walletStore"
 import { useAppState } from "../../app.state"
+import { selectAccount } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "./accountMetadata.state"
-import { selectAccount } from "./accounts.service"
 import { mapWalletAccountsToAccounts } from "./accounts.state"
 
 /** Switches to the first visible account on network, otherwise sets selectedAccount to undefined */

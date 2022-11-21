@@ -1,5 +1,8 @@
+import { getNetworkSelector } from "../shared/account/selectors"
+import { getAccounts } from "../shared/account/store"
 import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
+import { addNetwork, getNetworks } from "../shared/network"
 import { preAuthorize } from "../shared/preAuthorizations"
 import { assertNever } from "../ui/services/assertNever"
 import { accountDeployAction } from "./accounDeployAction"
@@ -99,16 +102,62 @@ export const handleActionApproval = async (
     }
 
     case "REQUEST_ADD_CUSTOM_NETWORK": {
-      return {
-        type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
-        data: { actionHash },
+      try {
+        await addNetwork(action.payload)
+        return {
+          type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
+          data: { actionHash },
+        }
+      } catch (error) {
+        return {
+          type: "REJECT_REQUEST_ADD_CUSTOM_NETWORK",
+          data: { actionHash },
+        }
       }
     }
 
     case "REQUEST_SWITCH_CUSTOM_NETWORK": {
-      return {
-        type: "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
-        data: { actionHash },
+      try {
+        const networks = await getNetworks()
+
+        const network = networks.find(
+          (n) => n.chainId === action.payload.chainId,
+        )
+
+        if (!network) {
+          throw Error(
+            `Network with chainId ${action.payload.chainId} not found`,
+          )
+        }
+
+        const accountsOnNetwork = await getAccounts(
+          getNetworkSelector(network.id),
+        )
+
+        if (!accountsOnNetwork.length) {
+          throw Error(
+            `No accounts found on network with chainId ${action.payload.chainId}`,
+          )
+        }
+
+        const selectedAccount = await wallet.selectAccount(accountsOnNetwork[0])
+
+        if (!selectedAccount) {
+          throw Error(
+            `No accounts found on network with chainId ${action.payload.chainId}`,
+          )
+        }
+
+        return {
+          type: "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
+          data: { actionHash, selectedAccount },
+        }
+      } catch (error) {
+        console.error(error)
+        return {
+          type: "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
+          data: { actionHash },
+        }
       }
     }
 

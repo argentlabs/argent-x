@@ -8,9 +8,9 @@ import {
   accountsOnNetwork,
   getAccounts,
   getLastSelectedAccount,
+  selectAccount,
 } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
-import { selectAccount } from "../accounts/accounts.service"
 import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
 
 interface RecoveryOptions {

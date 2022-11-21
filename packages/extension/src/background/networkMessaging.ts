@@ -46,8 +46,10 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
 
       if (exists) {
         return sendToTabAndUi({
-          type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
-          data: {},
+          type: "REQUEST_ADD_CUSTOM_NETWORK_REJ",
+          data: {
+            error: `Network with chainId ${msg.data.chainId} already exists`,
+          },
         })
       }
 
@@ -69,8 +71,10 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
 
       if (!network) {
         return sendToTabAndUi({
-          type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
-          data: {},
+          type: "REQUEST_SWITCH_CUSTOM_NETWORK_REJ",
+          data: {
+            error: `Network with chainId ${msg.data.chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
+          },
         })
       }
 

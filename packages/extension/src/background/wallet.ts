@@ -694,10 +694,13 @@ export class Wallet {
       accountsEqual(account, accountIdentifier),
     )
 
-    if (account) {
-      const { address, networkId } = account // makes sure to strip away unused properties
-      await this.store.set("selected", { address, networkId })
+    if (!account) {
+      throw Error("account not found")
     }
+
+    const { address, networkId } = account // makes sure to strip away unused properties
+    await this.store.set("selected", { address, networkId })
+    return account
   }
 
   public async lock() {

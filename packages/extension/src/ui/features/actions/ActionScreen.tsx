@@ -7,9 +7,9 @@ import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { analytics } from "../../services/analytics"
 import { assertNever } from "../../services/assertNever"
+import { selectAccount } from "../../services/backgroundAccounts"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { Account } from "../accounts/Account"
-import { selectAccount } from "../accounts/accounts.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
@@ -105,6 +105,7 @@ export const ActionScreen: FC = () => {
           hideBackButton
           onSubmit={onSubmit}
           onReject={onReject}
+          mode="add"
         />
       )
 
@@ -112,10 +113,10 @@ export const ActionScreen: FC = () => {
       return (
         <AddNetworkScreen
           requestedNetwork={action.payload}
-          mode="switch"
           hideBackButton
           onSubmit={onSubmit}
           onReject={onReject}
+          mode="switch"
         />
       )
 
