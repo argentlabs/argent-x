@@ -10,6 +10,7 @@ interface SettingsMenuItemProps {
   onClick?: () => void
   title: string
   to: string
+  disabled?: boolean
 }
 
 const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
@@ -18,6 +19,7 @@ const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
   onClick,
   to,
   title,
+  disabled,
 }) => (
   <ButtonCell
     as={Link}
@@ -26,6 +28,7 @@ const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
     width="100%"
     to={to}
     onClick={onClick}
+    disabled={disabled}
   >
     {title}
   </ButtonCell>
