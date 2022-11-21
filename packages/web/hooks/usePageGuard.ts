@@ -8,7 +8,7 @@ const allowedDestinations = {
   "/email": ["/email", "/pin"],
   "/password": ["/password"],
   "/new-password": ["/new-password"],
-  "/dashboard": ["/dashboard"],
+  "/dashboard": ["/dashboard", "/review"],
 }
 
 const conditionallyPushTo = (
