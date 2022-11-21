@@ -1,8 +1,9 @@
+import { IStarknetWindowObject } from "@argent/get-starknet/dist"
 import { supportsSessions } from "@argent/x-sessions"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { AccountInterface } from "starknet"
+import { AccountInterface, defaultProvider } from "starknet"
 
 import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
@@ -15,10 +16,21 @@ import {
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
+const connectWebWallet = async (): Promise<
+  IStarknetWindowObject | undefined
+> => {
+  return {
+    isConnected: true,
+    selectedAddress: "0x123",
+    account: {},
+    provider: defaultProvider,
+  } as any
+}
+
 const Home: NextPage = () => {
   const [address, setAddress] = useState<string>()
   const [supportSessions, setSupportsSessions] = useState<boolean | null>(null)
-  const [chain, setChain] = useState(chainId())
+  const [chain, setChain] = useState<string | undefined>(undefined)
   const [isConnected, setConnected] = useState(false)
   const [account, setAccount] = useState<AccountInterface | null>(null)
 
@@ -26,7 +38,7 @@ const Home: NextPage = () => {
     const handler = async () => {
       const wallet = await silentConnectWallet()
       setAddress(wallet?.selectedAddress)
-      setChain(chainId())
+      setChain(chainId(wallet?.provider))
       setConnected(!!wallet?.isConnected)
       if (wallet?.account) {
         setAccount(wallet.account)
@@ -55,23 +67,25 @@ const Home: NextPage = () => {
     }
   }, [])
 
-  const handleConnectClick = async () => {
-    const wallet = await connectWallet()
-    setAddress(wallet?.selectedAddress)
-    setChain(chainId())
-    setConnected(!!wallet?.isConnected)
-    if (wallet?.account) {
-      setAccount(wallet.account)
+  const handleConnectClick =
+    (connectWallet: () => Promise<IStarknetWindowObject | undefined>) =>
+    async () => {
+      const wallet = await connectWallet()
+      setAddress(wallet?.selectedAddress)
+      setChain(chainId(wallet?.provider))
+      setConnected(!!wallet?.isConnected)
+      if (wallet?.account) {
+        setAccount(wallet.account)
+      }
+      setSupportsSessions(null)
+      if (wallet?.selectedAddress) {
+        const sessionSupport = await supportsSessions(
+          wallet.selectedAddress,
+          wallet.provider,
+        )
+        setSupportsSessions(sessionSupport)
+      }
     }
-    setSupportsSessions(null)
-    if (wallet?.selectedAddress) {
-      const sessionSupport = await supportsSessions(
-        wallet.selectedAddress,
-        wallet.provider,
-      )
-      setSupportsSessions(sessionSupport)
-    }
-  }
 
   return (
     <div className={styles.container}>
@@ -98,8 +112,17 @@ const Home: NextPage = () => {
           </>
         ) : (
           <>
-            <button className={styles.connect} onClick={handleConnectClick}>
+            <button
+              className={styles.connect}
+              onClick={handleConnectClick(connectWallet)}
+            >
               Connect Wallet
+            </button>
+            <button
+              className={styles.connect}
+              onClick={handleConnectClick(connectWebWallet)}
+            >
+              Connect WebWallet
             </button>
             <p>First connect wallet to use dapp.</p>
           </>

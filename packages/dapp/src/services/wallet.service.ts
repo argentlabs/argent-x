@@ -1,5 +1,5 @@
 import { connect, getStarknet } from "@argent/get-starknet"
-import { constants, shortString } from "starknet"
+import { ProviderInterface, constants, shortString } from "starknet"
 
 import { Network } from "./token.service"
 
@@ -72,13 +72,12 @@ export const getExplorerBaseUrl = (): string | undefined => {
   }
 }
 
-export const chainId = (): string | undefined => {
-  const starknet = getStarknet()
-  if (!starknet?.isConnected) {
-    return
-  }
+export const chainId = (provider?: ProviderInterface): string | undefined => {
   try {
-    return shortString.decodeShortString(starknet.provider.chainId)
+    if (!provider) {
+      throw Error("no provider")
+    }
+    return shortString.decodeShortString(provider.chainId)
   } catch {}
 }
 
