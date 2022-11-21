@@ -34,7 +34,7 @@ export const Block: FC<PropsWithChildren> = ({ children }) => {
 
 export const Row: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Flex alignItems="center" justifyContent="space-between" w="100%">
+    <Flex alignItems="center" justifyContent="space-between" w="100%" p={1}>
       {children}
     </Flex>
   )
