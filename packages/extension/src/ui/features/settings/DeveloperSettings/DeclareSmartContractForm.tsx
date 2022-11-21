@@ -1,5 +1,6 @@
-import { Error, Input, Select } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { Error as ErrorEl, Input, Select } from "@argent/ui"
+import { calculate_class_hash } from "@argent/x-wasm"
+import { Box, Flex, Spinner } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
@@ -18,8 +19,28 @@ interface FieldValues {
   network: string
 }
 
+const readFileAsString = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (reader.result) {
+        return resolve(reader.result?.toString())
+      }
+      return reject(new Error("Could not read file"))
+    }
+    reader.onerror = reject
+    reader.onabort = reject.bind(null, new Error("User aborted"))
+    reader.readAsText(file)
+  })
+}
+
 interface DeclareSmartContractFormProps {
-  children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
+  children?: (options: {
+    isDirty: boolean
+    isSubmitting: boolean
+    isBusy: boolean
+    hasInvalidFile: boolean
+  }) => ReactNode
 }
 
 const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
@@ -45,25 +66,39 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   const { accounts, accountOptions, networkOptions } =
     useFormSelects(selectedNetwork)
 
+  const [contractClassHashLoading, setContractClassHashLoading] =
+    useState(false)
+  const [contractClassHashComputed, setContractClassHashComputed] =
+    useState(false)
+
   const uploadFile = useCallback(async () => {
-    const file = get(fileInputRef, "current.files[0]")
-    const reader = new FileReader()
-    reader.onload = function () {
-      if (reader.result) {
-        try {
-          JSON.parse(reader.result.toString())
-        } catch (e) {
-          setError("contract", {
-            type: "invalid",
-          })
-          return
-        }
-        setContractJSON(reader.result.toString())
-        setValue("contract", file.name)
+    setContractClassHashComputed(false)
+    setContractClassHashLoading(true)
+
+    const file: File | undefined = get(fileInputRef, "current.files[0]")
+
+    if (file) {
+      setValue("contract", file.name)
+      clearErrors("contract")
+      try {
+        const contractContent = await readFileAsString(file)
+        setContractJSON(contractContent)
+
+        const classHash = await calculate_class_hash(contractContent)
+        setValue("classHash", classHash)
+
+        setContractClassHashComputed(true)
+      } catch (error) {
+        setError("contract", {
+          type: "invalid",
+          message: "Invalid JSON file",
+        })
+        setValue("classHash", "")
       }
     }
-    reader.readAsText(file)
-  }, [setValue])
+
+    setContractClassHashLoading(false)
+  }, [clearErrors, setError, setValue])
 
   const onSubmit: SubmitHandler<FieldValues> = async ({
     account,
@@ -88,7 +123,11 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
         <Controller
           name="contract"
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: true,
+            validate: () =>
+              !(errors.contract?.type === "invalid") || "Invalid JSON file",
+          }}
           defaultValue=""
           render={({ field: { ref, value, onChange, ...inputProps } }) => (
             <>
@@ -102,7 +141,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
               ></input>
               <Input
                 _placeholder={{ color: "white" }}
-                placeholder={value || "Upload contract JSON"}
+                placeholder={value || "Click to upload contract JSON"}
                 isInvalid={!isEmpty(errors.contract)}
                 onClick={() => fileInputRef?.current?.click()}
                 cursor="pointer"
@@ -112,29 +151,50 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           )}
         />
         {!isEmpty(errors.contract) && (
-          <Error
+          <ErrorEl
             message={
-              errors.contract.type === "required" ? "Required" : "Invalid JSON"
+              errors.contract.type === "required"
+                ? "A contract is required"
+                : "Invalid contract file"
             }
           />
         )}
 
-        <Controller
-          name="classHash"
-          control={control}
-          rules={{ required: true }}
-          defaultValue=""
-          render={({ field: { ref, ...field } }) => (
-            <Input
-              autoFocus
-              placeholder="Contract classhash"
-              {...field}
-              isInvalid={!isEmpty(errors.classHash)}
-            />
+        <Box position="relative">
+          <Controller
+            name="classHash"
+            control={control}
+            rules={{ required: true }}
+            defaultValue=""
+            render={({ field: { ref, ...field } }) => (
+              <Input
+                readOnly={contractClassHashComputed}
+                disabled={contractClassHashLoading}
+                placeholder="Contract classhash"
+                {...field}
+                isInvalid={!isEmpty(errors.classHash)}
+              />
+            )}
+          />
+          {contractClassHashLoading && (
+            <Box
+              position="absolute"
+              top="0"
+              right="0"
+              bottom="0"
+              left="0"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              backdropFilter="blur(2px)"
+              borderRadius="lg"
+            >
+              <Spinner size="sm" />
+            </Box>
           )}
-        />
+        </Box>
         {!isEmpty(errors.classHash) && (
-          <Error message="Classhash is required" />
+          <ErrorEl message="Classhash is required" />
         )}
 
         <Controller
@@ -154,7 +214,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             />
           )}
         />
-        {!isEmpty(errors.network) && <Error message="Network is required" />}
+        {!isEmpty(errors.network) && <ErrorEl message="Network is required" />}
 
         <Controller
           name="account"
@@ -175,9 +235,14 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             />
           )}
         />
-        {!isEmpty(errors.account) && <Error message="Account is required" />}
+        {!isEmpty(errors.account) && <ErrorEl message="Account is required" />}
 
-        {children?.({ isDirty, isSubmitting })}
+        {children?.({
+          isDirty,
+          isSubmitting,
+          isBusy: contractClassHashLoading,
+          hasInvalidFile: !isEmpty(errors.contract),
+        })}
       </Flex>
     </form>
   )

@@ -14,13 +14,13 @@ const DeclareSmartContractScreen: FC = () => {
       title={"Declare smart contract"}
     >
       <DeclareSmartContractForm>
-        {({ isDirty, isSubmitting }) => (
+        {({ isDirty, isSubmitting, hasInvalidFile, isBusy }) => (
           <StickyGroup>
             <Button
               gap="2"
               colorScheme="primary"
               type="submit"
-              disabled={!isDirty || isSubmitting}
+              disabled={!isDirty || isSubmitting || hasInvalidFile || isBusy}
               width="100%"
               loadingText="Unlocking"
             >
