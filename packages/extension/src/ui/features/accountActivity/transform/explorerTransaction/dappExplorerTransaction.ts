@@ -4,7 +4,6 @@ import {
   IExplorerTransactionEvent,
 } from "../../../../../shared/explorer/type"
 import { getKnownDappForContractAddress } from "../../../../../shared/knownDapps"
-import { PublicNetworkIds } from "../../../../../shared/network/public"
 
 /**
  * Crude test if any event or call `address` or parameter value is a known dapp
@@ -12,7 +11,7 @@ import { PublicNetworkIds } from "../../../../../shared/network/public"
 
 export const getKnownDappForExplorerTransaction = (
   explorerTransaction: IExplorerTransaction,
-  network?: PublicNetworkIds,
+  network?: string,
 ) => {
   const { calls, events } = explorerTransaction
   const eventsAndCalls: Array<

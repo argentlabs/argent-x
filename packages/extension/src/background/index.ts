@@ -86,6 +86,10 @@ const handlers = [
   handleTokenMessaging,
 ] as Array<HandleMessage<MessageType>>
 
+getAccounts()
+  .then((x) => transactionTracker.loadHistory(x))
+  .catch(() => console.warn("failed to load transaction history"))
+
 messageStream.subscribe(async ([msg, sender]) => {
   await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages
 
