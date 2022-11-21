@@ -1,15 +1,6 @@
-export interface DeclareContract {
-  address: string
-  classHash: string
-  contract: string
-  networkId: string
-}
+import type { DeclareContractPayload } from "starknet"
 
-export interface DeployContract {
+export type DeclareContract = {
   address: string
   networkId: string
-  classHash: string
-  constructorCalldata: any // TODO: type
-  salt: string
-  unique: boolean
-}
+} & DeclareContractPayload

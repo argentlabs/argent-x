@@ -12,6 +12,7 @@ import {
 } from "../accountTokens/TokenListItemDeprecated"
 import {
   isDeclareContractTransaction,
+  isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -89,6 +90,7 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
   const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
+  const isDeployContract = isDeployContractTransaction(transactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer) {
@@ -117,12 +119,16 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
     if (isDeclareContract) {
       return <>{transactionTransformed.classHash}</>
     }
+    if (isDeployContract) {
+      return <>{transactionTransformed.contractAddress}</>
+    }
     return null
   }, [
     isTransfer,
     dapp,
     isNFTTransfer,
     isDeclareContract,
+    isDeployContract,
     action,
     transactionTransformed,
     network.id,

@@ -1,4 +1,4 @@
-import { DeclareContract, DeployContract } from "./../udp/type"
+import { DeclareContract } from "./../udp/type"
 
 export type UdpMessage =
   | { type: "REQUEST_DECLARE_CONTRACT"; data: DeclareContract }

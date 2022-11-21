@@ -1,6 +1,11 @@
-import type { Abi, Call, InvocationsDetails } from "starknet"
+import type {
+  Abi,
+  Call,
+  InvocationsDetails,
+  UniversalDeployerContractPayload,
+} from "starknet"
 
-import { DeclareContract, DeployContract } from "./../udp/type"
+import { DeclareContract } from "./../udp/type"
 import { Transaction } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
 
@@ -53,5 +58,14 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES"
+      data: any
+    }
+  | {
+      type: "ESTIMATE_DEPLOY_CONTRACT_FEE"
+      data: UniversalDeployerContractPayload
+    }
+  | { type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"; data: { error: string } }
+  | {
+      type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
       data: any
     }

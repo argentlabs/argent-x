@@ -8,7 +8,7 @@ export default function ({ transaction, result }: ITransactionTransformer) {
   const calls = getCallsFromTransaction(transaction)
   const entrypointNames = calls.map(({ entrypoint }) => entrypoint)
   let displayName = meta?.title || formatTruncatedAddress(hash)
-  const classHash = formatTruncatedAddress(meta?.subTitle || "")
+  const contractAddress = formatTruncatedAddress(meta?.subTitle || "")
   if (entrypointNames.length) {
     const entrypointDisplayName = transactionNamesToTitle(entrypointNames)
     if (entrypointDisplayName) {
@@ -18,9 +18,9 @@ export default function ({ transaction, result }: ITransactionTransformer) {
   result = {
     ...result,
     entity: "CONTRACT",
-    action: "DECLARE",
+    action: "DEPLOY",
     displayName,
-    classHash,
+    contractAddress,
   }
   return result
 }
