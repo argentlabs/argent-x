@@ -10,12 +10,12 @@ import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { FormatListBulletedIcon } from "../../components/Icons/MuiIcons"
+import { LoadingPulse } from "../../components/LoadingPulse"
 import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { H2, H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenIcon } from "./TokenIcon"
-import { IIsLoading, isLoadingPulse } from "./TokenListItemDeprecated"
 import { TokenMenu } from "./TokenMenu"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
@@ -69,11 +69,10 @@ const ComingSoonText = styled.div`
   color: ${({ theme }) => theme.text3};
 `
 
-const TokenBalanceContainer = styled(RowCentered)<IIsLoading>`
+const TokenBalanceContainer = styled(RowCentered)`
   gap: 8px;
   margin-top: 12px;
   align-items: baseline;
-  ${isLoadingPulse}
 `
 
 const StyledH2 = styled(H2)`
@@ -109,15 +108,17 @@ export const TokenScreen: FC = () => {
         <TokenHeader hasCurrencyValue={!!currencyValue}>
           <ColumnCenter>
             <TokenIcon name={name} url={image} size={12} />
-            <TokenBalanceContainer isLoading={isLoading}>
-              <StyledH2
-                data-testid={
-                  isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
-                }
-              >
-                {displayBalance}
-              </StyledH2>
-              <H3>{symbol}</H3>
+            <TokenBalanceContainer>
+              <LoadingPulse isLoading={isLoading}>
+                <StyledH2
+                  data-testid={
+                    isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
+                  }
+                >
+                  {displayBalance}
+                </StyledH2>
+                <H3>{symbol}</H3>
+              </LoadingPulse>
             </TokenBalanceContainer>
             {currencyValue && (
               <CurrencyValueText>

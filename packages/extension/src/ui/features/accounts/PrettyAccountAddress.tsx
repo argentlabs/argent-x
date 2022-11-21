@@ -1,4 +1,4 @@
-import { Center, Flex } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode, useMemo } from "react"
 
 import { AddressBookContact } from "../../../shared/addressBook"
