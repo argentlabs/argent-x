@@ -1,3 +1,5 @@
+import {} from "../../services/backgroundAccounts"
+
 // FIXME: remove when depricated accounts do not longer work
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
@@ -7,9 +9,8 @@ import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { OpenInNewIcon } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
-import { connectAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
-import { createAccount } from "../accounts/accounts.service"
+import { createAccount, selectAccount } from "../accounts/accounts.service"
 import { recover } from "../recovery/recovery.service"
 
 const Container = styled.div`
@@ -37,7 +38,7 @@ export const MigrationDisclaimerScreen: FC = () => {
     useAppState.setState({ isLoading: true })
     try {
       const newAccount = await createAccount(switcherNetworkId)
-      connectAccount(newAccount)
+      selectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {
       useAppState.setState({ error: `${error}` })

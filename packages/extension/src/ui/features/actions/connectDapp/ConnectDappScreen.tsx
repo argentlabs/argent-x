@@ -172,22 +172,22 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
 }) => {
   const initiallySelectedAccount = useSelectedAccount()
   const visibleAccounts = useAccounts()
-  const [connectAccount, setConnectAccount] = useState<
+  const [connectedAccount, setConnectedAccount] = useState<
     BaseWalletAccount | undefined
   >(initiallySelectedAccount)
   const isConnected = useIsPreauthorized(host, initiallySelectedAccount)
 
   const selectedAccount = useMemo(() => {
-    if (connectAccount) {
+    if (connectedAccount) {
       const account = visibleAccounts.find((account) =>
-        accountsEqual(account, connectAccount),
+        accountsEqual(account, connectedAccount),
       )
       return account
     }
-  }, [visibleAccounts, connectAccount])
+  }, [visibleAccounts, connectedAccount])
 
   const onSelectedAccountChange = useCallback((account: BaseWalletAccount) => {
-    setConnectAccount(account)
+    setConnectedAccount(account)
   }, [])
 
   const onConnect = useCallback(() => {
@@ -220,7 +220,7 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
       <SelectContainer>
         <ConnectDappAccountSelect
           accounts={visibleAccounts}
-          selectedAccount={connectAccount}
+          selectedAccount={connectedAccount}
           onSelectedAccountChange={onSelectedAccountChange}
           host={host}
         />
