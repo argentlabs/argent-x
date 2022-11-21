@@ -1,6 +1,6 @@
 import { Button, icons } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
+import { Flex, Text } from "@chakra-ui/react"
+import { FC, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
@@ -14,18 +14,31 @@ import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccountStore } from "./accounts.state"
 
-const { MoreIcon } = icons
+const { MoreIcon, ChevronRightIcon } = icons
 
 interface IAccountListScreenItem {
   account: Account
   selectedAccount?: BaseWalletAccount
   needsUpgrade?: boolean
+  clickNavigateSettings?: boolean
 }
+
+const IconContaier: FC<{ children: ReactNode }> = ({ children }) => (
+  <Flex
+    position={"absolute"}
+    right={4}
+    top={"50%"}
+    transform={"translateY(-50%)"}
+  >
+    {children}
+  </Flex>
+)
 
 export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   account,
   selectedAccount,
   needsUpgrade,
+  clickNavigateSettings,
 }) => {
   const navigate = useNavigate()
   const status = useAccountStatus(account, selectedAccount)
@@ -61,7 +74,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
     <Flex position={"relative"} direction={"column"}>
       <AccountListItem
         aria-label={`Select ${accountName}`}
-        onClick={onClick}
+        onClick={clickNavigateSettings ? onAccountEdit : onClick}
         accountName={accountName}
         accountAddress={account.address}
         networkId={account.networkId}
@@ -71,26 +84,32 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         upgrade={needsUpgrade}
         connected={isConnected}
         pr={14}
-      />
-      <Flex
-        position={"absolute"}
-        right={4}
-        top={"50%"}
-        transform={"translateY(-50%)"}
       >
-        <Button
-          aria-label={`${accountName} options`}
-          backgroundColor="black"
-          colorScheme="transparent"
-          padding="1.5"
-          fontSize="xl"
-          size="auto"
-          rounded="full"
-          onClick={onAccountEdit}
-        >
-          <MoreIcon />
-        </Button>
-      </Flex>
+        {clickNavigateSettings && (
+          <IconContaier>
+            <Text>
+              <ChevronRightIcon />
+            </Text>
+          </IconContaier>
+        )}
+      </AccountListItem>
+
+      {!clickNavigateSettings && (
+        <IconContaier>
+          <Button
+            aria-label={`${accountName} options`}
+            backgroundColor="black"
+            colorScheme="transparent"
+            padding="1.5"
+            fontSize="xl"
+            size="auto"
+            rounded="full"
+            onClick={onAccountEdit}
+          >
+            <MoreIcon />
+          </Button>
+        </IconContaier>
+      )}
     </Flex>
   )
 }
