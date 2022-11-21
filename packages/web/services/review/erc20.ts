@@ -16,7 +16,6 @@ export async function reviewErc20Transfer(call: Call): Promise<ReviewBlock> {
     throw Error(`${call.entrypoint} !== transfer`)
   }
   const to = number.toHex(number.toBN(call.calldata?.[0]))
-  console.log("to", to)
   if (!addressSchema.safeParse(to).success) {
     throw Error(`Invalid to address: ${to}`)
   }

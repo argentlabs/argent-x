@@ -1,3 +1,4 @@
+import { utils } from "ethers"
 import { number, uint256 } from "starknet"
 
 import { multicallProvider } from "../provider"
@@ -50,16 +51,30 @@ export const getTokensBalances = async (
   return balances
 }
 
-export const formatTokenAmount = (amount: bigint, decimals: number): string => {
-  const formattedAmount = amount.toString()
-  const decimalsIndex = formattedAmount.length - decimals
-  if (decimalsIndex <= 0) {
-    return `0.${"0".repeat(-decimalsIndex)}${formattedAmount}`
+const formatTokenBalanceToCharLength =
+  (length: number) =>
+  (balance: bigint = 0n, decimals = 18): string => {
+    const balanceFullString = utils.formatUnits(balance.toString(), decimals)
+
+    // show max ${length} characters or what's needed to show everything before the decimal point.
+    let balanceString = balanceFullString.slice(
+      0,
+      Math.max(length, balanceFullString.indexOf(".")),
+    )
+
+    // make sure seperator is not the last character, if so remove it
+    // remove unnecessary 0s from the end, except for ".0"
+    let cleanedBalanceString = balanceString
+      .replace(/\.$/, "")
+      .replace(/0+$/, "")
+    if (cleanedBalanceString.endsWith(".")) {
+      cleanedBalanceString += "0"
+    }
+
+    return cleanedBalanceString
   }
-  return `${formattedAmount.slice(0, decimalsIndex)}.${formattedAmount.slice(
-    decimalsIndex,
-  )}`
-}
+
+export const formatTokenAmount = formatTokenBalanceToCharLength(9)
 
 export const formatFeeTokenAmount = (amount: bigint): string => {
   return formatTokenAmount(amount, getFeeToken().decimals)
