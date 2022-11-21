@@ -9,6 +9,7 @@ import { RecoveryMessage } from "./RecoveryMessage"
 import { SessionMessage } from "./SessionMessage"
 import { TokenMessage } from "./TokenMessage"
 import { TransactionMessage } from "./TransactionMessage"
+import { UdpMessage } from "./UdpMessage"
 
 export type MessageType =
   | AccountMessage
@@ -20,6 +21,7 @@ export type MessageType =
   | SessionMessage
   | TokenMessage
   | TransactionMessage
+  | UdpMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

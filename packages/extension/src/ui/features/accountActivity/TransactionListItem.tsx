@@ -11,6 +11,7 @@ import {
   TokenWrapper,
 } from "../accountTokens/TokenListItemDeprecated"
 import {
+  isDeclareContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -80,12 +81,14 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   ...props
 }) => {
   const { action, displayName, dapp } = transactionTransformed
+  console.log(transactionTransformed)
   const isNFT = isNFTTransaction(transactionTransformed)
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
+  const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer) {
@@ -111,11 +114,15 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
     if (dapp) {
       return <>{dapp.title}</>
     }
+    if (isDeclareContract) {
+      return <>{transactionTransformed.classHash}</>
+    }
     return null
   }, [
     isTransfer,
     dapp,
     isNFTTransfer,
+    isDeclareContract,
     action,
     transactionTransformed,
     network.id,

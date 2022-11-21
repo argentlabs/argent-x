@@ -26,6 +26,7 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
         throw new Error("Action not found")
       }
       const resultMessage = await handleActionApproval(action, background)
+
       if (resultMessage) {
         sendToTabAndUi(resultMessage)
       }
@@ -37,7 +38,6 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
 
       const actionHashes = Array.isArray(payload) ? payload : [payload]
 
-      console.log("REJECT_ACTION", actionHashes)
       for (const actionHash of actionHashes) {
         const action = await actionQueue.remove(actionHash)
         if (!action) {

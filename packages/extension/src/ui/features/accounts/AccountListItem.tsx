@@ -63,7 +63,10 @@ interface AccountAvatarProps extends ComponentProps<"img"> {
   outlined?: boolean
 }
 
-const AccountAvatar: FC<AccountAvatarProps> = ({ outlined, ...rest }) => {
+export const AccountAvatar: FC<AccountAvatarProps> = ({
+  outlined,
+  ...rest
+}) => {
   return (
     <Flex position={"relative"} flexShrink={0}>
       <Image borderRadius={"full"} width={12} height={12} {...rest} />
