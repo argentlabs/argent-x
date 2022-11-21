@@ -1,29 +1,25 @@
+import { CellStack } from "@argent/ui"
 import { FC, Suspense, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { useAppState } from "../../app.state"
 import { IconBar } from "../../components/IconBar"
-import { AddIcon } from "../../components/Icons/MuiIcons"
 import { SearchIcon } from "../../components/Icons/SearchIcon"
 import {
   ControlledInputType,
   StyledControlledInput,
 } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import { H3 } from "../../theme/Typography"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { AddTokenIconButton } from "../accountTokens/AccountTokens"
 import { TokenList } from "../accountTokens/TokenList"
-import { TokenTitle, TokenWrapper } from "../accountTokens/TokenListItem"
 import {
   TokenDetailsWithBalance,
-  useTokensWithBalance,
+  useTokensInNetwork,
 } from "../accountTokens/tokens.state"
 
 const SearchBox = styled.form`
@@ -82,17 +78,16 @@ export const SendScreen: FC = () => {
     defaultValues: { query: "" },
   })
 
-  const navigate = useNavigate()
-
   const account = useSelectedAccount()
 
   const [selectedTab, setSelectedTab] = useState<SendAssetTab>("tokens")
 
   const currentQueryValue = watch().query
 
-  const { tokenDetails, isValidating } = useTokensWithBalance(account)
+  const { switcherNetworkId } = useAppState()
+  const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
 
-  const tokenList = useCustomTokenList(tokenDetails, currentQueryValue)
+  const tokenList = useCustomTokenList(tokensInNetwork, currentQueryValue)
 
   const collectibles = useCollections(account)
 
@@ -145,23 +140,14 @@ export const SendScreen: FC = () => {
         <TabView>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             {selectedTab === "tokens" && (
-              <>
+              <CellStack py={0}>
                 <TokenList
-                  variant="no-currency"
-                  isValidating={isValidating}
                   tokenList={tokenList}
-                  showTokenSymbol
+                  variant="no-currency"
                   navigateToSend
+                  showNewTokenButton
                 />
-                <TokenWrapper
-                  {...makeClickable(() => navigate(routes.newToken()))}
-                >
-                  <AddTokenIconButton size={40}>
-                    <AddIcon />
-                  </AddTokenIconButton>
-                  <TokenTitle>Add token</TokenTitle>
-                </TokenWrapper>
-              </>
+              </CellStack>
             )}
 
             {selectedTab === "nfts" && (
@@ -188,11 +174,13 @@ const useCustomTokenList = (
       return tokenDetails
     }
 
+    const queryLowercase = query.toLowerCase()
+
     return tokenDetails.filter(
       (token) =>
-        token.name.includes(query) ||
-        token.address.includes(query) ||
-        token.symbol.includes(query),
+        token.name.toLowerCase().includes(queryLowercase) ||
+        token.address.toLowerCase().includes(queryLowercase) ||
+        token.symbol.toLowerCase().includes(queryLowercase),
     )
   }, [query, tokenDetails])
 }

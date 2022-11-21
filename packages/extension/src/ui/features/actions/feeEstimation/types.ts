@@ -15,3 +15,11 @@ export type DeployAccountFeeEstimationProps = Omit<
   TransactionsFeeEstimationProps,
   "transactions"
 >
+
+export type DeclareContractFeeEstimationProps = Omit<
+  TransactionsFeeEstimationProps,
+  "transactions"
+> & {
+  classHash: string
+  contract: any
+}

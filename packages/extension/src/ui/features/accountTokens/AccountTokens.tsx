@@ -2,7 +2,6 @@ import { CellStack } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import styled from "styled-components"
 import useSWR from "swr"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
@@ -11,13 +10,7 @@ import {
   getAccountIdentifier,
   isDeprecated,
 } from "../../../shared/wallet.service"
-import { ErrorBoundary } from "../../components/ErrorBoundary"
-import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { IconButton } from "../../components/IconButton"
-import { AddIcon } from "../../components/Icons/MuiIcons"
-import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { makeClickable } from "../../services/a11y"
 import {
   connectAccount,
   redeployAccount,
@@ -39,24 +32,10 @@ import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
-import { TokenTitle, TokenWrapper } from "./TokenListItem"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
-import { useTokensWithBalance } from "./tokens.state"
 import { UpgradeBanner } from "./UpgradeBanner"
-import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
-
-export const AddTokenIconButton = styled(IconButton)`
-  &:hover,
-  &:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-    outline: 0;
-  }
-`
-
-const StatusMessage = styled.div`
-  margin: 0 20px 16px 20px;
-`
+import { useAccountStatus } from "./useAccountStatus"
 
 interface AccountTokensProps {
   account: Account
@@ -94,9 +73,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [navigate, transactionsBeforeReview, userHasReviewed])
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
-
-  const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
-    useTokensWithBalance(account)
 
   const { data: needsUpgrade = false, mutate } = useSWR(
     [
@@ -152,7 +128,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
-  const accountIsDeployed = useAccountIsDeployed(account)
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mb={6}>
@@ -164,7 +139,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         />
         <AccountTokensButtons account={account} />
       </VStack>
-      <CellStack>
+      <CellStack py={0}>
         <StatusMessageBannerContainer />
         {isDeprecated(account) && <MigrationBanner />}
         {showBackupBanner && <RecoveryBanner />}
@@ -177,45 +152,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
+        <TokenList variant={tokenListVariant} showNewTokenButton />
       </CellStack>
-      {/** TODO: remove this extra error boundary once TokenList issues are settled */}
-      {accountIsDeployed && (
-        <ErrorBoundary
-          fallback={
-            <ErrorBoundaryFallbackWithCopyError
-              message={"Sorry, an error occurred fetching tokens"}
-            />
-          }
-        >
-          {error ? (
-            <ErrorBoundaryFallbackWithCopyError
-              error={error}
-              message={"Sorry, an error occurred fetching tokens"}
-            />
-          ) : (
-            <>
-              <TokenList
-                showTitle={hasPendingTransactions}
-                isValidating={isValidating}
-                tokenList={tokenDetails}
-                variant={tokenListVariant}
-              />
-              {tokenDetailsIsInitialising ? (
-                <Spinner size={64} style={{ marginTop: 40 }} />
-              ) : (
-                <TokenWrapper
-                  {...makeClickable(() => navigate(routes.newToken()))}
-                >
-                  <AddTokenIconButton size={40}>
-                    <AddIcon />
-                  </AddTokenIconButton>
-                  <TokenTitle>Add token</TokenTitle>
-                </TokenWrapper>
-              )}
-            </>
-          )}
-        </ErrorBoundary>
-      )}
     </Flex>
   )
 }

@@ -14,8 +14,8 @@ import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { H2, H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { TokenIcon } from "./TokenIcon"
-import { IIsLoading, isLoadingPulse } from "./TokenListItem"
+import { TokenIconDeprecated } from "./TokenIconDeprecated"
+import { IIsLoading, isLoadingPulse } from "./TokenListItemDeprecated"
 import { TokenMenu } from "./TokenMenu"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
@@ -108,7 +108,7 @@ export const TokenScreen: FC = () => {
       <TokenScreenWrapper>
         <TokenHeader hasCurrencyValue={!!currencyValue}>
           <ColumnCenter>
-            <TokenIcon name={name} url={image} large />
+            <TokenIconDeprecated name={name} url={image} large />
             <TokenBalanceContainer isLoading={isLoading}>
               <StyledH2
                 data-testid={

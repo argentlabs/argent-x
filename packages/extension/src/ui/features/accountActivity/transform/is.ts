@@ -2,6 +2,7 @@ import { IExplorerTransaction } from "../../../../shared/explorer/type"
 import { Transaction } from "../../../../shared/transactions"
 import { ActivityTransaction } from "../useActivity"
 import {
+  DeclareContractTransaction,
   NFTTransaction,
   NFTTransferTransaction,
   SwapTransaction,
@@ -57,6 +58,13 @@ export const isSwapTransaction = (
 ): transaction is SwapTransaction => {
   const { action } = transaction
   return action === "SWAP"
+}
+
+export const isDeclareContractTransaction = (
+  transaction: TransformedTransaction,
+): transaction is DeclareContractTransaction => {
+  const { action, entity } = transaction
+  return entity === "CONTRACT" && action === "DECLARE"
 }
 
 export const isActivityTransaction = (

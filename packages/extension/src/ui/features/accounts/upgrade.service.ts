@@ -5,6 +5,7 @@ import useSWR from "swr"
 
 import { getAccountIdentifier } from "./../../../shared/wallet.service"
 import { getAccounts } from "../../../shared/account/store"
+import { getMulticallForNetwork } from "../../../shared/multicall"
 import { Network, getProvider } from "../../../shared/network"
 import { fetchFeeTokenBalanceForAccounts } from "./../accountTokens/tokens.service"
 import { useCurrentNetwork, useNetwork } from "./../networks/useNetworks"
@@ -113,16 +114,7 @@ export async function partitionDeprecatedAccount(
     return [[], accounts]
   }
 
-  const { multicallAddress } = network
-
-  if (!multicallAddress) {
-    throw Error("Multicall contract is required to check for upgrade")
-  }
-
-  const multicall = new Multicall(
-    getProvider(network),
-    network.multicallAddress,
-  )
+  const multicall = getMulticallForNetwork(network)
 
   const deployedAccounts = accounts.filter((acc) => !acc.needsDeploy)
 

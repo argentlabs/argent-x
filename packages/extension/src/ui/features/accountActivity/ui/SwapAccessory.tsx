@@ -2,7 +2,10 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { prettifyTokenAmount } from "../../../../shared/token/price"
-import { TokenTextGroup, TokenTitle } from "../../accountTokens/TokenListItem"
+import {
+  TokenTextGroup,
+  TokenTitle,
+} from "../../accountTokens/TokenListItemDeprecated"
 import { SwapTransaction } from "../transform/type"
 
 export const TokenAmount = styled(TokenTitle)`
