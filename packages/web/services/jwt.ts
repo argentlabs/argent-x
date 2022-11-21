@@ -1,4 +1,5 @@
 import {
+  JWK,
   SignJWT,
   calculateJwkThumbprint,
   exportJWK,
@@ -34,7 +35,7 @@ createDevice().then(async (d) => {
     .setAudience("https://example.com")
     .setProtectedHeader({
       alg: "ES256",
-      jwk: { ...jwk },
+      jwk: { ...jwk, kid: thumbprint } as JWK,
       kid: thumbprint,
     })
     .sign(d.signingKey.privateKey)
