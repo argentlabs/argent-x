@@ -3,7 +3,7 @@ import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
-import { getIsPreauthorized, getNetwork } from "./messaging"
+import { getIsPreauthorized } from "./messaging"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
 const INJECT_NAMES = ["starknet", "starknet_argentX"]
@@ -51,9 +51,8 @@ window.addEventListener(
       return
     }
 
-    if (starknet.account && data.type === "CONNECT_ACCOUNT") {
-      const { address, networkId } = data.data
-      const network = await getNetwork(networkId)
+    if (data.type === "CONNECT_ACCOUNT_RES") {
+      const { address, network } = data.data
       const isPreauthorized = await getIsPreauthorized()
       if (!isPreauthorized) {
         // disconnect so the user can see they are no longer connected
