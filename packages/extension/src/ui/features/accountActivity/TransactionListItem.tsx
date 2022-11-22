@@ -82,7 +82,6 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   ...props
 }) => {
   const { action, displayName, dapp } = transactionTransformed
-  console.log(transactionTransformed)
   const isNFT = isNFTTransaction(transactionTransformed)
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
