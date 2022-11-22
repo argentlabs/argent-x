@@ -26,10 +26,16 @@ export const TransferAccessory: FC<TransferAccessoryProps> = ({
   if (!displayAmount) {
     return null
   }
-  const prefix = action === "SEND" ? <>&minus;</> : ""
+  const prefix =
+    action === "SEND" ? <>&minus;</> : action === "RECEIVE" ? <>+</> : null
   return (
     <Flex direction={"column"} overflow="hidden">
-      <H6 overflow="hidden" textOverflow={"ellipsis"} textAlign={"right"}>
+      <H6
+        overflow="hidden"
+        textOverflow={"ellipsis"}
+        textAlign={"right"}
+        color={action === "RECEIVE" ? "secondary.500" : undefined}
+      >
         {prefix}
         {displayAmount}
       </H6>

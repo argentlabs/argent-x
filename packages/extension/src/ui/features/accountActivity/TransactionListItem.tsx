@@ -17,6 +17,7 @@ import {
 import { TransformedTransaction } from "./transform/type"
 import { NFTImage } from "./ui/NFTImage"
 import { SwapAccessory } from "./ui/SwapAccessory"
+import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
 
@@ -94,8 +95,13 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
         />
       )
     }
+    if (isSwap) {
+      return (
+        <SwapTransactionIcon transaction={transactionTransformed} size={9} />
+      )
+    }
     return <TransactionIcon transaction={transactionTransformed} size={9} />
-  }, [isNFT, transactionTransformed, network.id])
+  }, [isNFT, isSwap, transactionTransformed, network.id])
 
   const accessory = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {

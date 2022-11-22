@@ -13,7 +13,13 @@ export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
   const { fromAmount, fromToken, toAmount, toToken } = transaction
   return (
     <Flex direction={"column"} overflow="hidden">
-      <H6 overflow="hidden" textOverflow={"ellipsis"} textAlign={"right"}>
+      <H6
+        overflow="hidden"
+        textOverflow={"ellipsis"}
+        textAlign={"right"}
+        color={"secondary.500"}
+      >
+        <>+</>
         {toToken ? (
           prettifyTokenAmount({
             amount: toAmount,
