@@ -5,8 +5,8 @@ import type {
   UniversalDeployerContractPayload,
 } from "starknet"
 
-import { DeclareContract } from "./../udp/type"
 import { Transaction } from "../transactions"
+import { DeclareContract } from "../udc/type"
 import { BaseWalletAccount } from "../wallet.model"
 
 export interface EstimateFeeResponse {

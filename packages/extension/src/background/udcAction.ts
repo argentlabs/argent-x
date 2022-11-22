@@ -15,6 +15,16 @@ type DeclareContractAction = ExtQueueItem<{
   payload: DeclareContractPayload
 }>
 
+type DeployContractAction = ExtQueueItem<{
+  type: "DEPLOY_CONTRACT_ACTION"
+  payload: UniversalDeployerContractPayload
+}>
+
+export enum UcdTransactionType {
+  DEPLOY_CONTRACT = "DEPLOY",
+  DECLARE_CONTRACT = "DECLARE",
+}
+
 export const udcDeclareContract = async (
   { payload }: DeclareContractAction,
   { wallet }: BackgroundService,
@@ -51,6 +61,7 @@ export const udcDeclareContract = async (
       meta: {
         title: "Contract declared",
         subTitle: classHash,
+        type: UcdTransactionType.DECLARE_CONTRACT,
       },
     })
 
@@ -60,10 +71,6 @@ export const udcDeclareContract = async (
   throw Error("Account does not support Starknet declare")
 }
 
-type DeployContractAction = ExtQueueItem<{
-  type: "DEPLOY_CONTRACT_ACTION"
-  payload: UniversalDeployerContractPayload
-}>
 export const udcDeployContract = async (
   { payload }: DeployContractAction,
   { wallet }: BackgroundService,
@@ -71,6 +78,7 @@ export const udcDeployContract = async (
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
+
   const account = await wallet.getSelectedAccount()
   if (!account) {
     throw new Error("No account selected")
@@ -112,6 +120,7 @@ export const udcDeployContract = async (
       meta: {
         title: "Contract deployed",
         subTitle: contractAddress,
+        type: UcdTransactionType.DEPLOY_CONTRACT,
       },
     })
 

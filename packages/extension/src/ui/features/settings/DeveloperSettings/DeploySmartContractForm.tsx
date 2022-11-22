@@ -1,4 +1,15 @@
-import { Alert, CellStack, Error, H6, Input, L2, P4, Select } from "@argent/ui"
+import {
+  Alert,
+  Button,
+  CellStack,
+  Error,
+  H6,
+  Input,
+  L2,
+  P4,
+  Select,
+  icons,
+} from "@argent/ui"
 import {
   Box,
   Flex,
@@ -25,6 +36,7 @@ import {
 import { AbiEntry } from "starknet"
 import { randomAddress } from "starknet/dist/utils/stark"
 
+import { Transaction } from "../../../../shared/transactions"
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { isEqualAddress } from "../../../services/addresses"
@@ -33,6 +45,8 @@ import {
   fetchConstructorParams,
 } from "../../../services/udc.service"
 import { useSelectedAccountStore } from "../../accounts/accounts.state"
+import { LatestDeclaredContracts } from "./LatestDeclaredContracts"
+import { useLastDeclaredContracts } from "./udc.state"
 import { useFormSelects } from "./useFormSelects"
 
 interface FieldValues {
@@ -47,6 +61,8 @@ interface FieldValues {
   salt: string
   unique: boolean
 }
+
+const { CloseIcon } = icons
 
 interface DeploySmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
@@ -84,6 +100,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     name: "parameters",
   })
 
+  const lastDeclaredContracts = useLastDeclaredContracts({ limit: 10 })
   const { accounts, accountOptions, networkOptions } =
     useFormSelects(currentNetwork)
 
@@ -167,13 +184,45 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <CellStack h="100vh">
-        <Input
-          {...register("classHash", { required: true })}
-          autoFocus
-          placeholder="Contract classhash"
-          isInvalid={!isEmpty(errors.classHash)}
-        />
+      <CellStack>
+        <Box position="relative">
+          <Input
+            {...register("classHash", { required: true })}
+            autoFocus
+            placeholder="Contract classhash"
+            isInvalid={!isEmpty(errors.classHash)}
+          />
+          {!currentClassHash && (
+            <LatestDeclaredContracts
+              onClick={(transaction: Transaction) => {
+                setValue("classHash", transaction.meta?.subTitle || "")
+              }}
+              transactions={lastDeclaredContracts}
+            />
+          )}
+          {currentClassHash && (
+            <Box
+              position="absolute"
+              top="50%"
+              right="12px"
+              transform={"translateY(-50%)"}
+              zIndex={10}
+            >
+              <Button
+                color="neutrals.200"
+                padding="1.5"
+                fontSize="xl"
+                size="auto"
+                rounded="full"
+                onClick={() => {
+                  resetField("classHash")
+                }}
+              >
+                <CloseIcon />
+              </Button>
+            </Box>
+          )}
+        </Box>
         {!isEmpty(errors.classHash) && (
           <Error message="Classhash is required" />
         )}
@@ -221,7 +270,6 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         {fields.length > 0 && (
           <>
             <Flex borderTop="1px solid" borderTopColor="neutrals.600" my="5" />
-
             <Flex justifyContent="space-between">
               <H6>Parameters </H6>
               {isLoading && <Spinner />}
