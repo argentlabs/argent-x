@@ -1,4 +1,5 @@
 import { HeaderCell } from "@argent/ui"
+import { Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network } from "../../../shared/network"
@@ -14,12 +15,12 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { TransactionListItem } from "./TransactionListItem"
 import { transformTransaction } from "./transform"
 
-interface IPendingTransactionsContainer {
+interface PendingTransactionsContainerProps {
   account: BaseWalletAccount
 }
 
 export const PendingTransactionsContainer: FC<
-  IPendingTransactionsContainer
+  PendingTransactionsContainerProps
 > = ({ account }) => {
   const network = useCurrentNetwork()
   const { pendingTransactions } = useAccountTransactions(account)
@@ -35,14 +36,14 @@ export const PendingTransactionsContainer: FC<
   )
 }
 
-interface IPendingTransactions {
+interface PendingTransactionsProps {
   pendingTransactions: Transaction[]
   network: Network
   tokensByNetwork?: Token[]
   accountAddress: string
 }
 
-export const PendingTransactions: FC<IPendingTransactions> = ({
+export const PendingTransactions: FC<PendingTransactionsProps> = ({
   pendingTransactions,
   network,
   tokensByNetwork,
@@ -54,7 +55,23 @@ export const PendingTransactions: FC<IPendingTransactions> = ({
 
   return (
     <>
-      <HeaderCell>Pending transactions</HeaderCell>
+      <HeaderCell>
+        <Flex alignItems={"center"} gap={1}>
+          Pending transactions
+          <Center
+            color={"neutrals.900"}
+            backgroundColor={"skyBlue.500"}
+            rounded={"full"}
+            height={4}
+            minWidth={4}
+            fontWeight={"extrabold"}
+            fontSize={"2xs"}
+            px={0.5}
+          >
+            {pendingTransactions.length}
+          </Center>
+        </Flex>
+      </HeaderCell>
       {pendingTransactions.map((transaction) => {
         const transactionTransformed = transformTransaction({
           transaction,
@@ -70,9 +87,9 @@ export const PendingTransactions: FC<IPendingTransactions> = ({
               network={network}
               onClick={() => openBlockExplorerTransaction(hash, network)}
             >
-              <div style={{ display: "flex" }}>
+              <Center>
                 <TransactionStatusIndicator color={"orange"} />
-              </div>
+              </Center>
             </TransactionListItem>
           )
         }
