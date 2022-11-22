@@ -287,7 +287,7 @@ export const ActionScreen: FC = () => {
     case "DEPLOY_CONTRACT_ACTION":
       return (
         <>
-          {/* TODO: move into single component for udp */}
+          {/* TODO: move into single component for udc */}
           <ApproveDeployContractScreen
             actionHash={action.meta.hash}
             {...action.payload}

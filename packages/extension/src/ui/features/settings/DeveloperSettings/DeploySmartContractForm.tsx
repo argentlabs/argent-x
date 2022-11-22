@@ -31,7 +31,7 @@ import { isEqualAddress } from "../../../services/addresses"
 import {
   deployContract,
   fetchConstructorParams,
-} from "../../../services/udp.service"
+} from "../../../services/udc.service"
 import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { useFormSelects } from "./useFormSelects"
 

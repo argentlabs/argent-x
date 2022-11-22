@@ -1,6 +1,6 @@
-import { DeclareContract, DeployContract } from "./../udp/type"
+import { DeclareContract, DeployContract } from "../udc/type"
 
-export type UdpMessage =
+export type UdcMessage =
   | { type: "REQUEST_DECLARE_CONTRACT"; data: DeclareContract }
   | { type: "REQUEST_DECLARE_CONTRACT_RES"; data: { actionHash: string } }
   | {

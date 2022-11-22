@@ -15,7 +15,7 @@ type DeclareContractAction = ExtQueueItem<{
   payload: DeclareContractPayload
 }>
 
-export const udpDeclareContract = async (
+export const udcDeclareContract = async (
   { payload }: DeclareContractAction,
   { wallet }: BackgroundService,
 ) => {
@@ -64,7 +64,7 @@ type DeployContractAction = ExtQueueItem<{
   type: "DEPLOY_CONTRACT_ACTION"
   payload: UniversalDeployerContractPayload
 }>
-export const udpDeployContract = async (
+export const udcDeployContract = async (
   { payload }: DeployContractAction,
   { wallet }: BackgroundService,
 ) => {

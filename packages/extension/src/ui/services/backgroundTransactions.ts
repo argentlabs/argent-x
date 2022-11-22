@@ -2,7 +2,7 @@ import { Call, UniversalDeployerContractPayload } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
-import { DeclareContract } from "../../shared/udp/type"
+import { DeclareContract } from "../../shared/udc/type"
 import { BaseWalletAccount } from "../../shared/wallet.model"
 
 export const executeTransaction = (data: ExecuteTransactionRequest) => {

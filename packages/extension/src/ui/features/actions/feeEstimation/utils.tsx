@@ -2,7 +2,7 @@ import { BigNumber, utils } from "ethers"
 import { Call, UniversalDeployerContractPayload } from "starknet"
 import useSWR from "swr"
 
-import { DeclareContract } from "../../../../shared/udp/type"
+import { DeclareContract } from "../../../../shared/udc/type"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import {
   getAccountDeploymentEstimatedFee,
