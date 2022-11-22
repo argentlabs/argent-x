@@ -7,7 +7,6 @@ import { Token } from "../../../shared/token/type"
 import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useAppState } from "../../app.state"
-import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
@@ -86,11 +85,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
               transactionTransformed={transactionTransformed}
               network={network}
               onClick={() => openBlockExplorerTransaction(hash, network)}
-            >
-              <Center>
-                <TransactionStatusIndicator color={"orange"} />
-              </Center>
-            </TransactionListItem>
+            />
           )
         }
         return null
