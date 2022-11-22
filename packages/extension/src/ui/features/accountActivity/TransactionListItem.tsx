@@ -15,7 +15,7 @@ import {
   isTokenTransferTransaction,
 } from "./transform/is"
 import { TransformedTransaction } from "./transform/type"
-import { NFTAccessory } from "./ui/NFTAccessory"
+import { NFTImage } from "./ui/NFTImage"
 import { SwapAccessory } from "./ui/SwapAccessory"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
@@ -78,15 +78,26 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     network.id,
   ])
 
-  const accessory = useMemo(() => {
+  const icon = useMemo(() => {
     if (isNFT) {
+      const { contractAddress, tokenId } = transactionTransformed
       return (
-        <NFTAccessory
-          transaction={transactionTransformed}
+        <NFTImage
+          contractAddress={contractAddress}
+          tokenId={tokenId}
           networkId={network.id}
+          display={"flex"}
+          flexShrink={0}
+          rounded={"lg"}
+          width={9}
+          height={9}
         />
       )
     }
+    return <TransactionIcon transaction={transactionTransformed} size={9} />
+  }, [isNFT, transactionTransformed, network.id])
+
+  const accessory = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
       return <TransferAccessory transaction={transactionTransformed} />
     }
@@ -94,19 +105,11 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
       return <SwapAccessory transaction={transactionTransformed} />
     }
     return null
-  }, [
-    isNFT,
-    isTransfer,
-    isTokenMint,
-    isTokenApprove,
-    isSwap,
-    transactionTransformed,
-    network.id,
-  ])
+  }, [isTransfer, isTokenMint, isTokenApprove, isSwap, transactionTransformed])
 
   return (
     <CustomButtonCell highlighted={highlighted} {...props}>
-      <TransactionIcon transaction={transactionTransformed} size={9} />
+      {icon}
       <Flex
         flexGrow={1}
         alignItems="center"
