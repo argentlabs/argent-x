@@ -19,7 +19,7 @@ import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
-import { useAccount, useSelectedAccountStore } from "../accounts/accounts.state"
+import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 
@@ -86,7 +86,7 @@ export const SettingsScreen: FC = () => {
   const extensionIsInTab = useExtensionIsInTab()
   const { pathname: returnTo } = useLocation()
   const navigate = useNavigate()
-  const { selectedAccount } = useSelectedAccountStore()
+  const selectedAccount = useSelectedAccount()
   const account = useAccount(selectedAccount)
   return (
     <>
