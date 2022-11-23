@@ -84,7 +84,12 @@ const ClassHashInputActions: FC<ClassHashInputActionsProps> = ({
                   <Box>
                     <Box p="4">
                       <H6 p="4" bg="neutrals.600" borderRadius="8" w="85%">
-                        Previously declared contracts
+                        {transactions.length === 0 && (
+                          <>No contracts declared</>
+                        )}
+                        {transactions.length > 0 && (
+                          <>Previously declared contracts</>
+                        )}
                       </H6>
                     </Box>
                   </Box>
