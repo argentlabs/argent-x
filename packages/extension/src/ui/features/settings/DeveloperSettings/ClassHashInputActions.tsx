@@ -71,20 +71,15 @@ const ClassHashInputActions: FC<ClassHashInputActionsProps> = ({
             </Button>
           </Box>
           {isOpen && (
-            <Box
-              position="absolute"
-              top="100%"
-              zIndex={100}
-              left="0"
-              right="0"
-              maxH="50vh"
-            >
+            <Box position="absolute" top="100%" zIndex={100} left="0" right="0">
               <ScaleFade initialScale={0.9} in={isOpen}>
                 <Box
                   color="white"
                   bg="neutrals.700"
                   shadow="md"
                   borderBottomRadius="8"
+                  maxH="60vh"
+                  overflow="auto"
                 >
                   <Box>
                     <Box p="4">

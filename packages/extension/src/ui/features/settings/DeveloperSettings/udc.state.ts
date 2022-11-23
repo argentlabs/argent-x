@@ -8,13 +8,17 @@ export const useLastDeclaredContracts = ({ limit }: { limit?: number }) => {
 
   return useMemo(() => {
     if (!limit) {
-      return declaredTransactions
+      return declaredTransactions.reverse()
     }
 
+    const length = declaredTransactions.length
+    const checkLimit = length < limit ? length : limit
+
     const limitedArray = []
-    for (let i = 0; i < limit; i++) {
-      limitedArray.push(declaredTransactions[i])
+    for (let i = 0; i < checkLimit; i++) {
+      limitedArray.unshift(declaredTransactions[i])
     }
-    return declaredTransactions
+
+    return limitedArray
   }, [declaredTransactions, limit])
 }

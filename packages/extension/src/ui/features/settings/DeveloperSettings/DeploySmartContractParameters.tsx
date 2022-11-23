@@ -1,13 +1,16 @@
 import { Error, H6, Input, L2, Switch } from "@argent/ui"
 import { Flex, FormControl, FormLabel, Spinner } from "@chakra-ui/react"
+import { isNull } from "lodash-es"
 import { get, isEmpty } from "lodash-es"
 import { FC, Fragment, useCallback, useEffect } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 import { randomAddress } from "starknet/dist/utils/stark"
 
+import { ParameterField } from "./DeploySmartContractForm"
+
 const DeploySmartContractParameters: FC<{
   isLoading: boolean
-  constructorParameters: any
+  constructorParameters: ParameterField[] | null
 }> = ({ isLoading, constructorParameters }) => {
   const { control, register, formState, setValue, resetField } =
     useFormContext()
@@ -18,14 +21,13 @@ const DeploySmartContractParameters: FC<{
   })
 
   useEffect(() => {
-    if (constructorParameters.length === 0) {
-      resetField("parameters")
-      fields.map((_, index) => remove(index))
-    } else {
-      constructorParameters.map((input: any) => {
-        append({ name: input.name, type: input.type, value: "" })
-      })
-    }
+    resetField("parameters")
+    fields.map((_, index) => remove(index))
+
+    constructorParameters?.map((input: any) => {
+      append({ name: input.name, type: input.type, value: "" })
+    })
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [constructorParameters, append, resetField, remove])
 
@@ -35,29 +37,34 @@ const DeploySmartContractParameters: FC<{
 
   return (
     <>
-      {fields.length > 0 && (
+      {!isNull(constructorParameters) && (
         <>
           <Flex borderTop="1px solid" borderTopColor="neutrals.600" my="5" />
           <Flex justifyContent="space-between">
             <H6>Parameters </H6>
             {isLoading && <Spinner />}
           </Flex>
-          {fields.map((item, index) => (
-            <Fragment key={item.id}>
-              <Input
-                key={item.id}
-                autoFocus={index === 0}
-                placeholder={`Constructor argument ${index + 1}`}
-                {...register(`parameters.${index}.value`, {
-                  required: true,
-                })}
-                isInvalid={!isEmpty(get(errors, `parameters[0]`))}
-              />
-              {!isEmpty(get(errors, `parameters[${index}]`)) && (
-                <Error message="Constructor argument is required" />
-              )}
-            </Fragment>
-          ))}
+        </>
+      )}
+
+      {fields.map((item, index) => (
+        <Fragment key={item.id}>
+          <Input
+            key={item.id}
+            autoFocus={index === 0}
+            placeholder={`Constructor argument ${index + 1}`}
+            {...register(`parameters.${index}.value`, {
+              required: true,
+            })}
+            isInvalid={!isEmpty(get(errors, `parameters[0]`))}
+          />
+          {!isEmpty(get(errors, `parameters[${index}]`)) && (
+            <Error message="Constructor argument is required" />
+          )}
+        </Fragment>
+      ))}
+      {!isNull(constructorParameters) && (
+        <>
           <Input
             placeholder="Salt"
             {...register("salt")}

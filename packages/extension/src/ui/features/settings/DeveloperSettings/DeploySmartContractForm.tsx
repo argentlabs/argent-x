@@ -24,7 +24,7 @@ import { DeploySmartContractParameters } from "./DeploySmartContractParameters"
 import { useLastDeclaredContracts } from "./udc.state"
 import { useFormSelects } from "./useFormSelects"
 
-type ParameterField = {
+export type ParameterField = {
   name: string
   type: string
   value: string
@@ -67,7 +67,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   const { errors, isDirty, isSubmitting } = formState
 
   const [fetchError, setFetchError] = useState("")
-  const [parameterFields, setParameterFields] = useState<ParameterField[]>([])
+  const [parameterFields, setParameterFields] = useState<
+    ParameterField[] | null
+  >(null)
 
   const currentNetwork = watch("network")
   const currentClassHash = watch("classHash")
@@ -108,7 +110,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     resetField("parameters")
     resetField("salt")
     resetField("unique")
-    setParameterFields([])
+    setParameterFields(null)
   }, [resetField])
 
   const getConstructorParams = async (
@@ -122,14 +124,12 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         currentNetwork,
       )
       const constructorAbi = abi?.find((item) => item.type === "constructor")
-      resetAbiFields()
-
       setParameterFields(
-        constructorAbi.inputs.map((input: AbiEntry) => ({
+        constructorAbi?.inputs.map((input: AbiEntry) => ({
           name: input.name,
           type: input.type,
           value: "",
-        })),
+        })) || [],
       )
     } catch (error) {
       resetAbiFields()
