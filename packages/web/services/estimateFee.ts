@@ -20,7 +20,7 @@ export const isContractDeployed = async (
   }
 }
 
-interface EstimateFeeResponse {
+export interface EstimateFeeResponse {
   fee: bigint
   maxFee: bigint
 }
@@ -46,7 +46,7 @@ export const estimateTransactions = async (
   }
 }
 
-type EstimateDeploymentFeeResponse =
+export type EstimateDeploymentFeeResponse =
   | {
       needsDeploy: false
     }

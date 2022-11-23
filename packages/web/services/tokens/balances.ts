@@ -4,26 +4,7 @@ import { number, uint256 } from "starknet"
 import { multicallProvider } from "../provider"
 import tokens from "./default-tokens.json"
 
-export const getTokenBalance = async (
-  tokenAddress: string,
-  address: string,
-) => {
-  const result = await multicallProvider.call({
-    contractAddress: tokenAddress,
-    entrypoint: "balanceOf",
-    calldata: [address],
-  })
-  return BigInt(
-    number.toHex(
-      uint256.uint256ToBN({
-        low: result[0],
-        high: result[1],
-      }),
-    ),
-  )
-}
-
-interface Token {
+export interface Token {
   address: string
   name: string
   symbol: string
@@ -31,24 +12,44 @@ interface Token {
   image?: string
 }
 
-export const getFeeToken = (): Token => {
-  return tokens.find((token) => token.symbol === "ETH")!
-}
-
 interface TokenWithBalance extends Token {
   balance: bigint
 }
 
-export const getTokensBalances = async (
+export const getTokenBalance = async (
+  tokenAddress: string,
   address: string,
-): Promise<TokenWithBalance[]> => {
-  const balances = await Promise.all(
-    tokens.map(async (token) => ({
-      ...token,
-      balance: await getTokenBalance(token.address, address),
-    })),
+): Promise<TokenWithBalance> => {
+  const token = tokens.find((t) => t.address === tokenAddress)
+  if (!token) {
+    throw new Error(`Token not found: ${tokenAddress}`)
+  }
+  const result = await multicallProvider.call({
+    contractAddress: tokenAddress,
+    entrypoint: "balanceOf",
+    calldata: [address],
+  })
+  const balance = BigInt(
+    number.toHex(
+      uint256.uint256ToBN({
+        low: result[0],
+        high: result[1],
+      }),
+    ),
   )
-  return balances
+  return {
+    ...token,
+    balance,
+  }
+}
+
+export const getTokens = async (): Promise<Token[]> => {
+  return tokens
+}
+
+export const getFeeToken = async (): Promise<Token> => {
+  const tokens = await getTokens()
+  return tokens.find((t) => t.symbol === "ETH")!
 }
 
 const formatTokenBalanceToCharLength =
@@ -77,5 +78,5 @@ const formatTokenBalanceToCharLength =
 export const formatTokenAmount = formatTokenBalanceToCharLength(9)
 
 export const formatFeeTokenAmount = (amount: bigint): string => {
-  return formatTokenAmount(amount, getFeeToken().decimals)
+  return formatTokenAmount(amount, 18)
 }

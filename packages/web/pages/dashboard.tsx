@@ -7,22 +7,49 @@ import { useRouter } from "next/router"
 import { FC, PropsWithChildren } from "react"
 import { Call, number, uint256 } from "starknet"
 import { compileCalldata } from "starknet/dist/utils/stark"
-import useSwr from "swr"
 
 import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
-import { formatAddress, getAccount } from "../services/account"
-import { getFeeToken, getTokensBalances } from "../services/tokens/balances"
+import { useAccount } from "../hooks/account"
+import { useTokenBalance } from "../hooks/balance"
+import { useTokens } from "../hooks/token"
+import { formatAddress } from "../services/account"
+import { Token } from "../services/tokens/balances"
 import Home from "."
 
-const TokensBalances: FC<{ address: string }> = ({ address }) => {
-  const { data: tokensBalances } = useSwr(
-    ["services/tokens/balances/getTokensBalances", address],
-    () => getTokensBalances(address),
-    { refreshInterval: 60000 },
+const TokenBalance: FC<{ token: Token }> = ({
+  token: { image, address, decimals, name, symbol },
+}) => {
+  const tokenWithBalance = useTokenBalance(address)
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      w="100%"
+    >
+      <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
+        {image && <Image src={image} alt={name} width={32} height={32} />}
+        <span>{name}</span>
+      </Box>
+      <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
+        <span>{symbol}</span>
+        <span>
+          {tokenWithBalance ? (
+            utils.formatUnits(tokenWithBalance?.balance, decimals)
+          ) : (
+            <Spinner size="sm" />
+          )}
+        </span>
+      </Box>
+    </Box>
   )
+}
 
-  if (!tokensBalances) {
+const TokensBalances: FC<{ address: string }> = ({ address }) => {
+  const tokens = useTokens()
+
+  if (!tokens) {
     return <Spinner />
   }
 
@@ -38,36 +65,9 @@ const TokensBalances: FC<{ address: string }> = ({ address }) => {
       justifyContent="center"
       gap={2}
     >
-      {tokensBalances.map(
-        ({ balance, address, symbol, decimals, name, image }) => (
-          <Box
-            key={address}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            w="100%"
-          >
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={2}
-            >
-              {image && <Image src={image} alt={name} width={32} height={32} />}
-              <span>{name}</span>
-            </Box>
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={2}
-            >
-              <span>{symbol}</span>
-              <span>{utils.formatUnits(balance, decimals)}</span>
-            </Box>
-          </Box>
-        ),
-      )}
+      {tokens.map((token) => (
+        <TokenBalance key={token.address} token={token} />
+      ))}
     </Box>
   )
 }
@@ -103,13 +103,11 @@ const encodeTransactions = (transactions: Call[]): string => {
 
 export default function Dashboard() {
   const navigate = useRouter()
-  const { isValidating, data, error } = useSwr("services/account", () =>
-    getAccount(),
-  )
+  const { isValidating, account, error } = useAccount()
   if (error) {
     return <Navigate to="/" />
   }
-  if (isValidating || !data) {
+  if (isValidating || !account) {
     return <Home />
   }
   return (
@@ -123,19 +121,20 @@ export default function Dashboard() {
         flexDirection="column"
       >
         Wallet address:
-        <ClickToCopy value={data.address}>
-          <b>{formatAddress(data.address)}</b>
+        <ClickToCopy value={account.address}>
+          <b>{formatAddress(account.address)}</b>
         </ClickToCopy>
       </P3>
-      <TokensBalances address={data.address} />
+      <TokensBalances address={account.address} />
       <Button
         onClick={() => {
           const encodedTransactions = encodeTransactions([
             {
-              contractAddress: getFeeToken().address,
+              contractAddress:
+                "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
               entrypoint: "transfer",
               calldata: compileCalldata({
-                to: data.address,
+                to: account.address,
                 value: {
                   type: "struct",
                   ...uint256.bnToUint256(number.toBN(200000000000)),
@@ -143,10 +142,11 @@ export default function Dashboard() {
               }),
             },
             {
-              contractAddress: getFeeToken().address,
+              contractAddress:
+                "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
               entrypoint: "transfer",
               calldata: compileCalldata({
-                to: data.address,
+                to: account.address,
                 value: {
                   type: "struct",
                   ...uint256.bnToUint256(number.toBN(400000000000)),

@@ -4,11 +4,24 @@ import { UnsecuredJWT } from "jose"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
-import { Call } from "starknet"
+import { useForm } from "react-hook-form"
+import { Call, hash, stark } from "starknet"
 
 import { InpageLayout } from "../components/InpageLayout"
 import { Navigate } from "../components/Navigate"
 import { TransactionReview } from "../components/Review"
+import { useFeeTokenBalance } from "../hooks/balance"
+import {
+  useEstimateDeployment,
+  useEstimateTransactions,
+  useReview,
+} from "../hooks/transactions"
+import {
+  ACCOUNT_IMPLEMENTATION_CLASS_HASH,
+  PROXY_CLASS_HASH,
+  getAccount,
+} from "../services/account"
+import { getAccounts } from "../services/backend/account"
 
 export default function ReviewScreen() {
   const navigate = useRouter()
@@ -26,6 +39,19 @@ export default function ReviewScreen() {
     }
   }, [transactionsString])
 
+  const deploymentFees = useEstimateDeployment()
+  const executionFees = useEstimateTransactions(transactions)
+  const review = useReview(transactions)
+  const feeTokenBalance = useFeeTokenBalance()
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({})
+
+  const stillLoading =
+    !deploymentFees || !executionFees || !review || !feeTokenBalance
+
   if (transactions.length === 0) {
     return <Navigate to="/" />
   }
@@ -38,13 +64,54 @@ export default function ReviewScreen() {
         alignItems="center"
         justifyContent="center"
         padding={6}
+        as="form"
+        onSubmit={handleSubmit(async () => {
+          const account = await getAccount()
+          const [beAccount] = await getAccounts()
+          if (!account || !beAccount) {
+            return
+          }
+
+          if (deploymentFees?.needsDeploy) {
+            const deploymentTx = await account.deployAccount(
+              {
+                classHash: PROXY_CLASS_HASH,
+                constructorCalldata: stark.compileCalldata({
+                  implementation: ACCOUNT_IMPLEMENTATION_CLASS_HASH,
+                  selector: hash.getSelectorFromName("initialize"),
+                  calldata: stark.compileCalldata({
+                    signer: beAccount.ownerAddress,
+                    guardian: "0",
+                  }),
+                }),
+                addressSalt: beAccount.ownerAddress,
+              },
+              {
+                maxFee: deploymentFees?.maxFee,
+              },
+            )
+            console.log("deploymentTx", deploymentTx)
+          }
+
+          const signed = await account.execute(transactions, undefined, {
+            maxFee: executionFees?.maxFee,
+          })
+
+          console.log("TX:", signed.transaction_hash)
+
+          navigate.push(`/dashboard`)
+        })}
       >
         <Image src="/dapp-logo.svg" width={80} height={80} alt="Dapp logo" />
         <H5 mt={3}>Confirm transaction</H5>
         <P4 color="#8C8C8C" mb={6}>
           somecooldapp.xyz
         </P4>
-        <TransactionReview transactions={transactions} />
+        <TransactionReview
+          deploymentFees={deploymentFees}
+          executionFees={executionFees}
+          review={review}
+        />
         <Flex w="100%" alignItems="center" gap={2}>
           <Button
             variant="outline"
@@ -58,9 +125,9 @@ export default function ReviewScreen() {
             variant="solid"
             colorScheme="accent"
             w="100%"
-            onClick={async () => {
-              navigate.push(`/dashboard`)
-            }}
+            type="submit"
+            isDisabled={isSubmitting || stillLoading}
+            isLoading={isSubmitting}
           >
             Confirm
           </Button>

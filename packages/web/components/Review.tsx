@@ -6,10 +6,12 @@ import { Call } from "starknet"
 import useSwr from "swr"
 
 import {
+  EstimateDeploymentFeeResponse,
+  EstimateFeeResponse,
   estimateDeployment,
   estimateTransactions,
 } from "../services/estimateFee"
-import { reviewTransaction } from "../services/review"
+import { Review, reviewTransaction } from "../services/review"
 import { formatFeeTokenAmount } from "../services/tokens/balances"
 
 const { InfoIcon } = icons
@@ -40,21 +42,17 @@ export const Row: FC<PropsWithChildren> = ({ children }) => {
   )
 }
 
-export const TransactionReview: FC<{
-  transactions: Call[]
-}> = ({ transactions }) => {
-  const hash = useMemo(() => objectHash({ transactions }), [transactions])
-  const { data: review } = useSwr(["services/review", hash], () =>
-    reviewTransaction(transactions),
-  )
-  const { data: deploymentFees } = useSwr(
-    "services/estimateFee/estimateDeployment",
-    () => estimateDeployment(),
-  )
-  const { data: executionFees } = useSwr(
-    ["services/estimateFee/estimateTransactions", hash],
-    () => estimateTransactions(transactions),
-  )
+interface TransactionReviewProps {
+  review?: Review
+  deploymentFees?: EstimateDeploymentFeeResponse
+  executionFees?: EstimateFeeResponse
+}
+
+export const TransactionReview: FC<TransactionReviewProps> = ({
+  deploymentFees,
+  executionFees,
+  review,
+}) => {
   if (!review) {
     return <Spinner />
   }
