@@ -22,7 +22,7 @@ type DeployContractAction = ExtQueueItem<{
   payload: UniversalDeployerContractPayload
 }>
 
-export enum UcdTransactionType {
+export enum UdcTransactionType {
   DEPLOY_CONTRACT = "DEPLOY",
   DECLARE_CONTRACT = "DECLARE",
 }
@@ -63,7 +63,7 @@ export const udcDeclareContract = async (
       meta: {
         title: "Contract declared",
         subTitle: classHash.toString(),
-        type: UcdTransactionType.DECLARE_CONTRACT,
+        type: UdcTransactionType.DECLARE_CONTRACT,
       },
     })
 
@@ -122,7 +122,7 @@ export const udcDeployContract = async (
       meta: {
         title: "Contract deployed",
         subTitle: contractAddress,
-        type: UcdTransactionType.DEPLOY_CONTRACT,
+        type: UdcTransactionType.DEPLOY_CONTRACT,
       },
     })
 
