@@ -1,5 +1,12 @@
-import { Error, H6, Input, L2, Switch } from "@argent/ui"
-import { Flex, FormControl, FormLabel, Spinner } from "@chakra-ui/react"
+import { Error, H6, Input, L2, Switch, icons } from "@argent/ui"
+import {
+  Flex,
+  FormControl,
+  FormLabel,
+  Spinner,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react"
 import { isNull } from "lodash-es"
 import { get, isEmpty } from "lodash-es"
 import { FC, Fragment, useCallback, useEffect } from "react"
@@ -9,6 +16,8 @@ import { stark } from "starknet"
 import { ParameterField } from "./DeploySmartContractForm"
 
 const { randomAddress } = stark
+
+const { InfoIcon } = icons
 
 const DeploySmartContractParameters: FC<{
   isLoading: boolean
@@ -91,8 +100,18 @@ const DeploySmartContractParameters: FC<{
             py="4.5"
             px="5"
           >
-            <FormLabel htmlFor="unique" mb="0">
+            <FormLabel
+              htmlFor="unique"
+              mb="0"
+              display="flex"
+              alignItems="center"
+            >
               Unique address
+              <Tooltip label="The generated address is unique to the deployer of the contract and cannot be squatted">
+                <Text fontSize="xs" pl="2">
+                  <InfoIcon />
+                </Text>
+              </Tooltip>
             </FormLabel>
             <Switch id="unique" {...register("unique")} colorScheme="primary" />
           </FormControl>
