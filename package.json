@@ -33,7 +33,8 @@
     "prepare": "yarn --cwd packages/get-starknet build && yarn --cwd packages/sessions build && yarn --cwd packages/ui build && yarn --cwd packages/multicall build && husky install",
     "postinstall": "patch-package && lerna run postinstall --stream",
     "storybook": "cd packages/storybook && yarn storybook",
-    "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts"
+    "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
+    "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {

@@ -1,3 +1,5 @@
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
+import { Flex, VStack } from "@chakra-ui/react"
 import { isFunction } from "lodash-es"
 import { nanoid } from "nanoid"
 import { FC, useMemo, useState } from "react"
@@ -183,102 +185,106 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
   }
 
   return (
-    <Wrapper {...props}>
-      <AlertDialog
-        isOpen={deleteDialogOpen}
-        title="Delete contact"
-        message="Are you sure you want to delete this contact from your address book?"
-        onDestroy={handleDelete}
-        onCancel={() => setDeleteDialogOpen(false)}
-      />
-      <ColumnCenter gap="16px">
-        {!debouncedCName ? (
-          <IconWrapper>
-            {currentMode === "add" && <StyledAddIcon />}
-            {currentMode === "edit" && <StyledEditIcon />}
-          </IconWrapper>
-        ) : (
-          <ContactAvatar
-            src={getNetworkAccountImageUrl({
-              accountName: debouncedCName,
-              accountAddress: debouncedCAddress,
-              networkId: debouncedCNetwork,
-            })}
-          />
-        )}
-
-        {currentMode === "add" && <H3>New address</H3>}
-        {currentMode === "edit" && <H3>Edit address</H3>}
-      </ColumnCenter>
-
-      <StyledContactForm
-        onSubmit={handleSubmit(
-          async (contact) => await handleAddOrEditContact(contact),
-        )}
-        formHeight={formHeight}
-      >
-        <Column gap="12px">
-          <div>
-            <StyledControlledInput
-              name="name"
-              placeholder="Name"
-              autoComplete="off"
-              autoFocus
-              control={control}
-              type="text"
-              spellCheck={false}
+    <NavigationContainer
+      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      title={currentMode === "add" ? "New address" : "Edit address"}
+    >
+      <VStack {...props} p="4">
+        <AlertDialog
+          isOpen={deleteDialogOpen}
+          title="Delete contact"
+          message="Are you sure you want to delete this contact from your address book?"
+          onDestroy={handleDelete}
+          onCancel={() => setDeleteDialogOpen(false)}
+        />
+        <Flex pt="5" pb="10" gap="16px">
+          {!debouncedCName ? (
+            <IconWrapper>
+              {currentMode === "add" && <StyledAddIcon />}
+              {currentMode === "edit" && <StyledEditIcon />}
+            </IconWrapper>
+          ) : (
+            <ContactAvatar
+              src={getNetworkAccountImageUrl({
+                accountName: debouncedCName,
+                accountAddress: debouncedCAddress,
+                networkId: debouncedCNetwork,
+              })}
             />
-            {errors.name && <FormErrorAlt>{errors.name.message}</FormErrorAlt>}
-          </div>
-
-          <div>
-            <StyledControlledTextArea
-              name="address"
-              placeholder="Starknet Address"
-              autoComplete="false"
-              control={control}
-              minRows={3}
-              maxRows={3}
-              spellCheck={false}
-              onlyAddressHex
-            />
-            {errors.address && (
-              <FormErrorAlt>{errors.address.message}</FormErrorAlt>
-            )}
-          </div>
-
-          <div>
-            <StyledControlledSelect
-              name="networkId"
-              options={networksToOptions}
-              defaultValue={currentNetwork.id}
-              control={control}
-              placeholder="Network"
-              classNamePrefix="network-selector"
-              isDisabled={networkDisabled}
-            />
-          </div>
-
-          {selectedContact && currentMode === "edit" && (
-            <RemoveContactButton
-              type="button"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              Remove from address book
-            </RemoveContactButton>
           )}
-        </Column>
+        </Flex>
 
-        <Row gap="12px">
-          <Button
-            type="button"
-            onClick={() => (isFunction(onCancel) ? onCancel() : navigate(-1))}
-          >
-            Cancel
-          </Button>
-          <Button>Save</Button>
-        </Row>
-      </StyledContactForm>
-    </Wrapper>
+        <StyledContactForm
+          onSubmit={handleSubmit(
+            async (contact) => await handleAddOrEditContact(contact),
+          )}
+          formHeight={formHeight}
+        >
+          <CellStack p="0">
+            <div>
+              <StyledControlledInput
+                name="name"
+                placeholder="Name"
+                autoComplete="off"
+                autoFocus
+                control={control}
+                type="text"
+                spellCheck={false}
+              />
+              {errors.name && (
+                <FormErrorAlt>{errors.name.message}</FormErrorAlt>
+              )}
+            </div>
+
+            <div>
+              <StyledControlledTextArea
+                name="address"
+                placeholder="Starknet Address"
+                autoComplete="false"
+                control={control}
+                minRows={3}
+                maxRows={3}
+                spellCheck={false}
+                onlyAddressHex
+              />
+              {errors.address && (
+                <FormErrorAlt>{errors.address.message}</FormErrorAlt>
+              )}
+            </div>
+
+            <div>
+              <StyledControlledSelect
+                name="networkId"
+                options={networksToOptions}
+                defaultValue={currentNetwork.id}
+                control={control}
+                placeholder="Network"
+                classNamePrefix="network-selector"
+                isDisabled={networkDisabled}
+              />
+            </div>
+
+            {selectedContact && currentMode === "edit" && (
+              <RemoveContactButton
+                type="button"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                Remove from address book
+              </RemoveContactButton>
+            )}
+          </CellStack>
+
+          <Row gap="12px">
+            <Button
+              type="button"
+              onClick={() => (isFunction(onCancel) ? onCancel() : navigate(-1))}
+            >
+              Cancel
+            </Button>
+            <Button>Save</Button>
+          </Row>
+        </StyledContactForm>
+      </VStack>
+    </NavigationContainer>
   )
 }

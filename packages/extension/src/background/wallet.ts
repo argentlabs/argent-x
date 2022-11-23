@@ -2,9 +2,7 @@ import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, noop, throttle, union } from "lodash-es"
 import {
-  Abi,
   Account,
-  Contract,
   DeployContractPayload,
   EstimateFee,
   ec,
@@ -19,9 +17,9 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
-import ProxyCompiledContractAbi from "../abis/Proxy.json"
 import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
 import { withHiddenSelector } from "../shared/account/selectors"
+import { getMulticallForNetwork } from "../shared/multicall"
 import {
   Network,
   defaultNetwork,
@@ -682,15 +680,13 @@ export class Wallet {
   public async getCurrentImplementation(
     account: WalletAccount,
   ): Promise<string> {
-    const provider = getProvider(account.network)
+    const multicall = getMulticallForNetwork(account.network)
 
-    const proxyContract = new Contract(
-      ProxyCompiledContractAbi as Abi,
-      account.address,
-      provider,
-    )
+    const [implementation] = await multicall.call({
+      contractAddress: account.address,
+      entrypoint: "get_implementation",
+    })
 
-    const { implementation } = await proxyContract.call("get_implementation")
     return stark.makeAddress(number.toHex(implementation))
   }
 

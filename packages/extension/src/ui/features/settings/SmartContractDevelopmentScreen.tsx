@@ -22,7 +22,8 @@ const SmartContractDevelopmentScreen: FC = () => {
 
         <SettingsMenuItem
           to={routes.settingsSmartContractDeploy()}
-          title="Deploy smart contract"
+          title="Deploy smart contract (soon!)"
+          disabled
         />
       </CellStack>
     </>

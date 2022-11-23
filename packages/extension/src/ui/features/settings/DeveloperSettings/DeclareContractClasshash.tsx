@@ -60,12 +60,12 @@ const DeclareContractClasshash: FC = () => {
       )}
       <StickyGroup>
         <Button
-          onClick={() => navigate(routes.settingsSmartContractDeploy())}
+          onClick={() => navigate(routes.accountTokens())}
           gap="2"
           colorScheme="primary"
           width="100%"
         >
-          Go to deployment
+          Go to account
         </Button>
       </StickyGroup>
     </NavigationContainer>
