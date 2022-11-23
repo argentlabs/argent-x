@@ -242,7 +242,7 @@ export const getAccounts = async (): Promise<Account[]> => {
   return json.accounts
 }
 
-interface UserAccount {
+export interface UserAccount {
   email: string
   accounts: Account[]
 }

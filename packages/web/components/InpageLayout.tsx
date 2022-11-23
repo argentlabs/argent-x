@@ -1,16 +1,12 @@
 import { P4, icons } from "@argent/ui"
-import { Box } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
-import useSwr from "swr"
 
-import { getAccount } from "../services/backend/account"
+import { useBackendAccount } from "../hooks/account"
 
 const { ProfileIcon } = icons
 
 export const InpageLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const { data } = useSwr("services/backend/account/getAccount", () =>
-    getAccount(),
-  )
+  const { account } = useBackendAccount()
   return (
     <>
       <P4
@@ -24,7 +20,7 @@ export const InpageLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
         color="#8C8C8C"
       >
         <ProfileIcon fontSize="12px" />
-        {data?.email}
+        {account?.email}
       </P4>
       {children}
     </>

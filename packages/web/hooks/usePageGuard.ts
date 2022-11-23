@@ -1,8 +1,7 @@
 import { NextRouter, useRouter } from "next/router"
-import useSwr from "swr"
 
 import { getAccount as getMemoryAccount } from "../services/account"
-import { getAccount } from "../services/backend/account"
+import { useBackendAccount } from "./account"
 
 const allowedDestinations = {
   "/email": ["/email", "/pin"],
@@ -27,7 +26,7 @@ const conditionallyPushTo = (
 
 export const usePageGuard = () => {
   const router = useRouter()
-  useSwr("services/backend/account/getAccount", () => getAccount(), {
+  useBackendAccount({
     onSuccess: async (account) => {
       if ((account.accounts?.length ?? 0) > 0) {
         if (await getMemoryAccount()) {
