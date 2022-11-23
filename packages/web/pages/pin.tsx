@@ -108,7 +108,6 @@ export default function Pin() {
           otp
           isDisabled={isSubmitDisabled(formState)}
           onComplete={async () => {
-            console.log("onComplete")
             formRef.current?.requestSubmit()
           }}
         >

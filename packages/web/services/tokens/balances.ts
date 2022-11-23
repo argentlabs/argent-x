@@ -12,7 +12,7 @@ export interface Token {
   image?: string
 }
 
-interface TokenWithBalance extends Token {
+export interface TokenWithBalance extends Token {
   balance: bigint
 }
 

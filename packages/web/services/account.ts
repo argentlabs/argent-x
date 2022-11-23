@@ -20,9 +20,12 @@ export const ACCOUNT_IMPLEMENTATION_CLASS_HASH =
 export const PROXY_CLASS_HASH =
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918"
 
-export const calculateAccountAddress = (pubKey: string): string => {
+export const calculateAccountAddress = (
+  pubKey: string,
+  salt: string,
+): string => {
   const accountAddress = hash.calculateContractAddressFromHash(
-    pubKey,
+    salt,
     PROXY_CLASS_HASH,
     stark.compileCalldata({
       implementation: ACCOUNT_IMPLEMENTATION_CLASS_HASH,
@@ -48,7 +51,6 @@ export const createAccount = async (password: string) => {
   const device = await getDevice()
   // generate a new keypair
   const { publicKey, privateKey } = await getNewStarkKeypair()
-  const accountAddress = calculateAccountAddress(publicKey)
 
   // upload encrypted backups in parallel
   const uploadEncryptedFilesPromises = [
@@ -67,7 +69,7 @@ export const createAccount = async (password: string) => {
       postTextFile(
         `device-${await calculateJwkThumbprint(
           await exportJWK(device.encryptionKey.publicKey),
-        )}-encypted-${accountAddress}`,
+        )}-encypted-${publicKey}`,
         deviceEncryptedPrivateKey,
         { accessPolicy: "WEB_WALLET_SESSION" }, // TODO: [BE] change as soon as the backend is ready
       ),
@@ -88,15 +90,10 @@ export const createAccount = async (password: string) => {
     addHexPrefix(r.toString(16)),
     addHexPrefix(s.toString(16)),
   ])
-  const keyPair = ec.getKeyPair(privateKey)
-  account = new Account(provider, accountAddress, keyPair)
 
-  console.log(
-    "precalculated account address",
-    accountAddress,
-    "server calculated account address",
-    registration.address,
-  )
+  const keyPair = ec.getKeyPair(privateKey)
+  account = new Account(provider, registration.address, keyPair)
+
   return account
 }
 

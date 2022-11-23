@@ -62,8 +62,6 @@ export const getTextFile = async (name: string): Promise<string> => {
     },
   })
 
-  console.log("getTextFile", "HTTP code", response.status)
-
   if (!response.ok) {
     switch (response.status) {
       case 404:

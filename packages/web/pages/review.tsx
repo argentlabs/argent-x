@@ -49,6 +49,18 @@ export default function ReviewScreen() {
     formState: { isSubmitting },
   } = useForm({})
 
+  const balanceTooLowToPayFees = useMemo(() => {
+    if (!feeTokenBalance || !executionFees) {
+      return false
+    }
+    const deploymentFee = deploymentFees?.needsDeploy
+      ? deploymentFees?.maxFee
+      : 0n
+    const executionFee = executionFees.maxFee
+    const totalFee = deploymentFee + executionFee
+    return feeTokenBalance.balance <= totalFee
+  }, [deploymentFees, executionFees, feeTokenBalance])
+
   const stillLoading =
     !deploymentFees || !executionFees || !review || !feeTokenBalance
 
@@ -84,7 +96,7 @@ export default function ReviewScreen() {
                     guardian: "0",
                   }),
                 }),
-                addressSalt: beAccount.ownerAddress,
+                addressSalt: beAccount.salt,
               },
               {
                 maxFee: deploymentFees?.maxFee,
@@ -99,7 +111,7 @@ export default function ReviewScreen() {
 
           console.log("TX:", signed.transaction_hash)
 
-          navigate.push(`/dashboard`)
+          return navigate.push(`/dashboard`)
         })}
       >
         <Image src="/dapp-logo.svg" width={80} height={80} alt="Dapp logo" />
@@ -108,9 +120,10 @@ export default function ReviewScreen() {
           somecooldapp.xyz
         </P4>
         <TransactionReview
-          deploymentFees={deploymentFees}
-          executionFees={executionFees}
           review={review}
+          executionFees={executionFees}
+          deploymentFees={deploymentFees}
+          balanceTooLowToPayFees={balanceTooLowToPayFees}
         />
         <Flex w="100%" alignItems="center" gap={2}>
           <Button
@@ -126,7 +139,7 @@ export default function ReviewScreen() {
             colorScheme="accent"
             w="100%"
             type="submit"
-            isDisabled={isSubmitting || stillLoading}
+            isDisabled={isSubmitting || stillLoading || balanceTooLowToPayFees}
             isLoading={isSubmitting}
           >
             Confirm
