@@ -1,5 +1,5 @@
-import { Error, H6, Input, L2 } from "@argent/ui"
-import { Flex, FormControl, FormLabel, Spinner, Switch } from "@chakra-ui/react"
+import { Error, H6, Input, L2, Switch } from "@argent/ui"
+import { Flex, FormControl, FormLabel, Spinner } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
 import { FC, Fragment, useCallback, useEffect } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
