@@ -62,7 +62,7 @@ export const udcDeclareContract = async (
       account,
       meta: {
         title: "Contract declared",
-        subTitle: classHash,
+        subTitle: classHash.toString(),
         type: UcdTransactionType.DECLARE_CONTRACT,
       },
     })

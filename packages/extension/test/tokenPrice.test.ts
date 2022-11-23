@@ -250,7 +250,7 @@ describe("prettifyTokenAmount()", () => {
       ).toEqual("0.0000000000000001")
       expect(
         prettifyTokenAmount({
-          amount: UINT_256_MAX,
+          amount: UINT_256_MAX.toString(),
           decimals: 18,
         }),
       ).toEqual(PRETTY_UNLIMITED)

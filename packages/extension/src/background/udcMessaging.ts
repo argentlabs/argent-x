@@ -77,7 +77,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
       const action = await actionQueue.push({
         type: "DEPLOY_CONTRACT_ACTION",
         payload: {
-          classHash,
+          classHash: classHash.toString(),
           constructorCalldata,
           salt,
           unique,

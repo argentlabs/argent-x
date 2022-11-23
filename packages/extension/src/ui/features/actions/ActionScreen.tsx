@@ -241,7 +241,7 @@ export const ActionScreen: FC = () => {
       return (
         <ApproveDeclareContractScreen
           actionHash={action.meta.hash}
-          classHash={action.payload.classHash}
+          classHash={action.payload.classHash.toString()}
           contract={action.payload.contract}
           onSubmit={async () => {
             analytics.track("signedTransaction", {

@@ -6,10 +6,10 @@ import {
   DeployContractPayload,
   EstimateFee,
   ec,
+  hash,
   number,
   stark,
 } from "starknet"
-import { hash } from "starknet"
 import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
@@ -42,6 +42,8 @@ import {
   getStarkPair,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
+
+console.log(hash)
 
 const { calculateContractAddressFromHash, getSelectorFromName } = hash
 
@@ -686,7 +688,7 @@ export class Wallet {
       entrypoint: "get_implementation",
     })
 
-    return stark.makeAddress(number.toHex(implementation))
+    return stark.makeAddress(number.toHex(number.toBN(implementation)))
   }
 
   public async getSelectedStarknetAccount(): Promise<Account | Accountv4> {
