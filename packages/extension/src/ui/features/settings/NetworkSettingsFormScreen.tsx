@@ -1,3 +1,4 @@
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -93,8 +94,10 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
-      <IconBar back />
+    <NavigationContainer
+      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      title={"Networks"}
+    >
       <ConfirmScreen
         title={props.mode === "add" ? "Add network" : "Edit network"}
         singleButton
@@ -231,6 +234,6 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
           )}
         </Wrapper>
       </ConfirmScreen>
-    </>
+    </NavigationContainer>
   )
 }

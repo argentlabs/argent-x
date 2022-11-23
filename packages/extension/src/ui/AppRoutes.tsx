@@ -183,42 +183,9 @@ const legacyUiWalletRoutes = (
     <Route path={routes.token.path} element={<TokenScreen />} />
     <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
     <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
-    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
     <Route
       path={routes.settingsSmartContractDeploy.path}
       element={<DeploySmartContractScreen />}
-    />
-    <Route
-      path={routes.settingsNetworks.path}
-      element={<NetworkSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsBlockExplorer.path}
-      element={<BlockExplorerSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsAddCustomNetwork.path}
-      element={<NetworkSettingsFormScreen mode="add" />}
-    />
-    <Route
-      path={routes.settingsEditCustomNetwork.path}
-      element={<NetworkSettingsEditScreen />}
-    />
-    <Route
-      path={routes.settingsDappConnections.path}
-      element={<DappConnectionsSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsAddressbook.path}
-      element={<AddressbookSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsAddressbookAdd.path}
-      element={<AddressbookAddOrEditScreen />}
-    />
-    <Route
-      path={routes.settingsAddressbookEdit.path}
-      element={<AddressbookAddOrEditScreen />}
     />
     <Route
       path={routes.backupDownload.path}
@@ -227,18 +194,6 @@ const legacyUiWalletRoutes = (
     <Route
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
-    />
-    <Route
-      path={routes.settingsPrivacy.path}
-      element={<PrivacySettingsScreen />}
-    />
-    <Route
-      path={routes.settingsExperimental.path}
-      element={<PrivacyExperimentalSettings />}
-    />
-    <Route
-      path={routes.settingsPrivacyStatement.path}
-      element={<SettingsPrivacyStatementScreen />}
     />
   </>
 )
@@ -266,6 +221,39 @@ const walletRoutes = (
     <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
     <Route path={routes.settings.path} element={<SettingsScreen />} />
     <Route
+      path={routes.settingsPrivacy.path}
+      element={<PrivacySettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddCustomNetwork.path}
+      element={<NetworkSettingsFormScreen mode="add" />}
+    />
+    <Route
+      path={routes.settingsEditCustomNetwork.path}
+      element={<NetworkSettingsEditScreen />}
+    />
+    <Route
+      path={routes.settingsBlockExplorer.path}
+      element={<BlockExplorerSettingsScreen />}
+    />
+    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
+    <Route
+      path={routes.settingsDappConnections.path}
+      element={<DappConnectionsSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbook.path}
+      element={<AddressbookSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbookAdd.path}
+      element={<AddressbookAddOrEditScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbookEdit.path}
+      element={<AddressbookAddOrEditScreen />}
+    />
+    <Route
       path={routes.settingsDeveloper.path}
       element={<DeveloperSettings />}
     />
@@ -280,6 +268,18 @@ const walletRoutes = (
     <Route
       path={routes.settingsSmartContractDeclareClassHash.path}
       element={<DeclareContractClasshash />}
+    />
+    <Route
+      path={routes.settingsExperimental.path}
+      element={<PrivacyExperimentalSettings />}
+    />
+    <Route
+      path={routes.settingsNetworks.path}
+      element={<NetworkSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsPrivacyStatement.path}
+      element={<SettingsPrivacyStatementScreen />}
     />
   </>
 )
