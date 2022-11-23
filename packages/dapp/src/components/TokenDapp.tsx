@@ -1,7 +1,7 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
 import { Abi, AccountInterface, Contract } from "starknet"
-import { genKeyPair, getStarkKey } from "starknet/dist/utils/ellipticCurve"
+import { ec } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
@@ -19,6 +19,8 @@ import {
   waitForTransaction,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
+
+const { genKeyPair, getStarkKey } = ec
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
 

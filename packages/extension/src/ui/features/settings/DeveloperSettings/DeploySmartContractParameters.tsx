@@ -4,9 +4,11 @@ import { isNull } from "lodash-es"
 import { get, isEmpty } from "lodash-es"
 import { FC, Fragment, useCallback, useEffect } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
-import { randomAddress } from "starknet/dist/utils/stark"
+import { stark } from "starknet"
 
 import { ParameterField } from "./DeploySmartContractForm"
+
+const { randomAddress } = stark
 
 const DeploySmartContractParameters: FC<{
   isLoading: boolean

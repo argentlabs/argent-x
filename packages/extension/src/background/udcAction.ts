@@ -3,12 +3,14 @@ import {
   UniversalDeployerContractPayload,
   stark,
 } from "starknet"
-import { calculateContractAddressFromHash } from "starknet/dist/utils/hash"
+import { hash } from "starknet"
 
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { BackgroundService } from "./background"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
+
+const { calculateContractAddressFromHash } = hash
 
 type DeclareContractAction = ExtQueueItem<{
   type: "DECLARE_CONTRACT_ACTION"

@@ -1,5 +1,4 @@
 import { Account, number, stark } from "starknet"
-import { UDC } from "starknet/dist/constants"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { HandleMessage, UnhandledMessage } from "../background"
@@ -172,26 +171,14 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
       try {
-        const compiledConstructorCallData = stark.compileCalldata(
-          constructorCalldata || [],
-        )
-
-        /* TODO: use new method */
         const { overall_fee, suggestedMaxFee } = await (
           selectedAccount as Account
-        ).estimateInvokeFee([
-          {
-            contractAddress: UDC.ADDRESS,
-            entrypoint: UDC.ENTRYPOINT,
-            calldata: [
-              classHash,
-              salt,
-              unique,
-              compiledConstructorCallData.length,
-              ...compiledConstructorCallData,
-            ],
-          },
-        ])
+        ).estimateDeployFee({
+          classHash,
+          salt,
+          unique,
+          constructorCalldata,
+        })
         const maxADFee = number.toHex(
           stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )

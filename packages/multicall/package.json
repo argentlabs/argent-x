@@ -52,6 +52,6 @@
   },
   "dependencies": {
     "dataloader": "^2.1.0",
-    "starknet": "^4.9.0"
+    "starknet": "^4.13.1"
   }
 }

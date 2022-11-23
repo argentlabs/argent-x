@@ -1,15 +1,16 @@
 import { Call, validateAndParseAddress } from "starknet"
-import { BigNumberish } from "starknet/dist/utils/number"
-import { Uint256, uint256ToBN } from "starknet/dist/utils/uint256"
+import { number, uint256 } from "starknet"
 
 import { normalizeAddress } from "../../ui/services/addresses"
+
+const { uint256ToBN } = uint256
 
 export interface Erc721TransferCall extends Call {
   calldata: [
     fromAddressDecimal: string,
     toAddressDecimal: string,
-    tokenIdLowFelt: BigNumberish,
-    tokenIdHighFelt: BigNumberish,
+    tokenIdLowFelt: number.BigNumberish,
+    tokenIdHighFelt: number.BigNumberish,
   ]
   entrypoint: "transferFrom"
 }
@@ -33,7 +34,7 @@ export const isErc721TransferCall = (
       ] = calldata
       validateAndParseAddress(fromAddressDecimal)
       validateAndParseAddress(toAddressDecimal)
-      const tokenIdUnit256: Uint256 = {
+      const tokenIdUnit256: uint256.Uint256 = {
         low: tokenIdLowFelt,
         high: tokenIdHighFelt,
       }
@@ -56,7 +57,7 @@ export const parseErc721TransferCall = (call: Erc721TransferCall) => {
   ] = calldata
   const fromAddress = normalizeAddress(fromAddressDecimal)
   const toAddress = normalizeAddress(toAddressDecimal)
-  const tokenIdUnit256: Uint256 = {
+  const tokenIdUnit256: uint256.Uint256 = {
     low: tokenIdLowFelt,
     high: tokenIdHighFelt,
   }
