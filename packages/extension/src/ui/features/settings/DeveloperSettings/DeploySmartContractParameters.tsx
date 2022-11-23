@@ -18,7 +18,6 @@ const DeploySmartContractParameters: FC<{
   })
 
   useEffect(() => {
-    console.log(constructorParameters)
     if (constructorParameters.length === 0) {
       resetField("parameters")
       fields.map((_, index) => remove(index))

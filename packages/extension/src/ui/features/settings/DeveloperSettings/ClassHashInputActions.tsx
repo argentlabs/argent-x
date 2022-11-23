@@ -35,7 +35,6 @@ const ClassHashInputActions: FC<ClassHashInputActionsProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (!classHash && ref.current && !ref.current.contains(event.target)) {
-        console.log("outside")
         setIsOpen(false)
       }
     }
@@ -46,10 +45,8 @@ const ClassHashInputActions: FC<ClassHashInputActionsProps> = ({
   }, [classHash])
 
   const handleToggle = useCallback(() => {
-    console.log(`isOpen inside ${isOpen}`)
     setIsOpen(!isOpen)
   }, [isOpen])
-  console.log(isOpen)
 
   return (
     <>
