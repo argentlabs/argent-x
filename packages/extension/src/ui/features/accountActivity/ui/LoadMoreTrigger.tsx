@@ -1,6 +1,7 @@
-import { FC, useEffect, useRef } from "react"
+import { Box } from "@chakra-ui/react"
+import { ComponentProps, FC, useEffect, useRef } from "react"
 
-interface ILoadMore {
+interface LoadMoreProps extends ComponentProps<typeof Box> {
   onLoadMore: () => void
   oneShot?: boolean
 }
@@ -13,9 +14,10 @@ const options: IntersectionObserverInit = {
 
 /** invokes onLoadMore callback when visible in the viewport */
 
-export const LoadMoreTrigger: FC<ILoadMore> = ({
+export const LoadMoreTrigger: FC<LoadMoreProps> = ({
   onLoadMore,
   oneShot = true,
+  ...rest
 }) => {
   const ref = useRef(null)
   const intersectionObserver = useRef<IntersectionObserver | null>(null)
@@ -51,5 +53,5 @@ export const LoadMoreTrigger: FC<ILoadMore> = ({
     }
   }, [onLoadMore, oneShot])
 
-  return <div ref={ref} />
+  return <Box ref={ref} {...rest} />
 }

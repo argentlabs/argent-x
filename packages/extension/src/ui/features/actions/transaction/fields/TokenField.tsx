@@ -10,7 +10,7 @@ import {
   LeftPaddedField,
 } from "../../../../components/Fields"
 import { isEqualAddress } from "../../../../services/addresses"
-import { TokenIconDeprecated } from "../../../accountTokens/TokenIconDeprecated"
+import { TokenIcon } from "../../../accountTokens/TokenIcon"
 
 export interface ITokenField {
   label: string
@@ -42,9 +42,7 @@ export const TokenField: FC<ITokenField> = ({
     <Field>
       <FieldKey>{label}</FieldKey>
       <FieldValue>
-        {token && (
-          <TokenIconDeprecated url={token.image} name={token.name} small />
-        )}
+        {token && <TokenIcon url={token.image} name={token.name} size={6} />}
         <LeftPaddedField>{displayAmount}</LeftPaddedField>
       </FieldValue>
     </Field>

@@ -1,12 +1,11 @@
-import { CellStack, H4 } from "@argent/ui"
-import { Center } from "@chakra-ui/react"
+import { CellStack, H4, SpacerCell } from "@argent/ui"
+import { Center, Skeleton } from "@chakra-ui/react"
 import { FC, Suspense, useCallback, useMemo } from "react"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
-import { Spinner } from "../../components/Spinner"
 import { formatDate } from "../../services/dates"
 import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
@@ -18,7 +17,7 @@ import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
 
-interface AccountActivityContainerProps {
+export interface AccountActivityContainerProps {
   account: Account
 }
 
@@ -27,14 +26,50 @@ const PAGE_SIZE = 10
 export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
   account,
 }) => {
+  return (
+    <CellStack>
+      <Center>
+        <H4>Activity</H4>
+      </Center>
+      <PendingTransactionsContainer account={account} />
+      <ErrorBoundary
+        fallback={
+          <ErrorBoundaryFallback title="Seems like Voyager API is down..." />
+        }
+      >
+        <Suspense
+          fallback={
+            <>
+              <SpacerCell />
+              <Skeleton height="16" rounded={"xl"} />
+              <Skeleton height="16" rounded={"xl"} />
+              <Skeleton height="16" rounded={"xl"} />
+            </>
+          }
+        >
+          <AccountActivityLoader account={account} />
+        </Suspense>
+      </ErrorBoundary>
+    </CellStack>
+  )
+}
+
+export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
+  account,
+}) => {
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data: nftContractAddresses } = useAspectContractAddresses()
-  const { data, setSize } = useArgentExplorerAccountTransactionsInfinite({
-    accountAddress: account.address,
-    network: switcherNetworkId,
-    pageSize: PAGE_SIZE,
-  })
+  const { data, setSize } = useArgentExplorerAccountTransactionsInfinite(
+    {
+      accountAddress: account.address,
+      network: switcherNetworkId,
+      pageSize: PAGE_SIZE,
+    },
+    {
+      suspense: true,
+    },
+  )
 
   const explorerTransactions = useMemo(() => {
     if (!data) {
@@ -155,27 +190,13 @@ export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
   }, [isReachingEnd, setSize])
 
   return (
-    <CellStack>
-      <Center>
-        <H4>Activity</H4>
-      </Center>
-      <PendingTransactionsContainer account={account} />
-      <ErrorBoundary
-        fallback={
-          <ErrorBoundaryFallback title="Seems like Voyager API is down..." />
-        }
-      >
-        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <AccountActivity
-            activity={mergedActivity}
-            loadMoreHashes={loadMoreHashes}
-            account={account}
-            tokensByNetwork={tokensByNetwork}
-            nftContractAddresses={nftContractAddresses}
-            onLoadMore={onLoadMore}
-          />
-        </Suspense>
-      </ErrorBoundary>
-    </CellStack>
+    <AccountActivity
+      activity={mergedActivity}
+      loadMoreHashes={loadMoreHashes}
+      account={account}
+      tokensByNetwork={tokensByNetwork}
+      nftContractAddresses={nftContractAddresses}
+      onLoadMore={onLoadMore}
+    />
   )
 }
