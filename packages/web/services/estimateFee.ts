@@ -78,7 +78,7 @@ export const estimateDeployment =
           guardian: "0",
         }),
       }),
-      addressSalt: beAccount.ownerAddress,
+      addressSalt: beAccount.salt,
     })
     const maxFee = stark.estimatedFeeToMaxFee(fee.overall_fee)
 

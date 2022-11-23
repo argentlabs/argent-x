@@ -220,6 +220,9 @@ interface Account {
   deploymentStatus: "notDeployed" | "deploying" | "deployed" | "deployError"
   application: "mobile" | "webwallet" | "argentx"
   guardianAddresses: string[]
+  implClassHash: string
+  proxyClassHash: string
+  salt: string
 }
 
 export const getAccounts = async (): Promise<Account[]> => {
