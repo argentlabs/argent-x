@@ -1,14 +1,13 @@
 import Bowser from "bowser"
-import sn, {
+import type {
   DisconnectOptions,
   GetWalletOptions,
   StarknetWindowObject,
-  type,
-  type,
-  type,
 } from "get-starknet-core"
+import sn from "get-starknet-core"
 
-import show, { WalletProviderWithStoreVersion, type } from "./modal"
+import type { WalletProviderWithStoreVersion } from "./modal"
+import show from "./modal"
 
 export type { StarknetWindowObject, DisconnectOptions } from "get-starknet-core"
 
