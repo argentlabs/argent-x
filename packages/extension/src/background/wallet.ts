@@ -720,7 +720,12 @@ export class Wallet {
     return account ?? defaultAccount
   }
 
-  public async selectAccount(accountIdentifier: BaseWalletAccount) {
+  public async selectAccount(accountIdentifier?: BaseWalletAccount) {
+    if (!accountIdentifier) {
+      await this.store.set("selected", undefined)
+      return
+    }
+
     const accounts = await this.walletStore.get()
     const account = find(accounts, (account) =>
       accountsEqual(account, accountIdentifier),

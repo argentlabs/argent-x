@@ -55,7 +55,7 @@ window.addEventListener(
       data.type === "CONNECT_ACCOUNT_RES" ||
       data.type === "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK"
     ) {
-      const { address, network } =
+      const account =
         data.type === "CONNECT_ACCOUNT_RES"
           ? data.data
           : data.data.selectedAccount
@@ -67,9 +67,12 @@ window.addEventListener(
         await disconnectAccount()
       } else {
         if (
-          address !== starknet.selectedAddress ||
-          network.chainId !== starknet.chainId
+          account &&
+          (account.address !== starknet.selectedAddress ||
+            account.network.chainId !== starknet.chainId)
         ) {
+          const { address, network } = account
+
           starknet.selectedAddress = address
           starknet.chainId = network.chainId
           starknet.provider = getProvider(network)

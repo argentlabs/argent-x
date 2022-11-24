@@ -26,12 +26,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       // Select an Account of BaseWalletAccount type
       const selectedAccount = await wallet.selectAccount(msg.data)
 
-      if (!selectedAccount) {
-        throw new Error(
-          `Could not select account in wallet with address ${msg.data.address} and networkId ${msg.data.networkId}`,
-        )
-      }
-
       return sendToTabAndUi({
         type: "CONNECT_ACCOUNT_RES",
         data: selectedAccount,

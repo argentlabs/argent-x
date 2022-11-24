@@ -84,6 +84,9 @@ export const useAccount = (
 ): Account | undefined => {
   const accounts = useAccounts({ allNetworks: true, showHidden: true })
   return useMemo(() => {
+    if (!account) {
+      return undefined
+    }
     return accounts.find((a) => account && accountsEqual(a, account))
   }, [accounts, account])
 }

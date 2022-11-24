@@ -17,6 +17,7 @@ import {
   mapNetworkStatusToColor,
 } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 import { useNetwork, useNetworkStatuses, useNetworks } from "./useNetworks"
@@ -36,6 +37,11 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   const { networkStatuses } = useNetworkStatuses()
   const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
   const currentNetworkStatus = networkStatuses[currentNetwork.id]
+  const selectedAccount = useSelectedAccount()
+  console.log(
+    "🚀 ~ file: NetworkSwitcher.tsx ~ line 40 ~ selectedAccount - HOOK",
+    selectedAccount,
+  )
 
   useEffect(() => {
     if (
@@ -49,7 +55,14 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
   }, [currentNetworkStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onChangeNetwork = useCallback(async (networkId: string) => {
-    await autoSelectAccountOnNetwork(networkId)
+    const selectedAccount = await autoSelectAccountOnNetwork(networkId)
+    console.log(
+      "🚀 ~ file: NetworkSwitcher.tsx ~ line 53 ~ onChangeNetwork ~ selectedAccount",
+      selectedAccount,
+    )
+    // selectedAccount
+    //   ? navigate(routes.accountTokens())
+    //   : navigate(routes.accounts())
   }, [])
 
   return (
