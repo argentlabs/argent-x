@@ -6,7 +6,7 @@ import { HandleMessage, UnhandledMessage } from "./background"
 export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
   msg,
   background,
-  sendToTabAndUi,
+  respond,
 }) => {
   const { actionQueue, wallet } = background
   const { type } = msg
@@ -25,7 +25,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
         },
       })
 
-      return sendToTabAndUi({
+      return respond({
         type: "REQUEST_DECLARE_CONTRACT_RES",
         data: {
           actionHash: action.meta.hash,
@@ -44,7 +44,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
       try {
         if ("getClassByHash" in provider) {
           const contract = await provider.getClassByHash(classHash)
-          return sendToTabAndUi({
+          return respond({
             type: "FETCH_CONSTRUCTOR_PARAMS_RES",
             data: {
               contract,
@@ -52,7 +52,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
           })
         }
       } catch (error) {
-        return sendToTabAndUi({
+        return respond({
           type: "FETCH_CONSTRUCTOR_PARAMS_REJ",
           data: {
             error: `${error}`,
@@ -84,7 +84,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
         },
       })
 
-      return sendToTabAndUi({
+      return respond({
         type: "REQUEST_DEPLOY_CONTRACT_RES",
         data: {
           actionHash: action.meta.hash,

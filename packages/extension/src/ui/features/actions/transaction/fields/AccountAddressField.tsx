@@ -21,7 +21,7 @@ export const AccountAddressField: FC<IAccountAddressField> = ({
       <FieldKey>{title}</FieldKey>
       <LeftPaddedField>
         <PrettyAccountAddress
-          small
+          size={6}
           accountAddress={accountAddress}
           networkId={networkId}
           fallbackValue={fallbackValue}

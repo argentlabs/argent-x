@@ -132,7 +132,6 @@ const nonWalletRoutes = (
 const legacyUiWalletRoutes = (
   <>
     <Route path={routes.accountNft.path} element={<NftScreen />} />
-
     <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
@@ -158,7 +157,6 @@ const legacyUiWalletRoutes = (
       path={routes.accountUpgradeV4.path}
       element={<UpgradeScreenV4 upgradeType={"account"} />}
     />
-    <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route
       path={routes.accountsHidden.path}
       element={<AccountListHiddenScreen />}

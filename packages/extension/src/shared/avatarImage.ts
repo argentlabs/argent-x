@@ -3,6 +3,9 @@ const getInitials = (name: string) => {
     .split(" ")
     .map((n) => n[0])
     .join("")
+  if (name.length === 1) {
+    return name.toUpperCase()
+  }
   if (initials.length < 2) {
     initials = name[0] + name[1]
   }
