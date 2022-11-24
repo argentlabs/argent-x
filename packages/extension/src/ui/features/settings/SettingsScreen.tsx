@@ -22,6 +22,7 @@ import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
 import { useAccount, useSelectedAccountStore } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { SettingsMenuItem } from "./SettingsMenuItem"
+import { SupportFooter } from "./SupportFooter"
 
 const {
   LockIcon,
@@ -142,23 +143,30 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
-          <Link onClick={stopSession} to={routes.lockScreen()}>
-            <SpacerCell />
-            <Flex
-              py={2}
-              gap={2}
-              cursor="pointer"
-              justifyContent="center"
-              alignItems="center"
-              color="white50"
-            >
-              <Text fontSize="base">
-                <LockIcon />
-              </Text>
-              <B2>Lock wallet</B2>
-            </Flex>
-          </Link>
+
+          <SupportFooter />
         </CellStack>
+        <Link onClick={stopSession} to={routes.lockScreen()}>
+          <SpacerCell
+            borderTop="solid 1px"
+            borderTopColor="neutrals.700"
+            h="4"
+          />
+          <Flex
+            py={2}
+            gap={2}
+            cursor="pointer"
+            justifyContent="center"
+            alignItems="center"
+            color="white50"
+          >
+            <Text fontSize="base">
+              <LockIcon />
+            </Text>
+            <B2>Lock wallet</B2>
+          </Flex>
+          <SpacerCell h="4" />
+        </Link>
       </NavigationContainer>
     </>
   )
