@@ -3,7 +3,7 @@
   "collaborators": [
     "Janek <janek.rahrt@me.com>"
   ],
-  "version": "5.0.6",
+  "version": "5.0.7",
   "files": [
     "pkg/wasm_bg.wasm",
     "pkg/wasm.js",
