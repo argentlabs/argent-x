@@ -1,10 +1,8 @@
-import { connect, getStarknet } from "@argent/get-starknet"
+import { connect } from "@argent/get-starknet"
 import { ProviderInterface, constants, shortString } from "starknet"
 
-import { Network } from "./token.service"
-
 export const silentConnectWallet = async () => {
-  const windowStarknet = await connect({ showList: false })
+  const windowStarknet = await connect({ modalMode: "neverAsk" })
   if (!windowStarknet?.isConnected) {
     await windowStarknet?.enable({
       showModal: false,
@@ -19,36 +17,19 @@ export const connectWallet = async () => {
     include: ["argentX"],
   })
   await windowStarknet?.enable({ starknetVersion: "v4" } as any)
-  return windowStarknet
+  return windowStarknet ?? undefined
 }
 
 export const walletAddress = async (): Promise<string | undefined> => {
-  const starknet = getStarknet()
+  const starknet = await connect({ modalMode: "neverAsk" })
   if (!starknet?.isConnected) {
     return
   }
   return starknet.selectedAddress
 }
 
-export const networkId = (): Network | undefined => {
-  const starknet = getStarknet()
-  if (!starknet?.isConnected) {
-    return
-  }
-  try {
-    const { chainId } = starknet.provider
-    if (chainId === constants.StarknetChainId.MAINNET) {
-      return "mainnet-alpha"
-    } else if (chainId === constants.StarknetChainId.TESTNET) {
-      return "goerli-alpha"
-    } else {
-      return "localhost"
-    }
-  } catch {}
-}
-
 export const addToken = async (address: string): Promise<void> => {
-  const starknet = getStarknet()
+  const starknet = await connect({ modalMode: "neverAsk" })
   if (!starknet?.isConnected) {
     throw Error("starknet wallet not connected")
   }
@@ -63,15 +44,6 @@ export const addToken = async (address: string): Promise<void> => {
   })
 }
 
-export const getExplorerBaseUrl = (): string | undefined => {
-  const network = networkId()
-  if (network === "mainnet-alpha") {
-    return "https://voyager.online"
-  } else if (network === "goerli-alpha") {
-    return "https://goerli.voyager.online"
-  }
-}
-
 export const chainId = (provider?: ProviderInterface): string | undefined => {
   try {
     if (!provider) {
@@ -82,7 +54,7 @@ export const chainId = (provider?: ProviderInterface): string | undefined => {
 }
 
 export const signMessage = async (message: string) => {
-  const starknet = getStarknet()
+  const starknet = await connect({ modalMode: "neverAsk" })
   if (!starknet?.isConnected) throw Error("starknet wallet not connected")
   if (!shortString.isShortString(message)) {
     throw Error("message must be a short string")
@@ -91,7 +63,7 @@ export const signMessage = async (message: string) => {
   return starknet.account.signMessage({
     domain: {
       name: "Example DApp",
-      chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
+      chainId: starknet.chainId,
       version: "0.0.1",
     },
     types: {
@@ -110,7 +82,7 @@ export const signMessage = async (message: string) => {
 }
 
 export const waitForTransaction = async (hash: string) => {
-  const starknet = getStarknet()
+  const starknet = await connect({ modalMode: "neverAsk" })
   if (!starknet?.isConnected) {
     return
   }
@@ -120,7 +92,7 @@ export const waitForTransaction = async (hash: string) => {
 export const addWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
-  const starknet = getStarknet()
+  const starknet = await connect({ modalMode: "neverAsk" })
   if (!starknet?.isConnected) {
     return
   }
@@ -130,7 +102,7 @@ export const addWalletChangeListener = async (
 export const removeWalletChangeListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
-  const starknet = getStarknet()
+  const starknet = await connect({ modalMode: "neverAsk" })
   if (!starknet?.isConnected) {
     return
   }

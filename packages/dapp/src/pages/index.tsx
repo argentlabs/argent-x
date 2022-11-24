@@ -1,4 +1,4 @@
-import { IStarknetWindowObject } from "@argent/get-starknet/dist"
+import { StarknetWindowObject } from "@argent/get-starknet"
 import { supportsSessions } from "@argent/x-sessions"
 import type { NextPage } from "next"
 import Head from "next/head"
@@ -17,7 +17,7 @@ import {
 import styles from "../styles/Home.module.css"
 
 const connectWebWallet = async (): Promise<
-  IStarknetWindowObject | undefined
+  StarknetWindowObject | undefined
 > => {
   return {
     isConnected: true,
@@ -68,7 +68,7 @@ const Home: NextPage = () => {
   }, [])
 
   const handleConnectClick =
-    (connectWallet: () => Promise<IStarknetWindowObject | undefined>) =>
+    (connectWallet: () => Promise<StarknetWindowObject | undefined>) =>
     async () => {
       const wallet = await connectWallet()
       setAddress(wallet?.selectedAddress)
@@ -79,11 +79,15 @@ const Home: NextPage = () => {
       }
       setSupportsSessions(null)
       if (wallet?.selectedAddress) {
-        const sessionSupport = await supportsSessions(
-          wallet.selectedAddress,
-          wallet.provider,
-        )
-        setSupportsSessions(sessionSupport)
+        try {
+          const sessionSupport = await supportsSessions(
+            wallet.selectedAddress,
+            wallet.provider,
+          )
+          setSupportsSessions(sessionSupport)
+        } catch {
+          setSupportsSessions(false)
+        }
       }
     }
 
