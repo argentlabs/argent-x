@@ -17,12 +17,7 @@ const SupportFooter: FC = () => (
       <Button
         as={"a"}
         size="sm"
-        display="flex"
-        flex="1"
-        gap={2}
-        p={4}
         rounded={"lg"}
-        justifyContent={"center"}
         leftIcon={<SupportIcon />}
         href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
         title="Get ArgentX Support"
@@ -33,12 +28,7 @@ const SupportFooter: FC = () => (
       <Button
         as={"a"}
         size="sm"
-        display="flex"
-        flex="1"
-        gap={2}
-        p={4}
         rounded={"lg"}
-        justifyContent={"center"}
         leftIcon={<Discord />}
         href="https://discord.gg/T4PDFHxm6T"
         title="Ask a question on the argent-x-support channel on Discord"
@@ -49,12 +39,7 @@ const SupportFooter: FC = () => (
       <Button
         as="a"
         size="sm"
-        display="flex"
-        flex="1"
-        gap={2}
-        p={4}
         rounded={"lg"}
-        justifyContent={"center"}
         leftIcon={<Github />}
         href="https://github.com/argentlabs/argent-x/issues"
         title="Post an issue on Argent X GitHub"
