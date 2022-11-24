@@ -4,7 +4,7 @@ import { HandleMessage, UnhandledMessage } from "./background"
 export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
   msg,
   background,
-  sendToTabAndUi,
+  respond,
 }) => {
   const { actionQueue, wallet } = background
   const { type } = msg
@@ -23,7 +23,7 @@ export const handleUdpMessaging: HandleMessage<UdpMessage> = async ({
         },
       })
 
-      return sendToTabAndUi({
+      return respond({
         type: "REQUEST_DECLARE_CONTRACT_RES",
         data: {
           actionHash: action.meta.hash,
