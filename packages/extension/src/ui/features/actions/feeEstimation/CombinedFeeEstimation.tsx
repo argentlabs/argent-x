@@ -294,7 +294,14 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
             </ExtendableControl>
           </FieldError>
 
-          <Collapse in={feeErrorExpanded} timeout="auto">
+          <Collapse
+            in={feeErrorExpanded}
+            timeout="auto"
+            style={{
+              maxHeight: "80vh",
+              overflow: "auto",
+            }}
+          >
             {parsedFeeEstimationError && (
               <CopyTooltip
                 copyValue={parsedFeeEstimationError}
