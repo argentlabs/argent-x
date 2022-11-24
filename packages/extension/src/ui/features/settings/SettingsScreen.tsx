@@ -6,7 +6,7 @@ import {
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
+import { Box, Flex, Text } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
@@ -145,28 +145,31 @@ export const SettingsScreen: FC = () => {
           )}
 
           <SupportFooter />
+          <SpacerCell h="16" />
         </CellStack>
-        <Link onClick={stopSession} to={routes.lockScreen()}>
-          <SpacerCell
-            borderTop="solid 1px"
-            borderTopColor="neutrals.700"
-            h="4"
-          />
-          <Flex
-            py={2}
-            gap={2}
-            cursor="pointer"
-            justifyContent="center"
-            alignItems="center"
-            color="white50"
-          >
-            <Text fontSize="base">
-              <LockIcon />
-            </Text>
-            <B2>Lock wallet</B2>
-          </Flex>
-          <SpacerCell h="4" />
-        </Link>
+        <Box bg="neutrals.900" position="fixed" bottom="0" left="0" right="0">
+          <Link onClick={stopSession} to={routes.lockScreen()}>
+            <SpacerCell
+              borderTop="solid 1px"
+              borderTopColor="neutrals.700"
+              h="4"
+            />
+            <Flex
+              py={2}
+              gap={2}
+              cursor="pointer"
+              justifyContent="center"
+              alignItems="center"
+              color="white50"
+            >
+              <Text fontSize="base">
+                <LockIcon />
+              </Text>
+              <B2>Lock wallet</B2>
+            </Flex>
+            <SpacerCell h="4" />
+          </Link>
+        </Box>
       </NavigationContainer>
     </>
   )
