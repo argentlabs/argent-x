@@ -41,7 +41,7 @@ export const estimateTransactions = async (
   const maxFee = stark.estimatedFeeToMaxFee(fee.overall_fee)
 
   return {
-    fee: BigInt(fee.toString()),
+    fee: BigInt(fee.overall_fee.toString()),
     maxFee: BigInt(maxFee.toString()),
   }
 }
