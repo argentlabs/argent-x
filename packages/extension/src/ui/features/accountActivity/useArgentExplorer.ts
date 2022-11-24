@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react"
+import { SWRConfiguration } from "swr"
 import useSWRInfinite from "swr/infinite"
 import urlJoin from "url-join"
 
@@ -98,13 +99,16 @@ export const useArgentExplorerAccountTransactions = ({
   )
 }
 
-export const useArgentExplorerAccountTransactionsInfinite = ({
-  accountAddress,
-  network,
-  pageSize = 10,
-  direction = "DESC",
-  withTransfers = true,
-}: IUseArgentExplorerAccountTransactions) => {
+export const useArgentExplorerAccountTransactionsInfinite = (
+  {
+    accountAddress,
+    network,
+    pageSize = 10,
+    direction = "DESC",
+    withTransfers = true,
+  }: IUseArgentExplorerAccountTransactions,
+  config?: SWRConfiguration,
+) => {
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const apiNetwork = argentApiNetworkForNetwork(network)
   const key = useCallback(
@@ -143,5 +147,6 @@ export const useArgentExplorerAccountTransactionsInfinite = ({
   return useSWRInfinite<IExplorerTransaction[]>(key, argentApiFetcher, {
     revalidateAll: true,
     ...withPolling(15 * 1000) /** 15 seconds */,
+    ...config,
   })
 }

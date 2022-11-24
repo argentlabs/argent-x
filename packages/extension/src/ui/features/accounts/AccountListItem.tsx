@@ -1,23 +1,19 @@
-import { ButtonRect, H6, L2, P4, icons, typographyStyles } from "@argent/ui"
+import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
 import { Circle, Flex, Image, Text, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
+import {
+  CustomButtonCell,
+  CustomButtonCellProps,
+} from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
 const { LinkIcon, DeployIcon, ViewIcon } = icons
 
-export interface AccountListItemWrapperProps
-  extends ComponentProps<typeof ButtonRect> {
-  highlighted?: boolean
-  transparent?: boolean
-  dark?: boolean
-  outlined?: boolean
-}
-
-export interface AccountListItemProps extends AccountListItemWrapperProps {
+export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
   accountAddress: string
   networkId: string
@@ -28,35 +24,6 @@ export interface AccountListItemProps extends AccountListItemWrapperProps {
   connected?: boolean
   hidden?: boolean
   avatarOutlined?: boolean
-}
-
-const AccountListItemWrapper: FC<AccountListItemWrapperProps> = ({
-  highlighted,
-  transparent,
-  dark,
-  outlined,
-  ...rest
-}) => {
-  const colorScheme = transparent
-    ? "transparent"
-    : highlighted
-    ? "tertiary"
-    : "neutrals"
-  const borderColor = outlined ? "neutrals.600" : "transparent"
-  return (
-    <ButtonRect
-      gap={3}
-      p={4}
-      h={"initial"}
-      textAlign={"left"}
-      fontWeight={"initial"}
-      colorScheme={colorScheme}
-      border={"1px solid"}
-      borderColor={borderColor}
-      borderRadius={"lg"}
-      {...rest}
-    />
-  )
 }
 
 interface AccountAvatarProps extends ComponentProps<"img"> {
@@ -118,7 +85,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   ...rest
 }) => {
   return (
-    <AccountListItemWrapper dark={hidden} {...rest}>
+    <CustomButtonCell {...rest}>
       <AccountAvatar
         outlined={avatarOutlined}
         src={getNetworkAccountImageUrl({
@@ -188,6 +155,6 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           {children}
         </Flex>
       </Flex>
-    </AccountListItemWrapper>
+    </CustomButtonCell>
   )
 }

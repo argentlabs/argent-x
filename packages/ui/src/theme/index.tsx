@@ -14,10 +14,12 @@ import {
 } from "../components"
 import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
+import { switchTheme } from "../components/Switch"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
 import { semanticTokens } from "./semanticTokens"
 import { shadows } from "./shadows"
+import { sizes } from "./sizes"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
 
@@ -42,6 +44,7 @@ const extendedTheme = extendTheme({
   },
   breakpoints,
   ...typography,
+  sizes,
   shadows,
   space: spacing,
   components: {
@@ -51,6 +54,7 @@ const extendedTheme = extendTheme({
     Menu: menuTheme,
     Textarea: textareaTheme,
     Tooltip: tooltipTheme,
+    Switch: switchTheme,
   },
 })
 

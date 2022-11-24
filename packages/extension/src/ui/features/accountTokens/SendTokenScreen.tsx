@@ -48,7 +48,7 @@ import { AddressBookMenu } from "../accounts/AddressBookMenu"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { TokenIconDeprecated } from "./TokenIconDeprecated"
+import { TokenIcon } from "./TokenIcon"
 import { TokenMenu } from "./TokenMenu"
 import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
@@ -403,7 +403,7 @@ export const SendTokenScreen: FC = () => {
                 style={{ padding: "17px 16px 17px 57px" }}
               >
                 <InputGroupBefore>
-                  <TokenIconDeprecated name={name} url={image} size={32} />
+                  <TokenIcon name={name} url={image} size={8} />
                 </InputGroupBefore>
                 <InputGroupAfter>
                   {inputAmount ? (

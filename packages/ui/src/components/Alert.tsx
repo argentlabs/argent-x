@@ -100,8 +100,7 @@ const sizes = {
   }),
   lg: definePartsStyle({
     container: {
-      px: 4,
-      py: "3.5",
+      p: 4,
       rounded: "xl",
     },
     title: {
