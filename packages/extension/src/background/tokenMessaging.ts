@@ -6,7 +6,7 @@ import { HandleMessage, UnhandledMessage } from "./background"
 export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
   msg,
   background: { actionQueue, wallet },
-  sendToTabAndUi,
+  respond,
 }) => {
   switch (msg.type) {
     case "REQUEST_TOKEN": {
@@ -23,7 +23,7 @@ export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
           payload: msg.data,
         })
 
-        return sendToTabAndUi({
+        return respond({
           type: "REQUEST_TOKEN_RES",
           data: {
             actionHash: meta.hash,
@@ -31,7 +31,7 @@ export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
         })
       }
 
-      return sendToTabAndUi({
+      return respond({
         type: "REQUEST_TOKEN_RES",
         data: {},
       })
