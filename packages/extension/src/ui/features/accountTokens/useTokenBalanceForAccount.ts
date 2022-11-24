@@ -1,6 +1,7 @@
 import { BigNumber } from "ethers"
 import { get } from "lodash-es"
 import { useEffect, useMemo, useRef } from "react"
+import { GatewayError } from "starknet"
 import useSWR, { SWRConfiguration } from "swr"
 
 import { getTokenBalanceForAccount } from "../../../shared/token/getTokenBalance"
@@ -116,8 +117,8 @@ const errorToMessage = (
   tokenAddress: string,
   multicallAddress?: string,
 ): TokenBalanceErrorMessage => {
-  const errorCode = get(error, "errorCode")
-  const message = get(error, "message")
+  const errorCode = get(error as GatewayError, "errorCode")
+  const message = get(error as Error, "message")
   if (errorCode === "StarknetErrorCode.UNINITIALIZED_CONTRACT") {
     /** tried to use a contract not found on this network */
     /** message like "Requested contract address 0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4 is not deployed" */

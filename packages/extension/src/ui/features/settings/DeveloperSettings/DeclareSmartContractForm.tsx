@@ -1,7 +1,7 @@
 import { Error as ErrorEl, Input, Select } from "@argent/ui"
 import { calculate_class_hash } from "@argent/x-wasm"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
-import { get, isEmpty } from "lodash-es"
+import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
@@ -75,7 +75,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     setContractClassHashComputed(false)
     setContractClassHashLoading(true)
 
-    const file: File | undefined = get(fileInputRef, "current.files[0]")
+    const file = fileInputRef.current?.files?.[0]
 
     if (file) {
       setValue("contract", file.name)
