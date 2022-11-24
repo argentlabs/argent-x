@@ -3,7 +3,7 @@ import { supportsSessions } from "@argent/x-sessions"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { AccountInterface, defaultProvider } from "starknet"
+import { AccountInterface } from "starknet"
 
 import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
@@ -15,17 +15,6 @@ import {
   silentConnectWallet,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
-
-const connectWebWallet = async (): Promise<
-  StarknetWindowObject | undefined
-> => {
-  return {
-    isConnected: true,
-    selectedAddress: "0x123",
-    account: {},
-    provider: defaultProvider,
-  } as any
-}
 
 const Home: NextPage = () => {
   const [address, setAddress] = useState<string>()
@@ -121,12 +110,6 @@ const Home: NextPage = () => {
               onClick={handleConnectClick(connectWallet)}
             >
               Connect Wallet
-            </button>
-            <button
-              className={styles.connect}
-              onClick={handleConnectClick(connectWebWallet)}
-            >
-              Connect WebWallet
             </button>
             <p>First connect wallet to use dapp.</p>
           </>
