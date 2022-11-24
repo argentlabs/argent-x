@@ -54,9 +54,11 @@ export const connect = async ({
   modalMode = "canAsk",
   storeVersion = getStoreVersionFromBrowser(),
   modalTheme,
-  alwaysShowDiscovery = true,
+  alwaysShowDiscovery = false,
   ...restOptions
 }: ConnectOptions = {}): Promise<StarknetWindowObject | null> => {
+  restOptions.sort ??= ["argentX"]
+
   const preAuthorizedWallets = await sn.getPreAuthorizedWallets({
     ...restOptions,
   })
@@ -110,7 +112,7 @@ export const connect = async ({
     lastWallet,
     preAuthorizedWallets,
     installedWallets,
-    discoveryWallets: alwaysShowDiscovery ? discoveryWalletsByStoreVersion : [],
+    discoveryWallets: discoveryWalletsByStoreVersion,
     enable: enableWithVersion,
     modalOptions: {
       theme: modalTheme,

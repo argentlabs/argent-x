@@ -13,9 +13,7 @@ export const silentConnectWallet = async () => {
 }
 
 export const connectWallet = async () => {
-  const windowStarknet = await connect({
-    include: ["argentX"],
-  })
+  const windowStarknet = await connect()
   await windowStarknet?.enable({ starknetVersion: "v4" } as any)
   return windowStarknet ?? undefined
 }
