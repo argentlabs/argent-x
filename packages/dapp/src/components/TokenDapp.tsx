@@ -5,15 +5,13 @@ import { Abi, AccountInterface, Contract, ec } from "starknet"
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
 import {
-  getErc20TokenAddress,
+  erc20TokenAddress,
   mintToken,
   parseInputAmountToUint256,
   transfer,
 } from "../services/token.service"
 import {
   addToken,
-  getExplorerBaseUrl,
-  networkId,
   signMessage,
   waitForTransaction,
 } from "../services/wallet.service"
@@ -63,20 +61,19 @@ export const TokenDapp: FC<{
     })()
   }, [transactionStatus, lastTransactionHash])
 
-  const network = networkId()
-  if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
-    return (
-      <>
-        <p>
-          There is no demo token for this network, but you can deploy one and
-          add its address to this file:
-        </p>
-        <div>
-          <pre>packages/dapp/src/token.service.ts</pre>
-        </div>
-      </>
-    )
-  }
+  // if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
+  //   return (
+  //     <>
+  //       <p>
+  //         There is no demo token for this network, but you can deploy one and
+  //         add its address to this file:
+  //       </p>
+  //       <div>
+  //         <pre>packages/dapp/src/token.service.ts</pre>
+  //       </div>
+  //     </>
+  //   )
+  // }
 
   const handleMintSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,7 +81,7 @@ export const TokenDapp: FC<{
       setTransactionStatus("approve")
 
       console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount, network)
+      const result = await mintToken(mintAmount)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -101,7 +98,7 @@ export const TokenDapp: FC<{
       setTransactionStatus("approve")
 
       console.log("transfer", { transferTo, transferAmount })
-      const result = await transfer(transferTo, transferAmount, network)
+      const result = await transfer(transferTo, transferAmount)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -137,7 +134,7 @@ export const TokenDapp: FC<{
         expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
         policies: [
           {
-            contractAddress: getErc20TokenAddress(network),
+            contractAddress: erc20TokenAddress,
             selector: "transfer",
           },
         ],
@@ -163,7 +160,7 @@ export const TokenDapp: FC<{
       }
       const erc20Contract = new Contract(
         Erc20Abi as Abi,
-        getErc20TokenAddress(network),
+        erc20TokenAddress,
         sessionAccount,
       )
 
@@ -180,7 +177,6 @@ export const TokenDapp: FC<{
       setTransactionStatus("idle")
     }
   }
-  const tokenAddress = getErc20TokenAddress(network as any)
 
   return (
     <>
@@ -191,7 +187,7 @@ export const TokenDapp: FC<{
         <h3 style={{ margin: 0 }}>
           Transaction hash:{" "}
           <a
-            href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
+            // href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
             target="_blank"
             rel="noreferrer"
             style={{ color: "blue", margin: "0 0 1em" }}
@@ -325,7 +321,7 @@ export const TokenDapp: FC<{
           style={{ marginLeft: ".6em" }}
           onClick={async () => {
             try {
-              await addToken(tokenAddress)
+              await addToken(erc20TokenAddress)
               setAddTokenError("")
             } catch (error: any) {
               setAddTokenError(error.message)
@@ -338,10 +334,10 @@ export const TokenDapp: FC<{
         <code>
           <a
             target="_blank"
-            href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
+            // href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
             rel="noreferrer"
           >
-            {truncateAddress(tokenAddress)}
+            {truncateAddress(erc20TokenAddress)}
           </a>
         </code>
       </h3>

@@ -74,14 +74,6 @@ body {
   padding: 0;
 }
 
-footer,
-header,
-main {
-  margin: 0 auto;
-  max-width: var(--width-content);
-  padding: 3rem 1rem;
-}
-
 hr {
   background-color: var(--color-bg-secondary);
   border: none;
