@@ -149,11 +149,7 @@ export const SettingsScreen: FC = () => {
         </CellStack>
         <Box bg="neutrals.900" position="fixed" bottom="0" left="0" right="0">
           <Link onClick={stopSession} to={routes.lockScreen()}>
-            <SpacerCell
-              borderTop="solid 1px"
-              borderTopColor="neutrals.700"
-              h="4"
-            />
+            <SpacerCell borderTop="solid 1px" borderColor="border" h="4" />
             <Flex
               py={2}
               gap={2}
