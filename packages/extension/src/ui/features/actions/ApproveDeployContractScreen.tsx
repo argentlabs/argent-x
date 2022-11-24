@@ -1,5 +1,6 @@
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
+import { UniversalDeployerContractPayload } from "starknet"
 
 import {
   Field,
@@ -16,21 +17,14 @@ import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 export interface ApproveDeployContractScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
-  classHash: string
-  salt: string
-  unique: boolean
-  constructorCalldata: any
-  /* TODO: add types */
+  deployPayload: UniversalDeployerContractPayload
   onSubmit: () => void
 }
 
 const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
   selectedAccount,
   actionHash,
-  classHash,
-  salt,
-  unique,
-  constructorCalldata,
+  deployPayload: { classHash, salt, unique, constructorCalldata },
   onSubmit,
   ...props
 }) => {

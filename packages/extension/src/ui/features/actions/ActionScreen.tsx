@@ -290,7 +290,7 @@ export const ActionScreen: FC = () => {
           {/* TODO: move into single component for udc */}
           <ApproveDeployContractScreen
             actionHash={action.meta.hash}
-            {...action.payload}
+            deployPayload={action.payload}
             onSubmit={async () => {
               analytics.track("signedTransaction", {
                 networkId: account?.networkId || "unknown",

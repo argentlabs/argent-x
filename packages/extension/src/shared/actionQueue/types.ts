@@ -3,6 +3,7 @@ import type {
   Call,
   DeclareContractPayload,
   InvocationsDetails,
+  UniversalDeployerContractPayload,
   typedData,
 } from "starknet"
 
@@ -84,12 +85,7 @@ export type ActionItem =
     }
   | {
       type: "DEPLOY_CONTRACT_ACTION"
-      payload: {
-        classHash: string
-        constructorCalldata: any // TODO: type
-        salt: string
-        unique: boolean
-      }
+      payload: UniversalDeployerContractPayload
     }
 
 export type ExtensionActionItem = ExtQueueItem<ActionItem>
