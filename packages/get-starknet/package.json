@@ -18,7 +18,7 @@
     "@rollup/plugin-commonjs": "^23.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "rollup": "^3.1.0",
-    "rollup-plugin-esbuild": "^4.9.1",
+    "rollup-plugin-esbuild": "^5.0.0",
     "rollup-plugin-generate-declarations": "^1.1.1",
     "starknet": "^4.9.0",
     "tslib": "^2.0.0",
