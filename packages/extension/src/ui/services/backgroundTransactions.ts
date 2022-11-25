@@ -35,7 +35,6 @@ export const getAccountDeploymentEstimatedFee = async (
   ])
 
   if ("error" in response) {
-    console.error(response.error)
     throw response.error
   }
 
@@ -51,7 +50,6 @@ export const getDeclareContractEstimatedFee = async (data: DeclareContract) => {
   ])
 
   if ("error" in response) {
-    console.error(response.error)
     throw response.error
   }
 
@@ -69,7 +67,6 @@ export const getDeployContractEstimatedFee = async (
   ])
 
   if ("error" in response) {
-    console.error(response.error)
     throw response.error
   }
 

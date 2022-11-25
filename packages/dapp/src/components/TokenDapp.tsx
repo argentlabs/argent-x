@@ -1,7 +1,6 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
-import { Abi, AccountInterface, Contract } from "starknet"
-import { ec } from "starknet"
+import { Abi, AccountInterface, Contract, ec } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"

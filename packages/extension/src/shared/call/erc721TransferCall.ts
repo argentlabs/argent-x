@@ -1,5 +1,4 @@
-import { Call, validateAndParseAddress } from "starknet"
-import { number, uint256 } from "starknet"
+import { Call, number, uint256, validateAndParseAddress } from "starknet"
 
 import { normalizeAddress } from "../../ui/services/addresses"
 
