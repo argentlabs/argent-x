@@ -43,8 +43,6 @@ import {
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
 
-console.log(hash)
-
 const { calculateContractAddressFromHash, getSelectorFromName } = hash
 
 const isDev = process.env.NODE_ENV === "development"
