@@ -3,7 +3,6 @@ import { Transaction } from "../../../../../shared/transactions"
 import { ActivityTransaction } from "../../useActivity"
 import { TransformedTransaction } from "../type"
 import dateTransformer from "./transformers/dateTransformer"
-import declareContract from "./transformers/declareContractTransformer"
 import defaultDisplayNameTransformer from "./transformers/defaultDisplayNameTransformer"
 import knownDappTransformer from "./transformers/knownDappTransformer"
 import nftTransferTransformer from "./transformers/nftTransferTransformer"
@@ -20,7 +19,6 @@ const preTransformers = [
 
 /** all are executed until one returns */
 const mainTransformers = [
-  declareContract,
   nftTransferTransformer,
   tokenMintTransformer,
   tokenTransferTransformer,
