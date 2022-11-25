@@ -185,7 +185,14 @@ export const DeclareContractFeeEstimation: FC<
             </ExtendableControl>
           </FieldError>
 
-          <Collapse in={feeEstimateExpanded} timeout="auto">
+          <Collapse
+            in={feeEstimateExpanded}
+            timeout="auto"
+            style={{
+              maxHeight: "80vh",
+              overflow: "auto",
+            }}
+          >
             {parsedFeeEstimationError && (
               <CopyTooltip
                 copyValue={parsedFeeEstimationError}
