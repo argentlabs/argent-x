@@ -34,7 +34,7 @@ import { handleTokenMessaging } from "./tokenMessaging"
 import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
-import { handleUdpMessaging } from "./udpMessaging"
+import { handleUdcMessaging } from "./udcMessaging"
 import { Wallet, sessionStore, walletStore } from "./wallet"
 
 browser.alarms.create("core:transactionTracker:history", {
@@ -86,7 +86,7 @@ const handlers = [
   handleSessionMessage,
   handleTransactionMessage,
   handleTokenMessaging,
-  handleUdpMessaging,
+  handleUdcMessaging,
 ] as Array<HandleMessage<MessageType>>
 
 getAccounts()

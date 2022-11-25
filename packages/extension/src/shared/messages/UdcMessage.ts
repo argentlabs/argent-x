@@ -1,6 +1,8 @@
-import { DeclareContract, DeployContract } from "./../udp/type"
+import { ContractClass } from "starknet"
 
-export type UdpMessage =
+import { DeclareContract, DeployContract } from "../udc/type"
+
+export type UdcMessage =
   | { type: "REQUEST_DECLARE_CONTRACT"; data: DeclareContract }
   | { type: "REQUEST_DECLARE_CONTRACT_RES"; data: { actionHash: string } }
   | {
@@ -31,4 +33,23 @@ export type UdpMessage =
       type: "REQUEST_DEPLOY_CONTRACT_REJ"
       data: { actionHash: string; error?: string }
     }
-  | { type: "APPROVE_REQUEST_DEPLOY_CONTRACT"; data: { actionHash: string } }
+  | {
+      type: "DEPLOY_CONTRACT_ACTION_SUBMITTED"
+      data: { txHash: string; actionHash: string }
+    }
+  | {
+      type: "DEPLOY_CONTRACT_ACTION_FAILED"
+      data: { actionHash: string; error?: string }
+    }
+  | {
+      type: "FETCH_CONSTRUCTOR_PARAMS"
+      data: { classHash: string; networkId: string }
+    }
+  | {
+      type: "FETCH_CONSTRUCTOR_PARAMS_RES"
+      data: { contract: ContractClass }
+    }
+  | {
+      type: "FETCH_CONSTRUCTOR_PARAMS_REJ"
+      data: { error?: string }
+    }

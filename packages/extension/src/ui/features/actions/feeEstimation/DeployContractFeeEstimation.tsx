@@ -32,19 +32,21 @@ import {
   StyledInfoRoundedIcon,
   StyledReportGmailerrorredRoundedIcon,
 } from "./styled"
-import { DeclareContractFeeEstimationProps } from "./types"
-import { getTooltipText, useMaxDeclareContractFeeEstimation } from "./utils"
+import { DeployContractFeeEstimationProps } from "./types"
+import { getTooltipText, useMaxDeployContractFeeEstimation } from "./utils"
 import { getParsedError } from "./utils"
 
-export const DeclareContractFeeEstimation: FC<
-  DeclareContractFeeEstimationProps
+export const DeployContractFeeEstimation: FC<
+  DeployContractFeeEstimationProps
 > = ({
   accountAddress,
   actionHash,
   onErrorChange,
   networkId,
   classHash,
-  contract,
+  salt,
+  unique,
+  constructorCalldata,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
@@ -55,12 +57,12 @@ export const DeclareContractFeeEstimation: FC<
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
-  const { fee, error } = useMaxDeclareContractFeeEstimation(
+  const { fee, error } = useMaxDeployContractFeeEstimation(
     {
-      address: accountAddress,
-      networkId,
       classHash,
-      contract,
+      salt,
+      unique,
+      constructorCalldata,
     },
     actionHash,
   )
@@ -84,7 +86,7 @@ export const DeclareContractFeeEstimation: FC<
   const feeToken = getFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
-    fee?.declareFee,
+    fee?.deployFee,
   )
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
@@ -124,12 +126,12 @@ export const DeclareContractFeeEstimation: FC<
                   ~
                   {feeToken ? (
                     prettifyTokenAmount({
-                      amount: fee.declareFee,
+                      amount: fee.deployFee,
                       decimals: feeToken.decimals,
                       symbol: feeToken.symbol,
                     })
                   ) : (
-                    <>{fee.declareFee} Unknown</>
+                    <>{fee.deployFee} Unknown</>
                   )}
                 </FeeEstimationValue>
               )}
@@ -185,14 +187,7 @@ export const DeclareContractFeeEstimation: FC<
             </ExtendableControl>
           </FieldError>
 
-          <Collapse
-            in={feeEstimateExpanded}
-            timeout="auto"
-            style={{
-              maxHeight: "80vh",
-              overflow: "auto",
-            }}
-          >
+          <Collapse in={feeEstimateExpanded} timeout="auto">
             {parsedFeeEstimationError && (
               <CopyTooltip
                 copyValue={parsedFeeEstimationError}

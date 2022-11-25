@@ -1,3 +1,5 @@
+import { ContractClass } from "starknet"
+
 import { sendMessage, waitForMessage } from "../../shared/messages"
 
 export const declareContract = async (
@@ -27,13 +29,32 @@ export const declareContract = async (
   }
 }
 
-/* TODO: complete */
-export const deployContract = async (address: string, networkId: string) => {
+interface DeployContractService {
+  address: string
+  networkId: string
+  classHash: string
+  constructorCalldata: any
+  salt: string
+  unique: boolean
+}
+
+export const deployContract = async ({
+  address,
+  networkId,
+  classHash,
+  constructorCalldata,
+  salt,
+  unique,
+}: DeployContractService) => {
   sendMessage({
     type: "REQUEST_DEPLOY_CONTRACT",
     data: {
       address,
       networkId,
+      classHash,
+      constructorCalldata,
+      salt,
+      unique,
     },
   })
   try {
@@ -45,5 +66,29 @@ export const deployContract = async (address: string, networkId: string) => {
     ])
   } catch {
     throw Error("Could not declare contract")
+  }
+}
+
+export const fetchConstructorParams = async (
+  classHash: string,
+  networkId: string,
+): Promise<ContractClass> => {
+  sendMessage({
+    type: "FETCH_CONSTRUCTOR_PARAMS",
+    data: {
+      classHash,
+      networkId,
+    },
+  })
+  try {
+    const result = await Promise.race([
+      waitForMessage("FETCH_CONSTRUCTOR_PARAMS_RES"),
+      waitForMessage("FETCH_CONSTRUCTOR_PARAMS_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+    return result.contract
+  } catch {
+    throw Error("Could not fetch contract constructor params")
   }
 }

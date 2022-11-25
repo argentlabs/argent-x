@@ -1,6 +1,6 @@
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { CompiledContract } from "starknet"
+import { UniversalDeployerContractPayload } from "starknet"
 
 import {
   Field,
@@ -11,26 +11,24 @@ import {
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
-import { DeclareContractFeeEstimation } from "./feeEstimation/DeclareContractFeeEstimation"
+import { DeployContractFeeEstimation } from "./feeEstimation/DeployContractFeeEstimation"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 
-export interface ApproveDeclareContractScreenProps
+export interface ApproveDeployContractScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
-  classHash: string
-  contract: string | CompiledContract
+  deployPayload: UniversalDeployerContractPayload
   onSubmit: () => void
 }
 
-const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
+const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
   selectedAccount,
   actionHash,
-  classHash,
-  contract,
+  deployPayload: { classHash, salt, unique, constructorCalldata },
   onSubmit,
   ...props
 }) => {
-  usePageTracking("signDeclareTransaction", {
+  usePageTracking("signDeployTransaction", {
     networkId: selectedAccount?.networkId || "unknown",
   })
 
@@ -42,20 +40,22 @@ const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
 
   return (
     <ConfirmScreen
-      title="Review declare"
+      title="Review deploy"
       confirmButtonText="Approve"
       confirmButtonDisabled={disableConfirm}
       selectedAccount={selectedAccount}
       onSubmit={onSubmit}
       showHeader={false}
       footer={
-        <DeclareContractFeeEstimation
+        <DeployContractFeeEstimation
           onErrorChange={setDisableConfirm}
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
           actionHash={actionHash}
           classHash={classHash}
-          contract={contract}
+          salt={salt}
+          unique={unique}
+          constructorCalldata={constructorCalldata}
         />
       }
       {...props}
@@ -75,4 +75,4 @@ const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
   )
 }
 
-export { ApproveDeclareContractScreen }
+export { ApproveDeployContractScreen }
