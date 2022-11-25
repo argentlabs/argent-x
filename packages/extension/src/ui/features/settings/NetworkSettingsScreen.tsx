@@ -1,6 +1,7 @@
 import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
+import { AlertDialog } from "@argent/ui"
 import { isEqual } from "lodash-es"
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -18,6 +19,7 @@ import { P } from "../../theme/Typography"
 import { useCustomNetworks, useNetworks } from "../networks/useNetworks"
 import { DappConnection } from "./DappConnection"
 import { useSelectedNetwork } from "./selectedNetwork.state"
+import { validateRemoveNetwork } from "./validateRemoveNetwork"
 
 const IconButtonCenter = styled(IconButton)`
   margin: 0 auto;
@@ -69,57 +71,88 @@ export const NetworkSettingsScreen: FC = () => {
   const navigate = useNavigate()
   const [, setSelectedCustomNetwork] = useSelectedNetwork()
   const customNetworks = useCustomNetworks()
+  const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   const isDefaultCustomNetworks = useMemo(() => {
     return isEqual(customNetworks, defaultCustomNetworks)
   }, [customNetworks])
 
+  const removeNetworkClick = useCallback(async (networkId: string) => {
+    try {
+      const shouldRemoveNetwork = await validateRemoveNetwork(networkId)
+      if (shouldRemoveNetwork) {
+        await removeNetwork(networkId)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message)
+        setAlertDialogIsOpen(true)
+      } else {
+        // unexpected, throw to error boundary
+        throw error
+      }
+    }
+  }, [])
+
+  const onCancel = useCallback(() => {
+    setAlertDialogIsOpen(false)
+  }, [])
+
   return (
-    <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
-      title={"Networks"}
-    >
-      <CellStack>
-        {!allNetworks ? (
-          <Spinner />
-        ) : allNetworks.length === 0 ? (
-          <P>No custom networks found</P>
-        ) : (
-          allNetworks.map((network) => (
-            <DappConnection
-              key={network.id}
-              host={network.name}
-              onClick={() => {
-                setSelectedCustomNetwork(network)
-                navigate(routes.settingsEditCustomNetwork())
-              }}
-              hideRemove={network.readonly}
-              onRemoveClick={async () => {
-                await removeNetwork(network.id)
-              }}
-            />
-          ))
+    <>
+      <AlertDialog
+        isOpen={alertDialogIsOpen}
+        title={"Cannot remove"}
+        message={errorMessage}
+        onCancel={onCancel}
+      />
+      <NavigationContainer
+        leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+        title={"Networks"}
+      >
+        <CellStack>
+          {!allNetworks ? (
+            <Spinner />
+          ) : allNetworks.length === 0 ? (
+            <P>No custom networks found</P>
+          ) : (
+            allNetworks.map((network) => (
+              <DappConnection
+                key={network.id}
+                host={network.name}
+                onClick={() => {
+                  setSelectedCustomNetwork(network)
+                  navigate(routes.settingsEditCustomNetwork())
+                }}
+                hideRemove={network.readonly}
+                onRemoveClick={() => {
+                  removeNetworkClick(network.id)
+                }}
+              />
+            ))
+          )}
+        </CellStack>
+
+        <Link to={routes.settingsAddCustomNetwork()}>
+          <IconButtonCenter size={48} style={{ marginTop: "32px" }}>
+            <AddIcon fontSize="large" />
+          </IconButtonCenter>
+        </Link>
+
+        {!isDefaultCustomNetworks && (
+          <Footer>
+            <RestoreDefaultsButton
+              onClick={async () => await restoreDefaultCustomNetworks()}
+            >
+              <RestoreDefaultsButtonIcon>
+                <RefreshIcon fontSize="inherit" />
+              </RestoreDefaultsButtonIcon>
+              <div>Restore default networks</div>
+            </RestoreDefaultsButton>
+          </Footer>
         )}
-      </CellStack>
-
-      <Link to={routes.settingsAddCustomNetwork()}>
-        <IconButtonCenter size={48} style={{ marginTop: "32px" }}>
-          <AddIcon fontSize="large" />
-        </IconButtonCenter>
-      </Link>
-
-      {!isDefaultCustomNetworks && (
-        <Footer>
-          <RestoreDefaultsButton
-            onClick={async () => await restoreDefaultCustomNetworks()}
-          >
-            <RestoreDefaultsButtonIcon>
-              <RefreshIcon fontSize="inherit" />
-            </RestoreDefaultsButtonIcon>
-            <div>Restore default networks</div>
-          </RestoreDefaultsButton>
-        </Footer>
-      )}
-    </NavigationContainer>
+      </NavigationContainer>
+    </>
   )
 }
