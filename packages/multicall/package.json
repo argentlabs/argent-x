@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-multicall",
-  "version": "5.0.7",
+  "version": "5.0.8",
   "description": "A library for batched calls to Starknet smart contracts",
   "keywords": [
     "starknet",
