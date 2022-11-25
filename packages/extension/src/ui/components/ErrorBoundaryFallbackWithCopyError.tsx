@@ -210,7 +210,15 @@ ${displayStack}
             />
           </ShowLogsToggle>
         </ErrorLogsContainer>
-        <Collapse in={viewLogs} timeout="auto" style={{ borderRadius: "8px" }}>
+        <Collapse
+          in={viewLogs}
+          timeout="auto"
+          style={{
+            maxHeight: "80vh",
+            overflow: "auto",
+            borderRadius: "8px",
+          }}
+        >
           <Logs>
             <pre style={{ whiteSpace: "pre-wrap", lineBreak: "anywhere" }}>
               {errorPayload}

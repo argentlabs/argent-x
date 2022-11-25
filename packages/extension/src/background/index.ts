@@ -150,20 +150,19 @@ messageStream.subscribe(async ([msg, sender]) => {
   const isSafeOrigin = sender.origin === `chrome-extension://${extensionId}`
 
   if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
-    if (!safeMessages.includes(msg.type)) {
-      console.warn(
-        "message received from unknown origin is trying to use unsafe method",
-      )
-      return // this return must not be removed
-    }
+    console.warn(
+      "message received from unknown origin is trying to use unsafe method",
+    )
+    return // this return must not be removed
+  }
 
-    // forward UI messages to rest of the tabs
-    if (!hasTab(sender.tab?.id)) {
-      sendMessageToActiveTabs(msg)
-    }
+  // forward UI messages to rest of the tabs
+  if (isSafeOrigin && hasTab(sender.tab?.id)) {
+    sendMessageToActiveTabs(msg)
   }
 
   const respond = async (msg: MessageType) => {
+    console.log("respond", msg)
     if (safeMessages.includes(msg.type)) {
       sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
     } else {
