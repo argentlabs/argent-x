@@ -67,6 +67,7 @@ describe("transformTransaction", () => {
         {
           "action": "TRANSFER",
           "amount": "1000000000000",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Transfer",
@@ -99,6 +100,7 @@ describe("transformTransaction", () => {
         {
           "action": "MINT",
           "amount": "1000000000000000000000",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
@@ -127,6 +129,7 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "TRANSFER",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x03090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Transfer NFT",
@@ -148,6 +151,7 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "DEPLOY",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x0000...0000",
           "dapp": {
             "hosts": [
@@ -172,6 +176,7 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "DEPLOY",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x0000...0000",
           "dapp": {
             "hosts": [
@@ -196,6 +201,7 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "DEPLOY",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x0000...0000",
           "dapp": {
             "hosts": [
@@ -221,6 +227,7 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "DEPLOY",
+          "classHash": "0x0000...0000",
           "contractAddress": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
