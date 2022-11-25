@@ -86,7 +86,7 @@ export const DeployContractFeeEstimation: FC<
   const feeToken = getFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
-    fee?.accountDeploymentFee,
+    fee?.deployFee,
   )
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
@@ -126,12 +126,12 @@ export const DeployContractFeeEstimation: FC<
                   ~
                   {feeToken ? (
                     prettifyTokenAmount({
-                      amount: fee.accountDeploymentFee,
+                      amount: fee.deployFee,
                       decimals: feeToken.decimals,
                       symbol: feeToken.symbol,
                     })
                   ) : (
-                    <>{fee.accountDeploymentFee} Unknown</>
+                    <>{fee.deployFee} Unknown</>
                   )}
                 </FeeEstimationValue>
               )}

@@ -131,7 +131,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
           value: "",
         })) || [],
       )
-    } catch (error) {
+    } catch {
       resetAbiFields()
       setFetchError("Contract classhash not found in this network")
     } finally {

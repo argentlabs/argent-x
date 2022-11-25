@@ -21,6 +21,15 @@ export interface AccountDeploymentEstimateFeeResponse {
   maxADFee: string
 }
 
+export interface UdcDeclareEstimateFeeResponse {
+  declareFee: string
+  maxADFee: string
+}
+export interface UdcDeployEstimateFeeResponse {
+  deployFee: string
+  maxADFee: string
+}
+
 export interface ExecuteTransactionRequest {
   transactions: Call | Call[]
   abis?: Abi[]
@@ -58,7 +67,7 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES"
-      data: any
+      data: UdcDeclareEstimateFeeResponse
     }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE"
@@ -67,5 +76,5 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
-      data: any
+      data: UdcDeployEstimateFeeResponse
     }

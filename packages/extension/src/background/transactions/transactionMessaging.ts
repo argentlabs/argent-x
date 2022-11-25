@@ -145,7 +145,7 @@ export const handleTransactionMessage: HandleMessage<
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
           data: {
-            accountDeploymentFee: number.toHex(overall_fee),
+            declareFee: number.toHex(overall_fee),
             maxADFee,
           },
         })
@@ -187,18 +187,18 @@ export const handleTransactionMessage: HandleMessage<
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
           data: {
-            accountDeploymentFee: number.toHex(overall_fee),
+            deployFee: number.toHex(overall_fee),
             maxADFee,
           },
         })
       } catch (error) {
         console.log(error)
         return respond({
-          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ",
           data: {
             error:
-              (error as any)?.message?.toString?.() ??
-              (error as any)?.toString?.() ??
+              (error as any)?.message?.toString() ??
+              (error as any)?.toString() ??
               "Unkown error",
           },
         })
