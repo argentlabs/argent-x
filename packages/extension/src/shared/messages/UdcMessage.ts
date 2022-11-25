@@ -1,3 +1,5 @@
+import { ContractClass } from "starknet"
+
 import { DeclareContract, DeployContract } from "../udc/type"
 
 export type UdcMessage =
@@ -45,7 +47,7 @@ export type UdcMessage =
     }
   | {
       type: "FETCH_CONSTRUCTOR_PARAMS_RES"
-      data: { contract: any } /* TODO:type */
+      data: { contract: ContractClass }
     }
   | {
       type: "FETCH_CONSTRUCTOR_PARAMS_REJ"
