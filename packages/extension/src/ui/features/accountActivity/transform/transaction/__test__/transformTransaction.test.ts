@@ -68,7 +68,6 @@ describe("transformTransaction", () => {
           "action": "TRANSFER",
           "amount": "1000000000000",
           "classHash": "0x0000...0000",
-          "contractAddress": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Transfer",
           "entity": "TOKEN",
@@ -101,7 +100,6 @@ describe("transformTransaction", () => {
           "action": "MINT",
           "amount": "1000000000000000000000",
           "classHash": "0x0000...0000",
-          "contractAddress": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
           "entity": "TOKEN",
@@ -150,9 +148,8 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DEPLOY",
+          "action": "DECLARE",
           "classHash": "0x0000...0000",
-          "contractAddress": "0x0000...0000",
           "dapp": {
             "hosts": [
               "testnet.app.alpharoad.fi",
@@ -175,9 +172,8 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DEPLOY",
+          "action": "DECLARE",
           "classHash": "0x0000...0000",
-          "contractAddress": "0x0000...0000",
           "dapp": {
             "hosts": [
               "app.testnet.jediswap.xyz",
@@ -200,9 +196,8 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DEPLOY",
+          "action": "DECLARE",
           "classHash": "0x0000...0000",
-          "contractAddress": "0x0000...0000",
           "dapp": {
             "hosts": [
               "www.myswap.xyz",
@@ -226,9 +221,8 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DEPLOY",
+          "action": "DECLARE",
           "classHash": "0x0000...0000",
-          "contractAddress": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
           "entity": "CONTRACT",
