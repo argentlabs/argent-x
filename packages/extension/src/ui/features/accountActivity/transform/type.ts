@@ -14,6 +14,8 @@ export type TransformedTransactionAction =
   | "APPROVE"
   | "DECLARE"
   | "DEPLOY"
+  | "ADD"
+  | "REMOVE"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -22,6 +24,7 @@ export type TransformedTransactionEntity =
   | "TOKEN"
   | "NFT"
   | "CONTRACT"
+  | "GUARDIAN"
 
 export interface BaseTransformedTransaction {
   action: TransformedTransactionAction
@@ -99,6 +102,11 @@ export interface DeployContractTransaction extends BaseTransformedTransaction {
   contractAddress: string
 }
 
+export interface ChangeGuardianTransaction extends BaseTransformedTransaction {
+  action: "ADD" | "REMOVE"
+  entity: "GUARDIAN"
+}
+
 export type TransformedTransaction =
   | BaseTransformedTransaction
   | TokenTransferTransaction
@@ -109,3 +117,4 @@ export type TransformedTransaction =
   | SwapTransaction
   | DeclareContractTransaction
   | DeployContractTransaction
+  | ChangeGuardianTransaction

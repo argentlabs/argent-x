@@ -23,10 +23,10 @@ import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import { useActions } from "./features/actions/actions.state"
-import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
+import { MaybeShieldActionScreen } from "./features/actions/MaybeShieldActionScreen"
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
@@ -65,6 +65,13 @@ import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
+import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
+import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
+import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
+import { ShieldAccountOTPScreen } from "./features/shield/ShieldAccountOTPScreen"
+import { ShieldAccountStartScreen } from "./features/shield/ShieldAccountStartScreen"
+import { ShieldActionEmailScreen } from "./features/shield/ShieldActionEmailScreen"
+import { ShieldActionOTPScreen } from "./features/shield/ShieldActionOTPScreen"
 import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
@@ -102,6 +109,14 @@ const nonWalletRoutes = (
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
+    />
+    <Route
+      path={routes.shieldActionEmail.path}
+      element={<ShieldActionEmailScreen />}
+    />
+    <Route
+      path={routes.shieldActionOTP.path}
+      element={<ShieldActionOTPScreen />}
     />
   </>
 )
@@ -154,6 +169,31 @@ const walletRoutes = (
       presentation="push"
       path={routes.editAccount.path}
       element={<AccountEditScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountStart.path}
+      element={<ShieldAccountStartScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountEmail.path}
+      element={<ShieldAccountEmailScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountOTP.path}
+      element={<ShieldAccountOTPScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountAction.path}
+      element={<ShieldAccountActionScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountFinish.path}
+      element={<ShieldAccountFinishScreen />}
     />
     <Route
       presentation="modal"
@@ -394,7 +434,7 @@ export const AppRoutes: FC = () => {
   if (showActions) {
     return (
       <ResponsiveContainer>
-        <ActionScreen />
+        <MaybeShieldActionScreen />
       </ResponsiveContainer>
     )
   }

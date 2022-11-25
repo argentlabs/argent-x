@@ -31,6 +31,7 @@ import { initOnboarding } from "./onboarding"
 import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
+import { handleShieldMessage } from "./shieldMessaging"
 import { handleTokenMessaging } from "./tokenMessaging"
 import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
@@ -88,6 +89,7 @@ const handlers = [
   handleTransactionMessage,
   handleTokenMessaging,
   handleUdcMessaging,
+  handleShieldMessage,
 ] as Array<HandleMessage<MessageType>>
 
 getAccounts()

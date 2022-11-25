@@ -8,6 +8,7 @@
     "@sentry/webpack-plugin": "^1.18.9",
     "@svgr/webpack": "^6.0.0",
     "@testing-library/react": "^13.3.0",
+    "@types/async-retry": "^1.4.5",
     "@types/chrome": "^0.0.200",
     "@types/lodash-es": "^4.17.6",
     "@types/object-hash": "^3.0.2",
@@ -88,9 +89,12 @@
     "@sentry/react": "^7.6.0",
     "@sentry/tracing": "^7.6.0",
     "@tippyjs/react": "^4.2.6",
+    "async-retry": "^1.3.3",
     "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
     "colord": "^2.9.2",
+    "dexie": "^3.2.2",
+    "dexie-react-hooks": "^1.1.1",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",
     "lodash-es": "^4.17.21",
@@ -118,6 +122,7 @@
     "url-join": "^5.0.0",
     "webextension-polyfill": "^0.10.0",
     "yup": "^1.0.0-beta.4",
+    "zod": "^3.19.1",
     "zustand": "^3.6.5"
   }
 }

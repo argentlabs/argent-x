@@ -82,6 +82,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         accountAddress={account.address}
         networkId={account.networkId}
         accountType={account.type}
+        isShield={Boolean(account.guardian)}
         avatarOutlined={status.code === "CONNECTED"}
         deploying={status.code === "DEPLOYING"}
         upgrade={needsUpgrade}

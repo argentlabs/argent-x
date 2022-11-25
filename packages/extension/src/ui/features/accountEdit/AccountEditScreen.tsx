@@ -4,11 +4,12 @@ import {
   CellStack,
   NavigationContainer,
   SpacerCell,
+  Switch,
   icons,
 } from "@argent/ui"
 import { Center, Flex, Image } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
@@ -30,7 +31,7 @@ import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon } = icons
+const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -135,6 +136,23 @@ export const AccountEditScreen: FC = () => {
               <AddressCopyButton address={accountAddress} />
             </Center>
           </Flex>
+          <SpacerCell />
+          <ButtonCell
+            as={Link}
+            to={routes.shieldAccountStart(accountAddress)}
+            leftIcon={<ShieldIcon />}
+            rightIconOpaque
+            rightIcon={
+              <Switch
+                isChecked={Boolean(account?.guardian)}
+                onChange={() =>
+                  navigate(routes.shieldAccountStart(accountAddress))
+                }
+              />
+            }
+          >
+            Argent Shield
+          </ButtonCell>
           <SpacerCell />
           <ButtonCell
             onClick={() =>

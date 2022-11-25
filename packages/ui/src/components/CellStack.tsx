@@ -32,9 +32,14 @@ export const HeaderCell = chakra(H6, {
   },
 })
 
+export interface ButtonCellProps extends ComponentProps<typeof Button> {
+  rightIconOpaque?: boolean
+}
+
 export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
   leftIcon,
   rightIcon = <ChevronRightIcon />,
+  rightIconOpaque,
   children,
   ...rest
 }) => {
@@ -51,7 +56,7 @@ export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
       {leftIcon && <Flex fontSize="base">{leftIcon}</Flex>}
       <H6>{children}</H6>
       {rightIcon && (
-        <Flex ml={"auto"} fontSize="base" opacity={0.6}>
+        <Flex ml={"auto"} fontSize="base" opacity={rightIconOpaque ? 1 : 0.6}>
           {rightIcon}
         </Flex>
       )}

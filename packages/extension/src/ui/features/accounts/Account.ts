@@ -18,6 +18,7 @@ export interface AccountConstructorProps {
   network: Network
   signer: WalletAccountSigner
   type: ArgentAccountType
+  guardian?: string | undefined
   deployTransaction?: string
   hidden?: boolean
   needsDeploy?: boolean
@@ -30,6 +31,7 @@ export class Account {
   networkId: string
   signer: WalletAccountSigner
   type: ArgentAccountType
+  guardian?: string | undefined
   deployTransaction?: string
   contract: Contract
   proxyContract: Contract
@@ -42,6 +44,7 @@ export class Account {
     network,
     signer,
     type,
+    guardian,
     deployTransaction,
     hidden,
     needsDeploy = false,
@@ -56,6 +59,7 @@ export class Account {
     this.deployTransaction = deployTransaction
     this.needsDeploy = needsDeploy
     this.type = type
+    this.guardian = guardian
     this.provider = getProvider(network)
     this.contract =
       contract ??
@@ -122,18 +126,21 @@ export class Account {
       network,
       signer: result.account.signer,
       type: result.account.type,
+      guardian: result.account.guardian,
       needsDeploy: result.account.needsDeploy,
     })
   }
 
   public toWalletAccount(): WalletAccount {
-    const { networkId, address, network, signer, type, needsDeploy } = this
+    const { networkId, address, network, signer, type, guardian, needsDeploy } =
+      this
     return {
       networkId,
       address,
       network,
       signer,
       type,
+      guardian,
       needsDeploy,
     }
   }

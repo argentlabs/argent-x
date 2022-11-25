@@ -16,6 +16,7 @@ import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
 import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
+import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
 import {
@@ -39,6 +40,7 @@ import {
   declareContracts,
   getPreDeployedAccount,
 } from "./devnet/declareAccounts"
+import { GuardianSigner } from "./GuardianSigner"
 import {
   getIndexForPath,
   getNextPathIndex,
@@ -293,9 +295,15 @@ export class Wallet {
 
     try {
       const accountWithTypes = await getAccountTypesFromChain(accounts)
-      return accountWithTypes
+      const accountWithTypesAndGuardians = await getAccountGuardiansFromChain(
+        accountWithTypes,
+      )
+      return accountWithTypesAndGuardians
     } catch (error) {
-      console.error("Error getting account types from chain", error)
+      console.error(
+        "Error getting account types or guardians from chain",
+        error,
+      )
       return accounts
     }
   }
@@ -372,6 +380,8 @@ export class Wallet {
       network,
       offset,
     )
+
+    console.log({ accounts })
 
     await this.walletStore.push(accounts)
   }
@@ -646,17 +656,25 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
+    const keyPairOrSigner = account.guardian
+      ? new GuardianSigner(keyPair)
+      : keyPair
+
     if (account.needsDeploy || useLatest) {
-      return new Account(provider, account.address, keyPair)
+      return new Account(provider, account.address, keyPairOrSigner)
     }
 
-    const oldAccount = new Accountv4(providerV4, account.address, keyPair)
+    const oldAccount = new Accountv4(
+      providerV4,
+      account.address,
+      keyPairOrSigner,
+    )
 
     const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
 
     return isOldAccount
       ? oldAccount
-      : new Account(provider, account.address, keyPair)
+      : new Account(provider, account.address, keyPairOrSigner)
   }
 
   public async isNonceManagedOnAccountContract(account: Accountv4) {

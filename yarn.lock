@@ -6435,6 +6435,13 @@
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.1.tgz#3286741fb8f1e1580ac28784add4c7a1d49bdfbc"
   integrity sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q==
 
+"@types/async-retry@^1.4.5":
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/@types/async-retry/-/async-retry-1.4.5.tgz#02680eb366739a327550f6ad38bb898a5571a095"
+  integrity sha512-YrdjSD+yQv7h6d5Ip+PMxh3H6ZxKyQk0Ts+PvaNRInxneG9PFVZjFg77ILAN+N6qYf7g4giSJ1l+ZjQ1zeegvA==
+  dependencies:
+    "@types/retry" "*"
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
   version "7.1.20"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.20.tgz#e168cdd612c92a2d335029ed62ac94c95b362359"
@@ -6922,6 +6929,11 @@
   integrity sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==
   dependencies:
     "@types/node" "*"
+
+"@types/retry@*":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.2.tgz#ed279a64fa438bb69f2480eda44937912bb7480a"
+  integrity sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow==
 
 "@types/retry@0.12.0":
   version "0.12.0"
@@ -8285,6 +8297,13 @@ async-each@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/async-each/-/async-each-1.0.3.tgz#b727dbf87d7651602f06f4d4ac387f47d91b0cbf"
   integrity sha512-z/WhQ5FPySLdvREByI2vZiTWwCnF0moMJ1hK9YQwDTHKh6I7/uSckMetoRGb5UBZPC1z0jlw+n/XCgjeH7y1AQ==
+
+async-retry@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/async-retry/-/async-retry-1.3.3.tgz#0e7f36c04d8478e7a58bdbed80cedf977785f280"
+  integrity sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==
+  dependencies:
+    retry "0.13.1"
 
 async@^3.2.0, async@^3.2.3:
   version "3.2.4"
@@ -10819,6 +10838,16 @@ detective@^5.2.1:
     acorn-node "^1.8.2"
     defined "^1.0.0"
     minimist "^1.2.6"
+
+dexie-react-hooks@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/dexie-react-hooks/-/dexie-react-hooks-1.1.1.tgz#ff405cc89e5d899ddbac5e40d593f83f9a74106a"
+  integrity sha512-Cam5JP6PxHN564RvWEoe8cqLhosW0O4CAZ9XEVYeGHJBa6KEJlOpd9CUpV3kmU9dm2MrW97/lk7qkf1xpij7gA==
+
+dexie@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.2.2.tgz#fa6f2a3c0d6ed0766f8d97a03720056f88fe0e01"
+  integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
 
 dezalgo@^1.0.0:
   version "1.0.4"
@@ -19687,15 +19716,15 @@ ret@~0.1.10:
   resolved "https://registry.yarnpkg.com/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
   integrity sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==
 
+retry@0.13.1, retry@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/retry/-/retry-0.13.1.tgz#185b1587acf67919d63b357349e03537b2484658"
+  integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
+
 retry@^0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/retry/-/retry-0.12.0.tgz#1b42a6266a21f07421d1b0b54b7dc167b01c013b"
   integrity sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==
-
-retry@^0.13.1:
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/retry/-/retry-0.13.1.tgz#185b1587acf67919d63b357349e03537b2484658"
-  integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
 
 reusify@^1.0.4:
   version "1.0.4"
@@ -23240,6 +23269,11 @@ z-schema@~5.0.2:
     validator "^13.7.0"
   optionalDependencies:
     commander "^9.4.1"
+
+zod@^3.19.1:
+  version "3.20.2"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.20.2.tgz#068606642c8f51b3333981f91c0a8ab37dfc2807"
+  integrity sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==
 
 zustand@^3.6.5:
   version "3.7.2"

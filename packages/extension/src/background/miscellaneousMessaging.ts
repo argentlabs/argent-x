@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill"
 
 import { MiscenalleousMessage as MiscellaneousMessage } from "../shared/messages/MiscellaneousMessage"
+import { resetDevice } from "../shared/shield/jwt"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
@@ -15,6 +16,7 @@ export const handleMiscellaneousMessage: HandleMessage<
     }
 
     case "RESET_ALL": {
+      await resetDevice()
       try {
         browser.storage.local.clear()
         browser.storage.sync.clear()

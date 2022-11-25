@@ -1,9 +1,10 @@
 import { BaseWalletAccount, WalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
 import { getAccountTypesFromChain } from "./details/fetchType"
+import { getAccountGuardiansFromChain } from "./details/getAccountGuardiansFromChain"
 import { addAccounts, getAccounts } from "./store"
 
-type UpdateScope = "all" | "type" | "deploy"
+type UpdateScope = "all" | "type" | "deploy" | "guardian"
 
 export async function updateAccountDetails(
   scope: UpdateScope,
@@ -17,6 +18,10 @@ export async function updateAccountDetails(
 
   if (scope === "type" || scope === "all") {
     newAccounts = await getAccountTypesFromChain(allAccounts)
+  }
+
+  if (scope === "guardian" || scope === "all") {
+    newAccounts = await getAccountGuardiansFromChain(allAccounts)
   }
 
   if (scope === "deploy" || scope === "all") {
