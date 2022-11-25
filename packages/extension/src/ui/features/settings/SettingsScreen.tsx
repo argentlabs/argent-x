@@ -92,7 +92,9 @@ export const SettingsScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+        leftButton={
+          <BarBackButton onClick={() => navigate(routes.accountTokens())} />
+        }
         title={"Settings"}
       >
         <CellStack>
