@@ -26,6 +26,9 @@
     "48": "assets/logo.png",
     "128": "assets/logo.png"
   },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

@@ -146,8 +146,10 @@ messageStream.subscribe(async ([msg, sender]) => {
     actionQueue,
   }
 
-  const extensionId = browser.runtime.id
-  const isSafeOrigin = sender.origin === `chrome-extension://${extensionId}`
+  const extensionUrl = browser.extension.getURL("")
+  const safeOrigin = extensionUrl.replace(/\/$/, "")
+  const origin = sender.origin ?? sender.url // Firefox uses url, Chrome uses origin
+  const isSafeOrigin = Boolean(origin?.startsWith(safeOrigin))
 
   if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
     console.warn(
