@@ -87,6 +87,12 @@ export interface Events {
   userFeedbackAction: {
     action: UserFeedbackAction
   }
+  signedDeclareTransaction: {
+    networkId: string
+  }
+  signedDeployTransaction: {
+    networkId: string
+  }
 }
 
 export interface Pages {
@@ -97,6 +103,12 @@ export interface Pages {
   restoreWalletWithFile: undefined
   signMessage: undefined
   signTransaction: {
+    networkId: string
+  }
+  signDeclareTransaction: {
+    networkId: string
+  }
+  signDeployTransaction: {
     networkId: string
   }
   addFunds: {

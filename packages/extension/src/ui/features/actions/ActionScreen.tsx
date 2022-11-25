@@ -244,7 +244,7 @@ export const ActionScreen: FC = () => {
           classHash={action.payload.classHash.toString()}
           contract={action.payload.contract}
           onSubmit={async () => {
-            analytics.track("signedTransaction", {
+            analytics.track("signedDeclareTransaction", {
               networkId: account?.networkId || "unknown",
             })
             await approveAction(action)
@@ -291,7 +291,7 @@ export const ActionScreen: FC = () => {
             actionHash={action.meta.hash}
             deployPayload={action.payload}
             onSubmit={async () => {
-              analytics.track("signedTransaction", {
+              analytics.track("signedDeployTransaction", {
                 networkId: account?.networkId || "unknown",
               })
               await approveAction(action)
