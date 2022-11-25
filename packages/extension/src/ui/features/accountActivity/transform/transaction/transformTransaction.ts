@@ -5,7 +5,6 @@ import { TransformedTransaction } from "../type"
 import dateTransformer from "./transformers/dateTransformer"
 import declareContractTransformer from "./transformers/declareContractTransformer"
 import defaultDisplayNameTransformer from "./transformers/defaultDisplayNameTransformer"
-import deployContractTransformer from "./transformers/deployContractTransformer"
 import knownDappTransformer from "./transformers/knownDappTransformer"
 import nftTransferTransformer from "./transformers/nftTransferTransformer"
 import postTransferTransformer from "./transformers/postTransferTransformer"
@@ -22,7 +21,6 @@ const preTransformers = [
 /** all are executed until one returns */
 const mainTransformers = [
   declareContractTransformer,
-  deployContractTransformer,
   nftTransferTransformer,
   tokenMintTransformer,
   tokenTransferTransformer,
