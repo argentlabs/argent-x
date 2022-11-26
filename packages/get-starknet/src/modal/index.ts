@@ -25,6 +25,8 @@ export default async function show({
   preAuthorizedWallets,
   enable,
   modalOptions,
+  dappName,
+  enableArgentWebWallet,
 }: {
   lastWallet?: StarknetWindowObject
   installedWallets?: StarknetWindowObject[]
@@ -36,6 +38,8 @@ export default async function show({
   modalOptions?: {
     theme?: "light" | "dark" | "system"
   }
+  dappName?: string
+  enableArgentWebWallet?: boolean
 }): Promise<StarknetWindowObject | null> {
   return new Promise((resolve) => {
     // make sure wallets are not shown twice
@@ -54,8 +58,9 @@ export default async function show({
     const modal = new Modal({
       target: document.body,
       props: {
-        enableArgentWebWallet: true,
-        dappName: undefined,
+        enableArgentWebWallet,
+        dappName,
+
         callback: async (value: StarknetWindowObject | null) => {
           const enabledValue = (await enable?.(value)) ?? value
           modal.$destroy()

@@ -57,9 +57,14 @@ const Home: NextPage = () => {
   }, [])
 
   const handleConnectClick =
-    (connectWallet: () => Promise<StarknetWindowObject | undefined>) =>
+    (
+      connectWallet: (
+        enableWebWallet: boolean,
+      ) => Promise<StarknetWindowObject | undefined>,
+      enableWebWallet = true,
+    ) =>
     async () => {
-      const wallet = await connectWallet()
+      const wallet = await connectWallet(enableWebWallet)
       setAddress(wallet?.selectedAddress)
       setChain(chainId(wallet?.provider))
       setConnected(!!wallet?.isConnected)
@@ -110,6 +115,12 @@ const Home: NextPage = () => {
               onClick={handleConnectClick(connectWallet)}
             >
               Connect Wallet
+            </button>
+            <button
+              className={styles.connect}
+              onClick={handleConnectClick(connectWallet, false)}
+            >
+              Connect Wallet (without WebWallet)
             </button>
             <p>First connect wallet to use dapp.</p>
           </>

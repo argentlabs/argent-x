@@ -41,6 +41,7 @@ export interface ConnectOptions extends GetWalletOptions {
   modalTheme?: "light" | "dark" | "system"
   storeVersion?: StoreVersion
   alwaysShowDiscovery?: boolean
+  dappName?: string
 }
 
 const enableWithVersion = async (wallet: StarknetWindowObject | null) => {
@@ -55,6 +56,7 @@ export const connect = async ({
   storeVersion = getStoreVersionFromBrowser(),
   modalTheme,
   alwaysShowDiscovery = true,
+  dappName,
   ...restOptions
 }: ConnectOptions = {}): Promise<StarknetWindowObject | null> => {
   restOptions.sort ??= ["argentX"]
@@ -108,7 +110,15 @@ export const connect = async ({
         download: downloads[storeVersion],
       }))
 
+  const enableArgentWebWallet = Boolean(
+    restOptions.exclude?.every((id) => id !== "argentWebWallet") ??
+      restOptions.include?.some((id) => id === "argentWebWallet") ??
+      true,
+  )
+
   return show({
+    dappName,
+    enableArgentWebWallet,
     lastWallet,
     preAuthorizedWallets,
     installedWallets,
