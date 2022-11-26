@@ -122,7 +122,7 @@ const safeMessages: MessageType["type"][] = [
   "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
   "CONNECT_DAPP_RES",
   "START_SESSION_RES",
-  "CONNECT_ACCOUNT",
+  "CONNECT_ACCOUNT_RES",
 ]
 
 messageStream.subscribe(async ([msg, sender]) => {
