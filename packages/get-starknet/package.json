@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "bowser": "^2.11.0",
-    "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2"
+    "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2",
+    "svelte-forms": "^2.3.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",

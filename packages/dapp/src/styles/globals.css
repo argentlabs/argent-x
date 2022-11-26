@@ -376,18 +376,6 @@ button[disabled]:hover {
   filter: none;
 }
 
-form {
-  border: 1px solid var(--color-bg-secondary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow) var(--color-shadow);
-  display: block;
-  max-width: var(--width-card-wide);
-  min-width: var(--width-card);
-  padding: 1.5rem;
-  margin: 2rem 0;
-  text-align: var(--justify-normal);
-}
-
 form header {
   margin: 1.5rem 0;
   padding: 1.5rem 0;

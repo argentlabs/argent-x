@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { StarknetWindowObject } from "get-starknet-core"
   import { onMount } from "svelte"
+  import { field, form } from "svelte-forms"
+  import { email } from "svelte-forms/validators"
 
   import type { WalletProviderWithStoreVersion } from "."
 
@@ -51,6 +53,12 @@
       }
     }
   })
+
+  const mail = field("email", "", [email()], {
+    stopAtFirstError: true,
+    validateOnChange: false,
+  })
+  const mailForm = form(mail)
 
   const wallets = [
     lastWallet,
@@ -114,21 +122,46 @@
     {#if enableArgentWebWallet}
       <!-- webwallet -->
       <main>
-        <div class="relative">
+        <form
+          class="relative"
+          on:submit={async (e) => {
+            e.preventDefault()
+            await mailForm.validate()
+          }}
+        >
           <!-- svelte-ignore a11y-autofocus -->
           <input
             autofocus
-            class="peer w-full mb-2 p-5 py-[18px] rounded-xl bg-neutral-100 dark:bg-black placeholder:text-neutral-500 placeholder:dark:text-neutral-400 text-base focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-            type="text"
+            class={"peer w-full mb-2 p-5 py-[18px] rounded-xl bg-neutral-100 dark:bg-black placeholder:text-neutral-500 placeholder:dark:text-neutral-400 text-base focus:outline-none transition-colors " +
+              ($mail.invalid
+                ? "ring-2 ring-red-500 dark:ring-red-500"
+                : "focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700")}
+            type="email"
+            name="email"
             placeholder="Email"
+            bind:value={$mail.value}
+            on:keyup={() => {
+              if ($mail.invalid) {
+                mail.validate()
+              }
+            }}
+            on:blur={() => {
+              if ($mail.value?.trim() !== "") {
+                mail.validate()
+              }
+            }}
+            aria-invalid={$mail.invalid}
           />
           <!-- continue button just shown when input not empty -->
           <div
-            class="absolute right-4 top-1/2 -translate-y-1/2 peer-placeholder-shown:opacity-0 peer-placeholder-shown:scale-0 opacity-1 scale-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700"
+            class={"absolute right-4 top-1/2 -translate-y-1/2 peer-placeholder-shown:opacity-0 peer-placeholder-shown:scale-0 opacity-1 scale-1 transition-all duration-300 " +
+              ($mail.invalid ? "opacity-0 scale-0" : "")}
           >
             <button
-              class="bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-white rounded-full p-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
-              disabled
+              tabindex="0"
+              class="bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-white rounded-full p-2 hover:bg-neutral-100 hover:disabled:bg-neutral-200 dark:hover:bg-neutral-700 dark:hover:disabled:bg-neutral-800 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700"
+              type="submit"
+              disabled={!$mailForm.valid}
             >
               <svg
                 width="12"
@@ -147,10 +180,17 @@
               </svg>
             </button>
           </div>
-        </div>
+        </form>
 
         <div class="flex items-center justify-between mb-8 px-2">
-          <div class="text-xs text-red-400">Example Error</div>
+          <div class="text-xs text-red-400">
+            {#if $mail.invalid}
+              <!-- $mail.errors[0] can be "not_an_email" -->
+              {#if $mail.errors[0] === "not_an_email"}
+                Please enter a valid email
+              {/if}
+            {/if}
+          </div>
           <div
             class="text-xs text-gray-400 inline-flex items-center justify-center gap-[6px]"
           >
