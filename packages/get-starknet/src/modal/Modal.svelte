@@ -60,7 +60,9 @@
   })
   const mailForm = form(mail)
 
-  let mailSubmitting = false
+  let windowRef: Window | null = null
+  const origin = "http://localhost:3005"
+  const submitGoalUrl = `${origin}/email`
 
   const wallets = [
     lastWallet,
@@ -132,8 +134,62 @@
             if (!$mailForm.valid) {
               return
             }
-            mailSubmitting = true
-            // TODO: Submit email to backend
+            const h = 600
+            const w = 500
+
+            // parent is the window that opened this window; if not detected then it falls back to the current screen
+            const parentWidth =
+              globalWindow?.outerWidth ??
+              globalWindow?.innerWidth ??
+              globalWindow?.screen.width ??
+              0
+            const parentHeight =
+              globalWindow?.outerHeight ??
+              globalWindow?.innerHeight ??
+              globalWindow?.screen.height ??
+              0
+            const parentLeft =
+              globalWindow?.screenLeft ?? globalWindow?.screenX ?? 0
+            const parentTop =
+              globalWindow?.screenTop ?? globalWindow?.screenY ?? 0
+
+            const y = parentTop + parentHeight / 2 - h / 2
+            const x = parentLeft + parentWidth / 2 - w / 2
+            // open popup window
+            windowRef = window.open(
+              submitGoalUrl + "?email=" + encodeURIComponent($mail.value),
+              "Argent",
+              `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
+            )
+            // wait for popup to close
+            const interval = setInterval(() => {
+              if (windowRef?.closed) {
+                clearInterval(interval)
+                windowRef = null
+              }
+            }, 1000)
+
+            // wait for message from popup
+            const messageHandler = (event) => {
+              if (
+                event.origin === origin &&
+                event.data.type === "ARGENT_WEB_WALLET::CONNECT"
+              ) {
+                window.removeEventListener("message", messageHandler)
+                clearInterval(interval)
+                windowRef = null
+                // @ts-ignore
+                cb({
+                  id: "argent-web-wallet",
+                  name: "Argent Web Wallet",
+                  icon: "argent",
+                  enable: () => Promise.resolve(event.data.payload),
+                  isConnected: true,
+                  selectedAddress: event.data.payload.address,
+                })
+              }
+            }
+            window.addEventListener("message", messageHandler)
           }}
         >
           <!-- svelte-ignore a11y-autofocus -->
@@ -143,11 +199,11 @@
               ($mail.invalid
                 ? "ring-2 ring-red-500 dark:ring-red-500"
                 : "focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700") +
-              (mailSubmitting ? " opacity-50" : "")}
+              (Boolean(windowRef) ? " opacity-50" : "")}
             type="text"
             name="email"
             placeholder="Email"
-            disabled={mailSubmitting}
+            disabled={Boolean(windowRef)}
             bind:value={$mail.value}
             on:keyup={() => {
               if ($mail.invalid) {
@@ -166,7 +222,7 @@
             class={"absolute right-4 top-1/2 -translate-y-1/2 peer-placeholder-shown:opacity-0 peer-placeholder-shown:scale-0 opacity-1 scale-1 transition-all duration-300 " +
               ($mail.invalid ? "opacity-0 scale-0" : "")}
           >
-            {#if mailSubmitting}
+            {#if Boolean(windowRef)}
               <div role="status">
                 <svg
                   aria-hidden="true"
@@ -211,17 +267,17 @@
               </button>
             {/if}
           </div>
-          {#if mailSubmitting}
+          {#if Boolean(windowRef)}
             <div
               class="absolute rounded-xl left-0 right-0 bottom-0 top-0 cursor-pointer focus:ring-2 focus:outline-none focus:ring-neutral-200 dark:focus:ring-neutral-700"
               role="button"
               tabindex="0"
               on:click={() => {
-                // TODO: Bring window to front
+                windowRef?.focus()
               }}
               on:keydown={(e) => {
                 if (e.key === "Enter") {
-                  // TODO: Bring window to front
+                  windowRef?.focus()
                 }
               }}
             />

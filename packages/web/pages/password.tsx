@@ -30,7 +30,19 @@ export default function Password() {
       as="form"
       onSubmit={handleSubmit(async ({ password }) => {
         try {
-          await retrieveAccountWithPassword(password)
+          const account = await retrieveAccountWithPassword(password)
+          if (window.opener) {
+            window.opener.postMessage(
+              {
+                type: "ARGENT_WEB_WALLET::CONNECT",
+                payload: {
+                  address: account.address,
+                },
+              },
+              "*",
+            )
+            return window.close()
+          }
           return navigate.push("/dashboard")
         } catch (error) {
           console.error(error)

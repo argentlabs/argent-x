@@ -16,7 +16,7 @@ const conditionallyPushTo = (
   urlParams?: Record<string, string>,
 ) => {
   const allowed = allowedDestinations[destination]
-  if (!allowed.includes(router.asPath ?? router.pathname)) {
+  if (!allowed.includes(router.pathname ?? router.asPath)) {
     return router.push(
       `${destination}?${new URLSearchParams(urlParams)}`,
       destination,
