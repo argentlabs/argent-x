@@ -6,6 +6,8 @@
 
   export const globalWindow = typeof window !== "undefined" ? window : null
 
+  export let enableArgentWebWallet: boolean = true
+  export let dappName: string = window.document.title ?? "Some cool Dapp"
   export let lastWallet: StarknetWindowObject | null = null
   export let installedWallets: StarknetWindowObject[] = []
   export let preAuthorizedWallets: StarknetWindowObject[] = []
@@ -69,18 +71,23 @@
 >
   <main
     role="dialog"
-    class={"bg-slate-50 rounded-md shadow w-full max-w-[500px] mx-6 p-4 text-center z-50 dark:bg-neutral-900 dark:text-white"}
+    class={"bg-slate-50 rounded-3xl shadow w-full max-w-[380px] mx-6 p-6 pb-8 text-center z-50 dark:bg-neutral-900 dark:text-white"}
     on:click={(e) => e.stopPropagation()}
     on:keyup={(e) => {
       e.stopPropagation()
     }}
   >
-    <header class="flex items-center justify-between mb-2">
-      <h1 class="text-xl">Connect a wallet</h1>
+    <header class="flex items-center justify-center flex-col mb-2 relative">
+      <h2 class="text-sm text-gray-400 font-semibold">Connect to</h2>
+      <h1
+        class="text-xl font-bold mb-6 max-w-[240px] overflow-hidden whitespace-nowrap text-ellipsis"
+      >
+        {dappName}
+      </h1>
       <span
+        class="absolute top-0 right-0 p-2 cursor-pointer rounded-full bg-neutral-200 dark:bg-black"
         role="button"
         alt="Close"
-        class="cursor-pointer"
         on:click={() => cb(null)}
         on:keyup={(e) => {
           if (e.key === "Enter") {
@@ -89,14 +96,15 @@
         }}
       >
         <svg
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          width="24px"
-          viewBox="0 0 24 24"
-          fill="currentColor"
         >
           <path
-            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"
+            d="M9.77275 3.02275C9.99242 2.80308 9.99242 2.44692 9.77275 2.22725C9.55308 2.00758 9.19692 2.00758 8.97725 2.22725L6 5.20451L3.02275 2.22725C2.80308 2.00758 2.44692 2.00758 2.22725 2.22725C2.00758 2.44692 2.00758 2.80308 2.22725 3.02275L5.20451 6L2.22725 8.97725C2.00758 9.19692 2.00758 9.55308 2.22725 9.77275C2.44692 9.99242 2.80308 9.99242 3.02275 9.77275L6 6.79549L8.97725 9.77275C9.19692 9.99242 9.55308 9.99242 9.77275 9.77275C9.99242 9.55308 9.99242 9.19692 9.77275 8.97725L6.79549 6L9.77275 3.02275Z"
+            fill="currentColor"
           />
         </svg>
       </span>
@@ -105,7 +113,7 @@
     <ul class="flex flex-col gap-3">
       {#each wallets as wallet}
         <li
-          class="flex justify-between items-center p-3 bg-slate-100 rounded-md cursor-pointer shadow-sm hover:bg-slate-200 transition-colors dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:border-neutral-600 dark:text-white"
+          class="flex flex-row-reverse justify-between items-center p-3 bg-slate-100 rounded-md cursor-pointer shadow-sm hover:bg-slate-200 transition-colors dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:border-neutral-600 dark:text-white"
           on:click={() => cb(wallet)}
           on:keyup={(e) => {
             if (e.key === "Enter") {
@@ -113,7 +121,10 @@
             }
           }}
         >
-          {wallet.name}
+          <span class="w-8 h-8" />
+          <p class="font-semibold text-base">
+            {wallet.name}
+          </p>
           {#if loadingItem === wallet.id}
             <div role="status">
               <svg

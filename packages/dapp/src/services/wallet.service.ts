@@ -2,19 +2,12 @@ import { connect } from "@argent/get-starknet"
 import { ProviderInterface, constants, shortString } from "starknet"
 
 export const silentConnectWallet = async () => {
-  const windowStarknet = await connect({ modalMode: "neverAsk" })
-  if (!windowStarknet?.isConnected) {
-    await windowStarknet?.enable({
-      showModal: false,
-      starknetVersion: "v4",
-    } as any)
-  }
-  return windowStarknet
+  const windowStarknet = connect({ modalMode: "neverAsk" })
+  return windowStarknet ?? undefined
 }
 
 export const connectWallet = async () => {
   const windowStarknet = await connect()
-  await windowStarknet?.enable({ starknetVersion: "v4" } as any)
   return windowStarknet ?? undefined
 }
 

@@ -54,6 +54,8 @@ export default async function show({
     const modal = new Modal({
       target: document.body,
       props: {
+        enableArgentWebWallet: true,
+        dappName: undefined,
         callback: async (value: StarknetWindowObject | null) => {
           const enabledValue = (await enable?.(value)) ?? value
           modal.$destroy()
