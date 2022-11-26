@@ -59,17 +59,16 @@ window.addEventListener(
         // TODO: better UX would be to also re-connect when user selects pre-authorized account
         await disconnectAccount()
       } else {
-        const walletAccountP = Promise.race([
-          waitForMessage("CONNECT_DAPP_RES", 10 * 60 * 1000),
-          waitForMessage("START_SESSION_RES", 10 * 60 * 1000, (x) =>
-            Boolean(x.data),
-          ),
-        ])
+        const walletAccountP = waitForMessage(
+          "CONNECT_DAPP_RES",
+          10 * 60 * 1000,
+        )
         sendMessage({
           type: "CONNECT_DAPP",
           data: { host: window.location.host },
         })
         const walletAccount = await walletAccountP
+
         if (!walletAccount) {
           return disconnectAccount()
         }
