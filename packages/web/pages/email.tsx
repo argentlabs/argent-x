@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Image from "next/image"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
+import { createRef, useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 import { Layout } from "../components/Layout"
@@ -13,12 +13,22 @@ import { requestEmail } from "../services/register"
 
 export default function Email() {
   const navigate = useRouter()
-  const { handleSubmit, register, formState, setError } = useForm({
+  const queryEmail = navigate.query["email"]
+  const { handleSubmit, register, formState, setError, setValue } = useForm({
     defaultValues: {
       email: "",
     },
     resolver: zodResolver(enterEmailFormSchema),
   })
+  const submitButtonRef = createRef<HTMLButtonElement>()
+
+  useEffect(() => {
+    if (typeof queryEmail === "string" && queryEmail) {
+      setValue("email", queryEmail)
+      submitButtonRef.current?.click()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryEmail])
 
   return (
     <Layout
@@ -69,6 +79,7 @@ export default function Email() {
         type="submit"
         disabled={isSubmitDisabled(formState)}
         isLoading={formState.isSubmitting}
+        ref={submitButtonRef}
       >
         Continue
       </Button>
