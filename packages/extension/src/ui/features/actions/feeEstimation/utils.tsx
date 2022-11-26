@@ -64,7 +64,7 @@ export const useMaxDeployContractFeeEstimation = (
   actionHash: string,
 ) => {
   const { data: fee, error } = useSWR(
-    [actionHash, "declareContractFeeEstimation"],
+    [actionHash, "deployContractFeeEstimation"],
     () => getDeployContractEstimatedFee(declareContractPayload),
     {
       suspense: false,

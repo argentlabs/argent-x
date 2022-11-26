@@ -28,7 +28,7 @@ const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
   onSubmit,
   ...props
 }) => {
-  usePageTracking("signTransaction", {
+  usePageTracking("signDeployTransaction", {
     networkId: selectedAccount?.networkId || "unknown",
   })
 
