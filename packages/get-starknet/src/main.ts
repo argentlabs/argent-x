@@ -54,7 +54,7 @@ export const connect = async ({
   modalMode = "canAsk",
   storeVersion = getStoreVersionFromBrowser(),
   modalTheme,
-  alwaysShowDiscovery = false,
+  alwaysShowDiscovery = true,
   ...restOptions
 }: ConnectOptions = {}): Promise<StarknetWindowObject | null> => {
   restOptions.sort ??= ["argentX"]

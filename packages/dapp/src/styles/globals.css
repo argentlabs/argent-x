@@ -285,11 +285,6 @@ a:active {
   text-decoration: underline;
 }
 
-a:hover {
-  filter: brightness(var(--hover-brightness));
-  text-decoration: underline;
-}
-
 a b,
 a em,
 a i,

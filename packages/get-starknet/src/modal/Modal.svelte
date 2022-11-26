@@ -71,7 +71,7 @@
 >
   <main
     role="dialog"
-    class={"bg-slate-50 rounded-3xl shadow w-full max-w-[380px] mx-6 p-6 pb-8 text-center z-50 dark:bg-neutral-900 dark:text-white"}
+    class={"bg-slate-50 rounded-3xl shadow-modal dark:shadow-none w-full max-w-[380px] mx-6 p-6 pb-8 text-center z-50 dark:bg-neutral-900 dark:text-white"}
     on:click={(e) => e.stopPropagation()}
     on:keyup={(e) => {
       e.stopPropagation()
@@ -80,12 +80,12 @@
     <header class="flex items-center justify-center flex-col mb-2 relative">
       <h2 class="text-sm text-gray-400 font-semibold">Connect to</h2>
       <h1
-        class="text-xl font-bold mb-6 max-w-[240px] overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-xl font-semibold mb-6 max-w-[240px] overflow-hidden whitespace-nowrap text-ellipsis"
       >
         {dappName}
       </h1>
       <span
-        class="absolute top-0 right-0 p-2 cursor-pointer rounded-full bg-neutral-200 dark:bg-black"
+        class="absolute top-0 right-0 p-2 cursor-pointer rounded-full bg-neutral-200 text-neutral-400 dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
         role="button"
         alt="Close"
         on:click={() => cb(null)}
@@ -113,7 +113,7 @@
     <ul class="flex flex-col gap-3">
       {#each wallets as wallet}
         <li
-          class="flex flex-row-reverse justify-between items-center p-3 bg-slate-100 rounded-md cursor-pointer shadow-sm hover:bg-slate-200 transition-colors dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:border-neutral-600 dark:text-white"
+          class="flex flex-row-reverse justify-between items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
           on:click={() => cb(wallet)}
           on:keyup={(e) => {
             if (e.key === "Enter") {
@@ -162,7 +162,7 @@
           rel="noopener noreferrer"
         >
           <li
-            class="flex justify-between items-center p-3 bg-slate-100 rounded-md shadow-sm cursor-pointer hover:bg-slate-200 transition-colors dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:border-neutral-600 dark:text-white"
+            class="flex flex-row-reverse justify-between items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
             on:click={() => cb(null)}
             on:keyup={(e) => {
               if (e.key === "Enter") {
@@ -170,7 +170,10 @@
               }
             }}
           >
-            Install {discoveryWallet.name}
+            <span class="w-8 h-8" />
+            <p class="font-semibold text-base">
+              Install {discoveryWallet.name}
+            </p>
             <img
               alt={discoveryWallet.name}
               src={discoveryWallet.icon}
@@ -188,8 +191,10 @@
   @tailwind components;
   @tailwind base;
 
+  @import url("https://fonts.googleapis.com/css2?family=Barlow:wght@500;600&display=swap");
+
   * {
-    font-family: Nunito, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    font-family: "Barlow", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
       Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
       sans-serif;
     -webkit-font-smoothing: antialiased;
