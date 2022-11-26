@@ -6,8 +6,10 @@ export const silentConnectWallet = async () => {
   return windowStarknet ?? undefined
 }
 
-export const connectWallet = async () => {
-  const windowStarknet = await connect()
+export const connectWallet = async (enableWebWallet: boolean) => {
+  const windowStarknet = await connect({
+    exclude: enableWebWallet ? [] : ["argentWebWallet"],
+  })
   return windowStarknet ?? undefined
 }
 
