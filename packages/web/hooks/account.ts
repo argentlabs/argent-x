@@ -7,8 +7,14 @@ import {
 } from "../services/backend/account"
 
 export const useAccount = () => {
-  const { data: account, ...rest } = useSwr("services/account/getAccount", () =>
-    getAccount(),
+  const { data: account, ...rest } = useSwr(
+    "services/account/getAccount",
+    () => getAccount(),
+    {
+      refreshInterval(latestData) {
+        return latestData ? 30000 : 500
+      },
+    },
   )
 
   return {

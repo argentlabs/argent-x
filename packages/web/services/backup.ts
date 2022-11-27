@@ -61,9 +61,9 @@ export const decryptPrivateKeyWithPassword = async (
   return privateKey
 }
 
-export const encryptPrivateKeyWithDeviceKey = async (
+export const encryptPrivateKeyWithKey = async (
   privateKey: string,
-  devicePublicKey: KeyLike,
+  encPublicKey: KeyLike,
 ): Promise<string> => {
   const encryptedPrivateKey = await new EncryptJWT({
     privateKey,
@@ -71,20 +71,20 @@ export const encryptPrivateKeyWithDeviceKey = async (
     .setProtectedHeader({
       alg: "ECDH-ES+A256KW",
       enc: "A256GCM",
-      kid: await calculateJwkThumbprint(await exportJWK(devicePublicKey)),
+      kid: await calculateJwkThumbprint(await exportJWK(encPublicKey)),
     })
-    .encrypt(devicePublicKey)
+    .encrypt(encPublicKey)
 
   return encryptedPrivateKey
 }
 
-export const decryptPrivateKeyWithDeviceKey = async (
+export const decryptPrivateKeyWithKey = async (
   encryptedPrivateKey: string,
-  devicePrivateKey: KeyLike,
+  encPrivateKey: KeyLike,
 ): Promise<string> => {
   const {
     payload: { privateKey },
-  } = await jwtDecrypt(encryptedPrivateKey, devicePrivateKey)
+  } = await jwtDecrypt(encryptedPrivateKey, encPrivateKey)
 
   if (typeof privateKey !== "string") {
     throw new Error("private key not found in the payload")

@@ -4,15 +4,21 @@ import { Signature, keccak, pedersen, sign } from "micro-starknet"
 import { Account, AccountInterface, ec, encode, hash, stark } from "starknet"
 
 import { getDevice } from "./__unsafe__oldJwt"
-import { addAccount, getAccounts } from "./backend/account"
+import {
+  Account as BeAccount,
+  addAccount,
+  getAccounts,
+} from "./backend/account"
 import { getTextFile, postTextFile } from "./backend/file"
 import {
+  decryptPrivateKeyWithKey,
   decryptPrivateKeyWithPassword,
-  encryptPrivateKeyWithDeviceKey,
+  encryptPrivateKeyWithKey,
   encryptPrivateKeyWithPassword,
 } from "./backup"
 import { getNewStarkKeypair } from "./generatePrivateKey"
 import { provider } from "./provider"
+import { createSession, getSession } from "./session"
 
 export const ACCOUNT_IMPLEMENTATION_CLASS_HASH =
   "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
@@ -63,17 +69,15 @@ export const createAccount = async (password: string) => {
           { accessPolicy: "WEB_WALLET_KEY" },
         ),
     ),
-    encryptPrivateKeyWithDeviceKey(
-      privateKey,
-      device.encryptionKey.publicKey,
-    ).then(async (deviceEncryptedPrivateKey) =>
-      postTextFile(
-        `device-${await calculateJwkThumbprint(
-          await exportJWK(device.encryptionKey.publicKey),
-        )}-encypted-${publicKey}`,
-        deviceEncryptedPrivateKey,
-        { accessPolicy: "WEB_WALLET_SESSION" }, // TODO: [BE] change as soon as the backend is ready
-      ),
+    encryptPrivateKeyWithKey(privateKey, device.encryptionKey.publicKey).then(
+      async (deviceEncryptedPrivateKey) =>
+        postTextFile(
+          `device-${await calculateJwkThumbprint(
+            await exportJWK(device.encryptionKey.publicKey),
+          )}-encypted-${publicKey}`,
+          deviceEncryptedPrivateKey,
+          { accessPolicy: "WEB_WALLET_SESSION" }, // TODO: [BE] change as soon as the backend is ready
+        ),
     ),
   ]
 
@@ -91,6 +95,8 @@ export const createAccount = async (password: string) => {
     encode.addHexPrefix(r.toString(16)),
     encode.addHexPrefix(s.toString(16)),
   ])
+
+  await createSession(privateKey)
 
   const keyPair = ec.getKeyPair(privateKey)
   account = new Account(provider, registration.address, keyPair)
@@ -112,6 +118,41 @@ export const retrieveAccountWithPassword = async (password: string) => {
       passwordEncryptedPrivateKey,
       password,
     )
+
+    await createSession(privateKey)
+
+    const keyPair = ec.getKeyPair(privateKey)
+    account = new Account(provider, beAccount.address, keyPair)
+    return account
+  } catch (e) {
+    if (e instanceof errors.JWEDecryptionFailed) {
+      throw new Error("Wrong password", { cause: e })
+    }
+    throw e
+  }
+}
+
+export const retrieveAccountFromSession = async (
+  providedBeAccount?: BeAccount,
+) => {
+  try {
+    const session = await getSession()
+    const sessionThumbprint = await exportJWK(
+      session.encryptionKey.publicKey,
+    ).then((jwk) => calculateJwkThumbprint(jwk))
+    const sessionEncryptedPrivateKey = await getTextFile(
+      `session-${sessionThumbprint}`,
+    )
+
+    const privateKey = await decryptPrivateKeyWithKey(
+      sessionEncryptedPrivateKey,
+      session.encryptionKey.privateKey,
+    )
+
+    const [[beAccount]] = await Promise.all([
+      providedBeAccount ? Promise.resolve([providedBeAccount]) : getAccounts(),
+      createSession(privateKey),
+    ])
     const keyPair = ec.getKeyPair(privateKey)
     account = new Account(provider, beAccount.address, keyPair)
     return account
