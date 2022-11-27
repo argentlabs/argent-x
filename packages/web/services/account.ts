@@ -1,8 +1,7 @@
 import { stringToBytes } from "@scure/base"
 import { calculateJwkThumbprint, errors, exportJWK } from "jose"
 import { Signature, keccak, pedersen, sign } from "micro-starknet"
-import { Account, AccountInterface, ec, hash, stark } from "starknet"
-import { addHexPrefix, removeHexPrefix } from "starknet/dist/utils/encode"
+import { Account, AccountInterface, ec, encode, hash, stark } from "starknet"
 
 import { getDevice } from "./__unsafe__oldJwt"
 import { addAccount, getAccounts } from "./backend/account"
@@ -42,7 +41,9 @@ export const calculateAccountAddress = (
 }
 
 export const formatAddress = (address: string): string => {
-  return `0x${removeHexPrefix(address).slice(0, 4)}...${address.slice(-4)}`
+  return `0x${encode.removeHexPrefix(address).slice(0, 4)}...${address.slice(
+    -4,
+  )}`
 }
 
 let account: AccountInterface | undefined
@@ -87,8 +88,8 @@ export const createAccount = async (password: string) => {
   await Promise.all(uploadEncryptedFilesPromises)
 
   const registration = await addAccount(publicKey, [
-    addHexPrefix(r.toString(16)),
-    addHexPrefix(s.toString(16)),
+    encode.addHexPrefix(r.toString(16)),
+    encode.addHexPrefix(s.toString(16)),
   ])
 
   const keyPair = ec.getKeyPair(privateKey)
