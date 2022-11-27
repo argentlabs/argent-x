@@ -5,8 +5,7 @@ import { UnsecuredJWT } from "jose"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { FC, PropsWithChildren } from "react"
-import { Call, number, uint256 } from "starknet"
-import { compileCalldata } from "starknet/dist/utils/stark"
+import { Call, number, stark, uint256 } from "starknet"
 
 import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
@@ -133,7 +132,7 @@ export default function Dashboard() {
               contractAddress:
                 "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
               entrypoint: "transfer",
-              calldata: compileCalldata({
+              calldata: stark.compileCalldata({
                 to: account.address,
                 value: {
                   type: "struct",
@@ -145,7 +144,7 @@ export default function Dashboard() {
               contractAddress:
                 "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
               entrypoint: "transfer",
-              calldata: compileCalldata({
+              calldata: stark.compileCalldata({
                 to: account.address,
                 value: {
                   type: "struct",

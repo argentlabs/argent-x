@@ -33,7 +33,7 @@ const Home: NextPage = () => {
         setAccount(wallet.account)
       }
       setSupportsSessions(null)
-      if (wallet?.selectedAddress) {
+      if (wallet?.selectedAddress && wallet.provider) {
         try {
           const sessionSupport = await supportsSessions(
             wallet.selectedAddress,
@@ -72,7 +72,7 @@ const Home: NextPage = () => {
         setAccount(wallet.account)
       }
       setSupportsSessions(null)
-      if (wallet?.selectedAddress) {
+      if (wallet?.selectedAddress && wallet.provider) {
         try {
           const sessionSupport = await supportsSessions(
             wallet.selectedAddress,
