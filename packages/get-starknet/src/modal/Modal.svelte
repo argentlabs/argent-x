@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { WindowMessenger } from "@argent/x-window"
   import type { StarknetWindowObject } from "get-starknet-core"
   import { onMount } from "svelte"
   import { field, form } from "svelte-forms"
@@ -41,7 +42,34 @@
     darkModeControlClass = event.matches ? "dark" : ""
   }
 
-  onMount(() => {
+  let starknetWindowObject: StarknetWindowObject | null = null
+  let messenger: WindowMessenger | null = null
+  onMount(async () => {
+    const { getArgentStarknetWindowObject, WindowMessenger } = await import(
+      "@argent/x-window"
+    )
+    const { defaultProvider } = await import("starknet")
+    const { warp } = await import("../warp")
+
+    messenger = new WindowMessenger(
+      {
+        window: globalWindow,
+        origin,
+      },
+      warp(origin),
+    )
+    starknetWindowObject = await getArgentStarknetWindowObject(
+      {
+        host: window.location.origin,
+        id: "argentWebWallet",
+        icon: "https://www.argent.xyz/favicon.ico",
+        name: "Argent Web Wallet",
+        version: "1.0.0",
+      },
+      messenger,
+      defaultProvider,
+    )
+
     if (theme === null) {
       globalWindow
         ?.matchMedia("(prefers-color-scheme: dark)")
@@ -178,15 +206,7 @@
                 window.removeEventListener("message", messageHandler)
                 clearInterval(interval)
                 windowRef = null
-                // @ts-ignore
-                cb({
-                  id: "argent-web-wallet",
-                  name: "Argent Web Wallet",
-                  icon: "argent",
-                  enable: () => Promise.resolve(event.data.payload),
-                  isConnected: true,
-                  selectedAddress: event.data.payload.address,
-                })
+                cb(starknetWindowObject)
               }
             }
             window.addEventListener("message", messageHandler)

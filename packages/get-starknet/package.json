@@ -39,6 +39,7 @@
     "@argent/x-window": "^5.0.8",
     "bowser": "^2.11.0",
     "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2",
+    "lodash-es": "^4.17.21",
     "svelte-forms": "^2.3.1"
   },
   "devDependencies": {
