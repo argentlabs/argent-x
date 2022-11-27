@@ -239,21 +239,38 @@ export interface WalletMessenger {
   subscribe: (callback: (message: MessageTypes) => AllowPromise<void>) => void
 }
 
+export interface Subscribable {
+  postMessage: (message: MessageTypes, targetOrigin: string) => void
+  addEventListener: (
+    type: string,
+    listener: (event: MessageEvent<MessageTypes>) => void,
+  ) => void
+}
+interface WindowWithOrigin {
+  window: Subscribable
+  origin: string
+}
+
 export class WindowMessenger implements WalletMessenger {
   private readonly _listeners: Set<(message: MessageTypes) => void> = new Set(
     [],
   )
 
-  constructor(private readonly _window: Window) {
-    this._window.addEventListener("message", (event) => {
-      if (event.data.type) {
+  constructor(
+    private readonly _windowListen: WindowWithOrigin,
+    private readonly _windowPost: Subscribable = _windowListen.window,
+  ) {
+    this._windowListen.window.addEventListener("message", (event) => {
+      if (event.data.type && event.origin === this._windowListen.origin) {
+        console.log("Received message", event.data, event.origin)
         this._listeners.forEach((listener) => listener(event.data))
       }
     })
   }
 
   postMessage(message: MessageTypes): void {
-    this._window.postMessage(message, "*")
+    console.log("postMessage", message)
+    this._windowPost.postMessage(message, "*")
   }
 
   listenMessage<T extends MessageTypes>(
