@@ -21,7 +21,30 @@ export interface GetArgentStarknetWindowObject {
   name: string
   version: string
   host: string
-  walletAddress?: string
+}
+
+function updateStarknetWindowObject(
+  windowObject: StarknetWindowObject,
+  provider: ProviderInterface,
+  messenger: WalletMessenger,
+  walletAddress: string,
+): ConnectedStarknetWindowObject {
+  if (windowObject.isConnected) {
+    return windowObject
+  }
+
+  const valuesToAssign: Pick<
+    ConnectedStarknetWindowObject,
+    "isConnected" | "chainId" | "selectedAddress" | "account" | "provider"
+  > = {
+    isConnected: true,
+    chainId: provider.chainId,
+    selectedAddress: walletAddress,
+    account: new MessageAccount(messenger, provider, walletAddress),
+    provider,
+  }
+
+  return Object.assign(windowObject, valuesToAssign)
 }
 
 export const getArgentStarknetWindowObject = (
@@ -29,7 +52,7 @@ export const getArgentStarknetWindowObject = (
   messenger: WalletMessenger,
   provider: ProviderInterface,
 ): StarknetWindowObject => {
-  const disconnectedWallet: StarknetWindowObject = {
+  const wallet: StarknetWindowObject = {
     ...options,
     isConnected: false,
     provider,
@@ -147,6 +170,13 @@ export const getArgentStarknetWindowObject = (
         throw Error(dataOrError.error)
       }
 
+      updateStarknetWindowObject(
+        wallet,
+        provider,
+        messenger,
+        dataOrError.selectedAddress,
+      )
+
       return [dataOrError.selectedAddress]
     },
     async isPreauthorized() {
@@ -194,20 +224,7 @@ export const getArgentStarknetWindowObject = (
     },
   }
 
-  if (!options.walletAddress) {
-    return disconnectedWallet
-  }
-
-  const connectedWallet: ConnectedStarknetWindowObject = {
-    ...disconnectedWallet,
-    isConnected: true,
-    chainId: provider.chainId,
-    selectedAddress: options.walletAddress,
-    account: new MessageAccount(messenger, provider, options.walletAddress),
-    provider,
-  }
-
   // TODO: handle network and account changes
 
-  return connectedWallet
+  return wallet
 }

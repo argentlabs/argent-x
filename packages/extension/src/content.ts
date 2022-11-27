@@ -19,8 +19,10 @@ window.addEventListener(
     // forward messages which were not forwarded before and belong to the extension
     if (
       !event.data?.forwarded &&
-      event.data?.extensionId === argentExtensionId
+      event.data?.extensionId === argentExtensionId &&
+      event.origin === window.location.origin
     ) {
+      console.log("forwarding message", event.data, event)
       sendMessage({ ...event.data })
     }
   },

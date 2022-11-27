@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { WindowMessenger } from "@argent/x-window"
   import type { StarknetWindowObject } from "get-starknet-core"
+  import type { ProviderInterface } from "starknet"
   import { onMount } from "svelte"
   import { field, form } from "svelte-forms"
   import { email } from "svelte-forms/validators"
@@ -22,10 +23,14 @@
 
   let loadingItem: string | false = false
 
+  let setLoadingItem = (item: string | false) => {
+    loadingItem = item
+  }
+
   let cb = async (value: StarknetWindowObject | null) => {
-    loadingItem = value?.id ?? false
+    setLoadingItem(value?.id ?? false)
     await callback(value).catch(() => {})
-    loadingItem = false
+    setLoadingItem(false)
   }
 
   let darkModeControlClass = ""
@@ -42,8 +47,16 @@
     darkModeControlClass = event.matches ? "dark" : ""
   }
 
+  const walletOptions = {
+    host: window.location.origin,
+    id: "argentWebWallet" as const,
+    icon: "https://www.argent.xyz/favicon.ico",
+    name: "Argent Web Wallet",
+    version: "1.0.0",
+  }
   let starknetWindowObject: StarknetWindowObject | null = null
   let messenger: WindowMessenger | null = null
+  let provider: ProviderInterface | null = null
   onMount(async () => {
     const { getArgentStarknetWindowObject, WindowMessenger } = await import(
       "@argent/x-window"
@@ -58,16 +71,11 @@
       },
       warp(origin),
     )
+    provider = defaultProvider
     starknetWindowObject = await getArgentStarknetWindowObject(
-      {
-        host: window.location.origin,
-        id: "argentWebWallet",
-        icon: "https://www.argent.xyz/favicon.ico",
-        name: "Argent Web Wallet",
-        version: "1.0.0",
-      },
+      walletOptions,
       messenger,
-      defaultProvider,
+      provider,
     )
 
     if (theme === null) {
@@ -162,6 +170,7 @@
             if (!$mailForm.valid) {
               return
             }
+            setLoadingItem("argentWebWallet")
             const h = 600
             const w = 500
 
@@ -198,7 +207,7 @@
             }, 1000)
 
             // wait for message from popup
-            const messageHandler = (event) => {
+            const messageHandler = async (event) => {
               if (
                 event.origin === origin &&
                 event.data.type === "ARGENT_WEB_WALLET::CONNECT"
@@ -219,11 +228,11 @@
               ($mail.invalid
                 ? "ring-2 ring-red-500 dark:ring-red-500"
                 : "focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700") +
-              (Boolean(windowRef) ? " opacity-50" : "")}
+              (loadingItem === "argentWebWallet" ? " opacity-50" : "")}
             type="text"
             name="email"
             placeholder="Email"
-            disabled={Boolean(windowRef)}
+            disabled={loadingItem === "argentWebWallet"}
             bind:value={$mail.value}
             on:keyup={() => {
               if ($mail.invalid) {
@@ -242,7 +251,7 @@
             class={"absolute right-4 top-1/2 -translate-y-1/2 peer-placeholder-shown:opacity-0 peer-placeholder-shown:scale-0 opacity-1 scale-1 transition-all duration-300 " +
               ($mail.invalid ? "opacity-0 scale-0" : "")}
           >
-            {#if Boolean(windowRef)}
+            {#if loadingItem === "argentWebWallet"}
               <div role="status">
                 <svg
                   aria-hidden="true"
@@ -287,7 +296,7 @@
               </button>
             {/if}
           </div>
-          {#if Boolean(windowRef)}
+          {#if loadingItem === "argentWebWallet"}
             <div
               class="absolute rounded-xl left-0 right-0 bottom-0 top-0 cursor-pointer focus:ring-2 focus:outline-none focus:ring-neutral-200 dark:focus:ring-neutral-700"
               role="button"
