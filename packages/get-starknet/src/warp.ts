@@ -28,7 +28,7 @@ export const getTargetIframe = memo(
       background.style.bottom = "0"
       background.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
       background.style.zIndex = "9999"
-      background.style.backdropFilter = "blur(10px)"
+      background.style.backdropFilter = "blur(4px)"
 
       const messageHandler = (event: MessageEvent) => {
         console.log(

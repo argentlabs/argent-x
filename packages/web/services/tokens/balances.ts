@@ -75,7 +75,7 @@ const formatTokenBalanceToCharLength =
     return cleanedBalanceString
   }
 
-export const formatTokenAmount = formatTokenBalanceToCharLength(9)
+export const formatTokenAmount = formatTokenBalanceToCharLength(14)
 
 export const formatFeeTokenAmount = (amount: bigint): string => {
   return formatTokenAmount(amount, 18)
