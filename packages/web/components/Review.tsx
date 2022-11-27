@@ -1,16 +1,13 @@
 import { P4, icons } from "@argent/ui"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
-import { FC, PropsWithChildren, useMemo } from "react"
+import { FC, PropsWithChildren } from "react"
 
 import {
   EstimateDeploymentFeeResponse,
   EstimateFeeResponse,
 } from "../services/estimateFee"
-import { Review, reviewTransaction } from "../services/review"
-import {
-  TokenWithBalance,
-  formatFeeTokenAmount,
-} from "../services/tokens/balances"
+import { Review } from "../services/review"
+import { formatFeeTokenAmount } from "../services/tokens/balances"
 
 const { InfoIcon } = icons
 

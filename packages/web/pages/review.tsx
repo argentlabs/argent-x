@@ -127,7 +127,13 @@ export default function ReviewScreen() {
           return navigate.push(`/dashboard`)
         })}
       >
-        <Image src="/dapp-logo.svg" width={80} height={80} alt="Dapp logo" />
+        <Image
+          priority
+          src="/dapp-logo.svg"
+          width={80}
+          height={80}
+          alt="Dapp logo"
+        />
         <H5 mt={3}>Confirm transaction</H5>
         <P4 color="#8C8C8C" mb={6}>
           somecooldapp.xyz
