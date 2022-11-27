@@ -1,4 +1,5 @@
 import { NextRouter, useRouter } from "next/router"
+import { useEffect } from "react"
 
 import {
   getAccount as getMemoryAccount,
@@ -12,6 +13,8 @@ const allowedDestinations = {
   "/new-password": ["/new-password"],
   "/dashboard": ["/dashboard", "/review"],
 }
+
+const shouldShowIframe = ["/review"]
 
 const conditionallyPushTo = (
   router: NextRouter,
@@ -29,6 +32,55 @@ const conditionallyPushTo = (
 
 export const usePageGuard = () => {
   const router = useRouter()
+
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      const messageTarget: Window = window.opener ?? window.parent
+      const newHeight = entries[0].target.clientHeight
+      if (messageTarget && newHeight) {
+        messageTarget.postMessage(
+          {
+            type: "ARGENT_WEB_WALLET::HEIGHT_CHANGED",
+            data: {
+              height: newHeight,
+            },
+          },
+          "*",
+        )
+      }
+    })
+
+    const handler = (url: string) => {
+      const messageTarget: Window = window.opener ?? window.parent
+      console.log("change", url)
+      if (messageTarget) {
+        const [pathname] = url.split("?")
+        if (shouldShowIframe.includes(pathname)) {
+          messageTarget.postMessage(
+            {
+              type: "ARGENT_WEB_WALLET::SHOULD_SHOW",
+            },
+            "*",
+          )
+          observer.observe(window.document.body)
+        } else {
+          messageTarget.postMessage(
+            {
+              type: "ARGENT_WEB_WALLET::SHOULD_HIDE",
+            },
+            "*",
+          )
+          observer.disconnect()
+        }
+      }
+      return true
+    }
+    router.events.on("routeChangeComplete", handler)
+    return () => {
+      router.events.off("routeChangeComplete", handler)
+    }
+  }, [router])
+
   useBackendAccount({
     onSuccess: async (account) => {
       if (account.accounts[0]) {

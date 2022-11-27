@@ -1,4 +1,5 @@
 import { Button, H5, P4 } from "@argent/ui"
+import { MessageTypes } from "@argent/x-window"
 import { Box, Flex } from "@chakra-ui/react"
 import { UnsecuredJWT } from "jose"
 import Image from "next/image"
@@ -111,6 +112,18 @@ export default function ReviewScreen() {
 
           console.log("TX:", signed.transaction_hash)
 
+          const messageTarget: Window = window.opener ?? window.parent
+          if (messageTarget) {
+            const response: MessageTypes = {
+              type: "SIGN_TRANSACTION_RESPONSE",
+              meta: { forReceiptId: "333" },
+              data: {
+                signature: [signed.transaction_hash],
+              },
+            }
+            messageTarget.postMessage(response, "*")
+          }
+
           return navigate.push(`/dashboard`)
         })}
       >
@@ -130,7 +143,20 @@ export default function ReviewScreen() {
             variant="outline"
             colorScheme="accent"
             w="100%"
-            onClick={() => navigate.push("/dashboard")}
+            onClick={() => {
+              const messageTarget: Window = window.opener ?? window.parent
+              if (messageTarget) {
+                const response: MessageTypes = {
+                  type: "SIGN_TRANSACTION_FAILURE",
+                  meta: { forReceiptId: "333" },
+                  data: {
+                    error: "User rejected",
+                  },
+                }
+                messageTarget.postMessage(response, "*")
+              }
+              navigate.push("/dashboard")
+            }}
           >
             Cancel
           </Button>
