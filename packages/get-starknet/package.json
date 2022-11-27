@@ -32,9 +32,11 @@
   "scripts": {
     "build": "vite build",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "dev": "vite build --watch"
+    "dev": "vite build --watch",
+    "prepare": "yarn build"
   },
   "dependencies": {
+    "@argent/x-window": "^5.0.8",
     "bowser": "^2.11.0",
     "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2",
     "svelte-forms": "^2.3.1"

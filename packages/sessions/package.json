@@ -39,7 +39,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "prepare": "yarn build"
   },
   "bugs": {
     "url": "https://github.com/argentlabs/argent-x/issues"

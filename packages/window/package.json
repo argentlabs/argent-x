@@ -1,0 +1,31 @@
+{
+  "name": "@argent/x-window",
+  "version": "5.0.8",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/window.umd.js",
+  "module": "./dist/window.es.js",
+  "types": "./dist/window.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/window.es.js",
+      "require": "./dist/window.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc && vite build",
+    "prepare": "yarn build"
+  },
+  "devDependencies": {
+    "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2",
+    "typescript": "^4.9.3",
+    "vite": "^3.2.4"
+  },
+  "peerDependencies": {
+    "starknet": "^4.13.2"
+  }
+}
