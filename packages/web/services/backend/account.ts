@@ -212,7 +212,7 @@ export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
   return json.status
 }
 
-interface Account {
+export interface Account {
   name: string
   address: string
   ownerAddress: string

@@ -1,6 +1,9 @@
 import { NextRouter, useRouter } from "next/router"
 
-import { getAccount as getMemoryAccount } from "../services/account"
+import {
+  getAccount as getMemoryAccount,
+  retrieveAccountFromSession,
+} from "../services/account"
 import { useBackendAccount } from "./account"
 
 const allowedDestinations = {
@@ -28,8 +31,13 @@ export const usePageGuard = () => {
   const router = useRouter()
   useBackendAccount({
     onSuccess: async (account) => {
-      if ((account.accounts?.length ?? 0) > 0) {
-        if (await getMemoryAccount()) {
+      if (account.accounts[0]) {
+        if (
+          (await getMemoryAccount()) ||
+          (await retrieveAccountFromSession(account.accounts[0]).catch(
+            () => false,
+          ))
+        ) {
           return conditionallyPushTo(router, "/dashboard")
         }
         return conditionallyPushTo(router, "/password", {

@@ -7,13 +7,21 @@ export interface Device {
   encryptionKey: GenerateKeyPairResult
 }
 
+export interface Session {
+  id?: number
+  encryptionKey: GenerateKeyPairResult
+  expiresAt: number
+}
+
 export class StoreDexie extends Dexie {
   devices!: Table<Device>
+  session!: Table<Session>
 
   constructor() {
     super("store")
     this.version(1).stores({
       devices: "id, signingKey, encryptionKey",
+      session: "id, encryptionKey",
     })
   }
 }
