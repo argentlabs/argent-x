@@ -16,7 +16,7 @@ import { routes } from "../../routes"
 import { H2, H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenIcon } from "./TokenIcon"
-import { TokenMenu } from "./TokenMenu"
+import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
@@ -101,7 +101,7 @@ export const TokenScreen: FC = () => {
 
   return (
     <>
-      <IconBar back childAfter={<TokenMenu tokenAddress={address} />}>
+      <IconBar back childAfter={<TokenMenuDeprecated tokenAddress={address} />}>
         <H3>{name === "Ether" ? "Ethereum" : name}</H3>
       </IconBar>
       <TokenScreenWrapper>
