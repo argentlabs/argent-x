@@ -172,6 +172,8 @@
         windowRef.close()
       }
       windowRef = null
+
+      await warpConnection.call("reloadData")
     }
 
     cb(starknetWindowObject)
