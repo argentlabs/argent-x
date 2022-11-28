@@ -1,5 +1,6 @@
 import type { RemoteConnection } from "@argent/x-window"
 import { getRemoteHandle } from "@argent/x-window"
+import retry from "async-retry"
 import memo from "lodash-es/memoize"
 
 export const getIframeConnection = memo(
@@ -33,14 +34,29 @@ export const getIframeConnection = memo(
 
       setTimeout(() => reject(new Error("Timeout")), 20000)
 
+      const iframeLoaded = new Promise<void>((resolve) => {
+        iframe.addEventListener("load", () => {
+          resolve()
+        })
+      })
+
       background.appendChild(iframe)
       document.body.appendChild(background)
 
-      Promise.resolve().then(async () => {
-        const handle = await getRemoteHandle({
-          remoteWindow: iframe.contentWindow,
-          remoteOrigin: "*",
-          localWindow: window,
+      iframeLoaded.then(async () => {
+        const handle = await retry(
+          () =>
+            getRemoteHandle({
+              remoteWindow: iframe.contentWindow,
+              remoteOrigin: "*",
+              localWindow: window,
+            }),
+          {
+            maxRetryTime: 5,
+            minTimeout: 500,
+          },
+        ).catch((cause) => {
+          throw Error("Failed to connect to iframe", { cause })
         })
 
         handle.addEventListener("ARGENT_WEB_WALLET::SHOULD_SHOW", () => {

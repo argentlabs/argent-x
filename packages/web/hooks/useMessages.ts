@@ -109,5 +109,5 @@ export const useAccountMessageHandler = () => {
         throw Error("not implemented")
       },
     })
-  }, [localHandle, account, router])
+  }, [localHandle, account, router, mutate])
 }

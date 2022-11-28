@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ConnectionOptions, RemoteConnection } from "@argent/x-window"
+  import retry from "async-retry"
   import type { StarknetWindowObject } from "get-starknet-core"
   import type { ProviderInterface } from "starknet"
   import { onMount } from "svelte"
@@ -150,24 +151,24 @@
         `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
       )
 
-      // wait for popup to close
-      const interval = setInterval(() => {
-        if (windowRef?.closed) {
-          clearInterval(interval)
-          windowRef = null
-        }
-      }, 1000)
-
       // wait for message from popup
-      const messageHandler = await getRemoteHandle({
-        localWindow: globalWindow,
-        remoteWindow: windowRef,
-        remoteOrigin: "*",
+      const messageHandler = await retry(
+        () =>
+          getRemoteHandle({
+            localWindow: globalWindow,
+            remoteWindow: windowRef,
+            remoteOrigin: "*",
+          }),
+        {
+          maxRetryTime: 5,
+          minTimeout: 500,
+        },
+      ).catch((cause) => {
+        throw Error("Failed to connect to popup", { cause })
       })
 
       await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
 
-      clearInterval(interval)
       if (!windowRef.closed) {
         windowRef.close()
       }
@@ -238,7 +239,15 @@
         {#if webWalletEmail === null || loadingItem === "argentWebWallet"}
           <!-- Loading -->
           <li
-            class="mb-2 flex justify-center items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
+            class="mb-2 flex justify-center items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
+            on:click={() => {
+              windowRef?.focus()
+            }}
+            on:keydown={(e) => {
+              if (e.key === "Enter") {
+                windowRef?.focus()
+              }
+            }}
           >
             <div role="status">
               <svg
