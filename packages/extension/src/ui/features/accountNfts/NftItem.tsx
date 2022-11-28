@@ -12,6 +12,7 @@ interface NftItemProps {
 }
 
 const NftItem: FC<NftItemProps> = ({ logoSrc, name, thumbnailSrc, total }) => {
+  console.log(logoSrc)
   return (
     <Box as="figure">
       <Box position="relative">

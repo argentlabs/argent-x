@@ -1,5 +1,5 @@
-import { H4, H6 } from "@argent/ui"
-import { Box, Flex, SimpleGrid } from "@chakra-ui/react"
+import { H4 } from "@argent/ui"
+import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 
