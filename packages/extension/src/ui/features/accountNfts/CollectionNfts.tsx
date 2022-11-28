@@ -1,4 +1,4 @@
-import { BarBackButton, H4, NavigationContainer, P4 } from "@argent/ui"
+import { BarBackButton, H1, H4, H6, NavigationContainer, P4 } from "@argent/ui"
 import { Flex, Image, SimpleGrid } from "@chakra-ui/react"
 import { ethers } from "ethers"
 import { FC } from "react"
@@ -28,18 +28,45 @@ export const CollectionNfts: FC = () => {
 
   const { collectible, error } = useCollection(contractAddress, account)
 
+  for (let i = 0; i < 10; i++) {
+    collectible?.nfts.push(collectible?.nfts[0])
+  }
+
   if (!contractAddress) {
     return <></>
   }
 
   if (error) {
-    return <h1>Error loading</h1>
+    return (
+      <NavigationContainer
+        leftButton={
+          <BarBackButton
+            onClick={() => navigate(routes.accountCollections())}
+          />
+        }
+      >
+        <H1 mt="4" textAlign="center">
+          Error loading
+        </H1>
+      </NavigationContainer>
+    )
   }
 
   return (
     <NavigationContainer
       leftButton={
         <BarBackButton onClick={() => navigate(routes.accountCollections())} />
+      }
+      scrollContent={
+        <>
+          <Image
+            w="28px"
+            h="28px"
+            src={collectible?.imageUri}
+            borderRadius="lg"
+          />
+          <H6>{collectible?.name}</H6>
+        </>
       }
     >
       {collectible ? (

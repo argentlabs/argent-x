@@ -131,8 +131,6 @@ const nonWalletRoutes = (
 // Routes which need an unlocked wallet and therefore can also sign actions
 const legacyUiWalletRoutes = (
   <>
-    <Route path={routes.accountNft.path} element={<NftScreen />} />
-    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
@@ -195,6 +193,8 @@ const legacyUiWalletRoutes = (
 /** Screens using new UI */
 const walletRoutes = (
   <>
+    <Route path={routes.accountNft.path} element={<NftScreen />} />
+    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.networkWarning.path}
       element={<NetworkWarningScreen />}

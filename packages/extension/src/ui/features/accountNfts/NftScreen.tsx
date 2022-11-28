@@ -76,8 +76,6 @@ export const NftScreen: FC = () => {
     )
   }
 
-  console.log(nft)
-
   return (
     <>
       <NavigationContainer
