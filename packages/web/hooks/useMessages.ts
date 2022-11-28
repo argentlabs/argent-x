@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import { useEffect } from "react"
 
 import { encodeTransactions } from "../pages/dashboard"
+import { retrieveAccountFromSession } from "../services/account"
 import { getAccount } from "../services/backend/account"
 import { useAccount } from "./account"
 import { useLocalHandle } from "./usePageGuard"
@@ -36,7 +37,7 @@ function waitForAction<T extends keyof ActionEvents>(action: T) {
 export const useAccountMessageHandler = () => {
   const router = useRouter()
   const localHandle = useLocalHandle()
-  const { account } = useAccount()
+  const { account, mutate } = useAccount()
 
   useEffect(() => {
     if (!localHandle) {
@@ -72,6 +73,10 @@ export const useAccountMessageHandler = () => {
         } catch (e) {
           return { isLoggedIn: false }
         }
+      },
+      async reloadData() {
+        await retrieveAccountFromSession().catch(() => {})
+        await mutate()
       },
       async execute(transactions, abis, transactionsDetail) {
         const txs = Array.isArray(transactions) ? transactions : [transactions]
