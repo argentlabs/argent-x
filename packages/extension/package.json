@@ -91,6 +91,7 @@
     "ethers": "^5.5.1",
     "jose": "^4.3.6",
     "lodash-es": "^4.17.21",
+    "micro-starknet": "^0.1.1",
     "nanoid": "^4.0.0",
     "object-hash": "^3.0.0",
     "qr-code-styling": "^1.6.0-rc.1",
