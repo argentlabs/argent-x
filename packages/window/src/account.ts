@@ -1,130 +1,62 @@
-import type {
+import { RemoteHandle } from "post-me"
+import {
   Abi,
+  Account,
+  AccountInterface,
+  AllowArray,
   Call,
-  DeclareSignerDetails,
-  InvocationsSignerDetails,
+  InvocationsDetails,
+  InvokeFunctionResponse,
   ProviderInterface,
   Signature,
   SignerInterface,
+  typedData,
 } from "starknet"
-import { Account, typedData } from "starknet"
 
-import type { WalletMessenger } from "./messages"
+import { WindowMethods } from "./messages/types"
 
-class MessageSigner implements SignerInterface {
-  constructor(private readonly messager: WalletMessenger) {}
-
+class UnimplementedSigner implements SignerInterface {
   async getPubKey(): Promise<string> {
-    const dataPromise = this.messager.listenMessage("GET_PUBKEY_RESPONSE")
-    this.messager.postMessage({ type: "GET_PUBKEY_REQUEST" })
-    const data = await dataPromise
-    return data.pubkey
+    throw new Error("Method not implemented")
   }
 
-  async signMessage(
-    typedData: typedData.TypedData,
-    accountAddress: string,
-  ): Promise<Signature> {
-    const receiptPromise = this.messager.listenMessage(
-      "SIGN_MESSAGE_REQUEST_RECEIPT",
-    )
-    this.messager.postMessage({
-      type: "SIGN_MESSAGE_REQUEST",
-      data: { typedData, accountAddress },
-    })
-    const receipt = await receiptPromise
-    const dataOrError = await Promise.race([
-      this.messager.listenMessage(
-        "SIGN_MESSAGE_RESPONSE",
-        (message) => message.meta.forReceiptId === receipt.receiptId,
-      ),
-      this.messager.listenMessage(
-        "SIGN_MESSAGE_FAILURE",
-        (message) => message.meta.forReceiptId === receipt.receiptId,
-      ),
-    ])
-
-    if ("error" in dataOrError) {
-      throw Error(dataOrError.error)
-    }
-
-    return dataOrError.signature
+  async signMessage(): Promise<Signature> {
+    throw new Error("Method not implemented")
   }
 
-  async signTransaction(
-    transactions: Call[],
-    transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[] | undefined,
-  ): Promise<Signature> {
-    const receiptPromise = this.messager.listenMessage(
-      "SIGN_TRANSACTION_REQUEST_RECEIPT",
-    )
-    this.messager.postMessage({
-      type: "SIGN_TRANSACTION_REQUEST",
-      data: { transactions, transactionsDetail, abis },
-    })
-    const receipt = await receiptPromise
-    const dataOrError = await Promise.race([
-      this.messager.listenMessage(
-        "SIGN_TRANSACTION_RESPONSE",
-        (m) => m.meta.forReceiptId === receipt.receiptId,
-      ),
-      this.messager.listenMessage(
-        "SIGN_TRANSACTION_FAILURE",
-        (m) => m.meta.forReceiptId === receipt.receiptId,
-      ),
-    ])
-
-    if ("error" in dataOrError) {
-      throw new Error(dataOrError.error)
-    }
-
-    return dataOrError.signature
+  async signTransaction(): Promise<Signature> {
+    throw new Error("Method not implemented")
   }
 
-  async signDeclareTransaction(
-    declareContract: DeclareSignerDetails,
-  ): Promise<Signature> {
-    const receiptPromise = this.messager.listenMessage(
-      "SIGN_DECLARE_TRANSACTION_REQUEST_RECEIPT",
-    )
-    this.messager.postMessage({
-      type: "SIGN_DECLARE_TRANSACTION_REQUEST",
-      data: { declareContract },
-    })
-    const receipt = await receiptPromise
-    const dataOrError = await Promise.race([
-      this.messager.listenMessage(
-        "SIGN_DECLARE_TRANSACTION_RESPONSE",
-        (m) => m.meta.forReceiptId === receipt.receiptId,
-      ),
-      this.messager.listenMessage(
-        "SIGN_DECLARE_TRANSACTION_FAILURE",
-        (m) => m.meta.forReceiptId === receipt.receiptId,
-      ),
-    ])
-
-    if ("error" in dataOrError) {
-      throw new Error(dataOrError.error)
-    }
-
-    return dataOrError.signature
+  async signDeclareTransaction(): Promise<Signature> {
+    throw new Error("Method not implemented")
   }
 
   async signDeployAccountTransaction(): Promise<Signature> {
-    throw new Error(
-      "Method not implemented. Account normally gets deployed by the Wallet and doesnt need to be done explicitly.",
-    )
+    throw new Error("Method not implemented")
   }
 }
 
-export class MessageAccount extends Account {
+export class MessageAccount extends Account implements AccountInterface {
+  public signer = new UnimplementedSigner()
+
   constructor(
-    messenger: WalletMessenger,
     provider: ProviderInterface,
     public address: string,
-    public signer = new MessageSigner(messenger),
+    private readonly remoteHandle: RemoteHandle<WindowMethods>,
   ) {
-    super(provider, address, signer)
+    super(provider, address, new UnimplementedSigner())
+  }
+
+  execute(
+    calls: AllowArray<Call>,
+    abis?: Abi[] | undefined,
+    transactionsDetail?: InvocationsDetails | undefined,
+  ): Promise<InvokeFunctionResponse> {
+    return this.remoteHandle.call("execute", calls, abis, transactionsDetail)
+  }
+
+  signMessage(typedData: typedData.TypedData): Promise<Signature> {
+    return this.remoteHandle.call("signMessage", typedData)
   }
 }

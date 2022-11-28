@@ -1,9 +1,10 @@
-import type { Subscribable } from "@argent/x-window"
+import type { RemoteConnection } from "@argent/x-window"
+import { getRemoteHandle } from "@argent/x-window"
 import memo from "lodash-es/memoize"
 
-export const getTargetIframe = memo(
+export const getIframeConnection = memo(
   async (targetUrl: string) =>
-    new Promise<HTMLIFrameElement>((resolve, reject) => {
+    new Promise<RemoteConnection>((resolve, reject) => {
       const iframe = document.createElement("iframe")
       iframe.src = targetUrl
       // middle of the screen
@@ -28,47 +29,40 @@ export const getTargetIframe = memo(
       background.style.bottom = "0"
       background.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
       background.style.zIndex = "9999"
-      background.style.backdropFilter = "blur(4px)"
-
-      const messageHandler = (event: MessageEvent) => {
-        console.log(
-          "received message",
-          event.origin,
-          targetUrl,
-          event.data.type,
-        )
-        if (targetUrl.includes(event.origin)) {
-          if (event.data.type === "ARGENT_WEB_WALLET::CONNECT") {
-            return resolve(iframe)
-          }
-          if (event.data.type === "ARGENT_WEB_WALLET::SHOULD_SHOW") {
-            background.style.display = "block"
-          }
-          if (event.data.type === "ARGENT_WEB_WALLET::SHOULD_HIDE") {
-            background.style.display = "none"
-          }
-          if (event.data.type === "ARGENT_WEB_WALLET::HEIGHT_CHANGED") {
-            const suggestedHeight = event.data.data.height
-            iframe.style.height = `min(${suggestedHeight || 420}px, 100%)`
-          }
-        }
-      }
-      window.addEventListener("message", messageHandler)
+      ;(background.style as any).backdropFilter = "blur(4px)"
 
       setTimeout(() => reject(new Error("Timeout")), 20000)
 
       background.appendChild(iframe)
       document.body.appendChild(background)
+
+      Promise.resolve().then(async () => {
+        const handle = await getRemoteHandle({
+          remoteWindow: iframe.contentWindow,
+          remoteOrigin: "*",
+          localWindow: window,
+        })
+
+        handle.addEventListener("ARGENT_WEB_WALLET::SHOULD_SHOW", () => {
+          background.style.display = "block"
+        })
+        handle.addEventListener("ARGENT_WEB_WALLET::SHOULD_HIDE", () => {
+          background.style.display = "none"
+        })
+        handle.addEventListener(
+          "ARGENT_WEB_WALLET::HEIGHT_CHANGED",
+          (height) => {
+            iframe.style.height = `min(${height || 420}px, 100%)`
+          },
+        )
+        await handle.once("ARGENT_WEB_WALLET::CONNECT")
+        return resolve(handle)
+      })
     }),
 )
 
-export const warp = (targetUrl: string): Subscribable => ({
-  postMessage(message, targetOrigin) {
-    getTargetIframe(targetUrl).then((iframe) => {
-      iframe.contentWindow?.postMessage(message, targetOrigin)
-    })
-  },
-  addEventListener(type, listener) {
-    window.addEventListener("message", listener)
-  },
-})
+export const warp = (targetUrl: string) =>
+  getIframeConnection(targetUrl).then((h) => {
+    console.log("warp", h)
+    return h
+  })
