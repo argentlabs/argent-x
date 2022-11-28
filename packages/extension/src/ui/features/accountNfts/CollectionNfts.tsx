@@ -28,10 +28,6 @@ export const CollectionNfts: FC = () => {
 
   const { collectible, error } = useCollection(contractAddress, account)
 
-  for (let i = 0; i < 10; i++) {
-    collectible?.nfts.push(collectible?.nfts[0])
-  }
-
   if (!contractAddress) {
     return <></>
   }
