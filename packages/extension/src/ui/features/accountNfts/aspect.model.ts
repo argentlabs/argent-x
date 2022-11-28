@@ -1,6 +1,11 @@
 import { number } from "starknet"
 
 export interface AspectNft {
+  best_bid_order?: {
+    payment_address: string
+    payment_amount: number.BigNumberish
+    payment_amount_per: number.BigNumberish
+  }
   contract_address: string
   token_id: string
   name?: string

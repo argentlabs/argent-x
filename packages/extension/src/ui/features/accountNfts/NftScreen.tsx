@@ -1,74 +1,41 @@
+import {
+  BarBackButton,
+  BarCloseButton,
+  Button,
+  CellStack,
+  H5,
+  NavigationContainer,
+  P4,
+  icons,
+} from "@argent/ui"
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Flex,
+  Image,
+  SimpleGrid,
+} from "@chakra-ui/react"
+import { ethers } from "ethers"
 import { FC, lazy } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
-import styled from "styled-components"
 import { Schema, object } from "yup"
 
-import { Button, ButtonGroup } from "../../components/Button"
-import { ColumnCenter } from "../../components/Column"
-import { IconBar } from "../../components/IconBar"
-import { AspectLogo } from "../../components/Icons/AspectLogo"
-import { MintSquareLogo } from "../../components/Icons/MintSquareLogo"
-import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { addressSchema, isEqualAddress } from "../../services/addresses"
-import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { openAspectNft } from "./aspect.service"
 import { openMintSquareNft } from "./mint-square.service"
-import { NftThumbnailImage } from "./NftThumbnailImage"
 import { useNfts } from "./useNfts"
+import { ViewOnMenu } from "./ViewOnMenu"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
 
-export const Container = styled.div`
-  margin: 0 24px;
-
-  h3 {
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 34px;
-    margin-bottom: 16px;
-  }
-
-  img {
-    width: 100%;
-    border-radius: 8px;
-  }
-
-  a {
-    color: ${({ theme }) => theme.text1};
-    font-size: 16px;
-  }
-
-  p {
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 20px;
-    margin: 10px 0 15px 0;
-  }
-
-  ${ButtonGroup} {
-    margin-top: 10px;
-  }
-`
-
-const NftDescription = styled.div`
-  margin: 16px 0 20px;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-`
-
-const ViewOnText = styled.div`
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-`
-
-const ViewOnButton = styled(Button)`
-  padding: 10px;
-`
+const { SendIcon, DropdownDownIcon } = icons
 
 export interface SendNftInput {
   recipient: string
@@ -96,43 +63,76 @@ export const NftScreen: FC = () => {
     return <Navigate to={routes.accounts()} />
   }
 
+  if (!nft) {
+    return (
+      <NavigationContainer
+        leftButton={
+          <BarBackButton
+            onClick={() => navigate(routes.accountCollections())}
+          />
+        }
+        title="Not found"
+      />
+    )
+  }
+
+  console.log(nft)
+
   return (
     <>
-      {nft ? (
-        <IconBar
-          back
-          childAfter={
-            <TokenMenu
-              tokenAddress={nft.contract_address}
-              canHideToken={false}
-            />
-          }
-        >
-          <H3>
-            {nft.name ||
-              nft.contract.name_custom ||
-              nft.contract.name ||
-              "Untitled"}
-          </H3>
-        </IconBar>
-      ) : (
-        <IconBar back>
-          <H3>Not found</H3>
-        </IconBar>
-      )}
-      <Container>
-        {nft ? (
-          <>
-            {nft.animation_uri ? (
-              <LazyNftModelViewer nft={nft} />
-            ) : (
-              <NftThumbnailImage src={nft.image_url_copy} alt={nft.name} />
-            )}
-            <NftDescription>{nft.description}</NftDescription>
-          </>
-        ) : null}
+      <NavigationContainer
+        leftButton={
+          <TokenMenu tokenAddress={nft.contract_address} canHideToken={false} />
+        }
+        rightButton={<BarCloseButton onClick={() => navigate(-1)} />}
+      >
+        <>
+          {nft.animation_uri ? (
+            <LazyNftModelViewer nft={nft} />
+          ) : (
+            <Box mx="10">
+              <Image
+                border="solid 2px"
+                borderColor="transparent"
+                borderRadius="lg"
+                alt={nft.name}
+                src={nft.image_url_copy}
+              />
+            </Box>
+          )}
+          <H5 py="6" textAlign="center">
+            {nft.name}
+          </H5>
+        </>
 
-        <ColumnCenter gap="20px" style={{ marginBottom: "32px" }}>
+        <CellStack pb="18">
+          <Accordion allowToggle>
+            <AccordionItem>
+              <AccordionButton justifyContent="space-between">
+                <P4 color="neutrals.300">Description</P4> <AccordionIcon />
+              </AccordionButton>
+              <AccordionPanel>{nft.description}</AccordionPanel>
+            </AccordionItem>
+          </Accordion>
+
+          <Flex
+            justifyContent="space-between"
+            alignItems="center"
+            px="4"
+            py="2"
+            border="solid 1px"
+            borderColor="neutrals.700"
+            borderRadius="lg"
+          >
+            <P4 color="neutrals.300">Best Offer</P4>
+            <P4>
+              {ethers.utils.formatEther(nft.best_bid_order?.payment_amount) ||
+                "0"}
+              ETH
+            </P4>
+          </Flex>
+        </CellStack>
+        {/*  <ColumnCenter gap="20px" style={{ marginBottom: "32px" }}>
           <RowCentered gap="8px">
             <ViewOnButton
               onClick={() =>
@@ -156,15 +156,36 @@ export const NftScreen: FC = () => {
               </RowCentered>
             </ViewOnButton>
           </RowCentered>
-
+ */}
+        {/* </ColumnCenter> */}
+        <SimpleGrid
+          bg="neutrals.900"
+          position="fixed"
+          bottom="0"
+          left="0"
+          right="0"
+          px="4"
+          py="3"
+          gap="2"
+          columns={2}
+          borderTop="solid 1px"
+          borderColor="neutrals.800"
+        >
+          <ViewOnMenu
+            contractAddress={contractAddress}
+            tokenId={tokenId}
+            networkId={account.networkId}
+          />
           <Button
+            w="100%"
             type="button"
             onClick={() => navigate(routes.sendNft(contractAddress, tokenId))}
+            leftIcon={<SendIcon />}
           >
             Send
           </Button>
-        </ColumnCenter>
-      </Container>
+        </SimpleGrid>
+      </NavigationContainer>
     </>
   )
 }
