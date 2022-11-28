@@ -1,68 +1,20 @@
-import { Button, CellStack, H4, H6, P3, logos } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { H4, H6 } from "@argent/ui"
+import { Box, Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
-import { RowCentered } from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { A, P } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import { Collections } from "./aspect.service"
 import { EmptyCollections } from "./EmptyCollections"
-import { NftThumbnailImage } from "./NftThumbnailImage"
+import { NftFigure } from "./NftFigure"
+import { NftItem } from "./NftItem"
 import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
 
-export const NftItem = styled.figure`
-  display: inline-block;
-  overflow: hidden;
-  margin: 8px;
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.15);
-  cursor: pointer;
-  position: relative;
-
-  img {
-    width: 148px;
-    height: 148px;
-    object-fit: cover;
-  }
-
-  figcaption {
-    ${({ theme }) => theme.flexRowNoWrap}
-    justify-content: space-between;
-    width: 148px;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 20px;
-    padding: 2px 10px 5px 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  transition: all 0.2s ease-in-out;
-  &:hover {
-    transform: scale(1.05);
-  }
-`
-
-const CollectiblesNumber = styled(RowCentered)`
-  background-color: ${({ theme }) => theme.bg1};
-  height: 24px;
-  width: 24px;
-  border-radius: 50%;
-  color: ${({ theme }) => theme.white};
-
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 18px;
-`
-const { Aspect, Briq, Mintsquare } = logos
 interface AccountCollectionsProps {
   account: Account
   withHeader?: boolean
@@ -77,27 +29,31 @@ const Collections: FC<AccountCollectionsProps> = ({
 }) => {
   const navigate = useNavigate()
   const collectibles = useCollections(account)
+
   return (
     <>
       {collectibles.length === 0 && (
         <EmptyCollections networkId={account.networkId} />
       )}
-      {(customList || collectibles).map((collectible) => (
-        <NftItem
-          key={collectible.contractAddress}
-          onClick={() =>
-            navigate(routes.collectionNfts(collectible.contractAddress), {
-              state: { navigateToSend },
-            })
-          }
-        >
-          <NftThumbnailImage src={collectible.imageUri} />
-          <figcaption>
-            {collectible.name}
-            <CollectiblesNumber>{collectible.nfts.length}</CollectiblesNumber>
-          </figcaption>
-        </NftItem>
-      ))}
+      <SimpleGrid gridTemplateColumns="repeat(auto-fill, 158px)" gap="3" py={4}>
+        {(customList || collectibles).map((collectible) => (
+          <NftFigure
+            key={collectible.contractAddress}
+            onClick={() =>
+              navigate(routes.collectionNfts(collectible.contractAddress), {
+                state: { navigateToSend },
+              })
+            }
+          >
+            <NftItem
+              name={collectible.name}
+              thumbnailSrc={collectible.nfts[0].image_url_copy || ""}
+              logoSrc={collectible.imageUri}
+              total={collectible.nfts.length}
+            />
+          </NftFigure>
+        ))}
+      </SimpleGrid>
     </>
   )
 }
@@ -122,14 +78,7 @@ export const AccountCollections: FC<AccountCollectionsProps> = ({
   return (
     <>
       {withHeader && <H4 textAlign="center">NFTs</H4>}
-      <Flex
-        direction="column"
-        flex={1}
-        mx="4"
-        textAlign="center"
-        justifyContent="center"
-        {...rest}
-      >
+      <Flex direction="column" flex={1} {...rest} mx="4">
         <ErrorBoundary fallback={<CollectionsFallback account={account} />}>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             <Collections

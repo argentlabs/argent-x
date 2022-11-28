@@ -1,40 +1,43 @@
-import { isString } from "lodash-es"
+import { Box, Image } from "@chakra-ui/react"
 import { FC, ImgHTMLAttributes } from "react"
-import styled from "styled-components"
 
 import { ImageNotSupportedOutlinedIcon } from "../../components/Icons/MuiIcons"
-
-const PlaceholderSizer = styled.div`
-  height: 0;
-  width: 100%;
-  padding-bottom: 100%;
-  position: relative;
-`
-
-const Placeholder = styled.div`
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
 
 type NftThumbnailImage = ImgHTMLAttributes<HTMLImageElement>
 
 /** Transparently displays an image or palceholder fallback set to square aspect ratio */
 
 export const NftThumbnailImage: FC<NftThumbnailImage> = ({ src, ...rest }) => {
-  if (isString(src)) {
-    return <img src={src} {...rest} />
-  }
   return (
-    <PlaceholderSizer {...rest}>
-      <Placeholder>
-        <ImageNotSupportedOutlinedIcon />
-      </Placeholder>
-    </PlaceholderSizer>
+    <Image
+      src={src}
+      {...rest}
+      w="142px"
+      h="142px"
+      borderRadius="lg"
+      position="relative"
+      sx={{
+        _groupHover: {
+          transform: "scale(1.05)",
+          transition: "all 0.2s ease-in-out",
+        },
+      }}
+      fallback={
+        <Box height={0} width="100%" position="relative" pb="100%" {...rest}>
+          <Box
+            position="absolute"
+            top={0}
+            bottom={0}
+            left={0}
+            right={0}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <ImageNotSupportedOutlinedIcon />
+          </Box>
+        </Box>
+      }
+    />
   )
 }

@@ -1,10 +1,17 @@
 import { Button, CellStack, H6, P3, logos } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 const { Aspect, Briq, Mintsquare } = logos
 
 const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
-  <>
+  <Flex
+    direction="column"
+    flex={1}
+    mx="4"
+    textAlign="center"
+    justifyContent="center"
+  >
     <H6 color="neutrals.400">No NFTs</H6>
     <P3 color="neutrals.400" mb="3" mt="1.5">
       Discover NFTs on StarkNet
@@ -75,7 +82,7 @@ const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
         </>
       )}
     </CellStack>
-  </>
+  </Flex>
 )
 
 export { EmptyCollections }
