@@ -11,6 +11,7 @@
   "dependencies": {
     "@argent/ui": "^5.0.3",
     "@argent/x-multicall": "^5.0.3",
+    "@argent/x-window": "^5.0.8",
     "@chakra-ui/react": "^2.3.7",
     "@hookform/resolvers": "^2.9.10",
     "@noble/hashes": "^1.1.3",

@@ -6,12 +6,14 @@ import { useForm } from "react-hook-form"
 
 import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
+import { useLocalHandle } from "../hooks/usePageGuard"
 import { createPasswordFormSchema } from "../schemas/forms/password"
 import { isSubmitDisabled } from "../schemas/utils"
 import { createAccount } from "../services/account"
 
 export default function NewPassword() {
   const navigate = useRouter()
+  const handler = useLocalHandle()
 
   const { formState, handleSubmit, setError, register } = useForm({
     defaultValues: {
@@ -30,18 +32,9 @@ export default function NewPassword() {
       as="form"
       onSubmit={handleSubmit(async ({ password }) => {
         try {
-          const account = await createAccount(password)
-          if (window.opener) {
-            window.opener.postMessage(
-              {
-                type: "ARGENT_WEB_WALLET::CONNECT",
-                payload: {
-                  address: account.address,
-                },
-              },
-              "*",
-            )
-            return window.close()
+          await createAccount(password)
+          if (handler) {
+            handler.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
           }
           return navigate.push("/dashboard")
         } catch (error) {

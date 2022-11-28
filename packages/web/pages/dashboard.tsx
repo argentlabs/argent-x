@@ -1,5 +1,4 @@
 import { Button, P3 } from "@argent/ui"
-import { MessageTypes } from "@argent/x-window"
 import { Box, Spinner } from "@chakra-ui/react"
 import { utils } from "ethers"
 import { UnsecuredJWT } from "jose"
@@ -13,6 +12,8 @@ import { Navigate } from "../components/Navigate"
 import { useAccount } from "../hooks/account"
 import { useTokenBalance } from "../hooks/balance"
 import { useTokens } from "../hooks/token"
+import { useAccountMessageHandler } from "../hooks/useMessages"
+import { useLocalHandle } from "../hooks/usePageGuard"
 import { formatAddress } from "../services/account"
 import { Token } from "../services/tokens/balances"
 import Home from "."
@@ -93,7 +94,7 @@ const ClickToCopy: FC<PropsWithChildren<{ value: string }>> = ({
   )
 }
 
-const encodeTransactions = (transactions: Call[]): string => {
+export const encodeTransactions = (transactions: Call[]): string => {
   const unsignedJwt = new UnsecuredJWT({
     transactions,
   }).encode()
@@ -101,79 +102,9 @@ const encodeTransactions = (transactions: Call[]): string => {
   return unsignedJwt
 }
 
-const useHandleMessages = (account?: AccountInterface) => {
-  const navigate = useRouter()
-  useEffect(() => {
-    if (!account) return
-
-    const messageTarget: Window = window.opener ?? window.parent
-    const handleMessage = (event: MessageEvent<MessageTypes>) => {
-      console.log("WW", event.origin, event.data)
-      if (event.data.type === "CONNECT_REQUEST") {
-        const receiptResponse: MessageTypes = {
-          type: "CONNECT_REQUEST_RECEIPT",
-          data: {
-            receiptId: "123",
-          },
-        }
-        messageTarget.postMessage(receiptResponse, event.origin)
-        const response: MessageTypes = {
-          type: "CONNECT_RESPONSE",
-          meta: { forReceiptId: "123" },
-          data: {
-            selectedAddress: account.address,
-          },
-        }
-        messageTarget.postMessage(response, event.origin)
-      }
-      if (event.data.type === "SIGN_TRANSACTION_REQUEST") {
-        const receiptResponse: MessageTypes = {
-          type: "SIGN_TRANSACTION_REQUEST_RECEIPT",
-          data: {
-            receiptId: "333",
-          },
-        }
-        messageTarget.postMessage(receiptResponse, event.origin)
-
-        navigate.push(
-          `/review?transactions=${encodeTransactions(
-            event.data.data.transactions,
-          )}`,
-          "/review",
-        )
-      }
-    }
-
-    window.addEventListener("message", handleMessage)
-
-    return () => {
-      window.removeEventListener("message", handleMessage)
-    }
-  }, [account])
-}
-
 export default function Dashboard() {
   const navigate = useRouter()
   const { isValidating, account, error } = useAccount()
-
-  useEffect(() => {
-    const messageTarget: Window = window.opener ?? window.parent
-    if (messageTarget && account && !isValidating) {
-      messageTarget.postMessage(
-        {
-          type: "ARGENT_WEB_WALLET::CONNECT",
-          payload: {
-            address: account.address,
-          },
-        },
-        "*",
-      )
-      if (window.opener) {
-        window.close()
-      }
-    }
-  }, [account, isValidating])
-  useHandleMessages(account)
 
   if (error) {
     return <Navigate to="/" />

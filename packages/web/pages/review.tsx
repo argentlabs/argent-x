@@ -1,5 +1,4 @@
 import { Button, H5, P4 } from "@argent/ui"
-import { MessageTypes } from "@argent/x-window"
 import { Box, Flex } from "@chakra-ui/react"
 import { UnsecuredJWT } from "jose"
 import Image from "next/image"
@@ -17,6 +16,7 @@ import {
   useEstimateTransactions,
   useReview,
 } from "../hooks/transactions"
+import { actionEmitter } from "../hooks/useMessages"
 import {
   ACCOUNT_IMPLEMENTATION_CLASS_HASH,
   PROXY_CLASS_HASH,
@@ -41,7 +41,7 @@ export default function ReviewScreen() {
   }, [transactionsString])
 
   const deploymentFees = useEstimateDeployment()
-  const executionFees = useEstimateTransactions(transactions)
+  const { executionFees, error } = useEstimateTransactions(transactions)
   const review = useReview(transactions)
   const feeTokenBalance = useFeeTokenBalance()
 
@@ -112,17 +112,10 @@ export default function ReviewScreen() {
 
           console.log("TX:", signed.transaction_hash)
 
-          const messageTarget: Window = window.opener ?? window.parent
-          if (messageTarget) {
-            const response: MessageTypes = {
-              type: "SIGN_TRANSACTION_RESPONSE",
-              meta: { forReceiptId: "333" },
-              data: {
-                signature: [signed.transaction_hash],
-              },
-            }
-            messageTarget.postMessage(response, "*")
-          }
+          actionEmitter.emit("execute", {
+            success: true,
+            txHash: signed.transaction_hash,
+          })
 
           return navigate.push(`/dashboard`)
         })}
@@ -142,7 +135,11 @@ export default function ReviewScreen() {
           review={review}
           executionFees={executionFees}
           deploymentFees={deploymentFees}
-          balanceTooLowToPayFees={balanceTooLowToPayFees}
+          error={
+            balanceTooLowToPayFees
+              ? Error("Insufficient balance to pay fees")
+              : error
+          }
         />
         <Flex w="100%" alignItems="center" gap={2}>
           <Button
@@ -150,17 +147,9 @@ export default function ReviewScreen() {
             colorScheme="accent"
             w="100%"
             onClick={() => {
-              const messageTarget: Window = window.opener ?? window.parent
-              if (messageTarget) {
-                const response: MessageTypes = {
-                  type: "SIGN_TRANSACTION_FAILURE",
-                  meta: { forReceiptId: "333" },
-                  data: {
-                    error: "User rejected",
-                  },
-                }
-                messageTarget.postMessage(response, "*")
-              }
+              actionEmitter.emit("execute", {
+                success: false,
+              })
               navigate.push("/dashboard")
             }}
           >

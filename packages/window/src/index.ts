@@ -1,5 +1,12 @@
 export type { GetArgentStarknetWindowObject, Variant } from "./starknet"
-export type { MessageTypes, WalletMessenger, Subscribable } from "./messages"
+export type {
+  LocalConnection,
+  RemoteConnection,
+  WindowEvents,
+  WindowMethods,
+  ConnectionOptions,
+} from "./messages/types"
 
 export { getArgentStarknetWindowObject } from "./starknet"
-export { WindowMessenger } from "./messages"
+export { getRemoteHandle } from "./messages/remote"
+export { getLocalHandle } from "./messages/local"

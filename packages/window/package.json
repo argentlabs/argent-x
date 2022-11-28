@@ -27,5 +27,9 @@
   },
   "peerDependencies": {
     "starknet": "^4.13.2"
+  },
+  "dependencies": {
+    "mitt": "^3.0.0",
+    "post-me": "^0.4.5"
   }
 }

@@ -1,6 +1,6 @@
 import objectHash from "object-hash"
 import { useMemo } from "react"
-import { Call } from "starknet"
+import { Call, GatewayError } from "starknet"
 import useSwr from "swr"
 
 import {
@@ -20,12 +20,20 @@ export const useReview = (transactions: Call[]) => {
 
 export const useEstimateTransactions = (transactions: Call[]) => {
   const hash = useMemo(() => objectHash({ transactions }), [transactions])
-  const { data: executionFees } = useSwr(
+  const { data: executionFees, error } = useSwr(
     ["services/estimateFee/estimateTransactions", hash],
     () => estimateTransactions(transactions),
+    {
+      shouldRetryOnError(err) {
+        if (err instanceof GatewayError) {
+          return false
+        }
+        return true
+      },
+    },
   )
 
-  return executionFees
+  return { executionFees, error }
 }
 
 export const useEstimateDeployment = () => {

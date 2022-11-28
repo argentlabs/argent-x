@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WindowMessenger } from "@argent/x-window"
+  import type { ConnectionOptions, RemoteConnection } from "@argent/x-window"
   import type { StarknetWindowObject } from "get-starknet-core"
   import type { ProviderInterface } from "starknet"
   import { onMount } from "svelte"
@@ -29,7 +29,9 @@
 
   let cb = async (value: StarknetWindowObject | null) => {
     setLoadingItem(value?.id ?? false)
-    await callback(value).catch(() => {})
+    await callback(value)
+      .catch(() => {})
+      .then((e) => console.log("callback done", e))
     setLoadingItem(false)
   }
 
@@ -55,27 +57,22 @@
     version: "1.0.0",
   }
   let starknetWindowObject: StarknetWindowObject | null = null
-  let messenger: WindowMessenger | null = null
   let provider: ProviderInterface | null = null
+  let getRemoteHandle: (
+    options: ConnectionOptions,
+  ) => Promise<RemoteConnection> | null = null
   onMount(async () => {
-    const { getArgentStarknetWindowObject, WindowMessenger } = await import(
-      "@argent/x-window"
-    )
+    const { getArgentStarknetWindowObject, getRemoteHandle: _getRemoteHandle } =
+      await import("@argent/x-window")
     const { defaultProvider } = await import("starknet")
     const { warp } = await import("../warp")
 
-    messenger = new WindowMessenger(
-      {
-        window: globalWindow,
-        origin,
-      },
-      warp(origin),
-    )
     provider = defaultProvider
-    starknetWindowObject = await getArgentStarknetWindowObject(
+    getRemoteHandle = _getRemoteHandle
+    starknetWindowObject = getArgentStarknetWindowObject(
       walletOptions,
-      messenger,
       provider,
+      await warp(origin),
     )
 
     if (theme === null) {
@@ -207,18 +204,21 @@
             }, 1000)
 
             // wait for message from popup
-            const messageHandler = async (event) => {
-              if (
-                event.origin === origin &&
-                event.data.type === "ARGENT_WEB_WALLET::CONNECT"
-              ) {
-                window.removeEventListener("message", messageHandler)
-                clearInterval(interval)
-                windowRef = null
-                cb(starknetWindowObject)
-              }
+            const messageHandler = await getRemoteHandle({
+              localWindow: globalWindow,
+              remoteWindow: windowRef,
+              remoteOrigin: "*",
+            })
+
+            await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
+
+            clearInterval(interval)
+            if (!windowRef.closed) {
+              windowRef.close()
             }
-            window.addEventListener("message", messageHandler)
+            windowRef = null
+
+            cb(starknetWindowObject)
           }}
         >
           <!-- svelte-ignore a11y-autofocus -->

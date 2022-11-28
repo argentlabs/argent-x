@@ -1,5 +1,7 @@
+import { getLocalHandle } from "@argent/x-window"
 import { NextRouter, useRouter } from "next/router"
 import { useEffect } from "react"
+import useSwr from "swr"
 
 import {
   getAccount as getMemoryAccount,
@@ -30,56 +32,62 @@ const conditionallyPushTo = (
   }
 }
 
+export const useLocalHandle = () => {
+  const { data } = useSwr(
+    "localHandle",
+    async () => {
+      const messageTarget: Window = window.opener ?? window.parent
+      const localHandle = await getLocalHandle({
+        remoteWindow: messageTarget,
+        remoteOrigin: "*",
+        localWindow: window,
+      })
+      return localHandle
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      revalidateOnMount: true,
+      onError: (e) => {
+        console.error("Failed to connect to parent window", e)
+      },
+    },
+  )
+  return data
+}
+
 export const usePageGuard = () => {
   const router = useRouter()
+  const localHandle = useLocalHandle()
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
-      const messageTarget: Window = window.opener ?? window.parent
       const newHeight = entries[0].target.clientHeight
-      if (messageTarget && newHeight) {
-        messageTarget.postMessage(
-          {
-            type: "ARGENT_WEB_WALLET::HEIGHT_CHANGED",
-            data: {
-              height: newHeight,
-            },
-          },
-          "*",
-        )
+      if (localHandle && newHeight) {
+        localHandle.emit("ARGENT_WEB_WALLET::HEIGHT_CHANGED", newHeight)
       }
     })
 
     const handler = (url: string) => {
-      const messageTarget: Window = window.opener ?? window.parent
-      console.log("change", url)
-      if (messageTarget) {
+      if (localHandle) {
         const [pathname] = url.split("?")
         if (shouldShowIframe.includes(pathname)) {
-          messageTarget.postMessage(
-            {
-              type: "ARGENT_WEB_WALLET::SHOULD_SHOW",
-            },
-            "*",
-          )
+          localHandle.emit("ARGENT_WEB_WALLET::SHOULD_SHOW", undefined)
           observer.observe(window.document.body)
         } else {
-          messageTarget.postMessage(
-            {
-              type: "ARGENT_WEB_WALLET::SHOULD_HIDE",
-            },
-            "*",
-          )
+          localHandle.emit("ARGENT_WEB_WALLET::SHOULD_HIDE", undefined)
           observer.disconnect()
         }
       }
       return true
     }
+
     router.events.on("routeChangeComplete", handler)
     return () => {
       router.events.off("routeChangeComplete", handler)
     }
-  }, [router])
+  }, [localHandle, router])
 
   useBackendAccount({
     onSuccess: async (account) => {
@@ -90,6 +98,9 @@ export const usePageGuard = () => {
             () => false,
           ))
         ) {
+          if (localHandle) {
+            localHandle.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
+          }
           return conditionallyPushTo(router, "/dashboard")
         }
         return conditionallyPushTo(router, "/password", {

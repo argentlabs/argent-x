@@ -70,14 +70,14 @@ interface TransactionReviewProps {
   review?: Review
   deploymentFees?: EstimateDeploymentFeeResponse
   executionFees?: EstimateFeeResponse
-  balanceTooLowToPayFees?: boolean
+  error?: Error
 }
 
 export const TransactionReview: FC<TransactionReviewProps> = ({
   deploymentFees,
   executionFees,
   review,
-  balanceTooLowToPayFees,
+  error,
 }) => {
   if (!review) {
     return <Spinner />
@@ -120,9 +120,9 @@ export const TransactionReview: FC<TransactionReviewProps> = ({
             </Row>
           )}
         </BlockContent>
-        {balanceTooLowToPayFees && (
+        {error && (
           <BlockError>
-            <P4>Insufficient balance to pay fees</P4>
+            <P4>{error.message}</P4>
           </BlockError>
         )}
       </Block>
