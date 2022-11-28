@@ -49,6 +49,12 @@
     darkModeControlClass = event.matches ? "dark" : ""
   }
 
+  const mail = field("email", "", [email()], {
+    stopAtFirstError: true,
+    validateOnChange: false,
+  })
+  const mailForm = form(mail)
+
   const walletOptions = {
     host: window.location.origin,
     id: "argentWebWallet" as const,
@@ -61,6 +67,9 @@
   let getRemoteHandle: (
     options: ConnectionOptions,
   ) => Promise<RemoteConnection> | null = null
+  let webWalletEmail: string | false | null = null
+  let warpConnection: RemoteConnection | null = null
+
   onMount(async () => {
     const { getArgentStarknetWindowObject, getRemoteHandle: _getRemoteHandle } =
       await import("@argent/x-window")
@@ -69,10 +78,19 @@
 
     provider = defaultProvider
     getRemoteHandle = _getRemoteHandle
+    warpConnection = await warp(origin)
+    const loginStatus = await warpConnection.call("getLoginStatus")
+
+    if (loginStatus.isLoggedIn) {
+      webWalletEmail = loginStatus.email
+    } else {
+      webWalletEmail = false
+    }
+
     starknetWindowObject = getArgentStarknetWindowObject(
       walletOptions,
       provider,
-      await warp(origin),
+      warpConnection,
     )
 
     if (theme === null) {
@@ -87,12 +105,6 @@
     }
   })
 
-  const mail = field("email", "", [email()], {
-    stopAtFirstError: true,
-    validateOnChange: false,
-  })
-  const mailForm = form(mail)
-
   let windowRef: Window | null = null
   const origin = "http://localhost:3005"
   const submitGoalUrl = `${origin}/email`
@@ -102,6 +114,68 @@
     ...preAuthorizedWallets,
     ...installedWallets,
   ].filter(Boolean)
+
+  export async function onWebWallet() {
+    setLoadingItem("argentWebWallet")
+
+    const h = 600
+    const w = 500
+
+    // parent is the window that opened this window; if not detected then it falls back to the current screen
+    const parentWidth =
+      globalWindow?.outerWidth ??
+      globalWindow?.innerWidth ??
+      globalWindow?.screen.width ??
+      0
+    const parentHeight =
+      globalWindow?.outerHeight ??
+      globalWindow?.innerHeight ??
+      globalWindow?.screen.height ??
+      0
+    const parentLeft = globalWindow?.screenLeft ?? globalWindow?.screenX ?? 0
+    const parentTop = globalWindow?.screenTop ?? globalWindow?.screenY ?? 0
+
+    const y = parentTop + parentHeight / 2 - h / 2
+    const x = parentLeft + parentWidth / 2 - w / 2
+
+    const session = await warpConnection?.call("getLoginStatus")
+    const hasSession = session.isLoggedIn && session.hasSession
+    if (!hasSession) {
+      // open popup window
+      windowRef = window.open(
+        !webWalletEmail
+          ? submitGoalUrl + "?email=" + encodeURIComponent($mail.value)
+          : origin,
+        "Argent",
+        `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
+      )
+
+      // wait for popup to close
+      const interval = setInterval(() => {
+        if (windowRef?.closed) {
+          clearInterval(interval)
+          windowRef = null
+        }
+      }, 1000)
+
+      // wait for message from popup
+      const messageHandler = await getRemoteHandle({
+        localWindow: globalWindow,
+        remoteWindow: windowRef,
+        remoteOrigin: "*",
+      })
+
+      await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
+
+      clearInterval(interval)
+      if (!windowRef.closed) {
+        windowRef.close()
+      }
+      windowRef = null
+    }
+
+    cb(starknetWindowObject)
+  }
 </script>
 
 <div
@@ -159,119 +233,71 @@
     {#if enableArgentWebWallet}
       <!-- webwallet -->
       <main>
-        <form
-          class="relative group group-first:disabled:cursor-pointer"
-          on:submit={async (e) => {
-            e.preventDefault()
-            await mailForm.validate()
-            if (!$mailForm.valid) {
-              return
-            }
-            setLoadingItem("argentWebWallet")
-            const h = 600
-            const w = 500
-
-            // parent is the window that opened this window; if not detected then it falls back to the current screen
-            const parentWidth =
-              globalWindow?.outerWidth ??
-              globalWindow?.innerWidth ??
-              globalWindow?.screen.width ??
-              0
-            const parentHeight =
-              globalWindow?.outerHeight ??
-              globalWindow?.innerHeight ??
-              globalWindow?.screen.height ??
-              0
-            const parentLeft =
-              globalWindow?.screenLeft ?? globalWindow?.screenX ?? 0
-            const parentTop =
-              globalWindow?.screenTop ?? globalWindow?.screenY ?? 0
-
-            const y = parentTop + parentHeight / 2 - h / 2
-            const x = parentLeft + parentWidth / 2 - w / 2
-            // open popup window
-            windowRef = window.open(
-              submitGoalUrl + "?email=" + encodeURIComponent($mail.value),
-              "Argent",
-              `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
-            )
-            // wait for popup to close
-            const interval = setInterval(() => {
-              if (windowRef?.closed) {
-                clearInterval(interval)
-                windowRef = null
-              }
-            }, 1000)
-
-            // wait for message from popup
-            const messageHandler = await getRemoteHandle({
-              localWindow: globalWindow,
-              remoteWindow: windowRef,
-              remoteOrigin: "*",
-            })
-
-            await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
-
-            clearInterval(interval)
-            if (!windowRef.closed) {
-              windowRef.close()
-            }
-            windowRef = null
-
-            cb(starknetWindowObject)
-          }}
-        >
-          <!-- svelte-ignore a11y-autofocus -->
-          <input
-            autofocus
-            class={"peer w-full mb-2 p-5 py-[18px] rounded-xl bg-neutral-100 dark:bg-black placeholder:text-neutral-500 placeholder:dark:text-neutral-400 text-base focus:outline-none transition-colors " +
-              ($mail.invalid
-                ? "ring-2 ring-red-500 dark:ring-red-500"
-                : "focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700") +
-              (loadingItem === "argentWebWallet" ? " opacity-50" : "")}
-            type="text"
-            name="email"
-            placeholder="Email"
-            disabled={loadingItem === "argentWebWallet"}
-            bind:value={$mail.value}
-            on:keyup={() => {
-              if ($mail.invalid) {
-                mail.validate()
-              }
-            }}
-            on:blur={() => {
-              if ($mail.value?.trim() !== "") {
-                mail.validate()
-              }
-            }}
-            aria-invalid={$mail.invalid}
-          />
-          <!-- continue button just shown when input not empty -->
-          <div
-            class={"absolute right-4 top-1/2 -translate-y-1/2 peer-placeholder-shown:opacity-0 peer-placeholder-shown:scale-0 opacity-1 scale-1 transition-all duration-300 " +
-              ($mail.invalid ? "opacity-0 scale-0" : "")}
+        {#if webWalletEmail === null || loadingItem === "argentWebWallet"}
+          <!-- Loading -->
+          <li
+            class="mb-2 flex justify-center items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
           >
-            {#if loadingItem === "argentWebWallet"}
-              <div role="status">
-                <svg
-                  aria-hidden="true"
-                  class="w-6 h-6 text-neutral-300 animate-spin dark:text-neutral-600 fill-neutral-600 dark:fill-neutral-300"
-                  viewBox="0 0 100 101"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                    fill="currentFill"
-                  />
-                </svg>
-                <span class="sr-only">Loading...</span>
-              </div>
-            {:else}
+            <div role="status">
+              <svg
+                aria-hidden="true"
+                class="w-8 h-8 text-neutral-300 animate-spin dark:text-neutral-600 fill-neutral-600 dark:fill-neutral-300"
+                viewBox="0 0 100 101"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="currentFill"
+                />
+              </svg>
+              <span class="sr-only">Loading...</span>
+            </div>
+          </li>
+        {:else if webWalletEmail === false}
+          <form
+            class="relative group group-first:disabled:cursor-pointer mb-2"
+            on:submit={async (e) => {
+              e.preventDefault()
+              await mailForm.validate()
+              if (!$mailForm.valid) {
+                return
+              }
+              return onWebWallet()
+            }}
+          >
+            <!-- svelte-ignore a11y-autofocus -->
+            <input
+              autofocus
+              class={"peer w-full p-5 py-[18px] rounded-xl bg-neutral-100 dark:bg-black placeholder:text-neutral-500 placeholder:dark:text-neutral-400 text-base focus:outline-none transition-colors " +
+                ($mail.invalid
+                  ? "ring-2 ring-red-500 dark:ring-red-500"
+                  : "focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700")}
+              type="text"
+              name="email"
+              placeholder="Email"
+              bind:value={$mail.value}
+              on:keyup={() => {
+                if ($mail.invalid) {
+                  mail.validate()
+                }
+              }}
+              on:blur={() => {
+                if ($mail.value?.trim() !== "") {
+                  mail.validate()
+                }
+              }}
+              aria-invalid={$mail.invalid}
+            />
+            <!-- continue button just shown when input not empty -->
+            <div
+              class={"absolute right-4 top-1/2 -translate-y-1/2 peer-placeholder-shown:opacity-0 peer-placeholder-shown:scale-0 opacity-1 scale-1 transition-all duration-300 " +
+                ($mail.invalid ? "opacity-0 scale-0" : "")}
+            >
               <button
                 tabindex="0"
                 class="bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-white rounded-full p-2 hover:bg-neutral-100 hover:disabled:bg-neutral-200 dark:hover:bg-neutral-700 dark:hover:disabled:bg-neutral-800 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700"
@@ -294,24 +320,42 @@
                   />
                 </svg>
               </button>
-            {/if}
-          </div>
-          {#if loadingItem === "argentWebWallet"}
-            <div
-              class="absolute rounded-xl left-0 right-0 bottom-0 top-0 cursor-pointer focus:ring-2 focus:outline-none focus:ring-neutral-200 dark:focus:ring-neutral-700"
-              role="button"
-              tabindex="0"
-              on:click={() => {
-                windowRef?.focus()
-              }}
-              on:keydown={(e) => {
-                if (e.key === "Enter") {
-                  windowRef?.focus()
-                }
-              }}
-            />
-          {/if}
-        </form>
+            </div>
+          </form>
+        {:else}
+          <!-- Already logged in -->
+          <li
+            class="mb-2 flex justify-center items-center gap-2 p-4 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
+            role="button"
+            tabindex="0"
+            on:click={() => onWebWallet()}
+            on:keyup={(e) => {
+              if (e.key === "Enter") {
+                return onWebWallet()
+              }
+            }}
+          >
+            <p
+              class="flex justify-center items-center font-semibold text-base gap-2"
+            >
+              <svg
+                width="18"
+                height="17"
+                viewBox="0 0 18 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M5.42912 11.244C3.99182 10.1604 3.06266 8.4387 3.06266 6.5C3.06266 3.22081 5.72097 0.5625 9.00016 0.5625C12.2793 0.5625 14.9377 3.22081 14.9377 6.5C14.9377 8.4387 14.0085 10.1604 12.5712 11.244C13.0085 11.4174 13.4341 11.623 13.8443 11.8599C15.3171 12.7103 16.54 13.9334 17.3902 15.4063C17.6491 15.8547 17.4954 16.4281 17.047 16.6869C16.5985 16.9458 16.0252 16.7921 15.7663 16.3437C15.0807 15.1559 14.0944 14.1695 12.9067 13.4837C11.7389 12.8093 10.4168 12.449 9.06905 12.4371C9.04612 12.4374 9.02315 12.4375 9.00016 12.4375C8.97716 12.4375 8.9542 12.4374 8.93126 12.4371C7.58356 12.449 6.26143 12.8093 5.0936 13.4837C3.90587 14.1695 2.91962 15.1559 2.23397 16.3437C1.97513 16.7921 1.40178 16.9458 0.953356 16.6869C0.504933 16.4281 0.351247 15.8547 0.61009 15.4063C1.46029 13.9334 2.68324 12.7103 4.15602 11.8599C4.56624 11.623 4.99182 11.4174 5.42912 11.244ZM4.93766 6.5C4.93766 4.25634 6.7565 2.4375 9.00016 2.4375C11.2438 2.4375 13.0627 4.25634 13.0627 6.5C13.0627 8.72244 11.278 10.5281 9.06369 10.562C9.04252 10.5619 9.02134 10.5618 9.00016 10.5618C8.97897 10.5618 8.9578 10.5619 8.93663 10.562C6.72227 10.5281 4.93766 8.72244 4.93766 6.5Z"
+                  fill="currentColor"
+                />
+              </svg>
+              {webWalletEmail}
+            </p>
+          </li>
+        {/if}
 
         <div class="flex items-center justify-between mb-8 px-2">
           <div class="text-xs text-red-400">

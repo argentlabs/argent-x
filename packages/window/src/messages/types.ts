@@ -15,6 +15,10 @@ export interface ConnectionOptions {
 export type WindowMethods = {
   enable: (options?: { starknetVersion?: "v3" | "v4" }) => Promise<string[]>
   isPreauthorized: () => Promise<boolean>
+  getLoginStatus: () => Promise<
+    | { isLoggedIn: false }
+    | { isLoggedIn: true; hasSession: boolean; email: string }
+  >
   addStarknetChain: (params: AddStarknetChainParameters) => Promise<boolean>
   switchStarknetChain: (
     params: SwitchStarknetChainParameter,
