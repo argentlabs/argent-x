@@ -1,3 +1,5 @@
+import { Button, CellStack, H4, H6, P3, logos } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -10,28 +12,10 @@ import { routes } from "../../routes"
 import { A, P } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import { Collections } from "./aspect.service"
+import { EmptyCollections } from "./EmptyCollections"
 import { NftThumbnailImage } from "./NftThumbnailImage"
 import { useCollections } from "./useCollections"
 import { useNfts } from "./useNfts"
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: 16px;
-  margin: 0 16px 0 16px;
-
-  ${P} {
-    text-align: center;
-  }
-`
-
-const Header = styled.h2`
-  font-weight: 600;
-  font-size: 32px;
-  line-height: 38.4px;
-  margin-bottom: 25px;
-  text-align: center;
-`
 
 export const NftItem = styled.figure`
   display: inline-block;
@@ -78,7 +62,7 @@ const CollectiblesNumber = styled(RowCentered)`
   font-weight: 600;
   line-height: 18px;
 `
-
+const { Aspect, Briq, Mintsquare } = logos
 interface AccountCollectionsProps {
   account: Account
   withHeader?: boolean
@@ -94,41 +78,9 @@ const Collections: FC<AccountCollectionsProps> = ({
   const navigate = useNavigate()
   const collectibles = useCollections(account)
   return (
-    <div>
+    <>
       {collectibles.length === 0 && (
-        <>
-          <P>No NFTs to show</P>
-          {account.networkId === "goerli-alpha" && (
-            <P style={{ marginTop: 120 }}>
-              <small>
-                You can browse NFTs on
-                <A href="https://testnet.aspect.co" target="_blank">
-                  Aspect
-                </A>
-              </small>
-            </P>
-          )}
-          {account.networkId === "mainnet-alpha" && (
-            <P style={{ marginTop: 120 }}>
-              <small>
-                You can browse NFTs on
-                <A href="https://aspect.co" target="_blank">
-                  Aspect
-                </A>
-              </small>
-            </P>
-          )}
-          {account.networkId === "goerli-alpha" && (
-            <P style={{ marginTop: 16 }}>
-              <small>
-                Or build your own 3D NFTs on
-                <A href="https://briq.construction/" target="_blank">
-                  briq
-                </A>
-              </small>
-            </P>
-          )}
-        </>
+        <EmptyCollections networkId={account.networkId} />
       )}
       {(customList || collectibles).map((collectible) => (
         <NftItem
@@ -146,7 +98,7 @@ const Collections: FC<AccountCollectionsProps> = ({
           </figcaption>
         </NftItem>
       ))}
-    </div>
+    </>
   )
 }
 
@@ -168,17 +120,26 @@ export const AccountCollections: FC<AccountCollectionsProps> = ({
   ...rest
 }) => {
   return (
-    <Container {...rest}>
-      {withHeader && <Header>NFTs</Header>}
-      <ErrorBoundary fallback={<CollectionsFallback account={account} />}>
-        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <Collections
-            account={account}
-            customList={customList}
-            navigateToSend={navigateToSend}
-          />
-        </Suspense>
-      </ErrorBoundary>
-    </Container>
+    <>
+      {withHeader && <H4 textAlign="center">NFTs</H4>}
+      <Flex
+        direction="column"
+        flex={1}
+        mx="4"
+        textAlign="center"
+        justifyContent="center"
+        {...rest}
+      >
+        <ErrorBoundary fallback={<CollectionsFallback account={account} />}>
+          <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
+            <Collections
+              account={account}
+              customList={customList}
+              navigateToSend={navigateToSend}
+            />
+          </Suspense>
+        </ErrorBoundary>
+      </Flex>
+    </>
   )
 }
