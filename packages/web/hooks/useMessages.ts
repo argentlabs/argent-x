@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import { useEffect } from "react"
 
 import { encodeTransactions } from "../pages/dashboard"
+import { getAccount } from "../services/backend/account"
 import { useAccount } from "./account"
 import { useLocalHandle } from "./usePageGuard"
 
@@ -42,15 +43,14 @@ export const useAccountMessageHandler = () => {
       console.warn("No local handle")
       return
     }
-    if (!account) {
-      console.warn("No account")
-      return
-    }
 
     localHandle.setMethods({
       async enable(options) {
         if (options?.starknetVersion === "v3") {
           throw Error("not implemented")
+        }
+        if (!account) {
+          throw Error("not logged in")
         }
         // const { success } = await waitForAction("enable")
         // if (!success) {
@@ -60,6 +60,18 @@ export const useAccountMessageHandler = () => {
       },
       async isPreauthorized() {
         return true
+      },
+      async getLoginStatus() {
+        try {
+          const beAccount = await getAccount()
+          return {
+            isLoggedIn: true,
+            email: beAccount.email,
+            hasSession: Boolean(account),
+          }
+        } catch (e) {
+          return { isLoggedIn: false }
+        }
       },
       async execute(transactions, abis, transactionsDetail) {
         const txs = Array.isArray(transactions) ? transactions : [transactions]

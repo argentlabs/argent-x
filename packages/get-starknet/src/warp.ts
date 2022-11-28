@@ -55,7 +55,6 @@ export const getIframeConnection = memo(
             iframe.style.height = `min(${height || 420}px, 100%)`
           },
         )
-        await handle.once("ARGENT_WEB_WALLET::CONNECT")
         return resolve(handle)
       })
     }),
