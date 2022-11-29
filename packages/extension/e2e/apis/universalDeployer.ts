@@ -1,6 +1,5 @@
 import { Abi, Contract } from "starknet"
 
-import { SUCCESS_STATUSES } from "../../src/shared/transactions"
 import UniversalDeployerAbi from "./abis/UniversalDeployer.json"
 import { account } from "./account"
 
@@ -35,10 +34,6 @@ export async function universalDeployerDeployContract(
     [], // calldata
   )
 
-  await account.waitForTransaction(
-    response.transaction_hash,
-    SUCCESS_STATUSES,
-    1e3,
-  ) // wait for transaction to be mined (poll every second)
+  await account.waitForTransaction(response.transaction_hash, undefined, 1e3) // wait for transaction to be mined (poll every second)
   return response
 }
