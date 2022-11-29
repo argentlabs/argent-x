@@ -124,38 +124,13 @@ export const NftScreen: FC = () => {
           >
             <P4 color="neutrals.300">Best Offer</P4>
             <P4>
-              {ethers.utils.formatEther(nft.best_bid_order?.payment_amount) ||
-                "0"}
+              {nft.best_bid_order?.payment_amount
+                ? ethers.utils.formatEther(nft.best_bid_order?.payment_amount)
+                : "0"}
               ETH
             </P4>
           </Flex>
         </CellStack>
-        {/*  <ColumnCenter gap="20px" style={{ marginBottom: "32px" }}>
-          <RowCentered gap="8px">
-            <ViewOnButton
-              onClick={() =>
-                openAspectNft(contractAddress, tokenId, account.networkId)
-              }
-            >
-              <RowCentered gap="5px">
-                <AspectLogo />
-                <ViewOnText>View on Aspect</ViewOnText>
-              </RowCentered>
-            </ViewOnButton>
-
-            <ViewOnButton
-              onClick={() =>
-                openMintSquareNft(contractAddress, tokenId, account.networkId)
-              }
-            >
-              <RowCentered gap="5px">
-                <MintSquareLogo />
-                <ViewOnText>View on Mint Square</ViewOnText>
-              </RowCentered>
-            </ViewOnButton>
-          </RowCentered>
- */}
-        {/* </ColumnCenter> */}
         <SimpleGrid
           bg="neutrals.900"
           position="fixed"
