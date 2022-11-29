@@ -182,10 +182,6 @@ const legacyUiWalletRoutes = (
     <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
     <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
     <Route
-      path={routes.settingsSmartContractDeploy.path}
-      element={<DeploySmartContractScreen />}
-    />
-    <Route
       path={routes.backupDownload.path}
       element={<BackupDownloadScreen />}
     />
@@ -262,6 +258,10 @@ const walletRoutes = (
     <Route
       path={routes.settingsSmartContractDeclare.path}
       element={<DeclareSmartContractScreen />}
+    />
+    <Route
+      path={routes.settingsSmartContractDeploy.path}
+      element={<DeploySmartContractScreen />}
     />
     <Route
       path={routes.settingsSmartContractDeclareClassHash.path}

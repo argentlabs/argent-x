@@ -34,7 +34,7 @@ import { handleTokenMessaging } from "./tokenMessaging"
 import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
-import { handleUdpMessaging } from "./udpMessaging"
+import { handleUdcMessaging } from "./udcMessaging"
 import { Wallet, sessionStore, walletStore } from "./wallet"
 
 browser.alarms.create("core:transactionTracker:history", {
@@ -86,7 +86,7 @@ const handlers = [
   handleSessionMessage,
   handleTransactionMessage,
   handleTokenMessaging,
-  handleUdpMessaging,
+  handleUdcMessaging,
 ] as Array<HandleMessage<MessageType>>
 
 getAccounts()
@@ -121,8 +121,9 @@ const safeMessages: MessageType["type"][] = [
   "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
   "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
   "CONNECT_DAPP_RES",
-  "START_SESSION_RES",
+  "CONNECT_ACCOUNT_RES",
   "CONNECT_ACCOUNT",
+  "REJECT_PREAUTHORIZATION",
 ]
 
 messageStream.subscribe(async ([msg, sender]) => {

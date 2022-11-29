@@ -21,6 +21,7 @@ export interface TransactionMeta {
   isUpgrade?: boolean
   isDeployAccount?: boolean
   transactions?: Call | Call[]
+  type?: string // TODO: in future can be DECLARE | DEPLOY | CALL
 }
 
 export interface TransactionBase {

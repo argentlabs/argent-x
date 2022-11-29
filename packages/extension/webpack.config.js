@@ -69,7 +69,6 @@ module.exports = {
         loader: "esbuild-loader",
         options: {
           loader: "tsx", // Or 'ts' if you don't need tsx
-          target: "es2015",
         },
       },
     ],
@@ -144,7 +143,6 @@ module.exports = {
         minimize: true,
         minimizer: [
           new ESBuildMinifyPlugin({
-            target: "es2015", // Syntax to compile to (see options below for possible values)
             loader: "tsx",
           }),
         ],

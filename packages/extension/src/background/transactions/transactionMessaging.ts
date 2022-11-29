@@ -145,7 +145,7 @@ export const handleTransactionMessage: HandleMessage<
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
           data: {
-            accountDeploymentFee: number.toHex(overall_fee),
+            declareFee: number.toHex(overall_fee),
             maxADFee,
           },
         })
@@ -157,6 +157,48 @@ export const handleTransactionMessage: HandleMessage<
             error:
               (error as any)?.message?.toString?.() ??
               (error as any)?.toString?.() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "ESTIMATE_DEPLOY_CONTRACT_FEE": {
+      const { classHash, constructorCalldata, salt, unique } = msg.data
+
+      const selectedAccount = await wallet.getSelectedStarknetAccount()
+
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+      try {
+        const { overall_fee, suggestedMaxFee } = await (
+          selectedAccount as Account
+        ).estimateDeployFee({
+          classHash,
+          salt,
+          unique,
+          constructorCalldata,
+        })
+        const maxADFee = number.toHex(
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        )
+
+        return respond({
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
+          data: {
+            deployFee: number.toHex(overall_fee),
+            maxADFee,
+          },
+        })
+      } catch (error) {
+        console.log(error)
+        return respond({
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString() ??
+              (error as any)?.toString() ??
               "Unkown error",
           },
         })
