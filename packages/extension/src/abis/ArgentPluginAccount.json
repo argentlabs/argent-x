@@ -112,6 +112,17 @@
   {
     "data": [
       {
+        "name": "new_implementation",
+        "type": "felt"
+      }
+    ],
+    "keys": [],
+    "name": "account_upgraded",
+    "type": "event"
+  },
+  {
+    "data": [
+      {
         "name": "account",
         "type": "felt"
       },
@@ -126,17 +137,6 @@
     ],
     "keys": [],
     "name": "account_created",
-    "type": "event"
-  },
-  {
-    "data": [
-      {
-        "name": "new_implementation",
-        "type": "felt"
-      }
-    ],
-    "keys": [],
-    "name": "account_upgraded",
     "type": "event"
   },
   {
@@ -161,15 +161,23 @@
   {
     "inputs": [
       {
-        "name": "signer",
+        "name": "call_array_len",
         "type": "felt"
       },
       {
-        "name": "guardian",
+        "name": "call_array",
+        "type": "CallArray*"
+      },
+      {
+        "name": "calldata_len",
         "type": "felt"
+      },
+      {
+        "name": "calldata",
+        "type": "felt*"
       }
     ],
-    "name": "initialize",
+    "name": "__validate__",
     "outputs": [],
     "type": "function"
   },
@@ -190,10 +198,6 @@
       {
         "name": "calldata",
         "type": "felt*"
-      },
-      {
-        "name": "nonce",
-        "type": "felt"
       }
     ],
     "name": "__execute__",
@@ -212,37 +216,22 @@
   {
     "inputs": [
       {
-        "name": "plugin",
+        "name": "class_hash",
         "type": "felt"
       }
     ],
-    "name": "add_plugin",
+    "name": "__validate_declare__",
     "outputs": [],
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "name": "plugin",
-        "type": "felt"
-      }
-    ],
-    "name": "remove_plugin",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "plugin",
-        "type": "felt"
-      },
       {
         "name": "selector",
         "type": "felt"
       },
       {
-        "name": "calldata_len",
+        "name": "calldata_size",
         "type": "felt"
       },
       {
@@ -250,108 +239,7 @@
         "type": "felt*"
       }
     ],
-    "name": "execute_on_plugin",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "plugin",
-        "type": "felt"
-      }
-    ],
-    "name": "is_plugin",
-    "outputs": [
-      {
-        "name": "success",
-        "type": "felt"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "implementation",
-        "type": "felt"
-      }
-    ],
-    "name": "upgrade",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "new_signer",
-        "type": "felt"
-      }
-    ],
-    "name": "change_signer",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "new_guardian",
-        "type": "felt"
-      }
-    ],
-    "name": "change_guardian",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "new_guardian",
-        "type": "felt"
-      }
-    ],
-    "name": "change_guardian_backup",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "trigger_escape_guardian",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "trigger_escape_signer",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "cancel_escape",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "new_guardian",
-        "type": "felt"
-      }
-    ],
-    "name": "escape_guardian",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "new_signer",
-        "type": "felt"
-      }
-    ],
-    "name": "escape_signer",
+    "name": "__validate_deploy__",
     "outputs": [],
     "type": "function"
   },
@@ -370,7 +258,7 @@
         "type": "felt*"
       }
     ],
-    "name": "is_valid_signature",
+    "name": "isValidSignature",
     "outputs": [
       {
         "name": "is_valid",
@@ -398,11 +286,61 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "get_nonce",
+    "inputs": [
+      {
+        "name": "plugin",
+        "type": "felt"
+      }
+    ],
+    "name": "addPlugin",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "plugin",
+        "type": "felt"
+      }
+    ],
+    "name": "removePlugin",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "plugin",
+        "type": "felt"
+      },
+      {
+        "name": "selector",
+        "type": "felt"
+      },
+      {
+        "name": "calldata_len",
+        "type": "felt"
+      },
+      {
+        "name": "calldata",
+        "type": "felt*"
+      }
+    ],
+    "name": "executeOnPlugin",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "plugin",
+        "type": "felt"
+      }
+    ],
+    "name": "isPlugin",
     "outputs": [
       {
-        "name": "nonce",
+        "name": "success",
         "type": "felt"
       }
     ],
@@ -410,8 +348,156 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "name": "signer",
+        "type": "felt"
+      },
+      {
+        "name": "guardian",
+        "type": "felt"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "felt"
+      },
+      {
+        "name": "calldata_len",
+        "type": "felt"
+      },
+      {
+        "name": "calldata",
+        "type": "felt*"
+      }
+    ],
+    "name": "upgrade",
+    "outputs": [
+      {
+        "name": "retdata_len",
+        "type": "felt"
+      },
+      {
+        "name": "retdata",
+        "type": "felt*"
+      }
+    ],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "call_array_len",
+        "type": "felt"
+      },
+      {
+        "name": "call_array",
+        "type": "CallArray*"
+      },
+      {
+        "name": "calldata_len",
+        "type": "felt"
+      },
+      {
+        "name": "calldata",
+        "type": "felt*"
+      }
+    ],
+    "name": "execute_after_upgrade",
+    "outputs": [
+      {
+        "name": "retdata_len",
+        "type": "felt"
+      },
+      {
+        "name": "retdata",
+        "type": "felt*"
+      }
+    ],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "newSigner",
+        "type": "felt"
+      }
+    ],
+    "name": "changeSigner",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "newGuardian",
+        "type": "felt"
+      }
+    ],
+    "name": "changeGuardian",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "newGuardian",
+        "type": "felt"
+      }
+    ],
+    "name": "changeGuardianBackup",
+    "outputs": [],
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "get_signer",
+    "name": "triggerEscapeGuardian",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "triggerEscapeSigner",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cancelEscape",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "newGuardian",
+        "type": "felt"
+      }
+    ],
+    "name": "escapeGuardian",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "newSigner",
+        "type": "felt"
+      }
+    ],
+    "name": "escapeSigner",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getSigner",
     "outputs": [
       {
         "name": "signer",
@@ -423,7 +509,7 @@
   },
   {
     "inputs": [],
-    "name": "get_guardian",
+    "name": "getGuardian",
     "outputs": [
       {
         "name": "guardian",
@@ -435,10 +521,10 @@
   },
   {
     "inputs": [],
-    "name": "get_guardian_backup",
+    "name": "getGuardianBackup",
     "outputs": [
       {
-        "name": "guardian_backup",
+        "name": "guardianBackup",
         "type": "felt"
       }
     ],
@@ -447,10 +533,10 @@
   },
   {
     "inputs": [],
-    "name": "get_escape",
+    "name": "getEscape",
     "outputs": [
       {
-        "name": "active_at",
+        "name": "activeAt",
         "type": "felt"
       },
       {
@@ -463,10 +549,47 @@
   },
   {
     "inputs": [],
-    "name": "get_version",
+    "name": "getVersion",
     "outputs": [
       {
         "name": "version",
+        "type": "felt"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getName",
+    "outputs": [
+      {
+        "name": "name",
+        "type": "felt"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "hash",
+        "type": "felt"
+      },
+      {
+        "name": "sig_len",
+        "type": "felt"
+      },
+      {
+        "name": "sig",
+        "type": "felt*"
+      }
+    ],
+    "name": "is_valid_signature",
+    "outputs": [
+      {
+        "name": "is_valid",
         "type": "felt"
       }
     ],

@@ -44,8 +44,8 @@ export const starknetWindowObject: StarknetWindowObject = {
   enable: async ({ starknetVersion = "v3" } = {}) => {
     const walletAccountP = Promise.race([
       waitForMessage("CONNECT_DAPP_RES", 10 * 60 * 1000),
-      waitForMessage("START_SESSION_RES", 10 * 60 * 1000, (x) =>
-        Boolean(x.data),
+      waitForMessage("REJECT_PREAUTHORIZATION", 10 * 60 * 1000).then(
+        () => "USER_ABORTED" as const,
       ),
     ])
     sendMessage({
@@ -56,6 +56,9 @@ export const starknetWindowObject: StarknetWindowObject = {
 
     if (!walletAccount) {
       throw Error("No wallet account (should not be possible)")
+    }
+    if (walletAccount === "USER_ABORTED") {
+      throw Error("User aborted")
     }
     const { starknet } = window
     if (!starknet) {
