@@ -91,7 +91,7 @@ export class SessionAccount extends Account implements AccountInterface {
     return [pluginCall, ...calls]
   }
 
-  public async estimateFee(
+  public async estimateInvokeFee(
     calls: Call | Call[],
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {},
   ): Promise<EstimateFee> {
@@ -99,15 +99,16 @@ export class SessionAccount extends Account implements AccountInterface {
       Array.isArray(calls) ? calls : [calls],
       this.signedSession,
     )
-    const nonce = providedNonce ?? (await this.getNonce())
+    const nonce = number.toBN(providedNonce ?? (await this.getNonce()))
     const version = number.toBN(hash.feeTransactionVersion)
+    const chainId = await this.getChainId()
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce: number.toBN(nonce),
       maxFee: constants.ZERO,
       version,
-      chainId: this.chainId,
+      chainId,
     }
 
     const signature = await this.signer.signTransaction(
@@ -115,11 +116,8 @@ export class SessionAccount extends Account implements AccountInterface {
       signerDetails,
     )
 
-    const calldata = transaction.fromCallsToExecuteCalldataWithNonce(
-      transactions,
-      nonce,
-    )
-    const response = await super.getEstimateFee(
+    const calldata = transaction.fromCallsToExecuteCalldata(transactions)
+    const response = await super.getInvokeEstimateFee(
       {
         contractAddress: this.address,
         calldata,
@@ -163,7 +161,7 @@ export class SessionAccount extends Account implements AccountInterface {
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee
     } else {
-      const { suggestedMaxFee } = await this.estimateFee(
+      const { suggestedMaxFee } = await this.estimateInvokeFee(
         Array.isArray(calls) ? calls : [calls],
         {
           nonce,
@@ -188,10 +186,7 @@ export class SessionAccount extends Account implements AccountInterface {
       abis,
     )
 
-    const calldata = transaction.fromCallsToExecuteCalldataWithNonce(
-      transactions,
-      nonce,
-    )
+    const calldata = transaction.fromCallsToExecuteCalldata(transactions)
 
     return this.invokeFunction(
       {
