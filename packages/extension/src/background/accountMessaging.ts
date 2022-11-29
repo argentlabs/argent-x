@@ -26,7 +26,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       await wallet.selectAccount(msg.data)
       return respond({
         type: "CONNECT_ACCOUNT_RES",
-        data: msg.data,
       })
     }
 

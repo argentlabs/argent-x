@@ -1,8 +1,8 @@
 import { flatten, groupBy, toPairs } from "lodash-es"
-import { Call, hash, number } from "starknet"
+import { Call, number } from "starknet"
 
 import { isEqualAddress } from "../../../ui/services/addresses"
-import { getMulticallContract } from "../../../ui/services/multicall.service"
+import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork, getProvider } from "../../network"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 
@@ -40,55 +40,43 @@ export async function getAccountTypesFromChain(accounts: WalletAccount[]) {
             }))
           }
 
-          const multicallContract = getMulticallContract(network)
-
-          if (!multicallContract) {
-            const provider = getProvider(network)
+          if (network.multicallAddress) {
+            const multicall = getMulticallForNetwork(network)
             const responses = await Promise.all(
-              calls.map((call) => provider.callContract(call)),
+              calls.map((call) => multicall.call(call)),
             )
-            const results: string[] = responses.map((res) =>
-              number.toHex(number.toBN(res.result[0])),
-            )
-            return calls.map((call, i) => ({
-              address: call.contractAddress,
-              type: isEqualAddress(
-                results[i],
+            const result = responses.map((response, i) => {
+              const call = calls[i]
+              const type: ArgentAccountType = isEqualAddress(
+                response[0],
                 network.accountClassHash?.argentPluginAccount || "0x0",
               )
                 ? "argent-plugin"
-                : "argent",
-            }))
+                : "argent"
+              return {
+                address: call.contractAddress,
+                type,
+              }
+            })
+            return result
           }
-
-          const multicallCall = calls.flatMap(
-            (call) =>
-              [
-                call.contractAddress,
-                hash.getSelectorFromName(call.entrypoint),
-                0,
-              ] as const,
+          /** fallback to single calls */
+          const provider = getProvider(network)
+          const responses = await Promise.all(
+            calls.map((call) => provider.callContract(call)),
           )
-
-          const response = await multicallContract.aggregate(multicallCall)
-
-          const results: string[] = response.result.map((res: any) =>
-            number.toHex(res),
+          const results: string[] = responses.map((res) =>
+            number.toHex(number.toBN(res.result[0])),
           )
-
-          return calls.map((call, i) => {
-            const type = isEqualAddress(
+          return calls.map((call, i) => ({
+            address: call.contractAddress,
+            type: isEqualAddress(
               results[i],
               network.accountClassHash?.argentPluginAccount || "0x0",
             )
               ? "argent-plugin"
-              : "argent"
-
-            return {
-              address: call.contractAddress,
-              type,
-            }
-          })
+              : "argent",
+          }))
         },
       ),
     ),
