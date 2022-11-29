@@ -88,15 +88,32 @@ export const NftScreen: FC = () => {
           {nft.animation_uri ? (
             <LazyNftModelViewer nft={nft} />
           ) : (
-            <Box mx="10">
-              <Image
-                border="solid 2px"
-                borderColor="transparent"
-                borderRadius="lg"
-                alt={nft.name}
-                src={nft.image_url_copy}
-              />
-            </Box>
+            <>
+              <Box pt="6" px="10" position="relative">
+                <Box
+                  backgroundImage={nft.image_url_copy}
+                  backgroundPosition="center"
+                  backgroundSize="cover"
+                  backgroundRepeat="no-repeat"
+                  style={{ filter: "blur(50px)" }}
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  right={0}
+                  bottom={0}
+                  zIndex={0}
+                />
+                <Image
+                  position="relative"
+                  border="solid 2px"
+                  borderColor="transparent"
+                  borderRadius="lg"
+                  alt={nft.name}
+                  src={nft.image_url_copy}
+                  zIndex={10}
+                />
+              </Box>
+            </>
           )}
           <H5 py="6" textAlign="center">
             {nft.name}
