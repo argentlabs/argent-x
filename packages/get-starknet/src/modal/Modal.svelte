@@ -69,29 +69,27 @@
     options: ConnectionOptions,
   ) => Promise<RemoteConnection> | null = null
   let webWalletEmail: string | false | null = null
-  let warpConnection: RemoteConnection | null = null
+  let wormholeConnection: RemoteConnection | null = null
+  let hasSession = false
 
   onMount(async () => {
     const { getArgentStarknetWindowObject, getRemoteHandle: _getRemoteHandle } =
       await import("@argent/x-window")
     const { defaultProvider } = await import("starknet")
-    const { warp } = await import("../warp")
+    const { wormhole, getMemorizedLoginStatus } = await import("../wormhole")
 
     provider = defaultProvider
     getRemoteHandle = _getRemoteHandle
-    warpConnection = await warp(origin)
-    const loginStatus = await warpConnection.call("getLoginStatus")
+    wormholeConnection = await wormhole(origin)
+    const loginStatus = await getMemorizedLoginStatus(wormholeConnection)
 
-    if (loginStatus.isLoggedIn) {
-      webWalletEmail = loginStatus.email
-    } else {
-      webWalletEmail = false
-    }
+    webWalletEmail = loginStatus.isLoggedIn ? loginStatus.email : false
+    hasSession = loginStatus.isLoggedIn && loginStatus.hasSession
 
     starknetWindowObject = getArgentStarknetWindowObject(
       walletOptions,
       provider,
-      warpConnection,
+      wormholeConnection,
     )
 
     if (theme === null) {
@@ -139,8 +137,6 @@
     const y = parentTop + parentHeight / 2 - h / 2
     const x = parentLeft + parentWidth / 2 - w / 2
 
-    const session = await warpConnection?.call("getLoginStatus")
-    const hasSession = session.isLoggedIn && session.hasSession
     if (!hasSession) {
       // open popup window
       windowRef = window.open(
@@ -150,6 +146,15 @@
         "Argent",
         `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
       )
+
+      // callback if popup is closed
+      const interval = setInterval(() => {
+        if (windowRef?.closed) {
+          clearInterval(interval)
+          setLoadingItem(false)
+          windowRef = null
+        }
+      }, 500)
 
       // wait for message from popup
       const messageHandler = await retry(
@@ -169,12 +174,7 @@
 
       await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
 
-      if (!windowRef.closed) {
-        windowRef.close()
-      }
-      windowRef = null
-
-      await warpConnection.call("reloadData")
+      await wormholeConnection.call("reloadData")
     }
 
     cb(starknetWindowObject)

@@ -14,6 +14,13 @@ export type { StarknetWindowObject, DisconnectOptions } from "get-starknet-core"
 type StoreVersion = "chrome" | "firefox" | "edge"
 
 export const globalWindow = typeof window !== "undefined" ? window : null
+if (globalWindow) {
+  const origin = "http://localhost:3005"
+  import("./wormhole").then(async ({ wormhole, getMemorizedLoginStatus }) => {
+    const wormholeConnection = await wormhole(origin)
+    getMemorizedLoginStatus(wormholeConnection)
+  })
+}
 
 function getStoreVersionFromBrowser(): StoreVersion | null {
   const browserName = Bowser.getParser(globalWindow?.navigator.userAgent)
