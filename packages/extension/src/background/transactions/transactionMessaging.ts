@@ -6,14 +6,14 @@ import { calculateEstimateFeeFromL1Gas } from "./transactionExecution"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
-> = async ({ msg, background: { wallet, actionQueue }, sendToTabAndUi }) => {
+> = async ({ msg, background: { wallet, actionQueue }, respond: respond }) => {
   switch (msg.type) {
     case "EXECUTE_TRANSACTION": {
       const { meta } = await actionQueue.push({
         type: "TRANSACTION",
         payload: msg.data,
       })
-      return sendToTabAndUi({
+      return respond({
         type: "EXECUTE_TRANSACTION_RES",
         data: { actionHash: meta.hash },
       })
@@ -57,7 +57,7 @@ export const handleTransactionMessage: HandleMessage<
           stark.estimatedFeeToMaxFee(maxTxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )
 
-        return sendToTabAndUi({
+        return respond({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
             amount: txFee,
@@ -68,7 +68,7 @@ export const handleTransactionMessage: HandleMessage<
         })
       } catch (error) {
         console.error(error)
-        return sendToTabAndUi({
+        return respond({
           type: "ESTIMATE_TRANSACTION_FEE_REJ",
           data: {
             error:
@@ -98,7 +98,7 @@ export const handleTransactionMessage: HandleMessage<
           stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )
 
-        return sendToTabAndUi({
+        return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
           data: {
             accountDeploymentFee: number.toHex(overall_fee),
@@ -107,7 +107,7 @@ export const handleTransactionMessage: HandleMessage<
         })
       } catch (error) {
         console.error(error)
-        return sendToTabAndUi({
+        return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ",
           data: {
             error:
@@ -142,21 +142,63 @@ export const handleTransactionMessage: HandleMessage<
           stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )
 
-        return sendToTabAndUi({
+        return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
           data: {
-            accountDeploymentFee: number.toHex(overall_fee),
+            declareFee: number.toHex(overall_fee),
             maxADFee,
           },
         })
       } catch (error) {
         console.error(error)
-        return sendToTabAndUi({
+        return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ",
           data: {
             error:
               (error as any)?.message?.toString?.() ??
               (error as any)?.toString?.() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "ESTIMATE_DEPLOY_CONTRACT_FEE": {
+      const { classHash, constructorCalldata, salt, unique } = msg.data
+
+      const selectedAccount = await wallet.getSelectedStarknetAccount()
+
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+      try {
+        const { overall_fee, suggestedMaxFee } = await (
+          selectedAccount as Account
+        ).estimateDeployFee({
+          classHash,
+          salt,
+          unique,
+          constructorCalldata,
+        })
+        const maxADFee = number.toHex(
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        )
+
+        return respond({
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
+          data: {
+            deployFee: number.toHex(overall_fee),
+            maxADFee,
+          },
+        })
+      } catch (error) {
+        console.log(error)
+        return respond({
+          type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString() ??
+              (error as any)?.toString() ??
               "Unkown error",
           },
         })

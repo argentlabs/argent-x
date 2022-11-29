@@ -1,86 +1,62 @@
+import { Button, L2, P3, icons, logos } from "@argent/ui"
+import { SimpleGrid, VStack } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
+import { Link } from "react-router-dom"
 
-import { DiscordIcon } from "../../components/Icons/DiscordIcon"
-import { GithubIcon } from "../../components/Icons/GithubIcon"
-import { SupportIcon } from "../../components/Icons/SupportIcon"
-import { PrivacyStatementLink } from "../../components/PrivacyStatementLink"
-import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 
-const IconWrapper = styled(RowCentered)`
-  padding: 8px 10px 8px 8px;
-  background: ${({ theme }) => theme.bg2};
-  border-radius: 100px;
-  gap: 8px;
-`
-
-const IconText = styled.span`
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 18px;
-  text-align: center;
-  color: ${({ theme }) => theme.text1};
-`
-
-const StyledPrivacyStatementLink = styled(PrivacyStatementLink)`
-  margin-top: 20px;
-`
-
-export const P = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.text2};
-  margin-top: 16px;
-`
-
-export const Footer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  p {
-    padding-bottom: 16px;
-  }
-`
+const { SupportIcon } = icons
+const { Discord, Github } = logos
 
 const SupportFooter: FC = () => (
-  <Footer>
-    <P>Help, support &amp; suggestions:</P>
-    <RowCentered gap="10px">
-      <a
+  <VStack mt={4} borderTop="solid 1px" borderTopColor="border">
+    <P3 color="neutrals.400" pt="6">
+      Help, support &amp; suggestions:
+    </P3>
+    <SimpleGrid columns={3} gap="2" w="100%" py={4}>
+      <Button
+        as={"a"}
+        size="sm"
+        rounded={"lg"}
+        leftIcon={<SupportIcon />}
         href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
         title="Get ArgentX Support"
         target="_blank"
       >
-        <IconWrapper>
-          <SupportIcon />
-          <IconText>Support</IconText>
-        </IconWrapper>
-      </a>
-      <a
+        Help
+      </Button>
+      <Button
+        as={"a"}
+        size="sm"
+        rounded={"lg"}
+        leftIcon={<Discord />}
         href="https://discord.gg/T4PDFHxm6T"
         title="Ask a question on the argent-x-support channel on Discord"
         target="_blank"
       >
-        <IconWrapper>
-          <DiscordIcon />
-          <IconText>Discord</IconText>
-        </IconWrapper>
-      </a>
-      <a
+        Discord
+      </Button>
+      <Button
+        as="a"
+        size="sm"
+        rounded={"lg"}
+        leftIcon={<Github />}
         href="https://github.com/argentlabs/argent-x/issues"
         title="Post an issue on Argent X GitHub"
         target="_blank"
       >
-        <IconWrapper>
-          <GithubIcon />
-          <IconText>Github</IconText>
-        </IconWrapper>
-      </a>
-    </RowCentered>
-    <StyledPrivacyStatementLink to={routes.settingsPrivacyStatement()} />
-    <P style={{ marginTop: "8px" }}>Version: v{process.env.VERSION}</P>
-  </Footer>
+        Github
+      </Button>
+    </SimpleGrid>
+    <Link to={routes.settingsPrivacyStatement()}>
+      <L2 color="neutrals.400" cursor="inherit" textDecoration="underline">
+        Privacy Statement
+      </L2>
+    </Link>
+    <L2 color="neutrals.500" py="2">
+      Version: v{process.env.VERSION}
+    </L2>
+  </VStack>
 )
 
 export { SupportFooter }

@@ -16,6 +16,7 @@ import {
   hasTab,
   sendMessageToActiveTabs,
   sendMessageToActiveTabsAndUi,
+  sendMessageToUi,
 } from "./activeTabs"
 import {
   BackgroundService,
@@ -33,7 +34,7 @@ import { handleTokenMessaging } from "./tokenMessaging"
 import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
-import { handleUdpMessaging } from "./udpMessaging"
+import { handleUdcMessaging } from "./udcMessaging"
 import { Wallet, sessionStore, walletStore } from "./wallet"
 
 browser.alarms.create("core:transactionTracker:history", {
@@ -85,12 +86,44 @@ const handlers = [
   handleSessionMessage,
   handleTransactionMessage,
   handleTokenMessaging,
-  handleUdpMessaging,
+  handleUdcMessaging,
 ] as Array<HandleMessage<MessageType>>
 
 getAccounts()
   .then((x) => transactionTracker.loadHistory(x))
   .catch(() => console.warn("failed to load transaction history"))
+
+const safeMessages: MessageType["type"][] = [
+  "IS_PREAUTHORIZED",
+  "CONNECT_DAPP",
+  "DISCONNECT_ACCOUNT",
+  "EXECUTE_TRANSACTION",
+  "OPEN_UI",
+  "SIGN_MESSAGE",
+  "REQUEST_TOKEN",
+  "REQUEST_ADD_CUSTOM_NETWORK",
+  "REQUEST_SWITCH_CUSTOM_NETWORK",
+  // answers
+  "EXECUTE_TRANSACTION_RES",
+  "TRANSACTION_SUBMITTED",
+  "TRANSACTION_FAILED",
+  "SIGN_MESSAGE_RES",
+  "SIGNATURE_SUCCESS",
+  "SIGNATURE_FAILURE",
+  "IS_PREAUTHORIZED_RES",
+  "REQUEST_TOKEN_RES",
+  "APPROVE_REQUEST_TOKEN",
+  "REJECT_REQUEST_TOKEN",
+  "REQUEST_ADD_CUSTOM_NETWORK_RES",
+  "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
+  "REJECT_REQUEST_ADD_CUSTOM_NETWORK",
+  "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
+  "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
+  "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
+  "CONNECT_DAPP_RES",
+  "START_SESSION_RES",
+  "CONNECT_ACCOUNT",
+]
 
 messageStream.subscribe(async ([msg, sender]) => {
   await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages
@@ -113,13 +146,30 @@ messageStream.subscribe(async ([msg, sender]) => {
     actionQueue,
   }
 
-  const sendToTabAndUi = async (msg: MessageType) => {
-    sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
+  const extensionUrl = browser.extension.getURL("")
+  const safeOrigin = extensionUrl.replace(/\/$/, "")
+  const origin = sender.origin ?? sender.url // Firefox uses url, Chrome uses origin
+  const isSafeOrigin = Boolean(origin?.startsWith(safeOrigin))
+
+  if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
+    console.warn(
+      "message received from unknown origin is trying to use unsafe method",
+    )
+    return // this return must not be removed
   }
 
   // forward UI messages to rest of the tabs
-  if (!hasTab(sender.tab?.id)) {
+  if (isSafeOrigin && hasTab(sender.tab?.id)) {
     sendMessageToActiveTabs(msg)
+  }
+
+  const respond = async (msg: MessageType) => {
+    console.log("respond", msg)
+    if (safeMessages.includes(msg.type)) {
+      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
+    } else {
+      sendMessageToUi(msg)
+    }
   }
 
   for (const handleMessage of handlers) {
@@ -129,7 +179,7 @@ messageStream.subscribe(async ([msg, sender]) => {
         sender,
         background,
         messagingKeys,
-        sendToTabAndUi,
+        respond,
       })
     } catch (error) {
       if (error instanceof UnhandledMessage) {

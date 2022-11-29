@@ -1,12 +1,13 @@
 import { ethers } from "ethers"
 import { number } from "starknet"
-import { toBN } from "starknet/dist/utils/number"
 
 import { generateAvatarImage } from "../../../shared/avatarImage"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
+
+const { toBN } = number
 
 export const createAccount = async (networkId: string, password?: string) => {
   if (password) {

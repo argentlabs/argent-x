@@ -6,7 +6,7 @@ import {
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
+import { Box, Flex, Text } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
@@ -22,6 +22,7 @@ import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
 import { useAccount, useSelectedAccountStore } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { SettingsMenuItem } from "./SettingsMenuItem"
+import { SupportFooter } from "./SupportFooter"
 
 const {
   LockIcon,
@@ -91,7 +92,9 @@ export const SettingsScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+        leftButton={
+          <BarBackButton onClick={() => navigate(routes.accountTokens())} />
+        }
         title={"Settings"}
       >
         <CellStack>
@@ -142,8 +145,13 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
+
+          <SupportFooter />
+          <SpacerCell h="16" />
+        </CellStack>
+        <Box bg="neutrals.900" position="fixed" bottom="0" left="0" right="0">
           <Link onClick={stopSession} to={routes.lockScreen()}>
-            <SpacerCell />
+            <SpacerCell borderTop="solid 1px" borderColor="border" h="4" />
             <Flex
               py={2}
               gap={2}
@@ -157,8 +165,9 @@ export const SettingsScreen: FC = () => {
               </Text>
               <B2>Lock wallet</B2>
             </Flex>
+            <SpacerCell h="4" />
           </Link>
-        </CellStack>
+        </Box>
       </NavigationContainer>
     </>
   )

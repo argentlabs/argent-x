@@ -67,7 +67,6 @@ describe("transformTransaction", () => {
         {
           "action": "TRANSFER",
           "amount": "1000000000000",
-          "classHash": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Transfer",
           "entity": "TOKEN",
@@ -99,7 +98,6 @@ describe("transformTransaction", () => {
         {
           "action": "MINT",
           "amount": "1000000000000000000000",
-          "classHash": "0x0000...0000",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
           "entity": "TOKEN",
@@ -127,7 +125,6 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "TRANSFER",
-          "classHash": "0x0000...0000",
           "contractAddress": "0x03090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Transfer NFT",
@@ -148,8 +145,7 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DECLARE",
-          "classHash": "0x0000...0000",
+          "action": "UNKNOWN",
           "dapp": {
             "hosts": [
               "testnet.app.alpharoad.fi",
@@ -160,7 +156,7 @@ describe("transformTransaction", () => {
           "dappContractAddress": "0x4aec73f0611a9be0524e7ef21ab1679bdf9c97dc7d72614f15373d431226b6a",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Approve and swap exact tokens for tokens",
-          "entity": "CONTRACT",
+          "entity": "DAPP",
         }
       `)
       expect(
@@ -172,8 +168,7 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DECLARE",
-          "classHash": "0x0000...0000",
+          "action": "UNKNOWN",
           "dapp": {
             "hosts": [
               "app.testnet.jediswap.xyz",
@@ -184,7 +179,7 @@ describe("transformTransaction", () => {
           "dappContractAddress": "0x012b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Approve and swap exact tokens for tokens",
-          "entity": "CONTRACT",
+          "entity": "DAPP",
         }
       `)
       expect(
@@ -196,8 +191,7 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DECLARE",
-          "classHash": "0x0000...0000",
+          "action": "UNKNOWN",
           "dapp": {
             "hosts": [
               "www.myswap.xyz",
@@ -209,7 +203,7 @@ describe("transformTransaction", () => {
           "dappContractAddress": "0x018a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Approve and swap",
-          "entity": "CONTRACT",
+          "entity": "DAPP",
         }
       `)
       expect(
@@ -221,11 +215,10 @@ describe("transformTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "DECLARE",
-          "classHash": "0x0000...0000",
+          "action": "UNKNOWN",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
-          "entity": "CONTRACT",
+          "entity": "UNKNOWN",
         }
       `)
     })

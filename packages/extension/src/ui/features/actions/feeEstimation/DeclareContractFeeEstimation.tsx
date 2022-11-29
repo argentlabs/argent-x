@@ -84,7 +84,7 @@ export const DeclareContractFeeEstimation: FC<
   const feeToken = getFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
-    fee?.accountDeploymentFee,
+    fee?.declareFee,
   )
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
@@ -124,12 +124,12 @@ export const DeclareContractFeeEstimation: FC<
                   ~
                   {feeToken ? (
                     prettifyTokenAmount({
-                      amount: fee.accountDeploymentFee,
+                      amount: fee.declareFee,
                       decimals: feeToken.decimals,
                       symbol: feeToken.symbol,
                     })
                   ) : (
-                    <>{fee.accountDeploymentFee} Unknown</>
+                    <>{fee.declareFee} Unknown</>
                   )}
                 </FeeEstimationValue>
               )}
@@ -185,7 +185,14 @@ export const DeclareContractFeeEstimation: FC<
             </ExtendableControl>
           </FieldError>
 
-          <Collapse in={feeEstimateExpanded} timeout="auto">
+          <Collapse
+            in={feeEstimateExpanded}
+            timeout="auto"
+            style={{
+              maxHeight: "80vh",
+              overflow: "auto",
+            }}
+          >
             {parsedFeeEstimationError && (
               <CopyTooltip
                 copyValue={parsedFeeEstimationError}

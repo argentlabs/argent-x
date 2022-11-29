@@ -8,7 +8,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { isEqualAddress } from "../../../services/addresses"
-import { declareContract } from "../../../services/udp.service"
+import { declareContract } from "../../../services/udc.service"
 import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { useFormSelects } from "./useFormSelects"
 

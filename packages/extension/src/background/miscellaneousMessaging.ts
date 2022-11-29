@@ -8,7 +8,7 @@ import { openUi } from "./openUi"
 
 export const handleMiscellaneousMessage: HandleMessage<
   MiscellaneousMessage
-> = async ({ msg, messagingKeys: { publicKeyJwk }, sendToTabAndUi }) => {
+> = async ({ msg, messagingKeys: { publicKeyJwk }, respond }) => {
   switch (msg.type) {
     case "OPEN_UI": {
       return openUi()
@@ -23,7 +23,7 @@ export const handleMiscellaneousMessage: HandleMessage<
       } catch {
         // Ignore browser.storage.session error "This is a read-only store"
       }
-      return sendToTabAndUi({ type: "DISCONNECT_ACCOUNT" })
+      return respond({ type: "DISCONNECT_ACCOUNT" })
     }
 
     case "GET_MESSAGING_PUBLIC_KEY": {

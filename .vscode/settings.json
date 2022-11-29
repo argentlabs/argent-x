@@ -8,5 +8,6 @@
     "**/.{idea,git,cache,output,temp}/**"
   ],
   "vitest.enable": true,
-  "vitest.commandLine": "npx vitest -r packages/extension/"
+  "vitest.commandLine": "npx vitest -r packages/extension/",
+  "rust-analyzer.linkedProjects": ["packages/wasm/Cargo.toml"]
 }
