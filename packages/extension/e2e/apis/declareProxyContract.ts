@@ -1,6 +1,7 @@
 import fs from "fs"
 import path from "path"
 
+import { SUCCESS_STATUSES } from "../../src/shared/transactions"
 import { account } from "./account"
 
 /** read the compiled contract JSON as plain text */
@@ -16,6 +17,10 @@ export async function declareProxyContract(): Promise<string | undefined> {
     classHash:
       "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918",
   })
-  await account.waitForTransaction(response.transaction_hash, 1e3) // wait for transaction to be mined (poll every second)
+  await account.waitForTransaction(
+    response.transaction_hash,
+    SUCCESS_STATUSES,
+    1e3,
+  ) // wait for transaction to be mined (poll every second)
   return response.class_hash
 }
