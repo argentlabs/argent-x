@@ -28,6 +28,7 @@ export type WindowMethods = {
 } & Pick<AccountInterface, "execute" | "signMessage">
 
 export type WindowEvents = {
+  "ARGENT_WEB_WALLET::LOADED": undefined
   "ARGENT_WEB_WALLET::CONNECT": undefined
   "ARGENT_WEB_WALLET::SHOULD_SHOW": undefined
   "ARGENT_WEB_WALLET::SHOULD_HIDE": undefined

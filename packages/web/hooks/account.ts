@@ -26,7 +26,7 @@ export const useAccount = () => {
 export const useBackendAccount = (
   config: SWRConfiguration<UserAccount, unknown> = {},
 ) => {
-  const { data: account, ...rest } = useSwr(
+  const { data: account, ...rest } = useSwr<UserAccount>(
     "services/backend/account/getAccount",
     () => getBackendAccount(),
     config,

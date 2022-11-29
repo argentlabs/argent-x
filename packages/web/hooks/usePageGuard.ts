@@ -7,7 +7,7 @@ import {
   getAccount as getMemoryAccount,
   retrieveAccountFromSession,
 } from "../services/account"
-import { useBackendAccount } from "./account"
+import { useAccount, useBackendAccount } from "./account"
 
 const allowedDestinations = {
   "/email": ["/email", "/pin"],
@@ -59,6 +59,7 @@ export const useLocalHandle = () => {
 
 export const usePageGuard = () => {
   const router = useRouter()
+  const { mutate } = useAccount()
   const localHandle = useLocalHandle()
 
   useEffect(() => {
@@ -94,24 +95,30 @@ export const usePageGuard = () => {
       if (account.accounts[0]) {
         if (
           (await getMemoryAccount()) ||
-          (await retrieveAccountFromSession(account.accounts[0]).catch(
-            () => false,
-          ))
+          (await retrieveAccountFromSession(account.accounts[0])
+            .then(() => mutate())
+            .catch(() => false))
         ) {
           if (localHandle) {
             localHandle.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
+          } else {
+            await conditionallyPushTo(router, "/dashboard")
           }
-          return conditionallyPushTo(router, "/dashboard")
+        } else {
+          await conditionallyPushTo(router, "/password", {
+            email: account.email,
+          })
         }
-        return conditionallyPushTo(router, "/password", {
+      } else {
+        await conditionallyPushTo(router, "/new-password", {
           email: account.email,
         })
       }
-      return conditionallyPushTo(router, "/new-password", {
-        email: account.email,
-      })
+      localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
     },
     onError: () => {
+      localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
+
       return conditionallyPushTo(router, "/email")
     },
     dedupingInterval: 20000,

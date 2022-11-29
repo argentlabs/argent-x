@@ -16,6 +16,13 @@ export const getIframeConnection = memo(
       iframe.style.width = "380px"
       iframe.style.height = "420px"
       iframe.style.border = "none"
+      // sandbox
+      iframe.sandbox.add(
+        "allow-scripts",
+        "allow-same-origin",
+        "allow-forms",
+        "allow-top-navigation",
+      )
       // round corners
       iframe.style.borderRadius = "40px"
       // box shadow
@@ -71,13 +78,21 @@ export const getIframeConnection = memo(
             iframe.style.height = `min(${height || 420}px, 100%)`
           },
         )
+
+        await handle.once("ARGENT_WEB_WALLET::LOADED")
+
         return resolve(handle)
       })
     }),
 )
 
-export const warp = (targetUrl: string) =>
+export const wormhole = (targetUrl: string) =>
   getIframeConnection(targetUrl).then((h) => {
-    console.log("warp", h)
+    console.log("wormhole", h)
     return h
   })
+
+export const getMemorizedLoginStatus = memo(
+  async (wormholeConnection: RemoteConnection) =>
+    wormholeConnection.call("getLoginStatus"),
+)
