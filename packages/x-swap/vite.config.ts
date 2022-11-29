@@ -7,9 +7,14 @@ import dts from "vite-plugin-dts"
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react() as PluginOption, // stops TS from complaining
+    react({
+      jsxRuntime: "classic",
+    }) as PluginOption, // stops TS from complaining
     dts(),
   ],
+  // optimizeDeps: {
+  //   include: ["react/jsx-runtime"],
+  // },
   build: {
     lib: {
       entry: resolvePath(__dirname, "src/index.ts"),
@@ -17,9 +22,9 @@ export default defineConfig({
       formats: ["es", "umd", "cjs"],
       fileName: (format) => `x-swap.${format}.js`,
     },
+
     emptyOutDir: false,
     rollupOptions: {
-      external: ["react", "react-dom"],
       output: {
         sourcemapExcludeSources: true,
 
@@ -31,6 +36,7 @@ export default defineConfig({
     },
     sourcemap: true,
     target: "esnext",
+
     // Leave minification up to applications.
     minify: false,
   },

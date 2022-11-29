@@ -207,10 +207,12 @@ const walletRoutes = (
       path={routes.accountCollections.path}
       element={<AccountScreen tab="collections" />}
     />
+    <Route path={routes.swap.path} element={<AccountScreen tab="swap" />} />
     <Route
       path={routes.accountActivity.path}
       element={<AccountScreen tab="activity" />}
     />
+
     <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
     <Route path={routes.settings.path} element={<SettingsScreen />} />

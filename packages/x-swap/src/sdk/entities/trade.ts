@@ -1,7 +1,7 @@
 import invariant from "tiny-invariant"
 
 import { InsufficientInputAmountError } from "./../errors"
-import { ChainId, ONE, TradeType, ZERO } from "../constants"
+import { ONE, SupportedNetworks, TradeType, ZERO } from "../constants"
 import { InsufficientReservesError } from "../errors"
 import { sortedInsert } from "../utils"
 import { Currency, ETHER } from "./currency"
@@ -101,23 +101,26 @@ export interface BestTradeOptions {
  */
 function wrappedAmount(
   currencyAmount: CurrencyAmount,
-  chainId: ChainId,
+  networkId: SupportedNetworks,
 ): TokenAmount {
   if (currencyAmount instanceof TokenAmount) {
     return currencyAmount
   }
   if (currencyAmount.currency === ETHER) {
-    return new TokenAmount(WETH[chainId], currencyAmount.raw)
+    return new TokenAmount(WETH[networkId], currencyAmount.raw)
   }
   invariant(false, "CURRENCY")
 }
 
-function wrappedCurrency(currency: Currency, chainId: ChainId): Token {
+function wrappedCurrency(
+  currency: Currency,
+  networkId: SupportedNetworks,
+): Token {
   if (currency instanceof Token) {
     return currency
   }
   if (currency === ETHER) {
-    return WETH[chainId]
+    return WETH[networkId]
   }
   invariant(false, "CURRENCY")
 }
@@ -183,7 +186,7 @@ export class Trade {
     const nextPairs: Pair[] = new Array(route.pairs.length)
     if (tradeType === TradeType.EXACT_INPUT) {
       invariant(currencyEquals(amount.currency, route.input), "INPUT")
-      amounts[0] = wrappedAmount(amount, route.chainId)
+      amounts[0] = wrappedAmount(amount, route.networkId)
       for (let i = 0; i < route.path.length - 1; i++) {
         const pair = route.pairs[i]
         const [outputAmount, nextPair] = pair.getOutputAmount(amounts[i])
@@ -192,7 +195,7 @@ export class Trade {
       }
     } else {
       invariant(currencyEquals(amount.currency, route.output), "OUTPUT")
-      amounts[amounts.length - 1] = wrappedAmount(amount, route.chainId)
+      amounts[amounts.length - 1] = wrappedAmount(amount, route.networkId)
       for (let i = route.path.length - 1; i > 0; i--) {
         const pair = route.pairs[i - 1]
         const [inputAmount, nextPair] = pair.getInputAmount(amounts[i])
@@ -296,16 +299,16 @@ export class Trade {
       originalAmountIn === currencyAmountIn || currentPairs.length > 0,
       "INVALID_RECURSION",
     )
-    const chainId: ChainId | undefined =
+    const networkId: SupportedNetworks | undefined =
       currencyAmountIn instanceof TokenAmount
-        ? currencyAmountIn.token.chainId
+        ? currencyAmountIn.token.networkId
         : currencyOut instanceof Token
-        ? currencyOut.chainId
+        ? currencyOut.networkId
         : undefined
-    invariant(chainId !== undefined, "CHAIN_ID")
+    invariant(networkId !== undefined, "CHAIN_ID")
 
-    const amountIn = wrappedAmount(currencyAmountIn, chainId)
-    const tokenOut = wrappedCurrency(currencyOut, chainId)
+    const amountIn = wrappedAmount(currencyAmountIn, networkId)
+    const tokenOut = wrappedCurrency(currencyOut, networkId)
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i]
       // pair irrelevant
@@ -403,16 +406,16 @@ export class Trade {
       originalAmountOut === currencyAmountOut || currentPairs.length > 0,
       "INVALID_RECURSION",
     )
-    const chainId: ChainId | undefined =
+    const networkId: SupportedNetworks | undefined =
       currencyAmountOut instanceof TokenAmount
-        ? currencyAmountOut.token.chainId
+        ? currencyAmountOut.token.networkId
         : currencyIn instanceof Token
-        ? currencyIn.chainId
+        ? currencyIn.networkId
         : undefined
-    invariant(chainId !== undefined, "CHAIN_ID")
+    invariant(networkId !== undefined, "CHAIN_ID")
 
-    const amountOut = wrappedAmount(currencyAmountOut, chainId)
-    const tokenIn = wrappedCurrency(currencyIn, chainId)
+    const amountOut = wrappedAmount(currencyAmountOut, networkId)
+    const tokenIn = wrappedCurrency(currencyIn, networkId)
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i]
       // pair irrelevant

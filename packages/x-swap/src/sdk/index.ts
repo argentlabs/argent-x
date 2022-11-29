@@ -5,7 +5,7 @@ export type { BigintIsh } from "./constants"
 export { JSBI }
 
 export {
-  ChainId,
+  SupportedNetworks,
   TradeType,
   Rounding,
   FACTORY_ADDRESS,

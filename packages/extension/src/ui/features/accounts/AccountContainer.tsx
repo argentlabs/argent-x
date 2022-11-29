@@ -58,6 +58,7 @@ export const AccountContainer: FC<PropsWithChildren> = ({ children }) => {
           icon={<NftIcon />}
           label="NFTs"
         />
+        <Tab as={NavLink} to={routes.swap()} icon={<NftIcon />} label="Swap" />
         <Tab
           as={NavLink}
           to={routes.accountActivity()}

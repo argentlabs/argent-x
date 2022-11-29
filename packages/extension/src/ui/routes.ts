@@ -163,4 +163,5 @@ export const routes = {
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
+  swap: route("/swap"),
 }

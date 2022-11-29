@@ -112,7 +112,7 @@ export interface TokenBalanceErrorMessage {
 }
 
 const errorToMessage = (
-  error: unknown,
+  error: string,
   tokenAddress: string,
   multicallAddress?: string,
 ): TokenBalanceErrorMessage => {

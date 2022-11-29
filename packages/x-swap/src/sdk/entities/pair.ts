@@ -4,8 +4,7 @@ import invariant from "tiny-invariant"
 
 import {
   BigintIsh,
-  ChainId,
-  DEFAULT_CHAIN_ID,
+  DEFAULT_NETWORK_ID,
   FACTORY_ADDRESS,
   FEE_TO_SETTER_ADDRESS,
   FIVE,
@@ -44,10 +43,10 @@ export class Pair {
     const salt = pedersen([tokens[0].address, tokens[1].address])
 
     const contructorCalldata = [
-      PAIR_CLASS_HASH[tokens[0].chainId ?? DEFAULT_CHAIN_ID],
+      PAIR_CLASS_HASH[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
       tokens[0].address,
       tokens[1].address,
-      FEE_TO_SETTER_ADDRESS[tokens[0].chainId ?? DEFAULT_CHAIN_ID],
+      FEE_TO_SETTER_ADDRESS[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
     ]
 
     if (
@@ -59,9 +58,9 @@ export class Pair {
           ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
           [tokens[1].address]: calculateContractAddressFromHash(
             salt,
-            PAIR_PROXY_CLASS_HASH[tokens[0].chainId ?? DEFAULT_CHAIN_ID],
+            PAIR_PROXY_CLASS_HASH[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
             contructorCalldata,
-            FACTORY_ADDRESS[tokens[0].chainId ?? DEFAULT_CHAIN_ID],
+            FACTORY_ADDRESS[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
           ),
         },
       }
@@ -80,7 +79,7 @@ export class Pair {
       : [tokenAmountB, tokenAmountA]
 
     this.liquidityToken = new Token(
-      tokenAmounts[0].token.chainId,
+      tokenAmounts[0].token.networkId,
       pairAddress
         ? pairAddress
         : Pair.getAddress(tokenAmounts[0].token, tokenAmounts[1].token),
@@ -135,8 +134,8 @@ export class Pair {
   /**
    * Returns the chain ID of the tokens in the pair.
    */
-  public get chainId(): ChainId {
-    return this.token0.chainId
+  public get networkId() {
+    return this.token0.networkId
   }
 
   public get token0(): Token {

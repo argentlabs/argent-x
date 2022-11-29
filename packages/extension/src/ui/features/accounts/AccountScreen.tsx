@@ -13,7 +13,7 @@ import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
 import { useAddAccount } from "./useAddAccount"
 
 interface AccountScreenProps {
-  tab: "tokens" | "collections" | "activity"
+  tab: "tokens" | "collections" | "activity" | "swap"
 }
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
@@ -48,6 +48,8 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   } else if (tab === "collections") {
     body = <AccountCollections account={account} />
   } else if (tab === "activity") {
+    body = <AccountActivityContainer account={account} />
+  } else if (tab === "swap") {
     body = <AccountActivityContainer account={account} />
   } else {
     assertNever(tab)
