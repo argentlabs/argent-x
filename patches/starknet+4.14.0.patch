@@ -1,5 +1,5 @@
 diff --git a/node_modules/starknet/dist/index.js b/node_modules/starknet/dist/index.js
-index 6c8a825..6e1a53c 100644
+index a1710d3..5301ffc 100644
 --- a/node_modules/starknet/dist/index.js
 +++ b/node_modules/starknet/dist/index.js
 @@ -89,6 +89,7 @@ __export(hash_exports, {
@@ -10,7 +10,7 @@ index 6c8a825..6e1a53c 100644
  var import_minimalistic_assert3 = __toESM(require("minimalistic-assert"));
  
  // src/constants.ts
-@@ -2424,26 +2425,9 @@ function getSelector(value) {
+@@ -2426,26 +2427,9 @@ function getSelector(value) {
    }
    return getSelectorFromName(value);
  }
@@ -40,7 +40,7 @@ index 6c8a825..6e1a53c 100644
  function computeHashOnElements(data) {
    return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
 diff --git a/node_modules/starknet/dist/index.mjs b/node_modules/starknet/dist/index.mjs
-index db86b17..d8d06d4 100644
+index 90ee4d9..c3cdc65 100644
 --- a/node_modules/starknet/dist/index.mjs
 +++ b/node_modules/starknet/dist/index.mjs
 @@ -32,7 +32,7 @@ __export(hash_exports, {
@@ -52,7 +52,7 @@ index db86b17..d8d06d4 100644
  
  // src/constants.ts
  var constants_exports = {};
-@@ -2367,26 +2367,9 @@ function getSelector(value) {
+@@ -2369,26 +2369,9 @@ function getSelector(value) {
    }
    return getSelectorFromName(value);
  }
