@@ -33,7 +33,7 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
   useOnClickOutside(ref, () => onClose())
   return (
     <>
-      <Menu isOpen={isOpen} onClose={onClose} matchWidth gutter={1}>
+      <Menu isOpen={isOpen} onClose={onClose} matchWidth gutter={1} size="3xs">
         <MenuButton
           onMouseOver={onOpen}
           aria-label="NFT actions"
@@ -43,6 +43,7 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           rounded="full"
           w="100%"
           as={Button}
+          bg="neutrals.700"
         >
           <Flex justifyContent="center" alignItems="center" gap="2">
             <DropdownDownIcon />
@@ -54,20 +55,25 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           boxShadow="none"
           ref={ref}
           onMouseLeave={onClose}
+          minW="0"
+          w={"155px"}
+          rootProps={{ maxWidth: "155px", width: "100%" }}
         >
           <Button
+            bg="neutrals.700"
             gap="2"
             my="1"
-            w="100%"
+            w="155px"
             onClick={() => openAspectNft(contractAddress, tokenId, networkId)}
           >
             <Aspect />
             <B3>Aspect</B3>
           </Button>
           <Button
+            bg="neutrals.700"
             gap="2"
             my="1"
-            w="100%"
+            w="155px"
             onClick={() =>
               openMintSquareNft(contractAddress, tokenId, networkId)
             }
