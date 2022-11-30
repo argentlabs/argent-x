@@ -2,6 +2,7 @@ import urljoin from "url-join"
 
 import { Network, NetworkStatus } from "../shared/network"
 import { KeyValueStorage } from "../shared/storage"
+import { tryToDeclareContracts } from "./devnet/declareAccounts"
 import { createStaleWhileRevalidateCache } from "./swr"
 import { fetchWithTimeout } from "./utils/fetchWithTimeout"
 
@@ -84,6 +85,29 @@ const getGatewayNetworkStatus = async (
     }
   })
 
+export const getDevnetStatus = async (
+  network: Network,
+): Promise<NetworkStatus> =>
+  swr(`${network.id}-devnet-network-status`, async () => {
+    // fetch http://localhost:5050/is_alive and check the response
+    try {
+      const response = await fetchWithTimeout(
+        urljoin(network.baseUrl, "is_alive"),
+        { timeout: 5000, method: "GET" },
+      )
+
+      const status = determineStatusByRequestStatusCode(response.status)
+
+      if (status === "ok") {
+        tryToDeclareContracts(network)
+      }
+
+      return status
+    } catch {
+      return "error"
+    }
+  })
+
 export const getNetworkStatus = async (
   network: Network,
 ): Promise<NetworkStatus> => {
@@ -91,6 +115,11 @@ export const getNetworkStatus = async (
   // return degraded if any of the above are degraded
   // return error if any of the above are error
   // return unknown if all of the above are unknown
+
+  const isDevnet = await getDevnetStatus(network)
+  if (isDevnet === "ok") {
+    return isDevnet
+  }
 
   const statuses = await Promise.all([
     getChecklyNetworkStatus(network),

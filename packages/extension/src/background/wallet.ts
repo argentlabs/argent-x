@@ -35,6 +35,7 @@ import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
+import { declareContracts } from "./devnet/declareAccounts"
 import {
   getIndexForPath,
   getNextPathIndex,
@@ -196,22 +197,14 @@ export class Wallet {
       }
       return network.accountClassHash.argentAccount
     }
-    const [proxyContract, accountContract] = await this.loadContracts(
-      network.id,
-    )
 
     if (deployerAccount) {
-      await deployerAccount.declare({
-        classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-        contract: proxyContract,
-      })
+      const { account } = await declareContracts(
+        deployerAccount,
+        this.loadContracts,
+      )
 
-      const declareResponse = await deployerAccount.declare({
-        classHash: ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0],
-        contract: accountContract,
-      })
-
-      return declareResponse.class_hash
+      return account.class_hash
     }
 
     return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
