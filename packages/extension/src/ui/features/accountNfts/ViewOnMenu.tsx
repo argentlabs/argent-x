@@ -43,7 +43,6 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           rounded="full"
           w="100%"
           as={Button}
-          bg="neutrals.700"
         >
           <Flex justifyContent="center" alignItems="center" gap="2">
             <DropdownDownIcon />
@@ -60,7 +59,6 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           rootProps={{ maxWidth: "155px", width: "100%" }}
         >
           <Button
-            bg="neutrals.700"
             gap="2"
             my="1"
             w="155px"
@@ -70,7 +68,6 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
             <B3>Aspect</B3>
           </Button>
           <Button
-            bg="neutrals.700"
             gap="2"
             my="1"
             w="155px"

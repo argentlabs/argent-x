@@ -169,7 +169,7 @@ export const NftScreen: FC = () => {
             onClick={() => navigate(routes.sendNft(contractAddress, tokenId))}
             leftIcon={<SendIcon />}
           >
-            <B3> Send</B3>
+            <B3>Send</B3>
           </Button>
         </SimpleGrid>
       </NavigationContainer>
