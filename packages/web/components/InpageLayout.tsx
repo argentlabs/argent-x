@@ -2,10 +2,12 @@ import { P4, icons } from "@argent/ui"
 import { FC, PropsWithChildren } from "react"
 
 import { useBackendAccount } from "../hooks/account"
+import { usePageGuard } from "../hooks/usePageGuard"
 
 const { ProfileIcon } = icons
 
 export const InpageLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
+  usePageGuard()
   const { account } = useBackendAccount()
   return (
     <>
