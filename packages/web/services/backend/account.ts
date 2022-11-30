@@ -250,6 +250,8 @@ export interface UserAccount {
   accounts: Account[]
 }
 
+export const ERROR_MESSAGE_NOT_LOGGED_IN = "not logged in" as const
+
 export const getAccount = async (): Promise<UserAccount> => {
   const jwt = await getJwt()
   const response = await fetch(`${ARGENT_API_BASE_URL}/account`, {
@@ -260,6 +262,9 @@ export const getAccount = async (): Promise<UserAccount> => {
   })
 
   if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error(ERROR_MESSAGE_NOT_LOGGED_IN)
+    }
     throw new Error("failed to get account")
   }
 

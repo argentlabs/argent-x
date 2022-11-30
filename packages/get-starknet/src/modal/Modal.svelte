@@ -174,6 +174,13 @@
 
       await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
 
+      // close popup
+      if (!windowRef?.closed) {
+        clearInterval(interval)
+        setLoadingItem(false)
+        windowRef = null
+      }
+
       await wormholeConnection.call("reloadData")
     }
 
