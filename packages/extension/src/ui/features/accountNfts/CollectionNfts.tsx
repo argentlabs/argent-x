@@ -77,6 +77,9 @@ export const CollectionNfts: FC = () => {
               w="64px"
               h="64px"
               src={collectible.imageUri}
+              backgroundColor={
+                !collectible.imageUri ? "neutrals.300" : "transparent"
+              }
               borderRadius="lg"
             />
             <H4>{collectible?.name || "Loading..."}</H4>

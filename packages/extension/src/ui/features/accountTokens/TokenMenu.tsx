@@ -1,6 +1,6 @@
 import { icons } from "@argent/ui"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
-import { FC, useRef, useState } from "react"
+import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 
@@ -11,7 +11,6 @@ import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
-import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { IconWrapper } from "./DeprecatedAccountMenu"
 
@@ -26,13 +25,9 @@ export const TokenMenu: FC<TokenMenuProps> = ({
   tokenAddress,
   canHideToken = true,
 }) => {
-  const [isMenuOpen, setMenuOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const currentNetwork = useCurrentNetwork()
   const blockExplorerTitle = useBlockExplorerTitle()
-
-  useOnClickOutside(ref, () => setMenuOpen(false))
 
   return (
     <>

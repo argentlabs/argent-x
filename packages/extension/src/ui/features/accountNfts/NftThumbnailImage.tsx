@@ -1,4 +1,4 @@
-import { Box, Image, Spinner } from "@chakra-ui/react"
+import { Flex, Image, Spinner } from "@chakra-ui/react"
 import { FC, ImgHTMLAttributes } from "react"
 
 import { NftFallback } from "./NftFallback"
@@ -25,6 +25,11 @@ export const NftThumbnailImage: FC<NftThumbnailImage> = ({ src, ...rest }) => {
           transition: "all 0.2s ease-in-out",
         },
       }}
+      fallback={
+        <Flex w="142px" h="142px" justifyContent="center" alignItems="center">
+          <Spinner />
+        </Flex>
+      }
     />
   )
 }

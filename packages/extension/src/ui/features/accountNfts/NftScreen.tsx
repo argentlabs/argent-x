@@ -110,7 +110,6 @@ export const NftScreen: FC = () => {
                   borderRadius="lg"
                   alt={nft.name}
                   src={nft.image_url_copy}
-                  zIndex={10}
                 />
               </Box>
             </>
