@@ -92,7 +92,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       >
         {clickNavigateSettings && (
           <IconContaier>
-            <Text fontSize="base">
+            <Text>
               <ChevronRightIcon />
             </Text>
           </IconContaier>
