@@ -8,6 +8,7 @@ import dts from "vite-plugin-dts"
 export default defineConfig({
   build: {
     emptyOutDir: false,
+    target: "es2020",
     lib: {
       entry: resolve(__dirname, "src/main.ts"),
       name: "ui",
