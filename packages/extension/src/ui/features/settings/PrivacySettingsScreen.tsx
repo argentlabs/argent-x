@@ -69,7 +69,7 @@ export const PrivacySettingsScreen: FC = () => {
         <hr />
         <SettingsItem>
           <Title>
-            <span>Share analytics data</span>
+            <span>Share anonymised data with Argent</span>
             <Switch
               colorScheme="primary"
               isChecked={privacyShareAnalyticsData}
@@ -82,8 +82,8 @@ export const PrivacySettingsScreen: FC = () => {
             />
           </Title>
           <P>
-            This helps the Argent team to identify issues, prioritize features
-            and build a better product
+            This helps the Argent team to identify issues, prioritise features
+            and build a better product without compromising your privacy
           </P>
         </SettingsItem>
       </SettingsScreenWrapper>
