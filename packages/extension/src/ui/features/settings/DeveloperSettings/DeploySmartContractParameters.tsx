@@ -63,7 +63,7 @@ const DeploySmartContractParameters: FC<{
           <Input
             key={item.id}
             autoFocus={index === 0}
-            placeholder={`Constructor argument ${index + 1}`}
+            placeholder={get(item, "name", "")}
             {...register(`parameters.${index}.value`, {
               required: true,
             })}

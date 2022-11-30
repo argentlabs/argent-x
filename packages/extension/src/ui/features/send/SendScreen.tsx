@@ -140,7 +140,7 @@ export const SendScreen: FC = () => {
         <TabView>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             {selectedTab === "tokens" && (
-              <CellStack py={0}>
+              <CellStack pt={0}>
                 <TokenList
                   tokenList={tokenList}
                   variant="no-currency"

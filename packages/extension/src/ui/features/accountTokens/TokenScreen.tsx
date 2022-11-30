@@ -109,14 +109,19 @@ export const TokenScreen: FC = () => {
           <ColumnCenter>
             <TokenIcon name={name} url={image} size={12} />
             <TokenBalanceContainer>
-              <LoadingPulse isLoading={isLoading}>
-                <StyledH2
+              <LoadingPulse
+                isLoading={isLoading}
+                display="flex"
+                alignItems="center"
+                gap="2"
+              >
+                <H3
                   data-testid={
                     isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
                   }
                 >
                   {displayBalance}
-                </StyledH2>
+                </H3>
                 <H3>{symbol}</H3>
               </LoadingPulse>
             </TokenBalanceContainer>
