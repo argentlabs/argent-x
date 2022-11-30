@@ -100,6 +100,7 @@ export const usePageGuard = () => {
             .catch(() => false))
         ) {
           if (localHandle) {
+            console.log("Account found, sending to parent")
             localHandle.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
           } else {
             await conditionallyPushTo(router, "/dashboard")

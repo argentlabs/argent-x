@@ -33,6 +33,8 @@ export type WindowEvents = {
   "ARGENT_WEB_WALLET::SHOULD_SHOW": undefined
   "ARGENT_WEB_WALLET::SHOULD_HIDE": undefined
   "ARGENT_WEB_WALLET::HEIGHT_CHANGED": number
+  "ARGENT_WEB_WALLET::INLINE::SHOW_LOADING": undefined
+  "ARGENT_WEB_WALLET::INLINE::HIDE_LOADING": undefined
 }
 
 export type LocalConnection = LocalHandle<WindowMethods, WindowEvents>

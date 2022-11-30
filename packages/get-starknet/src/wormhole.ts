@@ -1,7 +1,6 @@
 import type { RemoteConnection } from "@argent/x-window"
 import { getRemoteHandle } from "@argent/x-window"
 import retry from "async-retry"
-import memo from "lodash-es/memoize"
 
 export const applyModalStyle = (iframe: HTMLIFrameElement) => {
   // middle of the screen
@@ -19,7 +18,7 @@ export const applyModalStyle = (iframe: HTMLIFrameElement) => {
   iframe.style.boxShadow = "0px 4px 20px rgba(0, 0, 0, 0.5)"
 
   const background = document.createElement("div")
-  background.style.display = "block"
+  background.style.display = "none"
   background.style.position = "fixed"
   background.style.top = "0"
   background.style.left = "0"
@@ -32,6 +31,14 @@ export const applyModalStyle = (iframe: HTMLIFrameElement) => {
   background.appendChild(iframe)
 
   return background
+}
+
+export const showModal = (modal: HTMLDivElement) => {
+  modal.style.display = "block"
+}
+
+export const hideModal = (modal: HTMLDivElement) => {
+  modal.style.display = "none"
 }
 
 export const applyInlineStyle = (iframe: HTMLIFrameElement) => {
@@ -49,8 +56,10 @@ export const applyInlineStyle = (iframe: HTMLIFrameElement) => {
   return iframe
 }
 
-export const applyHideStyle = (iframe: HTMLIFrameElement) => {
-  iframe.style.display = "none"
+export const createIframe = async (targetUrl: string, shouldShow: boolean) => {
+  const iframe = document.createElement("iframe")
+  iframe.src = targetUrl
+  iframe.style.display = shouldShow ? "block" : "none"
   iframe.style.position = "absolute"
   iframe.style.top = "-10000px"
   iframe.style.left = "-10000px"
@@ -60,18 +69,13 @@ export const applyHideStyle = (iframe: HTMLIFrameElement) => {
   iframe.style.borderRadius = "0px"
   iframe.style.boxShadow = "none"
   iframe.style.transform = "none"
-}
-
-export const createIframe = async (targetUrl: string) => {
-  const iframe = document.createElement("iframe")
-  iframe.src = targetUrl
-  applyHideStyle(iframe)
   ;(iframe as any).loading = "eager"
   iframe.sandbox.add(
     "allow-scripts",
     "allow-same-origin",
     "allow-forms",
     "allow-top-navigation",
+    "allow-popups",
   )
 
   return iframe
@@ -91,30 +95,26 @@ export const loadIframe = async (iframe: HTMLIFrameElement) =>
     })
   })
 
-export const getIframeConnection = memo(
-  async (iframe: HTMLIFrameElement): Promise<RemoteConnection> => {
-    const handle = await retry(
-      () =>
-        getRemoteHandle({
-          remoteWindow: iframe.contentWindow,
-          remoteOrigin: "*",
-          localWindow: window,
-        }),
-      {
-        maxRetryTime: 5,
-        minTimeout: 500,
-      },
-    ).catch((cause) => {
-      throw Error("Failed to connect to iframe", { cause })
-    })
+export const getIframeConnection = async (
+  iframe: HTMLIFrameElement,
+): Promise<RemoteConnection> => {
+  const handle = await retry(
+    () =>
+      getRemoteHandle({
+        remoteWindow: iframe.contentWindow,
+        remoteOrigin: "*",
+        localWindow: window,
+      }),
+    {
+      maxRetryTime: 5,
+      minTimeout: 500,
+    },
+  ).catch((cause) => {
+    throw Error("Failed to connect to iframe", { cause })
+  })
 
-    await handle.once("ARGENT_WEB_WALLET::LOADED")
+  await handle.once("ARGENT_WEB_WALLET::LOADED")
+  console.log("ARGENT_WEB_WALLET::LOADED")
 
-    return handle
-  },
-)
-
-export const getMemorizedLoginStatus = memo(
-  async (wormholeConnection: RemoteConnection) =>
-    wormholeConnection.call("getLoginStatus"),
-)
+  return handle
+}

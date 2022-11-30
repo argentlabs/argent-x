@@ -1,14 +1,17 @@
 import { H6, Input, L1, L2 } from "@argent/ui"
+import { getRemoteHandle } from "@argent/x-window"
 import { Box, DarkMode, Flex, IconButton, LightMode } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import retry from "async-retry"
 import { useRouter } from "next/router"
 import { FC, PropsWithChildren, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
-import { useBackendAccount } from "../../hooks/account"
+import { useAccount, useBackendAccount } from "../../hooks/account"
 import { useLocalHandle } from "../../hooks/usePageGuard"
 import { enterEmailFormSchema } from "../../schemas/forms/email"
 import { isSubmitDisabled } from "../../schemas/utils"
+import { getAccount, retrieveAccountFromSession } from "../../services/account"
 
 const GlobalStyle: FC<{ darkmode: boolean }> = ({ darkmode }) => (
   <style jsx global>{`
@@ -101,8 +104,16 @@ const boxShadow = "rgba(0,0,0,0.12) 0px 2px 12px 0px"
 export default function Modal() {
   const navigate = useRouter()
   const localHandle = useLocalHandle()
-  const { account } = useBackendAccount({
-    onSuccess: () => {
+  const { account, mutate } = useAccount()
+  const { account: beAccount } = useBackendAccount({
+    onSuccess: async (account) => {
+      const memoryAccount = await getAccount()
+      if (!memoryAccount) {
+        await retrieveAccountFromSession(account.accounts[0])
+          .then(() => mutate())
+          .catch(() => {}) // ignore error
+      }
+
       localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
     },
     onError: () => {
@@ -121,11 +132,98 @@ export default function Modal() {
   const { isSubmitting } = formState
   const canSubmit = !isSubmitDisabled(formState)
 
-  const onWebWallet = useCallback(() => {
-    localHandle?.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
-  }, [localHandle])
+  const onWebWallet = useCallback(
+    async (values?: { email: string }) => {
+      try {
+        console.log("ARGENT_WEB_WALLET::INLINE::SHOW_LOADING")
+        localHandle?.emit("ARGENT_WEB_WALLET::INLINE::SHOW_LOADING", undefined)
 
-  if (account?.email) {
+        const email = beAccount?.email ?? values?.email
+        if (!email) {
+          throw new Error("Email is required")
+        }
+
+        if (!account) {
+          const h = 600
+          const w = 500
+
+          // parent is the window that opened this window; if not detected then it falls back to the current screen
+          const parentWidth =
+            window?.outerWidth ??
+            window?.innerWidth ??
+            window?.screen.width ??
+            0
+          const parentHeight =
+            window?.outerHeight ??
+            window?.innerHeight ??
+            window?.screen.height ??
+            0
+          const parentLeft = window?.screenLeft ?? window?.screenX ?? 0
+          const parentTop = window?.screenTop ?? window?.screenY ?? 0
+
+          const y = parentTop + parentHeight / 2 - h / 2
+          const x = parentLeft + parentWidth / 2 - w / 2
+
+          const submitGoalUrl = `${origin}/email`
+          // no session
+          const windowRef = window.open(
+            !beAccount?.email
+              ? submitGoalUrl + "?email=" + encodeURIComponent(email)
+              : origin,
+            "Argent",
+            `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
+          )
+
+          if (!windowRef) {
+            throw new Error("Failed to open popup")
+          }
+
+          // callback if popup is closed
+          const interval = setInterval(() => {
+            if (windowRef?.closed) {
+              clearInterval(interval)
+              localHandle?.emit(
+                "ARGENT_WEB_WALLET::INLINE::HIDE_LOADING",
+                undefined,
+              )
+              throw new Error("Popup closed")
+            }
+          }, 500)
+
+          // wait for message from popup
+          const messageHandler = await retry(
+            () =>
+              getRemoteHandle({
+                remoteWindow: windowRef,
+                remoteOrigin: "*",
+              }),
+            {
+              maxRetryTime: 5,
+              minTimeout: 500,
+            },
+          ).catch((cause) => {
+            throw Error("Failed to connect to popup", { cause })
+          })
+
+          await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
+          await messageHandler.call("reloadData")
+
+          // close popup
+          if (!windowRef?.closed) {
+            clearInterval(interval)
+            windowRef.close()
+          }
+        }
+        localHandle?.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
+      } catch (e) {
+        console.error(e)
+        localHandle?.emit("ARGENT_WEB_WALLET::INLINE::HIDE_LOADING", undefined)
+      }
+    },
+    [account, beAccount?.email, localHandle],
+  )
+
+  if (beAccount?.email) {
     return (
       <ErrorWrapper darkmode={darkmode}>
         <Box
@@ -144,7 +242,7 @@ export default function Modal() {
           transition="all 0.2s"
           role="button"
           tabIndex={0}
-          onClick={onWebWallet}
+          onClick={() => onWebWallet()}
           onKeyUp={(e) => {
             if (e.key === "Enter") {
               onWebWallet()
@@ -171,7 +269,7 @@ export default function Modal() {
                 fill="currentColor"
               />
             </svg>
-            {account.email}
+            {beAccount.email}
           </H6>
         </Box>
       </ErrorWrapper>
@@ -183,13 +281,7 @@ export default function Modal() {
       darkmode={darkmode}
       error={formState.errors.email?.message ?? ""}
     >
-      <Box
-        as="form"
-        position={"relative"}
-        onSubmit={handleSubmit(({ email }) => {
-          console.log(email)
-        })}
-      >
+      <Box as="form" position={"relative"} onSubmit={handleSubmit(onWebWallet)}>
         <Input
           autoFocus
           backgroundColor={darkmode ? undefined : "#f5f5f5"}

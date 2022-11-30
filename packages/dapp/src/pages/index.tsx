@@ -2,7 +2,7 @@ import { StarknetWindowObject } from "@argent/get-starknet"
 import { supportsSessions } from "@argent/x-sessions"
 import type { NextPage } from "next"
 import Head from "next/head"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { AccountInterface } from "starknet"
 
 import { TokenDapp } from "../components/TokenDapp"
@@ -56,34 +56,36 @@ const Home: NextPage = () => {
     }
   }, [])
 
-  const handleConnectClick =
+  const handleConnectClick = useCallback(
     (
-      connectWallet: (
-        enableWebWallet: boolean,
-      ) => Promise<StarknetWindowObject | undefined>,
-      enableWebWallet = true,
-    ) =>
-    async () => {
-      const wallet = await connectWallet(enableWebWallet)
-      setAddress(wallet?.selectedAddress)
-      setChain(chainId(wallet?.provider))
-      setConnected(!!wallet?.isConnected)
-      if (wallet?.account) {
-        setAccount(wallet.account)
-      }
-      setSupportsSessions(null)
-      if (wallet?.selectedAddress && wallet.provider) {
-        try {
-          const sessionSupport = await supportsSessions(
-            wallet.selectedAddress,
-            wallet.provider,
-          )
-          setSupportsSessions(sessionSupport)
-        } catch {
-          setSupportsSessions(false)
+        connectWallet: (
+          enableWebWallet: boolean,
+        ) => Promise<StarknetWindowObject | undefined>,
+        enableWebWallet = true,
+      ) =>
+      async () => {
+        const wallet = await connectWallet(enableWebWallet)
+        setAddress(wallet?.selectedAddress)
+        setChain(chainId(wallet?.provider))
+        setConnected(!!wallet?.isConnected)
+        if (wallet?.account) {
+          setAccount(wallet.account)
         }
-      }
-    }
+        setSupportsSessions(null)
+        if (wallet?.selectedAddress && wallet.provider) {
+          try {
+            const sessionSupport = await supportsSessions(
+              wallet.selectedAddress,
+              wallet.provider,
+            )
+            setSupportsSessions(sessionSupport)
+          } catch {
+            setSupportsSessions(false)
+          }
+        }
+      },
+    [],
+  )
 
   return (
     <div className={styles.container}>
