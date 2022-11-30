@@ -13,7 +13,7 @@ import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { openAspectNft } from "./aspect.service"
 import { openMintSquareNft } from "./mint-square.service"
 
-const { DropdownDownIcon } = icons
+const { ViewIcon } = icons
 const { Aspect, Mintsquare } = logos
 
 export interface TokenMenuProps {
@@ -33,7 +33,7 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
   useOnClickOutside(ref, () => onClose())
   return (
     <>
-      <Menu isOpen={isOpen} onClose={onClose} matchWidth gutter={1} size="3xs">
+      <Menu isOpen={isOpen} onClose={onClose} matchWidth gutter={2} size="3xs">
         <MenuButton
           onMouseOver={onOpen}
           aria-label="NFT actions"
@@ -43,9 +43,11 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           rounded="full"
           w="100%"
           as={Button}
+          bg="neutrals.700"
+          _hover={{ bg: "neutrals.600" }}
         >
           <Flex justifyContent="center" alignItems="center" gap="2">
-            <DropdownDownIcon />
+            <ViewIcon />
             <B3>View on</B3>
           </Flex>
         </MenuButton>
@@ -55,25 +57,27 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           ref={ref}
           onMouseLeave={onClose}
           minW="0"
-          w={"155px"}
-          rootProps={{ maxWidth: "155px", width: "100%" }}
         >
           <Button
             gap="2"
             my="1"
-            w="155px"
+            w="100%"
             onClick={() => openAspectNft(contractAddress, tokenId, networkId)}
+            bg="neutrals.700"
+            _hover={{ bg: "neutrals.600" }}
           >
             <Aspect />
             <B3>Aspect</B3>
           </Button>
           <Button
+            w="100%"
             gap="2"
             my="1"
-            w="155px"
             onClick={() =>
               openMintSquareNft(contractAddress, tokenId, networkId)
             }
+            bg="neutrals.700"
+            _hover={{ bg: "neutrals.600" }}
           >
             <Mintsquare />
             <B3>MintSquare</B3>
