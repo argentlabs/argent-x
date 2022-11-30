@@ -116,7 +116,7 @@ export const NavigationBar: FC<NavigationBarProps> = ({
       {(leftButton || rightButton) && (
         <ButtonsContainer>
           {leftButton}
-          {rightButton}
+          {rightButton && <Flex ml={"auto"}>{rightButton}</Flex>}
         </ButtonsContainer>
       )}
       {children}

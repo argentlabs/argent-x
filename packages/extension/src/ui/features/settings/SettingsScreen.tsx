@@ -1,5 +1,5 @@
 import {
-  BarBackButton,
+  BarCloseButton,
   Button,
   CellStack,
   NavigationContainer,
@@ -87,8 +87,8 @@ export const SettingsScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={
-          <BarBackButton onClick={() => navigate(routes.accountTokens())} />
+        rightButton={
+          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
         }
         title={"Settings"}
       >
