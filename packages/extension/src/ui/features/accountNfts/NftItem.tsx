@@ -13,7 +13,14 @@ interface NftItemProps {
 
 const NftItem: FC<NftItemProps> = ({ logoSrc, name, thumbnailSrc, total }) => (
   <Box as="figure">
-    <Box position="relative">
+    <Box
+      position="relative"
+      _hover={{
+        transform: "scale(1.05)",
+        transitionDuration: "0.2s",
+        transitionTimingFunction: "ease-in-out",
+      }}
+    >
       <NftThumbnailImage src={thumbnailSrc} />
       {logoSrc && (
         <Box

@@ -19,12 +19,6 @@ export const NftThumbnailImage: FC<NftThumbnailImage> = ({ src, ...rest }) => {
       h="142px"
       borderRadius="lg"
       position="relative"
-      sx={{
-        _groupHover: {
-          transform: "scale(1.05)",
-          transition: "all 0.2s ease-in-out",
-        },
-      }}
       fallback={
         <Flex w="142px" h="142px" justifyContent="center" alignItems="center">
           <Spinner />
