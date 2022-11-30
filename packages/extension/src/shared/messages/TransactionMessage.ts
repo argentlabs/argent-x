@@ -16,17 +16,11 @@ export interface EstimateFeeResponse {
   maxADFee?: string
 }
 
-export interface AccountDeploymentEstimateFeeResponse {
-  accountDeploymentFee: string
-  maxADFee: string
-}
-
-export interface UdcDeclareEstimateFeeResponse {
-  declareFee: string
-  maxADFee: string
-}
-export interface UdcDeployEstimateFeeResponse {
-  deployFee: string
+export interface DeclareDeployEstimateFeeResponse
+  extends Omit<
+    EstimateFeeResponse,
+    "suggestedMaxFee" | "accountDeploymentFee" | "theme"
+  > {
   maxADFee: string
 }
 
@@ -61,13 +55,13 @@ export type TransactionMessage =
   | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES"
-      data: AccountDeploymentEstimateFeeResponse
+      data: DeclareDeployEstimateFeeResponse
     }
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE"; data: DeclareContract }
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES"
-      data: UdcDeclareEstimateFeeResponse
+      data: DeclareDeployEstimateFeeResponse
     }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE"
@@ -76,5 +70,5 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
-      data: UdcDeployEstimateFeeResponse
+      data: DeclareDeployEstimateFeeResponse
     }
