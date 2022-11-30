@@ -1,4 +1,5 @@
 import {
+  B3,
   BarBackButton,
   BarCloseButton,
   Button,
@@ -28,14 +29,12 @@ import { routes } from "../../routes"
 import { addressSchema, isEqualAddress } from "../../services/addresses"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenMenu } from "../accountTokens/TokenMenu"
-import { openAspectNft } from "./aspect.service"
-import { openMintSquareNft } from "./mint-square.service"
 import { useNfts } from "./useNfts"
 import { ViewOnMenu } from "./ViewOnMenu"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
 
-const { SendIcon, DropdownDownIcon } = icons
+const { SendIcon } = icons
 
 export interface SendNftInput {
   recipient: string
@@ -97,11 +96,10 @@ export const NftScreen: FC = () => {
                   backgroundRepeat="no-repeat"
                   style={{ filter: "blur(50px)" }}
                   position="absolute"
-                  top={0}
-                  left={0}
-                  right={0}
-                  bottom={0}
-                  zIndex={0}
+                  top="15%"
+                  left="20%"
+                  right="20%"
+                  bottom="15%"
                 />
                 <Image
                   position="relative"
@@ -171,7 +169,7 @@ export const NftScreen: FC = () => {
             onClick={() => navigate(routes.sendNft(contractAddress, tokenId))}
             leftIcon={<SendIcon />}
           >
-            Send
+            <B3> Send</B3>
           </Button>
         </SimpleGrid>
       </NavigationContainer>

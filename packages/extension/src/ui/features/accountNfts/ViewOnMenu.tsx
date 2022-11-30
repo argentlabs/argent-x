@@ -1,18 +1,15 @@
-import { icons, logos } from "@argent/ui"
+import { B3, icons, logos } from "@argent/ui"
 import {
   Button,
   Flex,
   Menu,
   MenuButton,
-  MenuItem,
   MenuList,
+  useDisclosure,
 } from "@chakra-ui/react"
-import { FC, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { FC, useRef } from "react"
 
-import { useBlockExplorerTitle } from "../../services/blockExplorer.service"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
-import { useCurrentNetwork } from "../networks/useNetworks"
 import { openAspectNft } from "./aspect.service"
 import { openMintSquareNft } from "./mint-square.service"
 
@@ -30,15 +27,15 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
   networkId,
   tokenId,
 }) => {
-  const [isMenuOpen, setMenuOpen] = useState(false)
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const ref = useRef<HTMLDivElement>(null)
 
-  useOnClickOutside(ref, () => setMenuOpen(false))
-
+  useOnClickOutside(ref, () => onClose())
   return (
     <>
-      <Menu>
+      <Menu isOpen={isOpen} onClose={onClose} matchWidth gutter={1}>
         <MenuButton
+          onMouseOver={onOpen}
           aria-label="NFT actions"
           padding="1.5"
           fontSize="xl"
@@ -49,26 +46,35 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
         >
           <Flex justifyContent="center" alignItems="center" gap="2">
             <DropdownDownIcon />
-            View on
+            <B3>View on</B3>
           </Flex>
         </MenuButton>
-        <MenuList>
-          <MenuItem
-            onClick={() => openAspectNft(contractAddress, tokenId, networkId)}
+        <MenuList
+          bg="transparent"
+          boxShadow="none"
+          ref={ref}
+          onMouseLeave={onClose}
+        >
+          <Button
             gap="2"
+            my="1"
+            w="100%"
+            onClick={() => openAspectNft(contractAddress, tokenId, networkId)}
           >
             <Aspect />
-            View on Aspect
-          </MenuItem>
-          <MenuItem
+            <B3>Aspect</B3>
+          </Button>
+          <Button
             gap="2"
+            my="1"
+            w="100%"
             onClick={() =>
               openMintSquareNft(contractAddress, tokenId, networkId)
             }
           >
             <Mintsquare />
-            View on MintSquare
-          </MenuItem>
+            <B3>MintSquare</B3>
+          </Button>
         </MenuList>
       </Menu>
     </>
