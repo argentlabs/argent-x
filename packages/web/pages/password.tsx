@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 
 import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
+import { useAccount } from "../hooks/account"
 import { useLocalHandle } from "../hooks/usePageGuard"
 import { createPasswordFormSchema } from "../schemas/forms/password"
 import { isSubmitDisabled } from "../schemas/utils"
@@ -14,6 +15,7 @@ import { retrieveAccountWithPassword } from "../services/account"
 export default function Password() {
   const navigate = useRouter()
   const handler = useLocalHandle()
+  const { mutate } = useAccount()
 
   const { formState, handleSubmit, setError, register } = useForm({
     defaultValues: {
@@ -33,7 +35,7 @@ export default function Password() {
       onSubmit={handleSubmit(async ({ password }) => {
         try {
           await retrieveAccountWithPassword(password)
-          console.log("handler", handler, "opener", window.opener)
+          await mutate()
           if (handler) {
             handler.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
           }
