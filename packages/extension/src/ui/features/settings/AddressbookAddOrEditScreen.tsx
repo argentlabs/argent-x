@@ -19,7 +19,6 @@ import {
 } from "../../../shared/addressBook/type"
 import { AlertDialog } from "../../components/AlertDialog"
 import { Button, ButtonTransparent } from "../../components/Button"
-import Column, { ColumnCenter } from "../../components/Column"
 import { AddRoundedIcon } from "../../components/Icons/MuiIcons"
 import { EditRoundedIcon } from "../../components/Icons/MuiIcons"
 import { StyledControlledSelect } from "../../components/InputSelect"
@@ -30,17 +29,10 @@ import {
 import Row, { RowCentered } from "../../components/Row"
 import { useAddressBook } from "../../services/addressBook"
 import useDebounce from "../../services/useDebounce"
-import { FormErrorAlt, H3 } from "../../theme/Typography"
+import { FormErrorAlt } from "../../theme/Typography"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useCurrentNetwork, useNetworks } from "../networks/useNetworks"
 import { useYupValidationResolver } from "./useYupValidationResolver"
-
-const Wrapper = styled(ColumnCenter)`
-  padding: 56px 24px 32px;
-  gap: 32px;
-  justify-content: space-between;
-  position: relative;
-`
 
 const IconWrapper = styled(RowCentered)`
   height: 64px;

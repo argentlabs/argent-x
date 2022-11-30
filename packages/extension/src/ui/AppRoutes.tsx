@@ -116,15 +116,20 @@ const ResponsiveRoutes: FC = () => (
 )
 
 // Routes which don't need an unlocked wallet
-const nonWalletRoutes = (
+const legacyNonWalletRoutes = (
   <>
-    <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
     />
     <Route path={routes.error.path} element={<ErrorScreen />} />
+  </>
+)
+
+const nonWalletRoutes = (
+  <>
+    <Route path={routes.lockScreen.path} element={<LockScreen />} />
   </>
 )
 
@@ -339,13 +344,14 @@ export const AppRoutes: FC = () => {
   return (
     <Routes>
       <Route element={<LegacyResponsiveViewport />}>
-        {nonWalletRoutes}
+        {legacyNonWalletRoutes}
         {hasActions ? (
           <Route path="*" element={<ActionScreen />} />
         ) : (
           legacyUiWalletRoutes
         )}
       </Route>
+      <Route element={<ResponsiveRoutes />}>{nonWalletRoutes}</Route>
       {!hasActions && (
         <Route element={<ResponsiveRoutes />}>{walletRoutes}</Route>
       )}
