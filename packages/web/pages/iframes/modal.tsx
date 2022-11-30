@@ -14,8 +14,11 @@ const GlobalStyle: FC<{ darkmode: boolean }> = ({ darkmode }) => (
   <style jsx global>{`
     html,
     body {
-      background-color: ${darkmode ? "#171717" : "white"};
+      background-color: ${darkmode ? "#171717" : "#f8fafc"} !important;
+      height: 104px !important;
+      overflow: hidden !important;
       color: ${darkmode ? "white" : "black"};
+      width: 100%;
     }
   `}</style>
 )
@@ -25,11 +28,6 @@ const InfoIcon: FC = () => (
     width="16"
     height="16"
     viewBox="0 0 16 16"
-    style={{
-      cursor: "pointer",
-    }}
-    role="button"
-    tabIndex={0}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -71,9 +69,26 @@ const ErrorWrapper: FC<
           gap={2}
         >
           <L1 color="red.500">{error}</L1>
-          <L2 display={"inline-flex"} alignContent="center" gap={1}>
-            Powered by Argent
-            <InfoIcon />
+          <L2
+            display={"inline-flex"}
+            alignContent="center"
+            gap={"6px"}
+            color="#9ca3af"
+          >
+            <p style={{ marginTop: "1px" }}>Powered by Argent</p>
+            <Box
+              role="button"
+              tabIndex={0}
+              borderRadius="100%"
+              _focus={{
+                outline: "none",
+                boxShadow: darkmode
+                  ? "#404040 0px 0px 0px 2px"
+                  : "#e5e5e5 0px 0px 0px 2px",
+              }}
+            >
+              <InfoIcon />
+            </Box>
           </L2>
         </Flex>
       </Box>
@@ -122,7 +137,7 @@ export default function Modal() {
           rounded="md"
           cursor="pointer"
           boxShadow={boxShadow}
-          backgroundColor={darkmode ? "#262626" : "white"}
+          backgroundColor={darkmode ? "#262626" : "#f8fafc"}
           _hover={{
             backgroundColor: darkmode ? "#404040" : "#f5f5f5",
           }}

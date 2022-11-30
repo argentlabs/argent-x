@@ -15,11 +15,12 @@ type StoreVersion = "chrome" | "firefox" | "edge"
 
 export const globalWindow = typeof window !== "undefined" ? window : null
 if (globalWindow) {
-  const origin = "http://localhost:3005"
-  import("./wormhole").then(async ({ wormhole, getMemorizedLoginStatus }) => {
-    const wormholeConnection = await wormhole(origin)
-    getMemorizedLoginStatus(wormholeConnection)
-  })
+  const target = "http://localhost:3005/iframes/modal"
+  const prefetchLink = document.createElement("link")
+  prefetchLink.rel = "prefetch"
+  prefetchLink.href = target
+  prefetchLink.as = "document"
+  document.head.appendChild(prefetchLink)
 }
 
 function getStoreVersionFromBrowser(): StoreVersion | null {
