@@ -48,7 +48,7 @@ import {
   SaveAddressButton,
   StyledAccountAddress,
 } from "../accountTokens/SendTokenScreen"
-import { TokenMenu } from "../accountTokens/TokenMenu"
+import { TokenMenuDeprecated } from "../accountTokens/TokenMenuDeprecated"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { useNfts } from "./useNfts"
@@ -206,7 +206,7 @@ export const SendNftScreen: FC = () => {
       />
       <IconBar
         back
-        childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
+        childAfter={<TokenMenuDeprecated tokenAddress={nft.contract_address} />}
       >
         <H3>{nft.name}</H3>
       </IconBar>
