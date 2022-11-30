@@ -1,6 +1,7 @@
 import { Box, BoxProps } from "@chakra-ui/react"
 import { FC } from "react"
 
+import { usePageGuard } from "../hooks/usePageGuard"
 import { Header } from "./Header"
 import { WithFooter } from "./WithFooter"
 
@@ -21,6 +22,7 @@ const Content: FC<BoxProps> = ({ children, ...props }) => (
 )
 
 export const Layout: FC<BoxProps> = ({ children, ...props }) => {
+  usePageGuard()
   return (
     <WithFooter>
       <Header />
