@@ -11,7 +11,7 @@ export interface Erc721TransferCall extends Call {
     tokenIdLowFelt: number.BigNumberish,
     tokenIdHighFelt: number.BigNumberish,
   ]
-  entrypoint: "safeTransferFrom"
+  entrypoint: "safeTransferFrom" | "transferFrom"
 }
 
 export const isErc721TransferCall = (
