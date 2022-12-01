@@ -1,6 +1,6 @@
 import {
-  isErc721SafeTransferCall,
-  parseErc721SafeTransferCall,
+  isErc721TransferCall,
+  parseErc721TransferCall,
 } from "../../../../../../shared/call/erc721TransferCall"
 import { NFTTransferTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
@@ -11,12 +11,12 @@ import { ITransactionTransformer } from "./type"
 export default function ({ transaction, result }: ITransactionTransformer) {
   const calls = getCallsFromTransaction(transaction)
   for (const call of calls) {
-    if (isErc721SafeTransferCall(call)) {
+    if (isErc721TransferCall(call)) {
       const action = "TRANSFER"
       const entity = "NFT"
       const displayName = "Transfer NFT"
       const { contractAddress, fromAddress, toAddress, tokenId } =
-        parseErc721SafeTransferCall(call)
+        parseErc721TransferCall(call)
       result = {
         ...result,
         action,

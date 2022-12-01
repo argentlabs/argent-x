@@ -14,7 +14,7 @@ export interface Erc721TransferCall extends Call {
   entrypoint: "safeTransferFrom"
 }
 
-export const isErc721SafeTransferCall = (
+export const isErc721TransferCall = (
   call: Call,
 ): call is Erc721TransferCall => {
   try {
@@ -47,7 +47,7 @@ export const isErc721SafeTransferCall = (
   return false
 }
 
-export const parseErc721SafeTransferCall = (call: Erc721TransferCall) => {
+export const parseErc721TransferCall = (call: Erc721TransferCall) => {
   const { contractAddress, calldata } = call
   const [
     fromAddressDecimal,
