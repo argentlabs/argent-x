@@ -92,6 +92,7 @@ export const SendNftScreen: FC = () => {
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
   )
+
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
@@ -161,16 +162,29 @@ export const SendNftScreen: FC = () => {
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
   const onSubmit = async ({ recipient }: SendNftInput) => {
-    sendTransaction({
-      to: contractAddress,
-      method: "safeTransferFrom",
-      calldata: {
-        from_: account.address,
-        to: recipient,
-        tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
-        data_len: "0",
-      },
-    })
+    const calldata = {
+      from_: account.address,
+      to: recipient,
+      tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+    }
+
+    if (nft.contract.schema === "ERC721") {
+      sendTransaction({
+        to: contractAddress,
+        method: "transferFrom",
+        calldata,
+      })
+    } else {
+      sendTransaction({
+        to: contractAddress,
+        method: "safeTransferFrom",
+        calldata: {
+          ...calldata,
+          amount: "1",
+          data_len: "0",
+        },
+      })
+    }
 
     navigate(routes.accountActivity())
   }
