@@ -1,4 +1,11 @@
-import { Alert, CellStack, Error, Input, P4, Select } from "@argent/ui"
+import {
+  Alert,
+  CellStack,
+  Error as ErrorEl,
+  Input,
+  P4,
+  Select,
+} from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useEffect, useState } from "react"
@@ -8,7 +15,7 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form"
-import { AbiEntry } from "starknet"
+import { AbiEntry, number, uint256 } from "starknet"
 
 import { Transaction } from "../../../../shared/transactions"
 import { WalletAccount } from "../../../../shared/wallet.model"
@@ -45,6 +52,8 @@ interface DeploySmartContractFormProps {
   setIsLoading: (isLoading: boolean) => void
 }
 
+const supportedConstructorTypes = ["felt", "Uint256"]
+
 const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   children,
   isLoading,
@@ -61,6 +70,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     formState,
     handleSubmit,
     clearErrors,
+    setError,
     watch,
     setValue,
   } = methods
@@ -95,15 +105,39 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
       selectedAccount,
     })
 
+    const constructorCalldata = parameters.flatMap<string>((param, i) => {
+      try {
+        if (param.type === "felt") {
+          return [number.toHex(number.toBN(param.value))]
+        }
+        if (param.type === "Uint256") {
+          const { low, high } = uint256.bnToUint256(number.toBN(param.value))
+          return [low, high]
+        }
+        setError(`parameters.${i}`, {
+          type: "manual",
+          message: `Unsupported type ${param.type}`,
+        })
+        throw new Error(`Unsupported type ${param.type}`)
+      } catch (e) {
+        setError(`parameters.${i}`, {
+          type: "manual",
+          message:
+            "Invalid parameter. Only hex and decimal numbers are supported",
+        })
+        throw new Error("Invalid parameter")
+      }
+    })
+
+    clearErrors()
     await deployContract({
       address: account,
       classHash,
       networkId: network,
-      constructorCalldata: parameters.map((p) => p.value),
+      constructorCalldata,
       salt,
       unique,
     })
-    clearErrors()
   }
 
   const resetAbiFields = useCallback(() => {
@@ -125,15 +159,34 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
       )
       const constructorAbi = abi?.find((item) => item.type === "constructor")
       setParameterFields(
-        constructorAbi?.inputs.map((input: AbiEntry) => ({
-          name: input.name,
-          type: input.type,
-          value: "",
-        })) || [],
+        constructorAbi?.inputs.map((input: AbiEntry) => {
+          if (!supportedConstructorTypes.includes(input.type)) {
+            throw Error(
+              `Unsupported constructor type "${input.type}" for ${
+                input.name
+              }. Only ${supportedConstructorTypes.join(", ")} are supported.`,
+            )
+          }
+          return {
+            name: input.name,
+            type: input.type,
+            value: "",
+          }
+        }) || [],
       )
-    } catch {
+    } catch (e) {
       resetAbiFields()
-      setFetchError("Contract classhash not found in this network")
+      if (
+        e instanceof Error &&
+        e.message.startsWith("Unsupported constructor type")
+      ) {
+        setError("classHash", {
+          type: "manual",
+          message: e.message,
+        })
+      } else {
+        setFetchError("Contract classhash not found in this network")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -168,8 +221,12 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
               transactions={lastDeclaredContracts}
             />
           </Box>
-          {!isEmpty(errors.classHash) && (
-            <Error message="Classhash is required" />
+          {errors.classHash?.type === "required" ? (
+            <ErrorEl message="Classhash is required" />
+          ) : (
+            errors.classHash?.type === "manual" && (
+              <ErrorEl message={errors.classHash.message ?? ""} />
+            )
           )}
 
           <Controller
@@ -189,7 +246,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
               />
             )}
           />
-          {!isEmpty(errors.network) && <Error message="Network is required" />}
+          {!isEmpty(errors.network) && (
+            <ErrorEl message="Network is required" />
+          )}
 
           <Controller
             name="account"
@@ -210,7 +269,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
               />
             )}
           />
-          {!isEmpty(errors.account) && <Error message="Account is required" />}
+          {!isEmpty(errors.account) && (
+            <ErrorEl message="Account is required" />
+          )}
 
           {fetchError && (
             <Box mx="4">
