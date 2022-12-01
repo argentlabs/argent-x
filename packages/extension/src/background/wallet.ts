@@ -35,7 +35,10 @@ import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
-import { declareContracts } from "./devnet/declareAccounts"
+import {
+  declareContracts,
+  getPreDeployedAccount,
+} from "./devnet/declareAccounts"
 import {
   getIndexForPath,
   getNextPathIndex,
@@ -186,7 +189,6 @@ export class Wallet {
   private async getAccountClassHashForNetwork(
     network: Network,
     accountType: ArgentAccountType,
-    deployerAccount?: Account, // Only for use with devnet
   ): Promise<string> {
     if (network.accountClassHash) {
       if (
@@ -198,8 +200,10 @@ export class Wallet {
       return network.accountClassHash.argentAccount
     }
 
+    const deployerAccount = await getPreDeployedAccount(network)
     if (deployerAccount) {
       const { account } = await declareContracts(
+        network,
         deployerAccount,
         this.loadContracts,
       )
@@ -429,7 +433,6 @@ export class Wallet {
 
   public async deployAccount(
     walletAccount: WalletAccount,
-    deployerAccount?: Account,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
 
@@ -439,7 +442,6 @@ export class Wallet {
 
     const deployAccountPayload = await this.getAccountDeploymentPayload(
       walletAccount,
-      deployerAccount,
     )
 
     const { transaction_hash } = await starknetAccount.deployAccount(
@@ -453,7 +455,6 @@ export class Wallet {
 
   public async getAccountDeploymentFee(
     walletAccount: WalletAccount,
-    deployerAccount?: Account,
   ): Promise<EstimateFee> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
 
@@ -463,7 +464,6 @@ export class Wallet {
 
     const deployAccountPayload = await this.getAccountDeploymentPayload(
       walletAccount,
-      deployerAccount,
     )
 
     return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
@@ -495,12 +495,8 @@ export class Wallet {
   /** Get the Account Deployment Payload
    * Use it in the deployAccount and getAccountDeploymentFee methods
    * @param  {WalletAccount} walletAccount
-   * @param  {Account} deployerAccount?
    */
-  public async getAccountDeploymentPayload(
-    walletAccount: WalletAccount,
-    deployerAccount?: Account,
-  ) {
+  public async getAccountDeploymentPayload(walletAccount: WalletAccount) {
     const starkPair = await this.getKeyPairByDerivationPath(
       walletAccount.signer.derivationPath,
     )
@@ -510,7 +506,6 @@ export class Wallet {
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
       "argent",
-      deployerAccount,
     )
 
     const constructorCallData = {

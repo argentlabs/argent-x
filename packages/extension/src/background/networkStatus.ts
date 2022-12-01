@@ -2,7 +2,6 @@ import urljoin from "url-join"
 
 import { Network, NetworkStatus } from "../shared/network"
 import { KeyValueStorage } from "../shared/storage"
-import { tryToDeclareContracts } from "./devnet/declareAccounts"
 import { createStaleWhileRevalidateCache } from "./swr"
 import { fetchWithTimeout } from "./utils/fetchWithTimeout"
 
@@ -97,10 +96,6 @@ export const getDevnetStatus = async (
       )
 
       const status = determineStatusByRequestStatusCode(response.status)
-
-      if (status === "ok") {
-        tryToDeclareContracts(network)
-      }
 
       return status
     } catch {

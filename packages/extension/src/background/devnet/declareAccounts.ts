@@ -1,8 +1,9 @@
+import { memoize } from "lodash-es"
 import { Account, AccountInterface, ec } from "starknet"
 import urlJoin from "url-join"
 
 import { Network, getProvider } from "../../shared/network"
-import { LoadContracts, loadContracts } from "../accounts"
+import { LoadContracts } from "../accounts"
 import {
   ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
   PROXY_CONTRACT_CLASS_HASHES,
@@ -13,48 +14,58 @@ interface PreDeployedAccount {
   private_key: string
 }
 
-export const tryToDeclareContracts = async (
+export const getPreDeployedAccount = async (
   network: Network,
-  _loadContracts = loadContracts,
-) => {
+  index = 0,
+): Promise<AccountInterface | null> => {
   try {
-    const provider = getProvider(network)
-    const [preDeployedAccount] = await fetch(
+    const preDeployedAccounts = await fetch(
       urlJoin(network.baseUrl, "predeployed_accounts"),
     ).then((x) => x.json() as Promise<PreDeployedAccount[]>)
+
+    const preDeployedAccount = preDeployedAccounts[index]
+    if (!preDeployedAccount) {
+      throw new Error(`No pre-deployed account with index ${index}`)
+    }
+
+    const provider = getProvider(network)
     const keypair = ec.getKeyPair(preDeployedAccount.private_key)
-    const deployerAccount = new Account(
-      provider,
-      preDeployedAccount.address,
-      keypair,
-    )
-    await declareContracts(deployerAccount, _loadContracts)
+    return new Account(provider, preDeployedAccount.address, keypair)
   } catch (e) {
-    console.warn("Failed to declare contracts", e)
+    console.warn(`Failed to get pre-deployed account: ${e}`)
+    return null
   }
 }
 
-export const declareContracts = async (
-  deployAccount: AccountInterface,
-  _loadContracts: LoadContracts,
-) => {
-  const [proxyContract, accountContract] = await _loadContracts()
-  const proxy = await deployAccount.declare({
-    classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-    contract: proxyContract,
-  })
+export const declareContracts = memoize(
+  async (
+    _network: Network,
+    deployAccount: AccountInterface,
+    _loadContracts: LoadContracts,
+  ) => {
+    const [proxyContract, accountContract] = await _loadContracts()
+    const proxy = await deployAccount.declare({
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contract: proxyContract,
+    })
 
-  const account = await deployAccount.declare({
-    classHash: ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0],
-    contract: accountContract,
-  })
+    const account = await deployAccount.declare({
+      classHash: ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0],
+      contract: accountContract,
+    })
 
-  await deployAccount.waitForTransaction(
-    account.transaction_hash,
-    undefined,
-    1e3,
-  )
-  await deployAccount.waitForTransaction(proxy.transaction_hash, undefined, 1e3)
+    await deployAccount.waitForTransaction(
+      account.transaction_hash,
+      undefined,
+      1e3,
+    )
+    await deployAccount.waitForTransaction(
+      proxy.transaction_hash,
+      undefined,
+      1e3,
+    )
 
-  return { proxy, account }
-}
+    return { proxy, account }
+  },
+  (network) => `${network.baseUrl}`,
+)
