@@ -4,7 +4,7 @@ import { normalizeAddress } from "../../ui/services/addresses"
 
 const { uint256ToBN } = uint256
 
-export interface Erc721TransferCall extends Call {
+export interface NftTransferCall extends Call {
   calldata: [
     fromAddressDecimal: string,
     toAddressDecimal: string,
@@ -14,9 +14,7 @@ export interface Erc721TransferCall extends Call {
   entrypoint: "safeTransferFrom" | "transferFrom"
 }
 
-export const isErc721TransferCall = (
-  call: Call,
-): call is Erc721TransferCall => {
+export const isNftTransferCall = (call: Call): call is NftTransferCall => {
   try {
     if (
       call.contractAddress &&
@@ -47,7 +45,7 @@ export const isErc721TransferCall = (
   return false
 }
 
-export const parseErc721TransferCall = (call: Erc721TransferCall) => {
+export const parseNftTransferCall = (call: NftTransferCall) => {
   const { contractAddress, calldata } = call
   const [
     fromAddressDecimal,

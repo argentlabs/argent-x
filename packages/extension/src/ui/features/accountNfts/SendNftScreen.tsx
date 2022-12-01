@@ -2,6 +2,7 @@ import { BigNumber } from "ethers"
 import { FC, lazy, useCallback, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { number } from "starknet"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
@@ -92,11 +93,13 @@ export const SendNftScreen: FC = () => {
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
   )
+
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] =
-    useState<Account | AddressBookContact>()
+  const [addressBookRecipient, setAddressBookRecipient] = useState<
+    Account | AddressBookContact
+  >()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
@@ -161,16 +164,29 @@ export const SendNftScreen: FC = () => {
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
   const onSubmit = async ({ recipient }: SendNftInput) => {
-    sendTransaction({
-      to: contractAddress,
-      method: "safeTransferFrom",
-      calldata: {
-        from_: account.address,
-        to: recipient,
-        tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
-        data_len: "0",
-      },
-    })
+    if (nft.contract.schema === "ERC721") {
+      sendTransaction({
+        to: contractAddress,
+        method: "transferFrom",
+        calldata: {
+          from_: account.address,
+          to: recipient,
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)), // OZ specs need a uint256 as tokenId
+        },
+      })
+    } else {
+      sendTransaction({
+        to: contractAddress,
+        method: "safeTransferFrom",
+        calldata: {
+          from_: account.address,
+          to: recipient,
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+          amount: getUint256CalldataFromBN(BigNumber.from(1)),
+          data_len: "0",
+        },
+      })
+    }
 
     navigate(routes.accountActivity())
   }
