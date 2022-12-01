@@ -52,7 +52,7 @@ import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettin
 import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { DeveloperSettings } from "./features/settings/DeveloperSettings"
-import { DeclareContractClasshash } from "./features/settings/DeveloperSettings/DeclareContractClasshash"
+import { DeclareOrDeployContractSuccess } from "./features/settings/DeveloperSettings/DeclareContractClasshash"
 import { DeclareSmartContractScreen } from "./features/settings/DeveloperSettings/DeclareSmartContractScreen"
 import { DeploySmartContractScreen } from "./features/settings/DeveloperSettings/DeploySmartContractScreen"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
@@ -269,8 +269,8 @@ const walletRoutes = (
       element={<DeploySmartContractScreen />}
     />
     <Route
-      path={routes.settingsSmartContractDeclareClassHash.path}
-      element={<DeclareContractClasshash />}
+      path={routes.settingsSmartContractDeclareOrDeploySuccess.path}
+      element={<DeclareOrDeployContractSuccess />}
     />
     <Route
       path={routes.settingsExperimental.path}

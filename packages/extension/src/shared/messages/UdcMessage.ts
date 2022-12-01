@@ -21,7 +21,10 @@ export type UdcMessage =
     }
   | {
       type: "DECLARE_CONTRACT_ACTION_SUBMITTED"
-      data: { txHash: string; actionHash: string }
+      data: {
+        txHash: string | null // may be null if the contract was already declared
+        actionHash: string
+      }
     }
   | {
       type: "DECLARE_CONTRACT_ACTION_FAILED"
@@ -35,11 +38,15 @@ export type UdcMessage =
     }
   | {
       type: "DEPLOY_CONTRACT_ACTION_SUBMITTED"
-      data: { txHash: string; actionHash: string }
+      data: {
+        txHash: string
+        deployedContractAddress: string
+        actionHash: string
+      }
     }
   | {
       type: "DEPLOY_CONTRACT_ACTION_FAILED"
-      data: { actionHash: string; error?: string }
+      data: { actionHash: string; error: string }
     }
   | {
       type: "FETCH_CONSTRUCTOR_PARAMS"

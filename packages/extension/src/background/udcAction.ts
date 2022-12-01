@@ -47,6 +47,18 @@ export const udcDeclareContract = async (
 
   if ("declare" in starknetAccount) {
     const { classHash, contract } = payload
+
+    // check if contract was already declared
+    try {
+      const deployed = await starknetAccount.getClassByHash(classHash)
+      if (deployed) {
+        console.warn(`Contract already declared at ${classHash}`) // TODO: add into last declared contracts store if not already there
+        return null
+      }
+    } catch {
+      // contract was not deployed yet, pass
+    }
+
     const nonce = await getNonce(account, wallet)
     const { transaction_hash: txHash } = await starknetAccount.declare(
       {
@@ -147,7 +159,7 @@ export const udcDeployContract = async (
     // transaction added, lets increase the local nonce, so we can queue transactions if needed
     await increaseStoredNonce(account)
 
-    return txHash
+    return { txHash, contractAddress }
   }
 
   throw Error("Account does not support Starknet declare")
