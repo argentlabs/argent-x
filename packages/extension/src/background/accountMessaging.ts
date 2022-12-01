@@ -6,6 +6,7 @@ import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
+import { tryToMintFeeToken } from "./devnet/mintFeeToken"
 import { addTransaction } from "./transactions/store"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
@@ -37,6 +38,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       const network = msg.data
       try {
         const account = await wallet.newAccount(network)
+
+        tryToMintFeeToken(account)
 
         analytics.track("createAccount", {
           status: "success",
