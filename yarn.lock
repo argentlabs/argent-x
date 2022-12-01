@@ -10767,9 +10767,9 @@ fragment-cache@^0.2.1:
     map-cache "^0.2.2"
 
 framer-motion@^7.6.1:
-  version "7.6.4"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-7.6.4.tgz#e396b36f68a14e14cc95b01210feac8cd5d2824d"
-  integrity sha512-Ac3Bl9M45fS8A0ibOUnYMSCfjaCrFfWT0uh0/MZVm/DGWcr5IsRRinWRiVGABA9RGJgn4THehqcn235JVQkucQ==
+  version "7.6.15"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-7.6.15.tgz#2990cf9792e2bc9d63474ccee4000564d86780cc"
+  integrity sha512-z3LPTWWq3zlmtxtZyCHWyucNRHg8iXXeLo9cFQwCIgOT8mp3gWFzU+KrGQ9h3QJFx79G9MVqAcuIN6dVhhuFQQ==
   dependencies:
     "@motionone/dom" "10.13.1"
     framesync "6.1.2"
