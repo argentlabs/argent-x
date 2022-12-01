@@ -11,7 +11,7 @@ export interface Erc721TransferCall extends Call {
     tokenIdLowFelt: number.BigNumberish,
     tokenIdHighFelt: number.BigNumberish,
   ]
-  entrypoint: "transferFrom"
+  entrypoint: "safeTransferFrom" | "transferFrom"
 }
 
 export const isErc721TransferCall = (
@@ -20,7 +20,8 @@ export const isErc721TransferCall = (
   try {
     if (
       call.contractAddress &&
-      call.entrypoint === "transferFrom" &&
+      (call.entrypoint === "transferFrom" ||
+        call.entrypoint === "safeTransferFrom") &&
       call.calldata?.length === 4
     ) {
       const { contractAddress, calldata } = call
