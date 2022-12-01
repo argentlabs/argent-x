@@ -20,7 +20,8 @@ export const isErc721SafeTransferCall = (
   try {
     if (
       call.contractAddress &&
-      call.entrypoint === "safeTransferFrom" &&
+      (call.entrypoint === "transferFrom" ||
+        call.entrypoint === "safeTransferFrom") &&
       call.calldata?.length === 4
     ) {
       const { contractAddress, calldata } = call
