@@ -169,7 +169,7 @@ export const SendNftScreen: FC = () => {
         calldata: {
           from_: account.address,
           to: recipient,
-          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)), // OZ specs need a uint256 as tokenId
         },
       })
     } else {
@@ -179,7 +179,7 @@ export const SendNftScreen: FC = () => {
         calldata: {
           from_: account.address,
           to: recipient,
-          tokenId: tokenId,
+          tokenId: tokenId, // Briq contract specs need a felt type as tokenId
           amount: "1",
           data_len: "0",
         },
