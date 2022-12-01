@@ -7,6 +7,7 @@ import { hash } from "starknet"
 
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { BackgroundService } from "./background"
+import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
 
@@ -46,16 +47,24 @@ export const udcDeclareContract = async (
 
   if ("declare" in starknetAccount) {
     const { classHash, contract } = payload
-    const { transaction_hash: txHash } = await starknetAccount.declare({
-      classHash,
-      contract,
-    })
+    const nonce = await getNonce(account, wallet)
+    const { transaction_hash: txHash } = await starknetAccount.declare(
+      {
+        classHash,
+        contract,
+      },
+      {
+        nonce,
+      },
+    )
 
     if (!checkTransactionHash(txHash)) {
       throw Error(
         "Deploy Account Transaction could not be added to the sequencer",
       )
     }
+
+    await increaseStoredNonce(account)
 
     await addTransaction({
       hash: txHash,
@@ -93,19 +102,8 @@ export const udcDeployContract = async (
 
   if ("declare" in starknetAccount) {
     const { classHash, salt, unique, constructorCalldata } = payload
-    const { transaction_hash: txHash } = await starknetAccount.deploy({
-      classHash,
-      salt,
-      unique,
-      constructorCalldata,
-    })
 
-    if (!checkTransactionHash(txHash)) {
-      throw Error(
-        "Deploy Account Transaction could not be added to the sequencer",
-      )
-    }
-
+    // make sure contract hashes can be calculated before submitting onchain
     const compiledConstructorCallData = stark.compileCalldata(
       constructorCalldata || [],
     )
@@ -116,6 +114,26 @@ export const udcDeployContract = async (
       account.address,
     )
 
+    // submit onchain
+    const nonce = await getNonce(account, wallet)
+    const { transaction_hash: txHash } = await starknetAccount.deploy(
+      {
+        classHash,
+        salt,
+        unique,
+        constructorCalldata,
+      },
+      {
+        nonce,
+      },
+    )
+
+    if (!checkTransactionHash(txHash)) {
+      throw Error(
+        "Deploy Account Transaction could not be added to the sequencer",
+      )
+    }
+
     await addTransaction({
       hash: txHash,
       account,
@@ -125,6 +143,9 @@ export const udcDeployContract = async (
         type: UdcTransactionType.DEPLOY_CONTRACT,
       },
     })
+
+    // transaction added, lets increase the local nonce, so we can queue transactions if needed
+    await increaseStoredNonce(account)
 
     return txHash
   }
