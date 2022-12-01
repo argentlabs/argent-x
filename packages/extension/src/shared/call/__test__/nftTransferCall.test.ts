@@ -6,8 +6,8 @@ import {
 } from "../../../ui/features/accountActivity/transform/transaction/__test__/__fixtures__/transaction-calls/goerli-alpha"
 import { NftTransferCall, parseNftTransferCall } from "../nftTransferCall"
 
-describe("erc721TransferCall", () => {
-  describe("parseErc721TransferCall()", () => {
+describe("nftTransferCall", () => {
+  describe("parseNftTransferCall()", () => {
     describe("when valid", () => {
       test("parses contractAddress, recipientAddress, and amount", () => {
         expect(parseNftTransferCall(erc721Transfer as NftTransferCall))
@@ -20,11 +20,7 @@ describe("erc721TransferCall", () => {
           }
         `)
       })
-    })
-  })
 
-  describe("parseErc721TransferCall()", () => {
-    describe("when valid", () => {
       test("parses contractAddress, recipientAddress, and amount", () => {
         expect(parseNftTransferCall(erc1155Transfer as NftTransferCall))
           .toMatchInlineSnapshot(`

@@ -162,24 +162,24 @@ export const SendNftScreen: FC = () => {
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
   const onSubmit = async ({ recipient }: SendNftInput) => {
-    const calldata = {
-      from_: account.address,
-      to: recipient,
-      tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
-    }
-
     if (nft.contract.schema === "ERC721") {
       sendTransaction({
         to: contractAddress,
         method: "transferFrom",
-        calldata,
+        calldata: {
+          from_: account.address,
+          to: recipient,
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+        },
       })
     } else {
       sendTransaction({
         to: contractAddress,
         method: "safeTransferFrom",
         calldata: {
-          ...calldata,
+          from_: account.address,
+          to: recipient,
+          tokenId: tokenId,
           amount: "1",
           data_len: "0",
         },
