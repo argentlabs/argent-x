@@ -35,25 +35,33 @@ const Collections: FC<AccountCollectionsProps> = ({
       {collectibles.length === 0 && (
         <EmptyCollections networkId={account.networkId} />
       )}
-      <SimpleGrid gridTemplateColumns="repeat(auto-fill, 158px)" gap="3" py={4}>
-        {(customList || collectibles).map((collectible) => (
-          <NftFigure
-            key={collectible.contractAddress}
-            onClick={() =>
-              navigate(routes.collectionNfts(collectible.contractAddress), {
-                state: { navigateToSend },
-              })
-            }
-          >
-            <NftItem
-              name={collectible.name}
-              thumbnailSrc={collectible.nfts[0].image_url_copy || ""}
-              logoSrc={collectible.imageUri}
-              total={collectible.nfts.length}
-            />
-          </NftFigure>
-        ))}
-      </SimpleGrid>
+
+      {collectibles.length > 0 && (
+        <SimpleGrid
+          gridTemplateColumns="repeat(auto-fill, 158px)"
+          gap="3"
+          py={4}
+          mx="4"
+        >
+          {(customList || collectibles).map((collectible) => (
+            <NftFigure
+              key={collectible.contractAddress}
+              onClick={() =>
+                navigate(routes.collectionNfts(collectible.contractAddress), {
+                  state: { navigateToSend },
+                })
+              }
+            >
+              <NftItem
+                name={collectible.name}
+                thumbnailSrc={collectible.nfts[0].image_url_copy || ""}
+                logoSrc={collectible.imageUri}
+                total={collectible.nfts.length}
+              />
+            </NftFigure>
+          ))}
+        </SimpleGrid>
+      )}
     </>
   )
 }
@@ -78,7 +86,7 @@ export const AccountCollections: FC<AccountCollectionsProps> = ({
   return (
     <>
       {withHeader && <H4 textAlign="center">NFTs</H4>}
-      <Flex direction="column" flex={1} {...rest} mx="4">
+      <Flex direction="column" flex={1} {...rest}>
         <ErrorBoundary fallback={<CollectionsFallback account={account} />}>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             <Collections

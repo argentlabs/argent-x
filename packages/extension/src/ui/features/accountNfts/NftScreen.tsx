@@ -78,10 +78,10 @@ export const NftScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={
+        leftButton={<BarCloseButton onClick={() => navigate(-1)} />}
+        rightButton={
           <TokenMenu tokenAddress={nft.contract_address} canHideToken={false} />
         }
-        rightButton={<BarCloseButton onClick={() => navigate(-1)} />}
       >
         <>
           {nft.animation_uri ? (

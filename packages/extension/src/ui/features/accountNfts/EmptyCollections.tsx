@@ -1,87 +1,101 @@
-import { Button, CellStack, H6, P3, logos } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { Button, H5, L2, P3, icons, logos } from "@argent/ui"
+import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react"
+import { FC, ReactNode } from "react"
 
+const { NftIcon } = icons
 const { Aspect, Briq, Mintsquare } = logos
+
+const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
+  icon,
+  href,
+  title,
+}) => (
+  <Box>
+    <Button
+      h="56px"
+      mb="2"
+      as={"a"}
+      rounded="3xl"
+      href={href}
+      title={title}
+      target="_blank"
+    >
+      <Text fontSize="3xl">{icon}</Text>
+    </Button>
+    <L2>{title}</L2>
+  </Box>
+)
 
 const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
   <Flex
     direction="column"
     flex={1}
-    mx="4"
     textAlign="center"
     justifyContent="center"
+    m={0}
   >
-    <H6 color="neutrals.400">No NFTs</H6>
-    <P3 color="neutrals.400" mb="3" mt="1.5">
-      Discover NFTs on StarkNet
-    </P3>
+    <Flex
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      flex={1}
+    >
+      <Flex
+        bg="black"
+        w="80px"
+        h="80px"
+        mb="4"
+        alignItems="center"
+        justifyContent="center"
+        borderRadius="full"
+      >
+        <Text fontSize="4xl">
+          <NftIcon />
+        </Text>
+      </Flex>
+      <H5 color="neutrals.400">No NFTs</H5>
+    </Flex>
+    <Flex direction="column" flex={1} bg="black" p="-4">
+      <P3 color="neutrals.400" mb="3" mt="12">
+        Discover NFTs on StarkNet
+      </P3>
 
-    <CellStack>
-      {networkId === "goerli-alpha" && (
-        <>
-          <Button
-            as={"a"}
-            size="sm"
-            rounded={"lg"}
-            leftIcon={<Aspect />}
-            href="https://testnet.aspect.co"
-            title="Aspect"
-            target="_blank"
-          >
-            Aspect
-          </Button>
-          <Button
-            as={"a"}
-            size="sm"
-            rounded={"lg"}
-            leftIcon={<Mintsquare />}
-            href="https://mintsquare.io/starknet-testnet"
-            title="Mintsquare"
-            target="_blank"
-          >
-            Mintsquare
-          </Button>
-          <Button
-            as={"a"}
-            size="sm"
-            rounded={"lg"}
-            leftIcon={<Briq />}
-            href="https://briq.construction/"
-            title="Briq"
-            target="_blank"
-          >
-            Briq
-          </Button>
-        </>
-      )}
-      {networkId === "mainnet-alpha" && (
-        <>
-          <Button
-            as={"a"}
-            size="sm"
-            rounded={"lg"}
-            leftIcon={<Aspect />}
-            href="https://aspect.co"
-            title="Aspect"
-            target="_blank"
-          >
-            Aspect
-          </Button>
-          <Button
-            as={"a"}
-            size="sm"
-            rounded={"lg"}
-            leftIcon={<Mintsquare />}
-            href="https://mintsquare.io/starknet"
-            title="Mintsquare"
-            target="_blank"
-          >
-            Mintsquare
-          </Button>
-        </>
-      )}
-    </CellStack>
+      <SimpleGrid columns={networkId === "goerli-alpha" ? 3 : 2} gap="2" mx="8">
+        {networkId === "goerli-alpha" && (
+          <>
+            <ButtonLink
+              title="Aspect"
+              icon={<Aspect />}
+              href="https://testnet.aspect.co"
+            />
+            <ButtonLink
+              title="Mintsquare"
+              icon={<Mintsquare />}
+              href="https://mintsquare.io/starknet-testnet"
+            />
+            <ButtonLink
+              title="Briq"
+              icon={<Briq />}
+              href="https://briq.construction/"
+            />
+          </>
+        )}
+        {networkId === "mainnet-alpha" && (
+          <>
+            <ButtonLink
+              title="Aspect"
+              icon={<Aspect />}
+              href="https://aspect.co"
+            />
+            <ButtonLink
+              title="Mintsquare"
+              icon={<Mintsquare />}
+              href="https://mintsquare.io/starknet"
+            />
+          </>
+        )}
+      </SimpleGrid>
+    </Flex>
   </Flex>
 )
 
