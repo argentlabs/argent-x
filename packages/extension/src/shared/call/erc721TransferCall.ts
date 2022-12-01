@@ -11,16 +11,16 @@ export interface Erc721TransferCall extends Call {
     tokenIdLowFelt: number.BigNumberish,
     tokenIdHighFelt: number.BigNumberish,
   ]
-  entrypoint: "transferFrom"
+  entrypoint: "safeTransferFrom"
 }
 
-export const isErc721TransferCall = (
+export const isErc721SafeTransferCall = (
   call: Call,
 ): call is Erc721TransferCall => {
   try {
     if (
       call.contractAddress &&
-      call.entrypoint === "transferFrom" &&
+      call.entrypoint === "safeTransferFrom" &&
       call.calldata?.length === 4
     ) {
       const { contractAddress, calldata } = call
@@ -46,7 +46,7 @@ export const isErc721TransferCall = (
   return false
 }
 
-export const parseErc721TransferCall = (call: Erc721TransferCall) => {
+export const parseErc721SafeTransferCall = (call: Erc721TransferCall) => {
   const { contractAddress, calldata } = call
   const [
     fromAddressDecimal,

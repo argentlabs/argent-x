@@ -95,9 +95,8 @@ export const SendNftScreen: FC = () => {
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
-  >()
+  const [addressBookRecipient, setAddressBookRecipient] =
+    useState<Account | AddressBookContact>()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
@@ -164,11 +163,12 @@ export const SendNftScreen: FC = () => {
   const onSubmit = async ({ recipient }: SendNftInput) => {
     sendTransaction({
       to: contractAddress,
-      method: "transferFrom",
+      method: "safeTransferFrom",
       calldata: {
         from_: account.address,
         to: recipient,
         tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+        data_len: "0",
       },
     })
 
