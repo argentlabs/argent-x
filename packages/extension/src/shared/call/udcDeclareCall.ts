@@ -1,14 +1,15 @@
 import { Call, constants, validateAndParseAddress } from "starknet"
 
 import { isEqualAddress } from "../../ui/services/addresses"
+
 const { UDC } = constants
 
-export const isUdcDeployCall = (call: Call): call is Call => {
+export const isUdcDeclareCall = (call: Call): call is Call => {
   try {
     if (
       call.contractAddress &&
       isEqualAddress(call.contractAddress, UDC.ADDRESS) &&
-      call.entrypoint === "deployContract"
+      call.entrypoint === "declareContract"
     ) {
       validateAndParseAddress(call.contractAddress)
       return true
@@ -17,11 +18,4 @@ export const isUdcDeployCall = (call: Call): call is Call => {
     // failure implies invalid
   }
   return false
-}
-
-export const parseUdcDeployCall = (call: Call) => {
-  const { contractAddress } = call
-  return {
-    contractAddress,
-  }
 }

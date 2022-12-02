@@ -2,6 +2,7 @@ import { icons } from "@argent/ui"
 import { BigNumber } from "ethers"
 import { isString } from "lodash-es"
 import { FC, useMemo, useState } from "react"
+import CopyToClipboard from "react-copy-to-clipboard"
 import styled, { useTheme } from "styled-components"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
@@ -36,6 +37,7 @@ import { ParameterField } from "../actions/transaction/fields/ParameterField"
 import { TokenField } from "../actions/transaction/fields/TokenField"
 import { TransactionDetailWrapper } from "./TransactionDetailWrapper"
 import {
+  isDeclareContractTransaction,
   isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
@@ -168,8 +170,8 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
+  const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
   const isDeployContract = isDeployContractTransaction(transactionTransformed)
-  console.log(isDeployContract)
   const theme = useTheme()
   const title = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
@@ -268,8 +270,6 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
-
-  console.log(transaction)
 
   return (
     <StyledTransactionDetailWrapper
@@ -448,6 +448,20 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
               </HyperlinkText>
             </FieldValue>
           </Field>
+        </FieldGroup>
+      )}
+      {isDeclareContract && transaction && transaction.meta?.subTitle && (
+        <FieldGroup>
+          <CopyToClipboard text={transaction.meta?.subTitle}>
+            <Field clickable={!!transaction.meta?.subTitle}>
+              <FieldKey>Declared contract hash</FieldKey>
+              <FieldValue>
+                <HyperlinkText>
+                  {formatTruncatedAddress(transaction.meta?.subTitle)}
+                </HyperlinkText>
+              </FieldValue>
+            </Field>
+          </CopyToClipboard>
         </FieldGroup>
       )}
     </StyledTransactionDetailWrapper>

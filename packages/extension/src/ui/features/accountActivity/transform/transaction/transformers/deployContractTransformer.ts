@@ -1,9 +1,7 @@
-import { isUdcDeployCall } from "../../../../../../shared/call/udcDeploy"
+import { isUdcDeployCall } from "../../../../../../shared/call/udcDeployCall"
 import { DeployContractTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
 import { ITransactionTransformer } from "./type"
-
-/** adds erc721 token transfer data */
 
 export default function ({ transaction, result }: ITransactionTransformer) {
   const calls = getCallsFromTransaction(transaction)
@@ -12,7 +10,7 @@ export default function ({ transaction, result }: ITransactionTransformer) {
     if (isUdcDeployCall(call)) {
       const action = "DEPLOY"
       const entity = "CONTRACT"
-      const displayName = "Contract deployment"
+      const displayName = "Contract deployed"
       result = {
         ...result,
         action,

@@ -14,7 +14,7 @@ import { checkTransactionHash } from "./transactions/transactionExecution"
 
 const { UDC } = constants
 
-const { calculateContractAddressFromHash } = hash
+const { calculateContractAddressFromHash, pedersen } = hash
 
 type DeclareContractAction = ExtQueueItem<{
   type: "DECLARE_CONTRACT_ACTION"
@@ -88,6 +88,10 @@ export const udcDeclareContract = async (
         title: "Contract declared",
         subTitle: classHash.toString(),
         type: UdcTransactionType.DECLARE_CONTRACT,
+        transactions: {
+          contractAddress: UDC.ADDRESS,
+          entrypoint: "declareContract",
+        },
       },
     })
 
@@ -122,8 +126,9 @@ export const udcDeployContract = async (
     const compiledConstructorCallData = stark.compileCalldata(
       constructorCalldata || [],
     )
+
     const contractAddress = calculateContractAddressFromHash(
-      salt,
+      unique ? pedersen([salt, UDC.ADDRESS]) : salt,
       classHash,
       compiledConstructorCallData,
       unique ? UDC.ADDRESS : 0,
@@ -153,7 +158,7 @@ export const udcDeployContract = async (
       hash: txHash,
       account,
       meta: {
-        title: "Contract deployed",
+        title: "Contract deployment",
         subTitle: contractAddress,
         type: UdcTransactionType.DEPLOY_CONTRACT,
         transactions: {

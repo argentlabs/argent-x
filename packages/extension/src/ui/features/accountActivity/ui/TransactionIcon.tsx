@@ -67,7 +67,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       break
   }
 
-  if (entity === "CONTRACT" && action === "DEPLOY") {
+  if (entity === "CONTRACT" && (action === "DEPLOY" || action === "DECLARE")) {
     iconComponent = <DocumentIcon />
   }
 
