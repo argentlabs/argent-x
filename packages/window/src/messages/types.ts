@@ -19,7 +19,6 @@ export type WindowMethods = {
     | { isLoggedIn: false }
     | { isLoggedIn: true; hasSession: boolean; email: string }
   >
-  reloadData: () => Promise<void>
   addStarknetChain: (params: AddStarknetChainParameters) => Promise<boolean>
   switchStarknetChain: (
     params: SwitchStarknetChainParameter,
