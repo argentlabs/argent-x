@@ -23,7 +23,10 @@ import {
 } from "../../components/Fields"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
+import {
+  openBlockExplorerAddress,
+  openBlockExplorerTransaction,
+} from "../../services/blockExplorer.service"
 import { formatDateTime } from "../../services/dates"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import { AccountAddressField } from "../actions/transaction/fields/AccountAddressField"
@@ -33,6 +36,7 @@ import { ParameterField } from "../actions/transaction/fields/ParameterField"
 import { TokenField } from "../actions/transaction/fields/TokenField"
 import { TransactionDetailWrapper } from "./TransactionDetailWrapper"
 import {
+  isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -164,6 +168,8 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
+  const isDeployContract = isDeployContractTransaction(transactionTransformed)
+  console.log(isDeployContract)
   const theme = useTheme()
   const title = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
@@ -262,6 +268,8 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
+
+  console.log(transaction)
 
   return (
     <StyledTransactionDetailWrapper
@@ -419,6 +427,25 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
             <FieldKey>Transaction ID</FieldKey>
             <FieldValue>
               <HyperlinkText>{displayTransactionHash}</HyperlinkText>
+            </FieldValue>
+          </Field>
+        </FieldGroup>
+      )}
+      {isDeployContract && transaction && transaction.meta?.subTitle && (
+        <FieldGroup>
+          <Field
+            clickable={!!transaction.meta?.subTitle}
+            onClick={() => {
+              if (transaction.meta?.subTitle) {
+                openBlockExplorerAddress(network, transaction.meta?.subTitle)
+              }
+            }}
+          >
+            <FieldKey>Deployed contract address</FieldKey>
+            <FieldValue>
+              <HyperlinkText>
+                {formatTruncatedAddress(transaction.meta?.subTitle)}
+              </HyperlinkText>
             </FieldValue>
           </Field>
         </FieldGroup>

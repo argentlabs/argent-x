@@ -1,6 +1,7 @@
 import {
   DeclareContractPayload,
   UniversalDeployerContractPayload,
+  constants,
   stark,
 } from "starknet"
 import { hash } from "starknet"
@@ -10,6 +11,8 @@ import { BackgroundService } from "./background"
 import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
+
+const { UDC } = constants
 
 const { calculateContractAddressFromHash } = hash
 
@@ -112,7 +115,7 @@ export const udcDeployContract = async (
     networkId: account.networkId,
   })
 
-  if ("declare" in starknetAccount) {
+  if ("deploy" in starknetAccount) {
     const { classHash, salt, unique, constructorCalldata } = payload
 
     // make sure contract hashes can be calculated before submitting onchain
@@ -123,7 +126,7 @@ export const udcDeployContract = async (
       salt,
       classHash,
       compiledConstructorCallData,
-      account.address,
+      unique ? UDC.ADDRESS : 0,
     )
 
     // submit onchain
@@ -153,6 +156,11 @@ export const udcDeployContract = async (
         title: "Contract deployed",
         subTitle: contractAddress,
         type: UdcTransactionType.DEPLOY_CONTRACT,
+        transactions: {
+          contractAddress: UDC.ADDRESS,
+          entrypoint: "deployContract",
+          calldata: compiledConstructorCallData,
+        },
       },
     })
 
