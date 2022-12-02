@@ -8,6 +8,7 @@ import { FC, PropsWithChildren, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
 import { useAccount, useBackendAccount } from "../../hooks/account"
+import { triggerRefresh } from "../../hooks/useMessages"
 import { useLocalHandle } from "../../hooks/usePageGuard"
 import { enterEmailFormSchema } from "../../schemas/forms/email"
 import { isSubmitDisabled } from "../../schemas/utils"
@@ -206,13 +207,14 @@ export default function Modal() {
           })
 
           await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
-          await messageHandler.call("reloadData")
 
           // close popup
           if (!windowRef?.closed) {
             clearInterval(interval)
             windowRef.close()
           }
+
+          await triggerRefresh()
         }
         localHandle?.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
       } catch (e) {

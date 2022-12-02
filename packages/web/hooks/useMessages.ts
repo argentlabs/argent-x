@@ -34,10 +34,45 @@ function waitForAction<T extends keyof ActionEvents>(action: T) {
   })
 }
 
+export const listenForRefresh = (fn: () => Promise<void>) => {
+  const bc = new BroadcastChannel("refresh")
+  const handler = async (e: MessageEvent) => {
+    if (e.data === "refresh") {
+      await fn()
+      bc.postMessage("refresh_done")
+    }
+  }
+  bc.addEventListener("message", handler)
+  return () => bc.removeEventListener("message", handler)
+}
+
+export const triggerRefresh = () => {
+  const bc = new BroadcastChannel("refresh")
+  bc.postMessage("refresh")
+  return new Promise<void>((resolve) => {
+    const handler = (e: MessageEvent) => {
+      if (e.data === "refresh_done") {
+        // wait for 500ms to make sure the page was refreshed in every tab
+        setTimeout(() => {
+          resolve()
+        }, 500)
+      }
+    }
+    bc.addEventListener("message", handler, { once: true })
+  })
+}
+
 export const useAccountMessageHandler = () => {
   const router = useRouter()
   const localHandle = useLocalHandle()
   const { account, mutate } = useAccount()
+
+  useEffect(() => {
+    return listenForRefresh(async () => {
+      await retrieveAccountFromSession().catch(() => {})
+      await mutate()
+    })
+  }, [mutate])
 
   useEffect(() => {
     if (!localHandle) {
@@ -73,10 +108,6 @@ export const useAccountMessageHandler = () => {
         } catch (e) {
           return { isLoggedIn: false }
         }
-      },
-      async reloadData() {
-        await retrieveAccountFromSession().catch(() => {})
-        await mutate()
       },
       async execute(transactions, abis, transactionsDetail) {
         const txs = Array.isArray(transactions) ? transactions : [transactions]

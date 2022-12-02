@@ -14,14 +14,19 @@ export type { StarknetWindowObject, DisconnectOptions } from "get-starknet-core"
 type StoreVersion = "chrome" | "firefox" | "edge"
 
 export const globalWindow = typeof window !== "undefined" ? window : null
-if (globalWindow) {
-  const target = "http://localhost:3005/iframes/modal"
-  const prefetchLink = document.createElement("link")
-  prefetchLink.rel = "prefetch"
-  prefetchLink.href = target
-  prefetchLink.as = "document"
-  document.head.appendChild(prefetchLink)
-}
+;(async () => {
+  if (globalWindow) {
+    const target = "http://localhost:3005/iframes/modal"
+    const prefetchLink = document.createElement("link")
+    prefetchLink.rel = "prefetch"
+    prefetchLink.href = target
+    prefetchLink.as = "document"
+    document.head.appendChild(prefetchLink)
+
+    const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
+    await getWebWalletStarknetObject() // call once on mount to memoize the promise
+  }
+})()
 
 function getStoreVersionFromBrowser(): StoreVersion | null {
   const browserName = Bowser.getParser(globalWindow?.navigator.userAgent)

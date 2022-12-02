@@ -33,14 +33,6 @@
 
   let darkModeControlClass = theme === "dark" ? "dark" : ""
 
-  const walletOptions = {
-    host: window.location.origin,
-    id: "argentWebWallet" as const,
-    icon: "https://www.argent.xyz/favicon.ico",
-    name: "Argent Web Wallet",
-    version: "1.0.0",
-  }
-
   const origin = "http://localhost:3005"
   let target = `${origin}/iframes/modal?darkmode=${Boolean(
     darkModeControlClass,
@@ -57,24 +49,10 @@
     }
     target = `${origin}/iframes/modal?darkmode=${Boolean(darkModeControlClass)}`
 
-    const { getArgentStarknetWindowObject } = await import("@argent/x-window")
-    const { defaultProvider } = await import("starknet")
-    const {
-      createIframe,
-      loadIframe,
-      getIframeConnection,
-      applyInlineStyle,
-      applyModalStyle,
-      hideModal,
-      showModal,
-    } = await import("../wormhole")
-
-    const provider = defaultProvider
+    const { getIframeConnection } = await import("../wormhole")
 
     let localWormholeConnection = await getIframeConnection(inlineIframe)
-    applyInlineStyle(inlineIframe)
 
-    console.log("localWormholeConnection", localWormholeConnection)
     webWalletLoading = false
 
     localWormholeConnection.addEventListener(
@@ -92,42 +70,11 @@
 
     await localWormholeConnection.once("ARGENT_WEB_WALLET::CONNECT")
     webWalletLoading = true
-    // persist the iframe connection by moving the iframe to the body
-    const iframe = await createIframe(target, true)
-    const modal = applyModalStyle(iframe)
-    window.document.body.appendChild(modal)
-    const persistedIframe = modal.querySelector("iframe") as HTMLIFrameElement
-    persistedIframe.id = "aww__wormhole__persisted__iframe"
-    await loadIframe(persistedIframe)
 
-    const persistedWormholeConnection = await getIframeConnection(
-      persistedIframe,
-    )
+    // permanent connection
+    const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
 
-    persistedWormholeConnection.addEventListener(
-      "ARGENT_WEB_WALLET::SHOULD_SHOW",
-      () => {
-        showModal(modal)
-      },
-    )
-    persistedWormholeConnection.addEventListener(
-      "ARGENT_WEB_WALLET::SHOULD_HIDE",
-      () => {
-        hideModal(modal)
-      },
-    )
-    persistedWormholeConnection.addEventListener(
-      "ARGENT_WEB_WALLET::HEIGHT_CHANGED",
-      (height) => {
-        persistedIframe.style.height = `min(${height || 420}px, 100%)`
-      },
-    )
-
-    const starknetWindowObject = getArgentStarknetWindowObject(
-      walletOptions,
-      provider,
-      persistedWormholeConnection,
-    )
+    const starknetWindowObject = await getWebWalletStarknetObject()
 
     console.log("starknetWindowObject", starknetWindowObject)
 
@@ -265,7 +212,8 @@
           id="aww__wormhole__inline__iframe"
           src={target}
           sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation allow-popups"
-          class={"w-full h-[104px] " + (webWalletLoading ? "hidden" : "")}
+          class={"border-none rounded-none shadow-none relative top-0 left-0 transform-none block w-full h-[104px] " +
+            (webWalletLoading ? "hidden" : "")}
           bind:this={inlineIframe}
         />
       </main>

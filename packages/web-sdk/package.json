@@ -1,6 +1,6 @@
 {
-  "name": "@argent/get-starknet",
-  "version": "5.0.12",
+  "name": "@argent/web-sdk",
+  "version": "5.0.10",
   "repository": "github:argentlabs/argent-x",
   "private": false,
   "browser": {
@@ -19,43 +19,33 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/ui.js",
-      "require": "./dist/ui.umd.cjs"
+      "import": "./dist/web-sdk.js",
+      "require": "./dist/web-sdk.umd.cjs"
     }
   },
-  "main": "./dist/ui.umd.cjs",
-  "module": "./dist/ui.js",
-  "types": "./dist/ui.d.ts",
+  "main": "./dist/web-sdk.umd.cjs",
+  "module": "./dist/web-sdk.js",
+  "types": "./dist/web-sdk.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "vite build",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev": "vite build --watch",
     "prepare": "yarn build"
   },
   "dependencies": {
     "@argent/x-window": "^5.0.8",
-    "@argent/web-sdk": "^5.0.8",
-    "bowser": "^2.11.0",
     "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2",
-    "lodash-es": "^4.17.21",
-    "svelte-forms": "^2.3.1"
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.1",
-    "@tsconfig/svelte": "^3.0.0",
     "@types/async-retry": "^1.4.5",
-    "autoprefixer": "^10.4.7",
-    "postcss": "^8.4.14",
-    "svelte": "^3.49.0",
-    "svelte-check": "^2.8.0",
-    "svelte-preprocess": "^4.10.7",
-    "tailwindcss": "^3.1.6",
-    "tslib": "^2.4.0",
     "typescript": "^4.9.3",
     "vite": "^3.0.0",
     "vite-plugin-dts": "^1.4.0"
+  },
+  "peerDependencies": {
+    "starknet": "^4.14.0"
   }
 }
