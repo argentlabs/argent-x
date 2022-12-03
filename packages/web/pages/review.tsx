@@ -9,7 +9,7 @@ import { Call, hash, stark } from "starknet"
 
 import { InpageLayout } from "../components/InpageLayout"
 import { Navigate } from "../components/Navigate"
-import { TransactionReview } from "../components/Review"
+import { TransactionReview } from "../components/TransactionReview"
 import { useFeeTokenBalance } from "../hooks/balance"
 import {
   useEstimateDeployment,

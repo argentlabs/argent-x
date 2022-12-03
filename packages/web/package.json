@@ -27,7 +27,8 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.39.1",
     "starknet": "^4.14.0",
-    "zod": "^3.19.1"
+    "zod": "^3.19.1",
+    "zustand": "^4.1.4"
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.5",

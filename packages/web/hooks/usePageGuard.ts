@@ -13,10 +13,10 @@ const allowedDestinations = {
   "/email": ["/email", "/pin"],
   "/password": ["/password"],
   "/new-password": ["/new-password"],
-  "/dashboard": ["/dashboard", "/review"],
+  "/dashboard": ["/dashboard", "/review", "/connect"],
 }
 
-const shouldShowIframe = ["/review"]
+const shouldShowIframe = ["/review", "/connect"]
 
 const conditionallyPushTo = (
   router: NextRouter,

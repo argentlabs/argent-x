@@ -140,10 +140,12 @@ export default function Modal() {
         localHandle?.emit("ARGENT_WEB_WALLET::INLINE::SHOW_LOADING", undefined)
 
         const email = beAccount?.email ?? values?.email
+        console.log("ARGENT_WEB_WALLET::INLINE::EMAIL", email)
         if (!email) {
           throw new Error("Email is required")
         }
 
+        console.log("ARGENT_WEB_WALLET::INLINE::GET_ACCOUNT", account)
         if (!account) {
           const h = 600
           const w = 500
@@ -166,6 +168,8 @@ export default function Modal() {
           const x = parentLeft + parentWidth / 2 - w / 2
 
           const submitGoalUrl = `${origin}/email`
+
+          console.log("ARGENT_WEB_WALLET::INLINE::OPEN_WINDOW")
           // no session
           const windowRef = window.open(
             !beAccount?.email

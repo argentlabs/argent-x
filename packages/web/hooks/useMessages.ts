@@ -4,8 +4,8 @@ import { useEffect } from "react"
 
 import { encodeTransactions } from "../pages/dashboard"
 import { retrieveAccountFromSession } from "../services/account"
-import { getAccount } from "../services/backend/account"
-import { useAccount } from "./account"
+import { usePreAuthorized } from "../states/preAuthorized"
+import { useAccount, useBackendAccount } from "./account"
 import { useLocalHandle } from "./usePageGuard"
 
 type ActionEvents = {
@@ -65,20 +65,23 @@ export const triggerRefresh = () => {
 export const useAccountMessageHandler = () => {
   const router = useRouter()
   const localHandle = useLocalHandle()
-  const { account, mutate } = useAccount()
+  const { account, mutate: accountMutate } = useAccount()
+  const { account: beAccount } = useBackendAccount()
+  const { isPreAuthorized } = usePreAuthorized()
 
   useEffect(() => {
     return listenForRefresh(async () => {
       await retrieveAccountFromSession().catch(() => {})
-      await mutate()
+      await accountMutate()
     })
-  }, [mutate])
+  }, [accountMutate])
 
   useEffect(() => {
     if (!localHandle) {
       console.warn("No local handle")
       return
     }
+    const origin = "http://localhost:3000"
 
     localHandle.setMethods({
       async enable(options) {
@@ -88,25 +91,26 @@ export const useAccountMessageHandler = () => {
         if (!account) {
           throw Error("not logged in")
         }
-        // const { success } = await waitForAction("enable")
-        // if (!success) {
-        //   throw Error("User rejected")
-        // }
+        if (isPreAuthorized(origin)) {
+          return [account.address]
+        }
+        router.push(`/connect?origin=${encodeURIComponent(origin)}`, "/connect")
+        const { success } = await waitForAction("enable")
+        console.log("enable", success)
+        if (!success) {
+          throw Error("User rejected")
+        }
         return [account.address]
       },
-      async isPreauthorized() {
-        return true
-      },
       async getLoginStatus() {
-        try {
-          const beAccount = await getAccount()
-          return {
-            isLoggedIn: true,
-            email: beAccount.email,
-            hasSession: Boolean(account),
-          }
-        } catch (e) {
+        if (!beAccount) {
           return { isLoggedIn: false }
+        }
+
+        return {
+          isLoggedIn: true,
+          hasSession: !!account,
+          isPreauthorized: isPreAuthorized(origin),
         }
       },
       async execute(transactions, abis, transactionsDetail) {
@@ -140,5 +144,5 @@ export const useAccountMessageHandler = () => {
         throw Error("not implemented")
       },
     })
-  }, [localHandle, account, router, mutate])
+  }, [localHandle, account, router, accountMutate, beAccount, isPreAuthorized])
 }
