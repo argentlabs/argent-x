@@ -25,9 +25,11 @@
 
   let cb = async (value: StarknetWindowObject | null) => {
     setLoadingItem(value?.id ?? false)
-    await callback(value)
-      .catch(() => {})
-      .then((e) => console.log("callback done", e))
+    await callback(value).catch(() => {
+      if (value?.id === "argentWebWallet") {
+        webWalletLoading = false
+      }
+    })
     setLoadingItem(false)
   }
 
@@ -68,17 +70,18 @@
       },
     )
 
-    await localWormholeConnection.once("ARGENT_WEB_WALLET::CONNECT")
-    webWalletLoading = true
-
     // permanent connection
     const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
+    localWormholeConnection.addEventListener(
+      "ARGENT_WEB_WALLET::CONNECT",
+      async () => {
+        webWalletLoading = true
 
-    const starknetWindowObject = await getWebWalletStarknetObject()
+        const starknetWindowObject = await getWebWalletStarknetObject()
 
-    console.log("starknetWindowObject", starknetWindowObject)
-
-    cb(starknetWindowObject)
+        cb(starknetWindowObject)
+      },
+    )
   })
 
   const wallets = [

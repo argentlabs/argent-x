@@ -58,16 +58,10 @@ export interface ConnectOptions extends GetWalletOptions {
 }
 
 const enableWithVersion = async (wallet: StarknetWindowObject | null) => {
-  console.log("enableWithVersion", wallet)
   if (!wallet) {
     return null
   }
-  return sn
-    .enable(wallet, { starknetVersion: "v4" })
-    .catch(() => null)
-    .finally(() => {
-      console.log("enableWithVersion finally")
-    })
+  return sn.enable(wallet, { starknetVersion: "v4" })
 }
 
 export const connect = async ({

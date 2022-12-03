@@ -94,7 +94,8 @@ export const getArgentStarknetWindowObject = (
       return [selectedAddress]
     },
     async isPreauthorized() {
-      return remoteHandle.call("isPreauthorized")
+      const loginStatus = await remoteHandle.call("getLoginStatus")
+      return loginStatus.isLoggedIn && loginStatus.isPreauthorized
     },
     on: (event, handleEvent) => {
       if (event === "accountsChanged") {
