@@ -108,6 +108,35 @@ export const getAccount = async () => {
   return account
 }
 
+export const retrieveAccountWithDevice = async () => {
+  try {
+    const device = await getDevice()
+    const [beAccount] = await getAccounts()
+
+    const deviceEncryptedPrivateKey = await getTextFile(
+      `device-${await calculateJwkThumbprint(
+        await exportJWK(device.encryptionKey.publicKey),
+      )}-encypted-${beAccount.ownerAddress}`,
+    )
+
+    const privateKey = await decryptPrivateKeyWithKey(
+      deviceEncryptedPrivateKey,
+      device.encryptionKey.privateKey,
+    )
+
+    const keyPair = ec.getKeyPair(privateKey)
+    account = new Account(provider, beAccount.address, keyPair)
+
+    return account
+  } catch (error) {
+    if (error instanceof errors.JOSEError) {
+      throw new Error("Failed to decrypt private key")
+    }
+
+    throw error
+  }
+}
+
 export const retrieveAccountWithPassword = async (password: string) => {
   try {
     const [beAccount] = await getAccounts()

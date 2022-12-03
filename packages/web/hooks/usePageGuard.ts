@@ -11,7 +11,13 @@ import { useAccount, useBackendAccount } from "./account"
 
 const allowedDestinations = {
   "/email": ["/email", "/pin"],
-  "/password": ["/password"],
+  "/password": [
+    "/password",
+    "/pin",
+    "/new-password",
+    "/forgot-password",
+    "/forgot-password/wait",
+  ],
   "/new-password": ["/new-password"],
   "/dashboard": ["/dashboard", "/review", "/connect"],
 }
@@ -100,11 +106,9 @@ export const usePageGuard = () => {
             .catch(() => false))
         ) {
           if (localHandle) {
-            console.log("Account found, sending to parent")
             localHandle.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
-          } else {
-            await conditionallyPushTo(router, "/dashboard")
           }
+          await conditionallyPushTo(router, "/dashboard")
         } else {
           await conditionallyPushTo(router, "/password", {
             email: account.email,

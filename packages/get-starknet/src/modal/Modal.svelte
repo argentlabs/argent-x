@@ -25,11 +25,7 @@
 
   let cb = async (value: StarknetWindowObject | null) => {
     setLoadingItem(value?.id ?? false)
-    await callback(value).catch(() => {
-      if (value?.id === "argentWebWallet") {
-        webWalletLoading = false
-      }
-    })
+    await callback(value).catch(() => {})
     setLoadingItem(false)
   }
 
@@ -51,32 +47,16 @@
     }
     target = `${origin}/iframes/modal?darkmode=${Boolean(darkModeControlClass)}`
 
+    console.time("modal")
     const { getIframeConnection } = await import("../wormhole")
 
     let localWormholeConnection = await getIframeConnection(inlineIframe)
-
-    webWalletLoading = false
-
-    localWormholeConnection.addEventListener(
-      "ARGENT_WEB_WALLET::INLINE::SHOW_LOADING",
-      () => {
-        webWalletLoading = true
-      },
-    )
-    localWormholeConnection.addEventListener(
-      "ARGENT_WEB_WALLET::INLINE::HIDE_LOADING",
-      () => {
-        webWalletLoading = false
-      },
-    )
 
     // permanent connection
     const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
     localWormholeConnection.addEventListener(
       "ARGENT_WEB_WALLET::CONNECT",
       async () => {
-        webWalletLoading = true
-
         const starknetWindowObject = await getWebWalletStarknetObject()
 
         cb(starknetWindowObject)
@@ -218,6 +198,14 @@
           class={"border-none rounded-none shadow-none relative top-0 left-0 transform-none block w-full h-[104px] " +
             (webWalletLoading ? "hidden" : "")}
           bind:this={inlineIframe}
+          on:load={() => {
+            setTimeout(() => {
+              // give 200ms extra for rendering
+              console.timeEnd("modal")
+
+              webWalletLoading = false
+            }, 200)
+          }}
         />
       </main>
       <!-- or -->

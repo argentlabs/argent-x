@@ -42,6 +42,12 @@ export default function Pin() {
     return <Navigate to="/" />
   }
 
+  const flow: "login" | "forgotPassword" =
+    typeof navigate.query["flow"] === "string" &&
+    ["login", "forgotPassword"].includes(navigate.query["flow"])
+      ? (navigate.query["flow"] as "login" | "forgotPassword")
+      : "login"
+
   return (
     <Layout maxW={330}>
       <Box
@@ -73,20 +79,29 @@ export default function Pin() {
           try {
             await confirmEmail(pin)
 
-            const accounts = await getAccounts()
-            console.log(accounts)
+            if (flow === "login") {
+              const accounts = await getAccounts()
+              console.log(accounts)
 
-            if (accounts.length === 0) {
+              if (accounts.length === 0) {
+                return navigate.push(
+                  `/new-password?email=${encodeURIComponent(email)}`,
+                  "/new-password",
+                )
+              }
+
               return navigate.push(
-                `/new-password?email=${encodeURIComponent(email)}`,
-                "/new-password",
+                `/password?email=${encodeURIComponent(email)}`,
+                "/password",
               )
             }
 
-            return navigate.push(
-              `/password?email=${encodeURIComponent(email)}`,
-              "/password",
-            )
+            if (flow === "forgotPassword") {
+              return navigate.push(
+                `/forgot-password/wait?email=${encodeURIComponent(email)}`,
+                "/forgot-password/wait",
+              )
+            }
           } catch (e) {
             console.error(e)
             if (e instanceof Error) {
@@ -130,6 +145,7 @@ export default function Pin() {
         </FieldError>
       ) : (
         <L2 as="a" href="#" color={"accent.500"}>
+          {/* TODO: resend email */}
           Not received an email?
         </L2>
       )}
