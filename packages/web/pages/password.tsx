@@ -1,6 +1,7 @@
-import { Button, FieldError, H4, H6, Input, L2 } from "@argent/ui"
+import { Button, FieldError, H4, H6, Input, L2, P4 } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 
@@ -58,7 +59,10 @@ export default function Password() {
         mb={8}
       >
         <H4 textAlign="center">Enter your password</H4>
-        <H6 textAlign="center">To log in to {email}</H6>
+        <Box textAlign="center">
+          <P4>To login to</P4>
+          <H6 textAlign="center">{email}</H6>
+        </Box>
       </Box>
       <Input
         // TODO: [UI] Add good password strength indicator
@@ -71,9 +75,14 @@ export default function Password() {
       <FieldError minH="1em" alignSelf="start">
         {formState.errors.password?.message}
       </FieldError>
-      <L2 as="a" href="#" mt={4} color={"accent.500"}>
-        Forgotten your password?
-      </L2>
+      <Link
+        href={"/forgot-password?email=" + encodeURIComponent(email)}
+        as={"/forgot-password"}
+      >
+        <L2 as="a" mt={4} color={"accent.500"}>
+          Forgotten your password?
+        </L2>
+      </Link>
       <Button
         colorScheme={"primary"}
         mt={8}

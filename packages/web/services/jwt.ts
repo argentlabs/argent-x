@@ -24,25 +24,6 @@ const createDevice = async (): Promise<Device> => {
   }
 }
 
-createDevice().then(async (d) => {
-  if (typeof d.signingKey === "string") {
-    throw new Error("Signing key is not a key object")
-  }
-  const jwk = await exportJWK(d.signingKey.publicKey)
-  const thumbprint = await calculateJwkThumbprint(jwk)
-  const jwt = await new SignJWT({ foo: "bar" })
-    .setIssuer("https://example.com")
-    .setAudience("https://example.com")
-    .setProtectedHeader({
-      alg: "ES256",
-      jwk: { ...jwk, kid: thumbprint } as JWK,
-      kid: thumbprint,
-    })
-    .sign(d.signingKey.privateKey)
-
-  console.log(jwt)
-})
-
 export const getDevice = async () => {
   if (!device) {
     const newDevice = await createDevice()

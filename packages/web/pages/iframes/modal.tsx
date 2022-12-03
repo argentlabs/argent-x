@@ -3,16 +3,65 @@ import { getRemoteHandle } from "@argent/x-window"
 import { Box, DarkMode, Flex, IconButton, LightMode } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import retry from "async-retry"
+import { withIronSessionSsr } from "iron-session/next"
 import { useRouter } from "next/router"
-import { FC, PropsWithChildren, useCallback, useMemo } from "react"
+import { FC, PropsWithChildren, useCallback, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import { useAccount, useBackendAccount } from "../../hooks/account"
 import { triggerRefresh } from "../../hooks/useMessages"
 import { useLocalHandle } from "../../hooks/usePageGuard"
+import { settings } from "../../iron-session"
 import { enterEmailFormSchema } from "../../schemas/forms/email"
 import { isSubmitDisabled } from "../../schemas/utils"
-import { getAccount, retrieveAccountFromSession } from "../../services/account"
+import { retrieveAccountFromSession } from "../../services/account"
+import { ERROR_MESSAGE_NOT_LOGGED_IN } from "../../services/backend/account"
+
+interface ModalProps {
+  defaultLoggedIn?: boolean
+  defaultEmail?: string
+  defaultMode?: "light" | "dark"
+  [key: string]: unknown
+}
+
+// This part (SSR) should always be optional
+// It was introduced to avoid long loading times in the modal
+export const getServerSideProps = withIronSessionSsr<ModalProps>(
+  async function getServerSideProps({ req, query }) {
+    console.log(req.session.modalValues)
+    const defaultLoggedIn = req.session.modalValues?.loggedIn
+    // get default email (and login status) from session
+    const defaultEmail =
+      req.session.modalValues?.loggedIn && req.session.modalValues.email
+    // get default mode from search params
+    const defaultMode = query["darkmode"] === "true" ? "dark" : "light"
+
+    return {
+      props: {
+        ...(defaultLoggedIn !== undefined && { defaultLoggedIn }),
+        ...(defaultEmail && { defaultEmail }),
+        defaultMode,
+      },
+    }
+  },
+  settings,
+)
+
+async function saveSSRState(loggedIn: boolean, email?: string) {
+  // save default email in session
+  await fetch("/api/storeModalValues", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      loggedIn,
+      // stringify does not output undefined
+      email,
+    }),
+  })
+}
+// SSR part ends here
 
 const GlobalStyle: FC<{ darkmode: boolean }> = ({ darkmode }) => (
   <style jsx global>{`
@@ -21,8 +70,14 @@ const GlobalStyle: FC<{ darkmode: boolean }> = ({ darkmode }) => (
       background-color: ${darkmode ? "#171717" : "#f8fafc"} !important;
       height: 104px !important;
       overflow: hidden !important;
-      color: ${darkmode ? "white" : "black"};
+      color: ${darkmode ? "white" : "black"} !important;
       width: 100%;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
   `}</style>
 )
@@ -100,29 +155,45 @@ const ErrorWrapper: FC<
   )
 }
 
-const boxShadow = "rgba(0,0,0,0.12) 0px 2px 12px 0px"
-
-export default function Modal() {
+export default function Modal({
+  defaultLoggedIn,
+  defaultEmail,
+  defaultMode,
+}: ModalProps) {
   const navigate = useRouter()
   const localHandle = useLocalHandle()
   const { account, mutate } = useAccount()
-  const { account: beAccount } = useBackendAccount({
-    onSuccess: async (account) => {
-      const memoryAccount = await getAccount()
-      if (!memoryAccount) {
-        await retrieveAccountFromSession(account.accounts[0])
-          .then(() => mutate())
-          .catch(() => {}) // ignore error
+  const { account: beAccount, error } = useBackendAccount({
+    onSuccess: async (fetchedAccount) => {
+      if (!account) {
+        await retrieveAccountFromSession(fetchedAccount.accounts[0]).catch(
+          () => {},
+        ) // ignore error
+        await mutate()
       }
 
-      localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
+      // set new SSR values when email or login state has changed
+      if (defaultLoggedIn !== true || defaultEmail !== fetchedAccount.email) {
+        await saveSSRState(true, fetchedAccount.email)
+      }
     },
-    onError: () => {
-      localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
+    onError: async (err) => {
+      // set new SSR values when email or login state has changed
+      if (
+        defaultLoggedIn !== false &&
+        err instanceof Error &&
+        err.message === ERROR_MESSAGE_NOT_LOGGED_IN
+      ) {
+        await saveSSRState(false)
+      }
     },
   })
+  const [isLoading, setIsLoading] = useState(false)
 
-  const darkmode = navigate.query["darkmode"] === "true"
+  const email = beAccount?.email || defaultEmail
+  const darkmode = (navigate.query["darkmode"] || defaultMode) === "true"
+  const loading =
+    isLoading || (defaultLoggedIn === undefined && !beAccount && !error)
 
   const { formState, handleSubmit, register } = useForm({
     defaultValues: {
@@ -136,16 +207,13 @@ export default function Modal() {
   const onWebWallet = useCallback(
     async (values?: { email: string }) => {
       try {
-        console.log("ARGENT_WEB_WALLET::INLINE::SHOW_LOADING")
-        localHandle?.emit("ARGENT_WEB_WALLET::INLINE::SHOW_LOADING", undefined)
+        setIsLoading(true)
 
         const email = beAccount?.email ?? values?.email
-        console.log("ARGENT_WEB_WALLET::INLINE::EMAIL", email)
         if (!email) {
           throw new Error("Email is required")
         }
 
-        console.log("ARGENT_WEB_WALLET::INLINE::GET_ACCOUNT", account)
         if (!account) {
           const h = 600
           const w = 500
@@ -169,7 +237,6 @@ export default function Modal() {
 
           const submitGoalUrl = `${origin}/email`
 
-          console.log("ARGENT_WEB_WALLET::INLINE::OPEN_WINDOW")
           // no session
           const windowRef = window.open(
             !beAccount?.email
@@ -187,10 +254,7 @@ export default function Modal() {
           const interval = setInterval(() => {
             if (windowRef?.closed) {
               clearInterval(interval)
-              localHandle?.emit(
-                "ARGENT_WEB_WALLET::INLINE::HIDE_LOADING",
-                undefined,
-              )
+              setIsLoading(false)
               throw new Error("Popup closed")
             }
           }, 500)
@@ -222,14 +286,14 @@ export default function Modal() {
         }
         localHandle?.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
       } catch (e) {
+        setIsLoading(false)
         console.error(e)
-        localHandle?.emit("ARGENT_WEB_WALLET::INLINE::HIDE_LOADING", undefined)
       }
     },
     [account, beAccount?.email, localHandle],
   )
 
-  if (beAccount?.email) {
+  if (loading) {
     return (
       <ErrorWrapper darkmode={darkmode}>
         <Box
@@ -240,7 +304,61 @@ export default function Modal() {
           height="56px" // needs to be fixed to avoid jumping
           rounded="md"
           cursor="pointer"
-          boxShadow={boxShadow}
+          boxShadow={"rgba(0,0,0,0.12) 0px 2px 12px 0px"}
+          backgroundColor={darkmode ? "#262626" : "#f8fafc"}
+          _hover={{
+            backgroundColor: darkmode ? "#404040" : "#f5f5f5",
+          }}
+          transition="all 0.2s"
+        >
+          <Box
+            role="status"
+            w={8}
+            h={8}
+            color={"neutrals.300"}
+            fill="neutrals.600"
+            _dark={{
+              color: "neutrals.600",
+              fill: "neutrals.300",
+            }}
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{
+                animation: "spin 1s linear infinite",
+                fill: darkmode ? "#d4d4d4" : "#525252",
+              }}
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+          </Box>
+        </Box>
+      </ErrorWrapper>
+    )
+  }
+
+  if (email) {
+    return (
+      <ErrorWrapper darkmode={darkmode}>
+        <Box
+          mb={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height="56px" // needs to be fixed to avoid jumping
+          rounded="md"
+          cursor="pointer"
+          boxShadow={"rgba(0,0,0,0.12) 0px 2px 12px 0px"}
           backgroundColor={darkmode ? "#262626" : "#f8fafc"}
           _hover={{
             backgroundColor: darkmode ? "#404040" : "#f5f5f5",
@@ -275,7 +393,7 @@ export default function Modal() {
                 fill="currentColor"
               />
             </svg>
-            {beAccount.email}
+            {email}
           </H6>
         </Box>
       </ErrorWrapper>
