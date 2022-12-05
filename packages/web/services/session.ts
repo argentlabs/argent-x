@@ -7,7 +7,9 @@ import { genKeyPairOpts } from "./jwt"
 
 export const createSession = async (privateKey: string): Promise<Session> => {
   const encryptionKey = await generateKeyPair("ECDH-ES+A256KW", genKeyPairOpts)
-  const expiresAt = Date.now() + 5 * 60 * 1000 // 5 minutes
+  const expiresAt =
+    // 5 minutes in production, 1 minute in development
+    Date.now() + (process.env.NODE_ENV === "development" ? 1 : 5) * 60 * 1000
 
   const newSession = {
     id: 0,

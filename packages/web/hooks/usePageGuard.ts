@@ -17,6 +17,7 @@ const allowedDestinations = {
     "/new-password",
     "/forgot-password",
     "/forgot-password/wait",
+    "/forgot-password/finish",
   ],
   "/new-password": ["/new-password"],
   "/dashboard": ["/dashboard", "/review", "/connect"],

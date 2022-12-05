@@ -21,9 +21,7 @@ export const encryptPrivateKeyWithPassword = async (
 ): Promise<string> => {
   const salt = randomBytes(32)
 
-  console.time("scrypt")
   const key = await scryptAsync(password, salt, scryptOpts)
-  console.timeEnd("scrypt")
 
   const encryptedPrivateKey = await new EncryptJWT({
     privateKey,

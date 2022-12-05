@@ -8,6 +8,7 @@ interface Metadata {
 type AccessPolicy = "WEB_WALLET_KEY" | "WEB_WALLET_SESSION" | "DEFAULT"
 
 interface PostFileRequest {
+  update?: boolean
   metadata?: Metadata
   accessPolicy?: AccessPolicy
 }
@@ -24,7 +25,7 @@ interface PostFileResponse {
 export const postTextFile = async (
   name: string,
   content: string,
-  options?: PostFileRequest,
+  { update = false, ...options }: PostFileRequest = {},
 ): Promise<PostFileResponse> => {
   const jwt = await getJwt()
 
@@ -42,7 +43,7 @@ export const postTextFile = async (
   }
 
   const response = await fetch(`${ARGENT_API_BASE_URL}/files/${name}.txt`, {
-    method: "POST",
+    method: update ? "PUT" : "POST",
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
@@ -76,4 +77,19 @@ export const getTextFile = async (name: string): Promise<string> => {
   const blob = await response.blob()
   const text = await blob.text()
   return text
+}
+
+/**
+ * @notice Not useable yet
+ */
+export const existsTextFile = async (name: string): Promise<boolean> => {
+  const jwt = await getJwt()
+  const response = await fetch(`${ARGENT_API_BASE_URL}/files/${name}.txt`, {
+    method: "HEAD",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  })
+
+  return response.ok
 }

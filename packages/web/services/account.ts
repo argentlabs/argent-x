@@ -1,7 +1,15 @@
 import { stringToBytes } from "@scure/base"
 import { calculateJwkThumbprint, errors, exportJWK } from "jose"
 import { Signature, keccak, pedersen, sign } from "micro-starknet"
-import { Account, AccountInterface, ec, encode, hash, stark } from "starknet"
+import {
+  Account,
+  AccountInterface,
+  KeyPair,
+  ec,
+  encode,
+  hash,
+  stark,
+} from "starknet"
 
 import { getDevice } from "./__unsafe__oldJwt"
 import {
@@ -53,32 +61,45 @@ export const formatAddress = (address: string): string => {
 }
 
 let account: AccountInterface | undefined
+let privateKey: string | undefined
+
+const getKeyPair = (_privateKey: string): Promise<KeyPair> => {
+  privateKey = _privateKey
+  return ec.getKeyPair(_privateKey)
+}
+
+const uploadEncryptPrivateKeyWithPassword = async (
+  password: string,
+  privateKey: string,
+): Promise<void> => {
+  const publicKey = ec.getStarkKey(getKeyPair(privateKey))
+  const passwordEncryptedPrivateKey = await encryptPrivateKeyWithPassword(
+    privateKey,
+    password,
+  )
+
+  await postTextFile(
+    `password-encypted-${publicKey}`,
+    passwordEncryptedPrivateKey,
+    { update: true, accessPolicy: "WEB_WALLET_KEY" },
+  )
+}
+
+export const changePassword = async (newPassword: string): Promise<void> => {
+  if (!account || !privateKey) {
+    throw new Error("not logged in")
+  }
+  await uploadEncryptPrivateKeyWithPassword(newPassword, privateKey)
+}
 
 export const createAccount = async (password: string) => {
-  const device = await getDevice()
   // generate a new keypair
   const { publicKey, privateKey } = await getNewStarkKeypair()
 
   // upload encrypted backups in parallel
   const uploadEncryptedFilesPromises = [
-    encryptPrivateKeyWithPassword(privateKey, password).then(
-      (passwordEncryptedPrivateKey) =>
-        postTextFile(
-          `password-encypted-${publicKey}`,
-          passwordEncryptedPrivateKey,
-          { accessPolicy: "WEB_WALLET_KEY" },
-        ),
-    ),
-    encryptPrivateKeyWithKey(privateKey, device.encryptionKey.publicKey).then(
-      async (deviceEncryptedPrivateKey) =>
-        postTextFile(
-          `device-${await calculateJwkThumbprint(
-            await exportJWK(device.encryptionKey.publicKey),
-          )}-encypted-${publicKey}`,
-          deviceEncryptedPrivateKey,
-          { accessPolicy: "WEB_WALLET_SESSION" }, // TODO: [BE] change as soon as the backend is ready
-        ),
-    ),
+    uploadEncryptPrivateKeyWithPassword(password, privateKey),
+    ensureDeviceBackup(privateKey),
   ]
 
   // signature = sign(
@@ -96,9 +117,9 @@ export const createAccount = async (password: string) => {
     encode.addHexPrefix(s.toString(16)),
   ])
 
-  await createSession(privateKey)
+  await Promise.all([createSession(privateKey), ensureDeviceBackup(privateKey)])
 
-  const keyPair = ec.getKeyPair(privateKey)
+  const keyPair = getKeyPair(privateKey)
   account = new Account(provider, registration.address, keyPair)
 
   return account
@@ -124,8 +145,15 @@ export const retrieveAccountWithDevice = async () => {
       device.encryptionKey.privateKey,
     )
 
-    const keyPair = ec.getKeyPair(privateKey)
+    const uploadEncryptedFilesPromises = [
+      createSession(privateKey),
+      ensureDeviceBackup(privateKey),
+    ]
+
+    const keyPair = getKeyPair(privateKey)
     account = new Account(provider, beAccount.address, keyPair)
+
+    await Promise.all(uploadEncryptedFilesPromises)
 
     return account
   } catch (error) {
@@ -148,9 +176,12 @@ export const retrieveAccountWithPassword = async (password: string) => {
       password,
     )
 
-    await createSession(privateKey)
+    await Promise.all([
+      createSession(privateKey),
+      ensureDeviceBackup(privateKey),
+    ])
 
-    const keyPair = ec.getKeyPair(privateKey)
+    const keyPair = getKeyPair(privateKey)
     account = new Account(provider, beAccount.address, keyPair)
     return account
   } catch (e) {
@@ -181,8 +212,9 @@ export const retrieveAccountFromSession = async (
     const [[beAccount]] = await Promise.all([
       providedBeAccount ? Promise.resolve([providedBeAccount]) : getAccounts(),
       createSession(privateKey),
+      ensureDeviceBackup(privateKey),
     ])
-    const keyPair = ec.getKeyPair(privateKey)
+    const keyPair = getKeyPair(privateKey)
     account = new Account(provider, beAccount.address, keyPair)
     return account
   } catch (e) {
@@ -190,5 +222,42 @@ export const retrieveAccountFromSession = async (
       throw new Error("Wrong password", { cause: e })
     }
     throw e
+  }
+}
+
+// ensure device backup is available
+export const ensureDeviceBackup = async (privateKey: string) => {
+  const device = await getDevice()
+  const [beAccount] = await getAccounts()
+
+  try {
+    const deviceEncryptedPrivateKey = await getTextFile(
+      `device-${await calculateJwkThumbprint(
+        await exportJWK(device.encryptionKey.publicKey),
+      )}-encypted-${beAccount.ownerAddress}`,
+    )
+
+    if (!deviceEncryptedPrivateKey) {
+      throw new Error("Device backup not found")
+    }
+  } catch (e) {
+    if (e instanceof Error && e.message === "file not found") {
+      console.warn("Device backup not found")
+
+      const publicKey = ec.getStarkKey(getKeyPair(privateKey))
+      const deviceEncryptedPrivateKey = await encryptPrivateKeyWithKey(
+        privateKey,
+        device.encryptionKey.publicKey,
+      )
+      await postTextFile(
+        `device-${await calculateJwkThumbprint(
+          await exportJWK(device.encryptionKey.publicKey),
+        )}-encypted-${publicKey}`,
+        deviceEncryptedPrivateKey,
+        { accessPolicy: "WEB_WALLET_KEY" }, // TODO: [BE] change as soon as the backend is ready
+      )
+    } else {
+      throw e
+    }
   }
 }
