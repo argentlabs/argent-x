@@ -3,6 +3,7 @@ import { useMemo } from "react"
 import { Call, GatewayError } from "starknet"
 import useSwr from "swr"
 
+import { parseStarknetError } from "../services/errorParser"
 import {
   estimateDeployment,
   estimateTransactions,
@@ -20,7 +21,7 @@ export const useReview = (transactions: Call[]) => {
 
 export const useEstimateTransactions = (transactions: Call[]) => {
   const hash = useMemo(() => objectHash({ transactions }), [transactions])
-  const { data: executionFees, error } = useSwr(
+  const { data: executionFees, error: rawError } = useSwr(
     ["services/estimateFee/estimateTransactions", hash],
     () => estimateTransactions(transactions),
     {
@@ -32,6 +33,13 @@ export const useEstimateTransactions = (transactions: Call[]) => {
       },
     },
   )
+
+  const error = useMemo(() => {
+    if (rawError instanceof Error) {
+      return parseStarknetError(rawError)
+    }
+    return rawError
+  }, [rawError])
 
   return { executionFees, error }
 }

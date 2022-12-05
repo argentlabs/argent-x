@@ -52,6 +52,8 @@ export const TransactionReview: FC<TransactionReviewProps> = ({
             </P4>
             {executionFees ? (
               <P4 ml={3}>{formatFeeTokenAmount(executionFees.fee)} ETH</P4>
+            ) : error ? (
+              <P4 ml={3}>Error</P4>
             ) : (
               <Spinner size="sm" />
             )}
