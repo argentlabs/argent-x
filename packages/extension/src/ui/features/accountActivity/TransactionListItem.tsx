@@ -134,7 +134,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
             {displayName}
           </H6>
           <P4
-            color="neutrals.400"
+            color="neutrals.300"
             fontWeight={"semibold"}
             overflow="hidden"
             textOverflow={"ellipsis"}

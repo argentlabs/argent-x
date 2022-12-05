@@ -241,8 +241,7 @@ export const ActionScreen: FC = () => {
       return (
         <ApproveDeclareContractScreen
           actionHash={action.meta.hash}
-          classHash={action.payload.classHash.toString()}
-          contract={action.payload.contract}
+          payload={action.payload}
           onSubmit={async () => {
             analytics.track("signedDeclareTransaction", {
               networkId: account?.networkId || "unknown",

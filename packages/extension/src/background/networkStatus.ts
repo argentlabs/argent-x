@@ -84,6 +84,25 @@ const getGatewayNetworkStatus = async (
     }
   })
 
+export const getDevnetStatus = async (
+  network: Network,
+): Promise<NetworkStatus> =>
+  swr(`${network.id}-devnet-network-status`, async () => {
+    // fetch http://localhost:5050/is_alive and check the response
+    try {
+      const response = await fetchWithTimeout(
+        urljoin(network.baseUrl, "is_alive"),
+        { timeout: 5000, method: "GET" },
+      )
+
+      const status = determineStatusByRequestStatusCode(response.status)
+
+      return status
+    } catch {
+      return "error"
+    }
+  })
+
 export const getNetworkStatus = async (
   network: Network,
 ): Promise<NetworkStatus> => {
@@ -91,6 +110,11 @@ export const getNetworkStatus = async (
   // return degraded if any of the above are degraded
   // return error if any of the above are error
   // return unknown if all of the above are unknown
+
+  const isDevnet = await getDevnetStatus(network)
+  if (isDevnet === "ok") {
+    return isDevnet
+  }
 
   const statuses = await Promise.all([
     getChecklyNetworkStatus(network),

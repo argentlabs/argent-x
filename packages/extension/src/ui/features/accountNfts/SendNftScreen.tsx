@@ -48,7 +48,7 @@ import {
   SaveAddressButton,
   StyledAccountAddress,
 } from "../accountTokens/SendTokenScreen"
-import { TokenMenu } from "../accountTokens/TokenMenu"
+import { TokenMenuDeprecated } from "../accountTokens/TokenMenuDeprecated"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { useNfts } from "./useNfts"
@@ -95,9 +95,8 @@ export const SendNftScreen: FC = () => {
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
-  >()
+  const [addressBookRecipient, setAddressBookRecipient] =
+    useState<Account | AddressBookContact>()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
@@ -164,11 +163,12 @@ export const SendNftScreen: FC = () => {
   const onSubmit = async ({ recipient }: SendNftInput) => {
     sendTransaction({
       to: contractAddress,
-      method: "transferFrom",
+      method: "safeTransferFrom",
       calldata: {
         from_: account.address,
         to: recipient,
         tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+        data_len: "0",
       },
     })
 
@@ -206,7 +206,7 @@ export const SendNftScreen: FC = () => {
       />
       <IconBar
         back
-        childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
+        childAfter={<TokenMenuDeprecated tokenAddress={nft.contract_address} />}
       >
         <H3>{nft.name}</H3>
       </IconBar>

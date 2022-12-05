@@ -21,7 +21,7 @@ import { useNetworks } from "../networks/useNetworks"
 const { SearchIcon } = icons
 
 export const AddressbookSettingsScreen: FC = () => {
-  const { register, control, watch } = useForm({
+  const { register, watch } = useForm({
     defaultValues: { query: "" },
   })
 

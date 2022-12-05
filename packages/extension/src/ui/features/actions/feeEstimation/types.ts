@@ -1,5 +1,9 @@
 import { BigNumber } from "ethers"
-import { Call, UniversalDeployerContractPayload } from "starknet"
+import {
+  Call,
+  DeclareContractPayload,
+  UniversalDeployerContractPayload,
+} from "starknet"
 
 export interface TransactionsFeeEstimationProps {
   transactions: Call | Call[]
@@ -20,12 +24,12 @@ export type DeclareContractFeeEstimationProps = Omit<
   TransactionsFeeEstimationProps,
   "transactions"
 > & {
-  classHash: string
-  contract: any
+  payload: DeclareContractPayload
 }
 
 export type DeployContractFeeEstimationProps = Omit<
   TransactionsFeeEstimationProps,
   "transactions"
-> &
-  UniversalDeployerContractPayload
+> & {
+  payload: UniversalDeployerContractPayload
+}

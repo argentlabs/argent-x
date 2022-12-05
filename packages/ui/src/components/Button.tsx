@@ -81,16 +81,13 @@ export const buttonTheme = defineStyleConfig({
           },
         }
       } else if (c === "neutrals") {
+        const color = mode(`${c}.700`, "white")(props)
         return {
           bg: mode(`white`, `${c}.800`)(props),
-          color: mode(`${c}.700`, "white")(props),
+          color,
           boxShadow: mode("neutralsButtonLight", "initial")(props),
-          _hover: {
-            bg: mode(`gray.50`, `${c}.700`)(props),
-          },
-          _active: {
-            bg: mode(`gray.100`, `${c}.600`)(props),
-          },
+          _hover: { color, bg: mode(`gray.50`, `${c}.700`)(props) },
+          _active: { color, bg: mode(`gray.100`, `${c}.600`)(props) },
         }
       } else if (c === "tertiary") {
         return {
@@ -104,13 +101,16 @@ export const buttonTheme = defineStyleConfig({
           },
         }
       } else if (c === "transparent") {
+        const color = mode(`gray.700`, "white")(props)
         return {
           bg: "transparent",
-          color: mode(`gray.700`, "white")(props),
+          color,
           _hover: {
+            color,
             bg: mode(`gray.50`, `neutrals.700`)(props),
           },
           _active: {
+            color,
             bg: mode(`gray.100`, `neutrals.800`)(props),
           },
         }

@@ -2,14 +2,12 @@ import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
-import useSWR from "swr"
 
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
 import { getFeeToken } from "../../../../shared/token/utils"
-import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
 import {
   FieldAlt,

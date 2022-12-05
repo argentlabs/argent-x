@@ -101,7 +101,7 @@ export const handleTransactionMessage: HandleMessage<
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
           data: {
-            accountDeploymentFee: number.toHex(overall_fee),
+            amount: number.toHex(overall_fee),
             maxADFee,
           },
         })
@@ -145,7 +145,7 @@ export const handleTransactionMessage: HandleMessage<
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
           data: {
-            declareFee: number.toHex(overall_fee),
+            amount: number.toHex(overall_fee),
             maxADFee,
           },
         })
@@ -187,7 +187,7 @@ export const handleTransactionMessage: HandleMessage<
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
           data: {
-            deployFee: number.toHex(overall_fee),
+            amount: number.toHex(overall_fee),
             maxADFee,
           },
         })

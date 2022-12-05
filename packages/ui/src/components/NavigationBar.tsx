@@ -1,4 +1,4 @@
-import { Button, Flex, chakra } from "@chakra-ui/react"
+import { Button, Fade, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
 
 import { IScroll } from "../hooks"
@@ -46,6 +46,7 @@ export interface NavigationBarProps extends PropsWithChildren {
   title?: ReactNode
   rightButton?: ReactNode
   scroll?: IScroll
+  scrollContent?: ReactNode
 }
 
 export const BarIconButton: FC<ComponentProps<typeof Button>> = ({
@@ -100,9 +101,11 @@ export const NavigationBar: FC<NavigationBarProps> = ({
   title,
   scroll,
   children,
+  scrollContent,
 }) => {
   const scrollTop = scroll?.scrollTop ?? 0
   const isTransparent = scrollTop <= 16
+  const showScrollContent = scrollTop > 90
   return (
     <Container
       bg={isTransparent ? "transparent" : "neutrals.700"}
@@ -113,10 +116,13 @@ export const NavigationBar: FC<NavigationBarProps> = ({
           <H6>{title}</H6>
         </TitleContainer>
       )}
+      <Fade in={!title && showScrollContent}>
+        <TitleContainer gap="2">{scrollContent}</TitleContainer>
+      </Fade>
       {(leftButton || rightButton) && (
         <ButtonsContainer>
           {leftButton}
-          {rightButton}
+          {rightButton && <Flex ml={"auto"}>{rightButton}</Flex>}
         </ButtonsContainer>
       )}
       {children}

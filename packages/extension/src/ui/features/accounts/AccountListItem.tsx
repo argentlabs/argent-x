@@ -122,8 +122,8 @@ export const AccountListItem: FC<AccountListItemProps> = ({
               </L2>
             )}
           </Flex>
-          <Flex gap={2} color={"neutrals.400"}>
-            <P4 fontWeight={"bold"}>
+          <Flex gap={2} color={"neutrals.300"}>
+            <P4 fontWeight={"semibold"}>
               {formatTruncatedAddress(accountAddress)}
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}

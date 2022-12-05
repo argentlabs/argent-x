@@ -116,9 +116,8 @@ const ResponsiveRoutes: FC = () => (
 )
 
 // Routes which don't need an unlocked wallet
-const nonWalletRoutes = (
+const legacyNonWalletRoutes = (
   <>
-    <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
@@ -128,11 +127,15 @@ const nonWalletRoutes = (
   </>
 )
 
+const nonWalletRoutes = (
+  <>
+    <Route path={routes.lockScreen.path} element={<LockScreen />} />
+  </>
+)
+
 // Routes which need an unlocked wallet and therefore can also sign actions
 const legacyUiWalletRoutes = (
   <>
-    <Route path={routes.accountNft.path} element={<NftScreen />} />
-    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
@@ -195,6 +198,8 @@ const legacyUiWalletRoutes = (
 /** Screens using new UI */
 const walletRoutes = (
   <>
+    <Route path={routes.accountNft.path} element={<NftScreen />} />
+    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.networkWarning.path}
       element={<NetworkWarningScreen />}
@@ -339,13 +344,14 @@ export const AppRoutes: FC = () => {
   return (
     <Routes>
       <Route element={<LegacyResponsiveViewport />}>
-        {nonWalletRoutes}
+        {legacyNonWalletRoutes}
         {hasActions ? (
           <Route path="*" element={<ActionScreen />} />
         ) : (
           legacyUiWalletRoutes
         )}
       </Route>
+      <Route element={<ResponsiveRoutes />}>{nonWalletRoutes}</Route>
       {!hasActions && (
         <Route element={<ResponsiveRoutes />}>{walletRoutes}</Route>
       )}
