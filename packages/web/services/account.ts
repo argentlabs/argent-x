@@ -71,6 +71,7 @@ const getKeyPair = (_privateKey: string): Promise<KeyPair> => {
 const uploadEncryptPrivateKeyWithPassword = async (
   password: string,
   privateKey: string,
+  update: boolean,
 ): Promise<void> => {
   const publicKey = ec.getStarkKey(getKeyPair(privateKey))
   const passwordEncryptedPrivateKey = await encryptPrivateKeyWithPassword(
@@ -81,7 +82,7 @@ const uploadEncryptPrivateKeyWithPassword = async (
   await postTextFile(
     `password-encypted-${publicKey}`,
     passwordEncryptedPrivateKey,
-    { update: true, accessPolicy: "WEB_WALLET_KEY" },
+    { update, accessPolicy: "WEB_WALLET_KEY" },
   )
 }
 
@@ -89,7 +90,7 @@ export const changePassword = async (newPassword: string): Promise<void> => {
   if (!account || !privateKey) {
     throw new Error("not logged in")
   }
-  await uploadEncryptPrivateKeyWithPassword(newPassword, privateKey)
+  await uploadEncryptPrivateKeyWithPassword(newPassword, privateKey, true)
 }
 
 export const createAccount = async (password: string) => {
@@ -98,7 +99,7 @@ export const createAccount = async (password: string) => {
 
   // upload encrypted backups in parallel
   const uploadEncryptedFilesPromises = [
-    uploadEncryptPrivateKeyWithPassword(password, privateKey),
+    uploadEncryptPrivateKeyWithPassword(password, privateKey, false),
     ensureDeviceBackup(privateKey),
   ]
 
@@ -228,13 +229,13 @@ export const retrieveAccountFromSession = async (
 // ensure device backup is available
 export const ensureDeviceBackup = async (privateKey: string) => {
   const device = await getDevice()
-  const [beAccount] = await getAccounts()
+  const publicKey = ec.getStarkKey(getKeyPair(privateKey))
 
   try {
     const deviceEncryptedPrivateKey = await getTextFile(
       `device-${await calculateJwkThumbprint(
         await exportJWK(device.encryptionKey.publicKey),
-      )}-encypted-${beAccount.ownerAddress}`,
+      )}-encypted-${publicKey}`,
     )
 
     if (!deviceEncryptedPrivateKey) {
