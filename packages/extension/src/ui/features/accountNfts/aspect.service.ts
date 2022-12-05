@@ -1,4 +1,5 @@
 import { isString } from "lodash-es"
+import { number } from "starknet"
 import useSWR from "swr"
 import join from "url-join"
 
@@ -15,6 +16,7 @@ export interface Collection {
   contractAddress: string
   nfts: AspectNft[]
   imageUri?: string
+  floorPrice?: number.BigNumberish
 }
 
 export type Collections = Collection[]
@@ -100,6 +102,7 @@ export const fetchAspectCollection = async (
         assets[0].contract.name_custom || assets[0].contract.name || "Untitled",
       contractAddress,
       imageUri: assets[0].contract.image_url,
+      floorPrice: assets[0].contract.floor_list_price,
       nfts: assets,
     }
   }

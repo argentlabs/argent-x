@@ -49,7 +49,7 @@ import { ProfilePicture } from "../accounts/ProfilePicture"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
-import { TokenMenu } from "./TokenMenu"
+import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
 import {
@@ -366,7 +366,10 @@ export const SendTokenScreen: FC = () => {
         onCancel={() => setBottomSheetOpen(false)}
         recipientAddress={inputRecipient}
       />
-      <StyledIconBar back childAfter={<TokenMenu tokenAddress={address} />}>
+      <StyledIconBar
+        back
+        childAfter={<TokenMenuDeprecated tokenAddress={address} />}
+      >
         <ColumnCenter>
           <H3>Send {symbol}</H3>
           <BalanceText>{`${balance} ${symbol}`}</BalanceText>

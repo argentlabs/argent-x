@@ -1,12 +1,12 @@
 import {
-  B2,
-  BarBackButton,
+  BarCloseButton,
+  Button,
   CellStack,
   NavigationContainer,
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Box, Flex, Text } from "@chakra-ui/react"
+import { Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
@@ -14,7 +14,6 @@ import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { Button } from "../../components/Button"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
@@ -71,10 +70,6 @@ export const SettingsScreenWrapper = styled.div`
     margin: 0 32px 32px 32px;
   }
 
-  ${Button} {
-    margin-top: 10px;
-  }
-
   hr {
     border: none;
     height: 1px;
@@ -92,8 +87,8 @@ export const SettingsScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={
-          <BarBackButton onClick={() => navigate(routes.accountTokens())} />
+        rightButton={
+          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
         }
         title={"Settings"}
       >
@@ -145,30 +140,28 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
-
           <SupportFooter />
-          <SpacerCell h="16" />
         </CellStack>
-        <Box bg="neutrals.900" position="fixed" bottom="0" left="0" right="0">
-          <Link onClick={stopSession} to={routes.lockScreen()}>
-            <SpacerCell borderTop="solid 1px" borderColor="border" h="4" />
-            <Flex
-              py={2}
-              gap={2}
-              cursor="pointer"
-              justifyContent="center"
-              alignItems="center"
-              color="white50"
-            >
-              <Text fontSize="base">
-                <LockIcon />
-              </Text>
-              <B2>Lock wallet</B2>
-            </Flex>
-            <SpacerCell h="4" />
-          </Link>
-        </Box>
       </NavigationContainer>
+      <Center
+        height={16}
+        borderTop="1px solid"
+        borderTopColor="border"
+        background="bg"
+        boxShadow="menu"
+      >
+        <Button
+          as={Link}
+          onClick={stopSession}
+          to={routes.lockScreen()}
+          size="sm"
+          colorScheme="transparent"
+          color="white50"
+          leftIcon={<LockIcon />}
+        >
+          Lock wallet
+        </Button>
+      </Center>
     </>
   )
 }

@@ -2,6 +2,7 @@ import { BigNumber } from "ethers"
 import { FC, lazy, useCallback, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { number } from "starknet"
 import styled from "styled-components"
 import { Schema, object } from "yup"
 
@@ -48,7 +49,7 @@ import {
   SaveAddressButton,
   StyledAccountAddress,
 } from "../accountTokens/SendTokenScreen"
-import { TokenMenu } from "../accountTokens/TokenMenu"
+import { TokenMenuDeprecated } from "../accountTokens/TokenMenuDeprecated"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { useNfts } from "./useNfts"
@@ -92,6 +93,7 @@ export const SendNftScreen: FC = () => {
     ({ contract_address, token_id }) =>
       contract_address === contractAddress && token_id === tokenId,
   )
+
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
@@ -162,15 +164,29 @@ export const SendNftScreen: FC = () => {
   const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
 
   const onSubmit = async ({ recipient }: SendNftInput) => {
-    sendTransaction({
-      to: contractAddress,
-      method: "transferFrom",
-      calldata: {
-        from_: account.address,
-        to: recipient,
-        tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
-      },
-    })
+    if (nft.contract.schema === "ERC721") {
+      sendTransaction({
+        to: contractAddress,
+        method: "transferFrom",
+        calldata: {
+          from_: account.address,
+          to: recipient,
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)), // OZ specs need a uint256 as tokenId
+        },
+      })
+    } else {
+      sendTransaction({
+        to: contractAddress,
+        method: "safeTransferFrom",
+        calldata: {
+          from_: account.address,
+          to: recipient,
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+          amount: getUint256CalldataFromBN(BigNumber.from(1)),
+          data_len: "0",
+        },
+      })
+    }
 
     navigate(routes.accountActivity())
   }
@@ -206,7 +222,7 @@ export const SendNftScreen: FC = () => {
       />
       <IconBar
         back
-        childAfter={<TokenMenu tokenAddress={nft.contract_address} />}
+        childAfter={<TokenMenuDeprecated tokenAddress={nft.contract_address} />}
       >
         <H3>{nft.name}</H3>
       </IconBar>

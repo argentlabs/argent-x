@@ -63,14 +63,26 @@ const DeploySmartContractParameters: FC<{
           <Input
             key={item.id}
             autoFocus={index === 0}
-            placeholder={`Constructor argument ${index + 1}`}
+            placeholder={`${get(item, "name", "")}: ${get(
+              item,
+              "type",
+              "felt",
+            )}`}
             {...register(`parameters.${index}.value`, {
               required: true,
             })}
-            isInvalid={!isEmpty(get(errors, `parameters[0]`))}
+            isInvalid={!isEmpty(get(errors, `parameters[${index}]`))}
           />
-          {!isEmpty(get(errors, `parameters[${index}]`)) && (
+          {get(errors, `parameters[${index}]`)?.type === "required" ? (
             <Error message="Constructor argument is required" />
+          ) : (
+            get(errors, `parameters[${index}]`)?.type === "manual" && (
+              <Error
+                message={
+                  (get(errors, `parameters[${index}]`)?.message as string) ?? ""
+                }
+              />
+            )
           )}
         </Fragment>
       ))}

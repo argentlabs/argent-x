@@ -52,7 +52,7 @@ import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettin
 import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { DeveloperSettings } from "./features/settings/DeveloperSettings"
-import { DeclareContractClasshash } from "./features/settings/DeveloperSettings/DeclareContractClasshash"
+import { DeclareOrDeployContractSuccess } from "./features/settings/DeveloperSettings/DeclareContractClasshash"
 import { DeclareSmartContractScreen } from "./features/settings/DeveloperSettings/DeclareSmartContractScreen"
 import { DeploySmartContractScreen } from "./features/settings/DeveloperSettings/DeploySmartContractScreen"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
@@ -116,9 +116,8 @@ const ResponsiveRoutes: FC = () => (
 )
 
 // Routes which don't need an unlocked wallet
-const nonWalletRoutes = (
+const legacyNonWalletRoutes = (
   <>
-    <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
@@ -128,11 +127,15 @@ const nonWalletRoutes = (
   </>
 )
 
+const nonWalletRoutes = (
+  <>
+    <Route path={routes.lockScreen.path} element={<LockScreen />} />
+  </>
+)
+
 // Routes which need an unlocked wallet and therefore can also sign actions
 const legacyUiWalletRoutes = (
   <>
-    <Route path={routes.accountNft.path} element={<NftScreen />} />
-    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
@@ -195,6 +198,8 @@ const legacyUiWalletRoutes = (
 /** Screens using new UI */
 const walletRoutes = (
   <>
+    <Route path={routes.accountNft.path} element={<NftScreen />} />
+    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
       path={routes.networkWarning.path}
       element={<NetworkWarningScreen />}
@@ -266,8 +271,8 @@ const walletRoutes = (
       element={<DeploySmartContractScreen />}
     />
     <Route
-      path={routes.settingsSmartContractDeclareClassHash.path}
-      element={<DeclareContractClasshash />}
+      path={routes.settingsSmartContractDeclareOrDeploySuccess.path}
+      element={<DeclareOrDeployContractSuccess />}
     />
     <Route
       path={routes.settingsExperimental.path}
@@ -341,13 +346,14 @@ export const AppRoutes: FC = () => {
   return (
     <Routes>
       <Route element={<LegacyResponsiveViewport />}>
-        {nonWalletRoutes}
+        {legacyNonWalletRoutes}
         {hasActions ? (
           <Route path="*" element={<ActionScreen />} />
         ) : (
           legacyUiWalletRoutes
         )}
       </Route>
+      <Route element={<ResponsiveRoutes />}>{nonWalletRoutes}</Route>
       {!hasActions && (
         <Route element={<ResponsiveRoutes />}>{walletRoutes}</Route>
       )}

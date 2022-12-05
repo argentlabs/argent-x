@@ -1,6 +1,6 @@
 import { Button, icons } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
-import { FC, ReactNode, useCallback } from "react"
+import { Flex } from "@chakra-ui/react"
+import { FC, MouseEvent, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
@@ -66,9 +66,14 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
     navigate(routes.accountTokens())
   }, [account, navigate])
 
-  const onAccountEdit = useCallback(() => {
-    navigate(routes.editAccount(account.address))
-  }, [account.address, navigate])
+  const onAccountEdit = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation()
+      e.preventDefault()
+      navigate(routes.editAccount(account.address))
+    },
+    [account.address, navigate],
+  )
 
   return (
     <Flex position={"relative"} direction={"column"}>
@@ -87,29 +92,30 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       >
         {clickNavigateSettings && (
           <IconContaier>
-            <Text>
-              <ChevronRightIcon />
-            </Text>
+            <ChevronRightIcon opacity={0.6} />
+          </IconContaier>
+        )}
+        {!clickNavigateSettings && (
+          <IconContaier>
+            <Button
+              as="div"
+              aria-label={`${accountName} options`}
+              backgroundColor="black"
+              colorScheme="transparent"
+              padding="1.5"
+              fontSize="xl"
+              size="auto"
+              rounded="full"
+              onClick={onAccountEdit}
+              _hover={{
+                bg: "neutrals.600",
+              }}
+            >
+              <MoreIcon />
+            </Button>
           </IconContaier>
         )}
       </AccountListItem>
-
-      {!clickNavigateSettings && (
-        <IconContaier>
-          <Button
-            aria-label={`${accountName} options`}
-            backgroundColor="black"
-            colorScheme="transparent"
-            padding="1.5"
-            fontSize="xl"
-            size="auto"
-            rounded="full"
-            onClick={onAccountEdit}
-          >
-            <MoreIcon />
-          </Button>
-        </IconContaier>
-      )}
     </Flex>
   )
 }

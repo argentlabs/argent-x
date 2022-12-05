@@ -2,17 +2,11 @@ import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { UniversalDeployerContractPayload } from "starknet"
 
-import {
-  Field,
-  FieldGroup,
-  FieldKey,
-  FieldValue,
-} from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { AccountAddress } from "./AccountAddress"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { DeployContractFeeEstimation } from "./feeEstimation/DeployContractFeeEstimation"
-import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 
 export interface ApproveDeployContractScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -24,7 +18,7 @@ export interface ApproveDeployContractScreenProps
 const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
   selectedAccount,
   actionHash,
-  deployPayload: { classHash, salt, unique, constructorCalldata },
+  deployPayload,
   onSubmit,
   ...props
 }) => {
@@ -52,25 +46,12 @@ const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
           actionHash={actionHash}
-          classHash={classHash}
-          salt={salt}
-          unique={unique}
-          constructorCalldata={constructorCalldata}
+          payload={deployPayload}
         />
       }
       {...props}
     >
-      <FieldGroup>
-        <AccountAddressField
-          title="From"
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.network.id}
-        />
-        <Field>
-          <FieldKey>Network</FieldKey>
-          <FieldValue>{selectedAccount.network.name}</FieldValue>
-        </Field>
-      </FieldGroup>
+      <AccountAddress selectedAccount={selectedAccount} />
     </ConfirmScreen>
   )
 }

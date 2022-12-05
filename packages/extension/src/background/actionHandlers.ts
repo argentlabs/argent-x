@@ -136,11 +136,18 @@ export const handleActionApproval = async (
 
     case "DEPLOY_CONTRACT_ACTION": {
       try {
-        const txHash = await udcDeployContract(action, background)
+        const { txHash, contractAddress } = await udcDeployContract(
+          action,
+          background,
+        )
 
         return {
           type: "DEPLOY_CONTRACT_ACTION_SUBMITTED",
-          data: { txHash, actionHash },
+          data: {
+            txHash,
+            deployedContractAddress: contractAddress,
+            actionHash,
+          },
         }
       } catch (exception: unknown) {
         let error = `${exception}`

@@ -2,6 +2,7 @@ export * as icons from "./icons"
 export * as logos from "./logos"
 
 export * from "./Absolute"
+export * from "./Accordion"
 export * from "./Alert"
 export * from "./AlertDialog"
 export * from "./Button"

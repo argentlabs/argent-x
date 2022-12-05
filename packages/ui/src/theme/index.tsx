@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react"
 
 import {
+  accordionTheme,
   alertTheme,
   menuTheme,
   textareaTheme,
@@ -48,6 +49,7 @@ const extendedTheme = extendTheme({
   shadows,
   space: spacing,
   components: {
+    Accordion: accordionTheme,
     Alert: alertTheme,
     Button: buttonTheme,
     Input: inputTheme,
