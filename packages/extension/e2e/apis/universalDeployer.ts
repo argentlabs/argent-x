@@ -36,6 +36,6 @@ export async function universalDeployerDeployContract(
     [], // calldata
   )
 
-  await account.waitForTransaction(response.transaction_hash, undefined, 1e3) // wait for transaction to be mined (poll every second)
+  await account.waitForTransaction(response.transaction_hash, 1e3) // wait for transaction to be mined (poll every second)
   return response
 }
