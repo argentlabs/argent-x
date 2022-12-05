@@ -73,9 +73,35 @@ export const variantFilled = definePartsStyle((props) => {
   }
 })
 
+export const variantFlat = definePartsStyle((props) => {
+  return {
+    field: {
+      bg: mode("gray.50", "neutrals.800")(props),
+      border: "none",
+      _placeholder: {
+        color: mode("gray.300", "neutrals.400")(props),
+      },
+      _hover: {
+        bg: mode("gray.100", "neutrals.800")(props),
+      },
+      _invalid: {
+        boxShadow: "error",
+        _focusVisible: {
+          boxShadow: mode("outlineError", "error")(props),
+        },
+      },
+      _focusVisible: {
+        bg: mode("white", "neutrals.800")(props),
+        boxShadow: mode("outlineAccent", "none")(props),
+      },
+    },
+  }
+})
+
 const variants = {
   outline: variantOutline,
   filled: variantFilled,
+  flat: variantFlat,
 }
 
 const size = {

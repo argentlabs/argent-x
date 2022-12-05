@@ -1,5 +1,4 @@
 import JSBI from "jsbi"
-import { hash } from "starknet"
 import invariant from "tiny-invariant"
 
 import {
@@ -20,6 +19,7 @@ import {
   InsufficientInputAmountError,
   InsufficientReservesError,
 } from "../errors"
+import { calculateContractAddressFromHash, pedersen } from "../hash"
 import { parseBigintIsh, sqrt } from "../utils"
 import { Price } from "./fractions/price"
 import { TokenAmount } from "./fractions/tokenAmount"
@@ -37,8 +37,6 @@ export class Pair {
     const tokens = tokenA.sortsBefore(tokenB)
       ? [tokenA, tokenB]
       : [tokenB, tokenA] // does safety checks
-
-    const { calculateContractAddressFromHash, pedersen } = hash
 
     const salt = pedersen([tokens[0].address, tokens[1].address])
 

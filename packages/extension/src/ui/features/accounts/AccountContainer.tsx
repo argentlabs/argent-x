@@ -9,7 +9,7 @@ import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
 import { useAccountTransactions } from "./accountTransactions.state"
 
-const { WalletIcon, NftIcon, ActivityIcon } = icons
+const { WalletIcon, NftIcon, ActivityIcon, SwapIcon } = icons
 
 export const DeprecatedContainer = styled.div<{
   header?: boolean
@@ -58,7 +58,7 @@ export const AccountContainer: FC<PropsWithChildren> = ({ children }) => {
           icon={<NftIcon />}
           label="NFTs"
         />
-        <Tab as={NavLink} to={routes.swap()} icon={<NftIcon />} label="Swap" />
+        <Tab as={NavLink} to={routes.swap()} icon={<SwapIcon />} label="Swap" />
         <Tab
           as={NavLink}
           to={routes.accountActivity()}

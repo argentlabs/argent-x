@@ -10,7 +10,9 @@ export default defineConfig({
     react({
       jsxRuntime: "classic",
     }) as PluginOption, // stops TS from complaining
-    dts(),
+    dts({
+      insertTypesEntry: true,
+    }),
   ],
   // optimizeDeps: {
   //   include: ["react/jsx-runtime"],
@@ -19,15 +21,15 @@ export default defineConfig({
     lib: {
       entry: resolvePath(__dirname, "src/index.ts"),
       name: "x-swap",
-      formats: ["es", "umd", "cjs"],
+      formats: ["es", "umd"],
       fileName: (format) => `x-swap.${format}.js`,
     },
 
     emptyOutDir: false,
     rollupOptions: {
+      external: ["react", "react-dom"],
       output: {
-        sourcemapExcludeSources: true,
-
+        // sourcemapExcludeSources: true,
         globals: {
           react: "React",
           "react-dom": "ReactDOM",

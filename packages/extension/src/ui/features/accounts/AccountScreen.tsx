@@ -1,11 +1,14 @@
+import { SwapProvider } from "@argent/x-swap"
 import { FC, ReactNode } from "react"
 
+import { getMulticallForNetwork } from "../../../shared/multicall"
 import { assertNever } from "../../services/assertNever"
 import { AccountActivityContainer } from "../accountActivity/AccountActivityContainer"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
 import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShouldShowFullScreenStatusMessage"
+import { Swap } from "../swap"
 import { AccountContainer } from "./AccountContainer"
 import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
 import { AccountScreenEmpty } from "./AccountScreenEmpty"
@@ -27,6 +30,8 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
 
   const hasAcccount = !!account
   const showEmpty = !hasAcccount || (hasAcccount && isDeploying)
+
+  const multicall = account && getMulticallForNetwork(account?.network)
 
   let body: ReactNode
   if (showEmpty) {
@@ -50,7 +55,11 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   } else if (tab === "activity") {
     body = <AccountActivityContainer account={account} />
   } else if (tab === "swap") {
-    body = <AccountActivityContainer account={account} />
+    body = (
+      <SwapProvider selectedAccount={account} multicall={multicall}>
+        <Swap />
+      </SwapProvider>
+    )
   } else {
     assertNever(tab)
   }
