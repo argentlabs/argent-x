@@ -9,7 +9,7 @@ import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
 import { useAccount } from "../hooks/account"
 import { useLocalHandle } from "../hooks/usePageGuard"
-import { createPasswordFormSchema } from "../schemas/forms/password"
+import { enterPasswordFormSchema } from "../schemas/forms/password"
 import { isSubmitDisabled } from "../schemas/utils"
 import { retrieveAccountWithPassword } from "../services/account"
 
@@ -22,7 +22,7 @@ export default function Password() {
     defaultValues: {
       password: "",
     },
-    resolver: zodResolver(createPasswordFormSchema),
+    resolver: zodResolver(enterPasswordFormSchema),
   })
 
   const email = navigate.query["email"]
@@ -79,7 +79,7 @@ export default function Password() {
         href={"/forgot-password?email=" + encodeURIComponent(email)}
         as={"/forgot-password"}
       >
-        <L2 as="a" mt={4} color={"accent.500"}>
+        <L2 mt={4} color={"accent.500"}>
           Forgotten your password?
         </L2>
       </Link>
