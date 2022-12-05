@@ -11,7 +11,7 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
-const { LinkIcon, DeployIcon, ViewIcon, UpgradeIcon } = icons
+const { LinkIcon, ViewIcon, UpgradeIcon } = icons
 
 export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -21,7 +21,7 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   accountType?: ArgentAccountType
   deploying?: boolean
   upgrade?: boolean
-  connected?: boolean
+  connectedHost?: string
   hidden?: boolean
   avatarOutlined?: boolean
 }
@@ -98,7 +98,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   accountType,
   deploying,
   upgrade,
-  connected,
+  connectedHost,
   hidden,
   avatarOutlined,
   children,
@@ -158,10 +158,14 @@ export const AccountListItem: FC<AccountListItemProps> = ({
               <TransactionStatusIndicator color="orange" />
               Deploying
             </NetworkStatusWrapper>
-          ) : connected ? (
-            <NetworkStatusWrapper color="secondary.500">
-              <LinkIcon /> Connected
-            </NetworkStatusWrapper>
+          ) : connectedHost ? (
+            <Tooltip label={`Connected to ${connectedHost}`}>
+              <Circle size={8} bg={"neutrals.900"}>
+                <Circle size={6} bg={"secondary.500"} color={"white"}>
+                  <LinkIcon />
+                </Circle>
+              </Circle>
+            </Tooltip>
           ) : (
             hidden && (
               <Circle size={10} bg={"neutrals.600"}>
