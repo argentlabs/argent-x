@@ -273,7 +273,8 @@ export const ActionScreen: FC = () => {
               closePopupIfLastAction()
               useAppState.setState({ isLoading: false })
               navigate(
-                routes.settingsSmartContractDeclareClassHash(
+                routes.settingsSmartContractDeclareOrDeploySuccess(
+                  "declare",
                   action.payload.classHash,
                 ),
               )
@@ -319,7 +320,12 @@ export const ActionScreen: FC = () => {
               } else {
                 closePopupIfLastAction()
                 useAppState.setState({ isLoading: false })
-                navigate(routes.accountTokens())
+                navigate(
+                  routes.settingsSmartContractDeclareOrDeploySuccess(
+                    "deploy",
+                    result.deployedContractAddress,
+                  ),
+                )
               }
             }}
             onReject={rejectAllActions}
