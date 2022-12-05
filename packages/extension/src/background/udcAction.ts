@@ -128,7 +128,7 @@ export const udcDeployContract = async (
     )
 
     const contractAddress = calculateContractAddressFromHash(
-      unique ? pedersen([salt, UDC.ADDRESS]) : salt,
+      unique ? pedersen([salt, account.address]) : salt,
       classHash,
       compiledConstructorCallData,
       unique ? UDC.ADDRESS : 0,

@@ -1,3 +1,4 @@
+import { get } from "lodash-es"
 import { FC, useMemo } from "react"
 import { Navigate, useParams } from "react-router-dom"
 
@@ -48,6 +49,14 @@ export const TransactionDetailScreen: FC = () => {
     )
   }, [network.id, transactions, txHash])
 
+  // TODO: remove this when after backend update
+  const isUdcTransaction = useMemo(() => {
+    return (
+      get(transaction, "meta.transactions.entrypoint") === "deployContract" ||
+      get(transaction, "meta.transactions.entrypoint") === "declareContract"
+    )
+  }, [transaction])
+
   const explorerTransactionTransformed = useMemo(() => {
     if (explorerTransaction && account) {
       if (!explorerTransaction.timestamp && transaction) {
@@ -89,7 +98,11 @@ export const TransactionDetailScreen: FC = () => {
     return <LoadingScreen />
   }
 
-  if (explorerTransaction && explorerTransactionTransformed) {
+  if (
+    !isUdcTransaction &&
+    explorerTransaction &&
+    explorerTransactionTransformed
+  ) {
     return (
       <TransactionDetail
         explorerTransaction={explorerTransaction}
