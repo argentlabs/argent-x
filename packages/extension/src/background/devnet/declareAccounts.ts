@@ -54,16 +54,8 @@ export const declareContracts = memoize(
       contract: accountContract,
     })
 
-    await deployAccount.waitForTransaction(
-      account.transaction_hash,
-      undefined,
-      1e3,
-    )
-    await deployAccount.waitForTransaction(
-      proxy.transaction_hash,
-      undefined,
-      1e3,
-    )
+    await deployAccount.waitForTransaction(account.transaction_hash, 1e3)
+    await deployAccount.waitForTransaction(proxy.transaction_hash, 1e3)
 
     return { proxy, account }
   },

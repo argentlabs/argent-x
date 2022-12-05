@@ -49,7 +49,7 @@ export const defaultNetworks: Network[] = [
   {
     id: "goerli-alpha-2",
     name: "Testnet 2",
-    chainId: "SN_GOERLI",
+    chainId: "SN_GOERLI2",
     baseUrl: "https://alpha4-2.starknet.io",
     explorerUrl: "https://goerli-2.voyager.online/",
     accountClassHash: {

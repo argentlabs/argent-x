@@ -1,5 +1,5 @@
 import { Button, icons } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react"
 import { FC, MouseEvent, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -92,9 +92,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       >
         {clickNavigateSettings && (
           <IconContaier>
-            <Text>
-              <ChevronRightIcon />
-            </Text>
+            <ChevronRightIcon opacity={0.6} />
           </IconContaier>
         )}
         {!clickNavigateSettings && (

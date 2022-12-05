@@ -1,35 +1,21 @@
 import { ButtonCell, icons } from "@argent/ui"
-import { FC, ReactNode } from "react"
+import { ComponentProps, FC } from "react"
 import { Link } from "react-router-dom"
 
 const { ChevronRightIcon } = icons
 
-interface SettingsMenuItemProps {
-  leftIcon?: ReactNode
-  rightIcon?: ReactNode
-  onClick?: () => void
+interface SettingsMenuItemProps extends ComponentProps<typeof ButtonCell> {
   title: string
   to: string
-  disabled?: boolean
 }
 
 const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
-  leftIcon,
-  rightIcon = <ChevronRightIcon fontSize="inherit" />,
-  onClick,
+  rightIcon = <ChevronRightIcon />,
   to,
   title,
-  disabled,
+  ...rest
 }) => (
-  <ButtonCell
-    as={Link}
-    leftIcon={<>{leftIcon}</>}
-    rightIcon={<>{rightIcon}</>}
-    width="100%"
-    to={to}
-    onClick={onClick}
-    disabled={disabled}
-  >
+  <ButtonCell as={Link} rightIcon={rightIcon} width="100%" to={to} {...rest}>
     {title}
   </ButtonCell>
 )
