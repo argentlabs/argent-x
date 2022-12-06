@@ -127,6 +127,5 @@ export const usePageGuard = () => {
 
       return conditionallyPushTo(router, "/email")
     },
-    dedupingInterval: 20000,
   })
 }
