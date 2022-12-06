@@ -1,12 +1,13 @@
 import { getLocalHandle } from "@argent/x-window"
 import { NextRouter, useRouter } from "next/router"
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import useSwr from "swr"
 
 import {
   getAccount as getMemoryAccount,
   retrieveAccountFromSession,
 } from "../services/account"
+import { UserAccount } from "../services/backend/account"
 import { useAccount, useBackendAccount } from "./account"
 
 const allowedDestinations = {
@@ -66,9 +67,10 @@ export const useLocalHandle = () => {
 
 export const usePageGuard = () => {
   const router = useRouter()
-  const { mutate } = useAccount()
+  const { mutate: refreshAccount } = useAccount()
   const localHandle = useLocalHandle()
 
+  // emits messages to the parent window when shown to communicate the current height
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
       const newHeight = entries[0].target.clientHeight
@@ -97,13 +99,13 @@ export const usePageGuard = () => {
     }
   }, [localHandle, router])
 
-  useBackendAccount({
-    onSuccess: async (account) => {
+  const handleAccountSuccess = useCallback(
+    async (account: UserAccount) => {
       if (account.accounts[0]) {
         if (
           (await getMemoryAccount()) ||
           (await retrieveAccountFromSession(account.accounts[0])
-            .then(() => mutate())
+            .then(() => refreshAccount())
             .catch(() => false))
         ) {
           if (localHandle) {
@@ -122,10 +124,38 @@ export const usePageGuard = () => {
       }
       localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
     },
-    onError: () => {
-      localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
+    [localHandle, refreshAccount, router],
+  )
+  const handleAccountError = useCallback(async () => {
+    localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
 
-      return conditionallyPushTo(router, "/email")
+    return conditionallyPushTo(router, "/email")
+  }, [localHandle, router])
+
+  const { account, error } = useBackendAccount({
+    onSuccess: (a) => {
+      console.log("account", a)
+      handleAccountSuccess(a)
+    },
+    onError: (e) => {
+      console.log("error", e)
+      handleAccountError()
     },
   })
+
+  // revaildate navigation guard without refetching account
+  const routeChangeHandler = useCallback(() => {
+    console.log("route change", account, error)
+    if (account) {
+      handleAccountSuccess(account)
+    } else if (error) {
+      handleAccountError()
+    }
+  }, [account, error, handleAccountError, handleAccountSuccess])
+  useEffect(() => {
+    router.events.on("routeChangeComplete", routeChangeHandler)
+    return () => {
+      router.events.off("routeChangeComplete", routeChangeHandler)
+    }
+  }, [routeChangeHandler, router.events])
 }
