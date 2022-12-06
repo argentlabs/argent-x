@@ -1,5 +1,5 @@
 import { Button, icons } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { Circle, Flex } from "@chakra-ui/react"
 import { FC, MouseEvent, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -87,7 +87,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         avatarOutlined={status.code === "CONNECTED"}
         deploying={status.code === "DEPLOYING"}
         upgrade={needsUpgrade}
-        connected={isConnected}
+        connectedHost={isConnected ? originatingHost : undefined}
         pr={14}
       >
         {clickNavigateSettings && (
@@ -98,15 +98,15 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         {!clickNavigateSettings && (
           <IconContaier>
             <Button
-              as="div"
+              as={Circle}
               aria-label={`${accountName} options`}
-              backgroundColor="black"
               colorScheme="transparent"
-              padding="1.5"
-              fontSize="xl"
+              width={8}
+              height={8}
               size="auto"
               rounded="full"
               onClick={onAccountEdit}
+              bg="black"
               _hover={{
                 bg: "neutrals.600",
               }}
