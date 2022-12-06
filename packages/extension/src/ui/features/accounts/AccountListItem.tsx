@@ -1,5 +1,5 @@
 import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
-import { Circle, Flex, Image, Text, chakra } from "@chakra-ui/react"
+import { Circle, Flex, Image, Text, Tooltip, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
@@ -11,7 +11,7 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
-const { LinkIcon, DeployIcon, ViewIcon } = icons
+const { LinkIcon, ViewIcon, UpgradeIcon } = icons
 
 export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -21,7 +21,7 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   accountType?: ArgentAccountType
   deploying?: boolean
   upgrade?: boolean
-  connected?: boolean
+  connectedHost?: string
   hidden?: boolean
   avatarOutlined?: boolean
 }
@@ -32,6 +32,7 @@ interface AccountAvatarProps extends ComponentProps<"img"> {
 
 export const AccountAvatar: FC<AccountAvatarProps> = ({
   outlined,
+  children,
   ...rest
 }) => {
   return (
@@ -55,6 +56,7 @@ export const AccountAvatar: FC<AccountAvatarProps> = ({
           />
         </>
       )}
+      {children}
     </Flex>
   )
 }
@@ -70,6 +72,24 @@ const NetworkStatusWrapper = chakra(Flex, {
   },
 })
 
+export const AccountListItemUpgradeBadge: FC = () => (
+  <Tooltip label="This account needs to be upgraded">
+    <Circle
+      position={"absolute"}
+      right={-0.5}
+      bottom={-0.5}
+      size={5}
+      bg={"primary.500"}
+      border={"2px solid"}
+      borderColor={"neutrals.800"}
+      color={"neutrals.800"}
+      fontSize={"2xs"}
+    >
+      <UpgradeIcon />
+    </Circle>
+  </Tooltip>
+)
+
 export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
   accountAddress,
@@ -78,12 +98,13 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   accountType,
   deploying,
   upgrade,
-  connected,
+  connectedHost,
   hidden,
   avatarOutlined,
   children,
   ...rest
 }) => {
+  const avatarBadge = upgrade ? <AccountListItemUpgradeBadge /> : null
   return (
     <CustomButtonCell {...rest}>
       <AccountAvatar
@@ -94,7 +115,9 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           networkId,
           backgroundColor: hidden ? "333332" : undefined,
         })}
-      />
+      >
+        {avatarBadge}
+      </AccountAvatar>
       <Flex
         flex={1}
         overflow={"hidden"}
@@ -135,14 +158,14 @@ export const AccountListItem: FC<AccountListItemProps> = ({
               <TransactionStatusIndicator color="orange" />
               Deploying
             </NetworkStatusWrapper>
-          ) : upgrade ? (
-            <NetworkStatusWrapper>
-              <DeployIcon /> Upgrade
-            </NetworkStatusWrapper>
-          ) : connected ? (
-            <NetworkStatusWrapper color="secondary.500">
-              <LinkIcon /> Connected
-            </NetworkStatusWrapper>
+          ) : connectedHost ? (
+            <Tooltip label={`Connected to ${connectedHost}`}>
+              <Circle size={8} bg={"neutrals.900"}>
+                <Circle size={6} bg={"secondary.500"} color={"white"}>
+                  <LinkIcon />
+                </Circle>
+              </Circle>
+            </Tooltip>
           ) : (
             hidden && (
               <Circle size={10} bg={"neutrals.600"}>
