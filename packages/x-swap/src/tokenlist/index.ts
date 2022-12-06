@@ -55,3 +55,5 @@ export function useArgentTokenList() {
 
   return useMemo(() => listToTokenMap(argentTokenList), [argentTokenList])
 }
+
+export { WrappedTokenInfo }

@@ -47,7 +47,7 @@ const initialState = {
   },
   [Field.OUTPUT]: {
     currencyId:
-      "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+      "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
   },
 }
 

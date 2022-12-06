@@ -1,5 +1,6 @@
 import { useCallback } from "react"
 
+import { WrappedTokenInfo } from "./../../tokenlist/types"
 import { Currency, CurrencyAmount, ETHER, Token, Trade } from "../../sdk"
 import { useSwapProvider } from "./../providers/swap"
 import { Field, useSwapState } from "../state/swap"
@@ -12,7 +13,7 @@ import { useCurrencyBalances } from "./Wallet"
 
 // from the current swap inputs, compute the best trade and return it.
 export function useDerivedSwapInfo(): {
-  currencies: { [field in Field]?: Currency }
+  currencies: { [field in Field]?: Currency | WrappedTokenInfo }
   currencyBalances: { [field in Field]?: CurrencyAmount }
   parsedAmount: CurrencyAmount | undefined
   trade: Trade | undefined

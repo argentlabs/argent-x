@@ -1,4 +1,4 @@
-import { CellStack, icons } from "@argent/ui"
+import { CellStack, L2, icons } from "@argent/ui"
 import {
   Currency,
   CurrencyAmount,
@@ -132,30 +132,51 @@ export function Swap() {
   )
 
   return (
-    <SwapContainer>
-      <SwapInputPanel
-        type="pay"
-        id="swap-input-pay-panel"
-        value={formattedAmounts[Field.INPUT]}
-        onUserInput={handleTypeInput}
-        onCurrencySelect={handleInputSelect}
-        showMaxButton={!atMaxAmountInput}
-        onMax={handleMaxInput}
-        otherCurrency={currencies[Field.OUTPUT]}
-      />
-      <SwitchDirectionButton
-        icon={<StyledSwitchDirectionIcon />}
-        onClick={switchCurrencies}
-      />
+    <>
+      <SwapContainer>
+        <SwapInputPanel
+          type="pay"
+          id="swap-input-pay-panel"
+          currency={currencies[Field.INPUT]}
+          value={formattedAmounts[Field.INPUT]}
+          onUserInput={handleTypeInput}
+          onCurrencySelect={handleInputSelect}
+          showMaxButton={!atMaxAmountInput}
+          onMax={handleMaxInput}
+          otherCurrency={currencies[Field.OUTPUT]}
+          currentBalance={currencyBalances[Field.INPUT]}
+        />
+        <SwitchDirectionButton
+          icon={<StyledSwitchDirectionIcon />}
+          onClick={switchCurrencies}
+        />
 
-      <SwapInputPanel
-        type="receive"
-        id="swap-input-receive-panel"
-        value={formattedAmounts[Field.OUTPUT]}
-        onUserInput={handleTypeOutput}
-        onCurrencySelect={handleOutputSelect}
-        otherCurrency={currencies[Field.INPUT]}
-      />
-    </SwapContainer>
+        <SwapInputPanel
+          type="receive"
+          id="swap-input-receive-panel"
+          currency={currencies[Field.OUTPUT]}
+          value={formattedAmounts[Field.OUTPUT]}
+          onUserInput={handleTypeOutput}
+          onCurrencySelect={handleOutputSelect}
+          otherCurrency={currencies[Field.INPUT]}
+          currentBalance={currencyBalances[Field.OUTPUT]}
+        />
+      </SwapContainer>
+      <L2
+        textAlign="center"
+        mt="4"
+        as={"a"}
+        rounded={"lg"}
+        color={"neutrals.500"}
+        href="https://jediswap.xyz/"
+        title="Jediswap"
+        target="_blank"
+        _hover={{
+          textDecoration: "underline",
+        }}
+      >
+        Powered by Jediswap
+      </L2>
+    </>
   )
 }
