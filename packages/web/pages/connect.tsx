@@ -12,7 +12,7 @@ import { usePreAuthorized } from "../states/preAuthorized"
 
 const { TickIcon } = icons
 
-export default function ReviewScreen() {
+export default function ConnectScreen() {
   const navigate = useRouter()
   const origin = navigate.query.origin
   const { addPreAuthorizedOrigin } = usePreAuthorized()
