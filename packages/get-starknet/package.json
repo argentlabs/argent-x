@@ -36,8 +36,8 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "@argent/x-window": "^5.0.8",
     "@argent/web-sdk": "^5.0.8",
+    "@argent/x-window": "^5.0.8",
     "bowser": "^2.11.0",
     "get-starknet-core": "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2",
     "lodash-es": "^4.17.21",
@@ -49,6 +49,7 @@
     "@types/async-retry": "^1.4.5",
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
+    "starknet": "^4.15.0",
     "svelte": "^3.49.0",
     "svelte-check": "^2.8.0",
     "svelte-preprocess": "^4.10.7",
