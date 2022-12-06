@@ -46,6 +46,6 @@
     "vite-plugin-dts": "^1.4.0"
   },
   "peerDependencies": {
-    "starknet": "^4.14.0"
+    "starknet": "^4.15.0"
   }
 }
