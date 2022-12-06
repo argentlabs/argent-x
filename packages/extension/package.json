@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.0.10",
+  "version": "5.0.12",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -72,10 +72,10 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
-    "@argent/ui": "^5.0.10",
-    "@argent/x-multicall": "^5.0.10",
-    "@argent/x-sessions": "^5.0.10",
-    "@argent/x-wasm": "^5.0.10",
+    "@argent/ui": "^5.0.12",
+    "@argent/x-multicall": "^5.0.12",
+    "@argent/x-sessions": "^5.0.12",
+    "@argent/x-wasm": "^5.0.12",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",
@@ -105,7 +105,7 @@
     "react-select": "^5.4.0",
     "react-textarea-autosize": "^8.3.4",
     "semver": "^7.3.7",
-    "starknet": "^4.14.0",
+    "starknet": "^4.15.0",
     "starknet3": "npm:starknet@3.18.2",
     "starknet4": "npm:starknet@4.4.0",
     "styled-components": "^5.3.5",
