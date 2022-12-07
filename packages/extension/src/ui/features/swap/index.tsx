@@ -11,6 +11,8 @@ import {
 import { IconButton, chakra } from "@chakra-ui/react"
 import { useCallback } from "react"
 
+import { useSelectedAccount } from "../accounts/accounts.state"
+import { useTokensWithBalance } from "../accountTokens/tokens.state"
 import { useNetworkStatuses } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 
@@ -130,6 +132,8 @@ export function Swap() {
       onCurrencySelection(Field.OUTPUT, outputCurrency),
     [onCurrencySelection],
   )
+  const account = useSelectedAccount()
+  const { tokenDetails: ownedTokens } = useTokensWithBalance(account)
 
   return (
     <>
@@ -145,6 +149,7 @@ export function Swap() {
           onMax={handleMaxInput}
           otherCurrency={currencies[Field.OUTPUT]}
           currentBalance={currencyBalances[Field.INPUT]}
+          ownedTokens={ownedTokens}
         />
         <SwitchDirectionButton
           icon={<StyledSwitchDirectionIcon />}

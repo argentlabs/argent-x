@@ -47,7 +47,10 @@ const initialState = {
   },
   [Field.OUTPUT]: {
     currencyId:
-      "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
+      // TODO: dynamic
+      "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3", // dai mainnet
+    // "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9", // DAI // testnet
+    //"0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426", // USDC // testnet
   },
 }
 
