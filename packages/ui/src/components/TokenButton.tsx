@@ -1,10 +1,10 @@
-import { Button, FieldError, H6, P4, icons } from "@argent/ui"
 import { Circle, Flex, Image, Tooltip } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode } from "react"
 
+import { Button } from "./Button"
+import { AlertIcon } from "./icons"
 import { LoadingPulse } from "./LoadingPulse"
-
-const { AlertIcon } = icons
+import { FieldError, H6, P4 } from "./Typography"
 
 export interface TokenListItemProps extends ComponentProps<typeof Button> {
   name: string
@@ -111,7 +111,7 @@ const TokenButton: FC<TokenListItemProps> = ({
               </Tooltip>
             ) : (
               <>
-                <H6 overflow="hidden" textOverflow={"ellipsis"}>
+                <H6 overflow="hidden" textOverflow={"ellipsis"} textAlign="end">
                   {valueLabelPrimary}
                 </H6>
                 {valueLabelSecondary && (
