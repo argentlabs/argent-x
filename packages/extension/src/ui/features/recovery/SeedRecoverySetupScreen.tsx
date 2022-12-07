@@ -1,7 +1,7 @@
+import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
@@ -15,8 +15,12 @@ export const SeedRecoverySetupScreen: FC = () => {
   const returnTo = useReturnTo()
 
   return (
-    <>
-      <IconBar back close={returnTo} />
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
+    >
       <ConfirmScreen
         smallTopPadding
         title="Recovery phrase"
@@ -34,6 +38,6 @@ export const SeedRecoverySetupScreen: FC = () => {
 
         <CopySeedPhrase seedPhrase={seedPhrase} />
       </ConfirmScreen>
-    </>
+    </NavigationContainer>
   )
 }

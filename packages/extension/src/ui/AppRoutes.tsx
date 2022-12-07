@@ -1,7 +1,6 @@
 import { chakra } from "@chakra-ui/system"
 import { FC } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
-import styled from "styled-components"
 
 import { useAppState } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
@@ -69,31 +68,7 @@ import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
 
-/** Screens using legacy UI should remain inside this container */
-
-export const LegacyScrollBehaviour = styled.div`
-  height: 100vh;
-  overflow-y: auto;
-
-  overscroll-behavior: none;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
-`
-
-const LegacyResponsiveViewport: FC = () => (
-  <LegacyScrollBehaviour>
-    <ResponsiveBox>
-      <Outlet />
-    </ResponsiveBox>
-  </LegacyScrollBehaviour>
-)
-
-/** Screens using new UI should moved inside this container */
-
-export const ResponsiveContainer = chakra(ResponsiveBox, {
+const ResponsiveContainer = chakra(ResponsiveBox, {
   baseStyle: {
     display: "flex",
     flexDirection: "column",
@@ -116,86 +91,21 @@ const ResponsiveRoutes: FC = () => (
 )
 
 // Routes which don't need an unlocked wallet
-const legacyNonWalletRoutes = (
+
+const nonWalletRoutes = (
   <>
+    <Route path={routes.error.path} element={<ErrorScreen />} />
+    <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
     />
-    <Route path={routes.error.path} element={<ErrorScreen />} />
-  </>
-)
-
-const nonWalletRoutes = (
-  <>
-    <Route path={routes.lockScreen.path} element={<LockScreen />} />
   </>
 )
 
 // Routes which need an unlocked wallet and therefore can also sign actions
-const legacyUiWalletRoutes = (
-  <>
-    <Route
-      path={routes.transactionDetail.path}
-      element={<TransactionDetailScreen />}
-    />
-    <Route
-      path={routes.accountHideConfirm.path}
-      element={<HideOrDeleteAccountConfirmScreen mode="hide" />}
-    />
-    <Route
-      path={routes.accountDeleteConfirm.path}
-      element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
-    />
-    <Route path={routes.sendScreen.path} element={<SendScreen />} />
-    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
-    <Route path={routes.sendNft.path} element={<SendNftScreen />} />
-    <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
-    <Route
-      path={routes.networkUpgradeV4.path}
-      element={<UpgradeScreenV4 upgradeType={"network"} />}
-    />
-    <Route
-      path={routes.accountUpgradeV4.path}
-      element={<UpgradeScreenV4 upgradeType={"account"} />}
-    />
-    <Route
-      path={routes.accountsHidden.path}
-      element={<AccountListHiddenScreen />}
-    />
-    <Route path={routes.funding.path} element={<FundingScreen />} />
-    <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
-    <Route path={routes.fundingQrCode.path} element={<FundingQrCodeScreen />} />
-    <Route
-      path={routes.fundingProvider.path}
-      element={<FundingProviderScreen />}
-    />
-    <Route
-      path={routes.confirmSeedRecovery.path}
-      element={<SeedRecoveryConfirmScreen />}
-    />
-    <Route
-      path={routes.setupSeedRecovery.path}
-      element={<SeedRecoverySetupScreen />}
-    />
-    <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
-    <Route path={routes.newToken.path} element={<AddTokenScreen />} />
-    <Route path={routes.token.path} element={<TokenScreen />} />
-    <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
-    <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
-    <Route
-      path={routes.backupDownload.path}
-      element={<BackupDownloadScreen />}
-    />
-    <Route
-      path={routes.exportPrivateKey.path}
-      element={<ExportPrivateKeyScreen />}
-    />
-  </>
-)
 
-/** Screens using new UI */
 const walletRoutes = (
   <>
     <Route path={routes.accountNft.path} element={<NftScreen />} />
@@ -284,6 +194,62 @@ const walletRoutes = (
       path={routes.settingsPrivacyStatement.path}
       element={<SettingsPrivacyStatementScreen />}
     />
+    <Route
+      path={routes.transactionDetail.path}
+      element={<TransactionDetailScreen />}
+    />
+    <Route
+      path={routes.accountHideConfirm.path}
+      element={<HideOrDeleteAccountConfirmScreen mode="hide" />}
+    />
+    <Route
+      path={routes.accountDeleteConfirm.path}
+      element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
+    />
+    <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
+    <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
+    <Route path={routes.sendScreen.path} element={<SendScreen />} />
+    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
+    <Route path={routes.sendNft.path} element={<SendNftScreen />} />
+    <Route
+      path={routes.networkUpgradeV4.path}
+      element={<UpgradeScreenV4 upgradeType={"network"} />}
+    />
+    <Route
+      path={routes.accountUpgradeV4.path}
+      element={<UpgradeScreenV4 upgradeType={"account"} />}
+    />
+    <Route
+      path={routes.accountsHidden.path}
+      element={<AccountListHiddenScreen />}
+    />
+    <Route path={routes.funding.path} element={<FundingScreen />} />
+    <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
+    <Route path={routes.fundingQrCode.path} element={<FundingQrCodeScreen />} />
+    <Route
+      path={routes.fundingProvider.path}
+      element={<FundingProviderScreen />}
+    />
+    <Route
+      path={routes.confirmSeedRecovery.path}
+      element={<SeedRecoveryConfirmScreen />}
+    />
+    <Route
+      path={routes.setupSeedRecovery.path}
+      element={<SeedRecoverySetupScreen />}
+    />
+    <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
+    <Route path={routes.newToken.path} element={<AddTokenScreen />} />
+    <Route path={routes.token.path} element={<TokenScreen />} />
+    <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
+    <Route
+      path={routes.backupDownload.path}
+      element={<BackupDownloadScreen />}
+    />
+    <Route
+      path={routes.exportPrivateKey.path}
+      element={<ExportPrivateKeyScreen />}
+    />
   </>
 )
 
@@ -343,18 +309,14 @@ export const AppRoutes: FC = () => {
 
   return (
     <Routes>
-      <Route element={<LegacyResponsiveViewport />}>
-        {legacyNonWalletRoutes}
+      <Route element={<ResponsiveRoutes />}>
+        {nonWalletRoutes}
         {hasActions ? (
           <Route path="*" element={<ActionScreen />} />
         ) : (
-          legacyUiWalletRoutes
+          walletRoutes
         )}
       </Route>
-      <Route element={<ResponsiveRoutes />}>{nonWalletRoutes}</Route>
-      {!hasActions && (
-        <Route element={<ResponsiveRoutes />}>{walletRoutes}</Route>
-      )}
       {fullscreenRoutes}
     </Routes>
   )

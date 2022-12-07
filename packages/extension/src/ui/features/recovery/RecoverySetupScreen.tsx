@@ -1,9 +1,8 @@
-import { icons } from "@argent/ui"
+import { BarCloseButton, NavigationContainer, icons } from "@argent/ui"
 import { FC } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper, Paragraph, Title } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
@@ -23,10 +22,16 @@ const CircleIconContainer = styled.div`
 `
 
 export const RecoverySetupScreen: FC = () => {
+  const navigate = useNavigate()
   const returnTo = useReturnTo()
   return (
-    <>
-      <IconBar close={returnTo} />
+    <NavigationContainer
+      rightButton={
+        <BarCloseButton
+          onClick={() => navigate(returnTo || routes.accountTokens())}
+        />
+      }
+    >
       <PageWrapper>
         <Title>Set up account recovery</Title>
         <Paragraph>
@@ -69,6 +74,6 @@ export const RecoverySetupScreen: FC = () => {
           </Link>
         </OptionsWrapper>
       </PageWrapper>
-    </>
+    </NavigationContainer>
   )
 }

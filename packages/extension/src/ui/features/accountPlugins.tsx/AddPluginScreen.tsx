@@ -1,9 +1,9 @@
+import { BarCloseButton, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
 import { useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import { AutoColumn } from "../../components/Column"
-import { IconBar } from "../../components/IconBar"
 import { H2 } from "../../theme/Typography"
 import { Plugin } from "./Plugin"
 import { plugins } from "./Plugins"
@@ -20,8 +20,7 @@ export const AddPluginScreen: FC = () => {
   }
 
   return (
-    <>
-      <IconBar close />
+    <NavigationContainer rightButton={<BarCloseButton />}>
       <Container>
         <H2>Add a plugin</H2>
         <AutoColumn>
@@ -37,6 +36,6 @@ export const AddPluginScreen: FC = () => {
           ))}
         </AutoColumn>
       </Container>
-    </>
+    </NavigationContainer>
   )
 }

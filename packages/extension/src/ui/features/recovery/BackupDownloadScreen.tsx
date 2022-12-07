@@ -1,10 +1,9 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { FC, FormEventHandler } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { BackButton } from "../../components/BackButton"
 import { Button } from "../../components/Button"
-import { Header } from "../../components/Header"
 import { routes } from "../../routes"
 import { downloadBackupFile } from "../../services/backgroundRecovery"
 import { H2, P } from "../../theme/Typography"
@@ -34,11 +33,7 @@ export const BackupDownloadScreen: FC = () => {
   }
 
   return (
-    <>
-      <Header hide={!isSettings}>
-        <BackButton />
-      </Header>
-
+    <NavigationContainer leftButton={isSettings ? <BarBackButton /> : null}>
       <Container>
         <H2>Download your backup</H2>
         <P>
@@ -51,6 +46,6 @@ export const BackupDownloadScreen: FC = () => {
         </P>
         <DownloadButton onClick={handleDownloadClick}>Download</DownloadButton>
       </Container>
-    </>
+    </NavigationContainer>
   )
 }

@@ -16,8 +16,7 @@ const Container = styled.div`
   padding: 88px 40px 24px 40px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 68px);
-
+  flex: 1;
   ${P} {
     font-weight: 600;
     margin-top: 15px;
@@ -27,6 +26,11 @@ const Container = styled.div`
     color: ${({ theme }) => theme.red3};
     text-decoration: none;
   }
+`
+
+const ButtonSpacer = styled.div`
+  display: flex;
+  flex: 1;
 `
 
 export const MigrationDisclaimerScreen: FC = () => {
@@ -70,9 +74,8 @@ export const MigrationDisclaimerScreen: FC = () => {
           Read more about this change <OpenInNewIcon style={{ fontSize: 14 }} />
         </a>
       </P>
-      <Button style={{ marginTop: 70 }} onClick={handleAddAccount}>
-        Create new account
-      </Button>
+      <ButtonSpacer />
+      <Button onClick={handleAddAccount}>Create new account</Button>
     </Container>
   )
 }

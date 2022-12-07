@@ -1,4 +1,5 @@
 import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/ConfirmScreen"
+import { Center } from "@chakra-ui/layout"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { MemoryRouter } from "react-router-dom"
 
@@ -9,7 +10,11 @@ export default {
 
 const Template: ComponentStory<typeof ConfirmScreen> = (props) => (
   <MemoryRouter initialEntries={["/"]}>
-    <ConfirmScreen {...props}></ConfirmScreen>
+    <ConfirmScreen {...props}>
+      <Center rounded={"md"} bg={"neutrals.800"} height={800}>
+        Some content in here
+      </Center>
+    </ConfirmScreen>
   </MemoryRouter>
 )
 

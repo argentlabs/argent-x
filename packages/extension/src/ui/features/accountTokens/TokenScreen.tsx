@@ -1,3 +1,4 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { FC, useMemo } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
@@ -8,12 +9,11 @@ import {
 } from "../../../shared/token/price"
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
-import { IconBar } from "../../components/IconBar"
 import { FormatListBulletedIcon } from "../../components/Icons/MuiIcons"
 import { LoadingPulse } from "../../components/LoadingPulse"
 import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
-import { H2, H3 } from "../../theme/Typography"
+import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenIcon } from "./TokenIcon"
 import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
@@ -75,10 +75,6 @@ const TokenBalanceContainer = styled(RowCentered)`
   align-items: baseline;
 `
 
-const StyledH2 = styled(H2)`
-  margin-bottom: 0;
-`
-
 export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
@@ -100,10 +96,11 @@ export const TokenScreen: FC = () => {
   const isLoading = isValidating || tokenDetailsIsInitialising
 
   return (
-    <>
-      <IconBar back childAfter={<TokenMenuDeprecated tokenAddress={address} />}>
-        <H3>{name === "Ether" ? "Ethereum" : name}</H3>
-      </IconBar>
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={<TokenMenuDeprecated tokenAddress={address} />}
+      title={name === "Ether" ? "Ethereum" : name}
+    >
       <TokenScreenWrapper>
         <TokenHeader hasCurrencyValue={!!currencyValue}>
           <ColumnCenter>
@@ -151,6 +148,6 @@ export const TokenScreen: FC = () => {
           </ColumnCenter>
         </ActionContainer>
       </TokenScreenWrapper>
-    </>
+    </NavigationContainer>
   )
 }

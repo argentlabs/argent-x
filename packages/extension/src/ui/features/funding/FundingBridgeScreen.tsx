@@ -1,8 +1,8 @@
+import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
-import { Navigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 
 import { isDeprecated } from "../../../shared/wallet.service"
-import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
@@ -15,6 +15,7 @@ import OrbiterSvg from "./orbiter.svg"
 
 export const FundingBridgeScreen: FC = () => {
   const account = useSelectedAccount()
+  const navigate = useNavigate()
 
   if (!account) {
     return <Navigate to={routes.accounts()} />
@@ -33,8 +34,12 @@ export const FundingBridgeScreen: FC = () => {
   const allowOrbiter = isOrbiterEnabled && isMainnet && !isDeprecatedAccount
 
   return (
-    <>
-      <IconBar back close />
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
+    >
       <PageWrapper>
         <Title>Bridge your assets</Title>
         <OptionsWrapper>
@@ -76,6 +81,6 @@ export const FundingBridgeScreen: FC = () => {
           )}
         </OptionsWrapper>
       </PageWrapper>
-    </>
+    </NavigationContainer>
   )
 }

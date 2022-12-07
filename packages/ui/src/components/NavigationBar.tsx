@@ -71,7 +71,7 @@ export const BarBackButton: FC<ComponentProps<typeof BarIconButton>> = (
 ) => {
   const onClick = useNavigateBack()
   return (
-    <BarIconButton onClick={onClick} {...props}>
+    <BarIconButton aria-label="Back" onClick={onClick} {...props}>
       <ArrowLeftIcon />
     </BarIconButton>
   )
@@ -82,7 +82,7 @@ export const BarCloseButton: FC<ComponentProps<typeof BarIconButton>> = (
 ) => {
   const onClick = useNavigateBack()
   return (
-    <BarIconButton onClick={onClick} {...props}>
+    <BarIconButton aria-label="Close" onClick={onClick} {...props}>
       <CloseIcon />
     </BarIconButton>
   )
@@ -120,7 +120,13 @@ export const NavigationBar: FC<NavigationBarProps> = ({
         </TitleContainer>
       )}
       <Fade in={!title && showScrollContent}>
-        <TitleContainer gap="2">{scrollContent}</TitleContainer>
+        <TitleContainer gap="2">
+          {typeof scrollContent === "string" ? (
+            <H6>{scrollContent}</H6>
+          ) : (
+            <>{scrollContent}</>
+          )}
+        </TitleContainer>
       </Fade>
       {(leftButton || rightButton) && (
         <ButtonsContainer>
