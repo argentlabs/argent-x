@@ -59,7 +59,7 @@ export const AddressbookSettingsScreen: FC = () => {
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       rightButton={
         <BarAddButton
           onClick={() => navigate(routes.settingsAddressbookAdd())}

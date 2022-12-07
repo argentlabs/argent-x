@@ -26,7 +26,7 @@ export const DappConnectionsSettingsScreen: FC = () => {
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       title={"Dapp connections"}
     >
       <VStack gap="6">

@@ -107,10 +107,7 @@ export const NetworkSettingsScreen: FC = () => {
         message={errorMessage}
         onCancel={onCancel}
       />
-      <NavigationContainer
-        leftButton={<BarBackButton onClick={() => navigate(-1)} />}
-        title={"Networks"}
-      >
+      <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
         <CellStack>
           {!allNetworks ? (
             <Spinner />

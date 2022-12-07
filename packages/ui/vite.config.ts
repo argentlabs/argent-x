@@ -20,11 +20,12 @@ export default defineConfig({
     },
     emptyOutDir: false,
     rollupOptions: {
-      external: ["react", "react-dom", "@chakra-ui/react"],
+      external: ["react", "react-dom", "react-router-dom", "@chakra-ui/react"],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
+          "react-router-dom": "ReactRouterDOM",
           "@chakra-ui/react": "ChakraUIReact",
         },
       },

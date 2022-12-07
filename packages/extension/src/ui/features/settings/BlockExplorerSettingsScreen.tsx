@@ -1,7 +1,6 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { Radio } from "@mui/material"
 import { FC, Fragment } from "react"
-import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { settingsStore } from "../../../shared/settings"
@@ -28,10 +27,9 @@ const StyledRadio = styled(Radio)`
 
 export const BlockExplorerSettingsScreen: FC = () => {
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
-  const navigate = useNavigate()
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       title={"Block explorer"}
     >
       <SettingsScreenWrapper>

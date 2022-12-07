@@ -93,10 +93,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
-      title={"Networks"}
-    >
+    <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
       <ConfirmScreen
         title={props.mode === "add" ? "Add network" : "Edit network"}
         singleButton
