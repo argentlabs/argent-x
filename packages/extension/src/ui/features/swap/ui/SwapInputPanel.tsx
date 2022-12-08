@@ -39,6 +39,7 @@ import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedN
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 import { CurrencyValue } from "./CurrencyValue"
+import { MaxEthModal } from "./MaxEthModal"
 import { OwnedToken } from "./OwnedToken"
 import { TokenPrice } from "./TokenPrice"
 
@@ -51,13 +52,13 @@ interface SwapInputPanelProps {
   onMax?: () => void
   currency?: Currency | undefined
   showMaxButton?: boolean
-  //   label?: string
   onCurrencySelect: (currency: Currency) => void
   currentBalance?: CurrencyAmount | TokenAmount
   otherCurrency?: Currency | null
   id: string
   ownedTokens?: TokenDetailsWithBalance[]
   tradeLoading: boolean
+  insufficientBalance?: boolean
 }
 
 const SwapInputPanel: FC<SwapInputPanelProps> = ({
@@ -73,6 +74,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
   otherCurrency,
   ownedTokens,
   tradeLoading,
+  insufficientBalance,
 }) => {
   const { register, watch } = useForm({
     defaultValues: { query: "" },
@@ -116,6 +118,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
     <>
       <Flex
         position="relative"
+        flexDirection="column"
         gap="2px"
         padding="16px 20px"
         backgroundColor="neutrals.800"
@@ -123,10 +126,14 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         borderRadius={type === "pay" ? "12px 12px 0 0" : "0 0 12px 12px"}
         id={id}
       >
-        <Flex flexDirection="column" gap="2px" flex={1}>
+        <Flex>
           <P4 color="neutrals.400">{type === "pay" ? "Pay" : "Receive"}</P4>
-          <LoadingPulse isLoading={tradeLoading && !value}>
+        </Flex>
+
+        <Flex justifyContent="space-between" alignItems="center">
+          <LoadingPulse isLoading={tradeLoading && !value} mr="3">
             <Input
+              color={insufficientBalance ? "error.500" : "white"}
               p="0"
               minH="min-content"
               variant="flat"
@@ -141,6 +148,36 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
                 }
               }}
             />
+          </LoadingPulse>
+
+          {token && (
+            <Flex alignItems="center">
+              <Button
+                height="min-content"
+                minH="min-content"
+                width="min-content"
+                backgroundColor="neutrals.900"
+                rounded={"full"}
+                onClick={onOpenTokenList}
+                leftIcon={
+                  <TokenIcon
+                    name={token?.name || "?"}
+                    url={token?.image}
+                    size="5"
+                  />
+                }
+                px="1"
+                py="1"
+                rightIcon={<ChevronDownIcon />}
+              >
+                <H6>{token?.symbol}</H6>
+              </Button>
+            </Flex>
+          )}
+        </Flex>
+
+        <Flex justifyContent="space-between">
+          <Flex flexDirection="column">
             {showMaxButton && (
               <L2
                 onClick={onMaxCheck}
@@ -151,79 +188,22 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
                 Max
               </L2>
             )}
-            {token && (
+            {value && token && (
               <CurrencyValue
                 amount={value}
                 token={token}
                 approx={type === "receive"}
               />
             )}
-          </LoadingPulse>
-        </Flex>
-        <Flex
-          flexDirection="column"
-          gap="2"
-          justifyContent="center"
-          flex={1}
-          alignItems="flex-end"
-        >
-          {token && (
-            <Button
-              height="min-content"
-              minH="min-content"
-              width="min-content"
-              backgroundColor="neutrals.900"
-              rounded={"full"}
-              onClick={onOpenTokenList}
-              leftIcon={
-                <TokenIcon
-                  name={token?.name || "?"}
-                  url={token?.image}
-                  size="5"
-                />
-              }
-              px="1"
-              py="1"
-              rightIcon={<ChevronDownIcon />}
-            >
-              <H6>{token?.symbol}</H6>
-            </Button>
-          )}
-
-          <Flex justifyContent="flex-end">
-            <L2 fontWeight="500" color="neutrals.400">
-              Balance: {currentBalance?.toSignificant(6) ?? 0}
-            </L2>
           </Flex>
+          <L2 fontWeight="500" color="neutrals.400">
+            Balance: {currentBalance?.toSignificant(6) ?? 0}
+          </L2>
         </Flex>
       </Flex>
 
       {showMaxButton && (
-        <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
-          <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
-          <ModalContent>
-            <ModalHeader>
-              <H5 fontWeight="600" textAlign="center">
-                Sell Max ETH?
-              </H5>
-            </ModalHeader>
-            <ModalBody>
-              <P3 fontWeight="400" textAlign="center">
-                ETH is required to pay fees so we recommend having ETH in your
-                wallet to complete transactions
-              </P3>
-            </ModalBody>
-
-            <ModalFooter flexDirection="column" gap="3">
-              <Button w="100%" colorScheme="primary" onClick={onMax}>
-                Use Max ETH
-              </Button>
-              <Button w="100%" colorScheme="neutrals" onClick={onClose}>
-                Choose different amount
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <MaxEthModal isOpen={isOpen} onClose={onClose} onMax={onMax} />
       )}
 
       <Modal
@@ -244,13 +224,30 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
               <SearchInput placeholder="Search" {...register("query")} />
               {type === "pay" ? (
                 <>
-                  {ownedTokens?.map((token) => (
-                    <OwnedToken
-                      key={token.address}
-                      token={token}
-                      amount={token.balance ?? 0}
-                    />
-                  ))}
+                  {ownedTokens
+                    ?.filter((token) =>
+                      currentQueryValue
+                        ? token.name
+                            ?.toLowerCase()
+                            .includes(currentQueryValue.toLowerCase()) ||
+                          token.symbol
+                            ?.toLowerCase()
+                            .includes(currentQueryValue.toLowerCase())
+                        : token,
+                    )
+                    .map((token) => (
+                      <OwnedToken
+                        key={token.address}
+                        token={token}
+                        amount={token.balance ?? 0}
+                        onClick={() => {
+                          onCurrencySelect(
+                            currency === ETHER ? currency : token,
+                          )
+                          onCloseTokenList()
+                        }}
+                      />
+                    ))}
                 </>
               ) : (
                 <>
@@ -269,7 +266,9 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
                       <TokenPrice
                         key={token.address}
                         onClick={() => {
-                          onCurrencySelect(token)
+                          onCurrencySelect(
+                            currency === ETHER ? currency : token,
+                          )
                           onCloseTokenList()
                         }}
                         token={token as TokenDetailsWithBalance}

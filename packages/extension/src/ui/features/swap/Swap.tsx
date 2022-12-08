@@ -1,19 +1,16 @@
-import { Button, CellStack, L2, P4, icons } from "@argent/ui"
+import { Button, CellStack, L2, icons } from "@argent/ui"
 import {
   Currency,
   CurrencyAmount,
   Field,
-  basisPointsToPercent,
   maxAmountSpend,
-  tryParseAmount,
   useDerivedSwapInfo,
   useSwapActionHandlers,
   useSwapState,
-  useTradeExactIn,
-  useUserState,
 } from "@argent/x-swap"
-import { Box, Flex, IconButton, Tooltip, chakra } from "@chakra-ui/react"
-import { useCallback } from "react"
+import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
+import { keyframes } from "@chakra-ui/react"
+import { useCallback, useState } from "react"
 
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useTokensWithBalance } from "../accountTokens/tokens.state"
@@ -21,7 +18,7 @@ import { useNetworkStatuses } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 
-const { InfoIcon, SwitchDirectionIcon } = icons
+const { SwitchDirectionIcon } = icons
 
 const SwapContainer = chakra(CellStack, {
   baseStyle: {
@@ -51,7 +48,7 @@ const SwitchDirectionButton = chakra(IconButton, {
     minWidth: "32px",
     padding: "10.25px",
     _active: {
-      transform: "translate(-50%, -50%) ",
+      transform: "translate(-50%, -50%)",
     },
   },
 })
@@ -62,7 +59,12 @@ const StyledSwitchDirectionIcon = chakra(SwitchDirectionIcon, {
   },
 })
 
-export function Swap() {
+const spin = keyframes`
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(180deg); }
+`
+
+const Swap = () => {
   const {
     currencies,
     trade,
@@ -72,6 +74,8 @@ export function Swap() {
     tradeLoading,
   } = useDerivedSwapInfo()
   console.log("🚀 ~ file: index.tsx ~ line 65 ~ Swap ~ trade", trade)
+
+  const [rotate, setRotate] = useState(false)
 
   const networkStatus = useNetworkStatuses()
   console.log("🚀 ~ file: index.tsx ~ line 6 ~ Swap ~ currencies", currencies)
@@ -153,18 +157,23 @@ export function Swap() {
             value={formattedAmounts[Field.INPUT]}
             onUserInput={handleTypeInput}
             onCurrencySelect={handleInputSelect}
-            showMaxButton={!atMaxAmountInput}
+            showMaxButton={!atMaxAmountInput && !formattedAmounts[Field.INPUT]}
             onMax={handleMaxInput}
             otherCurrency={currencies[Field.OUTPUT]}
             currentBalance={currencyBalances[Field.INPUT]}
             ownedTokens={ownedTokens}
             tradeLoading={tradeLoading}
+            insufficientBalance={!isValid && !!formattedAmounts[Field.INPUT]}
           />
           <SwitchDirectionButton
+            animation={rotate ? `${spin} 0.125s linear` : ""}
             icon={<StyledSwitchDirectionIcon />}
-            onClick={switchCurrencies}
+            onClick={() => {
+              setRotate(true)
+              setTimeout(() => setRotate(false), 150)
+              switchCurrencies()
+            }}
           />
-
           <SwapInputPanel
             type="receive"
             id="swap-input-receive-panel"
@@ -227,3 +236,5 @@ export function Swap() {
     </>
   )
 }
+
+export { Swap }

@@ -14,9 +14,10 @@ import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 interface OwnedTokenProps {
   token: TokenDetailsWithBalance
   amount: BigNumberish
+  onClick: () => void
 }
 
-const OwnedToken: FC<OwnedTokenProps> = ({ token, amount }) => {
+const OwnedToken: FC<OwnedTokenProps> = ({ amount, onClick, token }) => {
   const currencyValue = useTokenAmountToCurrencyValue(token, amount)
 
   const { name, image, symbol } = toTokenView(token)
@@ -25,6 +26,7 @@ const OwnedToken: FC<OwnedTokenProps> = ({ token, amount }) => {
 
   return (
     <TokenButton
+      onClick={onClick}
       name={name}
       image={image || ""}
       getTokenIconUrl={getTokenIconUrl}

@@ -54,6 +54,7 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
         w="100%"
         mt="4"
         p="3"
+        gap="3"
       >
         <Flex justifyContent="space-between">
           <P4 color="neutrals.300">Rate</P4>
@@ -74,7 +75,7 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
             <P4 color="neutrals.300">Min received</P4>
-            <Tooltip label="PLACEHOLDER">
+            <Tooltip label="The minimum amount of tokens you're guaranteed to receive given the slippage percentage">
               <Text color="neutrals.300" cursor="pointer">
                 <InfoIcon />
               </Text>
@@ -94,7 +95,7 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
                   Slippage {userSlippageTolerance / 100}
                 </P4>
               </Flex>
-              {showSlippageForm && <SlippageForm />}
+              {showSlippageForm && <SlippageForm closeHandler={showSlippage} />}
             </Box>
             <P4 fontWeight="bold">
               {trade
@@ -113,7 +114,7 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
               </Text>
             </Tooltip>
           </Flex>
-          <P4 fontWeight="bold">{trade.priceImpact.toSignificant(6)}</P4>
+          <P4 fontWeight="bold">{trade.priceImpact.toSignificant(6)}%</P4>
         </Flex>
         {/* 
 				TODO: Add/decide how to display fees
