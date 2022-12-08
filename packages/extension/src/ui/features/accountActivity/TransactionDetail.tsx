@@ -262,9 +262,9 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
-
   return (
     <StyledTransactionDetailWrapper
+      scrollContent={transactionTransformed.displayName || "Transaction"}
       title={
         <>
           {!isNFT && (
