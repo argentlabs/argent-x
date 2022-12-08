@@ -7,11 +7,13 @@ import { prettifyCurrencyValue } from "../../../../shared/token/price"
 import { Token } from "../../../../shared/token/type"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 
-const CurrencyValue: FC<{
+interface CurrencyValueProps {
   amount: string
   approx?: boolean
   token: WrappedTokenInfo
-}> = ({ amount, approx, token }) => {
+}
+
+const CurrencyValue: FC<CurrencyValueProps> = ({ amount, approx, token }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token as Token,
     amount ? ethers.utils.parseEther(amount) : 0,

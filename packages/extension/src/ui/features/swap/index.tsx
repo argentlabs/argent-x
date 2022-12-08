@@ -206,7 +206,13 @@ export function Swap() {
       <Box mx="4">
         <Button
           w="100%"
-          bg={isValid ? "primary.500" : "error.500"}
+          bg={
+            isValid ||
+            !formattedAmounts[Field.INPUT] ||
+            !formattedAmounts[Field.OUTPUT]
+              ? "primary.500"
+              : "error.500"
+          }
           mb="6"
           disabled={
             !formattedAmounts[Field.INPUT] ||

@@ -11,10 +11,12 @@ import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHoo
 import { toTokenView } from "../../accountTokens/tokens.service"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 
-const OwnedToken: FC<{
+interface OwnedTokenProps {
   token: TokenDetailsWithBalance
   amount: BigNumberish
-}> = ({ token, amount }) => {
+}
+
+const OwnedToken: FC<OwnedTokenProps> = ({ token, amount }) => {
   const currencyValue = useTokenAmountToCurrencyValue(token, amount)
 
   const { name, image, symbol } = toTokenView(token)

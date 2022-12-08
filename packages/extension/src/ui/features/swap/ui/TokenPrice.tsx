@@ -12,10 +12,12 @@ import {
 import { toTokenView } from "../../accountTokens/tokens.service"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 
-const TokenPrice: FC<{
+interface TokenPriceProps {
   token: TokenDetailsWithBalance
   onClick: () => void
-}> = ({ token, onClick }) => {
+}
+
+const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
     ethers.utils.parseEther("1"),
