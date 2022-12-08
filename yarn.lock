@@ -13863,9 +13863,9 @@ methods@~1.1.2:
   integrity sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==
 
 micro-starknet@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/micro-starknet/-/micro-starknet-0.1.1.tgz#1ef03a069b48bd537e9c6f3c89c31450f8503d8a"
-  integrity sha512-Nel/nXkqX7acoTUjv9VdL1360gaQvxO6rLyZXQXHpWdQvD6NvxtzV47ag3UOwwLR/jjbQ36anlKuOsUwC8529g==
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/micro-starknet/-/micro-starknet-0.1.2.tgz#e7f441893989096aee034afcd3dfa3e8d31c411d"
+  integrity sha512-zPqCXzpxuHCf3UpBJojepvAFJiQlFXHwmfldk/RoUPIdKuwEPYXoAEyxQvE8PgN7OqcgBafYV0jVQ2n+SEHGXA==
   dependencies:
     "@noble/hashes" "~1.1.1"
 
