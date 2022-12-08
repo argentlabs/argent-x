@@ -1,33 +1,35 @@
-import { CellStack, L2, icons } from "@argent/ui"
+import { Button, CellStack, L2, P4, icons } from "@argent/ui"
 import {
   Currency,
   CurrencyAmount,
   Field,
+  basisPointsToPercent,
   maxAmountSpend,
+  tryParseAmount,
   useDerivedSwapInfo,
   useSwapActionHandlers,
   useSwapState,
+  useTradeExactIn,
+  useUserState,
 } from "@argent/x-swap"
-import { IconButton, chakra } from "@chakra-ui/react"
+import { Box, Flex, IconButton, Tooltip, chakra } from "@chakra-ui/react"
 import { useCallback } from "react"
 
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useTokensWithBalance } from "../accountTokens/tokens.state"
 import { useNetworkStatuses } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
+import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 
-const { SwitchDirectionIcon } = icons
+const { InfoIcon, SwitchDirectionIcon } = icons
 
 const SwapContainer = chakra(CellStack, {
   baseStyle: {
     position: "relative",
     flexDirection: "column",
-    borderRadius: "12px",
-    boxShadow: " 0px 4px 20px rgba(0, 0, 0, 0.5)",
-    backgroundColor: "neutrals.900",
-    gap: "2px",
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
 })
 
@@ -67,6 +69,7 @@ export function Swap() {
     parsedAmount,
     currencyBalances,
     inputError: swapInputError,
+    tradeLoading,
   } = useDerivedSwapInfo()
   console.log("🚀 ~ file: index.tsx ~ line 65 ~ Swap ~ trade", trade)
 
@@ -81,8 +84,7 @@ export function Swap() {
       independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
   }
 
-  const { onSwitchTokens, onCurrencySelection, onUserInput } =
-    useSwapActionHandlers()
+  const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
 
   const isValid = !swapInputError
 
@@ -138,50 +140,84 @@ export function Swap() {
   return (
     <>
       <SwapContainer>
-        <SwapInputPanel
-          type="pay"
-          id="swap-input-pay-panel"
-          currency={currencies[Field.INPUT]}
-          value={formattedAmounts[Field.INPUT]}
-          onUserInput={handleTypeInput}
-          onCurrencySelect={handleInputSelect}
-          showMaxButton={!atMaxAmountInput}
-          onMax={handleMaxInput}
-          otherCurrency={currencies[Field.OUTPUT]}
-          currentBalance={currencyBalances[Field.INPUT]}
-          ownedTokens={ownedTokens}
-        />
-        <SwitchDirectionButton
-          icon={<StyledSwitchDirectionIcon />}
-          onClick={switchCurrencies}
-        />
+        <Flex
+          position="relative"
+          flexDirection="column"
+          gap="1"
+          borderRadius="lg"
+        >
+          <SwapInputPanel
+            type="pay"
+            id="swap-input-pay-panel"
+            currency={currencies[Field.INPUT]}
+            value={formattedAmounts[Field.INPUT]}
+            onUserInput={handleTypeInput}
+            onCurrencySelect={handleInputSelect}
+            showMaxButton={!atMaxAmountInput}
+            onMax={handleMaxInput}
+            otherCurrency={currencies[Field.OUTPUT]}
+            currentBalance={currencyBalances[Field.INPUT]}
+            ownedTokens={ownedTokens}
+            tradeLoading={tradeLoading}
+          />
+          <SwitchDirectionButton
+            icon={<StyledSwitchDirectionIcon />}
+            onClick={switchCurrencies}
+          />
 
-        <SwapInputPanel
-          type="receive"
-          id="swap-input-receive-panel"
-          currency={currencies[Field.OUTPUT]}
-          value={formattedAmounts[Field.OUTPUT]}
-          onUserInput={handleTypeOutput}
-          onCurrencySelect={handleOutputSelect}
-          otherCurrency={currencies[Field.INPUT]}
-          currentBalance={currencyBalances[Field.OUTPUT]}
-        />
+          <SwapInputPanel
+            type="receive"
+            id="swap-input-receive-panel"
+            currency={currencies[Field.OUTPUT]}
+            value={formattedAmounts[Field.OUTPUT]}
+            onUserInput={handleTypeOutput}
+            onCurrencySelect={handleOutputSelect}
+            otherCurrency={currencies[Field.INPUT]}
+            currentBalance={currencyBalances[Field.OUTPUT]}
+            tradeLoading={tradeLoading}
+          />
+        </Flex>
+
+        {trade && (
+          <SwapPricesInfo
+            currencyIn={currencies[Field.INPUT]}
+            currencyOut={currencies[Field.OUTPUT]}
+            trade={trade}
+          />
+        )}
+
+        <L2
+          textAlign="center"
+          mt="4"
+          as={"a"}
+          rounded={"lg"}
+          color={"neutrals.500"}
+          href="https://jediswap.xyz/"
+          title="Jediswap"
+          target="_blank"
+          _hover={{
+            textDecoration: "underline",
+          }}
+        >
+          Powered by Jediswap
+        </L2>
       </SwapContainer>
-      <L2
-        textAlign="center"
-        mt="4"
-        as={"a"}
-        rounded={"lg"}
-        color={"neutrals.500"}
-        href="https://jediswap.xyz/"
-        title="Jediswap"
-        target="_blank"
-        _hover={{
-          textDecoration: "underline",
-        }}
-      >
-        Powered by Jediswap
-      </L2>
+      <Flex flex={1} />
+      <Box mx="4">
+        <Button
+          w="100%"
+          bg={isValid ? "primary.500" : "error.500"}
+          mb="6"
+          disabled={
+            !formattedAmounts[Field.INPUT] ||
+            !formattedAmounts[Field.OUTPUT] ||
+            !isValid
+          }
+        >
+          {!swapInputError && <>Review swap</>}
+          {!!swapInputError && <>{swapInputError}</>}
+        </Button>
+      </Box>
     </>
   )
 }

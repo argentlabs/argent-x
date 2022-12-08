@@ -3,9 +3,10 @@ import { number, uint256 } from "starknet"
 import { CurrencyAmount, ETHER, JSBI, Percent } from "../../sdk"
 import { validateAndParseAddress } from "../../sdk/utils"
 import { MIN_ETH } from "../constants"
+import { tryParseAmount } from "./parseAmount"
 import { wrappedCurrency } from "./wrappedCurrency"
 
-export { wrappedCurrency }
+export { tryParseAmount, wrappedCurrency }
 
 // converts a basis points value to a sdk percent
 export function basisPointsToPercent(num: number): Percent {

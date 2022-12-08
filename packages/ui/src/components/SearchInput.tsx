@@ -14,7 +14,7 @@ const SearchInput = forwardRef<HTMLInputElement, InputElementProps>(
           left="3"
           transform="translateY(-50%)"
           fontSize="base"
-          zIndex={1}
+          zIndex={10}
         >
           <SearchIcon />
         </Text>
@@ -24,7 +24,7 @@ const SearchInput = forwardRef<HTMLInputElement, InputElementProps>(
           {...props}
           autoFocus
           ref={ref}
-          pl="6"
+          pl="8"
         />
       </Box>
     )

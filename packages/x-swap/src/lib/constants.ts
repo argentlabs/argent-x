@@ -1,7 +1,7 @@
 import { JSBI, SupportedNetworks, Token, WETH } from "../sdk"
 
 // default allowed slippage, in bips
-export const INITIAL_ALLOWED_SLIPPAGE = 50
+export const INITIAL_ALLOWED_SLIPPAGE = 200
 
 // a list of tokens by chain
 type ChainTokenList = {
