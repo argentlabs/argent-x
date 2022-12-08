@@ -6,7 +6,6 @@ import {
   Input,
   L2,
   LoadingPulse,
-  P3,
   P4,
   SearchInput,
   icons,
@@ -27,9 +26,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
-  ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react"
 import { FC, useCallback, useMemo } from "react"
