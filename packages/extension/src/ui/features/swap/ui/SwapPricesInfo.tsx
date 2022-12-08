@@ -7,7 +7,7 @@ import {
   useTradeExactIn,
   useUserState,
 } from "@argent/x-swap"
-import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
+import { Box, Flex, Skeleton, Text, Tooltip } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 
 import { SlippageForm } from "./SlippageForm"
@@ -58,19 +58,31 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
       >
         <Flex justifyContent="space-between">
           <P4 color="neutrals.300">Rate</P4>
-          <P4
-            fontWeight="bold"
-            cursor="pointer"
-            _hover={{ color: "accent.500" }}
-            onClick={switchRate}
+          <Skeleton
+            minW="30px"
+            isLoaded={
+              (isTokenIn && !loadingRateTokenInputTokenOutput) ||
+              (!isTokenIn && !loadingRateTokenOutputTokenInput)
+            }
           >
-            1 ≈{" "}
-            {isTokenIn ? (
-              <>{rateTokenInputTokenOutput?.executionPrice.toSignificant(6)} </>
-            ) : (
-              <>{rateTokenOutputTokenInput?.executionPrice.toSignificant(6)}</>
-            )}
-          </P4>
+            <P4
+              fontWeight="bold"
+              cursor="pointer"
+              _hover={{ color: "accent.500" }}
+              onClick={switchRate}
+            >
+              1 ≈{" "}
+              {isTokenIn ? (
+                <>
+                  {rateTokenInputTokenOutput?.executionPrice.toSignificant(6)}{" "}
+                </>
+              ) : (
+                <>
+                  {rateTokenOutputTokenInput?.executionPrice.toSignificant(6)}
+                </>
+              )}
+            </P4>
+          </Skeleton>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">

@@ -77,7 +77,6 @@ const Swap = () => {
 
   const [rotate, setRotate] = useState(false)
 
-  const networkStatus = useNetworkStatuses()
   console.log("🚀 ~ file: index.tsx ~ line 6 ~ Swap ~ currencies", currencies)
   const { independentField, typedValue, switchCurrencies } = useSwapState()
 
