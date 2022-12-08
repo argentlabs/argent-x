@@ -4271,7 +4271,7 @@
     is-module "^1.0.0"
     resolve "^1.22.1"
 
-"@rollup/pluginutils@^5.0.1":
+"@rollup/pluginutils@^5.0.1", "@rollup/pluginutils@^5.0.2":
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-5.0.2.tgz#012b8f53c71e4f6f9cb317e311df1404f56e7a33"
   integrity sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==
@@ -18400,11 +18400,12 @@ vi-fetch@^0.8.0:
     tinyspy "^1.0.0"
 
 vite-plugin-dts@^1.4.1, vite-plugin-dts@^1.6.6:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-dts/-/vite-plugin-dts-1.7.0.tgz#9dc8b98d23a9038d0ccde3473fa884ed64cbf04a"
-  integrity sha512-SG1JRPFrrw8bseWXvKQJwcaZIoOcCsQjJub1h8hfywegdxJTT3hBDoKQyzT6Wi8wiTH3GidDWC2wxqiUS3gy5g==
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/vite-plugin-dts/-/vite-plugin-dts-1.7.1.tgz#7090237333a023a78bbcf7ce8e042531422f233a"
+  integrity sha512-2oGMnAjcrZN7jM1TloiS1b1mCn42s3El04ix2RFhId5P1WfMigF8WAwsqT6a6jk0Yso8t7AeZsBkkxYShR0hBQ==
   dependencies:
     "@microsoft/api-extractor" "^7.33.5"
+    "@rollup/pluginutils" "^5.0.2"
     "@rushstack/node-core-library" "^3.53.2"
     debug "^4.3.4"
     fast-glob "^3.2.12"
