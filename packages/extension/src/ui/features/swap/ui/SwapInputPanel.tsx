@@ -1,15 +1,4 @@
-import {
-  Button,
-  CellStack,
-  H5,
-  H6,
-  Input,
-  L2,
-  LoadingPulse,
-  P4,
-  SearchInput,
-  icons,
-} from "@argent/ui"
+import { Button, H6, Input, L2, LoadingPulse, P4, icons } from "@argent/ui"
 import {
   Currency,
   CurrencyAmount,
@@ -20,25 +9,16 @@ import {
   useSwapProvider,
   wrappedCurrency,
 } from "@argent/x-swap"
-import {
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  useDisclosure,
-} from "@chakra-ui/react"
-import { FC, useCallback, useMemo } from "react"
-import { useForm } from "react-hook-form"
+import { Flex, useDisclosure } from "@chakra-ui/react"
+import { debounce } from "lodash-es"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 
 import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedNumericInputValue"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 import { CurrencyValue } from "./CurrencyValue"
 import { MaxEthModal } from "./MaxEthModal"
-import { OwnedToken } from "./OwnedToken"
-import { TokenPrice } from "./TokenPrice"
+import { SwapTokensModal } from "./SwapTokensModal"
 
 const { ChevronDownIcon } = icons
 
@@ -73,18 +53,20 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
   tradeLoading,
   insufficientBalance,
 }) => {
-  const { register, watch } = useForm({
-    defaultValues: { query: "" },
-  })
-  const currentQueryValue = watch("query")
   const { networkId } = useSwapProvider()
   const allTokens = useAllTokens()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isOpenEthModal,
+    onOpen: onOpenEthModal,
+    onClose: onCloseEthModal,
+  } = useDisclosure()
   const {
     isOpen: isTokenListOpen,
     onOpen: onOpenTokenList,
     onClose: onCloseTokenList,
   } = useDisclosure()
+
+  const [inputValue, setInputValue] = useState("")
 
   const token = useMemo(() => {
     const wrapped = wrappedCurrency(currency, networkId)
@@ -99,17 +81,36 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
     const copy = { ...allTokens }
     if (wrapped) {
       delete copy[wrapped.address]
-      return copy
+      return Object.values(copy)
     }
 
-    return allTokens
+    return Object.values(allTokens)
   }, [allTokens, networkId, otherCurrency])
 
   const onMaxCheck = useCallback(() => {
     if (currency === ETHER) {
-      onOpen()
+      onOpenEthModal()
     }
-  }, [currency, onOpen])
+  }, [currency, onOpenEthModal])
+
+  // eslint-disable-next-line
+  const delayedOnChange = useCallback(
+    debounce((value: string) => {
+      if (isAllowedNumericInputValue(value)) {
+        onUserInput(value)
+      }
+    }, 500),
+    [],
+  )
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value)
+    delayedOnChange(e.target.value)
+  }
+
+  useEffect(() => {
+    setInputValue(value)
+  }, [value])
 
   return (
     <>
@@ -138,12 +139,8 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
               fontSize="24px"
               fontWeight="600"
               lineHeight="26px"
-              value={value}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                if (isAllowedNumericInputValue(e.target.value)) {
-                  onUserInput(e.target.value)
-                }
-              }}
+              value={inputValue}
+              onChange={onChange}
             />
           </LoadingPulse>
 
@@ -200,78 +197,20 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
       </Flex>
 
       {showMaxButton && (
-        <MaxEthModal isOpen={isOpen} onClose={onClose} onMax={onMax} />
+        <MaxEthModal
+          isOpen={isOpenEthModal}
+          onClose={onCloseEthModal}
+          onMax={onMax}
+        />
       )}
 
-      <Modal isOpen={isTokenListOpen} onClose={onCloseTokenList} size="full">
-        <ModalContent bg="neutrals.900">
-          <ModalHeader>
-            <H5 fontWeight="600" textAlign="center">
-              {type === "pay" ? "Pay with" : "Receive "}
-            </H5>
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody flexDirection="column">
-            <CellStack px="0" gap={3}>
-              <SearchInput placeholder="Search" {...register("query")} />
-              {type === "pay" ? (
-                <>
-                  {ownedTokens
-                    ?.filter((token) =>
-                      currentQueryValue
-                        ? token.name
-                            ?.toLowerCase()
-                            .includes(currentQueryValue.toLowerCase()) ||
-                          token.symbol
-                            ?.toLowerCase()
-                            .includes(currentQueryValue.toLowerCase())
-                        : token,
-                    )
-                    .map((token) => (
-                      <OwnedToken
-                        key={token.address}
-                        token={token}
-                        amount={token.balance ?? 0}
-                        onClick={() => {
-                          onCurrencySelect(
-                            currency === ETHER ? currency : token,
-                          )
-                          onCloseTokenList()
-                        }}
-                      />
-                    ))}
-                </>
-              ) : (
-                <>
-                  {Object.values(availableBuyTokens)
-                    ?.filter((token) =>
-                      currentQueryValue
-                        ? token.name
-                            ?.toLowerCase()
-                            .includes(currentQueryValue.toLowerCase()) ||
-                          token.symbol
-                            ?.toLowerCase()
-                            .includes(currentQueryValue.toLowerCase())
-                        : token,
-                    )
-                    .map((token) => (
-                      <TokenPrice
-                        key={token.address}
-                        onClick={() => {
-                          onCurrencySelect(
-                            currency === ETHER ? currency : token,
-                          )
-                          onCloseTokenList()
-                        }}
-                        token={token as TokenDetailsWithBalance}
-                      />
-                    ))}
-                </>
-              )}
-            </CellStack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <SwapTokensModal
+        isOpen={isTokenListOpen}
+        onClose={onCloseTokenList}
+        isPay={type === "pay"}
+        tokens={type === "pay" ? ownedTokens : availableBuyTokens}
+        onCurrencySelect={onCurrencySelect}
+      />
     </>
   )
 }

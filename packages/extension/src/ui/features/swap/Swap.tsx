@@ -6,7 +6,6 @@ import {
   maxAmountSpend,
   useDerivedSwapInfo,
   useSwapActionHandlers,
-  useSwapProvider,
   useSwapState,
 } from "@argent/x-swap"
 import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
@@ -75,10 +74,8 @@ const Swap = () => {
   } = useDerivedSwapInfo()
 
   const account = useSelectedAccount()
-  const { networkId } = useSwapProvider()
   const { tokenDetails: ownedTokens } = useTokensWithBalance(account)
-  const { independentField, typedValue, switchCurrencies } =
-    useSwapState(networkId)
+  const { independentField, typedValue, switchCurrencies } = useSwapState()
   const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const [rotate, setRotate] = useState(false)
 

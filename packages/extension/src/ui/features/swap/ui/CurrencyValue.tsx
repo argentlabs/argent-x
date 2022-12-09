@@ -16,7 +16,7 @@ interface CurrencyValueProps {
 const CurrencyValue: FC<CurrencyValueProps> = ({ amount, approx, token }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token as Token,
-    amount ? ethers.utils.parseEther(amount) : 0,
+    amount ? ethers.utils.parseUnits(amount, token.decimals) : 0,
   )
 
   return (
