@@ -203,12 +203,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         <MaxEthModal isOpen={isOpen} onClose={onClose} onMax={onMax} />
       )}
 
-      <Modal
-        isOpen={isTokenListOpen}
-        onClose={onCloseTokenList}
-        isCentered
-        size="full"
-      >
+      <Modal isOpen={isTokenListOpen} onClose={onCloseTokenList} size="full">
         <ModalContent bg="neutrals.900">
           <ModalHeader>
             <H5 fontWeight="600" textAlign="center">

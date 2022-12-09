@@ -20,7 +20,7 @@ interface TokenPriceProps {
 const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
-    ethers.utils.parseEther("1"),
+    ethers.utils.parseUnits("1", token.decimals),
   )
 
   const priceDetails = useTokenPriceDetails(token)

@@ -6,6 +6,7 @@ import {
   maxAmountSpend,
   useDerivedSwapInfo,
   useSwapActionHandlers,
+  useSwapProvider,
   useSwapState,
 } from "@argent/x-swap"
 import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
@@ -14,7 +15,6 @@ import { useCallback, useState } from "react"
 
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useTokensWithBalance } from "../accountTokens/tokens.state"
-import { useNetworkStatuses } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 
@@ -43,7 +43,7 @@ const SwitchDirectionButton = chakra(IconButton, {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    zIndex: 2,
+    zIndex: 1,
     minHeight: "32px",
     minWidth: "32px",
     padding: "10.25px",
@@ -73,12 +73,14 @@ const Swap = () => {
     inputError: swapInputError,
     tradeLoading,
   } = useDerivedSwapInfo()
-  console.log("🚀 ~ file: index.tsx ~ line 65 ~ Swap ~ trade", trade)
 
+  const account = useSelectedAccount()
+  const { networkId } = useSwapProvider()
+  const { tokenDetails: ownedTokens } = useTokensWithBalance(account)
+  const { independentField, typedValue, switchCurrencies } =
+    useSwapState(networkId)
+  const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const [rotate, setRotate] = useState(false)
-
-  console.log("🚀 ~ file: index.tsx ~ line 6 ~ Swap ~ currencies", currencies)
-  const { independentField, typedValue, switchCurrencies } = useSwapState()
 
   const parsedAmounts = {
     [Field.INPUT]:
@@ -86,8 +88,6 @@ const Swap = () => {
     [Field.OUTPUT]:
       independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
   }
-
-  const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
 
   const isValid = !swapInputError
 
@@ -137,8 +137,6 @@ const Swap = () => {
       onCurrencySelection(Field.OUTPUT, outputCurrency),
     [onCurrencySelection],
   )
-  const account = useSelectedAccount()
-  const { tokenDetails: ownedTokens } = useTokensWithBalance(account)
 
   return (
     <>

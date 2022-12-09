@@ -22,6 +22,7 @@ export function useDerivedSwapInfo(): {
 } {
   const { selectedAccount: account } = useSwapProvider()
 
+  const { networkId } = useSwapProvider()
   const connectedAddress = account?.address
 
   const {
@@ -29,7 +30,7 @@ export function useDerivedSwapInfo(): {
     typedValue,
     [Field.INPUT]: { currencyId: inputCurrencyId },
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
-  } = useSwapState()
+  } = useSwapState(networkId)
 
   const inputCurrency = useCurrency(inputCurrencyId)
   const outputCurrency = useCurrency(outputCurrencyId)
@@ -110,6 +111,7 @@ export function useDerivedSwapInfo(): {
     parsedAmount,
     trade: trade ?? undefined,
     inputError,
+    /* TODO: ask always */
     tradeLoading: isExactIn ? bestTradeInLoading : bestTradeOutLoading,
   }
 }
@@ -119,7 +121,9 @@ export function useSwapActionHandlers(): {
   onSwitchTokens: () => void
   onUserInput: (field: Field, typedValue: string) => void
 } {
-  const { selectCurrency, switchCurrencies, typeInput } = useSwapState()
+  const { networkId } = useSwapProvider()
+  const { selectCurrency, switchCurrencies, typeInput } =
+    useSwapState(networkId)
 
   const onCurrencySelection = useCallback(
     (field: Field, currency: Currency) => {

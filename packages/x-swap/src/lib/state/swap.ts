@@ -1,5 +1,8 @@
 import create from "zustand"
 
+import { USDC } from "../../lib/constants"
+import { DEFAULT_NETWORK_ID, SupportedNetworks } from "../../sdk/constants"
+
 export enum Field {
   INPUT = "INPUT",
   OUTPUT = "OUTPUT",
@@ -39,7 +42,7 @@ type ReplaceSwapState = {
   outputCurrencyId?: string
 }
 
-const initialState = {
+const initialState = (networkId: SupportedNetworks) => ({
   independentField: Field.INPUT,
   typedValue: "",
   [Field.INPUT]: {
@@ -47,71 +50,73 @@ const initialState = {
   },
   [Field.OUTPUT]: {
     currencyId:
-      // TODO: dynamic
-      "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3", // dai mainnet
-    // "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9", // DAI // testnet
-    //"0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426", // USDC // testnet
+      networkId === SupportedNetworks.MAINNET
+        ? USDC[SupportedNetworks.MAINNET].address
+        : USDC[SupportedNetworks.TESTNET].address,
   },
-}
+})
 
-export const useSwapState = create<SwapState>()((set) => ({
-  ...initialState,
+export const useSwapState = (networkId: SupportedNetworks | undefined) => {
+  return create<SwapState>()((set) => ({
+    ...initialState(networkId || DEFAULT_NETWORK_ID),
 
-  // Select Currency
-  selectCurrency: ({ field, currencyId }: SelectCurrency) =>
-    set((state) => {
-      const otherField = field === Field.INPUT ? Field.OUTPUT : Field.INPUT
-      if (currencyId === state[otherField].currencyId) {
-        // the case where we have to swap the order
-        return {
-          ...state,
-          independentField:
-            state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
-          [field]: { currencyId: currencyId },
-          [otherField]: { currencyId: state[field].currencyId },
+    // Select Currency
+    selectCurrency: ({ field, currencyId }: SelectCurrency) =>
+      set((state) => {
+        const otherField = field === Field.INPUT ? Field.OUTPUT : Field.INPUT
+        if (currencyId === state[otherField].currencyId) {
+          // the case where we have to swap the order
+          return {
+            ...state,
+            independentField:
+              state.independentField === Field.INPUT
+                ? Field.OUTPUT
+                : Field.INPUT,
+            [field]: { currencyId: currencyId },
+            [otherField]: { currencyId: state[field].currencyId },
+          }
+        } else {
+          // the normal case
+          return {
+            ...state,
+            [field]: { currencyId: currencyId },
+          }
         }
-      } else {
-        // the normal case
-        return {
-          ...state,
-          [field]: { currencyId: currencyId },
-        }
-      }
-    }),
+      }),
 
-  // Switch Currencies
-  switchCurrencies: () =>
-    set((state) => ({
-      ...state,
-      independentField:
-        state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
-      [Field.INPUT]: { currencyId: state[Field.OUTPUT].currencyId },
-      [Field.OUTPUT]: { currencyId: state[Field.INPUT].currencyId },
-    })),
-
-  // typeInput
-  typeInput: ({ field, typedValue }: TypeInput) =>
-    set((state) => {
-      return {
+    // Switch Currencies
+    switchCurrencies: () =>
+      set((state) => ({
         ...state,
+        independentField:
+          state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
+        [Field.INPUT]: { currencyId: state[Field.OUTPUT].currencyId },
+        [Field.OUTPUT]: { currencyId: state[Field.INPUT].currencyId },
+      })),
+
+    // typeInput
+    typeInput: ({ field, typedValue }: TypeInput) =>
+      set((state) => {
+        return {
+          ...state,
+          independentField: field,
+          typedValue,
+        }
+      }),
+
+    // replaceSwapState
+    replaceSwapState: ({
+      field,
+      typedValue,
+      inputCurrencyId,
+      outputCurrencyId,
+    }: ReplaceSwapState) =>
+      set(() => ({
         independentField: field,
         typedValue,
-      }
-    }),
-
-  // replaceSwapState
-  replaceSwapState: ({
-    field,
-    typedValue,
-    inputCurrencyId,
-    outputCurrencyId,
-  }: ReplaceSwapState) =>
-    set(() => ({
-      independentField: field,
-      typedValue,
-      [Field.INPUT]: { currencyId: inputCurrencyId },
-      [Field.OUTPUT]: { currencyId: outputCurrencyId },
-    })),
-}))
-
+        [Field.INPUT]: { currencyId: inputCurrencyId },
+        [Field.OUTPUT]: { currencyId: outputCurrencyId },
+      })),
+  }))()
+}
 export default useSwapState
