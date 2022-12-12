@@ -19,6 +19,7 @@ import { useTokensWithBalance } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
+import { SwapWarning } from "./ui/SwapWarning"
 
 const { SwitchDirectionIcon } = icons
 
@@ -246,6 +247,7 @@ const Swap = () => {
           {!!swapInputError && <>{swapInputError}</>}
         </Button>
       </Box>
+      <SwapWarning />
     </>
   )
 }
