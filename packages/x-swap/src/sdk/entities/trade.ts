@@ -1,7 +1,15 @@
+import JSBI from "jsbi"
 import invariant from "tiny-invariant"
 
 import { InsufficientInputAmountError } from "./../errors"
-import { ONE, SupportedNetworks, TradeType, ZERO } from "../constants"
+import {
+  ONE,
+  SupportedNetworks,
+  TradeType,
+  ZERO,
+  _1000,
+  _997,
+} from "../constants"
 import { InsufficientReservesError } from "../errors"
 import { sortedInsert } from "../utils"
 import { Currency, ETHER } from "./currency"
@@ -151,6 +159,10 @@ export class Trade {
    */
   public readonly executionPrice: Price
   /**
+   * The price expressed in terms of output amount/(input amount - 0.3% fee).
+   */
+  public readonly executionPriceWithFee: Price
+  /**
    * The mid price after the trade executes assuming no slippage.
    */
   public readonly nextMidPrice: Price
@@ -224,6 +236,14 @@ export class Trade {
       this.inputAmount.raw,
       this.outputAmount.raw,
     )
+
+    this.executionPriceWithFee = new Price(
+      this.inputAmount.currency,
+      this.outputAmount.currency,
+      JSBI.multiply(this.inputAmount.raw, _997),
+      JSBI.multiply(this.outputAmount.raw, _1000),
+    )
+
     this.nextMidPrice = Price.fromRoute(new Route(nextPairs, route.input))
     this.priceImpact = computePriceImpact(
       route.midPrice,

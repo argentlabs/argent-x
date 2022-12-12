@@ -1,7 +1,8 @@
-import { JSBI, SupportedNetworks, Token, WETH } from "../sdk"
+import { JSBI, Percent, SupportedNetworks, Token, WETH } from "../sdk"
 
 // default allowed slippage, in bips
 export const INITIAL_ALLOWED_SLIPPAGE = 200
+export const ONE_BIPS = new Percent(JSBI.BigInt(1), JSBI.BigInt(10000))
 
 // a list of tokens by chain
 type ChainTokenList = {

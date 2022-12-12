@@ -1,13 +1,14 @@
 import { P4, icons } from "@argent/ui"
 import {
   Currency,
+  ONE_BIPS,
   Trade,
   basisPointsToPercent,
-  tryParseAmount,
-  useTradeExactIn,
+  computeTradePriceBreakdown,
+  formatExecutionPriceWithFee,
   useUserState,
 } from "@argent/x-swap"
-import { Box, Flex, Skeleton, Text, Tooltip } from "@chakra-ui/react"
+import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 
 import { SlippageForm } from "./SlippageForm"
@@ -20,24 +21,16 @@ interface SwapPricesInfoProps {
   trade: Trade
 }
 
-const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
-  currencyIn,
-  currencyOut,
-  trade,
-}) => {
-  const [isTokenIn, setIsTokenIn] = useState(true)
+const SwapPricesInfo: FC<SwapPricesInfoProps> = ({ currencyOut, trade }) => {
+  const [inverted, setInverted] = useState(false)
   const [showSlippageForm, setShowSlippageForm] = useState(false)
   const { userSlippageTolerance } = useUserState()
-
-  const [rateTokenInputTokenOutput, loadingRateTokenInputTokenOutput] =
-    useTradeExactIn(tryParseAmount("1", currencyIn), currencyOut)
-
-  const [rateTokenOutputTokenInput, loadingRateTokenOutputTokenInput] =
-    useTradeExactIn(tryParseAmount("1", currencyOut), currencyIn)
+  const { priceImpactWithoutFee: priceImpact } =
+    computeTradePriceBreakdown(trade)
 
   const switchRate = useCallback(() => {
-    setIsTokenIn(!isTokenIn)
-  }, [isTokenIn])
+    setInverted(!inverted)
+  }, [inverted])
 
   const showSlippage = useCallback(() => {
     setShowSlippageForm(!showSlippageForm)
@@ -57,32 +50,22 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
         gap="3"
       >
         <Flex justifyContent="space-between">
-          <P4 color="neutrals.300">Rate</P4>
-          <Skeleton
-            minW="30px"
-            isLoaded={
-              (isTokenIn && !loadingRateTokenInputTokenOutput) ||
-              (!isTokenIn && !loadingRateTokenOutputTokenInput)
-            }
+          <Flex alignItems="center" gap="1">
+            <P4 color="neutrals.300">Rate</P4>
+            <Tooltip label="Includes Jediswap's 0.3% protocol fee">
+              <Text color="neutrals.300" cursor="pointer">
+                <InfoIcon />
+              </Text>
+            </Tooltip>
+          </Flex>
+          <P4
+            fontWeight="bold"
+            cursor="pointer"
+            _hover={{ color: "accent.500" }}
+            onClick={switchRate}
           >
-            <P4
-              fontWeight="bold"
-              cursor="pointer"
-              _hover={{ color: "accent.500" }}
-              onClick={switchRate}
-            >
-              1 ≈{" "}
-              {isTokenIn ? (
-                <>
-                  {rateTokenInputTokenOutput?.executionPrice.toSignificant(6)}{" "}
-                </>
-              ) : (
-                <>
-                  {rateTokenOutputTokenInput?.executionPrice.toSignificant(6)}
-                </>
-              )}
-            </P4>
-          </Skeleton>
+            {formatExecutionPriceWithFee(trade, inverted, "≈")}
+          </P4>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
@@ -103,8 +86,8 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
                 onClick={showSlippage}
               >
                 <SettingsIcon />
-                <P4 fontWeight="bold">
-                  Slippage {userSlippageTolerance / 100}
+                <P4 fontWeight="500" color="neutrals.300">
+                  Slippage {userSlippageTolerance / 100}%
                 </P4>
               </Flex>
               {showSlippageForm && <SlippageForm closeHandler={showSlippage} />}
@@ -126,15 +109,26 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
               </Text>
             </Tooltip>
           </Flex>
-          <P4 fontWeight="bold">{trade.priceImpact.toSignificant(6)}%</P4>
+          <P4 fontWeight="bold">
+            {priceImpact
+              ? priceImpact.lessThan(ONE_BIPS)
+                ? "<0.01%"
+                : `${priceImpact.toFixed(2)}%`
+              : "-"}
+          </P4>
         </Flex>
-        {/* 
-				TODO: Add/decide how to display fees
-				<Flex justifyContent="space-between">
-					<P4 color="neutrals.300">Estimated fees</P4>
-					<P4 fontWeight="bold">TODO</P4>
-				</Flex> 
-			*/}
+        {/** Keeping this here, might be useful in future. }
+         <Flex justifyContent="space-between">
+          <Flex alignItems="center" gap="1">
+            <P4 color="neutrals.300">Estimated Fees</P4>
+            <Tooltip label="A portion of each trade (0.30%) goes to JediSwap liquidity providers as a protocol incentive">
+              <Text color="neutrals.300" cursor="pointer">
+                <InfoIcon />
+              </Text>
+            </Tooltip>
+          </Flex>
+          <P4 fontWeight="bold">TODO</P4>
+        </Flex> */}
       </Flex>
     </>
   )
