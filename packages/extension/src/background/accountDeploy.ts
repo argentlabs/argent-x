@@ -19,7 +19,7 @@ export const deployAccountAction = async ({
 
 export const isAccountDeployed = async (
   account: WalletAccount,
-  getClassAt: (address: string) => Promise<unknown>,
+  getClassAt: (address: string, blockIdentifier?: unknown) => Promise<unknown>,
 ) => {
   if (!account.needsDeploy) {
     return true
