@@ -96,5 +96,5 @@ export const isHiddenAccount = (account: Account) => !!account.hidden
 // Use selected account from Wallet Store
 export const useSelectedAccount = () => {
   const baseWalletAccount = useKeyValueStorage(walletStore, "selected")
-  return useAccount(baseWalletAccount)
+  return useAccount(baseWalletAccount ?? undefined)
 }

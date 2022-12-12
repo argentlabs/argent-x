@@ -3,7 +3,7 @@ import { BaseWalletAccount } from "../wallet.model"
 
 export interface WalletStorageProps {
   backup?: string
-  selected?: BaseWalletAccount
+  selected?: BaseWalletAccount | null
   discoveredOnce?: boolean
 }
 

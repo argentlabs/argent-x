@@ -74,7 +74,7 @@ export interface WalletSession {
 
 export interface WalletStorageProps {
   backup?: string
-  selected?: BaseWalletAccount
+  selected?: BaseWalletAccount | null
   discoveredOnce?: boolean
 }
 /*
@@ -709,7 +709,7 @@ export class Wallet {
 
   public async selectAccount(accountIdentifier?: BaseWalletAccount) {
     if (!accountIdentifier) {
-      await this.store.set("selected", undefined)
+      await this.store.set("selected", null) // Set null instead of undefinded
       return
     }
 

@@ -21,11 +21,11 @@ import { Transaction } from "../../../../shared/transactions"
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { isEqualAddress } from "../../../services/addresses"
+import { selectAccount } from "../../../services/backgroundAccounts"
 import {
   deployContract,
   fetchConstructorParams,
 } from "../../../services/udc.service"
-import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { ClassHashInputActions } from "./ClassHashInputActions"
 import { DeploySmartContractParameters } from "./DeploySmartContractParameters"
 import { useLastDeclaredContracts } from "./udc.state"
@@ -101,9 +101,8 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         isEqualAddress(act.address, account) && act.networkId === network,
     )
     useAppState.setState({ switcherNetworkId: network })
-    useSelectedAccountStore.setState({
-      selectedAccount,
-    })
+
+    await selectAccount(selectedAccount)
 
     const constructorCalldata = parameters.flatMap<string>((param, i) => {
       try {
