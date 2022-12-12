@@ -109,7 +109,7 @@ export function useTradeExactIn(
       }
       return null
     }, [allowedPairs, currencyAmountIn, currencyOut]),
-    pairLoading || allowedPairs.length === 0,
+    pairLoading,
   ]
 }
 
@@ -137,6 +137,6 @@ export function useTradeExactOut(
       }
       return null
     }, [allowedPairs, currencyIn, currencyAmountOut]),
-    pairLoading || allowedPairs.length === 0,
+    pairLoading,
   ]
 }
