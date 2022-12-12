@@ -1,10 +1,12 @@
+import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
 import { FC, useCallback, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { AccountAddress, AccountName } from "../../components/Address"
 import { CopyIconButton } from "../../components/CopyIconButton"
-import { IconBar } from "../../components/IconBar"
 import { PageWrapper } from "../../components/Page"
+import { routes } from "../../routes"
 import { formatFullAddress, normalizeAddress } from "../../services/addresses"
 import { usePageTracking } from "../../services/analytics"
 import {
@@ -25,6 +27,7 @@ const StyledCopyIconButton = styled(CopyIconButton)`
 `
 
 export const FundingQrCodeScreen: FC = () => {
+  const navigate = useNavigate()
   const addressRef = useRef<HTMLParagraphElement | null>(null)
   const account = useSelectedAccount()
   usePageTracking("addFundsFromOtherAccount", {
@@ -69,8 +72,12 @@ export const FundingQrCodeScreen: FC = () => {
   )
 
   return (
-    <>
-      <IconBar back close />
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
+    >
       <PageWrapper>
         {account && (
           <Container>
@@ -88,6 +95,6 @@ export const FundingQrCodeScreen: FC = () => {
           </Container>
         )}
       </PageWrapper>
-    </>
+    </NavigationContainer>
   )
 }

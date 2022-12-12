@@ -7,11 +7,11 @@ import { getNetworkStatuses } from "./networkStatus"
 export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
   msg,
   background: { actionQueue },
-  sendToTabAndUi,
+  respond,
 }) => {
   switch (msg.type) {
     case "GET_NETWORKS": {
-      return sendToTabAndUi({
+      return respond({
         type: "GET_NETWORKS_RES",
         data: await getNetworks(),
       })
@@ -26,7 +26,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         throw new Error(`Network with id ${msg.data} not found`)
       }
 
-      return sendToTabAndUi({
+      return respond({
         type: "GET_NETWORK_RES",
         data: network,
       })
@@ -35,7 +35,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
     case "GET_NETWORK_STATUSES": {
       const networks = msg.data?.length ? msg.data : await getNetworks()
       const statuses = await getNetworkStatuses(networks)
-      return sendToTabAndUi({
+      return respond({
         type: "GET_NETWORK_STATUSES_RES",
         data: statuses,
       })
@@ -45,7 +45,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
       const exists = await getNetwork(msg.data.chainId)
 
       if (exists) {
-        return sendToTabAndUi({
+        return respond({
           type: "REQUEST_ADD_CUSTOM_NETWORK_REJ",
           data: {
             error: `Network with chainId ${msg.data.chainId} already exists`,
@@ -58,7 +58,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         payload: msg.data,
       })
 
-      return sendToTabAndUi({
+      return respond({
         type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
         data: {
           actionHash: meta.hash,
@@ -70,7 +70,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
       const network = await getNetworkByChainId(msg.data.chainId)
 
       if (!network) {
-        return sendToTabAndUi({
+        return respond({
           type: "REQUEST_SWITCH_CUSTOM_NETWORK_REJ",
           data: {
             error: `Network with chainId ${msg.data.chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
@@ -83,7 +83,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         payload: network,
       })
 
-      return sendToTabAndUi({
+      return respond({
         type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
         data: {
           actionHash: meta.hash,

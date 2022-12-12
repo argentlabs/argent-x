@@ -1,7 +1,6 @@
 import { chakra } from "@chakra-ui/system"
 import { FC } from "react"
 import { Outlet, Route, Routes } from "react-router-dom"
-import styled from "styled-components"
 
 import { useAppState } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
@@ -52,7 +51,7 @@ import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettin
 import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { DeveloperSettings } from "./features/settings/DeveloperSettings"
-import { DeclareContractClasshash } from "./features/settings/DeveloperSettings/DeclareContractClasshash"
+import { DeclareOrDeployContractSuccess } from "./features/settings/DeveloperSettings/DeclareContractClasshash"
 import { DeclareSmartContractScreen } from "./features/settings/DeveloperSettings/DeclareSmartContractScreen"
 import { DeploySmartContractScreen } from "./features/settings/DeveloperSettings/DeploySmartContractScreen"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
@@ -69,31 +68,7 @@ import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
 
-/** Screens using legacy UI should remain inside this container */
-
-export const LegacyScrollBehaviour = styled.div`
-  height: 100vh;
-  overflow-y: auto;
-
-  overscroll-behavior: none;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
-`
-
-const LegacyResponsiveViewport: FC = () => (
-  <LegacyScrollBehaviour>
-    <ResponsiveBox>
-      <Outlet />
-    </ResponsiveBox>
-  </LegacyScrollBehaviour>
-)
-
-/** Screens using new UI should moved inside this container */
-
-export const ResponsiveContainer = chakra(ResponsiveBox, {
+const ResponsiveContainer = chakra(ResponsiveBox, {
   baseStyle: {
     display: "flex",
     flexDirection: "column",
@@ -116,24 +91,109 @@ const ResponsiveRoutes: FC = () => (
 )
 
 // Routes which don't need an unlocked wallet
+
 const nonWalletRoutes = (
   <>
+    <Route path={routes.error.path} element={<ErrorScreen />} />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
     />
-    <Route path={routes.error.path} element={<ErrorScreen />} />
   </>
 )
 
 // Routes which need an unlocked wallet and therefore can also sign actions
-const legacyUiWalletRoutes = (
+
+const walletRoutes = (
   <>
     <Route path={routes.accountNft.path} element={<NftScreen />} />
-
     <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
+    <Route
+      path={routes.networkWarning.path}
+      element={<NetworkWarningScreen />}
+    />
+    <Route
+      path={routes.accountTokens.path}
+      element={<AccountScreen tab="tokens" />}
+    />
+    <Route
+      path={routes.accountCollections.path}
+      element={<AccountScreen tab="collections" />}
+    />
+    <Route
+      path={routes.accountActivity.path}
+      element={<AccountScreen tab="activity" />}
+    />
+    <Route path={routes.accounts.path} element={<AccountListScreen />} />
+    <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
+    <Route path={routes.settings.path} element={<SettingsScreen />} />
+    <Route
+      path={routes.settingsPrivacy.path}
+      element={<PrivacySettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddCustomNetwork.path}
+      element={<NetworkSettingsFormScreen mode="add" />}
+    />
+    <Route
+      path={routes.settingsEditCustomNetwork.path}
+      element={<NetworkSettingsEditScreen />}
+    />
+    <Route
+      path={routes.settingsBlockExplorer.path}
+      element={<BlockExplorerSettingsScreen />}
+    />
+    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
+    <Route
+      path={routes.settingsDappConnections.path}
+      element={<DappConnectionsSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbook.path}
+      element={<AddressbookSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbookAdd.path}
+      element={<AddressbookAddOrEditScreen />}
+    />
+    <Route
+      path={routes.settingsAddressbookEdit.path}
+      element={<AddressbookAddOrEditScreen />}
+    />
+    <Route
+      path={routes.settingsDeveloper.path}
+      element={<DeveloperSettings />}
+    />
+    <Route
+      path={routes.settingsSmartContractDevelopment.path}
+      element={<SmartContractDevelopmentScreen />}
+    />
+    <Route
+      path={routes.settingsSmartContractDeclare.path}
+      element={<DeclareSmartContractScreen />}
+    />
+    <Route
+      path={routes.settingsSmartContractDeploy.path}
+      element={<DeploySmartContractScreen />}
+    />
+    <Route
+      path={routes.settingsSmartContractDeclareOrDeploySuccess.path}
+      element={<DeclareOrDeployContractSuccess />}
+    />
+    <Route
+      path={routes.settingsExperimental.path}
+      element={<PrivacyExperimentalSettings />}
+    />
+    <Route
+      path={routes.settingsNetworks.path}
+      element={<NetworkSettingsScreen />}
+    />
+    <Route
+      path={routes.settingsPrivacyStatement.path}
+      element={<SettingsPrivacyStatementScreen />}
+    />
     <Route
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
@@ -146,10 +206,11 @@ const legacyUiWalletRoutes = (
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
     />
+    <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
+    <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
-    <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route
       path={routes.networkUpgradeV4.path}
       element={<UpgradeScreenV4 upgradeType={"network"} />}
@@ -158,7 +219,6 @@ const legacyUiWalletRoutes = (
       path={routes.accountUpgradeV4.path}
       element={<UpgradeScreenV4 upgradeType={"account"} />}
     />
-    <Route path={routes.accounts.path} element={<AccountListScreen />} />
     <Route
       path={routes.accountsHidden.path}
       element={<AccountListHiddenScreen />}
@@ -181,45 +241,7 @@ const legacyUiWalletRoutes = (
     <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
     <Route path={routes.newToken.path} element={<AddTokenScreen />} />
     <Route path={routes.token.path} element={<TokenScreen />} />
-    <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
     <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
-    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
-    <Route
-      path={routes.settingsSmartContractDeploy.path}
-      element={<DeploySmartContractScreen />}
-    />
-    <Route
-      path={routes.settingsNetworks.path}
-      element={<NetworkSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsBlockExplorer.path}
-      element={<BlockExplorerSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsAddCustomNetwork.path}
-      element={<NetworkSettingsFormScreen mode="add" />}
-    />
-    <Route
-      path={routes.settingsEditCustomNetwork.path}
-      element={<NetworkSettingsEditScreen />}
-    />
-    <Route
-      path={routes.settingsDappConnections.path}
-      element={<DappConnectionsSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsAddressbook.path}
-      element={<AddressbookSettingsScreen />}
-    />
-    <Route
-      path={routes.settingsAddressbookAdd.path}
-      element={<AddressbookAddOrEditScreen />}
-    />
-    <Route
-      path={routes.settingsAddressbookEdit.path}
-      element={<AddressbookAddOrEditScreen />}
-    />
     <Route
       path={routes.backupDownload.path}
       element={<BackupDownloadScreen />}
@@ -227,59 +249,6 @@ const legacyUiWalletRoutes = (
     <Route
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
-    />
-    <Route
-      path={routes.settingsPrivacy.path}
-      element={<PrivacySettingsScreen />}
-    />
-    <Route
-      path={routes.settingsExperimental.path}
-      element={<PrivacyExperimentalSettings />}
-    />
-    <Route
-      path={routes.settingsPrivacyStatement.path}
-      element={<SettingsPrivacyStatementScreen />}
-    />
-  </>
-)
-
-/** Screens using new UI */
-const walletRoutes = (
-  <>
-    <Route
-      path={routes.networkWarning.path}
-      element={<NetworkWarningScreen />}
-    />
-    <Route
-      path={routes.accountTokens.path}
-      element={<AccountScreen tab="tokens" />}
-    />
-    <Route
-      path={routes.accountCollections.path}
-      element={<AccountScreen tab="collections" />}
-    />
-    <Route
-      path={routes.accountActivity.path}
-      element={<AccountScreen tab="activity" />}
-    />
-    <Route path={routes.accounts.path} element={<AccountListScreen />} />
-    <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
-    <Route path={routes.settings.path} element={<SettingsScreen />} />
-    <Route
-      path={routes.settingsDeveloper.path}
-      element={<DeveloperSettings />}
-    />
-    <Route
-      path={routes.settingsSmartContractDevelopment.path}
-      element={<SmartContractDevelopmentScreen />}
-    />
-    <Route
-      path={routes.settingsSmartContractDeclare.path}
-      element={<DeclareSmartContractScreen />}
-    />
-    <Route
-      path={routes.settingsSmartContractDeclareClassHash.path}
-      element={<DeclareContractClasshash />}
     />
   </>
 )
@@ -340,17 +309,14 @@ export const AppRoutes: FC = () => {
 
   return (
     <Routes>
-      <Route element={<LegacyResponsiveViewport />}>
+      <Route element={<ResponsiveRoutes />}>
         {nonWalletRoutes}
         {hasActions ? (
           <Route path="*" element={<ActionScreen />} />
         ) : (
-          legacyUiWalletRoutes
+          walletRoutes
         )}
       </Route>
-      {!hasActions && (
-        <Route element={<ResponsiveRoutes />}>{walletRoutes}</Route>
-      )}
       {fullscreenRoutes}
     </Routes>
   )

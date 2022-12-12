@@ -14,7 +14,7 @@ export const formatTruncatedAddress = (address: string) => {
   const hex = normalized.slice(0, 2)
   const start = normalized.slice(2, 6)
   const end = normalized.slice(-4)
-  return `${hex} ${start} ... ${end}`
+  return `${hex}${start}…${end}`
 }
 
 export const formatFullAddress = (address: string) => {

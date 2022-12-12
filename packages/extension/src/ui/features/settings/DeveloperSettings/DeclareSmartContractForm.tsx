@@ -9,7 +9,7 @@ import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { isEqualAddress } from "../../../services/addresses"
 import { selectAccount } from "../../../services/backgroundAccounts"
-import { declareContract } from "../../../services/udp.service"
+import { declareContract } from "../../../services/udc.service"
 import { useFormSelects } from "./useFormSelects"
 
 interface FieldValues {

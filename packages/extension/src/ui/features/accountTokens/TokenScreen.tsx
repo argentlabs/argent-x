@@ -1,3 +1,4 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { FC, useMemo } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
@@ -8,15 +9,14 @@ import {
 } from "../../../shared/token/price"
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
-import { IconBar } from "../../components/IconBar"
 import { FormatListBulletedIcon } from "../../components/Icons/MuiIcons"
+import { LoadingPulse } from "../../components/LoadingPulse"
 import { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
-import { H2, H3 } from "../../theme/Typography"
+import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
-import { TokenIconDeprecated } from "./TokenIconDeprecated"
-import { IIsLoading, isLoadingPulse } from "./TokenListItemDeprecated"
-import { TokenMenu } from "./TokenMenu"
+import { TokenIcon } from "./TokenIcon"
+import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
 import { useTokensWithBalance } from "./tokens.state"
@@ -69,15 +69,10 @@ const ComingSoonText = styled.div`
   color: ${({ theme }) => theme.text3};
 `
 
-const TokenBalanceContainer = styled(RowCentered)<IIsLoading>`
+const TokenBalanceContainer = styled(RowCentered)`
   gap: 8px;
   margin-top: 12px;
   align-items: baseline;
-  ${isLoadingPulse}
-`
-
-const StyledH2 = styled(H2)`
-  margin-bottom: 0;
 `
 
 export const TokenScreen: FC = () => {
@@ -101,23 +96,31 @@ export const TokenScreen: FC = () => {
   const isLoading = isValidating || tokenDetailsIsInitialising
 
   return (
-    <>
-      <IconBar back childAfter={<TokenMenu tokenAddress={address} />}>
-        <H3>{name === "Ether" ? "Ethereum" : name}</H3>
-      </IconBar>
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={<TokenMenuDeprecated tokenAddress={address} />}
+      title={name === "Ether" ? "Ethereum" : name}
+    >
       <TokenScreenWrapper>
         <TokenHeader hasCurrencyValue={!!currencyValue}>
           <ColumnCenter>
-            <TokenIconDeprecated name={name} url={image} large />
-            <TokenBalanceContainer isLoading={isLoading}>
-              <StyledH2
-                data-testid={
-                  isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
-                }
+            <TokenIcon name={name} url={image} size={12} />
+            <TokenBalanceContainer>
+              <LoadingPulse
+                isLoading={isLoading}
+                display="flex"
+                alignItems="center"
+                gap="2"
               >
-                {displayBalance}
-              </StyledH2>
-              <H3>{symbol}</H3>
+                <H3
+                  data-testid={
+                    isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
+                  }
+                >
+                  {displayBalance}
+                </H3>
+                <H3>{symbol}</H3>
+              </LoadingPulse>
             </TokenBalanceContainer>
             {currencyValue && (
               <CurrencyValueText>
@@ -145,6 +148,6 @@ export const TokenScreen: FC = () => {
           </ColumnCenter>
         </ActionContainer>
       </TokenScreenWrapper>
-    </>
+    </NavigationContainer>
   )
 }

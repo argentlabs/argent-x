@@ -2,6 +2,7 @@ import { Token } from "@argent-x/extension/src/shared/token/type"
 import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/utils"
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
 import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
+import { CellStack } from "@argent/ui"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { BigNumber } from "ethers"
 
@@ -11,7 +12,9 @@ export default {
 } as ComponentMeta<typeof TokenListItem>
 
 const Template: ComponentStory<typeof TokenListItem> = (props) => (
-  <TokenListItem {...props}></TokenListItem>
+  <CellStack>
+    <TokenListItem {...props}></TokenListItem>
+  </CellStack>
 )
 
 const tokenWithSymbol = (symbol: string): Token => {

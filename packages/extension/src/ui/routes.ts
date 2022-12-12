@@ -143,13 +143,13 @@ export const routes = {
   settingsSmartContractDeclare: route(
     "/settings/smart-contract-development/declare",
   ),
-  settingsSmartContractDeclareClassHash: route(
-    (classhash) =>
-      `/settings/smart-contract-development/declare/classhash/${classhash}`,
-    "/settings/smart-contract-development/declare/classhash/:classhash",
-  ),
   settingsSmartContractDeploy: route(
     "/settings/smart-contract-development/deploy",
+  ),
+  settingsSmartContractDeclareOrDeploySuccess: route(
+    (type: "declare" | "deploy", classHashOrDeployedAddress) =>
+      `/settings/smart-contract-development/${type}/success/${classHashOrDeployedAddress}`,
+    "/settings/smart-contract-development/:type/success/:classHashOrDeployedAddress",
   ),
   networkWarning: routeWithReturnTo("/network-warning"),
   backupDownload: route(

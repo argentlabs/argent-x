@@ -1,17 +1,20 @@
-import { CellStack } from "@argent/ui"
+import {
+  BarBackButton,
+  BarCloseButton,
+  CellStack,
+  NavigationContainer,
+} from "@argent/ui"
 import { FC, Suspense, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import styled from "styled-components"
 
 import { useAppState } from "../../app.state"
-import { IconBar } from "../../components/IconBar"
 import { SearchIcon } from "../../components/Icons/SearchIcon"
 import {
   ControlledInputType,
   StyledControlledInput,
 } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
-import { H3 } from "../../theme/Typography"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
@@ -101,11 +104,11 @@ export const SendScreen: FC = () => {
   }
 
   return (
-    <>
-      <IconBar close back>
-        <H3>Send</H3>
-      </IconBar>
-
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={<BarCloseButton />}
+      title={"Send"}
+    >
       <Container>
         <SearchBox>
           <StyledInput
@@ -140,7 +143,7 @@ export const SendScreen: FC = () => {
         <TabView>
           <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
             {selectedTab === "tokens" && (
-              <CellStack py={0}>
+              <CellStack pt={0}>
                 <TokenList
                   tokenList={tokenList}
                   variant="no-currency"
@@ -161,7 +164,7 @@ export const SendScreen: FC = () => {
           </Suspense>
         </TabView>
       </Container>
-    </>
+    </NavigationContainer>
   )
 }
 

@@ -1,47 +1,20 @@
-import { FC, useRef, useState } from "react"
+import { icons } from "@argent/ui"
+import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
+import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
-import { ContentCopyIcon, VisibilityOff } from "../../components/Icons/MuiIcons"
-import { MoreVertSharp } from "../../components/Icons/MuiIcons"
-import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
-import Row, { RowCentered } from "../../components/Row"
+import { VisibilityOff } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
-import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import {
-  IconWrapper,
-  Menu,
-  MenuContainer,
-  MenuItem,
-  MenuItemWrapper,
-  Separator,
-} from "./DeprecatedAccountMenu"
+import { IconWrapper } from "./DeprecatedAccountMenu"
 
-const StyledMenuContainer = styled(MenuContainer)`
-  flex: 1;
-  text-align: right;
-`
-
-const StyledMenu = styled(Menu)`
-  top: 120%;
-  right: 5%;
-`
-
-const MoreVertWrapper = styled(RowCentered)`
-  align-items: center;
-  border-radius: 50%;
-  height: 32px;
-  width: 32px;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.1);
-`
+const { MoreIcon } = icons
 
 export interface TokenMenuProps {
   tokenAddress: string
@@ -52,62 +25,50 @@ export const TokenMenu: FC<TokenMenuProps> = ({
   tokenAddress,
   canHideToken = true,
 }) => {
-  const [isMenuOpen, setMenuOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const currentNetwork = useCurrentNetwork()
   const blockExplorerTitle = useBlockExplorerTitle()
 
-  useOnClickOutside(ref, () => setMenuOpen(false))
-
   return (
-    <StyledMenuContainer id="token-menu-container" style={{}} ref={ref}>
-      <Row style={{ justifyContent: "flex-end" }}>
-        <MoreVertWrapper onClick={() => setMenuOpen(!isMenuOpen)}>
-          <MoreVertSharp />
-        </MoreVertWrapper>
-      </Row>
-      {isMenuOpen && (
-        <StyledMenu>
-          <CopyToClipboard
-            text={normalizeAddress(tokenAddress)}
-            onCopy={() => setMenuOpen(false)}
-          >
-            <MenuItemWrapper>
-              <MenuItem>
-                <ContentCopyIcon fontSize="inherit" htmlColor="white" />
-                Copy address
-              </MenuItem>
-            </MenuItemWrapper>
+    <>
+      <Menu>
+        <MenuButton
+          aria-label="NFT actions"
+          color="neutrals.200"
+          colorScheme="transparent"
+          padding="1.5"
+          fontSize="xl"
+          size="auto"
+          rounded="full"
+          as={Button}
+        >
+          <MoreIcon />
+        </MenuButton>
+        <MenuList>
+          <CopyToClipboard text={normalizeAddress(tokenAddress)}>
+            <MenuItem>Copy address</MenuItem>
           </CopyToClipboard>
-          <Separator />
-          <MenuItemWrapper
+          <MenuItem
             onClick={() =>
               openBlockExplorerAddress(currentNetwork, tokenAddress)
             }
           >
-            <MenuItem>
-              <ViewOnBlockExplorerIcon />
-              View on {blockExplorerTitle}
-            </MenuItem>
-          </MenuItemWrapper>
+            View on {blockExplorerTitle}
+          </MenuItem>
           {canHideToken && (
             <>
-              <Separator />
-              <MenuItemWrapper
+              <MenuItem
                 onClick={() => navigate(routes.hideToken(tokenAddress))}
               >
-                <MenuItem>
-                  <IconWrapper>
-                    <VisibilityOff fontSize="inherit" htmlColor="white" />
-                  </IconWrapper>
-                  Hide this token
-                </MenuItem>
-              </MenuItemWrapper>
+                <IconWrapper>
+                  <VisibilityOff fontSize="inherit" htmlColor="white" />
+                </IconWrapper>
+                Hide this token
+              </MenuItem>
             </>
           )}
-        </StyledMenu>
-      )}
-    </StyledMenuContainer>
+        </MenuList>
+      </Menu>
+    </>
   )
 }

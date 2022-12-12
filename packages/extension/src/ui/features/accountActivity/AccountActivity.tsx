@@ -83,7 +83,9 @@ export const AccountActivity: FC<AccountActivityProps> = ({
                         navigate(routes.transactionDetail(transactionHash))
                       }
                     />
-                    {loadMore && <LoadMoreTrigger onLoadMore={onLoadMore} />}
+                    {loadMore && (
+                      <LoadMoreTrigger onLoadMore={onLoadMore} mt={-2} />
+                    )}
                   </Fragment>
                 )
               }

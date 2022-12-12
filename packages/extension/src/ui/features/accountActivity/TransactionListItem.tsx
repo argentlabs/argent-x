@@ -1,16 +1,13 @@
+import { H6, P4 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode, useMemo } from "react"
-import styled from "styled-components"
 
 import { Network } from "../../../shared/network"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
-  TokenDetailsWrapper,
-  TokenTextGroup,
-  TokenTitle,
-} from "../accountTokens/TokenListItemDeprecated"
-import {
   isDeclareContractTransaction,
+  isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -19,28 +16,11 @@ import {
   isTokenTransferTransaction,
 } from "./transform/is"
 import { TransformedTransaction } from "./transform/type"
-import { NFTAccessory } from "./ui/NFTAccessory"
+import { NFTImage } from "./ui/NFTImage"
 import { SwapAccessory } from "./ui/SwapAccessory"
+import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
-
-const TransactionSubtitle = styled.div`
-  font-size: 13px;
-  line-height: 18px;
-  color: ${({ theme }) => theme.text2};
-  margin: 0;
-`
-
-const TitleAddressContainer = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const TitleAddressPrefix = styled.div`
-  margin-right: 8px;
-`
-
-const TitleAddress = styled.div``
 
 export interface TransactionListItemProps {
   transactionTransformed: TransformedTransaction
@@ -65,6 +45,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
   const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
+  const isDeployContract = isDeployContractTransaction(transactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer) {
@@ -73,18 +54,14 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
         (action === "SEND" || action === "TRANSFER")
       const { toAddress, fromAddress } = transactionTransformed
       return (
-        <TitleAddressContainer>
-          <TitleAddressPrefix>
-            {titleShowsTo ? "To:" : "From:"}
-          </TitleAddressPrefix>
-          <TitleAddress>
-            <PrettyAccountAddress
-              accountAddress={titleShowsTo ? toAddress : fromAddress}
-              networkId={network.id}
-              size={15}
-            />
-          </TitleAddress>
-        </TitleAddressContainer>
+        <>
+          {titleShowsTo ? "To: " : "From: "}
+          <PrettyAccountAddress
+            accountAddress={titleShowsTo ? toAddress : fromAddress}
+            networkId={network.id}
+            icon={false}
+          />
+        </>
       )
     }
     if (dapp) {
@@ -93,26 +70,46 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     if (isDeclareContract) {
       return <>{transactionTransformed.classHash}</>
     }
+    if (isDeployContract) {
+      return <>{transactionTransformed.contractAddress}</>
+    }
     return null
   }, [
     isTransfer,
     dapp,
     isNFTTransfer,
     isDeclareContract,
+    isDeployContract,
     action,
     transactionTransformed,
     network.id,
   ])
 
-  const accessory = useMemo(() => {
+  const icon = useMemo(() => {
     if (isNFT) {
+      const { contractAddress, tokenId } = transactionTransformed
       return (
-        <NFTAccessory
-          transaction={transactionTransformed}
+        <NFTImage
+          contractAddress={contractAddress}
+          tokenId={tokenId}
           networkId={network.id}
+          display={"flex"}
+          flexShrink={0}
+          rounded={"lg"}
+          width={9}
+          height={9}
         />
       )
     }
+    if (isSwap) {
+      return (
+        <SwapTransactionIcon transaction={transactionTransformed} size={9} />
+      )
+    }
+    return <TransactionIcon transaction={transactionTransformed} size={9} />
+  }, [isNFT, isSwap, transactionTransformed, network.id])
+
+  const accessory = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
       return <TransferAccessory transaction={transactionTransformed} />
     }
@@ -120,25 +117,32 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
       return <SwapAccessory transaction={transactionTransformed} />
     }
     return null
-  }, [
-    isNFT,
-    isTransfer,
-    isTokenMint,
-    isTokenApprove,
-    isSwap,
-    transactionTransformed,
-    network.id,
-  ])
+  }, [isTransfer, isTokenMint, isTokenApprove, isSwap, transactionTransformed])
 
   return (
     <CustomButtonCell highlighted={highlighted} {...props}>
-      <TransactionIcon transaction={transactionTransformed} size={40} />
-      <TokenDetailsWrapper>
-        <TokenTextGroup>
-          <TokenTitle>{displayName}</TokenTitle>
-          <TransactionSubtitle>{subtitle}</TransactionSubtitle>
-        </TokenTextGroup>
-      </TokenDetailsWrapper>
+      {icon}
+      <Flex
+        flexGrow={1}
+        alignItems="center"
+        justifyContent={"space-between"}
+        gap={2}
+        overflow={"hidden"}
+      >
+        <Flex direction={"column"} overflow="hidden">
+          <H6 overflow="hidden" textOverflow={"ellipsis"}>
+            {displayName}
+          </H6>
+          <P4
+            color="neutrals.300"
+            fontWeight={"semibold"}
+            overflow="hidden"
+            textOverflow={"ellipsis"}
+          >
+            {subtitle}
+          </P4>
+        </Flex>
+      </Flex>
       {accessory}
       {children}
     </CustomButtonCell>

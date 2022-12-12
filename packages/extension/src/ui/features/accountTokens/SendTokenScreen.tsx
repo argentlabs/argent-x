@@ -1,3 +1,4 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { utils } from "ethers"
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -48,8 +49,8 @@ import { AddressBookMenu } from "../accounts/AddressBookMenu"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { TokenIconDeprecated } from "./TokenIconDeprecated"
-import { TokenMenu } from "./TokenMenu"
+import { TokenIcon } from "./TokenIcon"
+import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
 import {
@@ -73,8 +74,8 @@ export const StyledIconBar = styled(IconBar)`
 
 export const StyledForm = styled.form`
   padding: 24px;
-  height: 85vh;
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
@@ -109,6 +110,11 @@ export const StyledMaxButton = styled(Button)`
   line-height: 18px;
   margin-top: 0 !important;
   padding: 4px 8px;
+`
+
+const ButtonSpacer = styled.div`
+  display: flex;
+  flex: 1;
 `
 
 export const AtTheRateWrapper = styled(StyledMaxButton)<{ active?: boolean }>`
@@ -167,6 +173,7 @@ export const StyledAccountAddress = styled.p`
   line-height: 18px;
   color: ${({ theme }) => theme.text2};
 `
+
 export const SaveAddressButton = styled(ButtonTransparent)`
   ${({ theme }) => theme.flexRowNoWrap}
   justify-content: flex-end;
@@ -359,187 +366,194 @@ export const SendTokenScreen: FC = () => {
     isInputAmountGtBalance // Balance: 1234, maxInput: 1231, , maxFee: 3, updatedInput: 1233
 
   return (
-    <div style={{ position: "relative" }}>
+    <>
       <AddContactBottomSheet
         open={bottomSheetOpen}
         onSave={handleSaveAddress}
         onCancel={() => setBottomSheetOpen(false)}
         recipientAddress={inputRecipient}
       />
-      <StyledIconBar back childAfter={<TokenMenu tokenAddress={address} />}>
-        <ColumnCenter>
-          <H3>Send {symbol}</H3>
-          <BalanceText>{`${balance} ${symbol}`}</BalanceText>
-        </ColumnCenter>
-      </StyledIconBar>
-
-      <ColumnCenter>
-        <StyledForm
-          onSubmit={handleSubmit(({ amount, recipient }) => {
-            sendTransaction({
-              to: address,
-              method: "transfer",
-              calldata: {
-                recipient,
-                amount: getUint256CalldataFromBN(parseAmount(amount, decimals)),
-              },
-            })
-            navigate(routes.accountTokens())
-          })}
-        >
-          <Column gap="12px">
-            <div>
-              <StyledControlledInput
-                autoComplete="off"
-                autoFocus
-                control={control}
-                placeholder="Amount"
-                name="amount"
-                type="text"
-                onKeyDown={() => {
-                  setMaxClicked(false)
-                }}
-                onlyNumeric
-                style={{ padding: "17px 16px 17px 57px" }}
-              >
-                <InputGroupBefore>
-                  <TokenIconDeprecated name={name} url={image} size={32} />
-                </InputGroupBefore>
-                <InputGroupAfter>
-                  {inputAmount ? (
-                    <CurrencyValueText>
-                      {prettifyCurrencyValue(currencyValue)}
-                    </CurrencyValueText>
-                  ) : (
-                    <>
-                      <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
-                      <StyledMaxButton type="button" onClick={handleMaxClick}>
-                        {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
-                      </StyledMaxButton>
-                    </>
-                  )}
-                </InputGroupAfter>
-              </StyledControlledInput>
-              {inputAmount && isInputAmountGtBalance && (
-                <FormError>Insufficient balance</FormError>
-              )}
-              {maxFeeError ? (
-                maxFeeError.message ? (
-                  <FormError>{maxFeeError.message}</FormError>
-                ) : (
-                  <FormError>Unable to estimate fee</FormError>
-                )
-              ) : undefined}
-              {errors.amount ? (
-                errors.amount.message ? (
-                  <FormError>{errors.amount.message}</FormError>
-                ) : (
-                  <FormError>Incorrect Amount</FormError>
-                )
-              ) : undefined}
-            </div>
-
-            <div>
-              {addressBookRecipient && accountName ? (
-                <AddressBookRecipient
-                  onDoubleClick={() => setAddressBookRecipient(undefined)}
+      <NavigationContainer
+        leftButton={<BarBackButton />}
+        rightButton={<TokenMenuDeprecated tokenAddress={address} />}
+        scrollContent={`Send ${symbol}`}
+      >
+        <>
+          <ColumnCenter>
+            <H3>Send {symbol}</H3>
+            <BalanceText>{`${balance} ${symbol}`}</BalanceText>
+          </ColumnCenter>
+          <StyledForm
+            onSubmit={handleSubmit(({ amount, recipient }) => {
+              sendTransaction({
+                to: address,
+                method: "transfer",
+                calldata: {
+                  recipient,
+                  amount: getUint256CalldataFromBN(
+                    parseAmount(amount, decimals),
+                  ),
+                },
+              })
+              navigate(routes.accountTokens())
+            })}
+          >
+            <Column gap="12px">
+              <div>
+                <StyledControlledInput
+                  autoComplete="off"
+                  autoFocus
+                  control={control}
+                  placeholder="Amount"
+                  name="amount"
+                  type="text"
+                  onKeyDown={() => {
+                    setMaxClicked(false)
+                  }}
+                  onlyNumeric
+                  style={{ padding: "17px 16px 17px 57px" }}
                 >
-                  <RowBetween>
-                    <Row gap="16px">
-                      <ProfilePicture
-                        src={getAccountImageUrl(
-                          accountName,
-                          addressBookRecipient,
-                        )}
-                        size="lg"
-                      />
+                  <InputGroupBefore>
+                    <TokenIcon name={name} url={image} size={8} />
+                  </InputGroupBefore>
+                  <InputGroupAfter>
+                    {inputAmount ? (
+                      <CurrencyValueText>
+                        {prettifyCurrencyValue(currencyValue)}
+                      </CurrencyValueText>
+                    ) : (
+                      <>
+                        <InputTokenSymbol>{token.symbol}</InputTokenSymbol>
+                        <StyledMaxButton type="button" onClick={handleMaxClick}>
+                          {maxFeeLoading ? <Spinner size={18} /> : "MAX"}
+                        </StyledMaxButton>
+                      </>
+                    )}
+                  </InputGroupAfter>
+                </StyledControlledInput>
+                {inputAmount && isInputAmountGtBalance && (
+                  <FormError>Insufficient balance</FormError>
+                )}
+                {maxFeeError ? (
+                  maxFeeError.message ? (
+                    <FormError>{maxFeeError.message}</FormError>
+                  ) : (
+                    <FormError>Unable to estimate fee</FormError>
+                  )
+                ) : undefined}
+                {errors.amount ? (
+                  errors.amount.message ? (
+                    <FormError>{errors.amount.message}</FormError>
+                  ) : (
+                    <FormError>Incorrect Amount</FormError>
+                  )
+                ) : undefined}
+              </div>
 
-                      <Column>
-                        <H5>{accountName}</H5>
-                        <StyledAccountAddress>
-                          {formatTruncatedAddress(addressBookRecipient.address)}
-                        </StyledAccountAddress>
-                      </Column>
-                    </Row>
-                    <CloseIconAlt
-                      {...makeClickable(resetAddressBookRecipient)}
-                      style={{ cursor: "pointer" }}
-                    />
-                  </RowBetween>
-                </AddressBookRecipient>
-              ) : (
-                <div ref={ref}>
-                  <StyledControlledTextArea
-                    autoComplete="off"
-                    control={control}
-                    spellCheck={false}
-                    placeholder="Recipient's address"
-                    name="recipient"
-                    maxRows={3}
-                    style={{
-                      paddingRight: "50px",
-                      borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
-                    }}
-                    onlyAddressHex
-                    onChange={(e) => {
-                      if (validateStarknetAddress(e.target.value)) {
-                        const account = addressBook.contacts.find((c) =>
-                          isEqualAddress(c.address, e.target.value),
-                        )
-                        handleAddressSelect(account)
-                      }
-                    }}
+              <div>
+                {addressBookRecipient && accountName ? (
+                  <AddressBookRecipient
+                    onDoubleClick={() => setAddressBookRecipient(undefined)}
                   >
-                    <>
-                      <InputGroupAfter>
-                        {validRecipientAddress ? (
-                          <CloseIconAlt
-                            {...makeClickable(resetAddressBookRecipient)}
-                            style={{ cursor: "pointer" }}
-                          />
-                        ) : (
-                          <AtTheRateWrapper
-                            type="button"
-                            active={addressBookOpen}
-                            {...makeClickable(() =>
-                              setAddressBookOpen(!addressBookOpen),
-                            )}
-                          >
-                            <AtTheRateIcon />
-                          </AtTheRateWrapper>
-                        )}
-                      </InputGroupAfter>
-
-                      {addressBookOpen && !showSaveAddressButton && (
-                        <AddressBookMenu
-                          addressBook={addressBook}
-                          onAddressSelect={handleAddressSelect}
+                    <RowBetween>
+                      <Row gap="16px">
+                        <ProfilePicture
+                          src={getAccountImageUrl(
+                            accountName,
+                            addressBookRecipient,
+                          )}
+                          size="lg"
                         />
-                      )}
-                    </>
-                  </StyledControlledTextArea>
-                  {showSaveAddressButton && (
-                    <SaveAddressButton
-                      type="button"
-                      onClick={() => setBottomSheetOpen(true)}
-                    >
-                      <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
-                      Save address
-                    </SaveAddressButton>
-                  )}
-                  {errors.recipient && (
-                    <FormError>{errors.recipient.message}</FormError>
-                  )}
-                </div>
-              )}
-            </div>
-          </Column>
 
-          <Button disabled={disableSubmit} type="submit">
-            Next
-          </Button>
-        </StyledForm>
-      </ColumnCenter>
-    </div>
+                        <Column>
+                          <H5>{accountName}</H5>
+                          <StyledAccountAddress>
+                            {formatTruncatedAddress(
+                              addressBookRecipient.address,
+                            )}
+                          </StyledAccountAddress>
+                        </Column>
+                      </Row>
+                      <CloseIconAlt
+                        {...makeClickable(resetAddressBookRecipient)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </RowBetween>
+                  </AddressBookRecipient>
+                ) : (
+                  <div ref={ref}>
+                    <StyledControlledTextArea
+                      autoComplete="off"
+                      control={control}
+                      spellCheck={false}
+                      placeholder="Recipient's address"
+                      name="recipient"
+                      maxRows={3}
+                      style={{
+                        paddingRight: "50px",
+                        borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
+                      }}
+                      onlyAddressHex
+                      onChange={(e) => {
+                        if (validateStarknetAddress(e.target.value)) {
+                          const account = addressBook.contacts.find((c) =>
+                            isEqualAddress(c.address, e.target.value),
+                          )
+                          handleAddressSelect(account)
+                        }
+                      }}
+                    >
+                      <>
+                        <InputGroupAfter>
+                          {validRecipientAddress ? (
+                            <CloseIconAlt
+                              {...makeClickable(resetAddressBookRecipient)}
+                              style={{ cursor: "pointer" }}
+                            />
+                          ) : (
+                            <AtTheRateWrapper
+                              type="button"
+                              active={addressBookOpen}
+                              {...makeClickable(() =>
+                                setAddressBookOpen(!addressBookOpen),
+                              )}
+                            >
+                              <AtTheRateIcon />
+                            </AtTheRateWrapper>
+                          )}
+                        </InputGroupAfter>
+
+                        {addressBookOpen && !showSaveAddressButton && (
+                          <AddressBookMenu
+                            addressBook={addressBook}
+                            onAddressSelect={handleAddressSelect}
+                          />
+                        )}
+                      </>
+                    </StyledControlledTextArea>
+                    {showSaveAddressButton && (
+                      <SaveAddressButton
+                        type="button"
+                        onClick={() => setBottomSheetOpen(true)}
+                      >
+                        <AddIcon fill="#29C5FF" style={{ fontSize: "15px" }} />
+                        Save address
+                      </SaveAddressButton>
+                    )}
+                    {errors.recipient && (
+                      <FormError>{errors.recipient.message}</FormError>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Column>
+            <ButtonSpacer />
+            <Button disabled={disableSubmit} type="submit">
+              Next
+            </Button>
+          </StyledForm>
+        </>
+      </NavigationContainer>
+    </>
   )
 }

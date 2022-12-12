@@ -6,13 +6,10 @@ import {
   DeployContractPayload,
   EstimateFee,
   ec,
+  hash,
   number,
   stark,
 } from "starknet"
-import {
-  calculateContractAddressFromHash,
-  getSelectorFromName,
-} from "starknet/dist/utils/hash"
 import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
@@ -38,12 +35,18 @@ import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
 import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
 import {
+  declareContracts,
+  getPreDeployedAccount,
+} from "./devnet/declareAccounts"
+import {
   getIndexForPath,
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
 } from "./keys/keyDerivation"
 import backupSchema from "./schema/backup.schema"
+
+const { calculateContractAddressFromHash, getSelectorFromName } = hash
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -185,7 +188,6 @@ export class Wallet {
   private async getAccountClassHashForNetwork(
     network: Network,
     accountType: ArgentAccountType,
-    deployerAccount?: Account, // Only for use with devnet
   ): Promise<string> {
     if (network.accountClassHash) {
       if (
@@ -196,22 +198,16 @@ export class Wallet {
       }
       return network.accountClassHash.argentAccount
     }
-    const [proxyContract, accountContract] = await this.loadContracts(
-      network.id,
-    )
 
+    const deployerAccount = await getPreDeployedAccount(network)
     if (deployerAccount) {
-      await deployerAccount.declare({
-        classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-        contract: proxyContract,
-      })
+      const { account } = await declareContracts(
+        network,
+        deployerAccount,
+        this.loadContracts,
+      )
 
-      const declareResponse = await deployerAccount.declare({
-        classHash: ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0],
-        contract: accountContract,
-      })
-
-      return declareResponse.class_hash
+      return account.class_hash
     }
 
     return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
@@ -436,7 +432,6 @@ export class Wallet {
 
   public async deployAccount(
     walletAccount: WalletAccount,
-    deployerAccount?: Account,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
 
@@ -446,7 +441,6 @@ export class Wallet {
 
     const deployAccountPayload = await this.getAccountDeploymentPayload(
       walletAccount,
-      deployerAccount,
     )
 
     const { transaction_hash } = await starknetAccount.deployAccount(
@@ -460,7 +454,6 @@ export class Wallet {
 
   public async getAccountDeploymentFee(
     walletAccount: WalletAccount,
-    deployerAccount?: Account,
   ): Promise<EstimateFee> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
 
@@ -470,7 +463,6 @@ export class Wallet {
 
     const deployAccountPayload = await this.getAccountDeploymentPayload(
       walletAccount,
-      deployerAccount,
     )
 
     return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
@@ -502,12 +494,8 @@ export class Wallet {
   /** Get the Account Deployment Payload
    * Use it in the deployAccount and getAccountDeploymentFee methods
    * @param  {WalletAccount} walletAccount
-   * @param  {Account} deployerAccount?
    */
-  public async getAccountDeploymentPayload(
-    walletAccount: WalletAccount,
-    deployerAccount?: Account,
-  ) {
+  public async getAccountDeploymentPayload(walletAccount: WalletAccount) {
     const starkPair = await this.getKeyPairByDerivationPath(
       walletAccount.signer.derivationPath,
     )
@@ -517,7 +505,6 @@ export class Wallet {
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
       "argent",
-      deployerAccount,
     )
 
     const constructorCallData = {
@@ -686,7 +673,7 @@ export class Wallet {
       entrypoint: "get_implementation",
     })
 
-    return stark.makeAddress(number.toHex(implementation))
+    return stark.makeAddress(number.toHex(number.toBN(implementation)))
   }
 
   public async getSelectedStarknetAccount(): Promise<Account | Accountv4> {

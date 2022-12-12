@@ -102,7 +102,7 @@ export class Account {
       entrypoint: "get_implementation",
     })
 
-    return stark.makeAddress(number.toHex(implementation))
+    return stark.makeAddress(number.toHex(number.toBN(implementation)))
   }
 
   public static async create(networkId: string): Promise<Account> {

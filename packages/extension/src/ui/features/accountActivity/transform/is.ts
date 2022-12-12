@@ -3,6 +3,7 @@ import { Transaction } from "../../../../shared/transactions"
 import { ActivityTransaction } from "../useActivity"
 import {
   DeclareContractTransaction,
+  DeployContractTransaction,
   NFTTransaction,
   NFTTransferTransaction,
   SwapTransaction,
@@ -65,6 +66,13 @@ export const isDeclareContractTransaction = (
 ): transaction is DeclareContractTransaction => {
   const { action, entity } = transaction
   return entity === "CONTRACT" && action === "DECLARE"
+}
+
+export const isDeployContractTransaction = (
+  transaction: TransformedTransaction,
+): transaction is DeployContractTransaction => {
+  const { action, entity } = transaction
+  return entity === "CONTRACT" && action === "DEPLOY"
 }
 
 export const isActivityTransaction = (

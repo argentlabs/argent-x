@@ -25,7 +25,7 @@ export const getTokenIconUrl = ({
 export const TokenIcon: FC<TokenIconProps> = ({ name, url, size, ...rest }) => {
   const src = getTokenIconUrl({ url, name })
   return (
-    <Circle position={"relative"} overflow={"hidden"} size={size}>
+    <Circle position={"relative"} overflow={"hidden"} size={size} {...rest}>
       <Image
         position={"absolute"}
         left={0}
@@ -34,7 +34,6 @@ export const TokenIcon: FC<TokenIconProps> = ({ name, url, size, ...rest }) => {
         bottom={0}
         alt={name}
         src={src}
-        {...rest}
       />
     </Circle>
   )

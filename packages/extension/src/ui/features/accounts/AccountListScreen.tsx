@@ -10,7 +10,6 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { ResponsiveFixedBox } from "../../components/Responsive"
 import { useReturnTo } from "../../routes"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
@@ -43,21 +42,6 @@ const DimmingContainer = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-`
-
-const Footer = styled(ResponsiveFixedBox)`
-  bottom: 0;
-  background-color: ${({ theme }) => theme.bg1};
-  background: linear-gradient(
-    180deg,
-    rgba(16, 16, 16, 0.4) 0%,
-    ${({ theme }) => theme.bg1} 73.72%
-  );
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
 `
 
 export const AccountListScreen: FC = () => {
@@ -139,11 +123,7 @@ export const AccountListScreen: FC = () => {
           {isDeploying && <DimmingContainer />}
         </Flex>
       </NavigationContainer>
-      {hasHiddenAccounts && (
-        <Footer>
-          <HiddenAccountsBar />
-        </Footer>
-      )}
+      {hasHiddenAccounts && <HiddenAccountsBar />}
     </>
   )
 }

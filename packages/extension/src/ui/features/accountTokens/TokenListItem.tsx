@@ -58,7 +58,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
           {!isNoCurrencyVariant && (
             <LoadingPulse isLoading={isLoading}>
               <P4
-                color="neutrals.400"
+                color="neutrals.300"
                 fontWeight={"semibold"}
                 overflow="hidden"
                 textOverflow={"ellipsis"}

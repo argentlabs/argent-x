@@ -1,12 +1,12 @@
 import {
-  B2,
-  BarBackButton,
+  BarCloseButton,
+  Button,
   CellStack,
   NavigationContainer,
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
+import { Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
@@ -14,7 +14,6 @@ import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { Button } from "../../components/Button"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
@@ -22,6 +21,7 @@ import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
 import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { SettingsMenuItem } from "./SettingsMenuItem"
+import { SupportFooter } from "./SupportFooter"
 
 const {
   LockIcon,
@@ -70,10 +70,6 @@ export const SettingsScreenWrapper = styled.div`
     margin: 0 32px 32px 32px;
   }
 
-  ${Button} {
-    margin-top: 10px;
-  }
-
   hr {
     border: none;
     height: 1px;
@@ -91,7 +87,9 @@ export const SettingsScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+        rightButton={
+          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+        }
         title={"Settings"}
       >
         <CellStack>
@@ -142,24 +140,28 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
-          <Link onClick={stopSession} to={routes.lockScreen()}>
-            <SpacerCell />
-            <Flex
-              py={2}
-              gap={2}
-              cursor="pointer"
-              justifyContent="center"
-              alignItems="center"
-              color="white50"
-            >
-              <Text fontSize="base">
-                <LockIcon />
-              </Text>
-              <B2>Lock wallet</B2>
-            </Flex>
-          </Link>
+          <SupportFooter />
         </CellStack>
       </NavigationContainer>
+      <Center
+        height={16}
+        borderTop="1px solid"
+        borderTopColor="border"
+        background="bg"
+        boxShadow="menu"
+      >
+        <Button
+          as={Link}
+          onClick={stopSession}
+          to={routes.lockScreen()}
+          size="sm"
+          colorScheme="transparent"
+          color="white50"
+          leftIcon={<LockIcon />}
+        >
+          Lock wallet
+        </Button>
+      </Center>
     </>
   )
 }

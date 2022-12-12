@@ -19,12 +19,7 @@ preAuthorizeStore.subscribe(async (_, changeSet) => {
 
 export const handlePreAuthorizationMessage: HandleMessage<
   PreAuthorisationMessage
-> = async ({
-  msg,
-  sender,
-  background: { wallet, actionQueue },
-  sendToTabAndUi,
-}) => {
+> = async ({ msg, sender, background: { wallet, actionQueue }, respond }) => {
   switch (msg.type) {
     case "CONNECT_DAPP": {
       const selectedAccount = await wallet.getSelectedAccount()
@@ -49,7 +44,7 @@ export const handlePreAuthorizationMessage: HandleMessage<
       }
 
       if (isAuthorized && selectedAccount?.address) {
-        return sendToTabAndUi({
+        return respond({
           type: "CONNECT_DAPP_RES",
           data: selectedAccount,
         })
@@ -62,11 +57,11 @@ export const handlePreAuthorizationMessage: HandleMessage<
       const selectedAccount = await wallet.getSelectedAccount()
 
       if (!selectedAccount) {
-        return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: false })
+        return respond({ type: "IS_PREAUTHORIZED_RES", data: false })
       }
 
       const valid = await isPreAuthorized(selectedAccount, msg.data)
-      return sendToTabAndUi({ type: "IS_PREAUTHORIZED_RES", data: valid })
+      return respond({ type: "IS_PREAUTHORIZED_RES", data: valid })
     }
   }
 

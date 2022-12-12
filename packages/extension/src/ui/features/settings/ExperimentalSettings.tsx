@@ -1,10 +1,8 @@
+import { BarBackButton, NavigationContainer, Switch } from "@argent/ui"
 import { FC } from "react"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { IconBar } from "../../components/IconBar"
-import IOSSwitch from "../../components/IOSSwitch"
-import { H2 } from "../../theme/Typography"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 export const PrivacyExperimentalSettings: FC = () => {
@@ -14,16 +12,14 @@ export const PrivacyExperimentalSettings: FC = () => {
   )
 
   return (
-    <>
-      <IconBar back />
+    <NavigationContainer leftButton={<BarBackButton />} title={"Experimental"}>
       <SettingsScreenWrapper>
-        <H2>Experimental</H2>
         <SettingsItem>
           <Title>
             <span>Use Plugin Account</span>
-            <IOSSwitch
-              checked={experimentalPluginAccount}
-              onClick={() =>
+            <Switch
+              isChecked={experimentalPluginAccount}
+              onChange={() =>
                 settingsStore.set(
                   "experimentalPluginAccount",
                   !experimentalPluginAccount,
@@ -34,6 +30,6 @@ export const PrivacyExperimentalSettings: FC = () => {
           <P>Use the experimental Argent Plugin account on testnet</P>
         </SettingsItem>
       </SettingsScreenWrapper>
-    </>
+    </NavigationContainer>
   )
 }

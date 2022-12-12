@@ -1,36 +1,28 @@
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { CompiledContract } from "starknet"
+import { DeclareContractPayload } from "starknet"
 
-import {
-  Field,
-  FieldGroup,
-  FieldKey,
-  FieldValue,
-} from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { AccountAddress } from "./AccountAddress"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { DeclareContractFeeEstimation } from "./feeEstimation/DeclareContractFeeEstimation"
-import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 
 export interface ApproveDeclareContractScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
-  classHash: string
-  contract: string | CompiledContract
+  payload: DeclareContractPayload
   onSubmit: () => void
 }
 
 const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
   selectedAccount,
   actionHash,
-  classHash,
-  contract,
+  payload,
   onSubmit,
   ...props
 }) => {
-  usePageTracking("signTransaction", {
+  usePageTracking("signDeclareTransaction", {
     networkId: selectedAccount?.networkId || "unknown",
   })
 
@@ -54,23 +46,12 @@ const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}
           actionHash={actionHash}
-          classHash={classHash}
-          contract={contract}
+          payload={payload}
         />
       }
       {...props}
     >
-      <FieldGroup>
-        <AccountAddressField
-          title="From"
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.network.id}
-        />
-        <Field>
-          <FieldKey>Network</FieldKey>
-          <FieldValue>{selectedAccount.network.name}</FieldValue>
-        </Field>
-      </FieldGroup>
+      <AccountAddress selectedAccount={selectedAccount} />
     </ConfirmScreen>
   )
 }

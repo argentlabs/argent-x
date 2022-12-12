@@ -1,3 +1,4 @@
+import { icons } from "@argent/ui"
 import { BigNumber } from "ethers"
 import { isString } from "lodash-es"
 import { FC, useMemo, useState } from "react"
@@ -21,7 +22,6 @@ import {
   SectionHeader,
 } from "../../components/Fields"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
-import { TransactionUnknownInline } from "../../components/Icons/TransactionUnknownInline"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { formatDateTime } from "../../services/dates"
@@ -46,6 +46,8 @@ import { NFTTitle } from "./ui/NFTTitle"
 import { TransactionCallDataBottomSheet } from "./ui/TransactionCallDataBottomSheet"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferTitle } from "./ui/TransferTitle"
+
+const { ActivityIcon } = icons
 
 function getErrorMessageFromErrorDump(errorDump?: string) {
   try {
@@ -260,16 +262,16 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
-
   return (
     <StyledTransactionDetailWrapper
+      scrollContent={transactionTransformed.displayName || "Transaction"}
       title={
         <>
           {!isNFT && (
             <MainTransactionIconContainer>
               <TransactionIcon
                 transaction={transactionTransformed}
-                size={80}
+                size={18}
                 outline
               />
             </MainTransactionIconContainer>
@@ -288,7 +290,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
                       : transactionTransformed.fromAddress
                   }
                   networkId={network.id}
-                  size={20}
+                  size={5}
                 />
               </TitleAddress>
             </TitleAddressContainer>
@@ -305,9 +307,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         />
       )}
       <ExpandableFieldGroup
-        icon={
-          <TransactionIcon transaction={transactionTransformed} size={40} />
-        }
+        icon={<TransactionIcon transaction={transactionTransformed} size={9} />}
         title="Action"
         subtitle={displayName}
       >
@@ -344,7 +344,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
             <ExpandableFieldGroup
               icon={
                 <TransactionIconContainer>
-                  <TransactionUnknownInline />
+                  <ActivityIcon />
                 </TransactionIconContainer>
               }
               title={displayName}

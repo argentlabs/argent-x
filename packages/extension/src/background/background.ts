@@ -25,7 +25,7 @@ interface HandlerParams<T> {
   sender: browser.runtime.MessageSender
   background: BackgroundService
   messagingKeys: MessagingKeys
-  sendToTabAndUi: (msg: MessageType) => Promise<void>
+  respond: (msg: MessageType) => Promise<void>
 }
 
 export type HandleMessage<T> = (params: HandlerParams<T>) => Promise<unknown>

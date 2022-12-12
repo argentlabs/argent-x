@@ -1,37 +1,29 @@
+import { H6, P4, icons } from "@argent/ui"
+import { Flex, HStack } from "@chakra-ui/react"
 // FIXME: remove when depricated accounts do not longer work
 import { FC } from "react"
-import styled from "styled-components"
 
-import { WarningIcon } from "../../components/Icons/WarningIcon"
-import Row from "../../components/Row"
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
-
-const Title = styled.div`
-  font-weight: 600;
-  font-size: 17px;
-  line-height: 22px;
-`
-
-const Alert = styled(Row)`
-  width: auto;
-  background: ${({ theme }) => theme.red1};
-  margin-top: 8px;
-  border-radius: 13px;
-  padding: 5px 10px;
-  gap: 5px;
-`
+const { UpgradeIcon } = icons
 
 export const DeprecatedAccountsWarning: FC = () => (
-  <Container>
-    <Title>Upgrade Required</Title>
-    <Alert>
-      <WarningIcon />
-      These accounts need to be upgraded
-    </Alert>
-  </Container>
+  <Flex
+    pt={4}
+    mt={4}
+    px={2}
+    pb={2}
+    direction={"column"}
+    gap={0.5}
+    borderTop="1px solid"
+    borderTopColor={"border"}
+  >
+    <HStack spacing={1} color={"primary.500"}>
+      <H6>Upgrade Required</H6>
+      <H6>
+        <UpgradeIcon />
+      </H6>
+    </HStack>
+    <P4 color={"neutrals.100"}>
+      Upgrade the following accounts to continue using them
+    </P4>
+  </Flex>
 )

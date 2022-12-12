@@ -1,3 +1,5 @@
+// Currently unused, but kept so we don't have to re-write it later if we need it
+
 import { Abi, Contract } from "starknet"
 
 import UniversalDeployerAbi from "./abis/UniversalDeployer.json"

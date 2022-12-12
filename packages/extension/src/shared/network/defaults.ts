@@ -8,7 +8,7 @@ const DEV_ONLY_NETWORKS: Network[] = [
     baseUrl: "https://external.integration.starknet.io",
     accountClassHash: {
       argentAccount:
-        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
+        "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
     },
     multicallAddress:
       "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
@@ -49,7 +49,7 @@ export const defaultNetworks: Network[] = [
   {
     id: "goerli-alpha-2",
     name: "Testnet 2",
-    chainId: "SN_GOERLI",
+    chainId: "SN_GOERLI2",
     baseUrl: "https://alpha4-2.starknet.io",
     explorerUrl: "https://goerli-2.voyager.online/",
     accountClassHash: {

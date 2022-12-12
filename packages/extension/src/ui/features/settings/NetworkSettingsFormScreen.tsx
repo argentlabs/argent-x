@@ -1,3 +1,4 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -9,7 +10,6 @@ import { settingsStore } from "../../../shared/settings"
 import { defaultBlockExplorers } from "../../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { useAppState } from "../../app.state"
-import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
@@ -93,8 +93,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
-      <IconBar back />
+    <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
       <ConfirmScreen
         title={props.mode === "add" ? "Add network" : "Edit network"}
         singleButton
@@ -231,6 +230,6 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
           )}
         </Wrapper>
       </ConfirmScreen>
-    </>
+    </NavigationContainer>
   )
 }

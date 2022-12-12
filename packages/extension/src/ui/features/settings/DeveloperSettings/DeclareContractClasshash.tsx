@@ -17,24 +17,36 @@ import { StickyGroup } from "../../actions/ConfirmScreen"
 
 const { TickCircleIcon } = icons
 
-const DeclareContractClasshash: FC = () => {
+export const DeclareOrDeployContractSuccess: FC = () => {
   const navigate = useNavigate()
-  const { classhash } = useParams()
+  const { type, classHashOrDeployedAddress } = useParams()
+
+  const isDeclare = type === "declare"
+  const value = classHashOrDeployedAddress
 
   return (
     <NavigationContainer
-      title={"Declare smart contract"}
+      title={isDeclare ? "Declared smart contract" : "Deployed smart contract"}
       rightButton={
         <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
       }
     >
-      {classhash && (
+      {value && (
         <Flex flex={1} mx={6} mt={16} direction="column" alignItems="center">
           <Text fontSize="6xl" mb={7}>
             <TickCircleIcon />
           </Text>
-          <H3 mb={4}>Contract declared</H3>
-          <H6 mb={6}>Contract declared with class hash:</H6>
+          {isDeclare ? (
+            <>
+              <H3 mb={4}>Contract declared</H3>
+              <H6 mb={6}>Contract declared with class hash:</H6>
+            </>
+          ) : (
+            <>
+              <H3 mb={4}>Contract deployed</H3>
+              <H6 mb={6}>Contract deployed with address:</H6>
+            </>
+          )}
           <Box
             maxW="100%"
             backgroundColor="neutrals.800"
@@ -43,9 +55,16 @@ const DeclareContractClasshash: FC = () => {
             px="4.5"
             overflowWrap="break-word"
           >
-            <P3>{classhash}</P3>
+            <P3>{value}</P3>
           </Box>
-          <CopyTooltip prompt="Click to copy classhash" copyValue={classhash}>
+          <CopyTooltip
+            prompt={
+              isDeclare
+                ? "Click to copy classhash"
+                : "Click to copy contract address"
+            }
+            copyValue={value}
+          >
             <Button
               mt={3}
               size="3xs"
@@ -59,17 +78,26 @@ const DeclareContractClasshash: FC = () => {
         </Flex>
       )}
       <StickyGroup>
-        <Button
-          onClick={() => navigate(routes.accountTokens())}
-          gap="2"
-          colorScheme="primary"
-          width="100%"
-        >
-          Go to account
-        </Button>
+        {isDeclare ? (
+          <Button
+            onClick={() => navigate(routes.settingsSmartContractDeploy())}
+            gap="2"
+            colorScheme="primary"
+            width="100%"
+          >
+            Go to deployment
+          </Button>
+        ) : (
+          <Button
+            onClick={() => navigate(routes.accountTokens())}
+            gap="2"
+            colorScheme="primary"
+            width="100%"
+          >
+            Go to account
+          </Button>
+        )}
       </StickyGroup>
     </NavigationContainer>
   )
 }
-
-export { DeclareContractClasshash }

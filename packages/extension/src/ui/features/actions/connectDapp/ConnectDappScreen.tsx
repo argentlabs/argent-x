@@ -58,7 +58,7 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
         accountName,
         accountAddress: account.address,
         networkId: account.networkId,
-        connected,
+        connectedHost: connected ? host : undefined,
         accountType: account.type,
       }
     },

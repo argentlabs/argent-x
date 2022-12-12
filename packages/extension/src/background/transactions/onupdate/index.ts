@@ -1,3 +1,4 @@
+import { handleDeclareContractTransaction } from "./declareContract"
 import { handleDeployAccountTransaction } from "./deployAccount"
 import { checkResetStoredNonce } from "./nonce"
 import { notifyAboutCompletedTransactions } from "./notifications"
@@ -7,6 +8,7 @@ import { handleUpgradeTransaction } from "./upgrade"
 const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
   handleUpgradeTransaction,
   handleDeployAccountTransaction,
+  handleDeclareContractTransaction,
   checkResetStoredNonce,
 ]
 

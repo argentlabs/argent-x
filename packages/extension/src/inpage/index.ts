@@ -3,6 +3,7 @@ import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
+import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
@@ -52,7 +53,7 @@ window.addEventListener(
     }
 
     if (
-      data.type === "CONNECT_ACCOUNT_RES" ||
+      (starknet.account && data.type === "CONNECT_ACCOUNT_RES") ||
       data.type === "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK"
     ) {
       const account =
@@ -66,6 +67,20 @@ window.addEventListener(
         // TODO: better UX would be to also re-connect when user selects pre-authorized account
         await disconnectAccount()
       } else {
+        const walletAccountP = waitForMessage(
+          "CONNECT_DAPP_RES",
+          10 * 60 * 1000,
+        )
+        sendMessage({
+          type: "CONNECT_DAPP",
+          data: { host: window.location.host },
+        })
+        const walletAccount = await walletAccountP
+
+        if (!walletAccount) {
+          return disconnectAccount()
+        }
+
         if (
           account &&
           (account.address !== starknet.selectedAddress ||

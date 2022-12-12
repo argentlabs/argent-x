@@ -13,6 +13,7 @@ export type TransformedTransactionAction =
   | "BUY"
   | "APPROVE"
   | "DECLARE"
+  | "DEPLOY"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -92,6 +93,12 @@ export interface DeclareContractTransaction extends BaseTransformedTransaction {
   classHash: string
 }
 
+export interface DeployContractTransaction extends BaseTransformedTransaction {
+  action: "DEPLOY"
+  entity: "CONTRACT"
+  contractAddress: string
+}
+
 export type TransformedTransaction =
   | BaseTransformedTransaction
   | TokenTransferTransaction
@@ -101,3 +108,4 @@ export type TransformedTransaction =
   | NFTTransferTransaction
   | SwapTransaction
   | DeclareContractTransaction
+  | DeployContractTransaction

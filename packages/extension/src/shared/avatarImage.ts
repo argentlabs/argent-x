@@ -1,15 +1,18 @@
-const getInitials = (name: string) => {
-  let initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-  if (initials.length < 2) {
-    initials = name[0] + name[1]
+import { isString, upperCase } from "lodash-es"
+
+export const getInitials = (name: string, alphanumeric = false) => {
+  if (!isString(name)) {
+    return ""
   }
-  if (initials.length > 2) {
-    initials = initials.slice(0, 2)
+  const filtered = alphanumeric ? name.replace(/[^0-9a-z ]/gi, "") : name
+  const uppercase = upperCase(filtered)
+  const uppercaseElements = uppercase.split(" ")
+
+  if (uppercaseElements.length === 1) {
+    return uppercaseElements[0].substring(0, 2)
   }
-  return initials.toUpperCase()
+  const initials = uppercaseElements.map((n) => n[0])
+  return [initials[0], initials[initials.length - 1]].join("")
 }
 
 const parseColor = (color: string) => {
@@ -28,8 +31,8 @@ export const generateAvatarImage = (
   const background = parseColor(options.background)
   const color = parseColor(options.color ?? "#ffffff")
 
-  // get initials
-  const initials = getInitials(name)
+  // get alphanumeric initials (to avoid issues with being outside range of btoa)
+  const initials = getInitials(name, true)
 
   // generate 64x64 svg with initials in the center (horizontal and vertical) with font color and background color and font family Helvetica (plus fallbacks)
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">

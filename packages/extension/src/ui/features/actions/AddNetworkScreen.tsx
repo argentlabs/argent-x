@@ -11,6 +11,7 @@ import { FormError, H2 } from "../../theme/Typography"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   padding: 0 32px 48px 32px;
 

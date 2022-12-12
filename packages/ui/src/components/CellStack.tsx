@@ -51,7 +51,7 @@ export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
       {leftIcon && <Flex fontSize="base">{leftIcon}</Flex>}
       <H6>{children}</H6>
       {rightIcon && (
-        <Flex ml={"auto"} fontSize="base">
+        <Flex ml={"auto"} fontSize="base" opacity={0.6}>
           {rightIcon}
         </Flex>
       )}
