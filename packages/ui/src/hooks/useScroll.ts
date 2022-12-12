@@ -53,7 +53,9 @@ export const useScroll = ({ onScroll: onScrollProp }: UseScrollProps = {}) => {
       if (ref?.current) {
         const { scrollTop, scrollLeft } = ref.current
         setScroll({ scrollTop, scrollLeft })
-        ref.current.addEventListener("scroll", onScroll)
+        ref.current.addEventListener("scroll", onScroll, {
+          passive: true,
+        })
       }
     },
     [onScroll],

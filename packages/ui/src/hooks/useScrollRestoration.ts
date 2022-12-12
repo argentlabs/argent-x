@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect } from "react"
+import { useLayoutEffect } from "react"
 import { NavigationType, useNavigationType } from "react-router-dom"
 
 import { ScrollProps, useScroll } from "./useScroll"
@@ -24,13 +24,7 @@ export const useScrollRestoration = (
   storageKey: string,
   storage: IScrollRestorationStorage | undefined = memoryStorage,
 ): ReturnType<typeof useScroll> => {
-  const onScroll = useCallback(
-    (scroll: ScrollProps) => {
-      storage.set(storageKey, scroll)
-    },
-    [storage, storageKey],
-  )
-  const useScrollProps = useScroll({ onScroll })
+  const useScrollProps = useScroll()
   const navigationType = useNavigationType()
 
   useLayoutEffect(() => {
@@ -39,6 +33,12 @@ export const useScrollRestoration = (
       if (value && useScrollProps.useScrollRef.current) {
         const { scrollTop, scrollLeft } = value
         useScrollProps.useScrollRef.current.scroll(scrollLeft, scrollTop)
+      }
+    }
+    return () => {
+      if (useScrollProps.useScrollRef.current) {
+        const { scrollTop, scrollLeft } = useScrollProps.useScrollRef.current
+        storage.set(storageKey, { scrollTop, scrollLeft })
       }
     }
   }, [navigationType, storage, storageKey, useScrollProps.useScrollRef])
