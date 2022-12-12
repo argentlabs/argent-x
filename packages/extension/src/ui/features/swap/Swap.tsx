@@ -19,6 +19,7 @@ import { useTokensWithBalance } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
+import { SwapWarning } from "./ui/SwapWarning"
 
 const { SwitchDirectionIcon } = icons
 
@@ -222,6 +223,11 @@ const Swap = () => {
       <Flex flex={1} />
       <Box mx="4">
         <Button
+          isLoading={
+            tradeLoading &&
+            (!!formattedAmounts[Field.INPUT] ||
+              !!formattedAmounts[Field.OUTPUT])
+          }
           w="100%"
           bg={
             isValid ||
@@ -241,6 +247,7 @@ const Swap = () => {
           {!!swapInputError && <>{swapInputError}</>}
         </Button>
       </Box>
+      <SwapWarning />
     </>
   )
 }
