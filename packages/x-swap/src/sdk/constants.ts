@@ -7,6 +7,7 @@ export type BigintIsh = JSBI | bigint | string
 export enum ChainId { // From starknet.js
   MAINNET = "0x534e5f4d41494e", // encodeShortString('SN_MAIN'),
   TESTNET = "0x534e5f474f45524c49", // encodeShortString('SN_GOERLI'),
+  TESTNET2 = "0x534e5f474f45524c4932", // encodeShortString('SN_GOERLI2')
 }
 
 export type SupportedChainIds =
@@ -17,6 +18,7 @@ export type SupportedChainIds =
 export enum SupportedNetworks {
   MAINNET = "mainnet-alpha",
   TESTNET = "goerli-alpha",
+  TESTNET2 = "goerli-alpha-2",
 }
 
 export const DEFAULT_NETWORK_ID = SupportedNetworks.TESTNET
@@ -37,23 +39,15 @@ export const FACTORY_ADDRESS: { [networkId in SupportedNetworks]: string } = {
     "0xdad44c139a476c7a17fc8141e6db680e9abc9f56fe249a105094c44382c2fd",
   [SupportedNetworks.TESTNET]:
     "0x262744f8cea943dadc8823c318eaf24d0110dee2ee8026298f49a3bc58ed74a",
+  [SupportedNetworks.TESTNET2]:
+    "0x0329d90b8dd38a089e2c4d1e1b6f0caab166f769bda267b7d4118f06b07fed87",
 }
 
-export const PAIR_CLASS_HASH: { [networkId in SupportedNetworks]: string } = {
-  [SupportedNetworks.MAINNET]:
-    "0x2b39bc3f4c1fd5bef8b7d21504c44e0da59cf27b350551b13d913da52e40d3b",
-  [SupportedNetworks.TESTNET]:
-    "0x2b39bc3f4c1fd5bef8b7d21504c44e0da59cf27b350551b13d913da52e40d3b",
-}
+export const PAIR_CLASS_HASH =
+  "0x2b39bc3f4c1fd5bef8b7d21504c44e0da59cf27b350551b13d913da52e40d3b" // Pair Classhash should remain same independent of network
 
-export const PAIR_PROXY_CLASS_HASH: {
-  [networkId in SupportedNetworks]: string
-} = {
-  [SupportedNetworks.MAINNET]:
-    "0x7b5cd6a6949cc1730f89d795f2442f6ab431ea6c9a5be00685d50f97433c5eb",
-  [SupportedNetworks.TESTNET]:
-    "0x7b5cd6a6949cc1730f89d795f2442f6ab431ea6c9a5be00685d50f97433c5eb",
-}
+export const PAIR_PROXY_CLASS_HASH =
+  "0x7b5cd6a6949cc1730f89d795f2442f6ab431ea6c9a5be00685d50f97433c5eb" // Same with Pair Proxy Classhash
 
 export const FEE_TO_SETTER_ADDRESS: {
   [networkId in SupportedNetworks]: string
@@ -61,6 +55,8 @@ export const FEE_TO_SETTER_ADDRESS: {
   [SupportedNetworks.MAINNET]:
     "0x284a1ad6382cffc520d8f711cf9519ccf43b3c105b89ef081cbe1a625322410",
   [SupportedNetworks.TESTNET]:
+    "0x284a1ad6382cffc520d8f711cf9519ccf43b3c105b89ef081cbe1a625322410",
+  [SupportedNetworks.TESTNET2]:
     "0x284a1ad6382cffc520d8f711cf9519ccf43b3c105b89ef081cbe1a625322410",
 }
 

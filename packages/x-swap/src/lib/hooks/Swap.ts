@@ -38,10 +38,6 @@ export function useDerivedSwapInfo(): {
     connectedAddress ?? undefined,
     [inputCurrency ?? undefined, outputCurrency ?? undefined],
   )
-  console.log(
-    "🚀 ~ file: Swap.ts ~ line 40 ~ useDerivedSwapInfo ~ relevantTokenBalances",
-    relevantTokenBalances,
-  )
 
   const isExactIn: boolean = independentField === Field.INPUT
   const parsedAmount = tryParseAmount(

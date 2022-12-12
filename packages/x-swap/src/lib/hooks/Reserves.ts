@@ -34,10 +34,6 @@ export function useReserves(pairAddresses: (string | undefined)[]) {
   const { multicall, networkId } = useSwapProvider()
 
   const pairAddressesString = pairAddresses.filter(Boolean).join("-")
-  console.log(
-    "🚀 ~ file: Reserves.ts ~ line 37 ~ useReserves ~ pairAddressesString",
-    pairAddressesString,
-  )
 
   const key = ["get_reserves", pairAddressesString, networkId]
     .filter(Boolean)
@@ -60,16 +56,8 @@ export function useReserves(pairAddresses: (string | undefined)[]) {
           })
         : undefined,
     )
-    console.log(
-      "🚀 ~ file: Reserves.ts ~ line 55 ~ useReserves ~ promises",
-      promises,
-    )
 
     const response = await Promise.all(promises)
-    console.log(
-      "🚀 ~ file: Reserves.ts ~ line 57 ~ useReserves ~ response",
-      response,
-    )
 
     return response.map((res) => {
       if (!res) {

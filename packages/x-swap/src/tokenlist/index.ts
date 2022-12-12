@@ -7,22 +7,18 @@ import { TokenAddressMap, TokenInfoList, WrappedTokenInfo } from "./types"
 const EMPTY_LIST: TokenAddressMap = {
   "mainnet-alpha": {},
   "goerli-alpha": {},
+  "goerli-alpha-2": {},
 }
 
 export function useTokenList(): TokenInfoList {
   return useMemo(
     () =>
-      ArgentTokenList.filter(
-        (ti) =>
-          ti.networkId === SupportedNetworks.MAINNET ||
-          ti.networkId === SupportedNetworks.TESTNET,
+      ArgentTokenList.filter((ti) =>
+        Object.values(SupportedNetworks).includes(ti.networkId as any),
       ).map((ti) => {
         return {
           ...ti,
-          networkId:
-            ti.networkId === "mainnet-alpha"
-              ? SupportedNetworks.MAINNET
-              : SupportedNetworks.TESTNET,
+          networkId: ti.networkId as SupportedNetworks,
           decimals: parseInt(ti.decimals),
         }
       }),

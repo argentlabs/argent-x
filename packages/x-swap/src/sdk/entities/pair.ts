@@ -41,7 +41,7 @@ export class Pair {
     const salt = pedersen([tokens[0].address, tokens[1].address])
 
     const contructorCalldata = [
-      PAIR_CLASS_HASH[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
+      PAIR_CLASS_HASH,
       tokens[0].address,
       tokens[1].address,
       FEE_TO_SETTER_ADDRESS[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
@@ -56,7 +56,7 @@ export class Pair {
           ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
           [tokens[1].address]: calculateContractAddressFromHash(
             salt,
-            PAIR_PROXY_CLASS_HASH[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
+            PAIR_PROXY_CLASS_HASH,
             contructorCalldata,
             FACTORY_ADDRESS[tokens[0].networkId ?? DEFAULT_NETWORK_ID],
           ),

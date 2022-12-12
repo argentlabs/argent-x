@@ -11,6 +11,7 @@ type ChainTokenList = {
 const WETH_ONLY: ChainTokenList = {
   [SupportedNetworks.MAINNET]: [WETH[SupportedNetworks.MAINNET]],
   [SupportedNetworks.TESTNET]: [WETH[SupportedNetworks.TESTNET]],
+  [SupportedNetworks.TESTNET2]: [WETH[SupportedNetworks.TESTNET2]],
 }
 
 export const DAI = {

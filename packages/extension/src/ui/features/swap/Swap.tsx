@@ -146,6 +146,7 @@ const Swap = () => {
         ? USDC[SupportedNetworks.MAINNET]
         : USDC[SupportedNetworks.TESTNET],
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId])
 
   return (
