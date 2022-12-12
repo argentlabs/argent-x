@@ -3,6 +3,8 @@ import {
   Currency,
   CurrencyAmount,
   Field,
+  SupportedNetworks,
+  USDC,
   maxAmountSpend,
   useDerivedSwapInfo,
   useSwapActionHandlers,
@@ -10,10 +12,11 @@ import {
 } from "@argent/x-swap"
 import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
 import { keyframes } from "@chakra-ui/react"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useTokensWithBalance } from "../accountTokens/tokens.state"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 
@@ -74,6 +77,7 @@ const Swap = () => {
   } = useDerivedSwapInfo()
 
   const account = useSelectedAccount()
+  const { id: networkId } = useCurrentNetwork()
   const { tokenDetails: ownedTokens } = useTokensWithBalance(account)
   const { independentField, typedValue, switchCurrencies } = useSwapState()
   const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
@@ -134,6 +138,15 @@ const Swap = () => {
       onCurrencySelection(Field.OUTPUT, outputCurrency),
     [onCurrencySelection],
   )
+
+  useEffect(() => {
+    onCurrencySelection(
+      Field.OUTPUT,
+      networkId === SupportedNetworks.MAINNET
+        ? USDC[SupportedNetworks.MAINNET]
+        : USDC[SupportedNetworks.TESTNET],
+    )
+  }, [])
 
   return (
     <>
