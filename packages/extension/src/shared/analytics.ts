@@ -56,6 +56,7 @@ export interface Events {
   deployAccount:
     | {
         status: "success"
+        trigger: "sign" | "transaction"
         networkId: string
       }
     | {

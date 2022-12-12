@@ -1,6 +1,8 @@
 import { Button, chakra, defineStyleConfig } from "@chakra-ui/react"
 import { mode } from "@chakra-ui/theme-tools"
 
+import { typographyStyles } from "./Typography"
+
 /** as a convenience */
 export { Button }
 
@@ -30,37 +32,37 @@ export const buttonTheme = defineStyleConfig({
   sizes: {
     auto: {},
     "3xs": {
-      fontSize: "sm",
+      ...typographyStyles.B3,
       px: "1.5",
       py: 0,
     },
     "2xs": {
+      ...typographyStyles.B3,
       minHeight: 8,
-      fontSize: "sm",
       px: 3,
       py: 1,
     },
     xs: {
+      ...typographyStyles.B3,
       minHeight: 9,
-      fontSize: "sm",
       px: 4,
       py: 1,
     },
     sm: {
+      ...typographyStyles.B3,
       minHeight: 10,
-      fontSize: "sm",
       px: 5,
       py: 2,
     },
     md: {
+      ...typographyStyles.B2,
       minHeight: 12,
-      fontSize: "lg",
       px: 6,
       py: 2,
     },
     lg: {
+      ...typographyStyles.B1,
       minHeight: 14,
-      fontSize: "lg",
       px: 8,
       py: 2,
     },

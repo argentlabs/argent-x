@@ -52,7 +52,7 @@ Upgrade.args = {
 export const Connected = Template.bind({})
 Connected.args = {
   ...account,
-  connected: true,
+  connectedHost: "foobar.xyz",
 }
 
 export const Hidden = Template.bind({})

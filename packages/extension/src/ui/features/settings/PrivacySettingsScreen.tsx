@@ -1,13 +1,11 @@
 import { BarBackButton, NavigationContainer, Switch } from "@argent/ui"
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 export const PrivacySettingsScreen: FC = () => {
-  const navigate = useNavigate()
   const privacyUseArgentServices = useKeyValueStorage(
     settingsStore,
     "privacyUseArgentServices",
@@ -24,10 +22,7 @@ export const PrivacySettingsScreen: FC = () => {
   )
 
   return (
-    <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
-      title={"Privacy"}
-    >
+    <NavigationContainer leftButton={<BarBackButton />} title={"Privacy"}>
       <SettingsScreenWrapper>
         <hr />
         <SettingsItem>

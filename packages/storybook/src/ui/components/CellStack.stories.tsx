@@ -19,7 +19,7 @@ const Template: ComponentStory<typeof CellStack> = (props) => (
     <HeaderCell>HeaderCell</HeaderCell>
     <ButtonCell>ButtonCell</ButtonCell>
     <ButtonCell>ButtonCell</ButtonCell>
-    <ButtonCell>ButtonCell</ButtonCell>
+    <ButtonCell color={"error.500"}>ButtonCell with color</ButtonCell>
     <SpacerCell />
     <ButtonCell>ButtonCell</ButtonCell>
     <ButtonCell>ButtonCell</ButtonCell>

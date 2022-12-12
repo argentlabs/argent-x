@@ -1,7 +1,7 @@
 import { Button, Fade, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
 
-import { IScroll } from "../hooks"
+import { IScroll, useNavigateBack } from "../hooks"
 import { AbsoluteFlex } from "./Absolute"
 import * as icons from "./icons"
 import { H6 } from "./Typography"
@@ -69,8 +69,9 @@ export const BarIconButton: FC<ComponentProps<typeof Button>> = ({
 export const BarBackButton: FC<ComponentProps<typeof BarIconButton>> = (
   props,
 ) => {
+  const onClick = useNavigateBack()
   return (
-    <BarIconButton {...props}>
+    <BarIconButton aria-label="Back" onClick={onClick} {...props}>
       <ArrowLeftIcon />
     </BarIconButton>
   )
@@ -79,8 +80,9 @@ export const BarBackButton: FC<ComponentProps<typeof BarIconButton>> = (
 export const BarCloseButton: FC<ComponentProps<typeof BarIconButton>> = (
   props,
 ) => {
+  const onClick = useNavigateBack()
   return (
-    <BarIconButton {...props}>
+    <BarIconButton aria-label="Close" onClick={onClick} {...props}>
       <CloseIcon />
     </BarIconButton>
   )
@@ -95,6 +97,7 @@ export const BarAddButton: FC<ComponentProps<typeof BarIconButton>> = (
     </BarIconButton>
   )
 }
+
 export const NavigationBar: FC<NavigationBarProps> = ({
   leftButton,
   rightButton,
@@ -117,7 +120,13 @@ export const NavigationBar: FC<NavigationBarProps> = ({
         </TitleContainer>
       )}
       <Fade in={!title && showScrollContent}>
-        <TitleContainer gap="2">{scrollContent}</TitleContainer>
+        <TitleContainer gap="2">
+          {typeof scrollContent === "string" ? (
+            <H6>{scrollContent}</H6>
+          ) : (
+            <>{scrollContent}</>
+          )}
+        </TitleContainer>
       </Fade>
       {(leftButton || rightButton) && (
         <ButtonsContainer>

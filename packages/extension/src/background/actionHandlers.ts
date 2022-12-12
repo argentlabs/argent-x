@@ -56,6 +56,12 @@ export const handleActionApproval = async (
       try {
         const txHash = await accountDeployAction(action, background)
 
+        analytics.track("deployAccount", {
+          status: "success",
+          trigger: "sign",
+          networkId: action.payload.networkId,
+        })
+
         return {
           type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
           data: { txHash, actionHash },
@@ -65,6 +71,12 @@ export const handleActionApproval = async (
         if (error.includes("403")) {
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
+
+        analytics.track("deployAccount", {
+          status: "failure",
+          networkId: action.payload.networkId,
+          errorMessage: `${error}`,
+        })
 
         return {
           type: "DEPLOY_ACCOUNT_ACTION_FAILED",

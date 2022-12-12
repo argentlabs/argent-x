@@ -1,38 +1,16 @@
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
-import { Navigate, useParams } from "react-router-dom"
-import styled from "styled-components"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 
 import { useAppState } from "../../app.state"
-import { IconBar } from "../../components/IconBar"
 import { routes, useReturnTo } from "../../routes"
-import { H1 } from "../../theme/Typography"
-import { DeprecatedContainer } from "./AccountContainer"
 import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
 import { isHiddenAccount, useAccountsOnNetwork } from "./accounts.state"
-
-const AccountList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 48px 32px;
-`
-
-const AccountListWrapper = styled(DeprecatedContainer)`
-  display: flex;
-  flex-direction: column;
-
-  ${H1} {
-    text-align: center;
-  }
-
-  > ${AccountList} {
-    width: 100%;
-  }
-`
 
 export const AccountListHiddenScreen: FC = () => {
   const { networkId } = useParams()
   const { switcherNetworkId } = useAppState()
+  const navigate = useNavigate()
 
   const hiddenAccounts = useAccountsOnNetwork({
     showHidden: true,
@@ -46,17 +24,22 @@ export const AccountListHiddenScreen: FC = () => {
     return <Navigate to={returnTo ? returnTo : routes.accounts()} />
   }
   return (
-    <AccountListWrapper>
-      <IconBar back close={returnTo} />
-      <H1>Hidden Accounts</H1>
-      <AccountList>
+    <NavigationContainer
+      title={"Hidden Accounts"}
+      leftButton={
+        <BarBackButton
+          onClick={() => navigate(returnTo ? returnTo : routes.accounts())}
+        />
+      }
+    >
+      <CellStack>
         {hiddenAccounts.map((account) => (
           <AccountListHiddenScreenItem
             key={account.address}
             account={account}
           />
         ))}
-      </AccountList>
-    </AccountListWrapper>
+      </CellStack>
+    </NavigationContainer>
   )
 }

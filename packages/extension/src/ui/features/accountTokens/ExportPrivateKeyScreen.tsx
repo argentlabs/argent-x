@@ -1,11 +1,12 @@
+import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
 import { FC, ReactNode, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
 import { CopyTooltip } from "../../components/CopyTooltip"
-import { IconBar } from "../../components/IconBar"
 import { Paragraph } from "../../components/Page"
+import { routes } from "../../routes"
 import { checkPassword } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/ConfirmScreen"
@@ -49,14 +50,19 @@ const WarningContainer = styled.div`
 `
 
 const Wrapper: FC<{ children: ReactNode }> = ({ children }) => {
+  const navigate = useNavigate()
   return (
-    <>
-      <IconBar back close />
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
+    >
       <Container>
         <H2>Export private key</H2>
         {children}
       </Container>
-    </>
+    </NavigationContainer>
   )
 }
 
