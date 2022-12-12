@@ -3,6 +3,7 @@ import {
   Currency,
   CurrencyAmount,
   Field,
+  JSBI,
   SupportedNetworks,
   USDC,
   maxAmountSpend,
@@ -91,8 +92,6 @@ const Swap = () => {
       independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
   }
 
-  const isValid = !swapInputError
-
   const handleTypeInput = useCallback(
     (value: string) => {
       onUserInput(Field.INPUT, value)
@@ -139,6 +138,19 @@ const Swap = () => {
       onCurrencySelection(Field.OUTPUT, outputCurrency),
     [onCurrencySelection],
   )
+
+  const noRoute = !trade?.route
+
+  const userHasSpecifiedInputOutput = Boolean(
+    currencies[Field.INPUT] &&
+      currencies[Field.OUTPUT] &&
+      parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0)),
+  )
+
+  const insufficientLiquidityError =
+    !tradeLoading && userHasSpecifiedInputOutput && noRoute
+
+  const isValid = !swapInputError && !insufficientLiquidityError
 
   useEffect(() => {
     onCurrencySelection(
@@ -222,26 +234,35 @@ const Swap = () => {
       </SwapContainer>
       <Flex flex={1} />
       <Box mx="4">
-        <Button
-          isLoading={tradeLoading}
-          w="100%"
-          bg={
-            isValid ||
-            !formattedAmounts[Field.INPUT] ||
-            !formattedAmounts[Field.OUTPUT]
-              ? "primary.500"
-              : "error.500"
-          }
-          mb="6"
-          disabled={
-            !formattedAmounts[Field.INPUT] ||
-            !formattedAmounts[Field.OUTPUT] ||
-            !isValid
-          }
-        >
-          {!swapInputError && <>Review swap</>}
-          {!!swapInputError && <>{swapInputError}</>}
-        </Button>
+        {isValid ? (
+          <Button
+            isLoading={tradeLoading}
+            w="100%"
+            bg="primary.500"
+            mb="6"
+            disabled={
+              !formattedAmounts[Field.INPUT] || !formattedAmounts[Field.OUTPUT]
+            }
+          >
+            Review swap
+          </Button>
+        ) : (
+          <Button
+            isLoading={tradeLoading}
+            w="100%"
+            bg={swapInputError ? "primary.500" : "error.500"}
+            mb="6"
+            disabled
+          >
+            {swapInputError ? (
+              <>{swapInputError}</>
+            ) : insufficientLiquidityError ? (
+              <>{insufficientLiquidityError}</>
+            ) : (
+              <>Unknown Error</>
+            )}
+          </Button>
+        )}
       </Box>
       <SwapWarning />
     </>
