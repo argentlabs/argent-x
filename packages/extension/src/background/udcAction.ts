@@ -127,26 +127,20 @@ export const udcDeployContract = async (
       constructorCalldata || [],
     )
 
-    const contractAddress = calculateContractAddressFromHash(
-      unique ? pedersen([salt, account.address]) : salt,
-      classHash,
-      compiledConstructorCallData,
-      unique ? UDC.ADDRESS : 0,
-    )
-
     // submit onchain
     const nonce = await getNonce(account, wallet)
-    const { transaction_hash: txHash } = await starknetAccount.deploy(
-      {
-        classHash,
-        salt,
-        unique,
-        constructorCalldata,
-      },
-      {
-        nonce,
-      },
-    )
+    const { transaction_hash: txHash, contract_address } =
+      await starknetAccount.deploy(
+        {
+          classHash,
+          salt,
+          unique,
+          constructorCalldata,
+        },
+        {
+          nonce,
+        },
+      )
 
     if (!checkTransactionHash(txHash)) {
       throw Error(
@@ -154,6 +148,7 @@ export const udcDeployContract = async (
       )
     }
 
+    const contractAddress = contract_address[0]
     await addTransaction({
       hash: txHash,
       account,
