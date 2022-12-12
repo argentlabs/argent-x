@@ -4,7 +4,6 @@ import {
   constants,
   stark,
 } from "starknet"
-import { hash } from "starknet"
 
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { BackgroundService } from "./background"
@@ -13,8 +12,6 @@ import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
 
 const { UDC } = constants
-
-const { calculateContractAddressFromHash, pedersen } = hash
 
 type DeclareContractAction = ExtQueueItem<{
   type: "DECLARE_CONTRACT_ACTION"
