@@ -7,16 +7,11 @@ import dts from "vite-plugin-dts"
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react({
-      jsxRuntime: "classic",
-    }) as PluginOption, // stops TS from complaining
     dts({
       insertTypesEntry: true,
     }),
+    react() as PluginOption, // stops TS from complaining
   ],
-  // optimizeDeps: {
-  //   include: ["react/jsx-runtime"],
-  // },
   build: {
     lib: {
       entry: resolvePath(__dirname, "src/index.ts"),
