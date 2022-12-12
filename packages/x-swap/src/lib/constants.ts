@@ -3,6 +3,10 @@ import { JSBI, Percent, SupportedNetworks, Token, WETH } from "../sdk"
 // default allowed slippage, in bips
 export const INITIAL_ALLOWED_SLIPPAGE = 200
 export const ONE_BIPS = new Percent(JSBI.BigInt(1), JSBI.BigInt(10000))
+export const BIPS_BASE = JSBI.BigInt(10000)
+
+// 60 minutes, denominated in seconds
+export const DEFAULT_DEADLINE_FROM_NOW = 60 * 60
 
 // a list of tokens by chain
 type ChainTokenList = {

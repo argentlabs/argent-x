@@ -17,6 +17,8 @@ export const getProviderForNetworkId = memoize(
         return getProviderForBaseUrl("https://alpha-mainnet.starknet.io")
       case SupportedNetworks.TESTNET:
         return getProviderForBaseUrl("https://alpha4.starknet.io")
+      case SupportedNetworks.TESTNET2:
+        return getProviderForBaseUrl("https://alpha4-2.starknet.io")
       default: {
         console.error(
           `Network not supported: ${networkId}. Using default provider.`,

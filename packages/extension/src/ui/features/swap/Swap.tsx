@@ -9,12 +9,15 @@ import {
   maxAmountSpend,
   useDerivedSwapInfo,
   useSwapActionHandlers,
+  useSwapCallback,
   useSwapState,
+  useUserState,
 } from "@argent/x-swap"
 import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
 import { keyframes } from "@chakra-ui/react"
 import { useCallback, useEffect, useState } from "react"
 
+import { executeTransaction } from "../../services/backgroundTransactions"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useTokensWithBalance } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -84,6 +87,7 @@ const Swap = () => {
   const { independentField, typedValue, switchCurrencies } = useSwapState()
   const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const [rotate, setRotate] = useState(false)
+  const { userSlippageTolerance } = useUserState()
 
   const parsedAmounts = {
     [Field.INPUT]:
@@ -151,6 +155,26 @@ const Swap = () => {
     !tradeLoading && userHasSpecifiedInputOutput && noRoute
 
   const isValid = !swapInputError && !insufficientLiquidityError
+
+  const { callback: swapCallback, error: swapCallbackError } = useSwapCallback(
+    trade,
+    userSlippageTolerance,
+  )
+
+  const handleSwap = useCallback(() => {
+    if (swapCallbackError) {
+      console.error(swapCallbackError)
+      return
+    }
+
+    if (swapCallback) {
+      const swapCalls = swapCallback()
+
+      return executeTransaction({ transactions: swapCalls }).then(() => {
+        onUserInput(Field.INPUT, "")
+      })
+    }
+  }, [onUserInput, swapCallback, swapCallbackError])
 
   useEffect(() => {
     onCurrencySelection(
@@ -243,6 +267,7 @@ const Swap = () => {
             disabled={
               !formattedAmounts[Field.INPUT] || !formattedAmounts[Field.OUTPUT]
             }
+            onClick={handleSwap}
           >
             Review swap
           </Button>

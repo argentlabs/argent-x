@@ -34,6 +34,15 @@ export enum Rounding {
   ROUND_UP,
 }
 
+export const ROUTER_ADDRESS: { [network in SupportedNetworks]: string } = {
+  [SupportedNetworks.MAINNET]:
+    "0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
+  [SupportedNetworks.TESTNET]:
+    "0x2bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
+  [SupportedNetworks.TESTNET2]:
+    "0x0756bef7f575eafdde2af479b2413ebf94f9677e904e4bac7b84a21143d39925",
+}
+
 export const FACTORY_ADDRESS: { [networkId in SupportedNetworks]: string } = {
   [SupportedNetworks.MAINNET]:
     "0xdad44c139a476c7a17fc8141e6db680e9abc9f56fe249a105094c44382c2fd",
