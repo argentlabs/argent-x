@@ -178,7 +178,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       title={currentMode === "add" ? "New address" : "Edit address"}
     >
       <VStack {...props} p="4">

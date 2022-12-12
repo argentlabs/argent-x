@@ -1,6 +1,7 @@
 import { Account, number, stark } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
+import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { calculateEstimateFeeFromL1Gas } from "./transactionExecution"
 
@@ -32,7 +33,13 @@ export const handleTransactionMessage: HandleMessage<
           accountDeploymentFee: string | undefined,
           maxADFee: string | undefined
 
-        if (selectedAccount.needsDeploy) {
+        if (
+          selectedAccount.needsDeploy &&
+          !(await isAccountDeployed(
+            selectedAccount,
+            starknetAccount.getClassAt,
+          ))
+        ) {
           const { overall_fee: adFee, suggestedMaxFee: suggestedADFee } =
             await wallet.getAccountDeploymentFee(selectedAccount)
 

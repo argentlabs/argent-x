@@ -1,16 +1,13 @@
 import { BarBackButton, Button, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
 
 import { StickyGroup } from "../../actions/ConfirmScreen"
 import { DeclareSmartContractForm } from "./DeclareSmartContractForm"
 
 const DeclareSmartContractScreen: FC = () => {
-  const navigate = useNavigate()
-
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       title={"Declare smart contract"}
     >
       <DeclareSmartContractForm>

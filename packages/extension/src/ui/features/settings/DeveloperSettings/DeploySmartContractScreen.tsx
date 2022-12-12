@@ -1,17 +1,15 @@
 import { BarBackButton, Button, NavigationContainer } from "@argent/ui"
 import { FC, useState } from "react"
-import { useNavigate } from "react-router-dom"
 
 import { StickyGroup } from "../../actions/ConfirmScreen"
 import { DeploySmartContractForm } from "./DeploySmartContractForm"
 
 const DeploySmartContractScreen: FC = () => {
-  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       title={"Deploy smart contract"}
     >
       <DeploySmartContractForm
