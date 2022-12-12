@@ -128,13 +128,6 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
           </Flex>
           <P4 fontWeight="bold">{trade.priceImpact.toSignificant(6)}%</P4>
         </Flex>
-        {/* 
-				TODO: Add/decide how to display fees
-				<Flex justifyContent="space-between">
-					<P4 color="neutrals.300">Estimated fees</P4>
-					<P4 fontWeight="bold">TODO</P4>
-				</Flex> 
-			*/}
       </Flex>
     </>
   )
