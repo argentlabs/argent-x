@@ -222,6 +222,11 @@ const Swap = () => {
       <Flex flex={1} />
       <Box mx="4">
         <Button
+          isLoading={
+            tradeLoading &&
+            (!!formattedAmounts[Field.INPUT] ||
+              !!formattedAmounts[Field.OUTPUT])
+          }
           w="100%"
           bg={
             isValid ||
