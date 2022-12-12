@@ -35,7 +35,8 @@ const SwapTokensModal: FC<any> = ({
     return tokens.filter(
       (token: any) =>
         token.name?.toLowerCase().includes(currentQueryValue.toLowerCase()) ||
-        token.symbol?.toLowerCase().includes(currentQueryValue.toLowerCase()),
+        token.symbol?.toLowerCase().includes(currentQueryValue.toLowerCase()) ||
+        token.address?.toLowerCase().includes(currentQueryValue.toLowerCase()),
     )
   }, [tokens, currentQueryValue])
 

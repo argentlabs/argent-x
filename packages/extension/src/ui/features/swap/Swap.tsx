@@ -146,7 +146,7 @@ const Swap = () => {
         ? USDC[SupportedNetworks.MAINNET]
         : USDC[SupportedNetworks.TESTNET],
     )
-  }, [])
+  }, [networkId])
 
   return (
     <>
