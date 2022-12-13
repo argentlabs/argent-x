@@ -17,7 +17,6 @@ import {
   mapNetworkStatusToColor,
 } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
-import { useSelectedAccount } from "../accounts/accounts.state"
 import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
 import { useNeedsToShowNetworkStatusWarning } from "./seenNetworkStatusWarning.state"
 import { useNetwork, useNetworkStatuses, useNetworks } from "./useNetworks"

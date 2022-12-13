@@ -4,6 +4,7 @@ import {
   BaseWalletAccount,
   WalletAccount,
 } from "../../shared/wallet.model"
+import { walletStore } from "../../shared/wallet/walletStore"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
 export const createNewAccount = async (networkId: string) => {
@@ -49,10 +50,10 @@ export const accountsOnNetwork = (
 
 export const selectAccount = async (
   account?: BaseWalletAccount,
-): Promise<WalletAccount | undefined> => {
-  connectAccount(account)
+): Promise<void> => {
+  await walletStore.set("selected", account ?? null)
 
-  return waitForMessage("CONNECT_ACCOUNT_RES")
+  return connectAccount(account)
 }
 
 export const connectAccount = (account?: BaseWalletAccount) => {
