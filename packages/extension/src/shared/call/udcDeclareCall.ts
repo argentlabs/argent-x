@@ -4,7 +4,11 @@ import { isEqualAddress } from "../../ui/services/addresses"
 
 const { UDC } = constants
 
-export const isUdcDeclareCall = (call: Call): call is Call => {
+export interface UdcDeclareCall extends Call {
+  entrypoint: "declareContract"
+}
+
+export const isUdcDeclareCall = (call: Call): call is UdcDeclareCall => {
   try {
     if (
       call.contractAddress &&
