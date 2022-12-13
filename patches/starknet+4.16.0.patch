@@ -1,5 +1,5 @@
 diff --git a/node_modules/starknet/dist/index.js b/node_modules/starknet/dist/index.js
-index 47b8f16..e7df06e 100644
+index 45c37b0..06f4440 100644
 --- a/node_modules/starknet/dist/index.js
 +++ b/node_modules/starknet/dist/index.js
 @@ -89,6 +89,7 @@ __export(hash_exports, {
@@ -40,7 +40,7 @@ index 47b8f16..e7df06e 100644
  function computeHashOnElements(data) {
    return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
 diff --git a/node_modules/starknet/dist/index.mjs b/node_modules/starknet/dist/index.mjs
-index aaf0836..055ed1d 100644
+index ee8f97f..baa1d36 100644
 --- a/node_modules/starknet/dist/index.mjs
 +++ b/node_modules/starknet/dist/index.mjs
 @@ -32,7 +32,7 @@ __export(hash_exports, {
