@@ -166,7 +166,6 @@ export const handleActionApproval = async (
           data: { actionHash, selectedAccount },
         }
       } catch (error) {
-        console.error(error)
         return {
           type: "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
           data: { actionHash },
