@@ -1,7 +1,7 @@
 import { Button, Fade, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
 
-import { IScroll, useNavigateBack } from "../hooks"
+import { ScrollProps, useNavigateBack } from "../hooks"
 import { AbsoluteFlex } from "./Absolute"
 import * as icons from "./icons"
 import { H6 } from "./Typography"
@@ -45,7 +45,7 @@ export interface NavigationBarProps extends PropsWithChildren {
   leftButton?: ReactNode
   title?: ReactNode
   rightButton?: ReactNode
-  scroll?: IScroll
+  scroll?: ScrollProps
   scrollContent?: ReactNode
 }
 

@@ -1,9 +1,13 @@
-import { ScrollContainer, Tab, TabBar, icons, useScroll } from "@argent/ui"
+import {
+  ScrollContainer,
+  Tab,
+  TabBar,
+  icons,
+  useScrollRestoration,
+} from "@argent/ui"
 import { FC, PropsWithChildren } from "react"
 import { NavLink } from "react-router-dom"
-import styled, { css } from "styled-components"
 
-import { Header } from "../../components/Header"
 import { routes } from "../../routes"
 import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
@@ -11,31 +15,17 @@ import { useAccountTransactions } from "./accountTransactions.state"
 
 const { WalletIcon, NftIcon, ActivityIcon } = icons
 
-export const DeprecatedContainer = styled.div<{
-  header?: boolean
-  footer?: boolean
-}>`
-  ${({ header = false }) =>
-    header &&
-    css`
-      padding-top: 68px;
-    `}
-  ${({ footer = false }) =>
-    footer &&
-    css`
-      padding-bottom: 64px;
-    `}
+export interface AccountContainerProps extends PropsWithChildren {
+  scrollKey: string
+}
 
-  ${Header} > a {
-    width: 36px;
-    height: 36px;
-  }
-`
-
-export const AccountContainer: FC<PropsWithChildren> = ({ children }) => {
+export const AccountContainer: FC<AccountContainerProps> = ({
+  scrollKey,
+  children,
+}) => {
   const account = useSelectedAccount()
   const { pendingTransactions } = useAccountTransactions(account)
-  const { scrollRef, scroll } = useScroll()
+  const { scrollRef, scroll } = useScrollRestoration(scrollKey)
 
   if (!account) {
     return <></>
