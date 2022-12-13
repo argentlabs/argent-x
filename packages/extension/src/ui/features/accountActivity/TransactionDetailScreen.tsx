@@ -1,4 +1,4 @@
-import { get } from "lodash-es"
+import { isArray } from "lodash-es"
 import { FC, useMemo } from "react"
 import { Navigate, useParams } from "react-router-dom"
 
@@ -51,9 +51,18 @@ export const TransactionDetailScreen: FC = () => {
 
   // TODO: remove this when after backend update
   const isUdcTransaction = useMemo(() => {
+    if (!transaction?.meta?.transactions) {
+      return false
+    }
+    if (isArray(transaction?.meta?.transactions)) {
+      return (
+        transaction.meta.transactions[0].entrypoint === "deployContract" ||
+        transaction.meta.transactions[0].entrypoint === "declareContract"
+      )
+    }
     return (
-      get(transaction, "meta.transactions.entrypoint") === "deployContract" ||
-      get(transaction, "meta.transactions.entrypoint") === "declareContract"
+      transaction.meta.transactions.entrypoint === "deployContract" ||
+      transaction.meta.transactions.entrypoint === "declareContract"
     )
   }, [transaction])
 
