@@ -11789,10 +11789,6 @@ get-starknet-core@^2.0.0:
   resolved "https://registry.yarnpkg.com/get-starknet-core/-/get-starknet-core-2.0.0.tgz#2c107982ff3aa3c2dd98586bec8194cc2bfc0d1d"
   integrity sha512-cpPQrn2/uw1dxn/gpDiVtKrYxyoSkCsrz1mf7CqeyNxcSiiqsHHRNIGyFtqSm2hCduA1kl7ddVugLoTul/oBQQ==
 
-"get-starknet-core@https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2":
-  version "2.0.0"
-  resolved "https://gitpkg.now.sh/starknet-io/get-starknet/packages/core?feature/v2#9cbbb92f55f8ce2d5b15620e6d3bdec95aaba127"
-
 get-stdin@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
