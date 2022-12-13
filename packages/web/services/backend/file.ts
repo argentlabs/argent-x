@@ -5,7 +5,10 @@ interface Metadata {
   [key: string]: string
 }
 
-type AccessPolicy = "WEB_WALLET_KEY" | "WEB_WALLET_SESSION" | "DEFAULT"
+type AccessPolicy =
+  | "WEB_WALLET_PASSWORD_ENCRYPTED_KEY"
+  | "WEB_WALLET_SESSION"
+  | "DEFAULT"
 
 interface PostFileRequest {
   update?: boolean

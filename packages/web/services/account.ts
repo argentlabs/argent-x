@@ -82,7 +82,7 @@ const uploadEncryptPrivateKeyWithPassword = async (
   await postTextFile(
     `password-encypted-${publicKey}`,
     passwordEncryptedPrivateKey,
-    { update, accessPolicy: "WEB_WALLET_KEY" },
+    { update, accessPolicy: "WEB_WALLET_PASSWORD_ENCRYPTED_KEY" },
   )
 }
 
@@ -255,7 +255,7 @@ export const ensureDeviceBackup = async (privateKey: string) => {
           await exportJWK(device.encryptionKey.publicKey),
         )}-encypted-${publicKey}`,
         deviceEncryptedPrivateKey,
-        { accessPolicy: "WEB_WALLET_KEY" }, // TODO: [BE] change as soon as the backend is ready
+        { accessPolicy: "WEB_WALLET_PASSWORD_ENCRYPTED_KEY" }, // TODO: [BE] change as soon as the backend is ready
       )
     } else {
       throw e

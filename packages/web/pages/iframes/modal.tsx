@@ -1,16 +1,25 @@
 import { H6, Input, L1, L2 } from "@argent/ui"
-import { getRemoteHandle } from "@argent/x-window"
+import {
+  IframeMethods,
+  MessageExchange,
+  WindowMessenger,
+} from "@argent/x-window"
 import { Box, DarkMode, Flex, IconButton, LightMode } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import retry from "async-retry"
 import { withIronSessionSsr } from "iron-session/next"
 import { useRouter } from "next/router"
-import { FC, PropsWithChildren, useCallback, useMemo, useState } from "react"
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { useForm } from "react-hook-form"
 
 import { useAccount, useBackendAccount } from "../../hooks/account"
-import { triggerRefresh } from "../../hooks/useMessages"
-import { useLocalHandle } from "../../hooks/usePageGuard"
+import { triggerRefresh, useLocalHandle } from "../../hooks/useMessages"
 import { settings } from "../../iron-session"
 import { enterEmailFormSchema } from "../../schemas/forms/email"
 import { isSubmitDisabled } from "../../schemas/utils"
@@ -163,31 +172,29 @@ export default function Modal({
   const navigate = useRouter()
   const localHandle = useLocalHandle()
   const { account, mutate } = useAccount()
-  const { account: beAccount, error } = useBackendAccount({
-    onSuccess: async (fetchedAccount) => {
-      if (!account) {
-        await retrieveAccountFromSession(fetchedAccount.accounts[0]).catch(
-          () => {},
-        ) // ignore error
-        await mutate()
-      }
+  const { account: beAccount, error } = useBackendAccount()
+  useEffect(() => {
+    if (beAccount) {
+      retrieveAccountFromSession(beAccount.accounts[0])
+        .then(() => {
+          mutate()
 
-      // set new SSR values when email or login state has changed
-      if (defaultLoggedIn !== true || defaultEmail !== fetchedAccount.email) {
-        await saveSSRState(true, fetchedAccount.email)
-      }
-    },
-    onError: async (err) => {
-      // set new SSR values when email or login state has changed
+          if (defaultLoggedIn !== true || defaultEmail !== beAccount.email) {
+            return saveSSRState(true, beAccount.email)
+          }
+        })
+        .catch(() => {}) // ignore error
+    } else if (error) {
       if (
         defaultLoggedIn !== false &&
-        err instanceof Error &&
-        err.message === ERROR_MESSAGE_NOT_LOGGED_IN
+        error instanceof Error &&
+        error.message === ERROR_MESSAGE_NOT_LOGGED_IN
       ) {
-        await saveSSRState(false)
+        saveSSRState(false)
+        mutate()
       }
-    },
-  })
+    }
+  }, [beAccount, defaultEmail, defaultLoggedIn, error, mutate])
   const [isLoading, setIsLoading] = useState(false)
 
   const email = beAccount?.email || defaultEmail
@@ -205,11 +212,10 @@ export default function Modal({
   const canSubmit = !isSubmitDisabled(formState)
 
   const onWebWallet = useCallback(
-    async (values?: { email: string }) => {
+    async ({ email, loggedIn }: { email: string; loggedIn?: boolean }) => {
       try {
         setIsLoading(true)
 
-        const email = beAccount?.email ?? values?.email
         if (!email) {
           throw new Error("Email is required")
         }
@@ -235,15 +241,16 @@ export default function Modal({
           const y = parentTop + parentHeight / 2 - h / 2
           const x = parentLeft + parentWidth / 2 - w / 2
 
+          const origin = "http://localhost:3005"
           const submitGoalUrl = `${origin}/email`
 
           // no session
           const windowRef = window.open(
-            !beAccount?.email
+            !loggedIn
               ? submitGoalUrl + "?email=" + encodeURIComponent(email)
               : origin,
-            "Argent",
-            `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=yes,status=no`,
+            undefined,
+            `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=no,status=no`,
           )
 
           if (!windowRef) {
@@ -259,38 +266,47 @@ export default function Modal({
             }
           }, 500)
 
-          // wait for message from popup
-          const messageHandler = await retry(
-            () =>
-              getRemoteHandle({
-                remoteWindow: windowRef,
-                remoteOrigin: "*",
-              }),
-            {
-              maxRetryTime: 5,
-              minTimeout: 500,
-            },
-          ).catch((cause) => {
-            throw Error("Failed to connect to popup", { cause })
+          // wait for popup load
+          await new Promise((resolve) => {
+            windowRef.addEventListener("load", () => {
+              resolve(undefined)
+            })
           })
 
-          await messageHandler.once("ARGENT_WEB_WALLET::CONNECT")
+          // wait for message from popup
+          const messenger = new WindowMessenger({
+            postWindow: windowRef,
+            postOrigin: "*",
+            listenWindow: window,
+          })
 
-          // close popup
-          if (!windowRef?.closed) {
-            clearInterval(interval)
-            windowRef.close()
+          const connection = new MessageExchange<{}, IframeMethods>(messenger, {
+            connect: async () => {
+              if (!windowRef?.closed) {
+                clearInterval(interval)
+                windowRef.close()
+              }
+
+              await triggerRefresh()
+
+              return localHandle?.call("connect")
+            },
+          })
+
+          return () => {
+            connection.destroy()
           }
-
+        } else {
           await triggerRefresh()
+
+          return localHandle?.call("connect")
         }
-        localHandle?.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
       } catch (e) {
         setIsLoading(false)
         console.error(e)
       }
     },
-    [account, beAccount?.email, localHandle],
+    [account, localHandle],
   )
 
   if (loading) {
@@ -366,10 +382,10 @@ export default function Modal({
           transition="all 0.2s"
           role="button"
           tabIndex={0}
-          onClick={() => onWebWallet()}
+          onClick={() => onWebWallet({ email, loggedIn: true })}
           onKeyUp={(e) => {
             if (e.key === "Enter") {
-              onWebWallet()
+              onWebWallet({ email, loggedIn: true })
             }
           }}
         >

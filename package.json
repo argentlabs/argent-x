@@ -31,8 +31,7 @@
     "test:watch": "lerna run test:watch --stream",
     "test:e2e": "lerna run test:e2e --stream",
     "prepare": "husky install && lerna run prepare --stream",
-    "patch-get-starknet": "yarn --cwd node_modules/get-starknet-core --ignore-scripts install && yarn --cwd node_modules/get-starknet-core build && rm -fr node_modules/get-starknet-core/node_modules/starknet",
-    "postinstall": "patch-package && lerna run postinstall --stream && yarn patch-get-starknet",
+    "postinstall": "patch-package && lerna run postinstall --stream",
     "storybook": "cd packages/storybook && yarn storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts"

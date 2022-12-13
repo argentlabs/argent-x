@@ -1,7 +1,7 @@
 import { resolve as resolvePath } from "path"
 
-import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
+import { defineConfig } from "vitest/config"
 
 export default defineConfig({
   plugins: [
@@ -19,6 +19,13 @@ export default defineConfig({
     emptyOutDir: false,
     rollupOptions: {
       external: ["starknet"],
+    },
+  },
+  test: {
+    environment: "happy-dom",
+    exclude: ["**/node_modules/**", "**/*.mock.ts"],
+    coverage: {
+      exclude: ["**/node_modules/**", "**/*.mock.ts"],
     },
   },
 })

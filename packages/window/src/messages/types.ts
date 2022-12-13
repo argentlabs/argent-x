@@ -1,18 +1,11 @@
-import {
+import type {
   AddStarknetChainParameters,
   SwitchStarknetChainParameter,
   WatchAssetParameters,
 } from "get-starknet-core"
-import { LocalHandle, RemoteHandle } from "post-me"
 import { AccountInterface } from "starknet"
 
-export interface ConnectionOptions {
-  localWindow?: Window
-  remoteWindow: Window
-  remoteOrigin: string
-}
-
-export type WindowMethods = {
+export type StarknetMethods = {
   enable: (options?: { starknetVersion?: "v3" | "v4" }) => Promise<string[]>
   getLoginStatus: () => Promise<
     | { isLoggedIn: false }
@@ -25,13 +18,18 @@ export type WindowMethods = {
   watchAsset: (params: WatchAssetParameters) => Promise<boolean>
 } & Pick<AccountInterface, "execute" | "signMessage">
 
-export type WindowEvents = {
-  "ARGENT_WEB_WALLET::LOADED": undefined
-  "ARGENT_WEB_WALLET::CONNECT": undefined
-  "ARGENT_WEB_WALLET::SHOULD_SHOW": undefined
-  "ARGENT_WEB_WALLET::SHOULD_HIDE": undefined
-  "ARGENT_WEB_WALLET::HEIGHT_CHANGED": number
+export type ConnectMethods = {
+  connect: () => void
 }
 
-export type LocalConnection = LocalHandle<WindowMethods, WindowEvents>
-export type RemoteConnection = RemoteHandle<WindowMethods, WindowEvents>
+export type ModalMethods = {
+  shouldShow: () => void
+  shouldHide: () => void
+  heightChanged: (height: number) => void
+}
+
+export type WebWalletMethods = ConnectMethods & ModalMethods
+
+export type IframeMethods = {
+  connect: () => void
+}

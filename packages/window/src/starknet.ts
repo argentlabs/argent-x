@@ -7,12 +7,12 @@ import type {
   SwitchStarknetChainParameter,
   WatchAssetParameters,
 } from "get-starknet-core"
-import { RemoteHandle } from "post-me"
 import type { ProviderInterface } from "starknet"
 
 import { MessageAccount } from "./account"
 import { userEventHandlers } from "./eventHandlers"
-import { WindowMethods } from "./messages/types"
+import { MessageExchange } from "./messages/messenger"
+import { StarknetMethods } from "./messages/types"
 
 export type Variant = "argentX" | "argentWebWallet"
 
@@ -27,7 +27,7 @@ export interface GetArgentStarknetWindowObject {
 function updateStarknetWindowObject(
   windowObject: StarknetWindowObject,
   provider: ProviderInterface,
-  remoteHandle: RemoteHandle<WindowMethods>,
+  remoteHandle: MessageExchange<StarknetMethods, {}>,
   walletAddress: string,
 ): ConnectedStarknetWindowObject {
   if (windowObject.isConnected) {
@@ -51,7 +51,7 @@ function updateStarknetWindowObject(
 export const getArgentStarknetWindowObject = (
   options: GetArgentStarknetWindowObject,
   provider: ProviderInterface,
-  remoteHandle: RemoteHandle<WindowMethods>,
+  remoteHandle: MessageExchange<StarknetMethods, {}>,
 ): StarknetWindowObject => {
   const wallet: StarknetWindowObject = {
     ...options,

@@ -63,6 +63,7 @@ export default async function show({
 
         callback: async (value: StarknetWindowObject | null) => {
           const enabledValue = (await enable?.(value)) ?? value
+          console.log("enabledValue", enabledValue)
           modal.$destroy()
           resolve(enabledValue)
         },

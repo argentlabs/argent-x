@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
 import { useAccount } from "../hooks/account"
-import { useLocalHandle } from "../hooks/usePageGuard"
+import { useLocalHandle } from "../hooks/useMessages"
 import { enterPasswordFormSchema } from "../schemas/forms/password"
 import { isSubmitDisabled } from "../schemas/utils"
 import { retrieveAccountWithPassword } from "../services/account"
@@ -38,7 +38,7 @@ export default function Password() {
           await retrieveAccountWithPassword(password)
           await mutate()
           if (handler) {
-            handler.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
+            handler.call("connect")
           }
           return navigate.push("/dashboard")
         } catch (error) {

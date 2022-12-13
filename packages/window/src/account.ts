@@ -1,4 +1,3 @@
-import { RemoteHandle } from "post-me"
 import {
   Abi,
   Account,
@@ -13,7 +12,8 @@ import {
   typedData,
 } from "starknet"
 
-import { WindowMethods } from "./messages/types"
+import { MessageExchange } from "./messages/messenger"
+import { StarknetMethods } from "./messages/types"
 
 class UnimplementedSigner implements SignerInterface {
   async getPubKey(): Promise<string> {
@@ -43,7 +43,7 @@ export class MessageAccount extends Account implements AccountInterface {
   constructor(
     provider: ProviderInterface,
     public address: string,
-    private readonly remoteHandle: RemoteHandle<WindowMethods>,
+    private readonly remoteHandle: MessageExchange<StarknetMethods, {}>,
   ) {
     super(provider, address, new UnimplementedSigner())
   }

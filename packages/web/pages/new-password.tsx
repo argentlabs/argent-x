@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout"
 import { Navigate } from "../components/Navigate"
 import { SetPasswordForm } from "../components/SetPasswordForm"
 import { useAccount } from "../hooks/account"
-import { useLocalHandle } from "../hooks/usePageGuard"
+import { useLocalHandle } from "../hooks/useMessages"
 import { createAccount } from "../services/account"
 
 export default function NewPassword() {
@@ -26,7 +26,7 @@ export default function NewPassword() {
             await createAccount(password)
             await mutate()
             if (handler) {
-              handler.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
+              handler.call("connect")
             }
             return navigate.push("/dashboard")
           } catch (error) {

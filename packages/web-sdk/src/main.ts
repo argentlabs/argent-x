@@ -3,13 +3,7 @@ import type { StarknetWindowObject } from "get-starknet-core"
 import memo from "lodash-es/memoize"
 import { SequencerProvider } from "starknet"
 
-import {
-  createModal,
-  getIframeConnection,
-  hideModal,
-  setIframeHeight,
-  showModal,
-} from "./wormhole"
+import { createModal, getConnection } from "./wormhole"
 
 const ORIGIN = "http://localhost:3005"
 const TARGET = `${ORIGIN}/`
@@ -24,7 +18,7 @@ export const getWebWalletStarknetObject = memo(
 
     const { iframe, modal } = await createModal(TARGET, false)
 
-    const connection = await getIframeConnection(iframe)
+    const connection = await getConnection({ iframe, modal })
 
     const defaultProvider = new SequencerProvider({ network: DEFAULT_NETWORK })
     const starknetWindowObject = getArgentStarknetWindowObject(
@@ -37,20 +31,6 @@ export const getWebWalletStarknetObject = memo(
       },
       defaultProvider,
       connection,
-    )
-
-    // listen to the iframe messages
-    connection.addEventListener("ARGENT_WEB_WALLET::SHOULD_SHOW", () => {
-      showModal(modal)
-    })
-    connection.addEventListener("ARGENT_WEB_WALLET::SHOULD_HIDE", () => {
-      hideModal(modal)
-    })
-    connection.addEventListener(
-      "ARGENT_WEB_WALLET::HEIGHT_CHANGED",
-      (height) => {
-        setIframeHeight(iframe, height)
-      },
     )
 
     return starknetWindowObject

@@ -1,7 +1,5 @@
-import { getLocalHandle } from "@argent/x-window"
 import { NextRouter, useRouter } from "next/router"
 import { useCallback, useEffect } from "react"
-import useSwr from "swr"
 
 import {
   getAccount as getMemoryAccount,
@@ -9,6 +7,7 @@ import {
 } from "../services/account"
 import { UserAccount } from "../services/backend/account"
 import { useAccount, useBackendAccount } from "./account"
+import { useLocalHandle } from "./useMessages"
 
 const allowedDestinations = {
   "/email": ["/email", "/pin"],
@@ -31,6 +30,7 @@ const conditionallyPushTo = (
   destination: keyof typeof allowedDestinations,
   urlParams?: Record<string, string>,
 ) => {
+  console.log("conditionallyPushTo", destination, urlParams)
   const allowed = allowedDestinations[destination]
   if (!allowed.includes(router.pathname ?? router.asPath)) {
     return router.push(
@@ -40,64 +40,10 @@ const conditionallyPushTo = (
   }
 }
 
-export const useLocalHandle = () => {
-  const { data } = useSwr(
-    "localHandle",
-    async () => {
-      const messageTarget: Window = window.opener ?? window.parent
-      const localHandle = await getLocalHandle({
-        remoteWindow: messageTarget,
-        remoteOrigin: "*",
-        localWindow: window,
-      })
-      return localHandle
-    },
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      revalidateIfStale: false,
-      revalidateOnMount: true,
-      onError: (e) => {
-        console.error("Failed to connect to parent window", e)
-      },
-    },
-  )
-  return data
-}
-
 export const usePageGuard = () => {
   const router = useRouter()
   const { mutate: refreshAccount } = useAccount()
   const localHandle = useLocalHandle()
-
-  // emits messages to the parent window when shown to communicate the current height
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      const newHeight = entries[0].target.clientHeight
-      if (localHandle && newHeight) {
-        localHandle.emit("ARGENT_WEB_WALLET::HEIGHT_CHANGED", newHeight)
-      }
-    })
-
-    const handler = (url: string) => {
-      if (localHandle) {
-        const [pathname] = url.split("?")
-        if (shouldShowIframe.includes(pathname)) {
-          localHandle.emit("ARGENT_WEB_WALLET::SHOULD_SHOW", undefined)
-          observer.observe(window.document.body)
-        } else {
-          localHandle.emit("ARGENT_WEB_WALLET::SHOULD_HIDE", undefined)
-          observer.disconnect()
-        }
-      }
-      return true
-    }
-
-    router.events.on("routeChangeComplete", handler)
-    return () => {
-      router.events.off("routeChangeComplete", handler)
-    }
-  }, [localHandle, router])
 
   const handleAccountSuccess = useCallback(
     async (account: UserAccount) => {
@@ -108,9 +54,6 @@ export const usePageGuard = () => {
             .then(() => refreshAccount())
             .catch(() => false))
         ) {
-          if (localHandle) {
-            localHandle.emit("ARGENT_WEB_WALLET::CONNECT", undefined)
-          }
           await conditionallyPushTo(router, "/dashboard")
         } else {
           await conditionallyPushTo(router, "/password", {
@@ -122,26 +65,22 @@ export const usePageGuard = () => {
           email: account.email,
         })
       }
-      localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
     },
-    [localHandle, refreshAccount, router],
+    [refreshAccount, router],
   )
   const handleAccountError = useCallback(async () => {
-    localHandle?.emit("ARGENT_WEB_WALLET::LOADED", undefined)
-
     return conditionallyPushTo(router, "/email")
-  }, [localHandle, router])
+  }, [router])
 
-  const { account, error } = useBackendAccount({
-    onSuccess: (a) => {
-      console.log("account", a)
-      handleAccountSuccess(a)
-    },
-    onError: (e) => {
-      console.log("error", e)
+  const { account, error } = useBackendAccount()
+
+  useEffect(() => {
+    if (account) {
+      handleAccountSuccess(account)
+    } else if (error) {
       handleAccountError()
-    },
-  })
+    }
+  }, [account, error, handleAccountError, handleAccountSuccess])
 
   // revaildate navigation guard without refetching account
   const routeChangeHandler = useCallback(() => {
@@ -158,4 +97,33 @@ export const usePageGuard = () => {
       router.events.off("routeChangeComplete", routeChangeHandler)
     }
   }, [routeChangeHandler, router.events])
+
+  // emits messages to the parent window when shown to communicate the current height
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      const newHeight = entries[0].target.clientHeight
+      if (localHandle && newHeight) {
+        localHandle.call("heightChanged", newHeight)
+      }
+    })
+
+    const handler = (url: string) => {
+      if (localHandle) {
+        const [pathname] = url.split("?")
+        if (shouldShowIframe.includes(pathname)) {
+          localHandle.call("shouldShow")
+          observer.observe(window.document.body)
+        } else {
+          localHandle.call("shouldHide")
+          observer.disconnect()
+        }
+      }
+      return true
+    }
+
+    router.events.on("routeChangeComplete", handler)
+    return () => {
+      router.events.off("routeChangeComplete", handler)
+    }
+  }, [localHandle, router])
 }

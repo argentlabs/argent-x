@@ -262,7 +262,7 @@ export const getAccount = async (): Promise<UserAccount> => {
   })
 
   if (!response.ok) {
-    if (response.status === 403) {
+    if (response.status === 403 || response.status === 401) {
       throw new Error(ERROR_MESSAGE_NOT_LOGGED_IN)
     }
     throw new Error("failed to get account")

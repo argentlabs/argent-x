@@ -1,4 +1,8 @@
 <script lang="ts">
+  import type {
+    ConnectMethods,
+    MethodsToImplementations,
+  } from "@argent/x-window"
   import type { StarknetWindowObject } from "get-starknet-core"
   import { onMount } from "svelte"
 
@@ -25,7 +29,9 @@
 
   let cb = async (value: StarknetWindowObject | null) => {
     setLoadingItem(value?.id ?? false)
-    await callback(value).catch(() => {})
+    await callback(value).catch((e) => {
+      console.error(e)
+    })
     setLoadingItem(false)
   }
 
@@ -47,21 +53,28 @@
     }
     target = `${origin}/iframes/modal?darkmode=${Boolean(darkModeControlClass)}`
 
-    console.time("modal")
-    const { getIframeConnection } = await import("../wormhole")
-
-    let localWormholeConnection = await getIframeConnection(inlineIframe)
-
-    // permanent connection
+    const { WindowMessenger, MessageExchange } = await import(
+      "@argent/x-window"
+    )
     const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
-    localWormholeConnection.addEventListener(
-      "ARGENT_WEB_WALLET::CONNECT",
-      async () => {
+
+    const messenger = new WindowMessenger({
+      postWindow: inlineIframe.contentWindow,
+      postOrigin: "*",
+      listenWindow: window,
+    })
+
+    new MessageExchange<
+      Record<string, never>,
+      MethodsToImplementations<ConnectMethods>
+    >(messenger, {
+      connect: async () => {
+        console.log("ARGENT_WEB_WALLET::CONNECT")
         const starknetWindowObject = await getWebWalletStarknetObject()
 
         cb(starknetWindowObject)
       },
-    )
+    })
   })
 
   const wallets = [
@@ -200,9 +213,6 @@
           bind:this={inlineIframe}
           on:load={() => {
             setTimeout(() => {
-              // give 200ms extra for rendering
-              console.timeEnd("modal")
-
               webWalletLoading = false
             }, 200)
           }}

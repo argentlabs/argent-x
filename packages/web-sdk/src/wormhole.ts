@@ -1,6 +1,8 @@
-import type { RemoteConnection } from "@argent/x-window"
-import { getRemoteHandle } from "@argent/x-window"
-import retry from "async-retry"
+import type {
+  MethodsToImplementations,
+  WebWalletMethods,
+} from "@argent/x-window"
+import { MessageExchange, WindowMessenger } from "@argent/x-window"
 
 const applyModalStyle = (iframe: HTMLIFrameElement) => {
   // middle of the screen
@@ -80,26 +82,36 @@ export const createModal = async (targetUrl: string, shouldShow: boolean) => {
   return { iframe, modal }
 }
 
-export const getIframeConnection = async (
-  iframe: HTMLIFrameElement,
-): Promise<RemoteConnection> => {
-  const handle = await retry(
-    () =>
-      getRemoteHandle({
-        remoteWindow: iframe.contentWindow,
-        remoteOrigin: "*", // TODO: restrict to the iframe origin
-        localWindow: window,
-      }),
-    {
-      maxRetryTime: 5,
-      minTimeout: 500,
-    },
-  ).catch((cause) => {
-    throw Error("Failed to connect to iframe", { cause })
+export const getConnection = async ({
+  iframe,
+  modal,
+}: {
+  iframe: HTMLIFrameElement
+  modal: HTMLDivElement
+}) => {
+  const messenger = new WindowMessenger({
+    postWindow: iframe.contentWindow,
+    postOrigin: "*",
+    listenWindow: window,
   })
 
-  await handle.once("ARGENT_WEB_WALLET::LOADED")
-  console.log("sdk: ARGENT_WEB_WALLET::LOADED")
+  const handle = new MessageExchange<
+    Record<string, never>,
+    MethodsToImplementations<WebWalletMethods>
+  >(messenger, {
+    connect: () => {
+      return
+    },
+    heightChanged: ([height]) => {
+      setIframeHeight(iframe, height)
+    },
+    shouldHide: () => {
+      hideModal(modal)
+    },
+    shouldShow: () => {
+      showModal(modal)
+    },
+  })
 
   return handle
 }

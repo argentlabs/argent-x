@@ -1,38 +1,19 @@
+import {
+  MessageExchange,
+  MethodsToImplementations,
+  StarknetMethods,
+  WebWalletMethods,
+  WindowMessenger,
+} from "@argent/x-window"
 import mitt from "mitt"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
+import useSwr from "swr"
 
 import { encodeTransactions } from "../pages/dashboard"
 import { retrieveAccountFromSession } from "../services/account"
 import { usePreAuthorized } from "../states/preAuthorized"
 import { useAccount, useBackendAccount } from "./account"
-import { useLocalHandle } from "./usePageGuard"
-
-type ActionEvents = {
-  enable: { success: boolean }
-  execute:
-    | {
-        success: false
-      }
-    | {
-        success: true
-        txHash: string
-      }
-  signMessage:
-    | {
-        success: false
-      }
-    | {
-        success: true
-        signature: string[]
-      }
-}
-export const actionEmitter = mitt<ActionEvents>()
-function waitForAction<T extends keyof ActionEvents>(action: T) {
-  return new Promise<ActionEvents[T]>((resolve) => {
-    actionEmitter.on(action, resolve)
-  })
-}
 
 export const listenForRefresh = (fn: () => Promise<void>) => {
   const bc = new BroadcastChannel("refresh")
@@ -62,29 +43,52 @@ export const triggerRefresh = () => {
   })
 }
 
-export const useAccountMessageHandler = () => {
+type ActionEvents = {
+  enable: { success: boolean }
+  execute:
+    | {
+        success: false
+      }
+    | {
+        success: true
+        txHash: string
+      }
+  signMessage:
+    | {
+        success: false
+      }
+    | {
+        success: true
+        signature: string[]
+      }
+}
+export const actionEmitter = mitt<ActionEvents>()
+function waitForAction<T extends keyof ActionEvents>(action: T) {
+  return new Promise<ActionEvents[T]>((resolve) => {
+    actionEmitter.on(action, resolve)
+  })
+}
+
+export const useLocalHandle = () => {
   const router = useRouter()
-  const localHandle = useLocalHandle()
-  const { account, mutate: accountMutate } = useAccount()
-  const { account: beAccount } = useBackendAccount()
+  const { mutate: getAccount } = useAccount()
+  const { mutate: getBeAccount } = useBackendAccount()
   const { isPreAuthorized } = usePreAuthorized()
 
-  useEffect(() => {
-    return listenForRefresh(async () => {
-      await retrieveAccountFromSession().catch(() => {})
-      await accountMutate()
+  const localHandleImplementation = useCallback(async () => {
+    const messageTarget: Window = window.opener ?? window.parent
+    const messenger = new WindowMessenger({
+      postWindow: messageTarget,
+      postOrigin: "*",
+      listenWindow: window,
     })
-  }, [accountMutate])
-
-  useEffect(() => {
-    if (!localHandle) {
-      console.warn("No local handle")
-      return
-    }
-    const origin = "http://localhost:3000"
-
-    localHandle.setMethods({
-      async enable(options) {
+    return new MessageExchange<
+      WebWalletMethods,
+      MethodsToImplementations<StarknetMethods>
+    >(messenger, {
+      async enable([options], origin) {
+        const account = await getAccount()
+        console.log("enable", options, origin, account)
         if (options?.starknetVersion === "v3") {
           throw Error("not implemented")
         }
@@ -92,9 +96,11 @@ export const useAccountMessageHandler = () => {
           throw Error("not logged in")
         }
         if (isPreAuthorized(origin)) {
+          console.log("preauthorized")
           return [account.address]
         }
         router.push(`/connect?origin=${encodeURIComponent(origin)}`, "/connect")
+        console.log("waiting for action")
         const { success } = await waitForAction("enable")
         console.log("enable", success)
         if (!success) {
@@ -103,6 +109,8 @@ export const useAccountMessageHandler = () => {
         return [account.address]
       },
       async getLoginStatus() {
+        const beAccount = await getBeAccount
+        const account = await getAccount()
         if (!beAccount) {
           return { isLoggedIn: false }
         }
@@ -113,7 +121,7 @@ export const useAccountMessageHandler = () => {
           isPreauthorized: isPreAuthorized(origin),
         }
       },
-      async execute(transactions, abis, transactionsDetail) {
+      async execute([transactions, abis, transactionsDetail]) {
         const txs = Array.isArray(transactions) ? transactions : [transactions]
         router.push(
           `/review?transactions=${encodeTransactions(txs)}`,
@@ -144,5 +152,27 @@ export const useAccountMessageHandler = () => {
         throw Error("not implemented")
       },
     })
-  }, [localHandle, account, router, accountMutate, beAccount, isPreAuthorized])
+  }, [getBeAccount, getAccount, isPreAuthorized, router])
+
+  const { data } = useSwr(`localHandle`, localHandleImplementation, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    revalidateOnMount: true,
+    onError: (e) => {
+      console.error("Failed to connect to parent window", e)
+    },
+  })
+  return data
+}
+
+export const useAccountMessageHandler = () => {
+  const { mutate: accountMutate } = useAccount()
+
+  useEffect(() => {
+    return listenForRefresh(async () => {
+      await retrieveAccountFromSession().catch(() => {})
+      await accountMutate()
+    })
+  }, [accountMutate])
 }
