@@ -13,6 +13,7 @@ import {
 import { TransformedTransaction } from "../transform/type"
 
 const {
+  DocumentIcon,
   SendIcon,
   ReceiveIcon,
   DeployIcon,
@@ -65,6 +66,11 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       iconComponent = <ApproveIcon />
       break
   }
+
+  if (entity === "CONTRACT" && (action === "DEPLOY" || action === "DECLARE")) {
+    iconComponent = <DocumentIcon />
+  }
+
   if (
     isTokenTransferTransaction(transaction) ||
     isTokenMintTransaction(transaction) ||

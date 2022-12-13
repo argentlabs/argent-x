@@ -1,7 +1,7 @@
 import { Button, Fade, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
 
-import { IScroll, useNavigateBack } from "../hooks"
+import { ScrollProps, useNavigateBack } from "../hooks"
 import { AbsoluteFlex } from "./Absolute"
 import * as icons from "./icons"
 import { H6 } from "./Typography"
@@ -12,7 +12,6 @@ export const NavigationBarHeight = 14
 
 const Container = chakra(Flex, {
   baseStyle: {
-    position: "relative",
     alignItems: "center",
     bottom: "initial",
     h: NavigationBarHeight,
@@ -42,10 +41,11 @@ const TitleContainer = chakra(AbsoluteFlex, {
 })
 
 export interface NavigationBarProps extends PropsWithChildren {
+  isAbsolute?: boolean
   leftButton?: ReactNode
   title?: ReactNode
   rightButton?: ReactNode
-  scroll?: IScroll
+  scroll?: ScrollProps
   scrollContent?: ReactNode
 }
 
@@ -99,6 +99,7 @@ export const BarAddButton: FC<ComponentProps<typeof BarIconButton>> = (
 }
 
 export const NavigationBar: FC<NavigationBarProps> = ({
+  isAbsolute,
   leftButton,
   rightButton,
   title,
@@ -113,6 +114,8 @@ export const NavigationBar: FC<NavigationBarProps> = ({
     <Container
       bg={isTransparent ? "transparent" : "neutrals.700"}
       boxShadow={isTransparent ? "none" : "menu"}
+      position={isAbsolute ? "absolute" : "relative"}
+      w="100%"
     >
       {title && (
         <TitleContainer>

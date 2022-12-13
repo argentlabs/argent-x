@@ -105,7 +105,7 @@
     "react-select": "^5.4.0",
     "react-textarea-autosize": "^8.3.4",
     "semver": "^7.3.7",
-    "starknet": "^4.15.0",
+    "starknet": "^4.16.0",
     "starknet3": "npm:starknet@3.18.2",
     "starknet4": "npm:starknet@4.4.0",
     "styled-components": "^5.3.5",

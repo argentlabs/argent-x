@@ -91,6 +91,7 @@ export const SettingsScreen: FC = () => {
           <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
         }
         title={"Settings"}
+        scrollKey={"settings/SettingsScreen"}
       >
         <CellStack>
           {account && (

@@ -3,7 +3,7 @@ import { ProgressCallback } from "ethers/lib/utils"
 import { find, noop, throttle, union } from "lodash-es"
 import {
   Account,
-  DeployContractPayload,
+  DeployAccountContractTransaction,
   EstimateFee,
   ec,
   hash,
@@ -44,6 +44,7 @@ import {
   getPathForIndex,
   getStarkPair,
 } from "./keys/keyDerivation"
+import { getNonce, increaseStoredNonce } from "./nonce"
 import backupSchema from "./schema/backup.schema"
 
 const { calculateContractAddressFromHash, getSelectorFromName } = hash
@@ -487,7 +488,12 @@ export class Wallet {
       networkId,
     )
 
-    const deployTransaction = await provider.deployContract(payload)
+    const nonce = await getNonce(account, this)
+
+    const deployTransaction = await provider.deployAccountContract(payload, {
+      nonce,
+    })
+    await increaseStoredNonce(account)
 
     return { account, txHash: deployTransaction.transaction_hash }
   }
@@ -559,7 +565,7 @@ export class Wallet {
   public async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
-  ): Promise<Required<DeployContractPayload>> {
+  ): Promise<Required<DeployAccountContractTransaction>> {
     const hasSession = await this.isSessionOpen()
     const session = await this.sessionStore.get()
     const initialised = await this.isInitialized()
@@ -574,7 +580,6 @@ export class Wallet {
     const network = await this.getNetwork(networkId)
     const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
     const starkPub = ec.getStarkKey(starkPair)
-    const [proxyCompiledContract] = await this.loadContracts(baseDerivationPath)
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       network,
@@ -582,13 +587,14 @@ export class Wallet {
     )
 
     const payload = {
-      contract: proxyCompiledContract,
+      classHash: accountClassHash,
       constructorCalldata: stark.compileCalldata({
         implementation: accountClassHash,
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
       addressSalt: starkPub,
+      signature: starkPair.getPrivate(),
     }
 
     return payload

@@ -30,6 +30,8 @@ const preTransformers = [
 ]
 
 /** all are executed until one returns */
+
+// TODO: add declare ad deploy contract transformers after backend update
 const mainTransformers = [
   accountCreateTransformer,
   accountUpgradeTransformer,
