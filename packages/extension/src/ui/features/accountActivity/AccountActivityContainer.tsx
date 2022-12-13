@@ -1,5 +1,6 @@
 import { CellStack, H4, SpacerCell } from "@argent/ui"
 import { Center, Skeleton } from "@chakra-ui/react"
+import { get } from "lodash-es"
 import { FC, Suspense, useCallback, useMemo } from "react"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
@@ -103,12 +104,23 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
         (explorerTransaction) =>
           explorerTransaction.transactionHash === voyagerTransaction.hash,
       )
-      if (explorerTransaction) {
+
+      // TODO: remove this when after backend update
+      const isUdcTransaction =
+        get(voyagerTransaction, "meta.transactions.entrypoint") ===
+          "deployContract" ||
+        get(voyagerTransaction, "meta.transactions.entrypoint") ===
+          "declareContract"
+
+      if (!isUdcTransaction && explorerTransaction) {
         if (!explorerTransaction.timestamp) {
           explorerTransaction.timestamp = voyagerTransaction.timestamp
         }
         matchedHashes.push(voyagerTransaction.hash)
         return explorerTransaction
+      }
+      if (isUdcTransaction) {
+        matchedHashes.push(voyagerTransaction.hash)
       }
       return voyagerTransaction
     })

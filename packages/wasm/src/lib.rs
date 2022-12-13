@@ -12,7 +12,7 @@ pub async fn calculate_class_hash(compiled_contract_json: &str) -> Result<String
     let class_hash = compiled_contract?.class_hash();
 
     match class_hash {
-        Ok(class_hash) => Ok(format!("0x{:x}", class_hash)),
+        Ok(class_hash) => Ok(format!("0x0{:x}", class_hash)),
         Err(err) => Err(JsError::new(&format!("{:?}", err))),
     }
 }
