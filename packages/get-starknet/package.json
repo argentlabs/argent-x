@@ -36,6 +36,7 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@argent/login": "^0.1.0-alpha-starknet.1",
     "@argent/web-sdk": "^5.0.8",
     "@argent/x-window": "^5.0.8",
     "bowser": "^2.11.0",
