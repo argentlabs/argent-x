@@ -1,12 +1,12 @@
+import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
 import { isString } from "@sentry/utils"
 import { colord } from "colord"
 // import { colord } from "colord"
 import { FC } from "react"
-import { Navigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { urlWithQuery } from "../../../shared/utils/url"
-import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
@@ -52,6 +52,7 @@ const RAMP_ENABLED =
   isString(process.env.RAMP_API_KEY) && process.env.RAMP_API_KEY.length > 0
 
 export const FundingProviderScreen: FC = () => {
+  const navigate = useNavigate()
   const account = useSelectedAccount()
   const isMainnet = useIsMainnet()
 
@@ -75,8 +76,12 @@ export const FundingProviderScreen: FC = () => {
   })
 
   return (
-    <>
-      <IconBar back close={routes.accountTokens()} />
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
+    >
       <PageWrapper>
         <Title>Choose provider</Title>
         <OptionsWrapper>
@@ -115,6 +120,6 @@ export const FundingProviderScreen: FC = () => {
           )}
         </OptionsWrapper>
       </PageWrapper>
-    </>
+    </NavigationContainer>
   )
 }

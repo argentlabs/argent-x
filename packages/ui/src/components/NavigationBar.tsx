@@ -1,7 +1,7 @@
 import { Button, Fade, Flex, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
 
-import { IScroll } from "../hooks"
+import { ScrollProps, useNavigateBack } from "../hooks"
 import { AbsoluteFlex } from "./Absolute"
 import * as icons from "./icons"
 import { H6 } from "./Typography"
@@ -12,7 +12,6 @@ export const NavigationBarHeight = 14
 
 const Container = chakra(Flex, {
   baseStyle: {
-    position: "relative",
     alignItems: "center",
     bottom: "initial",
     h: NavigationBarHeight,
@@ -42,10 +41,11 @@ const TitleContainer = chakra(AbsoluteFlex, {
 })
 
 export interface NavigationBarProps extends PropsWithChildren {
+  isAbsolute?: boolean
   leftButton?: ReactNode
   title?: ReactNode
   rightButton?: ReactNode
-  scroll?: IScroll
+  scroll?: ScrollProps
   scrollContent?: ReactNode
 }
 
@@ -69,8 +69,9 @@ export const BarIconButton: FC<ComponentProps<typeof Button>> = ({
 export const BarBackButton: FC<ComponentProps<typeof BarIconButton>> = (
   props,
 ) => {
+  const onClick = useNavigateBack()
   return (
-    <BarIconButton {...props}>
+    <BarIconButton aria-label="Back" onClick={onClick} {...props}>
       <ArrowLeftIcon />
     </BarIconButton>
   )
@@ -79,8 +80,9 @@ export const BarBackButton: FC<ComponentProps<typeof BarIconButton>> = (
 export const BarCloseButton: FC<ComponentProps<typeof BarIconButton>> = (
   props,
 ) => {
+  const onClick = useNavigateBack()
   return (
-    <BarIconButton {...props}>
+    <BarIconButton aria-label="Close" onClick={onClick} {...props}>
       <CloseIcon />
     </BarIconButton>
   )
@@ -95,7 +97,9 @@ export const BarAddButton: FC<ComponentProps<typeof BarIconButton>> = (
     </BarIconButton>
   )
 }
+
 export const NavigationBar: FC<NavigationBarProps> = ({
+  isAbsolute,
   leftButton,
   rightButton,
   title,
@@ -110,6 +114,8 @@ export const NavigationBar: FC<NavigationBarProps> = ({
     <Container
       bg={isTransparent ? "transparent" : "neutrals.700"}
       boxShadow={isTransparent ? "none" : "menu"}
+      position={isAbsolute ? "absolute" : "relative"}
+      w="100%"
     >
       {title && (
         <TitleContainer>
@@ -117,7 +123,13 @@ export const NavigationBar: FC<NavigationBarProps> = ({
         </TitleContainer>
       )}
       <Fade in={!title && showScrollContent}>
-        <TitleContainer gap="2">{scrollContent}</TitleContainer>
+        <TitleContainer gap="2">
+          {typeof scrollContent === "string" ? (
+            <H6>{scrollContent}</H6>
+          ) : (
+            <>{scrollContent}</>
+          )}
+        </TitleContainer>
       </Fade>
       {(leftButton || rightButton) && (
         <ButtonsContainer>

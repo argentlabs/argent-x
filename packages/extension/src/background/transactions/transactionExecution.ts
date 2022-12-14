@@ -10,6 +10,8 @@ import { AllowArray } from "../../shared/storage/types"
 import { nameTransaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/wallet.service"
+import { isAccountDeployed } from "../accountDeploy"
+import { analytics } from "../analytics"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
 import { addTransaction, transactionsStore } from "./store"
@@ -77,7 +79,10 @@ export const executeTransactionAction = async (
 
   let maxFee = "0"
 
-  if (accountNeedsDeploy) {
+  if (
+    selectedAccount.needsDeploy &&
+    !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
+  ) {
     const { account, txHash } = await wallet.deployAccount(selectedAccount)
 
     if (!checkTransactionHash(txHash)) {
@@ -85,6 +90,12 @@ export const executeTransactionAction = async (
         "Deploy Account Transaction could not get added to the sequencer",
       )
     }
+
+    analytics.track("deployAccount", {
+      status: "success",
+      trigger: "transaction",
+      networkId: account.networkId,
+    })
 
     await addTransaction({
       hash: txHash,

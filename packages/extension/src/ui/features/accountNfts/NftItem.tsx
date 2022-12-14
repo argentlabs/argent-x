@@ -12,10 +12,11 @@ interface NftItemProps {
 }
 
 const NftItem: FC<NftItemProps> = ({ logoSrc, name, thumbnailSrc, total }) => (
-  <Box as="figure">
+  <Box as="figure" role="group">
     <Box
       position="relative"
-      _hover={{
+      transition={"transform 0.2s ease-in-out"}
+      _groupHover={{
         transform: "scale(1.05)",
         transitionDuration: "0.2s",
         transitionTimingFunction: "ease-in-out",

@@ -1,3 +1,4 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { BigNumber } from "@ethersproject/bignumber"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -7,9 +8,7 @@ import styled from "styled-components"
 import { addToken } from "../../../shared/token/storage"
 import { RequestToken, Token } from "../../../shared/token/type"
 import { useAppState } from "../../app.state"
-import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupHorizontal } from "../../components/Button"
-import { Header } from "../../components/Header"
 import { InfoCircle } from "../../components/Icons/InfoCircle"
 import { InputText } from "../../components/InputText"
 import Row from "../../components/Row"
@@ -23,12 +22,14 @@ import { useTokensInNetwork } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   padding: 0 32px 48px 32px;
 
   > form {
     width: 100%;
     display: flex;
+    flex: 1;
     flex-direction: column;
     gap: 16px;
   }
@@ -44,6 +45,11 @@ const TokenWarningWrapper = styled(Row)`
   border-radius: 8px;
   background: rgba(255, 191, 61, 0.1);
   gap: 12px;
+`
+
+const ButtonSpacer = styled.div`
+  display: flex;
+  flex: 1;
 `
 
 const isDataComplete = (data: Partial<Token>): data is Token => {
@@ -150,11 +156,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }
 
   return (
-    <>
-      <Header hide={hideBackButton}>
-        <BackButton />
-      </Header>
-
+    <NavigationContainer leftButton={hideBackButton ? null : <BarBackButton />}>
       <AddTokenScreenWrapper>
         <H2>Add tokens</H2>
 
@@ -230,6 +232,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             </>
           )}
           {loading && <Spinner size={64} style={{ marginTop: 50 }} />}
+          <ButtonSpacer />
           <ButtonGroupHorizontal>
             {onReject && (
               <Button onClick={onReject} type="button">
@@ -245,6 +248,6 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
           </ButtonGroupHorizontal>
         </form>
       </AddTokenScreenWrapper>
-    </>
+    </NavigationContainer>
   )
 }

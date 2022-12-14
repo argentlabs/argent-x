@@ -78,40 +78,46 @@ export const NftScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={<BarCloseButton onClick={() => navigate(-1)} />}
+        isAbsolute
+        leftButton={<BarCloseButton />}
         rightButton={
           <TokenMenu tokenAddress={nft.contract_address} canHideToken={false} />
         }
       >
         <>
-          {nft.animation_uri ? (
-            <LazyNftModelViewer nft={nft} />
-          ) : (
-            <>
-              <Box pt="6" px="10" position="relative">
-                <Box
-                  backgroundImage={nft.image_url_copy}
-                  backgroundPosition="center"
-                  backgroundSize="cover"
-                  backgroundRepeat="no-repeat"
-                  style={{ filter: "blur(50px)" }}
-                  position="absolute"
-                  top="15%"
-                  left="20%"
-                  right="20%"
-                  bottom="15%"
-                />
-                <Image
-                  position="relative"
-                  border="solid 2px"
-                  borderColor="transparent"
-                  borderRadius="lg"
-                  alt={nft.name}
-                  src={nft.image_url_copy}
-                />
-              </Box>
-            </>
-          )}
+          <Box
+            pt="18"
+            px="10"
+            position="relative"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Box
+              backgroundImage={nft.image_url_copy}
+              backgroundPosition="center"
+              backgroundSize="cover"
+              backgroundRepeat="no-repeat"
+              style={{ filter: "blur(150px)" }}
+              position="absolute"
+              top="20%"
+              left="0"
+              right="0"
+              bottom="25%"
+            />
+            {nft.animation_uri ? (
+              <LazyNftModelViewer nft={nft} />
+            ) : (
+              <Image
+                position="relative"
+                border="solid 2px"
+                borderColor="transparent"
+                borderRadius="lg"
+                alt={nft.name}
+                src={nft.image_url_copy}
+              />
+            )}
+          </Box>
           <H5 py="6" textAlign="center">
             {nft.name}
           </H5>

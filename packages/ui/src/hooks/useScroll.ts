@@ -1,8 +1,12 @@
 import { useCallback, useRef, useState } from "react"
 
-export interface IScroll {
+export interface ScrollProps {
   scrollTop: number
   scrollLeft: number
+}
+
+export interface UseScrollProps {
+  onScroll?: (scroll: ScrollProps) => void
 }
 
 /**
@@ -21,20 +25,24 @@ export interface IScroll {
  * ```
  */
 
-export const useScroll = () => {
+export const useScroll = ({ onScroll: onScrollProp }: UseScrollProps = {}) => {
   const ref = useRef<HTMLDivElement | null>(null)
-  const [scroll, setScroll] = useState<IScroll>({
+  const [scroll, setScroll] = useState<ScrollProps>({
     scrollTop: 0,
     scrollLeft: 0,
   })
 
-  const onScroll = useCallback((e: Event) => {
-    if (!e.currentTarget) {
-      return
-    }
-    const { scrollTop, scrollLeft } = e.currentTarget as HTMLDivElement
-    setScroll({ scrollTop, scrollLeft })
-  }, [])
+  const onScroll = useCallback(
+    (e: Event) => {
+      if (!e.currentTarget) {
+        return
+      }
+      const { scrollTop, scrollLeft } = e.currentTarget as HTMLDivElement
+      setScroll({ scrollTop, scrollLeft })
+      onScrollProp && onScrollProp({ scrollTop, scrollLeft })
+    },
+    [onScrollProp],
+  )
 
   const setRef = useCallback(
     (nextRef: HTMLDivElement | null) => {
@@ -45,11 +53,17 @@ export const useScroll = () => {
       if (ref?.current) {
         const { scrollTop, scrollLeft } = ref.current
         setScroll({ scrollTop, scrollLeft })
-        ref.current.addEventListener("scroll", onScroll)
+        ref.current.addEventListener("scroll", onScroll, {
+          passive: true,
+        })
       }
     },
     [onScroll],
   )
 
-  return { scrollRef: setRef, scroll }
+  return {
+    scrollRef: setRef,
+    useScrollRef: ref,
+    scroll,
+  }
 }

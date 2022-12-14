@@ -78,19 +78,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           actionQueue,
         })
 
-        analytics.track("deployAccount", {
-          status: "success",
-          networkId: msg.data.networkId,
-        })
-
         return sendMessageToUi({ type: "DEPLOY_ACCOUNT_RES" })
       } catch (e) {
-        analytics.track("deployAccount", {
-          status: "failure",
-          networkId: msg.data.networkId,
-          errorMessage: `${e}`,
-        })
-
         return sendMessageToUi({ type: "DEPLOY_ACCOUNT_REJ" })
       }
     }

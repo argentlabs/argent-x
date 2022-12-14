@@ -1,8 +1,8 @@
+import { BarCloseButton, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { IconBar } from "../../components/IconBar"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
@@ -44,8 +44,11 @@ export const FundingScreen: FC = () => {
   const allowLayerswap = isLayerswapEnabled && isMainnet && !isDeprecatedAccount
 
   return (
-    <>
-      <IconBar close />
+    <NavigationContainer
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
+    >
       <PageWrapper>
         <Title>How would you like to fund your account?</Title>
         <OptionsWrapper>
@@ -101,6 +104,6 @@ export const FundingScreen: FC = () => {
           />
         </OptionsWrapper>
       </PageWrapper>
-    </>
+    </NavigationContainer>
   )
 }

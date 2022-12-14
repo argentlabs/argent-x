@@ -119,7 +119,7 @@ export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
   account: Account,
 ) => {
-  const response = await Promise.all(
+  const response = await Promise.allSettled(
     tokenAddresses.map((tokenAddress) => {
       return getTokenBalanceForAccount(tokenAddress, account)
     }),
@@ -128,7 +128,10 @@ export const fetchAllTokensBalance = async (
     const balance = response[i]
     return {
       ...acc,
-      [addr]: BigNumber.from(balance),
+      [addr]:
+        balance.status === "fulfilled"
+          ? BigNumber.from(balance.value)
+          : undefined, // Error will be surfaced to user by useTokenBalanceForAccount()
     }
   }, {})
 }
