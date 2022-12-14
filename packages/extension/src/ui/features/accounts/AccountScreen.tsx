@@ -1,5 +1,5 @@
-import { SwapProvider } from "@argent/x-swap"
-import { FC, ReactNode } from "react"
+import { SupportedNetworks, SwapProvider } from "@argent/x-swap"
+import { FC, ReactNode, useMemo } from "react"
 
 import { getMulticallForNetwork } from "../../../shared/multicall"
 import { assertNever } from "../../services/assertNever"
@@ -8,6 +8,7 @@ import { AccountCollections } from "../accountNfts/AccountCollections"
 import { AccountTokens } from "../accountTokens/AccountTokens"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
 import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShouldShowFullScreenStatusMessage"
+import { NoSwap } from "../swap/NoSwap"
 import { Swap } from "../swap/Swap"
 import { AccountContainer } from "./AccountContainer"
 import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
@@ -32,6 +33,14 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const showEmpty = !hasAcccount || (hasAcccount && isDeploying)
 
   const multicall = account && getMulticallForNetwork(account?.network)
+
+  const noSwap = useMemo(
+    () =>
+      ![SupportedNetworks.MAINNET, SupportedNetworks.TESTNET].includes(
+        account?.networkId as any,
+      ),
+    [account?.networkId],
+  )
 
   let body: ReactNode
   let scrollKey = "accounts/AccountScreen"
@@ -59,7 +68,9 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
     scrollKey = "accounts/AccountActivityContainer"
     body = <AccountActivityContainer account={account} />
   } else if (tab === "swap") {
-    body = (
+    body = noSwap ? (
+      <NoSwap />
+    ) : (
       <SwapProvider selectedAccount={account} multicall={multicall}>
         <Swap />
       </SwapProvider>
