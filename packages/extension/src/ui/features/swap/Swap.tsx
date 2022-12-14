@@ -1,4 +1,4 @@
-import { Button, CellStack, L2, icons } from "@argent/ui"
+import { Button, CellStack, H5, L2, icons } from "@argent/ui"
 import {
   Currency,
   CurrencyAmount,
@@ -13,7 +13,7 @@ import {
   useSwapState,
   useUserState,
 } from "@argent/x-swap"
-import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
+import { Box, Flex, IconButton, Text, chakra } from "@chakra-ui/react"
 import { keyframes } from "@chakra-ui/react"
 import { useCallback, useEffect, useState } from "react"
 
@@ -25,7 +25,7 @@ import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 import { SwapWarning } from "./ui/SwapWarning"
 
-const { SwitchDirectionIcon } = icons
+const { SwapIcon, SwitchDirectionIcon } = icons
 
 const SwapContainer = chakra(CellStack, {
   baseStyle: {
@@ -185,6 +185,26 @@ const Swap = () => {
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId])
+
+  if (networkId !== SupportedNetworks.MAINNET) {
+    return (
+      <Flex
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        color="neutrals.500"
+        flex="1"
+        mx="14"
+      >
+        <Text fontSize="40">
+          <SwapIcon />
+        </Text>
+        <H5 mt="10" textAlign="center">
+          Swaps are not available on this network
+        </H5>
+      </Flex>
+    )
+  }
 
   return (
     <>
