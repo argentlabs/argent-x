@@ -11,7 +11,6 @@ import {
   stark,
 } from "starknet"
 
-import { getDevice } from "./__unsafe__oldJwt"
 import {
   Account as BeAccount,
   addAccount,
@@ -25,6 +24,7 @@ import {
   encryptPrivateKeyWithPassword,
 } from "./backup"
 import { getNewStarkKeypair } from "./generatePrivateKey"
+import { getDevice } from "./jwt"
 import { provider } from "./provider"
 import { createSession, getSession } from "./session"
 

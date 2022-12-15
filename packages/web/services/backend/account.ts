@@ -1,6 +1,6 @@
 import retry from "async-retry"
 
-import { getJwt } from "../__unsafe__oldJwt"
+import { getJwt } from "../jwt"
 
 export const ARGENT_API_BASE_URL = "https://cloud-dev.argent-api.com/v1"
 
