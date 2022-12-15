@@ -1,9 +1,9 @@
 import {
   DeclareContractPayload,
   UniversalDeployerContractPayload,
+  constants,
   stark,
 } from "starknet"
-import { hash } from "starknet"
 
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { BackgroundService } from "./background"
@@ -11,7 +11,7 @@ import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
 
-const { calculateContractAddressFromHash } = hash
+const { UDC } = constants
 
 type DeclareContractAction = ExtQueueItem<{
   type: "DECLARE_CONTRACT_ACTION"
@@ -85,6 +85,10 @@ export const udcDeclareContract = async (
         title: "Contract declared",
         subTitle: classHash.toString(),
         type: UdcTransactionType.DECLARE_CONTRACT,
+        transactions: {
+          contractAddress: UDC.ADDRESS,
+          entrypoint: "declareContract",
+        },
       },
     })
 
@@ -112,33 +116,28 @@ export const udcDeployContract = async (
     networkId: account.networkId,
   })
 
-  if ("declare" in starknetAccount) {
+  if ("deploy" in starknetAccount) {
     const { classHash, salt, unique, constructorCalldata } = payload
 
     // make sure contract hashes can be calculated before submitting onchain
     const compiledConstructorCallData = stark.compileCalldata(
       constructorCalldata || [],
     )
-    const contractAddress = calculateContractAddressFromHash(
-      salt,
-      classHash,
-      compiledConstructorCallData,
-      account.address,
-    )
 
     // submit onchain
     const nonce = await getNonce(account, wallet)
-    const { transaction_hash: txHash } = await starknetAccount.deploy(
-      {
-        classHash,
-        salt,
-        unique,
-        constructorCalldata,
-      },
-      {
-        nonce,
-      },
-    )
+    const { transaction_hash: txHash, contract_address } =
+      await starknetAccount.deploy(
+        {
+          classHash,
+          salt,
+          unique,
+          constructorCalldata,
+        },
+        {
+          nonce,
+        },
+      )
 
     if (!checkTransactionHash(txHash)) {
       throw Error(
@@ -146,13 +145,19 @@ export const udcDeployContract = async (
       )
     }
 
+    const contractAddress = contract_address[0]
     await addTransaction({
       hash: txHash,
       account,
       meta: {
-        title: "Contract deployed",
+        title: "Contract deployment",
         subTitle: contractAddress,
         type: UdcTransactionType.DEPLOY_CONTRACT,
+        transactions: {
+          contractAddress: UDC.ADDRESS,
+          entrypoint: "deployContract",
+          calldata: compiledConstructorCallData,
+        },
       },
     })
 
