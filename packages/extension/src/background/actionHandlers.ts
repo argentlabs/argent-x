@@ -1,9 +1,9 @@
-import { getNetworkSelector } from "../shared/account/selectors"
 import { getAccounts } from "../shared/account/store"
 import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
 import { addNetwork, getNetworks } from "../shared/network"
 import { preAuthorize } from "../shared/preAuthorizations"
+import { isEqualWalletAddress } from "../shared/wallet.service"
 import { assertNever } from "../ui/services/assertNever"
 import { accountDeployAction } from "./accounDeployAction"
 import { analytics } from "./analytics"
@@ -143,9 +143,9 @@ export const handleActionApproval = async (
           )
         }
 
-        const accountsOnNetwork = await getAccounts(
-          getNetworkSelector(network.id),
-        )
+        const accountsOnNetwork = await getAccounts((account) => {
+          return account.networkId === network.id && !account.hidden
+        })
 
         if (!accountsOnNetwork.length) {
           throw Error(
@@ -153,7 +153,17 @@ export const handleActionApproval = async (
           )
         }
 
-        const selectedAccount = await wallet.selectAccount(accountsOnNetwork[0])
+        const currentlySelectedAccount = await wallet.getSelectedAccount()
+
+        const existingAccountOnNetwork =
+          currentlySelectedAccount &&
+          accountsOnNetwork.find((account) =>
+            isEqualWalletAddress(account, currentlySelectedAccount),
+          )
+
+        const selectedAccount = await wallet.selectAccount(
+          existingAccountOnNetwork ?? accountsOnNetwork[0],
+        )
 
         if (!selectedAccount) {
           throw Error(
