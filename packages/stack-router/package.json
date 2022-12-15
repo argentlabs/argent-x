@@ -1,0 +1,53 @@
+{
+  "name": "@argent/stack-router",
+  "version": "5.1.0",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/stack-router.umd.js",
+  "module": "./dist/stack-router.es.js",
+  "types": "./dist/stack-router.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/stack-router.es.js",
+      "require": "./dist/stack-router.umd.js"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.4.3",
+    "@emotion/styled": "^11.10.5",
+    "framer-motion": "^7.6.19",
+    "history": "^5.3.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@argent/ui": "^5.1.0",
+    "@chakra-ui/icons": "^2.0.13",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/jest": "^29.2.3",
+    "@types/lodash-es": "^4.17.6",
+    "@types/node": "^18.11.12",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^4.6.3",
+    "vite": "^3.0.9",
+    "vite-plugin-dts": "^1.6.6"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.10.5",
+    "colord": "^2.9.2",
+    "lodash-es": "^4.17.21",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.1"
+  }
+}
