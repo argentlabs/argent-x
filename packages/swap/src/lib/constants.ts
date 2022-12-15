@@ -86,4 +86,4 @@ export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   ],
 }
 
-export const MIN_ETH: JSBI = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(14)) // .0001 ETH
+export const MIN_ETH: JSBI = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(15)) // .001 ETH
