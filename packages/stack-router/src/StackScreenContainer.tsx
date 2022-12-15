@@ -13,5 +13,6 @@ export const StackScreenContainer = chakra(motion.div, {
     right: 0,
     bottom: 0,
     transformOrigin: "50% 0",
+    bg: "bg",
   },
 })

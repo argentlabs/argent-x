@@ -1,6 +1,8 @@
+import { Route, Routes } from "@argent/stack-router"
 import { chakra } from "@chakra-ui/system"
 import { FC } from "react"
-import { Outlet, Route, Routes } from "react-router-dom"
+// import { Outlet, Route, Routes } from "react-router-dom"
+import { Outlet } from "react-router-dom"
 
 import { useAppState } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
@@ -126,9 +128,17 @@ const walletRoutes = (
       path={routes.accountActivity.path}
       element={<AccountScreen tab="activity" />}
     />
-    <Route path={routes.accounts.path} element={<AccountListScreen />} />
+    <Route
+      path={routes.accounts.path}
+      presentation="modal"
+      element={<AccountListScreen />}
+    />
     <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
-    <Route path={routes.settings.path} element={<SettingsScreen />} />
+    <Route
+      path={routes.settings.path}
+      presentation="modal"
+      element={<SettingsScreen />}
+    />
     <Route
       path={routes.settingsPrivacy.path}
       element={<PrivacySettingsScreen />}
@@ -223,7 +233,11 @@ const walletRoutes = (
       path={routes.accountsHidden.path}
       element={<AccountListHiddenScreen />}
     />
-    <Route path={routes.funding.path} element={<FundingScreen />} />
+    <Route
+      path={routes.funding.path}
+      presentation={"modal"}
+      element={<FundingScreen />}
+    />
     <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
     <Route path={routes.fundingQrCode.path} element={<FundingQrCodeScreen />} />
     <Route

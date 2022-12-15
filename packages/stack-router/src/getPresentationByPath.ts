@@ -3,23 +3,25 @@ import { variantForPresentation } from "./presentationVariants"
 import { ScreenProps } from "./types"
 import {
   Presentation,
-  PresentationByPathname,
+  PresentationByPath,
   PresentationDirection,
 } from "./types"
 
-interface GetPresentationByPathnameProps {
+interface GetPresentationByPathProps {
   presentationDirection: PresentationDirection
-  poppedScreen: ScreenProps | null
+  poppedScreens: ScreenProps[]
   screens: ScreenProps[]
 }
 
-export const getPresentationByPathname = ({
+export const getPresentationByPath = ({
   presentationDirection,
-  poppedScreen,
+  poppedScreens,
   screens,
-}: GetPresentationByPathnameProps) => {
-  const result: PresentationByPathname = {}
-  const screensWithPopped = poppedScreen ? [...screens, poppedScreen] : screens
+}: GetPresentationByPathProps) => {
+  const result: PresentationByPath = {}
+  const screensWithPopped = poppedScreens
+    ? [...screens, ...poppedScreens]
+    : screens
   const isForwards = presentationDirection === PresentationDirection.Forwards
   for (let i = 0; i < screensWithPopped.length; i++) {
     const screen = screensWithPopped[i]
@@ -67,10 +69,32 @@ export const getPresentationByPathname = ({
         : screen.presentation
 
     const variant = variantForPresentation(presentation, !isForwards)
-    result[screen.pathname] = {
+    result[screen.path] = {
       variant,
       presentation,
       zIndex: i,
+    }
+  }
+  if (poppedScreens.length) {
+    /** Ensure popped modal siblings are dismissed with modal or modalSheet presentation */
+    let dismissPresentation: Presentation | undefined
+    for (const poppedScreen of poppedScreens) {
+      /** Encountered a modal, so start enforcing dismissal presentation */
+      if (isModalPresentation(poppedScreen.presentation)) {
+        dismissPresentation =
+          poppedScreen.presentation === "modal" ? "modal" : "modalSheet"
+      }
+      if (dismissPresentation) {
+        const poppedScreenVariant = variantForPresentation(
+          dismissPresentation,
+          true,
+        )
+        result[poppedScreen.path] = {
+          ...result[poppedScreen.path],
+          variant: poppedScreenVariant,
+          presentation: dismissPresentation,
+        }
+      }
     }
   }
   return result

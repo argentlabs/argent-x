@@ -1,7 +1,9 @@
 import { Target } from "framer-motion"
 
 export interface ScreenProps {
-  /** pathname e.g. /users/edit/123 */
+  /** path e.g. /accounts/:id */
+  path: string
+  /** pathname e.g. /accounts/123 */
   pathname: string
   /** unique history key e.g. 'default' or 'abc123' {@link https://github.com/remix-run/history/blob/main/docs/api-reference.md#locationkey} */
   key: string
@@ -29,7 +31,9 @@ export enum PresentationDirection {
   Backwards = "BACKWARDS",
 }
 
-export type PresentationByPathname = Record<
+export type DeclaredPresentationByPath = Record<string, Presentation>
+
+export type PresentationByPath = Record<
   string,
   {
     variant: PresentationVariant

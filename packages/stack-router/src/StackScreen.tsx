@@ -1,7 +1,7 @@
 import { usePresence } from "framer-motion"
 import { Transition } from "framer-motion"
-import { ComponentProps, FC, useEffect, useRef } from "react"
-import { useLocation } from "react-router-dom"
+import { useReducedMotion } from "framer-motion"
+import { ComponentProps, FC, useEffect, useMemo, useRef } from "react"
 
 import { isStackedPresentation } from "./is"
 import { useStackContext } from "./StackContext"
@@ -37,15 +37,19 @@ export const StackScreen: FC<StackScreenProps> = ({
   ...rest
 }) => {
   const ref = useRef<HTMLDivElement | null>(null)
-  const { presentationDirection, presentationByPathname, onStackClicked } =
-    useStackContext()
+  const {
+    presentationDirection,
+    presentationByPath: presentationByPath,
+    onStackClicked,
+  } = useStackContext()
   const [isPresent, safeToRemove] = usePresence()
-  const currentLocation = useLocation()
+  const prefersReducedMotion = useReducedMotion()
 
-  const { variant, presentation, zIndex } =
-    presentationByPathname[currentLocation.pathname] || {}
+  const { variant, presentation, zIndex } = presentationByPath[path] || {}
   const { enter, active, exit } = variant || {}
   const isStacked = isStackedPresentation(presentation)
+  const isModalSheet =
+    presentation === "modalSheet" || presentation === "defaultModalSheet"
 
   /** stack behind modal-sheet, remove when no longer in stack */
   useEffect(() => {
@@ -54,26 +58,29 @@ export const StackScreen: FC<StackScreenProps> = ({
     }
   }, [isPresent, isStacked, safeToRemove])
 
-  /** when stacked and clicked, could navigate back to this screen */
+  /** clicking outside navigates back in stack */
   useEffect(() => {
-    const currentRef = ref?.current
-    const onMouseUp = () => {
-      onStackClicked(path)
-    }
-    if (isStacked && currentRef) {
-      currentRef.addEventListener("mouseup", onMouseUp)
-    }
-    return () => {
-      if (isStacked && currentRef) {
-        currentRef.removeEventListener("mouseup", onMouseUp)
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isPresent && !ref.current?.contains(e.target as Node)) {
+        e.stopPropagation()
+        onStackClicked()
       }
     }
-  }, [isStacked, onStackClicked, path])
 
-  const transition =
-    presentationDirection === PresentationDirection.Replace
+    isModalSheet && document.addEventListener("mousedown", handleClickOutside)
+
+    return () => {
+      isModalSheet &&
+        document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [isModalSheet, isPresent, onStackClicked])
+
+  const transition = useMemo(() => {
+    return prefersReducedMotion ||
+      presentationDirection === PresentationDirection.Replace
       ? replaceTransition
       : animatedTransition
+  }, [prefersReducedMotion, presentationDirection])
 
   return (
     <StackScreenContainer

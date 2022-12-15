@@ -16,9 +16,12 @@
     }
   },
   "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "example": "cd example && react-scripts start"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.4.3",
@@ -29,15 +32,16 @@
   },
   "devDependencies": {
     "@argent/ui": "^5.1.0",
-    "@chakra-ui/icons": "^2.0.13",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3",
-    "@types/jest": "^29.2.3",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.11.12",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.7.0",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jsdom": "^20.0.0",
+    "react-scripts": "5.0.1",
     "typescript": "^4.6.3",
     "vite": "^3.0.9",
     "vite-plugin-dts": "^1.6.6"

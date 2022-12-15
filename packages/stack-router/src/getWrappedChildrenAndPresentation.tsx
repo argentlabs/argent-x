@@ -17,6 +17,8 @@ export interface WrappedChildrenAndPresentation {
   wrappedChildren: ReactNode
   /** `path` mapped to `presentation` declared in `<Route ... />` */
   declaredPresentationByPath: DeclaredPresentationByPath
+  /** all unique paths */
+  paths: string[]
 }
 
 /**
@@ -26,7 +28,7 @@ export interface WrappedChildrenAndPresentation {
  * converts e.g.
  *
  * `<Route presentation="modal" path="/users/picker" element={<UsersPicker />} />`
- *
+ *`
  * into
  *
  * `<Route presentation="modal" path="/users/picker" element={<StackScreen path={"/users/picker"}><UsersPicker /></StackScreen>}/>`
@@ -38,6 +40,7 @@ export const getWrappedChildrenAndPresentation = (
   parentPath = "/",
 ): WrappedChildrenAndPresentation => {
   const presentationByPath: DeclaredPresentationByPath = {}
+  let unfilteredPaths: string[] = []
   const wrappedChildren = Children.map(childRoutes, (child) => {
     if (isValidElement(child)) {
       let { children, element } = child.props
@@ -51,17 +54,21 @@ export const getWrappedChildrenAndPresentation = (
           /** record the presentation prop for this router path if present */
           presentationByPath[childPath] = presentation
         }
+        /** keep a record of all raw paths */
+        unfilteredPaths.push(childPath)
       }
       /** recurse into children, also handles type===Fragment */
       if (children) {
         const {
           wrappedChildren: nestedWrappedChildren,
           declaredPresentationByPath: nestedPresentationByPath,
+          paths: nestedPaths,
         } = getWrappedChildrenAndPresentation(children, childPath)
         /** replace current children with wrapped */
         children = nestedWrappedChildren
         /** add the presentation records */
         Object.assign(presentationByPath, nestedPresentationByPath)
+        unfilteredPaths = unfilteredPaths.concat(nestedPaths)
       }
       /** wrap the element in StackScreen and copy in the router path as a prop */
       if (element) {
@@ -79,8 +86,10 @@ export const getWrappedChildrenAndPresentation = (
 
     return child
   })
+  const paths = Array.from(new Set(unfilteredPaths))
   return {
     wrappedChildren,
     declaredPresentationByPath: presentationByPath,
+    paths,
   }
 }
