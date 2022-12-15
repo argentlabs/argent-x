@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react"
 
 import {
+  accordionTheme,
   alertTheme,
   menuTheme,
   textareaTheme,
@@ -14,10 +15,12 @@ import {
 } from "../components"
 import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
+import { switchTheme } from "../components/Switch"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
 import { semanticTokens } from "./semanticTokens"
 import { shadows } from "./shadows"
+import { sizes } from "./sizes"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
 
@@ -42,15 +45,18 @@ const extendedTheme = extendTheme({
   },
   breakpoints,
   ...typography,
+  sizes,
   shadows,
   space: spacing,
   components: {
+    Accordion: accordionTheme,
     Alert: alertTheme,
     Button: buttonTheme,
     Input: inputTheme,
     Menu: menuTheme,
     Textarea: textareaTheme,
     Tooltip: tooltipTheme,
+    Switch: switchTheme,
   },
 })
 

@@ -1,72 +1,67 @@
-import { CellStack } from "@argent/ui"
-import { Button, icons } from "@argent/ui"
-import { ComponentProps, FC, PropsWithChildren } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { FC, Suspense } from "react"
+import { useNavigate } from "react-router-dom"
 
+import { Token } from "../../../shared/token/type"
+import { useAppState } from "../../app.state"
+import { ErrorBoundary } from "../../components/ErrorBoundary"
+import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { routes } from "../../routes"
-import { TokenListItemContainer, TokenListItemVariant } from "./TokenListItem"
-import { TokenDetailsWithBalance } from "./tokens.state"
+import { useSelectedAccount } from "../accounts/accounts.state"
+import { NewTokenButton } from "./NewTokenButton"
+import { TokenListItemVariant } from "./TokenListItem"
+import { TokenListItemContainer } from "./TokenListItemContainer"
+import { useTokensInNetwork } from "./tokens.state"
 
-const { AddIcon } = icons
-
-interface TokenListProps extends PropsWithChildren {
-  showTitle?: boolean
+interface TokenListProps {
+  tokenList?: Token[]
+  showNewTokenButton?: boolean
   showTokenSymbol?: boolean
   variant?: TokenListItemVariant
-  tokenList: TokenDetailsWithBalance[]
-  isValidating: boolean
   navigateToSend?: boolean
 }
 
 export const TokenList: FC<TokenListProps> = ({
-  showTokenSymbol = false,
-  isValidating,
-  variant,
   tokenList,
+  showNewTokenButton = true,
+  showTokenSymbol = false,
+  variant,
   navigateToSend = false,
-  children,
 }) => {
   const navigate = useNavigate()
-  if (!tokenList) {
+  const account = useSelectedAccount()
+  const { switcherNetworkId } = useAppState()
+  const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
+  if (!account) {
     return null
   }
+  const tokens = tokenList || tokensInNetwork
   return (
-    <CellStack>
-      {tokenList.map((token) => (
-        <TokenListItemContainer
-          key={token.address}
-          token={token}
-          isLoading={isValidating}
-          variant={variant}
-          showTokenSymbol={showTokenSymbol}
-          onClick={() => {
-            navigate(
-              navigateToSend
-                ? routes.sendToken(token.address)
-                : routes.token(token.address),
-            )
-          }}
+    <ErrorBoundary
+      fallback={
+        <ErrorBoundaryFallbackWithCopyError
+          message={"Sorry, an error occurred fetching tokens"}
         />
-      ))}
-      {children}
-    </CellStack>
-  )
-}
-
-export const NewTokenButton: FC<ComponentProps<typeof Button>> = (props) => {
-  return (
-    <Button
-      size={"sm"}
-      colorScheme={"transparent"}
-      mx={"auto"}
-      as={Link}
-      to={routes.newToken()}
-      leftIcon={<AddIcon />}
-      color="neutrals.400"
-      loadingText={"Fetching tokens"}
-      {...props}
+      }
     >
-      New token
-    </Button>
+      <Suspense fallback={<NewTokenButton isLoading />}>
+        {tokens.map((token) => (
+          <TokenListItemContainer
+            key={token.address}
+            account={account}
+            token={token}
+            variant={variant}
+            showTokenSymbol={showTokenSymbol}
+            onClick={() => {
+              navigate(
+                navigateToSend
+                  ? routes.sendToken(token.address)
+                  : routes.token(token.address),
+              )
+            }}
+          />
+        ))}
+        {showNewTokenButton && <NewTokenButton />}
+      </Suspense>
+    </ErrorBoundary>
   )
 }

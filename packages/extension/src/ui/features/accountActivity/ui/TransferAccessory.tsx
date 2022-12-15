@@ -1,10 +1,7 @@
+import { H6, P4 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
 
-import {
-  TokenTextGroup,
-  TokenTitle,
-} from "../../accountTokens/TokenListItemDeprecated"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 import {
   TokenApproveTransaction,
@@ -12,26 +9,16 @@ import {
   TokenTransferTransaction,
 } from "../transform/type"
 
-export const TokenAmount = styled(TokenTitle)`
-  text-align: right;
-`
-
-const TokenValue = styled.div`
-  text-align: right;
-  font-size: 13px;
-  line-height: 18px;
-  color: ${({ theme }) => theme.text2};
-  margin: 0;
-`
-
-export interface ITransferAccessory {
+export interface TransferAccessoryProps {
   transaction:
     | TokenTransferTransaction
     | TokenMintTransaction
     | TokenApproveTransaction
 }
 
-export const TransferAccessory: FC<ITransferAccessory> = ({ transaction }) => {
+export const TransferAccessory: FC<TransferAccessoryProps> = ({
+  transaction,
+}) => {
   const { action, amount, tokenAddress } = transaction
   const { displayAmount, displayValue } = useDisplayTokenAmountAndCurrencyValue(
     { amount, tokenAddress },
@@ -39,19 +26,31 @@ export const TransferAccessory: FC<ITransferAccessory> = ({ transaction }) => {
   if (!displayAmount) {
     return null
   }
-  const prefix = action === "SEND" ? <>&minus;</> : ""
+  const prefix =
+    action === "SEND" ? <>&minus;</> : action === "RECEIVE" ? <>+</> : null
   return (
-    <TokenTextGroup>
-      <TokenAmount>
+    <Flex direction={"column"} overflow="hidden">
+      <H6
+        overflow="hidden"
+        textOverflow={"ellipsis"}
+        textAlign={"right"}
+        color={action === "RECEIVE" ? "secondary.500" : undefined}
+      >
         {prefix}
         {displayAmount}
-      </TokenAmount>
+      </H6>
       {displayValue && (
-        <TokenValue>
+        <P4
+          color="neutrals.400"
+          fontWeight={"semibold"}
+          overflow="hidden"
+          textOverflow={"ellipsis"}
+          textAlign={"right"}
+        >
           {prefix}
           {displayValue}
-        </TokenValue>
+        </P4>
       )}
-    </TokenTextGroup>
+    </Flex>
   )
 }

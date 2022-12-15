@@ -1,26 +1,19 @@
+import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
 
 import { ErrorBoundaryState } from "./components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "./components/ErrorBoundaryFallbackWithCopyError"
-import { SupportFooter } from "./features/settings/SettingsScreen"
-
-const FullscreenFallbackContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-`
+import { SupportFooter } from "./features/settings/SupportFooter"
 
 const AppErrorBoundaryFallback: FC<ErrorBoundaryState> = ({
   error,
   errorInfo,
 }) => {
   return (
-    <FullscreenFallbackContainer>
+    <Flex direction="column" w="100vw" h="100vh" px={4}>
       <ErrorBoundaryFallbackWithCopyError error={error} errorInfo={errorInfo} />
       <SupportFooter />
-    </FullscreenFallbackContainer>
+    </Flex>
   )
 }
 

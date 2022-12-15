@@ -21,7 +21,6 @@ import { WalletAccount } from "../src/shared/wallet.model"
 import { accountsEqual } from "../src/shared/wallet.service"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
-import { testAccount } from "./setupTestAccount"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
@@ -93,7 +92,7 @@ describe("Wallet", () => {
 
     const account = await wallet.newAccount(NETWORK)
 
-    const { txHash } = await wallet.deployAccount(account, testAccount)
+    const { txHash } = await wallet.deployAccount(account)
 
     expect(txHash).toMatch(REGEX_HEXSTRING)
 

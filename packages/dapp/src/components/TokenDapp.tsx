@@ -1,7 +1,6 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
-import { Abi, AccountInterface, Contract } from "starknet"
-import { genKeyPair, getStarkKey } from "starknet/dist/utils/ellipticCurve"
+import { Abi, AccountInterface, Contract, ec } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
@@ -19,6 +18,8 @@ import {
   waitForTransaction,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
+
+const { genKeyPair, getStarkKey } = ec
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
 
@@ -137,7 +138,7 @@ export const TokenDapp: FC<{
         policies: [
           {
             contractAddress: getErc20TokenAddress(network),
-            selector: "mint",
+            selector: "transfer",
           },
         ],
       },
@@ -166,9 +167,9 @@ export const TokenDapp: FC<{
         sessionAccount,
       )
 
-      const result = await erc20Contract.mint(
+      const result = await erc20Contract.transfer(
         account.address,
-        parseInputAmountToUint256("666"),
+        parseInputAmountToUint256("0.000000001"),
       )
       console.log(result)
 
@@ -180,10 +181,6 @@ export const TokenDapp: FC<{
     }
   }
   const tokenAddress = getErc20TokenAddress(network as any)
-  const ethAddress =
-    network === "goerli-alpha"
-      ? "0x2dd93e385742984bf2fc887cd5d8b5ec6917d80af09cf7a00a63710ad51ba53"
-      : undefined
 
   return (
     <>
@@ -219,6 +216,7 @@ export const TokenDapp: FC<{
 
           <label htmlFor="mint-amount">Amount</label>
           <input
+            disabled
             type="text"
             id="mint-amount"
             name="fname"
@@ -226,7 +224,7 @@ export const TokenDapp: FC<{
             onChange={(e) => setMintAmount(e.target.value)}
           />
 
-          <input type="submit" disabled={buttonsDisabled} value="Mint" />
+          <input type="submit" disabled={true} value="Not possible with ETH!" />
         </form>
 
         <form onSubmit={handleTransferSubmit}>
@@ -310,7 +308,7 @@ export const TokenDapp: FC<{
           <form onSubmit={handleSessionTransactionSubmit}>
             <h2 className={styles.title}>Open session</h2>
 
-            <p>Mint some test tokens using the session!</p>
+            <p>Send some ETH to yourself using the session!</p>
 
             <input
               type="submit"
@@ -321,7 +319,7 @@ export const TokenDapp: FC<{
         </div>
       )}
       <h3 style={{ margin: 0 }}>
-        ERC-20 token address
+        ETH token address
         <button
           className="flat"
           style={{ marginLeft: ".6em" }}
@@ -347,35 +345,6 @@ export const TokenDapp: FC<{
           </a>
         </code>
       </h3>
-      {ethAddress && (
-        <h3 style={{ margin: 0 }}>
-          Goerli ETH token address
-          <button
-            className="flat"
-            style={{ marginLeft: ".6em" }}
-            onClick={async () => {
-              try {
-                await addToken(ethAddress)
-                setAddTokenError("")
-              } catch (error: any) {
-                setAddTokenError(error.message)
-              }
-            }}
-          >
-            Add to wallet
-          </button>
-          <br />
-          <code>
-            <a
-              target="_blank"
-              href={`${getExplorerBaseUrl()}/contract/${ethAddress}`}
-              rel="noreferrer"
-            >
-              {truncateAddress(ethAddress)}
-            </a>
-          </code>
-        </h3>
-      )}
       <span className="error-message">{addTokenError}</span>
     </>
   )

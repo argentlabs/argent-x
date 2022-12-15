@@ -1,3 +1,4 @@
+import { useToast } from "@argent/ui"
 import { Collapse } from "@mui/material"
 import * as Sentry from "@sentry/react"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
@@ -109,12 +110,21 @@ Unable to parse error
 export interface IErrorBoundaryFallbackWithCopyError
   extends ErrorBoundaryState {
   message?: string
+  /** overrides storage setting, used in Storybook */
+  privacyErrorReporting?: boolean
 }
 
 const ErrorBoundaryFallbackWithCopyError: FC<
   IErrorBoundaryFallbackWithCopyError
-> = ({ error, errorInfo, message = "Sorry, an error occurred" }) => {
+> = ({
+  error,
+  errorInfo,
+  message = "Sorry, an error occurred",
+  privacyErrorReporting: privacyErrorReportingProp,
+}) => {
   const [viewLogs, setViewLogs] = useState(false)
+
+  const toast = useToast()
 
   const hardResetAndReload = useHardResetAndReload()
   const errorPayload = useMemo(() => {
@@ -145,14 +155,26 @@ ${displayStack}
         scope.setExtra("submittedManually", manuallySubmitted)
         Sentry.captureException(error)
       })
+      if (manuallySubmitted) {
+        toast({
+          title: "The error was reported successfully",
+          status: "success",
+          duration: 3000,
+        })
+      }
     },
-    [error, errorInfo],
+    [error, errorInfo, toast],
   )
 
-  const privacyErrorReporting = useKeyValueStorage(
+  const privacyErrorReportingSetting = useKeyValueStorage(
     settingsStore,
     "privacyErrorReporting",
   )
+
+  const privacyErrorReporting =
+    privacyErrorReportingProp !== undefined
+      ? privacyErrorReportingProp
+      : privacyErrorReportingSetting
 
   const privacyAutomaticErrorReporting = useKeyValueStorage(
     settingsStore,
@@ -188,7 +210,15 @@ ${displayStack}
             />
           </ShowLogsToggle>
         </ErrorLogsContainer>
-        <Collapse in={viewLogs} timeout="auto" style={{ borderRadius: "8px" }}>
+        <Collapse
+          in={viewLogs}
+          timeout="auto"
+          style={{
+            maxHeight: "80vh",
+            overflow: "auto",
+            borderRadius: "8px",
+          }}
+        >
           <Logs>
             <pre style={{ whiteSpace: "pre-wrap", lineBreak: "anywhere" }}>
               {errorPayload}

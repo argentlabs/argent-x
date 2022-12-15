@@ -26,7 +26,7 @@ export class PluginAccount extends ArgentXAccount {
   }
 
   public async isPlugin(pluginClassHash: string): Promise<boolean> {
-    const [result] = await this.contract.call("is_plugin", [
+    const [result] = await this.contract.call("isPlugin", [
       number.hexToDecimalString(pluginClassHash),
     ])
     return !result.isZero()
@@ -36,7 +36,7 @@ export class PluginAccount extends ArgentXAccount {
     return executeTransaction({
       transactions: {
         contractAddress: this.address,
-        entrypoint: "add_plugin",
+        entrypoint: "addPlugin",
         calldata: [number.hexToDecimalString(pluginClassHash)],
       },
     })
@@ -46,7 +46,7 @@ export class PluginAccount extends ArgentXAccount {
     return executeTransaction({
       transactions: {
         contractAddress: this.address,
-        entrypoint: "remove_plugin",
+        entrypoint: "removePlugin",
         calldata: [number.hexToDecimalString(pluginClassHash)],
       },
     })
@@ -59,7 +59,7 @@ export class PluginAccount extends ArgentXAccount {
     return executeTransaction({
       transactions: {
         contractAddress: this.address,
-        entrypoint: "execute_on_plugin",
+        entrypoint: "executeOnPlugin",
         calldata: [
           pluginClassHash,
           hash.getSelectorFromName(call.entrypoint),

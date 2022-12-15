@@ -3,6 +3,7 @@ import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
+import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./preAuthorization"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
@@ -51,14 +52,27 @@ window.addEventListener(
       return
     }
 
-    if (starknet.account && data.type === "CONNECT_ACCOUNT") {
-      const { address, network } = data.data
+    if (starknet.account && data.type === "CONNECT_ACCOUNT_RES") {
       const isPreauthorized = await getIsPreauthorized()
       if (!isPreauthorized) {
         // disconnect so the user can see they are no longer connected
         // TODO: better UX would be to also re-connect when user selects pre-authorized account
         await disconnectAccount()
       } else {
+        const walletAccountP = waitForMessage(
+          "CONNECT_DAPP_RES",
+          10 * 60 * 1000,
+        )
+        sendMessage({
+          type: "CONNECT_DAPP",
+          data: { host: window.location.host },
+        })
+        const walletAccount = await walletAccountP
+
+        if (!walletAccount) {
+          return disconnectAccount()
+        }
+        const { address, network } = walletAccount
         if (
           address !== starknet.selectedAddress ||
           network.chainId !== starknet.chainId

@@ -1,6 +1,7 @@
 import useSWRImmutable from "swr/immutable"
 import urlJoin from "url-join"
 
+import { generateAvatarImage } from "../../../../shared/avatarImage"
 import { getKnownDappForHost } from "../../../../shared/knownDapps"
 import { getBaseUrlForHost } from "../../../../shared/utils/url"
 import { getColor } from "../../accounts/accounts.service"
@@ -13,12 +14,12 @@ export interface IDappDisplayAttributes {
 export const getDappDisplayAttributes = async (
   host: string,
 ): Promise<IDappDisplayAttributes> => {
-  const color = getColor(host)
+  const background = getColor(host)
   const knownDapp = getKnownDappForHost(host)
   const title = knownDapp?.title || host
   const result: IDappDisplayAttributes = {
     title,
-    iconUrl: `https://eu.ui-avatars.com/api?name=${title}&background=${color}&color=fff`,
+    iconUrl: generateAvatarImage(title, { background }),
   }
 
   /** check if the icon still exists at the url */

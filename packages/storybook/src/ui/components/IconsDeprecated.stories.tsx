@@ -15,14 +15,6 @@ import { NetworkWarningIcon } from "@argent-x/extension/src/ui/components/Icons/
 import { PlusCircle } from "@argent-x/extension/src/ui/components/Icons/PlusCircle"
 import { SearchIcon } from "@argent-x/extension/src/ui/components/Icons/SearchIcon"
 import { SupportIcon } from "@argent-x/extension/src/ui/components/Icons/SupportIcon"
-import { TransactionApprove } from "@argent-x/extension/src/ui/components/Icons/TransactionApprove"
-import { TransactionArgentX } from "@argent-x/extension/src/ui/components/Icons/TransactionArgentX"
-import { TransactionNFT } from "@argent-x/extension/src/ui/components/Icons/TransactionNFT"
-import { TransactionReceive } from "@argent-x/extension/src/ui/components/Icons/TransactionReceive"
-import { TransactionSend } from "@argent-x/extension/src/ui/components/Icons/TransactionSend"
-import { TransactionSwap } from "@argent-x/extension/src/ui/components/Icons/TransactionSwap"
-import { TransactionUnknown } from "@argent-x/extension/src/ui/components/Icons/TransactionUnknown"
-import { TransactionUpgrade } from "@argent-x/extension/src/ui/components/Icons/TransactionUpgrade"
 import { UpdateIcon } from "@argent-x/extension/src/ui/components/Icons/UpdateIcon"
 import { ViewOnBlockExplorerIcon } from "@argent-x/extension/src/ui/components/Icons/ViewOnBlockExplorerIcon"
 import { WarningIcon } from "@argent-x/extension/src/ui/components/Icons/WarningIcon"
@@ -62,14 +54,6 @@ const Icons: FC = () => (
     <PlusCircle />
     <SearchIcon />
     <SupportIcon />
-    <TransactionApprove />
-    <TransactionArgentX />
-    <TransactionNFT />
-    <TransactionReceive />
-    <TransactionSend />
-    <TransactionSwap />
-    <TransactionUnknown />
-    <TransactionUpgrade />
     <UpdateIcon />
     <ViewOnBlockExplorerIcon />
     <WarningIcon />

@@ -128,13 +128,13 @@ For convenience this service can be started with [Docker desktop](https://www.do
 - For ARM computers (e.g. Mac computers with Apple silicon)
 
   ```bash
-  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm --seed 0
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm-seed0
   ```
 
 - Otherwise
 
   ```bash
-  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-seed0
   ```
 
 ### Run tests

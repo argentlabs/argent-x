@@ -7,6 +7,7 @@ import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
 import { executeTransactionAction } from "./transactions/transactionExecution"
+import { udcDeclareContract, udcDeployContract } from "./udcAction"
 
 export const handleActionApproval = async (
   action: ExtQueueItem<ActionItem>,
@@ -55,6 +56,12 @@ export const handleActionApproval = async (
       try {
         const txHash = await accountDeployAction(action, background)
 
+        analytics.track("deployAccount", {
+          status: "success",
+          trigger: "sign",
+          networkId: action.payload.networkId,
+        })
+
         return {
           type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
           data: { txHash, actionHash },
@@ -64,6 +71,12 @@ export const handleActionApproval = async (
         if (error.includes("403")) {
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
+
+        analytics.track("deployAccount", {
+          status: "failure",
+          networkId: action.payload.networkId,
+          errorMessage: `${error}`,
+        })
 
         return {
           type: "DEPLOY_ACCOUNT_ACTION_FAILED",
@@ -109,6 +122,55 @@ export const handleActionApproval = async (
       return {
         type: "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
         data: { actionHash },
+      }
+    }
+
+    case "DECLARE_CONTRACT_ACTION": {
+      try {
+        const txHash = await udcDeclareContract(action, background)
+
+        return {
+          type: "DECLARE_CONTRACT_ACTION_SUBMITTED",
+          data: { txHash, actionHash },
+        }
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        return {
+          type: "DECLARE_CONTRACT_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
+      }
+    }
+
+    case "DEPLOY_CONTRACT_ACTION": {
+      try {
+        const { txHash, contractAddress } = await udcDeployContract(
+          action,
+          background,
+        )
+
+        return {
+          type: "DEPLOY_CONTRACT_ACTION_SUBMITTED",
+          data: {
+            txHash,
+            deployedContractAddress: contractAddress,
+            actionHash,
+          },
+        }
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        return {
+          type: "DEPLOY_CONTRACT_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
       }
     }
 
@@ -175,6 +237,21 @@ export const handleActionRejection = async (
         data: { actionHash },
       }
     }
+
+    case "DECLARE_CONTRACT_ACTION": {
+      return {
+        type: "REQUEST_DECLARE_CONTRACT_REJ",
+        data: { actionHash },
+      }
+    }
+    case "DEPLOY_CONTRACT_ACTION": {
+      return {
+        type: "REQUEST_DEPLOY_CONTRACT_REJ",
+        data: { actionHash },
+      }
+    }
+
+    /* TODO: add deploy */
 
     default:
       assertNever(action)

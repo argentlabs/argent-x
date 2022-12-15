@@ -1,3 +1,4 @@
+import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { Radio } from "@mui/material"
 import { FC, Fragment } from "react"
 import styled from "styled-components"
@@ -9,8 +10,6 @@ import {
   defaultBlockExplorers,
 } from "../../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { IconBar } from "../../components/IconBar"
-import { H2 } from "../../theme/Typography"
 import { SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 const Default = styled.div`
@@ -29,10 +28,11 @@ const StyledRadio = styled(Radio)`
 export const BlockExplorerSettingsScreen: FC = () => {
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
   return (
-    <>
-      <IconBar back />
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      title={"Block explorer"}
+    >
       <SettingsScreenWrapper>
-        <H2>Block explorer</H2>
         <hr />
         {Object.entries(defaultBlockExplorers).map(([key, blockExplorer]) => {
           const { title } = blockExplorer
@@ -63,6 +63,6 @@ export const BlockExplorerSettingsScreen: FC = () => {
           )
         })}
       </SettingsScreenWrapper>
-    </>
+    </NavigationContainer>
   )
 }

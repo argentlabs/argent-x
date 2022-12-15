@@ -1,6 +1,8 @@
+import { icons } from "@argent/ui"
 import { BigNumber } from "ethers"
 import { isString } from "lodash-es"
 import { FC, useMemo, useState } from "react"
+import CopyToClipboard from "react-copy-to-clipboard"
 import styled, { useTheme } from "styled-components"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
@@ -21,9 +23,11 @@ import {
   SectionHeader,
 } from "../../components/Fields"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
-import { TransactionUnknownInline } from "../../components/Icons/TransactionUnknownInline"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
+import {
+  openBlockExplorerAddress,
+  openBlockExplorerTransaction,
+} from "../../services/blockExplorer.service"
 import { formatDateTime } from "../../services/dates"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import { AccountAddressField } from "../actions/transaction/fields/AccountAddressField"
@@ -33,6 +37,8 @@ import { ParameterField } from "../actions/transaction/fields/ParameterField"
 import { TokenField } from "../actions/transaction/fields/TokenField"
 import { TransactionDetailWrapper } from "./TransactionDetailWrapper"
 import {
+  isDeclareContractTransaction,
+  isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -46,6 +52,8 @@ import { NFTTitle } from "./ui/NFTTitle"
 import { TransactionCallDataBottomSheet } from "./ui/TransactionCallDataBottomSheet"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferTitle } from "./ui/TransferTitle"
+
+const { ActivityIcon } = icons
 
 function getErrorMessageFromErrorDump(errorDump?: string) {
   try {
@@ -162,6 +170,8 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
+  const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
+  const isDeployContract = isDeployContractTransaction(transactionTransformed)
   const theme = useTheme()
   const title = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
@@ -260,16 +270,16 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
-
   return (
     <StyledTransactionDetailWrapper
+      scrollContent={transactionTransformed.displayName || "Transaction"}
       title={
         <>
           {!isNFT && (
             <MainTransactionIconContainer>
               <TransactionIcon
                 transaction={transactionTransformed}
-                size={80}
+                size={18}
                 outline
               />
             </MainTransactionIconContainer>
@@ -288,7 +298,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
                       : transactionTransformed.fromAddress
                   }
                   networkId={network.id}
-                  size={20}
+                  size={5}
                 />
               </TitleAddress>
             </TitleAddressContainer>
@@ -305,9 +315,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         />
       )}
       <ExpandableFieldGroup
-        icon={
-          <TransactionIcon transaction={transactionTransformed} size={40} />
-        }
+        icon={<TransactionIcon transaction={transactionTransformed} size={9} />}
         title="Action"
         subtitle={displayName}
       >
@@ -344,7 +352,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
             <ExpandableFieldGroup
               icon={
                 <TransactionIconContainer>
-                  <TransactionUnknownInline />
+                  <ActivityIcon />
                 </TransactionIconContainer>
               }
               title={displayName}
@@ -421,6 +429,39 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
               <HyperlinkText>{displayTransactionHash}</HyperlinkText>
             </FieldValue>
           </Field>
+        </FieldGroup>
+      )}
+      {isDeployContract && transaction && transaction.meta?.subTitle && (
+        <FieldGroup>
+          <Field
+            clickable={!!transaction.meta?.subTitle}
+            onClick={() => {
+              if (transaction.meta?.subTitle) {
+                openBlockExplorerAddress(network, transaction.meta?.subTitle)
+              }
+            }}
+          >
+            <FieldKey>Deployed contract address</FieldKey>
+            <FieldValue>
+              <HyperlinkText>
+                {formatTruncatedAddress(transaction.meta?.subTitle)}
+              </HyperlinkText>
+            </FieldValue>
+          </Field>
+        </FieldGroup>
+      )}
+      {isDeclareContract && transaction && transaction.meta?.subTitle && (
+        <FieldGroup>
+          <CopyToClipboard text={transaction.meta?.subTitle}>
+            <Field clickable={!!transaction.meta?.subTitle}>
+              <FieldKey>Declared contract hash</FieldKey>
+              <FieldValue>
+                <HyperlinkText>
+                  {formatTruncatedAddress(transaction.meta?.subTitle)}
+                </HyperlinkText>
+              </FieldValue>
+            </Field>
+          </CopyToClipboard>
         </FieldGroup>
       )}
     </StyledTransactionDetailWrapper>

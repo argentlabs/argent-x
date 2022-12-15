@@ -1,3 +1,4 @@
+import erc1155Transfer from "./erc1155-transfer.json"
 import erc20MintTestToken from "./erc20-mint-test-token.json"
 import erc20SwapAlphaRoad from "./erc20-swap-alpha-road.json"
 import erc20SwapJediswap from "./erc20-swap-jediswap.json"
@@ -14,4 +15,5 @@ export {
   erc20Transfer,
   erc721Transfer,
   erc721MintAspect,
+  erc1155Transfer,
 }

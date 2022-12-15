@@ -23,6 +23,7 @@ import {
   erc721MintAspect,
   erc721Transfer,
 } from "@argent-x/extension/src/ui/features/accountActivity/transform/explorerTransaction/__test__/__fixtures__/explorer-transactions/goerli-alpha"
+import { CellStack } from "@argent/ui"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"
 import { MemoryRouter } from "react-router-dom"
@@ -49,10 +50,12 @@ const TransactionListItemWrapped: FC<ITransactionListItemWrapped> = ({
     return null
   }
   return (
-    <TransactionListItem
-      transactionTransformed={transactionTransformed}
-      {...rest}
-    ></TransactionListItem>
+    <CellStack>
+      <TransactionListItem
+        transactionTransformed={transactionTransformed}
+        {...rest}
+      ></TransactionListItem>
+    </CellStack>
   )
 }
 

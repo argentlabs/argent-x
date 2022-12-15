@@ -116,15 +116,20 @@ export const routes = {
   migrationDisclaimer: route("/migration-disclaimer"),
   legacy: route("/legacy"),
   settings: route("/settings"),
-  settingsNetworks: route("/settings/networks"),
+  settingsNetworks: route("/settings/developer-settings/networks"),
   settingsSeed: routeWithReturnTo("/settings/seed"),
-  settingsAddCustomNetwork: route("/settings/networks/add"),
-  settingsEditCustomNetwork: route("/settings/networks/edit"),
-  settingsRemoveCustomNetwork: route("/settings/networks/remove"),
+  settingsAddCustomNetwork: route("/settings/developer-settings/networks/add"),
+  settingsEditCustomNetwork: route(
+    "/settings/developer-settings/networks/edit",
+  ),
+  settingsRemoveCustomNetwork: route(
+    "/settings/developer-settings/networks/remove",
+  ),
   settingsDappConnections: route("/settings/dapp-connections"),
   settingsPrivacy: route("/settings/privacy"),
-  settingsExperimental: route("/settings/experimental"),
-  settingsBlockExplorer: route("/settings/block-explorer"),
+  settingsDeveloper: route("/settings/developer-settings"),
+  settingsExperimental: route("/settings/developer-settings/experimental"),
+  settingsBlockExplorer: route("/settings/developer-settings/block-explorer"),
   settingsAddressbook: route("/settings/addressbook"),
   settingsAddressbookEdit: route(
     (contactId) => `/settings/addressbook/add-or-edit/${contactId}`,
@@ -132,6 +137,20 @@ export const routes = {
   ),
   settingsAddressbookAdd: route("/settings/addressbook/add-or-edit"),
   settingsPrivacyStatement: route("/settings/privacy-policy"),
+  settingsSmartContractDevelopment: route(
+    "/settings/smart-contract-development",
+  ),
+  settingsSmartContractDeclare: route(
+    "/settings/smart-contract-development/declare",
+  ),
+  settingsSmartContractDeploy: route(
+    "/settings/smart-contract-development/deploy",
+  ),
+  settingsSmartContractDeclareOrDeploySuccess: route(
+    (type: "declare" | "deploy", classHashOrDeployedAddress) =>
+      `/settings/smart-contract-development/${type}/success/${classHashOrDeployedAddress}`,
+    "/settings/smart-contract-development/:type/success/:classHashOrDeployedAddress",
+  ),
   networkWarning: routeWithReturnTo("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>

@@ -1,6 +1,8 @@
 import { Button, chakra, defineStyleConfig } from "@chakra-ui/react"
 import { mode } from "@chakra-ui/theme-tools"
 
+import { typographyStyles } from "./Typography"
+
 /** as a convenience */
 export { Button }
 
@@ -30,37 +32,37 @@ export const buttonTheme = defineStyleConfig({
   sizes: {
     auto: {},
     "3xs": {
-      fontSize: "sm",
+      ...typographyStyles.B3,
       px: "1.5",
       py: 0,
     },
     "2xs": {
+      ...typographyStyles.B3,
       minHeight: 8,
-      fontSize: "sm",
       px: 3,
       py: 1,
     },
     xs: {
+      ...typographyStyles.B3,
       minHeight: 9,
-      fontSize: "sm",
       px: 4,
       py: 1,
     },
     sm: {
+      ...typographyStyles.B3,
       minHeight: 10,
-      fontSize: "sm",
       px: 5,
       py: 2,
     },
     md: {
+      ...typographyStyles.B2,
       minHeight: 12,
-      fontSize: "lg",
       px: 6,
       py: 2,
     },
     lg: {
+      ...typographyStyles.B1,
       minHeight: 14,
-      fontSize: "lg",
       px: 8,
       py: 2,
     },
@@ -81,16 +83,13 @@ export const buttonTheme = defineStyleConfig({
           },
         }
       } else if (c === "neutrals") {
+        const color = mode(`${c}.700`, "white")(props)
         return {
           bg: mode(`white`, `${c}.800`)(props),
-          color: mode(`${c}.700`, "white")(props),
+          color,
           boxShadow: mode("neutralsButtonLight", "initial")(props),
-          _hover: {
-            bg: mode(`gray.50`, `${c}.700`)(props),
-          },
-          _active: {
-            bg: mode(`gray.100`, `${c}.600`)(props),
-          },
+          _hover: { color, bg: mode(`gray.50`, `${c}.700`)(props) },
+          _active: { color, bg: mode(`gray.100`, `${c}.600`)(props) },
         }
       } else if (c === "tertiary") {
         return {
@@ -104,13 +103,16 @@ export const buttonTheme = defineStyleConfig({
           },
         }
       } else if (c === "transparent") {
+        const color = mode(`gray.700`, "white")(props)
         return {
           bg: "transparent",
-          color: mode(`gray.700`, "white")(props),
+          color,
           _hover: {
+            color,
             bg: mode(`gray.50`, `neutrals.700`)(props),
           },
           _active: {
+            color,
             bg: mode(`gray.100`, `neutrals.800`)(props),
           },
         }

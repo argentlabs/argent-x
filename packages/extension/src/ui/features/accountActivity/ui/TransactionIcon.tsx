@@ -1,13 +1,7 @@
-import { FC } from "react"
-import styled from "styled-components"
+import { icons } from "@argent/ui"
+import { Circle, Image } from "@chakra-ui/react"
+import { ComponentProps, FC } from "react"
 
-import { TransactionApprove } from "../../../components/Icons/TransactionApprove"
-import { TransactionArgentX } from "../../../components/Icons/TransactionArgentX"
-import { TransactionNFT } from "../../../components/Icons/TransactionNFT"
-import { TransactionReceive } from "../../../components/Icons/TransactionReceive"
-import { TransactionSend } from "../../../components/Icons/TransactionSend"
-import { TransactionSwap } from "../../../components/Icons/TransactionSwap"
-import { TransactionUnknown } from "../../../components/Icons/TransactionUnknown"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import { DappIcon } from "../../actions/connectDapp/DappIcon"
 import {
@@ -18,78 +12,65 @@ import {
 } from "../transform/is"
 import { TransformedTransaction } from "../transform/type"
 
-const Container = styled.div<{
-  size: number
-  outline?: boolean
-}>`
-  font-size: ${({ size }) => size}px;
-  width: 1em;
-  height: 1em;
-  border-radius: 500px;
-  background-color: ${({ theme }) => theme.black};
-  position: relative;
-  ${({ outline }) => (outline ? `border: 1px solid white;` : "")}
-`
+const {
+  DocumentIcon,
+  SendIcon,
+  ReceiveIcon,
+  DeployIcon,
+  ApproveIcon,
+  NftIcon,
+  SwapIcon,
+  ActivityIcon,
+} = icons
 
-const TokenImage = styled.img`
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 500px; ;
-`
-
-const BadgeContainer = styled.div<{
-  size: number
-}>`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: ${({ size }) => size}px;
-  height: ${({ size }) => size}px;
-`
-
-export interface ITransactionIcon {
+export interface TransactionIconProps
+  extends Omit<ComponentProps<typeof Circle>, "outline"> {
   transaction: TransformedTransaction
-  size: number
   outline?: boolean
 }
 
-export const TransactionIcon: FC<ITransactionIcon> = ({
+export const TransactionIcon: FC<TransactionIconProps> = ({
   transaction,
-  size = 80,
+  size = 18,
   outline = false,
+  ...rest
 }) => {
-  const badgeSize = Math.min(24, Math.round((size * 16) / 40))
+  const badgeSize = Math.min(32, Math.round((size * 16) / 36))
+  const iconSize = Math.round((4 * (size * 16)) / 36)
   const { action, entity, dapp } = transaction
-  let iconComponent = <TransactionUnknown />
+  let iconComponent = <ActivityIcon />
   let badgeComponent
   switch (entity) {
     case "ACCOUNT":
-      iconComponent = <TransactionArgentX />
+      iconComponent = <DeployIcon />
       break
   }
   switch (action) {
     case "SEND":
-      iconComponent = <TransactionSend />
+      iconComponent = <SendIcon />
       break
     case "RECEIVE":
-      iconComponent = <TransactionReceive />
+      iconComponent = <ReceiveIcon />
       break
     case "TRANSFER":
-      iconComponent = <TransactionSend />
+      iconComponent = <SendIcon />
       break
     case "SWAP":
-      iconComponent = <TransactionSwap />
+      iconComponent = <SwapIcon />
       break
     case "MINT":
     case "BUY":
-      iconComponent =
-        entity === "TOKEN" ? <TransactionReceive /> : <TransactionNFT />
+      iconComponent = entity === "TOKEN" ? <ReceiveIcon /> : <NftIcon />
       break
     case "APPROVE":
-      iconComponent = <TransactionApprove />
+      iconComponent = <ApproveIcon />
       break
   }
+
+  if (entity === "CONTRACT" && (action === "DEPLOY" || action === "DECLARE")) {
+    iconComponent = <DocumentIcon />
+  }
+
   if (
     isTokenTransferTransaction(transaction) ||
     isTokenMintTransaction(transaction) ||
@@ -101,7 +82,7 @@ export const TransactionIcon: FC<ITransactionIcon> = ({
         url: token.image,
         name: token.name,
       })
-      badgeComponent = <TokenImage src={src} />
+      badgeComponent = <Image src={src} />
     }
   } else if (isSwapTransaction(transaction)) {
     const { toToken } = transaction
@@ -110,16 +91,33 @@ export const TransactionIcon: FC<ITransactionIcon> = ({
         url: toToken.image,
         name: toToken.name,
       })
-      badgeComponent = <TokenImage src={src} />
+      badgeComponent = <Image src={src} />
     }
   }
   if (dapp && !badgeComponent) {
     badgeComponent = <DappIcon host={dapp.hosts[0]} />
   }
   return (
-    <Container size={size} outline={outline}>
+    <Circle
+      size={size}
+      border={outline ? `1px solid white` : undefined}
+      position={"relative"}
+      bg={"neutrals.600"}
+      fontSize={iconSize}
+      {...rest}
+    >
       {iconComponent}
-      <BadgeContainer size={badgeSize}>{badgeComponent}</BadgeContainer>
-    </Container>
+      {badgeComponent && (
+        <Circle
+          overflow={"hidden"}
+          position={"absolute"}
+          right={0}
+          bottom={0}
+          size={badgeSize}
+        >
+          {badgeComponent}
+        </Circle>
+      )}
+    </Circle>
   )
 }

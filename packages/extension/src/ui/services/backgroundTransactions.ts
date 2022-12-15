@@ -1,7 +1,8 @@
-import { Call } from "starknet"
+import { Call, UniversalDeployerContractPayload } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
+import { DeclareContract } from "../../shared/udc/type"
 import { BaseWalletAccount } from "../../shared/wallet.model"
 
 export const executeTransaction = (data: ExecuteTransactionRequest) => {
@@ -34,7 +35,38 @@ export const getAccountDeploymentEstimatedFee = async (
   ])
 
   if ("error" in response) {
-    console.error(response.error)
+    throw response.error
+  }
+
+  return response
+}
+
+export const getDeclareContractEstimatedFee = async (data: DeclareContract) => {
+  sendMessage({ type: "ESTIMATE_DECLARE_CONTRACT_FEE", data })
+
+  const response = await Promise.race([
+    waitForMessage("ESTIMATE_DECLARE_CONTRACT_FEE_RES"),
+    waitForMessage("ESTIMATE_DECLARE_CONTRACT_FEE_REJ"),
+  ])
+
+  if ("error" in response) {
+    throw response.error
+  }
+
+  return response
+}
+
+export const getDeployContractEstimatedFee = async (
+  data: UniversalDeployerContractPayload,
+) => {
+  sendMessage({ type: "ESTIMATE_DEPLOY_CONTRACT_FEE", data })
+
+  const response = await Promise.race([
+    waitForMessage("ESTIMATE_DEPLOY_CONTRACT_FEE_RES"),
+    waitForMessage("ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"),
+  ])
+
+  if ("error" in response) {
     throw response.error
   }
 

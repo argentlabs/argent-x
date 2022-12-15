@@ -1,7 +1,8 @@
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
+import { VStack } from "@chakra-ui/react"
 import { uniq } from "lodash-es"
 import { FC, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
 import {
   removePreAuthorization,
@@ -9,27 +10,8 @@ import {
   usePreAuthorizations,
 } from "../../../shared/preAuthorizations"
 import { Button } from "../../components/Button"
-import { IconBar } from "../../components/IconBar"
-import { H2, P } from "../../theme/Typography"
+import { P } from "../../theme/Typography"
 import { DappConnection } from "./DappConnection"
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0 32px 24px 32px;
-
-  ${P} {
-    margin: 16px 0;
-  }
-
-  ${Button} {
-    margin-top: 8px;
-  }
-
-  > * + * {
-    margin-top: 8px;
-  }
-`
 
 export const DappConnectionsSettingsScreen: FC = () => {
   const navigate = useNavigate()
@@ -43,15 +25,16 @@ export const DappConnectionsSettingsScreen: FC = () => {
   }, [preAuthorizations])
 
   return (
-    <>
-      <IconBar back />
-      <Wrapper>
-        <H2>Dapp connections</H2>
+    <NavigationContainer
+      leftButton={<BarBackButton />}
+      title={"Dapp connections"}
+    >
+      <VStack gap="6">
         {preauthorizedHosts === null ? null : preauthorizedHosts.length ===
           0 ? (
           <P>You haven&apos;t connected to any dapp yet.</P>
         ) : (
-          <>
+          <CellStack gap="4">
             {preauthorizedHosts.map((host) => (
               <DappConnection
                 key={host}
@@ -72,9 +55,9 @@ export const DappConnectionsSettingsScreen: FC = () => {
             >
               Reset all dapp connections
             </Button>
-          </>
+          </CellStack>
         )}
-      </Wrapper>
-    </>
+      </VStack>
+    </NavigationContainer>
   )
 }

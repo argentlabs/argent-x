@@ -1,5 +1,5 @@
-import { FC, ReactNode, useMemo } from "react"
-import styled from "styled-components"
+import { Flex } from "@chakra-ui/react"
+import { ComponentProps, FC, ReactNode, useMemo } from "react"
 
 import { AddressBookContact } from "../../../shared/addressBook"
 import { useAddressBook } from "../../services/addressBook"
@@ -7,10 +7,7 @@ import {
   formatTruncatedAddress,
   isEqualAddress,
 } from "../../services/addresses"
-import {
-  TokenIconDeprecated,
-  TokenIconProps,
-} from "../accountTokens/TokenIconDeprecated"
+import { TokenIcon } from "../accountTokens/TokenIcon"
 import { useAccountMetadata } from "./accountMetadata.state"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
@@ -48,35 +45,24 @@ const getContactNameForAddress = (
   }
 }
 
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const TokenIconContainer = styled.div`
-  margin-right: 8px;
-  display: flex;
-  align-items: center;
-`
-
-interface IPrettyAccountAddress
-  extends Pick<TokenIconProps, "large" | "small" | "size"> {
+interface PrettyAccountAddressProps
+  extends Pick<ComponentProps<typeof TokenIcon>, "size"> {
   accountAddress: string
   networkId: string
   accountNames?: Record<string, Record<string, string>>
   contacts?: AddressBookContact[]
   fallbackValue?: (accountAddress: string) => ReactNode
+  icon?: boolean
 }
 
-export const PrettyAccountAddress: FC<IPrettyAccountAddress> = ({
+export const PrettyAccountAddress: FC<PrettyAccountAddressProps> = ({
   accountAddress,
   networkId,
   accountNames,
   contacts,
-  large,
-  small,
-  size,
+  size = 10,
   fallbackValue,
+  icon = true,
 }) => {
   const defaultAccountNames = useAccountMetadata((x) => x.accountNames)
   const { contacts: defaultContacts } = useAddressBook()
@@ -107,24 +93,20 @@ export const PrettyAccountAddress: FC<IPrettyAccountAddress> = ({
     networkId,
     accountAddress,
   })
+  const accountDisplayName = accountName
+    ? accountName
+    : fallbackValue
+    ? fallbackValue(accountAddress)
+    : formatTruncatedAddress(accountAddress)
+  if (accountDisplayName && !icon) {
+    return <>{accountDisplayName}</>
+  }
   return (
-    <Container>
-      {accountName && (
-        <TokenIconContainer>
-          <TokenIconDeprecated
-            url={accountImageUrl}
-            name={accountAddress}
-            large={large}
-            small={small}
-            size={size}
-          />
-        </TokenIconContainer>
+    <Flex alignItems={"center"} gap={2}>
+      {icon && accountName && (
+        <TokenIcon url={accountImageUrl} name={accountAddress} size={size} />
       )}
-      {accountName
-        ? accountName
-        : fallbackValue
-        ? fallbackValue(accountAddress)
-        : formatTruncatedAddress(accountAddress)}
-    </Container>
+      {accountDisplayName}
+    </Flex>
   )
 }

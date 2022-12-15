@@ -2,14 +2,12 @@ import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
-import useSWR from "swr"
 
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
 import { getFeeToken } from "../../../../shared/token/utils"
-import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
 import {
   FieldAlt,
@@ -294,7 +292,14 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
             </ExtendableControl>
           </FieldError>
 
-          <Collapse in={feeErrorExpanded} timeout="auto">
+          <Collapse
+            in={feeErrorExpanded}
+            timeout="auto"
+            style={{
+              maxHeight: "80vh",
+              overflow: "auto",
+            }}
+          >
             {parsedFeeEstimationError && (
               <CopyTooltip
                 copyValue={parsedFeeEstimationError}

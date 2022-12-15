@@ -1,5 +1,7 @@
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
+import { AlertDialog } from "@argent/ui"
 import { isEqual } from "lodash-es"
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
@@ -8,51 +10,19 @@ import {
   restoreDefaultCustomNetworks,
 } from "../../../shared/network"
 import { defaultCustomNetworks } from "../../../shared/network/storage"
-import { IconBar } from "../../components/IconBar"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, RefreshIcon } from "../../components/Icons/MuiIcons"
 import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { H2, P } from "../../theme/Typography"
+import { P } from "../../theme/Typography"
 import { useCustomNetworks, useNetworks } from "../networks/useNetworks"
 import { DappConnection } from "./DappConnection"
 import { useSelectedNetwork } from "./selectedNetwork.state"
-
-interface IWrapper {
-  isDefaultCustomNetworks: boolean
-}
-
-const Wrapper = styled.div<IWrapper>`
-  display: flex;
-  flex-direction: column;
-  padding: 0 32px
-    ${({ isDefaultCustomNetworks }) =>
-      isDefaultCustomNetworks ? "24px" : "56px"}
-    32px;
-  ${H2} {
-    margin: 0;
-  }
-`
+import { validateRemoveNetwork } from "./validateRemoveNetwork"
 
 const IconButtonCenter = styled(IconButton)`
   margin: 0 auto;
-`
-
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 32px 0 8px;
-  width: 100%;
-
-  > * + * {
-    margin-top: 8px;
-  }
-
-  > * {
-    width: 100%;
-  }
 `
 
 const Footer = styled(ResponsiveFixedBox)`
@@ -101,17 +71,44 @@ export const NetworkSettingsScreen: FC = () => {
   const navigate = useNavigate()
   const [, setSelectedCustomNetwork] = useSelectedNetwork()
   const customNetworks = useCustomNetworks()
+  const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   const isDefaultCustomNetworks = useMemo(() => {
     return isEqual(customNetworks, defaultCustomNetworks)
   }, [customNetworks])
 
+  const removeNetworkClick = useCallback(async (networkId: string) => {
+    try {
+      const shouldRemoveNetwork = await validateRemoveNetwork(networkId)
+      if (shouldRemoveNetwork) {
+        await removeNetwork(networkId)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message)
+        setAlertDialogIsOpen(true)
+      } else {
+        // unexpected, throw to error boundary
+        throw error
+      }
+    }
+  }, [])
+
+  const onCancel = useCallback(() => {
+    setAlertDialogIsOpen(false)
+  }, [])
+
   return (
     <>
-      <IconBar back />
-      <Wrapper isDefaultCustomNetworks={isDefaultCustomNetworks}>
-        <H2>Networks</H2>
-        <List>
+      <AlertDialog
+        isOpen={alertDialogIsOpen}
+        title={"Cannot remove"}
+        message={errorMessage}
+        onCancel={onCancel}
+      />
+      <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
+        <CellStack>
           {!allNetworks ? (
             <Spinner />
           ) : allNetworks.length === 0 ? (
@@ -126,13 +123,13 @@ export const NetworkSettingsScreen: FC = () => {
                   navigate(routes.settingsEditCustomNetwork())
                 }}
                 hideRemove={network.readonly}
-                onRemoveClick={async () => {
-                  await removeNetwork(network.id)
+                onRemoveClick={() => {
+                  removeNetworkClick(network.id)
                 }}
               />
             ))
           )}
-        </List>
+        </CellStack>
 
         <Link to={routes.settingsAddCustomNetwork()}>
           <IconButtonCenter size={48} style={{ marginTop: "32px" }}>
@@ -152,7 +149,7 @@ export const NetworkSettingsScreen: FC = () => {
             </RestoreDefaultsButton>
           </Footer>
         )}
-      </Wrapper>
+      </NavigationContainer>
     </>
   )
 }

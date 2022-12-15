@@ -1,11 +1,9 @@
 import { expect } from "@playwright/test"
 
-import { declareProxyContract } from "./apis/declareProxyContract"
-import { declareUpgradeContract } from "./apis/declareUpgradeContract"
 import { test } from "./fixture"
 import { getAccountAddressFromAccountPage } from "./selectors/getAccountAddressFromAccountPage"
 import { getBalanceFromAccountPage } from "./selectors/getBalanceFromAccountPage"
-import { setupNewAccountWithTestnetEth } from "./setups/accountWithTestnetEth"
+import { setupNewAccount } from "./setups/accountWithTestnetEth"
 import { approveTransaction } from "./steps/approveTransaction"
 import { navigateFromAccountToAccountList } from "./steps/navigateFromAccountToAccountList"
 import { navigateFromAccountToTokenDetails } from "./steps/navigateFromAccountToTokenDetails"
@@ -18,20 +16,13 @@ import {
 import { formatTruncatedAddress } from "./utils"
 
 test("send max eth flow", async ({ page, context }) => {
-  const { address: a1, balance: b1 } = await setupNewAccountWithTestnetEth(
-    page,
-    context,
-  )
-
-  await declareProxyContract()
-
-  await declareUpgradeContract()
+  const { address: a1, balance: b1 } = await setupNewAccount(page, context)
 
   await navigateFromAccountToAccountList(page)
   await newAccount(page)
   const a2 = await getAccountAddressFromAccountPage(page)
   const b2 = await getBalanceFromAccountPage(page, "Ethereum")
-  expect(b2).toBe("0.0")
+  expect(b2).toBe("1.0")
   await navigateFromAccountToAccountList(page)
   await selectAccountFromAccountList(page, a1)
 
@@ -58,7 +49,7 @@ test("send max eth flow", async ({ page, context }) => {
   expect(b1After).not.toBe(b1)
   expect(b1After.substring(0, 4)).toBe("0.00")
   expect(b2After).not.toBe(b2)
-  expect(b2After.substring(0, 3)).toBe("0.9")
+  expect(b2After.substring(0, 3)).toBe("1.9")
 
   console.log(
     `Account ${formatTruncatedAddress(a1)} had Ξ${b1} and now has Ξ${b1After}`,

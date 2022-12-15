@@ -1,19 +1,20 @@
 import { ActionMessage } from "../shared/messages/ActionMessage"
 import { handleActionApproval, handleActionRejection } from "./actionHandlers"
+import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 
 export const handleActionMessage: HandleMessage<ActionMessage> = async ({
   msg,
   background,
-  sendToTabAndUi,
+  respond,
 }) => {
   const { actionQueue } = background
 
   switch (msg.type) {
     case "GET_ACTIONS": {
       const actions = await actionQueue.getAll()
-      return sendToTabAndUi({
+      return sendMessageToUi({
         type: "GET_ACTIONS_RES",
         data: actions,
       })
@@ -26,8 +27,9 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
         throw new Error("Action not found")
       }
       const resultMessage = await handleActionApproval(action, background)
+
       if (resultMessage) {
-        sendToTabAndUi(resultMessage)
+        respond(resultMessage)
       }
       return
     }
@@ -37,7 +39,6 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
 
       const actionHashes = Array.isArray(payload) ? payload : [payload]
 
-      console.log("REJECT_ACTION", actionHashes)
       for (const actionHash of actionHashes) {
         const action = await actionQueue.remove(actionHash)
         if (!action) {
@@ -45,7 +46,7 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
         }
         const resultMessage = await handleActionRejection(action, background)
         if (resultMessage) {
-          sendToTabAndUi(resultMessage)
+          respond(resultMessage)
         }
       }
       return
@@ -57,7 +58,7 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
         payload: msg.data,
       })
 
-      return sendToTabAndUi({
+      return respond({
         type: "SIGN_MESSAGE_RES",
         data: {
           actionHash: meta.hash,

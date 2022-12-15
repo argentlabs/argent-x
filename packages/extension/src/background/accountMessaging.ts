@@ -6,17 +6,18 @@ import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
+import { tryToMintFeeToken } from "./devnet/mintFeeToken"
 import { addTransaction } from "./transactions/store"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
   background: { wallet, actionQueue },
   messagingKeys: { privateKey },
-  sendToTabAndUi,
+  respond,
 }) => {
   switch (msg.type) {
     case "GET_ACCOUNTS": {
-      return sendToTabAndUi({
+      return sendMessageToUi({
         type: "GET_ACCOUNTS_RES",
         data: await getAccounts(msg.data?.showHidden ? () => true : undefined),
       })
@@ -24,9 +25,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "CONNECT_ACCOUNT": {
       await wallet.selectAccount(msg.data)
-      return sendToTabAndUi({
+      return respond({
         type: "CONNECT_ACCOUNT_RES",
-        data: msg.data,
       })
     }
 
@@ -39,6 +39,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       try {
         const account = await wallet.newAccount(network)
 
+        tryToMintFeeToken(account)
+
         analytics.track("createAccount", {
           status: "success",
           networkId: network,
@@ -46,7 +48,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
         const accounts = await getAccounts()
 
-        return sendToTabAndUi({
+        return sendMessageToUi({
           type: "NEW_ACCOUNT_RES",
           data: {
             account,
@@ -62,7 +64,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           errorMessage: error,
         })
 
-        return sendToTabAndUi({
+        return sendMessageToUi({
           type: "NEW_ACCOUNT_REJ",
           data: { error },
         })
@@ -76,26 +78,15 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           actionQueue,
         })
 
-        analytics.track("deployAccount", {
-          status: "success",
-          networkId: msg.data.networkId,
-        })
-
-        return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_RES" })
+        return sendMessageToUi({ type: "DEPLOY_ACCOUNT_RES" })
       } catch (e) {
-        analytics.track("deployAccount", {
-          status: "failure",
-          networkId: msg.data.networkId,
-          errorMessage: `${e}`,
-        })
-
-        return sendToTabAndUi({ type: "DEPLOY_ACCOUNT_REJ" })
+        return sendMessageToUi({ type: "DEPLOY_ACCOUNT_REJ" })
       }
     }
 
     case "GET_SELECTED_ACCOUNT": {
       const selectedAccount = await wallet.getSelectedAccount()
-      return sendToTabAndUi({
+      return sendMessageToUi({
         type: "GET_SELECTED_ACCOUNT_RES",
         data: selectedAccount,
       })
@@ -109,9 +100,9 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           actionQueue,
           targetImplementationType: msg.data.targetImplementationType,
         })
-        return sendToTabAndUi({ type: "UPGRADE_ACCOUNT_RES" })
+        return sendMessageToUi({ type: "UPGRADE_ACCOUNT_RES" })
       } catch {
-        return sendToTabAndUi({ type: "UPGRADE_ACCOUNT_REJ" })
+        return sendMessageToUi({ type: "UPGRADE_ACCOUNT_REJ" })
       }
     }
 
@@ -125,7 +116,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           account: fullAccount,
           meta: { title: "Redeploy wallet" },
         })
-        return sendToTabAndUi({
+        return sendMessageToUi({
           type: "REDEPLOY_ACCOUNT_RES",
           data: {
             txHash,
@@ -133,16 +124,16 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           },
         })
       } catch {
-        return sendToTabAndUi({ type: "REDEPLOY_ACCOUNT_REJ" })
+        return sendMessageToUi({ type: "REDEPLOY_ACCOUNT_REJ" })
       }
     }
 
     case "DELETE_ACCOUNT": {
       try {
         await removeAccount(msg.data)
-        return sendToTabAndUi({ type: "DELETE_ACCOUNT_RES" })
+        return sendMessageToUi({ type: "DELETE_ACCOUNT_RES" })
       } catch {
-        return sendToTabAndUi({ type: "DELETE_ACCOUNT_REJ" })
+        return sendMessageToUi({ type: "DELETE_ACCOUNT_REJ" })
       }
     }
 
@@ -157,7 +148,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         privateKey,
       )
 
-      return sendToTabAndUi({
+      return sendMessageToUi({
         type: "GET_ENCRYPTED_PRIVATE_KEY_RES",
         data: { encryptedPrivateKey },
       })

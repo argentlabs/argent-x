@@ -19,7 +19,9 @@ import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
+import { ApproveDeclareContractScreen } from "./ApproveDeclareContractScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
+import { ApproveDeployContractScreen } from "./ApproveDeployContractScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
@@ -234,6 +236,102 @@ export const ActionScreen: FC = () => {
           onReject={onReject}
           selectedAccount={account}
         />
+      )
+    case "DECLARE_CONTRACT_ACTION":
+      return (
+        <ApproveDeclareContractScreen
+          actionHash={action.meta.hash}
+          payload={action.payload}
+          onSubmit={async () => {
+            analytics.track("signedDeclareTransaction", {
+              networkId: account?.networkId || "unknown",
+            })
+            await approveAction(action)
+            useAppState.setState({ isLoading: true })
+            const result = await Promise.race([
+              waitForMessage(
+                "DECLARE_CONTRACT_ACTION_SUBMITTED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+              waitForMessage(
+                "DECLARE_CONTRACT_ACTION_FAILED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+            ])
+            // (await) blocking as the window may closes afterwards
+            await analytics.track("sentTransaction", {
+              success: !("error" in result),
+              networkId: account?.networkId || "unknown",
+            })
+            if ("error" in result) {
+              useAppState.setState({
+                error: `Sending transaction failed: ${result.error}`,
+                isLoading: false,
+              })
+              navigate(routes.error())
+            } else {
+              closePopupIfLastAction()
+              useAppState.setState({ isLoading: false })
+              navigate(
+                routes.settingsSmartContractDeclareOrDeploySuccess(
+                  "declare",
+                  action.payload.classHash,
+                ),
+              )
+            }
+          }}
+          onReject={rejectAllActions}
+          selectedAccount={account}
+        />
+      )
+    case "DEPLOY_CONTRACT_ACTION":
+      return (
+        <>
+          <ApproveDeployContractScreen
+            actionHash={action.meta.hash}
+            deployPayload={action.payload}
+            onSubmit={async () => {
+              analytics.track("signedDeployTransaction", {
+                networkId: account?.networkId || "unknown",
+              })
+              await approveAction(action)
+              useAppState.setState({ isLoading: true })
+              const result = await Promise.race([
+                waitForMessage(
+                  "DEPLOY_CONTRACT_ACTION_SUBMITTED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+                waitForMessage(
+                  "DEPLOY_CONTRACT_ACTION_FAILED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+              ])
+              // (await) blocking as the window may closes afterwards
+              await analytics.track("sentTransaction", {
+                success: !("error" in result),
+                networkId: account?.networkId || "unknown",
+              })
+              if ("error" in result) {
+                useAppState.setState({
+                  error: `Sending transaction failed: ${result.error}`,
+                  isLoading: false,
+                })
+                navigate(routes.error())
+              } else {
+                closePopupIfLastAction()
+                useAppState.setState({ isLoading: false })
+                navigate(
+                  routes.settingsSmartContractDeclareOrDeploySuccess(
+                    "deploy",
+                    result.deployedContractAddress,
+                  ),
+                )
+              }
+            }}
+            onReject={rejectAllActions}
+            selectedAccount={account}
+          />
+        </>
       )
 
     default:

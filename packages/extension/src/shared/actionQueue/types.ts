@@ -1,4 +1,11 @@
-import type { Abi, Call, InvocationsDetails, typedData } from "starknet"
+import type {
+  Abi,
+  Call,
+  DeclareContractPayload,
+  InvocationsDetails,
+  UniversalDeployerContractPayload,
+  typedData,
+} from "starknet"
 
 import { TransactionMeta } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
@@ -71,6 +78,14 @@ export type ActionItem =
         accountImplementation?: string
         rpcUrl?: string
       }
+    }
+  | {
+      type: "DECLARE_CONTRACT_ACTION"
+      payload: DeclareContractPayload
+    }
+  | {
+      type: "DEPLOY_CONTRACT_ACTION"
+      payload: UniversalDeployerContractPayload
     }
 
 export type ExtensionActionItem = ExtQueueItem<ActionItem>

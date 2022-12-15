@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers"
-import { UINT_256_MAX } from "starknet/dist/utils/uint256"
+import { uint256 } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import {
@@ -17,6 +17,8 @@ import mockApiPricesData from "./__fixtures__/argent-api-prices.mock.json"
 import mockApiTokenDataInvalid from "./__fixtures__/argent-api-tokens-invalid.mock.json"
 import mockApiTokenData from "./__fixtures__/argent-api-tokens.mock.json"
 import mockTokensWithBalanceRaw from "./__fixtures__/tokens-with-balance.mock.json"
+
+const { UINT_256_MAX } = uint256
 
 /** convert to expected types */
 export const mockTokensWithBalance: TokenDetailsWithBalance[] =
@@ -248,7 +250,7 @@ describe("prettifyTokenAmount()", () => {
       ).toEqual("0.0000000000000001")
       expect(
         prettifyTokenAmount({
-          amount: UINT_256_MAX,
+          amount: UINT_256_MAX.toString(),
           decimals: 18,
         }),
       ).toEqual(PRETTY_UNLIMITED)

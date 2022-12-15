@@ -1,6 +1,6 @@
 import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber } from "ethers"
-import { toBN } from "starknet/dist/utils/number"
+import { number } from "starknet"
 
 import {
   isNumeric,
@@ -8,6 +8,8 @@ import {
   prettifyNumber,
   prettifyTokenNumber,
 } from "../../src/shared/utils/number"
+
+const { toBN } = number
 
 describe("prettifyNumber()", () => {
   describe("when valid", () => {

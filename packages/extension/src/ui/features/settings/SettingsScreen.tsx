@@ -1,23 +1,38 @@
+import {
+  BarCloseButton,
+  Button,
+  CellStack,
+  NavigationContainer,
+  SpacerCell,
+  icons,
+} from "@argent/ui"
+import { Center } from "@chakra-ui/react"
 import { FC } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 import styled from "styled-components"
 
-import {
-  isExperimentalSettingsEnabled,
-  isPrivacySettingsEnabled,
-} from "../../../shared/settings"
-import { Button } from "../../components/Button"
-import { IconBar } from "../../components/IconBar"
-import { DiscordIcon } from "../../components/Icons/DiscordIcon"
-import { GithubIcon } from "../../components/Icons/GithubIcon"
-import { ArrowForwardIosIcon } from "../../components/Icons/MuiIcons"
-import { SupportIcon } from "../../components/Icons/SupportIcon"
-import { PrivacyStatementLink } from "../../components/PrivacyStatementLink"
-import { RowCentered } from "../../components/Row"
+import { isPrivacySettingsEnabled } from "../../../shared/settings"
 import { routes } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
+import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
+import { useAccount, useSelectedAccountStore } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
+import { SettingsMenuItem } from "./SettingsMenuItem"
+import { SupportFooter } from "./SupportFooter"
+
+const {
+  LockIcon,
+  AddressBookIcon,
+  CodeIcon,
+  ExpandIcon,
+  ExtendedIcon,
+  LinkIcon,
+  PasswordIcon,
+  ShieldIcon,
+} = icons
 
 export const Title = styled.h3`
   font-weight: 600;
@@ -41,6 +56,11 @@ export const P = styled.p`
   margin-top: 16px;
 `
 
+export const SettingsItem = styled.div`
+  padding: 24px 32px;
+`
+
+// TODO: remove this when we have a proper settings page
 export const SettingsScreenWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -50,10 +70,6 @@ export const SettingsScreenWrapper = styled.div`
     margin: 0 32px 32px 32px;
   }
 
-  ${Button} {
-    margin-top: 10px;
-  }
-
   hr {
     border: none;
     height: 1px;
@@ -61,186 +77,92 @@ export const SettingsScreenWrapper = styled.div`
   }
 `
 
-export const SettingsItem = styled.div`
-  padding: 24px 32px;
-`
-
-export const SettingsLinkItem = styled(Link)`
-  cursor: pointer;
-  padding: 24px 32px;
-
-  &:hover svg {
-    color: ${({ theme }) => theme.text1};
-  }
-`
-
-export const Footer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  p {
-    padding-bottom: 16px;
-  }
-`
-
-const IconWrapper = styled(RowCentered)`
-  padding: 8px 10px 8px 8px;
-  background: ${({ theme }) => theme.bg2};
-  border-radius: 100px;
-  gap: 8px;
-`
-
-const IconText = styled.span`
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 18px;
-  text-align: center;
-  color: ${({ theme }) => theme.text1};
-`
-
-const StyledPrivacyStatementLink = styled(PrivacyStatementLink)`
-  margin-top: 20px;
-`
-
-export const SupportFooter: FC = () => (
-  <Footer>
-    <P>Help, support &amp; suggestions:</P>
-    <RowCentered gap="10px">
-      <a
-        href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
-        title="Get ArgentX Support"
-        target="_blank"
-      >
-        <IconWrapper>
-          <SupportIcon />
-          <IconText>Support</IconText>
-        </IconWrapper>
-      </a>
-      <a
-        href="https://discord.gg/T4PDFHxm6T"
-        title="Ask a question on the argent-x-support channel on Discord"
-        target="_blank"
-      >
-        <IconWrapper>
-          <DiscordIcon />
-          <IconText>Discord</IconText>
-        </IconWrapper>
-      </a>
-      <a
-        href="https://github.com/argentlabs/argent-x/issues"
-        title="Post an issue on Argent X GitHub"
-        target="_blank"
-      >
-        <IconWrapper>
-          <GithubIcon />
-          <IconText>Github</IconText>
-        </IconWrapper>
-      </a>
-    </RowCentered>
-    <StyledPrivacyStatementLink to={routes.settingsPrivacyStatement()} />
-    <P style={{ marginTop: "8px" }}>Version: v{process.env.VERSION}</P>
-  </Footer>
-)
-
 export const SettingsScreen: FC = () => {
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
   const { pathname: returnTo } = useLocation()
+  const navigate = useNavigate()
+  const { selectedAccount } = useSelectedAccountStore()
+  const account = useAccount(selectedAccount)
   return (
     <>
-      <IconBar back />
-      <SettingsScreenWrapper>
-        <H2>Settings</H2>
-        <SettingsLinkItem to={routes.lockScreen()} onClick={stopSession}>
-          <Title>
-            <span>Lock wallet</span>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </Title>
-        </SettingsLinkItem>
-        <hr />
-        {!extensionIsInTab && (
-          <>
-            <SettingsLinkItem
+      <NavigationContainer
+        rightButton={
+          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+        }
+        title={"Settings"}
+        scrollKey={"settings/SettingsScreen"}
+      >
+        <CellStack>
+          {account && (
+            <>
+              <AccountListScreenItem account={account} clickNavigateSettings />
+              <SpacerCell />
+            </>
+          )}
+          {!extensionIsInTab && (
+            <SettingsMenuItem
+              leftIcon={<ExtendedIcon />}
+              rightIcon={<ExpandIcon />}
               to={routes.settings()}
               onClick={openExtensionInTab}
-            >
-              <Title>
-                <span>Extended view</span>
-                <ArrowForwardIosIcon fontSize="inherit" />
-              </Title>
-            </SettingsLinkItem>
-            <hr />
-          </>
-        )}
-        <SettingsLinkItem to={routes.settingsAddressbook()}>
-          <Title>
-            <span>Address book</span>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </Title>
-        </SettingsLinkItem>
-        <hr />
-        <SettingsLinkItem to={routes.settingsDappConnections()}>
-          <Title>
-            <span>Reset dapp connections</span>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </Title>
-          <P>
-            Dapps you have previously connected to can auto-connect in the
-            future.
-          </P>
-        </SettingsLinkItem>
-        <hr />
-        <SettingsLinkItem to={routes.settingsSeed(returnTo)}>
-          <Title>
-            <span>Show recovery phrase</span>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </Title>
-          <P>
-            Your recovery phrase allows anyone to use your account. Keep it
-            secure.
-          </P>
-        </SettingsLinkItem>
-        <hr />
-        <SettingsLinkItem to={routes.settingsNetworks()}>
-          <Title>
-            <span>Manage networks</span>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </Title>
-          <P>Here you can add, edit and remove custom networks.</P>
-        </SettingsLinkItem>
-        <hr />
-        <SettingsLinkItem to={routes.settingsBlockExplorer()}>
-          <Title>
-            <span>Block explorer</span>
-            <ArrowForwardIosIcon fontSize="inherit" />
-          </Title>
-        </SettingsLinkItem>
-        <hr />
-        {isPrivacySettingsEnabled && (
-          <>
-            <SettingsLinkItem to={routes.settingsPrivacy()}>
-              <Title>
-                <span>Privacy</span>
-                <ArrowForwardIosIcon fontSize="inherit" />
-              </Title>
-            </SettingsLinkItem>
-            <hr />
-          </>
-        )}
-        {isExperimentalSettingsEnabled && (
-          <>
-            <SettingsLinkItem to={routes.settingsExperimental()}>
-              <Title>
-                <span>Experimental</span>
-                <ArrowForwardIosIcon fontSize="inherit" />
-              </Title>
-            </SettingsLinkItem>
-            <hr />
-          </>
-        )}
-        <SupportFooter />
-      </SettingsScreenWrapper>
+              title="Extended view"
+            />
+          )}
+
+          <SettingsMenuItem
+            leftIcon={<AddressBookIcon />}
+            to={routes.settingsAddressbook()}
+            title="Address book"
+          />
+
+          <SettingsMenuItem
+            leftIcon={<LinkIcon />}
+            to={routes.settingsDappConnections()}
+            title="Connected dapps"
+          />
+
+          <SettingsMenuItem
+            leftIcon={<PasswordIcon />}
+            to={routes.settingsSeed(returnTo)}
+            title="Show recovery phrase"
+          />
+
+          <SettingsMenuItem
+            leftIcon={<CodeIcon />}
+            to={routes.settingsDeveloper()}
+            title="Developer settings"
+          />
+
+          {isPrivacySettingsEnabled && (
+            <SettingsMenuItem
+              leftIcon={<ShieldIcon />}
+              to={routes.settingsPrivacy()}
+              title="Privacy"
+            />
+          )}
+          <SupportFooter />
+        </CellStack>
+      </NavigationContainer>
+      <Center
+        height={16}
+        borderTop="1px solid"
+        borderTopColor="border"
+        background="bg"
+        boxShadow="menu"
+      >
+        <Button
+          as={Link}
+          onClick={stopSession}
+          to={routes.lockScreen()}
+          size="sm"
+          colorScheme="transparent"
+          color="white50"
+          leftIcon={<LockIcon />}
+        >
+          Lock wallet
+        </Button>
+      </Center>
     </>
   )
 }

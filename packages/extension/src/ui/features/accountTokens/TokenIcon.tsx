@@ -1,6 +1,7 @@
 import { Circle, Image } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
+import { generateAvatarImage } from "../../../shared/avatarImage"
 import { getColor } from "../accounts/accounts.service"
 
 export interface TokenIconProps
@@ -17,14 +18,14 @@ export const getTokenIconUrl = ({
   if (url && url.length) {
     return url
   }
-  const color = getColor(name)
-  return `https://eu.ui-avatars.com/api/?name=${name}&background=${color}&color=fff`
+  const background = getColor(name)
+  return generateAvatarImage(name, { background })
 }
 
 export const TokenIcon: FC<TokenIconProps> = ({ name, url, size, ...rest }) => {
   const src = getTokenIconUrl({ url, name })
   return (
-    <Circle position={"relative"} overflow={"hidden"} size={size}>
+    <Circle position={"relative"} overflow={"hidden"} size={size} {...rest}>
       <Image
         position={"absolute"}
         left={0}
@@ -33,7 +34,6 @@ export const TokenIcon: FC<TokenIconProps> = ({ name, url, size, ...rest }) => {
         bottom={0}
         alt={name}
         src={src}
-        {...rest}
       />
     </Circle>
   )

@@ -10,8 +10,6 @@ import {
   getAccountIdentifier,
   isDeprecated,
 } from "../../../shared/wallet.service"
-import { ErrorBoundary } from "../../components/ErrorBoundary"
-import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { routes } from "../../routes"
 import {
   connectAccount,
@@ -33,12 +31,11 @@ import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBann
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { MigrationBanner } from "./MigrationBanner"
-import { NewTokenButton, TokenList } from "./TokenList"
+import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
-import { useTokensWithBalance } from "./tokens.state"
 import { UpgradeBanner } from "./UpgradeBanner"
-import { useAccountIsDeployed, useAccountStatus } from "./useAccountStatus"
+import { useAccountStatus } from "./useAccountStatus"
 
 interface AccountTokensProps {
   account: Account
@@ -76,9 +73,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [navigate, transactionsBeforeReview, userHasReviewed])
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
-
-  const { isValidating, error, tokenDetails, tokenDetailsIsInitialising } =
-    useTokensWithBalance(account)
 
   const { data: needsUpgrade = false, mutate } = useSWR(
     [
@@ -134,10 +128,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
-  const accountIsDeployed = useAccountIsDeployed(account)
   return (
     <Flex direction={"column"} data-testid="account-tokens">
-      <VStack spacing={6} mb={6}>
+      <VStack spacing={6} mt={4} mb={6}>
         <AccountTokensHeader
           status={status}
           account={account}
@@ -146,7 +139,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         />
         <AccountTokensButtons account={account} />
       </VStack>
-      <CellStack py={0}>
+      <CellStack pt={0}>
         <StatusMessageBannerContainer />
         {isDeprecated(account) && <MigrationBanner />}
         {showBackupBanner && <RecoveryBanner />}
@@ -159,33 +152,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
+        <TokenList variant={tokenListVariant} showNewTokenButton />
       </CellStack>
-      {/** TODO: remove this extra error boundary once TokenList issues are settled */}
-      {accountIsDeployed && (
-        <ErrorBoundary
-          fallback={
-            <ErrorBoundaryFallbackWithCopyError
-              message={"Sorry, an error occurred fetching tokens"}
-            />
-          }
-        >
-          {error ? (
-            <ErrorBoundaryFallbackWithCopyError
-              error={error}
-              message={"Sorry, an error occurred fetching tokens"}
-            />
-          ) : (
-            <TokenList
-              showTitle={hasPendingTransactions}
-              isValidating={isValidating}
-              tokenList={tokenDetails}
-              variant={tokenListVariant}
-            >
-              <NewTokenButton isLoading={tokenDetailsIsInitialising} />
-            </TokenList>
-          )}
-        </ErrorBoundary>
-      )}
     </Flex>
   )
 }

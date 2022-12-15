@@ -1,16 +1,13 @@
+import { H6, P4 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode, useMemo } from "react"
-import styled, { css } from "styled-components"
 
 import { Network } from "../../../shared/network"
-import { makeClickable } from "../../services/a11y"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
-  TokenDetailsWrapper,
-  TokenTextGroup,
-  TokenTitle,
-  TokenWrapper,
-} from "../accountTokens/TokenListItemDeprecated"
-import {
+  isDeclareContractTransaction,
+  isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
   isSwapTransaction,
@@ -19,51 +16,13 @@ import {
   isTokenTransferTransaction,
 } from "./transform/is"
 import { TransformedTransaction } from "./transform/type"
-import { NFTAccessory } from "./ui/NFTAccessory"
+import { NFTImage } from "./ui/NFTImage"
 import { SwapAccessory } from "./ui/SwapAccessory"
+import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
 
-export const TransactionsListWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const Container = styled(TokenWrapper)<{
-  highlighted?: boolean
-}>`
-  cursor: pointer;
-
-  ${({ highlighted }) =>
-    highlighted &&
-    css`
-      background-color: rgba(255, 255, 255, 0.1);
-    `}
-
-  &:hover, &:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-`
-
-const TransactionSubtitle = styled.div`
-  font-size: 13px;
-  line-height: 18px;
-  color: ${({ theme }) => theme.text2};
-  margin: 0;
-`
-
-const TitleAddressContainer = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const TitleAddressPrefix = styled.div`
-  margin-right: 8px;
-`
-
-const TitleAddress = styled.div``
-
-export interface ITransactionListItem {
+export interface TransactionListItemProps {
   transactionTransformed: TransformedTransaction
   network: Network
   highlighted?: boolean
@@ -71,11 +30,10 @@ export interface ITransactionListItem {
   children?: ReactNode | ReactNode[]
 }
 
-export const TransactionListItem: FC<ITransactionListItem> = ({
+export const TransactionListItem: FC<TransactionListItemProps> = ({
   transactionTransformed,
   network,
   highlighted,
-  onClick,
   children,
   ...props
 }) => {
@@ -86,6 +44,8 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
+  const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
+  const isDeployContract = isDeployContractTransaction(transactionTransformed)
 
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer) {
@@ -94,42 +54,62 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
         (action === "SEND" || action === "TRANSFER")
       const { toAddress, fromAddress } = transactionTransformed
       return (
-        <TitleAddressContainer>
-          <TitleAddressPrefix>
-            {titleShowsTo ? "To:" : "From:"}
-          </TitleAddressPrefix>
-          <TitleAddress>
-            <PrettyAccountAddress
-              accountAddress={titleShowsTo ? toAddress : fromAddress}
-              networkId={network.id}
-              size={15}
-            />
-          </TitleAddress>
-        </TitleAddressContainer>
+        <>
+          {titleShowsTo ? "To: " : "From: "}
+          <PrettyAccountAddress
+            accountAddress={titleShowsTo ? toAddress : fromAddress}
+            networkId={network.id}
+            icon={false}
+          />
+        </>
       )
     }
     if (dapp) {
       return <>{dapp.title}</>
+    }
+    if (isDeclareContract) {
+      return <>{transactionTransformed.classHash}</>
+    }
+    if (isDeployContract) {
+      return <>{transactionTransformed.contractAddress}</>
     }
     return null
   }, [
     isTransfer,
     dapp,
     isNFTTransfer,
+    isDeclareContract,
+    isDeployContract,
     action,
     transactionTransformed,
     network.id,
   ])
 
-  const accessory = useMemo(() => {
+  const icon = useMemo(() => {
     if (isNFT) {
+      const { contractAddress, tokenId } = transactionTransformed
       return (
-        <NFTAccessory
-          transaction={transactionTransformed}
+        <NFTImage
+          contractAddress={contractAddress}
+          tokenId={tokenId}
           networkId={network.id}
+          display={"flex"}
+          flexShrink={0}
+          rounded={"lg"}
+          width={9}
+          height={9}
         />
       )
     }
+    if (isSwap) {
+      return (
+        <SwapTransactionIcon transaction={transactionTransformed} size={9} />
+      )
+    }
+    return <TransactionIcon transaction={transactionTransformed} size={9} />
+  }, [isNFT, isSwap, transactionTransformed, network.id])
+
+  const accessory = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
       return <TransferAccessory transaction={transactionTransformed} />
     }
@@ -137,27 +117,34 @@ export const TransactionListItem: FC<ITransactionListItem> = ({
       return <SwapAccessory transaction={transactionTransformed} />
     }
     return null
-  }, [
-    isNFT,
-    isTransfer,
-    isTokenMint,
-    isTokenApprove,
-    isSwap,
-    transactionTransformed,
-    network.id,
-  ])
+  }, [isTransfer, isTokenMint, isTokenApprove, isSwap, transactionTransformed])
 
   return (
-    <Container {...makeClickable(onClick)} highlighted={highlighted} {...props}>
-      <TransactionIcon transaction={transactionTransformed} size={40} />
-      <TokenDetailsWrapper>
-        <TokenTextGroup>
-          <TokenTitle>{displayName}</TokenTitle>
-          <TransactionSubtitle>{subtitle}</TransactionSubtitle>
-        </TokenTextGroup>
-      </TokenDetailsWrapper>
+    <CustomButtonCell highlighted={highlighted} {...props}>
+      {icon}
+      <Flex
+        flexGrow={1}
+        alignItems="center"
+        justifyContent={"space-between"}
+        gap={2}
+        overflow={"hidden"}
+      >
+        <Flex direction={"column"} overflow="hidden">
+          <H6 overflow="hidden" textOverflow={"ellipsis"}>
+            {displayName}
+          </H6>
+          <P4
+            color="neutrals.300"
+            fontWeight={"semibold"}
+            overflow="hidden"
+            textOverflow={"ellipsis"}
+          >
+            {subtitle}
+          </P4>
+        </Flex>
+      </Flex>
       {accessory}
       {children}
-    </Container>
+    </CustomButtonCell>
   )
 }

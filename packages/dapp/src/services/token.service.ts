@@ -6,9 +6,9 @@ import Erc20Abi from "../../abi/ERC20.json"
 
 export const erc20TokenAddressByNetwork = {
   "goerli-alpha":
-    "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   "mainnet-alpha":
-    "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
+    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
 }
 
 export type PublicNetwork = keyof typeof erc20TokenAddressByNetwork

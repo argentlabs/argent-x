@@ -1,6 +1,5 @@
 import untypedKnownDapps from "../assets/known-dapps.json"
 import { isEqualAddress } from "../ui/services/addresses"
-import { PublicNetworkIds } from "./network/public"
 
 export interface KnownDapp {
   /** a unique internal id for this dapp e.g. mydapp-example-xyz */
@@ -13,7 +12,7 @@ export interface KnownDapp {
   icon?: string
   /** known contract addresses per network */
   contracts: {
-    [network in PublicNetworkIds]: string[]
+    [network: string]: string[]
   }
 }
 
@@ -27,14 +26,14 @@ export const includesAddress = (needle: string, haystack: string[]) => {
 
 export const isKnownDappForContractAddress = (
   address: string,
-  network?: PublicNetworkIds,
+  network?: string,
 ) => {
   return !!getKnownDappForContractAddress(address, network)
 }
 
 export const getKnownDappForContractAddress = (
   address?: string,
-  network?: PublicNetworkIds,
+  network?: string,
 ) => {
   if (!address) {
     return
@@ -42,7 +41,7 @@ export const getKnownDappForContractAddress = (
   try {
     const knownContract = knownDapps.find(({ contracts }) => {
       if (network) {
-        return includesAddress(address, Object.values(contracts[network]))
+        return includesAddress(address, contracts[network] ?? [])
       }
       return includesAddress(address, Object.values(contracts).flat())
     })

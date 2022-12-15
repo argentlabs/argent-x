@@ -1,37 +1,25 @@
+import { H6, P4 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
 
 import { prettifyTokenAmount } from "../../../../shared/token/price"
-import {
-  TokenTextGroup,
-  TokenTitle,
-} from "../../accountTokens/TokenListItemDeprecated"
 import { SwapTransaction } from "../transform/type"
 
-export const TokenAmount = styled(TokenTitle)`
-  text-align: right;
-`
-
-const TokenValue = styled.div`
-  text-align: right;
-  font-size: 13px;
-  line-height: 18px;
-  color: ${({ theme }) => theme.text2};
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`
-
-export interface ISwapAccessory {
+export interface SwapAccessoryProps {
   transaction: SwapTransaction
 }
 
-export const SwapAccessory: FC<ISwapAccessory> = ({ transaction }) => {
+export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
   const { fromAmount, fromToken, toAmount, toToken } = transaction
   return (
-    <TokenTextGroup>
-      <TokenAmount>
+    <Flex direction={"column"} overflow="hidden">
+      <H6
+        overflow="hidden"
+        textOverflow={"ellipsis"}
+        textAlign={"right"}
+        color={"secondary.500"}
+      >
+        <>+</>
         {toToken ? (
           prettifyTokenAmount({
             amount: toAmount,
@@ -41,8 +29,14 @@ export const SwapAccessory: FC<ISwapAccessory> = ({ transaction }) => {
         ) : (
           <>{toAmount} Unknown</>
         )}
-      </TokenAmount>
-      <TokenValue>
+      </H6>
+      <P4
+        color="neutrals.400"
+        fontWeight={"semibold"}
+        overflow="hidden"
+        textOverflow={"ellipsis"}
+        textAlign={"right"}
+      >
         &minus;
         {fromToken ? (
           prettifyTokenAmount({
@@ -53,7 +47,7 @@ export const SwapAccessory: FC<ISwapAccessory> = ({ transaction }) => {
         ) : (
           <>{fromAmount} Unknown</>
         )}
-      </TokenValue>
-    </TokenTextGroup>
+      </P4>
+    </Flex>
   )
 }

@@ -1,6 +1,6 @@
 import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber, BigNumberish, utils } from "ethers"
-import { UINT_256_MAX } from "starknet/dist/utils/uint256"
+import { uint256 } from "starknet"
 
 import { TokenDetailsWithBalance } from "../../ui/features/accountTokens/tokens.state"
 import {
@@ -9,6 +9,8 @@ import {
   prettifyTokenNumber,
 } from "../utils/number"
 import { BaseToken } from "./type"
+
+const { UINT_256_MAX } = uint256
 
 /** shape of individual entity in the /tokens/info endpoint */
 export interface ApiTokenDetails {

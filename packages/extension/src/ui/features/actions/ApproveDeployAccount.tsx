@@ -1,17 +1,11 @@
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
 
-import {
-  Field,
-  FieldGroup,
-  FieldKey,
-  FieldValue,
-} from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
+import { AccountAddress } from "./AccountAddress"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
-import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -49,17 +43,7 @@ export const ApproveDeployAccountScreen: FC<
       }
       {...props}
     >
-      <FieldGroup>
-        <AccountAddressField
-          title="From"
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.network.id}
-        />
-        <Field>
-          <FieldKey>Network</FieldKey>
-          <FieldValue>{selectedAccount.network.name}</FieldValue>
-        </Field>
-      </FieldGroup>
+      <AccountAddress selectedAccount={selectedAccount} />
     </ConfirmScreen>
   )
 }

@@ -1,6 +1,6 @@
 {
   "name": "@argent/ui",
-  "version": "5.0.3",
+  "version": "5.1.0",
   "license": "MIT",
   "private": true,
   "files": [
@@ -41,7 +41,7 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.3.6",
+    "@chakra-ui/react": "2.4.2",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^7.6.1"

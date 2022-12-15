@@ -1,5 +1,4 @@
 import { getKnownDappForContractAddress } from "../../../../../shared/knownDapps"
-import { PublicNetworkIds } from "../../../../../shared/network/public"
 import { Transaction } from "../../../../../shared/transactions"
 import { ActivityTransaction } from "../../useActivity"
 import { getCallsFromTransaction } from "../transaction/getCallsFromTransaction"
@@ -10,7 +9,7 @@ import { getCallsFromTransaction } from "../transaction/getCallsFromTransaction"
 
 export const getKnownDappForTransaction = (
   transaction: ActivityTransaction | Transaction,
-  network?: PublicNetworkIds,
+  network?: string,
 ) => {
   const calls = getCallsFromTransaction(transaction)
   for (const call of calls) {

@@ -5,7 +5,7 @@ import { Button } from "./Button"
 import { ChevronRightIcon } from "./icons"
 import { H6 } from "./Typography"
 
-/** A vertical collection of Cells with spacing */
+/** A vertical collection of Cells with standardised spacing */
 
 export const CellStack = chakra(Flex, {
   baseStyle: {
@@ -18,6 +18,17 @@ export const CellStack = chakra(Flex, {
 export const SpacerCell = chakra(Flex, {
   baseStyle: {
     h: 2,
+  },
+})
+
+export const HeaderCell = chakra(H6, {
+  baseStyle: {
+    mt: 4,
+    mx: 2,
+    color: "neutrals.300",
+    "&:first-child": {
+      mt: 0,
+    },
   },
 })
 
@@ -40,7 +51,7 @@ export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
       {leftIcon && <Flex fontSize="base">{leftIcon}</Flex>}
       <H6>{children}</H6>
       {rightIcon && (
-        <Flex ml={"auto"} fontSize="base">
+        <Flex ml={"auto"} fontSize="base" opacity={0.6}>
           {rightIcon}
         </Flex>
       )}

@@ -15,5 +15,5 @@ export const scrollbarStyle = {
     border: "1px solid",
     borderColor: "white30",
   },
-  "scrollbar-width": "none" /** hides scrollbar on FireFox */,
+  scrollbarWidth: "none" /** hides scrollbar on FireFox */,
 }

@@ -1,10 +1,8 @@
+import { BarBackButton, NavigationContainer, Switch } from "@argent/ui"
 import { FC } from "react"
 
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { IconBar } from "../../components/IconBar"
-import IOSSwitch from "../../components/IOSSwitch"
-import { H2 } from "../../theme/Typography"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 export const PrivacySettingsScreen: FC = () => {
@@ -24,17 +22,16 @@ export const PrivacySettingsScreen: FC = () => {
   )
 
   return (
-    <>
-      <IconBar back />
+    <NavigationContainer leftButton={<BarBackButton />} title={"Privacy"}>
       <SettingsScreenWrapper>
-        <H2>Privacy</H2>
         <hr />
         <SettingsItem>
           <Title>
             <span>Use Argent services</span>
-            <IOSSwitch
-              checked={privacyUseArgentServices}
-              onClick={() =>
+            <Switch
+              colorScheme="primary"
+              isChecked={privacyUseArgentServices}
+              onChange={() =>
                 settingsStore.set(
                   "privacyUseArgentServices",
                   !privacyUseArgentServices,
@@ -51,9 +48,10 @@ export const PrivacySettingsScreen: FC = () => {
         <SettingsItem>
           <Title>
             <span>Automatic Error Reporting</span>
-            <IOSSwitch
-              checked={privacyAutomaticErrorReporting}
-              onClick={() =>
+            <Switch
+              colorScheme="primary"
+              isChecked={privacyAutomaticErrorReporting}
+              onChange={() =>
                 settingsStore.set(
                   "privacyAutomaticErrorReporting",
                   !privacyAutomaticErrorReporting,
@@ -66,10 +64,11 @@ export const PrivacySettingsScreen: FC = () => {
         <hr />
         <SettingsItem>
           <Title>
-            <span>Share analytics data</span>
-            <IOSSwitch
-              checked={privacyShareAnalyticsData}
-              onClick={() =>
+            <span>Share anonymised data with Argent</span>
+            <Switch
+              colorScheme="primary"
+              isChecked={privacyShareAnalyticsData}
+              onChange={() =>
                 settingsStore.set(
                   "privacyShareAnalyticsData",
                   !privacyShareAnalyticsData,
@@ -78,11 +77,11 @@ export const PrivacySettingsScreen: FC = () => {
             />
           </Title>
           <P>
-            This helps the Argent team to identify issues, prioritize features
-            and build a better product
+            This helps the Argent team to identify issues, prioritise features
+            and build a better product without compromising your privacy
           </P>
         </SettingsItem>
       </SettingsScreenWrapper>
-    </>
+    </NavigationContainer>
   )
 }

@@ -3,6 +3,7 @@ import { encode } from "starknet"
 
 import { getAccounts } from "../shared/account/store"
 import { RecoveryMessage } from "../shared/messages/RecoveryMessage"
+import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { downloadFile } from "./download"
@@ -11,15 +12,14 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
   msg,
   messagingKeys: { privateKey },
   background: { wallet, transactionTracker },
-  sendToTabAndUi,
 }) => {
   switch (msg.type) {
     case "RECOVER_BACKUP": {
       try {
         await wallet.importBackup(msg.data)
-        return sendToTabAndUi({ type: "RECOVER_BACKUP_RES" })
+        return sendMessageToUi({ type: "RECOVER_BACKUP_RES" })
       } catch (error) {
-        return sendToTabAndUi({
+        return sendMessageToUi({
           type: "RECOVER_BACKUP_REJ",
           data: `${error}`,
         })
@@ -28,7 +28,7 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
 
     case "DOWNLOAD_BACKUP_FILE": {
       await downloadFile(await wallet.exportBackup())
-      return sendToTabAndUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
+      return sendMessageToUi({ type: "DOWNLOAD_BACKUP_FILE_RES" })
     }
 
     case "RECOVER_SEEDPHRASE": {
@@ -49,10 +49,10 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
         await wallet.restoreSeedPhrase(seedPhrase, newPassword)
         transactionTracker.loadHistory(await getAccounts())
 
-        return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_RES" })
+        return sendMessageToUi({ type: "RECOVER_SEEDPHRASE_RES" })
       } catch (error) {
         console.error(error)
-        return sendToTabAndUi({ type: "RECOVER_SEEDPHRASE_REJ" })
+        return sendMessageToUi({ type: "RECOVER_SEEDPHRASE_REJ" })
       }
     }
   }

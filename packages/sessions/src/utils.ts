@@ -41,7 +41,7 @@ export async function supportsSessions(
 ): Promise<boolean> {
   const { result } = await provider.callContract({
     contractAddress: address,
-    entrypoint: "is_plugin",
+    entrypoint: "isPlugin",
     calldata: stark.compileCalldata({ classHash: SESSION_PLUGIN_CLASS_HASH }),
   })
   return !number.toBN(result[0]).isZero()

@@ -1,0 +1,25 @@
+{
+  "name": "@argent/x-wasm",
+  "collaborators": [
+    "Janek <janek.rahrt@me.com>"
+  ],
+  "version": "5.1.0",
+  "files": [
+    "pkg/wasm_bg.wasm",
+    "pkg/wasm.js",
+    "pkg/wasm_bg.js",
+    "pkg/wasm.d.ts"
+  ],
+  "module": "pkg/wasm.js",
+  "types": "pkg/wasm.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "wasm-pack build",
+    "test": "wasm-pack test --chrome --headless",
+    "postinstall": "yarn build",
+    "prepare": "yarn build"
+  },
+  "devDependencies": {
+    "wasm-pack": "^0.10.3"
+  }
+}
