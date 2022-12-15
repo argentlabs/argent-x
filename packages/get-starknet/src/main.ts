@@ -9,7 +9,11 @@ import sn from "get-starknet-core"
 import type { WalletProviderWithStoreVersion } from "./modal"
 import show from "./modal"
 
-export type { StarknetWindowObject, DisconnectOptions } from "get-starknet-core"
+export type {
+  StarknetWindowObject,
+  DisconnectOptions,
+  ConnectedStarknetWindowObject,
+} from "get-starknet-core"
 
 type StoreVersion = "chrome" | "firefox" | "edge"
 
