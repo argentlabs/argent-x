@@ -5787,9 +5787,9 @@
     svg-parser "^2.0.4"
 
 "@svgr/plugin-prettier@^6.5.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@svgr/plugin-prettier/-/plugin-prettier-6.5.0.tgz#435f7d5a4d858a83646cae9ff950a2edf6938773"
-  integrity sha512-Dhw16y3lE6h/y5Qsvx006RKYx0oxKbLmQMn6Mq0oXWEzx2brxXhjWAoLdRO+rgcSJUPp4vJonpEvlEm+zJsEKg==
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@svgr/plugin-prettier/-/plugin-prettier-6.5.1.tgz#3d4f07f4b43dc960990a75f2d66e7e593e3997f6"
+  integrity sha512-nJTtamrxQjsHcP9vb5PVBiaVW9kEtAt0hzGK8e4+zbaIUHq6RPeR8+SvYaAbIIn1TExFszFuZSz1U08UX7kz7w==
   dependencies:
     deepmerge "^4.2.2"
     prettier "^2.7.1"
