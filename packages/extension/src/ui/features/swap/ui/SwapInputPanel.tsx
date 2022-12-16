@@ -15,7 +15,6 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react"
 
 import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedNumericInputValue"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
-import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 import { CurrencyValue } from "./CurrencyValue"
 import { MaxEthModal } from "./MaxEthModal"
 import { SwapTokensModal } from "./SwapTokensModal"
@@ -29,11 +28,10 @@ interface SwapInputPanelProps {
   onMax?: () => void
   currency?: Currency | undefined
   showMaxButton?: boolean
-  onCurrencySelect: (currency: Currency) => void
+  onCurrencySelect?: (currency: Currency) => void
   currentBalance?: CurrencyAmount | TokenAmount
   otherCurrency?: Currency | null
   id: string
-  ownedTokens?: TokenDetailsWithBalance[]
   tradeLoading: boolean
   insufficientBalance?: boolean
 }
@@ -48,8 +46,6 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
   onCurrencySelect,
   onMax,
   showMaxButton = false,
-  otherCurrency,
-  ownedTokens,
   tradeLoading,
   insufficientBalance,
 }) => {
@@ -73,34 +69,13 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
     return wrapped ? (allTokens[wrapped.address] as WrappedTokenInfo) : null
   }, [allTokens, currency, networkId])
 
-  const availableBuyTokens = useMemo(() => {
-    if (!otherCurrency) {
-      return Object.values(allTokens)
-    }
-    const wrapped = wrappedCurrency(otherCurrency, networkId)
-    const copy = { ...allTokens }
-    if (wrapped) {
-      delete copy[wrapped.address]
-      return Object.values(copy)
-    }
-
-    return Object.values(allTokens)
-  }, [allTokens, networkId, otherCurrency])
-
-  const availableSellTokens = useMemo(() => {
-    return Object.values(allTokens).filter((t) => {
-      if (ownedTokens) {
-        return ownedTokens.some((ot) => ot.address === t.address)
-      }
-      return false
-    })
-  }, [allTokens, ownedTokens])
-
   const onMaxCheck = useCallback(() => {
     if (currency === ETHER) {
       onOpenEthModal()
+    } else {
+      onMax?.()
     }
-  }, [currency, onOpenEthModal])
+  }, [currency, onMax, onOpenEthModal])
 
   // eslint-disable-next-line
   const delayedOnChange = useCallback(
@@ -213,15 +188,12 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         />
       )}
 
-      {(ownedTokens || availableBuyTokens) && (
-        <SwapTokensModal
-          isOpen={isTokenListOpen}
-          onClose={onCloseTokenList}
-          isPay={type === "pay"}
-          tokens={type === "pay" ? availableSellTokens : availableBuyTokens}
-          onCurrencySelect={onCurrencySelect}
-        />
-      )}
+      <SwapTokensModal
+        isOpen={isTokenListOpen}
+        onClose={onCloseTokenList}
+        isPay={type === "pay"}
+        onCurrencySelect={onCurrencySelect}
+      />
     </>
   )
 }

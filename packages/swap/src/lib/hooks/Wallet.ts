@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Abi, number, uint256 } from "starknet"
+import { uint256 } from "starknet"
 import useSWR from "swr"
 
 import { DEFAULT_NETWORK_ID } from "./../../sdk/constants"

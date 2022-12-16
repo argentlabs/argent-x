@@ -27,10 +27,6 @@ export interface Reserves {
 }
 
 export function useReserves(pairAddresses: (string | undefined)[]) {
-  console.log(
-    "🚀 ~ file: Reserves.ts ~ line 30 ~ useReserves ~ pairAddresses",
-    pairAddresses,
-  )
   const { multicall, networkId } = useSwapProvider()
 
   const pairAddressesString = pairAddresses.filter(Boolean).join("-")

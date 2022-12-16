@@ -87,3 +87,6 @@ export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
 }
 
 export const MIN_ETH: JSBI = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(15)) // .001 ETH
+
+export const ETH_LOGO_URL =
+  "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png"

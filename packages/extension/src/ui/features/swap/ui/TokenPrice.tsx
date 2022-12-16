@@ -1,5 +1,12 @@
 import { TokenButton } from "@argent/ui"
-import { WrappedTokenInfo } from "@argent/x-swap"
+import {
+  Currency,
+  ETHER,
+  ETH_LOGO_URL,
+  SupportedNetworks,
+  WrappedTokenInfo,
+  wrappedCurrency,
+} from "@argent/x-swap"
 import { Text } from "@chakra-ui/react"
 import { ethers } from "ethers"
 import { FC } from "react"
@@ -10,36 +17,46 @@ import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
-import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
+import { useCurrentNetwork } from "../../networks/useNetworks"
 
 interface TokenPriceProps {
-  token: TokenDetailsWithBalance
+  currency: Currency
   onClick: () => void
+  showCurrencyValue?: boolean
 }
 
-const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
+const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
+  const network = useCurrentNetwork()
+
+  const token = wrappedCurrency(currency, network.id as SupportedNetworks)
+
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
-    ethers.utils.parseUnits("1", token.decimals),
+    ethers.utils.parseUnits("1", token?.decimals ?? 18),
   )
 
   const priceDetails = useTokenPriceDetails(token)
 
-  /* TODO: unify token types -- too many at the moment and it will involve a big refactor */
-  const {
-    name,
-    symbol,
-    tokenInfo: { image },
-  } = token as WrappedTokenInfo
+  if (!token) {
+    return <></>
+  }
+
+  const tokenImage =
+    token instanceof WrappedTokenInfo
+      ? token.image
+      : currency === ETHER
+      ? ETH_LOGO_URL
+      : undefined
+
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
 
   return (
     <TokenButton
       onClick={onClick}
-      name={name || ""}
-      image={image || ""}
+      name={token.name || ""}
+      image={tokenImage || ""}
       getTokenIconUrl={getTokenIconUrl}
-      symbol={symbol || ""}
+      symbol={token.symbol || ""}
       showTokenSymbol
       valueLabelPrimary={displayCurrencyValue}
       valueLabelSecondary={

@@ -1,5 +1,5 @@
 import { CellStack, H5, SearchInput } from "@argent/ui"
-import { Currency, ETHER, Token } from "@argent/x-swap"
+import { Currency, Token, useAllTokens } from "@argent/x-swap"
 import {
   Modal,
   ModalBody,
@@ -10,17 +10,14 @@ import {
 import { FC, Fragment, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
-import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 import { OwnedToken } from "./OwnedToken"
 import { TokenPrice } from "./TokenPrice"
 
 interface SwapTokensModalProps {
-  currency?: Currency | undefined
-  isOpen: boolean
   onClose: () => void
-  onCurrencySelect: (currency: Currency) => void
+  onCurrencySelect?: (currency: Currency) => void
+  isOpen: boolean
   isPay: boolean
-  tokens: Token[]
 }
 
 const SwapTokensModal: FC<SwapTokensModalProps> = ({
@@ -28,20 +25,20 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
   onCurrencySelect,
   isOpen,
   isPay,
-  tokens,
 }) => {
   const { register, watch } = useForm({
     defaultValues: { query: "" },
   })
   const currentQueryValue = watch("query")
+  const tokens = useAllTokens()
 
-  const filteredTokens = useMemo(() => {
+  const filteredTokens: Token[] = useMemo(() => {
     if (!currentQueryValue) {
-      return tokens
+      return Object.values(tokens)
     }
 
-    return tokens.filter(
-      (token: any) =>
+    return Object.values(tokens).filter(
+      (token) =>
         token.name?.toLowerCase().includes(currentQueryValue.toLowerCase()) ||
         token.symbol?.toLowerCase().includes(currentQueryValue.toLowerCase()) ||
         token.address?.toLowerCase().includes(currentQueryValue.toLowerCase()),
@@ -49,8 +46,8 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
   }, [tokens, currentQueryValue])
 
   const selectToken = useCallback(
-    (token: Token) => {
-      onCurrencySelect(token.symbol === "ETH" ? ETHER : token)
+    (currency: Currency) => {
+      onCurrencySelect?.(currency)
       onClose()
     },
     [onCurrencySelect, onClose],
@@ -74,13 +71,12 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
             <CellStack px="0" gap={3}>
               <SearchInput placeholder="Search" {...register("query")} />
 
-              {filteredTokens.map((token: any) => (
+              {filteredTokens?.map((token) => (
                 <Fragment key={token.address}>
                   {isPay ? (
                     <OwnedToken
                       key={token.address}
-                      token={token}
-                      amount={token.balance ?? 0}
+                      currency={token}
                       onClick={() => {
                         selectToken(token)
                       }}
@@ -91,7 +87,7 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
                       onClick={() => {
                         selectToken(token)
                       }}
-                      token={token as TokenDetailsWithBalance}
+                      currency={token}
                     />
                   )}
                 </Fragment>

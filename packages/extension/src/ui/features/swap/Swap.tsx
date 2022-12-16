@@ -18,8 +18,6 @@ import { keyframes } from "@chakra-ui/react"
 import { useCallback, useEffect, useState } from "react"
 
 import { executeTransaction } from "../../services/backgroundTransactions"
-import { useSelectedAccount } from "../accounts/accounts.state"
-import { useTokensWithBalance } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
@@ -80,10 +78,7 @@ const Swap = () => {
     inputError: swapInputError,
     tradeLoading,
   } = useDerivedSwapInfo()
-
-  const account = useSelectedAccount()
   const { id: networkId } = useCurrentNetwork()
-  const { tokenDetails: ownedTokens } = useTokensWithBalance(account)
   const { independentField, typedValue, switchCurrencies } = useSwapState()
   const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const [rotate, setRotate] = useState(false)
@@ -206,7 +201,6 @@ const Swap = () => {
             onMax={handleMaxInput}
             otherCurrency={currencies[Field.OUTPUT]}
             currentBalance={currencyBalances[Field.INPUT]}
-            ownedTokens={ownedTokens}
             tradeLoading={tradeLoading}
             insufficientBalance={!isValid && !!formattedAmounts[Field.INPUT]}
           />
