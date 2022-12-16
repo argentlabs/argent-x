@@ -49,7 +49,9 @@ export const titleForTransactionsAndReview = (
     ? "Review send"
     : hasSwap
     ? "Review trade"
-    : "Check transactions"
+    : transactionsArray.length === 1
+    ? "Review transaction"
+    : "Review transactions"
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
