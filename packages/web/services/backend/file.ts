@@ -1,4 +1,4 @@
-import { getJwt } from "../__unsafe__oldJwt"
+import { getJwt } from "../jwt"
 import { ARGENT_API_BASE_URL } from "./account"
 
 interface Metadata {
