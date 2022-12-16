@@ -1,4 +1,5 @@
 import { TokenButton } from "@argent/ui"
+import { WrappedTokenInfo } from "@argent/x-swap"
 import { BigNumberish } from "ethers"
 import { FC } from "react"
 
@@ -8,7 +9,6 @@ import {
 } from "../../../../shared/token/price"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { toTokenView } from "../../accountTokens/tokens.service"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 
 interface OwnedTokenProps {
@@ -20,17 +20,22 @@ interface OwnedTokenProps {
 const OwnedToken: FC<OwnedTokenProps> = ({ amount, onClick, token }) => {
   const currencyValue = useTokenAmountToCurrencyValue(token, amount)
 
-  const { name, image, symbol } = toTokenView(token)
+  /* TODO: unify token types -- too many at the moment and it will involve a big refactor */
+  const {
+    name,
+    symbol,
+    tokenInfo: { image },
+  } = token as WrappedTokenInfo
   const displayBalance = prettifyTokenBalance(token)
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
 
   return (
     <TokenButton
       onClick={onClick}
-      name={name}
+      name={name || ""}
       image={image || ""}
       getTokenIconUrl={getTokenIconUrl}
-      symbol={symbol}
+      symbol={symbol || ""}
       showTokenSymbol
       valueLabelPrimary={displayBalance}
       valueLabelSecondary={displayCurrencyValue}

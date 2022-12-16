@@ -1,4 +1,5 @@
 import { TokenButton } from "@argent/ui"
+import { WrappedTokenInfo } from "@argent/x-swap"
 import { Text } from "@chakra-ui/react"
 import { ethers } from "ethers"
 import { FC } from "react"
@@ -9,7 +10,6 @@ import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
-import { toTokenView } from "../../accountTokens/tokens.service"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 
 interface TokenPriceProps {
@@ -25,16 +25,21 @@ const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
 
   const priceDetails = useTokenPriceDetails(token)
 
-  const { name, image, symbol } = toTokenView(token)
+  /* TODO: unify token types -- too many at the moment and it will involve a big refactor */
+  const {
+    name,
+    symbol,
+    tokenInfo: { image },
+  } = token as WrappedTokenInfo
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
 
   return (
     <TokenButton
       onClick={onClick}
-      name={name}
+      name={name || ""}
       image={image || ""}
       getTokenIconUrl={getTokenIconUrl}
-      symbol={symbol}
+      symbol={symbol || ""}
       showTokenSymbol
       valueLabelPrimary={displayCurrencyValue}
       valueLabelSecondary={

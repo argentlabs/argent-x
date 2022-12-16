@@ -1,5 +1,5 @@
 import { CellStack, H5, SearchInput } from "@argent/ui"
-import { ETHER } from "@argent/x-swap"
+import { Currency, ETHER, Token } from "@argent/x-swap"
 import {
   Modal,
   ModalBody,
@@ -7,15 +7,23 @@ import {
   ModalContent,
   ModalHeader,
 } from "@chakra-ui/react"
-import { FC, Fragment, useMemo } from "react"
+import { FC, Fragment, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 import { OwnedToken } from "./OwnedToken"
 import { TokenPrice } from "./TokenPrice"
 
-const SwapTokensModal: FC<any> = ({
-  currency,
+interface SwapTokensModalProps {
+  currency?: Currency | undefined
+  isOpen: boolean
+  onClose: () => void
+  onCurrencySelect: (currency: Currency) => void
+  isPay: boolean
+  tokens: Token[]
+}
+
+const SwapTokensModal: FC<SwapTokensModalProps> = ({
   onClose,
   onCurrencySelect,
   isOpen,
@@ -40,6 +48,18 @@ const SwapTokensModal: FC<any> = ({
     )
   }, [tokens, currentQueryValue])
 
+  const selectToken = useCallback(
+    (token: Token) => {
+      onCurrencySelect(token.symbol === "ETH" ? ETHER : token)
+      onClose()
+    },
+    [onCurrencySelect, onClose],
+  )
+
+  if (!filteredTokens) {
+    return <></>
+  }
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} size="full">
@@ -62,16 +82,14 @@ const SwapTokensModal: FC<any> = ({
                       token={token}
                       amount={token.balance ?? 0}
                       onClick={() => {
-                        onCurrencySelect(currency === ETHER ? currency : token)
-                        onClose()
+                        selectToken(token)
                       }}
                     />
                   ) : (
                     <TokenPrice
                       key={token.address}
                       onClick={() => {
-                        onCurrencySelect(currency === ETHER ? currency : token)
-                        onClose()
+                        selectToken(token)
                       }}
                       token={token as TokenDetailsWithBalance}
                     />

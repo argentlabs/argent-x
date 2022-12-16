@@ -75,7 +75,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
 
   const availableBuyTokens = useMemo(() => {
     if (!otherCurrency) {
-      return allTokens
+      return Object.values(allTokens)
     }
     const wrapped = wrappedCurrency(otherCurrency, networkId)
     const copy = { ...allTokens }
@@ -86,6 +86,15 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
 
     return Object.values(allTokens)
   }, [allTokens, networkId, otherCurrency])
+
+  const availableSellTokens = useMemo(() => {
+    return Object.values(allTokens).filter((t) => {
+      if (ownedTokens) {
+        return ownedTokens.some((ot) => ot.address === t.address)
+      }
+      return false
+    })
+  }, [allTokens, ownedTokens])
 
   const onMaxCheck = useCallback(() => {
     if (currency === ETHER) {
@@ -204,13 +213,15 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         />
       )}
 
-      <SwapTokensModal
-        isOpen={isTokenListOpen}
-        onClose={onCloseTokenList}
-        isPay={type === "pay"}
-        tokens={type === "pay" ? ownedTokens : availableBuyTokens}
-        onCurrencySelect={onCurrencySelect}
-      />
+      {(ownedTokens || availableBuyTokens) && (
+        <SwapTokensModal
+          isOpen={isTokenListOpen}
+          onClose={onCloseTokenList}
+          isPay={type === "pay"}
+          tokens={type === "pay" ? availableSellTokens : availableBuyTokens}
+          onCurrencySelect={onCurrencySelect}
+        />
+      )}
     </>
   )
 }
