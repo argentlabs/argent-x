@@ -33,9 +33,14 @@ export const getPresentationByPath = ({
       : screens.slice(i + 1)
     const screensBelow = i > 0 ? screens.slice(0, i) : []
 
-    /** count modal screens above this one to determine 'stacked' appearance */
-    const modalsAbove = screensAbove.filter((screenAbove) =>
-      isModalPresentation(screenAbove.presentation),
+    /** count modalSheet screens above this one to determine 'stacked' appearance */
+    const modalsSheetsAbove = screensAbove.filter(
+      (screenAbove) => screenAbove.presentation === "modalSheet",
+    ).length
+
+    /** count modal screens above this one to determine 'modalStacked' appearance */
+    const modalsAbove = screensAboveWithPopped.filter(
+      (screenAbove) => screenAbove.presentation === "modal",
     ).length
 
     /** determine if push on top of a modalSheet - should animate like push, but modal sheet height - pushModalSheet */
@@ -58,10 +63,12 @@ export const getPresentationByPath = ({
 
     /** determine stacked order before modal overrides */
     const presentation: Presentation =
-      modalsAbove > 1
+      modalsSheetsAbove > 1
         ? "stackedStacked"
-        : modalsAbove === 1
+        : modalsSheetsAbove === 1
         ? "stacked"
+        : modalsAbove > 0
+        ? "modalStacked"
         : isModalSheetBeneathPush || isPushAboveModalSheet
         ? "pushModalSheet"
         : isModalBeneathPush

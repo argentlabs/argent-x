@@ -16,6 +16,7 @@ export type Presentation =
   | "push"
   | "modal"
   | "modalSheet"
+  | "modalStacked"
   | "pushModalSheet"
   | "stacked"
   | "stackedStacked"

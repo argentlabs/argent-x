@@ -29,6 +29,16 @@ export function Home() {
       }
     >
       <CellStack>
+        <ButtonCell as={Link} to="/tokens/a">
+          Token A
+        </ButtonCell>
+        <ButtonCell as={Link} to="/tokens/b">
+          Token B
+        </ButtonCell>
+        <ButtonCell as={Link} to="/tokens/c">
+          Token C
+        </ButtonCell>
+        <SpacerCell />
         <ButtonCell as={Link} to="/accounts/1">
           Account
         </ButtonCell>
@@ -40,6 +50,10 @@ export function Home() {
         </ButtonCell>
         <ButtonCell as={Link} to="/picker">
           Picker
+        </ButtonCell>
+        <SpacerCell />
+        <ButtonCell as={Link} to="/lock-screen">
+          Lock
         </ButtonCell>
         <SpacerCell />
         <ButtonCell onClick={onOpenWindow} rightIcon={<ExpandIcon />}>

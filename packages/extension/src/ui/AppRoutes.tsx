@@ -1,8 +1,8 @@
 import { Route, Routes } from "@argent/stack-router"
-import { chakra } from "@chakra-ui/system"
-import { FC } from "react"
-// import { Outlet, Route, Routes } from "react-router-dom"
-import { Outlet } from "react-router-dom"
+import { chakra } from "@chakra-ui/react"
+import { FC, ReactNode, isValidElement, useMemo } from "react"
+// import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
+import { Outlet, useLocation } from "react-router-dom"
 
 import { useAppState } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
@@ -96,10 +96,23 @@ const ResponsiveRoutes: FC = () => (
 
 const nonWalletRoutes = (
   <>
-    <Route path={routes.error.path} element={<ErrorScreen />} />
-    <Route path={routes.lockScreen.path} element={<LockScreen />} />
-    <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
+      presentation="replace"
+      path={routes.error.path}
+      element={<ErrorScreen />}
+    />
+    <Route
+      presentation="replace"
+      path={routes.lockScreen.path}
+      element={<LockScreen />}
+    />
+    <Route
+      presentation="replace"
+      path={routes.reset.path}
+      element={<ResetScreen />}
+    />
+    <Route
+      presentation="replace"
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
     />
@@ -110,9 +123,14 @@ const nonWalletRoutes = (
 
 const walletRoutes = (
   <>
-    <Route path={routes.accountNft.path} element={<NftScreen />} />
+    <Route
+      presentation="modal"
+      path={routes.accountNft.path}
+      element={<NftScreen />}
+    />
     <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
+      presentation="modal"
       path={routes.networkWarning.path}
       element={<NetworkWarningScreen />}
     />
@@ -222,10 +240,12 @@ const walletRoutes = (
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route
+      presentation="replace"
       path={routes.networkUpgradeV4.path}
       element={<UpgradeScreenV4 upgradeType={"network"} />}
     />
     <Route
+      presentation="replace"
       path={routes.accountUpgradeV4.path}
       element={<UpgradeScreenV4 upgradeType={"account"} />}
     />
@@ -255,7 +275,11 @@ const walletRoutes = (
     <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
     <Route path={routes.newToken.path} element={<AddTokenScreen />} />
     <Route path={routes.token.path} element={<TokenScreen />} />
-    <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
+    <Route
+      presentation="modal"
+      path={routes.addPlugin.path}
+      element={<AddPluginScreen />}
+    />
     <Route
       path={routes.backupDownload.path}
       element={<BackupDownloadScreen />}
@@ -270,66 +294,95 @@ const walletRoutes = (
 const fullscreenRoutes = (
   <>
     <Route
+      presentation="replace"
       path={routes.onboardingStart.path}
       element={<OnboardingStartScreen />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingDisclaimer.path}
       element={<OnboardingDisclaimerScreen />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingPrivacyStatement.path}
       element={<OnboardingPrivacyStatementScreen />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingPassword.path}
       element={<OnboardingPasswordScreen />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingRestoreBackup.path}
       element={<OnboardingRestoreBackup />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingRestoreSeed.path}
       element={<OnboardingRestoreSeed />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingRestorePassword.path}
       element={<OnboardingRestorePassword />}
     />
     <Route
+      presentation="replace"
       path={routes.onboardingFinish.path}
       element={<OnboardingFinishScreen />}
     />
-    <Route path={routes.userReview.path} element={<ReviewRatingScreen />} />
     <Route
+      presentation="replace"
+      path={routes.userReview.path}
+      element={<ReviewRatingScreen />}
+    />
+    <Route
+      presentation="replace"
       path={routes.userReviewFeedback.path}
       element={<ReviewFeedbackScreen />}
     />
   </>
 )
 
+/** Make a list of non-wallet routes which will show in place of actions */
+const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
+  (child: ReactNode) => {
+    return isValidElement(child) ? child.props.path : []
+  },
+)
+
 export const AppRoutes: FC = () => {
   useEntryRoute()
+  const location = useLocation()
 
   const { isLoading } = useAppState()
   const actions = useActions()
+
+  const showActions = useMemo(() => {
+    const hasActions = !!actions[0]
+    const isNonWalletRoute = nonWalletPaths.includes(location.pathname)
+    return hasActions && !isNonWalletRoute
+  }, [actions, location.pathname])
 
   if (isLoading) {
     return <LoadingScreen />
   }
 
-  const hasActions = !!actions[0]
+  if (showActions) {
+    return (
+      <ResponsiveContainer>
+        <ActionScreen />
+      </ResponsiveContainer>
+    )
+  }
 
   return (
     <Routes>
       <Route element={<ResponsiveRoutes />}>
         {nonWalletRoutes}
-        {hasActions ? (
-          <Route path="*" element={<ActionScreen />} />
-        ) : (
-          walletRoutes
-        )}
+        {walletRoutes}
       </Route>
       {fullscreenRoutes}
     </Routes>

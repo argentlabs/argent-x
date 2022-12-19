@@ -8,6 +8,7 @@ import {
 import { Route, resolvePath } from "react-router-dom"
 
 import { StackScreen } from "../StackScreen"
+import { StackScreenContainer } from "../StackScreenContainer"
 import { Presentation } from "../types"
 
 type DeclaredPresentationByPath = Record<string, Presentation>
@@ -70,9 +71,12 @@ export const getWrappedChildrenAndPresentation = (
         Object.assign(presentationByPath, nestedPresentationByPath)
         unfilteredPaths = unfilteredPaths.concat(nestedPaths)
       }
-      /** wrap the element in StackScreen and copy in the router path as a prop */
-      if (element) {
+      if (element && path) {
+        /** wrap the element in StackScreen and copy in the router path as a prop */
         element = <StackScreen path={childPath}>{element}</StackScreen>
+      } else {
+        /** some other component, presumably with nested <Outlet ... />, wrap in a neutral container to preserve animation capabilities */
+        element = <StackScreenContainer>{element}</StackScreenContainer>
       }
       /** return a clone of this Route with wrapped element and children */
       return cloneElement(

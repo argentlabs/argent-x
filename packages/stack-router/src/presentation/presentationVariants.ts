@@ -147,6 +147,18 @@ const variants: Record<Presentation, Partial<PresentationVariant>> = {
       scale: 0.8,
     },
   },
+  /** beneath modal (same as animation 'stacked' but not persistent) */
+  modalStacked: {
+    get enter() {
+      return variants.stacked.enter
+    },
+    get active() {
+      return variants.stacked.active
+    },
+    get exit() {
+      return variants.stacked.exit
+    },
+  },
   /** no animation */
   replace: {
     get enter() {

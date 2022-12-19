@@ -72,13 +72,11 @@ export const updateScreenStack = ({
   if (!existingScreen && existingScreenIndexWithPath === -1) {
     /** add this screen to the stack */
     if (navigationType === NavigationType.Replace) {
-      presentationDirection = PresentationDirection.Replace
       poppedScreens = []
-      /** replace the last screen with this one */
+      /** replace the last screen if it exists with this one */
       const screen = screenForCurrentLocation()
-      updatedScreens[screens.length - 1] = screen
+      updatedScreens[Math.max(0, screens.length - 1)] = screen
     } else {
-      /** NavigationType.Push and NavigationType.Pop can both add screens */
       if (currentLocation.key !== "default") {
         presentationDirection = PresentationDirection.Forwards
       }
@@ -113,6 +111,11 @@ export const updateScreenStack = ({
         }
       }
     }
+  }
+
+  /** always override 'replace' */
+  if (navigationType === NavigationType.Replace) {
+    presentationDirection = PresentationDirection.Replace
   }
 
   return {

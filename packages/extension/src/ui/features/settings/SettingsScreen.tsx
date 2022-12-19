@@ -87,7 +87,9 @@ export const SettingsScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        rightButton={<BarCloseButton />}
+        rightButton={
+          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+        }
         title={"Settings"}
         scrollKey={"settings/SettingsScreen"}
       >

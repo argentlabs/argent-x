@@ -1,5 +1,4 @@
-import { usePresence } from "framer-motion"
-import { useReducedMotion } from "framer-motion"
+import { usePresence, useReducedMotion } from "framer-motion"
 import { ComponentProps, FC, useEffect, useMemo, useRef } from "react"
 
 import {
@@ -7,7 +6,10 @@ import {
   replaceTransition,
 } from "./presentation/transitions"
 import { useStackContext } from "./StackContext"
-import { StackScreenContainer } from "./StackScreenContainer"
+import {
+  StackScreenContainer,
+  StackScreenMotionContainer,
+} from "./StackScreenContainer"
 import { PresentationDirection } from "./types"
 import { isModalSheetPresentation, isStackedPresentation } from "./utils/is"
 
@@ -43,7 +45,7 @@ export const StackScreen: FC<StackScreenProps> = ({
     }
   }, [isPresent, isStacked, safeToRemove])
 
-  /** clicking outside navigates back in stack */
+  /** clicking outside modalSheet navigates back in stack */
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (isPresent && !ref.current?.contains(e.target as Node)) {
@@ -69,7 +71,7 @@ export const StackScreen: FC<StackScreenProps> = ({
   }, [prefersReducedMotion, presentation, presentationDirection])
 
   return (
-    <StackScreenContainer
+    <StackScreenMotionContainer
       ref={ref}
       transition={transition}
       initial={enter}
@@ -79,6 +81,6 @@ export const StackScreen: FC<StackScreenProps> = ({
       {...rest}
     >
       {children}
-    </StackScreenContainer>
+    </StackScreenMotionContainer>
   )
 }

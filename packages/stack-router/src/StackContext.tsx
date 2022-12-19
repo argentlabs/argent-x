@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
 } from "react"
@@ -41,6 +42,9 @@ interface StackContextProviderProps extends PropsWithChildren {
   paths: string[]
 }
 
+/** Basic screen stack state persistence between component re-mounts */
+let _persistScreens: ScreenProps[] = []
+
 export const StackContextProvider: FC<StackContextProviderProps> = ({
   declaredPresentationByPath,
   paths,
@@ -56,9 +60,26 @@ export const StackContextProvider: FC<StackContextProviderProps> = ({
   const presentationDirection = useRef(PresentationDirection.Replace)
   const lastHandledLocation = useRef<Location | null>(null)
 
+  useEffect(() => {
+    return () => {
+      /** store screen state in case we are re-mounted */
+      _persistScreens = [...screens.current]
+    }
+  })
+
   const presentationByPath = useMemo(() => {
     /** only run once for same location in dev */
     if (lastHandledLocation.current !== currentLocation) {
+      if (lastHandledLocation.current === null) {
+        if (_persistScreens.length) {
+          const lastScreen = _persistScreens[_persistScreens.length - 1]
+          if (lastScreen.key === currentLocation.key) {
+            /** we were re-mounted with same history key, restore state */
+            screens.current = [..._persistScreens]
+          }
+        }
+      }
+
       lastHandledLocation.current = currentLocation
 
       const updatedStack = updateScreenStack({
