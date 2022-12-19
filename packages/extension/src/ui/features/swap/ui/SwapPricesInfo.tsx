@@ -1,5 +1,6 @@
-import { P4, icons } from "@argent/ui"
+import { L1, P4, icons } from "@argent/ui"
 import {
+  ALLOWED_PRICE_IMPACT_HIGH,
   Currency,
   ONE_BIPS,
   Trade,
@@ -9,7 +10,7 @@ import {
   useUserState,
 } from "@argent/x-swap"
 import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 
 import { SlippageForm } from "./SlippageForm"
 
@@ -21,12 +22,21 @@ interface SwapPricesInfoProps {
   trade: Trade
 }
 
-const SwapPricesInfo: FC<SwapPricesInfoProps> = ({ currencyOut, trade }) => {
+export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
+  currencyOut,
+  trade,
+}) => {
   const [inverted, setInverted] = useState(false)
   const [showSlippageForm, setShowSlippageForm] = useState(false)
   const { userSlippageTolerance } = useUserState()
-  const { priceImpactWithoutFee: priceImpact } =
-    computeTradePriceBreakdown(trade)
+  const { priceImpactWithoutFee: priceImpact } = useMemo(
+    () => computeTradePriceBreakdown(trade),
+    [trade],
+  )
+
+  const isPriceImpactHigh = useMemo(() => {
+    return priceImpact && !priceImpact.lessThan(ALLOWED_PRICE_IMPACT_HIGH)
+  }, [priceImpact])
 
   const switchRate = useCallback(() => {
     setInverted(!inverted)
@@ -109,13 +119,26 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({ currencyOut, trade }) => {
               </Text>
             </Tooltip>
           </Flex>
-          <P4 fontWeight="bold">
-            {priceImpact
-              ? priceImpact.lessThan(ONE_BIPS)
-                ? "<0.01%"
-                : `${priceImpact.toFixed(2)}%`
-              : "-"}
-          </P4>
+          <Flex alignItems="center" gap="1">
+            {isPriceImpactHigh && (
+              <Tooltip label={<HighPriceImpactLabel />} placement="top-start">
+                <Text color="neutrals.300" cursor="pointer">
+                  <InfoIcon color="#CC3247" />
+                  {/** Using Hex here because error.500 is not working for some reason */}
+                </Text>
+              </Tooltip>
+            )}
+            <P4
+              fontWeight="bold"
+              color={isPriceImpactHigh ? "error.500" : "white"}
+            >
+              {priceImpact
+                ? priceImpact.lessThan(ONE_BIPS)
+                  ? "<0.01%"
+                  : `${priceImpact.toFixed(2)}%`
+                : "-"}
+            </P4>
+          </Flex>
         </Flex>
         {/** Keeping this here, might be useful in future. }
          <Flex justifyContent="space-between">
@@ -134,4 +157,14 @@ const SwapPricesInfo: FC<SwapPricesInfoProps> = ({ currencyOut, trade }) => {
   )
 }
 
-export { SwapPricesInfo }
+const HighPriceImpactLabel = () => {
+  return (
+    <Flex direction="column" gap="4px" width="180px">
+      <L1>High Price Impact</L1>
+      <P4 color="neutrals.100">
+        This trade will result in you receiving significantly less than the
+        amount being sold
+      </P4>
+    </Flex>
+  )
+}

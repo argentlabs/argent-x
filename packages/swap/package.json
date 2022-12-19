@@ -22,6 +22,7 @@
     "lint": "eslint . --cache --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@chakra-ui/react": "2.4.2",
     "big.js": "^6.2.1",
     "decimal.js-light": "^2.5.1",
     "jsbi": "^4.3.0",

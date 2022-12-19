@@ -5,6 +5,17 @@ export const INITIAL_ALLOWED_SLIPPAGE = 200
 export const ONE_BIPS = new Percent(JSBI.BigInt(1), JSBI.BigInt(10000))
 export const BIPS_BASE = JSBI.BigInt(10000)
 
+// used for warning states
+export const ALLOWED_PRICE_IMPACT_LOW: Percent = new Percent(
+  JSBI.BigInt(100),
+  BIPS_BASE,
+) // 1%
+
+export const ALLOWED_PRICE_IMPACT_HIGH: Percent = new Percent(
+  JSBI.BigInt(300),
+  BIPS_BASE,
+) // 3%
+
 // 60 minutes, denominated in seconds
 export const DEFAULT_DEADLINE_FROM_NOW = 60 * 60
 
