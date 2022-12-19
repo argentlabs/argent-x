@@ -19,7 +19,7 @@ const MaxEthModal: FC<MaxEthModalProps> = ({ isOpen, onMax, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
-      <ModalContent>
+      <ModalContent background="neutrals.700">
         <ModalHeader>
           <H5 fontWeight="600" textAlign="center">
             Sell Max ETH?
