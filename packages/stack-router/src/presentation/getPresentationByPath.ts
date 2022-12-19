@@ -1,11 +1,11 @@
-import { isModalPresentation } from "./is"
-import { variantForPresentation } from "./presentationVariants"
-import { ScreenProps } from "./types"
 import {
   Presentation,
   PresentationByPath,
   PresentationDirection,
-} from "./types"
+} from "../types"
+import { ScreenProps } from "../types"
+import { isModalPresentation } from "../utils/is"
+import { variantForPresentation } from "./presentationVariants"
 
 interface GetPresentationByPathProps {
   presentationDirection: PresentationDirection
@@ -38,23 +38,23 @@ export const getPresentationByPath = ({
       isModalPresentation(screenAbove.presentation),
     ).length
 
-    /** determine if default on top of a modalSheet - should animate like default, but modal sheet height - defaultModalSheet */
+    /** determine if push on top of a modalSheet - should animate like push, but modal sheet height - pushModalSheet */
     const isAboveModalSheet =
-      screensBelow.filter((screen) => screen.presentation !== "default").pop()
+      screensBelow.filter((screen) => screen.presentation !== "push").pop()
         ?.presentation === "modalSheet"
 
-    const isDefaultAboveModalSheet =
-      isAboveModalSheet && screen.presentation === "default"
+    const isPushAboveModalSheet =
+      isAboveModalSheet && screen.presentation === "push"
 
     /** determine if modalSheet beneath default - should animate like default */
-    const isModalSheetBeneathDefault =
+    const isModalSheetBeneathPush =
       screen.presentation === "modalSheet" &&
-      screensAboveWithPopped[0]?.presentation === "default"
+      screensAboveWithPopped[0]?.presentation === "push"
 
     /** determine if modal beneath default - should animate like default  */
-    const isModalBeneathDefault =
+    const isModalBeneathPush =
       screen.presentation === "modal" &&
-      screensAboveWithPopped[0]?.presentation === "default"
+      screensAboveWithPopped[0]?.presentation === "push"
 
     /** determine stacked order before modal overrides */
     const presentation: Presentation =
@@ -62,10 +62,10 @@ export const getPresentationByPath = ({
         ? "stackedStacked"
         : modalsAbove === 1
         ? "stacked"
-        : isModalSheetBeneathDefault || isDefaultAboveModalSheet
-        ? "defaultModalSheet"
-        : isModalBeneathDefault
-        ? "default"
+        : isModalSheetBeneathPush || isPushAboveModalSheet
+        ? "pushModalSheet"
+        : isModalBeneathPush
+        ? "push"
         : screen.presentation
 
     const variant = variantForPresentation(presentation, !isForwards)

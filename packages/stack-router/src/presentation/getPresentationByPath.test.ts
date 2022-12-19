@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest"
 
+import { PresentationDirection } from "../types"
 import { getPresentationByPath } from "./getPresentationByPath"
 import { variantForPresentation } from "./presentationVariants"
-import { PresentationDirection } from "./types"
 
 describe("getPresentationByPath", () => {
   describe("when pushing default", () => {
@@ -15,13 +15,13 @@ describe("getPresentationByPath", () => {
             path: "/",
             pathname: "/",
             key: "1",
-            presentation: "default",
+            presentation: "push",
           },
         ],
       })
-      expect(presentationByPathname["/"].presentation).toEqual("default")
+      expect(presentationByPathname["/"].presentation).toEqual("push")
       expect(presentationByPathname["/"].variant).toEqual(
-        variantForPresentation("default"),
+        variantForPresentation("push"),
       )
     })
   })
@@ -35,7 +35,7 @@ describe("getPresentationByPath", () => {
             path: "/",
             pathname: "/",
             key: "1",
-            presentation: "default",
+            presentation: "push",
           },
           {
             path: "/modal-sheet",
@@ -67,7 +67,7 @@ describe("getPresentationByPath", () => {
             path: "/",
             pathname: "/",
             key: "1",
-            presentation: "default",
+            presentation: "push",
           },
           {
             path: "/modal-sheet",
@@ -79,7 +79,7 @@ describe("getPresentationByPath", () => {
             path: "/modal-sheet/detail",
             pathname: "/modal-sheet/detail",
             key: "3",
-            presentation: "default",
+            presentation: "push",
           },
         ],
       })
@@ -88,16 +88,16 @@ describe("getPresentationByPath", () => {
         variantForPresentation("stacked"),
       )
       expect(presentationByPathname["/modal-sheet"].presentation).toEqual(
-        "defaultModalSheet",
+        "pushModalSheet",
       )
       expect(presentationByPathname["/modal-sheet"].variant).toEqual(
-        variantForPresentation("defaultModalSheet"),
+        variantForPresentation("pushModalSheet"),
       )
       expect(
         presentationByPathname["/modal-sheet/detail"].presentation,
-      ).toEqual("defaultModalSheet")
+      ).toEqual("pushModalSheet")
       expect(presentationByPathname["/modal-sheet/detail"].variant).toEqual(
-        variantForPresentation("defaultModalSheet"),
+        variantForPresentation("pushModalSheet"),
       )
     })
   })
@@ -116,7 +116,7 @@ describe("getPresentationByPath", () => {
             path: "/modal-sheet/detail",
             pathname: "/modal-sheet/detail",
             key: "3",
-            presentation: "default",
+            presentation: "push",
           },
         ],
         screens: [
@@ -124,13 +124,13 @@ describe("getPresentationByPath", () => {
             path: "/",
             pathname: "/",
             key: "1",
-            presentation: "default",
+            presentation: "push",
           },
         ],
       })
-      expect(presentationByPathname["/"].presentation).toEqual("default")
+      expect(presentationByPathname["/"].presentation).toEqual("push")
       expect(presentationByPathname["/"].variant).toEqual(
-        variantForPresentation("default", true),
+        variantForPresentation("push", true),
       )
       expect(
         presentationByPathname["/modal-sheet/detail"].presentation,

@@ -1,8 +1,8 @@
 import { Action as NavigationType } from "history"
 import { describe, expect, test } from "vitest"
 
+import { DeclaredPresentationByPath } from "../types"
 import { updateScreenStack } from "./screenStack"
-import { DeclaredPresentationByPath } from "./types"
 
 const declaredPresentationByPath: DeclaredPresentationByPath = {
   "/settings": "modalSheet",
@@ -26,13 +26,14 @@ describe("screenStack", () => {
         screens: [],
         declaredPresentationByPath,
         paths,
+        defaultPresentation: "push",
       })
       expect(screenStack.screens).toEqual([
         {
           key: "1",
           path: "/",
           pathname: "/",
-          presentation: "default",
+          presentation: "push",
         },
       ])
     })
@@ -53,7 +54,7 @@ describe("screenStack", () => {
             key: "1",
             path: "/",
             pathname: "/",
-            presentation: "default",
+            presentation: "push",
           },
           {
             key: "2",
@@ -64,13 +65,14 @@ describe("screenStack", () => {
         ],
         declaredPresentationByPath,
         paths,
+        defaultPresentation: "push",
       })
       expect(screenStack.screens).toEqual([
         {
           key: "3",
           path: "/",
           pathname: "/",
-          presentation: "default",
+          presentation: "push",
         },
       ])
       expect(screenStack.poppedScreens).toEqual([
@@ -99,7 +101,7 @@ describe("screenStack", () => {
             key: "1",
             path: "/",
             pathname: "/",
-            presentation: "default",
+            presentation: "push",
           },
           {
             key: "2",
@@ -110,13 +112,14 @@ describe("screenStack", () => {
         ],
         declaredPresentationByPath,
         paths,
+        defaultPresentation: "push",
       })
       expect(screenStack.screens).toEqual([
         {
           key: "3",
           path: "/",
           pathname: "/",
-          presentation: "default",
+          presentation: "push",
         },
       ])
       expect(screenStack.poppedScreens).toEqual([
@@ -145,7 +148,7 @@ describe("screenStack", () => {
             key: "1",
             path: "/account/:id",
             pathname: "/account/1",
-            presentation: "default",
+            presentation: "push",
           },
           {
             key: "2",
@@ -156,13 +159,14 @@ describe("screenStack", () => {
         ],
         declaredPresentationByPath,
         paths,
+        defaultPresentation: "push",
       })
       expect(screenStack.screens).toEqual([
         {
           key: "3",
           path: "/account/:id",
           pathname: "/account/3",
-          presentation: "default",
+          presentation: "push",
         },
       ])
       expect(screenStack.poppedScreens).toEqual([

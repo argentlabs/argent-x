@@ -14,15 +14,16 @@ import {
   useNavigationType,
 } from "react-router-dom"
 
-import { getPresentationByPath } from "./getPresentationByPath"
-import { isModalPresentation } from "./is"
-import { updateScreenStack } from "./screenStack"
+import { getPresentationByPath } from "./presentation/getPresentationByPath"
+import { updateScreenStack } from "./presentation/screenStack"
+import { useStackRoutesConfig } from "./StackRoutesConfig"
 import {
   DeclaredPresentationByPath,
   PresentationByPath,
   PresentationDirection,
   ScreenProps,
 } from "./types"
+import { isModalPresentation } from "./utils/is"
 
 interface StackContextProps {
   presentationDirection: PresentationDirection
@@ -48,6 +49,7 @@ export const StackContextProvider: FC<StackContextProviderProps> = ({
   const navigationType = useNavigationType()
   const currentLocation = useLocation()
   const navigate = useNavigate()
+  const stackRoutesConfig = useStackRoutesConfig()
 
   const screens = useRef<ScreenProps[]>([])
   const poppedScreens = useRef<ScreenProps[]>([])
@@ -65,6 +67,7 @@ export const StackContextProvider: FC<StackContextProviderProps> = ({
         currentLocation,
         declaredPresentationByPath,
         paths,
+        defaultPresentation: stackRoutesConfig?.defaultPresentation,
       })
 
       screens.current = updatedStack.screens
@@ -79,7 +82,13 @@ export const StackContextProvider: FC<StackContextProviderProps> = ({
     })
 
     return presentationByPath
-  }, [currentLocation, declaredPresentationByPath, navigationType, paths])
+  }, [
+    currentLocation,
+    declaredPresentationByPath,
+    navigationType,
+    paths,
+    stackRoutesConfig?.defaultPresentation,
+  ])
 
   const onStackClicked = useCallback(() => {
     const topModal = [...screens.current]

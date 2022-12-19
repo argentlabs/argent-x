@@ -1,8 +1,8 @@
 import { Action as NavigationType } from "history"
 import { Location } from "react-router-dom"
 
-import { getMatchingPath } from "./getMatchingPath"
-import { Presentation, PresentationDirection, ScreenProps } from "./types"
+import { Presentation, PresentationDirection, ScreenProps } from "../types"
+import { getMatchingPath } from "../utils/getMatchingPath"
 
 interface UpdateScreenStackProps {
   navigationType: NavigationType
@@ -10,6 +10,7 @@ interface UpdateScreenStackProps {
   screens: ScreenProps[]
   declaredPresentationByPath: Record<string, Presentation>
   paths: string[]
+  defaultPresentation?: Presentation | undefined
 }
 
 /**
@@ -28,6 +29,7 @@ export const updateScreenStack = ({
   screens,
   declaredPresentationByPath,
   paths,
+  defaultPresentation = "push",
 }: UpdateScreenStackProps) => {
   /** this should always match, but if not then use unknown pathname as fallback */
   const matchingPath =
@@ -46,7 +48,7 @@ export const updateScreenStack = ({
     )
     const presentation = matchingPresentationPath
       ? declaredPresentationByPath[matchingPresentationPath]
-      : "default"
+      : defaultPresentation
     const { pathname, key } = currentLocation
     return {
       path: matchingPath,

@@ -1,29 +1,15 @@
 import { usePresence } from "framer-motion"
-import { Transition } from "framer-motion"
 import { useReducedMotion } from "framer-motion"
 import { ComponentProps, FC, useEffect, useMemo, useRef } from "react"
 
-import { isStackedPresentation } from "./is"
+import {
+  animatedTransition,
+  replaceTransition,
+} from "./presentation/transitions"
 import { useStackContext } from "./StackContext"
 import { StackScreenContainer } from "./StackScreenContainer"
 import { PresentationDirection } from "./types"
-
-export const animatedTransition: Transition = {
-  duration: 0.3,
-  // duration: 1,
-  transition: {
-    type: "spring",
-    stiffness: 1000,
-    damping: 500,
-    mass: 3,
-    restDelta: 10,
-    restSpeed: 10,
-  },
-}
-
-export const replaceTransition: Transition = {
-  duration: 0,
-}
+import { isModalSheetPresentation, isStackedPresentation } from "./utils/is"
 
 export interface StackScreenProps
   extends ComponentProps<typeof StackScreenContainer> {
@@ -48,8 +34,7 @@ export const StackScreen: FC<StackScreenProps> = ({
   const { variant, presentation, zIndex } = presentationByPath[path] || {}
   const { enter, active, exit } = variant || {}
   const isStacked = isStackedPresentation(presentation)
-  const isModalSheet =
-    presentation === "modalSheet" || presentation === "defaultModalSheet"
+  const isModalSheet = isModalSheetPresentation(presentation)
 
   /** stack behind modal-sheet, remove when no longer in stack */
   useEffect(() => {
@@ -77,10 +62,11 @@ export const StackScreen: FC<StackScreenProps> = ({
 
   const transition = useMemo(() => {
     return prefersReducedMotion ||
+      presentation === "replace" ||
       presentationDirection === PresentationDirection.Replace
       ? replaceTransition
       : animatedTransition
-  }, [prefersReducedMotion, presentationDirection])
+  }, [prefersReducedMotion, presentation, presentationDirection])
 
   return (
     <StackScreenContainer

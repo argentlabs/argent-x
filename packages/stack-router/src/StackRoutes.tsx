@@ -3,9 +3,9 @@ import { AnimatePresence } from "framer-motion"
 import { ComponentProps, FC, useMemo } from "react"
 import { Routes, useLocation } from "react-router-dom"
 
-import { getMatchingPath } from "./getMatchingPath"
-import { getWrappedChildrenAndPresentation } from "./getWrappedChildrenAndPresentation"
+import { getWrappedChildrenAndPresentation } from "./presentation/getWrappedChildrenAndPresentation"
 import { StackContextProvider } from "./StackContext"
+import { getMatchingPath } from "./utils/getMatchingPath"
 
 export const StackRoutes: FC<ComponentProps<typeof Flex>> = ({
   children,
@@ -24,10 +24,10 @@ export const StackRoutes: FC<ComponentProps<typeof Flex>> = ({
     >
       <Flex
         position={"relative"}
-        w={"100%"}
-        h={"100%"}
         overflow={"hidden"}
         flexDirection={"column"}
+        width={"100%"}
+        height={"100%"}
         {...rest}
       >
         <AnimatePresence initial={false}>

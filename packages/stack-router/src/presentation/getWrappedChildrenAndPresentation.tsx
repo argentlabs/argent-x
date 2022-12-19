@@ -7,8 +7,8 @@ import {
 } from "react"
 import { Route, resolvePath } from "react-router-dom"
 
-import { StackScreen } from "./StackScreen"
-import { Presentation } from "./types"
+import { StackScreen } from "../StackScreen"
+import { Presentation } from "../types"
 
 type DeclaredPresentationByPath = Record<string, Presentation>
 

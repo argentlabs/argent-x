@@ -12,10 +12,11 @@ export interface ScreenProps {
 }
 
 export type Presentation =
-  | "default"
+  | "replace"
+  | "push"
   | "modal"
   | "modalSheet"
-  | "defaultModalSheet"
+  | "pushModalSheet"
   | "stacked"
   | "stackedStacked"
 
