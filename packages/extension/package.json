@@ -76,6 +76,7 @@
     "@argent/x-multicall": "^5.1.0",
     "@argent/x-sessions": "^5.1.0",
     "@argent/x-wasm": "^5.1.0",
+    "@chakra-ui/react": "2.4.2",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",

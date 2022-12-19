@@ -1,5 +1,5 @@
-import { ScrollContainer } from "@argent/ui"
-import { Box } from "@chakra-ui/react"
+import { H6, P3, ScrollContainer } from "@argent/ui"
+import { Box, Flex, Stack } from "@chakra-ui/react"
 import { FC, FormEvent, ReactNode, useState } from "react"
 import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
@@ -12,6 +12,7 @@ import {
   ButtonVariant,
 } from "../../components/Button"
 import { Header } from "../../components/Header"
+import { formatTruncatedAddress } from "../../services/addresses"
 import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
@@ -28,9 +29,8 @@ const ConfirmScreenWrapper = styled.form<{
 }>`
   display: flex;
   flex-direction: column;
-  padding: ${({ smallTopPadding }) => (smallTopPadding ? "16px" : "48px")} 32px
+  padding: ${({ smallTopPadding }) => (smallTopPadding ? "18px" : "48px")} 32px
     0;
-  ${({ accountShown }) => (accountShown ? `padding-top: 0;` : ``)}
 
   > ${H2} {
     margin: 0 0 40px;
@@ -110,100 +110,100 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
   onReject ??= () => navigate(-1)
 
+  const accountHeader = Boolean(selectedAccount && showHeader)
+
   return (
     <ScrollContainer>
-      <ConfirmScreenWrapper
-        smallTopPadding={smallTopPadding}
-        accountShown={Boolean(showHeader && selectedAccount)}
+      <form
         onSubmit={(e) => {
           e.preventDefault()
           return onSubmit?.(e)
         }}
         {...props}
       >
-        {showHeader && selectedAccount && (
-          <Header style={{ margin: "0 -32px 16px" }}>
-            <ProfilePicture
-              src={getAccountImageUrl(
-                getAccountName(selectedAccount, accountNames),
-                selectedAccount,
-              )}
-              disabled
-            />
-            <NetworkSwitcher disabled />
-          </Header>
-        )}
-        {title && (
-          <Box pb={10}>
-            <H2>{title}</H2>
-          </Box>
-        )}
-
-        {children}
-
-        <Placeholder
-          style={{
-            height: placeholderHeight,
-          }}
-        />
-
-        <Measure
-          bounds
-          onResize={(contentRect) => {
-            const { height = 100 } = contentRect.bounds || {}
-            setPlaceholderHeight(height)
-          }}
+        <Stack
+          pt={smallTopPadding || accountHeader ? "18px" : 12}
+          px="8"
+          pb="0"
         >
-          {({ measureRef }) => (
-            <StickyGroup ref={measureRef}>
-              {footer}
-              {buttonGroup === "horizontal" && (
-                <ButtonGroupHorizontal switchButtonOrder={switchButtonOrder}>
-                  {!singleButton && (
-                    <Button onClick={onReject} type="button">
-                      {rejectButtonText}
-                    </Button>
-                  )}
-                  <Button
-                    disabled={confirmButtonDisabled}
-                    style={{
-                      backgroundColor: confirmButtonDisabled
-                        ? undefined
-                        : confirmButtonBackgroundColor,
-                    }}
-                    variant={confirmButtonVariant}
-                    type="submit"
-                  >
-                    {confirmButtonText}
-                  </Button>
-                </ButtonGroupHorizontal>
-              )}
-
-              {buttonGroup === "vertical" && (
-                <ButtonGroupVertical switchButtonOrder={switchButtonOrder}>
-                  {!singleButton && (
-                    <Button onClick={onReject} type="button">
-                      {rejectButtonText}
-                    </Button>
-                  )}
-                  <Button
-                    disabled={confirmButtonDisabled}
-                    style={{
-                      backgroundColor: confirmButtonDisabled
-                        ? undefined
-                        : confirmButtonBackgroundColor,
-                    }}
-                    variant={confirmButtonVariant}
-                    type="submit"
-                  >
-                    {confirmButtonText}
-                  </Button>
-                </ButtonGroupVertical>
-              )}
-            </StickyGroup>
+          {showHeader && selectedAccount && (
+            <Flex w="100%" justifyContent="center" alignItems="center">
+              <H6>{getAccountName(selectedAccount, accountNames)}</H6>&nbsp;
+              <P3>({formatTruncatedAddress(selectedAccount.address)})</P3>
+            </Flex>
           )}
-        </Measure>
-      </ConfirmScreenWrapper>
+          {title && (
+            <Box pb={10}>
+              <H2>{title}</H2>
+            </Box>
+          )}
+
+          {children}
+
+          <Placeholder
+            style={{
+              height: placeholderHeight,
+            }}
+          />
+
+          <Measure
+            bounds
+            onResize={(contentRect) => {
+              const { height = 100 } = contentRect.bounds || {}
+              setPlaceholderHeight(height)
+            }}
+          >
+            {({ measureRef }) => (
+              <StickyGroup ref={measureRef}>
+                {footer}
+                {buttonGroup === "horizontal" && (
+                  <ButtonGroupHorizontal switchButtonOrder={switchButtonOrder}>
+                    {!singleButton && (
+                      <Button onClick={onReject} type="button">
+                        {rejectButtonText}
+                      </Button>
+                    )}
+                    <Button
+                      disabled={confirmButtonDisabled}
+                      style={{
+                        backgroundColor: confirmButtonDisabled
+                          ? undefined
+                          : confirmButtonBackgroundColor,
+                      }}
+                      variant={confirmButtonVariant}
+                      type="submit"
+                    >
+                      {confirmButtonText}
+                    </Button>
+                  </ButtonGroupHorizontal>
+                )}
+
+                {buttonGroup === "vertical" && (
+                  <ButtonGroupVertical switchButtonOrder={switchButtonOrder}>
+                    {!singleButton && (
+                      <Button onClick={onReject} type="button">
+                        {rejectButtonText}
+                      </Button>
+                    )}
+                    <Button
+                      disabled={confirmButtonDisabled}
+                      style={{
+                        backgroundColor: confirmButtonDisabled
+                          ? undefined
+                          : confirmButtonBackgroundColor,
+                      }}
+                      variant={confirmButtonVariant}
+                      type="submit"
+                    >
+                      {confirmButtonText}
+                    </Button>
+                  </ButtonGroupVertical>
+                )}
+              </StickyGroup>
+            )}
+          </Measure>
+        </Stack>
+      </form>
     </ScrollContainer>
   )
 }
