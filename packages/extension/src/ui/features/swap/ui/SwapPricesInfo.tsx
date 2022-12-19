@@ -1,16 +1,15 @@
 import { L1, P4, icons } from "@argent/ui"
 import {
-  ALLOWED_PRICE_IMPACT_HIGH,
   Currency,
   ONE_BIPS,
+  Percent,
   Trade,
   basisPointsToPercent,
-  computeTradePriceBreakdown,
   formatExecutionPriceWithFee,
   useUserState,
 } from "@argent/x-swap"
 import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useState } from "react"
 
 import { SlippageForm } from "./SlippageForm"
 
@@ -20,24 +19,19 @@ interface SwapPricesInfoProps {
   currencyIn?: Currency
   currencyOut?: Currency
   trade: Trade
+  priceImpact?: Percent
+  isPriceImpactHigh?: boolean
 }
 
 export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
   currencyOut,
   trade,
+  priceImpact,
+  isPriceImpactHigh,
 }) => {
   const [inverted, setInverted] = useState(false)
   const [showSlippageForm, setShowSlippageForm] = useState(false)
   const { userSlippageTolerance } = useUserState()
-  const { priceImpactWithoutFee: priceImpact } = useMemo(
-    () => computeTradePriceBreakdown(trade),
-    [trade],
-  )
-
-  const isPriceImpactHigh = useMemo(() => {
-    return priceImpact && !priceImpact.lessThan(ALLOWED_PRICE_IMPACT_HIGH)
-  }, [priceImpact])
-
   const switchRate = useCallback(() => {
     setInverted(!inverted)
   }, [inverted])

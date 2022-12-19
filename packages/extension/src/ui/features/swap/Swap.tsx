@@ -1,11 +1,13 @@
 import { Button, CellStack, L2, icons } from "@argent/ui"
 import {
+  ALLOWED_PRICE_IMPACT_HIGH,
   Currency,
   CurrencyAmount,
   Field,
   JSBI,
   SupportedNetworks,
   USDC,
+  computeTradePriceBreakdown,
   maxAmountSpend,
   useDerivedSwapInfo,
   useSwapActionHandlers,
@@ -13,12 +15,13 @@ import {
   useSwapState,
   useUserState,
 } from "@argent/x-swap"
-import { Box, Flex, IconButton, chakra } from "@chakra-ui/react"
+import { Box, Flex, IconButton, chakra, useDisclosure } from "@chakra-ui/react"
 import { keyframes } from "@chakra-ui/react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { executeTransaction } from "../../services/backgroundTransactions"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { HighPriceImpactModal } from "./ui/HighPriceImpactModal"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 import { SwapWarning } from "./ui/SwapWarning"
@@ -83,6 +86,12 @@ const Swap = () => {
   const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const [rotate, setRotate] = useState(false)
   const { userSlippageTolerance } = useUserState()
+
+  const {
+    isOpen: isPISopen,
+    onOpen: onPISopen,
+    onClose: onPISclose,
+  } = useDisclosure()
 
   const parsedAmounts = {
     [Field.INPUT]:
@@ -181,6 +190,15 @@ const Swap = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId])
 
+  const { priceImpactWithoutFee: priceImpact } = useMemo(
+    () => computeTradePriceBreakdown(trade),
+    [trade],
+  )
+
+  const isPriceImpactHigh = useMemo(() => {
+    return priceImpact && !priceImpact.lessThan(ALLOWED_PRICE_IMPACT_HIGH)
+  }, [priceImpact])
+
   return (
     <>
       <SwapContainer>
@@ -231,6 +249,8 @@ const Swap = () => {
             currencyIn={currencies[Field.INPUT]}
             currencyOut={currencies[Field.OUTPUT]}
             trade={trade}
+            priceImpact={priceImpact}
+            isPriceImpactHigh={isPriceImpactHigh}
           />
         )}
 
@@ -261,7 +281,9 @@ const Swap = () => {
             disabled={
               !formattedAmounts[Field.INPUT] || !formattedAmounts[Field.OUTPUT]
             }
-            onClick={handleSwap}
+            onClick={() => {
+              isPriceImpactHigh ? onPISopen() : handleSwap()
+            }}
           >
             Review swap
           </Button>
@@ -284,6 +306,14 @@ const Swap = () => {
         )}
       </Box>
       <SwapWarning />
+
+      {isPISopen && (
+        <HighPriceImpactModal
+          isOpen={isPISopen}
+          onClose={onPISclose}
+          onAccept={handleSwap}
+        />
+      )}
     </>
   )
 }
