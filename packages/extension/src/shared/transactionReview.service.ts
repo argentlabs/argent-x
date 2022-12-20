@@ -26,10 +26,22 @@ export type ApiTransactionReviewAssessmentReason =
   | "src_token_black_listed"
   | "unknown_token"
 
+export type ApiTransactionReviewTargettedDapp = {
+  description: string
+  iconUrl: string
+  links: {
+    name: string
+    url: string
+    position: number
+  }[]
+  name: string
+}
+
 export interface ApiTransactionReviewResponse {
   assessment: ApiTransactionReviewAssessment
   reason?: ApiTransactionReviewAssessmentReason
   reviews: ApiTransactionReview[]
+  targetedDapp: ApiTransactionReviewTargettedDapp
 }
 
 export type ApiTransactionReviewActivityType =
@@ -162,13 +174,13 @@ export const getDisplayWarnAndReasonForTransactionReview = (
 /** finds activity of type 'swap */
 export const getTransactionReviewSwap = (
   transactionReview?: ApiTransactionReviewResponse,
-): ApiTransactionReviewActivity | undefined => {
+): ApiTransactionReview | undefined => {
   if (!transactionReview) {
     return
   }
   for (const review of transactionReview.reviews) {
     if (review.activity?.type === "swap") {
-      return review.activity
+      return review
     }
   }
 }
