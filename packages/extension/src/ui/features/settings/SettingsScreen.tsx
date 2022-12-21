@@ -8,7 +8,7 @@ import {
 } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
 import { FC } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 

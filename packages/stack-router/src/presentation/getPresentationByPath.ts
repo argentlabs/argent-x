@@ -66,19 +66,20 @@ export const getPresentationByPath = ({
       screensBelow[screensBelow.length - 1].presentation === "replace"
 
     /** determine stacked order before modal overrides */
-    const presentation: Presentation = isAboveReplace
-      ? "replace"
-      : modalsSheetsAbove > 1
-      ? "stackedStacked"
-      : modalsSheetsAbove === 1
-      ? "stacked"
-      : modalsAbove > 0
-      ? "modalStacked"
-      : isModalSheetBeneathPush || isPushAboveModalSheet
-      ? "pushModalSheet"
-      : isModalBeneathPush
-      ? "push"
-      : screen.presentation
+    const presentation: Presentation =
+      modalsSheetsAbove > 1
+        ? "stackedStacked"
+        : modalsSheetsAbove === 1
+        ? "stacked"
+        : modalsAbove > 0
+        ? "modalStacked"
+        : isModalSheetBeneathPush || isPushAboveModalSheet
+        ? "pushModalSheet"
+        : isModalBeneathPush
+        ? "push"
+        : isAboveReplace
+        ? "replace"
+        : screen.presentation
 
     const variant = variantForPresentation(presentation, !isForwards)
     result[screen.path] = {
