@@ -60,7 +60,7 @@ export const LockScreen: FC = () => {
                   window.close()
                 }
 
-                navigate(target, { replace: true })
+                navigate(target)
                 return true
               } catch {
                 useAppState.setState({

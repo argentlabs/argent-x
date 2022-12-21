@@ -8,7 +8,7 @@ import { Button, Flex, Text } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes, useCurrentPathnameWithQuery } from "../../routes"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccount } from "./accounts.state"
@@ -28,14 +28,15 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   const account = useSelectedAccount()
   const navigate = useNavigate()
   const location = useLocation()
+  const returnTo = useCurrentPathnameWithQuery()
 
   const openAccountList = useCallback(() => {
     navigate(routes.accounts(location.pathname))
   }, [location.pathname, navigate])
 
   const showSettings = useCallback(() => {
-    navigate(routes.settings())
-  }, [navigate])
+    navigate(routes.settings(returnTo))
+  }, [navigate, returnTo])
 
   const accountName = account && getAccountName(account, accountNames)
   return (

@@ -147,14 +147,14 @@ const walletRoutes = (
       element={<AccountScreen tab="activity" />}
     />
     <Route
-      path={routes.accounts.path}
       presentation="modal"
+      path={routes.accounts.path}
       element={<AccountListScreen />}
     />
     <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
     <Route
-      path={routes.settings.path}
       presentation="modal"
+      path={routes.settings.path}
       element={<SettingsScreen />}
     />
     <Route
@@ -173,7 +173,11 @@ const walletRoutes = (
       path={routes.settingsBlockExplorer.path}
       element={<BlockExplorerSettingsScreen />}
     />
-    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
+    <Route
+      presentation="replace"
+      path={routes.settingsSeed.path}
+      element={<SeedSettingsScreen />}
+    />
     <Route
       path={routes.settingsDappConnections.path}
       element={<DappConnectionsSettingsScreen />}
@@ -236,8 +240,16 @@ const walletRoutes = (
     />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
     <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
-    <Route path={routes.sendScreen.path} element={<SendScreen />} />
-    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
+    <Route
+      presentation="replace"
+      path={routes.sendScreen.path}
+      element={<SendScreen />}
+    />
+    <Route
+      presentation="replace"
+      path={routes.sendToken.path}
+      element={<SendTokenScreen />}
+    />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route
       presentation="replace"
@@ -254,8 +266,8 @@ const walletRoutes = (
       element={<AccountListHiddenScreen />}
     />
     <Route
-      path={routes.funding.path}
       presentation={"modal"}
+      path={routes.funding.path}
       element={<FundingScreen />}
     />
     <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
@@ -273,8 +285,16 @@ const walletRoutes = (
       element={<SeedRecoverySetupScreen />}
     />
     <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
-    <Route path={routes.newToken.path} element={<AddTokenScreen />} />
-    <Route path={routes.token.path} element={<TokenScreen />} />
+    <Route
+      presentation="replace"
+      path={routes.newToken.path}
+      element={<AddTokenScreen />}
+    />
+    <Route
+      presentation="replace"
+      path={routes.token.path}
+      element={<TokenScreen />}
+    />
     <Route
       presentation="modal"
       path={routes.addPlugin.path}
@@ -285,6 +305,7 @@ const walletRoutes = (
       element={<BackupDownloadScreen />}
     />
     <Route
+      presentation="replace"
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
     />

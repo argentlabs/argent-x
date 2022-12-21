@@ -65,7 +65,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       selectedAccount: account,
       showMigrationScreen: account ? isDeprecated(account) : false,
     })
-    navigate(returnTo ?? routes.accountTokens())
+    navigate(returnTo || routes.accountTokens())
   }, [account, navigate, returnTo])
 
   const onAccountEdit = useCallback(
