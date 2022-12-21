@@ -8,7 +8,6 @@ import {
 } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
@@ -81,15 +80,12 @@ export const SettingsScreen: FC = () => {
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
   const { pathname: returnTo } = useLocation()
-  const navigate = useNavigate()
   const { selectedAccount } = useSelectedAccountStore()
   const account = useAccount(selectedAccount)
   return (
     <>
       <NavigationContainer
-        rightButton={
-          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
-        }
+        rightButton={<BarCloseButton />}
         title={"Settings"}
         scrollKey={"settings/SettingsScreen"}
       >
