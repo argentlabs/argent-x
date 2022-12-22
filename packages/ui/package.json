@@ -41,7 +41,7 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.4.2",
+    "@chakra-ui/react": "2.4.4",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^7.6.1"
