@@ -9,15 +9,12 @@ import {
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
 import { Tooltip } from "../../../components/CopyTooltip"
-import {
-  FieldError,
-  FieldKeyGroup,
-  FieldValue,
-} from "../../../components/Fields"
+import { FieldError } from "../../../components/Fields"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
+import { useExtensionIsInTab } from "../../browser/tabs"
 import {
   FeeEstimationValue,
   LoadingInput,
@@ -81,6 +78,8 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     fee?.suggestedMaxFee,
   )
 
+  const extensionInTab = useExtensionIsInTab()
+
   return (
     <Flex
       borderRadius="xl"
@@ -92,26 +91,30 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
       px="3"
       py="3.5"
     >
-      <FieldKeyGroup>
+      <Flex alignItems="center" justifyContent="center">
         <P4 fontWeight="bold" color="neutrals.300">
           Network fee
-          <Tippy
-            content={
-              <Tooltip as="div">
-                {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
-              </Tooltip>
-            }
-          >
-            {enoughBalance ? (
-              <StyledInfoRoundedIcon />
-            ) : (
-              <StyledReportGmailerrorredRoundedIcon />
-            )}
-          </Tippy>
         </P4>
-      </FieldKeyGroup>
+        <Tippy
+          content={
+            <Tooltip as="div">
+              {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
+            </Tooltip>
+          }
+        >
+          {enoughBalance ? (
+            <StyledInfoRoundedIcon />
+          ) : (
+            <StyledReportGmailerrorredRoundedIcon />
+          )}
+        </Tippy>
+      </Flex>
       {fee ? (
-        <Flex gap="1" alignItems="center">
+        <Flex
+          gap="1"
+          alignItems="center"
+          direction={extensionInTab ? "row" : "column-reverse"}
+        >
           {suggestedMaxFeeCurrencyValue !== undefined ? (
             <L2 color="neutrals.300">
               (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
@@ -132,15 +135,14 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
             </L2>
           )}
 
-          <P4 fontWeight="bold">≈</P4>
-
-          <FieldValue>
+          <Flex alignItems="center">
             {amountCurrencyValue !== undefined ? (
               <P4 fontWeight="bold">
-                {prettifyCurrencyValue(amountCurrencyValue)}
+                ≈ {prettifyCurrencyValue(amountCurrencyValue)}
               </P4>
             ) : (
               <P4 fontWeight="bold">
+                ≈{" "}
                 {feeToken ? (
                   prettifyTokenAmount({
                     amount: fee.amount,
@@ -152,7 +154,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 )}
               </P4>
             )}
-          </FieldValue>
+          </Flex>
         </Flex>
       ) : showEstimateError ? (
         <FeeEstimationValue>Error</FeeEstimationValue>
