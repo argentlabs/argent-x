@@ -1,4 +1,4 @@
-import { P4 } from "@argent/ui"
+import { CopyTooltip, P4 } from "@argent/ui"
 import {
   Accordion,
   AccordionButton,
@@ -8,11 +8,14 @@ import {
   Divider,
   Flex,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, Fragment } from "react"
 import { Call, number } from "starknet"
 
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
-import { formatTruncatedAddress } from "../../../services/addresses"
+import {
+  formatTruncatedAddress,
+  normalizeAddress,
+} from "../../../services/addresses"
 
 export interface TransactionActionsProps {
   transactions: Call[]
@@ -96,9 +99,24 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                           Calldata {cdIndex + 1}
                         </P4>
                         <P4 color="neutrals.400" fontWeight="bold">
-                          {number.isHex(calldata)
-                            ? formatTruncatedAddress(calldata)
-                            : calldata}
+                          {number.isHex(calldata) ? (
+                            <CopyTooltip
+                              copyValue={normalizeAddress(calldata)}
+                              prompt=""
+                            >
+                              <Box
+                                _hover={{
+                                  bg: "neutrals.700",
+                                  color: "text",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {formatTruncatedAddress(calldata)}
+                              </Box>
+                            </CopyTooltip>
+                          ) : (
+                            calldata
+                          )}
                         </P4>
                       </Flex>
                     ))}
