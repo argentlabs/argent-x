@@ -1,5 +1,5 @@
 import { H6, P3, ScrollContainer } from "@argent/ui"
-import { Box, Flex, Stack } from "@chakra-ui/react"
+import { Box, Flex } from "@chakra-ui/react"
 import { FC, FormEvent, ReactNode, useState } from "react"
 import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
@@ -11,7 +11,6 @@ import {
   ButtonGroupVertical,
   ButtonVariant,
 } from "../../components/Button"
-import { Header } from "../../components/Header"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
@@ -19,23 +18,6 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
-import { getAccountImageUrl } from "../accounts/accounts.service"
-import { ProfilePicture } from "../accounts/ProfilePicture"
-import { NetworkSwitcher } from "../networks/NetworkSwitcher"
-
-const ConfirmScreenWrapper = styled.form<{
-  accountShown: boolean
-  smallTopPadding: boolean
-}>`
-  display: flex;
-  flex-direction: column;
-  padding: ${({ smallTopPadding }) => (smallTopPadding ? "18px" : "48px")} 32px
-    0;
-
-  > ${H2} {
-    margin: 0 0 40px;
-  }
-`
 
 export interface ConfirmPageProps {
   onSubmit?: (e: FormEvent<HTMLFormElement>) => void
@@ -121,13 +103,15 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
         }}
         {...props}
       >
-        <Stack
+        <Flex
           pt={smallTopPadding || accountHeader ? "18px" : 12}
           px="8"
           pb="0"
+          direction="column"
+          gap="2"
         >
           {showHeader && selectedAccount && (
-            <Flex w="100%" justifyContent="center" alignItems="center">
+            <Flex w="100%" justifyContent="center" alignItems="center" pb="1">
               <H6>{getAccountName(selectedAccount, accountNames)}</H6>&nbsp;
               <P3>({formatTruncatedAddress(selectedAccount.address)})</P3>
             </Flex>
@@ -202,7 +186,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               </StickyGroup>
             )}
           </Measure>
-        </Stack>
+        </Flex>
       </form>
     </ScrollContainer>
   )

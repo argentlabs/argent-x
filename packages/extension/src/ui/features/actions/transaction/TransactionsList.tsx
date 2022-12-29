@@ -11,7 +11,6 @@ import {
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
-import { TransactionDetails } from "./TransactionDetails"
 import { TransactionsListSwap } from "./TransactionsListSwap"
 
 export interface ITransactionsList {
@@ -24,7 +23,6 @@ export interface ITransactionsList {
 /** Renders one or more transactions with review if available */
 
 export const TransactionsList: FC<ITransactionsList> = ({
-  networkId,
   transactions,
   transactionReview,
   tokensByNetwork = [],
