@@ -11,9 +11,8 @@ import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShould
 import { NoSwap } from "../swap/NoSwap"
 import { Swap } from "../swap/Swap"
 import { AccountContainer } from "./AccountContainer"
-import { useSelectedAccount, useSelectedAccountStore } from "./accounts.state"
+import { useSelectedAccount } from "./accounts.state"
 import { AccountScreenEmpty } from "./AccountScreenEmpty"
-import { DeprecatedAccountScreen } from "./DeprecatedAccountScreen"
 import { useAddAccount } from "./useAddAccount"
 
 interface AccountScreenProps {
@@ -22,9 +21,6 @@ interface AccountScreenProps {
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
-  const showMigrationScreen = useSelectedAccountStore(
-    (x) => x.showMigrationScreen,
-  )
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
   const { addAccount, isDeploying } = useAddAccount()
@@ -47,14 +43,6 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   if (showEmpty) {
     return (
       <AccountScreenEmpty onAddAccount={addAccount} isDeploying={isDeploying} />
-    )
-  } else if (showMigrationScreen) {
-    return (
-      <DeprecatedAccountScreen
-        onSubmit={() =>
-          useSelectedAccountStore.setState({ showMigrationScreen: false })
-        }
-      />
     )
   } else if (shouldShowFullScreenStatusMessage) {
     return <StatusMessageFullScreenContainer />

@@ -6,15 +6,9 @@ import useSWR from "swr"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { userReviewStore } from "../../../shared/userReview"
-import {
-  getAccountIdentifier,
-  isDeprecated,
-} from "../../../shared/wallet.service"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
-import {
-  connectAccount,
-  redeployAccount,
-} from "../../services/backgroundAccounts"
+import { redeployAccount } from "../../services/backgroundAccounts"
 import { withPolling } from "../../services/swr"
 import { Account } from "../accounts/Account"
 import {
@@ -30,7 +24,6 @@ import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
-import { MigrationBanner } from "./MigrationBanner"
 import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
@@ -116,10 +109,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [mutate, hasPendingTransactions])
 
   useEffect(() => {
-    connectAccount(account)
-  }, [account])
-
-  useEffect(() => {
     if (shouldShowNetworkUpgradeMessage) {
       updateLastShownNetworkUpgradeMessage()
       navigate(routes.networkUpgradeV4())
@@ -141,7 +130,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       </VStack>
       <CellStack pt={0}>
         <StatusMessageBannerContainer />
-        {isDeprecated(account) && <MigrationBanner />}
         {showBackupBanner && <RecoveryBanner />}
         {showUpgradeBanner && (
           <UpgradeBanner

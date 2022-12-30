@@ -4,7 +4,7 @@ import {
   BaseWalletAccount,
   WalletAccount,
 } from "../../shared/wallet.model"
-import { Account } from "../features/accounts/Account"
+import { walletStore } from "../../shared/wallet/walletStore"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
 export const createNewAccount = async (networkId: string) => {
@@ -48,17 +48,18 @@ export const accountsOnNetwork = (
   networkId: string,
 ) => accounts.filter((account) => account.networkId === networkId)
 
-export const connectAccount = ({
-  address,
-  network,
-  networkId,
-  signer,
-  type,
-  needsDeploy,
-}: Account) => {
+export const selectAccount = async (
+  account?: BaseWalletAccount,
+): Promise<void> => {
+  await walletStore.set("selected", account ?? null)
+
+  return connectAccount(account)
+}
+
+export const connectAccount = (account?: BaseWalletAccount) => {
   sendMessage({
     type: "CONNECT_ACCOUNT",
-    data: { address, network, networkId, signer, type, needsDeploy },
+    data: account,
   })
 }
 

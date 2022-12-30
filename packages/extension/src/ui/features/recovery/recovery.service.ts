@@ -8,12 +8,10 @@ import {
   accountsOnNetwork,
   getAccounts,
   getLastSelectedAccount,
+  selectAccount,
 } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
-import {
-  mapWalletAccountsToAccounts,
-  useSelectedAccountStore,
-} from "../accounts/accounts.state"
+import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
 
 interface RecoveryOptions {
   networkId?: string
@@ -47,7 +45,7 @@ export const recover = async ({
     const accounts = mapWalletAccountsToAccounts(walletAccounts)
 
     setDefaultAccountNames(accounts)
-    useSelectedAccountStore.setState({ selectedAccount })
+    await selectAccount(selectedAccount)
     useAppState.setState({ switcherNetworkId: networkId })
 
     // this needs to be after changing the state, otherwise the migration screen would deploy on the network that was selected before the switch

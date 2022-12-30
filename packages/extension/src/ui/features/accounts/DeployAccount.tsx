@@ -9,7 +9,7 @@ import { RocketLaunchIcon } from "../../components/Icons/RocketLaunchIcon"
 import { deployNewAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
 import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
-import { useSelectedAccountStore } from "./accounts.state"
+import { useSelectedAccount } from "./accounts.state"
 
 const StyledIconBar = styled(IconBar)`
   background: url("../../../assets/StarknetStars.png");
@@ -80,7 +80,7 @@ export const DeployAccountScreen: FC<DeployAccountScreenProps> = ({
   onReject,
   ...props
 }) => {
-  const { selectedAccount } = useSelectedAccountStore()
+  const selectedAccount = useSelectedAccount()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
 
   if (!selectedAccount) {

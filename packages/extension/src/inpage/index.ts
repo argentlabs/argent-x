@@ -4,7 +4,7 @@ import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
 import { sendMessage, waitForMessage } from "./messageActions"
-import { getIsPreauthorized } from "./preAuthorization"
+import { getIsPreauthorized } from "./messaging"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 
 const INJECT_NAMES = ["starknet", "starknet_argentX"]
@@ -52,7 +52,15 @@ window.addEventListener(
       return
     }
 
-    if (starknet.account && data.type === "CONNECT_ACCOUNT_RES") {
+    if (
+      (starknet.account && data.type === "CONNECT_ACCOUNT_RES") ||
+      data.type === "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK"
+    ) {
+      const account =
+        data.type === "CONNECT_ACCOUNT_RES"
+          ? data.data
+          : data.data.selectedAccount
+
       const isPreauthorized = await getIsPreauthorized()
       if (!isPreauthorized) {
         // disconnect so the user can see they are no longer connected
@@ -72,11 +80,14 @@ window.addEventListener(
         if (!walletAccount) {
           return disconnectAccount()
         }
-        const { address, network } = walletAccount
+
         if (
-          address !== starknet.selectedAddress ||
-          network.chainId !== starknet.chainId
+          account &&
+          (account.address !== starknet.selectedAddress ||
+            account.network.chainId !== starknet.chainId)
         ) {
+          const { address, network } = account
+
           starknet.selectedAddress = address
           starknet.chainId = network.chainId
           starknet.provider = getProvider(network)
