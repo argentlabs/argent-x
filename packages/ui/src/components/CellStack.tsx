@@ -26,7 +26,7 @@ export const HeaderCell = chakra(H6, {
     mt: 4,
     mx: 2,
     color: "neutrals.300",
-    "&:first-child": {
+    "&:first-of-type": {
       mt: 0,
     },
   },

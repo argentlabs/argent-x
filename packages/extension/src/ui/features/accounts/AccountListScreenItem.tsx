@@ -21,6 +21,7 @@ interface IAccountListScreenItem {
   selectedAccount?: BaseWalletAccount
   needsUpgrade?: boolean
   clickNavigateSettings?: boolean
+  returnTo?: string
 }
 
 const IconContaier: FC<{ children: ReactNode }> = ({ children }) => (
@@ -39,6 +40,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   selectedAccount,
   needsUpgrade,
   clickNavigateSettings,
+  returnTo,
 }) => {
   const navigate = useNavigate()
   const status = useAccountStatus(account, selectedAccount)
@@ -63,8 +65,8 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       selectedAccount: account,
       showMigrationScreen: account ? isDeprecated(account) : false,
     })
-    navigate(routes.accountTokens())
-  }, [account, navigate])
+    navigate(returnTo || routes.accountTokens())
+  }, [account, navigate, returnTo])
 
   const onAccountEdit = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
