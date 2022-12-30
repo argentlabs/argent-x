@@ -1,0 +1,59 @@
+{
+  "name": "@argent/stack-router",
+  "version": "5.1.0",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/stack-router.umd.js",
+  "module": "./dist/stack-router.es.js",
+  "types": "./dist/stack-router.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/stack-router.es.js",
+      "require": "./dist/stack-router.umd.js"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "dev": "vite build --watch",
+    "prepare": "vite build",
+    "build": "vite build",
+    "example": "cd example && react-scripts start"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.4.3",
+    "@emotion/styled": "^11.10.5",
+    "framer-motion": "^7.6.19",
+    "history": "^5.3.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@argent/ui": "^5.1.0",
+    "@types/lodash-es": "^4.17.6",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.7.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jsdom": "^20.0.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.6.3",
+    "vite": "^3.0.9",
+    "vite-plugin-dts": "^1.6.6"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.10.5",
+    "colord": "^2.9.2",
+    "lodash-es": "^4.17.21",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.1"
+  }
+}

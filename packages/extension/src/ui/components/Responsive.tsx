@@ -21,8 +21,8 @@ export const AppDimensions: FC<PropsWithChildren> = (props) => {
   const extensionIsInTab = useExtensionIsInTab()
   return (
     <Box
-      width={extensionIsInTab ? undefined : "360px"}
-      height={extensionIsInTab ? undefined : "600px"}
+      width={extensionIsInTab ? "100vw" : "360px"}
+      height={extensionIsInTab ? "100vh" : "600px"}
       {...props}
     />
   )

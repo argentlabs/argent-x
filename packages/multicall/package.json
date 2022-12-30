@@ -38,6 +38,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "vite build --watch",
+    "prepare": "vite build",
     "build": "vite build"
   },
   "bugs": {

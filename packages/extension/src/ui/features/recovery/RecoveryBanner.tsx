@@ -1,14 +1,14 @@
 import { AlertButton, icons } from "@argent/ui"
 import { FC } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes, useCurrentPathnameWithQuery } from "../../routes"
 
 const { LockIcon } = icons
 
 export const RecoveryBanner: FC = () => {
   const navigate = useNavigate()
-  const { pathname: returnTo } = useLocation()
+  const returnTo = useCurrentPathnameWithQuery()
   return (
     <AlertButton
       colorScheme={"warning"}

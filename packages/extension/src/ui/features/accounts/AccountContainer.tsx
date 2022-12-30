@@ -39,12 +39,14 @@ export const AccountContainer: FC<AccountContainerProps> = ({
         <Tab
           as={NavLink}
           to={routes.accountTokens()}
+          replace
           icon={<WalletIcon />}
           label="Tokens"
         />
         <Tab
           as={NavLink}
           to={routes.accountCollections()}
+          replace
           icon={<NftIcon />}
           label="NFTs"
         />
@@ -52,6 +54,7 @@ export const AccountContainer: FC<AccountContainerProps> = ({
         <Tab
           as={NavLink}
           to={routes.accountActivity()}
+          replace
           icon={<ActivityIcon />}
           badgeLabel={pendingTransactions.length}
           badgeDescription={"Pending transactions"}

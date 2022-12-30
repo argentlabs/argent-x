@@ -395,7 +395,7 @@ export const SendTokenScreen: FC = () => {
                   ),
                 },
               })
-              navigate(routes.accountTokens())
+              navigate(routes.accountTokens(), { replace: true })
             })}
           >
             <Column gap="12px">
