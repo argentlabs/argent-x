@@ -1,10 +1,8 @@
 import { ThemeProvider as ArgentTheme, SetDarkMode } from "@argent/ui"
-import { SwapProvider } from "@argent/x-swap"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { FC, Suspense } from "react"
 import { SWRConfig } from "swr"
 
-import { getMulticallForNetwork } from "../shared/multicall"
 import AppErrorBoundaryFallback from "./AppErrorBoundaryFallback"
 import { AppRoutes } from "./AppRoutes"
 import { ErrorBoundary } from "./components/ErrorBoundary"
