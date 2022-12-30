@@ -13,7 +13,7 @@ import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
 import { useAccountTransactions } from "./accountTransactions.state"
 
-const { WalletIcon, NftIcon, ActivityIcon } = icons
+const { WalletIcon, NftIcon, ActivityIcon, SwapIcon } = icons
 
 export interface AccountContainerProps extends PropsWithChildren {
   scrollKey: string
@@ -50,6 +50,7 @@ export const AccountContainer: FC<AccountContainerProps> = ({
           icon={<NftIcon />}
           label="NFTs"
         />
+        <Tab as={NavLink} to={routes.swap()} icon={<SwapIcon />} label="Swap" />
         <Tab
           as={NavLink}
           to={routes.accountActivity()}

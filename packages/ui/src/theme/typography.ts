@@ -30,6 +30,7 @@ export const typography = {
   },
 
   fontSizes: {
+    "3xs": pxToRem(17),
     "2xs": pxToRem(12),
     xs: pxToRem(13),
     sm: pxToRem(14),

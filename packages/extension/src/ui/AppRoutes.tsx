@@ -135,6 +135,7 @@ const walletRoutes = (
       path={routes.accountCollections.path}
       element={<AccountScreen tab="collections" />}
     />
+    <Route path={routes.swap.path} element={<AccountScreen tab="swap" />} />
     <Route
       presentation="push"
       path={routes.accountActivity.path}

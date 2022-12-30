@@ -1,4 +1,11 @@
-import { Call, ProviderInterface, number, transaction } from "starknet"
+import {
+  Call,
+  GatewayError,
+  ProviderInterface,
+  number,
+  stark,
+  transaction,
+} from "starknet"
 
 const partitionResponses = (responses: string[]): string[][] => {
   if (responses.length === 0) {
@@ -27,6 +34,30 @@ const extractErrorCallIndex = (e: Error) => {
   }
 }
 
+const fallbackAggregate = async (
+  provider: ProviderInterface,
+  calls: Call[],
+): Promise<(string[] | Error)[]> => {
+  const results = await Promise.allSettled(
+    calls.map((call) =>
+      provider
+        .callContract({
+          contractAddress: call.contractAddress,
+          entrypoint: call.entrypoint,
+          calldata: stark.compileCalldata(call.calldata ?? []),
+        })
+        .then((res) => res.result),
+    ),
+  )
+
+  return results.map((result) => {
+    if (result.status === "fulfilled") {
+      return result.value
+    }
+    return result.reason
+  })
+}
+
 export const aggregate = async (
   provider: ProviderInterface,
   multicallAddress: string,
@@ -49,6 +80,14 @@ export const aggregate = async (
     if (!(e instanceof Error)) {
       throw e
     }
+
+    if (
+      e instanceof GatewayError &&
+      e.errorCode === "StarknetErrorCode.UNINITIALIZED_CONTRACT"
+    ) {
+      return fallbackAggregate(provider, calls)
+    }
+
     const errorCallIndex = extractErrorCallIndex(e)
     const remainingCalls = calls.filter((_, i) => i !== errorCallIndex)
     const remainingResults = await aggregate(
