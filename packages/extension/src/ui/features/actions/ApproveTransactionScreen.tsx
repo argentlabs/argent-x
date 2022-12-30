@@ -49,7 +49,9 @@ export const titleForTransactionsAndReview = (
     ? "Review send"
     : hasSwap
     ? "Review trade"
-    : "Check transactions"
+    : transactionsArray.length === 1
+    ? "Review transaction"
+    : "Review transactions"
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
@@ -71,10 +73,19 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
+  console.log(
+    "🚀 ~ file: ApproveTransactionScreen.tsx:74 ~ transactionReview",
+    transactionReview,
+  )
 
   const title = useMemo(() => {
     return titleForTransactionsAndReview(transactions, transactionReview)
   }, [transactionReview, transactions])
+
+  console.log(
+    "🚀 ~ file: ApproveTransactionScreen.tsx:76 ~ title ~ title",
+    title,
+  )
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 

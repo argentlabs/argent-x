@@ -1,4 +1,4 @@
-import { Error, H6, Input, L2, Switch, icons } from "@argent/ui"
+import { CellStack, Error, H6, Input, L2, Switch, icons } from "@argent/ui"
 import {
   Flex,
   FormControl,
@@ -7,7 +7,7 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react"
-import { isNull } from "lodash-es"
+import { isNull, isNumber } from "lodash-es"
 import { get, isEmpty } from "lodash-es"
 import { FC, Fragment, useCallback, useEffect } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
@@ -23,7 +23,7 @@ const DeploySmartContractParameters: FC<{
   isLoading: boolean
   constructorParameters: ParameterField[] | null
 }> = ({ isLoading, constructorParameters }) => {
-  const { control, register, formState, setValue, resetField } =
+  const { control, register, formState, setValue, resetField, watch } =
     useFormContext()
   const { errors } = formState
   const { fields, append, remove } = useFieldArray({
@@ -35,8 +35,8 @@ const DeploySmartContractParameters: FC<{
     resetField("parameters")
     fields.map((_, index) => remove(index))
 
-    constructorParameters?.map((input: any) => {
-      append({ name: input.name, type: input.type, value: "" })
+    constructorParameters?.map((input) => {
+      append({ name: input.name, type: input.type, value: input.value })
     })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,34 +58,100 @@ const DeploySmartContractParameters: FC<{
         </>
       )}
 
-      {fields.map((item, index) => (
-        <Fragment key={item.id}>
-          <Input
-            key={item.id}
-            autoFocus={index === 0}
-            placeholder={`${get(item, "name", "")}: ${get(
-              item,
-              "type",
-              "felt",
-            )}`}
-            {...register(`parameters.${index}.value`, {
-              required: true,
-            })}
-            isInvalid={!isEmpty(get(errors, `parameters[${index}]`))}
-          />
-          {get(errors, `parameters[${index}]`)?.type === "required" ? (
-            <Error message="Constructor argument is required" />
-          ) : (
-            get(errors, `parameters[${index}]`)?.type === "manual" && (
-              <Error
-                message={
-                  (get(errors, `parameters[${index}]`)?.message as string) ?? ""
-                }
-              />
-            )
-          )}
-        </Fragment>
-      ))}
+      {fields.map((item, index) => {
+        const value: string | string[] = get(item, "value", "")
+        if (Array.isArray(value)) {
+          const prevValue: string =
+            watch(`parameters.${index - 1}.value`) || "0"
+          const parsedPrevValue = parseInt(prevValue, 10)
+
+          if (
+            !isNumber(parsedPrevValue) ||
+            isNaN(parsedPrevValue) ||
+            parsedPrevValue <= 0
+          ) {
+            return null
+          }
+
+          return (
+            <CellStack
+              key={`${item.id}`}
+              bgColor="neutrals.700"
+              borderRadius="lg"
+            >
+              <L2>
+                {get(item, "name", "")}: {get(item, "type", "felt*")}
+              </L2>
+              {Array(parsedPrevValue)
+                .fill(0)
+                .map((_, i) => {
+                  return (
+                    <Fragment key={`${item.id}[${i}]`}>
+                      <Input
+                        key={`${item.id}[${i}]`}
+                        autoFocus={index === 0}
+                        placeholder={`${get(item, "name", "")}[${i}]: ${get(
+                          item,
+                          "type",
+                          "felt",
+                        ).replace("*", "")}`}
+                        {...register(`parameters.${index}.value.${i}`, {
+                          required: true,
+                        })}
+                        isInvalid={
+                          !isEmpty(get(errors, `parameters[${index}]`))
+                        }
+                      />
+                      {get(errors, `parameters[${index}][${i}]`)?.type ===
+                      "required" ? (
+                        <Error message="Constructor argument is required" />
+                      ) : (
+                        get(errors, `parameters[${index}][${i}]`)?.type ===
+                          "manual" && (
+                          <Error
+                            message={
+                              (get(errors, `parameters[${index}][${i}]`)
+                                ?.message as string) ?? ""
+                            }
+                          />
+                        )
+                      )}
+                    </Fragment>
+                  )
+                })}
+            </CellStack>
+          )
+        }
+        return (
+          <Fragment key={item.id}>
+            <Input
+              key={item.id}
+              autoFocus={index === 0}
+              placeholder={`${get(item, "name", "")}: ${get(
+                item,
+                "type",
+                "felt",
+              )}`}
+              {...register(`parameters.${index}.value`, {
+                required: true,
+              })}
+              isInvalid={!isEmpty(get(errors, `parameters[${index}]`))}
+            />
+            {get(errors, `parameters[${index}]`)?.type === "required" ? (
+              <Error message="Constructor argument is required" />
+            ) : (
+              get(errors, `parameters[${index}]`)?.type === "manual" && (
+                <Error
+                  message={
+                    (get(errors, `parameters[${index}]`)?.message as string) ??
+                    ""
+                  }
+                />
+              )
+            )}
+          </Fragment>
+        )
+      })}
       {!isNull(constructorParameters) && (
         <>
           <Input

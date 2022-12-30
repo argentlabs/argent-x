@@ -78,7 +78,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     const file: File | undefined = get(fileInputRef, "current.files[0]")
 
     if (file) {
-      setValue("contract", file.name)
+      setValue("contract", (file as File).name)
       clearErrors("contract")
       try {
         const contractContent = await readFileAsString(file)

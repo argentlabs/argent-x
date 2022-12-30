@@ -31,11 +31,17 @@ import { DeploySmartContractParameters } from "./DeploySmartContractParameters"
 import { useLastDeclaredContracts } from "./udc.state"
 import { useFormSelects } from "./useFormSelects"
 
-export type ParameterField = {
-  name: string
-  type: string
-  value: string
-}
+export type ParameterField =
+  | {
+      name: string
+      type: `felt` | `Uint256`
+      value: string
+    }
+  | {
+      name: string
+      type: `felt*`
+      value: string[]
+    }
 
 interface FieldValues {
   account: string
@@ -52,7 +58,7 @@ interface DeploySmartContractFormProps {
   setIsLoading: (isLoading: boolean) => void
 }
 
-const supportedConstructorTypes = ["felt", "Uint256"]
+const supportedConstructorTypes = ["felt", "Uint256", "felt*"]
 
 const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   children,
@@ -108,6 +114,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
       try {
         if (param.type === "felt") {
           return [number.toHex(number.toBN(param.value))]
+        }
+        if (param.type === "felt*") {
+          return param.value.map((value) => number.toHex(number.toBN(value)))
         }
         if (param.type === "Uint256") {
           const { low, high } = uint256.bnToUint256(number.toBN(param.value))
@@ -165,6 +174,14 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
                 input.name
               }. Only ${supportedConstructorTypes.join(", ")} are supported.`,
             )
+          }
+
+          if (input.type.endsWith("*")) {
+            return {
+              name: input.name,
+              type: input.type,
+              value: [],
+            }
           }
           return {
             name: input.name,

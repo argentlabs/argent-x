@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-sessions",
-  "version": "5.0.12",
+  "version": "5.1.0",
   "description": "Manage sessions for Argent X wallets",
   "keywords": [
     "starknet",
@@ -39,6 +39,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "vite build --watch",
+    "prepare": "vite build",
     "build": "vite build"
   },
   "bugs": {

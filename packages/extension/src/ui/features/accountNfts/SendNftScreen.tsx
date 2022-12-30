@@ -194,7 +194,7 @@ export const SendNftScreen: FC = () => {
       })
     }
 
-    navigate(routes.accountActivity())
+    navigate(routes.accountActivity(), { replace: true })
   }
 
   const handleAddressSelect = (account?: Account | AddressBookContact) => {

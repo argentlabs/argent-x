@@ -16,6 +16,9 @@ import {
 import { formatTruncatedAddress } from "./utils"
 
 test("send max eth flow", async ({ page, context }) => {
+  // disable page transitions so we don't need to wait for elements to settle
+  await page.emulateMedia({ reducedMotion: "reduce" })
+
   const { address: a1, balance: b1 } = await setupNewAccount(page, context)
 
   await navigateFromAccountToAccountList(page)

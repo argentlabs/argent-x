@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.0.12",
+  "version": "5.1.0",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -40,7 +40,7 @@
     "jsdom": "^20.0.0",
     "mitt": "^3.0.0",
     "raw-loader": "^4.0.2",
-    "typescript": "^4.6.3",
+    "typescript": "^4.9.4",
     "typescript-styled-plugin": "^0.18.2",
     "url-loader": "^4.1.1",
     "vi-fetch": "^0.8.0",
@@ -72,10 +72,12 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
-    "@argent/ui": "^5.0.12",
-    "@argent/x-multicall": "^5.0.12",
-    "@argent/x-sessions": "^5.0.12",
-    "@argent/x-wasm": "^5.0.12",
+    "@argent/stack-router": "^5.1.0",
+    "@argent/ui": "^5.1.0",
+    "@argent/x-multicall": "^5.1.0",
+    "@argent/x-sessions": "^5.1.0",
+    "@argent/x-swap": "^5.1.0",
+    "@argent/x-wasm": "^5.1.0",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",
