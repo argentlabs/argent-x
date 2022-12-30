@@ -27,8 +27,8 @@ export type AccountMessage =
     }
   | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
-  | { type: "CONNECT_ACCOUNT"; data: WalletAccount }
-  | { type: "CONNECT_ACCOUNT_RES" }
+  | { type: "CONNECT_ACCOUNT"; data?: BaseWalletAccount }
+  | { type: "CONNECT_ACCOUNT_RES"; data?: WalletAccount }
   | { type: "DISCONNECT_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT_RES"; data: WalletAccount | undefined }

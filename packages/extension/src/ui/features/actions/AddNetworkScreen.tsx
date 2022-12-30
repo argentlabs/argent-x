@@ -1,16 +1,13 @@
 import { FC, useState } from "react"
-import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { Network, addNetwork } from "../../../shared/network"
+import { Network, networkSchema } from "../../../shared/network"
+import { assertSchema } from "../../../shared/utils/schema"
 import { BackButton } from "../../components/BackButton"
 import { Button, ButtonGroupHorizontal } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { InputText } from "../../components/InputText"
-import { routes } from "../../routes"
 import { FormError, H2 } from "../../theme/Typography"
-import { useNetworks } from "../networks/useNetworks"
-import { recover } from "../recovery/recovery.service"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -33,7 +30,7 @@ const AddTokenScreenWrapper = styled.div`
 interface AddNetworkScreenProps {
   requestedNetwork: Network
   hideBackButton?: boolean
-  onSubmit?: () => void
+  onSubmit?: () => Promise<void>
   onReject?: () => void
   mode?: "add" | "switch"
 }
@@ -45,9 +42,6 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
   onReject,
   mode = "add",
 }) => {
-  const navigate = useNavigate()
-  const allNetworks = useNetworks()
-
   const [error, setError] = useState("")
 
   return (
@@ -62,22 +56,14 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
         <form
           onSubmit={async (e) => {
             e.preventDefault()
-            if (requestedNetwork) {
-              try {
-                if (mode === "add") {
-                  addNetwork(requestedNetwork)
-                  onSubmit?.()
-                  navigate(await recover({ networkId: requestedNetwork.id }))
-                } else if (mode === "switch") {
-                  onSubmit?.()
-                  if (allNetworks?.some((n) => n.id === requestedNetwork.id)) {
-                    navigate(await recover({ networkId: requestedNetwork.id }))
-                  } else {
-                    navigate(routes.accountTokens())
-                  }
-                }
-              } catch {
-                setError("Network already exists")
+            try {
+              await assertSchema(networkSchema, requestedNetwork)
+              await onSubmit?.()
+            } catch (error) {
+              if (error instanceof Error) {
+                setError(error.message)
+              } else {
+                setError(`${error}`)
               }
             }
           }}

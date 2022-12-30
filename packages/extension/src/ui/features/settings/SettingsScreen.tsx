@@ -17,7 +17,7 @@ import { routes, useCurrentPathnameWithQuery, useReturnTo } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
-import { useAccount, useSelectedAccountStore } from "../accounts/accounts.state"
+import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 import { SupportFooter } from "./SupportFooter"
@@ -80,8 +80,8 @@ export const SettingsScreen: FC = () => {
   const settingsReturnTo = useReturnTo()
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
+  const selectedAccount = useSelectedAccount()
   const returnTo = useCurrentPathnameWithQuery()
-  const { selectedAccount } = useSelectedAccountStore()
   const account = useAccount(selectedAccount)
   const navigate = useNavigate()
   return (
