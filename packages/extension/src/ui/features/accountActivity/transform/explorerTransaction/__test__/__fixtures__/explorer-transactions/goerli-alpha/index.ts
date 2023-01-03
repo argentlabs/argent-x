@@ -7,6 +7,7 @@ import erc20MintTestToken from "./erc20-mint-test-token.json"
 import erc20SwapAlphaRoad from "./erc20-swap-alpha-road.json"
 import erc20SwapJediswap from "./erc20-swap-jediswap.json"
 import erc20SwapMySwap from "./erc20-swap-my-swap.json"
+import erc20TransferNoContractAddress from "./erc20-transfer-no-contract-address.json"
 import erc20TransferNoEvents from "./erc20-transfer-no-events.json"
 import erc20TransferWithSequencerEvent from "./erc20-transfer-with-sequencer-event.json"
 import erc20Transfer from "./erc20-transfer.json"
@@ -30,6 +31,7 @@ export {
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc20TransferNoContractAddress,
   erc20TransferNoEvents,
   erc20TransferWithSequencerEvent /** {@link https://github.com/eqlabs/pathfinder/issues/569} */,
   erc721MintAspect,
