@@ -26,10 +26,21 @@ export type ApiTransactionReviewAssessmentReason =
   | "src_token_black_listed"
   | "unknown_token"
 
+export interface TargetedDapp {
+  name: string
+  description: string
+  iconUrl: string
+  links: {
+    name: string
+    url: string
+    position: number
+  }[]
+}
 export interface ApiTransactionReviewResponse {
   assessment: ApiTransactionReviewAssessment
   reason?: ApiTransactionReviewAssessmentReason
   reviews: ApiTransactionReview[]
+  targetedDapp?: TargetedDapp
 }
 
 export type ApiTransactionReviewActivityType =

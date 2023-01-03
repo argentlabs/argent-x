@@ -3,10 +3,13 @@ import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import {
+  useNetworkFeeToken,
+  useTokensWithBalance,
+} from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
-import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
 
 const { AddIcon, SendIcon, PluginIcon } = icons

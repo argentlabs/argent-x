@@ -2,10 +2,10 @@ import { BigNumber } from "ethers"
 import { Call, number, stark } from "starknet"
 import useSWR from "swr"
 
+import { getNetworkFeeToken } from "../../../shared/tokens.state"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
-import { getNetworkFeeToken } from "./tokens.state"
 
 const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
 

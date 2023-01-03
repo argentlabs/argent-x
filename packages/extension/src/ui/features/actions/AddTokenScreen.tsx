@@ -7,6 +7,7 @@ import styled from "styled-components"
 
 import { addToken } from "../../../shared/token/storage"
 import { RequestToken, Token } from "../../../shared/token/type"
+import { useTokensInNetwork } from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { Button, ButtonGroupHorizontal } from "../../components/Button"
 import { InfoCircle } from "../../components/Icons/InfoCircle"
@@ -18,7 +19,6 @@ import { isValidAddress } from "../../services/addresses"
 import { FormError, H2, WarningText } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { fetchTokenDetails } from "../accountTokens/tokens.service"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;

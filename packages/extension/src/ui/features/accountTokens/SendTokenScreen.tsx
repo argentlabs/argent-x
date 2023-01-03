@@ -9,6 +9,11 @@ import { Schema, object } from "yup"
 import { AddressBookContact } from "../../../shared/addressBook"
 import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
 import { prettifyCurrencyValue } from "../../../shared/token/price"
+import {
+  TokenDetailsWithBalance,
+  useNetworkFeeToken,
+  useTokensWithBalance,
+} from "../../../shared/tokens.state"
 import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -53,11 +58,6 @@ import { TokenIcon } from "./TokenIcon"
 import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
-import {
-  TokenDetailsWithBalance,
-  useNetworkFeeToken,
-  useTokensWithBalance,
-} from "./tokens.state"
 import { useMaxFeeEstimateForTransfer } from "./useMaxFeeForTransfer"
 
 export const BalanceText = styled.div`

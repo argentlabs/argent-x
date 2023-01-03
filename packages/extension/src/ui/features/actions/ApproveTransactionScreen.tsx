@@ -1,14 +1,16 @@
-import { FC, useState } from "react"
+import { isArray } from "lodash-es"
+import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 
+import { useTokensInNetwork } from "../../../shared/tokens.state"
+import { getTransactionReviewHasSwap } from "../../../shared/transactionReview.service"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
@@ -24,6 +26,8 @@ export interface ApproveTransactionScreenProps
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
 }
+
+export type TransactionViewType = "swap" | "nft" | "generic"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
@@ -45,10 +49,25 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     actionHash,
   })
 
+  const transactionViewType = useMemo(() => {
+    if (getTransactionReviewHasSwap(transactionReview)) {
+      return "swap"
+    }
+
+    // TODO: Add case for NFT
+
+    return "generic"
+  }, [transactionReview])
+
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
   const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
   const { pendingTransactions } = useAccountTransactions(selectedAccount)
+
+  const transactionsArray: Call[] = useMemo(
+    () => (isArray(transactions) ? transactions : [transactions]),
+    [transactions],
+  )
 
   const isUpgradeTransaction =
     !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
@@ -75,7 +94,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   return (
     <ConfirmScreen
-      confirmButtonText="Approve"
+      confirmButtonText="Confirm"
+      rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
       confirmButtonVariant={confirmButtonVariant}
       selectedAccount={selectedAccount}
@@ -105,13 +125,13 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       {...props}
     >
       <DappHeader
-        transactions={transactions}
+        transactions={transactionsArray}
         transactionReview={transactionReview}
       />
 
       <TransactionsList
         networkId={networkId}
-        transactions={transactions}
+        transactions={transactionsArray}
         transactionReview={transactionReview}
         tokensByNetwork={tokensByNetwork}
       />

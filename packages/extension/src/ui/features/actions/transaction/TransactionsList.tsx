@@ -15,7 +15,7 @@ import { TransactionsListSwap } from "./TransactionsListSwap"
 
 export interface ITransactionsList {
   networkId: string
-  transactions: Call | Call[]
+  transactions: Call[]
   transactionReview?: ApiTransactionReviewResponse
   tokensByNetwork?: Token[]
 }
@@ -27,10 +27,6 @@ export const TransactionsList: FC<ITransactionsList> = ({
   transactionReview,
   tokensByNetwork = [],
 }) => {
-  const transactionsArray: Call[] = useMemo(
-    () => (isArray(transactions) ? transactions : [transactions]),
-    [transactions],
-  )
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
   const hasSwap = getTransactionReviewHasSwap(transactionReview)
@@ -49,7 +45,7 @@ export const TransactionsList: FC<ITransactionsList> = ({
           tokensByNetwork={tokensByNetwork}
         />
       ) : (
-        <TransactionActions transactions={transactionsArray} />
+        <TransactionActions transactions={transactions} />
       )}
     </>
   )

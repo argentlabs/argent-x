@@ -5,13 +5,13 @@ import useSWR, { SWRConfiguration } from "swr"
 
 import { getTokenBalanceForAccount } from "../../../shared/token/getTokenBalance"
 import { Token } from "../../../shared/token/type"
+import { TokenDetailsWithBalance } from "../../../shared/tokens.state"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { isNumeric } from "../../../shared/utils/number"
 import { isEqualAddress } from "../../services/addresses"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { TokenDetailsWithBalance } from "./tokens.state"
 
 interface UseTokenBalanceForAccountArgs {
   token: Token

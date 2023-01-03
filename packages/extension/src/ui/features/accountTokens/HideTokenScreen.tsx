@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
 import { removeToken } from "../../../shared/token/storage"
+import { useToken } from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
 import { routes } from "../../routes"
@@ -10,7 +11,6 @@ import { FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/ConfirmScreen"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
-import { useToken } from "./tokens.state"
 
 export const HideTokenAlert = styled(Alert)`
   padding-top: 32px;

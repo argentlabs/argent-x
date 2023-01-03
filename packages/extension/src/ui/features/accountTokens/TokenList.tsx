@@ -2,6 +2,7 @@ import { FC, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { Token } from "../../../shared/token/type"
+import { useTokensInNetwork } from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
@@ -10,7 +11,6 @@ import { useSelectedAccount } from "../accounts/accounts.state"
 import { NewTokenButton } from "./NewTokenButton"
 import { TokenListItemVariant } from "./TokenListItem"
 import { TokenListItemContainer } from "./TokenListItemContainer"
-import { useTokensInNetwork } from "./tokens.state"
 
 interface TokenListProps {
   tokenList?: Token[]
