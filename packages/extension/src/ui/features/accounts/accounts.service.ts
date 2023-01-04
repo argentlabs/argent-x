@@ -49,7 +49,7 @@ export const stripAddressZeroPadding = (accountAddress: string) => {
   try {
     return number.toHex(toBN(number.hexToDecimalString(accountAddress)))
   } catch {
-    // ignore parsing erros
+    // ignore parsing errors
   }
   return ""
 }
