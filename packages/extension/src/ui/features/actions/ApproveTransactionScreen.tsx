@@ -44,6 +44,10 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
+  console.log(
+    "🚀 ~ file: ApproveTransactionScreen.tsx:74 ~ transactionReview",
+    transactionReview,
+  )
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 

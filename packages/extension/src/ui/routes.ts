@@ -34,6 +34,12 @@ export const useReturnTo = () => {
   return useQuery().get("returnTo") || undefined
 }
 
+/** makes a returnTo parameter that captures current page location including query */
+export const useCurrentPathnameWithQuery = () => {
+  const location = useLocation()
+  return `${location.pathname}${location.search}`
+}
+
 export const routes = {
   onboardingStart: route("/index.html"),
   onboardingDisclaimer: route("/onboarding/disclaimer"),
@@ -115,7 +121,7 @@ export const routes = {
   reset: route("/reset"),
   migrationDisclaimer: route("/migration-disclaimer"),
   legacy: route("/legacy"),
-  settings: route("/settings"),
+  settings: routeWithReturnTo("/settings"),
   settingsNetworks: route("/settings/developer-settings/networks"),
   settingsSeed: routeWithReturnTo("/settings/seed"),
   settingsAddCustomNetwork: route("/settings/developer-settings/networks/add"),
@@ -163,4 +169,5 @@ export const routes = {
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
+  swap: route("/swap"),
 }

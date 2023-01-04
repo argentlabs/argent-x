@@ -28,8 +28,8 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^20.0.0",
-    "typescript": "^4.6.3",
-    "vite": "^3.0.9",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3",
     "vite-plugin-dts": "^1.6.6"
   },
   "scripts": {
@@ -38,13 +38,15 @@
     "lint": "eslint . --cache --ext .ts,.tsx",
     "postinstall": "yarn gen:theme-typings",
     "dev": "vite build --watch",
-    "build": "tsc && vite build"
+    "prepare": "vite build",
+    "build": "vite build"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.4.4",
+    "@chakra-ui/react": "^2.4.6",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
-    "framer-motion": "^7.6.1"
+    "framer-motion": "^8.0.2",
+    "popmotion": "^11.0.5"
   },
   "peerDependencies": {
     "@emotion/react": "^11.10.4",

@@ -7,7 +7,7 @@ import { useAppState } from "../../app.state"
 import { StyledControlledInput } from "../../components/InputText"
 import { routes } from "../../routes"
 import { analytics, usePageTracking } from "../../services/analytics"
-import { connectAccount } from "../../services/backgroundAccounts"
+import { selectAccount } from "../../services/backgroundAccounts"
 import { FormError } from "../../theme/Typography"
 import { createAccount } from "../accounts/accounts.service"
 import { validatePassword } from "../recovery/seedRecovery.state"
@@ -67,7 +67,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
         setDeployFailed(false)
         try {
           const newAccount = await createAccount(switcherNetworkId, password)
-          connectAccount(newAccount)
+          selectAccount(newAccount)
           analytics.track("createWallet", {
             status: "success",
             networkId: newAccount.networkId,

@@ -84,7 +84,7 @@ export const CollectionNfts: FC = () => {
             />
             <H4>{collectible?.name || "Loading..."}</H4>
             <P4 color="neutrals.300">
-              Floor price:
+              Floor price:{" "}
               {collectible.floorPrice ? (
                 <>{ethers.utils.formatEther(collectible.floorPrice)} ETH</>
               ) : (

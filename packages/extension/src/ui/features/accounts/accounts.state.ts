@@ -1,5 +1,4 @@
 import { useMemo } from "react"
-import create from "zustand"
 
 import {
   getNetworkSelector,
@@ -8,9 +7,13 @@ import {
 } from "../../../shared/account/selectors"
 import { accountStore } from "../../../shared/account/store"
 import { defaultNetwork } from "../../../shared/network"
-import { useArrayStorage } from "../../../shared/storage/hooks"
+import {
+  useArrayStorage,
+  useKeyValueStorage,
+} from "../../../shared/storage/hooks"
 import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
+import { walletStore } from "../../../shared/wallet/walletStore"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { Account } from "./Account"
 
@@ -81,27 +84,17 @@ export const useAccount = (
 ): Account | undefined => {
   const accounts = useAccounts({ allNetworks: true, showHidden: true })
   return useMemo(() => {
+    if (!account) {
+      return undefined
+    }
     return accounts.find((a) => account && accountsEqual(a, account))
   }, [accounts, account])
 }
 
 export const isHiddenAccount = (account: Account) => !!account.hidden
 
-interface State {
-  selectedAccount?: BaseWalletAccount
-  showMigrationScreen?: boolean // FIXME: remove when depricated accounts do not longer work
-}
-
-export const useSelectedAccountStore = create<State>(() => ({}))
-
+// Use selected account from Wallet Store
 export const useSelectedAccount = () => {
-  const allAccounts = useAccounts({ showHidden: true })
-  const selectedAccount = useSelectedAccountStore(
-    (state) => state.selectedAccount,
-  )
-  return useMemo(() => {
-    return allAccounts.find(
-      (a) => selectedAccount && accountsEqual(a, selectedAccount),
-    )
-  }, [allAccounts, selectedAccount])
+  const baseWalletAccount = useKeyValueStorage(walletStore, "selected")
+  return useAccount(baseWalletAccount ?? undefined)
 }
