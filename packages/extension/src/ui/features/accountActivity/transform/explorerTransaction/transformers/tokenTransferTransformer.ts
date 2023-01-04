@@ -16,14 +16,17 @@ export default function ({
     fingerprint === "events[Transfer] calls[transfer]" ||
     fingerprint === "events[] calls[transfer]"
   ) {
-    const { calls } = explorerTransaction
+    const { calls, events } = explorerTransaction
     if (calls?.length === 1) {
       const entity = "TOKEN"
       let action = "TRANSFER"
       let displayName = "Transfer"
       const tokenAddress = calls[0].address
       const parameters = calls[0].parameters
-      const fromAddress = explorerTransaction.contractAddress
+      const eventParameters = events?.[0]?.parameters
+      const fromAddress =
+        explorerTransaction.contractAddress ||
+        getParameter(eventParameters, "from_")
       const toAddress = getParameter(parameters, "recipient")
       const amount = getParameter(parameters, "amount")
       if (accountAddress && toAddress && fromAddress) {

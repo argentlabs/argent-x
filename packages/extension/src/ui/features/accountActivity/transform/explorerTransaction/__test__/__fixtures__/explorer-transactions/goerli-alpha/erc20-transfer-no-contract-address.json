@@ -1,0 +1,82 @@
+{
+  "id": "0x1363064c77727cebc467ff8947ca25fcef0fd69fa1713294da3534a9f42c06b",
+  "blockNumber": 537439,
+  "timestamp": 1671699595,
+  "transactionHash": "0x1363064c77727cebc467ff8947ca25fcef0fd69fa1713294da3534a9f42c06b",
+  "entryPoint": "__execute__",
+  "maxFee": "0x16acf949a94",
+  "actualFee": "0x78ef3b2858",
+  "status": "ACCEPTED_ON_L2",
+  "events": [
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x77fec0db5632a3bd9a3ba7cbf4e0a8578c1220b9f4d40d4d9adbad149debce2"
+        },
+        {
+          "name": "to",
+          "value": "0x5b359ca70e7a4c4c6d33fbdab52a3db4c5a4228a811af4ff965b7a77329eebb"
+        },
+        {
+          "name": "value",
+          "value": "461478497624608933"
+        }
+      ]
+    },
+    {
+      "name": "transaction_executed",
+      "address": "0x77fec0db5632a3bd9a3ba7cbf4e0a8578c1220b9f4d40d4d9adbad149debce2",
+      "parameters": [
+        {
+          "name": "hash",
+          "value": "0x1363064c77727cebc467ff8947ca25fcef0fd69fa1713294da3534a9f42c06b"
+        },
+        {
+          "name": "response_len",
+          "value": "0x1"
+        },
+        {
+          "name": "response",
+          "value": ["0x1"]
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "from_",
+          "value": "0x77fec0db5632a3bd9a3ba7cbf4e0a8578c1220b9f4d40d4d9adbad149debce2"
+        },
+        {
+          "name": "to",
+          "value": "0x46a89ae102987331d369645031b49c27738ed096f2789c24449966da4c6de6b"
+        },
+        {
+          "name": "value",
+          "value": "519409707096"
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "name": "transfer",
+      "address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      "parameters": [
+        {
+          "name": "recipient",
+          "value": "0x5b359ca70e7a4c4c6d33fbdab52a3db4c5a4228a811af4ff965b7a77329eebb"
+        },
+        {
+          "name": "amount",
+          "value": "461478497624608933"
+        }
+      ]
+    }
+  ]
+}

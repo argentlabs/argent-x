@@ -19,6 +19,7 @@ import {
   erc20SwapJediswap,
   erc20SwapMySwap,
   erc20Transfer,
+  erc20TransferNoContractAddress,
   erc20TransferNoEvents,
   erc20TransferWithSequencerEvent,
   erc721MintAspect,
@@ -159,9 +160,40 @@ describe("transformExplorerTransaction", () => {
       `)
       expect(
         transformExplorerTransaction({
+          explorerTransaction:
+            erc20TransferNoContractAddress as IExplorerTransaction,
+          accountAddress:
+            "0x5b359ca70e7a4c4c6d33fbdab52a3db4c5a4228a811af4ff965b7a77329eebb",
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "RECEIVE",
+          "actualFee": "519409707096",
+          "amount": "461478497624608933",
+          "date": "2022-12-22T08:59:55.000Z",
+          "displayName": "Receive",
+          "entity": "TOKEN",
+          "fromAddress": "0x77fec0db5632a3bd9a3ba7cbf4e0a8578c1220b9f4d40d4d9adbad149debce2",
+          "maxFee": "1558260783764",
+          "toAddress": "0x5b359ca70e7a4c4c6d33fbdab52a3db4c5a4228a811af4ff965b7a77329eebb",
+          "token": {
+            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "decimals": 18,
+            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "name": "Ether",
+            "network": "mainnet-alpha",
+            "networkId": "mainnet-alpha",
+            "showAlways": true,
+            "symbol": "ETH",
+          },
+          "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        }
+      `)
+      expect(
+        transformExplorerTransaction({
           explorerTransaction: erc20TransferNoEvents as IExplorerTransaction,
           accountAddress:
-            "0x06eDF9F7045Ae05BA00BEe5fbC3224d526735B7f10351A51F4c295f3C5b6dA21",
+            "0x6edf9f7045ae05ba00bee5fbc3224d526735b7f10351a51f4c295f3c5b6da21",
         }),
       ).toMatchInlineSnapshot(`
         {
