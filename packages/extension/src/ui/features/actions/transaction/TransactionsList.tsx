@@ -1,3 +1,4 @@
+import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { Call } from "starknet"
 
@@ -5,12 +6,12 @@ import { Token } from "../../../../shared/token/type"
 import {
   ApiTransactionReviewResponse,
   getDisplayWarnAndReasonForTransactionReview,
-  getTransactionReviewHasSwap,
+  getTransactionReviewActivityOfType,
 } from "../../../../shared/transactionReview.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
+import { SwapTransactionActions } from "./SwapTransactionActions"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
-import { TransactionsListSwap } from "./TransactionsListSwap"
 import { VerifiedTransactionBanner } from "./VerifiedTransactionBanner"
 
 export interface ITransactionsList {
@@ -25,15 +26,18 @@ export interface ITransactionsList {
 export const TransactionsList: FC<ITransactionsList> = ({
   transactions,
   transactionReview,
-  tokensByNetwork = [],
 }) => {
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
-  const hasSwap = getTransactionReviewHasSwap(transactionReview)
+  const swapTxn = getTransactionReviewActivityOfType("swap", transactionReview)
+  const approveTxn = getTransactionReviewActivityOfType(
+    "approve",
+    transactionReview,
+  )
 
   const verifiedDapp = transactionReview?.targetedDapp
   return (
-    <>
+    <Flex direction="column" gap="2">
       {warn && (
         <TransactionBanner
           variant={transactionReview?.assessment}
@@ -42,14 +46,14 @@ export const TransactionsList: FC<ITransactionsList> = ({
         />
       )}
       {verifiedDapp && <VerifiedTransactionBanner dapp={verifiedDapp} />}
-      {hasSwap ? (
-        <TransactionsListSwap
-          transactionReview={transactionReview}
-          tokensByNetwork={tokensByNetwork}
+      {swapTxn ? (
+        <SwapTransactionActions
+          swapTransaction={swapTxn}
+          approveTransaction={approveTxn}
         />
       ) : (
         <TransactionActions transactions={transactions} />
       )}
-    </>
+    </Flex>
   )
 }

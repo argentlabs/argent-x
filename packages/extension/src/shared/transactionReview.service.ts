@@ -185,6 +185,20 @@ export const getTransactionReviewSwap = (
   }
 }
 
+export const getTransactionReviewActivityOfType = (
+  type: ApiTransactionReviewActivityType,
+  transactionReview?: ApiTransactionReviewResponse,
+): ApiTransactionReviewActivity | undefined => {
+  if (!transactionReview) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.activity?.type === type) {
+      return review.activity
+    }
+  }
+}
+
 export const getTransactionReviewHasSwap = (
   transactionReview?: ApiTransactionReviewResponse,
 ) => {
