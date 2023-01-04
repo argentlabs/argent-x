@@ -38,47 +38,50 @@ export const TransactionsListSwap: FC<ITransactionsListSwap> = ({
     return null
   }
   /** API only checks Jediswap at present */
-  const isJediswap = swap.dapp?.name.toLowerCase() === "jediswap"
+  const isJediswap =
+    transactionReview?.targetedDapp.name.toLowerCase() === "jediswap"
+  const { activity, assessmentDetails } = swap
+
   return (
     <>
       <FieldGroup>
         <TokenField
           label="Sell"
-          contractAddress={swap.src?.token.address}
-          amount={swap.src?.amount}
+          contractAddress={activity?.src?.token.address}
+          amount={activity?.src?.amount}
           tokensByNetwork={tokensByNetwork}
         />
         <Field>
           <FieldKey>Value</FieldKey>
-          <FieldValue>{prettifyCurrencyValue(swap.src?.usd)}</FieldValue>
+          <FieldValue>{prettifyCurrencyValue(activity?.src?.usd)}</FieldValue>
         </Field>
         <Field>
           <FieldKey>Slippage</FieldKey>
           <FieldValue>
-            {entryPointToHumanReadable(swap.src?.slippage || "–")}
+            {entryPointToHumanReadable(activity?.src?.slippage || "–")}
           </FieldValue>
         </Field>
       </FieldGroup>
       <FieldGroup>
         <TokenField
           label="Receive"
-          contractAddress={swap.dst?.token.address}
-          amount={swap.dst?.amount}
+          contractAddress={activity?.dst?.token.address}
+          amount={activity?.dst?.amount}
           tokensByNetwork={tokensByNetwork}
         />
         <Field>
           <FieldKey>Value</FieldKey>
-          <FieldValue>{prettifyCurrencyValue(swap.dst?.usd)}</FieldValue>
+          <FieldValue>{prettifyCurrencyValue(activity?.dst?.usd)}</FieldValue>
         </Field>
         <Field>
           <FieldKey>Slippage</FieldKey>
           <FieldValue>
-            {entryPointToHumanReadable(swap.dst?.slippage || "–")}
+            {entryPointToHumanReadable(activity?.dst?.slippage || "–")}
           </FieldValue>
         </Field>
       </FieldGroup>
       <FieldGroup>
-        <ContractField contractAddress={swap.dapp?.address} />
+        <ContractField contractAddress={assessmentDetails.contract_address} />
         <Field>
           <FieldKey>dApp</FieldKey>
           <FieldValue>
@@ -87,7 +90,9 @@ export const TransactionsListSwap: FC<ITransactionsListSwap> = ({
                 <DappIcon host="app.testnet.jediswap.xyz" />
               </DappIconContainer>
             )}
-            <LeftPaddedField>{swap.dapp?.name || "Unknown"}</LeftPaddedField>
+            <LeftPaddedField>
+              {transactionReview?.targetedDapp.name || "Unknown"}
+            </LeftPaddedField>
           </FieldValue>
         </Field>
       </FieldGroup>

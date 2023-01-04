@@ -1,9 +1,7 @@
 import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import { Call } from "starknet"
 
-import { isErc20TransferCall } from "../../../../shared/call"
 import { getTransactionReviewSwap } from "../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 
@@ -24,9 +22,9 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
 
   return hasSwap ? (
     <Flex alignItems="center" gap="1">
-      Swap {swapTxn.src?.token.symbol}
+      Swap {swapTxn.activity?.src?.token.symbol}
       <ArrowRightIcon width="0.7em" height="0.8em" />
-      {swapTxn.dst?.token.symbol}
+      {swapTxn.activity?.dst?.token.symbol}
     </Flex>
   ) : (
     <>Confirm {fallback}</>

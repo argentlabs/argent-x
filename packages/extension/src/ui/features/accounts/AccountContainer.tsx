@@ -13,7 +13,7 @@ import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
 import { useAccountTransactions } from "./accountTransactions.state"
 
-const { WalletIcon, NftIcon, ActivityIcon } = icons
+const { WalletIcon, NftIcon, ActivityIcon, SwapIcon } = icons
 
 export interface AccountContainerProps extends PropsWithChildren {
   scrollKey: string
@@ -39,18 +39,28 @@ export const AccountContainer: FC<AccountContainerProps> = ({
         <Tab
           as={NavLink}
           to={routes.accountTokens()}
+          replace
           icon={<WalletIcon />}
           label="Tokens"
         />
         <Tab
           as={NavLink}
           to={routes.accountCollections()}
+          replace
           icon={<NftIcon />}
           label="NFTs"
         />
         <Tab
           as={NavLink}
+          to={routes.swap()}
+          replace
+          icon={<SwapIcon />}
+          label="Swap"
+        />
+        <Tab
+          as={NavLink}
           to={routes.accountActivity()}
+          replace
           icon={<ActivityIcon />}
           badgeLabel={pendingTransactions.length}
           badgeDescription={"Pending transactions"}

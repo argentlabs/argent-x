@@ -69,6 +69,10 @@ const Home: NextPage = () => {
         wallet.selectedAddress,
         wallet.provider,
       )
+      console.log(
+        "🚀 ~ file: index.tsx ~ line 72 ~ handleConnectClick ~ sessionSupport",
+        sessionSupport,
+      )
       setSupportsSessions(sessionSupport)
     }
   }

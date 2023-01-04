@@ -209,9 +209,8 @@ export const SendTokenScreen: FC = () => {
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = useNetworkFeeToken(account?.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
-  const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
-  >()
+  const [addressBookRecipient, setAddressBookRecipient] =
+    useState<Account | AddressBookContact>()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { accountNames } = useAccountMetadata()
 
@@ -395,7 +394,7 @@ export const SendTokenScreen: FC = () => {
                   ),
                 },
               })
-              navigate(routes.accountTokens())
+              navigate(routes.accountTokens(), { replace: true })
             })}
           >
             <Column gap="12px">

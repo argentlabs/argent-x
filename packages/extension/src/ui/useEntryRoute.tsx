@@ -19,12 +19,12 @@ export const useEntryRoute = () => {
         const query = new URLSearchParams(window.location.search)
         const entry = await determineEntry(query)
         useAppState.setState({ isLoading: false, isFirstRender: false })
-        navigate(entry)
+        navigate(entry, { replace: true })
         if (IS_DEV) {
           const initialRoute = getInitialHardReloadRoute(query)
           if (initialRoute) {
             await delay(0)
-            navigate(initialRoute)
+            navigate(initialRoute, { replace: true })
           }
         }
       }

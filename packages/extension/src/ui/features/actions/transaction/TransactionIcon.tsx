@@ -1,9 +1,7 @@
-import { AbsoluteBox, icons } from "@argent/ui"
-import { Box, Center, Flex, Image } from "@chakra-ui/react"
+import { icons } from "@argent/ui"
+import { Box, Center, Image } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
-import { Call } from "starknet"
 
-import { isErc20TransferCall } from "../../../../shared/call"
 import { useToken } from "../../../../shared/tokens.state"
 import { getTransactionReviewSwap } from "../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
@@ -28,12 +26,12 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   const hasSwap = !!swapTxn
 
   const srcToken = useToken({
-    address: swapTxn?.src?.token.address || "0x0",
+    address: swapTxn?.activity?.src?.token.address || "0x0",
     networkId: network.id,
   })
 
   const dstToken = useToken({
-    address: swapTxn?.dst?.token.address || "0x0",
+    address: swapTxn?.activity?.dst?.token.address || "0x0",
     networkId: network.id,
   })
 

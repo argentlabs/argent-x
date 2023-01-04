@@ -20,6 +20,6 @@
     "prepare": "yarn build"
   },
   "devDependencies": {
-    "wasm-pack": "^0.10.3"
+    "wasm-pack": "0.10.2"
   }
 }

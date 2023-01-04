@@ -5,14 +5,13 @@ import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { isDeprecated } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
+import { selectAccount } from "../../services/backgroundAccounts"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useSelectedAccountStore } from "./accounts.state"
 
 const { MoreIcon, ChevronRightIcon } = icons
 
@@ -21,6 +20,7 @@ interface IAccountListScreenItem {
   selectedAccount?: BaseWalletAccount
   needsUpgrade?: boolean
   clickNavigateSettings?: boolean
+  returnTo?: string
 }
 
 const IconContaier: FC<{ children: ReactNode }> = ({ children }) => (
@@ -39,6 +39,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   selectedAccount,
   needsUpgrade,
   clickNavigateSettings,
+  returnTo,
 }) => {
   const navigate = useNavigate()
   const status = useAccountStatus(account, selectedAccount)
@@ -58,13 +59,10 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   //   { suspense: false, ...withPolling(60 * 1000) },
   // )
 
-  const onClick = useCallback(() => {
-    useSelectedAccountStore.setState({
-      selectedAccount: account,
-      showMigrationScreen: account ? isDeprecated(account) : false,
-    })
-    navigate(routes.accountTokens())
-  }, [account, navigate])
+  const onClick = useCallback(async () => {
+    await selectAccount(account)
+    navigate(returnTo || routes.accountTokens())
+  }, [account, navigate, returnTo])
 
   const onAccountEdit = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {

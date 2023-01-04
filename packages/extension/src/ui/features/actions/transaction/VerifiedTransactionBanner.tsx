@@ -3,12 +3,12 @@ import { Center, Flex, Image } from "@chakra-ui/react"
 import { upperFirst } from "lodash-es"
 import { FC } from "react"
 
-import { TargetedDapp } from "../../../../shared/transactionReview.service"
+import { ApiTransactionReviewTargettedDapp } from "../../../../shared/transactionReview.service"
 
 const { VerifiedIcon } = icons
 
 export interface IVerifiedTransactionBanner {
-  dapp: TargetedDapp
+  dapp: ApiTransactionReviewTargettedDapp
 }
 
 export const VerifiedTransactionBanner: FC<IVerifiedTransactionBanner> = ({

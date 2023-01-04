@@ -46,7 +46,12 @@ export const getAccountImageUrl = (
 }
 
 export const stripAddressZeroPadding = (accountAddress: string) => {
-  return number.toHex(toBN(number.hexToDecimalString(accountAddress)))
+  try {
+    return number.toHex(toBN(number.hexToDecimalString(accountAddress)))
+  } catch {
+    // ignore parsing errors
+  }
+  return ""
 }
 
 export const getNetworkAccountImageUrl = ({

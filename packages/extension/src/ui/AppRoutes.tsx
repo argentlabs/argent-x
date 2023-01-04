@@ -1,6 +1,8 @@
-import { chakra } from "@chakra-ui/system"
-import { FC } from "react"
-import { Outlet, Route, Routes } from "react-router-dom"
+import { Route, Routes, RoutesConfig } from "@argent/stack-router"
+import { chakra } from "@chakra-ui/react"
+import { FC, ReactNode, isValidElement, useMemo } from "react"
+// import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
+import { Outlet, useLocation } from "react-router-dom"
 
 import { useAppState } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
@@ -108,106 +110,158 @@ const nonWalletRoutes = (
 
 const walletRoutes = (
   <>
-    <Route path={routes.accountNft.path} element={<NftScreen />} />
-    <Route path={routes.collectionNfts.path} element={<CollectionNfts />} />
     <Route
+      presentation="modal"
+      path={routes.accountNft.path}
+      element={<NftScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.collectionNfts.path}
+      element={<CollectionNfts />}
+    />
+    <Route
+      presentation="modal"
       path={routes.networkWarning.path}
       element={<NetworkWarningScreen />}
     />
     <Route
+      presentation="push"
       path={routes.accountTokens.path}
       element={<AccountScreen tab="tokens" />}
     />
     <Route
+      presentation="push"
       path={routes.accountCollections.path}
       element={<AccountScreen tab="collections" />}
     />
     <Route
+      presentation="push"
+      path={routes.swap.path}
+      element={<AccountScreen tab="swap" />}
+    />
+    <Route
+      presentation="push"
       path={routes.accountActivity.path}
       element={<AccountScreen tab="activity" />}
     />
-    <Route path={routes.accounts.path} element={<AccountListScreen />} />
-    <Route path={routes.editAccount.path} element={<AccountEditScreen />} />
-    <Route path={routes.settings.path} element={<SettingsScreen />} />
     <Route
+      presentation="modal"
+      path={routes.accounts.path}
+      element={<AccountListScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.editAccount.path}
+      element={<AccountEditScreen />}
+    />
+    <Route
+      presentation="modal"
+      path={routes.settings.path}
+      element={<SettingsScreen />}
+    />
+    <Route
+      presentation="push"
       path={routes.settingsPrivacy.path}
       element={<PrivacySettingsScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsAddCustomNetwork.path}
       element={<NetworkSettingsFormScreen mode="add" />}
     />
     <Route
+      presentation="push"
       path={routes.settingsEditCustomNetwork.path}
       element={<NetworkSettingsEditScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsBlockExplorer.path}
       element={<BlockExplorerSettingsScreen />}
     />
     <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
     <Route
+      presentation="push"
       path={routes.settingsDappConnections.path}
       element={<DappConnectionsSettingsScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsAddressbook.path}
       element={<AddressbookSettingsScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsAddressbookAdd.path}
       element={<AddressbookAddOrEditScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsAddressbookEdit.path}
       element={<AddressbookAddOrEditScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsDeveloper.path}
       element={<DeveloperSettings />}
     />
     <Route
+      presentation="push"
       path={routes.settingsSmartContractDevelopment.path}
       element={<SmartContractDevelopmentScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsSmartContractDeclare.path}
       element={<DeclareSmartContractScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsSmartContractDeploy.path}
       element={<DeploySmartContractScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsSmartContractDeclareOrDeploySuccess.path}
       element={<DeclareOrDeployContractSuccess />}
     />
     <Route
+      presentation="push"
       path={routes.settingsExperimental.path}
       element={<PrivacyExperimentalSettings />}
     />
     <Route
+      presentation="push"
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreen />}
     />
     <Route
+      presentation="push"
       path={routes.settingsPrivacyStatement.path}
       element={<SettingsPrivacyStatementScreen />}
     />
     <Route
+      presentation="modal"
       path={routes.transactionDetail.path}
       element={<TransactionDetailScreen />}
     />
     <Route
+      presentation="push"
       path={routes.accountHideConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="hide" />}
     />
     <Route
+      presentation="push"
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
     />
     <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
-    <Route path={routes.hideToken.path} element={<HideTokenScreen />} />
+    <Route
+      presentation="push"
+      path={routes.hideToken.path}
+      element={<HideTokenScreen />}
+    />
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
     <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
@@ -220,13 +274,27 @@ const walletRoutes = (
       element={<UpgradeScreenV4 upgradeType={"account"} />}
     />
     <Route
+      presentation="push"
       path={routes.accountsHidden.path}
       element={<AccountListHiddenScreen />}
     />
-    <Route path={routes.funding.path} element={<FundingScreen />} />
-    <Route path={routes.fundingBridge.path} element={<FundingBridgeScreen />} />
-    <Route path={routes.fundingQrCode.path} element={<FundingQrCodeScreen />} />
     <Route
+      presentation={"modal"}
+      path={routes.funding.path}
+      element={<FundingScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.fundingBridge.path}
+      element={<FundingBridgeScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.fundingQrCode.path}
+      element={<FundingQrCodeScreen />}
+    />
+    <Route
+      presentation="push"
       path={routes.fundingProvider.path}
       element={<FundingProviderScreen />}
     />
@@ -241,7 +309,11 @@ const walletRoutes = (
     <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
     <Route path={routes.newToken.path} element={<AddTokenScreen />} />
     <Route path={routes.token.path} element={<TokenScreen />} />
-    <Route path={routes.addPlugin.path} element={<AddPluginScreen />} />
+    <Route
+      presentation="modal"
+      path={routes.addPlugin.path}
+      element={<AddPluginScreen />}
+    />
     <Route
       path={routes.backupDownload.path}
       element={<BackupDownloadScreen />}
@@ -295,29 +367,47 @@ const fullscreenRoutes = (
   </>
 )
 
+/** Make a list of non-wallet routes which will show in place of actions */
+const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
+  (child: ReactNode) => {
+    return isValidElement(child) ? child.props.path : []
+  },
+)
+
 export const AppRoutes: FC = () => {
   useEntryRoute()
+  const location = useLocation()
 
   const { isLoading } = useAppState()
   const actions = useActions()
+
+  const showActions = useMemo(() => {
+    const hasActions = !!actions[0]
+    const isNonWalletRoute = nonWalletPaths.includes(location.pathname)
+    return hasActions && !isNonWalletRoute
+  }, [actions, location.pathname])
 
   if (isLoading) {
     return <LoadingScreen />
   }
 
-  const hasActions = !!actions[0]
+  if (showActions) {
+    return (
+      <ResponsiveContainer>
+        <ActionScreen />
+      </ResponsiveContainer>
+    )
+  }
 
   return (
-    <Routes>
-      <Route element={<ResponsiveRoutes />}>
-        {nonWalletRoutes}
-        {hasActions ? (
-          <Route path="*" element={<ActionScreen />} />
-        ) : (
-          walletRoutes
-        )}
-      </Route>
-      {fullscreenRoutes}
-    </Routes>
+    <RoutesConfig defaultPresentation="replace">
+      <Routes>
+        <Route element={<ResponsiveRoutes />}>
+          {nonWalletRoutes}
+          {walletRoutes}
+        </Route>
+        {fullscreenRoutes}
+      </Routes>
+    </RoutesConfig>
   )
 }

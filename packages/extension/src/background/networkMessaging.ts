@@ -10,6 +10,28 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
   respond,
 }) => {
   switch (msg.type) {
+    case "GET_NETWORKS": {
+      return respond({
+        type: "GET_NETWORKS_RES",
+        data: await getNetworks(),
+      })
+    }
+
+    case "GET_NETWORK": {
+      const allNetworks = await getNetworks()
+
+      const network = allNetworks.find((n) => n.id === msg.data)
+
+      if (!network) {
+        throw new Error(`Network with id ${msg.data} not found`)
+      }
+
+      return respond({
+        type: "GET_NETWORK_RES",
+        data: network,
+      })
+    }
+
     case "GET_NETWORK_STATUSES": {
       const networks = msg.data?.length ? msg.data : await getNetworks()
       const statuses = await getNetworkStatuses(networks)
@@ -24,8 +46,10 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
 
       if (exists) {
         return respond({
-          type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
-          data: {},
+          type: "REQUEST_ADD_CUSTOM_NETWORK_REJ",
+          data: {
+            error: `Network with chainId ${msg.data.chainId} already exists`,
+          },
         })
       }
 
@@ -47,8 +71,10 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
 
       if (!network) {
         return respond({
-          type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
-          data: {},
+          type: "REQUEST_SWITCH_CUSTOM_NETWORK_REJ",
+          data: {
+            error: `Network with chainId ${msg.data.chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
+          },
         })
       }
 

@@ -7,13 +7,10 @@ import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { analytics } from "../../services/analytics"
 import { assertNever } from "../../services/assertNever"
-import { connectAccount } from "../../services/backgroundAccounts"
+import { selectAccount } from "../../services/backgroundAccounts"
 import { approveAction, rejectAction } from "../../services/backgroundActions"
 import { Account } from "../accounts/Account"
-import {
-  useSelectedAccount,
-  useSelectedAccountStore,
-} from "../accounts/accounts.state"
+import { useSelectedAccount } from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { useActions } from "./actions.state"
@@ -77,13 +74,7 @@ export const ActionScreen: FC = () => {
           host={action.payload.host}
           onConnect={async (selectedAccount: Account) => {
             useAppState.setState({ isLoading: true })
-            // switch UI to the account that was selected
-            useSelectedAccountStore.setState({
-              selectedAccount,
-            })
-            // switch background wallet to the account that was selected
-            connectAccount(selectedAccount)
-            await waitForMessage("CONNECT_ACCOUNT_RES")
+            selectAccount(selectedAccount)
             // continue with approval with selected account
             await approveAction(action)
             await waitForMessage("CONNECT_DAPP_RES")
@@ -116,6 +107,7 @@ export const ActionScreen: FC = () => {
           hideBackButton
           onSubmit={onSubmit}
           onReject={onReject}
+          mode="add"
         />
       )
 
@@ -123,10 +115,10 @@ export const ActionScreen: FC = () => {
       return (
         <AddNetworkScreen
           requestedNetwork={action.payload}
-          mode="switch"
           hideBackButton
           onSubmit={onSubmit}
           onReject={onReject}
+          mode="switch"
         />
       )
 

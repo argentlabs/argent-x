@@ -1,13 +1,11 @@
-import { H5, P4, icons } from "@argent/ui"
-import { Box, Center, Flex, Stack, VStack } from "@chakra-ui/react"
-import React, { useMemo } from "react"
+import { H5, P4 } from "@argent/ui"
+import { Box, Flex } from "@chakra-ui/react"
+import { useMemo } from "react"
 import { Call } from "starknet"
 
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
-
-const { UnknownDappIcon } = icons
 
 export interface DappHeaderProps {
   transactions: Call[]
@@ -18,11 +16,6 @@ export const DappHeader = ({
   transactions,
   transactionReview,
 }: DappHeaderProps) => {
-  console.log(
-    "🚀 ~ file: DappHeader.tsx:21 ~ transactionReview",
-    transactionReview,
-  )
-
   const targetedDappWebsite = useMemo(
     () =>
       transactionReview?.targetedDapp?.links.find((l) => l.name === "website"),
@@ -59,22 +52,6 @@ export const DappHeader = ({
           )}
         </Flex>
       </Flex>
-    </Box>
-  )
-}
-
-const IconWrapper = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Box
-      w="14"
-      h="14"
-      background="neutrals.700"
-      borderRadius="2xl"
-      boxShadow="0px 4px 20px rgba(0, 0, 0, 0.5);"
-    >
-      <Center justifyContent="center" alignItems="center" height="full">
-        {children}
-      </Center>
     </Box>
   )
 }

@@ -8,6 +8,7 @@ import { getNetwork } from "../shared/network"
 import { migratePreAuthorizations } from "../shared/preAuthorizations"
 import { delay } from "../shared/utils/delay"
 import { migrateWallet } from "../shared/wallet/storeMigration"
+import { walletStore } from "../shared/wallet/walletStore"
 import { handleAccountMessage } from "./accountMessaging"
 import { loadContracts } from "./accounts"
 import { handleActionMessage } from "./actionMessaging"
@@ -35,7 +36,7 @@ import { initBadgeText } from "./transactions/badgeText"
 import { transactionTracker } from "./transactions/tracking"
 import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { handleUdcMessaging } from "./udcMessaging"
-import { Wallet, sessionStore, walletStore } from "./wallet"
+import { Wallet, sessionStore } from "./wallet"
 
 browser.alarms.create("core:transactionTracker:history", {
   periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager

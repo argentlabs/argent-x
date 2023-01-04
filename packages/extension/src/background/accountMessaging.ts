@@ -24,9 +24,12 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "CONNECT_ACCOUNT": {
-      await wallet.selectAccount(msg.data)
+      // Select an Account of BaseWalletAccount type
+      const selectedAccount = await wallet.getSelectedAccount()
+
       return respond({
         type: "CONNECT_ACCOUNT_RES",
+        data: selectedAccount,
       })
     }
 
