@@ -26,7 +26,7 @@ const HighPriceImpactModal: FC<HighPriceImpactModalProps> = ({
       <ModalContent background="neutrals.700">
         <ModalHeader>
           <H5 fontWeight="600" textAlign="center">
-            High Price Impace
+            High Price Impact
           </H5>
         </ModalHeader>
         <ModalBody>
