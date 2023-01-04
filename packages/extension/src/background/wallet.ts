@@ -366,14 +366,19 @@ export class Wallet {
       // silent fail if no account implementation is defined for this network
       return
     }
-
     const accounts = await this.restoreAccountsFromWallet(
       wallet.privateKey,
       network,
       offset,
     )
+    const walletStoreAccounts = await this.walletStore.get()
+    const exists = accounts.some((a) =>
+      walletStoreAccounts.find((w) => isEqualAddress(w.address, a.address)),
+    )
 
-    await this.walletStore.push(accounts)
+    if (!exists) {
+      await this.walletStore.push(accounts)
+    }
   }
 
   public async newAccount(networkId: string): Promise<WalletAccount> {
@@ -384,9 +389,11 @@ export class Wallet {
 
     const network = await this.getNetwork(networkId)
 
+    console.log(await this.walletStore.get(withHiddenSelector))
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.walletStore.get(withHiddenSelector)
+    console.log(accounts)
 
     const currentPaths = accounts
       .filter(
