@@ -146,7 +146,7 @@ export const NftScreen: FC = () => {
             <P4>
               {nft.best_bid_order?.payment_amount
                 ? ethers.utils.formatEther(nft.best_bid_order?.payment_amount)
-                : "0"}
+                : "0"}{" "}
               ETH
             </P4>
           </Flex>
