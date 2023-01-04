@@ -389,11 +389,9 @@ export class Wallet {
 
     const network = await this.getNetwork(networkId)
 
-    console.log(await this.walletStore.get(withHiddenSelector))
     await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.walletStore.get(withHiddenSelector)
-    console.log(accounts)
 
     const currentPaths = accounts
       .filter(
