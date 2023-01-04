@@ -12,6 +12,7 @@ export const colors = {
   gray: makeColorVariants("#58585b"),
   primary: makeColorVariants("#f36a3d"),
   secondary: makeColorVariants("#08a681"),
+  secondaryDark: "#068063",
   tertiary: makeColorVariants("#404043"),
   accent: makeColorVariants("#197aa6"),
   warn: makeColorVariants("#ffbf3d"),
