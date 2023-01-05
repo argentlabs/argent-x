@@ -352,9 +352,11 @@ export const cosignerSign = async (message: any) => {
     IS_DEV && console.warn(coerceErrorToString(error))
     if (isFetcherError(error)) {
       if (error.responseJson?.status === "noMatchingAccountForUser") {
-        throw new Error("Failed to co-sign - no matching account for user")
+        throw new Error(
+          "Argent Shield failed to co-sign - no matching account for user",
+        )
       }
     }
-    throw new Error("Failed to co-sign")
+    throw new Error("Argent Shield failed to co-sign")
   }
 }

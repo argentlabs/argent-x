@@ -66,7 +66,7 @@ export const getVerifiedEmailAge = async () => {
     )
     return age
   }
-  throw new Error("Email not verified")
+  throw new Error("Argent Shield email not verified")
 }
 
 /** backend expiry is 30 days, be optimistic and check 29 here */

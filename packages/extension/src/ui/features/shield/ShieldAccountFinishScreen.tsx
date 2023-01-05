@@ -8,7 +8,7 @@ import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { Link } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes, useRouteAccountAddress } from "../../routes"
 import { ShieldHeader } from "./ShieldHeader"
 import {
   ChangeGuardian,
@@ -18,6 +18,7 @@ import { useRouteAccount } from "./useRouteAccount"
 
 export const ShieldAccountFinishScreen: FC = () => {
   const account = useRouteAccount()
+  const accountAddress = useRouteAccountAddress()
   const pendingChangeGuardian = usePendingChangeGuardian(account)
 
   const title = pendingChangeGuardian
@@ -41,7 +42,11 @@ export const ShieldAccountFinishScreen: FC = () => {
       <CellStack flex={1}>
         <ShieldHeader title={title} subtitle={subtitle} />
         <Flex flex={1} />
-        <Button as={Link} to={routes.accountActivity()} colorScheme={"primary"}>
+        <Button
+          as={Link}
+          to={routes.editAccount(accountAddress)}
+          colorScheme={"primary"}
+        >
           Done
         </Button>
       </CellStack>
