@@ -7,7 +7,7 @@ import {
   useToast,
 } from "@argent/ui"
 import { Center, HStack, PinInputField, chakra } from "@chakra-ui/react"
-import { FC, useCallback, useMemo, useRef } from "react"
+import { FC, MouseEvent, useCallback, useMemo, useRef } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
@@ -70,26 +70,30 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
   const formRef = useRef<HTMLFormElement>(null)
   const toast = useToast()
 
-  const onResendEmail = useCallback(async () => {
-    if (!email) {
-      return
-    }
-    try {
-      await requestEmail(email)
-      toast({
-        title: "Verification email sent",
-        status: "success",
-        duration: 3000,
-      })
-    } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
-      toast({
-        title: "Unable to verify email",
-        status: "error",
-        duration: 3000,
-      })
-    }
-  }, [email, toast])
+  const onResendEmail = useCallback(
+    async (e: MouseEvent) => {
+      e.preventDefault()
+      if (!email) {
+        return
+      }
+      try {
+        await requestEmail(email)
+        toast({
+          title: "Verification email sent",
+          status: "success",
+          duration: 3000,
+        })
+      } catch (error) {
+        IS_DEV && console.warn(coerceErrorToString(error))
+        toast({
+          title: "Unable to verify email",
+          status: "error",
+          duration: 3000,
+        })
+      }
+    },
+    [email, toast],
+  )
 
   const obfuscatedEmail = useMemo(() => {
     if (!email) {

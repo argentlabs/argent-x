@@ -38,7 +38,7 @@ export const MaybeShieldActionScreen: FC = () => {
     init()
   }, [hasGuardian, navigate, verifiedEmail])
 
-  if (hasGuardian && verifiedEmail === null) {
+  if (!account || verifiedEmail === null) {
     /** still loading */
     return (
       <VStack pt={12} px={8} spacing={2} align="stretch">

@@ -1,5 +1,6 @@
 import {
   BarBackButton,
+  BarCloseButton,
   Button,
   CellStack,
   FieldError,
@@ -24,11 +25,13 @@ const schema = yup.object().required().shape({
 
 export interface ShieldBaseEmailScreenProps {
   onBack?: () => void
+  onCancel?: () => void
   onEmailRequested: (email: string) => void
 }
 
 export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
   onBack,
+  onCancel,
   onEmailRequested,
 }) => {
   const resolver = useYupValidationResolver(schema)
@@ -42,7 +45,13 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
   })
   return (
     <NavigationContainer
-      leftButton={onBack ? <BarBackButton onClick={onBack} /> : null}
+      leftButton={
+        onBack ? (
+          <BarBackButton onClick={onBack} />
+        ) : onCancel ? (
+          <BarCloseButton onClick={onCancel} />
+        ) : null
+      }
       title={"Argent Shield"}
     >
       <CellStack

@@ -19,6 +19,19 @@ export const focusExtensionTab = async () => {
   }
 }
 
+/** Focus the extension if it is running in a tab  */
+export const useFocusExtensionIfInTab = () => {
+  const extensionIsInTab = useExtensionIsInTab()
+  useEffect(() => {
+    const init = async () => {
+      if (extensionIsInTab) {
+        await focusExtensionTab()
+      }
+    }
+    init()
+  }, [extensionIsInTab])
+}
+
 export const useExtensionIsInTab = () => {
   const [isInTab, setIsInTab] = useState(false)
   useEffect(() => {
