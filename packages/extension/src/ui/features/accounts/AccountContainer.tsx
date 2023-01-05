@@ -50,7 +50,13 @@ export const AccountContainer: FC<AccountContainerProps> = ({
           icon={<NftIcon />}
           label="NFTs"
         />
-        <Tab as={NavLink} to={routes.swap()} icon={<SwapIcon />} label="Swap" />
+        <Tab
+          as={NavLink}
+          to={routes.swap()}
+          replace
+          icon={<SwapIcon />}
+          label="Swap"
+        />
         <Tab
           as={NavLink}
           to={routes.accountActivity()}
