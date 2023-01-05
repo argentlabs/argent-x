@@ -267,7 +267,7 @@ const Swap = () => {
             textDecoration: "underline",
           }}
         >
-          Powered by Jediswap
+          Powered by JediSwap
         </L2>
       </SwapContainer>
       <Flex flex={1} />
