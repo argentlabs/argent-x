@@ -6,8 +6,6 @@ import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
 import { generateJwt } from "../jwt"
 
-/** TODO: align approach - originally copied from packages/web */
-
 type EnsFreeStatus =
   | "taken"
   | "alreadyReserved"
@@ -203,11 +201,12 @@ export const verifyEmail = async (
     return json
   } catch (error) {
     IS_DEV && console.warn(coerceErrorToString(error))
-    throw new Error("Failed to verify email")
+    throw error
   }
 }
 
 type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
+
 export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
   const jwt = await generateJwt()
   try {
@@ -263,33 +262,33 @@ export const getAccounts = async (): Promise<Account[]> => {
   }
 }
 
-export interface UserAccount {
-  email: string
-  accounts: Account[]
-}
+// export interface UserAccount {
+//   email: string
+//   accounts: Account[]
+// }
 
-export const getAccount = async (): Promise<UserAccount> => {
-  const jwt = await generateJwt()
-  const json = await fetcher(`${ARGENT_API_BASE_URL}/account`, {
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-  })
-  console.log("getAccount", JSON.stringify(json, null, 2))
+// export const getAccount = async (): Promise<UserAccount> => {
+//   const jwt = await generateJwt()
+//   const json = await fetcher(`${ARGENT_API_BASE_URL}/account`, {
+//     headers: {
+//       Authorization: `Bearer ${jwt}`,
+//       "Content-Type": "application/json",
+//     },
+//   })
+//   console.log("getAccount", JSON.stringify(json, null, 2))
 
-  // if (!response.ok) {
-  //   throw new Error("failed to get account")
-  // }
+//   // if (!response.ok) {
+//   //   throw new Error("failed to get account")
+//   // }
 
-  // const json = await response.json()
+//   // const json = await response.json()
 
-  // TODO: [BE] make atomic
-  json.accounts = await getAccounts()
-  console.log("getAccount with accounts", JSON.stringify(json, null, 2))
+//   // TODO: [BE] make atomic
+//   json.accounts = await getAccounts()
+//   console.log("getAccount with accounts", JSON.stringify(json, null, 2))
 
-  return json
-}
+//   return json
+// }
 
 interface AddAccountResponse {
   address: string

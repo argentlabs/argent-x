@@ -11,6 +11,7 @@ import { FC, useCallback, useMemo, useRef } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
+import { isFetcherError } from "../../../shared/api/fetcher"
 import {
   EmailVerificationStatus,
   getVerificationErrorMessage,
@@ -54,12 +55,14 @@ const schema = yup
 export interface ShieldBaseOTPScreenProps {
   onBack?: () => void
   email?: string
+  onOTPNotRequested: () => void
   onOTPConfirmed: () => void
 }
 
 export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
   onBack,
   email,
+  onOTPNotRequested,
   onOTPConfirmed,
 }) => {
   const verifiedEmail = useShieldVerifiedEmail()
@@ -135,15 +138,28 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
 
                     onOTPConfirmed()
                   } catch (e) {
-                    console.error("error", coerceErrorToString(e))
-                    if (e instanceof Error) {
-                      return setError("otp", {
-                        type: "manual",
-                        message: getVerificationErrorMessage(
-                          e.cause as EmailVerificationStatus,
-                        ),
-                      })
+                    if (isFetcherError(e)) {
+                      if (e.responseJson.status === "notRequested") {
+                        /** need to start verification over again */
+                        toast({
+                          title: "Please re-enter email",
+                          status: "error",
+                          duration: 3000,
+                        })
+                        onOTPNotRequested()
+                      } else {
+                        return setError("otp", {
+                          type: "manual",
+                          message: getVerificationErrorMessage(
+                            e.responseJson.status as EmailVerificationStatus,
+                          ),
+                        })
+                      }
                     }
+                    return setError("otp", {
+                      type: "manual",
+                      message: "Unknown",
+                    })
                   }
                 })}
               >

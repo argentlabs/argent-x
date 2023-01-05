@@ -2,8 +2,6 @@ import retry from "async-retry"
 
 import { isEnsFree, reserveEns } from "./backend/account"
 
-/** TODO: align approach - originally copied from packages/web */
-
 // generate random names like "ax-n12dwvzfyw.argent.xyz"
 export const generateArgentName = (length = 10) => {
   const randomString = Math.random()

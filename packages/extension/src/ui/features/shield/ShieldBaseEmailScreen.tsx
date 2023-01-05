@@ -8,11 +8,10 @@ import {
   useToast,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
+import { FC } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
-import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
@@ -34,16 +33,6 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
 }) => {
   const resolver = useYupValidationResolver(schema)
   const toast = useToast()
-
-  /** resets device locally, which allows a new email address to be used */
-  const onResetDevice = useCallback(async () => {
-    await resetDevice()
-    toast({
-      title: "Device reset",
-      status: "success",
-      duration: 3000,
-    })
-  }, [toast])
 
   const { handleSubmit, register, formState } = useForm({
     defaultValues: {
@@ -88,7 +77,6 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
         />
         <FieldError>{formState.errors.email?.message}</FieldError>
         <Flex flex={1} />
-        <Button onClick={onResetDevice}>Debug: reset device</Button>
         <Button
           colorScheme={"primary"}
           type="submit"

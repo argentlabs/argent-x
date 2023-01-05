@@ -9,10 +9,11 @@ import { Device, idb } from "./idb"
 
 /** important that signingKey stays not 'extractable' from browser */
 
+const alg = "ES256"
 const genKeyPairOpts = Object.freeze({ extractable: false })
 
 const createDevice = async (): Promise<Device> => {
-  const signingKey = await generateKeyPair("ES256", genKeyPairOpts)
+  const signingKey = await generateKeyPair(alg, genKeyPairOpts)
   return {
     id: 0,
     signingKey,
@@ -85,7 +86,6 @@ export const getVerifiedEmailIsExpiredForRemoval = async () => {
 }
 
 export const generateJwt = async () => {
-  const alg = "ES256"
   const device = await getDevice()
   if (typeof device.signingKey === "string") {
     throw new Error("signingKey is not a key object")

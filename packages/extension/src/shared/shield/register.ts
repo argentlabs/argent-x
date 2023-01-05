@@ -5,21 +5,17 @@ import {
   verifyEmail,
 } from "./backend/account"
 
-/** TODO: align approach - originally copied from packages/web */
-
 export const requestEmail = async (email: string) => {
   return requestEmailAuthentication(email)
 }
 
 export const confirmEmail = async (code: string) => {
-  const { status, userRegistrationStatus } = await verifyEmail(code)
-  if (status !== "verified") {
-    throw new Error("failed to verify email", { cause: status })
-  }
+  const { userRegistrationStatus } = await verifyEmail(code)
 
   // TODO: [BE] make atomic
   if (userRegistrationStatus === "notRegistered") {
-    console.log("assigned ENS:", await assignEns())
+    const reservedEns = await assignEns()
+    console.log("assigned ENS:", reservedEns)
     await register()
   }
 }
