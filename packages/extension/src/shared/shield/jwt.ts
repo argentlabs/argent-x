@@ -1,6 +1,4 @@
-import { Wallet } from "ethers"
 import {
-  JWK,
   SignJWT,
   calculateJwkThumbprint,
   exportJWK,
@@ -9,70 +7,31 @@ import {
 
 import { Device, idb } from "./idb"
 
-/** TODO: align approach - originally copied from packages/web */
+/** important that signingKey stays not 'extractable' from browser */
 
-export const genKeyPairOpts = Object.freeze({ extractable: false }) // important that it stays non-extractable
+const genKeyPairOpts = Object.freeze({ extractable: false })
 
 const createDevice = async (): Promise<Device> => {
-  // generate this and store in storage (persistent across refreshes)
-  // used to sign JWT,
-  // does not need to be encypted at rest
-  // store in indexeddb, not 'extractable' from browsr
-
-  // currently we are always registering a device as they never get deleted
-
-  // backend only has one valid jwt
-
-  // you can use any 'read' endpoint to check if your session is still valid
-
-  // const signingKey = await generateKeyPair("ES256", genKeyPairOpts)
-
-  // TODO: use the new method above when working
-  console.warn(
-    "TODO: Using legacy jwt signing - replace with new implementation",
-  )
-  const newWallet = Wallet.createRandom()
-  const signingKey = newWallet.privateKey
-
+  const signingKey = await generateKeyPair("ES256", genKeyPairOpts)
   return {
     id: 0,
     signingKey,
   }
 }
 
-// createDevice().then(async (d) => {
-//   if (typeof d.signingKey === "string") {
-//     throw new Error("Signing key is not a key object")
-//   }
-//   const jwk = await exportJWK(d.signingKey.publicKey)
-//   const thumbprint = await calculateJwkThumbprint(jwk)
-//   const jwt = await new SignJWT({ foo: "bar" })
-//     .setIssuer("https://example.com")
-//     .setAudience("https://example.com")
-//     .setProtectedHeader({
-//       alg: "ES256",
-//       jwk: { ...jwk, kid: thumbprint } as JWK,
-//       kid: thumbprint,
-//     })
-//     .sign(d.signingKey.privateKey)
-
-//   console.log(jwt)
-// })
-
-let device: Device | null = null
+let _device: Device | null = null
 
 export const resetDevice = async () => {
   await idb.transaction("rw", idb.devices, async () => {
     await idb.devices.delete(0)
-    device = null
+    _device = null
   })
 }
 
 export const getDevice = async () => {
-  if (!device) {
+  if (!_device) {
     const newDevice = await createDevice()
-
-    device = await idb.transaction("rw", idb.devices, async () => {
+    _device = await idb.transaction("rw", idb.devices, async () => {
       const device = await idb.devices.get(0)
       if (device) {
         return device
@@ -81,21 +40,15 @@ export const getDevice = async () => {
       return newDevice
     })
   }
-
-  return device
+  return _device
 }
 
 export const updateVerifiedEmail = async (email?: string) => {
-  if (device === null) {
-    device = await getDevice()
-  }
   await idb.transaction("rw", idb.devices, async () => {
-    const device = await idb.devices.get(0)
-    if (device) {
-      device.verifiedEmail = email
-      device.verifiedAt = new Date().toISOString()
-      await idb.devices.put(device)
-    }
+    const device = await getDevice()
+    device.verifiedEmail = email
+    device.verifiedAt = new Date().toISOString()
+    await idb.devices.put(device)
   })
 }
 
@@ -129,4 +82,25 @@ export const getVerifiedEmailIsExpiredForRemoval = async () => {
   const age = await getVerifiedEmailAge()
   const minutes = age / (1000 * 60)
   return minutes > 25
+}
+
+export const generateJwt = async () => {
+  const alg = "ES256"
+  const device = await getDevice()
+  if (typeof device.signingKey === "string") {
+    throw new Error("signingKey is not a key object")
+  }
+  const { publicKey, privateKey } = device.signingKey
+
+  const publicJwk = await exportJWK(publicKey)
+  const thumbprint = await calculateJwkThumbprint(publicJwk)
+
+  const jwt = await new SignJWT({})
+    .setProtectedHeader({ alg, jwk: publicJwk })
+    .setIssuedAt()
+    .setIssuer("kid:" + thumbprint)
+    .setExpirationTime("2h")
+    .sign(privateKey)
+
+  return jwt
 }

@@ -4,7 +4,7 @@ import { ARGENT_API_BASE_URL } from "../../api/constants"
 import { fetcher, isFetcherError } from "../../api/fetcher"
 import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
-import { getJwt } from "../__unsafe__oldJwt"
+import { generateJwt } from "../jwt"
 
 /** TODO: align approach - originally copied from packages/web */
 
@@ -16,7 +16,7 @@ type EnsFreeStatus =
   | "notUTS46"
   | "userAlreadyRegistered"
 export const isEnsFree = async (ens: string): Promise<EnsFreeStatus> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   const response = await fetch(
     `${ARGENT_API_BASE_URL}/account/isEnsFree?ens=${ens}`,
     {
@@ -43,7 +43,7 @@ type ReserveEnsStatus =
   | "notUTS46"
   | "userAlreadyRegistered"
 export const reserveEns = async (ens: string): Promise<ReserveEnsStatus> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   const response = await fetch(`${ARGENT_API_BASE_URL}/account/reserveEns`, {
     method: "POST",
     headers: {
@@ -67,7 +67,7 @@ export const requestEmailAuthentication = async (
   email: string,
   locale = "en-EN",
 ): Promise<void> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   const json = await fetcher(
     `${ARGENT_API_BASE_URL}/account/requestEmailAuthentication`,
     {
@@ -98,7 +98,7 @@ export type EmailVerificationStatus =
   | "notRequested"
 export const getEmailVerificationStatus =
   async (): Promise<EmailVerificationStatus> => {
-    const jwt = await getJwt()
+    const jwt = await generateJwt()
     try {
       const json = await fetcher(
         `${ARGENT_API_BASE_URL}/account/emailVerificationStatus`,
@@ -135,7 +135,7 @@ export const getVerificationErrorMessage = (
 }
 
 export const register = async (): Promise<void> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   try {
     const json = await fetcher(`${ARGENT_API_BASE_URL}/account/asyncRegister`, {
       method: "POST",
@@ -184,7 +184,7 @@ interface VerifyEmailResponse {
 export const verifyEmail = async (
   verificationCode: string,
 ): Promise<VerifyEmailResponse> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   try {
     const json: VerifyEmailResponse = await fetcher(
       `${ARGENT_API_BASE_URL}/verifyEmail`,
@@ -209,7 +209,7 @@ export const verifyEmail = async (
 
 type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
 export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   try {
     const json = await fetcher(
       `${ARGENT_API_BASE_URL}/account/registrationStatus`,
@@ -243,7 +243,7 @@ interface Account {
 }
 
 export const getAccounts = async (): Promise<Account[]> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   try {
     const json = await fetcher(
       `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
@@ -269,7 +269,7 @@ export interface UserAccount {
 }
 
 export const getAccount = async (): Promise<UserAccount> => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   const json = await fetcher(`${ARGENT_API_BASE_URL}/account`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
@@ -305,7 +305,7 @@ export const addAccount = async (
     throw new Error("only one signature supported")
   }
 
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   try {
     const json = await fetcher(`${ARGENT_API_BASE_URL}/account`, {
       method: "POST",
@@ -336,7 +336,7 @@ export const addAccount = async (
 }
 
 export const cosignerSign = async (message: any) => {
-  const jwt = await getJwt()
+  const jwt = await generateJwt()
   try {
     const json = await fetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
       method: "POST",

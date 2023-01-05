@@ -1,14 +1,12 @@
 import Dexie, { Table } from "dexie"
 import { GenerateKeyPairResult } from "jose"
 
-/** TODO: align approach - originally copied from packages/web */
-
 export interface Device {
   id?: number
   signingKey: GenerateKeyPairResult | string
   /** presence of email indicates that the email has been verified by 2fa with backend */
   verifiedEmail?: string
-  /** ISO date string of when the email was updated */
+  /** ISO date string of when the email was verified */
   verifiedAt?: string
 }
 
