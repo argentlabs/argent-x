@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/big.js": "^4.0.5",
-    "@types/jest": "^24.0.25",
+    "@types/jest": "^29.2.5",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^3.0.0",
