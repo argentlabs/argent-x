@@ -18,7 +18,6 @@ import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
  * Wraps any screen which may need to sign a transaction
  *
  * If the current account has a Guardian, check and handle the email / otp verification flow using local state
- *
  */
 
 enum ArgentShieldVerifiedState {
@@ -128,7 +127,7 @@ export const WithArgentShieldVerified: FC<PropsWithChildren> = ({
             isOpen={alertDialogIsOpen}
             title={"Argent Shield 2FA"}
             message={
-              "This account is protected by Argent Shield and sign transactions or estimate fees without 2FA"
+              "This account is protected by Argent Shield and cannot sign transactions or estimate fees without 2FA"
             }
             cancelTitle={"Abort 2FA"}
             onCancel={onAlertDialogConfirm}

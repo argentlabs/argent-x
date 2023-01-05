@@ -84,7 +84,10 @@ export const routes = {
   ),
   sendScreen: route("/send"),
   sendToken: route(
-    (tokenAddress: string) => `/send-token/${tokenAddress}`,
+    (tokenAddress: string, returnTo?: string) =>
+      returnTo
+        ? `/send-token/${tokenAddress}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/send-token/${tokenAddress}`,
     "/send-token/:tokenAddress",
   ),
   sendNft: route(
