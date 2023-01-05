@@ -6,7 +6,7 @@ import {
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import { routes, useRouteAccountAddress } from "../../routes"
 import { ShieldHeader } from "./ShieldHeader"
@@ -20,6 +20,7 @@ export const ShieldAccountFinishScreen: FC = () => {
   const account = useRouteAccount()
   const accountAddress = useRouteAccountAddress()
   const pendingChangeGuardian = usePendingChangeGuardian(account)
+  const navigate = useNavigate()
 
   const title = pendingChangeGuardian
     ? `${
@@ -37,16 +38,27 @@ export const ShieldAccountFinishScreen: FC = () => {
         account?.guardian ? "now" : "no longer"
       } protected by Argent Shield`
 
+  /** TODO: find a nice way to preserve the original 'returnTo' tab route from settings screen */
+  const returnRoute = routes.editAccount(
+    accountAddress,
+    routes.settings(routes.accountTokens()),
+  )
+
   return (
-    <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
+    <NavigationContainer
+      leftButton={
+        <BarBackButton
+          onClick={() => {
+            navigate(returnRoute)
+          }}
+        />
+      }
+      title={"Argent Shield"}
+    >
       <CellStack flex={1}>
         <ShieldHeader title={title} subtitle={subtitle} />
         <Flex flex={1} />
-        <Button
-          as={Link}
-          to={routes.editAccount(accountAddress)}
-          colorScheme={"primary"}
-        >
+        <Button as={Link} to={returnRoute} colorScheme={"primary"}>
           Done
         </Button>
       </CellStack>

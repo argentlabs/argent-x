@@ -105,7 +105,10 @@ export const routes = {
   ),
   accounts: routeWithReturnTo("/accounts"),
   editAccount: route(
-    (accountAddress) => `/accounts/${accountAddress}`,
+    (accountAddress, returnTo?: string) =>
+      returnTo
+        ? `/accounts/${accountAddress}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/accounts/${accountAddress}`,
     "/accounts/:accountAddress",
   ),
   addAccount: route("/accounts/new"),
