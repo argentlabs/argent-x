@@ -135,11 +135,6 @@ export const routes = {
     (accountAddress) => `/accounts/${accountAddress}/shield/finish`,
     "/accounts/:accountAddress/shield/finish",
   ),
-  shieldActionEmail: route("/shield/email"),
-  shieldActionOTP: route(
-    (email) => `/shield/otp?email=${encodeURIComponent(email)}`,
-    "/shield/otp",
-  ),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),

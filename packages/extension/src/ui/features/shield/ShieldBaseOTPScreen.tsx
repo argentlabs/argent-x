@@ -140,6 +140,12 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                     /** always check the account exists in backend */
                     await shieldMaybeAddAccount()
 
+                    toast({
+                      title: "Argent Shield email verified",
+                      status: "success",
+                      duration: 3000,
+                    })
+
                     onOTPConfirmed()
                   } catch (e) {
                     if (isFetcherError(e)) {

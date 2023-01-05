@@ -23,10 +23,10 @@ import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import { useActions } from "./features/actions/actions.state"
+import { ActionScreen } from "./features/actions/ActionScreen"
 import { AddTokenScreen } from "./features/actions/AddTokenScreen"
 import { ErrorScreen } from "./features/actions/ErrorScreen"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
-import { MaybeShieldActionScreen } from "./features/actions/MaybeShieldActionScreen"
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
@@ -70,8 +70,7 @@ import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailSc
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
 import { ShieldAccountOTPScreen } from "./features/shield/ShieldAccountOTPScreen"
 import { ShieldAccountStartScreen } from "./features/shield/ShieldAccountStartScreen"
-import { ShieldActionEmailScreen } from "./features/shield/ShieldActionEmailScreen"
-import { ShieldActionOTPScreen } from "./features/shield/ShieldActionOTPScreen"
+import { WithArgentShieldVerified } from "./features/shield/WithArgentShieldVerified"
 import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
@@ -109,14 +108,6 @@ const nonWalletRoutes = (
     <Route
       path={routes.migrationDisclaimer.path}
       element={<MigrationDisclaimerScreen />}
-    />
-    <Route
-      path={routes.shieldActionEmail.path}
-      element={<ShieldActionEmailScreen />}
-    />
-    <Route
-      path={routes.shieldActionOTP.path}
-      element={<ShieldActionOTPScreen />}
     />
   </>
 )
@@ -303,7 +294,14 @@ const walletRoutes = (
       element={<HideTokenScreen />}
     />
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
-    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
+    <Route
+      path={routes.sendToken.path}
+      element={
+        <WithArgentShieldVerified>
+          <SendTokenScreen />
+        </WithArgentShieldVerified>
+      }
+    />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route
       path={routes.networkUpgradeV4.path}
@@ -434,7 +432,7 @@ export const AppRoutes: FC = () => {
   if (showActions) {
     return (
       <ResponsiveContainer>
-        <MaybeShieldActionScreen />
+        <ActionScreen />
       </ResponsiveContainer>
     )
   }

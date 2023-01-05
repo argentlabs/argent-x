@@ -13,7 +13,7 @@ import { useRestorationState } from "./restoration.state"
 const restorationStatePathnames: Array<string | PathPattern<string>> = [
   /** Some users will close the extension when navigating to webmail to retreive the OTP */
   routes.shieldAccountOTP.path,
-  routes.shieldActionOTP.path,
+  routes.sendToken.path,
 ]
 
 const isRestorationStatePathname = memoize((pathname?: string) => {
