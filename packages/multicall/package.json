@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-multicall",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "A library for batched calls to Starknet smart contracts",
   "keywords": [
     "starknet",
@@ -38,6 +38,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "vite build --watch",
+    "prepare": "vite build",
     "build": "vite build"
   },
   "bugs": {
@@ -46,9 +47,9 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.0",
     "happy-dom": "^8.1.0",
-    "vite": "^3.0.9",
+    "vite": "^4.0.3",
     "vite-plugin-dts": "^1.4.1",
-    "vitest": "^0.25.3"
+    "vitest": "^0.26.2"
   },
   "dependencies": {
     "dataloader": "^2.1.0",

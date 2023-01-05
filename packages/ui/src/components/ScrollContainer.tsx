@@ -1,5 +1,4 @@
-import { Flex, FlexProps } from "@chakra-ui/react"
-import { forwardRef } from "@chakra-ui/react"
+import { Flex, FlexProps, forwardRef } from "@chakra-ui/react"
 
 import { scrollbarStyle } from "../theme"
 

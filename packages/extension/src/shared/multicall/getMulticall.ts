@@ -12,14 +12,11 @@ export class NoMulticallAddressError extends Error {
 
 export const getMulticallForNetwork = memoize(
   (network: Network) => {
-    if (!network.multicallAddress) {
-      throw new NoMulticallAddressError(
-        "Cannot create Multicall for network with no `multicallAddress`",
-      )
-    }
+    const defaultMulticallAddress =
+      "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4"
     const multicall = new Multicall(
       getProvider(network),
-      network.multicallAddress,
+      network.multicallAddress ?? defaultMulticallAddress,
     )
     return multicall
   },

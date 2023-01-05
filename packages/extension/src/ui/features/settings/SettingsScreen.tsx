@@ -9,16 +9,15 @@ import {
 import { Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import { useLocation } from "react-router-dom"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { routes } from "../../routes"
+import { routes, useCurrentPathnameWithQuery, useReturnTo } from "../../routes"
 import { stopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
-import { useAccount, useSelectedAccountStore } from "../accounts/accounts.state"
+import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 import { SupportFooter } from "./SupportFooter"
@@ -78,17 +77,22 @@ export const SettingsScreenWrapper = styled.div`
 `
 
 export const SettingsScreen: FC = () => {
+  const settingsReturnTo = useReturnTo()
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
-  const { pathname: returnTo } = useLocation()
-  const navigate = useNavigate()
-  const { selectedAccount } = useSelectedAccountStore()
+  const selectedAccount = useSelectedAccount()
+  const returnTo = useCurrentPathnameWithQuery()
   const account = useAccount(selectedAccount)
+  const navigate = useNavigate()
   return (
     <>
       <NavigationContainer
         rightButton={
-          <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+          <BarCloseButton
+            onClick={() =>
+              settingsReturnTo ? navigate(settingsReturnTo) : navigate(-1)
+            }
+          />
         }
         title={"Settings"}
         scrollKey={"settings/SettingsScreen"}

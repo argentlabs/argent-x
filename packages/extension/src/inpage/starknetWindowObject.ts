@@ -9,7 +9,7 @@ import type {
   WalletEvents,
 } from "./inpage.model"
 import { sendMessage, waitForMessage } from "./messageActions"
-import { getIsPreauthorized } from "./preAuthorization"
+import { getIsPreauthorized } from "./messaging"
 import {
   handleAddNetworkRequest,
   handleAddTokenRequest,

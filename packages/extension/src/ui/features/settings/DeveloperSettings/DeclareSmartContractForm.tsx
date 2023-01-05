@@ -8,8 +8,8 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
 import { isEqualAddress } from "../../../services/addresses"
+import { selectAccount } from "../../../services/backgroundAccounts"
 import { declareContract } from "../../../services/udc.service"
-import { useSelectedAccountStore } from "../../accounts/accounts.state"
 import { useFormSelects } from "./useFormSelects"
 
 interface FieldValues {
@@ -78,7 +78,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     const file: File | undefined = get(fileInputRef, "current.files[0]")
 
     if (file) {
-      setValue("contract", file.name)
+      setValue("contract", (file as File).name)
       clearErrors("contract")
       try {
         const contractContent = await readFileAsString(file)
@@ -110,9 +110,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
         isEqualAddress(act.address, account) && act.networkId === network,
     )
     useAppState.setState({ switcherNetworkId: network })
-    useSelectedAccountStore.setState({
-      selectedAccount,
-    })
+    await selectAccount(selectedAccount)
     await declareContract(account, classHash, contractJSON, network)
     clearErrors()
   }

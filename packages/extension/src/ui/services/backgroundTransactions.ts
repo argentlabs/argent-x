@@ -6,7 +6,7 @@ import { DeclareContract } from "../../shared/udc/type"
 import { BaseWalletAccount } from "../../shared/wallet.model"
 
 export const executeTransaction = (data: ExecuteTransactionRequest) => {
-  sendMessage({ type: "EXECUTE_TRANSACTION", data })
+  return sendMessage({ type: "EXECUTE_TRANSACTION", data })
 }
 
 export const getEstimatedFee = async (call: Call | Call[]) => {

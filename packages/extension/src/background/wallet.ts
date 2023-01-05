@@ -28,7 +28,6 @@ import {
   IArrayStorage,
   IKeyValueStorage,
   IObjectStorage,
-  KeyValueStorage,
   ObjectStorage,
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
@@ -76,14 +75,14 @@ export interface WalletSession {
 
 export interface WalletStorageProps {
   backup?: string
-  selected?: BaseWalletAccount
+  selected?: BaseWalletAccount | null
   discoveredOnce?: boolean
 }
-
+/*
 export const walletStore = new KeyValueStorage<WalletStorageProps>(
   {},
   "core:wallet",
-)
+) */
 
 export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
   namespace: "core:wallet:session",
@@ -714,16 +713,24 @@ export class Wallet {
     return account ?? defaultAccount
   }
 
-  public async selectAccount(accountIdentifier: BaseWalletAccount) {
+  public async selectAccount(accountIdentifier?: BaseWalletAccount) {
+    if (!accountIdentifier) {
+      await this.store.set("selected", null) // Set null instead of undefinded
+      return
+    }
+
     const accounts = await this.walletStore.get()
     const account = find(accounts, (account) =>
       accountsEqual(account, accountIdentifier),
     )
 
-    if (account) {
-      const { address, networkId } = account // makes sure to strip away unused properties
-      await this.store.set("selected", { address, networkId })
+    if (!account) {
+      throw Error("account not found")
     }
+
+    const { address, networkId } = account // makes sure to strip away unused properties
+    await this.store.set("selected", { address, networkId })
+    return account
   }
 
   public async lock() {

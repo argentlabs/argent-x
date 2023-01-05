@@ -21,7 +21,7 @@ import { AccountListScreenItem } from "./AccountListScreenItem"
 import {
   isHiddenAccount,
   useAccounts,
-  useSelectedAccountStore,
+  useSelectedAccount,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
@@ -47,7 +47,7 @@ const DimmingContainer = styled.div`
 export const AccountListScreen: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { selectedAccount } = useSelectedAccountStore()
+  const selectedAccount = useSelectedAccount()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
@@ -105,6 +105,7 @@ export const AccountListScreen: FC = () => {
               key={account.address}
               account={account}
               selectedAccount={selectedAccount}
+              returnTo={returnTo}
             />
           ))}
           {some(deprecatedAccounts) && (
@@ -115,6 +116,7 @@ export const AccountListScreen: FC = () => {
                   key={account.address}
                   account={account}
                   selectedAccount={selectedAccount}
+                  returnTo={returnTo}
                   needsUpgrade
                 />
               ))}

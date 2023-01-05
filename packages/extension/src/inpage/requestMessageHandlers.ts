@@ -70,14 +70,16 @@ export async function handleAddNetworkRequest(
     },
   })
 
-  const { actionHash } = await waitForMessage(
-    "REQUEST_ADD_CUSTOM_NETWORK_RES",
-    1000,
-  )
+  const req = await Promise.race([
+    waitForMessage("REQUEST_ADD_CUSTOM_NETWORK_RES", 1000),
+    waitForMessage("REQUEST_ADD_CUSTOM_NETWORK_REJ", 1000),
+  ])
 
-  if (!actionHash) {
-    return false
+  if ("error" in req) {
+    throw Error(req.error)
   }
+
+  const { actionHash } = req
 
   sendMessage({ type: "OPEN_UI" })
 
@@ -120,16 +122,16 @@ export async function handleSwitchNetworkRequest(callParams: {
     data: { chainId: callParams.chainId },
   })
 
-  const { actionHash } = await waitForMessage(
-    "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
-    1000,
-  )
+  const req = await Promise.race([
+    waitForMessage("REQUEST_SWITCH_CUSTOM_NETWORK_RES", 1000),
+    waitForMessage("REQUEST_SWITCH_CUSTOM_NETWORK_REJ", 1000),
+  ])
 
-  if (!actionHash) {
-    throw Error(
-      `Network with chainId ${callParams.chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
-    )
+  if ("error" in req) {
+    throw Error(req.error)
   }
+
+  const { actionHash } = req
 
   sendMessage({ type: "OPEN_UI" })
 
