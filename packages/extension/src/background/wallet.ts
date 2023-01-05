@@ -371,14 +371,8 @@ export class Wallet {
       network,
       offset,
     )
-    const walletStoreAccounts = await this.walletStore.get()
-    const exists = accounts.some((a) =>
-      walletStoreAccounts.find((w) => isEqualAddress(w.address, a.address)),
-    )
 
-    if (!exists) {
-      await this.walletStore.push(accounts)
-    }
+    await this.walletStore.push(accounts)
   }
 
   public async newAccount(networkId: string): Promise<WalletAccount> {
@@ -388,8 +382,6 @@ export class Wallet {
     }
 
     const network = await this.getNetwork(networkId)
-
-    await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.walletStore.get(withHiddenSelector)
 
