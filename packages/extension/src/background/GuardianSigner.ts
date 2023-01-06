@@ -14,7 +14,7 @@ import {
 } from "starknet"
 
 import { cosignerSign } from "../shared/shield/backend/account"
-import { getVerifiedEmailIsExpired } from "../shared/shield/jwt"
+import { getVerifiedEmailIsExpired } from "../shared/shield/verifiedEmail"
 
 export interface CosignerMessage {
   message: any

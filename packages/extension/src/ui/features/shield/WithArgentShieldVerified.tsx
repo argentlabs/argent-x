@@ -3,11 +3,9 @@ import { Skeleton, VStack } from "@chakra-ui/react"
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import {
-  getVerifiedEmailIsExpired,
-  resetDevice,
-} from "../../../shared/shield/jwt"
+import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
+import { getVerifiedEmailIsExpired } from "../../../shared/shield/verifiedEmail"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useShieldState } from "./shield.state"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"

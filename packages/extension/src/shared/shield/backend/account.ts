@@ -1,10 +1,10 @@
 import retry from "async-retry"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
-import { fetcher, isFetcherError } from "../../api/fetcher"
+import { isFetcherError } from "../../api/fetcher"
 import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
-import { generateJwt } from "../jwt"
+import { jwtFetcher } from "../jwtFetcher"
 
 type EnsFreeStatus =
   | "taken"
@@ -14,23 +14,14 @@ type EnsFreeStatus =
   | "notUTS46"
   | "userAlreadyRegistered"
 export const isEnsFree = async (ens: string): Promise<EnsFreeStatus> => {
-  const jwt = await generateJwt()
-  const response = await fetch(
-    `${ARGENT_API_BASE_URL}/account/isEnsFree?ens=${ens}`,
-    {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-    },
-  )
-
-  if (!response.ok) {
+  try {
+    const json = await jwtFetcher(
+      `${ARGENT_API_BASE_URL}/account/isEnsFree?ens=${ens}`,
+    )
+    return json.status
+  } catch (error) {
     throw new Error("failed to check ENS availability")
   }
-
-  const json = await response.json()
-  return json.status
 }
 
 type ReserveEnsStatus =
@@ -41,51 +32,39 @@ type ReserveEnsStatus =
   | "notUTS46"
   | "userAlreadyRegistered"
 export const reserveEns = async (ens: string): Promise<ReserveEnsStatus> => {
-  const jwt = await generateJwt()
-  const response = await fetch(`${ARGENT_API_BASE_URL}/account/reserveEns`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ens,
-    }),
-  })
-
-  if (!response.ok) {
+  try {
+    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/account/reserveEns`, {
+      method: "POST",
+      body: JSON.stringify({
+        ens,
+      }),
+    })
+    return json.status
+  } catch (error) {
     throw new Error("failed to reserve ENS")
   }
-
-  const json = await response.json()
-  return json.status
 }
 
 export const requestEmailAuthentication = async (
   email: string,
   locale = "en-EN",
-): Promise<void> => {
-  const jwt = await generateJwt()
-  const json = await fetcher(
-    `${ARGENT_API_BASE_URL}/account/requestEmailAuthentication`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
+) => {
+  try {
+    const json = await jwtFetcher(
+      `${ARGENT_API_BASE_URL}/account/requestEmailAuthentication`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          locale,
+          application: "argentx",
+        }),
       },
-      body: JSON.stringify({
-        email,
-        locale,
-        application: "argentx",
-      }),
-    },
-  )
-  // if (!res.ok) {
-  //   throw new Error("failed to request email verification")
-  // }
-  console.log("requestEmailAuthentication", JSON.stringify(json, null, 2))
-  return json
+    )
+    return json
+  } catch (error) {
+    throw new Error("failed to request email verification")
+  }
 }
 
 export type EmailVerificationStatus =
@@ -96,21 +75,12 @@ export type EmailVerificationStatus =
   | "notRequested"
 export const getEmailVerificationStatus =
   async (): Promise<EmailVerificationStatus> => {
-    const jwt = await generateJwt()
     try {
-      const json = await fetcher(
+      const json = await jwtFetcher(
         `${ARGENT_API_BASE_URL}/account/emailVerificationStatus`,
-        {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-            "Content-Type": "application/json",
-          },
-        },
       )
-      console.log("getEmailVerificationStatus", JSON.stringify(json, null, 2))
       return json.status
     } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
       throw new Error("Failed to get email verification status")
     }
   }
@@ -133,20 +103,14 @@ export const getVerificationErrorMessage = (
 }
 
 export const register = async (): Promise<void> => {
-  const jwt = await generateJwt()
   try {
-    const json = await fetcher(`${ARGENT_API_BASE_URL}/account/asyncRegister`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
+    const json = await jwtFetcher(
+      `${ARGENT_API_BASE_URL}/account/asyncRegister`,
+      {
+        method: "POST",
+        body: JSON.stringify({}),
       },
-      body: JSON.stringify({}),
-    })
-
-    console.log("register", JSON.stringify(json, null, 2))
-
-    console.log("awaiting registration status…")
+    )
 
     await retry(
       async (bail) => {
@@ -182,48 +146,27 @@ interface VerifyEmailResponse {
 export const verifyEmail = async (
   verificationCode: string,
 ): Promise<VerifyEmailResponse> => {
-  const jwt = await generateJwt()
-  try {
-    const json: VerifyEmailResponse = await fetcher(
-      `${ARGENT_API_BASE_URL}/verifyEmail`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          verificationCode,
-        }),
-      },
-    )
-    console.log("verifyEmail", JSON.stringify(json, null, 2))
-    return json
-  } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
-    throw error
-  }
+  const json: VerifyEmailResponse = await jwtFetcher(
+    `${ARGENT_API_BASE_URL}/verifyEmail`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        verificationCode,
+      }),
+    },
+  )
+  return json
 }
 
 type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
 
 export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
-  const jwt = await generateJwt()
   try {
-    const json = await fetcher(
+    const json = await jwtFetcher(
       `${ARGENT_API_BASE_URL}/account/registrationStatus`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-      },
     )
-    console.log("getRegistrationStatus", JSON.stringify(json, null, 2))
-
     return json.status
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
     throw new Error("Failed to get registration status")
   }
 }
@@ -242,53 +185,15 @@ interface Account {
 }
 
 export const getAccounts = async (): Promise<Account[]> => {
-  const jwt = await generateJwt()
   try {
-    const json = await fetcher(
+    const json = await jwtFetcher(
       `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-      },
     )
-    console.log("getAccounts", JSON.stringify(json, null, 2))
-
     return json.accounts
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
     throw new Error("Failed to get accounts")
   }
 }
-
-// export interface UserAccount {
-//   email: string
-//   accounts: Account[]
-// }
-
-// export const getAccount = async (): Promise<UserAccount> => {
-//   const jwt = await generateJwt()
-//   const json = await fetcher(`${ARGENT_API_BASE_URL}/account`, {
-//     headers: {
-//       Authorization: `Bearer ${jwt}`,
-//       "Content-Type": "application/json",
-//     },
-//   })
-//   console.log("getAccount", JSON.stringify(json, null, 2))
-
-//   // if (!response.ok) {
-//   //   throw new Error("failed to get account")
-//   // }
-
-//   // const json = await response.json()
-
-//   // TODO: [BE] make atomic
-//   json.accounts = await getAccounts()
-//   console.log("getAccount with accounts", JSON.stringify(json, null, 2))
-
-//   return json
-// }
 
 interface AddAccountResponse {
   address: string
@@ -300,18 +205,9 @@ export const addAccount = async (
   accountAddress: string,
   signature: string[],
 ): Promise<AddAccountResponse> => {
-  if (signature.length !== 2) {
-    throw new Error("only one signature supported")
-  }
-
-  const jwt = await generateJwt()
   try {
-    const json = await fetcher(`${ARGENT_API_BASE_URL}/account`, {
+    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/account`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         chain: "starknet",
         application: "argentx",
@@ -324,39 +220,26 @@ export const addAccount = async (
         assignCosigner: true,
       }),
     })
-
-    console.log("addAccount", JSON.stringify(json, null, 2))
-
     return json
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
     throw new Error("Failed to add account")
   }
 }
 
 export const cosignerSign = async (message: any) => {
-  const jwt = await generateJwt()
   try {
-    const json = await fetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
+    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(message),
     })
-
-    console.log("cosignerSign", JSON.stringify(json, null, 2))
     return json
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
-    if (isFetcherError(error)) {
-      if (error.responseJson?.status === "noMatchingAccountForUser") {
-        throw new Error(
-          "Argent Shield failed to co-sign - no matching account for user",
-        )
-      }
+    if (isFetcherError(error) && error.responseJson?.status) {
+      throw new Error(
+        `Argent Shield failed to co-sign - status:${error.responseJson?.status}`,
+      )
+    } else {
+      throw new Error("Argent Shield failed to co-sign")
     }
-    throw new Error("Argent Shield failed to co-sign")
   }
 }

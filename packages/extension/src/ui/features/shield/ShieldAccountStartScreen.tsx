@@ -11,11 +11,11 @@ import { Flex } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { requestEmail } from "../../../shared/shield/register"
 import {
   getVerifiedEmailIsExpired,
   getVerifiedEmailIsExpiredForRemoval,
-} from "../../../shared/shield/jwt"
-import { requestEmail } from "../../../shared/shield/register"
+} from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
