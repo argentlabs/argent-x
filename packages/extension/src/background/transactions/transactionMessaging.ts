@@ -40,18 +40,11 @@ export const handleTransactionMessage: HandleMessage<
             starknetAccount.getClassAt,
           ))
         ) {
-          const { overall_fee: adFee, suggestedMaxFee: suggestedADFee } =
-            await wallet.getAccountDeploymentFee(selectedAccount)
-
           const { overall_fee, suggestedMaxFee } =
-            await calculateEstimateFeeFromL1Gas(selectedAccount, transactions)
+            await starknetAccount.estimateFeeBulk(transactions)
 
           txFee = number.toHex(overall_fee)
-          maxTxFee = number.toHex(suggestedMaxFee)
-          accountDeploymentFee = number.toHex(adFee) // Here, accountDeploymentFee = estimatedFee * 1.5x
-          maxADFee = number.toHex(
-            stark.estimatedFeeToMaxFee(suggestedADFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
-          )
+          maxTxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
         } else {
           const { overall_fee, suggestedMaxFee } =
             await starknetAccount.estimateFee(transactions)

@@ -107,8 +107,7 @@ export const executeTransactionAction = async (
       },
     })
 
-    const { suggestedMaxFee } = await calculateEstimateFeeFromL1Gas(
-      account,
+    const { suggestedMaxFee } = await starknetAccount.estimateFeeBulk(
       transactions,
     )
     maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
