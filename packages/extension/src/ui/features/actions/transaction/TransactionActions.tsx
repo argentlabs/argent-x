@@ -8,14 +8,11 @@ import {
   Divider,
   Flex,
 } from "@chakra-ui/react"
-import { FC, Fragment } from "react"
+import { FC } from "react"
 import { Call, number } from "starknet"
 
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
-import {
-  formatTruncatedAddress,
-  normalizeAddress,
-} from "../../../services/addresses"
+import { formatTruncatedAddress } from "../../../services/addresses"
 
 export interface TransactionActionsProps {
   transactions: Call[]
@@ -90,33 +87,41 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                     txIndex === transactions.length - 1 ? "xl" : "0"
                   }
                   px="3"
+                  pb="0"
                 >
                   <Divider color="black" opacity="1" />
                   <Flex flexDirection="column" gap="12px" py="3.5">
                     {transaction.calldata?.map((calldata, cdIndex) => (
-                      <Flex key={cdIndex} justifyContent="space-between">
+                      <Flex
+                        key={cdIndex}
+                        justifyContent="space-between"
+                        gap="2"
+                      >
                         <P4 color="neutrals.300" fontWeight="bold">
                           Calldata {cdIndex + 1}
                         </P4>
-                        <P4 color="neutrals.400" fontWeight="bold">
-                          {number.isHex(calldata) ? (
-                            <CopyTooltip
-                              copyValue={normalizeAddress(calldata)}
-                              prompt=""
+                        <P4
+                          color="neutrals.400"
+                          fontWeight="bold"
+                          maxWidth="70%"
+                        >
+                          <CopyTooltip copyValue={calldata} prompt={calldata}>
+                            <Box
+                              _hover={{
+                                bg: "neutrals.700",
+                                color: "text",
+                                cursor: "pointer",
+                              }}
+                              whiteSpace="nowrap"
+                              textOverflow="ellipsis"
+                              overflow="hidden"
+                              minWidth="0"
                             >
-                              <Box
-                                _hover={{
-                                  bg: "neutrals.700",
-                                  color: "text",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {formatTruncatedAddress(calldata)}
-                              </Box>
-                            </CopyTooltip>
-                          ) : (
-                            calldata
-                          )}
+                              {number.isHex(calldata)
+                                ? formatTruncatedAddress(calldata)
+                                : calldata}
+                            </Box>
+                          </CopyTooltip>
                         </P4>
                       </Flex>
                     ))}

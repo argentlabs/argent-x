@@ -9,6 +9,7 @@ import { TokenDetailsWithBalance } from "../../../shared/tokens.state"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { isNumeric } from "../../../shared/utils/number"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { isEqualAddress } from "../../services/addresses"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
@@ -31,17 +32,13 @@ export const useTokenBalanceForAccount = (
 ) => {
   const { pendingTransactions } = useAccountTransactions(account)
   const pendingTransactionsLengthRef = useRef(pendingTransactions.length)
-  const key = [
-    "balanceOf",
-    token.address,
-    token.networkId,
-    account.address,
-    account.network.multicallAddress,
-  ]
-    .filter(Boolean)
-    .join("-")
   const { data, mutate, ...rest } = useSWR<string | TokenBalanceErrorMessage>(
-    key,
+    [
+      getAccountIdentifier(account),
+      "balanceOf",
+      token.address,
+      token.networkId,
+    ],
     async () => {
       try {
         const balance = await getTokenBalanceForAccount(

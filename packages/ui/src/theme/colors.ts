@@ -22,6 +22,7 @@ export const colors = {
   warning: makeColorVariants("#f4bc54"),
   success: makeColorVariants("#08a681"),
   error: makeColorVariants("#cc3247"),
+  errorText: "#E95F72",
   skyBlue: makeColorVariants("#29c5ff"),
   neutrals: {
     100: "#b7b7b9",

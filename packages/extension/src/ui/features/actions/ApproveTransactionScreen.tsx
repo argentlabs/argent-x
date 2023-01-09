@@ -114,6 +114,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         onSubmit(transactions)
       }}
       showHeader={true}
+      buttonGap="8px"
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation

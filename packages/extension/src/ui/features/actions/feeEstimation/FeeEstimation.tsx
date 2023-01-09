@@ -1,5 +1,5 @@
-import { L2, P4 } from "@argent/ui"
-import { Flex, VStack } from "@chakra-ui/react"
+import { L1, L2, P4, icons } from "@argent/ui"
+import { Flex, Text } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
@@ -11,17 +11,13 @@ import {
 } from "../../../../shared/token/price"
 import { useNetworkFeeToken } from "../../../../shared/tokens.state"
 import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
-import { FieldError } from "../../../components/Fields"
-import { KeyboardArrowDownRounded } from "../../../components/Icons/MuiIcons"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useExtensionIsInTab } from "../../browser/tabs"
 import {
-  DetailsText,
   ExtendableControl,
-  FeeErrorContainer,
   FeeEstimationValue,
   LoadingInput,
   StyledInfoRoundedIcon,
@@ -30,6 +26,8 @@ import {
 import { TransactionsFeeEstimationProps } from "./types"
 import { getTooltipText, useMaxFeeEstimation } from "./utils"
 import { getParsedError } from "./utils"
+
+const { AlertIcon, ChevronDownIcon } = icons
 
 export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   accountAddress,
@@ -87,53 +85,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   const extensionInTab = useExtensionIsInTab()
 
   return (
-    <Flex direction="column">
-      {showEstimateError && (
-        <>
-          <FieldError justify="space-between">
-            Transaction failure predicted
-            <ExtendableControl
-              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
-                label: "Show error details",
-              })}
-            >
-              <DetailsText>Details</DetailsText>
-              <KeyboardArrowDownRounded
-                style={{
-                  transition: "transform 0.2s ease-in-out",
-                  transform: feeEstimateExpanded
-                    ? "rotate(-180deg)"
-                    : "rotate(0deg)",
-                  height: 13,
-                  width: 13,
-                }}
-              />
-            </ExtendableControl>
-          </FieldError>
-
-          <Collapse
-            in={feeEstimateExpanded}
-            timeout="auto"
-            style={{
-              maxHeight: "80vh",
-              overflow: "auto",
-            }}
-          >
-            {parsedFeeEstimationError && (
-              <CopyTooltip
-                copyValue={parsedFeeEstimationError}
-                message="Copied"
-              >
-                <FeeErrorContainer>
-                  <pre style={{ whiteSpace: "pre-wrap" }}>
-                    {parsedFeeEstimationError}
-                  </pre>
-                </FeeErrorContainer>
-              </CopyTooltip>
-            )}
-          </Collapse>
-        </>
-      )}
+    <Flex direction="column" gap="1">
       <Flex
         borderRadius="xl"
         backgroundColor="neutrals.900"
@@ -214,9 +166,73 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
         ) : (
           <LoadingInput />
         )}
-
-        {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
       </Flex>
+
+      {showError && (
+        <Flex
+          direction="column"
+          backgroundColor="#330105"
+          boxShadow="menu"
+          py="3.5"
+          px="3.5"
+          borderRadius="xl"
+        >
+          <Flex justifyContent="space-between" alignItems="center">
+            <Flex gap="1" align="center">
+              <Text color="errorText">
+                <AlertIcon />
+              </Text>
+              <L1 color="errorText">
+                {showFeeError
+                  ? "Not enough funds to cover for fees"
+                  : "Transaction failure predicted"}
+              </L1>
+            </Flex>
+            {!showFeeError && (
+              <ExtendableControl
+                {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+                  label: "Show error details",
+                })}
+              >
+                <Text color="errorText">
+                  <ChevronDownIcon
+                    style={{
+                      transition: "transform 0.2s ease-in-out",
+                      transform: feeEstimateExpanded
+                        ? "rotate(-180deg)"
+                        : "rotate(0deg)",
+                    }}
+                    height="14px"
+                    width="16px"
+                  />
+                </Text>
+              </ExtendableControl>
+            )}
+          </Flex>
+
+          <Collapse
+            in={feeEstimateExpanded}
+            timeout="auto"
+            style={{
+              maxHeight: "80vh",
+              overflow: "auto",
+            }}
+          >
+            {parsedFeeEstimationError && (
+              <CopyTooltip
+                copyValue={parsedFeeEstimationError}
+                message="Copied"
+              >
+                <P4 color="errorText" pt="3">
+                  <pre style={{ whiteSpace: "pre-wrap" }}>
+                    {parsedFeeEstimationError}
+                  </pre>
+                </P4>
+              </CopyTooltip>
+            )}
+          </Collapse>
+        </Flex>
+      )}
     </Flex>
   )
 }
