@@ -366,7 +366,6 @@ export class Wallet {
       // silent fail if no account implementation is defined for this network
       return
     }
-
     const accounts = await this.restoreAccountsFromWallet(
       wallet.privateKey,
       network,
@@ -383,8 +382,6 @@ export class Wallet {
     }
 
     const network = await this.getNetwork(networkId)
-
-    await this.discoverAccountsForNetwork(network, 1) // discover until there is an free index found
 
     const accounts = await this.walletStore.get(withHiddenSelector)
 
