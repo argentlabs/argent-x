@@ -19,6 +19,7 @@ import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
 import { DappHeader } from "./transaction/DappHeader"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
+import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
 
 export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -48,9 +49,15 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
+
+  const { data: transactionSimulation } = useTransactionSimulation({
+    account: selectedAccount,
+    transactions,
+    actionHash,
+  })
   console.log(
-    "🚀 ~ file: ApproveTransactionScreen.tsx:74 ~ transactionReview",
-    transactionReview,
+    "🚀 ~ file: ApproveTransactionScreen.tsx:54 ~ transactionSimulation",
+    transactionSimulation,
   )
 
   const transactionViewType = useMemo(() => {
@@ -128,6 +135,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }
       {...props}
     >
+      {/** Use Transaction Review to get DappHeader */}
       <DappHeader
         transactions={transactionsArray}
         transactionReview={transactionReview}

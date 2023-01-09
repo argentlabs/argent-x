@@ -2,6 +2,7 @@ import type {
   Abi,
   Call,
   InvocationsDetails,
+  Sequencer,
   UniversalDeployerContractPayload,
 } from "starknet"
 
@@ -71,4 +72,16 @@ export type TransactionMessage =
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
       data: DeclareDeployEstimateFeeResponse
+    }
+  | {
+      type: "SIMULATE_TRANSACTION"
+      data: Call | Call[]
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_RES"
+      data: Sequencer.SimulateTransaction
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_REJ"
+      data: { error: string }
     }
