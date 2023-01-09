@@ -45,7 +45,8 @@ const SwapWarning = () => {
             The swap feature is powered by JediSwap, an AMM on StarkNet that is
             not yet audited. Both JediSwap and StarkNet are in Alpha, which
             means new changes are introduced frequently and some flows might
-            break.
+            break. Also, Total value locked in Jediswap is still very low and
+            some trades might not be favourable, specially with large volumes
           </P3>
           <B3
             display="flex"
