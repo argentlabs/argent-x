@@ -8,14 +8,11 @@ import {
   Divider,
   Flex,
 } from "@chakra-ui/react"
-import { FC, Fragment } from "react"
+import { FC } from "react"
 import { Call, number } from "starknet"
 
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
-import {
-  formatTruncatedAddress,
-  normalizeAddress,
-} from "../../../services/addresses"
+import { formatTruncatedAddress } from "../../../services/addresses"
 
 export interface TransactionActionsProps {
   transactions: Call[]
