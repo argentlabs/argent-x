@@ -42,8 +42,8 @@ const SwapWarning = () => {
           </Circle>
           <H3>Alpha warning</H3>
           <P3 color="neutrals.100" textAlign="center" mt="3" mb="8">
-            The swap feature is powered by Jediswap, an AMM on StarkNet that is
-            not yet audited. Both Jediswap and StarkNet are in Alpha, which
+            The swap feature is powered by JediSwap, an AMM on StarkNet that is
+            not yet audited. Both JediSwap and StarkNet are in Alpha, which
             means new changes are introduced frequently and some flows might
             break.
           </P3>
@@ -54,13 +54,13 @@ const SwapWarning = () => {
             justifyContent="center"
             as="a"
             href="https://jediswap.xyz/"
-            title="Jediswap"
+            title="JediSwap"
             target="_blank"
             _hover={{
               textDecoration: "underline",
             }}
           >
-            Learn more about Jediswap
+            Learn more about JediSwap
             <Text ml="1">
               <ExpandIcon />
             </Text>
