@@ -37,8 +37,10 @@ const SlippageForm: FC<SlippageFormProps> = ({ closeHandler }) => {
       gap="1"
       p="2"
       bg="black"
-      borderRadius="full"
+      border="1px solid"
       borderColor="neutrals.700"
+      borderRadius="full"
+      boxShadow="menu"
       position={"absolute"}
       top={0}
       transform={"translateY(-100%)"}
