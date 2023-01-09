@@ -38,7 +38,6 @@ export const useTokenBalanceForAccount = (
       "balanceOf",
       token.address,
       token.networkId,
-      account.network.multicallAddress,
     ],
     async () => {
       try {
