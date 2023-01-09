@@ -90,6 +90,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                     txIndex === transactions.length - 1 ? "xl" : "0"
                   }
                   px="3"
+                  pb="0"
                 >
                   <Divider color="black" opacity="1" />
                   <Flex flexDirection="column" gap="12px" py="3.5">
@@ -107,7 +108,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                           fontWeight="bold"
                           maxWidth="70%"
                         >
-                          <CopyTooltip copyValue={calldata} prompt="">
+                          <CopyTooltip copyValue={calldata} prompt={calldata}>
                             <Box
                               _hover={{
                                 bg: "neutrals.700",
