@@ -42,10 +42,11 @@ const SwapWarning = () => {
           </Circle>
           <H3>Alpha warning</H3>
           <P3 color="neutrals.100" textAlign="center" mt="3" mb="8">
-            The swap feature is powered by Jediswap, an AMM on StarkNet that is
-            not yet audited. Both Jediswap and StarkNet are in Alpha, which
+            The swap feature is powered by JediSwap, an AMM on StarkNet that is
+            not yet audited. Both JediSwap and StarkNet are in Alpha, which
             means new changes are introduced frequently and some flows might
-            break.
+            break. Also, Total value locked in Jediswap is still very low and
+            some trades might not be favourable, specially with large volumes
           </P3>
           <B3
             display="flex"
