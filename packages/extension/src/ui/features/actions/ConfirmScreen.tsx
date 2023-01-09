@@ -35,6 +35,7 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   singleButton?: boolean
   switchButtonOrder?: boolean
   buttonGroup?: "horizontal" | "vertical"
+  buttonGap?: string
   smallTopPadding?: boolean
   showHeader?: boolean
   footer?: ReactNode
@@ -76,6 +77,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonVariant,
   rejectButtonText = "Reject",
   buttonGroup = "horizontal",
+  buttonGap,
   onSubmit,
   onReject,
   selectedAccount,
@@ -141,7 +143,10 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               <StickyGroup ref={measureRef}>
                 {footer}
                 {buttonGroup === "horizontal" && (
-                  <ButtonGroupHorizontal switchButtonOrder={switchButtonOrder}>
+                  <ButtonGroupHorizontal
+                    switchButtonOrder={switchButtonOrder}
+                    buttonGap={buttonGap}
+                  >
                     {!singleButton && (
                       <Button onClick={onReject} type="button">
                         {rejectButtonText}

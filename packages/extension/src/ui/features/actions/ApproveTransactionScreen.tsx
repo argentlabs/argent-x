@@ -79,7 +79,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   return (
     <ConfirmScreen
-      confirmButtonText="Approve"
+      confirmButtonText="Confirm"
+      rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
       confirmButtonVariant={confirmButtonVariant}
       selectedAccount={selectedAccount}
@@ -87,6 +88,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         onSubmit(transactions)
       }}
       showHeader={true}
+      buttonGap="8px"
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation
