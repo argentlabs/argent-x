@@ -14,7 +14,7 @@
   {
     "id": "jediswap-xyz",
     "hosts": ["app.testnet.jediswap.xyz"],
-    "title": "Jediswap",
+    "title": "JediSwap",
     "contracts": {
       "mainnet-alpha": [],
       "goerli-alpha": [

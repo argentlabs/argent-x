@@ -119,7 +119,14 @@ export const NavigationBar: FC<NavigationBarProps> = ({
     >
       {title && (
         <TitleContainer>
-          <H6>{title}</H6>
+          <H6
+            maxW="200px"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+          >
+            {title}
+          </H6>
         </TitleContainer>
       )}
       <Fade in={!title && showScrollContent}>
