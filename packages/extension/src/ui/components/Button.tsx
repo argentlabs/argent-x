@@ -181,11 +181,12 @@ export const ButtonGroup = styled.div`
 
 export const ButtonGroupHorizontal = styled.div<{
   switchButtonOrder?: boolean
+  buttonGap?: string
 }>`
   display: flex;
   flex-direction: ${({ switchButtonOrder = false }) =>
     switchButtonOrder ? "row-reverse" : "row"};
-  gap: 12px;
+  gap: ${({ buttonGap }) => buttonGap ?? "12px"};
   width: 100%;
 `
 

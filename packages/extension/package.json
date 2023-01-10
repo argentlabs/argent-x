@@ -72,6 +72,8 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
+    "@chakra-ui/react": "2.4.6",
+    "@chakra-ui/icons": "^2.0.15",
     "@argent/stack-router": "^5.2.0",
     "@argent/ui": "^5.2.0",
     "@argent/x-multicall": "^5.2.0",
