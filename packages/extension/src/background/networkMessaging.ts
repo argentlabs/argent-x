@@ -1,3 +1,5 @@
+import { number, shortString } from "starknet"
+
 import { NetworkMessage } from "../shared/messages/NetworkMessage"
 import { getNetwork, getNetworkByChainId, getNetworks } from "../shared/network"
 import { UnhandledMessage } from "./background"
@@ -67,13 +69,21 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
     }
 
     case "REQUEST_SWITCH_CUSTOM_NETWORK": {
-      const network = await getNetworkByChainId(msg.data.chainId)
+      const { chainId } = msg.data
+
+      const isHexChainId = number.isHex(chainId)
+
+      const decodedChainId = shortString.decodeShortString(chainId)
+
+      const network = await getNetworkByChainId(
+        isHexChainId ? decodedChainId : chainId,
+      )
 
       if (!network) {
         return respond({
           type: "REQUEST_SWITCH_CUSTOM_NETWORK_REJ",
           data: {
-            error: `Network with chainId ${msg.data.chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
+            error: `Network with chainId ${chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
           },
         })
       }
