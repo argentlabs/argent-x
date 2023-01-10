@@ -31,21 +31,27 @@ jobs:
         run: yarn lint
 
       - name: Build
-        run: yarn build
+        run: yarn lerna run --scope @argent-x/extension build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run tests
         run: yarn test
 
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
 
       - uses: actions/upload-artifact@v3
-        if: failure()
         with:
           name: test-results
-          path: packages/extension/test-results/
+          path: |
+            packages/extension/test-results/
+            packages/playwright/artifacts/
+            packages/playwright/reports/
+          retention-days: 5
 
       - name: Check bundlesize
         run: yarn run bundlewatch
