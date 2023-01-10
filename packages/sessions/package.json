@@ -55,6 +55,6 @@
   },
   "dependencies": {
     "minimalistic-assert": "^1.0.1",
-    "starknet": "^4.16.0"
+    "starknet": "^4.19.0"
   }
 }

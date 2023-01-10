@@ -1,5 +1,12 @@
 import { BigNumber } from "ethers"
-import { Call, EstimateFee, constants, number, stark } from "starknet"
+import {
+  Call,
+  EstimateFee,
+  TransactionBulk,
+  constants,
+  number,
+  stark,
+} from "starknet"
 
 import {
   ExtQueueItem,
@@ -107,10 +114,19 @@ export const executeTransactionAction = async (
       },
     })
 
-    const { suggestedMaxFee } = await starknetAccount.estimateFeeBulk(
-      transactions,
-    )
-    maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+    if ("estimateFeeBulk" in starknetAccount) {
+      const bulkTransactions: TransactionBulk = [
+        {
+          type: "INVOKE_FUNCTION",
+          payload: transactions,
+        },
+      ]
+      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
+        bulkTransactions,
+      )
+
+      maxFee = number.toHex(estimateFeeBulk[0].suggestedMaxFee)
+    }
   } else {
     if (hasUpgradePending) {
       const oldStarknetAccount = await wallet.getStarknetAccount(

@@ -1,4 +1,4 @@
-import { Account, number, stark } from "starknet"
+import { Account, TransactionBulk, number, stark } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
@@ -40,11 +40,29 @@ export const handleTransactionMessage: HandleMessage<
             starknetAccount.getClassAt,
           ))
         ) {
-          const { overall_fee, suggestedMaxFee } =
-            await starknetAccount.estimateFeeBulk(transactions)
+          if ("estimateFeeBulk" in starknetAccount) {
+            const bulkTransactions: TransactionBulk = [
+              {
+                type: "DEPLOY_ACCOUNT",
+                payload: await wallet.getAccountDeploymentPayload(
+                  selectedAccount,
+                ),
+              },
+              {
+                type: "INVOKE_FUNCTION",
+                payload: transactions,
+              },
+            ]
 
-          txFee = number.toHex(overall_fee)
-          maxTxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
+            const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
+              bulkTransactions,
+            )
+
+            accountDeploymentFee = number.toHex(estimateFeeBulk[0].overall_fee)
+            maxADFee = number.toHex(estimateFeeBulk[0].suggestedMaxFee)
+            txFee = number.toHex(estimateFeeBulk[1].overall_fee)
+            maxTxFee = number.toHex(estimateFeeBulk[1].suggestedMaxFee)
+          }
         } else {
           const { overall_fee, suggestedMaxFee } =
             await starknetAccount.estimateFee(transactions)
