@@ -19,6 +19,7 @@ import { Box, Flex, IconButton, chakra, useDisclosure } from "@chakra-ui/react"
 import { keyframes } from "@chakra-ui/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { analytics } from "../../../background/analytics"
 import { executeTransaction } from "../../services/backgroundTransactions"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { HighPriceImpactModal } from "./ui/HighPriceImpactModal"
@@ -86,6 +87,8 @@ const Swap = () => {
   const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const [rotate, setRotate] = useState(false)
   const { userSlippageTolerance } = useUserState()
+
+  analytics.page("swap", { networkId })
 
   const {
     isOpen: isPISopen,
@@ -174,11 +177,26 @@ const Swap = () => {
     if (swapCallback) {
       const swapCalls = swapCallback()
 
+      analytics.track("swapInitiated", {
+        networkId,
+        pair:
+          trade?.inputAmount.currency.symbol +
+          "-" +
+          trade?.outputAmount.currency.symbol,
+      })
+
       return executeTransaction({ transactions: swapCalls }).then(() => {
         onUserInput(Field.INPUT, "")
       })
     }
-  }, [onUserInput, swapCallback, swapCallbackError])
+  }, [
+    networkId,
+    onUserInput,
+    swapCallback,
+    swapCallbackError,
+    trade?.inputAmount.currency.symbol,
+    trade?.outputAmount.currency.symbol,
+  ])
 
   useEffect(() => {
     onCurrencySelection(
@@ -261,13 +279,13 @@ const Swap = () => {
           rounded={"lg"}
           color={"neutrals.500"}
           href="https://jediswap.xyz/"
-          title="Jediswap"
+          title="JediSwap"
           target="_blank"
           _hover={{
             textDecoration: "underline",
           }}
         >
-          Powered by Jediswap
+          Powered by JediSwap
         </L2>
       </SwapContainer>
       <Flex flex={1} />

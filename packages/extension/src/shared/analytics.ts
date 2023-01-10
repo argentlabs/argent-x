@@ -94,6 +94,10 @@ export interface Events {
   signedDeployTransaction: {
     networkId: string
   }
+  swapInitiated: {
+    networkId: string
+    pair: string
+  }
 }
 
 export interface Pages {
@@ -116,6 +120,9 @@ export interface Pages {
     networkId: string
   }
   addFundsFromOtherAccount: {
+    networkId: string
+  }
+  swap: {
     networkId: string
   }
 }
