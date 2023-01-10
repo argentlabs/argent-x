@@ -48,7 +48,9 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
           size={"2xs"}
           onClick={openAccountList}
         >
-          <Text noOfLines={1}>{accountName}</Text>
+          <Text noOfLines={1} maxW={"180px"}>
+            {accountName}
+          </Text>
           <Text fontSize={"2xs"} ml={1}>
             <DropdownDownIcon />
           </Text>

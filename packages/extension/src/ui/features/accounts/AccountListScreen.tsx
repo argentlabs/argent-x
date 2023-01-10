@@ -81,7 +81,7 @@ export const AccountListScreen: FC = () => {
     <>
       <NavigationContainer
         leftButton={<BarCloseButton onClick={onClose} disabled={isDeploying} />}
-        title={"My accounts"}
+        title={`${currentNetwork.name} accounts`}
         rightButton={
           <BarIconButton
             aria-label="Create new wallet"
