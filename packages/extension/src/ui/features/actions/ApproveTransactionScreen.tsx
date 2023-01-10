@@ -74,21 +74,20 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
-  const confirmButtonVariant =
-    transactionReview?.assessment === "warn" ? "warn-high" : undefined
-
   return (
     <ConfirmScreen
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
-      confirmButtonVariant={confirmButtonVariant}
+      confirmButtonBackgroundColor="#F36A3D" // TODO: use theme from Chakra and ArgentUi
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
       }}
       showHeader={true}
       buttonGap="8px"
+      px="4"
+      stickyGroupPadding="4"
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation

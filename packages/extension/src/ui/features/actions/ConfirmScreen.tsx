@@ -1,5 +1,5 @@
 import { H6, P3, ScrollContainer } from "@argent/ui"
-import { Box, Flex } from "@chakra-ui/react"
+import { Box, Flex, chakra } from "@chakra-ui/react"
 import { FC, FormEvent, ReactNode, useState } from "react"
 import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
@@ -38,31 +38,26 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   buttonGap?: string
   smallTopPadding?: boolean
   showHeader?: boolean
+  px?: string
+  stickyGroupPadding?: string
   footer?: ReactNode
   children: ReactNode
 }
 
-export const StickyGroup = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px 32px 24px;
+export const StickyGroup = chakra(Box, {
+  baseStyle: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // padding: "16px 32px 24px",
+    background:
+      "linear-gradient(180deg, rgba(16, 16, 20, 0) 0%, #101014 66.54%)",
+    zIndex: 100,
 
-  background-color: ${({ theme }) => theme.bg1};
-  background: linear-gradient(
-    180deg,
-    rgba(16, 16, 16, 0.4) 0%,
-    ${({ theme }) => theme.bg1} 73.72%
-  );
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-
-  > * + * {
-    margin-top: 24px;
-  }
-`
+    "& > * + *": { marginTop: "24px" },
+  },
+})
 
 const Placeholder = styled.div`
   width: 100%;
@@ -87,6 +82,8 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   showHeader = true,
   footer,
   children,
+  px,
+  stickyGroupPadding,
   ...props
 }) => {
   const navigate = useNavigate()
@@ -107,7 +104,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       >
         <Flex
           pt={smallTopPadding || accountHeader ? "18px" : 12}
-          px="8"
+          px={px || "8"}
           pb="0"
           direction="column"
           gap="2"
@@ -140,7 +137,10 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
             }}
           >
             {({ measureRef }) => (
-              <StickyGroup ref={measureRef}>
+              <StickyGroup
+                ref={measureRef}
+                padding={stickyGroupPadding || "16px 32px 24px"}
+              >
                 {footer}
                 {buttonGroup === "horizontal" && (
                   <ButtonGroupHorizontal
