@@ -4,6 +4,7 @@ import { ec, encode } from "starknet"
 
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import { addAccount, getAccounts } from "../shared/shield/backend/account"
+import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import { isEqualAddress } from "../ui/services/addresses"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
@@ -15,6 +16,10 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
 }) => {
   switch (msg.type) {
     case "SHIELD_MAYBE_ADD_ACCOUNT": {
+      if (!ARGENT_SHIELD_ENABLED) {
+        /** should never happen */
+        throw "Argent Shield is not enabled"
+      }
       /** Check if account exists in backend and add it if not */
       try {
         const selectedAccount = await wallet.getSelectedAccount()

@@ -69,8 +69,6 @@ export const ActionScreen: FC = () => {
     init()
   }, [extensionIsInTab, action?.type])
 
-  console.log("ActionScreen", JSON.stringify(action, null, 2))
-
   switch (action?.type) {
     case "CONNECT_DAPP":
       return (

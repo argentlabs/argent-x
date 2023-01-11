@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill"
 
 import { MiscenalleousMessage as MiscellaneousMessage } from "../shared/messages/MiscellaneousMessage"
+import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import { resetDevice } from "../shared/shield/jwt"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
@@ -16,12 +17,14 @@ export const handleMiscellaneousMessage: HandleMessage<
     }
 
     case "RESET_ALL": {
-      await resetDevice()
       try {
         browser.storage.local.clear()
         browser.storage.sync.clear()
         browser.storage.managed.clear()
         browser.storage.session.clear()
+        if (ARGENT_SHIELD_ENABLED) {
+          await resetDevice()
+        }
       } catch {
         // Ignore browser.storage.session error "This is a read-only store"
       }

@@ -6,15 +6,14 @@ import { BaseWalletAccount } from "../../wallet.model"
 import { getIsCurrentImplementation } from "./getImplementation"
 
 /**
- * Get guardian address of account, or undefined if getGuardian returns `0x0` or account is not current implementation (deprecated?)
+ * Get guardian address of account, or undefined if getGuardian returns `0x0` or account is not current implementation
  */
 
 export const getGuardianForAccount = async (
   account: BaseWalletAccount,
 ): Promise<string | undefined> => {
   /**
-   * Skip older implementations which may use 'get_guardian' - if there are many old accounts
-   * then multicall will eventually (after 3 errors?) be throttled by Chrome leading to complete failure
+   * Skip older implementations which may use 'get_guardian'
    */
   const isCurrent = await getIsCurrentImplementation(account)
   if (!isCurrent) {

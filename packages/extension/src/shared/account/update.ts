@@ -1,3 +1,4 @@
+import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
 import { BaseWalletAccount, WalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
 import { getAccountTypesFromChain } from "./details/fetchType"
@@ -20,8 +21,10 @@ export async function updateAccountDetails(
     newAccounts = await getAccountTypesFromChain(allAccounts)
   }
 
-  if (scope === "guardian" || scope === "all") {
-    newAccounts = await getAccountGuardiansFromChain(allAccounts)
+  if (ARGENT_SHIELD_ENABLED) {
+    if (scope === "guardian" || scope === "all") {
+      newAccounts = await getAccountGuardiansFromChain(allAccounts)
+    }
   }
 
   if (scope === "deploy" || scope === "all") {

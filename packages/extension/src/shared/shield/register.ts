@@ -1,3 +1,4 @@
+import { IS_DEV } from "../utils/dev"
 import { assignEns } from "./ans"
 import {
   register,
@@ -15,7 +16,7 @@ export const confirmEmail = async (code: string) => {
   // TODO: [BE] make atomic
   if (userRegistrationStatus === "notRegistered") {
     const reservedEns = await assignEns()
-    console.log("assigned ENS:", reservedEns)
+    IS_DEV && console.log("assigned ENS:", reservedEns)
     await register()
   }
 }

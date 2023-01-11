@@ -12,6 +12,7 @@ import { FC, useCallback, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
+import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
@@ -139,27 +140,31 @@ export const AccountEditScreen: FC = () => {
             </Center>
           </Flex>
           <SpacerCell />
-          <ButtonCell
-            as={Link}
-            to={routes.shieldAccountStart(accountAddress)}
-            leftIcon={<ShieldIcon />}
-            rightIconOpaque={!pendingChangeGuardian}
-            rightIcon={
-              pendingChangeGuardian ? (
-                <Spinner size={"sm"} />
-              ) : (
-                <Switch
-                  isChecked={Boolean(account?.guardian)}
-                  onChange={() =>
-                    navigate(routes.shieldAccountStart(accountAddress))
-                  }
-                />
-              )
-            }
-          >
-            Argent Shield
-          </ButtonCell>
-          <SpacerCell />
+          {ARGENT_SHIELD_ENABLED && (
+            <>
+              <ButtonCell
+                as={Link}
+                to={routes.shieldAccountStart(accountAddress)}
+                leftIcon={<ShieldIcon />}
+                rightIconOpaque={!pendingChangeGuardian}
+                rightIcon={
+                  pendingChangeGuardian ? (
+                    <Spinner size={"sm"} />
+                  ) : (
+                    <Switch
+                      isChecked={Boolean(account?.guardian)}
+                      onChange={() =>
+                        navigate(routes.shieldAccountStart(accountAddress))
+                      }
+                    />
+                  )
+                }
+              >
+                Argent Shield
+              </ButtonCell>
+              <SpacerCell />
+            </>
+          )}
           <ButtonCell
             onClick={() =>
               account &&

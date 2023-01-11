@@ -3,6 +3,7 @@ import { Skeleton, VStack } from "@chakra-ui/react"
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
 import { getVerifiedEmailIsExpired } from "../../../shared/shield/verifiedEmail"
@@ -11,12 +12,6 @@ import { useShieldState } from "./shield.state"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
-
-/**
- * Wraps any screen which may need to sign a transaction
- *
- * If the current account has a Guardian, check and handle the email / otp verification flow using local state
- */
 
 enum ArgentShieldVerifiedState {
   INITIALISING = "INITIALISING",
@@ -27,7 +22,25 @@ enum ArgentShieldVerifiedState {
   USER_ABORTED = "USER_ABORTED",
 }
 
+/**
+ * Wraps any screen which may need to sign a transaction
+ *
+ * If the current account has a Guardian, check and handle the email / otp verification flow using local state
+ */
+
 export const WithArgentShieldVerified: FC<PropsWithChildren> = ({
+  children,
+}) => {
+  return ARGENT_SHIELD_ENABLED ? (
+    <WithArgentShieldEnabledVerified>
+      {children}
+    </WithArgentShieldEnabledVerified>
+  ) : (
+    <>{children}</>
+  )
+}
+
+const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
   children,
 }) => {
   const unverifiedEmail = useShieldState((state) => state.unverifiedEmail)

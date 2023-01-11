@@ -26,6 +26,7 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -295,6 +296,9 @@ export class Wallet {
 
     try {
       const accountWithTypes = await getAccountTypesFromChain(accounts)
+      if (!ARGENT_SHIELD_ENABLED) {
+        return accountWithTypes
+      }
       const accountWithTypesAndGuardians = await getAccountGuardiansFromChain(
         accountWithTypes,
       )
@@ -380,8 +384,6 @@ export class Wallet {
       network,
       offset,
     )
-
-    console.log({ accounts })
 
     await this.walletStore.push(accounts)
   }
@@ -656,7 +658,9 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
-    const keyPairOrSigner = account.guardian
+    const useGuardianSigner = ARGENT_SHIELD_ENABLED && account.guardian
+
+    const keyPairOrSigner = useGuardianSigner
       ? new GuardianSigner(keyPair)
       : keyPair
 
