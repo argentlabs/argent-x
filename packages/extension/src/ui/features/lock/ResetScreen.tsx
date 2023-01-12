@@ -5,14 +5,14 @@ import { useTheme } from "styled-components"
 import { routes } from "../../routes"
 import { resetAll } from "../../services/background"
 import { P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 
 export const ResetScreen: FC = () => {
   const navigate = useNavigate()
   const theme = useTheme()
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Reset wallet"
       confirmButtonText="RESET"
       confirmButtonBackgroundColor={theme.red1}
@@ -28,6 +28,6 @@ export const ResetScreen: FC = () => {
         12-word seed phrase. Make sure to back it up from the Argent X settings
         and save it somewhere securely before resetting the extension
       </P>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

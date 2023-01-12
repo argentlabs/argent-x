@@ -1,7 +1,7 @@
 import { BarBackButton, Button, NavigationContainer } from "@argent/ui"
 import { FC, useState } from "react"
 
-import { StickyGroup } from "../../actions/ConfirmScreen"
+import { StickyGroup } from "../../actions/DeprecatedConfirmScreen"
 import { DeploySmartContractForm } from "./DeploySmartContractForm"
 
 const DeploySmartContractScreen: FC = () => {

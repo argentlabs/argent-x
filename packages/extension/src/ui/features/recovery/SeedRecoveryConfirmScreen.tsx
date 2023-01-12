@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom"
 
 import { routes, useReturnTo } from "../../routes"
 import { P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { useBackupRequired } from "./backupDownload.state"
 
 export const SeedRecoveryConfirmScreen: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Have you written down your recovery phrase?"
       switchButtonOrder
       rejectButtonText="No"
@@ -27,6 +27,6 @@ export const SeedRecoveryConfirmScreen: FC = () => {
         If you lose your recovery phrase or someone steals it, you will lose
         access to your funds.
       </P>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

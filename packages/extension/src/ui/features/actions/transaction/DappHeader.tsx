@@ -23,7 +23,7 @@ export const DappHeader = ({
   )
 
   return (
-    <Box my="6">
+    <Box mb="6">
       <Flex
         direction="column"
         justifyContent="center"

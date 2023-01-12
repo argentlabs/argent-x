@@ -55,13 +55,13 @@ const SwapWarning = () => {
             justifyContent="center"
             as="a"
             href="https://jediswap.xyz/"
-            title="Jediswap"
+            title="JediSwap"
             target="_blank"
             _hover={{
               textDecoration: "underline",
             }}
           >
-            Learn more about Jediswap
+            Learn more about JediSwap
             <Text ml="1">
               <ExpandIcon />
             </Text>

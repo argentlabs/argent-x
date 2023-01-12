@@ -489,7 +489,7 @@ describe("transformExplorerTransaction", () => {
               "app.testnet.jediswap.xyz",
             ],
             "id": "jediswap-xyz",
-            "title": "Jediswap",
+            "title": "JediSwap",
           },
           "dappContractAddress": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
           "date": "2022-08-18T11:50:28.000Z",

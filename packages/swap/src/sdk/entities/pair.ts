@@ -83,7 +83,7 @@ export class Pair {
         : Pair.getAddress(tokenAmounts[0].token, tokenAmounts[1].token),
       18,
       "JEDI-P",
-      "Jediswap Pair",
+      "JediSwap Pair",
     )
     this.tokenAmounts = tokenAmounts as [TokenAmount, TokenAmount]
   }

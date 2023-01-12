@@ -279,7 +279,7 @@ const Swap = () => {
           rounded={"lg"}
           color={"neutrals.500"}
           href="https://jediswap.xyz/"
-          title="Jediswap"
+          title="JediSwap"
           target="_blank"
           _hover={{
             textDecoration: "underline",

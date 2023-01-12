@@ -12,7 +12,8 @@ import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
@@ -100,21 +101,16 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
-  const confirmButtonVariant =
-    transactionReview?.assessment === "warn" ? "warn-high" : undefined
-
   return (
     <ConfirmScreen
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
-      confirmButtonVariant={confirmButtonVariant}
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
       }}
       showHeader={true}
-      buttonGap="8px"
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation
