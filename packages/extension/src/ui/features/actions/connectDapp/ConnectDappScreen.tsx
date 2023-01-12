@@ -21,7 +21,7 @@ import { AccountSelect } from "../../accounts/AccountSelect"
 import {
   ConfirmPageProps,
   DeprecatedConfirmScreen,
-} from "../DeprecatedConfirmScreen"
+} from "../transaction/DeprecatedConfirmScreen"
 import { DappIcon } from "./DappIcon"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 

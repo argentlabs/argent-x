@@ -15,7 +15,7 @@ import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { makeClickable } from "../../services/a11y"
 import { A, FormError, P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/transaction/DeprecatedConfirmScreen"
 import { slugify } from "./slugify"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 

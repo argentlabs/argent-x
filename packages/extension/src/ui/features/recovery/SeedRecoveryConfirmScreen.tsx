@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { routes, useReturnTo } from "../../routes"
 import { P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/transaction/DeprecatedConfirmScreen"
 import { useBackupRequired } from "./backupDownload.state"
 
 export const SeedRecoveryConfirmScreen: FC = () => {

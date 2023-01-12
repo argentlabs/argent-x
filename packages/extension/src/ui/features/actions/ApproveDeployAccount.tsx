@@ -4,11 +4,11 @@ import { Navigate } from "react-router-dom"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { AccountAddress } from "./AccountAddress"
+import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
 import {
   ConfirmPageProps,
   DeprecatedConfirmScreen,
-} from "./DeprecatedConfirmScreen"
-import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
+} from "./transaction/DeprecatedConfirmScreen"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {

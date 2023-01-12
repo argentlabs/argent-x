@@ -1,6 +1,6 @@
 import { ScrollContainer } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
-import { FC, FormEvent, ReactNode, useState } from "react"
+import { FC, ReactNode, useState } from "react"
 import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -10,17 +10,19 @@ import {
   ButtonGroupHorizontal,
   ButtonGroupVertical,
   ButtonVariant,
-} from "../../components/Button"
-import { Header } from "../../components/Header"
-import { H2 } from "../../theme/Typography"
-import { Account } from "../accounts/Account"
+} from "../../../components/Button"
+import { Header } from "../../../components/Header"
+import { H2 } from "../../../theme/Typography"
 import {
   getAccountName,
   useAccountMetadata,
-} from "../accounts/accountMetadata.state"
-import { getAccountImageUrl } from "../accounts/accounts.service"
-import { ProfilePicture } from "../accounts/ProfilePicture"
-import { NetworkSwitcher } from "../networks/NetworkSwitcher"
+} from "../../accounts/accountMetadata.state"
+import { getAccountImageUrl } from "../../accounts/accounts.service"
+import { ProfilePicture } from "../../accounts/ProfilePicture"
+import { NetworkSwitcher } from "../../networks/NetworkSwitcher"
+import { ConfirmPageProps } from "./ConfirmScreen"
+
+export { ConfirmPageProps } // re-export for backwards compatibility
 
 const ConfirmScreenWrapper = styled.form<{
   accountShown: boolean
@@ -36,28 +38,6 @@ const ConfirmScreenWrapper = styled.form<{
     margin: 0 0 40px;
   }
 `
-
-export interface ConfirmPageProps {
-  onSubmit?: (e: FormEvent<HTMLFormElement>) => void
-  onReject?: () => void
-  selectedAccount?: Account
-}
-
-interface ConfirmScreenProps extends ConfirmPageProps {
-  title?: string
-  rejectButtonText?: string
-  confirmButtonText?: string
-  confirmButtonDisabled?: boolean
-  confirmButtonBackgroundColor?: string
-  confirmButtonVariant?: ButtonVariant
-  singleButton?: boolean
-  switchButtonOrder?: boolean
-  buttonGroup?: "horizontal" | "vertical"
-  smallTopPadding?: boolean
-  showHeader?: boolean
-  footer?: ReactNode
-  children: ReactNode
-}
 
 export const StickyGroup = styled.div`
   position: absolute;
@@ -85,10 +65,27 @@ const Placeholder = styled.div`
   width: 100%;
   margin-top: 8px;
 `
+
+interface DeprecatedConfirmScreenProps extends ConfirmPageProps {
+  title?: string
+  rejectButtonText?: string
+  confirmButtonText?: string
+  confirmButtonDisabled?: boolean
+  confirmButtonBackgroundColor?: string
+  confirmButtonVariant?: ButtonVariant
+  singleButton?: boolean
+  switchButtonOrder?: boolean
+  buttonGroup?: "horizontal" | "vertical"
+  smallTopPadding?: boolean
+  showHeader?: boolean
+  footer?: ReactNode
+  children: ReactNode
+}
+
 /**
  * @deprecated Use ConfirmScreen instead
  */
-export const DeprecatedConfirmScreen: FC<ConfirmScreenProps> = ({
+export const DeprecatedConfirmScreen: FC<DeprecatedConfirmScreenProps> = ({
   title,
   confirmButtonText = "Confirm",
   confirmButtonDisabled,
