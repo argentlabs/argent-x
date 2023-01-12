@@ -5,6 +5,7 @@ import {
   Account,
   DeployAccountContractTransaction,
   EstimateFee,
+  InvocationsDetails,
   ec,
   hash,
   number,
@@ -430,6 +431,7 @@ export class Wallet {
 
   public async deployAccount(
     walletAccount: WalletAccount,
+    transactionDetails?: InvocationsDetails | undefined,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     const starknetAccount = await this.getStarknetAccount(walletAccount)
 
@@ -443,6 +445,7 @@ export class Wallet {
 
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
+      transactionDetails,
     )
 
     await this.selectAccount(walletAccount)
