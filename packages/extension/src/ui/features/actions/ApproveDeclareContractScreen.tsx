@@ -5,7 +5,10 @@ import { DeclareContractPayload } from "starknet"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { AccountAddress } from "./AccountAddress"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import {
+  ConfirmPageProps,
+  DeprecatedConfirmScreen,
+} from "./DeprecatedConfirmScreen"
 import { DeclareContractFeeEstimation } from "./feeEstimation/DeclareContractFeeEstimation"
 
 export interface ApproveDeclareContractScreenProps
@@ -33,7 +36,7 @@ const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Review declare"
       confirmButtonText="Approve"
       confirmButtonDisabled={disableConfirm}
@@ -52,7 +55,7 @@ const ApproveDeclareContractScreen: FC<ApproveDeclareContractScreenProps> = ({
       {...props}
     >
       <AccountAddress selectedAccount={selectedAccount} />
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }
 

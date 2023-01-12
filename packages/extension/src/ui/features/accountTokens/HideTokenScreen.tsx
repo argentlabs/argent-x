@@ -7,7 +7,7 @@ import { useAppState } from "../../app.state"
 import { Alert } from "../../components/Alert"
 import { routes } from "../../routes"
 import { FormError, P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
 import { useToken } from "./tokens.state"
@@ -59,7 +59,7 @@ export const HideTokenScreen: FC = () => {
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Hide token"
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
@@ -76,6 +76,6 @@ export const HideTokenScreen: FC = () => {
           account.
         </P>
       </HideTokenAlert>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

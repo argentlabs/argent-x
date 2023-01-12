@@ -5,7 +5,10 @@ import { UniversalDeployerContractPayload } from "starknet"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { AccountAddress } from "./AccountAddress"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import {
+  ConfirmPageProps,
+  DeprecatedConfirmScreen,
+} from "./DeprecatedConfirmScreen"
 import { DeployContractFeeEstimation } from "./feeEstimation/DeployContractFeeEstimation"
 
 export interface ApproveDeployContractScreenProps
@@ -33,7 +36,7 @@ const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Review deploy"
       confirmButtonText="Approve"
       confirmButtonDisabled={disableConfirm}
@@ -52,7 +55,7 @@ const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
       {...props}
     >
       <AccountAddress selectedAccount={selectedAccount} />
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }
 

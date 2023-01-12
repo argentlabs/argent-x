@@ -6,7 +6,7 @@ import { coerceErrorToString } from "../../../shared/utils/error"
 import { useAppState } from "../../app.state"
 import { P } from "../../theme/Typography"
 import { Pre } from "./ApproveSignatureScreen"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { DeprecatedConfirmScreen } from "./DeprecatedConfirmScreen"
 
 const SP = styled(P)`
   font-size: 18px;
@@ -26,7 +26,7 @@ export const ErrorScreen: FC = () => {
     error && error.replace ? error.replace(/^(error:\s*)+/gi, "") : displayError
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Error"
       confirmButtonText="Back"
       singleButton
@@ -34,6 +34,6 @@ export const ErrorScreen: FC = () => {
     >
       <SP>Something went wrong:</SP>
       <WrappingPre>{message}</WrappingPre>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

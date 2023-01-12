@@ -8,7 +8,10 @@ import { IconBar } from "../../components/IconBar"
 import { RocketLaunchIcon } from "../../components/Icons/RocketLaunchIcon"
 import { deployNewAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
-import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
+import {
+  ConfirmPageProps,
+  StickyGroup,
+} from "../actions/DeprecatedConfirmScreen"
 import { useSelectedAccount } from "./accounts.state"
 
 const StyledIconBar = styled(IconBar)`

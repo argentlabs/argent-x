@@ -18,7 +18,10 @@ import {
 } from "../../accounts/accountMetadata.state"
 import { useAccounts, useSelectedAccount } from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
-import { ConfirmPageProps, ConfirmScreen } from "../ConfirmScreen"
+import {
+  ConfirmPageProps,
+  DeprecatedConfirmScreen,
+} from "../DeprecatedConfirmScreen"
 import { DappIcon } from "./DappIcon"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 
@@ -201,7 +204,7 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
   const dappDisplayAttributes = useDappDisplayAttributes(host)
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       confirmButtonText={isConnected ? "Continue" : "Connect"}
       rejectButtonText={isConnected ? "Disconnect" : "Reject"}
       onSubmit={onConnect}
@@ -240,6 +243,6 @@ export const ConnectDappScreen: FC<ConnectDappProps> = ({
           You will still need to sign any new transaction
         </SmallGreyText>
       </List>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }
