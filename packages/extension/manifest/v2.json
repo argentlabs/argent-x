@@ -19,7 +19,13 @@
     "tabs",
     "storage",
     "notifications",
-    "http://localhost/*"
+    "http://localhost/*",
+    "https://alpha4.starknet.io/*",
+    "https://alpha4-2.starknet.io/*",
+    "https://alpha-mainnet.starknet.io/*",
+    "https://external.integration.starknet.io/*",
+    "https://healthcheck.argent.xyz/*",
+    "https://cloud.argent-api.com/*"
   ],
   "content_security_policy": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
   "icons": {
