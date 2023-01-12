@@ -22,7 +22,7 @@ export const DappHeader = ({
   }, [transactionReview, transactions])
 
   return (
-    <Box my="6">
+    <Box mb="4">
       <VStack gap="1">
         <IconWrapper>
           <UnknownDappIcon color="#58585B" />

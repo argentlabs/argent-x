@@ -10,10 +10,8 @@ import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import {
-  ConfirmPageProps,
-  DeprecatedConfirmScreen,
-} from "./DeprecatedConfirmScreen"
+import { ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
@@ -47,10 +45,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-  console.log(
-    "🚀 ~ file: ApproveTransactionScreen.tsx:74 ~ transactionReview",
-    transactionReview,
-  )
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -78,7 +72,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   }
 
   return (
-    <DeprecatedConfirmScreen
+    <ConfirmScreen
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
@@ -120,6 +114,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         tokensByNetwork={tokensByNetwork}
       />
       <AccountNetworkInfo account={selectedAccount} />
-    </DeprecatedConfirmScreen>
+    </ConfirmScreen>
   )
 }

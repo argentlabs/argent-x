@@ -13,6 +13,7 @@ import {
 } from "../../components/Button"
 import { Header } from "../../components/Header"
 import { H2 } from "../../theme/Typography"
+import { Account } from "../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
@@ -20,9 +21,6 @@ import {
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
-import { ConfirmPageProps } from "./ConfirmScreen"
-
-export { ConfirmPageProps } // re-export for backwards compatibility
 
 const ConfirmScreenWrapper = styled.form<{
   accountShown: boolean
@@ -65,6 +63,12 @@ const Placeholder = styled.div`
   width: 100%;
   margin-top: 8px;
 `
+
+export interface ConfirmPageProps {
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
+  onReject?: () => void
+  selectedAccount?: Account
+} // re-export for backwards compatibility
 
 interface DeprecatedConfirmScreenProps extends ConfirmPageProps {
   title?: string
