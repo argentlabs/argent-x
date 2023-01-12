@@ -56,7 +56,7 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
             <P4 color="neutrals.300">Rate</P4>
-            <Tooltip label="Includes Jediswap's 0.3% protocol fee">
+            <Tooltip label="Includes JediSwap's 0.3% protocol fee">
               <Text color="neutrals.300" cursor="pointer">
                 <InfoIcon />
               </Text>

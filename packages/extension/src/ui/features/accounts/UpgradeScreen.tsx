@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { useSelectedAccount } from "./accounts.state"
 
 const StyledP = styled(P)`
@@ -30,7 +30,7 @@ export const UpgradeScreen: FC = () => {
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Upgrade Wallet"
       confirmButtonText="Upgrade"
       rejectButtonText="Cancel"
@@ -51,6 +51,6 @@ export const UpgradeScreen: FC = () => {
         expect these kind of upgrades to be less frequent as the network
         matures.
       </StyledP>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

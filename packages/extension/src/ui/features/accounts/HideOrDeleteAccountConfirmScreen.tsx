@@ -9,7 +9,7 @@ import { routes } from "../../routes"
 import { formatFullAddress } from "../../services/addresses"
 import { deleteAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useAccount } from "./accounts.state"
 import { autoSelectAccountOnNetwork } from "./switchAccount"
@@ -73,7 +73,7 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title={mode === "hide" ? "Hide Account" : "Delete Account"}
       confirmButtonText={mode === "hide" ? "Hide" : "Delete"}
       confirmButtonBackgroundColor="#C12026"
@@ -95,6 +95,6 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
           ? "You will be able to unhide the account from the account list screen."
           : "You will not be able to recover this account in the future."}
       </StyledP>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

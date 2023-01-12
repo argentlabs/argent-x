@@ -11,7 +11,10 @@ import { StarknetIcon } from "../../components/Icons/StarknetIcon"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { H2, P } from "../../theme/Typography"
-import { ConfirmPageProps, StickyGroup } from "../actions/ConfirmScreen"
+import {
+  ConfirmPageProps,
+  StickyGroup,
+} from "../actions/DeprecatedConfirmScreen"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { recover } from "../recovery/recovery.service"
 import { useSelectedAccount } from "./accounts.state"

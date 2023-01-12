@@ -15,7 +15,7 @@ import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { makeClickable } from "../../services/a11y"
 import { A, FormError, P } from "../../theme/Typography"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { slugify } from "./slugify"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 
@@ -94,7 +94,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
 
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
-      <ConfirmScreen
+      <DeprecatedConfirmScreen
         title={props.mode === "add" ? "Add network" : "Edit network"}
         singleButton
         confirmButtonText={props.mode === "add" ? "Create" : "Save"}
@@ -229,7 +229,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             </FormError>
           )}
         </Wrapper>
-      </ConfirmScreen>
+      </DeprecatedConfirmScreen>
     </NavigationContainer>
   )
 }

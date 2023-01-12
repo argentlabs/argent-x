@@ -1,19 +1,7 @@
-import { isArray } from "lodash-es"
-import { FC, useMemo, useState } from "react"
+import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 
-import { isErc20TransferCall } from "../../../shared/call"
-import {
-  ApiTransactionReviewResponse,
-  getTransactionReviewHasSwap,
-} from "../../../shared/transactionReview.service"
-import {
-  Field,
-  FieldGroup,
-  FieldKey,
-  FieldValue,
-} from "../../components/Fields"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
@@ -22,10 +10,12 @@ import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
-import { AccountAddressField } from "./transaction/fields/AccountAddressField"
+import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
+import { DappHeader } from "./transaction/DappHeader"
 import { TransactionsList } from "./transaction/TransactionsList"
 import { useTransactionReview } from "./transaction/useTransactionReview"
 
@@ -34,24 +24,6 @@ export interface ApproveTransactionScreenProps
   actionHash: string
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
-}
-
-export const titleForTransactionsAndReview = (
-  transactions: Call | Call[] = [],
-  transactionReview: ApiTransactionReviewResponse | undefined,
-) => {
-  const transactionsArray: Call[] = isArray(transactions)
-    ? transactions
-    : [transactions]
-  const hasErc20Transfer = transactionsArray.some(isErc20TransferCall)
-  const hasSwap = getTransactionReviewHasSwap(transactionReview)
-  return hasErc20Transfer
-    ? "Review send"
-    : hasSwap
-    ? "Review trade"
-    : transactionsArray.length === 1
-    ? "Review transaction"
-    : "Review transactions"
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
@@ -73,19 +45,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-  console.log(
-    "🚀 ~ file: ApproveTransactionScreen.tsx:74 ~ transactionReview",
-    transactionReview,
-  )
-
-  const title = useMemo(() => {
-    return titleForTransactionsAndReview(transactions, transactionReview)
-  }, [transactionReview, transactions])
-
-  console.log(
-    "🚀 ~ file: ApproveTransactionScreen.tsx:76 ~ title ~ title",
-    title,
-  )
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -112,20 +71,16 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
-  const confirmButtonVariant =
-    transactionReview?.assessment === "warn" ? "warn-high" : undefined
-
   return (
     <ConfirmScreen
-      title={title}
-      confirmButtonText="Approve"
+      confirmButtonText="Confirm"
+      rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
-      confirmButtonVariant={confirmButtonVariant}
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
       }}
-      showHeader={false}
+      showHeader={true}
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation
@@ -147,23 +102,18 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }
       {...props}
     >
+      <DappHeader
+        transactions={transactions}
+        transactionReview={transactionReview}
+      />
+
       <TransactionsList
         networkId={networkId}
         transactions={transactions}
         transactionReview={transactionReview}
         tokensByNetwork={tokensByNetwork}
       />
-      <FieldGroup>
-        <AccountAddressField
-          title="From"
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.network.id}
-        />
-        <Field>
-          <FieldKey>Network</FieldKey>
-          <FieldValue>{selectedAccount.network.name}</FieldValue>
-        </Field>
-      </FieldGroup>
+      <AccountNetworkInfo account={selectedAccount} />
     </ConfirmScreen>
   )
 }

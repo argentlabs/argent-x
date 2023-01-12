@@ -1,3 +1,4 @@
+import { P4 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode, useMemo } from "react"
 
@@ -53,6 +54,7 @@ interface PrettyAccountAddressProps
   contacts?: AddressBookContact[]
   fallbackValue?: (accountAddress: string) => ReactNode
   icon?: boolean
+  bold?: boolean
 }
 
 export const PrettyAccountAddress: FC<PrettyAccountAddressProps> = ({
@@ -63,6 +65,7 @@ export const PrettyAccountAddress: FC<PrettyAccountAddressProps> = ({
   size = 10,
   fallbackValue,
   icon = true,
+  bold = false,
 }) => {
   const defaultAccountNames = useAccountMetadata((x) => x.accountNames)
   const { contacts: defaultContacts } = useAddressBook()
@@ -106,7 +109,13 @@ export const PrettyAccountAddress: FC<PrettyAccountAddressProps> = ({
       {icon && accountName && (
         <TokenIcon url={accountImageUrl} name={accountAddress} size={size} />
       )}
-      {accountDisplayName}
+      {bold ? (
+        <P4 fontWeight="bold" color="white">
+          {accountDisplayName}
+        </P4>
+      ) : (
+        accountDisplayName
+      )}
     </Flex>
   )
 }

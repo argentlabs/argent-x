@@ -9,8 +9,8 @@ import {
   getTransactionReviewHasSwap,
 } from "../../../../shared/transactionReview.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
+import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
-import { TransactionDetails } from "./TransactionDetails"
 import { TransactionsListSwap } from "./TransactionsListSwap"
 
 export interface ITransactionsList {
@@ -23,7 +23,6 @@ export interface ITransactionsList {
 /** Renders one or more transactions with review if available */
 
 export const TransactionsList: FC<ITransactionsList> = ({
-  networkId,
   transactions,
   transactionReview,
   tokensByNetwork = [],
@@ -50,14 +49,7 @@ export const TransactionsList: FC<ITransactionsList> = ({
           tokensByNetwork={tokensByNetwork}
         />
       ) : (
-        transactionsArray.map((transaction, index) => (
-          <TransactionDetails
-            key={index}
-            networkId={networkId}
-            transaction={transaction}
-            tokensByNetwork={tokensByNetwork}
-          />
-        ))
+        <TransactionActions transactions={transactionsArray} />
       )}
     </>
   )
