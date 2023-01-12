@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/transaction/DeprecatedConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { useSelectedAccount } from "./accounts.state"
 
 const StyledP = styled(P)`

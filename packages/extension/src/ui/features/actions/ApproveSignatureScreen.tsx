@@ -12,7 +12,7 @@ import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import {
   ConfirmPageProps,
   DeprecatedConfirmScreen,
-} from "./transaction/DeprecatedConfirmScreen"
+} from "./DeprecatedConfirmScreen"
 
 interface ApproveSignatureScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {

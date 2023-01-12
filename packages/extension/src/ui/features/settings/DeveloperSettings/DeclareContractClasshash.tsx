@@ -13,7 +13,7 @@ import { FC } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { routes } from "../../../routes"
-import { StickyGroup } from "../../actions/transaction/DeprecatedConfirmScreen"
+import { StickyGroup } from "../../actions/DeprecatedConfirmScreen"
 
 const { TickCircleIcon } = icons
 

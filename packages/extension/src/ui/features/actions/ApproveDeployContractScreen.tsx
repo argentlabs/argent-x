@@ -5,11 +5,11 @@ import { UniversalDeployerContractPayload } from "starknet"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { AccountAddress } from "./AccountAddress"
-import { DeployContractFeeEstimation } from "./feeEstimation/DeployContractFeeEstimation"
 import {
   ConfirmPageProps,
   DeprecatedConfirmScreen,
-} from "./transaction/DeprecatedConfirmScreen"
+} from "./DeprecatedConfirmScreen"
+import { DeployContractFeeEstimation } from "./feeEstimation/DeployContractFeeEstimation"
 
 export interface ApproveDeployContractScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {

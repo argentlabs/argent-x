@@ -6,7 +6,7 @@ import { coerceErrorToString } from "../../../shared/utils/error"
 import { useAppState } from "../../app.state"
 import { P } from "../../theme/Typography"
 import { Pre } from "./ApproveSignatureScreen"
-import { DeprecatedConfirmScreen } from "./transaction/DeprecatedConfirmScreen"
+import { DeprecatedConfirmScreen } from "./DeprecatedConfirmScreen"
 
 const SP = styled(P)`
   font-size: 18px;

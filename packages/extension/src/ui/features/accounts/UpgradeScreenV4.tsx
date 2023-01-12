@@ -14,7 +14,7 @@ import { H2, P } from "../../theme/Typography"
 import {
   ConfirmPageProps,
   StickyGroup,
-} from "../actions/transaction/DeprecatedConfirmScreen"
+} from "../actions/DeprecatedConfirmScreen"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { recover } from "../recovery/recovery.service"
 import { useSelectedAccount } from "./accounts.state"

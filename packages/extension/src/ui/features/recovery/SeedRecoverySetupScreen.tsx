@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 import { Paragraph } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
-import { DeprecatedConfirmScreen } from "../actions/transaction/DeprecatedConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { CopySeedPhrase } from "./CopySeedPhrase"
 import { SeedPhrase } from "./SeedPhrase"
 import { useSeedPhrase } from "./useSeedPhrase"

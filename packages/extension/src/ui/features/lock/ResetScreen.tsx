@@ -5,7 +5,7 @@ import { useTheme } from "styled-components"
 import { routes } from "../../routes"
 import { resetAll } from "../../services/background"
 import { P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/transaction/DeprecatedConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 
 export const ResetScreen: FC = () => {
   const navigate = useNavigate()

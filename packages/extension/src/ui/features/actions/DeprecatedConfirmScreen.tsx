@@ -10,16 +10,16 @@ import {
   ButtonGroupHorizontal,
   ButtonGroupVertical,
   ButtonVariant,
-} from "../../../components/Button"
-import { Header } from "../../../components/Header"
-import { H2 } from "../../../theme/Typography"
+} from "../../components/Button"
+import { Header } from "../../components/Header"
+import { H2 } from "../../theme/Typography"
 import {
   getAccountName,
   useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
-import { getAccountImageUrl } from "../../accounts/accounts.service"
-import { ProfilePicture } from "../../accounts/ProfilePicture"
-import { NetworkSwitcher } from "../../networks/NetworkSwitcher"
+} from "../accounts/accountMetadata.state"
+import { getAccountImageUrl } from "../accounts/accounts.service"
+import { ProfilePicture } from "../accounts/ProfilePicture"
+import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { ConfirmPageProps } from "./ConfirmScreen"
 
 export { ConfirmPageProps } // re-export for backwards compatibility

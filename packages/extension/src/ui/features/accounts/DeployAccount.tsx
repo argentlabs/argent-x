@@ -11,7 +11,7 @@ import { H2, P } from "../../theme/Typography"
 import {
   ConfirmPageProps,
   StickyGroup,
-} from "../actions/transaction/DeprecatedConfirmScreen"
+} from "../actions/DeprecatedConfirmScreen"
 import { useSelectedAccount } from "./accounts.state"
 
 const StyledIconBar = styled(IconBar)`
