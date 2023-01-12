@@ -21,6 +21,7 @@ import { isAccountDeployed } from "../accountDeploy"
 import { analytics } from "../analytics"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
+import { argentMaxFee } from "../utils/argentMaxFee"
 import { addTransaction, transactionsStore } from "./store"
 
 export const checkTransactionHash = (
@@ -85,12 +86,33 @@ export const executeTransactionAction = async (
     : await getNonce(selectedAccount, wallet)
 
   let maxFee = "0"
+  let maxADFee = "0"
 
   if (
     selectedAccount.needsDeploy &&
     !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
   ) {
-    const { account, txHash } = await wallet.deployAccount(selectedAccount)
+    if ("estimateFeeBulk" in starknetAccount) {
+      const bulkTransactions: TransactionBulk = [
+        {
+          type: "DEPLOY_ACCOUNT",
+          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
+        },
+        {
+          type: "INVOKE_FUNCTION",
+          payload: transactions,
+        },
+      ]
+      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
+        bulkTransactions,
+      )
+
+      maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+      maxFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
+    }
+    const { account, txHash } = await wallet.deployAccount(selectedAccount, {
+      maxFee: maxADFee,
+    })
 
     if (!checkTransactionHash(txHash)) {
       throw Error(
@@ -113,20 +135,6 @@ export const executeTransactionAction = async (
         isDeployAccount: true,
       },
     })
-
-    if ("estimateFeeBulk" in starknetAccount) {
-      const bulkTransactions: TransactionBulk = [
-        {
-          type: "INVOKE_FUNCTION",
-          payload: transactions,
-        },
-      ]
-      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
-        bulkTransactions,
-      )
-
-      maxFee = number.toHex(estimateFeeBulk[0].suggestedMaxFee)
-    }
   } else {
     if (hasUpgradePending) {
       const oldStarknetAccount = await wallet.getStarknetAccount(
@@ -137,13 +145,13 @@ export const executeTransactionAction = async (
       const { suggestedMaxFee } = await oldStarknetAccount.estimateFee(
         transactions,
       )
-      maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+      maxFee = argentMaxFee(suggestedMaxFee)
     } else {
       // estimate fee with onchain nonce even tho transaction nonce may be different
       const { suggestedMaxFee } = await starknetAccount.estimateFee(
         transactions,
       )
-      maxFee = number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+      maxFee = argentMaxFee(suggestedMaxFee)
     }
   }
 
