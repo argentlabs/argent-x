@@ -85,8 +85,10 @@ const Placeholder = styled.div`
   width: 100%;
   margin-top: 8px;
 `
-
-export const ConfirmScreen: FC<ConfirmScreenProps> = ({
+/**
+ * @deprecated Use ConfirmScreen instead
+ */
+export const DeprecatedConfirmScreen: FC<ConfirmScreenProps> = ({
   title,
   confirmButtonText = "Confirm",
   confirmButtonDisabled,

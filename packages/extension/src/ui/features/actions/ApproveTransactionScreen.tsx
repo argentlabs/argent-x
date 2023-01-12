@@ -10,7 +10,10 @@ import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import {
+  ConfirmPageProps,
+  DeprecatedConfirmScreen,
+} from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
@@ -75,19 +78,15 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
-      confirmButtonBackgroundColor="#F36A3D" // TODO: use theme from Chakra and ArgentUi
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
       }}
       showHeader={true}
-      buttonGap="8px"
-      px="4"
-      stickyGroupPadding="4"
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation
@@ -121,6 +120,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         tokensByNetwork={tokensByNetwork}
       />
       <AccountNetworkInfo account={selectedAccount} />
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

@@ -9,7 +9,10 @@ import { DeployAccountScreen } from "../accounts/DeployAccount"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import {
+  ConfirmPageProps,
+  DeprecatedConfirmScreen,
+} from "./DeprecatedConfirmScreen"
 
 interface ApproveSignatureScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -54,7 +57,7 @@ export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Sign message"
       confirmButtonText="Sign"
       onSubmit={() => {
@@ -64,6 +67,6 @@ export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
     >
       <P>A dapp wants you to sign this message:</P>
       <Pre>{JSON.stringify(dataToSign, null, 2)}</Pre>
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }
