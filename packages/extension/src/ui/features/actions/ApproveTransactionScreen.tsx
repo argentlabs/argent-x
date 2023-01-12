@@ -10,7 +10,8 @@ import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
@@ -44,10 +45,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-  console.log(
-    "🚀 ~ file: ApproveTransactionScreen.tsx:74 ~ transactionReview",
-    transactionReview,
-  )
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -79,15 +76,11 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
       confirmButtonDisabled={disableConfirm}
-      confirmButtonBackgroundColor="#F36A3D" // TODO: use theme from Chakra and ArgentUi
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
       }}
       showHeader={true}
-      buttonGap="8px"
-      px="4"
-      stickyGroupPadding="4"
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation

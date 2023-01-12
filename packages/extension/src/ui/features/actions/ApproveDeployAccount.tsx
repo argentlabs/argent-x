@@ -4,7 +4,10 @@ import { Navigate } from "react-router-dom"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { AccountAddress } from "./AccountAddress"
-import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
+import {
+  ConfirmPageProps,
+  DeprecatedConfirmScreen,
+} from "./DeprecatedConfirmScreen"
 import { AccountDeploymentFeeEstimation } from "./feeEstimation/AccountDeploymentFeeEstimation"
 
 export interface ApproveDeployAccountScreenProps
@@ -26,7 +29,7 @@ export const ApproveDeployAccountScreen: FC<
   }
 
   return (
-    <ConfirmScreen
+    <DeprecatedConfirmScreen
       title="Review activation"
       confirmButtonText="Approve"
       confirmButtonDisabled={disableConfirm}
@@ -44,6 +47,6 @@ export const ApproveDeployAccountScreen: FC<
       {...props}
     >
       <AccountAddress selectedAccount={selectedAccount} />
-    </ConfirmScreen>
+    </DeprecatedConfirmScreen>
   )
 }

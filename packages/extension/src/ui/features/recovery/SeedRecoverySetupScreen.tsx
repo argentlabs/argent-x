@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 import { Paragraph } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
-import { ConfirmScreen } from "../actions/ConfirmScreen"
+import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 import { CopySeedPhrase } from "./CopySeedPhrase"
 import { SeedPhrase } from "./SeedPhrase"
 import { useSeedPhrase } from "./useSeedPhrase"
@@ -21,7 +21,7 @@ export const SeedRecoverySetupScreen: FC = () => {
         <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
       }
     >
-      <ConfirmScreen
+      <DeprecatedConfirmScreen
         smallTopPadding
         title="Recovery phrase"
         singleButton
@@ -37,7 +37,7 @@ export const SeedRecoverySetupScreen: FC = () => {
         <SeedPhrase seedPhrase={seedPhrase} />
 
         <CopySeedPhrase seedPhrase={seedPhrase} />
-      </ConfirmScreen>
+      </DeprecatedConfirmScreen>
     </NavigationContainer>
   )
 }
