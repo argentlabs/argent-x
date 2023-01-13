@@ -113,6 +113,18 @@ const fixIconComponentCodeEmWidth = (iconComponentCode: string) => {
   return fixedIconComponentCode
 }
 
+/** wrap the SVG with Chakra component factory so can use chakra props directly */
+
+const convertToChakraSvg = (iconComponentCode: string) => {
+  iconComponentCode = iconComponentCode.replace(
+    "export default SvgComponent",
+    "export default chakra(SvgComponent)",
+  )
+  return `
+import { chakra } from "@chakra-ui/react"
+${iconComponentCode}`
+}
+
 /** Figma API fetcher which sets the `X-Figma-Token` header */
 
 const fetcher = async (url: string, raw = false) => {
@@ -193,7 +205,9 @@ const generateIconsWithConfig = async (config: IconsConfig) => {
       svgCode,
       additionalSvgConfig,
     )
-    const fileContents = fixIconComponentCodeEmWidth(componentCode)
+    const fileContents = convertToChakraSvg(
+      fixIconComponentCodeEmWidth(componentCode),
+    )
     const componentFileName = path.join(outputFolder, `${componentName}.tsx`)
     fs.writeFileSync(componentFileName, fileContents, "utf8")
     lines.push(
