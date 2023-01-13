@@ -18,7 +18,10 @@ const playwrightConfig: PlaywrightTestConfig = {
   reporter: isCI
     ? [
         ["github"],
-        ["json", { outputFile: path.join(config.reportsDir, "dsx.json") }],
+        [
+          "json",
+          { outputFile: path.join(config.reportsDir, "extension.json") },
+        ],
         ["list"],
         [
           "html",

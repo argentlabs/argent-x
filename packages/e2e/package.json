@@ -1,5 +1,5 @@
 {
-  "name": "@argent-x/playwright",
+  "name": "@argent-x/e2e",
   "version": "5.2.0",
   "private": true,
   "repository": "github:argentlabs/argent-x",

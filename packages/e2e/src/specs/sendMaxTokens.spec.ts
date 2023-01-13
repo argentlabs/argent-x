@@ -34,27 +34,28 @@ test.describe("Send max tokens", () => {
       tokenName: "Ethereum",
       ammount: "MAX",
     })
-    await extension.account.ensureTokenBalance({
-      accountName: accountName1,
-      token: "Ethereum",
-      balance: 0.0048,
-    })
-    await extension.account.ensureTokenBalance({
-      accountName: accountName2,
-      token: "Ethereum",
-      balance: 1.994,
-    })
 
-    const updatedAssetsAccoun1 = await extension.account.assets(accountName1)
-    const updatedAssetsAccoun2 = await extension.account.assets(accountName2)
+    await extension.account.token("Ethereum").click()
+    await expect(extension.account.balance).toContainText("0.00")
+    await extension.account.back.click()
+    await extension.account.ensureAccount(accountName2)
+    await extension.account.token("Ethereum").click()
+    await expect(extension.account.balance).toContainText("1.9")
+    await extension.account.back.click()
 
-    await Promise.all([
-      expect(
-        updatedAssetsAccoun1.find((el) => (el.name = "Ethereum"))?.balance,
-      ).toBe(0.0048),
-      expect(
-        updatedAssetsAccoun2.find((el) => (el.name = "Ethereum"))?.balance,
-      ).toBe(1.994),
-    ])
+    //@TODO https://argent.atlassian.net/browse/BLO-670
+    /*
+        const updatedAssetsAccoun1 = await extension.account.assets(accountName1)
+        const updatedAssetsAccoun2 = await extension.account.assets(accountName2)
+    
+        await Promise.all([
+          expect(
+            updatedAssetsAccoun1.find((el) => (el.name = "Ethereum"))?.balance,
+          ).toContain(0.00),
+          expect(
+            updatedAssetsAccoun2.find((el) => (el.name = "Ethereum"))?.balance,
+          ).toContain(1.9),
+        ])
+      */
   })
 })

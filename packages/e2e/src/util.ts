@@ -7,7 +7,7 @@ export const EXTENSION_PATH = config.distDir
 export const isExtensionURL = (url: string) =>
   url.startsWith("chrome-extension://")
 
-export const CLOSE_PAGES = async (browserContext: ChromiumBrowserContext) => {
+export const closePages = async (browserContext: ChromiumBrowserContext) => {
   const pages = browserContext?.pages() || []
   for (const page of pages) {
     const url = page.url()

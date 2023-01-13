@@ -13,5 +13,4 @@ pnpm-lock.yaml
 .env
 sourcemaps
 coverage
-artifacts
 *.tsbuildinfo

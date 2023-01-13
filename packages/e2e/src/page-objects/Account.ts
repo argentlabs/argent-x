@@ -12,7 +12,7 @@ const text = {
     showAccoutList: "Show account list",
     send: "Send",
     next: "Next",
-    approve: "Approve",
+    confirm: "Confirm",
   },
 }
 type TokenName = "Ethereum"
@@ -66,10 +66,6 @@ export default class Account {
     return this.page.locator(`button:has-text('${tkn}')`)
   }
 
-  balance(unit: string) {
-    return this.page.locator(`div:has-text('${unit}')`)
-  }
-
   get accountList() {
     return this.page.locator(`[aria-label="${text[this.lang].showAccoutList}"]`)
   }
@@ -99,11 +95,15 @@ export default class Account {
   }
 
   get approve() {
-    return this.page.locator(`button:has-text("${text[this.lang].approve}")`)
+    return this.page.locator(`button:has-text("${text[this.lang].confirm}")`)
   }
 
   account(accountName: string) {
     return this.page.locator(`[aria-label="Select ${accountName}"]`)
+  }
+
+  get balance() {
+    return this.page.locator('[data-testid="tokenBalance"]')
   }
 
   async addAccount({ firstAccount = true }: { firstAccount?: boolean }) {

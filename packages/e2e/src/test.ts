@@ -4,7 +4,7 @@ import { ChromiumBrowserContext, Page, test } from "@playwright/test"
 
 import config from "./config"
 import ExtensionPage from "./page-objects/ExtensionPage"
-import { CLOSE_PAGES, initBrowserWithExtension } from "./util"
+import { closePages, initBrowserWithExtension } from "./util"
 
 let page: Page
 let browserContext: ChromiumBrowserContext
@@ -30,7 +30,7 @@ test.beforeEach(async () => {
   await page.bringToFront()
   await page.goto(extensionURL)
   await page.waitForTimeout(1000)
-  await CLOSE_PAGES(browserContext)
+  await closePages(browserContext)
   extension = new ExtensionPage(page, extensionURL)
 })
 let pageId = 0
@@ -60,7 +60,7 @@ test.afterEach(async ({}, testInfo) => {
     .catch((error) => {
       console.error(error)
     })
-  await CLOSE_PAGES(browserContext)
+  await closePages(browserContext)
 })
 
 export { test, extension }
