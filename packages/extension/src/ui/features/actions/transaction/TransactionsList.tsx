@@ -1,5 +1,6 @@
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { isEmpty } from "lodash-es"
+import { FC, useMemo } from "react"
 import { Call } from "starknet"
 
 import { Token } from "../../../../shared/token/type"
@@ -8,8 +9,9 @@ import {
   getDisplayWarnAndReasonForTransactionReview,
   getTransactionReviewActivityOfType,
 } from "../../../../shared/transactionReview.service"
+import { ApiTransactionSimulationResponse } from "../../../../shared/transactionSimulation.service"
 import { WarningIcon } from "../../../components/Icons/WarningIcon"
-import { SwapTransactionActions } from "./SwapTransactionActions"
+import { BalanceChangeOverview } from "./BalanceChangeOverview"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
 import { VerifiedTransactionBanner } from "./VerifiedTransactionBanner"
@@ -18,6 +20,7 @@ export interface ITransactionsList {
   networkId: string
   transactions: Call[]
   transactionReview?: ApiTransactionReviewResponse
+  transactionSimulation?: ApiTransactionSimulationResponse
   tokensByNetwork?: Token[]
 }
 
@@ -26,13 +29,20 @@ export interface ITransactionsList {
 export const TransactionsList: FC<ITransactionsList> = ({
   transactions,
   transactionReview,
+  transactionSimulation,
 }) => {
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
-  const swapTxn = getTransactionReviewActivityOfType("swap", transactionReview)
   const approveTxn = getTransactionReviewActivityOfType(
     "approve",
     transactionReview,
+  )
+
+  const txnHasApprovalsOrTransfers = useMemo(
+    () =>
+      !isEmpty(transactionSimulation?.approvals) ||
+      !isEmpty(transactionSimulation?.transfers),
+    [transactionSimulation],
   )
 
   const verifiedDapp = transactionReview?.targetedDapp
@@ -46,11 +56,8 @@ export const TransactionsList: FC<ITransactionsList> = ({
         />
       )}
       {verifiedDapp && <VerifiedTransactionBanner dapp={verifiedDapp} />}
-      {swapTxn ? (
-        <SwapTransactionActions
-          swapTransaction={swapTxn}
-          approveTransaction={approveTxn}
-        />
+      {transactionSimulation && txnHasApprovalsOrTransfers ? (
+        <BalanceChangeOverview transactionSimulation={transactionSimulation} />
       ) : (
         <TransactionActions transactions={transactions} />
       )}

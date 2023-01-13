@@ -4,7 +4,6 @@ import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 
 import { useTokensInNetwork } from "../../../shared/tokens.state"
-import { getTransactionReviewHasSwap } from "../../../shared/transactionReview.service"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
@@ -56,20 +55,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-  console.log(
-    "🚀 ~ file: ApproveTransactionScreen.tsx:54 ~ transactionSimulation",
-    transactionSimulation,
-  )
-
-  const transactionViewType = useMemo(() => {
-    if (getTransactionReviewHasSwap(transactionReview)) {
-      return "swap"
-    }
-
-    // TODO: Add case for NFT
-
-    return "generic"
-  }, [transactionReview])
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -142,6 +127,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         networkId={networkId}
         transactions={transactionsArray}
         transactionReview={transactionReview}
+        transactionSimulation={transactionSimulation}
         tokensByNetwork={tokensByNetwork}
       />
       <AccountNetworkInfo account={selectedAccount} />
