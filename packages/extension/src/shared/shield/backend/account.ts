@@ -226,7 +226,21 @@ export const addAccount = async (
   }
 }
 
-export const cosignerSign = async (message: any) => {
+export interface CosignerMessage {
+  message: any
+  type: "starknet" | "starknetDeploy"
+}
+
+export interface CosignerResponse {
+  signature: {
+    r: string
+    s: string
+  }
+}
+
+export type Cosigner = (message: CosignerMessage) => Promise<CosignerResponse>
+
+export const cosignerSign: Cosigner = async (message: CosignerMessage) => {
   try {
     const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
       method: "POST",

@@ -13,17 +13,19 @@ import {
   typedData,
 } from "starknet"
 
-import { cosignerSign } from "../shared/shield/backend/account"
+import {
+  Cosigner,
+  CosignerMessage,
+  cosignerSign,
+} from "../shared/shield/backend/account"
 import { getVerifiedEmailIsExpired } from "../shared/shield/verifiedEmail"
 
-export interface CosignerMessage {
-  message: any
-  type: "starknet" | "starknetDeploy"
-}
-
 export class GuardianSigner extends Signer {
-  constructor(keyPair: KeyPair) {
+  public cosigner: Cosigner
+
+  constructor(keyPair: KeyPair, cosignerImpl: Cosigner = cosignerSign) {
     super(keyPair)
+    this.cosigner = cosignerImpl
   }
 
   public async cosignMessage(
@@ -35,7 +37,7 @@ export class GuardianSigner extends Signer {
       throw new Error("Email verification expired")
     }
 
-    const response = await cosignerSign(cosignerMessage)
+    const response = await this.cosigner(cosignerMessage)
 
     const signature = [
       number.toBN(response.signature.r).toString(),
@@ -112,6 +114,7 @@ export class GuardianSigner extends Signer {
       ),
       maxFee: number.toBN(maxFee).toString(10),
       chainId: number.toBN(chainId).toString(10),
+      version,
     }
 
     const cosignerSignature = await this.cosignMessage({

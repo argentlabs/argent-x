@@ -630,6 +630,19 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
+  public async getSignerForAccount(account: WalletAccount) {
+    const keyPair = await this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+
+    const keyPairOrSigner =
+      ARGENT_SHIELD_ENABLED && account.guardian
+        ? new GuardianSigner(keyPair)
+        : keyPair
+
+    return keyPairOrSigner
+  }
+
   public async getStarknetAccount(
     selector: BaseWalletAccount,
     useLatest = false,
@@ -641,10 +654,6 @@ export class Wallet {
     if (!account) {
       throw Error("account not found")
     }
-
-    const keyPair = await this.getKeyPairByDerivationPath(
-      account.signer.derivationPath,
-    )
 
     const provider = getProvider(
       account.network && account.network.baseUrl
@@ -658,11 +667,7 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
-    const useGuardianSigner = ARGENT_SHIELD_ENABLED && account.guardian
-
-    const keyPairOrSigner = useGuardianSigner
-      ? new GuardianSigner(keyPair)
-      : keyPair
+    const keyPairOrSigner = await this.getSignerForAccount(account)
 
     if (account.needsDeploy || useLatest) {
       return new Account(provider, account.address, keyPairOrSigner)
