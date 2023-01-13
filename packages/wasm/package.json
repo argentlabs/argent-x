@@ -16,10 +16,12 @@
   "scripts": {
     "build": "wasm-pack build",
     "test": "wasm-pack test --chrome --headless",
-    "postinstall": "yarn build",
-    "prepare": "yarn build"
+    "postinstall2": "pnpm build"
   },
   "devDependencies": {
-    "wasm-pack": "0.10.2"
+    "wasm-pack": "^0.10.2"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
   }
 }

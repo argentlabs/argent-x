@@ -17,29 +17,30 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "yarn"
+          corepack-enable: true
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
       - name: Build
-        run: yarn build
+        run: pnpm build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run tests
-        run: yarn test
+        run: pnpm test
 
       - name: Run e2e tests
-        run: xvfb-run --auto-servernum yarn test:e2e
+        run: xvfb-run --auto-servernum pnpm test:e2e
 
       - uses: actions/upload-artifact@v3
         if: failure()
@@ -48,4 +49,4 @@ jobs:
           path: packages/extension/test-results/
 
       - name: Check bundlesize
-        run: yarn run bundlewatch
+        run: pnpm run bundlewatch

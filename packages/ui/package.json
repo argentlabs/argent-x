@@ -16,7 +16,14 @@
     }
   },
   "devDependencies": {
+    "react-copy-to-clipboard": "^5.1.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "lodash": "4.17.21",
     "@chakra-ui/cli": "^2.1.8",
+    "@chakra-ui/anatomy": "^2.1.1",
+    "@chakra-ui/styled-system": "^2.5.1",
+    "@chakra-ui/theme-tools": "^2.0.16",
     "@svgr/core": "^6.5.0",
     "@svgr/plugin-jsx": "^6.5.0",
     "@svgr/plugin-prettier": "^6.5.0",
@@ -36,7 +43,7 @@
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "postinstall": "yarn gen:theme-typings",
+    "postinstall": "pnpm gen:theme-typings",
     "dev": "vite build --watch",
     "prepare": "vite build",
     "build": "vite build"
