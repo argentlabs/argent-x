@@ -6,7 +6,7 @@ import { Call } from "starknet"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 import { titleForTransactions } from "./titleForTransactions"
 
-const { UnknownDappIcon } = icons
+const { NetworkIcon } = icons
 
 export interface DappHeaderProps {
   transactions: Call | Call[]
@@ -25,7 +25,7 @@ export const DappHeader = ({
     <Box mb="4">
       <VStack gap="1">
         <IconWrapper>
-          <UnknownDappIcon color="#58585B" />
+          <NetworkIcon color="#58585B" />
         </IconWrapper>
         <H5>{title}</H5>
       </VStack>
