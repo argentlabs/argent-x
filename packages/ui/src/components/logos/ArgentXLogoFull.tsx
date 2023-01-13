@@ -1,3 +1,4 @@
+import { chakra } from "@chakra-ui/react"
 import { SVGProps } from "react"
 const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -6,7 +7,6 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     viewBox="0 0 82 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    role="img"
     {...props}
   >
     <g clipPath="url(#prefix__a)" fill="#fff">
@@ -19,4 +19,4 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     </defs>
   </svg>
 )
-export default SvgComponent
+export default chakra(SvgComponent)

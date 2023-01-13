@@ -1,5 +1,5 @@
 import { P3, icons } from "@argent/ui"
-import { Flex, SimpleGrid, Text } from "@chakra-ui/react"
+import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"
 
@@ -7,9 +7,7 @@ const Icons: FC = () => (
   <SimpleGrid columns={[2, 4, 6, 8]} spacing={10}>
     {Object.entries(icons).map(([name, Icon], index) => (
       <Flex flexDirection="column" alignItems="center" gap={3} key={index}>
-        <Text fontSize={"5xl"} backgroundColor={"white30"}>
-          <Icon />
-        </Text>
+        <Icon color={"gray.100"} fontSize={"5xl"} backgroundColor={"white30"} />
         <P3>{name}</P3>
       </Flex>
     ))}
