@@ -7,7 +7,7 @@ import { getTransactionReviewSwap } from "../../../../shared/transactionReview.s
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../networks/useNetworks"
 
-const { UnknownDappIcon } = icons
+const { NetworkIcon } = icons
 
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
@@ -60,7 +60,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     </Center>
   ) : (
     <IconWrapper>
-      <UnknownDappIcon />
+      <NetworkIcon />
     </IconWrapper>
   )
 }

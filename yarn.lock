@@ -20575,6 +20575,23 @@ starknet@^4.16.0:
     ts-custom-error "^3.3.1"
     url-join "^4.0.1"
 
+starknet@^4.19.1:
+  version "4.19.1"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.19.1.tgz#b3269b1fa22cf9bece1b1aca1cc58d9de8bc0061"
+  integrity sha512-ffs4eXuf89jSgOFVS17tfqhMY7sEvrzlyY32ULX3YBEzN1vCqWz1fUm+wG2cR5PCuX4R6GhuzB/W6yk05ECJKw==
+  dependencies:
+    "@ethersproject/bytes" "^5.6.1"
+    bn.js "^5.2.1"
+    elliptic "^6.5.4"
+    ethereum-cryptography "^1.0.3"
+    hash.js "^1.1.7"
+    isomorphic-fetch "^3.0.0"
+    json-bigint "^1.0.0"
+    minimalistic-assert "^1.0.1"
+    pako "^2.0.4"
+    ts-custom-error "^3.3.1"
+    url-join "^4.0.1"
+
 starknet@^4.19.3:
   version "4.19.3"
   resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.19.3.tgz#63c928fd4bbd5877acf8cb7851164ce8999abe63"
