@@ -27,7 +27,7 @@ export const VerifiedTransactionBanner: FC<IVerifiedTransactionBanner> = ({
     >
       <Center>
         <Image src={dapp.iconUrl} w="5" h="5" borderRadius="base" mx="-1" />
-        <VerifiedIcon width="18" height="18" color="white" />
+        <VerifiedIcon width="4.5" height="4.5" color="white" />
       </Center>
       <P4 color="white" fontWeight="bold">
         Verified {upperFirst(dapp.name.toLowerCase())} transaction

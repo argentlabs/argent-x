@@ -36,7 +36,7 @@ interface TransferSimulationData extends CommonSimulationData {
   token: Token
   recipients: Recipient[]
   approvals: ApprovalSimulationData[]
-  isSafeTransfer?: boolean
+  safe?: boolean
 }
 
 export interface IUseTransactionSimulatedData {
@@ -121,7 +121,7 @@ export const useAggregatedSimData = (
           ZERO,
         )
 
-        const isSafeTransfer = amount.isEqualTo(totalApprovalAmount)
+        const safe = totalApprovalAmount.lte(amount.abs())
 
         return {
           ...acc,
@@ -131,7 +131,7 @@ export const useAggregatedSimData = (
             usdValue,
             recipients,
             approvals,
-            isSafeTransfer,
+            safe,
           },
         }
       },

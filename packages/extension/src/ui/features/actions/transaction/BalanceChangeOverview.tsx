@@ -1,4 +1,4 @@
-import { CopyTooltip, L2, P4, icons } from "@argent/ui"
+import { CopyTooltip, L2, P3, P4, icons } from "@argent/ui"
 import {
   Accordion,
   AccordionButton,
@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
-import { number } from "starknet"
 
 import {
   prettifyCurrencyValue,
@@ -26,7 +25,7 @@ import {
 } from "../../../services/addresses"
 import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
-const { InfoIcon } = icons
+const { InfoIcon, AlertIcon } = icons
 
 export interface BalanceChangeOverviewProps {
   transactionSimulation: ApiTransactionSimulationResponse
@@ -36,6 +35,11 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionSimulation,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
+
+  const allTransferSafe = useMemo(
+    () => aggregatedData.every((t) => t.safe),
+    [aggregatedData],
+  )
 
   return (
     <Box borderRadius="xl">
@@ -59,7 +63,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
       >
         <Accordion allowToggle>
           {aggregatedData.map(
-            ({ amount, recipients, token, usdValue, approvals }, dataIndex) => (
+            (
+              { amount, recipients, token, usdValue, approvals, safe },
+              dataIndex,
+            ) => (
               <AccordionItem
                 key={[token.address, "transfer"].join("-")}
                 border="none"
@@ -100,6 +107,11 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                           <P4 fontWeight="bold">
                             {token.name === "Ether" ? "Ethereum" : token.name}{" "}
                           </P4>
+                          {!safe && (
+                            <P3 color="error.500" fontWeight="bold" mt="0.25">
+                              <AlertIcon />
+                            </P3>
+                          )}
                         </Flex>
                         <Flex
                           direction="column"
@@ -243,6 +255,25 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
             ),
           )}
         </Accordion>
+        {!allTransferSafe && (
+          <Box m="2" borderRadius="lg" px="2" py="3" bgColor="neutrals.700">
+            <Flex justifyContent="flex-start" alignItems="flex-start" gap="2">
+              <P3 color="error.500" fontWeight="bold" mt="0.25">
+                <AlertIcon />
+              </P3>
+              <Flex direction="column" gap="1" alignItems="flex-start">
+                <P4 color="error.500" fontWeight="bold">
+                  Warning: Approved spending limit
+                </P4>
+                <P4 color="neutrals.100">
+                  You’re approving one or more addresses to spend more tokens
+                  than you’re using in this transaction. These funds will not be
+                  spent but you should not proceed if you don’t trust this app
+                </P4>
+              </Flex>
+            </Flex>
+          </Box>
+        )}
       </Flex>
     </Box>
   )
