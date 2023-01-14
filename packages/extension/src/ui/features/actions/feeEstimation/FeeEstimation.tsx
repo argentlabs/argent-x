@@ -1,4 +1,4 @@
-import { L1, L2, P4, icons } from "@argent/ui"
+import { L1, L2, P4, Pre, icons } from "@argent/ui"
 import { Flex, Text } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import Tippy from "@tippyjs/react"
@@ -223,11 +223,9 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 copyValue={parsedFeeEstimationError}
                 message="Copied"
               >
-                <P4 color="errorText" pt="3">
-                  <pre style={{ whiteSpace: "pre-wrap" }}>
-                    {parsedFeeEstimationError}
-                  </pre>
-                </P4>
+                <Pre color="errorText" pt="3" whiteSpace="pre-wrap">
+                  {parsedFeeEstimationError}
+                </Pre>
               </CopyTooltip>
             )}
           </Collapse>

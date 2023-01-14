@@ -170,23 +170,21 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 )}
                                 justifyContent="space-between"
                               >
-                                <P4 fontWeight="bold" color="neutrals.300">
-                                  <CopyTooltip
-                                    copyValue={normalizeAddress(
-                                      approval.spender,
-                                    )}
-                                    prompt=""
+                                <CopyTooltip
+                                  copyValue={normalizeAddress(approval.spender)}
+                                  prompt=""
+                                >
+                                  <P4
+                                    fontWeight="bold"
+                                    color="neutrals.300"
+                                    _hover={{
+                                      color: "text",
+                                      cursor: "pointer",
+                                    }}
                                   >
-                                    <Box
-                                      _hover={{
-                                        color: "text",
-                                        cursor: "pointer",
-                                      }}
-                                    >
-                                      {formatTruncatedAddress(approval.spender)}
-                                    </Box>
-                                  </CopyTooltip>
-                                </P4>
+                                    {formatTruncatedAddress(approval.spender)}
+                                  </P4>
+                                </CopyTooltip>
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
@@ -214,25 +212,23 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 key={["recipient", recipient.address].join("-")}
                                 justifyContent="space-between"
                               >
-                                <P4 fontWeight="bold" color="neutrals.300">
-                                  <CopyTooltip
-                                    copyValue={normalizeAddress(
-                                      recipient.address,
-                                    )}
-                                    prompt=""
+                                <CopyTooltip
+                                  copyValue={normalizeAddress(
+                                    recipient.address,
+                                  )}
+                                  prompt=""
+                                >
+                                  <P4
+                                    fontWeight="bold"
+                                    color="neutrals.300"
+                                    _hover={{
+                                      color: "text",
+                                      cursor: "pointer",
+                                    }}
                                   >
-                                    <Box
-                                      _hover={{
-                                        color: "text",
-                                        cursor: "pointer",
-                                      }}
-                                    >
-                                      {formatTruncatedAddress(
-                                        recipient.address,
-                                      )}
-                                    </Box>
-                                  </CopyTooltip>
-                                </P4>
+                                    {formatTruncatedAddress(recipient.address)}
+                                  </P4>
+                                </CopyTooltip>
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
