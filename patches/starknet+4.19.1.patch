@@ -1,8 +1,8 @@
 diff --git a/node_modules/starknet/dist/index.js b/node_modules/starknet/dist/index.js
-index 45c37b0..06f4440 100644
+index 6f50706..b384ddf 100644
 --- a/node_modules/starknet/dist/index.js
 +++ b/node_modules/starknet/dist/index.js
-@@ -89,6 +89,7 @@ __export(hash_exports, {
+@@ -88,6 +88,7 @@ __export(hash_exports, {
  });
  var import_keccak = require("ethereum-cryptography/keccak.js");
  var import_utils = require("ethereum-cryptography/utils.js");
@@ -10,7 +10,7 @@ index 45c37b0..06f4440 100644
  var import_minimalistic_assert3 = __toESM(require("minimalistic-assert"));
  
  // src/constants.ts
-@@ -2426,26 +2427,9 @@ function getSelector(value) {
+@@ -2425,26 +2426,9 @@ function getSelector(value) {
    }
    return getSelectorFromName(value);
  }
@@ -40,10 +40,10 @@ index 45c37b0..06f4440 100644
  function computeHashOnElements(data) {
    return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
 diff --git a/node_modules/starknet/dist/index.mjs b/node_modules/starknet/dist/index.mjs
-index ee8f97f..baa1d36 100644
+index 2c713c3..93b01e6 100644
 --- a/node_modules/starknet/dist/index.mjs
 +++ b/node_modules/starknet/dist/index.mjs
-@@ -32,7 +32,7 @@ __export(hash_exports, {
+@@ -31,7 +31,7 @@ __export(hash_exports, {
  });
  import { keccak256 } from "ethereum-cryptography/keccak.js";
  import { hexToBytes } from "ethereum-cryptography/utils.js";
@@ -52,7 +52,7 @@ index ee8f97f..baa1d36 100644
  
  // src/constants.ts
  var constants_exports = {};
-@@ -2369,26 +2369,9 @@ function getSelector(value) {
+@@ -2368,26 +2368,9 @@ function getSelector(value) {
    }
    return getSelectorFromName(value);
  }
