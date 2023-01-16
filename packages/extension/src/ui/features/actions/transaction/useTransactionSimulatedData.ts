@@ -103,16 +103,15 @@ export const useAggregatedSimData = (
         }, 0)
 
         const recipients = transfers.reduce<Recipient[]>((acc, t) => {
-          if (t.to !== account?.address) {
-            return [
-              ...acc,
-              {
-                address: t.to,
-                amount: new BigNumber(t.value),
-                usdValue: parseFloat(t.details.usdValue),
-              },
-            ]
-          }
+          return [
+            ...acc,
+            {
+              address: t.to,
+              amount: new BigNumber(t.value),
+              usdValue: parseFloat(t.details.usdValue),
+            },
+          ]
+
           return acc
         }, [])
 
