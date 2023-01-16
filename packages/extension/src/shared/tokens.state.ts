@@ -1,6 +1,7 @@
 import { BigNumber } from "ethers"
 import { memoize } from "lodash-es"
 import { useEffect, useMemo, useRef } from "react"
+import { number } from "starknet"
 import useSWR from "swr"
 
 import { useAccount } from "../ui/features/accounts/accounts.state"
@@ -71,18 +72,22 @@ export const useTokens = (baseTokens: BaseToken[]) => {
 
 export type TokensRecord = Record<string, Token>
 
-export const useTokensRecord = () => {
+export const useTokensRecord = ({ cleanHex = false }) => {
   const tokens = useArrayStorage(tokenStore)
 
   return useMemo(
     () =>
       tokens.reduce<TokensRecord>((acc, token) => {
+        const tokenAddress = cleanHex
+          ? number.cleanHex(token.address)
+          : token.address
+
         return {
           ...acc,
-          [token.address]: token,
+          [tokenAddress]: token,
         }
       }, {}),
-    [tokens],
+    [cleanHex, tokens],
   )
 }
 

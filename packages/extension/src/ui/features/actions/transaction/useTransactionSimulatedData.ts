@@ -2,7 +2,6 @@ import BigNumber from "bignumber.js"
 import { Dictionary } from "lodash"
 import { groupBy, reduce } from "lodash-es"
 import { useMemo } from "react"
-import { encode } from "starknet"
 
 import { Token } from "../../../../shared/token/type"
 import { useTokensRecord } from "../../../../shared/tokens.state"
@@ -48,7 +47,9 @@ export const useAggregatedSimData = (
 ) => {
   const network = useCurrentNetwork()
   const account = useSelectedAccount()
-  const tokensRecord = useTokensRecord()
+
+  // Need to clean hex because the API returns addresses with unpadded 0s
+  const tokensRecord = useTokensRecord({ cleanHex: true })
 
   const { transfers, approvals } = transactionSimulation
 
@@ -152,16 +153,7 @@ export function apiTokenDetailsToToken({
   networkId: string
   tokensRecord: Record<string, Token>
 }): Token {
-  const paddedAddress = encode.sanitizeHex(tokenAddress)
-
-  // FIXME: Properly handle token address padding
-  //   console.log(
-  //     "🚀 ~ file: useTransactionSimulatedData.ts:189 ~ paddedAddress",
-  //     details.symbol,
-  //     paddedAddress,
-  //   )
-
-  const token = tokensRecord[paddedAddress]
+  const token = tokensRecord[tokenAddress]
 
   if (token) {
     return token
