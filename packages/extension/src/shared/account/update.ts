@@ -1,8 +1,12 @@
 import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
-import { BaseWalletAccount, WalletAccount } from "../wallet.model"
+import { BaseWalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
-import { getAccountTypesFromChain } from "./details/fetchType"
 import { getAccountGuardiansFromChain } from "./details/getAccountGuardiansFromChain"
+import { getAccountTypesFromChain } from "./details/getAccountTypesFromChain"
+import {
+  DetailFetchers,
+  getAndMergeAccountDetails,
+} from "./details/getAndMergeAccountDetails"
 import { addAccounts, getAccounts } from "./store"
 
 type UpdateScope = "all" | "type" | "deploy" | "guardian"
@@ -15,17 +19,22 @@ export async function updateAccountDetails(
     accounts ? accounts.some((a2) => accountsEqual(a, a2)) : true,
   )
 
-  let newAccounts: WalletAccount[] = []
+  const accountDetailFetchers: DetailFetchers[] = []
 
   if (scope === "type" || scope === "all") {
-    newAccounts = await getAccountTypesFromChain(allAccounts)
+    accountDetailFetchers.push(getAccountTypesFromChain)
   }
 
   if (ARGENT_SHIELD_ENABLED) {
     if (scope === "guardian" || scope === "all") {
-      newAccounts = await getAccountGuardiansFromChain(allAccounts)
+      accountDetailFetchers.push(getAccountGuardiansFromChain)
     }
   }
+
+  let newAccounts = await getAndMergeAccountDetails(
+    allAccounts,
+    accountDetailFetchers,
+  )
 
   if (scope === "deploy" || scope === "all") {
     const _newAccounts = allAccounts.map((account) => ({

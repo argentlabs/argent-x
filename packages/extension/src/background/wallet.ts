@@ -15,8 +15,12 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
-import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
+import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
+import {
+  DetailFetchers,
+  getAndMergeAccountDetails,
+} from "../shared/account/details/getAndMergeAccountDetails"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
 import {
@@ -295,14 +299,17 @@ export class Wallet {
     await Promise.all(promises)
 
     try {
-      const accountWithTypes = await getAccountTypesFromChain(accounts)
-      if (!ARGENT_SHIELD_ENABLED) {
-        return accountWithTypes
+      const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
+
+      if (ARGENT_SHIELD_ENABLED) {
+        accountDetailFetchers.push(getAccountGuardiansFromChain)
       }
-      const accountWithTypesAndGuardians = await getAccountGuardiansFromChain(
-        accountWithTypes,
+
+      const accountsWithDetails = await getAndMergeAccountDetails(
+        accounts,
+        accountDetailFetchers,
       )
-      return accountWithTypesAndGuardians
+      return accountsWithDetails
     } catch (error) {
       console.error(
         "Error getting account types or guardians from chain",
