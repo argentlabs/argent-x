@@ -13,18 +13,17 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "pnpm"
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:
           version: 7
           run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: |
           echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
