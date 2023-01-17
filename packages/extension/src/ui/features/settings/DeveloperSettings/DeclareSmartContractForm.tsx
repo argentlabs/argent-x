@@ -1,9 +1,9 @@
 import { Error as ErrorEl, Input, Select } from "@argent/ui"
-import { calculate_class_hash } from "@argent/x-wasm"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import { hash } from "starknet5"
 
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
@@ -84,7 +84,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
         const contractContent = await readFileAsString(file)
         setContractJSON(contractContent)
 
-        const classHash = await calculate_class_hash(contractContent)
+        const classHash = hash.computeContractClassHash(contractContent)
         setValue("classHash", classHash)
 
         setContractClassHashComputed(true)
