@@ -12,22 +12,27 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "yarn"
-
-      - run: yarn install --frozen-lockfile
+          cache: "pnpm"
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+      - run: pnpm install --frozen-lockfile
       - run: |
           echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
-      - run: yarn build
+      - run: pnpm build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
-      - run: yarn --cwd packages/dapp export
+      - run: pnpm --cwd packages/dapp export
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

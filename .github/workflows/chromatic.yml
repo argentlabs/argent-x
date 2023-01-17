@@ -12,8 +12,19 @@ jobs:
     # Job steps
     steps:
       - uses: actions/checkout@v1
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "pnpm"
       - name: Install dependencies
-        run: yarn
+        run: pnpm install --frozen-lockfile
         # 👇 Adds Chromatic as a step in the workflow
       - name: Change to storybook directory
         run: cd packages/storybook

@@ -25,6 +25,12 @@ jobs:
           corepack-enable: true
           cache: "pnpm"
 
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

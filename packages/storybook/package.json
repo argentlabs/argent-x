@@ -3,6 +3,7 @@
   "version": "5.2.0",
   "private": true,
   "devDependencies": {
+    "webpack": "^5.62.1",
     "@argent-x/extension": "^5.2.0",
     "@argent/ui": "^5.2.0",
     "@babel/core": "^7.18.5",

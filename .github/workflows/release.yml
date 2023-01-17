@@ -33,25 +33,31 @@ jobs:
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
       SAFE_ENV_VARS: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
+          cache: "pnpm"
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - name: Release npm packages
         # if flow is triggered by a tag, publish to npm
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
           cp Readme.md ./packages/get-starknet/README.md
-          yarn --cwd packages/get-starknet publish --access public || exit 0
-          yarn --cwd packages/sessions publish --access public || exit 0
-      - run: yarn --cwd packages/dapp export
+          pnpm --cwd packages/get-starknet publish --access public || exit 0
+          pnpm --cwd packages/sessions publish --access public || exit 0
+      - run: pnpm --cwd packages/dapp export
       - name: Check bundlesize for chrome
-        run: yarn run bundlewatch
+        run: pnpm run bundlewatch
       - name: Create chrome zip
         run: |
           cd packages/extension/dist
@@ -59,7 +65,7 @@ jobs:
           mv $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ../../../
           cd ../../../
       - name: Build Firefox version
-        run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+        run: MANIFEST_VERSION=v2 pnpm --cwd packages/extension build
       - name: Create firefox zip
         run: |
           cd packages/extension/dist
@@ -67,11 +73,11 @@ jobs:
           mv $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ../../../
           cd ../../../
       - name: Check bundlesize for firefox
-        run: yarn run bundlewatch
+        run: pnpm run bundlewatch
 
       - name: Upload artifacts for chrome
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: chrome
           path: "*-chrome.zip"
@@ -79,7 +85,7 @@ jobs:
           if-no-files-found: error
       - name: Upload artifacts for firefox
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: firefox
           path: "*-firefox.zip"

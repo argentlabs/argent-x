@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/lodash": "^4.14.191",
     "@playwright/test": "^1.23.0",
     "@sentry/webpack-plugin": "^1.18.9",
     "@svgr/webpack": "^6.0.0",
@@ -89,6 +90,7 @@
     "@sentry/tracing": "^7.6.0",
     "@tippyjs/react": "^4.2.6",
     "bignumber.js": "^9.0.2",
+    "@ethersproject/bignumber": "^5.5.1",
     "buffer": "^6.0.3",
     "colord": "^2.9.2",
     "ethers": "^5.5.1",
@@ -118,6 +120,9 @@
     "url-join": "^5.0.0",
     "webextension-polyfill": "^0.10.0",
     "yup": "^1.0.0-beta.4",
-    "zustand": "^3.6.5"
+    "zustand": "^3.6.5",
+    "@sentry/utils": "^7.6.0",
+    "lodash": "^4.17.21",
+    "copy-to-clipboard": "^3.3.3"
   }
 }

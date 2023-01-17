@@ -10,17 +10,23 @@ jobs:
           - 5050:5050
     if: github.actor == 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
-      - run: yarn test
-      - run: xvfb-run --auto-servernum yarn test:e2e
-      - run: yarn --cwd packages/dapp export
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test
+      - run: xvfb-run --auto-servernum pnpm test:e2e
+      - run: pnpm --cwd packages/dapp export
       - uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT }}
