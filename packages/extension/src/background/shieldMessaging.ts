@@ -18,7 +18,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
     case "SHIELD_MAYBE_ADD_ACCOUNT": {
       if (!ARGENT_SHIELD_ENABLED) {
         /** should never happen */
-        throw "Argent Shield is not enabled"
+        throw new Error("Argent Shield is not enabled")
       }
       /** Check if account exists in backend and add it if not */
       try {
