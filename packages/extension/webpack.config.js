@@ -34,9 +34,6 @@ module.exports = {
     inpage: "./src/inpage",
     background: "./src/background",
   },
-  experiments: {
-    asyncWebAssembly: true,
-  },
   performance: {
     hints: false,
   },
