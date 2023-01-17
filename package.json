@@ -49,7 +49,7 @@
     "files": [
       {
         "path": "packages/extension/dist/**/*.*",
-        "maxSize": "4mB",
+        "maxSize": "5mB",
         "compression": "none"
       }
     ]
