@@ -46,7 +46,13 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
-    "vite-plugin-dts": "^1.6.6"
+    "vite-plugin-dts": "^1.6.6",
+    "@emotion/react": "^11.10.5",
+    "colord": "^2.9.2",
+    "lodash-es": "^4.17.21",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.1"
   },
   "peerDependencies": {
     "@emotion/react": "^11.10.5",

@@ -37,7 +37,11 @@
     "jsdom": "^20.0.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
-    "vite-plugin-dts": "^1.6.6"
+    "vite-plugin-dts": "^1.6.6",
+    "@emotion/react": "^11.10.4",
+    "colord": "^2.9.2",
+    "lodash-es": "^4.17.21",
+    "react-router-dom": "^6.0.1"
   },
   "scripts": {
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
