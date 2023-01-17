@@ -24,7 +24,7 @@ import { TransactionActions } from "./transaction/TransactionActions"
 import { TransactionBanner } from "./transaction/TransactionBanner"
 import { useTransactionReview } from "./transaction/useTransactionReview"
 import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
-import { VerifiedTransactionBanner } from "./transaction/VerifiedTransactionBanner"
+import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
 
 export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -153,7 +153,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           message={reason}
         />
       ) : verifiedDapp ? (
-        <VerifiedTransactionBanner dapp={verifiedDapp} />
+        <VerifiedDappBanner dapp={verifiedDapp} />
       ) : (
         <></>
       )}
