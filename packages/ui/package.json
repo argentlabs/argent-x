@@ -42,7 +42,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.4.7",
+    "@chakra-ui/react": "2.4.9",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^8.0.2",
