@@ -48,7 +48,7 @@
     "vitest": "^0.27.1",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
-    "webpack-cli": "^4.9.1",
+    "webpack-cli": "^5.0.1",
     "ws": "^8.8.1"
   },
   "scripts": {
