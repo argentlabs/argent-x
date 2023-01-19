@@ -48,7 +48,7 @@
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "postinstall": "pnpm gen:theme-typings",
+    "postinstall": "pnpm build && pnpm gen:theme-typings",
     "dev": "vite build --watch",
     "prepare": "vite build",
     "build": "vite build"
