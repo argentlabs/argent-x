@@ -35,6 +35,14 @@ export const initBrowserWithExtension = async () => {
     },
   })) as ChromiumBrowserContext
 
+  await browserContext.addInitScript("window.PLAYWRIGHT = true;")
+  await browserContext.addInitScript(() => {
+    window.localStorage.setItem(
+      "seenNetworkStatusState",
+      `{"state":{"lastSeen":${Date.now()}},"version":0}`, // tricks the extension into not showing the warning as it thinks it's been seen
+    )
+  })
+
   let page = browserContext.pages()[0]
   await page.bringToFront()
   await page.goto("chrome://inspect/#extensions")
