@@ -1,0 +1,42 @@
+{
+  "name": "@argent/guardian",
+  "version": "6.0.1",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/shared.js",
+      "require": "./dist/shared.umd.cjs"
+    }
+  },
+  "main": "./dist/shared.umd.cjs",
+  "module": "./dist/shared.js",
+  "types": "./dist/shared.d.ts",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "prepare": "yarn build"
+  },
+  "dependencies": {
+    "dexie": "^3.2.2",
+    "get-starknet-core": "^2.0.0",
+    "jose": "^4.11.2",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@tsconfig/svelte": "^3.0.0",
+    "@types/async-retry": "^1.4.5",
+    "starknet": "^4.19.2",
+    "typescript": "^4.9.3",
+    "vite": "^3.0.0",
+    "vite-plugin-dts": "^1.4.0"
+  },
+  "peerDependencies": {
+    "starknet": "^4.19.2"
+  },
+  "gitHead": "54c5d4dc549cc4d0ac044f7c0c1c80936becadde"
+}

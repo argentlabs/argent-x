@@ -1,3 +1,4 @@
+import { GuardianSigner } from "@argent/guardian"
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, noop, throttle, union } from "lodash-es"
@@ -46,7 +47,6 @@ import {
   declareContracts,
   getPreDeployedAccount,
 } from "./devnet/declareAccounts"
-import { GuardianSigner } from "./GuardianSigner"
 import {
   getIndexForPath,
   getNextPathIndex,

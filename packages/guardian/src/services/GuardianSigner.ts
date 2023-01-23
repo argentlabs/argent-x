@@ -1,4 +1,4 @@
-import {
+import type {
   Abi,
   Call,
   DeclareSignerDetails,
@@ -6,6 +6,8 @@ import {
   InvocationsSignerDetails,
   KeyPair,
   Signature,
+} from "starknet"
+import {
   Signer,
   addAddressPadding,
   number,
@@ -13,12 +15,9 @@ import {
   typedData,
 } from "starknet"
 
-import {
-  Cosigner,
-  CosignerMessage,
-  cosignerSign,
-} from "../shared/shield/backend/account"
-import { getVerifiedEmailIsExpired } from "../shared/shield/verifiedEmail"
+import type { Cosigner, CosignerMessage } from "./account"
+import { cosignerSign } from "./account"
+import { getVerifiedEmailIsExpired } from "./verifiedEmail"
 
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner

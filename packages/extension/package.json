@@ -80,6 +80,7 @@
     "@argent/x-multicall": "^5.2.0",
     "@argent/x-sessions": "^5.2.0",
     "@argent/x-swap": "^5.2.0",
+    "@argent/guardian": "^6.0.1",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^2.0.0",
     "@mui/icons-material": "^5.3.1",
