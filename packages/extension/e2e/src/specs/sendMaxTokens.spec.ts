@@ -47,5 +47,6 @@ test.describe("Send max tokens", () => {
           ).toContain(1.9),
         ])
       */
+    await extension.resetExtension()
   })
 })

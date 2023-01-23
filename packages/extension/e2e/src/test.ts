@@ -17,12 +17,12 @@ test.beforeAll(async () => {
   extensionURL = init.extensionURL
   page = init.page
 })
-
+/*
 test.afterAll(async () => {
   await browserContext?.close()
   extensionURL = ""
 })
-
+*/
 test.beforeEach(async () => {
   if (!extensionURL) {
     console.error("Invalid extensionURL", { extensionURL })

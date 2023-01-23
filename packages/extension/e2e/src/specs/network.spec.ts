@@ -13,5 +13,6 @@ test.describe("Network", () => {
       "Testnet 2\nhttps://alpha4-2.starknet.io",
       "Localhost 5050\nhttp://localhost:5050",
     ])
+    await extension.resetExtension()
   })
 })
