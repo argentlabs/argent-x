@@ -18,7 +18,6 @@ export const closePages = async (browserContext: ChromiumBrowserContext) => {
 }
 export const initBrowserWithExtension = async () => {
   const userDataDir = `/tmp/test-user-data-${Math.random()}`
-  console.log("debug test", userDataDir)
   const browserContext = (await chromium.launchPersistentContext(userDataDir, {
     headless: false,
     args: [
