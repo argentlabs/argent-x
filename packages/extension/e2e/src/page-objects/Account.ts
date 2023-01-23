@@ -59,7 +59,7 @@ export default class Account {
   }
 
   get send() {
-    return this.page.locator(`button:has-text("${text[this.lang].send}")`)
+    return this.page.locator(`button:text-is("${text[this.lang].send}")`)
   }
 
   token(tkn: TokenName) {
@@ -113,13 +113,13 @@ export default class Account {
       await this.accountList.click()
       await this.addANewccountFromAccountList.click()
     }
-    const accountName = await this.accountList.textContent()
     await this.addFunds.click()
     await this.addFundsFromStartNet.click()
     const accountAddress = await this.accountAddress
       .textContent()
       .then((v) => v?.replaceAll(" ", ""))
-    await this.close.click()
+    await this.close.last().click()
+    const accountName = await this.accountList.textContent()
     return [accountName, accountAddress]
   }
 
@@ -150,6 +150,13 @@ export default class Account {
     return assetsList
   }
 
+  async ensureAsset(accountName: string, name: "ETH", value: string) {
+    await this.ensureAccount(accountName)
+    await expect(
+      this.page.locator(`button :text("${value} ${name}")`),
+    ).toBeVisible()
+  }
+
   async transfer({
     originAccountName,
     recepientAddress,
@@ -163,7 +170,7 @@ export default class Account {
   }) {
     await this.ensureAccount(originAccountName)
     await this.token(tokenName).click()
-    await this.send.click()
+    await this.send.last().click()
     if (ammount === "MAX") {
       await this.sendMax.click()
     } else {

@@ -9,12 +9,12 @@ const isCI = Boolean(process.env.CI)
 
 const playwrightConfig: PlaywrightTestConfig = {
   workers: 1,
-  timeout: 5 * 60e3, // 5 minutes
-  reportSlowTests: {
+  timeout: 1 * 60e3, // 3 minutes
+  /*  reportSlowTests: {
     threshold: 2 * 60e3, // 2 minutes
     max: 5,
-  },
-  expect: { timeout: 60 * 1000 }, // 1 minute
+  },*/
+  expect: { timeout: 30 * 1000 }, // 30 seconds
   reporter: isCI
     ? [
         ["github"],
