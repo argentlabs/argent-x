@@ -75,11 +75,14 @@ export const udcDeclareContract = async (
 
       maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
     }
-    const { account, txHash } = await wallet.deployAccount(selectedAccount, {
-      maxFee: maxADFee,
-    })
+    const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
+      selectedAccount,
+      {
+        maxFee: maxADFee,
+      },
+    )
 
-    if (!checkTransactionHash(txHash)) {
+    if (!checkTransactionHash(accountDeployTxHash)) {
       throw Error(
         "Deploy Account Transaction could not get added to the sequencer",
       )
@@ -92,7 +95,7 @@ export const udcDeclareContract = async (
     })
 
     await addTransaction({
-      hash: txHash,
+      hash: accountDeployTxHash,
       account,
       meta: {
         title: "Activate Account",
@@ -105,7 +108,7 @@ export const udcDeclareContract = async (
     const { classHash, contract } = payload
 
     const nonce = await getNonce(selectedAccount, wallet)
-    const { transaction_hash: txHash, class_hash: deployedClassHash } =
+    const { transaction_hash: declareTxHash, class_hash: deployedClassHash } =
       await starknetAccount.declare(
         {
           classHash,
@@ -116,7 +119,7 @@ export const udcDeclareContract = async (
         },
       )
 
-    if (!checkTransactionHash(txHash)) {
+    if (!checkTransactionHash(declareTxHash)) {
       throw Error(
         "Deploy Account Transaction could not be added to the sequencer",
       )
@@ -125,7 +128,7 @@ export const udcDeclareContract = async (
     await increaseStoredNonce(selectedAccount)
 
     await addTransaction({
-      hash: txHash,
+      hash: declareTxHash,
       account: selectedAccount,
       meta: {
         title: "Contract declared",
@@ -138,7 +141,7 @@ export const udcDeclareContract = async (
       },
     })
 
-    return { txHash, classHash: deployedClassHash }
+    return { txHash: declareTxHash, classHash: deployedClassHash }
   }
 
   throw Error("Account does not support Starknet declare")
@@ -190,11 +193,14 @@ export const udcDeployContract = async (
 
       maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
     }
-    const { account, txHash } = await wallet.deployAccount(selectedAccount, {
-      maxFee: maxADFee,
-    })
+    const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
+      selectedAccount,
+      {
+        maxFee: maxADFee,
+      },
+    )
 
-    if (!checkTransactionHash(txHash)) {
+    if (!checkTransactionHash(accountDeployTxHash)) {
       throw Error(
         "Deploy Account Transaction could not get added to the sequencer",
       )
@@ -207,7 +213,7 @@ export const udcDeployContract = async (
     })
 
     await addTransaction({
-      hash: txHash,
+      hash: accountDeployTxHash,
       account,
       meta: {
         title: "Activate Account",
@@ -226,7 +232,7 @@ export const udcDeployContract = async (
 
     // submit onchain
     const nonce = await getNonce(selectedAccount, wallet)
-    const { transaction_hash: txHash, contract_address } =
+    const { transaction_hash: deployTxHash, contract_address } =
       await starknetAccount.deploy(
         {
           classHash,
@@ -239,7 +245,7 @@ export const udcDeployContract = async (
         },
       )
 
-    if (!checkTransactionHash(txHash)) {
+    if (!checkTransactionHash(deployTxHash)) {
       throw Error(
         "Deploy Account Transaction could not be added to the sequencer",
       )
@@ -247,7 +253,7 @@ export const udcDeployContract = async (
 
     const contractAddress = contract_address[0]
     await addTransaction({
-      hash: txHash,
+      hash: deployTxHash,
       account: selectedAccount,
       meta: {
         title: "Contract deployment",
@@ -264,7 +270,7 @@ export const udcDeployContract = async (
     // transaction added, lets increase the local nonce, so we can queue transactions if needed
     await increaseStoredNonce(selectedAccount)
 
-    return { txHash, contractAddress }
+    return { txHash: deployTxHash, contractAddress }
   }
 
   throw Error("Account does not support Starknet declare")
