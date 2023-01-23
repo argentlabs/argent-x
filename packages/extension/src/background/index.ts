@@ -106,6 +106,7 @@ const safeMessages: MessageType["type"][] = [
   "REQUEST_TOKEN",
   "REQUEST_ADD_CUSTOM_NETWORK",
   "REQUEST_SWITCH_CUSTOM_NETWORK",
+  "REQUEST_DECLARE_CONTRACT",
   // answers
   "EXECUTE_TRANSACTION_RES",
   "TRANSACTION_SUBMITTED",
@@ -127,6 +128,9 @@ const safeMessages: MessageType["type"][] = [
   "CONNECT_ACCOUNT_RES",
   "CONNECT_ACCOUNT",
   "REJECT_PREAUTHORIZATION",
+  "REQUEST_DECLARE_CONTRACT_RES",
+  "DECLARE_CONTRACT_ACTION_FAILED",
+  "DECLARE_CONTRACT_ACTION_SUBMITTED",
 ]
 
 messageStream.subscribe(async ([msg, sender]) => {

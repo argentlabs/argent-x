@@ -16,14 +16,15 @@
     "next": "^13.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "starknet": "^4.19.3"
+    "starknet": "^4.19.3",
+    "starknet5": "npm:starknet@5.0.0-beta.3"
   },
   "devDependencies": {
-    "@types/node": "18.11.9",
+    "@types/node": "18.11.18",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "eslint": "8",
-    "eslint-config-next": "13.0.3",
+    "eslint-config-next": "13.1.2",
     "typescript": "^4.9.4"
   }
 }

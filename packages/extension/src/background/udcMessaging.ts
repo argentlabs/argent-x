@@ -14,8 +14,13 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
   switch (type) {
     case "REQUEST_DECLARE_CONTRACT": {
       const { data } = msg
-      const { address, networkId, classHash, contract } = data
-      await wallet.selectAccount({ address, networkId })
+      const { classHash, contract, ...restData } = data
+      if ("address" in restData && "networkId" in restData) {
+        await wallet.selectAccount({
+          address: restData.address,
+          networkId: restData.networkId,
+        })
+      }
 
       const action = await actionQueue.push({
         type: "DECLARE_CONTRACT_ACTION",
