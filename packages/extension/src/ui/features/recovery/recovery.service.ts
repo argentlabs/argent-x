@@ -12,6 +12,7 @@ import {
 } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
 import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
+import { useRestorationState } from "../stateRestoration/restoration.state"
 
 interface RecoveryOptions {
   networkId?: string
@@ -60,6 +61,13 @@ export const recover = async ({
 
     if (showHiddenAccountList && networkId) {
       return routes.accountsHidden(networkId)
+    }
+
+    // restore entryRoute from restoration.state
+    const { entryRoute } = useRestorationState.getState()
+    if (entryRoute) {
+      const { pathname, search } = entryRoute
+      return [pathname, search].filter(Boolean).join("")
     }
 
     return routes.accountTokens()

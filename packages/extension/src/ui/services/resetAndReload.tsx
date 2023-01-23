@@ -8,6 +8,8 @@ import React, {
 } from "react"
 import browser from "webextension-polyfill"
 
+import { ARGENT_SHIELD_ENABLED } from "../../shared/shield/constants"
+import { resetDevice } from "../../shared/shield/jwt"
 import { delay } from "../../shared/utils/delay"
 import { IS_DEV } from "../../shared/utils/dev"
 import { useAppState } from "../app.state"
@@ -81,11 +83,14 @@ export const getInitialHardReloadRoute = (query: URLSearchParams) => {
 export const RESET_CACHE_OMIT_KEYS = ["backupDownload", "networkStatuses-all"]
 
 export const useResetCache = () => {
-  return useCallback(() => {
+  return useCallback(async () => {
     const clearKeys = Object.keys(localStorage).filter(
       (key) => !RESET_CACHE_OMIT_KEYS.includes(key),
     )
     clearKeys.forEach((key) => localStorage.removeItem(key))
+    if (ARGENT_SHIELD_ENABLED) {
+      await resetDevice()
+    }
   }, [])
 }
 

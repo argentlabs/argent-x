@@ -1,3 +1,4 @@
+import { handleChangeGuardianTransaction } from "./changeGuardian"
 import { handleDeclareContractTransaction } from "./declareContract"
 import { handleDeployAccountTransaction } from "./deployAccount"
 import { checkResetStoredNonce } from "./nonce"
@@ -9,6 +10,7 @@ const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
   handleUpgradeTransaction,
   handleDeployAccountTransaction,
   handleDeclareContractTransaction,
+  handleChangeGuardianTransaction,
   checkResetStoredNonce,
 ]
 
