@@ -50,8 +50,8 @@ jobs:
           name: test-results
           path: |
             packages/extension/test-results/
-            packages/playwright/artifacts/
-            packages/playwright/reports/
+            packages/extension/e2e/artifacts/playwright/
+            packages/extension/e2e/artifacts/reports/
           retention-days: 5
 
       - name: Check bundlesize
