@@ -1,15 +1,19 @@
 import {
   DeclareContractPayload,
+  TransactionBulk,
   UniversalDeployerContractPayload,
   constants,
   stark,
 } from "starknet"
 
 import { ExtQueueItem } from "../shared/actionQueue/types"
+import { isAccountDeployed } from "./accountDeploy"
+import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
+import { argentMaxFee } from "./utils/argentMaxFee"
 
 const { UDC } = constants
 
@@ -35,20 +39,72 @@ export const udcDeclareContract = async (
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
-  const account = await wallet.getSelectedAccount()
-  if (!account) {
+  const selectedAccount = await wallet.getSelectedAccount()
+  if (!selectedAccount) {
     throw new Error("No account selected")
   }
 
   const starknetAccount = await wallet.getStarknetAccount({
-    address: account.address,
-    networkId: account.networkId,
+    address: selectedAccount.address,
+    networkId: selectedAccount.networkId,
   })
+
+  let maxADFee = "0"
+
+  if (
+    selectedAccount.needsDeploy &&
+    !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
+  ) {
+    if ("estimateFeeBulk" in starknetAccount) {
+      const bulkTransactions: TransactionBulk = [
+        {
+          type: "DEPLOY_ACCOUNT",
+          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
+        },
+        {
+          type: "DECLARE",
+          payload: {
+            classHash: payload.classHash,
+            contract: payload.contract,
+          },
+        },
+      ]
+      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
+        bulkTransactions,
+      )
+
+      maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+    }
+    const { account, txHash } = await wallet.deployAccount(selectedAccount, {
+      maxFee: maxADFee,
+    })
+
+    if (!checkTransactionHash(txHash)) {
+      throw Error(
+        "Deploy Account Transaction could not get added to the sequencer",
+      )
+    }
+
+    analytics.track("deployAccount", {
+      status: "success",
+      trigger: "transaction",
+      networkId: account.networkId,
+    })
+
+    await addTransaction({
+      hash: txHash,
+      account,
+      meta: {
+        title: "Activate Account",
+        isDeployAccount: true,
+      },
+    })
+  }
 
   if ("declare" in starknetAccount) {
     const { classHash, contract } = payload
 
-    const nonce = await getNonce(account, wallet)
+    const nonce = await getNonce(selectedAccount, wallet)
     const { transaction_hash: txHash, class_hash: deployedClassHash } =
       await starknetAccount.declare(
         {
@@ -66,11 +122,11 @@ export const udcDeclareContract = async (
       )
     }
 
-    await increaseStoredNonce(account)
+    await increaseStoredNonce(selectedAccount)
 
     await addTransaction({
       hash: txHash,
-      account,
+      account: selectedAccount,
       meta: {
         title: "Contract declared",
         subTitle: classHash.toString(),
@@ -96,15 +152,69 @@ export const udcDeployContract = async (
     throw Error("you need an open session")
   }
 
-  const account = await wallet.getSelectedAccount()
-  if (!account) {
+  const selectedAccount = await wallet.getSelectedAccount()
+  if (!selectedAccount) {
     throw new Error("No account selected")
   }
 
   const starknetAccount = await wallet.getStarknetAccount({
-    address: account.address,
-    networkId: account.networkId,
+    address: selectedAccount.address,
+    networkId: selectedAccount.networkId,
   })
+
+  let maxADFee = "0"
+
+  if (
+    selectedAccount.needsDeploy &&
+    !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
+  ) {
+    if ("estimateFeeBulk" in starknetAccount) {
+      const bulkTransactions: TransactionBulk = [
+        {
+          type: "DEPLOY_ACCOUNT",
+          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
+        },
+        {
+          type: "DEPLOY",
+          payload: {
+            classHash: payload.classHash,
+            constructorCalldata: payload.constructorCalldata,
+            salt: payload.salt,
+            unique: payload.unique,
+          },
+        },
+      ]
+      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
+        bulkTransactions,
+      )
+
+      maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+    }
+    const { account, txHash } = await wallet.deployAccount(selectedAccount, {
+      maxFee: maxADFee,
+    })
+
+    if (!checkTransactionHash(txHash)) {
+      throw Error(
+        "Deploy Account Transaction could not get added to the sequencer",
+      )
+    }
+
+    analytics.track("deployAccount", {
+      status: "success",
+      trigger: "transaction",
+      networkId: account.networkId,
+    })
+
+    await addTransaction({
+      hash: txHash,
+      account,
+      meta: {
+        title: "Activate Account",
+        isDeployAccount: true,
+      },
+    })
+  }
 
   if ("deploy" in starknetAccount) {
     const { classHash, salt, unique, constructorCalldata } = payload
@@ -115,7 +225,7 @@ export const udcDeployContract = async (
     )
 
     // submit onchain
-    const nonce = await getNonce(account, wallet)
+    const nonce = await getNonce(selectedAccount, wallet)
     const { transaction_hash: txHash, contract_address } =
       await starknetAccount.deploy(
         {
@@ -138,7 +248,7 @@ export const udcDeployContract = async (
     const contractAddress = contract_address[0]
     await addTransaction({
       hash: txHash,
-      account,
+      account: selectedAccount,
       meta: {
         title: "Contract deployment",
         subTitle: contractAddress,
@@ -152,7 +262,7 @@ export const udcDeployContract = async (
     })
 
     // transaction added, lets increase the local nonce, so we can queue transactions if needed
-    await increaseStoredNonce(account)
+    await increaseStoredNonce(selectedAccount)
 
     return { txHash, contractAddress }
   }
