@@ -1,22 +1,38 @@
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
 
+import {
+  prettifyCurrencyValue,
+  prettifyTokenAmount,
+} from "../../../../../shared/token/price"
 import { CopyTooltip } from "../../../../components/CopyTooltip"
-import { Field, FieldError, FieldGroup } from "../../../../components/Fields"
+import {
+  Field,
+  FieldAlt,
+  FieldError,
+  FieldGroup,
+  FieldKeyGroup,
+  FieldKeySub,
+  FieldValueGroup,
+  FieldValueSub,
+} from "../../../../components/Fields"
 import { KeyboardArrowDownRounded } from "../../../../components/Icons/MuiIcons"
 import { makeClickable } from "../../../../services/a11y"
+import { useTokenAmountToCurrencyValue } from "../../../accountTokens/tokenPriceHooks"
 import {
   DetailsText,
   ExtendableControl,
   FeeErrorContainer,
   FeeEstimationValue,
   LoadingInput,
+  Separator,
 } from "../styled"
 import { getParsedError } from "../utils"
 import { NetworkFee } from "./NetworkFee"
 import { TokenAmounts } from "./TokenAmounts"
 
 const Estimation: FC<any> = ({
+  needsDeploy,
   fee,
   feeToken,
   feeTokenBalance,
@@ -24,9 +40,11 @@ const Estimation: FC<any> = ({
   onErrorChange,
 }) => {
   const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
+  const [feeEstimateExpandedError, setFeeEstimateErrorExpanded] =
+    useState(false)
 
   const enoughBalance = useMemo(
-    () => Boolean(fee && feeTokenBalance?.gte(fee?.maxADFee)),
+    () => Boolean(fee && feeTokenBalance?.gte(fee?.suggestedMaxFee)),
     [fee, feeTokenBalance],
   )
 
@@ -38,6 +56,16 @@ const Estimation: FC<any> = ({
 
   const parsedFeeEstimationError = showEstimateError && getParsedError(error)
 
+  const amountCurrencyValue = useTokenAmountToCurrencyValue(
+    feeToken,
+    fee?.amount,
+  )
+
+  const accountDeploymentCurrencyValue = useTokenAmountToCurrencyValue(
+    feeToken,
+    fee?.accountDeploymentFee,
+  )
+
   useEffect(() => {
     onErrorChange?.(hasError)
     // only rerun when error changes
@@ -45,8 +73,14 @@ const Estimation: FC<any> = ({
 
   return (
     <FieldGroup error={showError}>
-      <Field>
+      <Field
+        {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+          label: "Show Fee Estimate details",
+        })}
+        style={{ cursor: "pointer", paddingRight: "5px" }}
+      >
         <NetworkFee
+          needsDeploy={needsDeploy}
           fee={fee}
           feeTokenBalance={feeTokenBalance}
           enoughBalance={enoughBalance}
@@ -59,13 +93,69 @@ const Estimation: FC<any> = ({
           <LoadingInput />
         )}
       </Field>
+
+      <Collapse in={feeEstimateExpanded}>
+        <Separator />
+
+        <FieldAlt>
+          <FieldKeyGroup>
+            <FieldKeySub>Transaction fee</FieldKeySub>
+            <FieldKeySub>One-time activation fee</FieldKeySub>
+          </FieldKeyGroup>
+          {fee && fee.accountDeploymentFee && fee.maxADFee && (
+            <FieldValueGroup>
+              <FieldValueSub>
+                {amountCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    ~{prettifyCurrencyValue(amountCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <FeeEstimationValue>
+                    ~
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: fee.amount,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{fee.amount} Unknown</>
+                    )}
+                  </FeeEstimationValue>
+                )}
+              </FieldValueSub>
+              <FieldValueSub>
+                {accountDeploymentCurrencyValue !== undefined ? (
+                  <FeeEstimationValue>
+                    ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
+                  </FeeEstimationValue>
+                ) : (
+                  <FeeEstimationValue>
+                    ~
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: fee.accountDeploymentFee,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{fee.accountDeploymentFee} Unknown</>
+                    )}
+                  </FeeEstimationValue>
+                )}
+              </FieldValueSub>
+            </FieldValueGroup>
+          )}
+        </FieldAlt>
+      </Collapse>
+
       {showFeeError && <FieldError>Not enough funds to cover fee</FieldError>}
       {showEstimateError && (
         <>
           <FieldError justify="space-between">
             Transaction failure predicted
             <ExtendableControl
-              {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
+              {...makeClickable(() => setFeeEstimateErrorExpanded((x) => !x), {
                 label: "Show error details",
               })}
             >
@@ -73,7 +163,7 @@ const Estimation: FC<any> = ({
               <KeyboardArrowDownRounded
                 style={{
                   transition: "transform 0.2s ease-in-out",
-                  transform: feeEstimateExpanded
+                  transform: feeEstimateExpandedError
                     ? "rotate(-180deg)"
                     : "rotate(0deg)",
                   height: 13,
@@ -84,7 +174,7 @@ const Estimation: FC<any> = ({
           </FieldError>
 
           <Collapse
-            in={feeEstimateExpanded}
+            in={feeEstimateExpandedError}
             timeout="auto"
             style={{
               maxHeight: "80vh",
