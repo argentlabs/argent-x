@@ -6,6 +6,7 @@ import {
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
+  Signer,
   ec,
   hash,
   number,
@@ -642,12 +643,12 @@ export class Wallet {
       account.signer.derivationPath,
     )
 
-    const keyPairOrSigner =
+    const signer =
       ARGENT_SHIELD_ENABLED && account.guardian
         ? new GuardianSigner(keyPair)
-        : keyPair
+        : new Signer(keyPair)
 
-    return keyPairOrSigner
+    return signer
   }
 
   public async getStarknetAccount(
@@ -674,23 +675,19 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
-    const keyPairOrSigner = await this.getSignerForAccount(account)
+    const signer = await this.getSignerForAccount(account)
 
     if (account.needsDeploy || useLatest) {
-      return new Account(provider, account.address, keyPairOrSigner)
+      return new Account(provider, account.address, signer)
     }
 
-    const oldAccount = new Accountv4(
-      providerV4,
-      account.address,
-      keyPairOrSigner,
-    )
+    const oldAccount = new Accountv4(providerV4, account.address, signer)
 
     const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
 
     return isOldAccount
       ? oldAccount
-      : new Account(provider, account.address, keyPairOrSigner)
+      : new Account(provider, account.address, signer)
   }
 
   public async isNonceManagedOnAccountContract(account: Accountv4) {

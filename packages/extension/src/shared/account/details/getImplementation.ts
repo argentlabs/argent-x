@@ -3,7 +3,7 @@ import { Call, number } from "starknet"
 import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork, getProvider } from "../../network"
 import { BaseWalletAccount } from "../../wallet.model"
-import { feltToHexString } from "./util"
+import { uint256ToHexString } from "./util"
 
 /**
  * Get implementation class hash of account
@@ -20,12 +20,12 @@ export const getImplementationForAccount = async (
   if (network.multicallAddress) {
     const multicall = getMulticallForNetwork(network)
     const response = await multicall.call(call)
-    return feltToHexString(response)
+    return uint256ToHexString(response)
   }
   /** fallback to single call */
   const provider = getProvider(network)
   const response = await provider.callContract(call)
-  return feltToHexString(response.result)
+  return uint256ToHexString(response.result)
 }
 
 /**
