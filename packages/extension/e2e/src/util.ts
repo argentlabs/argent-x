@@ -56,7 +56,7 @@ export const initBrowserWithExtension = async () => {
   }
   const extensionId = url.split("/")[2]
   const extensionURL = `chrome-extension://${extensionId}/index.html`
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(1500)
   const pages = browserContext.pages()
 
   const extPage = pages.find((x) => x.url() === extensionURL)
