@@ -14,7 +14,7 @@ const playwrightConfig: PlaywrightTestConfig = {
     max: 5,
   },
   expect: { timeout: 60 * 1000 }, // 1 minute
-  fullyParallel: true,
+  fullyParallel: false,
   reporter: isCI
     ? [
         ["github"],
