@@ -66,7 +66,7 @@ const isDataComplete = (data: Partial<Token>): data is Token => {
 }
 
 function addressFormat64Byte(address: number.BigNumberish): string {
-  return `0x${number.toBN(address).toString("hex").padStart(64, "0")}`
+  return `0x${number.toBigInt(address).toString(16).padStart(64, "0")}`
 }
 
 interface AddTokenScreenProps {

@@ -30,7 +30,8 @@ export async function checkIfUpgradeAvailable(
   const isInKnownImplementationsList = targetImplementations.some(
     (targetImplementation) =>
       currentImplementation &&
-      number.toBN(currentImplementation).eq(number.toBN(targetImplementation)),
+      number.toBigInt(currentImplementation) ===
+        number.toBigInt(targetImplementation),
   )
 
   return !!targetImplementations && !isInKnownImplementationsList
@@ -85,12 +86,13 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
     const implementations = response.flat()
 
     const targetImplementations = Object.values(network.accountClassHash).map(
-      (ti) => number.toBN(ti),
+      (ti) => number.toBigInt(ti),
     )
 
     const oldAccountAddresses = implementations
       .filter(
-        (impl) => !targetImplementations.some((ti) => ti.eq(number.toBN(impl))),
+        (impl) =>
+          !targetImplementations.some((ti) => ti === number.toBigInt(impl)),
       )
       .map((_, i) => accounts[i].address)
 
@@ -162,7 +164,7 @@ export async function partitionDeprecatedAccount(
     }, {})
 
     const targetImplementations = Object.values(network.accountClassHash).map(
-      (ti) => number.toBN(ti),
+      (ti) => number.toBigInt(ti),
     )
 
     return partition(
@@ -171,7 +173,7 @@ export async function partitionDeprecatedAccount(
         !targetImplementations.some((ti) => {
           const impl = implementationsToAccountsMap[account.address]
           if (impl) {
-            return ti.eq(number.toBN(impl))
+            return ti === number.toBigInt(impl)
           }
           return false
         }),

@@ -18,7 +18,7 @@ import styles from "../styles/Home.module.css"
 const Home: NextPage = () => {
   const [address, setAddress] = useState<string>()
   const [supportSessions, setSupportsSessions] = useState<boolean | null>(null)
-  const [chain, setChain] = useState(chainId())
+  const [chain, setChain] = useState<string>()
   const [isConnected, setConnected] = useState(false)
   const [account, setAccount] = useState<AccountInterface | null>(null)
 
@@ -26,7 +26,8 @@ const Home: NextPage = () => {
     const handler = async () => {
       const wallet = await silentConnectWallet()
       setAddress(wallet?.selectedAddress)
-      setChain(chainId())
+      const _chainId = await chainId()
+      setChain(_chainId)
       setConnected(!!wallet?.isConnected)
       if (wallet?.account) {
         setAccount(wallet.account)
@@ -58,7 +59,9 @@ const Home: NextPage = () => {
   const handleConnectClick = async () => {
     const wallet = await connectWallet()
     setAddress(wallet?.selectedAddress)
-    setChain(chainId())
+    const _chainId = await chainId()
+
+    setChain(_chainId)
     setConnected(!!wallet?.isConnected)
     if (wallet?.account) {
       setAccount(wallet.account)

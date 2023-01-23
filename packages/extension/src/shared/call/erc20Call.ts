@@ -3,7 +3,7 @@ import { number, uint256 } from "starknet"
 
 import { normalizeAddress } from "../../ui/services/addresses"
 
-const { toBN } = number
+const { toBigInt } = number
 const { isUint256, uint256ToBN } = uint256
 
 export interface Erc20Call extends Call {
@@ -35,7 +35,7 @@ export const validateERC20Call = (call: Erc20Call) => {
     }
     const amount = uint256ToBN(amountUint256)
     /** final check for valid Unit256 that is > 0 */
-    if (isUint256(amount) && toBN(amount).gt(toBN(0))) {
+    if (isUint256(amount) && toBigInt(amount) > toBigInt(0)) {
       return true
     }
   } catch (e) {

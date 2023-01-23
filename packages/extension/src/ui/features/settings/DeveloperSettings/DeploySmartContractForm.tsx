@@ -113,13 +113,17 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     const constructorCalldata = parameters.flatMap<string>((param, i) => {
       try {
         if (param.type === "felt") {
-          return [number.toHex(number.toBN(param.value))]
+          return [number.toHex(number.toBigInt(param.value))]
         }
         if (param.type === "felt*") {
-          return param.value.map((value) => number.toHex(number.toBN(value)))
+          return param.value.map((value) =>
+            number.toHex(number.toBigInt(value)),
+          )
         }
         if (param.type === "Uint256") {
-          const { low, high } = uint256.bnToUint256(number.toBN(param.value))
+          const { low, high } = uint256.bnToUint256(
+            number.toBigInt(param.value),
+          )
           return [low, high]
         }
         setError(`parameters.${i}`, {

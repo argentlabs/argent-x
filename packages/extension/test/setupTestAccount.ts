@@ -1,4 +1,5 @@
-import { Account, SequencerProvider, ec } from "starknet"
+import { getStarkKey } from "@noble/curves/stark"
+import { Account, SequencerProvider } from "starknet"
 
 /** These values are from passing --seed 0 --accounts 1 to starkent-devnet and are ONLY for local testing */
 const pkOnlyForLocalTesting = "0xe3e70682c2094cac629f6fbed82c07cd"
@@ -10,10 +11,10 @@ export const provider = new SequencerProvider({
   baseUrl: BASE_URL,
 })
 
-const keyPair = ec.getKeyPair(pkOnlyForLocalTesting)
+const pk = getStarkKey(pkOnlyForLocalTesting)
 
 export const testAccount = new Account(
   provider,
   fromAddressOnlyForLocalTesting,
-  keyPair,
+  pk,
 )

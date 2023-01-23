@@ -12,7 +12,10 @@ import { FC } from "react"
 import { Call, number } from "starknet"
 
 import { entryPointToHumanReadable } from "../../../../shared/transactions"
-import { formatTruncatedAddress } from "../../../services/addresses"
+import {
+  formatTruncatedAddress,
+  isValidAddress,
+} from "../../../services/addresses"
 
 export interface TransactionActionsProps {
   transactions: Call[]
@@ -105,7 +108,10 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                           fontWeight="bold"
                           maxWidth="70%"
                         >
-                          <CopyTooltip copyValue={calldata} prompt={calldata}>
+                          <CopyTooltip
+                            copyValue={calldata.toString()}
+                            prompt={calldata.toString()}
+                          >
                             <Box
                               _hover={{
                                 bg: "neutrals.700",
@@ -117,9 +123,9 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                               overflow="hidden"
                               minWidth="0"
                             >
-                              {number.isHex(calldata)
-                                ? formatTruncatedAddress(calldata)
-                                : calldata}
+                              {isValidAddress(calldata)
+                                ? formatTruncatedAddress(calldata.toString())
+                                : calldata.toString()}
                             </Box>
                           </CopyTooltip>
                         </P4>

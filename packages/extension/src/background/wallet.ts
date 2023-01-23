@@ -3,10 +3,8 @@ import { ProgressCallback } from "ethers/lib/utils"
 import { find, noop, throttle, union } from "lodash-es"
 import {
   Account,
-  DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
-  ec,
   hash,
   number,
   stark,
@@ -251,16 +249,15 @@ export class Wallet {
 
         while (lastHit + offset > lastCheck) {
           const starkPair = getStarkPair(lastCheck, secret, baseDerivationPath)
-          const starkPub = ec.getStarkKey(starkPair)
 
           const address = calculateContractAddressFromHash(
-            starkPub,
+            starkPair.pubKey,
             contractClassHash,
             stark.compileCalldata({
               implementation: accountClassHash,
               selector: getSelectorFromName("initialize"),
               calldata: stark.compileCalldata({
-                signer: starkPub,
+                signer: starkPair.pubKey,
                 guardian: "0",
               }),
             }),
@@ -502,11 +499,11 @@ export class Wallet {
    * @param  {WalletAccount} walletAccount
    */
   public async getAccountDeploymentPayload(walletAccount: WalletAccount) {
-    const starkPair = await this.getKeyPairByDerivationPath(
+    const starkPair = await this.getStarkKeyByDerivationPath(
       walletAccount.signer.derivationPath,
     )
 
-    const starkPub = ec.getStarkKey(starkPair)
+    const starkPub = starkPair.pubKey
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
@@ -516,7 +513,10 @@ export class Wallet {
     const constructorCallData = {
       implementation: accountClassHash,
       selector: getSelectorFromName("initialize"),
-      calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      calldata: stark.compileCalldata({
+        signer: starkPub,
+        guardian: "0",
+      }),
     }
 
     const deployAccountPayload = {
@@ -565,7 +565,7 @@ export class Wallet {
   public async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
-  ): Promise<Required<DeployAccountContractTransaction>> {
+  ) {
     const hasSession = await this.isSessionOpen()
     const session = await this.sessionStore.get()
     const initialised = await this.isInitialized()
@@ -579,7 +579,6 @@ export class Wallet {
 
     const network = await this.getNetwork(networkId)
     const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
-    const starkPub = ec.getStarkKey(starkPair)
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       network,
@@ -591,10 +590,12 @@ export class Wallet {
       constructorCalldata: stark.compileCalldata({
         implementation: accountClassHash,
         selector: getSelectorFromName("initialize"),
-        calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+        calldata: stark.compileCalldata({
+          signer: starkPair.pubKey,
+          guardian: "0",
+        }),
       }),
-      addressSalt: starkPub,
-      signature: starkPair.getPrivate(),
+      addressSalt: starkPair.pubKey,
     }
 
     return payload
@@ -610,7 +611,7 @@ export class Wallet {
     return hit
   }
 
-  public async getKeyPairByDerivationPath(derivationPath: string) {
+  public async getStarkKeyByDerivationPath(derivationPath: string) {
     const session = await this.sessionStore.get()
     if (!session?.secret) {
       throw Error("session is not open")
@@ -630,7 +631,7 @@ export class Wallet {
       throw Error("account not found")
     }
 
-    const keyPair = await this.getKeyPairByDerivationPath(
+    const keyPair = await this.getStarkKeyByDerivationPath(
       account.signer.derivationPath,
     )
 
@@ -647,7 +648,7 @@ export class Wallet {
     )
 
     if (account.needsDeploy || useLatest) {
-      return new Account(provider, account.address, keyPair)
+      return new Account(provider, account.address, keyPair.getPrivateKey())
     }
 
     const oldAccount = new Accountv4(providerV4, account.address, keyPair)
@@ -656,7 +657,7 @@ export class Wallet {
 
     return isOldAccount
       ? oldAccount
-      : new Account(provider, account.address, keyPair)
+      : new Account(provider, account.address, keyPair.getPrivateKey())
   }
 
   public async isNonceManagedOnAccountContract(account: Accountv4) {
@@ -679,7 +680,7 @@ export class Wallet {
       entrypoint: "get_implementation",
     })
 
-    return stark.makeAddress(number.toHex(number.toBN(implementation)))
+    return stark.makeAddress(number.toBigInt(implementation).toString(16))
   }
 
   public async getSelectedStarknetAccount(): Promise<Account | Accountv4> {
@@ -767,7 +768,7 @@ export class Wallet {
       session.secret,
     )
 
-    return starkPair.getPrivate().toString()
+    return starkPair.getPrivateKey()
   }
 
   public static validateBackup(backupString: string): boolean {

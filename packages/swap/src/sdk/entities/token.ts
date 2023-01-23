@@ -45,10 +45,10 @@ export class Token extends Currency {
   public sortsBefore(other: Token): boolean {
     invariant(this.networkId === other.networkId, "CHAIN_IDS")
     invariant(this.address !== other.address, "ADDRESSES")
-    const thisAddress = number.toBN(this.address)
-    const otherAddress = number.toBN(other.address)
+    const thisAddress = number.toBigInt(this.address)
+    const otherAddress = number.toBigInt(other.address)
 
-    return thisAddress.lt(otherAddress)
+    return thisAddress < otherAddress
   }
 }
 

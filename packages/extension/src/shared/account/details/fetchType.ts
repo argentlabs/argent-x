@@ -66,7 +66,7 @@ export async function getAccountTypesFromChain(accounts: WalletAccount[]) {
             calls.map((call) => provider.callContract(call)),
           )
           const results: string[] = responses.map((res) =>
-            number.toHex(number.toBN(res.result[0])),
+            number.toHex(number.toBigInt(res.result[0])),
           )
           return calls.map((call, i) => ({
             address: call.contractAddress,

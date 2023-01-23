@@ -44,7 +44,7 @@ export async function supportsSessions(
     entrypoint: "isPlugin",
     calldata: stark.compileCalldata({ classHash: SESSION_PLUGIN_CLASS_HASH }),
   })
-  return !number.toBN(result[0]).isZero()
+  return number.toBigInt(result[0]) !== 0n
 }
 
 export function preparePolicy({ contractAddress, selector }: Policy): string {
@@ -71,6 +71,7 @@ export async function createSession(
   account: AccountInterface,
 ): Promise<SignedSession> {
   const { expires, key, policies, root } = prepareSession(session)
+  const chainId = await account.getChainId()
   const signature = await account.signMessage({
     primaryType: "Session",
     types: {
@@ -86,7 +87,7 @@ export async function createSession(
       StarkNetDomain: [{ name: "chainId", type: "felt" }],
     },
     domain: {
-      chainId: account.chainId,
+      chainId,
     },
     message: {
       key,

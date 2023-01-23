@@ -30,13 +30,13 @@ export const walletAddress = async (): Promise<string | undefined> => {
   return starknet.selectedAddress
 }
 
-export const networkId = (): Network | undefined => {
+export const networkId = async (): Promise<Network | undefined> => {
   const starknet = getStarknet()
   if (!starknet?.isConnected) {
     return
   }
   try {
-    const { chainId } = starknet.provider
+    const chainId = await starknet.provider.getChainId()
     if (chainId === constants.StarknetChainId.MAINNET) {
       return "mainnet-alpha"
     } else if (chainId === constants.StarknetChainId.TESTNET) {
@@ -63,8 +63,8 @@ export const addToken = async (address: string): Promise<void> => {
   })
 }
 
-export const getExplorerBaseUrl = (): string | undefined => {
-  const network = networkId()
+export const getExplorerBaseUrl = async (): Promise<string | undefined> => {
+  const network = await networkId()
   if (network === "mainnet-alpha") {
     return "https://voyager.online"
   } else if (network === "goerli-alpha") {
@@ -72,13 +72,14 @@ export const getExplorerBaseUrl = (): string | undefined => {
   }
 }
 
-export const chainId = (): string | undefined => {
+export const chainId = async (): Promise<string | undefined> => {
   const starknet = getStarknet()
   if (!starknet?.isConnected) {
     return
   }
   try {
-    return shortString.decodeShortString(starknet.provider.chainId)
+    const chain = await starknet.provider.getChainId()
+    return shortString.decodeShortString(chain)
   } catch {}
 }
 
@@ -89,10 +90,12 @@ export const signMessage = async (message: string) => {
     throw Error("message must be a short string")
   }
 
+  const network = await networkId()
+
   return starknet.account.signMessage({
     domain: {
       name: "Example DApp",
-      chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
+      chainId: network === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
       version: "0.0.1",
     },
     types: {

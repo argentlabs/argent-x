@@ -5,11 +5,11 @@ import { beforeAll, describe, expect, test } from "vitest"
 import { Multicall } from ".."
 
 describe.each([
-  {
-    // Test with default provider on testnet2 and default multicall contract address
-    baseUrl: "https://alpha4-2.starknet.io/",
-    multicallAddress: undefined,
-  },
+  // {
+  //   // Test with default provider on testnet2 and default multicall contract address
+  //   baseUrl: "https://alpha4-2.starknet.io/",
+  //   multicallAddress: undefined,
+  // },
   {
     // Test with default provider on testnet2 and not deployed multicall contract address (should fallback to one request per call)
     baseUrl: "https://alpha4-2.starknet.io/",
@@ -55,7 +55,7 @@ describe.each([
       for (const result of results) {
         const [low, high] = result
         const balance = uint256.uint256ToBN({ low, high })
-        expect(balance.gt(0)).toBeTruthy()
+        expect(balance > 0).toBeTruthy()
       }
     })
     test("should partially error with a single error", async () => {

@@ -8,7 +8,7 @@ export const parseAmount = (
 ) => {
   return utils.parseUnits(
     amount.replace(",", "."),
-    number.toBN(decimals).toNumber(),
+    number.toBigInt(decimals).toNumber(),
   )
 }
 

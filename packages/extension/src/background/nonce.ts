@@ -20,17 +20,17 @@ export async function getNonce(
   const account = await wallet.getStarknetAccount(baseWallet)
   const storageAddress = getAccountIdentifier(baseWallet)
   const result = await account.getNonce()
-  const nonceBn = number.toBN(result)
+  const nonceBn = number.toBigInt(result)
   const storedNonce = await nonceStore.get(storageAddress)
 
   // If there's no nonce stored or the fetched nonce is bigger than the stored one, store the fetched nonce
-  if (!storedNonce || nonceBn.gt(number.toBN(storedNonce))) {
+  if (!storedNonce || nonceBn > number.toBigInt(storedNonce)) {
     await nonceStore.set(storageAddress, number.toHex(nonceBn))
   }
 
   // If the stored nonce is greater than the fetched nonce, use the stored nonce
-  if (storedNonce && number.toBN(storedNonce).gt(nonceBn)) {
-    return number.toHex(number.toBN(storedNonce))
+  if (storedNonce && number.toBigInt(storedNonce) > nonceBn) {
+    return number.toHex(number.toBigInt(storedNonce))
   }
 
   // else return the fetched nonce
@@ -45,7 +45,7 @@ export async function increaseStoredNonce(
   if (storedNonce) {
     nonceStore.set(
       storageAddress,
-      number.toHex(number.toBN(storedNonce).add(number.toBN(1))),
+      number.toHex(number.toBigInt(storedNonce) + number.toBigInt(1)),
     )
   }
 }

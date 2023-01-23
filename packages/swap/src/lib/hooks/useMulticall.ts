@@ -1,5 +1,4 @@
-import { Multicall } from "@argent/x-multicall"
-import { Call, hash, stark } from "starknet"
+import { Call } from "starknet"
 import useSWR from "swr"
 
 import { useSwapProvider } from "../providers"
@@ -13,7 +12,7 @@ export const useMulticall = (call: Call, unique = false) => {
     contractAddress,
     entrypoint,
     networkId,
-    ...(calldata ? stark.compileCalldata(calldata) : []),
+    ...(calldata ? calldata : []),
     ...(unique ? [selectedAccount?.address] : []),
   ]
     .filter(Boolean)

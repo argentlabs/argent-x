@@ -9,7 +9,6 @@ import {
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
-  KeyPair,
   ProviderInterface,
   ProviderOptions,
   SignerInterface,
@@ -34,10 +33,10 @@ export class SessionAccount extends Account implements AccountInterface {
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
-    keyPairOrSigner: KeyPair | SignerInterface,
+    pkOrSigner: Uint8Array | string | SignerInterface,
     public signedSession: SignedSession,
   ) {
-    super(providerOrOptions, address, keyPairOrSigner)
+    super(providerOrOptions, address, pkOrSigner)
     this.merkleTree = createMerkleTreeForPolicies(signedSession.policies)
     assert(signedSession.root === this.merkleTree.root, "Invalid session")
   }
@@ -99,13 +98,13 @@ export class SessionAccount extends Account implements AccountInterface {
       Array.isArray(calls) ? calls : [calls],
       this.signedSession,
     )
-    const nonce = number.toBN(providedNonce ?? (await this.getNonce()))
-    const version = number.toBN(hash.feeTransactionVersion)
+    const nonce = number.toBigInt(providedNonce ?? (await this.getNonce()))
+    const version = number.toBigInt(hash.feeTransactionVersion)
     const chainId = await this.getChainId()
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
-      nonce: number.toBN(nonce),
+      nonce: number.toBigInt(nonce),
       maxFee: constants.ZERO,
       version,
       chainId,
@@ -154,7 +153,7 @@ export class SessionAccount extends Account implements AccountInterface {
       Array.isArray(calls) ? calls : [calls],
       this.signedSession,
     )
-    const nonce = number.toBN(
+    const nonce = number.toBigInt(
       transactionsDetail.nonce ?? (await this.getNonce()),
     )
     let maxFee: number.BigNumberish = "0"
@@ -170,14 +169,16 @@ export class SessionAccount extends Account implements AccountInterface {
       maxFee = suggestedMaxFee.toString()
     }
 
-    const version = number.toBN(hash.transactionVersion)
+    const version = number.toBigInt(hash.transactionVersion)
+
+    const chainId = await this.getChainId()
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
       maxFee,
       version,
-      chainId: this.chainId,
+      chainId,
     }
 
     const signature = await this.signer.signTransaction(

@@ -2,7 +2,7 @@ import {
   computeHashOnElements as micro_computeHashOnElements,
   pedersen as micro_pedersen,
 } from "micro-starknet"
-import { RawCalldata, encode, number } from "starknet"
+import { RawCalldata, number } from "starknet"
 
 export type PedersenArg = number | string
 
@@ -11,7 +11,7 @@ export function pedersen(input: [PedersenArg, PedersenArg]) {
 }
 
 export function computeHashOnElements(data: number.BigNumberish[]) {
-  const hexData = data.map((d) => number.toHex(number.toBN(d)))
+  const hexData = data.map((d) => number.toHex(number.toBigInt(d)))
 
   return micro_computeHashOnElements(hexData).toString(16)
 }

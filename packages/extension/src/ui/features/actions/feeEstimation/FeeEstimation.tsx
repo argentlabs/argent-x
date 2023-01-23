@@ -49,9 +49,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
 
   const totalMaxFee = useMemo(() => {
     if (account.needsDeploy && fee?.maxADFee) {
-      return number.toHex(
-        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
-      )
+      return number.toHex(BigInt(fee.maxADFee) + BigInt(fee.suggestedMaxFee))
     }
     return fee?.suggestedMaxFee
   }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])

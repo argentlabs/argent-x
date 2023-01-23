@@ -1,5 +1,6 @@
+import { getStarkKey } from "@noble/curves/stark"
 import { memoize } from "lodash-es"
-import { Account, AccountInterface, ec } from "starknet"
+import { Account, AccountInterface } from "starknet"
 import urlJoin from "url-join"
 
 import { Network, getProvider } from "../../shared/network"
@@ -29,8 +30,11 @@ export const getPreDeployedAccount = async (
     }
 
     const provider = getProvider(network)
-    const keypair = ec.getKeyPair(preDeployedAccount.private_key)
-    return new Account(provider, preDeployedAccount.address, keypair)
+    return new Account(
+      provider,
+      preDeployedAccount.address,
+      preDeployedAccount.private_key,
+    )
   } catch (e) {
     console.warn(`Failed to get pre-deployed account: ${e}`)
     return null

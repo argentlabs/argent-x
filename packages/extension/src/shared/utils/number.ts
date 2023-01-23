@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js"
+import { number } from "starknet"
 
 /** Checks if a value is numeric, ie. possible to coerce to a number, e.g. 123 or '123.0' */
 
@@ -29,11 +30,11 @@ export const prettifyNumberConfig: Record<string, IPrettifyNumberConfig> = {
   },
 }
 
-export const prettifyCurrencyNumber = (number: BigNumber.Value) => {
+export const prettifyCurrencyNumber = (number: number.BigNumberish) => {
   return prettifyNumber(number, prettifyNumberConfig.CURRENCY)
 }
 
-export const prettifyTokenNumber = (number: BigNumber.Value) => {
+export const prettifyTokenNumber = (number: number.BigNumberish) => {
   return prettifyNumber(number, prettifyNumberConfig.TOKEN)
 }
 
@@ -44,7 +45,7 @@ export const prettifyTokenNumber = (number: BigNumber.Value) => {
  */
 
 export const prettifyNumber = (
-  number: BigNumber.Value,
+  number: number.BigNumberish,
   {
     minDecimalPlaces,
     maxDecimalPlaces,
@@ -55,7 +56,8 @@ export const prettifyNumber = (
   if (!isNumeric(number)) {
     return null
   }
-  const numberBN = new BigNumber(number)
+
+  const numberBN = new BigNumber(number.toString())
   let untrimmed
   if (numberBN.gte(1)) {
     /** simplest case, formatting to minDecimalPlaces will look good */
@@ -75,6 +77,7 @@ export const prettifyNumber = (
       leadingZerosInDecimalPart + minDecimalSignificanDigits,
       minDecimalPlaces,
     )
+
     untrimmed = numberBN.toFormat(prettyDecimalPlaces)
   }
   /** the untrimmed string may have trailing zeros, e.g. 0.0890 */

@@ -8,7 +8,7 @@ export const openMintSquareNft = (
   // Need this as MintSquare doesn't support hex string with padded 0s.
   // For example, contractAddress: 0x023432.... is not equal to 0x23432...
   // MintSquare will only be able to load the second address.
-  const parsedContractAddress = number.toHex(number.toBN(contractAddress))
+  const parsedContractAddress = number.toHex(number.toBigInt(contractAddress))
 
   const url =
     networkId === "goerli-alpha"

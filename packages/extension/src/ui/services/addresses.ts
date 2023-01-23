@@ -52,7 +52,7 @@ export const addressSchema = yup
       }
 
       const parsedAddress = validateAndParseAddress(address)
-      if (number.toBN(parsedAddress).eq(constants.ZERO)) {
+      if (number.toBigInt(parsedAddress) === constants.ZERO) {
         return ctx.createError({ message: "Zero address not allowed" })
       }
 
@@ -66,8 +66,8 @@ export const addressSchema = yup
     return true
   })
 
-export const isValidAddress = (address: string) =>
-  addressSchema.isValidSync(address)
+export const isValidAddress = (address: unknown) =>
+  typeof address === "string" && addressSchema.isValidSync(address)
 
 export const isEqualAddress = (a: string, b: string) => {
   try {

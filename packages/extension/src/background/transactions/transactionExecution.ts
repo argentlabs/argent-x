@@ -31,8 +31,8 @@ export const checkTransactionHash = (
     if (!transactionHash) {
       throw Error("transactionHash not defined")
     }
-    const bn = number.toBN(transactionHash)
-    if (bn.lte(constants.ZERO)) {
+    const bn = number.toBigInt(transactionHash)
+    if (bn <= constants.ZERO) {
       throw Error("transactionHash needs to be >0")
     }
     return true
@@ -80,9 +80,9 @@ export const executeTransactionAction = async (
   // if nonce doesnt get provided by the UI, we can use the stored nonce to allow transaction queueing
   const nonceWasProvidedByUI = transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
   const nonce = accountNeedsDeploy
-    ? number.toHex(number.toBN(1))
+    ? number.toHex(number.toBigInt(1))
     : nonceWasProvidedByUI
-    ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
+    ? number.toHex(number.toBigInt(transactionsDetail?.nonce || 0))
     : await getNonce(selectedAccount, wallet)
 
   let maxFee = "0"
@@ -192,7 +192,7 @@ export const calculateEstimateFeeFromL1Gas = async (
   account: WalletAccount,
   transactions: AllowArray<Call>,
 ): Promise<EstimateFee> => {
-  const fallbackPrice = number.toBN(10e14)
+  const fallbackPrice = number.toBigInt(10e14)
   try {
     if (account.networkId === "localhost") {
       console.log("Using fallback gas price for localhost")
@@ -210,7 +210,7 @@ export const calculateEstimateFeeFromL1Gas = async (
     const price = l1GasPrice.mul(callsLen).mul(multiplier).toString()
 
     return {
-      overall_fee: number.toBN(price),
+      overall_fee: number.toBigInt(price),
       suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
     }
   } catch {

@@ -7,7 +7,7 @@ import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { Account } from "./Account"
 
-const { toBN } = number
+const { toBigInt } = number
 
 export const createAccount = async (networkId: string, password?: string) => {
   if (password) {
@@ -47,7 +47,7 @@ export const getAccountImageUrl = (
 
 export const stripAddressZeroPadding = (accountAddress: string) => {
   try {
-    return number.toHex(toBN(number.hexToDecimalString(accountAddress)))
+    return number.toHex(toBigInt(number.hexToDecimalString(accountAddress)))
   } catch {
     // ignore parsing errors
   }

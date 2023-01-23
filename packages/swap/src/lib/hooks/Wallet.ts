@@ -79,18 +79,14 @@ export function useETHBalance(
 
   const address = useAddressNormalizer(accountAddress)
 
-  // const balance = useSingleCallResult(tokenContract, "balanceOf", {
-  //   account: address ?? "",
-  // })
-
   const balance = useMulticall({
     contractAddress: ethAddress,
     entrypoint: "balanceOf",
-    calldata: [address],
+    calldata: [address ?? ""],
   })
 
   const uint256Balance: uint256.Uint256 = useMemo(
-    () => ({ low: balance?.result?.[0], high: balance?.result?.[1] }),
+    () => ({ low: balance?.result?.[0] ?? 0, high: balance?.result?.[1] ?? 0 }),
     [balance?.result],
   )
 

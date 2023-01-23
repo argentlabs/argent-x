@@ -70,7 +70,9 @@ export const useMaxFeeEstimateForTransfer = (
 
     const totalMaxFee =
       account.needsDeploy && maxADFee
-        ? number.toHex(number.toBN(maxADFee).add(number.toBN(suggestedMaxFee)))
+        ? number.toHex(
+            number.toBigInt(maxADFee) + number.toBigInt(suggestedMaxFee),
+          )
         : suggestedMaxFee
 
     const maxFee = addOverheadToFee(totalMaxFee, 0.2)

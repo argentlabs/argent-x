@@ -1,10 +1,12 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
+import { getStarkKey, utils } from "@noble/curves/stark"
 import { FC, useEffect, useState } from "react"
-import { Abi, AccountInterface, Contract, ec } from "starknet"
+import { Abi, AccountInterface, Contract, stark } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
 import {
+  Network,
   getErc20TokenAddress,
   mintToken,
   parseInputAmountToUint256,
@@ -19,7 +21,7 @@ import {
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
-const { genKeyPair, getStarkKey } = ec
+const { randomPrivateKey } = utils
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
 
@@ -36,8 +38,9 @@ export const TokenDapp: FC<{
   const [transactionStatus, setTransactionStatus] = useState<Status>("idle")
   const [transactionError, setTransactionError] = useState("")
   const [addTokenError, setAddTokenError] = useState("")
+  const [network, setNetwork] = useState<Network>()
 
-  const [sessionSigner] = useState(genKeyPair())
+  const [sessionSigner] = useState(randomPrivateKey())
   const [sessionAccount, setSessionAccount] = useState<
     SessionAccount | undefined
   >()
@@ -63,7 +66,13 @@ export const TokenDapp: FC<{
     })()
   }, [transactionStatus, lastTransactionHash])
 
-  const network = networkId()
+  useEffect(() => {
+    ;(async () => {
+      const networkId_ = await networkId()
+      setNetwork(networkId_)
+    })()
+  }, [])
+
   if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
     return (
       <>
@@ -121,7 +130,9 @@ export const TokenDapp: FC<{
       const result = await signMessage(shortText)
       console.log(result)
 
-      setLastSig(result)
+      const formattedSig = stark.formatSignature(result)
+
+      setLastSig(formattedSig)
       setTransactionStatus("success")
     } catch (e) {
       console.error(e)

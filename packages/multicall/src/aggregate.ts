@@ -13,7 +13,7 @@ const partitionResponses = (responses: string[]): string[][] => {
   }
 
   const [responseLength, ...restResponses] = responses
-  const responseLengthInt = number.toBN(responseLength).toNumber()
+  const responseLengthInt = Number(number.toBigInt(responseLength))
   const response = restResponses.slice(0, responseLengthInt)
   const remainingResponses = restResponses.slice(responseLengthInt)
 
@@ -82,7 +82,8 @@ export const aggregate = async (
     }
 
     if (
-      e instanceof GatewayError &&
+      // This is a hack to detect if the error is a Starknet error. Something is broken in the starknet.js
+      (e instanceof GatewayError || "errorCode" in e) &&
       e.errorCode === "StarknetErrorCode.UNINITIALIZED_CONTRACT"
     ) {
       return fallbackAggregate(provider, calls)
