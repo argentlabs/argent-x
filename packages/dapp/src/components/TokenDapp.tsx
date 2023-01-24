@@ -1,7 +1,6 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
-import { getStarkKey, utils } from "@noble/curves/stark"
 import { FC, useEffect, useState } from "react"
-import { Abi, AccountInterface, Contract, stark } from "starknet"
+import { Abi, AccountInterface, Contract, ec, stark } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
@@ -21,7 +20,7 @@ import {
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
 
-const { randomPrivateKey } = utils
+const { randomPrivateKey } = ec.starkCurve.utils
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
 
@@ -144,7 +143,7 @@ export const TokenDapp: FC<{
     e.preventDefault()
     const signedSession = await createSession(
       {
-        key: getStarkKey(sessionSigner),
+        key: ec.starkCurve.getStarkKey(sessionSigner),
         expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
         policies: [
           {
@@ -307,7 +306,9 @@ export const TokenDapp: FC<{
 
             <p>
               Random session signer:{" "}
-              <code>{truncateHex(getStarkKey(sessionSigner))}</code>
+              <code>
+                {truncateHex(ec.starkCurve.getStarkKey(sessionSigner))}
+              </code>
             </p>
 
             <input

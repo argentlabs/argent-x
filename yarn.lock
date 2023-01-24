@@ -20563,10 +20563,10 @@ stackframe@^1.3.4:
     ts-custom-error "^3.2.0"
     url-join "^4.0.1"
 
-starknet@^5.0.0-beta.3:
-  version "5.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-5.0.0-beta.3.tgz#59a7d0ff5e39e13b0e0cc61c40ad7b82162500bd"
-  integrity sha512-BqQAWSDHUXNwkimQiZbENSRJv2UCXcJi1MM38tcPQxV4N4V1DDdCNBOSWBpNW4sqmrlKla0v2HbDEpZnjC8zYg==
+starknet@^5.0.0-beta.4:
+  version "5.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-5.0.0-beta.4.tgz#b51d4031dfb902c1e13e990063a1d98da5de76b2"
+  integrity sha512-pn2wS1HJNL8f8/58s6g2pnFbwJBAE296CMe1foNlszGfiUcZSKhWGoqoNJjMN4cdv1dUqTeF1JmYjsigcoeb2A==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     "@noble/curves" "^0.5.1"

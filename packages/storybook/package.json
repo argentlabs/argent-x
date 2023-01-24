@@ -24,7 +24,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "storybook-addon-swc": "^1.1.7",
-    "starknet": "^5.0.0-beta.3",
+    "starknet": "^5.0.0-beta.4",
     "typescript": "^4.9.4"
   },
   "scripts": {
