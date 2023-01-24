@@ -1,5 +1,6 @@
 import { getMessage } from "@extend-chrome/messages"
 
+import { IS_DEV } from "../utils/dev"
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
@@ -41,4 +42,10 @@ export async function waitForMessage<
   return _waitForMessage(
     ([msg]: any) => msg.type === type && predicate(msg),
   ).then(([msg]: any) => msg.data)
+}
+
+if ((<any>window).PLAYWRIGHT || IS_DEV) {
+  ;(<any>window).messageStream = messageStream
+  ;(<any>window).sendMessage = sendMessage
+  ;(<any>window).waitForMessage = waitForMessage
 }

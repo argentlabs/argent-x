@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test"
 
+import Messages from "../utils/Messages"
 import Account from "./Account"
 import Network from "./Network"
 import Wallet from "./Wallet"
@@ -9,12 +10,14 @@ export default class ExtensionPage {
   wallet: Wallet
   network: Network
   account: Account
+  messages: Messages
   constructor(page: Page, private extensionUrl: string) {
     this.page = page
     this.wallet = new Wallet(page)
     this.network = new Network(page)
     this.account = new Account(page)
     this.extensionUrl = extensionUrl
+    this.messages = new Messages(page)
   }
 
   get settings() {

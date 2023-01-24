@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test"
 
-import { extension, test } from "../test"
+import test from "../test"
 
 test.describe("Send max tokens", () => {
-  test("send max eth flow", async () => {
+  test("send max eth flow", async ({ extension }) => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
@@ -47,6 +47,5 @@ test.describe("Send max tokens", () => {
           ).toContain(1.9),
         ])
       */
-    await extension.resetExtension()
   })
 })

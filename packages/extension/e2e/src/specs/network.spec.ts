@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test"
 
-import { extension, test } from "../test"
+import test from "../test"
 
 test.describe("Network", () => {
-  test("Available networks", async () => {
+  test("Available networks", async ({ extension }) => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
@@ -13,6 +13,5 @@ test.describe("Network", () => {
       "Testnet 2\nhttps://alpha4-2.starknet.io",
       "Localhost 5050\nhttp://localhost:5050",
     ])
-    await extension.resetExtension()
   })
 })
