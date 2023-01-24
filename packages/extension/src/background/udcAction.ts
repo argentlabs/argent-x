@@ -28,11 +28,6 @@ type DeployContractAction = ExtQueueItem<{
   payload: UniversalDeployerContractPayload
 }>
 
-export enum UdcTransactionType {
-  DEPLOY_CONTRACT = "DEPLOY",
-  DECLARE_CONTRACT = "DECLARE",
-}
-
 export const udcDeclareContract = async (
   { payload }: DeclareContractAction,
   { wallet }: BackgroundService,
@@ -106,7 +101,6 @@ export const udcDeclareContract = async (
       account,
       meta: {
         title: "Activate Account",
-        isDeployAccount: true,
         type: "DEPLOY_ACCOUNT",
       },
     })
@@ -141,7 +135,7 @@ export const udcDeclareContract = async (
       meta: {
         title: "Contract declared",
         subTitle: classHash.toString(),
-        type: UdcTransactionType.DECLARE_CONTRACT,
+        type: "DECLARE",
         transactions: {
           contractAddress: UDC.ADDRESS,
           entrypoint: "declareContract",
@@ -231,7 +225,6 @@ export const udcDeployContract = async (
       account,
       meta: {
         title: "Activate Account",
-        isDeployAccount: true,
         type: "DEPLOY_ACCOUNT",
       },
     })
@@ -273,7 +266,7 @@ export const udcDeployContract = async (
       meta: {
         title: "Contract deployment",
         subTitle: contractAddress,
-        type: UdcTransactionType.DEPLOY_CONTRACT,
+        type: "DEPLOY",
         transactions: {
           contractAddress: UDC.ADDRESS,
           entrypoint: "deployContract",

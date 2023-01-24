@@ -1,11 +1,11 @@
-import { Transaction } from "../../shared/transactions"
+import { Transaction, TransactionMeta } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { VoyagerTransaction } from "./sources/voyager"
 
 export const mapVoyagerTransactionToTransaction = (
   transaction: VoyagerTransaction,
   account: WalletAccount,
-  meta?: { title?: string; subTitle?: string },
+  meta?: TransactionMeta,
 ): Transaction => ({
   hash: transaction.hash,
   account,

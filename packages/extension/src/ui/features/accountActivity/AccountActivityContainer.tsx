@@ -88,7 +88,8 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     // RECEIVED transactions are already shown as pending
     return transactions.filter(
       (transaction) =>
-        transaction.status !== "RECEIVED" && !transaction.meta?.isDeployAccount,
+        transaction.status !== "RECEIVED" &&
+        transaction.meta?.type !== "DEPLOY_ACCOUNT",
     )
   }, [transactions])
   const mergedTransactions = useMemo(() => {

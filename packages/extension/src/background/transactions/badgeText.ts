@@ -15,7 +15,7 @@ import { transactionsStore } from "./store"
 export const pendingAccountTransactionsSelector = memoize(
   (account: BaseWalletAccount) => (transaction: Transaction) =>
     transaction.status === "RECEIVED" &&
-    !transaction.meta?.isDeployAccount &&
+    transaction.meta?.type !== "DEPLOY_ACCOUNT" &&
     accountsEqual(account, transaction.account),
 )
 

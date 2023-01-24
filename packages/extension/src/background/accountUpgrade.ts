@@ -54,7 +54,11 @@ export const upgradeAccount = async ({
         entrypoint: "upgrade",
         calldata,
       },
-      meta: { isUpgrade: true, title: "Switch account type" },
+      meta: {
+        isUpgrade: true,
+        title: "Switch account type",
+        type: "INVOKE_FUNCTION",
+      },
     },
   })
 }
