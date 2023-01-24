@@ -60,7 +60,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     </Center>
   ) : (
     <IconWrapper>
-      <NetworkIcon />
+      <NetworkIcon color="neutrals.500" width="27px" height="27px" />
     </IconWrapper>
   )
 }
