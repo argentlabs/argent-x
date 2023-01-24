@@ -25,8 +25,7 @@ export class StoreDexie extends Dexie {
   constructor() {
     super("store")
     this.version(1).stores({
-      devices: "id, signingKey, encryptionKey",
-      session: "id, encryptionKey",
+      devices: "id, signingKey, verifiedEmail, verifiedAt",
     })
   }
 }
