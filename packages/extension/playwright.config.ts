@@ -8,7 +8,7 @@ import config from "./e2e/src/config"
 const isCI = Boolean(process.env.CI)
 
 const playwrightConfig: PlaywrightTestConfig = {
-  fullyParallel: true,
+  workers: 5,
   timeout: 2 * 60e3, // 2 minutes
   reportSlowTests: {
     threshold: 1 * 60e3, // 1 minute
