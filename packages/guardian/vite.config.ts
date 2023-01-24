@@ -7,7 +7,7 @@ import dts from "vite-plugin-dts"
 export default defineConfig({
   build: {
     rollupOptions: {
-      external: ["starknet"],
+      external: ["starknet", "dexie", "jose"],
       output: {
         exports: "named",
       },
@@ -22,7 +22,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["starknet"],
+    include: ["starknet", "dexie", "jose"],
   },
   plugins: [
     dts({
