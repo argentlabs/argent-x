@@ -1,8 +1,6 @@
 import { getJwt } from "./jwt"
 
 export const ARGENT_API_BASE_URL = process.env.ARGENT_API_BASE_URL as string
-console.log("ARGENT_API_BASE_URL", ARGENT_API_BASE_URL)
-/* export const ARGENT_API_BASE_URL = "https://cloud-dev.argent-api.com/v1" */
 
 export interface CosignerMessage {
   message: any

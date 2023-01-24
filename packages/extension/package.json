@@ -94,7 +94,6 @@
     "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
     "colord": "^2.9.2",
-    "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.1.1",
     "ethers": "^5.5.1",
     "jose": "^4.3.6",

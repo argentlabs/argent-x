@@ -10,9 +10,9 @@ export default defineConfig({
     target: "es2020",
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "shared",
+      name: "guardian",
       // the proper extensions will be added
-      fileName: "shared",
+      fileName: "guardian",
     },
   },
   plugins: [

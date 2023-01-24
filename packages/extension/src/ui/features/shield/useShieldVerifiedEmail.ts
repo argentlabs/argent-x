@@ -1,6 +1,5 @@
+import { idb } from "@argent/guardian"
 import { useLiveQuery } from "dexie-react-hooks"
-
-import { idb } from "../../../shared/shield/idb"
 
 /**
  * Hook which returns the current verifiedEmail, updated live

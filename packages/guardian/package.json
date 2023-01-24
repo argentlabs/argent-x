@@ -9,13 +9,13 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/shared.js",
-      "require": "./dist/shared.umd.cjs"
+      "import": "./dist/guardian.js",
+      "require": "./dist/guardian.umd.cjs"
     }
   },
-  "main": "./dist/shared.umd.cjs",
-  "module": "./dist/shared.js",
-  "types": "./dist/shared.d.ts",
+  "main": "./dist/guardian.umd.cjs",
+  "module": "./dist/guardian.js",
+  "types": "./dist/guardian.d.ts",
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
