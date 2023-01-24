@@ -18,10 +18,7 @@ export const ControlledPinInput: FC<ControlledPinInputProps> = ({
     <Controller
       control={control}
       name={name}
-      render={({
-        field: { onChange, value },
-        fieldState: { invalid, error },
-      }) => (
+      render={({ field: { onChange, value } }) => (
         <PinInput {...props} onChange={onChange} value={value}>
           {children}
         </PinInput>

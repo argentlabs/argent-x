@@ -11,13 +11,13 @@ export { Input }
 const { definePartsStyle, defineMultiStyleConfig } =
   createMultiStyleConfigHelpers(parts.keys)
 
-const baseStyle = definePartsStyle({
+export const baseStyle = definePartsStyle({
   field: {
     /** placeholder */
   },
 })
 
-const variantOutline = definePartsStyle((props) => {
+export const variantOutline = definePartsStyle((props) => {
   return {
     field: {
       bg: mode("white", "black")(props),
@@ -104,7 +104,7 @@ const variants = {
   flat: variantFlat,
 }
 
-const size = {
+export const sizes = {
   md: defineStyle({
     px: "5",
     py: "4.5",
@@ -124,21 +124,21 @@ const size = {
   }),
 }
 
-const sizes = {
+const partsStyleSizes = {
   md: definePartsStyle({
-    field: size.md,
-    addon: size.md,
+    field: sizes.md,
+    addon: sizes.md,
   }),
   pill: definePartsStyle({
-    field: size.pill,
-    addon: size.pill,
+    field: sizes.pill,
+    addon: sizes.pill,
   }),
 }
 
 export const inputTheme = defineMultiStyleConfig({
   baseStyle,
   variants,
-  sizes,
+  sizes: partsStyleSizes,
   defaultProps: {
     size: "md",
     variant: "outline",

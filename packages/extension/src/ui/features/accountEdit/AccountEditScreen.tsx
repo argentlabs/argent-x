@@ -3,6 +3,7 @@ import {
   ButtonCell,
   CellStack,
   NavigationContainer,
+  P4,
   SpacerCell,
   Switch,
   icons,
@@ -30,10 +31,13 @@ import {
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { usePendingChangeGuardian } from "../shield/usePendingChangingGuardian"
+import {
+  ChangeGuardian,
+  usePendingChangeGuardian,
+} from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ShieldIcon } = icons
+const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ArgentShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -97,6 +101,12 @@ export const AccountEditScreen: FC = () => {
     setLiveEditingAccountName(accountName)
   }, [accountName])
 
+  const accountSubtitle = pendingChangeGuardian
+    ? `${
+        pendingChangeGuardian === ChangeGuardian.ADDING ? "Adding" : "Removing"
+      } Argent Shield…`
+    : `Two-factor account protection`
+
   return (
     <>
       <NavigationContainer
@@ -145,13 +155,14 @@ export const AccountEditScreen: FC = () => {
               <ButtonCell
                 as={Link}
                 to={routes.shieldAccountStart(accountAddress)}
-                leftIcon={<ShieldIcon />}
+                leftIcon={<ArgentShieldIcon fontSize={"xl"} />}
                 rightIconOpaque={!pendingChangeGuardian}
                 rightIcon={
                   pendingChangeGuardian ? (
                     <Spinner size={"sm"} />
                   ) : (
                     <Switch
+                      size={"lg"}
                       isChecked={Boolean(account?.guardian)}
                       onChange={() =>
                         navigate(routes.shieldAccountStart(accountAddress))
@@ -160,7 +171,10 @@ export const AccountEditScreen: FC = () => {
                   )
                 }
               >
-                Argent Shield
+                <>Argent Shield</>
+                <P4 color="neutrals.300" fontWeight={"normal"}>
+                  {accountSubtitle}
+                </P4>
               </ButtonCell>
               <SpacerCell />
             </>

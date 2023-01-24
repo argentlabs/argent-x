@@ -1,11 +1,4 @@
-import {
-  BarBackButton,
-  Button,
-  CellStack,
-  NavigationContainer,
-  useToast,
-} from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { useToast } from "@argent/ui"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
@@ -15,7 +8,7 @@ import { coerceErrorToString } from "../../../shared/utils/error"
 import { routes } from "../../routes"
 import { accountChangeGuardian } from "../../services/backgroundAccounts"
 import { shieldMaybeAddAccount } from "../../services/shieldAccount"
-import { ShieldHeader } from "./ShieldHeader"
+import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
 
@@ -62,28 +55,34 @@ export const ShieldAccountActionScreen: FC = () => {
   }, [account, toast])
 
   return (
-    <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
-      <CellStack flex={1}>
-        <ShieldHeader
-          title={`3 - ${account?.guardian ? "Remove" : "Add"} Argent Shield`}
-          subtitle={`You need to approve a transaction in order to ${
-            account?.guardian
-              ? "remove Argent Shield from"
-              : "add Argent Shield to"
-          } your account`}
-        />
-        <Flex flex={1} />
-        <Button
-          onClick={onAddOrRemove}
-          colorScheme={"primary"}
-          isLoading={isLoading}
-          loadingText={`${
-            account?.guardian ? "Removing" : "Adding"
-          } Argent Shield`}
-        >
-          {account?.guardian ? "Remove" : "Add"} Argent Shield
-        </Button>
-      </CellStack>
-    </NavigationContainer>
+    <ShieldBaseActionScreen
+      guardian={account?.guardian}
+      onAddOrRemove={onAddOrRemove}
+      isLoading={isLoading}
+    />
   )
+
+  // return (
+  //   <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
+  //     <ShieldHeader
+  //       title={`3 - ${account?.guardian ? "Remove" : "Add"} Argent Shield`}
+  //       subtitle={`You need to approve a transaction in order to ${
+  //         account?.guardian
+  //           ? "remove Argent Shield from"
+  //           : "add Argent Shield to"
+  //       } your account`}
+  //     />
+  //     <Flex flex={1} />
+  //     <Button
+  //       onClick={onAddOrRemove}
+  //       colorScheme={"primary"}
+  //       isLoading={isLoading}
+  //       loadingText={`${
+  //         account?.guardian ? "Removing" : "Adding"
+  //       } Argent Shield`}
+  //     >
+  //       {account?.guardian ? "Remove" : "Add"} Argent Shield
+  //     </Button>
+  //   </NavigationContainer>
+  // )
 }
