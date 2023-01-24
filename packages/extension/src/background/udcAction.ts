@@ -3,6 +3,7 @@ import {
   TransactionBulk,
   UniversalDeployerContractPayload,
   constants,
+  number,
   stark,
 } from "starknet"
 
@@ -50,6 +51,11 @@ export const udcDeclareContract = async (
   })
 
   let maxADFee = "0"
+  let maxDeclareFee = "0"
+
+  const declareNonce = selectedAccount.needsDeploy
+    ? number.toHex(number.toBN(1))
+    : await getNonce(selectedAccount, wallet)
 
   if (
     selectedAccount.needsDeploy &&
@@ -74,6 +80,7 @@ export const udcDeclareContract = async (
       )
 
       maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+      maxDeclareFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
     }
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
@@ -100,6 +107,7 @@ export const udcDeclareContract = async (
       meta: {
         title: "Activate Account",
         isDeployAccount: true,
+        type: "DEPLOY_ACCOUNT",
       },
     })
   }
@@ -107,7 +115,6 @@ export const udcDeclareContract = async (
   if ("declare" in starknetAccount) {
     const { classHash, contract } = payload
 
-    const nonce = await getNonce(selectedAccount, wallet)
     const { transaction_hash: declareTxHash, class_hash: deployedClassHash } =
       await starknetAccount.declare(
         {
@@ -115,7 +122,8 @@ export const udcDeclareContract = async (
           contract,
         },
         {
-          nonce,
+          nonce: declareNonce,
+          maxFee: maxDeclareFee,
         },
       )
 
@@ -166,6 +174,11 @@ export const udcDeployContract = async (
   })
 
   let maxADFee = "0"
+  let maxDeployFee = "0"
+
+  const deployNonce = selectedAccount.needsDeploy
+    ? number.toHex(number.toBN(1))
+    : await getNonce(selectedAccount, wallet)
 
   if (
     selectedAccount.needsDeploy &&
@@ -192,6 +205,7 @@ export const udcDeployContract = async (
       )
 
       maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+      maxDeployFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
     }
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
@@ -218,6 +232,7 @@ export const udcDeployContract = async (
       meta: {
         title: "Activate Account",
         isDeployAccount: true,
+        type: "DEPLOY_ACCOUNT",
       },
     })
   }
@@ -231,7 +246,6 @@ export const udcDeployContract = async (
     )
 
     // submit onchain
-    const nonce = await getNonce(selectedAccount, wallet)
     const { transaction_hash: deployTxHash, contract_address } =
       await starknetAccount.deploy(
         {
@@ -241,7 +255,8 @@ export const udcDeployContract = async (
           constructorCalldata,
         },
         {
-          nonce,
+          nonce: deployNonce,
+          maxFee: maxDeployFee,
         },
       )
 

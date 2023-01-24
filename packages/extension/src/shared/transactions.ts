@@ -1,5 +1,5 @@
 import { lowerCase, upperFirst } from "lodash-es"
-import { Call, Status } from "starknet"
+import { Call, Status, TransactionType } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
 
@@ -22,7 +22,7 @@ export interface TransactionMeta {
   isChangeGuardian?: boolean
   isDeployAccount?: boolean
   transactions?: Call | Call[]
-  type?: string // TODO: in future can be DECLARE | DEPLOY | CALL
+  type: TransactionType
 }
 
 export interface TransactionBase {

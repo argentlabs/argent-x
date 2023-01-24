@@ -119,7 +119,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         addTransaction({
           hash: txHash,
           account: fullAccount,
-          meta: { title: "Redeploy wallet" },
+          meta: { title: "Redeploy wallet", type: "DEPLOY_ACCOUNT" },
         })
         return sendMessageToUi({
           type: "REDEPLOY_ACCOUNT_RES",
@@ -194,6 +194,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             meta: {
               isChangeGuardian: true,
               title: "Change account guardian",
+              type: "INVOKE_FUNCTION",
             },
           },
         })
