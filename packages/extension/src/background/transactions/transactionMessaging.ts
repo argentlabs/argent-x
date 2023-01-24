@@ -258,6 +258,22 @@ export const handleTransactionMessage: HandleMessage<
           chainId,
         }
 
+        // TODO: Use this when Simulate Transaction allows multiple transaction types
+        // const signerDetailsWithZeroNonce = {
+        //   ...signerDetails,
+        //   nonce: 0,
+        // }
+
+        // const accountDeployPayload = await wallet.getAccountDeploymentPayload(
+        //   selectedAccount,
+        // )
+
+        // const accountDeployInvocation =
+        //   await starknetAccount.buildAccountDeployPayload(
+        //     accountDeployPayload,
+        //     signerDetailsWithZeroNonce,
+        //   )
+
         const { contractAddress, calldata, signature } =
           await starknetAccount.buildInvocation(transactions, signerDetails)
 

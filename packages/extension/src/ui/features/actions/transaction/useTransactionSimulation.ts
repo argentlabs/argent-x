@@ -12,6 +12,7 @@ import { fetchTransactionSimulation } from "../../../../shared/transactionSimula
 import { argentApiFetcher } from "../../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
+import { useIsMainnet } from "../../networks/useNetworks"
 
 export interface IUseTransactionSimulation {
   account?: Account
@@ -24,12 +25,18 @@ export const useTransactionSimulationEnabled = () => {
     settingsStore,
     "privacyUseArgentServices",
   )
+
+  // FIXME: this is a temporary hack to disable the transaction simulation API on testnets
+  const isMainnet = useIsMainnet()
+
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
-    return ARGENT_TRANSACTION_SIMULATION_API_ENABLED
+    return ARGENT_TRANSACTION_SIMULATION_API_ENABLED && isMainnet
   }
   return (
-    ARGENT_TRANSACTION_SIMULATION_API_ENABLED && privacyUseArgentServicesEnabled
+    ARGENT_TRANSACTION_SIMULATION_API_ENABLED &&
+    privacyUseArgentServicesEnabled &&
+    isMainnet
   )
 }
 
@@ -40,7 +47,8 @@ export const useTransactionSimulation = ({
 }: IUseTransactionSimulation) => {
   const transactionReviewEnabled = useTransactionSimulationEnabled()
   const transactionReviewFetcher = useCallback(async () => {
-    if (!account) {
+    if (!account || account.needsDeploy) {
+      // TODO: handle account deployment
       return
     }
     return fetchTransactionSimulation({
