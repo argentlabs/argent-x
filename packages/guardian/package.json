@@ -37,6 +37,5 @@
   },
   "peerDependencies": {
     "starknet": "^4.19.2"
-  },
-  "gitHead": "54c5d4dc549cc4d0ac044f7c0c1c80936becadde"
+  }
 }
