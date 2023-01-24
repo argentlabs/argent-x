@@ -8,6 +8,7 @@ import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
 import { RecoveryMessage } from "./RecoveryMessage"
 import { SessionMessage } from "./SessionMessage"
+import { ShieldMessage } from "./ShieldMessage"
 import { TokenMessage } from "./TokenMessage"
 import { TransactionMessage } from "./TransactionMessage"
 import { UdcMessage } from "./UdcMessage"
@@ -23,6 +24,7 @@ export type MessageType =
   | TokenMessage
   | TransactionMessage
   | UdcMessage
+  | ShieldMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

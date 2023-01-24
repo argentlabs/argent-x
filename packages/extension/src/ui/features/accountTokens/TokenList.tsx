@@ -5,7 +5,7 @@ import { Token } from "../../../shared/token/type"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { routes } from "../../routes"
+import { routes, useCurrentPathnameWithQuery } from "../../routes"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { NewTokenButton } from "./NewTokenButton"
 import { TokenListItemVariant } from "./TokenListItem"
@@ -31,6 +31,8 @@ export const TokenList: FC<TokenListProps> = ({
   const account = useSelectedAccount()
   const { switcherNetworkId } = useAppState()
   const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
+  const returnTo = useCurrentPathnameWithQuery()
+
   if (!account) {
     return null
   }
@@ -54,7 +56,7 @@ export const TokenList: FC<TokenListProps> = ({
             onClick={() => {
               navigate(
                 navigateToSend
-                  ? routes.sendToken(token.address)
+                  ? routes.sendToken(token.address, returnTo)
                   : routes.token(token.address),
               )
             }}

@@ -10,6 +10,11 @@ export interface FetcherError extends Error {
   status?: number
   statusText?: string
   responseText?: string
+  responseJson?: any
+}
+
+export const isFetcherError = (error: any): error is FetcherError => {
+  return error?.name === "FetcherError"
 }
 
 export const fetcherError = (
@@ -18,10 +23,17 @@ export const fetcherError = (
   responseText: string,
 ) => {
   const error: FetcherError = new Error(message)
+  error.name = "FetcherError"
   error.url = response.url
   error.status = response.status
   error.statusText = response.statusText
   error.responseText = responseText
+  try {
+    const reponseJson = JSON.parse(responseText)
+    error.responseJson = reponseJson
+  } catch {
+    // ignore error
+  }
   return error
 }
 

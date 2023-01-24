@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import create from "zustand"
 
 import { messageStream } from "../shared/messages"
 import { defaultNetwork } from "../shared/network"
+import { routes } from "./routes"
 
 interface State {
   switcherNetworkId: string
@@ -29,4 +31,17 @@ export const useLoadingProgress = () => {
   }, [])
 
   return { progress, clearProgress: () => setProgress(undefined) }
+}
+
+/** when session is stopped, make all tabs navigate to lock screen */
+
+export const useStopSessionHandler = () => {
+  const navigate = useNavigate()
+  useEffect(() => {
+    messageStream.subscribe(([message]) => {
+      if (message.type === "STOP_SESSION") {
+        navigate(routes.lockScreen())
+      }
+    })
+  }, [navigate])
 }
