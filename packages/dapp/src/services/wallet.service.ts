@@ -1,5 +1,5 @@
 import { connect, getStarknet } from "@argent/get-starknet"
-import { constants, shortString } from "starknet"
+import { CompiledContract, constants, shortString } from "starknet"
 
 import { Network } from "./token.service"
 
@@ -136,4 +136,16 @@ export const removeWalletChangeListener = async (
     return
   }
   starknet.off("accountsChanged", handleEvent)
+}
+
+export const declare = async (contract: string, classHash: string) => {
+  const starknet = getStarknet()
+  if (!starknet?.isConnected) {
+    throw Error("starknet wallet not connected")
+  }
+
+  return starknet.account.declare({
+    contract,
+    classHash,
+  })
 }

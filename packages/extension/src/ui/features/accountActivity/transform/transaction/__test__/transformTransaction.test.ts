@@ -6,6 +6,8 @@ import { nftContractAddresses } from "../../__test__/nftContractAddresses"
 import { tokensByNetwork } from "../../__test__/tokensByNetwork"
 import { transformTransaction } from "../transformTransaction"
 import {
+  changeGuardianAdd,
+  changeGuardianRemove,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,
@@ -219,6 +221,30 @@ describe("transformTransaction", () => {
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Mint",
           "entity": "UNKNOWN",
+        }
+      `)
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(changeGuardianAdd),
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "ADD",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Activate Argent Shield",
+          "entity": "GUARDIAN",
+        }
+      `)
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(changeGuardianRemove),
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "REMOVE",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Deactivate Argent Shield",
+          "entity": "GUARDIAN",
         }
       `)
     })

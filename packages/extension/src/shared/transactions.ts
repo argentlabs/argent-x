@@ -19,6 +19,7 @@ export interface TransactionMeta {
   title?: string
   subTitle?: string
   isUpgrade?: boolean
+  isChangeGuardian?: boolean
   isDeployAccount?: boolean
   transactions?: Call | Call[]
   type?: string // TODO: in future can be DECLARE | DEPLOY | CALL

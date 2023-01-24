@@ -6,7 +6,14 @@ import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork, getProvider } from "../../network"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 
-export async function getAccountTypesFromChain(accounts: WalletAccount[]) {
+export type AccountTypesFromChain = Pick<
+  WalletAccount,
+  "address" | "networkId" | "type"
+>
+
+export async function getAccountTypesFromChain(
+  accounts: WalletAccount[],
+): Promise<AccountTypesFromChain[]> {
   const accountsByNetwork = toPairs(groupBy(accounts, (a) => a.networkId))
 
   const accountTypeCallsByNetwork = accountsByNetwork.map(
@@ -86,8 +93,10 @@ export async function getAccountTypesFromChain(accounts: WalletAccount[]) {
     const accountType = newAccountTypes.find((x) =>
       isEqualAddress(x.address, account.address),
     )?.type
+    const { address, networkId } = account
     return {
-      ...account,
+      address,
+      networkId,
       type: accountType || account.type || "argent",
     }
   })

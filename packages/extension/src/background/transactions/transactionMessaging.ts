@@ -147,12 +147,12 @@ export const handleTransactionMessage: HandleMessage<
     }
 
     case "ESTIMATE_DECLARE_CONTRACT_FEE": {
-      const { address, networkId, classHash, contract } = msg.data
+      const { classHash, contract, ...restData } = msg.data
 
-      const selectedAccount = await wallet.getStarknetAccount({
-        address,
-        networkId,
-      })
+      const selectedAccount =
+        "address" in restData
+          ? await wallet.getStarknetAccount(restData)
+          : await wallet.getSelectedStarknetAccount()
 
       if (!selectedAccount) {
         throw Error("no accounts")

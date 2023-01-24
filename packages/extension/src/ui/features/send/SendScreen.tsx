@@ -6,6 +6,7 @@ import {
 } from "@argent/ui"
 import { FC, Suspense, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import {
@@ -19,6 +20,7 @@ import {
   StyledControlledInput,
 } from "../../components/InputText"
 import { Spinner } from "../../components/Spinner"
+import { routes } from "../../routes"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
@@ -82,7 +84,7 @@ export const SendScreen: FC = () => {
   })
 
   const account = useSelectedAccount()
-
+  const navigate = useNavigate()
   const [selectedTab, setSelectedTab] = useState<SendAssetTab>("tokens")
 
   const currentQueryValue = watch().query
@@ -105,8 +107,12 @@ export const SendScreen: FC = () => {
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton />}
-      rightButton={<BarCloseButton />}
+      leftButton={
+        <BarBackButton onClick={() => navigate(routes.accountTokens())} />
+      }
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
+      }
       title={"Send"}
     >
       <Container>
