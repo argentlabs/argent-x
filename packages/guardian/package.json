@@ -1,6 +1,6 @@
 {
   "name": "@argent/guardian",
-  "version": "6.0.1",
+  "version": "5.2.0",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "dexie": "^3.2.2",
-    "get-starknet-core": "^2.0.0",
     "jose": "^4.11.2",
     "lodash-es": "^4.17.21"
   },
