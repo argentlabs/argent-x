@@ -46,7 +46,7 @@ jobs:
           node-version: "16"
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: pnpm --stream -r run build
       - name: Release npm packages
         # if flow is triggered by a tag, publish to npm
         if: startsWith(github.ref, 'refs/tags/')

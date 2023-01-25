@@ -27,7 +27,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: |
           echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
-      - run: pnpm build
+      - run: pnpm --stream -r run build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 

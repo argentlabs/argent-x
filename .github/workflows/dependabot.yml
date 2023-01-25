@@ -23,7 +23,7 @@ jobs:
           node-version: "16"
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: pnpm --stream -r run build
       - run: pnpm test
       - run: xvfb-run --auto-servernum pnpm test:e2e
       - run: pnpm --cwd packages/dapp export

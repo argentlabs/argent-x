@@ -37,7 +37,7 @@ jobs:
         run: pnpm lint
 
       - name: Build
-        run: pnpm build
+        run: pnpm --stream -r run build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
