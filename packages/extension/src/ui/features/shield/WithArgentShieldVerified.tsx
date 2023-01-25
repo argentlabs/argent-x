@@ -1,11 +1,12 @@
-import { getVerifiedEmailIsExpired, resetDevice } from "@argent/guardian"
 import { AlertDialog } from "@argent/ui"
 import { Skeleton, VStack } from "@chakra-ui/react"
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
+import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
+import { getVerifiedEmailIsExpired } from "../../../shared/shield/verifiedEmail"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { useShieldState } from "./shield.state"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"

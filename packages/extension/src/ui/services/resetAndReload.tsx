@@ -1,4 +1,3 @@
-import { resetDevice } from "@argent/guardian"
 import React, {
   FC,
   ReactNode,
@@ -10,6 +9,7 @@ import React, {
 import browser from "webextension-polyfill"
 
 import { ARGENT_SHIELD_ENABLED } from "../../shared/shield/constants"
+import { resetDevice } from "../../shared/shield/jwt"
 import { delay } from "../../shared/utils/delay"
 import { IS_DEV } from "../../shared/utils/dev"
 import { useAppState } from "../app.state"

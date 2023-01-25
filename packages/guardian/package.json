@@ -22,7 +22,6 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "dexie": "^3.2.2",
     "jose": "^4.11.2",
     "lodash-es": "^4.17.21"
   },

@@ -1,4 +1,3 @@
-import { updateVerifiedEmail } from "@argent/guardian"
 import {
   BarBackButton,
   CellStack,
@@ -18,6 +17,7 @@ import {
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
 import { confirmEmail, requestEmail } from "../../../shared/shield/register"
+import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"

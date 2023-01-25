@@ -1,7 +1,7 @@
-import { resetDevice } from "@argent/guardian"
 import { FC, useCallback } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
+import { resetDevice } from "../../../shared/shield/jwt"
 import {
   routes,
   useRouteAccountAddress,

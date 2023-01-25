@@ -16,7 +16,6 @@ import {
 } from "starknet"
 
 import type { Cosigner, CosignerMessage } from "./CosignerTypes"
-import { getVerifiedEmailIsExpired } from "./verifiedEmail"
 
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner
@@ -29,12 +28,6 @@ export class GuardianSigner extends Signer {
   public async cosignMessage(
     cosignerMessage: CosignerMessage,
   ): Promise<Signature> {
-    const verifiedEmailIsExpired = await getVerifiedEmailIsExpired()
-
-    if (verifiedEmailIsExpired) {
-      throw new Error("Email verification expired")
-    }
-
     const response = await this.cosigner(cosignerMessage)
 
     const signature = [
