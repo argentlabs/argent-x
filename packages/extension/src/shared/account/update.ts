@@ -1,3 +1,4 @@
+import { WalletAccount } from "./../wallet.model"
 import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
 import { BaseWalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
@@ -20,6 +21,15 @@ export async function updateAccountDetails(
   )
 
   const accountDetailFetchers: DetailFetchers[] = []
+  let newAccounts: WalletAccount[] = []
+
+  // Update deploy status before fetching account details
+  if (scope === "deploy" || scope === "all") {
+    newAccounts = allAccounts.map((account) => ({
+      ...account,
+      needsDeploy: false,
+    }))
+  }
 
   if (scope === "type" || scope === "all") {
     accountDetailFetchers.push(getAccountTypesFromChain)
@@ -31,19 +41,15 @@ export async function updateAccountDetails(
     }
   }
 
-  let newAccounts = await getAndMergeAccountDetails(
-    allAccounts,
+  const deployedAccounts = allAccounts
+    .concat(newAccounts)
+    .filter((acc) => !acc.needsDeploy)
+
+  // Only fetch account details for deployed accounts
+  const newAccountsWithDetails = await getAndMergeAccountDetails(
+    deployedAccounts,
     accountDetailFetchers,
   )
 
-  if (scope === "deploy" || scope === "all") {
-    const _newAccounts = allAccounts.map((account) => ({
-      ...account,
-      needsDeploy: false,
-    }))
-
-    newAccounts = [..._newAccounts, ...newAccounts]
-  }
-
-  await addAccounts(newAccounts) // handles deduplication and updates
+  await addAccounts(newAccountsWithDetails) // handles deduplication and updates
 }
