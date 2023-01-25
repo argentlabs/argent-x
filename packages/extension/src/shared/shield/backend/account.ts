@@ -1,6 +1,8 @@
+import { Cosigner, CosignerMessage } from "@argent/guardian"
 import retry from "async-retry"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
+import { isFetcherError } from "../../api/fetcher"
 import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
 import { jwtFetcher } from "../jwtFetcher"
@@ -222,5 +224,23 @@ export const addAccount = async (
     return json
   } catch (error) {
     throw new Error("Failed to add account")
+  }
+}
+
+export const cosignerSign: Cosigner = async (message: CosignerMessage) => {
+  try {
+    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
+      method: "POST",
+      body: JSON.stringify(message),
+    })
+    return json
+  } catch (error) {
+    if (isFetcherError(error) && error.responseJson?.status) {
+      throw new Error(
+        `Argent Shield failed to co-sign - status:${error.responseJson?.status}`,
+      )
+    } else {
+      throw new Error("Argent Shield failed to co-sign")
+    }
   }
 }

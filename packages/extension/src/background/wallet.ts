@@ -32,6 +32,7 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import {
   IArrayStorage,
@@ -645,7 +646,7 @@ export class Wallet {
 
     const signer =
       ARGENT_SHIELD_ENABLED && account.guardian
-        ? new GuardianSigner(keyPair)
+        ? new GuardianSigner(keyPair, cosignerSign)
         : new Signer(keyPair)
 
     return signer

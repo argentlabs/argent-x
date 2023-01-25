@@ -15,14 +15,13 @@ import {
   typedData,
 } from "starknet"
 
-import type { Cosigner, CosignerMessage } from "./account"
-import { cosignerSign } from "./account"
+import type { Cosigner, CosignerMessage } from "./CosignerTypes"
 import { getVerifiedEmailIsExpired } from "./verifiedEmail"
 
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner
 
-  constructor(keyPair: KeyPair, cosignerImpl: Cosigner = cosignerSign) {
+  constructor(keyPair: KeyPair, cosignerImpl: Cosigner) {
     super(keyPair)
     this.cosigner = cosignerImpl
   }
