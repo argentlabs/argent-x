@@ -11,7 +11,7 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
-const { LinkIcon, ViewIcon, UpgradeIcon } = icons
+const { LinkIcon, ViewIcon, UpgradeIcon, ShieldIcon } = icons
 
 export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -24,6 +24,7 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   connectedHost?: string
   hidden?: boolean
   avatarOutlined?: boolean
+  isShield?: boolean
 }
 
 interface AccountAvatarProps extends ComponentProps<"img"> {
@@ -96,6 +97,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   networkId,
   networkName,
   accountType,
+  isShield,
   deploying,
   upgrade,
   connectedHost,
@@ -129,6 +131,11 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
+            {isShield && (
+              <H6>
+                <ShieldIcon />
+              </H6>
+            )}
             {accountType === "argent-plugin" && (
               <L2
                 backgroundColor={"neutrals.900"}

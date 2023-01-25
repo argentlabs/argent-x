@@ -13,6 +13,7 @@ import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
+import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
@@ -67,6 +68,7 @@ export const ActionScreen: FC = () => {
     }
     init()
   }, [extensionIsInTab, action?.type])
+
   switch (action?.type) {
     case "CONNECT_DAPP":
       return (
@@ -124,161 +126,169 @@ export const ActionScreen: FC = () => {
 
     case "TRANSACTION":
       return (
-        <ApproveTransactionScreen
-          transactions={action.payload.transactions}
-          actionHash={action.meta.hash}
-          onSubmit={async () => {
-            analytics.track("signedTransaction", {
-              networkId: account?.networkId || "unknown",
-            })
-            await approveAction(action)
-            useAppState.setState({ isLoading: true })
-            const result = await Promise.race([
-              waitForMessage(
-                "TRANSACTION_SUBMITTED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-              waitForMessage(
-                "TRANSACTION_FAILED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-            ])
-            // (await) blocking as the window may closes afterwards
-            await analytics.track("sentTransaction", {
-              success: !("error" in result),
-              networkId: account?.networkId || "unknown",
-            })
-            if ("error" in result) {
-              useAppState.setState({
-                error: `Sending transaction failed: ${result.error}`,
-                isLoading: false,
+        <WithArgentShieldVerified>
+          <ApproveTransactionScreen
+            transactions={action.payload.transactions}
+            actionHash={action.meta.hash}
+            onSubmit={async () => {
+              analytics.track("signedTransaction", {
+                networkId: account?.networkId || "unknown",
               })
-              navigate(routes.error())
-            } else {
-              closePopupIfLastAction()
-              useAppState.setState({ isLoading: false })
-            }
-          }}
-          onReject={onReject}
-          selectedAccount={account}
-        />
+              await approveAction(action)
+              useAppState.setState({ isLoading: true })
+              const result = await Promise.race([
+                waitForMessage(
+                  "TRANSACTION_SUBMITTED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+                waitForMessage(
+                  "TRANSACTION_FAILED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+              ])
+              // (await) blocking as the window may closes afterwards
+              await analytics.track("sentTransaction", {
+                success: !("error" in result),
+                networkId: account?.networkId || "unknown",
+              })
+              if ("error" in result) {
+                useAppState.setState({
+                  error: `Sending transaction failed: ${result.error}`,
+                  isLoading: false,
+                })
+                navigate(routes.error())
+              } else {
+                closePopupIfLastAction()
+                useAppState.setState({ isLoading: false })
+              }
+            }}
+            onReject={onReject}
+            selectedAccount={account}
+          />
+        </WithArgentShieldVerified>
       )
 
     case "DEPLOY_ACCOUNT_ACTION":
       return (
-        <ApproveDeployAccountScreen
-          actionHash={action.meta.hash}
-          onSubmit={async () => {
-            analytics.track("signedTransaction", {
-              networkId: account?.networkId || "unknown",
-            })
-            await approveAction(action)
-            useAppState.setState({ isLoading: true })
-            const result = await Promise.race([
-              waitForMessage(
-                "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-              waitForMessage(
-                "DEPLOY_ACCOUNT_ACTION_FAILED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-            ])
-            // (await) blocking as the window may closes afterwards
-            await analytics.track("sentTransaction", {
-              success: !("error" in result),
-              networkId: account?.networkId || "unknown",
-            })
-            if ("error" in result) {
-              useAppState.setState({
-                error: `Sending transaction failed: ${result.error}`,
-                isLoading: false,
+        <WithArgentShieldVerified>
+          <ApproveDeployAccountScreen
+            actionHash={action.meta.hash}
+            onSubmit={async () => {
+              analytics.track("signedTransaction", {
+                networkId: account?.networkId || "unknown",
               })
-              navigate(routes.error())
-            } else {
-              if ("txHash" in result) {
-                account?.updateDeployTx(result.txHash)
+              await approveAction(action)
+              useAppState.setState({ isLoading: true })
+              const result = await Promise.race([
+                waitForMessage(
+                  "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+                waitForMessage(
+                  "DEPLOY_ACCOUNT_ACTION_FAILED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+              ])
+              // (await) blocking as the window may closes afterwards
+              await analytics.track("sentTransaction", {
+                success: !("error" in result),
+                networkId: account?.networkId || "unknown",
+              })
+              if ("error" in result) {
+                useAppState.setState({
+                  error: `Sending transaction failed: ${result.error}`,
+                  isLoading: false,
+                })
+                navigate(routes.error())
+              } else {
+                if ("txHash" in result) {
+                  account?.updateDeployTx(result.txHash)
+                }
+                closePopupIfLastAction()
+                useAppState.setState({ isLoading: false })
               }
-              closePopupIfLastAction()
-              useAppState.setState({ isLoading: false })
-            }
-          }}
-          onReject={rejectAllActions}
-          selectedAccount={account}
-        />
+            }}
+            onReject={rejectAllActions}
+            selectedAccount={account}
+          />
+        </WithArgentShieldVerified>
       )
 
     case "SIGN":
       return (
-        <ApproveSignatureScreen
-          dataToSign={action.payload}
-          onSubmit={async () => {
-            await approveAction(action)
-            useAppState.setState({ isLoading: true })
-            await waitForMessage(
-              "SIGNATURE_SUCCESS",
-              ({ data }) => data.actionHash === action.meta.hash,
-            )
-            await analytics.track("signedMessage", {
-              networkId: account?.networkId || "unknown",
-            })
-            closePopupIfLastAction()
-            useAppState.setState({ isLoading: false })
-          }}
-          onReject={onReject}
-          selectedAccount={account}
-        />
+        <WithArgentShieldVerified>
+          <ApproveSignatureScreen
+            dataToSign={action.payload}
+            onSubmit={async () => {
+              await approveAction(action)
+              useAppState.setState({ isLoading: true })
+              await waitForMessage(
+                "SIGNATURE_SUCCESS",
+                ({ data }) => data.actionHash === action.meta.hash,
+              )
+              await analytics.track("signedMessage", {
+                networkId: account?.networkId || "unknown",
+              })
+              closePopupIfLastAction()
+              useAppState.setState({ isLoading: false })
+            }}
+            onReject={onReject}
+            selectedAccount={account}
+          />
+        </WithArgentShieldVerified>
       )
     case "DECLARE_CONTRACT_ACTION":
       return (
-        <ApproveDeclareContractScreen
-          actionHash={action.meta.hash}
-          payload={action.payload}
-          onSubmit={async () => {
-            analytics.track("signedDeclareTransaction", {
-              networkId: account?.networkId || "unknown",
-            })
-            await approveAction(action)
-            useAppState.setState({ isLoading: true })
-            const result = await Promise.race([
-              waitForMessage(
-                "DECLARE_CONTRACT_ACTION_SUBMITTED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-              waitForMessage(
-                "DECLARE_CONTRACT_ACTION_FAILED",
-                ({ data }) => data.actionHash === action.meta.hash,
-              ),
-            ])
-            // (await) blocking as the window may closes afterwards
-            await analytics.track("sentTransaction", {
-              success: !("error" in result),
-              networkId: account?.networkId || "unknown",
-            })
-            if ("error" in result) {
-              useAppState.setState({
-                error: `Sending transaction failed: ${result.error}`,
-                isLoading: false,
+        <WithArgentShieldVerified>
+          <ApproveDeclareContractScreen
+            actionHash={action.meta.hash}
+            payload={action.payload}
+            onSubmit={async () => {
+              analytics.track("signedDeclareTransaction", {
+                networkId: account?.networkId || "unknown",
               })
-              navigate(routes.error())
-            } else {
-              closePopupIfLastAction()
-              useAppState.setState({ isLoading: false })
-              navigate(
-                routes.settingsSmartContractDeclareOrDeploySuccess(
-                  "declare",
-                  action.payload.classHash,
+              await approveAction(action)
+              useAppState.setState({ isLoading: true })
+              const result = await Promise.race([
+                waitForMessage(
+                  "DECLARE_CONTRACT_ACTION_SUBMITTED",
+                  ({ data }) => data.actionHash === action.meta.hash,
                 ),
-              )
-            }
-          }}
-          onReject={rejectAllActions}
-          selectedAccount={account}
-        />
+                waitForMessage(
+                  "DECLARE_CONTRACT_ACTION_FAILED",
+                  ({ data }) => data.actionHash === action.meta.hash,
+                ),
+              ])
+              // (await) blocking as the window may closes afterwards
+              await analytics.track("sentTransaction", {
+                success: !("error" in result),
+                networkId: account?.networkId || "unknown",
+              })
+              if ("error" in result) {
+                useAppState.setState({
+                  error: `Sending transaction failed: ${result.error}`,
+                  isLoading: false,
+                })
+                navigate(routes.error())
+              } else {
+                closePopupIfLastAction()
+                useAppState.setState({ isLoading: false })
+                navigate(
+                  routes.settingsSmartContractDeclareOrDeploySuccess(
+                    "declare",
+                    action.payload.classHash,
+                  ),
+                )
+              }
+            }}
+            onReject={rejectAllActions}
+            selectedAccount={account}
+          />
+        </WithArgentShieldVerified>
       )
     case "DEPLOY_CONTRACT_ACTION":
       return (
-        <>
+        <WithArgentShieldVerified>
           <ApproveDeployContractScreen
             actionHash={action.meta.hash}
             deployPayload={action.payload}
@@ -323,7 +333,7 @@ export const ActionScreen: FC = () => {
             onReject={rejectAllActions}
             selectedAccount={account}
           />
-        </>
+        </WithArgentShieldVerified>
       )
 
     default:

@@ -6,6 +6,7 @@ import dateTransformer from "./transformers/dateTransformer"
 import declareContractTransformer from "./transformers/declareContractTransformer"
 import defaultDisplayNameTransformer from "./transformers/defaultDisplayNameTransformer"
 import deployContractTransformer from "./transformers/deployContractTransformer"
+import guardianTransformer from "./transformers/guardianTransformer"
 import knownDappTransformer from "./transformers/knownDappTransformer"
 import nftTransferTransformer from "./transformers/nftTransferTransformer"
 import postTransferTransformer from "./transformers/postTransferTransformer"
@@ -26,6 +27,7 @@ const mainTransformers = [
   nftTransferTransformer,
   tokenMintTransformer,
   tokenTransferTransformer,
+  guardianTransformer,
 ]
 
 /** all are executed */

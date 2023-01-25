@@ -120,8 +120,7 @@ const convertToChakraSvg = (iconComponentCode: string) => {
     "export default SvgComponent",
     "export default chakra(SvgComponent)",
   )
-  return `
-import { chakra } from "@chakra-ui/react"
+  return `import { chakra } from "@chakra-ui/react"
 ${iconComponentCode}`
 }
 
@@ -216,7 +215,7 @@ const generateIconsWithConfig = async (config: IconsConfig) => {
     index++
   }
   lines.push("")
-  const fileContents = lines.join("\r\n")
+  const fileContents = lines.join("\n")
   const indexFileName = path.join(outputFolder, `index.ts`)
   fs.writeFileSync(indexFileName, fileContents, "utf8")
   console.log("Done")

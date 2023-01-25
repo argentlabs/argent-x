@@ -1,3 +1,5 @@
+import { constants, number } from "starknet"
+
 import { getAccounts, removeAccount } from "../shared/account/store"
 import { AccountMessage } from "../shared/messages/AccountMessage"
 import { deployAccountAction } from "./accountDeploy"
@@ -176,6 +178,34 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "DEPLOY_ACCOUNT_ACTION_FAILED": {
       return await actionQueue.remove(msg.data.actionHash)
+    }
+
+    case "ACCOUNT_CHANGE_GUARDIAN": {
+      try {
+        const { account, guardian } = msg.data
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: {
+              contractAddress: account.address,
+              entrypoint: "changeGuardian",
+              calldata: [number.hexToDecimalString(guardian || constants.ZERO)],
+            },
+            meta: {
+              isChangeGuardian: true,
+              title: "Change account guardian",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ACCOUNT_CHANGE_GUARDIAN_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "ACCOUNT_CHANGE_GUARDIAN_REJ",
+          data: `${error}`,
+        })
+      }
     }
   }
 

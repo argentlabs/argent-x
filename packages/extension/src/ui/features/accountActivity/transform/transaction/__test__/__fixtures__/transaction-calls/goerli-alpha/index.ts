@@ -1,3 +1,5 @@
+import changeGuardianAdd from "./change-guardian-add.json"
+import changeGuardianRemove from "./change-guardian-remove.json"
 import erc1155Transfer from "./erc1155-transfer.json"
 import erc20MintTestToken from "./erc20-mint-test-token.json"
 import erc20SwapAlphaRoad from "./erc20-swap-alpha-road.json"
@@ -8,6 +10,8 @@ import erc721MintAspect from "./erc721-mint-aspect.json"
 import erc721Transfer from "./erc721-transfer.json"
 
 export {
+  changeGuardianAdd,
+  changeGuardianRemove,
   erc20MintTestToken,
   erc20SwapAlphaRoad,
   erc20SwapJediswap,

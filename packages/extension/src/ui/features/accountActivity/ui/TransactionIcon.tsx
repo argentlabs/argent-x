@@ -21,6 +21,7 @@ const {
   NftIcon,
   SwapIcon,
   ActivityIcon,
+  ShieldIcon,
 } = icons
 
 export interface TransactionIconProps
@@ -43,6 +44,9 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   switch (entity) {
     case "ACCOUNT":
       iconComponent = <DeployIcon />
+      break
+    case "GUARDIAN":
+      iconComponent = <ShieldIcon />
       break
   }
   switch (action) {
