@@ -22,7 +22,7 @@ export interface TransactionMeta {
   isChangeGuardian?: boolean
   isDeployAccount?: boolean
   transactions?: Call | Call[]
-  type: TransactionType
+  type?: TransactionType
 }
 
 export interface TransactionBase {
