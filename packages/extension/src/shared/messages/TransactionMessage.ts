@@ -16,7 +16,7 @@ export interface EstimateFeeResponse {
   maxADFee?: string
 }
 
-export interface DeclareDeployEstimateFeeResponse
+export interface DeployAccountEstimateFeeResponse
   extends Omit<
     EstimateFeeResponse,
     "suggestedMaxFee" | "accountDeploymentFee" | "theme"
@@ -55,13 +55,13 @@ export type TransactionMessage =
   | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES"
-      data: DeclareDeployEstimateFeeResponse
+      data: DeployAccountEstimateFeeResponse
     }
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE"; data: DeclareContract }
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES"
-      data: DeclareDeployEstimateFeeResponse
+      data: EstimateFeeResponse
     }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE"
@@ -70,5 +70,5 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
-      data: DeclareDeployEstimateFeeResponse
+      data: EstimateFeeResponse
     }

@@ -45,6 +45,7 @@ const ApproveDeployContractScreen: FC<ApproveDeployContractScreenProps> = ({
       showHeader={false}
       footer={
         <DeployContractFeeEstimation
+          needsDeploy={selectedAccount.needsDeploy}
           onErrorChange={setDisableConfirm}
           accountAddress={selectedAccount.address}
           networkId={selectedAccount.networkId}

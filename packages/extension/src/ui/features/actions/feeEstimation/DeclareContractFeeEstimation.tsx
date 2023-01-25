@@ -7,7 +7,14 @@ import { useMaxDeclareContractFeeEstimation } from "./utils"
 
 export const DeclareContractFeeEstimation: FC<
   DeclareContractFeeEstimationProps
-> = ({ accountAddress, networkId, payload, actionHash, onErrorChange }) => {
+> = ({
+  accountAddress,
+  networkId,
+  needsDeploy,
+  payload,
+  actionHash,
+  onErrorChange,
+}) => {
   const { feeToken, feeTokenBalance } = useEstimationAccountFees(
     accountAddress,
     networkId,
@@ -23,6 +30,7 @@ export const DeclareContractFeeEstimation: FC<
   )
   return (
     <Estimation
+      needsDeploy={needsDeploy}
       fee={fee}
       feeToken={feeToken}
       feeTokenBalance={feeTokenBalance}

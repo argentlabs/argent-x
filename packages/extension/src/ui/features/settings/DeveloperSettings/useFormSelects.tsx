@@ -33,7 +33,12 @@ const useFormSelects = (selectedNetwork: string) => {
   const accountOptions = useMemo(
     () =>
       accounts
-        .filter((account) => account.networkId === selectedNetwork)
+        .filter(
+          (account) =>
+            account.networkId === selectedNetwork &&
+            !account.hidden &&
+            !Boolean(account?.guardian).valueOf(),
+        )
         .map((account: WalletAccount) => ({
           icon: (
             <AccountAvatar
