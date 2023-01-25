@@ -20,8 +20,9 @@ export interface TransactionMeta {
   subTitle?: string
   isUpgrade?: boolean
   isChangeGuardian?: boolean
+  isDeployAccount?: boolean
   transactions?: Call | Call[]
-  type?: TransactionType
+  type: TransactionType
 }
 
 export interface TransactionBase {
@@ -61,7 +62,7 @@ export const getInFlightTransactions = (
   transactions.filter(
     ({ status, meta }) =>
       TRANSACTION_STATUSES_TO_TRACK.includes(status) ||
-      (meta?.type === "DEPLOY_ACCOUNT" && status === "PENDING"),
+      (meta?.isDeployAccount && status === "PENDING"),
   )
 
 export function nameTransaction(calls: Call | Call[]) {

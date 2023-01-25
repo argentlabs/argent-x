@@ -17,7 +17,7 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
       ) {
         addToAlreadyShown(hash)
 
-        if (!account.hidden && meta?.type !== "DEPLOY_ACCOUNT") {
+        if (!account.hidden && !meta?.isDeployAccount) {
           await decrementTransactionsBeforeReview()
           sentTransactionNotification(hash, status, meta)
         }

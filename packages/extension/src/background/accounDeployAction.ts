@@ -37,6 +37,7 @@ export const accountDeployAction = async (
     account,
     meta: {
       title: "Activate Account",
+      isDeployAccount: true,
       type: "DEPLOY_ACCOUNT",
     },
   })
