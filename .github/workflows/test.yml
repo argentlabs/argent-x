@@ -91,3 +91,13 @@ jobs:
           name: ${{ env.FILENAME_PREFIX }}-chrome.zip
           path: "*-chrome.zip"
           retention-days: 5
+
+      - name: Set GHA_BRANCH
+        run: echo "GHA_BRANCH=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+      - name: comment PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_REPO: ${{ env.GHA_BRANCH }}
+          INPUT_OWNER: ${{ github.repository_owner }}
+        run: |
+          gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
