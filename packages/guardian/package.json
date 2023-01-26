@@ -26,7 +26,6 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@tsconfig/svelte": "^3.0.0",
     "@types/async-retry": "^1.4.5",
     "starknet": "^4.19.2",
     "typescript": "^4.9.3",
