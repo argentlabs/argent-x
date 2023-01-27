@@ -103,8 +103,9 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               justifyContent="center"
               alignItems="center"
               py="18px"
+              gap={1}
             >
-              <H6>{getAccountName(selectedAccount, accountNames)}</H6>&nbsp;
+              <H6>{getAccountName(selectedAccount, accountNames)}</H6>
               <P3 color="neutrals.300">
                 ({formatTruncatedAddress(selectedAccount.address)})
               </P3>

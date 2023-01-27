@@ -61,28 +61,4 @@ export const ShieldAccountActionScreen: FC = () => {
       isLoading={isLoading}
     />
   )
-
-  // return (
-  //   <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
-  //     <ShieldHeader
-  //       title={`3 - ${account?.guardian ? "Remove" : "Add"} Argent Shield`}
-  //       subtitle={`You need to approve a transaction in order to ${
-  //         account?.guardian
-  //           ? "remove Argent Shield from"
-  //           : "add Argent Shield to"
-  //       } your account`}
-  //     />
-  //     <Flex flex={1} />
-  //     <Button
-  //       onClick={onAddOrRemove}
-  //       colorScheme={"primary"}
-  //       isLoading={isLoading}
-  //       loadingText={`${
-  //         account?.guardian ? "Removing" : "Adding"
-  //       } Argent Shield`}
-  //     >
-  //       {account?.guardian ? "Remove" : "Add"} Argent Shield
-  //     </Button>
-  //   </NavigationContainer>
-  // )
 }
