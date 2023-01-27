@@ -14,6 +14,8 @@ jobs:
         image: shardlabs/starknet-devnet:latest-seed0
         ports:
           - 5050:5050
+    env:
+      FILENAME: argent-extension-${{ github.ref_name }}
 
     steps:
       - name: Check out repository code
@@ -54,5 +56,48 @@ jobs:
             packages/extension/e2e/artifacts/reports/
           retention-days: 5
 
-      - name: Check bundlesize
+      - name: Check bundlesize for chrome
         run: yarn run bundlewatch
+      - name: Set filename prefix
+        run: echo "FILENAME_PREFIX=$(echo ${{ env.FILENAME }}  | tr / -)" >> $GITHUB_ENV
+
+      - name: Create chrome zip
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME_PREFIX }}-chrome.zip ./*
+          mv ${{ env.FILENAME_PREFIX }}-chrome.zip ../../../
+          cd ../../../
+      - name: Build Firefox version
+        run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+      - name: Create firefox zip
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME_PREFIX }}-firefox.zip ./*
+          mv ${{ env.FILENAME_PREFIX }}-firefox.zip ../../../
+          cd ../../../
+      - name: Check bundlesize for firefox
+        run: yarn run bundlewatch
+      - name: Upload artifacts for firefox
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-firefox.zip
+          path: "*-firefox.zip"
+          retention-days: 5
+      - name: Upload artifacts for chrome
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-chrome.zip
+          path: "*-chrome.zip"
+          retention-days: 5
+
+      - name: Set GHA_BRANCH
+        run: echo "GHA_BRANCH=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+      - name: comment PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_REPO: ${{ env.GHA_BRANCH }}
+          INPUT_OWNER: ${{ github.repository_owner }}
+        run: |
+          gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
