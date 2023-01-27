@@ -1,9 +1,8 @@
 import { Hex, bytesToHex, hexToBytes } from "@noble/curves/abstract/utils"
-import { getStarkKey, grindKey as nobleGrindKey } from "@noble/curves/stark"
 import { sha256 } from "@noble/hashes/sha256"
 import { HDKey } from "@scure/bip32"
 import { isNumber } from "lodash-es"
-import { encode, number } from "starknet"
+import { ec, encode, number } from "starknet"
 
 const { addHexPrefix } = encode
 
@@ -13,7 +12,6 @@ export function getStarkPair<T extends number | string>(
   ...[baseDerivationPath]: T extends string ? [] : [string]
 ): { pubKey: string; getPrivateKey: () => string } {
   const hex = number.toBigInt(secret).toString(16)
-  console.log("🚀 ~ file: keyDerivation.ts:16 ~ hex", hex)
   const masterNode = HDKey.fromMasterSeed(hexToBytes(hex))
 
   // baseDerivationPath will never be undefined because of the extends statement below,
@@ -29,13 +27,13 @@ export function getStarkPair<T extends number | string>(
 
   const groundKey = addHexPrefix(grindKey(childNode.privateKey))
   return {
-    pubKey: getStarkKey(groundKey),
+    pubKey: ec.starkCurve.getStarkKey(groundKey),
     getPrivateKey: () => groundKey,
   }
 }
 
 export function grindKey(privateKey: Hex): string {
-  return nobleGrindKey(privateKey)
+  return ec.starkCurve.grindKey(privateKey)
 }
 
 export function getPathForIndex(

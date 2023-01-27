@@ -1,5 +1,5 @@
+import Emittery from "emittery"
 import { isFunction } from "lodash-es"
-import mitt, { WildcardHandler } from "mitt"
 
 import {
   AreaName,
@@ -7,10 +7,15 @@ import {
   OnChanged,
   StorageArea,
   StorageChange,
-} from "../types"
+} from "./types"
 
-type Events = Record<AreaName, Record<string, StorageChange>>
-const emitter = mitt<Events>()
+type WildcardHandler<T = Record<string, unknown>> = (
+  type: keyof T,
+  event: T[keyof T],
+) => void
+type StorageChangeRecord = Record<string, StorageChange>
+type Events = Record<AreaName, StorageChangeRecord>
+const emitter = new Emittery<Events>()
 
 function getChangeMap(oldValue?: any, newValue?: any): StorageChange {
   const changeMap: StorageChange = {
@@ -20,8 +25,18 @@ function getChangeMap(oldValue?: any, newValue?: any): StorageChange {
   return changeMap
 }
 
-export class MockStorage implements StorageArea, chrome.storage.StorageArea {
+/**
+ * This is a polyfill for browser.storage.session
+ * It is used for manifest v2
+ * It is not used for manifest v3
+ *
+ */
+
+export class StoragePonyfill
+  implements StorageArea, chrome.storage.StorageArea
+{
   private store = new Map()
+  private listeners = new Set<(changes: StorageChangeRecord) => void>()
 
   public QUOTA_BYTES = 1024 * 1024 * 1024
 
@@ -119,17 +134,17 @@ export class MockStorage implements StorageArea, chrome.storage.StorageArea {
   onChanged: chrome.storage.StorageAreaChangedEvent = {
     addListener: (callback) => {
       emitter.on(this.area, callback)
+      this.listeners.add(callback)
     },
     hasListener: (callback) => {
-      return Boolean(
-        emitter.all.get(this.area)?.some((handler) => handler === callback),
-      )
+      return Boolean(this.listeners.has(callback))
     },
     hasListeners: () => {
-      return Boolean(emitter.all.get(this.area)?.length)
+      return Boolean(this.listeners.size)
     },
     removeListener: (callback) => {
       emitter.off(this.area, callback)
+      this.listeners.delete(callback)
     },
     addRules: () => {
       throw new Error("Method not implemented.")
@@ -192,20 +207,20 @@ const onStorageChange: OnChanged = {
       callback(event, type)
     }
     listenersSet.set(callback, handler)
-    emitter.on("*", handler)
+    emitter.onAny(handler)
   },
   removeListener(callback) {
     const handler = listenersSet.get(callback)
     if (handler) {
-      emitter.off("*", handler)
+      emitter.offAny(handler)
     }
   },
 }
 
 export const chromeStorageMock: Implementations = {
-  local: new MockStorage("local"),
-  sync: new MockStorage("sync"),
-  managed: new MockStorage("managed"),
-  session: new MockStorage("session"),
+  local: new StoragePonyfill("local"),
+  sync: new StoragePonyfill("sync"),
+  managed: new StoragePonyfill("managed"),
+  session: new StoragePonyfill("session"),
   onChanged: onStorageChange,
 }

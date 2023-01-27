@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
 
-import { MockStorage } from "./__test__/chrome-storage.mock"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
+import { StoragePonyfill } from "./StoragePonyfill"
 import {
   AllowPromise,
   AreaName,
@@ -47,7 +47,7 @@ export class KeyValueStorage<
         const { manifest_version } = browser.runtime.getManifest()
         if (manifest_version === 2) {
           console.log("[v2] Polyfill for browser.storage.session")
-          this.storageImplementation = new MockStorage("session") // for manifest v2
+          this.storageImplementation = new StoragePonyfill("session") // for manifest v2
           return
         }
       }

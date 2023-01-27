@@ -1,3 +1,5 @@
+import { Account } from "starknet"
+
 import { getAccounts } from "../shared/account/store"
 import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
@@ -93,9 +95,12 @@ export const handleActionApproval = async (
       if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }
-      const starknetAccount = await wallet.getSelectedStarknetAccount()
 
-      const [r, s] = await starknetAccount.signMessage(typedData)
+      // This works because we only allow new Accounts to Sign Messages
+      const starknetAccount =
+        (await wallet.getSelectedStarknetAccount()) as Account
+
+      const { r, s } = await starknetAccount.signMessage(typedData)
 
       return {
         type: "SIGNATURE_SUCCESS",

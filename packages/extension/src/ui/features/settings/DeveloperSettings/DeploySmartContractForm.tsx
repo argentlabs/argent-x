@@ -124,7 +124,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
           const { low, high } = uint256.bnToUint256(
             number.toBigInt(param.value),
           )
-          return [low, high]
+          return [number.toHex(low), number.toHex(high)]
         }
         setError(`parameters.${i}`, {
           type: "manual",

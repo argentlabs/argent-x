@@ -3,7 +3,7 @@ import { Box, Flex, Spinner } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { hash } from "starknet5"
+import { hash } from "starknet"
 
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"

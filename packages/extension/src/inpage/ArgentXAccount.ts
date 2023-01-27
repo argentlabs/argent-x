@@ -20,8 +20,8 @@ export class ArgentXAccount extends Account {
   constructor(address: string, provider?: ProviderInterface) {
     // since account constructor is taking a KeyPair,
     // we set a dummy one (never used anyway)
-    const keyPair = ec.getKeyPair(0)
-    super(provider || defaultProvider, address, keyPair)
+    const pk = ec.starkCurve.getStarkKey("0")
+    super(provider || defaultProvider, address, pk)
   }
 
   public override async execute(
@@ -98,6 +98,6 @@ export class ArgentXAccount extends Account {
       throw Error("User action timed out")
     }
 
-    return [result.r, result.s]
+    return new ec.starkCurve.Signature(BigInt(result.r), BigInt(result.s))
   }
 }

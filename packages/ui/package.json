@@ -12,7 +12,8 @@
   "exports": {
     ".": {
       "import": "./dist/ui.es.js",
-      "require": "./dist/ui.umd.js"
+      "require": "./dist/ui.umd.js",
+      "types": "./dist/ui.d.ts"
     }
   },
   "devDependencies": {
@@ -28,7 +29,7 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^20.0.0",
-    "typescript": "^4.9.4",
+    "typescript": "5.0.0-dev.20230125",
     "vite": "^4.0.3",
     "vite-plugin-dts": "^1.6.6"
   },
@@ -42,7 +43,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.4.7",
+    "@chakra-ui/react": "^2.4.9",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^8.0.2",

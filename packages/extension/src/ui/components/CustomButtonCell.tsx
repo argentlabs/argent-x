@@ -1,16 +1,16 @@
-import { Button } from "@argent/ui"
-import { ComponentProps, FC } from "react"
+import { Button } from "@chakra-ui/react"
+import { ComponentProps } from "react"
 
 export interface CustomButtonCellProps extends ComponentProps<typeof Button> {
   highlighted?: boolean
   transparent?: boolean
 }
 
-export const CustomButtonCell: FC<CustomButtonCellProps> = ({
+export const CustomButtonCell = ({
   highlighted,
   transparent,
   ...rest
-}) => {
+}: CustomButtonCellProps): JSX.Element => {
   const colorScheme = transparent
     ? "transparent"
     : highlighted

@@ -50,7 +50,7 @@ export const udcDeclareContract = async (
 
     // check if contract was already declared
     try {
-      const deployed = await starknetAccount.getClassByHash(classHash)
+      const deployed = await starknetAccount.getClassByHash(classHash ?? "0x0")
       if (deployed) {
         console.warn(`Contract already declared at ${classHash}`) // TODO: add into last declared contracts store if not already there
         return null
@@ -83,7 +83,7 @@ export const udcDeclareContract = async (
       account,
       meta: {
         title: "Contract declared",
-        subTitle: classHash.toString(),
+        subTitle: classHash?.toString(),
         type: UdcTransactionType.DECLARE_CONTRACT,
         transactions: {
           contractAddress: UDC.ADDRESS,
