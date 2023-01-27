@@ -1,14 +1,6 @@
-import Dexie, { Table } from "dexie"
-import { GenerateKeyPairResult } from "jose"
-
-export interface Device {
-  id?: number
-  signingKey: GenerateKeyPairResult | string
-  /** presence of email indicates that the email has been verified by 2fa with backend */
-  verifiedEmail?: string
-  /** ISO date string of when the email was verified */
-  verifiedAt?: string
-}
+import { Device } from "@argent/guardian"
+import type { Table } from "dexie"
+import Dexie from "dexie"
 
 export class StoreDexie extends Dexie {
   devices!: Table<Device>
