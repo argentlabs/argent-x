@@ -31,7 +31,9 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -46,7 +48,6 @@ import {
   declareContracts,
   getPreDeployedAccount,
 } from "./devnet/declareAccounts"
-import { GuardianSigner } from "./GuardianSigner"
 import {
   getIndexForPath,
   getNextPathIndex,
@@ -645,7 +646,7 @@ export class Wallet {
 
     const signer =
       ARGENT_SHIELD_ENABLED && account.guardian
-        ? new GuardianSigner(keyPair)
+        ? new GuardianSignerArgentX(keyPair, cosignerSign)
         : new Signer(keyPair)
 
     return signer
