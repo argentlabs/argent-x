@@ -6,7 +6,10 @@ on:
     branches: [develop]
 
 jobs:
+  call-setup-workflow:
+    uses: ./.github/workflows/setup.yml
   test:
+    needs: call-setup-workflow
     runs-on: ubuntu-latest
 
     services:
@@ -18,24 +21,21 @@ jobs:
       FILENAME: argent-extension-${{ github.ref_name }}
 
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Build
-        run: yarn lerna run --scope @argent-x/extension build
+      - name: "Download artifact"
+        run: |
+          OTHER_REPO="argentlabs/argent-x"
+          WF_NAME="Run Tests"
+          ARTIFACT_NAME="setup_dir.zip"
+          RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --jq '.[0].databaseId'`
+          echo ${RUN_ID}
+          gh run --repo ${OTHER_REPO} download ${RUN_ID} -n ${ARTIFACT_NAME}
         env:
-          UPLOAD_SENTRY_SOURCEMAPS: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: unzip setup folder
+        run: unzip -q setup_dir.zip
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: .
 
       - name: Run tests
         run: yarn test
