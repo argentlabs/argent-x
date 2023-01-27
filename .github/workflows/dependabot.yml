@@ -17,6 +17,8 @@ jobs:
           node-version: "16"
           cache: "yarn"
       - run: yarn install --frozen-lockfile
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
       - run: yarn build
       - run: yarn test
       - run: xvfb-run --auto-servernum yarn test:e2e
