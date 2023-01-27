@@ -41,7 +41,6 @@ export const ShieldAccountStartScreen: FC = () => {
         const verifiedEmailIsExpired = account?.guardian
           ? await getVerifiedEmailIsExpiredForRemoval()
           : await getVerifiedEmailIsExpired()
-        console.log({ verifiedEmailIsExpired })
         if (verifiedEmailIsExpired) {
           await requestEmail(verifiedEmail)
           navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
