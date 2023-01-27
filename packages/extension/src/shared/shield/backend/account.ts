@@ -1,3 +1,4 @@
+import { Cosigner, CosignerMessage } from "@argent/guardian"
 import retry from "async-retry"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
@@ -225,20 +226,6 @@ export const addAccount = async (
     throw new Error("Failed to add account")
   }
 }
-
-export interface CosignerMessage {
-  message: any
-  type: "starknet" | "starknetDeploy"
-}
-
-export interface CosignerResponse {
-  signature: {
-    r: string
-    s: string
-  }
-}
-
-export type Cosigner = (message: CosignerMessage) => Promise<CosignerResponse>
 
 export const cosignerSign: Cosigner = async (message: CosignerMessage) => {
   try {

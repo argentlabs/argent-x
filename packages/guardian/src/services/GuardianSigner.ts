@@ -1,4 +1,4 @@
-import {
+import type {
   Abi,
   Call,
   DeclareSignerDetails,
@@ -6,6 +6,8 @@ import {
   InvocationsSignerDetails,
   KeyPair,
   Signature,
+} from "starknet"
+import {
   Signer,
   addAddressPadding,
   number,
@@ -13,17 +15,12 @@ import {
   typedData,
 } from "starknet"
 
-import {
-  Cosigner,
-  CosignerMessage,
-  cosignerSign,
-} from "../shared/shield/backend/account"
-import { getVerifiedEmailIsExpired } from "../shared/shield/verifiedEmail"
+import type { Cosigner, CosignerMessage } from "./CosignerTypes"
 
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner
 
-  constructor(keyPair: KeyPair, cosignerImpl: Cosigner = cosignerSign) {
+  constructor(keyPair: KeyPair, cosignerImpl: Cosigner) {
     super(keyPair)
     this.cosigner = cosignerImpl
   }
@@ -31,12 +28,6 @@ export class GuardianSigner extends Signer {
   public async cosignMessage(
     cosignerMessage: CosignerMessage,
   ): Promise<Signature> {
-    const verifiedEmailIsExpired = await getVerifiedEmailIsExpired()
-
-    if (verifiedEmailIsExpired) {
-      throw new Error("Email verification expired")
-    }
-
     const response = await this.cosigner(cosignerMessage)
 
     const signature = [
