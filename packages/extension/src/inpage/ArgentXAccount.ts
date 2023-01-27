@@ -2,6 +2,8 @@ import {
   Abi,
   Account,
   Call,
+  DeclareContractPayload,
+  DeclareContractResponse,
   InvocationsDetails,
   ProviderInterface,
   Signature,
@@ -63,6 +65,50 @@ export class ArgentXAccount extends Account {
 
     return {
       transaction_hash: result.txHash,
+    }
+  }
+
+  public override async declare(
+    { classHash, contract }: DeclareContractPayload,
+    _transactionsDetail?: InvocationsDetails | undefined,
+  ): Promise<DeclareContractResponse> {
+    sendMessage({
+      type: "REQUEST_DECLARE_CONTRACT",
+      data: { classHash, contract },
+    })
+    const { actionHash } = await waitForMessage(
+      "REQUEST_DECLARE_CONTRACT_RES",
+      1000,
+    )
+    sendMessage({ type: "OPEN_UI" })
+
+    const result = await Promise.race([
+      waitForMessage(
+        "DECLARE_CONTRACT_ACTION_SUBMITTED",
+        11 * 60 * 1000,
+        (x) => x.data.actionHash === actionHash,
+      ),
+      waitForMessage(
+        "DECLARE_CONTRACT_ACTION_FAILED",
+        10 * 60 * 1000,
+        (x) => x.data.actionHash === actionHash,
+      )
+        .then(() => "error" as const)
+        .catch(() => {
+          return "timeout" as const
+        }),
+    ])
+
+    if (result === "error") {
+      throw Error("User abort")
+    }
+    if (result === "timeout") {
+      throw Error("User action timed out")
+    }
+
+    return {
+      transaction_hash: result.txHash,
+      class_hash: result.classHash,
     }
   }
 

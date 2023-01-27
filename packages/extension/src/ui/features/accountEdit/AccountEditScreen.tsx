@@ -4,13 +4,15 @@ import {
   CellStack,
   NavigationContainer,
   SpacerCell,
+  Switch,
   icons,
 } from "@argent/ui"
-import { Center, Flex, Image } from "@chakra-ui/react"
+import { Center, Flex, Image, Spinner } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
+import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
@@ -28,9 +30,10 @@ import {
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { usePendingChangeGuardian } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon } = icons
+const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -46,6 +49,7 @@ export const AccountEditScreen: FC = () => {
     ? getAccountName(account, accountNames)
     : "Not found"
   const blockExplorerTitle = useBlockExplorerTitle()
+  const pendingChangeGuardian = usePendingChangeGuardian(account)
 
   const [liveEditingAccountName, setLiveEditingAccountName] =
     useState(accountName)
@@ -136,6 +140,31 @@ export const AccountEditScreen: FC = () => {
             </Center>
           </Flex>
           <SpacerCell />
+          {ARGENT_SHIELD_ENABLED && (
+            <>
+              <ButtonCell
+                as={Link}
+                to={routes.shieldAccountStart(accountAddress)}
+                leftIcon={<ShieldIcon />}
+                rightIconOpaque={!pendingChangeGuardian}
+                rightIcon={
+                  pendingChangeGuardian ? (
+                    <Spinner size={"sm"} />
+                  ) : (
+                    <Switch
+                      isChecked={Boolean(account?.guardian)}
+                      onChange={() =>
+                        navigate(routes.shieldAccountStart(accountAddress))
+                      }
+                    />
+                  )
+                }
+              >
+                Argent Shield
+              </ButtonCell>
+              <SpacerCell />
+            </>
+          )}
           <ButtonCell
             onClick={() =>
               account &&

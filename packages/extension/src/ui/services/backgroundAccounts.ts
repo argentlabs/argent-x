@@ -145,3 +145,19 @@ export const getSeedPhrase = async (): Promise<string> => {
 
   return await decryptFromBackground(encryptedSeedPhrase, secret)
 }
+
+export const accountChangeGuardian = async (
+  account: BaseWalletAccount,
+  guardian: string | undefined,
+) => {
+  sendMessage({ type: "ACCOUNT_CHANGE_GUARDIAN", data: { account, guardian } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_CHANGE_GUARDIAN_RES"),
+    waitForMessage("ACCOUNT_CHANGE_GUARDIAN_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}

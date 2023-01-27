@@ -1,5 +1,6 @@
 import { getMessage } from "@extend-chrome/messages"
 
+import { IS_DEV } from "../utils/dev"
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
@@ -7,6 +8,7 @@ import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
 import { RecoveryMessage } from "./RecoveryMessage"
 import { SessionMessage } from "./SessionMessage"
+import { ShieldMessage } from "./ShieldMessage"
 import { TokenMessage } from "./TokenMessage"
 import { TransactionMessage } from "./TransactionMessage"
 import { UdcMessage } from "./UdcMessage"
@@ -22,6 +24,7 @@ export type MessageType =
   | TokenMessage
   | TransactionMessage
   | UdcMessage
+  | ShieldMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean
@@ -41,4 +44,10 @@ export async function waitForMessage<
   return _waitForMessage(
     ([msg]: any) => msg.type === type && predicate(msg),
   ).then(([msg]: any) => msg.data)
+}
+
+if ((<any>window).PLAYWRIGHT || IS_DEV) {
+  ;(<any>window).messageStream = messageStream
+  ;(<any>window).sendMessage = sendMessage
+  ;(<any>window).waitForMessage = waitForMessage
 }

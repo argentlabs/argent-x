@@ -14,15 +14,10 @@ export type UdcMessage =
       data: { address: string; contract: any }
     }
   | {
-      type: "DECLARE_CONTRACT_RES"
-    }
-  | {
-      type: "DECLARE_CONTRACT_REJ"
-    }
-  | {
       type: "DECLARE_CONTRACT_ACTION_SUBMITTED"
       data: {
-        txHash: string | null // may be null if the contract was already declared
+        txHash: string
+        classHash: string
         actionHash: string
       }
     }

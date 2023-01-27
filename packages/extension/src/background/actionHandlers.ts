@@ -7,7 +7,7 @@ import { addNetwork, getNetworks } from "../shared/network"
 import { preAuthorize } from "../shared/preAuthorizations"
 import { isEqualWalletAddress } from "../shared/wallet.service"
 import { assertNever } from "../ui/services/assertNever"
-import { accountDeployAction } from "./accounDeployAction"
+import { accountDeployAction } from "./accountDeployAction"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
 import { openUi } from "./openUi"
@@ -184,11 +184,14 @@ export const handleActionApproval = async (
 
     case "DECLARE_CONTRACT_ACTION": {
       try {
-        const txHash = await udcDeclareContract(action, background)
+        const { classHash, txHash } = await udcDeclareContract(
+          action,
+          background,
+        )
 
         return {
           type: "DECLARE_CONTRACT_ACTION_SUBMITTED",
-          data: { txHash, actionHash },
+          data: { txHash, actionHash, classHash },
         }
       } catch (exception: unknown) {
         let error = `${exception}`

@@ -22,7 +22,7 @@ import {
 } from "../../components/InputText"
 import Row, { RowBetween } from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { useAddressBook } from "../../services/addressBook"
 import {
@@ -203,6 +203,7 @@ const SendSchema: Schema<SendInput> = object().required().shape({
 
 export const SendTokenScreen: FC = () => {
   const navigate = useNavigate()
+  const returnTo = useReturnTo()
   const { tokenAddress } = useParams<{ tokenAddress: string }>()
   const account = useSelectedAccount()
   const { tokenDetails } = useTokensWithBalance(account)
@@ -374,7 +375,13 @@ export const SendTokenScreen: FC = () => {
         recipientAddress={inputRecipient}
       />
       <NavigationContainer
-        leftButton={<BarBackButton />}
+        leftButton={
+          <BarBackButton
+            onClick={() =>
+              navigate(returnTo ? returnTo : routes.accountTokens())
+            }
+          />
+        }
         rightButton={<TokenMenuDeprecated tokenAddress={address} />}
         scrollContent={`Send ${symbol}`}
       >

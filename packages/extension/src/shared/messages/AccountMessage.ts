@@ -72,3 +72,11 @@ export type AccountMessage =
       type: "GET_ENCRYPTED_SEED_PHRASE_RES"
       data: { encryptedSeedPhrase: string }
     }
+  | {
+      type: "ACCOUNT_CHANGE_GUARDIAN"
+      data: { account: BaseWalletAccount; guardian: string | undefined }
+    }
+  | {
+      type: "ACCOUNT_CHANGE_GUARDIAN_RES"
+    }
+  | { type: "ACCOUNT_CHANGE_GUARDIAN_REJ"; data: string }

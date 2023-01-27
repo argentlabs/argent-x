@@ -112,6 +112,6 @@
       }
     ]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "playwright.config.ts"],
   "exclude": ["node_modules"]
 }

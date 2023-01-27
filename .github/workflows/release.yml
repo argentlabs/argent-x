@@ -33,9 +33,9 @@ jobs:
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
       SAFE_ENV_VARS: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload artifacts for chrome
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: chrome
           path: "*-chrome.zip"
@@ -79,7 +79,7 @@ jobs:
           if-no-files-found: error
       - name: Upload artifacts for firefox
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: firefox
           path: "*-firefox.zip"

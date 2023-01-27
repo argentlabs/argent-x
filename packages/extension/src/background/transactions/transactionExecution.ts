@@ -133,6 +133,7 @@ export const executeTransactionAction = async (
         ...meta,
         title: "Activate Account",
         isDeployAccount: true,
+        type: "DEPLOY_ACCOUNT",
       },
     })
   } else {
@@ -174,6 +175,7 @@ export const executeTransactionAction = async (
       ...meta,
       title,
       transactions,
+      type: "DEPLOY_ACCOUNT",
     },
   })
 
@@ -181,7 +183,7 @@ export const executeTransactionAction = async (
     await increaseStoredNonce(selectedAccount)
   }
 
-  if (meta.isUpgrade) {
+  if ("isUpgrade" in meta && meta.isUpgrade) {
     await resetStoredNonce(selectedAccount) // reset nonce after upgrade. This is needed because nonce was managed by AccountContract before 0.10.0
   }
 

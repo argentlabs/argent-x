@@ -1,6 +1,6 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
-import { Abi, AccountInterface, Contract, ec, stark } from "starknet"
+import { Abi, AccountInterface, Contract, ec, hash, stark } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
@@ -13,6 +13,7 @@ import {
 } from "../services/token.service"
 import {
   addToken,
+  declare,
   getExplorerBaseUrl,
   networkId,
   signMessage,
@@ -23,6 +24,21 @@ import styles from "../styles/Home.module.css"
 const { randomPrivateKey } = ec.starkCurve.utils
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
+
+const readFileAsString = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (reader.result) {
+        return resolve(reader.result?.toString())
+      }
+      return reject(new Error("Could not read file"))
+    }
+    reader.onerror = reject
+    reader.onabort = reject.bind(null, new Error("User aborted"))
+    reader.readAsText(file)
+  })
+}
 
 export const TokenDapp: FC<{
   showSession: null | boolean
@@ -38,6 +54,8 @@ export const TokenDapp: FC<{
   const [transactionError, setTransactionError] = useState("")
   const [addTokenError, setAddTokenError] = useState("")
   const [network, setNetwork] = useState<Network>()
+  const [classHash, setClassHash] = useState("")
+  const [contract, setContract] = useState<string | undefined>()
 
   const [sessionSigner] = useState(randomPrivateKey())
   const [sessionAccount, setSessionAccount] = useState<
@@ -190,6 +208,27 @@ export const TokenDapp: FC<{
       setTransactionStatus("idle")
     }
   }
+
+  const handleDeclare = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault()
+      if (!contract) {
+        throw new Error("No contract")
+      }
+      if (!classHash) {
+        throw new Error("No class hash")
+      }
+      const result = await declare(contract, classHash)
+      console.log(result)
+
+      setLastTransactionHash(result.transaction_hash)
+      setTransactionStatus("pending")
+    } catch (e) {
+      console.error(e)
+      setTransactionStatus("idle")
+    }
+  }
+
   const tokenAddress = getErc20TokenAddress(network as any)
 
   return (
@@ -330,6 +369,42 @@ export const TokenDapp: FC<{
           </form>
         </div>
       )}
+
+      <div className="columns">
+        <form onSubmit={handleDeclare}>
+          <h2 className={styles.title}>Declare</h2>
+
+          <label htmlFor="contract">Compiled Cairo contract to declare:</label>
+          <input
+            id="contract"
+            name="contract"
+            type="file"
+            onChange={async (e) => {
+              if (e.target.files) {
+                const file = e.target.files[0]
+                const fileAsString = await readFileAsString(file)
+                setContract(fileAsString)
+
+                const classHash = hash.computeContractClassHash(fileAsString)
+                setClassHash(classHash)
+              }
+            }}
+          />
+
+          <label htmlFor="classHash">ClassHash:</label>
+          <input
+            id="classHash"
+            name="classHash"
+            type="text"
+            onChange={(e) => {
+              setClassHash(e.target.value)
+            }}
+            value={classHash}
+          />
+
+          <input type="submit" value="Declare" disabled={!classHash} />
+        </form>
+      </div>
       <h3 style={{ margin: 0 }}>
         ETH token address
         <button

@@ -4,7 +4,7 @@ import { FC, ReactNode, isValidElement, useMemo } from "react"
 // import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
 import { Outlet, useLocation } from "react-router-dom"
 
-import { useAppState } from "./app.state"
+import { useAppState, useStopSessionHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
@@ -65,6 +65,12 @@ import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
+import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
+import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
+import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
+import { ShieldAccountOTPScreen } from "./features/shield/ShieldAccountOTPScreen"
+import { ShieldAccountStartScreen } from "./features/shield/ShieldAccountStartScreen"
+import { WithArgentShieldVerified } from "./features/shield/WithArgentShieldVerified"
 import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { routes } from "./routes"
@@ -154,6 +160,31 @@ const walletRoutes = (
       presentation="push"
       path={routes.editAccount.path}
       element={<AccountEditScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountStart.path}
+      element={<ShieldAccountStartScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountEmail.path}
+      element={<ShieldAccountEmailScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountOTP.path}
+      element={<ShieldAccountOTPScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountAction.path}
+      element={<ShieldAccountActionScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountFinish.path}
+      element={<ShieldAccountFinishScreen />}
     />
     <Route
       presentation="modal"
@@ -263,7 +294,14 @@ const walletRoutes = (
       element={<HideTokenScreen />}
     />
     <Route path={routes.sendScreen.path} element={<SendScreen />} />
-    <Route path={routes.sendToken.path} element={<SendTokenScreen />} />
+    <Route
+      path={routes.sendToken.path}
+      element={
+        <WithArgentShieldVerified>
+          <SendTokenScreen />
+        </WithArgentShieldVerified>
+      }
+    />
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route
       path={routes.networkUpgradeV4.path}
@@ -376,6 +414,7 @@ const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
 
 export const AppRoutes: FC = () => {
   useEntryRoute()
+  useStopSessionHandler()
   const location = useLocation()
 
   const { isLoading } = useAppState()

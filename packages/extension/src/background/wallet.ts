@@ -5,6 +5,7 @@ import {
   Account,
   EstimateFee,
   InvocationsDetails,
+  Signer,
   hash,
   number,
   stark,
@@ -13,7 +14,12 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
-import { getAccountTypesFromChain } from "../shared/account/details/fetchType"
+import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
+import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
+import {
+  DetailFetchers,
+  getAndMergeAccountDetails,
+} from "../shared/account/details/getAndMergeAccountDetails"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
 import {
@@ -23,6 +29,9 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { cosignerSign } from "../shared/shield/backend/account"
+import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -289,10 +298,22 @@ export class Wallet {
     await Promise.all(promises)
 
     try {
-      const accountWithTypes = await getAccountTypesFromChain(accounts)
-      return accountWithTypes
+      const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
+
+      if (ARGENT_SHIELD_ENABLED) {
+        accountDetailFetchers.push(getAccountGuardiansFromChain)
+      }
+
+      const accountsWithDetails = await getAndMergeAccountDetails(
+        accounts,
+        accountDetailFetchers,
+      )
+      return accountsWithDetails
     } catch (error) {
-      console.error("Error getting account types from chain", error)
+      console.error(
+        "Error getting account types or guardians from chain",
+        error,
+      )
       return accounts
     }
   }
@@ -619,6 +640,19 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
+  public async getSignerForAccount(account: WalletAccount) {
+    const keyPair = await this.getStarkKeyByDerivationPath(
+      account.signer.derivationPath,
+    )
+
+    const signer =
+      ARGENT_SHIELD_ENABLED && account.guardian
+        ? new GuardianSignerArgentX(keyPair.getPrivateKey(), cosignerSign)
+        : new Signer(keyPair.getPrivateKey())
+
+    return signer
+  }
+
   public async getStarknetAccount(
     selector: BaseWalletAccount,
     useLatest = false,
@@ -630,10 +664,6 @@ export class Wallet {
     if (!account) {
       throw Error("account not found")
     }
-
-    const keyPair = await this.getStarkKeyByDerivationPath(
-      account.signer.derivationPath,
-    )
 
     const provider = getProvider(
       account.network && account.network.baseUrl
@@ -647,17 +677,19 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
+    const signer = await this.getSignerForAccount(account)
+
     if (account.needsDeploy || useLatest) {
-      return new Account(provider, account.address, keyPair.getPrivateKey())
+      return new Account(provider, account.address, signer)
     }
 
-    const oldAccount = new Accountv4(providerV4, account.address, keyPair)
+    const oldAccount = new Accountv4(providerV4, account.address, signer)
 
     const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
 
     return isOldAccount
       ? oldAccount
-      : new Account(provider, account.address, keyPair.getPrivateKey())
+      : new Account(provider, account.address, signer)
   }
 
   public async isNonceManagedOnAccountContract(account: Accountv4) {

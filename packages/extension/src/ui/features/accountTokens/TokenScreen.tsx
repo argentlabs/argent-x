@@ -12,7 +12,7 @@ import { ColumnCenter } from "../../components/Column"
 import { FormatListBulletedIcon } from "../../components/Icons/MuiIcons"
 import { LoadingPulse } from "../../components/LoadingPulse"
 import { RowCentered } from "../../components/Row"
-import { routes } from "../../routes"
+import { routes, useCurrentPathnameWithQuery } from "../../routes"
 import { H3 } from "../../theme/Typography"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenIcon } from "./TokenIcon"
@@ -86,9 +86,10 @@ export const TokenScreen: FC = () => {
     [tokenAddress, tokenDetails],
   )
   const currencyValue = useTokenBalanceToCurrencyValue(token)
+  const returnTo = useCurrentPathnameWithQuery()
 
   if (!token) {
-    return <Navigate to={routes.accounts()} />
+    return <Navigate to={routes.accountTokens()} />
   }
 
   const { address, name, symbol, image } = toTokenView(token)
@@ -97,7 +98,9 @@ export const TokenScreen: FC = () => {
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton />}
+      leftButton={
+        <BarBackButton onClick={() => navigate(routes.accountTokens())} />
+      }
       rightButton={<TokenMenuDeprecated tokenAddress={address} />}
       title={name === "Ether" ? "Ethereum" : name}
     >
@@ -132,7 +135,7 @@ export const TokenScreen: FC = () => {
         <ActionContainer>
           <Button
             type="button"
-            onClick={() => navigate(routes.sendToken(address))}
+            onClick={() => navigate(routes.sendToken(address, returnTo))}
           >
             Send
           </Button>

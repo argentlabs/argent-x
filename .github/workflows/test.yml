@@ -17,9 +17,9 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
@@ -31,21 +31,28 @@ jobs:
         run: yarn lint
 
       - name: Build
-        run: yarn build
+        run: yarn lerna run --scope @argent-x/extension build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run tests
         run: yarn test
 
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
 
       - uses: actions/upload-artifact@v3
-        if: failure()
+        if: always()
         with:
           name: test-results
-          path: packages/extension/test-results/
+          path: |
+            packages/extension/test-results/
+            packages/extension/e2e/artifacts/playwright/
+            packages/extension/e2e/artifacts/reports/
+          retention-days: 5
 
       - name: Check bundlesize
         run: yarn run bundlewatch
