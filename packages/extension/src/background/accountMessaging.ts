@@ -189,7 +189,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             transactions: {
               contractAddress: account.address,
               entrypoint: "changeGuardian",
-              calldata: [number.hexToDecimalString(guardian || constants.ZERO)],
+              calldata: [
+                number.hexToDecimalString(
+                  guardian || constants.ZERO.toString(),
+                ),
+              ],
             },
             meta: {
               isChangeGuardian: true,

@@ -40,8 +40,8 @@ export const usePendingChangeGuardian = (
         ),
       )
       if (calldata?.[0]) {
-        const guardianAddress = number.toBN(calldata[0])
-        if (guardianAddress.eq(constants.ZERO)) {
+        const guardianAddress = number.toBigInt(calldata[0])
+        if (guardianAddress === constants.ZERO) {
           return ChangeGuardian.REMOVING
         } else {
           return ChangeGuardian.ADDING

@@ -40,7 +40,8 @@ export const getIsCurrentImplementation = async (
   const accountImplementation = await getImplementationForAccount(account)
   const isCurrentImplementation = currentImplementations.some(
     (currentImplementation) =>
-      number.toBN(currentImplementation).eq(number.toBN(accountImplementation)),
+      number.toBigInt(currentImplementation) ===
+      number.toBigInt(accountImplementation),
   )
   return isCurrentImplementation
 }

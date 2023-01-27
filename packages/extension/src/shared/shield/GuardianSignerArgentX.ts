@@ -1,7 +1,7 @@
 import { GuardianSigner } from "@argent/guardian"
 import type { CosignerMessage } from "@argent/guardian"
 import type { Signature } from "starknet"
-import { number } from "starknet"
+import { ec, number } from "starknet"
 
 import { getVerifiedEmailIsExpired } from "./verifiedEmail"
 
@@ -17,11 +17,11 @@ export class GuardianSignerArgentX extends GuardianSigner {
 
     const response = await this.cosigner(cosignerMessage)
 
-    const signature = [
-      number.toBigInt(response.signature.r).toString(),
-      number.toBigInt(response.signature.s).toString(),
+    const [r, s] = [
+      number.toBigInt(response.signature.r),
+      number.toBigInt(response.signature.s),
     ]
 
-    return signature
+    return new ec.starkCurve.Signature(r, s)
   }
 }

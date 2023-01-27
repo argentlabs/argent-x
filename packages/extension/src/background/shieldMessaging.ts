@@ -1,6 +1,6 @@
 import { stringToBytes } from "@scure/base"
 import { Signature, keccak, pedersen, sign } from "micro-starknet"
-import { ec, encode } from "starknet"
+import { encode } from "starknet"
 
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import { addAccount, getAccounts } from "../shared/shield/backend/account"
@@ -41,12 +41,14 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           guardianAddress = existingAccount.guardianAddresses[0]
         } else {
           /** Add account to backend */
-          const keyPair = await wallet.getKeyPairByDerivationPath(
+          const keyPair = await wallet.getStarkKeyByDerivationPath(
             selectedAccount?.signer.derivationPath,
           )
-          const privateKey = keyPair.getPrivate()
-          const publicKey = ec.getStarkKey(keyPair)
-          const privateKeyHex = encode.addHexPrefix(privateKey.toString(16))
+          const privateKey = keyPair.getPrivateKey()
+          const publicKey = keyPair.pubKey
+          const privateKeyHex = encode.addHexPrefix(
+            BigInt(privateKey).toString(16),
+          )
 
           const deploySignature = sign(
             pedersen(keccak(stringToBytes("utf8", "starknet")), publicKey),

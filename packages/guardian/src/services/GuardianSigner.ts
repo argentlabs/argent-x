@@ -1,14 +1,14 @@
-import type {
+import {
   Abi,
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
-} from "starknet"
-import {
   Signer,
+  SignerInterface,
   addAddressPadding,
+  ec,
   number,
   transaction,
   typedData,
@@ -16,7 +16,7 @@ import {
 
 import type { Cosigner, CosignerMessage } from "./CosignerTypes"
 
-export class GuardianSigner extends Signer {
+export class GuardianSigner extends Signer implements SignerInterface {
   public cosigner: Cosigner
 
   constructor(pk: string | Uint8Array, cosignerImpl: Cosigner) {
@@ -30,11 +30,11 @@ export class GuardianSigner extends Signer {
     const response = await this.cosigner(cosignerMessage)
 
     const signature = [
-      number.toBigInt(response.signature.r).toString(),
-      number.toBigInt(response.signature.s).toString(),
+      number.toBigInt(response.signature.r),
+      number.toBigInt(response.signature.s),
     ]
 
-    return signature
+    return new ec.starkCurve.Signature(...signature)
   }
 
   public async signMessage(

@@ -38,8 +38,8 @@ export const getGuardianForAccount = async (
 const shapeResponse = (response: string[]) => {
   const [low, high] = response
   const guardian = uint256.uint256ToBN({ low, high })
-  if (guardian.eq(constants.ZERO)) {
+  if (guardian === constants.ZERO) {
     return
   }
-  return number.toHexString(guardian)
+  return number.toHex(guardian)
 }

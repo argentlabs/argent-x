@@ -188,7 +188,7 @@ export const handleTransactionMessage: HandleMessage<
             txFee = number.toHex(estimateFeeBulk[1].overall_fee)
 
             maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-            maxTxFee = estimateFeeBulk[1].suggestedMaxFee
+            maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
           }
         } else {
           const { overall_fee, suggestedMaxFee } = await (
@@ -276,7 +276,7 @@ export const handleTransactionMessage: HandleMessage<
             txFee = number.toHex(estimateFeeBulk[1].overall_fee)
 
             maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-            maxTxFee = estimateFeeBulk[1].suggestedMaxFee
+            maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
           }
         } else {
           const { overall_fee, suggestedMaxFee } = await (

@@ -11,8 +11,8 @@ export default function ({ transaction, result }: ITransactionTransformer) {
     if (isChangeGuardianCall(call)) {
       const guardianAddressCalldata = call.calldata?.[0]
       if (guardianAddressCalldata !== undefined) {
-        const guardianAddress = number.toBN(guardianAddressCalldata)
-        const isRemove = guardianAddress.eq(constants.ZERO)
+        const guardianAddress = number.toBigInt(guardianAddressCalldata)
+        const isRemove = guardianAddress === constants.ZERO
         const action = isRemove ? "REMOVE" : "ADD"
         const entity = "GUARDIAN"
         const displayName = isRemove
