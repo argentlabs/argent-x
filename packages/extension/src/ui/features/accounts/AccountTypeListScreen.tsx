@@ -1,5 +1,5 @@
 import { BarCloseButton, H6, NavigationContainer, P4, icons } from "@argent/ui"
-import { Center, Flex } from "@chakra-ui/react"
+import { Center, Flex, Spinner } from "@chakra-ui/react"
 import { ComponentProps, FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -85,6 +85,19 @@ export const AccountTypeListScreen: FC = () => {
     [addAccount, navigate],
   )
 
+  const isButtonLoading = useCallback(
+    (accountType: AccountType) => {
+      if (accountType.id === AccountTypeId.STANDARD && isDeploying) {
+        return true
+      }
+
+      // More cases here
+
+      return false
+    },
+    [isDeploying],
+  )
+
   return (
     <NavigationContainer
       rightButton={<BarCloseButton onClick={onClose} />}
@@ -96,7 +109,7 @@ export const AccountTypeListScreen: FC = () => {
             key={index}
             p={4}
             alignItems="center"
-            justifyContent="flex-start"
+            justifyContent="space-between"
             gap={3}
             onClick={() => onAccountTypeClick(accountType.id)}
             _hover={{
@@ -106,13 +119,16 @@ export const AccountTypeListScreen: FC = () => {
               },
             }}
           >
-            <AccountTypeAvatar>{accountType.icon}</AccountTypeAvatar>
-            <Flex direction="column" flex={0.5}>
-              <H6>{accountType.title}</H6>
-              <P4 fontWeight="bold" color="neutral.500">
-                {accountType.subtitle}
-              </P4>
+            <Flex gap={3} alignItems="center" justify="start">
+              <AccountTypeAvatar>{accountType.icon}</AccountTypeAvatar>
+              <Flex direction="column" flex={0.5}>
+                <H6>{accountType.title}</H6>
+                <P4 fontWeight="bold" color="neutral.500">
+                  {accountType.subtitle}
+                </P4>
+              </Flex>
             </Flex>
+            {isButtonLoading(accountType) && <Spinner w={4} h={4} />}
           </CustomButtonCell>
         ))}
       </Flex>
