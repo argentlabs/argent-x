@@ -8,7 +8,10 @@ import { Schema, object } from "yup"
 
 import { AddressBookContact } from "../../../shared/addressBook"
 import { inputAmountSchema, parseAmount } from "../../../shared/token/amount"
-import { prettifyCurrencyValue } from "../../../shared/token/price"
+import {
+  prettifyCurrencyValue,
+  prettifyTokenBalance,
+} from "../../../shared/token/price"
 import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -56,9 +59,10 @@ import { formatTokenBalance, toTokenView } from "./tokens.service"
 import {
   TokenDetailsWithBalance,
   useNetworkFeeToken,
-  useTokensWithBalance,
+  useToken,
 } from "./tokens.state"
 import { useMaxFeeEstimateForTransfer } from "./useMaxFeeForTransfer"
+import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
 
 export const BalanceText = styled.div`
   font-weight: 600;
@@ -206,7 +210,6 @@ export const SendTokenScreen: FC = () => {
   const returnTo = useReturnTo()
   const { tokenAddress } = useParams<{ tokenAddress: string }>()
   const account = useSelectedAccount()
-  const { tokenDetails } = useTokensWithBalance(account)
   const resolver = useYupValidationResolver(SendSchema)
   const feeToken = useNetworkFeeToken(account?.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
@@ -248,21 +251,31 @@ export const SendTokenScreen: FC = () => {
   const inputAmount = formValues.amount
   const inputRecipient = formValues.recipient
 
-  const token = tokenDetails.find(({ address }) => address === tokenAddress)
+  const token = useToken({
+    address: tokenAddress || "0x0",
+    networkId: currentNetworkId || "Unknown",
+  })
+  const { tokenWithBalance } = useTokenBalanceForAccount({ token, account })
   const currencyValue = useTokenUnitAmountToCurrencyValue(token, inputAmount)
+  const displayBalance = tokenWithBalance
+    ? prettifyTokenBalance(tokenWithBalance)
+    : "––"
 
   const {
     maxFee,
     error: maxFeeError,
     loading: maxFeeLoading,
-  } = useMaxFeeEstimateForTransfer(token?.address, token?.balance, account)
+  } = useMaxFeeEstimateForTransfer(
+    tokenAddress,
+    tokenWithBalance?.balance,
+    account,
+  )
 
   const setMaxInputAmount = useCallback(
-    (token: TokenDetailsWithBalance, maxFee?: string) => {
-      const tokenDecimals = token.decimals ?? 18
-      const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
-
-      if (token.balance && maxFee) {
+    (token?: TokenDetailsWithBalance, maxFee?: string) => {
+      if (token?.balance && maxFee) {
+        const tokenDecimals = token.decimals ?? 18
+        const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
         const balanceBn = token.balance
 
         const maxAmount =
@@ -310,28 +323,37 @@ export const SendTokenScreen: FC = () => {
   const showSaveAddressButton = validRecipientAddress && !recipientInAddressBook
 
   useEffect(() => {
-    if (maxClicked && maxFee && token) {
-      setMaxInputAmount(token, maxFee)
+    if (maxClicked && maxFee && tokenWithBalance) {
+      setMaxInputAmount(tokenWithBalance, maxFee)
     }
     // dont add token as dependency as the reference can change
-  }, [maxClicked, maxFee, setMaxInputAmount, token?.address, token?.networkId]) // eslint-disable-line react-hooks/exhaustive-deps
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [
+    maxClicked,
+    maxFee,
+    setMaxInputAmount,
+    tokenWithBalance?.address,
+    tokenWithBalance?.networkId,
+  ])
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   if (!token) {
     return <Navigate to={routes.accounts()} />
   }
 
-  const { address, name, symbol, balance, decimals, image } = toTokenView(token)
+  const { address, name, symbol, decimals, image } = toTokenView(token)
 
   const parsedInputAmount = inputAmount
     ? parseAmount(inputAmount, decimals)
     : parseAmount("0", decimals)
 
-  const parsedTokenBalance = token.balance || parseAmount("0", decimals)
+  const parsedTokenBalance =
+    tokenWithBalance?.balance || parseAmount("0", decimals)
 
   const isInputAmountGtBalance =
-    parsedInputAmount.gt(token.balance?.toString() ?? 0) ||
+    parsedInputAmount.gt(tokenWithBalance?.balance?.toString() ?? 0) ||
     (feeToken?.address === token.address &&
-      (inputAmount === balance ||
+      (inputAmount === tokenWithBalance?.balance?.toString() ||
         parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance)))
 
   const handleMaxClick = () => {
@@ -388,7 +410,7 @@ export const SendTokenScreen: FC = () => {
         <>
           <ColumnCenter>
             <H3>Send {symbol}</H3>
-            <BalanceText>{`${balance} ${symbol}`}</BalanceText>
+            <BalanceText>{displayBalance}</BalanceText>
           </ColumnCenter>
           <StyledForm
             onSubmit={handleSubmit(({ amount, recipient }) => {
