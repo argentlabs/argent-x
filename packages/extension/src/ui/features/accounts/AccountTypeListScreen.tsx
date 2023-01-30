@@ -55,7 +55,7 @@ const accountTypes: AccountType[] = [
 export const AccountTypeListScreen: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { addAccount, isDeploying } = useAddAccount()
+  const { addAccount, isAdding } = useAddAccount()
 
   const onClose = useCallback(async () => {
     if (returnTo) {
@@ -87,7 +87,7 @@ export const AccountTypeListScreen: FC = () => {
 
   const isButtonLoading = useCallback(
     (accountType: AccountType) => {
-      if (accountType.id === AccountTypeId.STANDARD && isDeploying) {
+      if (accountType.id === AccountTypeId.STANDARD && isAdding) {
         return true
       }
 
@@ -95,7 +95,7 @@ export const AccountTypeListScreen: FC = () => {
 
       return false
     },
-    [isDeploying],
+    [isAdding],
   )
 
   return (

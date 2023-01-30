@@ -55,7 +55,7 @@ export const AccountListScreen: FC = () => {
   )
   const { isBackupRequired } = useBackupRequired()
   const currentNetwork = useCurrentNetwork()
-  const { addAccount, isDeploying } = useAddAccount()
+  const { isAdding } = useAddAccount()
 
   const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
     visibleAccounts,
@@ -80,13 +80,13 @@ export const AccountListScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={<BarCloseButton onClick={onClose} disabled={isDeploying} />}
+        leftButton={<BarCloseButton onClick={onClose} disabled={isAdding} />}
         title={`${currentNetwork.name} accounts`}
         rightButton={
           <BarIconButton
             aria-label="Create new wallet"
             onClick={() => navigate(routes.accountsType())}
-            isLoading={isDeploying}
+            isLoading={isAdding}
           >
             <AddIcon />
           </BarIconButton>
@@ -122,7 +122,7 @@ export const AccountListScreen: FC = () => {
               ))}
             </>
           )}
-          {isDeploying && <DimmingContainer />}
+          {isAdding && <DimmingContainer />}
         </Flex>
       </NavigationContainer>
       {hasHiddenAccounts && <HiddenAccountsBar />}

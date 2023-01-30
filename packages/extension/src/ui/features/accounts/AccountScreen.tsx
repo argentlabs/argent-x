@@ -23,10 +23,10 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
-  const { isDeploying } = useAddAccount()
+  const { isAdding } = useAddAccount()
 
   const hasAcccount = !!account
-  const showEmpty = !hasAcccount || (hasAcccount && isDeploying)
+  const showEmpty = !hasAcccount || (hasAcccount && isAdding)
 
   const multicall = account && getMulticallForNetwork(account?.network)
 
