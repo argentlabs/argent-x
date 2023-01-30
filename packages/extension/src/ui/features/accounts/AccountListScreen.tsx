@@ -10,7 +10,7 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { useReturnTo } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -85,7 +85,7 @@ export const AccountListScreen: FC = () => {
         rightButton={
           <BarIconButton
             aria-label="Create new wallet"
-            onClick={addAccount}
+            onClick={() => navigate(routes.accountsType())}
             isLoading={isDeploying}
           >
             <AddIcon />

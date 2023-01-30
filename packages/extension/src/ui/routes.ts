@@ -107,6 +107,7 @@ export const routes = {
     "/accounts/hidden/:networkId",
   ),
   accounts: routeWithReturnTo("/accounts"),
+  accountsType: route("/accounts/type"),
   editAccount: route(
     (accountAddress, returnTo?: string) =>
       returnTo
@@ -207,5 +208,9 @@ export const routes = {
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
+
+  multisigSetup: route("/multisig/setup"),
+  multisigCreate: route("/multisig/create"),
+  multisigJoin: route("/multisig/join"),
   swap: route("/swap"),
 }
