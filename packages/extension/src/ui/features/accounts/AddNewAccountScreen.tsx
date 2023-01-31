@@ -123,7 +123,7 @@ export const AddNewAccountScreen: FC = () => {
               </Center>
               <Flex direction="column" flex={0.5}>
                 <H6>{accountType.title}</H6>
-                <P4 fontWeight="bold" color="neutral.500">
+                <P4 fontWeight="bold" color="neutrals.300">
                   {accountType.subtitle}
                 </P4>
               </Flex>
