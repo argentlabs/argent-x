@@ -4,6 +4,7 @@ import Messages from "../utils/Messages"
 import Account from "./Account"
 import Activity from "./Activity"
 import Network from "./Network"
+import Settings from "./Settings"
 import Wallet from "./Wallet"
 
 export default class ExtensionPage {
@@ -13,6 +14,8 @@ export default class ExtensionPage {
   account: Account
   messages: Messages
   activity: Activity
+  settings: Settings
+
   constructor(page: Page, private extensionUrl: string) {
     this.page = page
     this.wallet = new Wallet(page)
@@ -21,9 +24,10 @@ export default class ExtensionPage {
     this.extensionUrl = extensionUrl
     this.messages = new Messages(page)
     this.activity = new Activity(page)
+    this.settings = new Settings(page)
   }
 
-  get settings() {
+  get settingsMenu() {
     return this.page.locator('[aria-label="Show settings"]')
   }
 
@@ -55,7 +59,7 @@ export default class ExtensionPage {
     return this.page.locator('[aria-label="Tokens"]')
   }
   async resetExtension() {
-    await this.settings.click()
+    await this.settingsMenu.click()
     await this.lockWallet.click()
     await this.reset.click()
     await this.confirmReset.click()
