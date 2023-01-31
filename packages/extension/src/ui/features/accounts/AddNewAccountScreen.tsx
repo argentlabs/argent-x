@@ -1,13 +1,12 @@
 import { BarCloseButton, H6, NavigationContainer, P4, icons } from "@argent/ui"
 import { Center, Flex, Spinner } from "@chakra-ui/react"
-import { ComponentProps, FC, useCallback } from "react"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { booleanifyEnv } from "../../../shared/utils/booleanifyEnv"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-import { routes, useReturnTo } from "../../routes"
+import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
-import { recover } from "../recovery/recovery.service"
 import { useAddAccount } from "./useAddAccount"
 
 const { WalletIcon, MultisigIcon } = icons
@@ -52,18 +51,9 @@ const accountTypes: AccountType[] = [
   //   },
 ]
 
-export const AccountTypeListScreen: FC = () => {
+export const AddNewAccountScreen: FC = () => {
   const navigate = useNavigate()
-  const returnTo = useReturnTo()
   const { addAccount, isAdding } = useAddAccount()
-
-  const onClose = useCallback(async () => {
-    if (returnTo) {
-      navigate(returnTo)
-    } else {
-      navigate(await recover())
-    }
-  }, [navigate, returnTo])
 
   const onAccountTypeClick = useCallback(
     async (accountTypeId: AccountTypeId) => {
@@ -100,7 +90,7 @@ export const AccountTypeListScreen: FC = () => {
 
   return (
     <NavigationContainer
-      rightButton={<BarCloseButton onClick={onClose} />}
+      rightButton={<BarCloseButton onClick={() => navigate(-1)} />}
       title="Add a new account"
     >
       <Flex p={4} gap={2} direction="column">
@@ -120,7 +110,15 @@ export const AccountTypeListScreen: FC = () => {
             }}
           >
             <Flex gap={3} alignItems="center" justify="start">
-              <AccountTypeAvatar>{accountType.icon}</AccountTypeAvatar>
+              <Center
+                borderRadius="full"
+                width={12}
+                height={12}
+                backgroundColor="neutrals.700"
+                className="account-type-avatar"
+              >
+                {accountType.icon}
+              </Center>
               <Flex direction="column" flex={0.5}>
                 <H6>{accountType.title}</H6>
                 <P4 fontWeight="bold" color="neutral.500">
@@ -133,19 +131,5 @@ export const AccountTypeListScreen: FC = () => {
         ))}
       </Flex>
     </NavigationContainer>
-  )
-}
-
-export const AccountTypeAvatar: FC<ComponentProps<"img">> = ({ children }) => {
-  return (
-    <Center
-      borderRadius="full"
-      width={12}
-      height={12}
-      backgroundColor="neutrals.700"
-      className="account-type-avatar"
-    >
-      {children}
-    </Center>
   )
 }

@@ -15,7 +15,7 @@ import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
-import { AccountTypeListScreen } from "./features/accounts/AccountTypeListScreen"
+import { AddNewAccountScreen } from "./features/accounts/AddNewAccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
@@ -158,9 +158,9 @@ const walletRoutes = (
       element={<AccountListScreen />}
     />
     <Route
-      presentation="push"
-      path={routes.accountsType.path}
-      element={<AccountTypeListScreen />}
+      presentation="modal"
+      path={routes.newAccount.path}
+      element={<AddNewAccountScreen />}
     />
     <Route
       presentation="push"

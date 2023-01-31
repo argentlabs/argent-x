@@ -107,7 +107,7 @@ export const routes = {
     "/accounts/hidden/:networkId",
   ),
   accounts: routeWithReturnTo("/accounts"),
-  accountsType: route("/accounts/type"),
+  newAccount: route("/account/new"),
   editAccount: route(
     (accountAddress, returnTo?: string) =>
       returnTo

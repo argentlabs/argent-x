@@ -85,7 +85,7 @@ export const AccountListScreen: FC = () => {
         rightButton={
           <BarIconButton
             aria-label="Create new wallet"
-            onClick={() => navigate(routes.accountsType())}
+            onClick={() => navigate(routes.newAccount())}
             isLoading={isAdding}
           >
             <AddIcon />

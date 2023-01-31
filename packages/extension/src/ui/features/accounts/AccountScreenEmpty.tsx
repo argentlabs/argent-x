@@ -39,7 +39,7 @@ export const AccountScreenEmpty: FC = () => {
       >
         <EmptyButton
           leftIcon={<AddIcon />}
-          onClick={() => navigate(routes.accountsType())}
+          onClick={() => navigate(routes.newAccount())}
         >
           Create account
         </EmptyButton>
