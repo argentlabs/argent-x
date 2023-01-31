@@ -10,6 +10,7 @@
     "import-sort-style-module": "^6.0.0",
     "lerna": "^6.0.0",
     "lint-staged": ">=10",
+    "nx": "^15.6.3",
     "patch-package": "^6.4.7",
     "prettier": ">=2",
     "prettier-plugin-import-sort": "^0.0.7",
