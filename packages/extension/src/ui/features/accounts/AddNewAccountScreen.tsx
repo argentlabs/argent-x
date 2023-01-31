@@ -38,7 +38,7 @@ const accountTypes: AccountType[] = [
     title: "Multisig Account",
     subtitle: "For multiple owners",
     icon: <MultisigIcon />,
-    enabled: booleanifyEnv("FEATURE_MULTISIG", false),
+    enabled: booleanifyEnv(process.env.FEATURE_MULTISIG, false),
   },
 
   //   {

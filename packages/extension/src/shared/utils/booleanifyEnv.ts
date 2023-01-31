@@ -1,7 +1,6 @@
-export const booleanifyEnv = (name: string, defaultValue = false): boolean => {
-  const value = process.env[name]
-  if (value === undefined) {
-    return defaultValue
-  }
-  return value === "true"
+export const booleanifyEnv = (
+  envVar?: string,
+  defaultValue = false,
+): boolean => {
+  return envVar === "undefined" ? defaultValue : envVar === "true"
 }
