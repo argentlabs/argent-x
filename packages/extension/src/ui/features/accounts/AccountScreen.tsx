@@ -23,10 +23,10 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
-  const { addAccount, isDeploying } = useAddAccount()
+  const { isAdding } = useAddAccount()
 
   const hasAcccount = !!account
-  const showEmpty = !hasAcccount || (hasAcccount && isDeploying)
+  const showEmpty = !hasAcccount || (hasAcccount && isAdding)
 
   const multicall = account && getMulticallForNetwork(account?.network)
 
@@ -41,9 +41,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   let body: ReactNode
   let scrollKey = "accounts/AccountScreen"
   if (showEmpty) {
-    return (
-      <AccountScreenEmpty onAddAccount={addAccount} isDeploying={isDeploying} />
-    )
+    return <AccountScreenEmpty />
   } else if (shouldShowFullScreenStatusMessage) {
     return <StatusMessageFullScreenContainer />
   } else if (tab === "tokens") {

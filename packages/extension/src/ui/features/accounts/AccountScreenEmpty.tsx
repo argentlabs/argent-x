@@ -1,7 +1,9 @@
 import { Empty, EmptyButton, icons } from "@argent/ui"
 import { partition } from "lodash-es"
 import { FC, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
+import { routes } from "../../routes"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { AccountNavigationBar } from "./AccountNavigationBar"
 import { isHiddenAccount, useAccounts } from "./accounts.state"
@@ -10,16 +12,9 @@ import { autoSelectAccountOnNetwork } from "./switchAccount"
 
 const { WalletIcon, AddIcon } = icons
 
-export interface AccountScreenEmptyProps {
-  onAddAccount: () => void
-  isDeploying?: boolean
-}
-
-export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
-  onAddAccount,
-  isDeploying,
-}) => {
+export const AccountScreenEmpty: FC = () => {
   const currentNetwork = useCurrentNetwork()
+  const navigate = useNavigate()
   const allAccounts = useAccounts({ showHidden: true })
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
@@ -44,10 +39,7 @@ export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
       >
         <EmptyButton
           leftIcon={<AddIcon />}
-          onClick={onAddAccount}
-          isLoading={isDeploying}
-          isDisabled={isDeploying}
-          loadingText={"Creating"}
+          onClick={() => navigate(routes.newAccount())}
         >
           Create account
         </EmptyButton>
