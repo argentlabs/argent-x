@@ -8,7 +8,7 @@
     "bundlewatch": "^0.3.3",
     "husky": "^8.0.0",
     "import-sort-style-module": "^6.0.0",
-    "lerna": "^6.0.0",
+    "lerna": "^6.4.1",
     "lint-staged": ">=10",
     "nx": "^15.6.3",
     "patch-package": "^6.4.7",

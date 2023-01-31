@@ -4,14 +4,8 @@
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": [
-          "dev",
-          "build",
-          "lint",
-          "test",
-          "test:e2e",
-          "storybook"
-        ]
+        "cacheableOperations": ["build", "lint", "test", "test:e2e"],
+        "parallel": 5
       }
     }
   }
