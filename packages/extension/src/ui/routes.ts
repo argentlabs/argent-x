@@ -108,7 +108,6 @@ export const routes = {
   ),
   accounts: routeWithReturnTo("/accounts"),
   newAccount: route("/account/new"),
-  newMultisig: route("/account/new/multisig"),
   editAccount: route(
     (accountAddress, returnTo?: string) =>
       returnTo
@@ -210,6 +209,7 @@ export const routes = {
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
 
+  multisigNew: route("/account/new/multisig"),
   multisigSetup: route("/multisig/setup"),
   multisigCreate: route("/multisig/create"),
   multisigJoin: route("/multisig/join"),

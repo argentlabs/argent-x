@@ -17,6 +17,7 @@ import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { AddNewAccountScreen } from "./features/accounts/AddNewAccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
+import { JoinMultisigScreen } from "./features/accounts/multisig/JoinMultisigScreen"
 import { NewMultisigScreen } from "./features/accounts/multisig/NewMultisigScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
@@ -369,7 +370,8 @@ const walletRoutes = (
     />
 
     {/* Multisig */}
-    <Route path={routes.newMultisig.path} element={<NewMultisigScreen />} />
+    <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
+    <Route path={routes.multisigJoin.path} element={<JoinMultisigScreen />} />
   </>
 )
 

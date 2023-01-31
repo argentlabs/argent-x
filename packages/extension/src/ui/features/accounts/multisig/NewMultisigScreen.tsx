@@ -70,7 +70,8 @@ export const NewMultisigScreen: FC = () => {
           p={3}
           gap={4}
           alignItems="center"
-          border="1px solid rgba(255, 255, 255, 0.3)"
+          border="1px solid"
+          borderColor="white30"
           mb={1}
         >
           <MultisigDiagram />
