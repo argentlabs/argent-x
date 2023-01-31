@@ -9,7 +9,7 @@ const text = {
     fullAccountAddress: "Full account address",
     back: "Back",
     close: "Close",
-    showAccoutList: "Show account list",
+    showAccountList: "Show account list",
     send: "Send",
     next: "Next",
     confirm: "Confirm",
@@ -67,11 +67,17 @@ export default class Account {
   }
 
   get accountList() {
-    return this.page.locator(`[aria-label="${text[this.lang].showAccoutList}"]`)
+    return this.page.locator(
+      `[aria-label="${text[this.lang].showAccountList}"]`,
+    )
   }
 
   get addANewccountFromAccountList() {
     return this.page.locator('[aria-label="Create new wallet"]')
+  }
+
+  get addStandardAccountFromNewAccountScreen() {
+    return this.page.locator('[aria-label="Standard Account"]')
   }
 
   get assetsList() {
@@ -113,6 +119,7 @@ export default class Account {
       await this.accountList.click()
       await this.addANewccountFromAccountList.click()
     }
+    await this.addStandardAccountFromNewAccountScreen.click()
     await this.addFunds.click()
     await this.addFundsFromStartNet.click()
     const accountAddress = await this.accountAddress

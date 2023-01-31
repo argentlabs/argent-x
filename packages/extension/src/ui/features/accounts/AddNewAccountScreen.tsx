@@ -11,7 +11,7 @@ import { useAddAccount } from "./useAddAccount"
 
 const { WalletIcon, MultisigIcon } = icons
 
-enum AccountTypeId {
+export enum AccountTypeId {
   STANDARD,
   MULTISIG,
   // LEDGER,
@@ -94,9 +94,11 @@ export const AddNewAccountScreen: FC = () => {
       title="Add a new account"
     >
       <Flex p={4} gap={2} direction="column">
-        {accountTypes.map((accountType, index) => (
+        {accountTypes.map((accountType) => (
           <CustomButtonCell
-            key={index}
+            key={`account-type-${accountType.id}`}
+            aria-label={accountType.title}
+            aria-describedby={accountType.subtitle}
             p={4}
             alignItems="center"
             justifyContent="space-between"
