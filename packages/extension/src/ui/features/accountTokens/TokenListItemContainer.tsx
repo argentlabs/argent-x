@@ -30,8 +30,6 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
           true /** using Suspense, causes error to be returned as `balance` instead of throwing */,
       },
       {
-        suspense:
-          true /** Suspense allows us to show an initial loader for all tokens */,
         refreshInterval: 60 * 1000 /** 60 seconds */,
       },
     )
