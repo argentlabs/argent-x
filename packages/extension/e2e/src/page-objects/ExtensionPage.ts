@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test"
 
 import Messages from "../utils/Messages"
 import Account from "./Account"
+import Activity from "./Activity"
 import Network from "./Network"
 import Wallet from "./Wallet"
 
@@ -11,6 +12,7 @@ export default class ExtensionPage {
   network: Network
   account: Account
   messages: Messages
+  activity: Activity
   constructor(page: Page, private extensionUrl: string) {
     this.page = page
     this.wallet = new Wallet(page)
@@ -18,6 +20,7 @@ export default class ExtensionPage {
     this.account = new Account(page)
     this.extensionUrl = extensionUrl
     this.messages = new Messages(page)
+    this.activity = new Activity(page)
   }
 
   get settings() {
@@ -40,6 +43,17 @@ export default class ExtensionPage {
     await this.page.goto(this.extensionUrl)
   }
 
+  get activityTab() {
+    return this.page.locator('[aria-label="Activity"]')
+  }
+
+  get pendingTransationsIndicator() {
+    return this.page.locator('[aria-label="Pending transactions"]')
+  }
+
+  get tokens() {
+    return this.page.locator('[aria-label="Tokens"]')
+  }
   async resetExtension() {
     await this.settings.click()
     await this.lockWallet.click()
