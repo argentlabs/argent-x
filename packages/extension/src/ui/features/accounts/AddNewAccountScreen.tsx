@@ -62,7 +62,7 @@ export const AddNewAccountScreen: FC = () => {
           return await addAccount()
 
         case AccountTypeId.MULTISIG:
-          return navigate(routes.multisigSetup())
+          return navigate(routes.newMultisig())
 
         // case AccountTypeId.LEDGER:
         // navigate(routes.ledgerEntry())

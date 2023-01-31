@@ -108,6 +108,7 @@ export const routes = {
   ),
   accounts: routeWithReturnTo("/accounts"),
   newAccount: route("/account/new"),
+  newMultisig: route("/account/new/multisig"),
   editAccount: route(
     (accountAddress, returnTo?: string) =>
       returnTo
