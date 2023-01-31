@@ -23,8 +23,6 @@ interface AccountType {
   subtitle?: string
   icon: React.ReactNode
   enabled?: boolean
-  route?: string
-  onClick?: () => void
 }
 
 const accountTypes: AccountType[] = [
@@ -76,8 +74,8 @@ export const AddNewAccountScreen: FC = () => {
   )
 
   const isButtonLoading = useCallback(
-    (accountType: AccountType) => {
-      if (accountType.id === AccountTypeId.STANDARD && isAdding) {
+    (id: AccountType["id"]) => {
+      if (id === AccountTypeId.STANDARD && isAdding) {
         return true
       }
 
@@ -94,43 +92,46 @@ export const AddNewAccountScreen: FC = () => {
       title="Add a new account"
     >
       <Flex p={4} gap={2} direction="column">
-        {accountTypes.map((accountType) => (
-          <CustomButtonCell
-            key={`account-type-${accountType.id}`}
-            aria-label={accountType.title}
-            aria-describedby={accountType.subtitle}
-            p={4}
-            alignItems="center"
-            justifyContent="space-between"
-            gap={3}
-            onClick={() => onAccountTypeClick(accountType.id)}
-            _hover={{
-              backgroundColor: "neutrals.700",
-              "& > .account-type-avatar": {
-                backgroundColor: "neutrals.600",
-              },
-            }}
-          >
-            <Flex gap={3} alignItems="center" justify="start">
-              <Center
-                borderRadius="full"
-                width={12}
-                height={12}
-                backgroundColor="neutrals.700"
-                className="account-type-avatar"
+        {accountTypes.map(
+          ({ icon, id, enabled, title, subtitle }) =>
+            enabled && (
+              <CustomButtonCell
+                key={`account-type-${id}`}
+                aria-label={title}
+                aria-describedby={subtitle}
+                p={4}
+                alignItems="center"
+                justifyContent="space-between"
+                gap={3}
+                onClick={() => onAccountTypeClick(id)}
+                _hover={{
+                  backgroundColor: "neutrals.700",
+                  "& > .account-type-avatar": {
+                    backgroundColor: "neutrals.600",
+                  },
+                }}
               >
-                {accountType.icon}
-              </Center>
-              <Flex direction="column" flex={0.5}>
-                <H6>{accountType.title}</H6>
-                <P4 fontWeight="bold" color="neutrals.300">
-                  {accountType.subtitle}
-                </P4>
-              </Flex>
-            </Flex>
-            {isButtonLoading(accountType) && <Spinner w={4} h={4} />}
-          </CustomButtonCell>
-        ))}
+                <Flex gap={3} alignItems="center" justify="start">
+                  <Center
+                    borderRadius="full"
+                    width={12}
+                    height={12}
+                    backgroundColor="neutrals.700"
+                    className="account-type-avatar"
+                  >
+                    {icon}
+                  </Center>
+                  <Flex direction="column" flex={0.5}>
+                    <H6>{title}</H6>
+                    <P4 fontWeight="bold" color="neutrals.300">
+                      {subtitle}
+                    </P4>
+                  </Flex>
+                </Flex>
+                {isButtonLoading(id) && <Spinner w={4} h={4} />}
+              </CustomButtonCell>
+            ),
+        )}
       </Flex>
     </NavigationContainer>
   )
