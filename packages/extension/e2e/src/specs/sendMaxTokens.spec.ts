@@ -24,6 +24,13 @@ test.describe("Send max tokens", () => {
       tokenName: "Ethereum",
       ammount: "MAX",
     })
+    //check activity
+    await extension.pendingTransationsIndicator.click()
+    await extension.activity.ensurePendingTransactions(1)
+    await extension.tokens.click()
+    await expect(extension.pendingTransationsIndicator).not.toBeVisible({
+      timeout: 90000,
+    })
 
     await extension.account.token("Ethereum").click()
     await expect(extension.account.balance).toContainText("0.00")

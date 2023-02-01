@@ -92,7 +92,6 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
   })
 
   let page = browserContext.pages()[0]
-  await page.emulateMedia({ reducedMotion: "reduce" })
 
   await page.bringToFront()
   await page.goto("chrome://inspect/#extensions")
@@ -114,6 +113,8 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
   if (!page) {
     page = pages[0]
   }
+
+  await page.emulateMedia({ reducedMotion: "reduce" })
 
   return { browserContext, extensionURL, page }
 }
