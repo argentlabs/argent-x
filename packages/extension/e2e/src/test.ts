@@ -3,6 +3,7 @@ import path from "path"
 
 import {
   ChromiumBrowserContext,
+  Page,
   TestInfo,
   chromium,
   test as testBase,
@@ -24,10 +25,40 @@ const closePages = async (browserContext: ChromiumBrowserContext) => {
   }
 }
 
+const keepArtifacts = async (testInfo: TestInfo, page: Page) => {
+  if (
+    testInfo.config.preserveOutput === "always" ||
+    (testInfo.config.preserveOutput === "failures-only" &&
+      testInfo.status === "failed") ||
+    testInfo.status === "timedOut"
+  ) {
+    //save HTML
+    const folder = testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")
+    const filename = `${testInfo.retry}-${testInfo.status}-${pageId}-${testInfo.workerIndex}.html`
+    try {
+      const htmlContent = await page.content()
+      await fs.promises
+        .mkdir(path.resolve(config.artifactsDir, folder), { recursive: true })
+        .catch(() => {
+          null
+        })
+      await fs.promises
+        .writeFile(
+          path.resolve(config.artifactsDir, folder, filename),
+          htmlContent,
+        )
+        .catch((error) => {
+          console.error(error)
+        })
+    } catch (error) {
+      console.error("Error while saving HTML content", error)
+    }
+  }
+}
 const initBrowserWithExtension = async (testInfo: TestInfo) => {
-  const userDataDir = `/tmp/test-user-data-${Math.random()}-${
-    testInfo.workerIndex
-  }`
+  const userDataDir = `/tmp/test-user-data-${Math.round(
+    new Date().getTime() / 1000,
+  )}-${(Math.random() + 1).toString(36).substring(7)}-${testInfo.workerIndex}`
   const browserContext = (await chromium.launchPersistentContext(userDataDir, {
     headless: false,
     args: [
@@ -119,45 +150,21 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
   return { browserContext, extensionURL, page }
 }
 
-let pageId = 0
-const test = testBase.extend<TestExtensions>({
-  extension: async ({}, use, testInfo: TestInfo) => {
+function createExtension() {
+  return async ({}, use: any, testInfo: TestInfo) => {
     const { browserContext, page, extensionURL } =
       await initBrowserWithExtension(testInfo)
     const extension = new ExtensionPage(page, extensionURL)
-
+    await keepArtifacts(testInfo, page)
     await closePages(browserContext)
     await use(extension)
-    if (
-      testInfo.config.preserveOutput === "always" ||
-      (testInfo.config.preserveOutput === "failures-only" &&
-        testInfo.status === "failed") ||
-      testInfo.status === "timedOut"
-    ) {
-      //save HTML
-      const folder = testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")
-      const filename = `${testInfo.retry}-${testInfo.status}-${pageId}-${testInfo.workerIndex}.html`
-      try {
-        const htmlContent = await page.content()
-        await fs.promises
-          .mkdir(path.resolve(config.artifactsDir, folder), { recursive: true })
-          .catch(() => {
-            null
-          })
-        await fs.promises
-          .writeFile(
-            path.resolve(config.artifactsDir, folder, filename),
-            htmlContent,
-          )
-          .catch((error) => {
-            console.error(error)
-          })
-      } catch (error) {
-        console.error("Error while saving HTML content", error)
-      }
-    }
     await browserContext.close()
-  },
+  }
+}
+let pageId = 0
+const test = testBase.extend<TestExtensions>({
+  extension: createExtension(),
+  secondExtension: createExtension(),
 })
 
 export default test

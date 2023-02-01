@@ -10,7 +10,13 @@ export default class Network {
     return this.page.locator(`button[role="menuitem"]:has-text("${name}")`)
   }
 
-  async selectNetwork(name: string) {
+  async selectNetwork(
+    name:
+      | "Localhost 5050"
+      | "Testnet"
+      | "Testnet2"
+      | "Mainnet" = "Localhost 5050",
+  ) {
     await this.networkSelector.click()
     await this.networkOption(name).click()
   }

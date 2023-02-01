@@ -112,6 +112,10 @@ export default class Account {
     return this.page.locator('[data-testid="tokenBalance"]')
   }
 
+  currentBalance(tkn: "Ether") {
+    return this.page.locator(`//img[@alt="${tkn}"]/parent::*/parent::button`)
+  }
+
   async addAccount({ firstAccount = true }: { firstAccount?: boolean }) {
     if (firstAccount) {
       await this.createAccount.click()
@@ -164,6 +168,17 @@ export default class Account {
     ).toBeVisible()
   }
 
+  async getTotalFeeValue() {
+    const fee = await this.page
+      .locator('[aria-label="Show Fee Estimate details"] p')
+      .first()
+      .textContent()
+    if (!fee) {
+      throw new Error("Error! Fee not available")
+    }
+
+    return parseFloat(fee.split(" ")[0])
+  }
   async transfer({
     originAccountName,
     recepientAddress,
