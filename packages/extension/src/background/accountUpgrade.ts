@@ -33,9 +33,7 @@ export const upgradeAccount = async ({
   }
 
   const implementationClassHash =
-    accountType === "argent-plugin" && newImplementation.argentPluginAccount
-      ? newImplementation.argentPluginAccount
-      : newImplementation.argentAccount
+    newImplementation[accountType] ?? newImplementation["argent"]
 
   const calldata = stark.compileCalldata({
     implementation: implementationClassHash,

@@ -1,11 +1,18 @@
 import {
   ArgentAccountType,
   BaseWalletAccount,
+  CreateAccountType,
   WalletAccount,
 } from "../wallet.model"
 
 export type AccountMessage =
-  | { type: "NEW_ACCOUNT"; data: string }
+  | {
+      type: "NEW_ACCOUNT"
+      data: {
+        networkId: string
+        type?: CreateAccountType
+      }
+    }
   | {
       type: "NEW_ACCOUNT_RES"
       data: {
@@ -63,6 +70,13 @@ export type AccountMessage =
   | {
       type: "GET_ENCRYPTED_PRIVATE_KEY_RES"
       data: { encryptedPrivateKey: string }
+    }
+  | {
+      type: "GET_PUBLIC_KEY"
+    }
+  | {
+      type: "GET_PUBLIC_KEY_RES"
+      data: { publicKey: string }
     }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE"

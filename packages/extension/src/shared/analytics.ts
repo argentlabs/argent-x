@@ -4,6 +4,8 @@ import browser from "webextension-polyfill"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
+import { CreateAccountType } from "./wallet.model"
+
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
@@ -47,11 +49,13 @@ export interface Events {
     | {
         status: "success"
         networkId: string
+        type: CreateAccountType
       }
     | {
         status: "failure"
         errorMessage: string
         networkId: string
+        type: CreateAccountType
       }
   deployAccount:
     | {

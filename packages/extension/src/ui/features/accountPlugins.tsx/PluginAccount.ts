@@ -8,7 +8,7 @@ export class PluginAccount extends ArgentXAccount {
   constructor(account: ArgentXAccount) {
     super({
       ...account,
-      type: "argent-plugin",
+      type: "plugin",
       contract: new Contract(
         ArgentPluginCompiledContractAbi as Abi,
         account.address,

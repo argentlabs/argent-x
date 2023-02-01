@@ -1,12 +1,34 @@
-import { AbsoluteBox, H5, NavigationContainer, P3 } from "@argent/ui"
-import { Box, Button, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/ui"
+import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
+import { utils } from "ethers"
+import { FC, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../../routes"
+import { recover } from "../../recovery/recovery.service"
+import { usePublicKey } from "../usePublicKey"
+
+const { CopyIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
+  const pubKey = usePublicKey()
+  const { onCopy, setValue, hasCopied } = useClipboard("", 2000)
+
+  const encodedPubKey = useMemo(
+    () => pubKey && utils.base58.encode(pubKey),
+    [pubKey],
+  )
+
+  useEffect(() => {
+    if (encodedPubKey) {
+      setValue(encodedPubKey)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [encodedPubKey])
+
+  const onDone = async () => {
+    navigate(await recover({ showAccountList: true }))
+  }
 
   return (
     <NavigationContainer title="Join existing multisig">
@@ -29,18 +51,25 @@ export const JoinMultisigScreen: FC = () => {
           boxSizing="border-box"
           w="full"
         >
-          <P3 fontWeight="bold" color="white50">
-            Whh3pvMGvDTvpJWCymNpcYQ8tf7nkWF4efDwr7jQ9ie
-          </P3>
+          {pubKey ? (
+            <P3 fontWeight="bold" color="white50">
+              {encodedPubKey}
+            </P3>
+          ) : (
+            <Spinner w={6} h={6} />
+          )}
         </Box>
+
+        {encodedPubKey && (
+          <Button onClick={onCopy} variant="link" gap={1}>
+            <CopyIcon />
+            <B3 color="neutrals.400">{hasCopied ? "Copied" : "Copy"}</B3>
+          </Button>
+        )}
       </Flex>
 
       <Box position="absolute" w="full" bottom={6} px={4}>
-        <Button
-          bg="primary.500"
-          w="full"
-          onClick={() => navigate(routes.accounts())}
-        >
+        <Button bg="primary.500" w="full" onClick={onDone}>
           Done
         </Button>
       </Box>

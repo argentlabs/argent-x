@@ -136,7 +136,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 <ShieldIcon />
               </H6>
             )}
-            {accountType === "argent-plugin" && (
+            {accountType === "plugin" && (
               <L2
                 backgroundColor={"neutrals.900"}
                 px={1}

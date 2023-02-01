@@ -119,8 +119,8 @@ export const DeprecatedAccountMenu: FC<AccountNameProps> = ({
   const canUpgradeToPluginAccount =
     experimentalPluginAccount &&
     account &&
-    currentNetwork.accountClassHash?.argentPluginAccount &&
-    account.type !== "argent-plugin"
+    currentNetwork.accountClassHash?.plugin &&
+    account.type !== "plugin"
 
   return (
     <MenuContainer ref={ref}>
@@ -163,7 +163,7 @@ export const DeprecatedAccountMenu: FC<AccountNameProps> = ({
             <>
               <Separator />
               <MenuItemWrapper
-                onClick={() => upgradeAccount(account, "argent-plugin")}
+                onClick={() => upgradeAccount(account, "plugin")}
               >
                 <MenuItem>
                   <IconWrapper>

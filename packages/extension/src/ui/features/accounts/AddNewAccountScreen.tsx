@@ -59,7 +59,7 @@ export const AddNewAccountScreen: FC = () => {
     async (accountTypeId: AccountTypeId) => {
       switch (accountTypeId) {
         case AccountTypeId.STANDARD:
-          return await addAccount()
+          return await addAccount("argent") // default
 
         case AccountTypeId.MULTISIG:
           return navigate(routes.multisigNew())

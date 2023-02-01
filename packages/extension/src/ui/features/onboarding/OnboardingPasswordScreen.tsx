@@ -66,7 +66,10 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
         setIsDeploying(true)
         setDeployFailed(false)
         try {
-          const newAccount = await createAccount(switcherNetworkId, password)
+          const newAccount = await createAccount({
+            networkId: switcherNetworkId,
+            password,
+          })
           selectAccount(newAccount)
           analytics.track("createWallet", {
             status: "success",

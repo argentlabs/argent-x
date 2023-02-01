@@ -81,8 +81,8 @@ export const AccountEditScreen: FC = () => {
   const canUpgradeToPluginAccount =
     experimentalPluginAccount &&
     account &&
-    currentNetwork.accountClassHash?.argentPluginAccount &&
-    account.type !== "argent-plugin"
+    currentNetwork.accountClassHash?.plugin &&
+    account.type !== "plugin"
 
   const onChangeName = useCallback((name: string) => {
     setLiveEditingAccountName(name)
@@ -182,7 +182,7 @@ export const AccountEditScreen: FC = () => {
           </ButtonCell>
           {canUpgradeToPluginAccount && (
             <ButtonCell
-              onClick={() => upgradeAccount(account, "argent-plugin")}
+              onClick={() => upgradeAccount(account, "plugin")}
               icon={<PluginIcon />}
             >
               Use Plugins

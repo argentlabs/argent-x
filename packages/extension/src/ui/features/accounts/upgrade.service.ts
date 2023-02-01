@@ -140,8 +140,6 @@ export async function partitionDeprecatedAccount(
 
     const implementations = response.flat()
 
-    const { argentAccount, argentPluginAccount } = network.accountClassHash
-
     const implementationsToAccountsMap = accounts.reduce<
       Record<string, string | undefined>
     >((acc, account, i) => {
@@ -152,8 +150,7 @@ export async function partitionDeprecatedAccount(
         }
       }
 
-      const currentImpl =
-        account.type === "argent" ? argentAccount : argentPluginAccount
+      const currentImpl = network.accountClassHash?.[account.type]
 
       return {
         ...acc,

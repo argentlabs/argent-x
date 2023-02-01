@@ -40,15 +40,16 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         throw Error("you need an open session")
       }
 
-      const network = msg.data
+      const { networkId, type } = msg.data
       try {
-        const account = await wallet.newAccount(network)
+        const account = await wallet.newAccount(networkId, type)
 
         tryToMintFeeToken(account)
 
         analytics.track("createAccount", {
           status: "success",
-          networkId: network,
+          networkId,
+          type: type || "argent",
         })
 
         const accounts = await getAccounts()
@@ -65,7 +66,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
         analytics.track("createAccount", {
           status: "failure",
-          networkId: network,
+          networkId: networkId,
+          type: type || "argent",
           errorMessage: error,
         })
 
@@ -148,7 +150,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
 
       const encryptedPrivateKey = await encryptForUi(
-        await wallet.exportPrivateKey(),
+        await wallet.getPrivateKey(),
         msg.data.encryptedSecret,
         privateKey,
       )
@@ -156,6 +158,15 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       return sendMessageToUi({
         type: "GET_ENCRYPTED_PRIVATE_KEY_RES",
         data: { encryptedPrivateKey },
+      })
+    }
+
+    case "GET_PUBLIC_KEY": {
+      const publicKey = await wallet.getPublicKey()
+
+      return sendMessageToUi({
+        type: "GET_PUBLIC_KEY_RES",
+        data: { publicKey },
       })
     }
 

@@ -2,13 +2,23 @@ import { sendMessage, waitForMessage } from "../../shared/messages"
 import {
   ArgentAccountType,
   BaseWalletAccount,
+  CreateAccountType,
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
-export const createNewAccount = async (networkId: string) => {
-  sendMessage({ type: "NEW_ACCOUNT", data: networkId })
+export const createNewAccount = async (
+  networkId: string,
+  type?: CreateAccountType,
+) => {
+  sendMessage({
+    type: "NEW_ACCOUNT",
+    data: {
+      networkId,
+      type,
+    },
+  })
   try {
     return await Promise.race([
       waitForMessage("NEW_ACCOUNT_RES"),
@@ -130,6 +140,16 @@ export const getPrivateKey = async () => {
   )
 
   return await decryptFromBackground(encryptedPrivateKey, secret)
+}
+
+export const getPublicKey = async () => {
+  sendMessage({
+    type: "GET_PUBLIC_KEY",
+  })
+
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
 }
 
 export const getSeedPhrase = async (): Promise<string> => {

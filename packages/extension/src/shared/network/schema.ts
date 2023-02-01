@@ -24,11 +24,11 @@ export const networkSchema: Schema<Network> = object()
       .matches(REGEX_URL_WITH_LOCAL, "${path} must be a valid URL"),
     accountImplementation: string().optional().matches(REGEX_HEXSTRING),
     accountClassHash: object({
-      argentAccount: string()
+      argent: string()
         .label("Account class hash")
         .required()
         .matches(REGEX_HEXSTRING),
-      argentPluginAccount: string()
+      plugin: string()
         .label("Plugin account class hash")
         .optional()
         .matches(REGEX_HEXSTRING),

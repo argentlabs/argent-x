@@ -1,6 +1,8 @@
 import { Network } from "./network"
 
-export type ArgentAccountType = "argent" | "argent-plugin"
+export type ArgentAccountType = "argent" | "plugin" | "multisig"
+
+export type CreateAccountType = Exclude<ArgentAccountType, "plugin"> // Should not be able to create plugin accounts
 export interface WalletAccountSigner {
   type: "local_secret"
   derivationPath: string

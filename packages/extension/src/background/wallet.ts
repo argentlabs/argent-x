@@ -15,7 +15,7 @@ import {
 import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
-import { ArgentAccountType } from "./../shared/wallet.model"
+import { ArgentAccountType, CreateAccountType } from "./../shared/wallet.model"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
 import {
@@ -200,14 +200,10 @@ export class Wallet {
     network: Network,
     accountType: ArgentAccountType,
   ): Promise<string> {
-    if (network.accountClassHash) {
-      if (
-        accountType === "argent-plugin" &&
-        network.accountClassHash.argentPluginAccount
-      ) {
-        return network.accountClassHash.argentPluginAccount
-      }
-      return network.accountClassHash.argentAccount
+    const classHash = network.accountClassHash?.[accountType]
+
+    if (classHash) {
+      return classHash
     }
 
     const deployerAccount = await getPreDeployedAccount(network)
@@ -235,8 +231,8 @@ export class Wallet {
 
     const accountClassHashes = union(
       ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash?.argentAccount
-        ? [network.accountClassHash.argentAccount]
+      network?.accountClassHash?.argent
+        ? [network.accountClassHash.argent]
         : [],
     )
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
@@ -397,7 +393,10 @@ export class Wallet {
     await this.walletStore.push(accounts)
   }
 
-  public async newAccount(networkId: string): Promise<WalletAccount> {
+  public async newAccount(
+    networkId: string,
+    type: CreateAccountType = "argent", // Should not be able to create plugin accounts. Default to argent account
+  ): Promise<WalletAccount> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session) {
       throw Error("no open session")
@@ -439,7 +438,7 @@ export class Wallet {
         type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
-      type: "argent",
+      type,
       needsDeploy: true,
     }
 
@@ -783,7 +782,7 @@ export class Wallet {
     return { url, filename }
   }
 
-  public async exportPrivateKey(): Promise<string> {
+  public async getPrivateKey(): Promise<string> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session?.secret) {
       throw new Error("Session is not open")
@@ -800,6 +799,26 @@ export class Wallet {
     )
 
     return starkPair.getPrivate().toString()
+  }
+
+  public async getPublicKey(): Promise<string> {
+    const account = await this.getSelectedAccount()
+
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+    console.log(
+      "🚀 ~ file: wallet.ts:814 ~ Wallet ~ getPublicKey ~ starkPair",
+      starkPair,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    return starkPub
   }
 
   public static validateBackup(backupString: string): boolean {

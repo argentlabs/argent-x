@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom"
 import { CustomButtonCell } from "../../../components/CustomButtonCell"
 import { routes } from "../../../routes"
 import { assertNever } from "../../../services/assertNever"
+import { useAddAccount } from "../useAddAccount"
 
 const { AddIcon, MultisigJoinIcon } = icons
 const { MultisigDiagram } = logos
@@ -42,21 +43,26 @@ const multisigOptions: MultisigOption[] = [
 
 export const NewMultisigScreen: FC = () => {
   const navigate = useNavigate()
+  const { addAccount } = useAddAccount()
 
   const onClick = useCallback(
-    (type: MultisigOptionType) => {
+    async (type: MultisigOptionType) => {
       switch (type) {
         case "create":
           navigate(routes.multisigCreate())
           break
-        case "join":
+        case "join": {
+          const newAccount = await addAccount("multisig", true)
+          console.log("newAccount", newAccount)
           navigate(routes.multisigJoin())
           break
+        }
+
         default:
           assertNever(type)
       }
     },
-    [navigate],
+    [navigate, addAccount],
   )
 
   return (

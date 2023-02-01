@@ -40,7 +40,7 @@ export const MigrationDisclaimerScreen: FC = () => {
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: true })
     try {
-      const newAccount = await createAccount(switcherNetworkId)
+      const newAccount = await createAccount({ networkId: switcherNetworkId })
       selectAccount(newAccount)
       navigate(await recover())
     } catch (error: any) {
