@@ -11,7 +11,7 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 
-const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon } = icons
+const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon, ShieldIcon } = icons
 
 export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -156,7 +156,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 <ShieldIcon />
               </H6>
             )}
-            {accountType === "argent-plugin" && (
+            {accountType !== "argent" && (
               <L2
                 backgroundColor={"neutrals.900"}
                 px={1}
