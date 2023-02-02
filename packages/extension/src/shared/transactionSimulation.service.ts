@@ -48,7 +48,7 @@ export interface TokenDetails {
   name: string
   tokenURI: string | null
   tokenType: "erc20" | "erc721" | "erc1155"
-  usdValue: string
+  usdValue: string | null
 }
 
 export interface TransactionSimulationApproval {

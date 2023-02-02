@@ -286,6 +286,7 @@ export const handleTransactionMessage: HandleMessage<
             signature,
             nonce,
             version,
+            chainId,
           },
         })
       } catch (error) {

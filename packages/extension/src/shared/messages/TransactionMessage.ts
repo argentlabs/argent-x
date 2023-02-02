@@ -4,6 +4,7 @@ import type {
   InvocationsDetails,
   Sequencer,
   UniversalDeployerContractPayload,
+  constants,
 } from "starknet"
 
 import { Transaction } from "../transactions"
@@ -79,7 +80,9 @@ export type TransactionMessage =
     }
   | {
       type: "SIMULATE_TRANSACTION_RES"
-      data: Sequencer.SimulateTransaction
+      data: Sequencer.SimulateTransaction & {
+        chainId: constants.StarknetChainId
+      }
     }
   | {
       type: "SIMULATE_TRANSACTION_REJ"

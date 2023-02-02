@@ -23,6 +23,7 @@ import {
   formatTruncatedAddress,
   normalizeAddress,
 } from "../../../services/addresses"
+import { useIsMainnet } from "../../networks/useNetworks"
 import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
@@ -40,6 +41,8 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
     () => aggregatedData.every((t) => t.safe),
     [aggregatedData],
   )
+
+  const isMainnet = useIsMainnet()
 
   return (
     <Box borderRadius="xl">
@@ -132,9 +135,11 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               showPlusSign: true,
                             })}
                           </P4>
-                          <L2 color="neutrals.300">
-                            {prettifyCurrencyValue(Math.abs(usdValue))}
-                          </L2>
+                          {isMainnet && usdValue && (
+                            <L2 color="neutrals.300">
+                              {prettifyCurrencyValue(Math.abs(usdValue))}
+                            </L2>
+                          )}
                         </Flex>
                       </AccordionButton>
                     </h2>

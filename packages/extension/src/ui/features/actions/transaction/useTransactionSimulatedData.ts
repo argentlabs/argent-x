@@ -17,7 +17,7 @@ import { useCurrentNetwork } from "../../networks/useNetworks"
 interface CommonSimulationData {
   token: Token
   amount: BigNumber
-  usdValue: number
+  usdValue?: number
 }
 
 interface ApprovalSimulationData extends CommonSimulationData {
@@ -28,7 +28,7 @@ interface ApprovalSimulationData extends CommonSimulationData {
 interface Recipient {
   address: string
   amount: BigNumber
-  usdValue: number
+  usdValue?: number
 }
 
 interface TransferSimulationData extends CommonSimulationData {
@@ -84,7 +84,9 @@ export const useAggregatedSimData = (
             owner: a.owner,
             spender: a.spender,
             amount: new BigNumber(a.value),
-            usdValue: parseFloat(a.details.usdValue),
+            usdValue: a.details.usdValue
+              ? parseFloat(a.details.usdValue)
+              : undefined,
           })) ?? []
 
         const amount = transfers.reduce<BigNumber>((acc, t) => {
@@ -96,6 +98,10 @@ export const useAggregatedSimData = (
         }, ZERO)
 
         const usdValue = transfers.reduce<number>((acc, t) => {
+          if (!t.details.usdValue) {
+            return acc
+          }
+
           if (t.from === account?.address) {
             return acc - parseFloat(t.details.usdValue)
           }
@@ -109,7 +115,9 @@ export const useAggregatedSimData = (
             {
               address: t.to,
               amount: new BigNumber(t.value),
-              usdValue: parseFloat(t.details.usdValue),
+              usdValue: t.details.usdValue
+                ? parseFloat(t.details.usdValue)
+                : undefined,
             },
           ]
 
