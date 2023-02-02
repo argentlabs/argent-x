@@ -15,7 +15,11 @@ import {
   typedData,
 } from "starknet"
 
-import type { Cosigner, CosignerMessage } from "./CosignerTypes"
+import type {
+  Cosigner,
+  CosignerMessage,
+  CosignerOffchainMessage,
+} from "./CosignerTypes"
 
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner
@@ -26,7 +30,7 @@ export class GuardianSigner extends Signer {
   }
 
   public async cosignMessage(
-    cosignerMessage: CosignerMessage,
+    cosignerMessage: CosignerMessage | CosignerOffchainMessage,
   ): Promise<Signature> {
     const response = await this.cosigner(cosignerMessage)
 
@@ -42,8 +46,16 @@ export class GuardianSigner extends Signer {
     typedData: typedData.TypedData,
     accountAddress: string,
   ): Promise<Signature> {
-    console.warn("TODO: implement GuardianSigner signMessage")
-    return super.signMessage(typedData, accountAddress)
+    const signatures = await super.signMessage(typedData, accountAddress)
+    const cosignerMessage: CosignerOffchainMessage = {
+      message: typedData,
+      accountAddress,
+      chain: "starknet",
+    }
+
+    const cosignerSignature = await this.cosignMessage(cosignerMessage)
+
+    return [...signatures, ...cosignerSignature]
   }
 
   public async signTransaction(

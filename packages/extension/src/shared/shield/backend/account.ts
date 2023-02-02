@@ -1,6 +1,12 @@
-import { Cosigner, CosignerMessage } from "@argent/guardian"
+import {
+  Cosigner,
+  CosignerMessage,
+  CosignerOffchainMessage,
+} from "@argent/guardian"
 import retry from "async-retry"
+import { typedData } from "starknet"
 
+import { accountAddress } from "./../../../../../storybook/src/account"
 import { ARGENT_API_BASE_URL } from "../../api/constants"
 import { isFetcherError } from "../../api/fetcher"
 import { IS_DEV } from "../../utils/dev"
@@ -227,9 +233,28 @@ export const addAccount = async (
   }
 }
 
-export const cosignerSign: Cosigner = async (message: CosignerMessage) => {
+const isOffchainMessage = (
+  message: any,
+): message is CosignerOffchainMessage => {
+  return (
+    Boolean((message as CosignerOffchainMessage).message.message) &&
+    Boolean((message as CosignerOffchainMessage).message.types) &&
+    Boolean((message as CosignerOffchainMessage).message.types.length) &&
+    (Boolean((message as CosignerOffchainMessage).message.domain.name) ||
+      Boolean((message as CosignerOffchainMessage).message.domain.version) ||
+      Boolean((message as CosignerOffchainMessage).message.domain.chainId))
+  )
+}
+
+export const cosignerSign: Cosigner = async (
+  message: CosignerMessage | CosignerOffchainMessage,
+) => {
+  const beEndpoint = isOffchainMessage(message)
+    ? "/cosigner/personalSign"
+    : `/cosigner/sign`
+
   try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
+    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}${beEndpoint}`, {
       method: "POST",
       body: JSON.stringify(message),
     })
@@ -244,3 +269,27 @@ export const cosignerSign: Cosigner = async (message: CosignerMessage) => {
     }
   }
 }
+/* 
+export const cosignerOffchainSign: Cosigner = async (
+  message: CosignerOffchainMessage,
+) => {
+  try {
+    const json = await jwtFetcher(
+      `${ARGENT_API_BASE_URL}/cosigner/personalSign`,
+      {
+        method: "POST",
+        body: JSON.stringify(message),
+      },
+    )
+    return json
+  } catch (error) {
+    if (isFetcherError(error) && error.responseJson?.status) {
+      throw new Error(
+        `Argent Shield failed to co-sign - status:${error.responseJson?.status}`,
+      )
+    } else {
+      throw new Error("Argent Shield failed to co-sign")
+    }
+  }
+}
+ */

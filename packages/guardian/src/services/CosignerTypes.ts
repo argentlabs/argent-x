@@ -1,6 +1,14 @@
+import { typedData } from "starknet"
+
 export interface CosignerMessage {
   message: any
   type: "starknet" | "starknetDeploy"
+}
+
+export interface CosignerOffchainMessage {
+  chain: string
+  accountAddress: string
+  message: typedData.TypedData
 }
 
 export interface CosignerResponse {
@@ -10,4 +18,6 @@ export interface CosignerResponse {
   }
 }
 
-export type Cosigner = (message: CosignerMessage) => Promise<CosignerResponse>
+export type Cosigner = (
+  message: CosignerMessage | CosignerOffchainMessage,
+) => Promise<CosignerResponse>
