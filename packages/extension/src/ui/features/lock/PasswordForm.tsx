@@ -39,9 +39,11 @@ export const PasswordForm: FC<PasswordFormProps> = ({
   ) => {
     e?.preventDefault()
     clearErrors("password")
-    await verifyPassword(password)
+    const isValid = await verifyPassword(password)
+    if (!isValid) {
+      setError("password", { message: "Invalid password" })
+    }
   }
-
   return (
     <form onSubmit={handleSubmit(handlePassword)}>
       <Controller

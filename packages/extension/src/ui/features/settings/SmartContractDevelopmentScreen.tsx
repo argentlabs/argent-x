@@ -11,7 +11,7 @@ import { routes } from "../../routes"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 
-const { ShieldIcon } = icons
+const { ArgentShieldIcon } = icons
 
 const SmartContractDevelopmentScreen: FC = () => {
   const account = useSelectedAccount()
@@ -24,7 +24,7 @@ const SmartContractDevelopmentScreen: FC = () => {
       />
       {hasGuardian ? (
         <Empty
-          icon={<ShieldIcon />}
+          icon={<ArgentShieldIcon />}
           title={
             "You must remove Argent Shield from this account to access this feature"
           }

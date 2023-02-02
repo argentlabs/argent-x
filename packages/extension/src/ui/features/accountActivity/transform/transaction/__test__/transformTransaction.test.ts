@@ -231,7 +231,7 @@ describe("transformTransaction", () => {
         {
           "action": "ADD",
           "date": "2022-09-01T15:47:40.000Z",
-          "displayName": "Activate Argent Shield",
+          "displayName": "Add Argent Shield",
           "entity": "GUARDIAN",
         }
       `)
@@ -243,7 +243,7 @@ describe("transformTransaction", () => {
         {
           "action": "REMOVE",
           "date": "2022-09-01T15:47:40.000Z",
-          "displayName": "Deactivate Argent Shield",
+          "displayName": "Remove Argent Shield",
           "entity": "GUARDIAN",
         }
       `)

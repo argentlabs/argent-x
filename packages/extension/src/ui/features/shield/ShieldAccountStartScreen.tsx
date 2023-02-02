@@ -1,7 +1,6 @@
 import {
   BarBackButton,
   Button,
-  CellStack,
   Empty,
   NavigationContainer,
   icons,
@@ -11,6 +10,7 @@ import { Flex } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { ARGENT_SHIELD_NETWORK_ID } from "../../../shared/shield/constants"
 import { requestEmail } from "../../../shared/shield/register"
 import {
   getVerifiedEmailIsExpired,
@@ -24,7 +24,7 @@ import { ShieldAccountNotDeployed } from "./ShieldAccountNotDeployed"
 import { useRouteAccount } from "./useRouteAccount"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
-const { ShieldIcon } = icons
+const { ArgentShieldIcon } = icons
 
 export const ShieldAccountStartScreen: FC = () => {
   const navigate = useNavigate()
@@ -41,7 +41,6 @@ export const ShieldAccountStartScreen: FC = () => {
         const verifiedEmailIsExpired = account?.guardian
           ? await getVerifiedEmailIsExpiredForRemoval()
           : await getVerifiedEmailIsExpired()
-        console.log({ verifiedEmailIsExpired })
         if (verifiedEmailIsExpired) {
           await requestEmail(verifiedEmail)
           navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
@@ -62,12 +61,12 @@ export const ShieldAccountStartScreen: FC = () => {
     }
   }, [account?.address, account?.guardian, navigate, toast, verifiedEmail])
 
-  const isAvailable = network.id === "goerli-alpha-2"
+  const isAvailable = network.id === ARGENT_SHIELD_NETWORK_ID
 
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
       {isAvailable ? (
-        <CellStack flex={1}>
+        <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
           {account?.needsDeploy ? (
             <ShieldAccountNotDeployed />
           ) : account?.guardian ? (
@@ -83,13 +82,13 @@ export const ShieldAccountStartScreen: FC = () => {
             isLoading={isLoading}
             loadingText={"Verifying email"}
           >
-            {account?.guardian ? "Deactivate" : "Activate"}
+            Next
           </Button>
-        </CellStack>
+        </Flex>
       ) : (
         <Empty
-          icon={<ShieldIcon />}
-          title={"Argent Shield is currently available only on Testnet 2"}
+          icon={<ArgentShieldIcon />}
+          title={"Argent Shield is not enabled for this network"}
         />
       )}
     </NavigationContainer>

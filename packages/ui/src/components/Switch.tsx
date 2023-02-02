@@ -9,12 +9,13 @@ const { definePartsStyle, defineMultiStyleConfig } =
 
 const baseStyle = definePartsStyle({
   track: {
-    bg: "neutrals.100",
+    bg: "neutrals.600",
     _checked: {
       bg: "primary.500",
     },
   },
 })
+
 export const switchTheme = defineMultiStyleConfig({
   baseStyle,
 })

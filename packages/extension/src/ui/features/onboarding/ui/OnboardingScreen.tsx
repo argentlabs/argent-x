@@ -74,7 +74,11 @@ export const OnboardingScreen: FC<IOnboardingScreen> = ({
     /** on window focus, check if the wallet was initialised elsewhere and redirect to finish screen */
     const onFocus = async () => {
       const { initialized } = await isInitialized()
-      if (initialized && location.pathname !== routes.onboardingFinish.path) {
+      if (
+        initialized &&
+        location.pathname !== routes.onboardingFinish.path &&
+        location.pathname !== routes.onboardingRestorePassword.path // feels very hacky this useEffect here, need to find something more sustainable
+      ) {
         navigate(routes.onboardingFinish.path, { replace: true })
       }
     }

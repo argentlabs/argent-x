@@ -68,6 +68,7 @@ import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
+import { WithArgentServicesEnabled } from "./features/settings/WithArgentServicesEnabled"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
 import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
@@ -172,7 +173,11 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.shieldAccountStart.path}
-      element={<ShieldAccountStartScreen />}
+      element={
+        <WithArgentServicesEnabled>
+          <ShieldAccountStartScreen />
+        </WithArgentServicesEnabled>
+      }
     />
     <Route
       presentation="push"
