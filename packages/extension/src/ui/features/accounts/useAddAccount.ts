@@ -19,7 +19,7 @@ export const useAddAccount = () => {
   }, [switcherNetworkId])
 
   const addAccount = useCallback(
-    async (type?: CreateAccountType, skipNavigate = true) => {
+    async (type?: CreateAccountType, skipNavigate = false) => {
       setIsAdding(true)
       setAddingFailed(false)
       try {

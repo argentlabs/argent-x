@@ -50,6 +50,8 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
+  const hasJoinedMultiSig = false // TODO: useMultiSigStatus(account)
+
   // this is unnecessary for now, as we can easily source the upgrade status from the the list item (props)
   // may be useful in the future if dont partition the list by upgrade status anymore
   //
@@ -87,6 +89,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         deploying={status.code === "DEPLOYING"}
         upgrade={needsUpgrade}
         connectedHost={isConnected ? originatingHost : undefined}
+        multisigStatus={"pending"} // TODO: hasJoinedMultiSig ? "joined" : "pending"
         pr={14}
       >
         {clickNavigateSettings && (

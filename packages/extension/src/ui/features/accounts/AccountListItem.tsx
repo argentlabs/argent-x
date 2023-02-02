@@ -10,6 +10,7 @@ import {
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { getNetworkAccountImageUrl } from "./accounts.service"
+import { MultisigStatus } from "./multisig/types"
 
 const { LinkIcon, ViewIcon, UpgradeIcon, ShieldIcon } = icons
 
@@ -25,6 +26,7 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   hidden?: boolean
   avatarOutlined?: boolean
   isShield?: boolean
+  multisigStatus?: MultisigStatus
 }
 
 interface AccountAvatarProps extends ComponentProps<"img"> {
@@ -62,7 +64,7 @@ export const AccountAvatar: FC<AccountAvatarProps> = ({
   )
 }
 
-const NetworkStatusWrapper = chakra(Flex, {
+export const NetworkStatusWrapper = chakra(Flex, {
   baseStyle: {
     alignItems: "center",
     justifyContent: "right",
@@ -103,6 +105,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   connectedHost,
   hidden,
   avatarOutlined,
+  multisigStatus,
   children,
   ...rest
 }) => {
@@ -115,7 +118,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           accountName,
           accountAddress,
           networkId,
-          backgroundColor: hidden ? "333332" : undefined,
+          backgroundColor: hidden ? "#333332" : undefined,
         })}
       >
         {avatarBadge}
@@ -154,7 +157,9 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             <P4 fontWeight={"semibold"}>
-              {formatTruncatedAddress(accountAddress)}
+              {accountType === "multisig" && multisigStatus === "pending"
+                ? "Awaiting owner to finish setup"
+                : formatTruncatedAddress(accountAddress)}
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>
