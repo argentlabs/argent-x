@@ -84,7 +84,7 @@ export default class Account {
     return this.page.locator('button[role="alert"] ~ button')
   }
 
-  get ammount() {
+  get amount() {
     return this.page.locator('[name="amount"]')
   }
 
@@ -183,20 +183,20 @@ export default class Account {
     originAccountName,
     recepientAddress,
     tokenName,
-    ammount,
+    amount,
   }: {
     originAccountName: string
     recepientAddress: string
     tokenName: TokenName
-    ammount: number | "MAX"
+    amount: number | "MAX"
   }) {
     await this.ensureAccount(originAccountName)
     await this.token(tokenName).click()
     await this.send.last().click()
-    if (ammount === "MAX") {
+    if (amount === "MAX") {
       await this.sendMax.click()
     } else {
-      await this.ammount.fill(ammount.toString())
+      await this.amount.fill(amount.toString())
     }
     await this.recepientAddress.fill(recepientAddress)
 

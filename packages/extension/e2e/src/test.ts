@@ -29,8 +29,7 @@ const keepArtifacts = async (testInfo: TestInfo, page: Page) => {
   if (
     testInfo.config.preserveOutput === "always" ||
     (testInfo.config.preserveOutput === "failures-only" &&
-      testInfo.status === "failed") ||
-    testInfo.status === "timedOut"
+      testInfo.status !== "passed")
   ) {
     //save HTML
     const folder = testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")

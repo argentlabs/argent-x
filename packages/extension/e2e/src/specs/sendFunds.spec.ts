@@ -22,7 +22,7 @@ test.describe("Send funds", () => {
       originAccountName: accountName1,
       recepientAddress: accountAddress2,
       tokenName: "Ethereum",
-      ammount: 0.5,
+      amount: 0.5,
     })
     //check activity
     await extension.pendingTransationsIndicator.click()
@@ -64,7 +64,7 @@ test.describe("Send funds", () => {
     )
 
     if (!accountName1 || !accountAddress1) {
-      throw new Error("Invalid accoun info")
+      throw new Error("Invalid account info")
     }
     await extension.account.ensureAsset(accountName1, "ETH", "1.0")
 
@@ -77,14 +77,14 @@ test.describe("Send funds", () => {
       await secondExtension.account.addAccount({})
 
     if (!accountName2 || !accountAddress2) {
-      throw new Error("Invalid accoun info")
+      throw new Error("Invalid account info")
     }
     await secondExtension.account.ensureAsset(accountName1, "ETH", "1.0")
     await extension.account.transfer({
       originAccountName: accountName1,
       recepientAddress: accountAddress2,
       tokenName: "Ethereum",
-      ammount: 0.5,
+      amount: 0.5,
     })
     //check activity
     await extension.pendingTransationsIndicator.click()
@@ -128,7 +128,7 @@ test.describe("Send funds", () => {
       originAccountName: accountName1,
       recepientAddress: accountAddress2,
       tokenName: "Ethereum",
-      ammount: "MAX",
+      amount: "MAX",
     })
     //check activity
     await extension.pendingTransationsIndicator.click()
@@ -170,7 +170,7 @@ test.describe("Send funds", () => {
     )
 
     if (!accountName1 || !accountAddress1) {
-      throw new Error("Invalid accoun info")
+      throw new Error("Invalid account info")
     }
     await extension.account.ensureAsset(accountName1, "ETH", "1.0")
 
@@ -183,14 +183,14 @@ test.describe("Send funds", () => {
       await secondExtension.account.addAccount({})
 
     if (!accountName2 || !accountAddress2) {
-      throw new Error("Invalid accoun info")
+      throw new Error("Invalid account info")
     }
     await secondExtension.account.ensureAsset(accountName1, "ETH", "1.0")
     await extension.account.transfer({
       originAccountName: accountName1,
       recepientAddress: accountAddress2,
       tokenName: "Ethereum",
-      ammount: "MAX",
+      amount: "MAX",
     })
     //check activity
     await extension.pendingTransationsIndicator.click()
