@@ -1,8 +1,10 @@
+import { useMemo } from "react"
 import useSWR from "swr"
 
-import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { withPolling } from "../../services/swr"
-import { Account } from "../accounts/Account"
+import { getAccountIdentifier } from "../../../../shared/wallet.service"
+import { withPolling } from "../../../services/swr"
+import { Account } from "../../accounts/Account"
+import { useAccounts } from "../../accounts/accounts.state"
 
 export const accountHasEscape = (account: Account) => Boolean(account.escape)
 
@@ -52,4 +54,15 @@ export const useLiveAccountEscape = (account: Account) => {
       ...withPolling(1000) /** 1 second - purely cosmetic */,
     },
   )
+}
+
+export const useAccountsWithEscape = () => {
+  const allAccounts = useAccounts({ showHidden: true, allNetworks: true })
+
+  const filteredAccounts = useMemo(
+    () => allAccounts.filter(accountHasEscape),
+    [allAccounts],
+  )
+
+  return filteredAccounts
 }

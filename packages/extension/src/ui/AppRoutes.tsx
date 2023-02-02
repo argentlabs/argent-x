@@ -68,6 +68,7 @@ import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPriv
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
 import { WithArgentServicesEnabled } from "./features/settings/WithArgentServicesEnabled"
+import { EscapeWarningScreen } from "./features/shield/escape/EscapeWarningScreen"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
 import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
@@ -202,6 +203,10 @@ const walletRoutes = (
       presentation="push"
       path={routes.shieldAccountFinish.path}
       element={<ShieldAccountFinishScreen />}
+    />
+    <Route
+      path={routes.shieldEscapeWarning.path}
+      element={<EscapeWarningScreen />}
     />
     <Route
       presentation="modal"

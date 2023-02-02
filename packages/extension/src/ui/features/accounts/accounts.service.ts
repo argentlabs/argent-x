@@ -99,8 +99,9 @@ export const getStatus = (
   return { code: "DEFAULT", text: "" }
 }
 
+/** periodically check ALL accounts for escape+guardian status so we can alert user to relevant changes */
+
 export const useUpdateAccountsOnChainEscapeState = () => {
-  /** check ALL accounts for escape+guardian status so we can alert user to relevant changes */
   const allAccounts = useAccounts({ showHidden: true, allNetworks: true })
   return useSWR(
     "useUpdateAccountsOnChainEscapeState",
