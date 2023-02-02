@@ -73,11 +73,11 @@ export class GuardianSigner extends Signer {
 
     const cosignerMessage = {
       contractAddress: addAddressPadding(transactionsDetail.walletAddress),
-      version: transactionsDetail.version.toString(10),
+      version: number.toBN(transactionsDetail.version).toString(10),
       calldata: calldata.map((data) => number.toHex(number.toBN(data))),
       maxFee: number.toBN(transactionsDetail.maxFee).toString(10),
       chainId: number.toBN(transactionsDetail.chainId).toString(10),
-      nonce: transactionsDetail.nonce.toString(10),
+      nonce: number.toBN(transactionsDetail.nonce).toString(10),
     }
 
     const cosignerSignature = await this.cosignMessage({
