@@ -4,9 +4,7 @@ import {
   CosignerOffchainMessage,
 } from "@argent/guardian"
 import retry from "async-retry"
-import { typedData } from "starknet"
 
-import { accountAddress } from "./../../../../../storybook/src/account"
 import { ARGENT_API_BASE_URL } from "../../api/constants"
 import { isFetcherError } from "../../api/fetcher"
 import { IS_DEV } from "../../utils/dev"
