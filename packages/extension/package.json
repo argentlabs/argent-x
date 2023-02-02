@@ -46,7 +46,7 @@
     "url-loader": "^4.1.1",
     "vi-fetch": "^0.8.0",
     "vite": "^4.0.3",
-    "vitest": "^0.27.1",
+    "vitest": "^0.28.3",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
     "webpack-cli": "^5.0.1",
