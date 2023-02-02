@@ -11,6 +11,7 @@ import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShould
 import { NoSwap } from "../swap/NoSwap"
 import { Swap } from "../swap/Swap"
 import { AccountContainer } from "./AccountContainer"
+import { useUpdateAccountsOnChainEscapeState } from "./accounts.service"
 import { useSelectedAccount } from "./accounts.state"
 import { AccountScreenEmpty } from "./AccountScreenEmpty"
 import { useAddAccount } from "./useAddAccount"
@@ -20,6 +21,8 @@ interface AccountScreenProps {
 }
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
+  useUpdateAccountsOnChainEscapeState()
+
   const account = useSelectedAccount()
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
