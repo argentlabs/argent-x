@@ -31,8 +31,9 @@ export class GuardianSigner extends Signer {
 
   public async cosignMessage(
     cosignerMessage: CosignerMessage | CosignerOffchainMessage,
+    isOffchainMessage = false,
   ): Promise<Signature> {
-    const response = await this.cosigner(cosignerMessage)
+    const response = await this.cosigner(cosignerMessage, isOffchainMessage)
 
     const signature = [
       number.toBN(response.signature.r).toString(),
@@ -53,7 +54,7 @@ export class GuardianSigner extends Signer {
       chain: "starknet",
     }
 
-    const cosignerSignature = await this.cosignMessage(cosignerMessage)
+    const cosignerSignature = await this.cosignMessage(cosignerMessage, true)
 
     return [...signatures, ...cosignerSignature]
   }
