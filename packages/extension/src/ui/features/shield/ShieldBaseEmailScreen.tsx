@@ -6,6 +6,7 @@ import {
   FieldError,
   Input,
   NavigationContainer,
+  icons,
   useToast,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
@@ -17,7 +18,9 @@ import { requestEmail } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { ShieldHeader } from "./ShieldHeader"
+import { ShieldHeader } from "./ui/ShieldHeader"
+
+const { LockIcon } = icons
 
 const schema = yup.object().required().shape({
   email: yup.string().email().required(),
@@ -74,12 +77,15 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
         })}
       >
         <ShieldHeader
-          title={"1 - Enter email"}
-          subtitle={"Enter email that should be used for 2FA"}
+          icon={LockIcon}
+          title={"Enter email"}
+          subtitle={
+            "Enter email that should be used for two-factor authentication"
+          }
         />
         <Input
           isInvalid={Boolean(formState.errors.email)}
-          placeholder="Enter email"
+          placeholder="Email"
           autoFocus
           disabled={formState.isSubmitting}
           {...register("email")}

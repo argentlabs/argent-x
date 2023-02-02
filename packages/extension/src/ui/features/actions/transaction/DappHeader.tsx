@@ -25,7 +25,7 @@ export const DappHeader = ({
     <Box mb="4">
       <VStack gap="1">
         <IconWrapper>
-          <NetworkIcon color="#58585B" />
+          <NetworkIcon fontSize={"4xl"} color="neutrals.500" />
         </IconWrapper>
         <H5>{title}</H5>
       </VStack>
@@ -35,16 +35,14 @@ export const DappHeader = ({
 
 const IconWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box
+    <Center
       w="14"
       h="14"
       background="neutrals.700"
       borderRadius="2xl"
-      boxShadow="0px 4px 20px rgba(0, 0, 0, 0.5);"
+      boxShadow="menu"
     >
-      <Center justifyContent="center" alignItems="center" height="full">
-        {children}
-      </Center>
-    </Box>
+      {children}
+    </Center>
   )
 }
