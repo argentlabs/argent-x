@@ -8,6 +8,7 @@ import { useAppState, useStopSessionHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
+import { AccountImplementationScreen } from "./features/accountEdit/AccountImplementationScreen"
 import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
@@ -166,6 +167,11 @@ const walletRoutes = (
       presentation="push"
       path={routes.editAccount.path}
       element={<AccountEditScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.accountImplementations.path}
+      element={<AccountImplementationScreen />}
     />
     <Route
       presentation="push"

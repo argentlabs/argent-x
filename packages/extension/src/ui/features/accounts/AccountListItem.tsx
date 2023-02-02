@@ -136,7 +136,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 <ShieldIcon />
               </H6>
             )}
-            {accountType === "argent-plugin" && (
+            {accountType !== "argent" && (
               <L2
                 backgroundColor={"neutrals.900"}
                 px={1}
@@ -148,7 +148,8 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 border={"1px solid"}
                 borderColor={"neutrals.700"}
               >
-                Plugin
+                {accountType === "argent-plugin" && "Plugin"}
+                {accountType === "argent-better-multicall" && "Better MC"}
               </L2>
             )}
           </Flex>
