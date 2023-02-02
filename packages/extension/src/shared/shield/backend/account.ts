@@ -233,23 +233,11 @@ export const addAccount = async (
   }
 }
 
-const isOffchainMessage = (
-  message: any,
-): message is CosignerOffchainMessage => {
-  return (
-    Boolean((message as CosignerOffchainMessage).message.message) &&
-    Boolean((message as CosignerOffchainMessage).message.types) &&
-    Boolean((message as CosignerOffchainMessage).message.types.length) &&
-    (Boolean((message as CosignerOffchainMessage).message.domain.name) ||
-      Boolean((message as CosignerOffchainMessage).message.domain.version) ||
-      Boolean((message as CosignerOffchainMessage).message.domain.chainId))
-  )
-}
-
 export const cosignerSign: Cosigner = async (
   message: CosignerMessage | CosignerOffchainMessage,
+  isOffchainMessage = false,
 ) => {
-  const beEndpoint = isOffchainMessage(message)
+  const beEndpoint = isOffchainMessage
     ? "/cosigner/personalSign"
     : `/cosigner/sign`
 
