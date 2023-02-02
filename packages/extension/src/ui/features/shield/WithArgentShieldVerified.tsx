@@ -8,6 +8,7 @@ import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
 import { getVerifiedEmailIsExpired } from "../../../shared/shield/verifiedEmail"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { WithArgentServicesEnabled } from "../settings/WithArgentServicesEnabled"
 import { useShieldState } from "./shield.state"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
@@ -32,9 +33,11 @@ export const WithArgentShieldVerified: FC<PropsWithChildren> = ({
   children,
 }) => {
   return ARGENT_SHIELD_ENABLED ? (
-    <WithArgentShieldEnabledVerified>
-      {children}
-    </WithArgentShieldEnabledVerified>
+    <WithArgentServicesEnabled>
+      <WithArgentShieldEnabledVerified>
+        {children}
+      </WithArgentShieldEnabledVerified>
+    </WithArgentServicesEnabled>
   ) : (
     <>{children}</>
   )
