@@ -21,13 +21,12 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   guardian,
   returnRoute,
 }) => {
-  const icon = pendingChangeGuardian
-    ? pendingChangeGuardian === ChangeGuardian.ADDING
-      ? ArgentShieldIcon
-      : ArgentShieldDeactivateIcon
-    : guardian
-    ? TickIcon
-    : ArgentShieldDeactivateIcon
+  let icon
+  if (pendingChangeGuardian) {
+    icon = ChangeGuardian.ADDING ? ArgentShieldIcon : ArgentShieldDeactivateIcon
+  } else {
+    icon = guardian ? TickIcon : ArgentShieldDeactivateIcon
+  }
 
   const variant = pendingChangeGuardian
     ? "default"
