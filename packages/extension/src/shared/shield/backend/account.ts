@@ -269,27 +269,3 @@ export const cosignerSign: Cosigner = async (
     }
   }
 }
-/* 
-export const cosignerOffchainSign: Cosigner = async (
-  message: CosignerOffchainMessage,
-) => {
-  try {
-    const json = await jwtFetcher(
-      `${ARGENT_API_BASE_URL}/cosigner/personalSign`,
-      {
-        method: "POST",
-        body: JSON.stringify(message),
-      },
-    )
-    return json
-  } catch (error) {
-    if (isFetcherError(error) && error.responseJson?.status) {
-      throw new Error(
-        `Argent Shield failed to co-sign - status:${error.responseJson?.status}`,
-      )
-    } else {
-      throw new Error("Argent Shield failed to co-sign")
-    }
-  }
-}
- */
