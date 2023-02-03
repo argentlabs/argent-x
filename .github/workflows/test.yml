@@ -46,6 +46,9 @@ jobs:
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
 
+      - name: Check bundlesize for chrome
+        run: yarn run bundlewatch
+
       - uses: actions/upload-artifact@v3
         if: always()
         with:
@@ -56,45 +59,57 @@ jobs:
             packages/extension/e2e/artifacts/reports/
           retention-days: 5
 
-      - name: Check bundlesize for chrome
-        run: yarn run bundlewatch
+      ## Upload build and  comment PR
       - name: Set filename prefix
+        if: github.event.pull_request.merged != true
         run: echo "FILENAME_PREFIX=$(echo ${{ env.FILENAME }}  | tr / -)" >> $GITHUB_ENV
 
       - name: Create chrome zip
+        if: github.event.pull_request.merged != true
         run: |
           cd packages/extension/dist
           zip -r ${{ env.FILENAME_PREFIX }}-chrome.zip ./*
           mv ${{ env.FILENAME_PREFIX }}-chrome.zip ../../../
           cd ../../../
+
       - name: Build Firefox version
+        if: github.event.pull_request.merged != true
         run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+
       - name: Create firefox zip
+        if: github.event.pull_request.merged != true
         run: |
           cd packages/extension/dist
           zip -r ${{ env.FILENAME_PREFIX }}-firefox.zip ./*
           mv ${{ env.FILENAME_PREFIX }}-firefox.zip ../../../
           cd ../../../
+
       - name: Check bundlesize for firefox
+        if: github.event.pull_request.merged != true
         run: yarn run bundlewatch
+
       - name: Upload artifacts for firefox
+        if: github.event.pull_request.merged != true
         uses: actions/upload-artifact@v3
-        if: always()
         with:
           name: ${{ env.FILENAME_PREFIX }}-firefox.zip
           path: "*-firefox.zip"
           retention-days: 5
+
       - name: Upload artifacts for chrome
+        if: github.event.pull_request.merged != true
         uses: actions/upload-artifact@v3
-        if: always()
         with:
           name: ${{ env.FILENAME_PREFIX }}-chrome.zip
           path: "*-chrome.zip"
           retention-days: 5
 
       - name: Set GHA_BRANCH
+        if: github.event.pull_request.merged != true
         run: echo "GHA_BRANCH=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+
       - name: comment PR
+        if: github.event.pull_request.merged != true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_REPO: ${{ env.GHA_BRANCH }}

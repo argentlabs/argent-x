@@ -6,7 +6,8 @@ import {
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
-  Signer,
+  KeyPair,
+  SignerInterface,
   ec,
   hash,
   number,
@@ -31,6 +32,7 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
@@ -200,13 +202,11 @@ export class Wallet {
     accountType: ArgentAccountType,
   ): Promise<string> {
     if (network.accountClassHash) {
-      if (
-        accountType === "argent-plugin" &&
-        network.accountClassHash.argentPluginAccount
-      ) {
-        return network.accountClassHash.argentPluginAccount
-      }
-      return network.accountClassHash.argentAccount
+      return (
+        network.accountClassHash[
+          mapArgentAccountTypeToImplementationKey(accountType)
+        ] ?? network.accountClassHash.argentAccount
+      )
     }
 
     const deployerAccount = await getPreDeployedAccount(network)
@@ -640,17 +640,19 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
-  public async getSignerForAccount(account: WalletAccount) {
+  public async getSignerForAccount(
+    account: WalletAccount,
+  ): Promise<KeyPair | SignerInterface> {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
 
-    const signer =
+    const keyPairOrSigner =
       ARGENT_SHIELD_ENABLED && account.guardian
         ? new GuardianSignerArgentX(keyPair, cosignerSign)
-        : new Signer(keyPair)
+        : keyPair
 
-    return signer
+    return keyPairOrSigner
   }
 
   public async getStarknetAccount(

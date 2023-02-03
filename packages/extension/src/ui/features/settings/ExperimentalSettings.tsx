@@ -6,9 +6,9 @@ import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { P, SettingsItem, SettingsScreenWrapper, Title } from "./SettingsScreen"
 
 export const PrivacyExperimentalSettings: FC = () => {
-  const experimentalPluginAccount = useKeyValueStorage(
+  const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
-    "experimentalPluginAccount",
+    "experimentalAllowChooseAccount",
   )
 
   return (
@@ -16,18 +16,21 @@ export const PrivacyExperimentalSettings: FC = () => {
       <SettingsScreenWrapper>
         <SettingsItem>
           <Title>
-            <span>Use Plugin Account</span>
+            <span>Show account implementation picker</span>
             <Switch
-              isChecked={experimentalPluginAccount}
+              isChecked={experimentalAllowChooseAccount}
               onChange={() =>
                 settingsStore.set(
-                  "experimentalPluginAccount",
-                  !experimentalPluginAccount,
+                  "experimentalAllowChooseAccount",
+                  !experimentalAllowChooseAccount,
                 )
               }
             />
           </Title>
-          <P>Use the experimental Argent Plugin account on testnet</P>
+          <P>
+            Shows a new menu item in the account settings, which allows a user
+            to switch account implementation for an account.
+          </P>
         </SettingsItem>
       </SettingsScreenWrapper>
     </NavigationContainer>

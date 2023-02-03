@@ -115,6 +115,10 @@ export const routes = {
         : `/accounts/${accountAddress}`,
     "/accounts/:accountAddress",
   ),
+  accountImplementations: route(
+    (accountAddress) => `/accounts/${accountAddress}/implementation`,
+    "/accounts/:accountAddress/implementation",
+  ),
   addAccount: route("/accounts/new"),
   shieldAccountStart: route(
     (accountAddress) => `/accounts/${accountAddress}/shield`,

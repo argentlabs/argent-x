@@ -4,6 +4,7 @@ import { Call, number } from "starknet"
 import { isEqualAddress } from "../../../ui/services/addresses"
 import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork, getProvider } from "../../network"
+import { mapImplementationToArgentAccountType } from "../../network/utils"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 
 export type AccountTypesFromChain = Pick<
@@ -40,13 +41,6 @@ export async function getAccountTypesFromChain(
         > => {
           const network = await getNetwork(networkId)
 
-          if (!network.accountClassHash?.argentPluginAccount) {
-            return calls.map((call) => ({
-              address: call.contractAddress,
-              type: "argent",
-            }))
-          }
-
           if (network.multicallAddress) {
             const multicall = getMulticallForNetwork(network)
             const responses = await Promise.all(
@@ -54,12 +48,10 @@ export async function getAccountTypesFromChain(
             )
             const result = responses.map((response, i) => {
               const call = calls[i]
-              const type: ArgentAccountType = isEqualAddress(
+              const type = mapImplementationToArgentAccountType(
                 response[0],
-                network.accountClassHash?.argentPluginAccount || "0x0",
+                network,
               )
-                ? "argent-plugin"
-                : "argent"
               return {
                 address: call.contractAddress,
                 type,
@@ -77,12 +69,7 @@ export async function getAccountTypesFromChain(
           )
           return calls.map((call, i) => ({
             address: call.contractAddress,
-            type: isEqualAddress(
-              results[i],
-              network.accountClassHash?.argentPluginAccount || "0x0",
-            )
-              ? "argent-plugin"
-              : "argent",
+            type: mapImplementationToArgentAccountType(results[i], network),
           }))
         },
       ),
