@@ -16,6 +16,7 @@ import { settingsStore } from "../../../shared/settings"
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { parseAmount } from "../../../shared/token/amount"
+import { getFeeToken } from "../../../shared/token/utils"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
@@ -50,8 +51,6 @@ const {
   ArgentShieldIcon,
   NetworkIcon,
 } = icons
-
-const LOCAL_NETWORK = "Localhost 5050"
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -122,13 +121,12 @@ export const AccountEditScreen: FC = () => {
     : `Two-factor account protection`
 
   const handleDeploy = () => {
-    if (account) {
+    const feeToken = getFeeToken(currentNetwork.id)?.address
+    if (account && feeToken) {
       const ONE_GWEI = getUint256CalldataFromBN(parseAmount("1", 0))
       const self = account.address
-      const ETH_TOKEN_ADDRESS =
-        "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
       sendTransaction({
-        to: ETH_TOKEN_ADDRESS,
+        to: feeToken,
         method: "transfer",
         calldata: {
           recipient: self,
@@ -232,7 +230,7 @@ export const AccountEditScreen: FC = () => {
               Use Plugins
             </ButtonCell>
           )}
-          {account?.needsDeploy && currentNetwork.name === LOCAL_NETWORK && (
+          {account?.needsDeploy && (
             <ButtonCell onClick={handleDeploy} rightIcon={<NetworkIcon />}>
               Deploy account
             </ButtonCell>
