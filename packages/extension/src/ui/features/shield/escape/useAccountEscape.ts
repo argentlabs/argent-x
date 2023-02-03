@@ -1,10 +1,20 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
+import { Escape } from "../../../../shared/account/details/getEscape"
+import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
+import { routes } from "../../../routes"
+import { selectAccount } from "../../../services/backgroundAccounts"
 import { withPolling } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
+import { useUpdateAccountsOnChainEscapeState } from "../../accounts/accounts.service"
 import { useAccounts } from "../../accounts/accounts.state"
+import {
+  escapeWarningStore,
+  getEscapeWarningStoreKey,
+} from "./escapeWarningStore"
 
 export const accountHasEscape = (account: Account) => Boolean(account.escape)
 
@@ -35,11 +45,14 @@ export const getActiveFromNow = (activeAt: number) => {
   }
 }
 
-export const useLiveAccountEscape = (account: Account) => {
-  return useSWR(
-    [getAccountIdentifier(account), "accountEscape"],
+export type LiveAccountEscapeProps = Escape &
+  ReturnType<typeof getActiveFromNow>
+
+export const useLiveAccountEscape = (account?: Account) => {
+  return useSWR<LiveAccountEscapeProps | undefined>(
+    account ? [getAccountIdentifier(account), "accountEscape"] : null,
     async () => {
-      if (!account.escape) {
+      if (!account?.escape) {
         return
       }
       const { activeAt, type } = account.escape
@@ -65,4 +78,40 @@ export const useAccountsWithEscape = () => {
   )
 
   return filteredAccounts
+}
+
+/** checks and shows a warning if an account has an escape state that has not yet shown to the user */
+
+export const useAccountEscapeWarning = () => {
+  useUpdateAccountsOnChainEscapeState()
+
+  const navigate = useNavigate()
+
+  const accountsWithEscape = useAccountsWithEscape()
+  const escapeWarningKeys = useArrayStorage(escapeWarningStore)
+
+  const accountWithNewEscape = useMemo(() => {
+    return accountsWithEscape.find(
+      (account) =>
+        !escapeWarningKeys.includes(getEscapeWarningStoreKey(account)),
+    )
+  }, [escapeWarningKeys, accountsWithEscape])
+
+  useEffect(() => {
+    const maybeShowWarning = async () => {
+      if (accountWithNewEscape) {
+        console.log(
+          "TODO: navigate to warning about this account and add it to the handled warning keys",
+          accountWithNewEscape,
+        )
+        console.warn("TODO: check and unhide hidden account here")
+        await selectAccount(accountWithNewEscape)
+        navigate(routes.shieldEscapeWarning(accountWithNewEscape.address))
+        await escapeWarningStore.push(
+          getEscapeWarningStoreKey(accountWithNewEscape),
+        )
+      }
+    }
+    maybeShowWarning()
+  }, [accountWithNewEscape, escapeWarningKeys, navigate])
 }
