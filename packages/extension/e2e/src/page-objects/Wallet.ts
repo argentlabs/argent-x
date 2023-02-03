@@ -1,4 +1,6 @@
 import { Page, expect } from "@playwright/test"
+
+import cfg from "./../config"
 type language = "en"
 const text = {
   en: {
@@ -137,8 +139,8 @@ export default class Wallet {
       expect(this.banner3).toBeVisible(),
       expect(this.description3).toBeVisible(),
     ])
-    await this.password.fill("test123$")
-    await this.repeatPassword.fill("test123$")
+    await this.password.fill(cfg.password)
+    await this.repeatPassword.fill(cfg.password)
     await this.createWallet.click()
 
     await Promise.all([
