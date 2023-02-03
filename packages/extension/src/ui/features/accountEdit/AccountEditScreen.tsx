@@ -15,6 +15,7 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { settingsStore } from "../../../shared/settings"
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { parseAmount } from "../../../shared/token/amount"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
@@ -23,6 +24,10 @@ import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../../services/transactions"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -37,7 +42,16 @@ import {
 } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ArgentShieldIcon } = icons
+const {
+  ExpandIcon,
+  HideIcon,
+  PluginIcon,
+  AlertIcon,
+  ArgentShieldIcon,
+  NetworkIcon,
+} = icons
+
+const LOCAL_NETWORK = "Localhost 5050"
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -107,6 +121,22 @@ export const AccountEditScreen: FC = () => {
       } Argent Shield…`
     : `Two-factor account protection`
 
+  const handleDeploy = () => {
+    if (account) {
+      const ONE_GWEI = getUint256CalldataFromBN(parseAmount("1", 0))
+      const self = account.address
+      const ETH_TOKEN_ADDRESS =
+        "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+      sendTransaction({
+        to: ETH_TOKEN_ADDRESS,
+        method: "transfer",
+        calldata: {
+          recipient: self,
+          amount: ONE_GWEI,
+        },
+      })
+    }
+  }
   return (
     <>
       <NavigationContainer
@@ -200,6 +230,11 @@ export const AccountEditScreen: FC = () => {
               icon={<PluginIcon />}
             >
               Use Plugins
+            </ButtonCell>
+          )}
+          {account?.needsDeploy && currentNetwork.name === LOCAL_NETWORK && (
+            <ButtonCell onClick={handleDeploy} rightIcon={<NetworkIcon />}>
+              Deploy account
             </ButtonCell>
           )}
           <ButtonCell
