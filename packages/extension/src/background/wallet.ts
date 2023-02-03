@@ -6,7 +6,8 @@ import {
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
-  Signer,
+  KeyPair,
+  SignerInterface,
   ec,
   hash,
   number,
@@ -640,17 +641,19 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
-  public async getSignerForAccount(account: WalletAccount) {
+  public async getSignerForAccount(
+    account: WalletAccount,
+  ): Promise<KeyPair | SignerInterface> {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
 
-    const signer =
+    const keyPairOrSigner =
       ARGENT_SHIELD_ENABLED && account.guardian
         ? new GuardianSignerArgentX(keyPair, cosignerSign)
-        : new Signer(keyPair)
+        : keyPair
 
-    return signer
+    return keyPairOrSigner
   }
 
   public async getStarknetAccount(
