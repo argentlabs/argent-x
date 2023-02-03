@@ -809,10 +809,6 @@ export class Wallet {
     const starkPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
-    console.log(
-      "🚀 ~ file: wallet.ts:814 ~ Wallet ~ getPublicKey ~ starkPair",
-      starkPair,
-    )
 
     const starkPub = ec.getStarkKey(starkPair)
 
