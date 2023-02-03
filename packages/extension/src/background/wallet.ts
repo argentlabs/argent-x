@@ -32,6 +32,7 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
@@ -201,13 +202,11 @@ export class Wallet {
     accountType: ArgentAccountType,
   ): Promise<string> {
     if (network.accountClassHash) {
-      if (
-        accountType === "argent-plugin" &&
-        network.accountClassHash.argentPluginAccount
-      ) {
-        return network.accountClassHash.argentPluginAccount
-      }
-      return network.accountClassHash.argentAccount
+      return (
+        network.accountClassHash[
+          mapArgentAccountTypeToImplementationKey(accountType)
+        ] ?? network.accountClassHash.argentAccount
+      )
     }
 
     const deployerAccount = await getPreDeployedAccount(network)

@@ -18,7 +18,6 @@ import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
-import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
@@ -66,9 +65,9 @@ export const AccountEditScreen: FC = () => {
     }
   }, [navigate, returnTo])
 
-  const experimentalPluginAccount = useKeyValueStorage(
+  const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
-    "experimentalPluginAccount",
+    "experimentalAllowChooseAccount",
   )
 
   const showDelete =
@@ -81,12 +80,6 @@ export const AccountEditScreen: FC = () => {
       navigate(routes.accountHideConfirm(account.address))
     }
   }
-
-  const canUpgradeToPluginAccount =
-    experimentalPluginAccount &&
-    account &&
-    currentNetwork.accountClassHash?.argentPluginAccount &&
-    account.type !== "argent-plugin"
 
   const onChangeName = useCallback((name: string) => {
     setLiveEditingAccountName(name)
@@ -194,12 +187,14 @@ export const AccountEditScreen: FC = () => {
           >
             {showDelete ? "Delete" : "Hide"} account
           </ButtonCell>
-          {canUpgradeToPluginAccount && (
+          {experimentalAllowChooseAccount && account && (
             <ButtonCell
-              onClick={() => upgradeAccount(account, "argent-plugin")}
+              onClick={() => {
+                navigate(routes.accountImplementations(account.address))
+              }}
               icon={<PluginIcon />}
             >
-              Use Plugins
+              Change account implementation
             </ButtonCell>
           )}
           <ButtonCell
