@@ -148,8 +148,12 @@ export const AccountEditScreen: FC = () => {
               <ButtonCell
                 as={Link}
                 to={routes.shieldAccountStart(accountAddress)}
-                leftIcon={<ArgentShieldIcon fontSize={"xl"} />}
-                rightIconOpaque={!pendingChangeGuardian}
+                leftIcon={
+                  <ArgentShieldIcon
+                    fontSize={"xl"}
+                    opacity={!pendingChangeGuardian ? 1 : 0.6}
+                  />
+                }
                 rightIcon={
                   pendingChangeGuardian ? (
                     <Spinner size={"sm"} />
