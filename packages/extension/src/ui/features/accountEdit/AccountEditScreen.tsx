@@ -187,7 +187,7 @@ export const AccountEditScreen: FC = () => {
           </ButtonCell>
           <ButtonCell
             onClick={() => account && handleHideOrDeleteAccount(account)}
-            icon={<HideIcon />}
+            leftIcon={<HideIcon />}
           >
             {showDelete ? "Delete" : "Hide"} account
           </ButtonCell>
@@ -196,7 +196,7 @@ export const AccountEditScreen: FC = () => {
               onClick={() => {
                 navigate(routes.accountImplementations(account.address))
               }}
-              icon={<PluginIcon />}
+              leftIcon={<PluginIcon />}
             >
               Change account implementation
             </ButtonCell>
@@ -204,7 +204,7 @@ export const AccountEditScreen: FC = () => {
           <ButtonCell
             color={"error.500"}
             onClick={() => navigate(routes.exportPrivateKey())}
-            icon={<AlertIcon />}
+            leftIcon={<AlertIcon />}
           >
             Export private key
           </ButtonCell>

@@ -1,9 +1,9 @@
-import { ButtonProps, Flex, chakra } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import { ChakraComponent, Flex, chakra } from "@chakra-ui/react"
+import { ReactNode } from "react"
 
 import { Button } from "./Button"
 import { ChevronRightIcon } from "./icons"
-import { H6, P4 } from "./Typography"
+import { H6 } from "./Typography"
 
 /** A vertical collection of Cells with standardised spacing */
 
@@ -32,11 +32,16 @@ export const HeaderCell = chakra(H6, {
   },
 })
 
-export interface ButtonCellProps extends ButtonProps {
-  extendedDescription?: ReactNode
-}
+export type ButtonCellProps = ChakraComponent<
+  "button",
+  {
+    leftIcon?: ReactNode
+    rightIcon?: ReactNode
+    extendedDescription?: ReactNode
+  }
+>
 
-export const ButtonCell: FC<ButtonCellProps> = ({
+export const ButtonCell: ButtonCellProps = ({
   extendedDescription,
   leftIcon,
   rightIcon = <ChevronRightIcon />,
@@ -56,6 +61,7 @@ export const ButtonCell: FC<ButtonCellProps> = ({
       <Flex
         w="100%"
         gap={3}
+        flex="1"
         justifyContent={"flex-start"}
         alignItems={"center"}
         textAlign={"left"}
@@ -75,7 +81,7 @@ export const ButtonCell: FC<ButtonCellProps> = ({
           borderTop="1px"
           borderTopColor="black"
           flex="1"
-          maxW="100%"
+          w="100%"
           whiteSpace="normal"
         >
           {extendedDescription}
