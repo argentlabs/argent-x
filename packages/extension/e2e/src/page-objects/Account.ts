@@ -84,7 +84,7 @@ export default class Account {
     return this.page.locator('button[role="alert"] ~ button')
   }
 
-  get ammount() {
+  get amount() {
     return this.page.locator('[name="amount"]')
   }
 
@@ -110,6 +110,10 @@ export default class Account {
 
   get balance() {
     return this.page.locator('[data-testid="tokenBalance"]')
+  }
+
+  currentBalance(tkn: "Ether") {
+    return this.page.locator(`//img[@alt="${tkn}"]/parent::*/parent::button`)
   }
 
   async addAccount({ firstAccount = true }: { firstAccount?: boolean }) {
@@ -164,24 +168,35 @@ export default class Account {
     ).toBeVisible()
   }
 
+  async getTotalFeeValue() {
+    const fee = await this.page
+      .locator('[aria-label="Show Fee Estimate details"] p')
+      .first()
+      .textContent()
+    if (!fee) {
+      throw new Error("Error! Fee not available")
+    }
+
+    return parseFloat(fee.split(" ")[0])
+  }
   async transfer({
     originAccountName,
     recepientAddress,
     tokenName,
-    ammount,
+    amount,
   }: {
     originAccountName: string
     recepientAddress: string
     tokenName: TokenName
-    ammount: number | "MAX"
+    amount: number | "MAX"
   }) {
     await this.ensureAccount(originAccountName)
     await this.token(tokenName).click()
     await this.send.last().click()
-    if (ammount === "MAX") {
+    if (amount === "MAX") {
       await this.sendMax.click()
     } else {
-      await this.ammount.fill(ammount.toString())
+      await this.amount.fill(amount.toString())
     }
     await this.recepientAddress.fill(recepientAddress)
 
