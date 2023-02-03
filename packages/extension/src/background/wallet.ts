@@ -168,7 +168,10 @@ export class Wallet {
 
     await this.importBackup(encryptedBackup)
     await this.setSession(ethersWallet.privateKey, newPassword)
-    await this.discoverAccounts()
+    const accounts = await this.discoverAccounts()
+    if (accounts.length === 0) {
+      throw new Error(`No account found`)
+    }
   }
 
   public async discoverAccounts() {
@@ -193,8 +196,8 @@ export class Wallet {
     const accounts = accountsResults.flatMap((x) => x)
 
     await this.walletStore.push(accounts)
-
     this.store.set("discoveredOnce", true)
+    return accounts
   }
 
   private async getAccountClassHashForNetwork(
@@ -309,9 +312,7 @@ export class Wallet {
         accounts,
         accountDetailFetchers,
       )
-      if (accountsWithDetails.length === 0) {
-        throw new Error("No account found")
-      }
+
       return accountsWithDetails
     } catch (error) {
       console.error(
