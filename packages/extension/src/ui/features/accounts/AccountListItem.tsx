@@ -151,11 +151,6 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
-            {isShield && (
-              <H6>
-                <ShieldIcon />
-              </H6>
-            )}
             {accountType !== "argent" && (
               <L2
                 backgroundColor={"neutrals.900"}

@@ -208,6 +208,34 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         })
       }
     }
+
+    case "ACCOUNT_CANCEL_ESCAPE": {
+      try {
+        const { account } = msg.data
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: {
+              contractAddress: account.address,
+              entrypoint: "cancelEscape",
+              calldata: [],
+            },
+            meta: {
+              title: "Cancel escape",
+              type: "INVOKE_FUNCTION",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ACCOUNT_CANCEL_ESCAPE_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "ACCOUNT_CANCEL_ESCAPE_REJ",
+          data: `${error}`,
+        })
+      }
+    }
   }
 
   throw new UnhandledMessage()

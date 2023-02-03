@@ -161,3 +161,16 @@ export const accountChangeGuardian = async (
 
   return result
 }
+
+export const accountCancelEscape = async (account: BaseWalletAccount) => {
+  sendMessage({ type: "ACCOUNT_CANCEL_ESCAPE", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_CANCEL_ESCAPE_RES"),
+    waitForMessage("ACCOUNT_CANCEL_ESCAPE_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
