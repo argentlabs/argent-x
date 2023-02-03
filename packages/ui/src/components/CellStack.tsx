@@ -1,9 +1,9 @@
-import { Flex, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { ButtonProps, Flex, chakra } from "@chakra-ui/react"
+import { FC, ReactNode } from "react"
 
 import { Button } from "./Button"
 import { ChevronRightIcon } from "./icons"
-import { H6 } from "./Typography"
+import { H6, P4 } from "./Typography"
 
 /** A vertical collection of Cells with standardised spacing */
 
@@ -32,7 +32,12 @@ export const HeaderCell = chakra(H6, {
   },
 })
 
-export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
+export interface ButtonCellProps extends ButtonProps {
+  extendedDescription?: ReactNode
+}
+
+export const ButtonCell: FC<ButtonCellProps> = ({
+  extendedDescription,
   leftIcon,
   rightIcon = <ChevronRightIcon />,
   children,
@@ -40,19 +45,40 @@ export const ButtonCell: FC<ComponentProps<typeof Button>> = ({
 }) => {
   return (
     <Button
-      gap={3}
-      p={4}
       h={"initial"}
-      textAlign={"left"}
       rounded={"lg"}
+      flexDir={"column"}
+      p={4}
       justifyContent={"flex-start"}
+      textAlign={"left"}
       {...rest}
     >
-      {leftIcon && <Flex fontSize="base">{leftIcon}</Flex>}
-      <H6>{children}</H6>
-      {rightIcon && (
-        <Flex ml={"auto"} fontSize="base">
-          {rightIcon}
+      <Flex
+        w="100%"
+        gap={3}
+        justifyContent={"flex-start"}
+        alignItems={"center"}
+        textAlign={"left"}
+      >
+        {leftIcon && <Flex fontSize="base">{leftIcon}</Flex>}
+        <H6>{children}</H6>
+        {rightIcon && (
+          <Flex ml={"auto"} fontSize="base">
+            {rightIcon}
+          </Flex>
+        )}
+      </Flex>
+      {extendedDescription && (
+        <Flex
+          pt="3"
+          mt="4"
+          borderTop="1px"
+          borderTopColor="black"
+          flex="1"
+          maxW="100%"
+          whiteSpace="normal"
+        >
+          {extendedDescription}
         </Flex>
       )}
     </Button>

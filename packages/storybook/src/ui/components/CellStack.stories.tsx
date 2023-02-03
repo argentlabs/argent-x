@@ -55,9 +55,22 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
 
     <SpacerCell />
 
-    <ButtonCell>ButtonCell</ButtonCell>
-    <ButtonCell>ButtonCell</ButtonCell>
-    <ButtonCell>ButtonCell</ButtonCell>
+    <ButtonCell
+      rightIcon={<Switch isChecked={args.isChecked} />}
+      extendedDescription={
+        <P4 color="neutrals.300" w="100%">
+          Add extra protection to your Argent X accounts with two-factor
+          security. You need to have been added to the whitelist to use this
+          feature while it’s in beta
+        </P4>
+      }
+    >
+      Change account implementation
+    </ButtonCell>
+
+    <ButtonCell rightIcon={<Switch isChecked={args.isChecked} />}>
+      Argent Shield (2FA)
+    </ButtonCell>
   </CellStack>
 )
 
