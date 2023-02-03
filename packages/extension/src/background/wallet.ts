@@ -167,7 +167,6 @@ export class Wallet {
 
     await this.importBackup(encryptedBackup)
     await this.setSession(ethersWallet.privateKey, newPassword)
-
     await this.discoverAccounts()
   }
 
@@ -299,9 +298,8 @@ export class Wallet {
       },
     )
 
-    await Promise.all(promises)
-
     try {
+      await Promise.all(promises)
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
@@ -312,13 +310,16 @@ export class Wallet {
         accounts,
         accountDetailFetchers,
       )
+      if (accountsWithDetails.length === 0) {
+        throw new Error("No account found")
+      }
       return accountsWithDetails
     } catch (error) {
       console.error(
         "Error getting account types or guardians from chain",
         error,
       )
-      return accounts
+      throw new Error(JSON.stringify(error, Object.getOwnPropertyNames(error)))
     }
   }
 

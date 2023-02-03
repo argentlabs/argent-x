@@ -4,6 +4,7 @@ import {
   UseToastOptions,
   useToast as chakraUseToast,
 } from "@chakra-ui/react"
+import { ReactNode } from "react"
 
 import { L1, icons } from "../components"
 
@@ -27,11 +28,15 @@ const COLOR_MAP = {
 
 /** Wraps Chakra `useToast()` with a custom component render */
 
-export const useToast = (defaultOptions?: UseToastOptions) => {
+interface ToastOptions extends UseToastOptions {
+  icon?: ReactNode
+}
+
+export const useToast = (defaultOptions?: ToastOptions) => {
   const chakraToast = chakraUseToast(defaultOptions)
   return (options: UseToastOptions) => {
     const { title, status = "info" } = options
-    const icon = ICON_MAP[status]
+    const icon = defaultOptions?.icon || ICON_MAP[status]
     const backgroundColor = COLOR_MAP[status]
     const render = () => {
       return (

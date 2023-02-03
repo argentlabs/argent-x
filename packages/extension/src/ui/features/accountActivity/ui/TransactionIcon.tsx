@@ -21,7 +21,8 @@ const {
   NftIcon,
   SwapIcon,
   ActivityIcon,
-  ShieldIcon,
+  ArgentShieldIcon,
+  ArgentShieldDeactivateIcon,
 } = icons
 
 export interface TransactionIconProps
@@ -46,7 +47,8 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       iconComponent = <DeployIcon />
       break
     case "GUARDIAN":
-      iconComponent = <ShieldIcon />
+      iconComponent =
+        action === "ADD" ? <ArgentShieldIcon /> : <ArgentShieldDeactivateIcon />
       break
   }
   switch (action) {

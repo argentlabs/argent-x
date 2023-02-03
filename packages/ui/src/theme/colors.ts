@@ -19,7 +19,7 @@ export const colors = {
   info: makeColorVariants("#0078a4"),
   danger: makeColorVariants("#c12026"),
   warning: makeColorVariants("#f4bc54"),
-  success: makeColorVariants("#08a681"),
+  success: makeColorVariants("#3ed373"),
   error: makeColorVariants("#cc3247"),
   errorText: "#E95F72",
   skyBlue: makeColorVariants("#29c5ff"),

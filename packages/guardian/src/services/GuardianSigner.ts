@@ -15,7 +15,11 @@ import {
   typedData,
 } from "starknet"
 
-import type { Cosigner, CosignerMessage } from "./CosignerTypes"
+import type {
+  Cosigner,
+  CosignerMessage,
+  CosignerOffchainMessage,
+} from "./CosignerTypes"
 
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner
@@ -26,9 +30,10 @@ export class GuardianSigner extends Signer {
   }
 
   public async cosignMessage(
-    cosignerMessage: CosignerMessage,
+    cosignerMessage: CosignerMessage | CosignerOffchainMessage,
+    isOffchainMessage = false,
   ): Promise<Signature> {
-    const response = await this.cosigner(cosignerMessage)
+    const response = await this.cosigner(cosignerMessage, isOffchainMessage)
 
     const signature = [
       number.toBN(response.signature.r).toString(),
@@ -42,8 +47,16 @@ export class GuardianSigner extends Signer {
     typedData: typedData.TypedData,
     accountAddress: string,
   ): Promise<Signature> {
-    console.warn("TODO: implement GuardianSigner signMessage")
-    return super.signMessage(typedData, accountAddress)
+    const signatures = await super.signMessage(typedData, accountAddress)
+    const cosignerMessage: CosignerOffchainMessage = {
+      message: typedData,
+      accountAddress,
+      chain: "starknet",
+    }
+
+    const cosignerSignature = await this.cosignMessage(cosignerMessage, true)
+
+    return [...signatures, ...cosignerSignature]
   }
 
   public async signTransaction(
@@ -61,11 +74,11 @@ export class GuardianSigner extends Signer {
 
     const cosignerMessage = {
       contractAddress: addAddressPadding(transactionsDetail.walletAddress),
-      version: transactionsDetail.version.toString(10),
+      version: number.toBN(transactionsDetail.version).toString(10),
       calldata: calldata.map((data) => number.toHex(number.toBN(data))),
       maxFee: number.toBN(transactionsDetail.maxFee).toString(10),
       chainId: number.toBN(transactionsDetail.chainId).toString(10),
-      nonce: transactionsDetail.nonce.toString(10),
+      nonce: number.toBN(transactionsDetail.nonce).toString(10),
     }
 
     const cosignerSignature = await this.cosignMessage({

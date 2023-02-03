@@ -1,4 +1,8 @@
-import { Cosigner, CosignerMessage } from "@argent/guardian"
+import {
+  Cosigner,
+  CosignerMessage,
+  CosignerOffchainMessage,
+} from "@argent/guardian"
 import retry from "async-retry"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
@@ -227,9 +231,16 @@ export const addAccount = async (
   }
 }
 
-export const cosignerSign: Cosigner = async (message: CosignerMessage) => {
+export const cosignerSign: Cosigner = async (
+  message: CosignerMessage | CosignerOffchainMessage,
+  isOffchainMessage = false,
+) => {
+  const beEndpoint = isOffchainMessage
+    ? "/cosigner/personalSign"
+    : `/cosigner/sign`
+
   try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/cosigner/sign`, {
+    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}${beEndpoint}`, {
       method: "POST",
       body: JSON.stringify(message),
     })

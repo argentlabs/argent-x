@@ -15,7 +15,7 @@ export const recoverBackup = async (backup: string) => {
 export const recoverBySeedPhrase = async (
   seedPhrase: string,
   newPassword: string,
-): Promise<void> => {
+): Promise<boolean> => {
   const message = JSON.stringify({ seedPhrase, newPassword })
   const body = await encryptForBackground(message)
 
@@ -24,16 +24,12 @@ export const recoverBySeedPhrase = async (
     data: { secure: true, body },
   })
 
-  const succeeded = await Promise.race([
+  const isSuccess = await Promise.race([
     waitForMessage("RECOVER_SEEDPHRASE_RES").then(() => true),
-    waitForMessage("RECOVER_SEEDPHRASE_REJ")
-      .then(() => false)
-      .catch(() => false),
+    waitForMessage("RECOVER_SEEDPHRASE_REJ").then(() => false),
   ])
 
-  if (!succeeded) {
-    throw Error("Invalid Seed Phrase")
-  }
+  return isSuccess
 }
 
 export const downloadBackupFile = () => {

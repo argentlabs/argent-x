@@ -51,8 +51,10 @@ export const handleRecoveryMessage: HandleMessage<RecoveryMessage> = async ({
 
         return sendMessageToUi({ type: "RECOVER_SEEDPHRASE_RES" })
       } catch (error) {
-        console.error(error)
-        return sendMessageToUi({ type: "RECOVER_SEEDPHRASE_REJ" })
+        return sendMessageToUi({
+          type: "RECOVER_SEEDPHRASE_REJ",
+          data: "Something went wrong in the seedphrase recovery process",
+        })
       }
     }
   }
