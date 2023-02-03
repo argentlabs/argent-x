@@ -309,6 +309,9 @@ export class Wallet {
         accounts,
         accountDetailFetchers,
       )
+      if (accountsWithDetails.length === 0) {
+        throw new Error("No account found")
+      }
       return accountsWithDetails
     } catch (error) {
       console.error(
