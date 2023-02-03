@@ -102,6 +102,11 @@ export const AccountImplementationScreen: FC = () => {
     return <></>
   }
 
+  const handleImplementationClick = (i: Implementation) => async () => {
+    await upgradeAccount(account, i.id)
+    navigate(routes.accountTokens(), { replace: true })
+  }
+
   const [[activeImplementation], otherImplementations] = partition(
     filter(implementations, (i) =>
       Boolean(
@@ -133,10 +138,7 @@ export const AccountImplementationScreen: FC = () => {
                   {...i}
                   key={i.id}
                   active={false}
-                  onClick={async () => {
-                    await upgradeAccount(account, i.id)
-                    navigate(routes.accountTokens(), { replace: true })
-                  }}
+                  onClick={handleImplementationClick(i)}
                 />
               ))}
             </AutoColumn>
