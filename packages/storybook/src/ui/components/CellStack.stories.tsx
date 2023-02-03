@@ -96,9 +96,8 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
       rightIcon={<Switch isChecked={args.isChecked} />}
       extendedDescription={
         <P4 color="neutrals.300" w="100%">
-          Add extra protection to your Argent X accounts with two-factor
-          security. You need to have been added to the whitelist to use this
-          feature while it is in beta
+          Shows a new menu item in the account settings, which allows a user to
+          switch account implementation for an account.
         </P4>
       }
     >
