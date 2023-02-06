@@ -36,7 +36,7 @@ import {
 } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ArgentShieldIcon } = icons
+const { ExpandIcon, ArgentShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -148,8 +148,12 @@ export const AccountEditScreen: FC = () => {
               <ButtonCell
                 as={Link}
                 to={routes.shieldAccountStart(accountAddress)}
-                leftIcon={<ArgentShieldIcon fontSize={"xl"} />}
-                rightIconOpaque={!pendingChangeGuardian}
+                leftIcon={
+                  <ArgentShieldIcon
+                    fontSize={"xl"}
+                    opacity={!pendingChangeGuardian ? 1 : 0.6}
+                  />
+                }
                 rightIcon={
                   pendingChangeGuardian ? (
                     <Spinner size={"sm"} />
@@ -183,7 +187,6 @@ export const AccountEditScreen: FC = () => {
           </ButtonCell>
           <ButtonCell
             onClick={() => account && handleHideOrDeleteAccount(account)}
-            icon={<HideIcon />}
           >
             {showDelete ? "Delete" : "Hide"} account
           </ButtonCell>
@@ -192,7 +195,6 @@ export const AccountEditScreen: FC = () => {
               onClick={() => {
                 navigate(routes.accountImplementations(account.address))
               }}
-              icon={<PluginIcon />}
             >
               Change account implementation
             </ButtonCell>
@@ -200,7 +202,6 @@ export const AccountEditScreen: FC = () => {
           <ButtonCell
             color={"error.500"}
             onClick={() => navigate(routes.exportPrivateKey())}
-            icon={<AlertIcon />}
           >
             Export private key
           </ButtonCell>
