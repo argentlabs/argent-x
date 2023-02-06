@@ -4,6 +4,7 @@ import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/getEscape"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
+import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { routes } from "../../../routes"
 import { selectAccount } from "../../../services/backgroundAccounts"
@@ -11,6 +12,7 @@ import { withPolling } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
 import { useUpdateAccountsOnChainEscapeState } from "../../accounts/accounts.service"
 import { useAccounts } from "../../accounts/accounts.state"
+import { useAccountTransactions } from "../../accounts/accountTransactions.state"
 import {
   escapeWarningStore,
   getEscapeWarningStoreKey,
@@ -114,4 +116,24 @@ export const useAccountEscapeWarning = () => {
     }
     maybeShowWarning()
   }, [accountWithNewEscape, escapeWarningKeys, navigate])
+}
+
+/**
+ * Hook to check if there is a pending 'cancelEscape' transaction for the provided account
+ * @param account - the account to check
+ * @returns boolean status if there is a pending transaction
+ */
+
+export const useAccountHasPendingCancelEscape = (
+  account?: BaseWalletAccount,
+) => {
+  const { pendingTransactions } = useAccountTransactions(account)
+  const pendingCancelEscape = useMemo(() => {
+    const cancelEscapeTransaction = pendingTransactions.find(
+      (transaction) => transaction.meta?.isCancelEscape,
+    )
+    return Boolean(cancelEscapeTransaction)
+  }, [pendingTransactions])
+
+  return pendingCancelEscape
 }

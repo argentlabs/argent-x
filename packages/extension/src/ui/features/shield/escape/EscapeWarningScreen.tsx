@@ -5,6 +5,7 @@ import {
   icons,
   useToast,
 } from "@argent/ui"
+import { Center } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -13,10 +14,14 @@ import { IS_DEV } from "../../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../../shared/utils/error"
 import { routes } from "../../../routes"
 import { accountCancelEscape } from "../../../services/backgroundAccounts"
+import { ShieldHeader } from "../ui/ShieldHeader"
 import { useRouteAccount } from "../useRouteAccount"
 import { EscapeGuardian } from "./EscapeGuardian"
 import { EscapeSigner } from "./EscapeSigner"
-import { useLiveAccountEscape } from "./useAccountEscape"
+import {
+  useAccountHasPendingCancelEscape,
+  useLiveAccountEscape,
+} from "./useAccountEscape"
 
 export const EscapeWarningScreen: FC = () => {
   const navigate = useNavigate()
@@ -44,6 +49,24 @@ export const EscapeWarningScreen: FC = () => {
   }, [account, toast])
 
   const { data: liveAccountEscape } = useLiveAccountEscape(account)
+  const pending = useAccountHasPendingCancelEscape(account)
+  if (pending) {
+    return (
+      <NavigationContainer
+        rightButton={<BarCloseButton onClick={onClose} />}
+        isAbsolute
+      >
+        <Center flex={1}>
+          <ShieldHeader
+            title={"Pending Escape Transaction"}
+            subtitle={"This account has a pending escape transaction"}
+            isLoading
+            size={"lg"}
+          />
+        </Center>
+      </NavigationContainer>
+    )
+  }
   if (!liveAccountEscape) {
     return null
   }

@@ -1,11 +1,15 @@
 import { AlertButton, icons } from "@argent/ui"
+import { Spinner } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { ESCAPE_TYPE_GUARDIAN } from "../../../../shared/account/details/getEscape"
 import { routes } from "../../../routes"
 import { Account } from "../../accounts/Account"
-import { useLiveAccountEscape } from "./useAccountEscape"
+import {
+  useAccountHasPendingCancelEscape,
+  useLiveAccountEscape,
+} from "./useAccountEscape"
 
 const { ArgentShieldIcon, AlertIcon } = icons
 
@@ -36,7 +40,22 @@ export const getEscapeDisplayAttributes = (
 
 export const EscapeBanner: FC<EscapeBannerProps> = ({ account }) => {
   const navigate = useNavigate()
+  const pending = useAccountHasPendingCancelEscape(account)
   const { data: liveAccountEscape } = useLiveAccountEscape(account)
+  if (pending) {
+    return (
+      <AlertButton
+        colorScheme={"warning"}
+        title={"Pending Escape Transaction"}
+        description="This account has a pending escape transaction"
+        size="lg"
+        icon={<Spinner />}
+        onClick={() => {
+          navigate(routes.shieldEscapeWarning(account.address))
+        }}
+      />
+    )
+  }
   if (!liveAccountEscape) {
     return null
   }

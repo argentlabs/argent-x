@@ -221,6 +221,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
               calldata: [],
             },
             meta: {
+              isCancelEscape: true,
               title: "Cancel escape",
               type: "INVOKE_FUNCTION",
             },
