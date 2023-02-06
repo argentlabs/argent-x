@@ -193,7 +193,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
-                                    amount: approval.amount.toString(),
+                                    amount: approval.amount.toString(16),
                                     ...approval.token,
                                   })}
                                 </P4>
