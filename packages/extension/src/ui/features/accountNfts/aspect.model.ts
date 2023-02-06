@@ -1,53 +1,77 @@
-import { number } from "starknet"
+import { BigNumber } from "ethers"
+import { z } from "zod"
 
-export interface AspectNft {
-  best_bid_order?: {
-    payment_address: string
-    payment_amount: number.BigNumberish
-    payment_amount_per: number.BigNumberish
-  }
-  contract_address: string
-  token_id: string
-  name?: string
-  description?: string
-  image_uri?: string
-  image_url_copy?: string
-  animation_uri?: string
-  external_uri?: string
-  owner?: AspectNftOwner
-  contract: AspectNftContract
-}
+export const AspectNftOwnerSchema = z.object({
+  account_address: z.string(),
+  // TODO replace bignumbers with string().pattern(/^0x[0-9a-fA-F]+$/) to validate hexstring
+  payment_amount: z.string().transform((s) => BigNumber.from(s)),
+  payment_amount_per: z.string().transform((s) => BigNumber.from(s)),
+})
 
-interface AspectNftOwner {
-  account_address: string
-}
+export const AspectNftContractSchema = z.object({
+  contract_address: z.string(),
+  name: z.string().optional(),
+  symbol: z.string().optional(),
+  schema: z.string(), // Might be useful in future
+  name_custom: z.string(), // Collection Name
+  image_url: z.string(),
+  floor_list_price: z.string().transform((s) => BigNumber.from(s)),
+})
 
-export interface AspectNftContract {
-  contract_address: string
-  name?: string
-  symbol?: string
-  schema: string // Might be useful in future
-  name_custom: string // Collection Name
-  image_url: string
-  floor_list_price: number.BigNumberish
-}
+export const AspectNftSchema = z.object({
+  best_bid_order: z
+    .object({
+      payment_address: z.string(),
+      payment_amount: z.number(),
+      payment_amount_per: z.number(),
+    })
+    .optional(),
+  contract_address: z.string(),
+  token_id: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  image_uri: z.string().optional(),
+  image_url_copy: z.string().optional(),
+  animation_uri: z.string().optional(),
+  external_uri: z.string().optional(),
+  owner: AspectNftOwnerSchema.optional(),
+  contract: AspectNftContractSchema,
+})
 
-export interface AspectContract {
-  contract_address: string
-  name: string
-  symbol: string
-  schema: string
-  name_custom: string
-  image_url: string
-  banner_image_url: string
-  total_volume_all_time: string
-  total_volume_720_hours: string
-  total_volume_168_hours: string
-  total_volume_24_hours: string
-  volume_change_basis_points_720_hours: string
-  volume_change_basis_points_168_hours: string | null
-  volume_change_basis_points_24_hours: string | null
-  number_of_owners: string
-  number_of_assets: string
-  floor_list_price: string
-}
+export const AspectContractSchema = z.object({
+  contract_address: z.string(),
+  name: z.string(),
+  symbol: z.string(),
+  schema: z.string(),
+  name_custom: z.string(),
+  image_url: z.string(),
+  banner_image_url: z.string(),
+  total_volume_all_time: z.string(),
+  total_volume_720_hours: z.string(),
+  total_volume_168_hours: z.string(),
+  total_volume_24_hours: z.string(),
+  volume_change_basis_points_720_hours: z.string(),
+  volume_change_basis_points_168_hours: z.string().nullable(),
+  volume_change_basis_points_24_hours: z.string().nullable(),
+  number_of_owners: z.string(),
+  number_of_assets: z.string(),
+  floor_list_price: z.string(),
+})
+
+export const CollectionSchema = z.object({
+  name: z.string(),
+  contractAddress: z.string(),
+  nfts: AspectNftSchema.array(),
+  imageUri: z.string().optional(),
+  floorPrice: z
+    .string()
+    .transform((s) => BigNumber.from(s))
+    .optional(),
+})
+
+export const AspectNftArraySchema = AspectNftSchema.array()
+export type AspectNft = z.infer<typeof AspectNftSchema>
+export type AspectNftOwner = z.infer<typeof AspectNftOwnerSchema>
+export type AspectNftContract = z.infer<typeof AspectNftContractSchema>
+export type AspectContract = z.infer<typeof AspectContractSchema>
+export type Collection = z.infer<typeof CollectionSchema>
