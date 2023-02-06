@@ -2,7 +2,10 @@ import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
-import { Escape } from "../../../../shared/account/details/getEscape"
+import {
+  ESCAPE_TYPE_SIGNER,
+  Escape,
+} from "../../../../shared/account/details/getEscape"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
@@ -61,7 +64,7 @@ export const useLiveAccountEscape = (account?: Account) => {
       const activeFromNow = getActiveFromNow(activeAt)
       return {
         activeAt,
-        type,
+        type: ESCAPE_TYPE_SIGNER,
         ...activeFromNow,
       }
     },
@@ -102,11 +105,6 @@ export const useAccountEscapeWarning = () => {
   useEffect(() => {
     const maybeShowWarning = async () => {
       if (accountWithNewEscape) {
-        console.log(
-          "TODO: navigate to warning about this account and add it to the handled warning keys",
-          accountWithNewEscape,
-        )
-        console.warn("TODO: check and unhide hidden account here")
         await selectAccount(accountWithNewEscape)
         navigate(routes.shieldEscapeWarning(accountWithNewEscape.address))
         await escapeWarningStore.push(

@@ -1,4 +1,5 @@
-import { P4, icons } from "@argent/ui"
+import { Button, P4, icons } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ShieldExternalLinkButton } from "../ui/ShieldExternalLinkButton"
@@ -10,9 +11,13 @@ const { AlertIcon } = icons
 
 interface EscapeSignerProps {
   liveAccountEscape: LiveAccountEscapeProps
+  onRemove: () => void
 }
 
-export const EscapeSigner: FC<EscapeSignerProps> = ({ liveAccountEscape }) => {
+export const EscapeSigner: FC<EscapeSignerProps> = ({
+  liveAccountEscape,
+  onRemove,
+}) => {
   const { colorScheme, title } = getEscapeDisplayAttributes(liveAccountEscape)
   return (
     <>
@@ -36,6 +41,10 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({ liveAccountEscape }) => {
       <ShieldExternalLinkButton href={"https://www.argent.xyz/argent-x/"}>
         Detailed instructions
       </ShieldExternalLinkButton>
+      <Flex flex={1} />
+      <Button colorScheme={"primary"} onClick={onRemove}>
+        Start Argent Shield removal process
+      </Button>
     </>
   )
 }
