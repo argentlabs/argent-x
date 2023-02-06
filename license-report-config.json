@@ -1,0 +1,13 @@
+{
+  "output": "markdown",
+  "fields": [
+    "name",
+    "licenseType",
+    "link",
+    "author",
+    "installedVersion",
+    "definedVersion",
+    "remoteVersion",
+    "latestRemoteVersion"
+  ]
+}
