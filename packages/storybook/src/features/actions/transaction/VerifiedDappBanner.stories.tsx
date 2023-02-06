@@ -1,13 +1,13 @@
-import { VerifiedTransactionBanner } from "@argent-x/extension/src/ui/features/actions/transaction/VerifiedTransactionBanner"
+import { VerifiedDappBanner } from "@argent-x/extension/src/ui/features/actions/transaction/VerifiedDappBanner"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "features/VerifiedTransactionBanner",
-  component: VerifiedTransactionBanner,
-} as ComponentMeta<typeof VerifiedTransactionBanner>
+  title: "features/VerifiedDappBanner",
+  component: VerifiedDappBanner,
+} as ComponentMeta<typeof VerifiedDappBanner>
 
-const Template: ComponentStory<typeof VerifiedTransactionBanner> = (props) => (
-  <VerifiedTransactionBanner {...props}></VerifiedTransactionBanner>
+const Template: ComponentStory<typeof VerifiedDappBanner> = (props) => (
+  <VerifiedDappBanner {...props}></VerifiedDappBanner>
 )
 
 const jediswap = {
