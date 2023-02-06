@@ -2,10 +2,7 @@ import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
-import {
-  ESCAPE_TYPE_SIGNER,
-  Escape,
-} from "../../../../shared/account/details/getEscape"
+import { Escape } from "../../../../shared/account/details/getEscape"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
@@ -53,8 +50,12 @@ export const getActiveFromNow = (activeAt: number) => {
 export type LiveAccountEscapeProps = Escape &
   ReturnType<typeof getActiveFromNow>
 
+/** returns escape attributes including live countdown */
+
 export const useLiveAccountEscape = (account?: Account) => {
-  return useSWR<LiveAccountEscapeProps | undefined>(
+  const { data: liveAccountEscape } = useSWR<
+    LiveAccountEscapeProps | undefined
+  >(
     account ? [getAccountIdentifier(account), "accountEscape"] : null,
     async () => {
       if (!account?.escape) {
@@ -72,6 +73,7 @@ export const useLiveAccountEscape = (account?: Account) => {
       ...withPolling(1000) /** 1 second - purely cosmetic */,
     },
   )
+  return liveAccountEscape
 }
 
 export const useAccountsWithEscape = () => {

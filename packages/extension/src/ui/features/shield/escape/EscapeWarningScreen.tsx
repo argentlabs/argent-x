@@ -1,10 +1,4 @@
-import {
-  BarCloseButton,
-  H1,
-  NavigationContainer,
-  icons,
-  useToast,
-} from "@argent/ui"
+import { BarCloseButton, NavigationContainer, useToast } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
@@ -69,7 +63,7 @@ export const EscapeWarningScreen: FC = () => {
     }
   }, [account, toast])
 
-  const { data: liveAccountEscape } = useLiveAccountEscape(account)
+  const liveAccountEscape = useLiveAccountEscape(account)
   const pending = useAccountHasPendingCancelEscape(account)
   if (pending) {
     return (

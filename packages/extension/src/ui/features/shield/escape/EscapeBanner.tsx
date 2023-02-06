@@ -18,7 +18,7 @@ interface EscapeBannerProps {
 }
 
 export const getEscapeDisplayAttributes = (
-  liveAccountEscape: ReturnType<typeof useLiveAccountEscape>["data"],
+  liveAccountEscape: ReturnType<typeof useLiveAccountEscape>,
 ) => {
   if (!liveAccountEscape) {
     return {}
@@ -41,7 +41,7 @@ export const getEscapeDisplayAttributes = (
 export const EscapeBanner: FC<EscapeBannerProps> = ({ account }) => {
   const navigate = useNavigate()
   const pending = useAccountHasPendingCancelEscape(account)
-  const { data: liveAccountEscape } = useLiveAccountEscape(account)
+  const liveAccountEscape = useLiveAccountEscape(account)
   if (pending) {
     return (
       <AlertButton
