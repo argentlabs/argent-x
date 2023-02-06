@@ -1,5 +1,5 @@
 import { Button, P4, icons } from "@argent/ui"
-import { Center, Flex } from "@chakra-ui/react"
+import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ShieldExternalLinkButton } from "../ui/ShieldExternalLinkButton"
@@ -34,12 +34,17 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
       <P4 color="neutrals.100">
         If you didn’t start this action we recommend taking the following steps:
       </P4>
-      <P4 as="ol">
-        <li>Keep Argent Shield turned on</li>
-        <li>Migrate your funds to an account from a different seed phrase</li>
-      </P4>
+      <OrderedList variant={"bordered"} mt={3}>
+        <ListItem>Keep Argent Shield turned on</ListItem>
+        <ListItem>
+          Migrate your funds to an account from a different seed phrase
+        </ListItem>
+      </OrderedList>
       <Center>
-        <ShieldExternalLinkButton href={"https://www.argent.xyz/argent-x/"}>
+        <ShieldExternalLinkButton
+          href={"https://www.argent.xyz/argent-x/"}
+          my={3}
+        >
           Detailed instructions
         </ShieldExternalLinkButton>
       </Center>

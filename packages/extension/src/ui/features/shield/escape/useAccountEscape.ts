@@ -64,7 +64,7 @@ export const useLiveAccountEscape = (account?: Account) => {
       const activeFromNow = getActiveFromNow(activeAt)
       return {
         activeAt,
-        type: ESCAPE_TYPE_SIGNER,
+        type,
         ...activeFromNow,
       }
     },
