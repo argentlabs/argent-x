@@ -2,7 +2,7 @@ import {
   computeHashOnElements as micro_computeHashOnElements,
   pedersen as micro_pedersen,
 } from "micro-starknet"
-import { RawCalldata, encode, number } from "starknet"
+import { RawCalldata, number } from "starknet"
 
 export type PedersenArg = number | string
 
