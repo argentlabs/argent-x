@@ -4,6 +4,7 @@ import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/getEscape"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
+import { isNumeric } from "../../../../shared/utils/number"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { routes } from "../../../routes"
@@ -24,8 +25,11 @@ const pluralise = (value: number, unit: string) => {
   return `${value} ${unit}${value === 1 ? "" : "s"}`
 }
 
-export const getActiveFromNow = (activeAt: number) => {
-  const activeFromNowMs = Math.max(0, activeAt * 1000 - new Date().getTime())
+export const getActiveFromNow = (activeAt: number, now = new Date()) => {
+  if (!isNumeric(activeAt)) {
+    throw "activeAt should be numeric"
+  }
+  const activeFromNowMs = Math.max(0, activeAt * 1000 - now.getTime())
   /** 7 days max */
   const seconds = Math.floor((activeFromNowMs / 1000) % 60)
   const minutes = Math.floor((activeFromNowMs / (1000 * 60)) % 60)
