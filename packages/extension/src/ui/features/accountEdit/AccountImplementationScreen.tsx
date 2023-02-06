@@ -1,4 +1,11 @@
-import { BarBackButton, H3, H6, NavigationContainer, icons } from "@argent/ui"
+import {
+  BarBackButton,
+  ButtonCell,
+  H6,
+  NavigationContainer,
+  P4,
+  icons,
+} from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 import { filter, partition } from "lodash-es"
 import { FC, ReactNode } from "react"
@@ -11,13 +18,7 @@ import { routes } from "../../routes"
 import { upgradeAccount } from "../../services/backgroundAccounts"
 import { useSelectedAccount } from "../accounts/accounts.state"
 
-const {
-  WalletIcon,
-  PluginIcon,
-  UpgradeIcon,
-  CheckboxActiveIcon,
-  ChevronRightIcon,
-} = icons
+const { WalletIcon, PluginIcon, MulticallIcon, TickIcon } = icons
 
 interface Implementation {
   id: ArgentAccountType
@@ -28,22 +29,22 @@ interface Implementation {
 const implementations: Implementation[] = [
   {
     id: "argent",
-    title: "Default Implementation",
+    title: "Default",
     description: "The default Argent account implementation",
     icon: <WalletIcon />,
   },
   {
     id: "argent-plugin",
-    title: "Plugin Implementation",
+    title: "Plugin",
     description: "The Argent account implementation with plugin support",
     icon: <PluginIcon />,
   },
   {
     id: "argent-better-multicall",
-    title: "Better Multicall Implementation",
+    title: "Better multicall",
     description:
       "The Argent account implementation with better multicall support",
-    icon: <UpgradeIcon />,
+    icon: <MulticallIcon />,
   },
 ]
 
@@ -60,37 +61,26 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
   onClick,
 }) => {
   return (
-    <Box
-      bg="neutrals.700"
-      p="4"
-      borderRadius="md"
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      fontSize={"md"}
-      onClick={onClick}
-      gap="4"
-      cursor={active ? "default" : "pointer"}
-      transition="all 0.2s"
-      _hover={
-        active
-          ? {}
-          : {
-              bg: "neutrals.600",
-            }
+    <ButtonCell
+      leftIcon={icon}
+      rightIcon={
+        active ? (
+          <TickIcon color="primary.500" />
+        ) : (
+          <P4 color="primary.500">Enable</P4>
+        )
       }
+      extendedDescription={
+        description && (
+          <P4 color="neutrals.300" w="100%">
+            {description}
+          </P4>
+        )
+      }
+      onClick={onClick}
     >
-      <Box flex="0" width="32">
-        {icon}
-      </Box>
-      <Box flex="1" fontSize={"sm"}>
-        <H6 mb="1">{title}</H6>
-        <p>{description}</p>
-      </Box>
-      <Box flex="0">
-        {active ? <CheckboxActiveIcon /> : <ChevronRightIcon />}
-      </Box>
-    </Box>
+      {title}
+    </ButtonCell>
   )
 }
 
@@ -119,11 +109,16 @@ export const AccountImplementationScreen: FC = () => {
   )
 
   return (
-    <NavigationContainer leftButton={<BarBackButton />}>
+    <NavigationContainer
+      title="Change account implementation"
+      leftButton={<BarBackButton />}
+    >
       <Box p="5" display={"flex"} flexDirection="column" gap="4">
         {activeImplementation && (
           <>
-            <H3>Current implementation</H3>
+            <H6 color="neutrals.300" pl="2">
+              Current implementation
+            </H6>
             <AutoColumn>
               <ImplementationItem {...activeImplementation} active={true} />
             </AutoColumn>
@@ -131,7 +126,9 @@ export const AccountImplementationScreen: FC = () => {
         )}
         {otherImplementations && (
           <>
-            <H3>Other implementations</H3>
+            <H6 mt="2" pl="2" color="neutrals.300">
+              Other implementations
+            </H6>
             <AutoColumn gap="md">
               {otherImplementations.map((i) => (
                 <ImplementationItem
