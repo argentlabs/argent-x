@@ -10,13 +10,15 @@ jobs:
           - 5050:5050
     if: github.actor == 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
       - run: yarn install --frozen-lockfile
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
       - run: yarn build
       - run: yarn test
       - run: xvfb-run --auto-servernum yarn test:e2e

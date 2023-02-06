@@ -60,21 +60,21 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     </Center>
   ) : (
     <IconWrapper>
-      <NetworkIcon color="neutrals.500" width="27px" height="27px" />
+      <NetworkIcon fontSize={"4xl"} color="neutrals.500" />
     </IconWrapper>
   )
 }
 
 const IconWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box
+    <Center
       w="14"
       h="14"
       background="neutrals.700"
       borderRadius="2xl"
-      boxShadow="0px 4px 20px rgba(0, 0, 0, 0.5);"
+      boxShadow="menu"
     >
-      <Center height="full">{children}</Center>
-    </Box>
+      {children}
+    </Center>
   )
 }

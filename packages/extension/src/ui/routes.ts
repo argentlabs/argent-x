@@ -107,12 +107,17 @@ export const routes = {
     "/accounts/hidden/:networkId",
   ),
   accounts: routeWithReturnTo("/accounts"),
+  newAccount: route("/account/new"),
   editAccount: route(
     (accountAddress, returnTo?: string) =>
       returnTo
         ? `/accounts/${accountAddress}?returnTo=${encodeURIComponent(returnTo)}`
         : `/accounts/${accountAddress}`,
     "/accounts/:accountAddress",
+  ),
+  accountImplementations: route(
+    (accountAddress) => `/accounts/${accountAddress}/implementation`,
+    "/accounts/:accountAddress/implementation",
   ),
   addAccount: route("/accounts/new"),
   shieldAccountStart: route(
@@ -207,5 +212,9 @@ export const routes = {
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
+
+  multisigSetup: route("/multisig/setup"),
+  multisigCreate: route("/multisig/create"),
+  multisigJoin: route("/multisig/join"),
   swap: route("/swap"),
 }

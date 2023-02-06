@@ -14,12 +14,22 @@ jobs:
         image: shardlabs/starknet-devnet:latest-seed0
         ports:
           - 5050:5050
+    env:
+      FILENAME: argent-extension-${{ github.ref_name }}
 
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
+      - name: If github.head_ref not filled, we are merging
+        run: |
+          if [ "${{ github.head_ref }}" == "" ]; then
+            echo "PUBLISH_COMMENT=no" >> $GITHUB_ENV
+          else
+            echo "PUBLISH_COMMENT=yes" >> $GITHUB_ENV
+          fi
 
-      - uses: actions/setup-node@v2
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
@@ -31,21 +41,86 @@ jobs:
         run: yarn lint
 
       - name: Build
-        run: yarn build
+        run: yarn lerna run --scope @argent-x/extension build
         env:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run tests
         run: yarn test
 
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
 
+      - name: Check bundlesize for chrome
+        run: yarn run bundlewatch
+
       - uses: actions/upload-artifact@v3
-        if: failure()
+        if: always()
         with:
           name: test-results
-          path: packages/extension/test-results/
+          path: |
+            packages/extension/test-results/
+            packages/extension/e2e/artifacts/playwright/
+            packages/extension/e2e/artifacts/reports/
+          retention-days: 5
 
-      - name: Check bundlesize
+      ## Upload build and comment PR if not merging into develop
+      - name: Set filename prefix
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: echo "FILENAME_PREFIX=$(echo ${{ env.FILENAME }}  | tr / -)" >> $GITHUB_ENV
+
+      - name: Create chrome zip
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME_PREFIX }}-chrome.zip ./*
+          mv ${{ env.FILENAME_PREFIX }}-chrome.zip ../../../
+          cd ../../../
+
+      - name: Build Firefox version
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+
+      - name: Create firefox zip
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME_PREFIX }}-firefox.zip ./*
+          mv ${{ env.FILENAME_PREFIX }}-firefox.zip ../../../
+          cd ../../../
+
+      - name: Check bundlesize for firefox
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
         run: yarn run bundlewatch
+
+      - name: Upload artifacts for firefox
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-firefox.zip
+          path: "*-firefox.zip"
+          retention-days: 5
+
+      - name: Upload artifacts for chrome
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-chrome.zip
+          path: "*-chrome.zip"
+          retention-days: 5
+
+      - name: Set GHA_BRANCH
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: echo "GHA_BRANCH=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+
+      - name: comment PR
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_REPO: ${{ env.GHA_BRANCH }}
+          INPUT_OWNER: ${{ github.repository_owner }}
+        run: |
+          gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"

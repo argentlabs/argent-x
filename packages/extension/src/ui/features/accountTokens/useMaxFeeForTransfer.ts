@@ -3,6 +3,7 @@ import { Call, number, stark } from "starknet"
 import useSWR from "swr"
 
 import { getNetworkFeeToken } from "../../../shared/tokens.state"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { getEstimatedFee } from "../../services/backgroundTransactions"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
@@ -18,30 +19,21 @@ export const useMaxFeeEstimateForTransfer = (
   error?: any
   loading: boolean
 } => {
-  if (!account || !balance || !tokenAddress) {
-    throw new Error("Account, TokenAddress and Balance are required")
-  }
-
-  const call: Call = {
-    contractAddress: tokenAddress,
-    entrypoint: "transfer",
-    calldata: compileCalldata({
-      recipient: account.address,
-      amount: getUint256CalldataFromBN(balance),
-    }),
-  }
+  const key =
+    account && balance && tokenAddress
+      ? [getAccountIdentifier(account), "maxEthTransferEstimate"]
+      : null
 
   const {
     data: estimatedFee,
     error,
     isValidating,
   } = useSWR(
-    [
-      "maxEthTransferEstimate",
-      Math.floor(Date.now() / 60e3),
-      account.networkId,
-    ],
+    key,
     async () => {
+      if (!account || !balance || !tokenAddress) {
+        return
+      }
       const feeToken = await getNetworkFeeToken(account.networkId)
 
       if (feeToken?.address !== tokenAddress) {
@@ -51,21 +43,29 @@ export const useMaxFeeEstimateForTransfer = (
         }
       }
 
-      return getEstimatedFee(call)
+      const call: Call = {
+        contractAddress: tokenAddress,
+        entrypoint: "transfer",
+        calldata: compileCalldata({
+          recipient: account.address,
+          amount: getUint256CalldataFromBN(balance),
+        }),
+      }
+
+      const estimatedFee = await getEstimatedFee(call)
+      return estimatedFee
     },
     {
-      suspense: false,
-      refreshInterval: 15e3,
-      shouldRetryOnError: false,
+      refreshInterval: 15 * 1000 /** 15 seconds */,
     },
   )
 
   if (error) {
-    return { maxFee: undefined, error, loading: false }
+    return { maxFee: undefined, error, loading: isValidating }
   }
 
   // Add Overhead to estimatedFee
-  if (estimatedFee) {
+  if (estimatedFee && account) {
     const { suggestedMaxFee, maxADFee } = estimatedFee
 
     const totalMaxFee =
@@ -78,7 +78,7 @@ export const useMaxFeeEstimateForTransfer = (
     return {
       maxFee: number.toHex(maxFee),
       error: undefined,
-      loading: false,
+      loading: isValidating,
     }
   }
 

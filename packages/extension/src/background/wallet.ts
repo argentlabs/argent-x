@@ -6,7 +6,8 @@ import {
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
-  Signer,
+  KeyPair,
+  SignerInterface,
   ec,
   hash,
   number,
@@ -31,7 +32,10 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
+import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -46,7 +50,6 @@ import {
   declareContracts,
   getPreDeployedAccount,
 } from "./devnet/declareAccounts"
-import { GuardianSigner } from "./GuardianSigner"
 import {
   getIndexForPath,
   getNextPathIndex,
@@ -165,8 +168,10 @@ export class Wallet {
 
     await this.importBackup(encryptedBackup)
     await this.setSession(ethersWallet.privateKey, newPassword)
-
-    await this.discoverAccounts()
+    const accounts = await this.discoverAccounts()
+    if (accounts.length === 0) {
+      throw new Error(`No account found`)
+    }
   }
 
   public async discoverAccounts() {
@@ -191,8 +196,8 @@ export class Wallet {
     const accounts = accountsResults.flatMap((x) => x)
 
     await this.walletStore.push(accounts)
-
     this.store.set("discoveredOnce", true)
+    return accounts
   }
 
   private async getAccountClassHashForNetwork(
@@ -200,13 +205,11 @@ export class Wallet {
     accountType: ArgentAccountType,
   ): Promise<string> {
     if (network.accountClassHash) {
-      if (
-        accountType === "argent-plugin" &&
-        network.accountClassHash.argentPluginAccount
-      ) {
-        return network.accountClassHash.argentPluginAccount
-      }
-      return network.accountClassHash.argentAccount
+      return (
+        network.accountClassHash[
+          mapArgentAccountTypeToImplementationKey(accountType)
+        ] ?? network.accountClassHash.argentAccount
+      )
     }
 
     const deployerAccount = await getPreDeployedAccount(network)
@@ -297,9 +300,8 @@ export class Wallet {
       },
     )
 
-    await Promise.all(promises)
-
     try {
+      await Promise.all(promises)
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
@@ -310,13 +312,14 @@ export class Wallet {
         accounts,
         accountDetailFetchers,
       )
+
       return accountsWithDetails
     } catch (error) {
       console.error(
         "Error getting account types or guardians from chain",
         error,
       )
-      return accounts
+      throw new Error(JSON.stringify(error, Object.getOwnPropertyNames(error)))
     }
   }
 
@@ -638,17 +641,19 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
-  public async getSignerForAccount(account: WalletAccount) {
+  public async getSignerForAccount(
+    account: WalletAccount,
+  ): Promise<KeyPair | SignerInterface> {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
 
-    const signer =
+    const keyPairOrSigner =
       ARGENT_SHIELD_ENABLED && account.guardian
-        ? new GuardianSigner(keyPair)
-        : new Signer(keyPair)
+        ? new GuardianSignerArgentX(keyPair, cosignerSign)
+        : keyPair
 
-    return signer
+    return keyPairOrSigner
   }
 
   public async getStarknetAccount(

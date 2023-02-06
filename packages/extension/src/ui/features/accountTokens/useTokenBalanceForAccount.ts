@@ -15,8 +15,9 @@ import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 
 interface UseTokenBalanceForAccountArgs {
-  token: Token
-  account: Account
+  /** Not passing valid `token` will return undefined `tokenWithBalance` with descrption in `errorMessage`, this allows for lazy loading */
+  token?: Token
+  account?: Account
   /** Return `data` as {@link TokenBalanceErrorMessage} rather than throwing so the UI can choose if / how to display it to the user without `ErrorBoundary` */
   shouldReturnError?: boolean
 }
@@ -32,14 +33,23 @@ export const useTokenBalanceForAccount = (
 ) => {
   const { pendingTransactions } = useAccountTransactions(account)
   const pendingTransactionsLengthRef = useRef(pendingTransactions.length)
-  const { data, mutate, ...rest } = useSWR<string | TokenBalanceErrorMessage>(
-    [
-      getAccountIdentifier(account),
-      "balanceOf",
-      token.address,
-      token.networkId,
-    ],
+  const key =
+    token && account
+      ? [
+          getAccountIdentifier(account),
+          "balanceOf",
+          token.address,
+          token.networkId,
+        ]
+      : null
+  const { data, mutate, ...rest } = useSWR<
+    string | TokenBalanceErrorMessage | undefined
+  >(
+    key,
     async () => {
+      if (!token || !account) {
+        return
+      }
       try {
         const balance = await getTokenBalanceForAccount(
           token.address,
@@ -71,6 +81,15 @@ export const useTokenBalanceForAccount = (
 
   /** as a convenience, also return the token with balance and error message */
   const { tokenWithBalance, errorMessage } = useMemo(() => {
+    if (!token) {
+      return {
+        tokenWithBalance: undefined,
+        errorMessage: {
+          message: "Error",
+          description: "token is not defined",
+        },
+      }
+    }
     const tokenWithBalance: TokenDetailsWithBalance = {
       ...token,
     }

@@ -1,7 +1,6 @@
 import { FC } from "react"
 
 import { Token } from "../../../shared/token/type"
-import { withPolling } from "../../services/swr"
 import { Account } from "../accounts/Account"
 import { TokenListItem, TokenListItemProps } from "./TokenListItem"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
@@ -31,17 +30,15 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
           true /** using Suspense, causes error to be returned as `balance` instead of throwing */,
       },
       {
-        suspense:
-          true /** Suspense allows us to show an initial loader for all tokens */,
-        ...withPolling(60 * 1000) /** 60 seconds */,
+        refreshInterval: 60 * 1000 /** 60 seconds */,
       },
     )
 
   const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
   const shouldShow =
     token.showAlways ||
-    (tokenWithBalance.balance && tokenWithBalance.balance.gt(0))
-  if (!shouldShow) {
+    (tokenWithBalance?.balance && tokenWithBalance?.balance.gt(0))
+  if (!shouldShow || tokenWithBalance === undefined) {
     return null
   }
   return (

@@ -1,3 +1,4 @@
+import { Device } from "@argent/guardian"
 import {
   SignJWT,
   calculateJwkThumbprint,
@@ -5,7 +6,7 @@ import {
   generateKeyPair,
 } from "jose"
 
-import { Device, idb } from "./idb"
+import { idb } from "./idb"
 
 /** important that signingKey stays not 'extractable' from browser */
 

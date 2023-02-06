@@ -1,5 +1,5 @@
 import { Button, FieldError, H6, P4, icons } from "@argent/ui"
-import { Flex, Tooltip } from "@chakra-ui/react"
+import { Flex, Skeleton, Tooltip } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
 import {
@@ -41,6 +41,9 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   const displayBalance = prettifyTokenBalance(token)
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
   const isNoCurrencyVariant = variant === "no-currency"
+  if (token.balance === undefined && !errorMessage) {
+    return <Skeleton height={17} rounded={"xl"} />
+  }
   return (
     <CustomButtonCell {...rest}>
       <TokenIcon size={9} url={image} name={name} />

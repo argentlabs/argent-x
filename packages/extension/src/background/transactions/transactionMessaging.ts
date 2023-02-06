@@ -149,30 +149,75 @@ export const handleTransactionMessage: HandleMessage<
     case "ESTIMATE_DECLARE_CONTRACT_FEE": {
       const { classHash, contract, ...restData } = msg.data
 
-      const selectedAccount =
+      const selectedAccount = await wallet.getSelectedAccount()
+      const selectedStarknetAccount =
         "address" in restData
           ? await wallet.getStarknetAccount(restData)
           : await wallet.getSelectedStarknetAccount()
 
-      if (!selectedAccount) {
+      if (!selectedStarknetAccount) {
         throw Error("no accounts")
       }
-      try {
-        const { overall_fee, suggestedMaxFee } = await (
-          selectedAccount as Account
-        ).estimateDeclareFee({
-          classHash,
-          contract,
-        })
 
-        const maxADFee = number.toHex(
-          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
-        )
+      let txFee = "0",
+        maxTxFee = "0",
+        accountDeploymentFee: string | undefined,
+        maxADFee: string | undefined
+
+      try {
+        if (
+          selectedAccount?.needsDeploy &&
+          !(await isAccountDeployed(
+            selectedAccount,
+            selectedStarknetAccount.getClassAt,
+          ))
+        ) {
+          if ("estimateFeeBulk" in selectedStarknetAccount) {
+            const bulkTransactions: TransactionBulk = [
+              {
+                type: "DEPLOY_ACCOUNT",
+                payload: await wallet.getAccountDeploymentPayload(
+                  selectedAccount,
+                ),
+              },
+              {
+                type: "DECLARE",
+                payload: {
+                  classHash,
+                  contract,
+                },
+              },
+            ]
+
+            const estimateFeeBulk =
+              await selectedStarknetAccount.estimateFeeBulk(bulkTransactions)
+
+            accountDeploymentFee = number.toHex(estimateFeeBulk[0].overall_fee)
+            txFee = number.toHex(estimateFeeBulk[1].overall_fee)
+
+            maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+            maxTxFee = estimateFeeBulk[1].suggestedMaxFee
+          }
+        } else {
+          const { overall_fee, suggestedMaxFee } = await (
+            selectedStarknetAccount as Account
+          ).estimateDeclareFee({
+            classHash,
+            contract,
+          })
+
+          txFee = number.toHex(overall_fee)
+          maxTxFee = number.toHex(suggestedMaxFee)
+        }
+
+        const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
 
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
           data: {
-            amount: number.toHex(overall_fee),
+            amount: txFee,
+            suggestedMaxFee,
+            accountDeploymentFee,
             maxADFee,
           },
         })
@@ -193,28 +238,75 @@ export const handleTransactionMessage: HandleMessage<
     case "ESTIMATE_DEPLOY_CONTRACT_FEE": {
       const { classHash, constructorCalldata, salt, unique } = msg.data
 
-      const selectedAccount = await wallet.getSelectedStarknetAccount()
+      const selectedAccount = await wallet.getSelectedAccount()
+      const selectedStarknetAccount = await wallet.getSelectedStarknetAccount()
 
-      if (!selectedAccount) {
+      if (!selectedStarknetAccount) {
         throw Error("no accounts")
       }
+
+      let txFee = "0",
+        maxTxFee = "0",
+        accountDeploymentFee: string | undefined,
+        maxADFee: string | undefined
+
       try {
-        const { overall_fee, suggestedMaxFee } = await (
-          selectedAccount as Account
-        ).estimateDeployFee({
-          classHash,
-          salt,
-          unique,
-          constructorCalldata,
-        })
-        const maxADFee = number.toHex(
-          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
-        )
+        if (
+          selectedAccount?.needsDeploy &&
+          !(await isAccountDeployed(
+            selectedAccount,
+            selectedStarknetAccount.getClassAt,
+          ))
+        ) {
+          if ("estimateFeeBulk" in selectedStarknetAccount) {
+            const bulkTransactions: TransactionBulk = [
+              {
+                type: "DEPLOY_ACCOUNT",
+                payload: await wallet.getAccountDeploymentPayload(
+                  selectedAccount,
+                ),
+              },
+              {
+                type: "DEPLOY",
+                payload: {
+                  classHash,
+                  salt,
+                  unique,
+                  constructorCalldata,
+                },
+              },
+            ]
+
+            const estimateFeeBulk =
+              await selectedStarknetAccount.estimateFeeBulk(bulkTransactions)
+
+            accountDeploymentFee = number.toHex(estimateFeeBulk[0].overall_fee)
+            txFee = number.toHex(estimateFeeBulk[1].overall_fee)
+
+            maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+            maxTxFee = estimateFeeBulk[1].suggestedMaxFee
+          }
+        } else {
+          const { overall_fee, suggestedMaxFee } = await (
+            selectedStarknetAccount as Account
+          ).estimateDeployFee({
+            classHash,
+            salt,
+            unique,
+            constructorCalldata,
+          })
+          txFee = number.toHex(overall_fee)
+          maxTxFee = number.toHex(suggestedMaxFee)
+        }
+
+        const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
 
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
           data: {
-            amount: number.toHex(overall_fee),
+            amount: txFee,
+            suggestedMaxFee,
+            accountDeploymentFee,
             maxADFee,
           },
         })
