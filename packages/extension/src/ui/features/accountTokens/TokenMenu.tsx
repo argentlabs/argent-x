@@ -5,6 +5,7 @@ import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 
 import { VisibilityOff } from "../../components/Icons/MuiIcons"
+import { IconWrapper } from "../../components/Menu"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import {
@@ -12,7 +13,6 @@ import {
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import { IconWrapper } from "./DeprecatedAccountMenu"
 
 const { MoreIcon } = icons
 

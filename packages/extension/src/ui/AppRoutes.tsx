@@ -8,6 +8,7 @@ import { useAppState, useStopSessionHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
+import { AccountImplementationScreen } from "./features/accountEdit/AccountImplementationScreen"
 import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
@@ -66,6 +67,7 @@ import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
+import { WithArgentServicesEnabled } from "./features/settings/WithArgentServicesEnabled"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
 import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
@@ -169,8 +171,17 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
+      path={routes.accountImplementations.path}
+      element={<AccountImplementationScreen />}
+    />
+    <Route
+      presentation="push"
       path={routes.shieldAccountStart.path}
-      element={<ShieldAccountStartScreen />}
+      element={
+        <WithArgentServicesEnabled>
+          <ShieldAccountStartScreen />
+        </WithArgentServicesEnabled>
+      }
     />
     <Route
       presentation="push"

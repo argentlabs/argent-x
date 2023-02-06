@@ -13,7 +13,7 @@ import { NetworkSwitcher } from "../networks/NetworkSwitcher"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccount } from "./accounts.state"
 
-const { SettingsIcon, DropdownDownIcon } = icons
+const { SettingsIcon, DropdownDownIcon, ArgentShieldIcon } = icons
 
 export interface AccountNavigationBarProps
   extends Pick<NavigationBarProps, "scroll"> {
@@ -29,6 +29,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   const navigate = useNavigate()
   const location = useLocation()
   const returnTo = useCurrentPathnameWithQuery()
+  const isShield = Boolean(account?.guardian)
 
   const openAccountList = useCallback(() => {
     navigate(routes.accounts(location.pathname))
@@ -48,6 +49,11 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
           size={"2xs"}
           onClick={openAccountList}
         >
+          {isShield && (
+            <Text fontSize={"2xs"} mr={1}>
+              <ArgentShieldIcon />
+            </Text>
+          )}
           <Text noOfLines={1} maxW={"180px"}>
             {accountName}
           </Text>

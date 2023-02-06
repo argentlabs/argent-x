@@ -86,6 +86,8 @@ yarn build  # run build process for all packages
 
 Now you need to load the locally built chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
 
+### Chrome
+
 1. Open the Extension Management page by navigating to `chrome://extensions`.
 2. Enable Developer Mode by clicking the toggle switch next to **Developer mode**.
 3. Click the Load unpacked button and select the extension directory.
@@ -93,6 +95,13 @@ Now you need to load the locally built chrome extension into your browser, by lo
 ![Chrome screenshot of setup](https://wd.imgix.net/image/BhuKGJaIeLNPW9ehns59NfwqKxF2/vOu7iPbaapkALed96rzN.png?auto=format)
 
 [Source](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest)
+
+### Firefox
+
+1. Open the Extension Management page by navigating to `about:debugging#/runtime/this-firefox`
+2. Select the `manifest.json` from the dist folder
+
+[Source](https://firefox-source-docs.mozilla.org/devtools-user/about_colon_debugging/index.html)
 
 ## 👩🏾‍💻 Development
 
