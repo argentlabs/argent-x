@@ -6,7 +6,6 @@ import { assertNever } from "../../services/assertNever"
 import { AccountActivityContainer } from "../accountActivity/AccountActivityContainer"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { AccountTokens } from "../accountTokens/AccountTokens"
-import { useAccountEscapeWarning } from "../shield/escape/useAccountEscape"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
 import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShouldShowFullScreenStatusMessage"
 import { NoSwap } from "../swap/NoSwap"
@@ -21,8 +20,6 @@ interface AccountScreenProps {
 }
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
-  useAccountEscapeWarning()
-
   const account = useSelectedAccount()
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()

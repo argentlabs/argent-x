@@ -94,8 +94,6 @@ export const useAccountsWithEscape = () => {
 /** checks and shows a warning if an account has an escape state that has not yet shown to the user */
 
 export const useAccountEscapeWarning = () => {
-  useUpdateAccountsOnChainEscapeState()
-
   const navigate = useNavigate()
 
   const accountsWithEscape = useAccountsWithEscape()
