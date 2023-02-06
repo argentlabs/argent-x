@@ -18,7 +18,7 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { ApiTransactionSimulationResponse } from "../../../../shared/transactionSimulation.service"
+import { ApiTransactionSimulationResponse } from "../../../../shared/transactionSimulation/types"
 import {
   formatTruncatedAddress,
   normalizeAddress,

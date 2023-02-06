@@ -9,7 +9,7 @@ import {
   ApiTransactionSimulationResponse,
   TokenDetails,
   TransactionSimulationTransfer,
-} from "../../../../shared/transactionSimulation.service"
+} from "../../../../shared/transactionSimulation/types"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useCurrentNetwork } from "../../networks/useNetworks"
@@ -181,5 +181,9 @@ export const transferAffectsBalance = (
   t: TransactionSimulationTransfer,
   account: Account,
 ) => {
+  if (t.details.tokenType === "erc721") {
+    return false
+  }
+
   return t.from === account.address || t.to === account.address
 }

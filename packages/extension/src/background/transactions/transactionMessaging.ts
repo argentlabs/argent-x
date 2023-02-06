@@ -324,7 +324,7 @@ export const handleTransactionMessage: HandleMessage<
       }
     }
 
-    case "SIMULATE_TRANSACTION": {
+    case "SIMULATE_TRANSACTION_INVOCATION": {
       const transactions = Array.isArray(msg.data) ? msg.data : [msg.data]
 
       try {
@@ -369,22 +369,59 @@ export const handleTransactionMessage: HandleMessage<
         const { contractAddress, calldata, signature } =
           await starknetAccount.buildInvocation(transactions, signerDetails)
 
+        const invocation = {
+          type: "INVOKE_FUNCTION" as const,
+          contract_address: contractAddress,
+          calldata,
+          signature,
+          nonce,
+          version,
+        }
+
         return respond({
-          type: "SIMULATE_TRANSACTION_RES",
+          type: "SIMULATE_TRANSACTION_INVOCATION_RES",
           data: {
-            type: "INVOKE_FUNCTION",
-            contract_address: contractAddress,
-            calldata,
-            signature,
-            nonce,
-            version,
+            invocation,
             chainId,
           },
         })
       } catch (error) {
         console.log(error)
         return respond({
-          type: "SIMULATE_TRANSACTION_REJ",
+          type: "SIMULATE_TRANSACTION_INVOCATION_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString() ??
+              (error as any)?.toString() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "SIMULATE_TRANSACTION_FALLBACK": {
+      const selectedAccount = await wallet.getSelectedAccount()
+      const starknetAccount =
+        (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+
+      const nonce = await getNonce(selectedAccount, wallet)
+
+      try {
+        const simulated = await starknetAccount.simulateTransaction(msg.data, {
+          nonce,
+        })
+
+        return respond({
+          type: "SIMULATE_TRANSACTION_FALLBACK_RES",
+          data: simulated,
+        })
+      } catch (error) {
+        return respond({
+          type: "SIMULATE_TRANSACTION_FALLBACK_REJ",
           data: {
             error:
               (error as any)?.message?.toString() ??

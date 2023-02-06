@@ -3,6 +3,7 @@ import type {
   Call,
   InvocationsDetails,
   Sequencer,
+  TransactionSimulation,
   UniversalDeployerContractPayload,
   constants,
 } from "starknet"
@@ -75,16 +76,29 @@ export type TransactionMessage =
       data: EstimateFeeResponse
     }
   | {
-      type: "SIMULATE_TRANSACTION"
+      type: "SIMULATE_TRANSACTION_INVOCATION"
       data: Call | Call[]
     }
   | {
-      type: "SIMULATE_TRANSACTION_RES"
-      data: Sequencer.SimulateTransaction & {
+      type: "SIMULATE_TRANSACTION_INVOCATION_RES"
+      data: {
+        invocation: Sequencer.SimulateTransaction
         chainId: constants.StarknetChainId
       }
     }
   | {
-      type: "SIMULATE_TRANSACTION_REJ"
+      type: "SIMULATE_TRANSACTION_INVOCATION_REJ"
+      data: { error: string }
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_FALLBACK"
+      data: Call | Call[]
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_FALLBACK_RES"
+      data: TransactionSimulation
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_FALLBACK_REJ"
       data: { error: string }
     }
