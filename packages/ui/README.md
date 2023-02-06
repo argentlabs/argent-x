@@ -41,6 +41,8 @@ yarn storybook
 
 The icons in `/src/components/icons` are generated from master artwork in Figma. To regenerate these (requires an access key - see `.env`):
 
+You can get that access token from: https://www.figma.com/developers/api#access-tokens
+
 ```bash
 yarn gen:icons
 ```

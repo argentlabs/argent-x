@@ -1,5 +1,7 @@
 import { Page, expect } from "@playwright/test"
-type language = "en"
+
+import config from "./../config"
+
 const text = {
   en: {
     noAccounts: "You have no accounts on ",
@@ -13,6 +15,7 @@ const text = {
     send: "Send",
     next: "Next",
     confirm: "Confirm",
+    export: "Export",
   },
 }
 type TokenName = "Ethereum"
@@ -23,7 +26,7 @@ export interface IAsset {
 }
 
 export default class Account {
-  constructor(private page: Page, private lang: language = "en") {}
+  constructor(private page: Page, private lang = config.appLanguage) {}
   get noAccountBanner() {
     return this.page.locator(`div h5:has-text("${text[this.lang].noAccounts}")`)
   }
@@ -224,5 +227,13 @@ export default class Account {
       balance.toString(),
     )
     await this.back.click()
+  }
+
+  get password() {
+    return this.page.locator('input[name="password"]')
+  }
+
+  get exportPrivateKey() {
+    return this.page.locator(`button:has-text("${text[this.lang].export}")`)
   }
 }

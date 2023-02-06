@@ -40,6 +40,7 @@ const playwrightConfig: PlaywrightTestConfig = {
     trace: "on-first-retry",
     viewport: { width: 360, height: 600 },
     actionTimeout: 60 * 1000, // 1 minute
+    permissions: ["clipboard-read"],
   },
   outputDir: config.artifactsDir,
   preserveOutput: isCI ? "failures-only" : "never",
