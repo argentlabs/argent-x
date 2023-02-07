@@ -8,12 +8,12 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { useNetworkFeeToken } from "../../../../shared/tokens.state"
 import { CopyTooltip } from "../../../components/CopyTooltip"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
+import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 import { useExtensionIsInTab } from "../../browser/tabs"
 import { ExtendableControl, FeeEstimationValue, LoadingInput } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"

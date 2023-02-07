@@ -7,7 +7,6 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../shared/token/price"
-import { useToken } from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
@@ -21,6 +20,7 @@ import { TokenIcon } from "./TokenIcon"
 import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
+import { useToken } from "./tokens.state"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
 
 const TokenScreenWrapper = styled(ColumnCenter)`

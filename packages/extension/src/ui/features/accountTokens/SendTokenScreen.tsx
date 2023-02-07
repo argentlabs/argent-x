@@ -12,11 +12,6 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../shared/token/price"
-import {
-  TokenDetailsWithBalance,
-  useNetworkFeeToken,
-  useToken,
-} from "../../../shared/tokens.state"
 import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -61,6 +56,11 @@ import { TokenIcon } from "./TokenIcon"
 import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenUnitAmountToCurrencyValue } from "./tokenPriceHooks"
 import { formatTokenBalance, toTokenView } from "./tokens.service"
+import {
+  TokenDetailsWithBalance,
+  useNetworkFeeToken,
+  useToken,
+} from "./tokens.state"
 import { useMaxFeeEstimateForTransfer } from "./useMaxFeeForTransfer"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
 

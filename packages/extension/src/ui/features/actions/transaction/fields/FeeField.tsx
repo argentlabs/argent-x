@@ -1,8 +1,8 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { useNetworkFeeToken } from "../../../../../shared/tokens.state"
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
+import { useNetworkFeeToken } from "../../../accountTokens/tokens.state"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 
 const FeeAmount = styled.div`

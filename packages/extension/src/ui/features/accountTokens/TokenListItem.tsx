@@ -6,11 +6,11 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../shared/token/price"
-import { TokenDetailsWithBalance } from "../../../shared/tokens.state"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { LoadingPulse } from "../../components/LoadingPulse"
 import { TokenIcon } from "./TokenIcon"
 import { toTokenView } from "./tokens.service"
+import { TokenDetailsWithBalance } from "./tokens.state"
 
 const { AlertIcon } = icons
 

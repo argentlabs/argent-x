@@ -9,10 +9,6 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import {
-  TokenDetailsWithBalance,
-  useTokensInNetwork,
-} from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { SearchIcon } from "../../components/Icons/SearchIcon"
 import {
@@ -26,6 +22,10 @@ import { Collection, Collections } from "../accountNfts/aspect.service"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenList } from "../accountTokens/TokenList"
+import {
+  TokenDetailsWithBalance,
+  useTokensInNetwork,
+} from "../accountTokens/tokens.state"
 
 const SearchBox = styled.form`
   margin-top: 8px;

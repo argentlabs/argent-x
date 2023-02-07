@@ -6,10 +6,10 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../shared/token/price"
-import { useTokensInNetwork } from "../../../shared/tokens.state"
 import { useAppState } from "../../app.state"
 import { isEqualAddress } from "../../services/addresses"
 import { useTokenAmountToCurrencyValue } from "./tokenPriceHooks"
+import { useTokensInNetwork } from "./tokens.state"
 
 export interface IUseDisplayTokenAmountAndCurrencyValue {
   amount: BigNumberish

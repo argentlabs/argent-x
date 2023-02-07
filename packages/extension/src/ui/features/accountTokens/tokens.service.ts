@@ -9,12 +9,9 @@ import { getMulticallForNetwork } from "../../../shared/multicall"
 import { getTokenBalanceForAccount } from "../../../shared/token/getTokenBalance"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
-import {
-  TokenDetailsWithBalance,
-  getNetworkFeeToken,
-} from "../../../shared/tokens.state"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { Account } from "../accounts/Account"
+import { TokenDetailsWithBalance, getNetworkFeeToken } from "./tokens.state"
 
 export interface TokenView {
   address: string

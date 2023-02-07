@@ -3,11 +3,11 @@ import { VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { prettifyCurrencyValue } from "../../../shared/token/price"
-import { useTokensWithBalance } from "../../../shared/tokens.state"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { AccountStatus } from "../accounts/accounts.service"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
+import { useTokensWithBalance } from "./tokens.state"
 
 const { DeployIcon } = icons
 

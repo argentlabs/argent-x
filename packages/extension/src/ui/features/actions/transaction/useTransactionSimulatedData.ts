@@ -4,7 +4,6 @@ import { groupBy, reduce } from "lodash-es"
 import { useMemo } from "react"
 
 import { Token } from "../../../../shared/token/type"
-import { useTokensRecord } from "../../../../shared/tokens.state"
 import {
   ApiTransactionSimulationResponse,
   TokenDetails,
@@ -12,6 +11,7 @@ import {
 } from "../../../../shared/transactionSimulation/types"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
+import { useTokensRecord } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/useNetworks"
 
 interface CommonSimulationData {

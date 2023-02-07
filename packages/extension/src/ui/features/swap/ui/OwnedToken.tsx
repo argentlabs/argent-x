@@ -15,10 +15,10 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../../shared/token/price"
-import { TokenDetailsWithBalance } from "../../../../shared/tokens.state"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
+import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
 
 interface OwnedTokenProps {
   currency: Currency

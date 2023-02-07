@@ -2,7 +2,7 @@ import CurrencyConversionNumber from "bignumber.js"
 import { BigNumber, BigNumberish, utils } from "ethers"
 import { uint256 } from "starknet"
 
-import { TokenDetailsWithBalance } from "../tokens.state"
+import { TokenDetailsWithBalance } from "../../ui/features/accountTokens/tokens.state"
 import {
   isNumeric,
   prettifyCurrencyNumber,

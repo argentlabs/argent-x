@@ -2,9 +2,9 @@ import { icons } from "@argent/ui"
 import { Box, Center, Image } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
-import { useToken } from "../../../../shared/tokens.state"
 import { getTransactionReviewSwap } from "../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
+import { useToken } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/useNetworks"
 
 const { NetworkIcon } = icons
