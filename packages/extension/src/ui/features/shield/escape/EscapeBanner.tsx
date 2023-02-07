@@ -30,7 +30,7 @@ export const getEscapeDisplayAttributes = (
   const title =
     activeFromNowMs > 0
       ? `Removing ${entity} in ${activeFromNowPretty}`
-      : "${entity} removed"
+      : `${entity} removed`
   return {
     entity,
     colorScheme,
