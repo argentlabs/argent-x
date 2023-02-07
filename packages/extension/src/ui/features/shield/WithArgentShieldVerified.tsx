@@ -159,7 +159,7 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
         <ShieldBaseOTPScreen
           onBack={onResetEmailRequest}
           email={unverifiedEmail}
-          onOTPNotRequested={onResetEmailRequest}
+          onOTPReEnterEmail={onResetEmailRequest}
           onOTPConfirmed={onOTPConfirmed}
         />
       )

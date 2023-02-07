@@ -21,7 +21,7 @@ import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
-import { shieldMaybeAddAccount } from "../../services/shieldAccount"
+import { shieldValidateAccount } from "../../services/shieldAccount"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { ShieldHeader } from "./ui/ShieldHeader"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
@@ -41,14 +41,14 @@ const schema = yup
 export interface ShieldBaseOTPScreenProps {
   onBack?: () => void
   email?: string
-  onOTPNotRequested: () => void
+  onOTPReEnterEmail: () => void
   onOTPConfirmed: () => void
 }
 
 export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
   onBack,
   email,
-  onOTPNotRequested,
+  onOTPReEnterEmail,
   onOTPConfirmed,
 }) => {
   const verifiedEmail = useShieldVerifiedEmail()
@@ -120,11 +120,11 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                 try {
                   await confirmEmail(otp)
 
+                  /** always check the account can be used and exists in backend */
+                  await shieldValidateAccount()
+
                   /** successfully verifified with backend - persist this email in the local db */
                   await updateVerifiedEmail(email)
-
-                  /** always check the account exists in backend */
-                  await shieldMaybeAddAccount()
 
                   onOTPConfirmed()
                 } catch (e) {
@@ -136,7 +136,7 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                         status: "error",
                         duration: 3000,
                       })
-                      onOTPNotRequested()
+                      onOTPReEnterEmail()
                     } else {
                       return setError("otp", {
                         type: "manual",
@@ -145,6 +145,17 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                         ),
                       })
                     }
+                  }
+                  if (
+                    (e as Error)?.message?.toString() === "Error: Email in use"
+                  ) {
+                    toast({
+                      title:
+                        "Email in use - You must use a different email for this wallet",
+                      status: "error",
+                      duration: 3000,
+                    })
+                    onOTPReEnterEmail()
                   }
                   return setError("otp", {
                     type: "manual",

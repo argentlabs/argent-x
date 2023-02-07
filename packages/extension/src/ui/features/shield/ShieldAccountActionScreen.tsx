@@ -7,7 +7,7 @@ import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { routes } from "../../routes"
 import { accountChangeGuardian } from "../../services/backgroundAccounts"
-import { shieldMaybeAddAccount } from "../../services/shieldAccount"
+import { shieldValidateAccount } from "../../services/shieldAccount"
 import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
@@ -34,7 +34,7 @@ export const ShieldAccountActionScreen: FC = () => {
     setIsLoading(true)
     try {
       // always check the account exists in backend
-      const { guardianAddress } = await shieldMaybeAddAccount()
+      const { guardianAddress } = await shieldValidateAccount()
       if (account.guardian) {
         // remove
         await accountChangeGuardian(account, constants.ZERO.toString())

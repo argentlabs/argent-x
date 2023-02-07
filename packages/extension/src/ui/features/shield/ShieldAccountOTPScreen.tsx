@@ -18,7 +18,7 @@ export const ShieldAccountOTPScreen: FC = () => {
     navigate(routes.shieldAccountEmail(accountAddress))
   }, [accountAddress, navigate])
 
-  const onOTPNotRequested = useCallback(async () => {
+  const onOTPReEnterEmail = useCallback(async () => {
     await resetDevice()
     navigate(routes.shieldAccountEmail(accountAddress), { replace: true })
   }, [accountAddress, navigate])
@@ -35,7 +35,7 @@ export const ShieldAccountOTPScreen: FC = () => {
     <ShieldBaseOTPScreen
       onBack={onBack}
       email={email}
-      onOTPNotRequested={onOTPNotRequested}
+      onOTPReEnterEmail={onOTPReEnterEmail}
       onOTPConfirmed={onOTPConfirmed}
     />
   )
