@@ -4,14 +4,20 @@ import { z } from "zod"
 export const AspectNftOwnerSchema = z.object({
   account_address: z.string(),
   // TODO replace bignumbers with string().pattern(/^0x[0-9a-fA-F]+$/) to validate hexstring
-  payment_amount: z.string().transform((s) => BigNumber.from(s)),
-  payment_amount_per: z.string().transform((s) => BigNumber.from(s)),
+  payment_amount: z
+    .string()
+    .transform((s) => BigNumber.from(s))
+    .optional(),
+  payment_amount_per: z
+    .string()
+    .transform((s) => BigNumber.from(s))
+    .optional(),
 })
 
 export const AspectNftContractSchema = z.object({
   contract_address: z.string(),
-  name: z.string().optional(),
-  symbol: z.string().optional(),
+  name: z.string().nullable().optional(),
+  symbol: z.string().nullable().optional(),
   schema: z.string(), // Might be useful in future
   name_custom: z.string(), // Collection Name
   image_url: z.string(),
@@ -22,18 +28,19 @@ export const AspectNftSchema = z.object({
   best_bid_order: z
     .object({
       payment_address: z.string(),
-      payment_amount: z.number(),
-      payment_amount_per: z.number(),
+      payment_amount: z.number().optional(),
+      payment_amount_per: z.number().optional(),
     })
-    .optional(),
+    .optional()
+    .nullable(),
   contract_address: z.string(),
   token_id: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
   image_uri: z.string().optional(),
   image_url_copy: z.string().optional(),
-  animation_uri: z.string().optional(),
-  external_uri: z.string().optional(),
+  animation_uri: z.string().nullable().optional(),
+  external_uri: z.string().nullable().optional(),
   owner: AspectNftOwnerSchema.optional(),
   contract: AspectNftContractSchema,
 })
