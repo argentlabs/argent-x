@@ -6,9 +6,8 @@ interface StackRoutesConfigProps {
   defaultPresentation: Presentation
 }
 
-const StackRoutesConfigContext = createContext<StackRoutesConfigProps | null>(
-  null,
-)
+const StackRoutesConfigContext =
+  createContext<StackRoutesConfigProps | null>(null)
 
 export const useStackRoutesConfig = () =>
   useContext(StackRoutesConfigContext) as StackRoutesConfigProps

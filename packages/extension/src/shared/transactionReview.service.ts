@@ -27,6 +27,7 @@ export type ApiTransactionReviewAssessmentReason =
   | "unknown_token"
 
 export type ApiTransactionReviewTargettedDapp = {
+  name: string
   description: string
   iconUrl: string
   links: {
@@ -34,7 +35,6 @@ export type ApiTransactionReviewTargettedDapp = {
     url: string
     position: number
   }[]
-  name: string
 }
 
 export interface ApiTransactionReviewResponse {
@@ -181,6 +181,20 @@ export const getTransactionReviewSwap = (
   for (const review of transactionReview.reviews) {
     if (review.activity?.type === "swap") {
       return review
+    }
+  }
+}
+
+export const getTransactionReviewActivityOfType = (
+  type: ApiTransactionReviewActivityType,
+  transactionReview?: ApiTransactionReviewResponse,
+): ApiTransactionReviewActivity | undefined => {
+  if (!transactionReview) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.activity?.type === type) {
+      return review.activity
     }
   }
 }

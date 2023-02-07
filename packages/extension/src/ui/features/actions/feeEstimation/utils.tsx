@@ -85,6 +85,36 @@ export const getParsedError = (errorTxt: string) => {
   }
 }
 
+type FeeStatus = "loading" | "error" | "success"
+
+export function getCombinedFeeTooltipText(
+  maxFee?: string,
+  feeTokenBalance?: BigNumber,
+): {
+  status: FeeStatus
+  message: string
+} {
+  if (!maxFee || !feeTokenBalance) {
+    return {
+      status: "loading",
+      message: "Network fee is still loading.",
+    }
+  }
+  if (feeTokenBalance.gte(maxFee)) {
+    return {
+      status: "success",
+      message:
+        "Network fees are paid to the network to include transactions in blocks",
+    }
+  }
+  return {
+    status: "error",
+    message: `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
+      BigNumber.from(maxFee).sub(feeTokenBalance),
+    )} ETH more.`,
+  }
+}
+
 export function getTooltipText(maxFee?: string, feeTokenBalance?: BigNumber) {
   if (!maxFee || !feeTokenBalance) {
     return "Network fee is still loading."

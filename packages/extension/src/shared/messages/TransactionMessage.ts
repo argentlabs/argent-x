@@ -2,7 +2,10 @@ import type {
   Abi,
   Call,
   InvocationsDetails,
+  Sequencer,
+  TransactionSimulation,
   UniversalDeployerContractPayload,
+  constants,
 } from "starknet"
 
 import { Transaction } from "../transactions"
@@ -71,4 +74,31 @@ export type TransactionMessage =
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
       data: EstimateFeeResponse
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_INVOCATION"
+      data: Call | Call[]
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_INVOCATION_RES"
+      data: {
+        invocation: Sequencer.SimulateTransaction
+        chainId: constants.StarknetChainId
+      }
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_INVOCATION_REJ"
+      data: { error: string }
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_FALLBACK"
+      data: Call | Call[]
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_FALLBACK_RES"
+      data: TransactionSimulation
+    }
+  | {
+      type: "SIMULATE_TRANSACTION_FALLBACK_REJ"
+      data: { error: string }
     }
