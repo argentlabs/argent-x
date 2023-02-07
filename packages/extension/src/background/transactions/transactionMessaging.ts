@@ -408,7 +408,7 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
 
-      const nonce = await getNonce(selectedAccount, wallet)
+      const nonce = await starknetAccount.getNonce(selectedAccount)
 
       try {
         const simulated = await starknetAccount.simulateTransaction(msg.data, {

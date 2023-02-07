@@ -165,13 +165,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         <TransactionActions transactions={transactionsArray} />
       )}
 
-      {/* <TransactionsList
-        networkId={networkId}
-        transactions={transactionsArray}
-        transactionReview={transactionReview}
-        transactionSimulation={transactionSimulation}
-        tokensByNetwork={tokensByNetwork}
-      /> */}
       <AccountNetworkInfo account={selectedAccount} />
 
       <Center>

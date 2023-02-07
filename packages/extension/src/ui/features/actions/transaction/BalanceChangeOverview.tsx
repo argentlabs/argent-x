@@ -36,10 +36,6 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionSimulation,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
-  console.log(
-    "🚀 ~ file: BalanceChangeOverview.tsx:39 ~ aggregatedData",
-    aggregatedData,
-  )
 
   const allTransferSafe = useMemo(
     () => aggregatedData.every((t) => t.safe),
