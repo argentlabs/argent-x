@@ -23,7 +23,6 @@ export const estimatedFeesStore = new ArrayStorage<EstimatedFeesEnriched>([], {
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
 
 export const addEstimatedFees = (estimatedFees: EstimatedFees) => {
-  console.log("calling addesimtated", estimatedFees)
   const newEstimatedFees = {
     ...estimatedFees,
     timestamp: timestampInSeconds(),
