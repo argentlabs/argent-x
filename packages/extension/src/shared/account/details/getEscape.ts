@@ -54,7 +54,7 @@ active
 ]
 */
 
-const shapeResponse = (response: string[]): Escape | undefined => {
+const shapeResponse = (response: string[]) => {
   if (response.length !== 2) {
     return
   }
@@ -70,5 +70,5 @@ const shapeResponse = (response: string[]): Escape | undefined => {
   return {
     activeAt,
     type,
-  }
+  } as Escape
 }

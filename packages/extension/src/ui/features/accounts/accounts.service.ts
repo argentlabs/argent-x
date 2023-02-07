@@ -4,7 +4,6 @@ import useSWR from "swr"
 
 import { updateAccountDetails } from "../../../shared/account/update"
 import { generateAvatarImage } from "../../../shared/avatarImage"
-import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"

@@ -20,7 +20,7 @@ export interface AccountConstructorProps {
   signer: WalletAccountSigner
   type: ArgentAccountType
   guardian?: string | undefined
-  escape?: Escape | undefined
+  escape?: Escape
   deployTransaction?: string
   hidden?: boolean
   needsDeploy?: boolean
@@ -34,7 +34,7 @@ export class Account {
   signer: WalletAccountSigner
   type: ArgentAccountType
   guardian?: string | undefined
-  escape?: Escape | undefined
+  escape?: Escape
   deployTransaction?: string
   contract: Contract
   proxyContract: Contract
