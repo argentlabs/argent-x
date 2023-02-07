@@ -34,9 +34,10 @@ export const getActiveFromNow = (activeAt: number, now = new Date()) => {
   const minutes = Math.floor((activeFromNowMs / (1000 * 60)) % 60)
   const hours = Math.floor((activeFromNowMs / (1000 * 60 * 60)) % 24)
   const days = Math.floor(activeFromNowMs / (1000 * 60 * 60 * 24))
+  const daysCeil = Math.ceil(activeFromNowMs / (1000 * 60 * 60 * 24))
   const activeFromNowPretty =
     days > 0
-      ? pluralise(days, "day")
+      ? pluralise(daysCeil, "day")
       : hours > 0
       ? pluralise(hours, "hour")
       : minutes > 0
