@@ -2,6 +2,7 @@ import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
 
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
+import { Escape } from "../../../shared/account/details/getEscape"
 import { getMulticallForNetwork } from "../../../shared/multicall"
 import { Network, getNetwork, getProvider } from "../../../shared/network"
 import {
@@ -19,6 +20,7 @@ export interface AccountConstructorProps {
   signer: WalletAccountSigner
   type: ArgentAccountType
   guardian?: string | undefined
+  escape?: Escape
   deployTransaction?: string
   hidden?: boolean
   needsDeploy?: boolean
@@ -32,6 +34,7 @@ export class Account {
   signer: WalletAccountSigner
   type: ArgentAccountType
   guardian?: string | undefined
+  escape?: Escape
   deployTransaction?: string
   contract: Contract
   proxyContract: Contract
@@ -45,6 +48,7 @@ export class Account {
     signer,
     type,
     guardian,
+    escape,
     deployTransaction,
     hidden,
     needsDeploy = false,
@@ -60,6 +64,7 @@ export class Account {
     this.needsDeploy = needsDeploy
     this.type = type
     this.guardian = guardian
+    this.escape = escape
     this.provider = getProvider(network)
     this.contract =
       contract ??
@@ -127,13 +132,22 @@ export class Account {
       signer: result.account.signer,
       type: result.account.type,
       guardian: result.account.guardian,
+      escape: result.account.escape,
       needsDeploy: result.account.needsDeploy,
     })
   }
 
   public toWalletAccount(): WalletAccount {
-    const { networkId, address, network, signer, type, guardian, needsDeploy } =
-      this
+    const {
+      networkId,
+      address,
+      network,
+      signer,
+      type,
+      guardian,
+      escape,
+      needsDeploy,
+    } = this
     return {
       networkId,
       address,
@@ -141,6 +155,7 @@ export class Account {
       signer,
       type,
       guardian,
+      escape,
       needsDeploy,
     }
   }

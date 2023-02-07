@@ -143,6 +143,10 @@ export const routes = {
     (accountAddress) => `/accounts/${accountAddress}/shield/finish`,
     "/accounts/:accountAddress/shield/finish",
   ),
+  shieldEscapeWarning: route(
+    (accountAddress) => `/accounts/${accountAddress}/shield/escape-warning`,
+    "/accounts/:accountAddress/shield/escape-warning",
+  ),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),
