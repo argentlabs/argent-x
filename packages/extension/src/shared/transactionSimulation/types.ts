@@ -13,7 +13,7 @@ export interface TransactionSimulationApproval {
   owner: string
   spender: string
   value: string
-  details: TokenDetails
+  details?: TokenDetails
 }
 
 export interface TransactionSimulationTransfer {
@@ -21,7 +21,7 @@ export interface TransactionSimulationTransfer {
   from: string
   to: string
   value: string
-  details: TokenDetails
+  details?: TokenDetails
 }
 
 export interface TokenDetails {

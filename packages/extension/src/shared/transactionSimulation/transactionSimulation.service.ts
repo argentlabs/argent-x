@@ -4,10 +4,10 @@ import { ARGENT_TRANSACTION_SIMULATION_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
 import { sendMessage, waitForMessage } from "../messages"
 import { findTransfersAndApprovals } from "./findTransferAndApproval"
-import {
-  ApprovalEvent,
+import type {
   IFetchTransactionSimulation,
-  TransferEvent,
+  TransactionSimulationApproval,
+  TransactionSimulationTransfer,
 } from "./types"
 
 export const fetchTransactionSimulation = async ({
@@ -33,18 +33,26 @@ export const fetchTransactionSimulation = async ({
   }
 
   try {
-    const backendSimulation = fetcherImpl(ARGENT_TRANSACTION_SIMULATION_URL, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+    const { invocation, chainId } = data
+
+    const backendSimulation = await fetcherImpl(
+      ARGENT_TRANSACTION_SIMULATION_URL,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...invocation,
+          chainId,
+        }),
       },
-      body: JSON.stringify(data),
-    })
+    )
 
     return backendSimulation
   } catch (e) {
-    console.warn("Failed to fetch transaction simulation from backend", e)
+    console.error("Failed to fetch transaction simulation from backend", e)
     console.warn("Falling back to client-side simulation")
 
     return doTransactionSimulation(transactions)
@@ -65,8 +73,8 @@ export const doTransactionSimulation = async (transactions: Call | Call[]) => {
 
   const internalCalls = data.trace.function_invocation?.internal_calls
 
-  const transfers: Array<TransferEvent> = []
-  const approvals: Array<ApprovalEvent> = []
+  const transfers: TransactionSimulationTransfer[] = []
+  const approvals: TransactionSimulationApproval[] = []
 
   if (!internalCalls) {
     return { transfers, approvals }
@@ -75,7 +83,4 @@ export const doTransactionSimulation = async (transactions: Call | Call[]) => {
   findTransfersAndApprovals(internalCalls, approvals, transfers)
 
   return { transfers, approvals }
-
-  // Recursively find all the events in functionInvocation with key 0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9
-  // and add them to the transfers array
 }

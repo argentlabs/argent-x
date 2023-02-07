@@ -76,6 +76,11 @@ export const useAggregatedSimData = (
           tokensRecord,
         })
 
+        // Ignore tokens that we don't have a record of
+        if (!validatedToken) {
+          return acc
+        }
+
         const approvalsForTokens = approvalsByTokenAddress[tokenAddress]
 
         const approvals: ApprovalSimulationData[] =
@@ -84,7 +89,7 @@ export const useAggregatedSimData = (
             owner: a.owner,
             spender: a.spender,
             amount: new BigNumber(a.value),
-            usdValue: a.details.usdValue
+            usdValue: a.details?.usdValue
               ? parseFloat(a.details.usdValue)
               : undefined,
           })) ?? []
@@ -98,7 +103,7 @@ export const useAggregatedSimData = (
         }, ZERO)
 
         const usdValue = transfers.reduce<number>((acc, t) => {
-          if (!t.details.usdValue) {
+          if (!t.details?.usdValue) {
             return acc
           }
 
@@ -115,13 +120,11 @@ export const useAggregatedSimData = (
             {
               address: t.to,
               amount: new BigNumber(t.value),
-              usdValue: t.details.usdValue
+              usdValue: t.details?.usdValue
                 ? parseFloat(t.details.usdValue)
                 : undefined,
             },
           ]
-
-          return acc
         }, [])
 
         const totalApprovalAmount = approvals.reduce<BigNumber>(
@@ -157,31 +160,36 @@ export function apiTokenDetailsToToken({
   tokensRecord,
 }: {
   tokenAddress: string
-  details: TokenDetails
+  details?: TokenDetails
   networkId: string
   tokensRecord: Record<string, Token>
-}): Token {
+}): Token | undefined {
+  // Try to get the token from the tokensRecord
   const token = tokensRecord[tokenAddress]
-
   if (token) {
     return token
   }
 
-  return {
-    address: tokenAddress,
-    name: details.name,
-    symbol: details.symbol,
-    decimals: parseInt(details.decimals),
-    networkId: networkId,
-    image: undefined,
+  // If the token is not in the tokensRecord, try to get it from the details
+  if (details) {
+    return {
+      address: tokenAddress,
+      name: details.name,
+      symbol: details.symbol,
+      decimals: parseInt(details.decimals),
+      networkId: networkId,
+      image: undefined,
+    }
   }
+
+  return undefined
 }
 
 export const transferAffectsBalance = (
   t: TransactionSimulationTransfer,
   account: Account,
 ) => {
-  if (t.details.tokenType === "erc721") {
+  if (t.details?.tokenType === "erc721") {
     return false
   }
 

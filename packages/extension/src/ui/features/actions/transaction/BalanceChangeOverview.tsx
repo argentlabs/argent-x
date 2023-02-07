@@ -36,6 +36,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionSimulation,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
+  console.log(
+    "🚀 ~ file: BalanceChangeOverview.tsx:39 ~ aggregatedData",
+    aggregatedData,
+  )
 
   const allTransferSafe = useMemo(
     () => aggregatedData.every((t) => t.safe),
@@ -135,7 +139,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               showPlusSign: true,
                             })}
                           </P4>
-                          {isMainnet && usdValue && (
+
+                          {/** 0 usdValue means we don't have any value */}
+                          {isMainnet && !!usdValue && usdValue !== 0 && (
                             <L2 color="neutrals.300">
                               {prettifyCurrencyValue(Math.abs(usdValue))}
                             </L2>
