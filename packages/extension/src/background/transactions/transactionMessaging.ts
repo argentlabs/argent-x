@@ -4,6 +4,7 @@ import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { argentMaxFee } from "../utils/argentMaxFee"
+import { addEstimatedFees, getEstimatedFees } from "./fees/store"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -24,6 +25,14 @@ export const handleTransactionMessage: HandleMessage<
       const selectedAccount = await wallet.getSelectedAccount()
       const starknetAccount = await wallet.getSelectedStarknetAccount()
       const transactions = msg.data
+      const preComputedFees = await getEstimatedFees(transactions)
+
+      if (preComputedFees) {
+        return respond({
+          type: "ESTIMATE_TRANSACTION_FEE_RES",
+          data: preComputedFees,
+        })
+      }
       if (!selectedAccount) {
         throw Error("no accounts")
       }
@@ -75,7 +84,13 @@ export const handleTransactionMessage: HandleMessage<
         const suggestedMaxFee = number.toHex(
           stark.estimatedFeeToMaxFee(maxTxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )
-
+        addEstimatedFees({
+          amount: txFee,
+          suggestedMaxFee,
+          accountDeploymentFee,
+          maxADFee,
+          transactions,
+        })
         return respond({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
