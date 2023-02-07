@@ -17,6 +17,7 @@ import { useRouteAccount } from "../useRouteAccount"
 import { EscapeGuardian } from "./EscapeGuardian"
 import { EscapeSigner } from "./EscapeSigner"
 import {
+  hideEscapeWarning,
   useAccountHasPendingCancelEscape,
   useLiveAccountEscape,
 } from "./useAccountEscape"
@@ -24,12 +25,14 @@ import {
 export const EscapeWarningScreen: FC = () => {
   const navigate = useNavigate()
   const account = useRouteAccount()
-  const onClose = useCallback(() => {
+  const onClose = useCallback(async () => {
+    account && (await hideEscapeWarning(account))
     navigate(routes.accountTokens())
-  }, [navigate])
+  }, [account, navigate])
   const toast = useToast()
 
   const onKeepGuardian = useCallback(async () => {
+    account && (await hideEscapeWarning(account))
     if (!account) {
       console.error("Cannot cancel escape - no account")
       return
@@ -47,6 +50,7 @@ export const EscapeWarningScreen: FC = () => {
   }, [account, toast])
 
   const onRemoveGuardian = useCallback(async () => {
+    account && (await hideEscapeWarning(account))
     if (!account) {
       console.error("Cannot remove guardian - no account")
       return

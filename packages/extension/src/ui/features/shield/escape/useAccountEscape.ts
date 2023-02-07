@@ -11,7 +11,6 @@ import { routes } from "../../../routes"
 import { selectAccount } from "../../../services/backgroundAccounts"
 import { withPolling } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
-import { useUpdateAccountsOnChainEscapeState } from "../../accounts/accounts.service"
 import { useAccounts } from "../../accounts/accounts.state"
 import { useAccountTransactions } from "../../accounts/accountTransactions.state"
 import {
@@ -111,13 +110,15 @@ export const useAccountEscapeWarning = () => {
       if (accountWithNewEscape) {
         await selectAccount(accountWithNewEscape)
         navigate(routes.shieldEscapeWarning(accountWithNewEscape.address))
-        await escapeWarningStore.push(
-          getEscapeWarningStoreKey(accountWithNewEscape),
-        )
       }
     }
     maybeShowWarning()
   }, [accountWithNewEscape, escapeWarningKeys, navigate])
+}
+
+export const hideEscapeWarning = async (account: Account) => {
+  /** handles duplicates */
+  await escapeWarningStore.push(getEscapeWarningStoreKey(account))
 }
 
 /**
