@@ -171,7 +171,7 @@ export class Wallet {
     await this.setSession(ethersWallet.privateKey, newPassword)
     const accounts = await this.discoverAccounts()
     if (accounts.length === 0) {
-      throw new Error(`No account found`)
+      this.newAccount(defaultNetwork.id)
     }
   }
 
