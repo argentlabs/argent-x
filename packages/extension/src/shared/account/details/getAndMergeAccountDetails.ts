@@ -1,11 +1,13 @@
 import { WalletAccount } from "../../wallet.model"
 import { accountsEqual } from "../../wallet.service"
+import { getAccountEscapeFromChain } from "./getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "./getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "./getAccountTypesFromChain"
 
 export type DetailFetchers =
   | typeof getAccountTypesFromChain
   | typeof getAccountGuardiansFromChain
+  | typeof getAccountEscapeFromChain
 
 /** Use Promise.all allows multicall to batch all calls to get account deatils on chain */
 

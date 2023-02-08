@@ -83,9 +83,8 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   const { errors, isDirty, isSubmitting } = formState
 
   const [fetchError, setFetchError] = useState("")
-  const [parameterFields, setParameterFields] = useState<
-    ParameterField[] | null
-  >(null)
+  const [parameterFields, setParameterFields] =
+    useState<ParameterField[] | null>(null)
 
   const currentNetwork = watch("network")
   const currentClassHash = watch("classHash")

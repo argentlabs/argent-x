@@ -6,6 +6,14 @@ import styled from "styled-components"
 import { ContentCopyIcon, VisibilityOff } from "../../components/Icons/MuiIcons"
 import { MoreVertSharp } from "../../components/Icons/MuiIcons"
 import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
+import {
+  IconWrapper,
+  Menu,
+  MenuContainer,
+  MenuItem,
+  MenuItemWrapper,
+  Separator,
+} from "../../components/Menu"
 import Row, { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
@@ -15,14 +23,6 @@ import {
 } from "../../services/blockExplorer.service"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { useCurrentNetwork } from "../networks/useNetworks"
-import {
-  IconWrapper,
-  Menu,
-  MenuContainer,
-  MenuItem,
-  MenuItemWrapper,
-  Separator,
-} from "./DeprecatedAccountMenu"
 
 const StyledMenuContainer = styled(MenuContainer)`
   flex: 1;

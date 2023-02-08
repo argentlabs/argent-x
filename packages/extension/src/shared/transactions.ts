@@ -21,6 +21,7 @@ export interface TransactionMeta {
   isUpgrade?: boolean
   isChangeGuardian?: boolean
   isDeployAccount?: boolean
+  isCancelEscape?: boolean
   transactions?: Call | Call[]
   type?: TransactionType
 }

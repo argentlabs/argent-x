@@ -188,6 +188,8 @@ export const L2 = chakra("label", {
   },
 })
 
+export const Pre = chakra("pre")
+
 // form
 
 export const FieldError = chakra(L1, {

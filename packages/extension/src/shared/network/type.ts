@@ -10,6 +10,7 @@ export interface Network {
   accountClassHash?: {
     argentAccount: string
     argentPluginAccount?: string
+    argentBetterMulticallAccount?: string
   }
   rpcUrl?: string
   readonly?: boolean

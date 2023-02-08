@@ -20,7 +20,6 @@ import { getFeeToken } from "../../../shared/token/utils"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
-import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
@@ -43,7 +42,7 @@ import {
 } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ArgentShieldIcon } = icons
+const { ExpandIcon, ArgentShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -72,9 +71,9 @@ export const AccountEditScreen: FC = () => {
     }
   }, [navigate, returnTo])
 
-  const experimentalPluginAccount = useKeyValueStorage(
+  const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
-    "experimentalPluginAccount",
+    "experimentalAllowChooseAccount",
   )
 
   const showDelete =
@@ -87,12 +86,6 @@ export const AccountEditScreen: FC = () => {
       navigate(routes.accountHideConfirm(account.address))
     }
   }
-
-  const canUpgradeToPluginAccount =
-    experimentalPluginAccount &&
-    account &&
-    currentNetwork.accountClassHash?.argentPluginAccount &&
-    account.type !== "argent-plugin"
 
   const onChangeName = useCallback((name: string) => {
     setLiveEditingAccountName(name)
@@ -176,8 +169,12 @@ export const AccountEditScreen: FC = () => {
               <ButtonCell
                 as={Link}
                 to={routes.shieldAccountStart(accountAddress)}
-                leftIcon={<ArgentShieldIcon fontSize={"xl"} />}
-                rightIconOpaque={!pendingChangeGuardian}
+                leftIcon={
+                  <ArgentShieldIcon
+                    fontSize={"xl"}
+                    opacity={!pendingChangeGuardian ? 1 : 0.6}
+                  />
+                }
                 rightIcon={
                   pendingChangeGuardian ? (
                     <Spinner size={"sm"} />
@@ -211,16 +208,16 @@ export const AccountEditScreen: FC = () => {
           </ButtonCell>
           <ButtonCell
             onClick={() => account && handleHideOrDeleteAccount(account)}
-            icon={<HideIcon />}
           >
             {showDelete ? "Delete" : "Hide"} account
           </ButtonCell>
-          {canUpgradeToPluginAccount && (
+          {experimentalAllowChooseAccount && account && (
             <ButtonCell
-              onClick={() => upgradeAccount(account, "argent-plugin")}
-              icon={<PluginIcon />}
+              onClick={() => {
+                navigate(routes.accountImplementations(account.address))
+              }}
             >
-              Use Plugins
+              Change account implementation
             </ButtonCell>
           )}
           {account?.needsDeploy && (
@@ -229,7 +226,6 @@ export const AccountEditScreen: FC = () => {
           <ButtonCell
             color={"error.500"}
             onClick={() => navigate(routes.exportPrivateKey())}
-            icon={<AlertIcon />}
           >
             Export private key
           </ButtonCell>

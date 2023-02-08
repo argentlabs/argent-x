@@ -1,23 +1,30 @@
-import { FC, useState } from "react"
+import { P4 } from "@argent/ui"
+import { Center } from "@chakra-ui/react"
+import { isArray, isEmpty } from "lodash-es"
+import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 
+import { getDisplayWarnAndReasonForTransactionReview } from "../../../shared/transactionReview.service"
+import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
 import { usePageTracking } from "../../services/analytics"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { useCurrentNetwork } from "../networks/useNetworks"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
+import { BalanceChangeOverview } from "./transaction/BalanceChangeOverview"
 import { DappHeader } from "./transaction/DappHeader"
-import { TransactionsList } from "./transaction/TransactionsList"
+import { TransactionActions } from "./transaction/TransactionActions"
+import { TransactionBanner } from "./transaction/TransactionBanner"
 import { useTransactionReview } from "./transaction/useTransactionReview"
+import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
+import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
 
 export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -25,6 +32,8 @@ export interface ApproveTransactionScreenProps
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
 }
+
+export type TransactionViewType = "swap" | "nft" | "generic"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
@@ -37,10 +46,15 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
-  const { id: networkId } = useCurrentNetwork()
-  const tokensByNetwork = useTokensInNetwork(networkId)
+  const [txDetails, setTxDetails] = useState(false)
 
   const { data: transactionReview } = useTransactionReview({
+    account: selectedAccount,
+    transactions,
+    actionHash,
+  })
+
+  const { data: transactionSimulation } = useTransactionSimulation({
     account: selectedAccount,
     transactions,
     actionHash,
@@ -50,6 +64,11 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
   const { pendingTransactions } = useAccountTransactions(selectedAccount)
+
+  const transactionsArray: Call[] = useMemo(
+    () => (isArray(transactions) ? transactions : [transactions]),
+    [transactions],
+  )
 
   const isUpgradeTransaction =
     !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
@@ -62,6 +81,25 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       !hasUpgradeTransactionPending &&
       !isUpgradeTransaction,
   )
+
+  const txnHasApprovalsOrTransfers = useMemo(
+    () =>
+      !isEmpty(transactionSimulation?.approvals) ||
+      !isEmpty(transactionSimulation?.transfers),
+    [transactionSimulation],
+  )
+
+  // Show balance change if there is a transaction simulation and there are approvals or transfers
+  const showBalanceChange = transactionSimulation && txnHasApprovalsOrTransfers
+
+  // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
+  const showTransactionActions =
+    !showBalanceChange || (txDetails && showBalanceChange)
+
+  const verifiedDapp = transactionReview?.targetedDapp
+
+  const { warn, reason } =
+    getDisplayWarnAndReasonForTransactionReview(transactionReview)
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
@@ -102,18 +140,43 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }
       {...props}
     >
+      {/** Use Transaction Review to get DappHeader */}
       <DappHeader
-        transactions={transactions}
+        transactions={transactionsArray}
         transactionReview={transactionReview}
       />
 
-      <TransactionsList
-        networkId={networkId}
-        transactions={transactions}
-        transactionReview={transactionReview}
-        tokensByNetwork={tokensByNetwork}
-      />
+      {warn ? (
+        <TransactionBanner
+          variant={transactionReview?.assessment}
+          icon={WarningIcon}
+          message={reason}
+        />
+      ) : verifiedDapp ? (
+        <VerifiedDappBanner dapp={verifiedDapp} />
+      ) : (
+        <></>
+      )}
+
+      {showBalanceChange && (
+        <BalanceChangeOverview transactionSimulation={transactionSimulation} />
+      )}
+      {showTransactionActions && (
+        <TransactionActions transactions={transactionsArray} />
+      )}
+
       <AccountNetworkInfo account={selectedAccount} />
+
+      <Center>
+        <P4
+          fontWeight="bold"
+          color="neutrals.400"
+          _hover={{ textDecoration: "underline", cursor: "pointer" }}
+          onClick={() => setTxDetails(!txDetails)}
+        >
+          {txDetails ? "Hide" : "View more"} details
+        </P4>
+      </Center>
     </ConfirmScreen>
   )
 }
