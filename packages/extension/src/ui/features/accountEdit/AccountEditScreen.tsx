@@ -15,6 +15,8 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { settingsStore } from "../../../shared/settings"
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { parseAmount } from "../../../shared/token/amount"
+import { getFeeToken } from "../../../shared/token/utils"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
@@ -22,6 +24,10 @@ import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../../services/transactions"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -100,6 +106,21 @@ export const AccountEditScreen: FC = () => {
       } Argent Shield…`
     : `Two-factor account protection`
 
+  const handleDeploy = () => {
+    const feeToken = getFeeToken(currentNetwork.id)?.address
+    if (account && feeToken) {
+      const ONE_GWEI = getUint256CalldataFromBN(parseAmount("1", 0))
+      const self = account.address
+      sendTransaction({
+        to: feeToken,
+        method: "transfer",
+        calldata: {
+          recipient: self,
+          amount: ONE_GWEI,
+        },
+      })
+    }
+  }
   return (
     <>
       <NavigationContainer
@@ -198,6 +219,9 @@ export const AccountEditScreen: FC = () => {
             >
               Change account implementation
             </ButtonCell>
+          )}
+          {account?.needsDeploy && (
+            <ButtonCell onClick={handleDeploy}>Deploy account</ButtonCell>
           )}
           <ButtonCell
             color={"error.500"}
