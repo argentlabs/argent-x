@@ -4,7 +4,7 @@ import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { argentMaxFee } from "../utils/argentMaxFee"
-import { addEstimatedFees, getEstimatedFees } from "./fees/store"
+import { addEstimatedFees } from "./fees/store"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -25,14 +25,7 @@ export const handleTransactionMessage: HandleMessage<
       const selectedAccount = await wallet.getSelectedAccount()
       const starknetAccount = await wallet.getSelectedStarknetAccount()
       const transactions = msg.data
-      const preComputedFees = await getEstimatedFees(transactions)
 
-      if (preComputedFees) {
-        return respond({
-          type: "ESTIMATE_TRANSACTION_FEE_RES",
-          data: preComputedFees,
-        })
-      }
       if (!selectedAccount) {
         throw Error("no accounts")
       }

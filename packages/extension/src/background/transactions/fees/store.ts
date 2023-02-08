@@ -17,7 +17,7 @@ type EstimatedFeesEnriched = EstimatedFees & {
 
 export const estimatedFeesStore = new ArrayStorage<EstimatedFeesEnriched>([], {
   namespace: "core:estimatedFees",
-  areaName: "local",
+  areaName: "session",
 })
 
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
