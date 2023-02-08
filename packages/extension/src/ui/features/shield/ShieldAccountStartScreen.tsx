@@ -66,25 +66,27 @@ export const ShieldAccountStartScreen: FC = () => {
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
       {isAvailable ? (
-        <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
-          {account?.needsDeploy ? (
-            <ShieldAccountNotDeployed />
-          ) : account?.guardian ? (
-            <ShieldAccountDeactivate />
-          ) : (
-            <ShieldAccountActivate />
-          )}
-          <Flex flex={1} />
-          <Button
-            onClick={onActivate}
-            colorScheme={"primary"}
-            disabled={isLoading || account?.needsDeploy}
-            isLoading={isLoading}
-            loadingText={"Verifying email"}
-          >
-            Next
-          </Button>
-        </Flex>
+        account?.needsDeploy ? (
+          <ShieldAccountNotDeployed />
+        ) : (
+          <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
+            {account?.guardian ? (
+              <ShieldAccountDeactivate />
+            ) : (
+              <ShieldAccountActivate />
+            )}
+            <Flex flex={1} />
+            <Button
+              onClick={onActivate}
+              colorScheme={"primary"}
+              disabled={isLoading || account?.needsDeploy}
+              isLoading={isLoading}
+              loadingText={"Verifying email"}
+            >
+              Next
+            </Button>
+          </Flex>
+        )
       ) : (
         <Empty
           icon={<ArgentShieldIcon />}
