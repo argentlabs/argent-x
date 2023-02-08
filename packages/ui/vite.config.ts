@@ -4,6 +4,25 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 
+/** Reduce bundlesize - maps dependencies that should be excluded from bundling to their global name */
+
+export const externalGlobals = {
+  react: "React",
+  "react-dom": "ReactDOM",
+  "react-router-dom": "ReactRouterDOM",
+  "react/jsx-runtime": "ReactJSXRuntime",
+  "react-copy-to-clipboard": "ReactCopyToClipboard",
+  "@chakra-ui/react": "ChakraUIReact",
+  "@chakra-ui/anatomy": "ChakraUIAnatomy",
+  "@chakra-ui/theme-tools": "ChakraUIThemeTools",
+  "@chakra-ui/styled-system": "ChakraUIStyledSystem",
+  "framer-motion": "FramerMotion",
+  popmotion: "PopMotion",
+  colord: "Colord",
+  "colord/plugins/lch": "ColordPluginsLCH",
+  "@ethersproject/wordlists": "EthersProjectWordLists",
+}
+
 export default defineConfig({
   plugins: [
     dts({
@@ -20,14 +39,9 @@ export default defineConfig({
     },
     emptyOutDir: false,
     rollupOptions: {
-      external: ["react", "react-dom", "react-router-dom", "@chakra-ui/react"],
+      external: Object.keys(externalGlobals),
       output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react-router-dom": "ReactRouterDOM",
-          "@chakra-ui/react": "ChakraUIReact",
-        },
+        globals: externalGlobals,
       },
     },
   },
