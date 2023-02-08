@@ -80,3 +80,11 @@ export type AccountMessage =
       type: "ACCOUNT_CHANGE_GUARDIAN_RES"
     }
   | { type: "ACCOUNT_CHANGE_GUARDIAN_REJ"; data: string }
+  | {
+      type: "ACCOUNT_CANCEL_ESCAPE"
+      data: { account: BaseWalletAccount }
+    }
+  | {
+      type: "ACCOUNT_CANCEL_ESCAPE_RES"
+    }
+  | { type: "ACCOUNT_CANCEL_ESCAPE_REJ"; data: string }

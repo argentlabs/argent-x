@@ -2,6 +2,7 @@ import { WalletAccount } from "./../wallet.model"
 import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
 import { BaseWalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
+import { getAccountEscapeFromChain } from "./details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "./details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "./details/getAccountTypesFromChain"
 import {
@@ -38,6 +39,7 @@ export async function updateAccountDetails(
   if (ARGENT_SHIELD_ENABLED) {
     if (scope === "guardian" || scope === "all") {
       accountDetailFetchers.push(getAccountGuardiansFromChain)
+      accountDetailFetchers.push(getAccountEscapeFromChain)
     }
   }
 
