@@ -43,14 +43,7 @@ import {
 } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const {
-  ExpandIcon,
-  HideIcon,
-  PluginIcon,
-  AlertIcon,
-  ArgentShieldIcon,
-  NetworkIcon,
-} = icons
+const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ArgentShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -231,9 +224,7 @@ export const AccountEditScreen: FC = () => {
             </ButtonCell>
           )}
           {account?.needsDeploy && (
-            <ButtonCell onClick={handleDeploy} rightIcon={<NetworkIcon />}>
-              Deploy account
-            </ButtonCell>
+            <ButtonCell onClick={handleDeploy}>Deploy account</ButtonCell>
           )}
           <ButtonCell
             color={"error.500"}
