@@ -21,10 +21,10 @@ export const handleMiscellaneousMessage: HandleMessage<
         browser.storage.sync.clear()
         browser.storage.managed.clear()
         browser.storage.session.clear()
-        await resetDevice()
       } catch {
         // Ignore browser.storage.session error "This is a read-only store"
       }
+      await resetDevice()
       return respond({ type: "DISCONNECT_ACCOUNT" })
     }
 
