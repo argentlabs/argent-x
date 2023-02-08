@@ -6,6 +6,7 @@ import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import { addAccount, getAccounts } from "../shared/shield/backend/account"
 import {
   ARGENT_SHIELD_ENABLED,
+  ARGENT_SHIELD_ERROR_EMAIL_IN_USE,
   ARGENT_SHIELD_NETWORK_ID,
 } from "../shared/shield/constants"
 import { isEqualAddress } from "../ui/services/addresses"
@@ -53,7 +54,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
             }
           }
           if (!backendAccountMatches) {
-            throw new Error("Email in use")
+            throw new Error(ARGENT_SHIELD_ERROR_EMAIL_IN_USE)
           }
         }
 

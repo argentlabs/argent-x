@@ -16,6 +16,7 @@ import {
   EmailVerificationStatus,
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
+import { ARGENT_SHIELD_ERROR_EMAIL_IN_USE } from "../../../shared/shield/constants"
 import { confirmEmail, requestEmail } from "../../../shared/shield/register"
 import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
@@ -147,7 +148,8 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                     }
                   }
                   if (
-                    (e as Error)?.message?.toString() === "Error: Email in use"
+                    (e as Error)?.message?.toString() ===
+                    `Error: ${ARGENT_SHIELD_ERROR_EMAIL_IN_USE}`
                   ) {
                     toast({
                       title:
