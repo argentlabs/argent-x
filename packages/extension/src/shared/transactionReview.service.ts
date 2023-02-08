@@ -185,6 +185,14 @@ export const getTransactionReviewSwap = (
   }
 }
 
+export const getNFTTransferActivity = (
+  transactionReview?: ApiTransactionReviewResponse,
+) => {
+  if (!transactionReview) {
+    return
+  }
+}
+
 export const getTransactionReviewActivityOfType = (
   type: ApiTransactionReviewActivityType,
   transactionReview?: ApiTransactionReviewResponse,

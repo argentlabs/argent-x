@@ -224,8 +224,14 @@ export const prettifyTokenAmount = ({
     const decimalsNumber = Number(decimals)
     const balanceBn = BigNumber.from(amount)
     isPositiveValue = balanceBn.gt(0)
-    const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
-    prettyValue = prettifyTokenNumber(balanceFullString)
+    const balanceFullString =
+      decimalsNumber > 0
+        ? utils.formatUnits(balanceBn, decimalsNumber)
+        : balanceBn.toString()
+    prettyValue =
+      decimalsNumber > 0
+        ? prettifyTokenNumber(balanceFullString)
+        : balanceFullString
   }
 
   const prettyValueWithSymbol = [

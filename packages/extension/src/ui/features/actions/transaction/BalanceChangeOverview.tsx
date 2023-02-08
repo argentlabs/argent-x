@@ -23,7 +23,8 @@ import {
   formatTruncatedAddress,
   normalizeAddress,
 } from "../../../services/addresses"
-import { useIsMainnet } from "../../networks/useNetworks"
+import { useCurrentNetwork, useIsMainnet } from "../../networks/useNetworks"
+import { NftDetails } from "./NftDetails"
 import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
@@ -36,6 +37,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionSimulation,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
+  const network = useCurrentNetwork()
 
   const allTransferSafe = useMemo(
     () => aggregatedData.every((t) => t.safe),
@@ -105,17 +107,26 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               : "0",
                         }}
                       >
-                        <Flex alignItems="center" gap="2">
-                          <Image src={token.image} w="5" h="5" />
-                          <P4 fontWeight="bold">
-                            {token.name === "Ether" ? "Ethereum" : token.name}{" "}
-                          </P4>
-                          {!safe && (
-                            <P3 color="error.500" fontWeight="bold" mt="0.25">
-                              <AlertIcon />
-                            </P3>
-                          )}
-                        </Flex>
+                        {token.type === "erc721" && token.tokenId ? (
+                          <NftDetails
+                            contractAddress={token.address}
+                            tokenId={token.tokenId}
+                            networkId={network.id}
+                            safe={safe}
+                          />
+                        ) : (
+                          <Flex alignItems="center" gap="2">
+                            <Image src={token.image} w="5" h="5" />
+                            <P4 fontWeight="bold">
+                              {token.name === "Ether" ? "Ethereum" : token.name}{" "}
+                            </P4>
+                            {!safe && (
+                              <P3 color="error.500" fontWeight="bold" mt="0.25">
+                                <AlertIcon />
+                              </P3>
+                            )}
+                          </Flex>
+                        )}
                         <Flex
                           direction="column"
                           gap="0.5"
@@ -131,7 +142,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                           >
                             {prettifyTokenAmount({
                               amount: amount.toString(),
-                              ...token,
+                              decimals: token.decimals,
+                              symbol:
+                                token.type === "erc20" ? token.symbol : "NFT",
                               showPlusSign: true,
                             })}
                           </P4>

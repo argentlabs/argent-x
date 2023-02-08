@@ -23,6 +23,7 @@ import { DappHeader } from "./transaction/DappHeader"
 import { TransactionActions } from "./transaction/TransactionActions"
 import { TransactionBanner } from "./transaction/TransactionBanner"
 import { useTransactionReview } from "./transaction/useTransactionReview"
+import { useAggregatedSimData } from "./transaction/useTransactionSimulatedData"
 import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
 import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
 
@@ -32,8 +33,6 @@ export interface ApproveTransactionScreenProps
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
 }
-
-export type TransactionViewType = "swap" | "nft" | "generic"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
@@ -59,6 +58,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
+
+  const aggregatedData = useAggregatedSimData(transactionSimulation)
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -90,11 +91,11 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   )
 
   // Show balance change if there is a transaction simulation and there are approvals or transfers
-  const showBalanceChange = transactionSimulation && txnHasApprovalsOrTransfers
+  const hasBalanceChange = transactionSimulation && txnHasApprovalsOrTransfers
 
   // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
   const showTransactionActions =
-    !showBalanceChange || (txDetails && showBalanceChange)
+    !hasBalanceChange || (txDetails && hasBalanceChange)
 
   const verifiedDapp = transactionReview?.targetedDapp
 
@@ -144,6 +145,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       <DappHeader
         transactions={transactionsArray}
         transactionReview={transactionReview}
+        aggregatedData={aggregatedData}
       />
 
       {warn ? (
@@ -158,7 +160,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         <></>
       )}
 
-      {showBalanceChange && (
+      {hasBalanceChange && (
         <BalanceChangeOverview transactionSimulation={transactionSimulation} />
       )}
       {showTransactionActions && (
@@ -167,16 +169,18 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
       <AccountNetworkInfo account={selectedAccount} />
 
-      <Center>
-        <P4
-          fontWeight="bold"
-          color="neutrals.400"
-          _hover={{ textDecoration: "underline", cursor: "pointer" }}
-          onClick={() => setTxDetails(!txDetails)}
-        >
-          {txDetails ? "Hide" : "View more"} details
-        </P4>
-      </Center>
+      {hasBalanceChange && (
+        <Center>
+          <P4
+            fontWeight="bold"
+            color="neutrals.400"
+            _hover={{ textDecoration: "underline", cursor: "pointer" }}
+            onClick={() => setTxDetails(!txDetails)}
+          >
+            {txDetails ? "Hide" : "View more"} details
+          </P4>
+        </Center>
+      )}
     </ConfirmScreen>
   )
 }
