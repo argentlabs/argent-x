@@ -4,25 +4,6 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 
-/** Reduce bundlesize - maps dependencies that should be excluded from bundling to their global name */
-
-export const externalGlobals = {
-  react: "React",
-  "react-dom": "ReactDOM",
-  "react-router-dom": "ReactRouterDOM",
-  "react/jsx-runtime": "ReactJSXRuntime",
-  "react-copy-to-clipboard": "ReactCopyToClipboard",
-  "@chakra-ui/react": "ChakraUIReact",
-  "@chakra-ui/anatomy": "ChakraUIAnatomy",
-  "@chakra-ui/theme-tools": "ChakraUIThemeTools",
-  "@chakra-ui/styled-system": "ChakraUIStyledSystem",
-  "framer-motion": "FramerMotion",
-  popmotion: "PopMotion",
-  colord: "Colord",
-  "colord/plugins/lch": "ColordPluginsLCH",
-  "@ethersproject/wordlists": "EthersProjectWordLists",
-}
-
 export default defineConfig({
   plugins: [
     dts({
@@ -39,9 +20,33 @@ export default defineConfig({
     },
     emptyOutDir: false,
     rollupOptions: {
-      external: Object.keys(externalGlobals),
+      external: [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "react/jsx-runtime",
+        "@chakra-ui/react",
+        "@chakra-ui/anatomy",
+        "@chakra-ui/theme-tools",
+        "@chakra-ui/styled-system",
+        "framer-motion",
+        "popmotion",
+        "@ethersproject/wordlists",
+      ],
       output: {
-        globals: externalGlobals,
+        globals: {
+          react: "React",
+          "react-dom": "ReactDOM",
+          "react-router-dom": "ReactRouterDOM",
+          "react/jsx-runtime": "ReactJSXRuntime",
+          "@chakra-ui/react": "ChakraUIReact",
+          "@chakra-ui/anatomy": "ChakraUIAnatomy",
+          "@chakra-ui/theme-tools": "ChakraUIThemeTools",
+          "@chakra-ui/styled-system": "ChakraUIStyledSystem",
+          "framer-motion": "FramerMotion",
+          popmotion: "PopMotion",
+          "@ethersproject/wordlists": "EthersProjectWordLists",
+        },
       },
     },
   },
