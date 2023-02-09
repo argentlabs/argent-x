@@ -1,6 +1,6 @@
 import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 
 import {
   ApiTransactionReview,
@@ -37,7 +37,21 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
   return hasSwap ? (
     <SwapTitle swapReview={swapTxn} />
   ) : hasNftTransfer ? (
-    <NftTitle nftTransfers={nftTransfers} networkId={network.id} />
+    <Flex alignItems="center">
+      {nftTransfers?.map((nftTransfer, i) =>
+        i < 2 ? (
+          <NftTitle
+            nftTransfer={nftTransfer}
+            networkId={network.id}
+            key={i}
+            totalTransfers={nftTransfers.length}
+            index={i}
+          />
+        ) : (
+          i === 2 && <span key={i}>&nbsp;& {nftTransfers.length - 2} more</span>
+        ),
+      )}
+    </Flex>
   ) : (
     <>Confirm {fallback}</>
   )
@@ -56,10 +70,11 @@ const SwapTitle: FC<{ swapReview?: ApiTransactionReview }> = ({
 }
 
 const NftTitle: FC<{
-  nftTransfers?: AggregatedSimData[]
+  nftTransfer: AggregatedSimData
   networkId: string
-}> = ({ nftTransfers, networkId }) => {
-  const nftTransfer = nftTransfers?.[0]
+  index: number
+  totalTransfers: number
+}> = ({ nftTransfer, networkId, totalTransfers, index }) => {
   const amount = nftTransfer?.amount
 
   const { data: nft } = useAspectNft(
@@ -68,15 +83,23 @@ const NftTitle: FC<{
     networkId,
   )
 
+  const prefix = useMemo(() => {
+    if (index !== 0) {
+      if (index === totalTransfers - 1) {
+        return " &"
+      }
+      return ","
+    }
+    return ""
+  }, [index, totalTransfers])
+
   if (!nft || !amount) {
     return <></>
   }
 
   const action = amount.eq(0) ? "" : amount.gt(0) ? "Buy " : "Sell "
 
-  return (
-    <Flex alignItems="center" gap="1">
-      {action} {nft.name}
-    </Flex>
-  )
+  const title = `${prefix} ${action} ${nft.name}`
+
+  return <span style={{ whiteSpace: "pre-wrap" }}>{title}</span>
 }

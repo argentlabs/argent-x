@@ -3,6 +3,7 @@ import { Dictionary } from "lodash"
 import { groupBy, reduce } from "lodash-es"
 import { useMemo } from "react"
 
+import { TransactionSimulationApproval } from "./../../../../shared/transactionSimulation/types"
 import { Token } from "../../../../shared/token/type"
 import {
   ApiTransactionSimulationResponse,
@@ -69,8 +70,22 @@ export const useAggregatedSimData = (
       (t) => account && transferAffectsBalance(t, account),
     )
 
-    const transfersByTokenAddress = groupBy(filteredTransfers, "tokenAddress")
-    const approvalsByTokenAddress = groupBy(approvals, "tokenAddress")
+    // This is needed to uniquely identify tokens
+    // In case of ERC721 and ERC1155, we use the tokenURI because the tokenAddress can be the same for different tokens.
+    // For example, tokens from the same collection will have the same tokenAddress and different tokenId
+    // But we can use a mixtures of tokenAddress and tokenURI to uniquely identify tokens.
+    // tokenURI will always be unique for an erc721 token
+
+    // In case of ERC20, we use the tokenAddress, which is enough to uniquely identify a token
+    const keyForGrouping = (
+      t: TransactionSimulationTransfer | TransactionSimulationApproval,
+    ) =>
+      t.details?.tokenType === "erc20"
+        ? t.tokenAddress
+        : `${t.tokenAddress}/${t.value}`
+
+    const transfersRecord = groupBy(filteredTransfers, keyForGrouping)
+    const approvalsRecord = groupBy(approvals, keyForGrouping)
 
     const ZERO = new BigNumber(0)
 
@@ -78,10 +93,10 @@ export const useAggregatedSimData = (
       Dictionary<TransactionSimulationTransfer[]>,
       Record<string, AggregatedSimData>
     >(
-      transfersByTokenAddress,
-      (acc, transfers, tokenAddress) => {
+      transfersRecord,
+      (acc, transfers, key) => {
         const validatedToken = apiTokenDetailsToToken({
-          tokenAddress,
+          tokenAddress: transfers[0].tokenAddress,
           details: transfers[0].details,
           networkId: network.id,
           erc20TokensRecord,
@@ -94,7 +109,7 @@ export const useAggregatedSimData = (
           return acc
         }
 
-        const approvalsForTokens = approvalsByTokenAddress[tokenAddress]
+        const approvalsForTokens = approvalsRecord[key]
 
         const approvals: ApprovalSimulationData[] =
           approvalsForTokens?.map((a) => ({
@@ -156,7 +171,7 @@ export const useAggregatedSimData = (
 
         return {
           ...acc,
-          [tokenAddress]: {
+          [key]: {
             token: validatedToken,
             amount,
             usdValue,
