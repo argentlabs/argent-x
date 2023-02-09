@@ -1,4 +1,4 @@
-import { Button, CellStack, icons } from "@argent/ui"
+import { Button, CellStack, P3, P4, icons } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { Link, To } from "react-router-dom"
@@ -6,7 +6,12 @@ import { Link, To } from "react-router-dom"
 import { ShieldHeader } from "./ui/ShieldHeader"
 import { ChangeGuardian } from "./usePendingChangingGuardian"
 
-const { ArgentShieldIcon, ArgentShieldDeactivateIcon, TickIcon } = icons
+const {
+  ArgentShieldIcon,
+  ArgentShieldDeactivateIcon,
+  TickIcon,
+  AnnouncementIcon,
+} = icons
 
 export interface ShieldBaseFinishScreenProps {
   accountName?: string
@@ -67,7 +72,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
 
   return (
     <CellStack flex={1}>
-      <Center flex={1}>
+      <Center flex={1} flexDirection={"column"}>
         <ShieldHeader
           icon={icon}
           title={title}
@@ -76,6 +81,39 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
           variant={variant}
           size={"lg"}
         />
+        <Center
+          bg={"accent.800"}
+          rounded={"xl"}
+          flexDirection={"column"}
+          px={3}
+          py={4}
+          textAlign={"center"}
+        >
+          <P3 mb={2} fontWeight={"semibold"}>
+            <AnnouncementIcon
+              display={"inline-block"}
+              fontSize={"xl"}
+              verticalAlign={"bottom"}
+              transform={"scaleX(-1)"}
+              mr={1}
+            />{" "}
+            We want to hear your feedback
+          </P3>
+          <P4 mb={4}>
+            Thanks for being an early tester of Argent Shield. Let us know your
+            thoughts on Discord
+          </P4>
+          <Button
+            as={"a"}
+            href="https://discord.gg/T4PDFHxm6T"
+            target="_blank"
+            colorScheme={"accent"}
+            size={"xs"}
+            w={"100%"}
+          >
+            Share feedback
+          </Button>
+        </Center>
       </Center>
       <Button as={Link} to={returnRoute} colorScheme={"primary"}>
         {isLoading ? "Dismiss" : "Done"}
