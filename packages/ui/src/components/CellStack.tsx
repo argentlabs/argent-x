@@ -75,8 +75,7 @@ export const ButtonCell: ButtonCellProps = ({
         )}
       </Flex>
       {extendedDescription && (
-        <Flex
-          as={P4}
+        <P4
           pt="3"
           mt="4"
           borderTop="1px"
@@ -88,7 +87,7 @@ export const ButtonCell: ButtonCellProps = ({
           fontWeight="normal"
         >
           {extendedDescription}
-        </Flex>
+        </P4>
       )}
     </Button>
   )

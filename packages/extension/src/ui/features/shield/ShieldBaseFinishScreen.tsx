@@ -6,6 +6,8 @@ import { Link, To } from "react-router-dom"
 import { ShieldHeader } from "./ui/ShieldHeader"
 import { ChangeGuardian } from "./usePendingChangingGuardian"
 
+const SHARE_FEEDBACK_URL = "https://discord.gg/T4PDFHxm6T"
+
 const {
   ArgentShieldIcon,
   ArgentShieldDeactivateIcon,
@@ -105,7 +107,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
           </P4>
           <Button
             as={"a"}
-            href="https://discord.gg/T4PDFHxm6T"
+            href={SHARE_FEEDBACK_URL}
             target="_blank"
             colorScheme={"accent"}
             size={"xs"}
