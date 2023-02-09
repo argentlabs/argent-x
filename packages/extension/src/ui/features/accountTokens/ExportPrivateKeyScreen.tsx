@@ -120,7 +120,11 @@ export const ExportPrivateKeyScreen: FC = () => {
       />
 
       {privateKey && (
-        <CopyTooltip copyValue={privateKey} message="Copied">
+        <CopyTooltip
+          copyValue={privateKey}
+          message="Copied"
+          data-testid="privateKey"
+        >
           <KeyContainer>{privateKey}</KeyContainer>
         </CopyTooltip>
       )}

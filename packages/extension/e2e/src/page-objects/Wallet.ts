@@ -1,5 +1,7 @@
 import { Page, expect } from "@playwright/test"
-type language = "en"
+
+import config from "./../config"
+
 const text = {
   en: {
     //first screen
@@ -31,7 +33,7 @@ const text = {
   },
 }
 export default class Wallet {
-  constructor(private page: Page, private lang: language = "en") {}
+  constructor(private page: Page, private lang = config.appLanguage) {}
   get banner() {
     return this.page.locator(`div h1:has-text("${text[this.lang].banner1}")`)
   }
@@ -137,8 +139,8 @@ export default class Wallet {
       expect(this.banner3).toBeVisible(),
       expect(this.description3).toBeVisible(),
     ])
-    await this.password.fill("test123$")
-    await this.repeatPassword.fill("test123$")
+    await this.password.fill(config.password)
+    await this.repeatPassword.fill(config.password)
     await this.createWallet.click()
 
     await Promise.all([

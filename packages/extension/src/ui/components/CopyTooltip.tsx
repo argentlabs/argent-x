@@ -18,6 +18,7 @@ interface CopyTooltipProps {
   message: string
   autoDismiss?: boolean
   children: ReactNode
+  "data-testid"?: string
 }
 
 export const CopyTooltip: FC<CopyTooltipProps> = ({
@@ -25,6 +26,7 @@ export const CopyTooltip: FC<CopyTooltipProps> = ({
   message,
   autoDismiss = true,
   children,
+  "data-testid": dataTestId,
 }) => {
   const [visible, setVisible] = useState(false)
   const pidRef = useRef<any>()
@@ -49,7 +51,7 @@ export const CopyTooltip: FC<CopyTooltipProps> = ({
         setVisible(false)
       }}
     >
-      <div>
+      <div data-testid={dataTestId}>
         <CopyToClipboard text={copyValue} onCopy={() => setVisible(true)}>
           {children}
         </CopyToClipboard>
