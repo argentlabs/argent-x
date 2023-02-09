@@ -3,7 +3,7 @@ import { ReactNode } from "react"
 
 import { Button } from "./Button"
 import { ChevronRightIcon } from "./icons"
-import { H6 } from "./Typography"
+import { H6, P4 } from "./Typography"
 
 /** A vertical collection of Cells with standardised spacing */
 
@@ -76,6 +76,7 @@ export const ButtonCell: ButtonCellProps = ({
       </Flex>
       {extendedDescription && (
         <Flex
+          as={P4}
           pt="3"
           mt="4"
           borderTop="1px"
@@ -83,6 +84,8 @@ export const ButtonCell: ButtonCellProps = ({
           flex="1"
           w="100%"
           whiteSpace="normal"
+          color="neutrals.300"
+          fontWeight="normal"
         >
           {extendedDescription}
         </Flex>
