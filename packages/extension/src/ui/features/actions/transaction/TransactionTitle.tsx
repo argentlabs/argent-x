@@ -1,6 +1,6 @@
 import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { FC, useMemo } from "react"
+import { FC, Fragment, useMemo } from "react"
 
 import {
   ApiTransactionReview,
@@ -37,7 +37,7 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
   return hasSwap ? (
     <SwapTitle swapReview={swapTxn} />
   ) : hasNftTransfer ? (
-    <Flex alignItems="center">
+    <Flex alignItems="center" textAlign="center">
       {nftTransfers?.map((nftTransfer, i) =>
         i < 2 ? (
           <NftTitle
@@ -48,7 +48,9 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
             index={i}
           />
         ) : (
-          i === 2 && <span key={i}>&nbsp;& {nftTransfers.length - 2} more</span>
+          i === 2 && (
+            <Fragment key={i}>&nbsp;& {nftTransfers.length - 2} more</Fragment>
+          )
         ),
       )}
     </Flex>
@@ -101,5 +103,5 @@ const NftTitle: FC<{
 
   const title = `${prefix} ${action} ${nft.name}`
 
-  return <span style={{ whiteSpace: "pre-wrap" }}>{title}</span>
+  return <>{title}</>
 }

@@ -10,7 +10,6 @@ import {
   TokenDetails,
   TransactionSimulationTransfer,
 } from "../../../../shared/transactionSimulation/types"
-import { parseIPFSUri } from "../../../services/ipfs"
 import { useAspectContractAddresses } from "./../../accountNfts/aspect.service"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
@@ -80,10 +79,6 @@ export const useAggregatedSimData = (
   const { data: nftContracts } = useAspectContractAddresses()
 
   const { transfers, approvals } = transactionSimulation
-  console.log(
-    "🚀 ~ file: useTransactionSimulatedData.ts:67 ~ transfers",
-    transfers,
-  )
 
   const aggregatedData = useMemo(() => {
     const filteredTransfers = transfers.filter(
@@ -306,18 +301,6 @@ export function apiTokenDetailsToToken({
   }
 
   return undefined
-}
-
-export const getTokenImageOrURI = (
-  details: TokenDetails,
-): { image?: string; tokenURI?: string } => {
-  if (details.tokenType === "erc721" && details.tokenURI) {
-    const uri = parseIPFSUri(details.tokenURI)
-
-    return { tokenURI: uri, image: undefined }
-  }
-
-  return { image: details.tokenURI ?? undefined, tokenURI: undefined }
 }
 
 export const transferAffectsBalance = (

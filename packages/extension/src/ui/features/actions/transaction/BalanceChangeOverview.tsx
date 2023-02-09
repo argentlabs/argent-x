@@ -73,7 +73,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
               dataIndex,
             ) => (
               <AccordionItem
-                key={[token.address, "transfer"].join("-")}
+                key={[token.address, "transfer", dataIndex].join("-")}
                 border="none"
                 color="white"
                 isDisabled={isEmpty(approvals) && isEmpty(recipients)}
@@ -183,11 +183,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               </Flex>
                             </Flex>
 
-                            {approvals.map((approval) => (
+                            {approvals.map((approval, approvalIndex) => (
                               <Flex
-                                key={[approval.token.address, "approval"].join(
-                                  "-",
-                                )}
+                                key={approvalIndex}
                                 justifyContent="space-between"
                               >
                                 <CopyTooltip
@@ -227,9 +225,13 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               </P4>
                             </Flex>
 
-                            {recipients.map((recipient) => (
+                            {recipients.map((recipient, recipientIndex) => (
                               <Flex
-                                key={["recipient", recipient.address].join("-")}
+                                key={[
+                                  "recipient",
+                                  recipient.address,
+                                  recipientIndex,
+                                ].join("-")}
                                 justifyContent="space-between"
                               >
                                 <CopyTooltip

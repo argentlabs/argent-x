@@ -1,5 +1,5 @@
 import { icons } from "@argent/ui"
-import { Box, Center, Image } from "@chakra-ui/react"
+import { Box, BoxProps, Center, Image } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
 import { getTransactionReviewSwap } from "../../../../shared/transactionReview.service"
@@ -50,13 +50,43 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       dstTokenImg={dstToken?.image}
     />
   ) : hasNftTransfer ? (
-    <IconWrapper>
+    <IconWrapper position="relative">
       <NFTImage
         contractAddress={nftTransfers[0].token.address}
         tokenId={nftTransfers[0].token.tokenId}
         networkId={network.id}
         borderRadius="2xl"
+        position={nftTransfers.length > 1 ? "absolute" : "relative"}
+        left={nftTransfers.length > 1 ? "-14.29%" : "auto"}
+        right={nftTransfers.length > 1 ? "14.29%" : "auto"}
+        filter="auto"
+        dropShadow="menu"
+        zIndex={3}
       />
+      {nftTransfers.length > 1 && (
+        <>
+          <Box
+            h="14"
+            w="14"
+            borderRadius="2xl"
+            boxShadow="menu"
+            position="absolute"
+            bgColor="neutrals.600"
+            zIndex={2}
+          />
+          <Box
+            h="14"
+            w="14"
+            borderRadius="2xl"
+            boxShadow="menu"
+            bgColor="neutrals.700"
+            position="absolute"
+            left="14.29%"
+            right="-14.29%"
+            zIndex={1}
+          />
+        </>
+      )}
     </IconWrapper>
   ) : (
     <IconWrapper>
@@ -93,7 +123,12 @@ const SwapTokensImage: FC<{ srcTokenImg?: string; dstTokenImg?: string }> = ({
   </Center>
 )
 
-const IconWrapper = ({ children }: { children?: React.ReactNode }) => {
+const IconWrapper: FC<BoxProps> = ({
+  children,
+  ...rest
+}: {
+  children?: React.ReactNode
+}) => {
   return (
     <Center
       w="14"
@@ -101,6 +136,7 @@ const IconWrapper = ({ children }: { children?: React.ReactNode }) => {
       background="neutrals.700"
       borderRadius="2xl"
       boxShadow="menu"
+      {...rest}
     >
       {children}
     </Center>
