@@ -13,7 +13,6 @@ import { FC, useCallback, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
-import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { parseAmount } from "../../../shared/token/amount"
 import { getFeeToken } from "../../../shared/token/utils"
@@ -36,6 +35,7 @@ import {
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { useArgentShieldEnabled } from "../shield/useArgentShieldEnabled"
 import {
   ChangeGuardian,
   usePendingChangeGuardian,
@@ -70,6 +70,8 @@ export const AccountEditScreen: FC = () => {
       navigate(-1)
     }
   }, [navigate, returnTo])
+
+  const argentShieldEnabled = useArgentShieldEnabled()
 
   const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
@@ -164,7 +166,7 @@ export const AccountEditScreen: FC = () => {
             </Center>
           </Flex>
           <SpacerCell />
-          {ARGENT_SHIELD_ENABLED && (
+          {argentShieldEnabled && (
             <>
               <ButtonCell
                 as={Link}

@@ -9,6 +9,8 @@ import {
 import { FC, useCallback, useState } from "react"
 
 import { settingsStore } from "../../../shared/settings"
+import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
+import { resetDevice } from "../../../shared/shield/jwt"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { Account } from "../accounts/Account"
 import {
@@ -54,10 +56,13 @@ export const PrivacyExperimentalSettings: FC = () => {
     setAlertDialogIsOpen(false)
   }, [])
 
-  const toggleEnableArgentShield = useCallback(() => {
-    if (experimentalEnableArgentShield && hasAccountsWithGuardian) {
-      setAlertDialogIsOpen(true)
-      return
+  const toggleEnableArgentShield = useCallback(async () => {
+    if (experimentalEnableArgentShield) {
+      if (hasAccountsWithGuardian) {
+        setAlertDialogIsOpen(true)
+        return
+      }
+      await resetDevice()
     }
     settingsStore.set(
       "experimentalEnableArgentShield",
@@ -90,15 +95,17 @@ export const PrivacyExperimentalSettings: FC = () => {
           >
             Change account implementation
           </ButtonCell>
-          <ButtonCell
-            onClick={toggleEnableArgentShield}
-            rightIcon={<Switch isChecked={experimentalEnableArgentShield} />}
-            extendedDescription={
-              "Add extra protection to your Argent X accounts with two-factor security. You need to have been added to the whitelist to use this feature while it’s in beta"
-            }
-          >
-            Argent Shield (2FA)
-          </ButtonCell>
+          {ARGENT_SHIELD_ENABLED && (
+            <ButtonCell
+              onClick={toggleEnableArgentShield}
+              rightIcon={<Switch isChecked={experimentalEnableArgentShield} />}
+              extendedDescription={
+                "Add extra protection to your Argent X accounts with two-factor security. You need to have been added to the whitelist to use this feature while it’s in beta"
+              }
+            >
+              Argent Shield (2FA)
+            </ButtonCell>
+          )}
         </CellStack>
       </SettingsScreenWrapper>
     </NavigationContainer>
