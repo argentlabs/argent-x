@@ -75,17 +75,6 @@ export const useAggregatedSimData = (
   const network = useCurrentNetwork()
   const account = useSelectedAccount()
 
-  /*
-[
-    {
-        "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-        "from": "0x2b78e250940435d6ff937cda927a62dc43662d7e3605999b310055ede197756",
-        "to": "0x5a2b2b37f66157f767ea711cb4e034c40d41f2f5acf9ff4a19049fa11c1a884",
-        "value": "768666734571380"
-    }
-]
-  **/
-
   // Need to clean hex because the API returns addresses with unpadded 0s
   const erc20TokensRecord = useTokensRecord({ cleanHex: true })
   const { data: nftContracts } = useAspectContractAddresses()
