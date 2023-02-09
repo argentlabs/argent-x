@@ -50,6 +50,22 @@ export interface IUseTransactionSimulatedData {
   transactionSimulation: ApiTransactionSimulationResponse
 }
 
+export type ValidatedTokenTransfer = Omit<
+  TransactionSimulationTransfer,
+  "details"
+> & {
+  token: TokenWithType
+  usdValue: string | undefined
+}
+
+export type ValidatedTokenApproval = Omit<
+  TransactionSimulationApproval,
+  "details"
+> & {
+  token: TokenWithType
+  usdValue: string | undefined
+}
+
 export const useAggregatedSimData = (
   transactionSimulation: ApiTransactionSimulationResponse = {
     transfers: [],
@@ -59,94 +75,132 @@ export const useAggregatedSimData = (
   const network = useCurrentNetwork()
   const account = useSelectedAccount()
 
+  /*
+[
+    {
+        "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "from": "0x2b78e250940435d6ff937cda927a62dc43662d7e3605999b310055ede197756",
+        "to": "0x5a2b2b37f66157f767ea711cb4e034c40d41f2f5acf9ff4a19049fa11c1a884",
+        "value": "768666734571380"
+    }
+]
+  **/
+
   // Need to clean hex because the API returns addresses with unpadded 0s
   const erc20TokensRecord = useTokensRecord({ cleanHex: true })
   const { data: nftContracts } = useAspectContractAddresses()
 
   const { transfers, approvals } = transactionSimulation
+  console.log(
+    "🚀 ~ file: useTransactionSimulatedData.ts:67 ~ transfers",
+    transfers,
+  )
 
   const aggregatedData = useMemo(() => {
     const filteredTransfers = transfers.filter(
       (t) => account && transferAffectsBalance(t, account),
     )
 
+    // Validate Tokens before grouping them
+    // because we need to know the token type to group them
+
+    const transfersWithValidatedTokens: ValidatedTokenTransfer[] =
+      filteredTransfers
+        .map((t) => {
+          const validatedToken = apiTokenDetailsToToken({
+            tokenAddress: t.tokenAddress,
+            details: t.details,
+            erc20TokensRecord,
+            nftContracts,
+            tokenId: t.value,
+            networkId: network.id,
+          })
+
+          return {
+            token: validatedToken,
+            usdValue: t.details?.usdValue ?? undefined,
+            ...t,
+          }
+        })
+        .filter((t): t is ValidatedTokenTransfer => Boolean(t.token))
+
+    const approvalsWithValidatedTokens: ValidatedTokenApproval[] = approvals
+      .map((a) => {
+        const validatedToken = apiTokenDetailsToToken({
+          tokenAddress: a.tokenAddress,
+          details: a.details,
+          erc20TokensRecord,
+          nftContracts,
+          tokenId: a.value,
+          networkId: network.id,
+        })
+
+        return {
+          token: validatedToken,
+          usdValue: a.details?.usdValue ?? undefined,
+          ...a,
+        }
+      })
+      .filter((a): a is ValidatedTokenApproval => Boolean(a.token))
+
     // This is needed to uniquely identify tokens
     // In case of ERC721 and ERC1155, we use the tokenURI because the tokenAddress can be the same for different tokens.
     // For example, tokens from the same collection will have the same tokenAddress and different tokenId
-    // But we can use a mixtures of tokenAddress and tokenURI to uniquely identify tokens.
-    // tokenURI will always be unique for an erc721 token
+    // But we can use a mixtures of tokenAddress and tokenId to uniquely identify tokens.
+    // "tokenAddress/tokenId" will always be unique for an erc721 token
 
     // In case of ERC20, we use the tokenAddress, which is enough to uniquely identify a token
     const keyForGrouping = (
-      t: TransactionSimulationTransfer | TransactionSimulationApproval,
+      t: ValidatedTokenTransfer | ValidatedTokenApproval,
     ) =>
-      t.details?.tokenType === "erc20"
-        ? t.tokenAddress
-        : `${t.tokenAddress}/${t.value}`
+      t.token.type !== "erc20" ? `${t.tokenAddress}/${t.value}` : t.tokenAddress
 
-    const transfersRecord = groupBy(filteredTransfers, keyForGrouping)
-    const approvalsRecord = groupBy(approvals, keyForGrouping)
+    const transfersRecord = groupBy(
+      transfersWithValidatedTokens,
+      keyForGrouping,
+    )
+    const approvalsRecord = groupBy(
+      approvalsWithValidatedTokens,
+      keyForGrouping,
+    )
 
     const ZERO = new BigNumber(0)
 
     return reduce<
-      Dictionary<TransactionSimulationTransfer[]>,
+      Dictionary<ValidatedTokenTransfer[]>,
       Record<string, AggregatedSimData>
     >(
       transfersRecord,
       (acc, transfers, key) => {
-        const validatedToken = apiTokenDetailsToToken({
-          tokenAddress: transfers[0].tokenAddress,
-          details: transfers[0].details,
-          networkId: network.id,
-          erc20TokensRecord,
-          nftContracts,
-          tokenId: transfers[0].value, // Works for ERC721 and ERC1155
-        })
-
-        // Ignore tokens that we don't have a record of
-        if (!validatedToken) {
-          return acc
-        }
-
         const approvalsForTokens = approvalsRecord[key]
 
         const approvals: ApprovalSimulationData[] =
           approvalsForTokens?.map((a) => ({
-            token: validatedToken,
+            token: a.token,
             owner: a.owner,
             spender: a.spender,
-            amount: new BigNumber(
-              a.details?.tokenType === "erc20" ? a.value : 1,
-            ),
-
-            usdValue: a.details?.usdValue
-              ? parseFloat(a.details.usdValue)
-              : undefined,
+            amount: new BigNumber(a.token.type === "erc721" ? 1 : a.value),
+            usdValue: a.usdValue ? parseFloat(a.usdValue) : undefined,
           })) ?? []
 
         const amount = transfers.reduce<BigNumber>((acc, t) => {
           if (t.from === account?.address) {
-            return t.details?.tokenType === "erc20"
-              ? acc.minus(t.value)
-              : acc.minus(1)
+            return t.token.type === "erc721" ? acc.minus(1) : acc.minus(t.value)
           }
 
-          return t.details?.tokenType === "erc20"
-            ? acc.plus(t.value)
-            : acc.plus(1)
+          return t.token.type === "erc721" ? acc.plus(1) : acc.plus(t.value)
         }, ZERO)
 
         const usdValue = transfers.reduce<number>((acc, t) => {
-          if (!t.details?.usdValue) {
+          if (!t.usdValue) {
             return acc
           }
 
           if (t.from === account?.address) {
-            return acc - parseFloat(t.details.usdValue)
+            return acc - parseFloat(t.usdValue)
           }
 
-          return acc + parseFloat(t.details.usdValue)
+          return acc + parseFloat(t.usdValue)
         }, 0)
 
         const recipients = transfers.reduce<Recipient[]>((acc, t) => {
@@ -155,9 +209,7 @@ export const useAggregatedSimData = (
             {
               address: t.to,
               amount: new BigNumber(t.value),
-              usdValue: t.details?.usdValue
-                ? parseFloat(t.details.usdValue)
-                : undefined,
+              usdValue: t.usdValue ? parseFloat(t.usdValue) : undefined,
             },
           ]
         }, [])
@@ -172,7 +224,7 @@ export const useAggregatedSimData = (
         return {
           ...acc,
           [key]: {
-            token: validatedToken,
+            token: transfers[0].token,
             amount,
             usdValue,
             recipients,
