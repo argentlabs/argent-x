@@ -13,6 +13,7 @@ import { Account } from "../accounts/Account"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
+import { getOriginatingHost } from "../browser/useOriginatingHost"
 import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
@@ -50,9 +51,13 @@ export const ActionScreen: FC = () => {
   }, [action, closePopupIfLastAction])
 
   const onReject = useCallback(async () => {
+    await analytics.track("rejectedTransaction", {
+      networkId: account?.networkId || "unknown",
+      host: await getOriginatingHost(),
+    })
     await rejectAction(action.meta.hash)
     closePopupIfLastAction()
-  }, [action, closePopupIfLastAction])
+  }, [action, closePopupIfLastAction, account?.networkId])
 
   const rejectAllActions = useCallback(async () => {
     await rejectAction(actions.map((act) => act.meta.hash))
@@ -133,6 +138,7 @@ export const ActionScreen: FC = () => {
             onSubmit={async () => {
               analytics.track("signedTransaction", {
                 networkId: account?.networkId || "unknown",
+                host: await getOriginatingHost(),
               })
               await approveAction(action)
               useAppState.setState({ isLoading: true })
@@ -150,6 +156,7 @@ export const ActionScreen: FC = () => {
               await analytics.track("sentTransaction", {
                 success: !("error" in result),
                 networkId: account?.networkId || "unknown",
+                host: await getOriginatingHost(),
               })
               if ("error" in result) {
                 useAppState.setState({
