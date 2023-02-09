@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import useSWR from "swr"
 
 import { Network, getProvider } from "../../../shared/network"
 import { TransformedTransaction } from "./transform/type"
@@ -12,13 +12,15 @@ export const useTransactionFees = ({
   transactionTransformed: TransformedTransaction
   hash?: string
 }) => {
-  const [txFee, setTxFee] = useState<string | undefined>()
-  useEffect(() => {
-    const getFeeFromStarknetJs = async () => {
-      const receipt = await getProvider(network).getTransactionReceipt(hash)
-      setTxFee(transactionTransformed.actualFee ?? receipt.actual_fee)
-    }
-    getFeeFromStarknetJs()
-  }, [hash, network, transactionTransformed.actualFee])
+  const getFeeFromStarknetJs = async () => {
+    const receipt = await getProvider(network).getTransactionReceipt(hash)
+    return transactionTransformed.actualFee ?? receipt.actual_fee
+  }
+
+  const { data: txFee } = useSWR(
+    [hash, network, transactionTransformed.actualFee],
+    getFeeFromStarknetJs,
+  )
+
   return txFee
 }
