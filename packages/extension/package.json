@@ -96,7 +96,7 @@
     "colord": "^2.9.2",
     "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.1.1",
-    "ethers": "^5.5.1",
+    "ethers": "^6.0.2",
     "jose": "^4.3.6",
     "lodash-es": "^4.17.21",
     "micro-starknet": "^0.1.1",
