@@ -1,6 +1,6 @@
 import { stringToBytes } from "@scure/base"
 import { Signature, keccak, pedersen, sign } from "micro-starknet"
-import { ec, encode } from "starknet"
+import { ec, encode, number } from "starknet"
 
 import {
   getNetworkSelector,
@@ -9,16 +9,17 @@ import {
 import { getAccounts } from "../shared/account/store"
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import {
-  addAccount,
-  getAccounts as getBackendAccounts,
+  addBackendAccount,
+  getBackendAccounts,
 } from "../shared/shield/backend/account"
 import {
   ARGENT_SHIELD_ENABLED,
-  ARGENT_SHIELD_ERROR_EMAIL_IN_USE,
-  ARGENT_SHIELD_ERROR_WRONG_EMAIL,
   ARGENT_SHIELD_NETWORK_ID,
 } from "../shared/shield/constants"
-import { isEqualAddress } from "../ui/services/addresses"
+import {
+  checkForEmailInUse,
+  checkForWrongEmail,
+} from "../shared/shield/helpers"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
@@ -34,6 +35,11 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         throw new Error("Argent Shield is not enabled")
       }
 
+      if (!ARGENT_SHIELD_NETWORK_ID) {
+        /** should never happen */
+        throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
+      }
+
       /** Check if account is valid for current wallet and exists in backend */
       try {
         const selectedAccount = await wallet.getSelectedAccount()
@@ -44,53 +50,22 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         }
 
         const backendAccounts = await getBackendAccounts()
+        const accountsOnNetwork = await getAccounts(
+          getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
+        )
+        const accountsWithGuardian = await getAccounts(withGuardianSelector)
 
-        if (backendAccounts.length && ARGENT_SHIELD_NETWORK_ID) {
-          /**
-           * Validate that this email was used for existing local and backend accounts
-           * - check if existing accounts in backend match local accounts
-           * - if not then must use different email
-           * */
-          const accountsOnNetwork = await getAccounts(
-            getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
-          )
-          console.log({ accountsOnNetwork })
-          let backendAccountMatches = false
-          for (const backendAccount of backendAccounts) {
-            try {
-              const existingAccount = accountsOnNetwork.find((account) =>
-                isEqualAddress(account.address, backendAccount.address),
-              )
-              if (existingAccount) {
-                backendAccountMatches = true
-                break
-              }
-            } catch {
-              // ignore 'not found' exception
-            }
-          }
-          if (!backendAccountMatches) {
-            throw new Error(ARGENT_SHIELD_ERROR_EMAIL_IN_USE)
-          }
-        }
+        /** Validate email */
 
-        if (!backendAccounts.length) {
-          /**
-           * Validate that this email was used for existing local 2FA accounts
-           * - no backend accounts for this email
-           * - we already have > 0 accounts with guardian assigned
-           * - therefore must have used a different email for those
-           */
-          const accountsWithGuardian = await getAccounts(withGuardianSelector)
-          if (accountsWithGuardian.length) {
-            throw new Error(ARGENT_SHIELD_ERROR_WRONG_EMAIL)
-          }
-        }
+        checkForEmailInUse(backendAccounts, accountsOnNetwork)
+        checkForWrongEmail(backendAccounts, accountsWithGuardian)
 
         /** Check if this account already exists in backend */
 
-        const existingAccount = backendAccounts.find((x) =>
-          isEqualAddress(x.address, selectedAccount.address),
+        const existingAccount = backendAccounts.find(
+          (x) =>
+            number.hexToDecimalString(x.address) ===
+            number.hexToDecimalString(selectedAccount.address),
         )
 
         let guardianAddress: string | undefined
@@ -112,7 +87,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           )
 
           const { r, s } = Signature.fromHex(deploySignature)
-          const response = await addAccount(
+          const response = await addBackendAccount(
             publicKey,
             selectedAccount.address,
             [

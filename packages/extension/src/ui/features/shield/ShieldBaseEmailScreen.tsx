@@ -63,7 +63,6 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
         flex={1}
         onSubmit={handleSubmit(async ({ email }) => {
           try {
-            console.log("Registering email", email)
             await requestEmail(email)
             onEmailRequested(email)
           } catch (error) {
