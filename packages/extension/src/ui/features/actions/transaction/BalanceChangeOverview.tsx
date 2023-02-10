@@ -81,40 +81,35 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                 {({ isDisabled }) => (
                   <>
                     <h2>
-                      <AccordionButton
-                        display="flex"
-                        width="100%"
-                        justifyContent="space-between"
-                        outline="none"
-                        px="3"
-                        pb={
-                          dataIndex !== aggregatedData.length - 1 ? "3" : "3.5"
-                        }
-                        _expanded={{
-                          backgroundColor: "neutrals.700",
-                          pb: "3.5",
-                        }}
-                        disabled={isDisabled}
-                        _disabled={{
-                          cursor: "auto",
-                          opacity: 1,
-                        }}
-                        _hover={{
-                          backgroundColor: isDisabled ? "" : "neutrals.700",
-                          borderBottomRadius:
-                            dataIndex === aggregatedData.length - 1
-                              ? "xl"
-                              : "0",
-                        }}
-                      >
-                        {token.type === "erc721" && token.tokenId ? (
-                          <NftDetails
-                            contractAddress={token.address}
-                            tokenId={token.tokenId}
-                            networkId={network.id}
-                            safe={safe}
-                          />
-                        ) : (
+                      {token.type === "erc20" ? (
+                        <AccordionButton
+                          display="flex"
+                          width="100%"
+                          justifyContent="space-between"
+                          outline="none"
+                          px="3"
+                          pb={
+                            dataIndex !== aggregatedData.length - 1
+                              ? "3"
+                              : "3.5"
+                          }
+                          _expanded={{
+                            backgroundColor: "neutrals.700",
+                            pb: "3.5",
+                          }}
+                          disabled={isDisabled}
+                          _disabled={{
+                            cursor: "auto",
+                            opacity: 1,
+                          }}
+                          _hover={{
+                            backgroundColor: isDisabled ? "" : "neutrals.700",
+                            borderBottomRadius:
+                              dataIndex === aggregatedData.length - 1
+                                ? "xl"
+                                : "0",
+                          }}
+                        >
                           <Flex alignItems="center" gap="2">
                             <Image src={token.image} w="5" h="5" />
                             <P4 fontWeight="bold">
@@ -126,37 +121,50 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               </P3>
                             )}
                           </Flex>
-                        )}
-                        <Flex
-                          direction="column"
-                          gap="0.5"
-                          alignItems="flex-end"
-                        >
-                          <P4
-                            color={
-                              amount.isNegative()
-                                ? "error.500"
-                                : "secondary.500"
-                            }
-                            fontWeight="bold"
+                          <Flex
+                            direction="column"
+                            gap="0.5"
+                            alignItems="flex-end"
                           >
-                            {prettifyTokenAmount({
-                              amount: amount.toString(),
-                              decimals: token.decimals,
-                              symbol:
-                                token.type === "erc20" ? token.symbol : "NFT",
-                              showPlusSign: true,
-                            })}
-                          </P4>
+                            <P4
+                              color={
+                                amount.isNegative()
+                                  ? "error.500"
+                                  : "secondary.500"
+                              }
+                              fontWeight="bold"
+                            >
+                              {prettifyTokenAmount({
+                                amount: amount.toString(),
+                                decimals: token.decimals,
+                                symbol:
+                                  token.type === "erc20" ? token.symbol : "NFT",
+                                showPlusSign: true,
+                              })}
+                            </P4>
 
-                          {/** 0 usdValue means we don't have any value */}
-                          {isMainnet && !!usdValue && usdValue !== 0 && (
-                            <L2 color="neutrals.300">
-                              {prettifyCurrencyValue(Math.abs(usdValue))}
-                            </L2>
-                          )}
-                        </Flex>
-                      </AccordionButton>
+                            {/** 0 usdValue means we don't have any value */}
+                            {isMainnet && !!usdValue && usdValue !== 0 && (
+                              <L2 color="neutrals.300">
+                                {prettifyCurrencyValue(Math.abs(usdValue))}
+                              </L2>
+                            )}
+                          </Flex>
+                        </AccordionButton>
+                      ) : (
+                        <NftDetails
+                          contractAddress={token.address}
+                          tokenId={token.tokenId}
+                          networkId={network.id}
+                          dataIndex={dataIndex}
+                          totalData={aggregatedData.length}
+                          amount={amount}
+                          usdValue={usdValue}
+                          safe={safe}
+                          isMainnet={isMainnet}
+                          isDisabled={isDisabled}
+                        />
+                      )}
                     </h2>
                     <AccordionPanel
                       backgroundColor="neutrals.700"
