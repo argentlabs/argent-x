@@ -32,13 +32,6 @@ export const usePendingChangeGuardian = (
       const calldata = Array.isArray(transactions)
         ? transactions[0].calldata
         : transactions?.calldata
-      console.log(
-        JSON.stringify(
-          { changeGuardianTransaction, transactions, calldata },
-          null,
-          2,
-        ),
-      )
       if (calldata?.[0]) {
         const guardianAddress = number.toBN(calldata[0])
         if (guardianAddress.eq(constants.ZERO)) {

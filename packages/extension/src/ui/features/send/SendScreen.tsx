@@ -18,7 +18,7 @@ import {
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { AccountCollections } from "../accountNfts/AccountCollections"
-import { Collection, Collections } from "../accountNfts/aspect.service"
+import { Collection } from "../accountNfts/aspect.model"
 import { useCollections } from "../accountNfts/useCollections"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenList } from "../accountTokens/TokenList"
@@ -195,7 +195,7 @@ const useCustomTokenList = (
 }
 
 const useCustomCollectiblesList = (
-  collectibles: Collections,
+  collectibles: Collection[],
   query?: string,
 ) => {
   return useMemo(() => {

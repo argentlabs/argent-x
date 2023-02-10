@@ -70,13 +70,7 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
           <P4 color="primary.500">Enable</P4>
         )
       }
-      extendedDescription={
-        description && (
-          <P4 color="neutrals.300" w="100%">
-            {description}
-          </P4>
-        )
-      }
+      extendedDescription={description}
       onClick={onClick}
     >
       {title}

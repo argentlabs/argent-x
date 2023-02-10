@@ -1,8 +1,16 @@
-import { Account, TransactionBulk, number, stark } from "starknet"
+import {
+  Account,
+  InvocationsSignerDetails,
+  TransactionBulk,
+  hash,
+  number,
+  stark,
+} from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
+import { getNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
 
 export const handleTransactionMessage: HandleMessage<
@@ -306,6 +314,114 @@ export const handleTransactionMessage: HandleMessage<
         console.log(error)
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString() ??
+              (error as any)?.toString() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "SIMULATE_TRANSACTION_INVOCATION": {
+      const transactions = Array.isArray(msg.data) ? msg.data : [msg.data]
+
+      try {
+        const selectedAccount = await wallet.getSelectedAccount()
+        const starknetAccount =
+          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+
+        if (!selectedAccount) {
+          throw Error("no accounts")
+        }
+
+        const nonce = await getNonce(selectedAccount, wallet)
+
+        const chainId = starknetAccount.chainId
+
+        const version = number.toHex(hash.feeTransactionVersion)
+
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: starknetAccount.address,
+          nonce,
+          maxFee: 0,
+          version,
+          chainId,
+        }
+
+        // TODO: Use this when Simulate Transaction allows multiple transaction types
+        // const signerDetailsWithZeroNonce = {
+        //   ...signerDetails,
+        //   nonce: 0,
+        // }
+
+        // const accountDeployPayload = await wallet.getAccountDeploymentPayload(
+        //   selectedAccount,
+        // )
+
+        // const accountDeployInvocation =
+        //   await starknetAccount.buildAccountDeployPayload(
+        //     accountDeployPayload,
+        //     signerDetailsWithZeroNonce,
+        //   )
+
+        const { contractAddress, calldata, signature } =
+          await starknetAccount.buildInvocation(transactions, signerDetails)
+
+        const invocation = {
+          type: "INVOKE_FUNCTION" as const,
+          contract_address: contractAddress,
+          calldata,
+          signature,
+          nonce,
+          version,
+        }
+
+        return respond({
+          type: "SIMULATE_TRANSACTION_INVOCATION_RES",
+          data: {
+            invocation,
+            chainId,
+          },
+        })
+      } catch (error) {
+        console.log(error)
+        return respond({
+          type: "SIMULATE_TRANSACTION_INVOCATION_REJ",
+          data: {
+            error:
+              (error as any)?.message?.toString() ??
+              (error as any)?.toString() ??
+              "Unkown error",
+          },
+        })
+      }
+    }
+
+    case "SIMULATE_TRANSACTION_FALLBACK": {
+      const selectedAccount = await wallet.getSelectedAccount()
+      const starknetAccount =
+        (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+
+      if (!selectedAccount) {
+        throw Error("no accounts")
+      }
+
+      const nonce = await starknetAccount.getNonce(selectedAccount)
+
+      try {
+        const simulated = await starknetAccount.simulateTransaction(msg.data, {
+          nonce,
+        })
+
+        return respond({
+          type: "SIMULATE_TRANSACTION_FALLBACK_RES",
+          data: simulated,
+        })
+      } catch (error) {
+        return respond({
+          type: "SIMULATE_TRANSACTION_FALLBACK_REJ",
           data: {
             error:
               (error as any)?.message?.toString() ??

@@ -17,6 +17,7 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
+import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
 import {
@@ -170,7 +171,7 @@ export class Wallet {
     await this.setSession(ethersWallet.privateKey, newPassword)
     const accounts = await this.discoverAccounts()
     if (accounts.length === 0) {
-      throw new Error(`No account found`)
+      this.newAccount(defaultNetwork.id)
     }
   }
 
@@ -305,6 +306,7 @@ export class Wallet {
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
+        accountDetailFetchers.push(getAccountEscapeFromChain)
         accountDetailFetchers.push(getAccountGuardiansFromChain)
       }
 

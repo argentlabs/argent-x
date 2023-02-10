@@ -1,6 +1,7 @@
 import { BigNumber } from "ethers"
 import { memoize } from "lodash-es"
 import { useEffect, useMemo, useRef } from "react"
+import { number } from "starknet"
 import useSWR from "swr"
 
 import { useArrayStorage } from "../../../shared/storage/hooks"
@@ -17,7 +18,7 @@ export interface TokenDetailsWithBalance extends Token {
   balance?: BigNumber
 }
 
-interface UseTokens {
+interface UseTokensWithBalance {
   tokenDetails: TokenDetailsWithBalance[]
   tokenDetailsIsInitialising: boolean
   isValidating: boolean
@@ -59,12 +60,43 @@ export const useToken = (baseToken: BaseToken): Token | undefined => {
   return token
 }
 
+export const useTokens = (baseTokens: BaseToken[]) => {
+  const tokens = useArrayStorage(tokenStore, (tokenInList) =>
+    baseTokens.some((baseToken) => equalToken(tokenInList, baseToken)),
+  )
+  return useMemo(
+    () => baseTokens.map((baseToken) => tokens.find((t) => t === baseToken)),
+    [baseTokens, tokens],
+  )
+}
+
+export type TokensRecord = Record<string, Token>
+
+export const useTokensRecord = ({ cleanHex = false }) => {
+  const tokens = useArrayStorage(tokenStore)
+
+  return useMemo(
+    () =>
+      tokens.reduce<TokensRecord>((acc, token) => {
+        const tokenAddress = cleanHex
+          ? number.cleanHex(token.address)
+          : token.address
+
+        return {
+          ...acc,
+          [tokenAddress]: token,
+        }
+      }, {}),
+    [cleanHex, tokens],
+  )
+}
+
 /** error codes to suppress - will not bubble error up to parent */
 const SUPPRESS_ERROR_STATUS = [429]
 
 export const useTokensWithBalance = (
   account?: BaseWalletAccount,
-): UseTokens => {
+): UseTokensWithBalance => {
   const selectedAccount = useAccount(account)
   const { pendingTransactions } = useAccountTransactions(account)
   const pendingTransactionsLengthRef = useRef(pendingTransactions.length)

@@ -21,6 +21,14 @@ const variants = {
     bg: "success.900",
     fg: "success.500",
   },
+  warning: {
+    bg: "warning.500",
+    fg: "neutrals.900",
+  },
+  danger: {
+    bg: "error.900",
+    fg: "error.400",
+  },
 }
 
 type Variant = keyof typeof variants

@@ -1,5 +1,7 @@
 import { Page, expect } from "@playwright/test"
-type language = "en"
+
+import config from "./../config"
+
 const text = {
   en: {
     noAccounts: "You have no accounts on ",
@@ -13,6 +15,7 @@ const text = {
     send: "Send",
     next: "Next",
     confirm: "Confirm",
+    export: "Export",
   },
 }
 type TokenName = "Ethereum"
@@ -23,7 +26,7 @@ export interface IAsset {
 }
 
 export default class Account {
-  constructor(private page: Page, private lang: language = "en") {}
+  constructor(private page: Page, private lang = config.appLanguage) {}
   get noAccountBanner() {
     return this.page.locator(`div h5:has-text("${text[this.lang].noAccounts}")`)
   }
@@ -116,6 +119,10 @@ export default class Account {
     return this.page.locator(`//img[@alt="${tkn}"]/parent::*/parent::button`)
   }
 
+  get accountName() {
+    return this.page.locator('[data-testid="account-tokens"] h2')
+  }
+
   async addAccount({ firstAccount = true }: { firstAccount?: boolean }) {
     if (firstAccount) {
       await this.createAccount.click()
@@ -139,15 +146,16 @@ export default class Account {
     await this.account(accountName).click()
   }
 
-  async ensureAccount(accountName: string) {
+  async ensureSelectedAccount(accountName: string) {
     const currentAccount = await this.accountList.textContent()
     if (currentAccount != accountName) {
       await this.selectAccount(accountName)
     }
+    await expect(this.accountName).toHaveText(accountName)
   }
 
   async assets(accountName: string) {
-    await this.ensureAccount(accountName)
+    await this.ensureSelectedAccount(accountName)
 
     const assetsList: IAsset[] = []
     for (const asset of await this.assetsList.all()) {
@@ -162,7 +170,7 @@ export default class Account {
   }
 
   async ensureAsset(accountName: string, name: "ETH", value: string) {
-    await this.ensureAccount(accountName)
+    await this.ensureSelectedAccount(accountName)
     await expect(
       this.page.locator(`button :text("${value} ${name}")`),
     ).toBeVisible()
@@ -190,7 +198,7 @@ export default class Account {
     tokenName: TokenName
     amount: number | "MAX"
   }) {
-    await this.ensureAccount(originAccountName)
+    await this.ensureSelectedAccount(originAccountName)
     await this.token(tokenName).click()
     await this.send.last().click()
     if (amount === "MAX") {
@@ -213,11 +221,19 @@ export default class Account {
     token: TokenName
     balance: number
   }) {
-    await this.ensureAccount(accountName)
+    await this.ensureSelectedAccount(accountName)
     await this.token(token).click()
     await expect(this.page.locator('[data-testid="tokenBalance"]')).toHaveText(
       balance.toString(),
     )
     await this.back.click()
+  }
+
+  get password() {
+    return this.page.locator('input[name="password"]')
+  }
+
+  get exportPrivateKey() {
+    return this.page.locator(`button:has-text("${text[this.lang].export}")`)
   }
 }
