@@ -1,5 +1,5 @@
 import { L1, L2, P4, Pre, icons } from "@argent/ui"
-import { Flex, Text, Tooltip } from "@chakra-ui/react"
+import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
@@ -14,7 +14,6 @@ import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
-import { useExtensionIsInTab } from "../../browser/tabs"
 import { ExtendableControl, FeeEstimationValue, LoadingInput } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
 import { getTooltipText, useMaxFeeEstimation } from "./utils"
@@ -75,8 +74,6 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     fee?.suggestedMaxFee,
   )
 
-  const extensionInTab = useExtensionIsInTab()
-
   return (
     <Flex direction="column" gap="1">
       <Flex
@@ -115,18 +112,34 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
           </Tooltip>
         </Flex>
         {fee ? (
-          <Flex
-            gap="1"
-            alignItems="center"
-            direction={extensionInTab ? "row" : "column-reverse"}
-          >
+          <Box textAlign="right">
+            {amountCurrencyValue !== undefined ? (
+              <P4 fontWeight="bold" display="inline-block">
+                &nbsp; ≈ &nbsp;{prettifyCurrencyValue(amountCurrencyValue)}
+              </P4>
+            ) : (
+              <P4 fontWeight="bold">
+                &nbsp; ≈ &nbsp;
+                {feeToken ? (
+                  prettifyTokenAmount({
+                    amount: fee.amount,
+                    decimals: feeToken.decimals,
+                    symbol: feeToken.symbol,
+                  })
+                ) : (
+                  <>{fee.amount} Unknown</>
+                )}
+              </P4>
+            )}
+
             {suggestedMaxFeeCurrencyValue !== undefined ? (
-              <L2 color="neutrals.300">
-                (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
+              <L2 display="inline-block" color="neutrals.300">
+                {"  "}(Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
+                )
               </L2>
             ) : (
-              <L2 color="neutrals.300">
-                (Max &nbsp;
+              <L2 display="inline-block" color="neutrals.300">
+                {"  "}(Max &nbsp;
                 {feeToken ? (
                   prettifyTokenAmount({
                     amount: fee.suggestedMaxFee,
@@ -139,28 +152,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 )
               </L2>
             )}
-
-            <Flex alignItems="center">
-              {amountCurrencyValue !== undefined ? (
-                <P4 fontWeight="bold">
-                  ≈ {prettifyCurrencyValue(amountCurrencyValue)}
-                </P4>
-              ) : (
-                <P4 fontWeight="bold">
-                  ≈{" "}
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.amount,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.amount} Unknown</>
-                  )}
-                </P4>
-              )}
-            </Flex>
-          </Flex>
+          </Box>
         ) : showEstimateError ? (
           <FeeEstimationValue>Error</FeeEstimationValue>
         ) : (
