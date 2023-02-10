@@ -54,7 +54,7 @@ export default class Account {
   }
 
   get back() {
-    return this.page.locator(`[aria-label="${text[this.lang].back}"]`)
+    return this.page.locator(`[aria-label="${text[this.lang].back}"]`).first()
   }
 
   get close() {

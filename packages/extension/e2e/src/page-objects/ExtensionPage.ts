@@ -63,4 +63,8 @@ export default class ExtensionPage {
     await this.reset.click()
     await this.confirmReset.click()
   }
+  async paste() {
+    const key = process.env.CI ? "Control" : "Meta"
+    await this.page.keyboard.press(`${key}+KeyV`)
+  }
 }

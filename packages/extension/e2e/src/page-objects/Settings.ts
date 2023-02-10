@@ -6,7 +6,7 @@ const text = {
   en: {
     addresBook: "Address book",
     connectedDapps: "Connected dapps",
-    showRecoveryPhase: "Show recovery phase",
+    showRecoveryPhase: "Show recovery phrase",
     developerSettings: "Developer settings",
     privacy: "Privacy",
     back: "Back",
@@ -19,6 +19,8 @@ const text = {
     hiddenAccounts: "Hidden accounts",
     delete: "Delete",
     done: "Done",
+    copy: "Copy",
+    continue: "Continue",
   },
 }
 export default class Settings {
@@ -91,5 +93,17 @@ export default class Settings {
 
   get privateKey() {
     return this.page.locator('[data-testid="privateKey"]')
+  }
+
+  get showRecoveryPhase() {
+    return this.page.locator("[data-testid='recovery-phrase']")
+  }
+
+  get copy() {
+    return this.page.locator(`button:has-text("${text[this.lang].copy}")`)
+  }
+
+  get continue() {
+    return this.page.locator(`button:has-text("${text[this.lang].continue}")`)
   }
 }
