@@ -2,11 +2,20 @@ import { stringToBytes } from "@scure/base"
 import { Signature, keccak, pedersen, sign } from "micro-starknet"
 import { ec, encode } from "starknet"
 
+import {
+  getNetworkSelector,
+  withGuardianSelector,
+} from "../shared/account/selectors"
+import { getAccounts } from "../shared/account/store"
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
-import { addAccount, getAccounts } from "../shared/shield/backend/account"
+import {
+  addAccount,
+  getAccounts as getBackendAccounts,
+} from "../shared/shield/backend/account"
 import {
   ARGENT_SHIELD_ENABLED,
   ARGENT_SHIELD_ERROR_EMAIL_IN_USE,
+  ARGENT_SHIELD_ERROR_WRONG_EMAIL,
   ARGENT_SHIELD_NETWORK_ID,
 } from "../shared/shield/constants"
 import { isEqualAddress } from "../ui/services/addresses"
@@ -34,17 +43,24 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           throw Error("no accounts")
         }
 
-        const accounts = await getAccounts()
+        const backendAccounts = await getBackendAccounts()
 
-        if (accounts.length && ARGENT_SHIELD_NETWORK_ID) {
-          /** Validate - check if existing accounts in backend match local accounts - if not then must use different email */
+        if (backendAccounts.length && ARGENT_SHIELD_NETWORK_ID) {
+          /**
+           * Validate that this email was used for existing local and backend accounts
+           * - check if existing accounts in backend match local accounts
+           * - if not then must use different email
+           * */
+          const accountsOnNetwork = await getAccounts(
+            getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
+          )
+          console.log({ accountsOnNetwork })
           let backendAccountMatches = false
-          for (const backendAccount of accounts) {
+          for (const backendAccount of backendAccounts) {
             try {
-              const existingAccount = await wallet.getAccount({
-                address: backendAccount.address,
-                networkId: ARGENT_SHIELD_NETWORK_ID,
-              })
+              const existingAccount = accountsOnNetwork.find((account) =>
+                isEqualAddress(account.address, backendAccount.address),
+              )
               if (existingAccount) {
                 backendAccountMatches = true
                 break
@@ -58,9 +74,22 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           }
         }
 
+        if (!backendAccounts.length) {
+          /**
+           * Validate that this email was used for existing local 2FA accounts
+           * - no backend accounts for this email
+           * - we already have > 0 accounts with guardian assigned
+           * - therefore must have used a different email for those
+           */
+          const accountsWithGuardian = await getAccounts(withGuardianSelector)
+          if (accountsWithGuardian.length) {
+            throw new Error(ARGENT_SHIELD_ERROR_WRONG_EMAIL)
+          }
+        }
+
         /** Check if this account already exists in backend */
 
-        const existingAccount = accounts.find((x) =>
+        const existingAccount = backendAccounts.find((x) =>
           isEqualAddress(x.address, selectedAccount.address),
         )
 

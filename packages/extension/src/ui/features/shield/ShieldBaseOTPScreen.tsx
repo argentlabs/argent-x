@@ -16,7 +16,10 @@ import {
   EmailVerificationStatus,
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
-import { ARGENT_SHIELD_ERROR_EMAIL_IN_USE } from "../../../shared/shield/constants"
+import {
+  ARGENT_SHIELD_ERROR_EMAIL_IN_USE,
+  ARGENT_SHIELD_ERROR_WRONG_EMAIL,
+} from "../../../shared/shield/constants"
 import { confirmEmail, requestEmail } from "../../../shared/shield/register"
 import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
@@ -153,7 +156,19 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                   ) {
                     toast({
                       title:
-                        "Email in use - You must use a different email for this wallet",
+                        "Oops, wrong email - This address is associated with accounts from another seedphrase",
+                      status: "error",
+                      duration: 3000,
+                    })
+                    onOTPReEnterEmail()
+                  }
+                  if (
+                    (e as Error)?.message?.toString() ===
+                    `Error: ${ARGENT_SHIELD_ERROR_WRONG_EMAIL}`
+                  ) {
+                    toast({
+                      title:
+                        "Oops, wrong email - Please use the same email address that you used to add Argent Shield to your other accounts",
                       status: "error",
                       duration: 3000,
                     })
