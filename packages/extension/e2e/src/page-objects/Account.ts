@@ -1,23 +1,8 @@
 import { Page, expect } from "@playwright/test"
 
-import config from "./../config"
+import { lang } from "../languages"
+import Navigation from "./Navigation"
 
-const text = {
-  en: {
-    noAccounts: "You have no accounts on ",
-    createAccount: "Create account",
-    addFunds: "Add funds",
-    fundsFromStarkNet: "From another StarkNet account",
-    fullAccountAddress: "Full account address",
-    back: "Back",
-    close: "Close",
-    showAccountList: "Show account list",
-    send: "Send",
-    next: "Next",
-    confirm: "Confirm",
-    export: "Export",
-  },
-}
 type TokenName = "Ethereum"
 export interface IAsset {
   name: string
@@ -25,44 +10,34 @@ export interface IAsset {
   unit: string
 }
 
-export default class Account {
-  constructor(private page: Page, private lang = config.appLanguage) {}
+export default class Account extends Navigation {
+  constructor(page: Page) {
+    super(page)
+  }
   get noAccountBanner() {
-    return this.page.locator(`div h5:has-text("${text[this.lang].noAccounts}")`)
+    return this.page.locator(`div h5:has-text("${lang.account.noAccounts}")`)
   }
 
   get createAccount() {
-    return this.page.locator(
-      `button:has-text("${text[this.lang].createAccount}")`,
-    )
+    return this.page.locator(`button:has-text("${lang.account.createAccount}")`)
   }
 
   get addFunds() {
-    return this.page.locator(`button:has-text("${text[this.lang].addFunds}")`)
+    return this.page.locator(`button:has-text("${lang.account.addFunds}")`)
   }
 
   get addFundsFromStartNet() {
-    return this.page.locator(
-      `a:has-text("${text[this.lang].fundsFromStarkNet}")`,
-    )
+    return this.page.locator(`a:has-text("${lang.account.fundsFromStarkNet}")`)
   }
 
   get accountAddress() {
     return this.page.locator(
-      `[aria-label="${text[this.lang].fullAccountAddress}"]`,
+      `[aria-label="${lang.account.fullAccountAddress}"]`,
     )
   }
 
-  get back() {
-    return this.page.locator(`[aria-label="${text[this.lang].back}"]`).first()
-  }
-
-  get close() {
-    return this.page.locator(`[aria-label="${text[this.lang].close}"]`)
-  }
-
   get send() {
-    return this.page.locator(`button:text-is("${text[this.lang].send}")`)
+    return this.page.locator(`button:text-is("${lang.account.send}")`)
   }
 
   token(tkn: TokenName) {
@@ -70,9 +45,7 @@ export default class Account {
   }
 
   get accountList() {
-    return this.page.locator(
-      `[aria-label="${text[this.lang].showAccountList}"]`,
-    )
+    return this.page.locator(`[aria-label="${lang.account.showAccountList}"]`)
   }
 
   get addANewccountFromAccountList() {
@@ -97,14 +70,6 @@ export default class Account {
 
   get recepientAddress() {
     return this.page.locator('[name="recipient"]')
-  }
-
-  get next() {
-    return this.page.locator(`button:has-text("${text[this.lang].next}")`)
-  }
-
-  get approve() {
-    return this.page.locator(`button:has-text("${text[this.lang].confirm}")`)
   }
 
   account(accountName: string) {
@@ -234,6 +199,6 @@ export default class Account {
   }
 
   get exportPrivateKey() {
-    return this.page.locator(`button:has-text("${text[this.lang].export}")`)
+    return this.page.locator(`button:has-text("${lang.account.export}")`)
   }
 }

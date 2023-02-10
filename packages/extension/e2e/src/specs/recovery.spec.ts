@@ -6,7 +6,6 @@ import test from "../test"
 test.describe("Recovery Wallet", () => {
   test("User should be able to recove wallet using seed phrase", async ({
     extension,
-    secondExtension,
   }) => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
@@ -14,33 +13,26 @@ test.describe("Recovery Wallet", () => {
 
     await extension.settingsButton.click()
     await extension.settings.showRecoveryPhase.click()
-    await extension.page.locator('[name="password"]').fill(config.password)
-    await extension.settings.continue.click()
+    await extension.wallet.password.fill(config.password)
+    await extension.navigation.continue.click()
     await extension.settings.copy.click()
-    await extension.settings.back.click()
+    await extension.navigation.back.click()
 
     await extension.lockWallet.click()
     await extension.reset.click()
     await extension.confirmReset.click()
 
-    await secondExtension.wallet.restoreExistingWallet.click()
-    await secondExtension.paste()
-    await secondExtension.page
-      .locator("button:has-text('Continue')")
-      .first()
-      .click()
+    await extension.wallet.restoreExistingWallet.click()
+    await extension.paste()
+    await extension.navigation.continue.click()
 
-    await secondExtension.wallet.password.fill(config.password)
-    await secondExtension.wallet.repeatPassword.fill(config.password)
+    await extension.wallet.password.fill(config.password)
+    await extension.wallet.repeatPassword.fill(config.password)
 
-    await secondExtension.page
-      .locator("button:has-text('Continue')")
-      .first()
-      .click()
-    await expect(secondExtension.wallet.finish.first()).toBeVisible()
+    await extension.navigation.continue.click()
+    await expect(extension.wallet.finish.first()).toBeVisible()
 
-    await secondExtension.open()
-
-    await expect(secondExtension.network.networkSelector).toBeVisible()
+    await extension.open()
+    await expect(extension.network.networkSelector).toBeVisible()
   })
 })
