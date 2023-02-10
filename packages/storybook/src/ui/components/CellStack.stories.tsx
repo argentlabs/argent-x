@@ -60,9 +60,7 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
       leftIcon={<MulticallIcon />}
       rightIcon={<TickIcon color="primary.500" />}
       extendedDescription={
-        <P4 color="neutrals.300" w="100%">
-          The Argent account implementation with better multicall support
-        </P4>
+        "The Argent account implementation with better multicall support"
       }
     >
       Better Multicall
@@ -70,11 +68,7 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
     <ButtonCell
       leftIcon={<WalletIcon />}
       rightIcon={<P4 color="primary.500">Enable</P4>}
-      extendedDescription={
-        <P4 color="neutrals.300" w="100%">
-          The default Argent account implementation
-        </P4>
-      }
+      extendedDescription={"The default Argent account implementation"}
     >
       Default
     </ButtonCell>
@@ -82,9 +76,7 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
       leftIcon={<PluginIcon />}
       rightIcon={<P4 color="primary.500">Enable</P4>}
       extendedDescription={
-        <P4 color="neutrals.300" w="100%">
-          The Argent account implementation with plugin support
-        </P4>
+        "The Argent account implementation with plugin support"
       }
     >
       Plugin
@@ -95,10 +87,7 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
     <ButtonCell
       rightIcon={<Switch isChecked={args.isChecked} />}
       extendedDescription={
-        <P4 color="neutrals.300" w="100%">
-          Shows a new menu item in the account settings, which allows a user to
-          switch account implementation for an account.
-        </P4>
+        "Shows a new menu item in the account settings, which allows a user to switch account implementation for an account."
       }
     >
       Change account implementation
@@ -107,11 +96,7 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
     <ButtonCell
       rightIcon={<Switch isChecked={args.isChecked} />}
       extendedDescription={
-        <P4 color="neutrals.300" w="100%">
-          Add extra protection to your Argent X accounts with two-factor
-          security. You need to have been added to the whitelist to use this
-          feature while it is in beta
-        </P4>
+        "Add extra protection to your Argent X accounts with two-factor security. You need to have been added to the whitelist to use this feature while it is in beta"
       }
     >
       Argent Shield (2FA)

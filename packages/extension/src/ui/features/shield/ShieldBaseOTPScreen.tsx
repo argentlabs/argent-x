@@ -108,7 +108,7 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
       <ShieldHeader
         icon={EmailIcon}
         title={"Check your email"}
-        subtitle={`We’ve sent a verification code to ${obfuscatedEmail}`}
+        subtitle={`If you signed up for the beta we have sent a verification code to ${obfuscatedEmail}`}
       />
       {verifiedEmail === null ? (
         <></> /** initialising */
