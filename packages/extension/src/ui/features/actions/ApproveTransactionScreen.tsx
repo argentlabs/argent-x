@@ -17,6 +17,7 @@ import { ConfirmScreen } from "./ConfirmScreen"
 import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
+import { LoadingScreen } from "./LoadingScreen"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
 import { BalanceChangeOverview } from "./transaction/BalanceChangeOverview"
 import { DappHeader } from "./transaction/DappHeader"
@@ -53,11 +54,12 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     actionHash,
   })
 
-  const { data: transactionSimulation } = useTransactionSimulation({
-    account: selectedAccount,
-    transactions,
-    actionHash,
-  })
+  const { data: transactionSimulation, isValidating: isSimulationLoading } =
+    useTransactionSimulation({
+      account: selectedAccount,
+      transactions,
+      actionHash,
+    })
 
   const aggregatedData = useAggregatedSimData(transactionSimulation)
 
@@ -106,6 +108,10 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   if (shouldShowUpgrade) {
     return <UpgradeScreenV4 upgradeType="account" {...props} />
+  }
+
+  if (isSimulationLoading) {
+    return <LoadingScreen />
   }
 
   return (
