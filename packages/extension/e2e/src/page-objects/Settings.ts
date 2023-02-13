@@ -9,6 +9,26 @@ export default class Settings {
     return this.page.locator(`[aria-label="${lang.settings.extendedView}"]`)
   }
 
+  get addressBook() {
+    return this.page.locator(`//a//*[text()="${lang.settings.addresBook}"]`)
+  }
+
+  get connectedDapps() {
+    return this.page.locator(`//a//*[text()="${lang.settings.connectedDapps}"]`)
+  }
+
+  get showRecoveryPhase() {
+    return this.page.locator(
+      `//a//*[text()="${lang.settings.showRecoveryPhase}"]`,
+    )
+  }
+
+  get developerSettings() {
+    return this.page.locator(
+      `//a//*[text()="${lang.settings.developerSettings}"]`,
+    )
+  }
+
   // account settings
   get accountName() {
     return this.page.locator('input[placeholder="Account name"]')
@@ -16,12 +36,14 @@ export default class Settings {
 
   get exportPrivateKey() {
     return this.page.locator(
-      `button:has-text("${lang.settings.exportPrivateKey}")`,
+      `//button//*[text()="${lang.settings.exportPrivateKey}"]`,
     )
   }
 
   get hideAccount() {
-    return this.page.locator(`button:has-text("${lang.settings.hideAccount}")`)
+    return this.page.locator(
+      `//button//*[text()="${lang.settings.hideAccount}"]`,
+    )
   }
 
   account(accountName: string) {
@@ -59,10 +81,6 @@ export default class Settings {
 
   get privateKey() {
     return this.page.locator('[data-testid="privateKey"]')
-  }
-
-  get showRecoveryPhase() {
-    return this.page.locator("[data-testid='recovery-phrase']")
   }
 
   get copy() {

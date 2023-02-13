@@ -106,7 +106,6 @@ export const SettingsScreen: FC = () => {
           )}
           {!extensionIsInTab && (
             <SettingsMenuItem
-              data-testid="extended-view"
               leftIcon={<ExtendedIcon />}
               rightIcon={<ExpandIcon />}
               to={routes.settings()}
@@ -116,28 +115,24 @@ export const SettingsScreen: FC = () => {
           )}
 
           <SettingsMenuItem
-            data-testid="address-book"
             leftIcon={<AddressBookIcon />}
             to={routes.settingsAddressbook()}
             title="Address book"
           />
 
           <SettingsMenuItem
-            data-testid="connected-dapps"
             leftIcon={<LinkIcon />}
             to={routes.settingsDappConnections()}
             title="Connected dapps"
           />
 
           <SettingsMenuItem
-            data-testid="recovery-phrase"
             leftIcon={<PasswordIcon />}
             to={routes.settingsSeed(returnTo)}
             title="Show recovery phrase"
           />
 
           <SettingsMenuItem
-            data-testid="developer-settings"
             leftIcon={<CodeIcon />}
             to={routes.settingsDeveloper()}
             title="Developer settings"
@@ -145,7 +140,6 @@ export const SettingsScreen: FC = () => {
 
           {isPrivacySettingsEnabled && (
             <SettingsMenuItem
-              data-testid="privacy"
               leftIcon={<ShieldIcon />}
               to={routes.settingsPrivacy()}
               title="Privacy"
