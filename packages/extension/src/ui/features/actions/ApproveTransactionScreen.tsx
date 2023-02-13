@@ -28,6 +28,8 @@ import { useAggregatedSimData } from "./transaction/useTransactionSimulatedData"
 import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
 import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
 
+const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
+
 export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
@@ -97,7 +99,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const showTransactionActions =
     !hasBalanceChange || (txDetails && hasBalanceChange)
 
-  const verifiedDapp = transactionReview?.targetedDapp
+  const verifiedDapp = VERIFIED_DAPP_ENABLED && transactionReview?.targetedDapp
 
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
