@@ -17,20 +17,22 @@ import { FC, useMemo } from "react"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
-} from "../../../../shared/token/price"
+} from "../../../../../../shared/token/price"
 import {
   ApiTransactionReviewResponse,
   getTransactionReviewWithType,
-} from "../../../../shared/transactionReview.service"
-import { ApiTransactionSimulationResponse } from "../../../../shared/transactionSimulation/types"
+} from "../../../../../../shared/transactionReview.service"
+import { ApiTransactionSimulationResponse } from "../../../../../../shared/transactionSimulation/types"
 import {
   formatTruncatedAddress,
   normalizeAddress,
-} from "../../../services/addresses"
-import { useCurrentNetwork, useIsMainnet } from "../../networks/useNetworks"
+} from "../../../../../services/addresses"
+import {
+  useCurrentNetwork,
+  useIsMainnet,
+} from "../../../../networks/useNetworks"
+import { useAggregatedSimData } from "../../useTransactionSimulatedData"
 import { NftDetails } from "./NftDetails"
-import { UnknownTokenIcon } from "./UnknownTokenIcon"
-import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
 

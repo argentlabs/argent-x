@@ -2,16 +2,16 @@ import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, useMemo } from "react"
 
-import { prettifyTokenAmount } from "../../../../shared/token/price"
+import { prettifyTokenAmount } from "../../../../../../shared/token/price"
 import {
   apiTransactionReviewActivityType,
   getTransactionReviewWithType,
-} from "../../../../shared/transactionReview.service"
-import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
-import { useAspectNft } from "../../accountNfts/aspect.service"
-import { useCurrentNetwork } from "../../networks/useNetworks"
-import { useERC721Transfers } from "./useErc721Transfers"
-import { AggregatedSimData } from "./useTransactionSimulatedData"
+} from "../../../../../../shared/transactionReview.service"
+import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
+import { useAspectNft } from "../../../../accountNfts/aspect.service"
+import { useCurrentNetwork } from "../../../../networks/useNetworks"
+import { useERC721Transfers } from "../../useErc721Transfers"
+import { AggregatedSimData } from "../../useTransactionSimulatedData"
 
 const { ArrowRightIcon } = icons
 

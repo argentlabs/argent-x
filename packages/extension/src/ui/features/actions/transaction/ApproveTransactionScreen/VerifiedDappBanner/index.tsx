@@ -3,7 +3,7 @@ import { Center, Flex, Image, useDisclosure } from "@chakra-ui/react"
 import { upperFirst } from "lodash-es"
 import { FC } from "react"
 
-import { ApiTransactionReviewTargettedDapp } from "../../../../shared/transactionReview.service"
+import { ApiTransactionReviewTargettedDapp } from "../../../../../../shared/transactionReview.service"
 import { VerifiedDappModal } from "./VerifiedDappModal"
 
 const { VerifiedIcon } = icons

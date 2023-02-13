@@ -6,10 +6,10 @@ import { Call } from "starknet"
 import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
-} from "../../../../shared/transactionReview.service"
+} from "../../../../../../shared/transactionReview.service"
+import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
-import { AggregatedSimData } from "./useTransactionSimulatedData"
 
 export interface DappHeaderProps {
   transactions: Call[]

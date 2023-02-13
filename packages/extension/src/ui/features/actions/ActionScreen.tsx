@@ -21,8 +21,8 @@ import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveDeployContractScreen } from "./ApproveDeployContractScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
-import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
+import { ApproveTransactionScreen } from "./transaction/ApproveTransactionScreen"
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()

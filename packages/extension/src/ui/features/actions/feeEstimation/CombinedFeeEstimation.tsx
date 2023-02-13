@@ -81,16 +81,6 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     fee?.amount,
   )
 
-  const accountDeploymentCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.accountDeploymentFee,
-  )
-
-  const totalFeeCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    totalFee,
-  )
-
   const totalMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
     totalMaxFee,

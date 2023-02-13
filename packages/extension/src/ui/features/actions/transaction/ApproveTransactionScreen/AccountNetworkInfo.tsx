@@ -1,9 +1,9 @@
 import { P4 } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 
-import { formatTruncatedAddress } from "../../../services/addresses"
-import { Account } from "../../accounts/Account"
-import { PrettyAccountAddress } from "../../accounts/PrettyAccountAddress"
+import { formatTruncatedAddress } from "../../../../services/addresses"
+import { Account } from "../../../accounts/Account"
+import { PrettyAccountAddress } from "../../../accounts/PrettyAccountAddress"
 
 interface AccountNetworkInfoProps {
   account: Account

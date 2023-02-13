@@ -1,34 +1,33 @@
 import { P4 } from "@argent/ui"
+import { WarningIcon } from "@chakra-ui/icons"
 import { Center } from "@chakra-ui/react"
 import { isArray, isEmpty } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call, DeclareContractPayload } from "starknet"
 
-import { getDisplayWarnAndReasonForTransactionReview } from "../../../shared/transactionReview.service"
-import { WarningIcon } from "../../components/Icons/WarningIcon"
-import { routes } from "../../routes"
-import { normalizeAddress } from "../../services/addresses"
-import { usePageTracking } from "../../services/analytics"
-import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
-import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
-import { useFeeTokenBalance } from "../accountTokens/tokens.service"
-import { useIsMainnet } from "../networks/useNetworks"
+import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
+import { routes } from "../../../../routes"
+import { normalizeAddress } from "../../../../services/addresses"
+import { usePageTracking } from "../../../../services/analytics"
+import { useAccountTransactions } from "../../../accounts/accountTransactions.state"
+import { useCheckUpgradeAvailable } from "../../../accounts/upgrade.service"
+import { UpgradeScreenV4 } from "../../../accounts/UpgradeScreenV4"
+import { useFeeTokenBalance } from "../../../accountTokens/tokens.service"
+import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
+import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
+import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
+import { LoadingScreen } from "../../LoadingScreen"
+import { useTransactionReview } from "../useTransactionReview"
+import { useAggregatedSimData } from "../useTransactionSimulatedData"
+import { useTransactionSimulation } from "../useTransactionSimulation"
+import { AccountNetworkInfo } from "./AccountNetworkInfo"
+import { BalanceChangeOverview } from "./BalanceChangeOverview"
 import { ConfirmScreen } from "./ConfirmScreen"
-import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
-import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
-import { FeeEstimation } from "./feeEstimation/FeeEstimation"
-import { LoadingScreen } from "./LoadingScreen"
-import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
-import { BalanceChangeOverview } from "./transaction/BalanceChangeOverview"
-import { DappHeader } from "./transaction/DappHeader"
-import { TransactionActions } from "./transaction/TransactionActions"
-import { TransactionBanner } from "./transaction/TransactionBanner"
-import { useTransactionReview } from "./transaction/useTransactionReview"
-import { useAggregatedSimData } from "./transaction/useTransactionSimulatedData"
-import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
-import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
+import { DappHeader } from "./DappHeader"
+import { TransactionActions } from "./TransactionActions"
+import { TransactionBanner } from "./TransactionBanner"
+import { VerifiedDappBanner } from "./VerifiedDappBanner"
 
 const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
 
@@ -166,17 +165,14 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         isDeclareContract={isDeclareContract}
       />
 
-      {warn ? (
+      {warn && (
         <TransactionBanner
           variant={transactionReview?.assessment}
           icon={WarningIcon}
           message={reason}
         />
-      ) : verifiedDapp ? (
-        <VerifiedDappBanner dapp={verifiedDapp} />
-      ) : (
-        <></>
       )}
+      {verifiedDapp && <VerifiedDappBanner dapp={verifiedDapp} />}
 
       {hasBalanceChange && (
         <BalanceChangeOverview
