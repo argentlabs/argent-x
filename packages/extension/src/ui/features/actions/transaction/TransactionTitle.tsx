@@ -2,9 +2,10 @@ import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, useMemo } from "react"
 
+import { prettifyTokenAmount } from "../../../../shared/token/price"
 import {
-  ApiTransactionReview,
-  getTransactionReviewSwap,
+  apiTransactionReviewActivityType,
+  getTransactionReviewWithType,
 } from "../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../accountNfts/aspect.service"
@@ -25,50 +26,68 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
   aggregatedData,
   fallback = "transaction",
 }) => {
-  const network = useCurrentNetwork()
-  const swapTxn = getTransactionReviewSwap(transactionReview)
-
-  const hasSwap = Boolean(swapTxn)
-
   const nftTransfers = useERC721Transfers(aggregatedData)
-
+  const network = useCurrentNetwork()
   const hasNftTransfer = Boolean(nftTransfers?.length)
-
-  return hasSwap ? (
-    <SwapTitle swapReview={swapTxn} />
-  ) : hasNftTransfer ? (
-    <Flex alignItems="center" textAlign="center">
-      {nftTransfers?.map((nftTransfer, i) =>
-        i < 2 ? (
-          <NftTitle
-            nftTransfer={nftTransfer}
-            networkId={network.id}
-            key={i}
-            totalTransfers={nftTransfers.length}
-            index={i}
-          />
-        ) : (
-          i === 2 && (
-            <Fragment key={i}>&nbsp;& {nftTransfers.length - 2} more</Fragment>
-          )
-        ),
-      )}
-    </Flex>
-  ) : (
-    <>Confirm {fallback}</>
+  const transactionReviewWithType = useMemo(
+    () => getTransactionReviewWithType(transactionReview),
+    [transactionReview],
   )
-}
 
-const SwapTitle: FC<{ swapReview?: ApiTransactionReview }> = ({
-  swapReview,
-}) => {
-  return (
-    <Flex alignItems="center" gap="1">
-      Swap {swapReview?.activity?.src?.token.symbol}
-      <ArrowRightIcon width="0.7em" height="0.8em" />
-      {swapReview?.activity?.dst?.token.symbol}
-    </Flex>
-  )
+  if (
+    transactionReviewWithType?.type === apiTransactionReviewActivityType.swap
+  ) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Swap {transactionReviewWithType.activity?.src?.token.symbol}
+        <ArrowRightIcon width="0.7em" height="0.8em" />
+        {transactionReviewWithType.activity?.dst?.token.symbol}
+      </Flex>
+    )
+  }
+
+  if (
+    transactionReviewWithType?.type ===
+      apiTransactionReviewActivityType.transfer &&
+    transactionReviewWithType?.activity?.value?.amount
+  ) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Send{" "}
+        {prettifyTokenAmount({
+          amount: transactionReviewWithType?.activity?.value?.amount,
+          decimals: transactionReviewWithType?.activity?.value?.token.decimals,
+        })}{" "}
+        {transactionReviewWithType?.activity?.value?.token.symbol}
+      </Flex>
+    )
+  }
+
+  if (hasNftTransfer) {
+    return (
+      <Flex alignItems="center" textAlign="center">
+        {nftTransfers?.map((nftTransfer, i) =>
+          i < 2 ? (
+            <NftTitle
+              nftTransfer={nftTransfer}
+              networkId={network.id}
+              key={i}
+              totalTransfers={nftTransfers.length}
+              index={i}
+            />
+          ) : (
+            i === 2 && (
+              <Fragment key={i}>
+                &nbsp;& {nftTransfers.length - 2} more
+              </Fragment>
+            )
+          ),
+        )}
+      </Flex>
+    )
+  }
+
+  return <>Confirm {fallback}</>
 }
 
 const NftTitle: FC<{

@@ -94,7 +94,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     () => !isEmpty(transactionSimulation?.transfers),
     [transactionSimulation],
   )
-
   // Show balance change if there is a transaction simulation and there are approvals or transfers
   const hasBalanceChange = transactionSimulation && txnHasTransfers
 

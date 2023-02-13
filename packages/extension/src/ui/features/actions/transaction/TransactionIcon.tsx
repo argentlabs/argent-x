@@ -10,9 +10,12 @@ import {
 } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
+import { Network } from "../../../../shared/network"
 import {
   ApiTransactionReviewTargettedDapp,
-  getTransactionReviewSwap,
+  TransactionReviewWithType,
+  apiTransactionReviewActivityType,
+  getTransactionReviewWithType,
 } from "../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../accountNfts/aspect.service"
@@ -22,7 +25,7 @@ import { UnknownTokenIcon } from "./UnknownTokenIcon"
 import { useERC721Transfers } from "./useErc721Transfers"
 import { AggregatedSimData } from "./useTransactionSimulatedData"
 
-const { NetworkIcon } = icons
+const { NetworkIcon, SendIcon } = icons
 
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
@@ -37,38 +40,33 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 }) => {
   const network = useCurrentNetwork()
 
-  const swapTxn = useMemo(
-    () => getTransactionReviewSwap(transactionReview),
+  const transactionReviewWithType = useMemo(
+    () => getTransactionReviewWithType(transactionReview),
     [transactionReview],
   )
-
-  const hasSwap = Boolean(swapTxn)
-
-  const srcToken = useToken({
-    address: swapTxn?.activity?.src?.token.address || "0x0",
-    networkId: network.id,
-  })
-
-  const dstToken = useToken({
-    address: swapTxn?.activity?.dst?.token.address || "0x0",
-    networkId: network.id,
-  })
-
   const nftTransfers = useERC721Transfers(aggregatedData)
 
-  const hasNftTransfer = Boolean(nftTransfers?.length)
-
-  if (hasSwap) {
+  if (
+    transactionReviewWithType?.type === apiTransactionReviewActivityType.swap
+  ) {
     return (
-      <SwapTokensImage
-        srcTokenImg={srcToken?.image}
-        dstTokenImg={dstToken?.image}
+      <SwapTransactionIcon
+        network={network}
+        transaction={transactionReviewWithType}
       />
     )
   }
 
-  if (hasNftTransfer) {
-    return <NftPictures nftTransfers={nftTransfers} networkId={network.id} />
+  if (
+    transactionReviewWithType?.type ===
+    apiTransactionReviewActivityType.transfer
+  ) {
+    return (
+      <SendTransactionIcon
+        network={network}
+        transaction={transactionReviewWithType}
+      />
+    )
   }
 
   if (verifiedDapp) {
@@ -77,6 +75,9 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
         <Image src={verifiedDapp.iconUrl} borderRadius="2xl" />
       </IconWrapper>
     )
+  }
+  if (nftTransfers?.length) {
+    return <NftTransactionIcon network={network} nftTransfers={nftTransfers} />
   }
 
   return <UnknownDappIcon />
@@ -132,14 +133,14 @@ const SwapTokensImage: FC<{ srcTokenImg?: string; dstTokenImg?: string }> = ({
 
 interface NFTPictureProps extends ImageProps {
   nftTransfers: AggregatedSimData[]
-  networkId: string
+  network: Network
 }
 
-const NftPictures: FC<NFTPictureProps> = ({ nftTransfers, networkId }) => {
+const NftTransactionIcon: FC<NFTPictureProps> = ({ nftTransfers, network }) => {
   const { data: nft, isValidating } = useAspectNft(
     nftTransfers[0].token.address,
     nftTransfers[0].token.tokenId,
-    networkId,
+    network.id,
   )
 
   if (isValidating) {
@@ -198,22 +199,90 @@ const NftPictures: FC<NFTPictureProps> = ({ nftTransfers, networkId }) => {
   )
 }
 
-const IconWrapper: FC<BoxProps> = ({
-  children,
-  ...rest
+const SwapTransactionIcon = ({
+  transaction,
+  network,
 }: {
-  children?: React.ReactNode
+  transaction: TransactionReviewWithType
+  network: Network
 }) => {
+  const srcToken = useToken({
+    address: transaction?.activity?.src?.token.address || "0x0",
+    networkId: network.id,
+  })
+
+  const dstToken = useToken({
+    address: transaction?.activity?.dst?.token.address || "0x0",
+    networkId: network.id,
+  })
   return (
-    <Center
-      w="14"
-      h="14"
-      background="neutrals.700"
-      borderRadius="2xl"
-      boxShadow="menu"
-      {...rest}
-    >
-      {children}
+    <Center>
+      <Box height="14" width="14" position="relative">
+        <Image
+          src={srcToken?.image}
+          height="9"
+          width="9"
+          position="absolute"
+          zIndex="1"
+          top="0"
+          left="0"
+        />
+        <Image
+          src={dstToken?.image}
+          height="10"
+          width="10"
+          position="absolute"
+          zIndex="2"
+          bottom="0"
+          right="0"
+        />
+      </Box>
+    </Center>
+  )
+}
+
+const SendTransactionIcon = ({
+  transaction,
+  network,
+}: {
+  transaction: TransactionReviewWithType
+  network: Network
+}) => {
+  const srcToken = useToken({
+    address: transaction?.activity?.value?.token.address || "0x0",
+    networkId: network.id,
+  })
+  return (
+    <Center>
+      <Box height="14" width="14" position="relative">
+        <Center
+          w="14"
+          h="14"
+          background="neutrals.600"
+          borderRadius="90"
+          boxShadow="menu"
+          padding="4"
+        >
+          <SendIcon fontSize={"4xl"} color="white" />
+          {/* // what's the fallback token image ?  */}
+          {srcToken && (
+            <Center
+              w="28px"
+              h="28px"
+              background="neutrals.900"
+              borderRadius="90"
+              boxShadow="menu"
+              padding="1"
+              position="absolute"
+              zIndex="1"
+              right="-1"
+              bottom="-1"
+            >
+              <Image src={srcToken?.image} height="5" width="5" zIndex="2" />
+            </Center>
+          )}
+        </Center>
+      </Box>
     </Center>
   )
 }
