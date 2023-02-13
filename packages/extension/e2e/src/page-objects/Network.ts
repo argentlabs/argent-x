@@ -1,5 +1,5 @@
 import { Page, expect } from "@playwright/test"
-type NetworkName = "Localhost 5050" | "Testnet" | "Testnet2" | "Mainnet"
+type NetworkName = "Localhost 5050" | "Testnet" | "Testnet 2" | "Mainnet"
 export default class Network {
   constructor(private page: Page) {}
   get networkSelector() {
