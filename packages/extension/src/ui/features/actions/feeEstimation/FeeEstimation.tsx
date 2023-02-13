@@ -14,7 +14,6 @@ import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
-import { useExtensionIsInTab } from "../../browser/tabs"
 import { ExtendableControl, FeeEstimationValue, LoadingInput } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
 import { getTooltipText, useMaxFeeEstimation } from "./utils"
@@ -91,7 +90,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
       >
         <Flex alignItems="center" justifyContent="center" gap="5px">
           <P4 fontWeight="bold" color="neutrals.300">
-            Network fees
+            Network fee
           </P4>
 
           <Tooltip
