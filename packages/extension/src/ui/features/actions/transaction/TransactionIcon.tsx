@@ -25,18 +25,20 @@ import { UnknownTokenIcon } from "./UnknownTokenIcon"
 import { useERC721Transfers } from "./useErc721Transfers"
 import { AggregatedSimData } from "./useTransactionSimulatedData"
 
-const { NetworkIcon, SendIcon } = icons
+const { NetworkIcon, SendIcon, DocumentIcon } = icons
 
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
+  isDeclareContract: boolean
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
   verifiedDapp,
+  isDeclareContract,
 }) => {
   const network = useCurrentNetwork()
 
@@ -46,6 +48,9 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   )
   const nftTransfers = useERC721Transfers(aggregatedData)
 
+  if (isDeclareContract) {
+    return <DeclareContractIcon />
+  }
   if (
     transactionReviewWithType?.type === apiTransactionReviewActivityType.swap
   ) {
@@ -284,5 +289,13 @@ const SendTransactionIcon = ({
         </Center>
       </Box>
     </Center>
+  )
+}
+
+const DeclareContractIcon = () => {
+  return (
+    <IconWrapper position="relative" borderRadius="90">
+      <DocumentIcon />
+    </IconWrapper>
   )
 }

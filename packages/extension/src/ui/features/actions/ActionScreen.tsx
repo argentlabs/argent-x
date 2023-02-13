@@ -18,7 +18,6 @@ import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
-import { ApproveDeclareContractScreen } from "./ApproveDeclareContractScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveDeployContractScreen } from "./ApproveDeployContractScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
@@ -247,9 +246,10 @@ export const ActionScreen: FC = () => {
     case "DECLARE_CONTRACT_ACTION":
       return (
         <WithArgentShieldVerified>
-          <ApproveDeclareContractScreen
+          <ApproveTransactionScreen
             actionHash={action.meta.hash}
-            payload={action.payload}
+            transactions={[]}
+            declareContractPayload={action.payload}
             onSubmit={async () => {
               analytics.track("signedDeclareTransaction", {
                 networkId: account?.networkId || "unknown",

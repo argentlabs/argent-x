@@ -19,11 +19,13 @@ export interface TransactionTitleProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   fallback?: string
+  isDeclareContract: boolean
 }
 
 export const TransactionTitle: FC<TransactionTitleProps> = ({
   transactionReview,
   aggregatedData,
+  isDeclareContract,
   fallback = "transaction",
 }) => {
   const nftTransfers = useERC721Transfers(aggregatedData)
@@ -33,6 +35,14 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     () => getTransactionReviewWithType(transactionReview),
     [transactionReview],
   )
+
+  if (isDeclareContract) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Declare contract
+      </Flex>
+    )
+  }
 
   if (
     transactionReviewWithType?.type === apiTransactionReviewActivityType.swap
