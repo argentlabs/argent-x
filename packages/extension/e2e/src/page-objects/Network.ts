@@ -1,5 +1,5 @@
 import { Page, expect } from "@playwright/test"
-
+type NetworkName = "Localhost 5050" | "Testnet" | "Testnet 2" | "Mainnet"
 export default class Network {
   constructor(private page: Page) {}
   get networkSelector() {
@@ -10,9 +10,9 @@ export default class Network {
     return this.page.locator(`button[role="menuitem"]:has-text("${name}")`)
   }
 
-  async selectNetwork(name: string) {
+  async selectNetwork(networkName: NetworkName) {
     await this.networkSelector.click()
-    await this.networkOption(name).click()
+    await this.networkOption(networkName).click()
   }
 
   async ensureAvailableNetworks(networks: string[]) {

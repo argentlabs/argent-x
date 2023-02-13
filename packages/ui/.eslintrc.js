@@ -1,6 +1,7 @@
 module.exports = {
   extends: ["../extension/.eslintrc.js"],
   rules: {
+    "react/prop-types": "off",
     "@typescript-eslint/ban-types": [
       "error",
       {

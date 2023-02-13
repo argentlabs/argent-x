@@ -75,6 +75,9 @@ export const isEqualAddress = (a?: string, b?: string) => {
   }
 
   try {
+    if (!b) {
+      return false
+    }
     return number.hexToDecimalString(a) === number.hexToDecimalString(b)
   } catch {
     // ignore parsing error

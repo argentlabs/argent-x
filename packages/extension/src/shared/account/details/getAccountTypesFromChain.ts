@@ -4,7 +4,7 @@ import { Call, number } from "starknet"
 import { isEqualAddress } from "../../../ui/services/addresses"
 import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork, getProvider } from "../../network"
-import { AccountClassHash } from "../../network/type"
+import { mapImplementationToArgentAccountType } from "../../network/utils"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 
 export type AccountTypesFromChain = Pick<
@@ -61,10 +61,8 @@ export async function getAccountTypesFromChain(
             )
             const result = responses.map((response, i) => {
               const call = calls[i]
-              const type: ArgentAccountType = implementationToType(
-                response[0],
-                network.accountClassHash,
-              )
+              const type: ArgentAccountType =
+                mapImplementationToArgentAccountType(response[0], network)
               return {
                 address: call.contractAddress,
                 type,
@@ -82,7 +80,7 @@ export async function getAccountTypesFromChain(
           )
           return calls.map((call, i) => ({
             address: call.contractAddress,
-            type: implementationToType(results[i], network.accountClassHash),
+            type: mapImplementationToArgentAccountType(results[i], network),
           }))
         },
       ),
@@ -100,23 +98,4 @@ export async function getAccountTypesFromChain(
       type: accountType || account.type || "argent",
     }
   })
-}
-
-export const implementationToType = (
-  impl: string,
-  accountClassHash?: AccountClassHash,
-): ArgentAccountType => {
-  if (isEqualAddress(impl, accountClassHash?.multisig)) {
-    return "multisig"
-  }
-
-  if (isEqualAddress(impl, accountClassHash?.plugin)) {
-    return "plugin"
-  }
-
-  if (isEqualAddress(impl, accountClassHash?.argent)) {
-    return "argent"
-  }
-
-  throw new Error(`Unknown implementation ${impl}`)
 }

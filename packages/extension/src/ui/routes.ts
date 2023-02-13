@@ -115,6 +115,10 @@ export const routes = {
         : `/accounts/${accountAddress}`,
     "/accounts/:accountAddress",
   ),
+  accountImplementations: route(
+    (accountAddress) => `/accounts/${accountAddress}/implementation`,
+    "/accounts/:accountAddress/implementation",
+  ),
   addAccount: route("/accounts/new"),
   shieldAccountStart: route(
     (accountAddress) => `/accounts/${accountAddress}/shield`,
@@ -138,6 +142,10 @@ export const routes = {
   shieldAccountFinish: route(
     (accountAddress) => `/accounts/${accountAddress}/shield/finish`,
     "/accounts/:accountAddress/shield/finish",
+  ),
+  shieldEscapeWarning: route(
+    (accountAddress) => `/accounts/${accountAddress}/shield/escape-warning`,
+    "/accounts/:accountAddress/shield/escape-warning",
   ),
   newToken: route("/tokens/new"),
   funding: route("/funding"),

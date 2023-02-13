@@ -1,6 +1,8 @@
 import { ethers } from "ethers"
 import { number } from "starknet"
+import useSWR from "swr"
 
+import { updateAccountDetails } from "../../../shared/account/update"
 import { generateAvatarImage } from "../../../shared/avatarImage"
 import {
   BaseWalletAccount,
@@ -8,7 +10,9 @@ import {
 } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
+import { withPolling } from "../../services/swr"
 import { Account } from "./Account"
+import { useAccounts } from "./accounts.state"
 
 const { toBN } = number
 
@@ -106,4 +110,21 @@ export const getStatus = (
     return { code: "CONNECTED", text: "Active" }
   }
   return { code: "DEFAULT", text: "" }
+}
+
+/** periodically check ALL accounts for escape+guardian status so we can alert user to relevant changes */
+
+export const useUpdateAccountsOnChainEscapeState = () => {
+  const allAccounts = useAccounts({ showHidden: true, allNetworks: true })
+  return useSWR(
+    "useUpdateAccountsOnChainEscapeState",
+    async () => {
+      await updateAccountDetails("guardian", allAccounts)
+    },
+    {
+      ...withPolling(
+        60 * 1000,
+      ) /** 60 seconds, or will refresh next time extension is opened */,
+    },
+  )
 }

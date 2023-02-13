@@ -29,6 +29,7 @@ export const mapWalletAccountsToAccounts = (
         hidden: walletAccount.hidden,
         type: walletAccount.type,
         guardian: walletAccount.guardian,
+        escape: walletAccount.escape,
         needsDeploy: walletAccount.needsDeploy,
       }),
   )

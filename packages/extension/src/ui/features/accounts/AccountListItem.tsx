@@ -9,7 +9,10 @@ import {
 } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
+import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
+import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
 import { getNetworkAccountImageUrl } from "./accounts.service"
+import { useAccount } from "./accounts.state"
 import { MultisigStatus } from "./multisig/types"
 
 const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon } = icons
@@ -93,21 +96,52 @@ export const AccountListItemUpgradeBadge: FC = () => (
   </Tooltip>
 )
 
-export const AccountListItemShieldBadge: FC = () => (
-  <Tooltip label="This account is protected by Argent Shield 2FA">
-    <Circle
-      position={"absolute"}
-      right={-0.5}
-      bottom={-0.5}
-      size={5}
-      bg={"neutrals.800"}
-      color={"white"}
-      fontSize={"2xs"}
-    >
-      <ArgentShieldIcon />
-    </Circle>
-  </Tooltip>
-)
+type AccountListItemShieldBadgeProps = Pick<
+  AccountListItemProps,
+  "accountAddress" | "networkId"
+>
+
+export const AccountListItemShieldBadge: FC<
+  AccountListItemShieldBadgeProps
+> = ({ accountAddress, networkId }) => {
+  const account = useAccount({ address: accountAddress, networkId })
+  const liveAccountEscape = useLiveAccountEscape(account)
+  if (liveAccountEscape) {
+    const { colorScheme, title } = getEscapeDisplayAttributes(liveAccountEscape)
+    return (
+      <Tooltip label={title}>
+        <Circle
+          position={"absolute"}
+          right={-0.5}
+          bottom={-0.5}
+          size={5}
+          bg={`${colorScheme}.500`}
+          border={"2px solid"}
+          borderColor={"neutrals.800"}
+          color={"neutrals.900"}
+          fontSize={"2xs"}
+        >
+          <ArgentShieldIcon />
+        </Circle>
+      </Tooltip>
+    )
+  }
+  return (
+    <Tooltip label="This account is protected by Argent Shield 2FA">
+      <Circle
+        position={"absolute"}
+        right={-0.5}
+        bottom={-0.5}
+        size={5}
+        bg={"neutrals.800"}
+        color={"white"}
+        fontSize={"2xs"}
+      >
+        <ArgentShieldIcon />
+      </Circle>
+    </Tooltip>
+  )
+}
 
 export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
@@ -128,7 +162,10 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   const avatarBadge = upgrade ? (
     <AccountListItemUpgradeBadge />
   ) : isShield ? (
-    <AccountListItemShieldBadge />
+    <AccountListItemShieldBadge
+      accountAddress={accountAddress}
+      networkId={networkId}
+    />
   ) : null
   return (
     <CustomButtonCell {...rest}>
@@ -154,7 +191,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
-            {accountType === "plugin" && (
+            {accountType !== "argent" && (
               <L2
                 backgroundColor={"neutrals.900"}
                 px={1}
@@ -166,7 +203,8 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 border={"1px solid"}
                 borderColor={"neutrals.700"}
               >
-                Plugin
+                {accountType === "plugin" && "Plugin"}
+                {accountType === "multicall2" && "Better MC"}
               </L2>
             )}
           </Flex>

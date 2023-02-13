@@ -13,16 +13,20 @@ import { FC, useCallback, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
-import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { parseAmount } from "../../../shared/token/amount"
+import { getFeeToken } from "../../../shared/token/utils"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { routes, useReturnTo } from "../../routes"
-import { upgradeAccount } from "../../services/backgroundAccounts"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
+import {
+  getUint256CalldataFromBN,
+  sendTransaction,
+} from "../../services/transactions"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -31,13 +35,14 @@ import {
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
+import { useArgentShieldEnabled } from "../shield/useArgentShieldEnabled"
 import {
   ChangeGuardian,
   usePendingChangeGuardian,
 } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
-const { ExpandIcon, HideIcon, PluginIcon, AlertIcon, ArgentShieldIcon } = icons
+const { ExpandIcon, ArgentShieldIcon } = icons
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -66,9 +71,11 @@ export const AccountEditScreen: FC = () => {
     }
   }, [navigate, returnTo])
 
-  const experimentalPluginAccount = useKeyValueStorage(
+  const argentShieldEnabled = useArgentShieldEnabled()
+
+  const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
-    "experimentalPluginAccount",
+    "experimentalAllowChooseAccount",
   )
 
   const showDelete =
@@ -81,12 +88,6 @@ export const AccountEditScreen: FC = () => {
       navigate(routes.accountHideConfirm(account.address))
     }
   }
-
-  const canUpgradeToPluginAccount =
-    experimentalPluginAccount &&
-    account &&
-    currentNetwork.accountClassHash?.plugin &&
-    account.type !== "plugin"
 
   const onChangeName = useCallback((name: string) => {
     setLiveEditingAccountName(name)
@@ -107,6 +108,21 @@ export const AccountEditScreen: FC = () => {
       } Argent Shield…`
     : `Two-factor account protection`
 
+  const handleDeploy = () => {
+    const feeToken = getFeeToken(currentNetwork.id)?.address
+    if (account && feeToken) {
+      const ONE_GWEI = getUint256CalldataFromBN(parseAmount("1", 0))
+      const self = account.address
+      sendTransaction({
+        to: feeToken,
+        method: "transfer",
+        calldata: {
+          recipient: self,
+          amount: ONE_GWEI,
+        },
+      })
+    }
+  }
   return (
     <>
       <NavigationContainer
@@ -150,13 +166,17 @@ export const AccountEditScreen: FC = () => {
             </Center>
           </Flex>
           <SpacerCell />
-          {ARGENT_SHIELD_ENABLED && (
+          {argentShieldEnabled && (
             <>
               <ButtonCell
                 as={Link}
                 to={routes.shieldAccountStart(accountAddress)}
-                leftIcon={<ArgentShieldIcon fontSize={"xl"} />}
-                rightIconOpaque={!pendingChangeGuardian}
+                leftIcon={
+                  <ArgentShieldIcon
+                    fontSize={"xl"}
+                    opacity={!pendingChangeGuardian ? 1 : 0.6}
+                  />
+                }
                 rightIcon={
                   pendingChangeGuardian ? (
                     <Spinner size={"sm"} />
@@ -190,22 +210,24 @@ export const AccountEditScreen: FC = () => {
           </ButtonCell>
           <ButtonCell
             onClick={() => account && handleHideOrDeleteAccount(account)}
-            icon={<HideIcon />}
           >
             {showDelete ? "Delete" : "Hide"} account
           </ButtonCell>
-          {canUpgradeToPluginAccount && (
+          {experimentalAllowChooseAccount && account && (
             <ButtonCell
-              onClick={() => upgradeAccount(account, "plugin")}
-              icon={<PluginIcon />}
+              onClick={() => {
+                navigate(routes.accountImplementations(account.address))
+              }}
             >
-              Use Plugins
+              Change account implementation
             </ButtonCell>
+          )}
+          {account?.needsDeploy && (
+            <ButtonCell onClick={handleDeploy}>Deploy account</ButtonCell>
           )}
           <ButtonCell
             color={"error.500"}
             onClick={() => navigate(routes.exportPrivateKey())}
-            icon={<AlertIcon />}
           >
             Export private key
           </ButtonCell>

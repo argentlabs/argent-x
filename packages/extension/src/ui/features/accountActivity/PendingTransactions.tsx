@@ -82,6 +82,7 @@ export const PendingTransactions: FC<PendingTransactionsProps> = ({
           return (
             <TransactionListItem
               key={hash}
+              txHash={hash}
               transactionTransformed={transactionTransformed}
               network={network}
               onClick={() => openBlockExplorerTransaction(hash, network)}

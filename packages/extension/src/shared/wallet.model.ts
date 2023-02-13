@@ -1,6 +1,7 @@
+import { Escape } from "./account/details/getEscape"
 import { Network } from "./network"
 
-export type ArgentAccountType = "argent" | "plugin" | "multisig"
+export type ArgentAccountType = "argent" | "plugin" | "multisig" | "multicall2"
 
 export type CreateAccountType = Exclude<ArgentAccountType, "plugin"> // Should not be able to create plugin accounts
 export interface WalletAccountSigner {
@@ -23,6 +24,7 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
   hidden?: boolean
   needsDeploy?: boolean
   guardian?: string
+  escape?: Escape
 }
 
 export type StoredWalletAccount = Omit<WalletAccount, "network">

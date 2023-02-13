@@ -1,7 +1,6 @@
-import { L1, L2, P4, icons } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
+import { L1, L2, P4, Pre, icons } from "@argent/ui"
+import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
-import Tippy from "@tippyjs/react"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
 
@@ -9,25 +8,19 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
+import { CopyTooltip } from "../../../components/CopyTooltip"
 import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 import { useExtensionIsInTab } from "../../browser/tabs"
-import {
-  ExtendableControl,
-  FeeEstimationValue,
-  LoadingInput,
-  StyledInfoRoundedIcon,
-  StyledReportGmailerrorredRoundedIcon,
-} from "./styled"
+import { ExtendableControl, FeeEstimationValue, LoadingInput } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
 import { getTooltipText, useMaxFeeEstimation } from "./utils"
 import { getParsedError } from "./utils"
 
-const { AlertIcon, ChevronDownIcon } = icons
+const { AlertIcon, ChevronDownIcon, InfoIcon } = icons
 
 export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   accountAddress,
@@ -96,23 +89,30 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
         px="3"
         py="3.5"
       >
-        <Flex alignItems="center" justifyContent="center">
+        <Flex alignItems="center" justifyContent="center" gap="5px">
           <P4 fontWeight="bold" color="neutrals.300">
-            Network fee
+            Network fees
           </P4>
-          <Tippy
-            content={
-              <Tooltip as="div">
-                {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
-              </Tooltip>
-            }
+
+          <Tooltip
+            label={getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
+            p="3"
+            placement="top"
+            backgroundColor="black"
+            border="1px solid"
+            borderColor="neutrals.700"
+            borderRadius="4px"
           >
-            {enoughBalance ? (
-              <StyledInfoRoundedIcon />
-            ) : (
-              <StyledReportGmailerrorredRoundedIcon />
-            )}
-          </Tippy>
+            <Text
+              color="neutrals.300"
+              _hover={{
+                cursor: "pointer",
+                color: "white",
+              }}
+            >
+              <InfoIcon />
+            </Text>
+          </Tooltip>
         </Flex>
         {fee ? (
           <Flex
@@ -223,11 +223,9 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 copyValue={parsedFeeEstimationError}
                 message="Copied"
               >
-                <P4 color="errorText" pt="3">
-                  <pre style={{ whiteSpace: "pre-wrap" }}>
-                    {parsedFeeEstimationError}
-                  </pre>
-                </P4>
+                <Pre color="errorText" pt="3" whiteSpace="pre-wrap">
+                  {parsedFeeEstimationError}
+                </Pre>
               </CopyTooltip>
             )}
           </Collapse>

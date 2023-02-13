@@ -36,6 +36,7 @@ const baseStyle = definePartsStyle((props) => {
     },
     title: {
       ...typographyStyles.L1,
+      letterSpacing: "normal",
     },
     description: {
       ...typographyStyles.L2,

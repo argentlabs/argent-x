@@ -28,6 +28,7 @@ export interface TransactionListItemProps {
   highlighted?: boolean
   onClick?: () => void
   children?: ReactNode | ReactNode[]
+  txHash: string
 }
 
 export const TransactionListItem: FC<TransactionListItemProps> = ({
@@ -35,6 +36,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   network,
   highlighted,
   children,
+  txHash,
   ...props
 }) => {
   const { action, displayName, dapp } = transactionTransformed

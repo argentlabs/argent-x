@@ -6,7 +6,8 @@ import {
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
-  Signer,
+  KeyPair,
+  SignerInterface,
   ec,
   hash,
   number,
@@ -16,6 +17,7 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType, CreateAccountType } from "./../shared/wallet.model"
+import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
 import {
@@ -166,7 +168,10 @@ export class Wallet {
 
     await this.importBackup(encryptedBackup)
     await this.setSession(ethersWallet.privateKey, newPassword)
-    await this.discoverAccounts()
+    const accounts = await this.discoverAccounts()
+    if (accounts.length === 0) {
+      this.newAccount(defaultNetwork.id)
+    }
   }
 
   public async discoverAccounts() {
@@ -191,18 +196,18 @@ export class Wallet {
     const accounts = accountsResults.flatMap((x) => x)
 
     await this.walletStore.push(accounts)
-
     this.store.set("discoveredOnce", true)
+    return accounts
   }
 
   private async getAccountClassHashForNetwork(
     network: Network,
     accountType: ArgentAccountType,
   ): Promise<string> {
-    const classHash = network.accountClassHash?.[accountType]
-
-    if (classHash) {
-      return classHash
+    if (network.accountClassHash) {
+      return (
+        network.accountClassHash[accountType] ?? network.accountClassHash.argent
+      )
     }
 
     const deployerAccount = await getPreDeployedAccount(network)
@@ -298,6 +303,7 @@ export class Wallet {
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
+        accountDetailFetchers.push(getAccountEscapeFromChain)
         accountDetailFetchers.push(getAccountGuardiansFromChain)
       }
 
@@ -305,6 +311,7 @@ export class Wallet {
         accounts,
         accountDetailFetchers,
       )
+
       return accountsWithDetails
     } catch (error) {
       console.error(
@@ -636,17 +643,19 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
-  public async getSignerForAccount(account: WalletAccount) {
+  public async getSignerForAccount(
+    account: WalletAccount,
+  ): Promise<KeyPair | SignerInterface> {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
 
-    const signer =
+    const keyPairOrSigner =
       ARGENT_SHIELD_ENABLED && account.guardian
         ? new GuardianSignerArgentX(keyPair, cosignerSign)
-        : new Signer(keyPair)
+        : keyPair
 
-    return signer
+    return keyPairOrSigner
   }
 
   public async getStarknetAccount(

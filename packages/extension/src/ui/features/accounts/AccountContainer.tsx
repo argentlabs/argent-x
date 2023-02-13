@@ -9,6 +9,7 @@ import { FC, PropsWithChildren } from "react"
 import { NavLink } from "react-router-dom"
 
 import { routes } from "../../routes"
+import { WithEscapeWarning } from "../shield/escape/WithEscapeWarning"
 import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
 import { useAccountTransactions } from "./accountTransactions.state"
@@ -32,7 +33,7 @@ export const AccountContainer: FC<AccountContainerProps> = ({
   }
 
   return (
-    <>
+    <WithEscapeWarning>
       <AccountNavigationBar scroll={scroll} />
       <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
       <TabBar>
@@ -67,6 +68,6 @@ export const AccountContainer: FC<AccountContainerProps> = ({
           label="Activity"
         />
       </TabBar>
-    </>
+    </WithEscapeWarning>
   )
 }
