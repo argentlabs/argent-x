@@ -1,9 +1,16 @@
 import { Escape } from "./account/details/getEscape"
 import { Network } from "./network"
 
-export type ArgentAccountType = "argent" | "plugin" | "multisig" | "multicall2"
+export type ArgentAccountType =
+  | "standard"
+  | "plugin"
+  | "multisig"
+  | "multicall2"
 
-export type CreateAccountType = Exclude<ArgentAccountType, "plugin"> // Should not be able to create plugin accounts
+export type CreateAccountType = Exclude<
+  ArgentAccountType,
+  "plugin" | "multicall2"
+> // Should not be able to create plugin accounts
 export interface WalletAccountSigner {
   type: "local_secret"
   derivationPath: string

@@ -49,7 +49,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         analytics.track("createAccount", {
           status: "success",
           networkId,
-          type: type || "argent",
+          type: type || "standard",
         })
 
         const accounts = await getAccounts()
@@ -67,7 +67,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         analytics.track("createAccount", {
           status: "failure",
           networkId: networkId,
-          type: type || "argent",
+          type: type || "standard",
           errorMessage: error,
         })
 

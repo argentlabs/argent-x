@@ -32,5 +32,5 @@ export function mapImplementationToArgentAccountType(
     return "multicall2"
   }
 
-  return "argent"
+  return "standard"
 }

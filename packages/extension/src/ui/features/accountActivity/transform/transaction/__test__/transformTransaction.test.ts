@@ -24,7 +24,7 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
     account: {
       address: accountAddress,
-      type: "argent",
+      type: "standard",
       network: {
         accountClassHash: {
           argent:

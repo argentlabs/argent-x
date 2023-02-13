@@ -288,7 +288,7 @@ export class Wallet {
                 type: "local_secret",
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
-              type: "argent",
+              type: "standard",
               needsDeploy: false, // Only deployed accounts will be recovered
             })
           }
@@ -400,7 +400,7 @@ export class Wallet {
 
   public async newAccount(
     networkId: string,
-    type: CreateAccountType = "argent", // Should not be able to create plugin accounts. Default to argent account
+    type: CreateAccountType = "standard", // Should not be able to create plugin accounts. Default to argent account
   ): Promise<WalletAccount> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session) {
@@ -535,7 +535,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
-      "argent",
+      "standard",
     )
 
     const constructorCallData = {
@@ -608,7 +608,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       network,
-      "argent",
+      "standard",
     )
 
     const payload = {

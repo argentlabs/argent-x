@@ -50,7 +50,7 @@ export async function getAccountTypesFromChain(
           if (hasOnlyArgentAccounts) {
             return calls.map((call) => ({
               address: call.contractAddress,
-              type: "argent",
+              type: "standard",
             }))
           }
 
