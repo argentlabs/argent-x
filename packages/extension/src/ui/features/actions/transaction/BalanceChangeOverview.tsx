@@ -264,9 +264,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
-                                    amount: recipient.amount
-                                      .multipliedBy(-1)
-                                      .toString(),
+                                    amount: recipient.amount.toString(),
                                     ...token,
                                     withSymbol: false,
                                   })}

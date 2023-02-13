@@ -149,6 +149,7 @@ export const useAggregatedSimData = (
     )
 
     const ZERO = new BigNumber(0)
+    const ONE = new BigNumber(1)
 
     return reduce<
       Dictionary<ValidatedTokenTransfer[]>,
@@ -159,13 +160,15 @@ export const useAggregatedSimData = (
         const approvalsForTokens = approvalsRecord[key]
 
         const approvals: ApprovalSimulationData[] =
-          approvalsForTokens?.map((a) => ({
-            token: a.token,
-            owner: a.owner,
-            spender: a.spender,
-            amount: new BigNumber(a.token.type === "erc721" ? 1 : a.value),
-            usdValue: a.usdValue ? new BigNumber(a.usdValue) : undefined,
-          })) ?? []
+          approvalsForTokens
+            ?.map((a) => ({
+              token: a.token,
+              owner: a.owner,
+              spender: a.spender,
+              amount: new BigNumber(a.token.type === "erc721" ? 1 : a.value),
+              usdValue: a.usdValue ? new BigNumber(a.usdValue) : undefined,
+            }))
+            .filter((a) => a.owner === account?.address) ?? []
 
         const amount = transfers.reduce<BigNumber>((acc, t) => {
           if (t.from === account?.address) {
@@ -188,11 +191,16 @@ export const useAggregatedSimData = (
         }, ZERO)
 
         const recipients = transfers.reduce<Recipient[]>((acc, t) => {
+          const amount =
+            t.token.type === "erc721" ? ONE : new BigNumber(t.value)
+
+          const negated = amount.multipliedBy(-1)
+
           return [
             ...acc,
             {
               address: t.to,
-              amount: new BigNumber(t.value),
+              amount: t.to === account?.address ? amount : negated,
               usdValue: t.usdValue ? new BigNumber(t.usdValue) : undefined,
             },
           ]
@@ -209,10 +217,10 @@ export const useAggregatedSimData = (
           ...acc,
           [key]: {
             token: transfers[0].token,
+            approvals,
             amount,
             usdValue,
             recipients,
-            approvals,
             safe,
           },
         }
@@ -271,7 +279,10 @@ export function apiTokenDetailsToToken({
         ...token,
         type: "erc20",
       }
-    } else if (details.tokenType === "erc721") {
+    } else if (
+      details.tokenType === "erc721" ||
+      nftContracts.includes(tokenAddress)
+    ) {
       return {
         ...token,
         tokenId,
