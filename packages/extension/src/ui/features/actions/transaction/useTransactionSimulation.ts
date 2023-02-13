@@ -39,8 +39,8 @@ export const useTransactionSimulation = ({
   transactions,
   actionHash,
 }: IUseTransactionSimulation) => {
-  const transactionReviewEnabled = useTransactionSimulationEnabled()
-  const transactionReviewFetcher = useCallback(async () => {
+  const transactionSimulationEnabled = useTransactionSimulationEnabled()
+  const transactionSimulationFetcher = useCallback(async () => {
     if (!account || account.needsDeploy) {
       // TODO: handle account deployment
       return
@@ -51,8 +51,8 @@ export const useTransactionSimulation = ({
     })
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<ApiTransactionSimulationResponse>(
-    Boolean(transactionReviewEnabled),
+    Boolean(transactionSimulationEnabled),
     [actionHash, "transactionSimulation"],
-    transactionReviewFetcher,
+    transactionSimulationFetcher,
   )
 }
