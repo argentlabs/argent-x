@@ -49,6 +49,7 @@ export const AccountActivity: FC<AccountActivityProps> = ({
                 return (
                   <TransactionListItem
                     key={hash}
+                    txHash={hash}
                     transactionTransformed={transactionTransformed}
                     network={account.network}
                     onClick={() => navigate(routes.transactionDetail(hash))}
@@ -77,6 +78,7 @@ export const AccountActivity: FC<AccountActivityProps> = ({
                 return (
                   <Fragment key={transactionHash}>
                     <TransactionListItem
+                      txHash={transactionHash}
                       transactionTransformed={explorerTransactionTransformed}
                       network={account.network}
                       onClick={() =>
