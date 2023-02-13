@@ -1,38 +1,32 @@
 import type { Page } from "@playwright/test"
 
-import config from "./../config"
+import { lang } from "../languages"
 
-const text = {
-  en: {
-    addresBook: "Address book",
-    connectedDapps: "Connected dapps",
-    showRecoveryPhase: "Show recovery phase",
-    developerSettings: "Developer settings",
-    privacy: "Privacy",
-    back: "Back",
-    hideAccount: "Hide account",
-    deleteAccount: "Delete account", //only available for local network
-    close: "Close",
-    exportPrivateKey: "Export private key",
-    extendedView: "Extended view",
-    hide: "Hide",
-    hiddenAccounts: "Hidden accounts",
-    delete: "Delete",
-    done: "Done",
-  },
-}
 export default class Settings {
-  constructor(private page: Page, private lang = config.appLanguage) {}
-
-  get back() {
-    return this.page.locator(`[aria-label="${text[this.lang].back}"]`)
-  }
-  get close() {
-    return this.page.locator(`[aria-label="${text[this.lang].close}"]`)
-  }
+  constructor(private page: Page) {}
 
   get extendedView() {
-    return this.page.locator(`[aria-label="${text[this.lang].extendedView}"]`)
+    return this.page.locator(`[aria-label="${lang.settings.extendedView}"]`)
+  }
+
+  get addressBook() {
+    return this.page.locator(`//a//*[text()="${lang.settings.addresBook}"]`)
+  }
+
+  get connectedDapps() {
+    return this.page.locator(`//a//*[text()="${lang.settings.connectedDapps}"]`)
+  }
+
+  get showRecoveryPhase() {
+    return this.page.locator(
+      `//a//*[text()="${lang.settings.showRecoveryPhase}"]`,
+    )
+  }
+
+  get developerSettings() {
+    return this.page.locator(
+      `//a//*[text()="${lang.settings.developerSettings}"]`,
+    )
   }
 
   // account settings
@@ -42,13 +36,13 @@ export default class Settings {
 
   get exportPrivateKey() {
     return this.page.locator(
-      `button:has-text("${text[this.lang].exportPrivateKey}")`,
+      `//button//*[text()="${lang.settings.exportPrivateKey}"]`,
     )
   }
 
   get hideAccount() {
     return this.page.locator(
-      `button:has-text("${text[this.lang].hideAccount}")`,
+      `//button//*[text()="${lang.settings.hideAccount}"]`,
     )
   }
 
@@ -63,11 +57,11 @@ export default class Settings {
   }
 
   get confirmHide() {
-    return this.page.locator(`button:has-text("${text[this.lang].hide}")`)
+    return this.page.locator(`button:has-text("${lang.settings.hide}")`)
   }
   get hiddenAccounts() {
     return this.page.locator(
-      `button:has-text("${text[this.lang].hiddenAccounts}")`,
+      `button:has-text("${lang.settings.hiddenAccounts}")`,
     )
   }
 
@@ -77,19 +71,19 @@ export default class Settings {
 
   get deleteAccount() {
     return this.page.locator(
-      `button:has-text("${text[this.lang].deleteAccount}")`,
+      `button:has-text("${lang.settings.deleteAccount}")`,
     )
   }
 
   get confirmDelete() {
-    return this.page.locator(`button:has-text("${text[this.lang].delete}")`)
-  }
-
-  get done() {
-    return this.page.locator(`button:has-text("${text[this.lang].done}")`)
+    return this.page.locator(`button:has-text("${lang.settings.delete}")`)
   }
 
   get privateKey() {
     return this.page.locator('[data-testid="privateKey"]')
+  }
+
+  get copy() {
+    return this.page.locator(`button:has-text("${lang.settings.copy}")`)
   }
 }
