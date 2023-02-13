@@ -75,8 +75,6 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     fee?.suggestedMaxFee,
   )
 
-  const extensionInTab = useExtensionIsInTab()
-
   return (
     <Flex direction="column" gap="1">
       <Flex
@@ -88,6 +86,8 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
         justifyContent="space-between"
         px="3"
         py="3.5"
+        gap="2"
+        flexWrap="nowrap"
       >
         <Flex alignItems="center" justifyContent="center" gap="5px">
           <P4 fontWeight="bold" color="neutrals.300">
@@ -118,28 +118,9 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
           <Flex
             gap="1"
             alignItems="center"
-            direction={extensionInTab ? "row" : "column-reverse"}
+            direction="row-reverse"
+            flexWrap="wrap"
           >
-            {suggestedMaxFeeCurrencyValue !== undefined ? (
-              <L2 color="neutrals.300">
-                (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
-              </L2>
-            ) : (
-              <L2 color="neutrals.300">
-                (Max &nbsp;
-                {feeToken ? (
-                  prettifyTokenAmount({
-                    amount: fee.suggestedMaxFee,
-                    decimals: feeToken.decimals,
-                    symbol: feeToken.symbol,
-                  })
-                ) : (
-                  <>{fee.suggestedMaxFee} Unknown</>
-                )}
-                )
-              </L2>
-            )}
-
             <Flex alignItems="center">
               {amountCurrencyValue !== undefined ? (
                 <P4 fontWeight="bold">
@@ -160,6 +141,26 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 </P4>
               )}
             </Flex>
+
+            {suggestedMaxFeeCurrencyValue !== undefined ? (
+              <L2 color="neutrals.300">
+                (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
+              </L2>
+            ) : (
+              <L2 color="neutrals.300">
+                (Max &nbsp;
+                {feeToken ? (
+                  prettifyTokenAmount({
+                    amount: fee.suggestedMaxFee,
+                    decimals: feeToken.decimals,
+                    symbol: feeToken.symbol,
+                  })
+                ) : (
+                  <>{fee.suggestedMaxFee} Unknown</>
+                )}
+                )
+              </L2>
+            )}
           </Flex>
         ) : showEstimateError ? (
           <FeeEstimationValue>Error</FeeEstimationValue>
