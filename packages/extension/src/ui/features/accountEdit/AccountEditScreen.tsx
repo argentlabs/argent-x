@@ -211,7 +211,7 @@ export const AccountEditScreen: FC = () => {
           <ButtonCell
             onClick={() => account && handleHideOrDeleteAccount(account)}
           >
-            {showDelete ? "Delete" : "Hide"} account
+            {showDelete ? "Delete account" : "Hide account"}
           </ButtonCell>
           {experimentalAllowChooseAccount && account && (
             <ButtonCell
