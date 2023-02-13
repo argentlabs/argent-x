@@ -8,6 +8,7 @@ import { Call } from "starknet"
 import { getDisplayWarnAndReasonForTransactionReview } from "../../../shared/transactionReview.service"
 import { WarningIcon } from "../../components/Icons/WarningIcon"
 import { routes } from "../../routes"
+import { normalizeAddress } from "../../services/addresses"
 import { usePageTracking } from "../../services/analytics"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
@@ -58,7 +59,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-
+  console.log(transactionReview)
   const { data: transactionSimulation, isValidating: isSimulationLoading } =
     useTransactionSimulation({
       account: selectedAccount,
@@ -171,13 +172,25 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       )}
 
       {hasBalanceChange && (
-        <BalanceChangeOverview transactionSimulation={transactionSimulation} />
+        <BalanceChangeOverview
+          transactionSimulation={transactionSimulation}
+          transactionReview={transactionReview}
+        />
       )}
       {showTransactionActions && (
         <TransactionActions transactions={transactionsArray} />
       )}
 
-      <AccountNetworkInfo account={selectedAccount} />
+      <AccountNetworkInfo
+        account={selectedAccount}
+        to={
+          transactionReview?.reviews[0].activity?.recipient
+            ? normalizeAddress(
+                transactionReview?.reviews[0].activity?.recipient,
+              )
+            : undefined
+        }
+      />
 
       {hasBalanceChange && (
         <Center>
