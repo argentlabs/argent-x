@@ -19,7 +19,7 @@ import { useCurrentNetwork } from "../../networks/useNetworks"
 interface CommonSimulationData {
   token: Token
   amount: BigNumber
-  usdValue?: number
+  usdValue?: BigNumber
 }
 
 interface ApprovalSimulationData extends CommonSimulationData {
@@ -30,7 +30,7 @@ interface ApprovalSimulationData extends CommonSimulationData {
 interface Recipient {
   address: string
   amount: BigNumber
-  usdValue?: number
+  usdValue?: BigNumber
 }
 
 export interface TokenWithType extends Token {
@@ -164,7 +164,7 @@ export const useAggregatedSimData = (
             owner: a.owner,
             spender: a.spender,
             amount: new BigNumber(a.token.type === "erc721" ? 1 : a.value),
-            usdValue: a.usdValue ? parseFloat(a.usdValue) : undefined,
+            usdValue: a.usdValue ? new BigNumber(a.usdValue) : undefined,
           })) ?? []
 
         const amount = transfers.reduce<BigNumber>((acc, t) => {
@@ -175,17 +175,17 @@ export const useAggregatedSimData = (
           return t.token.type === "erc721" ? acc.plus(1) : acc.plus(t.value)
         }, ZERO)
 
-        const usdValue = transfers.reduce<number>((acc, t) => {
+        const usdValue = transfers.reduce<BigNumber>((acc, t) => {
           if (!t.usdValue) {
             return acc
           }
 
           if (t.from === account?.address) {
-            return acc - parseFloat(t.usdValue)
+            return acc.minus(t.usdValue)
           }
 
-          return acc + parseFloat(t.usdValue)
-        }, 0)
+          return acc.plus(t.usdValue)
+        }, ZERO)
 
         const recipients = transfers.reduce<Recipient[]>((acc, t) => {
           return [
@@ -193,7 +193,7 @@ export const useAggregatedSimData = (
             {
               address: t.to,
               amount: new BigNumber(t.value),
-              usdValue: t.usdValue ? parseFloat(t.usdValue) : undefined,
+              usdValue: t.usdValue ? new BigNumber(t.usdValue) : undefined,
             },
           ]
         }, [])

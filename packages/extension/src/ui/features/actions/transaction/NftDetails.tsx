@@ -27,7 +27,7 @@ interface NftDetailsProps {
   isDisabled?: boolean
   isMainnet?: boolean
   amount: BigNumber
-  usdValue?: number
+  usdValue?: BigNumber
 }
 
 export const NftDetails: FC<NftDetailsProps> = ({
@@ -101,9 +101,9 @@ export const NftDetails: FC<NftDetailsProps> = ({
             </P4>
 
             {/** 0 usdValue means we don't have any value */}
-            {isMainnet && !!usdValue && usdValue !== 0 && (
+            {isMainnet && !!usdValue && !usdValue.isZero() && (
               <L2 color="neutrals.300">
-                {prettifyCurrencyValue(Math.abs(usdValue))}
+                {prettifyCurrencyValue(usdValue.abs().toString())}
               </L2>
             )}
           </Flex>
