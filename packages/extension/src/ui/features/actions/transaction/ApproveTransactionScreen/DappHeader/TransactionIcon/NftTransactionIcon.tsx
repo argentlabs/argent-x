@@ -39,7 +39,7 @@ export const NftTransactionIcon: FC<NFTPictureProps> = ({
   }
 
   return (
-    <IconWrapper position="relative">
+    <IconWrapper position="relative" data-testid="nft-transaction-icon">
       <Image
         src={nft.image_url_copy}
         borderRadius="2xl"

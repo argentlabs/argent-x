@@ -1,10 +1,15 @@
-import { DocumentIcon } from "@argent/ui/dist/components/icons"
+import { icons } from "@argent/ui"
 
 import { IconWrapper } from "./IconWrapper"
 
+const { DocumentIcon } = icons
 export const DeclareContractIcon = () => {
   return (
-    <IconWrapper position="relative" borderRadius="90">
+    <IconWrapper
+      data-testid="declare-contract-icon"
+      position="relative"
+      borderRadius="90"
+    >
       <DocumentIcon />
     </IconWrapper>
   )

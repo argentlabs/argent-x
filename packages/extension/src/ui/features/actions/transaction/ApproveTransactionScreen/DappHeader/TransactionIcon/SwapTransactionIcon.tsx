@@ -21,7 +21,7 @@ export const SwapTransactionIcon = ({
     networkId: network.id,
   })
   return (
-    <Center>
+    <Center data-testid="swap-transaction-icon">
       <Box height="14" width="14" position="relative">
         <Image
           src={srcToken?.image}

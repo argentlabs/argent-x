@@ -32,7 +32,6 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     [transactionReview],
   )
   const nftTransfers = useERC721Transfers(aggregatedData)
-
   if (isDeclareContract) {
     return <DeclareContractIcon />
   }

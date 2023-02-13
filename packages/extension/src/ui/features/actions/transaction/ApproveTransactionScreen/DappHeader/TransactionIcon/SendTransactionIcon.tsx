@@ -19,7 +19,7 @@ export const SendTransactionIcon = ({
     networkId: network.id,
   })
   return (
-    <Center>
+    <Center data-testid="send-transaction-icon">
       <Box height="14" width="14" position="relative">
         <Center
           w="14"
