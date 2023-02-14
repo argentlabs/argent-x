@@ -16,10 +16,7 @@ import {
   ARGENT_SHIELD_ENABLED,
   ARGENT_SHIELD_NETWORK_ID,
 } from "../shared/shield/constants"
-import {
-  checkForEmailInUse,
-  checkForWrongEmail,
-} from "../shared/shield/helpers"
+import { validateEmailForAccounts } from "../shared/shield/validation"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
@@ -49,16 +46,23 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           throw Error("no accounts")
         }
 
-        const backendAccounts = await getBackendAccounts()
-        const accountsOnNetwork = await getAccounts(
+        /** Get current account state */
+
+        const localAccounts = await getAccounts(
           getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
         )
-        const accountsWithGuardian = await getAccounts(withGuardianSelector)
+        const localAccountsWithGuardian = await getAccounts(
+          withGuardianSelector,
+        )
+        const backendAccounts = await getBackendAccounts()
 
-        /** Validate email */
+        /** Validate email against account state */
 
-        checkForEmailInUse(backendAccounts, accountsOnNetwork)
-        checkForWrongEmail(backendAccounts, accountsWithGuardian)
+        validateEmailForAccounts({
+          localAccounts,
+          localAccountsWithGuardian,
+          backendAccounts,
+        })
 
         /** Check if this account already exists in backend */
 
