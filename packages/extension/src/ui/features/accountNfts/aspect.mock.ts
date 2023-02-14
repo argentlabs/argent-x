@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers"
+import { toBigInt } from "ethers"
 
 export const mockAddress =
   "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
@@ -257,7 +257,7 @@ export const expectedValidRes = [
       image_url:
         "https://cdn-testnet.aspect.co/contracts/custom/0x0798e884450c19e072d6620fefdbeb7387d0453d3fd51d95f5ace1f17633d88b/starknetid-pfp.jpg",
 
-      floor_list_price: BigNumber.from("0x010a741a46278000"),
+      floor_list_price: toBigInt("0x010a741a46278000"),
     },
     owner: {
       account_address:
@@ -288,7 +288,7 @@ export const expectedValidRes = [
       image_url:
         "https://cdn-testnet.aspect.co/contracts/custom/0x0798e884450c19e072d6620fefdbeb7387d0453d3fd51d95f5ace1f17633d88b/starknetid-pfp.jpg",
 
-      floor_list_price: BigNumber.from("0x010a741a46278000"),
+      floor_list_price: toBigInt("0x010a741a46278000"),
     },
     owner: {
       account_address:

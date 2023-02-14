@@ -1,9 +1,20 @@
 import BigNumber from "bignumber.js"
+import { BigNumberish, toBigInt } from "ethers"
 
 /** Checks if a value is numeric, ie. possible to coerce to a number, e.g. 123 or '123.0' */
 
-export const isNumeric = (numToCheck: any): boolean =>
-  !isNaN(parseFloat(numToCheck)) && isFinite(numToCheck)
+export const isNumeric = (numToCheck: any): numToCheck is BigNumberish => {
+  try {
+    toBigInt(numToCheck)
+    return true
+  } catch {
+    try {
+      return !isNaN(parseFloat(numToCheck)) && isFinite(numToCheck)
+    } catch {
+      return false
+    }
+  }
+}
 
 export interface IPrettifyNumberConfig {
   minDecimalPlaces: number

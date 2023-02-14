@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers"
+import { toBigInt } from "ethers"
 import { z } from "zod"
 
 export const AspectNftOwnerSchema = z.object({
@@ -6,11 +6,11 @@ export const AspectNftOwnerSchema = z.object({
   // TODO replace bignumbers with string().pattern(/^0x[0-9a-fA-F]+$/) to validate hexstring
   payment_amount: z
     .string()
-    .transform((s) => BigNumber.from(s))
+    .transform((s) => toBigInt(s))
     .optional(),
   payment_amount_per: z
     .string()
-    .transform((s) => BigNumber.from(s))
+    .transform((s) => toBigInt(s))
     .optional(),
 })
 
@@ -21,7 +21,7 @@ export const AspectNftContractSchema = z.object({
   schema: z.string(), // Might be useful in future
   name_custom: z.string(), // Collection Name
   image_url: z.string(),
-  floor_list_price: z.string().transform((s) => BigNumber.from(s)),
+  floor_list_price: z.string().transform((s) => toBigInt(s)),
 })
 
 export const AspectNftSchema = z.object({
@@ -72,7 +72,7 @@ export const CollectionSchema = z.object({
   imageUri: z.string().optional(),
   floorPrice: z
     .string()
-    .transform((s) => BigNumber.from(s))
+    .transform((s) => toBigInt(s))
     .optional(),
 })
 

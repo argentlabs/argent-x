@@ -1,6 +1,6 @@
 import { BarBackButton, H1, H4, H6, NavigationContainer, P4 } from "@argent/ui"
 import { Flex, Image, SimpleGrid } from "@chakra-ui/react"
-import { ethers } from "ethers"
+import { formatEther } from "ethers"
 import { FC } from "react"
 import { Location, useLocation, useNavigate, useParams } from "react-router-dom"
 
@@ -86,7 +86,7 @@ export const CollectionNfts: FC = () => {
             <P4 color="neutrals.300">
               Floor price:{" "}
               {collectible.floorPrice ? (
-                <>{ethers.utils.formatEther(collectible.floorPrice)} ETH</>
+                <>{formatEther(collectible.floorPrice)} ETH</>
               ) : (
                 "-"
               )}

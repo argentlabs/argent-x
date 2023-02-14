@@ -1,5 +1,5 @@
 import { icons } from "@argent/ui"
-import { BigNumber } from "ethers"
+import { toBigInt } from "ethers"
 import { isString } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
@@ -236,7 +236,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     if (isSwap) {
       const { fromTokenAddress, toTokenAddress, fromAmount, toAmount } =
         transactionTransformed
-      const negativeFromAmount = BigNumber.from(0).sub(fromAmount)
+      const negativeFromAmount = BigInt(0) - toBigInt(fromAmount)
       return (
         <>
           <TokenField

@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers"
 import { uint256 } from "starknet"
 import { describe, expect, test } from "vitest"
 
@@ -26,7 +25,7 @@ export const mockTokensWithBalance: TokenDetailsWithBalance[] =
     return {
       ...token,
       decimals: Number(token.decimals),
-      balance: BigNumber.from(token.balance),
+      balance: BigInt(token.balance),
     }
   })
 
@@ -70,7 +69,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
       expect(
         convertTokenAmountToCurrencyValue({
           amount: "30000000000",
-          decimals: BigNumber.from("10"),
+          decimals: BigInt("10"),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           unitCurrencyValue: null,

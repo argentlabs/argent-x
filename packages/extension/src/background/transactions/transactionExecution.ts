@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers"
+import { toBigInt } from "ethers"
 import {
   Call,
   EstimateFee,
@@ -207,9 +207,9 @@ export const calculateEstimateFeeFromL1Gas = async (
     const l1GasPrice = await getL1GasPrice(account.networkId)
 
     const callsLen = Array.isArray(transactions) ? transactions.length : 1
-    const multiplier = BigNumber.from(3744)
+    const multiplier = toBigInt(3744)
 
-    const price = l1GasPrice.mul(callsLen).mul(multiplier).toString()
+    const price = (l1GasPrice ?? BigInt(0)) * toBigInt(callsLen) * multiplier
 
     return {
       overall_fee: number.toBN(price),

@@ -1,7 +1,7 @@
 import { L1, L2, P4, Pre, icons } from "@argent/ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
-import { BigNumber, utils } from "ethers"
+import { formatEther, toBigInt } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
 
@@ -52,15 +52,18 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
 
   const totalMaxFee = useMemo(() => {
     if (account.needsDeploy && fee?.maxADFee) {
-      return number.toHex(
-        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
+      return toBigInt(
+        number
+          .toBN(fee.maxADFee)
+          .add(number.toBN(fee.suggestedMaxFee))
+          .toString(),
       )
     }
-    return fee?.suggestedMaxFee
+    return toBigInt(fee?.suggestedMaxFee ?? 0)
   }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
 
   const enoughBalance = useMemo(
-    () => Boolean(totalMaxFee && feeTokenBalance?.gte(totalMaxFee)),
+    () => Boolean(totalMaxFee && (feeTokenBalance ?? 0) >= totalMaxFee),
     [feeTokenBalance, totalMaxFee],
   )
 
@@ -79,16 +82,6 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
     fee?.amount,
-  )
-
-  const accountDeploymentCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.accountDeploymentFee,
-  )
-
-  const totalFeeCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    totalFee,
   )
 
   const totalMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
@@ -278,8 +271,8 @@ interface FeeEstimationTooltipProps {
   feeToken: Token
   maxNetworkFee?: string
   maxAccountDeploymentFee?: string
-  totalMaxFee?: string
-  feeTokenBalance?: BigNumber
+  totalMaxFee?: bigint
+  feeTokenBalance?: bigint
 }
 
 function getTooltipText({
@@ -297,7 +290,7 @@ function getTooltipText({
   ) {
     return <P4 color="neutrals.100">Network fee is still loading.</P4>
   }
-  if (feeTokenBalance.gte(totalMaxFee)) {
+  if (feeTokenBalance >= totalMaxFee) {
     return (
       <Flex flexDirection="column" gap="3">
         <P4 color="neutrals.100">
@@ -334,8 +327,7 @@ function getTooltipText({
   return (
     <P4 color="neutrals.500">
       Insufficient balance to pay network fees. You need at least $
-      {utils.formatEther(BigNumber.from(totalMaxFee).sub(feeTokenBalance))} ETH
-      more.
+      {formatEther(totalMaxFee - feeTokenBalance)} ETH more.
     </P4>
   )
 }

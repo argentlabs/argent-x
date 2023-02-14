@@ -1,5 +1,5 @@
 import CurrencyConversionNumber from "bignumber.js"
-import { BigNumber, BigNumberish, utils } from "ethers"
+import { BigNumberish, formatUnits, toBigInt } from "ethers"
 import { uint256 } from "starknet"
 
 import { TokenDetailsWithBalance } from "../../ui/features/accountTokens/tokens.state"
@@ -140,13 +140,13 @@ export const convertTokenAmountToCurrencyValue = ({
   ) {
     return
   }
-  const decimalsNumber = Number(decimals)
+
   /** amount to divide by to take amount to unit value */
-  const unitDivideBy = Math.pow(10, decimalsNumber)
+  const unitDivideBy = "1" + "0".repeat(parseInt(toBigInt(decimals).toString()))
   /** take amount to unit value */
   const amountDecimal = new CurrencyConversionNumber(
     amount.toString(),
-  ).dividedBy(unitDivideBy)
+  ).dividedBy(unitDivideBy.toString())
   /** multiply to convert to currency */
   const currencyValue = amountDecimal.multipliedBy(
     new CurrencyConversionNumber(unitCurrencyValue),
@@ -224,11 +224,11 @@ export const prettifyTokenAmount = ({
     prettyValue = unlimitedText ?? PRETTY_UNLIMITED
   } else {
     const decimalsNumber = Number(decimals)
-    const balanceBn = BigNumber.from(amount)
-    isPositiveValue = balanceBn.gt(0)
+    const balanceBn = toBigInt(amount)
+    isPositiveValue = balanceBn > 0
     const balanceFullString =
       decimalsNumber > 0
-        ? utils.formatUnits(balanceBn, decimalsNumber)
+        ? formatUnits(balanceBn, decimalsNumber)
         : balanceBn.toString()
     prettyValue =
       decimalsNumber > 0
@@ -280,12 +280,12 @@ export const convertTokenUnitAmountWithDecimals = ({
   ) {
     return
   }
-  const decimalsNumber = Number(decimals)
   /** amount to multipy by to take unit amount to token value */
-  const unitMultiplyBy = Math.pow(10, decimalsNumber)
+  const unitMultiplyBy =
+    "1" + "0".repeat(parseInt(toBigInt(decimals).toString()))
   /** take unit amount to token amount, enforcing integer */
   const amount = new CurrencyConversionNumber(unitAmount.toString())
-    .multipliedBy(unitMultiplyBy)
+    .multipliedBy(unitMultiplyBy.toString())
     .integerValue()
   /** keep as string to avoid loss of precision elsewhere */
   return amount.toString()

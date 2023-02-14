@@ -1,5 +1,4 @@
-import { BigNumber } from "ethers"
-import { RawArgs, stark, uint256 } from "starknet"
+import { RawArgs, number, stark, uint256 } from "starknet"
 
 import { executeTransaction } from "./backgroundTransactions"
 
@@ -19,9 +18,9 @@ export const sendTransaction = (data: TransactionRequest) => {
   })
 }
 
-export function getUint256CalldataFromBN(bn: BigNumber) {
+export function getUint256CalldataFromBN(bn: bigint) {
   return {
     type: "struct" as const,
-    ...uint256.bnToUint256(bn.toHexString()),
+    ...uint256.bnToUint256(number.toBN(bn.toString())),
   }
 }
