@@ -78,11 +78,10 @@ function orderAggregatedSimData(
     orderedSimData,
     (t) => t.token.type === "erc721",
   )
-  const [erc1155Transfers, erc20Transfers] = partition(
+  const [erc20Transfers, erc1155Transfers] = partition(
     restTransfers,
-    (t) => t.token.type === "erc1155",
+    (t) => t.token.type === "erc20",
   )
-
   const [incomingErc721Transfers, outgoingErc721Transfers] =
     partitionIncomingOutgoingTransfers(erc721Transfers)
   const [incomingErc1155Transfers, outgoingErc1155Transfers] =
