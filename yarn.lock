@@ -22665,7 +22665,7 @@ vite-plugin-dts@1.7.2, vite-plugin-dts@^1.4.0, vite-plugin-dts@^1.4.1, vite-plug
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.28.3, vitest@^0.28.4:
+vitest@^0.28.3:
   version "0.28.4"
   resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.28.4.tgz#d41113d6e250620cefd83ca967387a5844a7bde2"
   integrity sha512-sfWIy0AdlbyGRhunm+TLQEJrFH9XuRPdApfubsyLcDbCRrUX717BRQKInTgzEfyl2Ipi1HWoHB84Nqtcwxogcg==
