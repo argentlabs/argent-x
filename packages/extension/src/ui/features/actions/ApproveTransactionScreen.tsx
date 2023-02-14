@@ -13,6 +13,7 @@ import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
+import { useIsMainnet } from "../networks/useNetworks"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
@@ -49,6 +50,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
   const [txDetails, setTxDetails] = useState(false)
+
+  const isMainnet = useIsMainnet()
 
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
@@ -99,7 +102,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const showTransactionActions =
     !hasBalanceChange || (txDetails && hasBalanceChange)
 
-  const verifiedDapp = VERIFIED_DAPP_ENABLED && transactionReview?.targetedDapp
+  const verifiedDapp =
+    VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp
 
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
