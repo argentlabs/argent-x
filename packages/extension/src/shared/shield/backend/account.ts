@@ -11,45 +11,6 @@ import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
 import { jwtFetcher } from "../jwtFetcher"
 
-type EnsFreeStatus =
-  | "taken"
-  | "alreadyReserved"
-  | "blacklisted"
-  | "toBeReserved"
-  | "notUTS46"
-  | "userAlreadyRegistered"
-export const isEnsFree = async (ens: string): Promise<EnsFreeStatus> => {
-  try {
-    const json = await jwtFetcher(
-      `${ARGENT_API_BASE_URL}/account/isEnsFree?ens=${ens}`,
-    )
-    return json.status
-  } catch (error) {
-    throw new Error("failed to check ENS availability")
-  }
-}
-
-type ReserveEnsStatus =
-  | "taken"
-  | "alreadyReserved"
-  | "blacklisted"
-  | "toBeReserved"
-  | "notUTS46"
-  | "userAlreadyRegistered"
-export const reserveEns = async (ens: string): Promise<ReserveEnsStatus> => {
-  try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/account/reserveEns`, {
-      method: "POST",
-      body: JSON.stringify({
-        ens,
-      }),
-    })
-    return json.status
-  } catch (error) {
-    throw new Error("failed to reserve ENS")
-  }
-}
-
 export const requestEmailAuthentication = async (
   email: string,
   locale = "en-EN",
