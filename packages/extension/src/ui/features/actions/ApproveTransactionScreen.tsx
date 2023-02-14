@@ -156,6 +156,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         transactions={transactionsArray}
         transactionReview={transactionReview}
         aggregatedData={aggregatedData}
+        verifiedDapp={verifiedDapp || undefined}
       />
 
       {warn ? (

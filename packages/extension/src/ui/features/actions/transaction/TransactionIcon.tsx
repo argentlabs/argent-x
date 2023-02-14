@@ -9,7 +9,10 @@ import {
 } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
-import { getTransactionReviewSwap } from "../../../../shared/transactionReview.service"
+import {
+  ApiTransactionReviewTargettedDapp,
+  getTransactionReviewSwap,
+} from "../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../accountNfts/aspect.service"
 import { useToken } from "../../accountTokens/tokens.state"
@@ -22,11 +25,13 @@ const { NetworkIcon } = icons
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
+  verifiedDapp?: ApiTransactionReviewTargettedDapp
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
+  verifiedDapp,
 }) => {
   const network = useCurrentNetwork()
 
@@ -51,16 +56,28 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 
   const hasNftTransfer = Boolean(nftTransfers?.length)
 
-  return hasSwap ? (
-    <SwapTokensImage
-      srcTokenImg={srcToken?.image}
-      dstTokenImg={dstToken?.image}
-    />
-  ) : hasNftTransfer ? (
-    <NftPictures nftTransfers={nftTransfers} networkId={network.id} />
-  ) : (
-    <UnknownDappIcon />
-  )
+  if (hasSwap) {
+    return (
+      <SwapTokensImage
+        srcTokenImg={srcToken?.image}
+        dstTokenImg={dstToken?.image}
+      />
+    )
+  }
+
+  if (hasNftTransfer) {
+    return <NftPictures nftTransfers={nftTransfers} networkId={network.id} />
+  }
+
+  if (verifiedDapp) {
+    return (
+      <IconWrapper>
+        <Image src={verifiedDapp.iconUrl} borderRadius="2xl" />
+      </IconWrapper>
+    )
+  }
+
+  return <UnknownDappIcon />
 }
 
 const UnknownDappIcon = () => {
