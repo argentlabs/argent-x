@@ -32,6 +32,7 @@ import {
   useIsMainnet,
 } from "../../../../networks/useNetworks"
 import { useAggregatedSimData } from "../../useTransactionSimulatedData"
+import { UnknownTokenIcon } from "../DappHeader/TransactionIcon/UnknownTokenIcon"
 import { NftDetails } from "./NftDetails"
 
 const { InfoIcon, AlertIcon } = icons

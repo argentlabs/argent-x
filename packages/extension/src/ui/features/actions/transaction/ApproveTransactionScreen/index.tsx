@@ -14,6 +14,7 @@ import { useAccountTransactions } from "../../../accounts/accountTransactions.st
 import { useCheckUpgradeAvailable } from "../../../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../../../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../../../accountTokens/tokens.service"
+import { useIsMainnet } from "../../../networks/useNetworks"
 import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "../../feeEstimation/FeeEstimation"

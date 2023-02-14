@@ -4,6 +4,7 @@ import { Box, Center, Image } from "@chakra-ui/react"
 import { Network } from "../../../../../../../shared/network"
 import { TransactionReviewWithType } from "../../../../../../../shared/transactionReview.service"
 import { useToken } from "../../../../../accountTokens/tokens.state"
+import { UnknownTokenIcon } from "./UnknownTokenIcon"
 
 const { SendIcon } = icons
 
@@ -31,7 +32,7 @@ export const SendTransactionIcon = ({
         >
           <SendIcon fontSize={"4xl"} color="white" />
           {/* // what's the fallback token image ?  */}
-          {srcToken && (
+          {srcToken ? (
             <Center
               w="28px"
               h="28px"
@@ -46,6 +47,19 @@ export const SendTransactionIcon = ({
             >
               <Image src={srcToken?.image} height="5" width="5" zIndex="2" />
             </Center>
+          ) : (
+            <UnknownTokenIcon
+              w="28px"
+              h="28px"
+              background="neutrals.900"
+              borderRadius="90"
+              boxShadow="menu"
+              padding="1"
+              position="absolute"
+              zIndex="1"
+              right="-1"
+              bottom="-1"
+            />
           )}
         </Center>
       </Box>

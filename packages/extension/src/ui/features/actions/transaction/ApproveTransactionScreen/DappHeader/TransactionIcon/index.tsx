@@ -2,6 +2,7 @@ import { FC, useMemo } from "react"
 
 import {
   ApiTransactionReviewResponse,
+  ApiTransactionReviewTargettedDapp,
   apiTransactionReviewActivityType,
   getTransactionReviewWithType,
 } from "../../../../../../../shared/transactionReview.service"
@@ -13,17 +14,20 @@ import { NftTransactionIcon } from "./NftTransactionIcon"
 import { SendTransactionIcon } from "./SendTransactionIcon"
 import { SwapTransactionIcon } from "./SwapTransactionIcon"
 import { UnknownDappIcon } from "./UnknownDappIcon"
+import { VerifiedDappIcon } from "./VerifiedDappIcon"
 
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   isDeclareContract: boolean
+  verifiedDapp?: ApiTransactionReviewTargettedDapp
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
   isDeclareContract,
+  verifiedDapp,
 }) => {
   const network = useCurrentNetwork()
 
@@ -56,6 +60,10 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
         transaction={transactionReviewWithType}
       />
     )
+  }
+
+  if (verifiedDapp) {
+    return <VerifiedDappIcon iconUrl={verifiedDapp.iconUrl} />
   }
 
   if (nftTransfers?.length) {
