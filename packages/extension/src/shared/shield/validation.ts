@@ -51,6 +51,28 @@ export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2 =
 export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3 =
   "SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3"
 
+export type ShieldValidationErrorMessage =
+  | typeof SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1
+  | typeof SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2
+  | typeof SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3
+
+/** retreive shield error passed from background process via messages */
+
+export const getShieldValidationErrorFromBackendError = (error: unknown) => {
+  const message = (error as Error)?.message?.toString()
+  const errorMessage = message.match(/Error: (.+)/)?.[1]
+  if (
+    errorMessage &&
+    [
+      SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
+      SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
+      SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3,
+    ].includes(errorMessage)
+  ) {
+    return errorMessage as ShieldValidationErrorMessage
+  }
+}
+
 interface ValidateEmailForAccountsProps {
   localAccounts: WalletAccount[]
   localAccountsWithGuardian: WalletAccount[]
