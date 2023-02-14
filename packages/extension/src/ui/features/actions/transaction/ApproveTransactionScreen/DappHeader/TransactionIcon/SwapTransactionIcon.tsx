@@ -40,7 +40,7 @@ export const SwapTransactionIcon = ({
   }
 
   return (
-    <Center>
+    <Center data-testid="swap-transaction-icon">
       <Box height="14" width="14" position="relative">
         {srcToken?.image ? (
           <Image src={srcToken.image} sx={token1Styling} />
