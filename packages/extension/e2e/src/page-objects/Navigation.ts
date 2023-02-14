@@ -41,4 +41,44 @@ export default class Navigation {
   get no() {
     return this.page.locator(`button:has-text("${lang.common.no}")`)
   }
+
+  get unlock() {
+    return this.page.locator(`button:has-text("${lang.common.unlock}")`)
+  }
+
+  get showSettings() {
+    return this.page.locator('[aria-label="Show settings"]')
+  }
+
+  get lockWallet() {
+    return this.page.locator(`a:text-is("${lang.common.lockWallet}")`)
+  }
+
+  get reset() {
+    return this.page.locator(`a:text-is("${lang.common.reset}")`)
+  }
+
+  get confirmReset() {
+    return this.page.locator(`button:has-text("${lang.common.confirmReset}")`)
+  }
+
+  get menuPendingTransationsIndicator() {
+    return this.page.locator('[aria-label="Pending transactions"]')
+  }
+
+  get menuTokens() {
+    return this.page.locator('[aria-label="Tokens"]')
+  }
+
+  get menuNTFs() {
+    return this.page.locator('[aria-label="NFTs"]')
+  }
+
+  get menuSwaps() {
+    return this.page.locator('[aria-label="Swap"]')
+  }
+
+  get menuActivity() {
+    return this.page.locator('[aria-label="Activity"]')
+  }
 }

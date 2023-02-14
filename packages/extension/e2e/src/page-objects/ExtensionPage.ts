@@ -28,43 +28,16 @@ export default class ExtensionPage {
     this.settings = new Settings(page)
     this.navigation = new Navigation(page)
   }
-  get settingsButton() {
-    return this.page.locator('[aria-label="Show settings"]')
-  }
-
-  get lockWallet() {
-    return this.page.locator('a:text-is("Lock wallet")')
-  }
-
-  get reset() {
-    return this.page.locator('a:text-is("Reset")')
-  }
-
-  get confirmReset() {
-    return this.page.locator('button:text-is("RESET")')
-  }
 
   async open() {
     await this.page.goto(this.extensionUrl)
   }
 
-  get activityTab() {
-    return this.page.locator('[aria-label="Activity"]')
-  }
-
-  get pendingTransationsIndicator() {
-    return this.page.locator('[aria-label="Pending transactions"]')
-  }
-
-  get tokens() {
-    return this.page.locator('[aria-label="Tokens"]')
-  }
-
   async resetExtension() {
-    await this.settingsButton.click()
-    await this.lockWallet.click()
-    await this.reset.click()
-    await this.confirmReset.click()
+    await this.navigation.showSettings.click()
+    await this.navigation.lockWallet.click()
+    await this.navigation.reset.click()
+    await this.navigation.confirmReset.click()
   }
 
   async paste() {
