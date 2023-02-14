@@ -70,10 +70,16 @@ export interface Events {
   }
   signedTransaction: {
     networkId: string
+    host?: string
   }
   sentTransaction: {
     success: boolean
     networkId: string
+    host?: string
+  }
+  rejectedTransaction: {
+    networkId: string
+    host?: string
   }
   signedMessage: {
     networkId: string
