@@ -218,6 +218,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                   {prettifyTokenAmount({
                                     amount: approval.amount.toFixed(),
                                     ...approval.token,
+                                    unlimitedText: "All your",
                                   })}
                                 </P4>
                               </Flex>
