@@ -206,7 +206,8 @@ export class Wallet {
   ): Promise<string> {
     if (network.accountClassHash) {
       return (
-        network.accountClassHash[accountType] ?? network.accountClassHash.argent
+        network.accountClassHash[accountType] ??
+        network.accountClassHash.standard
       )
     }
 
@@ -235,8 +236,8 @@ export class Wallet {
 
     const accountClassHashes = union(
       ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash?.argent
-        ? [network.accountClassHash.argent]
+      network?.accountClassHash?.standard
+        ? [network.accountClassHash.standard]
         : [],
     )
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES

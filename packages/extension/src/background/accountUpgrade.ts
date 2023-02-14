@@ -33,7 +33,7 @@ export const upgradeAccount = async ({
   }
 
   const implementationClassHash =
-    newImplementation[accountType] ?? newImplementation["argent"]
+    newImplementation[accountType] ?? newImplementation.standard
 
   const calldata = stark.compileCalldata({
     implementation: implementationClassHash,

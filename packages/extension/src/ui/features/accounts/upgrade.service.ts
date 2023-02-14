@@ -7,6 +7,7 @@ import { getAccountIdentifier } from "./../../../shared/wallet.service"
 import { getAccounts } from "../../../shared/account/store"
 import { getMulticallForNetwork } from "../../../shared/multicall"
 import { Network, getProvider } from "../../../shared/network"
+import { withPolling } from "../../services/swr"
 import { fetchFeeTokenBalanceForAccounts } from "./../accountTokens/tokens.service"
 import { useCurrentNetwork, useNetwork } from "./../networks/useNetworks"
 import { Account } from "./Account"
@@ -19,21 +20,28 @@ export async function checkIfUpgradeAvailable(
     return false
   }
 
-  const currentImplementation = await account.getCurrentImplementation()
+  try {
+    const currentImplementation = await account.getCurrentImplementation()
 
-  // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
-  // const oldAccount = isDeprecated(account)
+    // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
+    // const oldAccount = isDeprecated(account)
 
-  // matches all current target implementations. If you want to change the account type please do it using a different flow than this banner
-  const targetImplementations = Object.values(targetClassHash)
+    // matches all current target implementations. If you want to change the account type please do it using a different flow than this banner
+    const targetImplementations = Object.values(targetClassHash)
 
-  const isInKnownImplementationsList = targetImplementations.some(
-    (targetImplementation) =>
-      currentImplementation &&
-      number.toBN(currentImplementation).eq(number.toBN(targetImplementation)),
-  )
+    const isInKnownImplementationsList = targetImplementations.some(
+      (targetImplementation) =>
+        currentImplementation &&
+        number
+          .toBN(currentImplementation)
+          .eq(number.toBN(targetImplementation)),
+    )
 
-  return !!targetImplementations && !isInKnownImplementationsList
+    return !!targetImplementations && !isInKnownImplementationsList
+  } catch (e) {
+    console.error(e)
+    return false
+  }
 }
 
 export async function checkIfV4UpgradeAvailableOnNetwork(
@@ -216,11 +224,18 @@ export const useCheckUpgradeAvailable = (account?: Account) => {
     data: needsUpgrade,
     error: needsUpgradeError,
     isValidating: needsUpgradeValidating,
+    mutate,
   } = useSWR(
     [accountIdentifier, accountClassHash, "showUpgradeBanner"],
-    () => account && checkIfUpgradeAvailable(account, accountClassHash),
-    { suspense: false },
+    () => {
+      if (!account) {
+        return false
+      }
+
+      return checkIfUpgradeAvailable(account, accountClassHash)
+    },
+    { suspense: false, ...withPolling(60 * 1000) },
   )
 
-  return { needsUpgrade, needsUpgradeError, needsUpgradeValidating }
+  return { needsUpgrade, needsUpgradeError, needsUpgradeValidating, mutate }
 }

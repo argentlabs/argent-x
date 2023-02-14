@@ -1,7 +1,7 @@
 import { ArgentAccountType } from "../wallet.model"
 
 export type AccountClassHash = { [key in ArgentAccountType]?: string } & {
-  argent: string
+  standard: string
 }
 
 export interface Network {

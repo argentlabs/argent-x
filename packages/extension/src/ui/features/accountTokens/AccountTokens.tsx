@@ -2,23 +2,19 @@ import { CellStack } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import useSWR from "swr"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { userReviewStore } from "../../../shared/userReview"
-import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
 import { redeployAccount } from "../../services/backgroundAccounts"
-import { withPolling } from "../../services/swr"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { checkIfUpgradeAvailable } from "../accounts/upgrade.service"
+import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
-import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { EscapeBanner } from "../shield/escape/EscapeBanner"
@@ -53,7 +49,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const hasPendingTransactions = pendingTransactions.length > 0
   const accountName = getAccountName(account, accountNames)
-  const network = useCurrentNetwork()
   const {
     shouldShow: shouldShowNetworkUpgradeMessage,
     updateLastShown: updateLastShownNetworkUpgradeMessage,
@@ -69,15 +64,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
-  const { data: needsUpgrade = false, mutate } = useSWR(
-    [
-      getAccountIdentifier(account),
-      network.accountClassHash,
-      "showUpgradeBanner",
-    ],
-    () => checkIfUpgradeAvailable(account, network.accountClassHash),
-    { suspense: false, ...withPolling(60 * 1000) },
-  )
+  const { needsUpgrade = false, mutate } = useCheckUpgradeAvailable(account)
 
   const onRedeploy = useCallback(async () => {
     const data = account.toBaseWalletAccount()
