@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js"
-import { Dictionary } from "lodash"
+import { Dictionary, orderBy } from "lodash"
 import { groupBy, reduce } from "lodash-es"
 import { useMemo } from "react"
 
@@ -235,7 +235,11 @@ export const useAggregatedSimData = (
     nftContracts,
   ])
 
-  return Object.values(aggregatedData)
+  return useMemo(() => {
+    const aggregatedDataValues = Object.values(aggregatedData)
+
+    return orderBy(aggregatedDataValues, (t) => t.amount.toString(16), "desc")
+  }, [aggregatedData])
 }
 
 export function apiTokenDetailsToToken({
