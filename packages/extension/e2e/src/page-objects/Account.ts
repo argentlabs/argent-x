@@ -73,7 +73,7 @@ export default class Account extends Navigation {
   }
 
   account(accountName: string) {
-    return this.page.locator(`[aria-label="Select ${accountName}"]`)
+    return this.page.locator(`[aria-label^="Select ${accountName}"]`)
   }
 
   get balance() {
@@ -96,6 +96,7 @@ export default class Account extends Navigation {
       await this.addANewccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
+    await this.account("").last().click()
     await this.addFunds.click()
     await this.addFundsFromStartNet.click()
     const accountAddress = await this.accountAddress
