@@ -6,6 +6,8 @@ const texts = {
     done: "Done",
     continue: "Continue",
     next: "Next",
+    yes: "Yes",
+    no: "No",
   },
   account: {
     noAccounts: "You have no accounts on ",
@@ -16,6 +18,8 @@ const texts = {
     showAccountList: "Show account list",
     send: "Send",
     export: "Export",
+    accountRecovery: "Set up account recovery",
+    saveTheRecoveryPhrase: "Save the recovery phrase",
   },
   wallet: {
     //first screen

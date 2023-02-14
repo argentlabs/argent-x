@@ -201,4 +201,17 @@ export default class Account extends Navigation {
   get exportPrivateKey() {
     return this.page.locator(`button:has-text("${lang.account.export}")`)
   }
+
+  get setUpAccountRecovery() {
+    return this.page.locator(
+      `button:has-text("${lang.account.accountRecovery}")`,
+    )
+  }
+
+  // account recovery modal
+  get saveTheRecoveryPhrase() {
+    return this.page.locator(
+      `//a//*[text()="${lang.account.saveTheRecoveryPhrase}"]`,
+    )
+  }
 }

@@ -6,6 +6,8 @@ export interface ILanguage {
     done: string
     next: string
     continue: string
+    yes: string
+    no: string
   }
   account: {
     noAccounts: string
@@ -16,6 +18,8 @@ export interface ILanguage {
     showAccountList: string
     send: string
     export: string
+    accountRecovery: string
+    saveTheRecoveryPhrase: string
   }
   wallet: {
     //first screen
