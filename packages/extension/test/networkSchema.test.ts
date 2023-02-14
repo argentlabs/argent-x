@@ -37,7 +37,7 @@ describe("networkSchema", () => {
         networkSchema.validateSync({
           ...defaultLocalhostNetwork,
           accountClassHash: {
-            argent: "foo",
+            standard: "foo",
           },
         }),
       ).toThrowErrorMatchingInlineSnapshot(
