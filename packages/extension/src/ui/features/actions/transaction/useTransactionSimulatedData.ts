@@ -148,8 +148,8 @@ export const useAggregatedSimData = (
       keyForGrouping,
     )
 
-    const ZERO = new BigNumber(0)
-    const ONE = new BigNumber(1)
+    const ZERO = BigNumber(0)
+    const ONE = BigNumber(1)
 
     return reduce<
       Dictionary<ValidatedTokenTransfer[]>,
@@ -165,8 +165,8 @@ export const useAggregatedSimData = (
               token: a.token,
               owner: a.owner,
               spender: a.spender,
-              amount: new BigNumber(a.token.type === "erc721" ? 1 : a.value),
-              usdValue: a.usdValue ? new BigNumber(a.usdValue) : undefined,
+              amount: BigNumber(a.token.type === "erc721" ? 1 : a.value),
+              usdValue: a.usdValue ? BigNumber(a.usdValue) : undefined,
             }))
             .filter((a) => a.owner === account?.address) ?? []
 
@@ -191,17 +191,16 @@ export const useAggregatedSimData = (
         }, ZERO)
 
         const recipients = transfers.reduce<Recipient[]>((acc, t) => {
-          const amount =
-            t.token.type === "erc721" ? ONE : new BigNumber(t.value)
+          const amount = t.token.type === "erc721" ? ONE : BigNumber(t.value)
 
-          const negated = amount.multipliedBy(-1)
+          const negated = amount.negated()
 
           return [
             ...acc,
             {
               address: t.to,
               amount: t.to === account?.address ? amount : negated,
-              usdValue: t.usdValue ? new BigNumber(t.usdValue) : undefined,
+              usdValue: t.usdValue ? BigNumber(t.usdValue) : undefined,
             },
           ]
         }, [])

@@ -135,7 +135,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               fontWeight="bold"
                             >
                               {prettifyTokenAmount({
-                                amount: amount.toString(),
+                                amount: amount.toFixed(),
                                 decimals: token.decimals,
                                 symbol:
                                   token.type === "erc20" ? token.symbol : "NFT",
@@ -216,7 +216,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
-                                    amount: approval.amount.toString(16),
+                                    amount: approval.amount.toFixed(),
                                     ...approval.token,
                                   })}
                                 </P4>
@@ -264,7 +264,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
-                                    amount: recipient.amount.toString(),
+                                    amount: recipient.amount.toFixed(),
                                     ...token,
                                     withSymbol: false,
                                   })}

@@ -54,5 +54,8 @@ export const useTransactionSimulation = ({
     Boolean(transactionSimulationEnabled),
     [actionHash, "transactionSimulation"],
     transactionSimulationFetcher,
+    {
+      revalidateOnFocus: false,
+    },
   )
 }
