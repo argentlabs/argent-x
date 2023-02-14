@@ -64,7 +64,6 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
     useState<ShieldValidationErrorMessage | null>(null)
 
   const onShieldValdationErrorDone = useCallback(() => {
-    setShieldValdationError(null)
     onOTPReEnterEmail()
   }, [onOTPReEnterEmail])
 
