@@ -17,8 +17,8 @@ test.describe("Account settings", () => {
     await expect(extension.settings.accountName).toHaveValue(
       "My new account name",
     )
-    await extension.settings.back.click()
-    await extension.settings.close.click()
+    await extension.navigation.back.click()
+    await extension.navigation.close.click()
 
     await extension.account.ensureSelectedAccount("My new account name")
   })
@@ -44,7 +44,7 @@ test.describe("Account settings", () => {
       await extension.settings.privateKey.textContent(),
     )
 
-    await extension.settings.done.click()
+    await extension.navigation.done.click()
     await expect(extension.settings.exportPrivateKey).toBeVisible()
   })
 
