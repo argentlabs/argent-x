@@ -8,6 +8,11 @@ export interface ILanguage {
     continue: string
     yes: string
     no: string
+    unlock: string
+    showSettings: string
+    lockWallet: string
+    reset: string
+    confirmReset: string
   }
   account: {
     noAccounts: string
