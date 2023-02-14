@@ -13,18 +13,23 @@ import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../accountTokens/tokens.service"
+import { useIsMainnet } from "../networks/useNetworks"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "./feeEstimation/FeeEstimation"
+import { LoadingScreen } from "./LoadingScreen"
 import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
 import { BalanceChangeOverview } from "./transaction/BalanceChangeOverview"
 import { DappHeader } from "./transaction/DappHeader"
 import { TransactionActions } from "./transaction/TransactionActions"
 import { TransactionBanner } from "./transaction/TransactionBanner"
 import { useTransactionReview } from "./transaction/useTransactionReview"
+import { useAggregatedSimData } from "./transaction/useTransactionSimulatedData"
 import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
 import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
+
+const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
 
 export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -32,8 +37,6 @@ export interface ApproveTransactionScreenProps
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
 }
-
-export type TransactionViewType = "swap" | "nft" | "generic"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
@@ -48,17 +51,22 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const [disableConfirm, setDisableConfirm] = useState(true)
   const [txDetails, setTxDetails] = useState(false)
 
+  const isMainnet = useIsMainnet()
+
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
     transactions,
     actionHash,
   })
 
-  const { data: transactionSimulation } = useTransactionSimulation({
-    account: selectedAccount,
-    transactions,
-    actionHash,
-  })
+  const { data: transactionSimulation, isValidating: isSimulationLoading } =
+    useTransactionSimulation({
+      account: selectedAccount,
+      transactions,
+      actionHash,
+    })
+
+  const aggregatedData = useAggregatedSimData(transactionSimulation)
 
   const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
 
@@ -82,21 +90,20 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       !isUpgradeTransaction,
   )
 
-  const txnHasApprovalsOrTransfers = useMemo(
-    () =>
-      !isEmpty(transactionSimulation?.approvals) ||
-      !isEmpty(transactionSimulation?.transfers),
+  const txnHasTransfers = useMemo(
+    () => !isEmpty(transactionSimulation?.transfers),
     [transactionSimulation],
   )
 
   // Show balance change if there is a transaction simulation and there are approvals or transfers
-  const showBalanceChange = transactionSimulation && txnHasApprovalsOrTransfers
+  const hasBalanceChange = transactionSimulation && txnHasTransfers
 
   // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
   const showTransactionActions =
-    !showBalanceChange || (txDetails && showBalanceChange)
+    !hasBalanceChange || (txDetails && hasBalanceChange)
 
-  const verifiedDapp = transactionReview?.targetedDapp
+  const verifiedDapp =
+    VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp
 
   const { warn, reason } =
     getDisplayWarnAndReasonForTransactionReview(transactionReview)
@@ -107,6 +114,10 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   if (shouldShowUpgrade) {
     return <UpgradeScreenV4 upgradeType="account" {...props} />
+  }
+
+  if (isSimulationLoading) {
+    return <LoadingScreen />
   }
 
   return (
@@ -144,6 +155,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       <DappHeader
         transactions={transactionsArray}
         transactionReview={transactionReview}
+        aggregatedData={aggregatedData}
+        verifiedDapp={verifiedDapp || undefined}
       />
 
       {warn ? (
@@ -158,7 +171,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         <></>
       )}
 
-      {showBalanceChange && (
+      {hasBalanceChange && (
         <BalanceChangeOverview transactionSimulation={transactionSimulation} />
       )}
       {showTransactionActions && (
@@ -167,16 +180,18 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
       <AccountNetworkInfo account={selectedAccount} />
 
-      <Center>
-        <P4
-          fontWeight="bold"
-          color="neutrals.400"
-          _hover={{ textDecoration: "underline", cursor: "pointer" }}
-          onClick={() => setTxDetails(!txDetails)}
-        >
-          {txDetails ? "Hide" : "View more"} details
-        </P4>
-      </Center>
+      {hasBalanceChange && (
+        <Center>
+          <P4
+            fontWeight="bold"
+            color="neutrals.400"
+            _hover={{ textDecoration: "underline", cursor: "pointer" }}
+            onClick={() => setTxDetails(!txDetails)}
+          >
+            {txDetails ? "Hide" : "View more"} details
+          </P4>
+        </Center>
+      )}
     </ConfirmScreen>
   )
 }

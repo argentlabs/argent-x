@@ -3,18 +3,25 @@ import { Box, Flex } from "@chakra-ui/react"
 import { useMemo } from "react"
 import { Call } from "starknet"
 
-import { ApiTransactionReviewResponse } from "../../../../shared/transactionReview.service"
+import {
+  ApiTransactionReviewResponse,
+  ApiTransactionReviewTargettedDapp,
+} from "../../../../shared/transactionReview.service"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
+import { AggregatedSimData } from "./useTransactionSimulatedData"
 
 export interface DappHeaderProps {
   transactions: Call[]
   transactionReview?: ApiTransactionReviewResponse
+  aggregatedData?: AggregatedSimData[]
+  verifiedDapp?: ApiTransactionReviewTargettedDapp
 }
 
 export const DappHeader = ({
   transactions,
   transactionReview,
+  aggregatedData,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -30,7 +37,11 @@ export const DappHeader = ({
         alignItems="center"
         gap="3"
       >
-        <TransactionIcon transactionReview={transactionReview} />
+        <TransactionIcon
+          transactionReview={transactionReview}
+          aggregatedData={aggregatedData}
+          verifiedDapp={transactionReview?.targetedDapp}
+        />
         <Flex
           direction="column"
           justifyContent="center"
@@ -40,6 +51,7 @@ export const DappHeader = ({
           <H5>
             <TransactionTitle
               transactionReview={transactionReview}
+              aggregatedData={aggregatedData}
               fallback={
                 transactions.length > 1 ? "transactions" : "transaction"
               }
