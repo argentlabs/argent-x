@@ -23,7 +23,9 @@ import {
   formatTruncatedAddress,
   normalizeAddress,
 } from "../../../services/addresses"
-import { useIsMainnet } from "../../networks/useNetworks"
+import { useCurrentNetwork, useIsMainnet } from "../../networks/useNetworks"
+import { NftDetails } from "./NftDetails"
+import { UnknownTokenIcon } from "./UnknownTokenIcon"
 import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
@@ -36,6 +38,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionSimulation,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
+  const network = useCurrentNetwork()
 
   const allTransferSafe = useMemo(
     () => aggregatedData.every((t) => t.safe),
@@ -71,7 +74,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
               dataIndex,
             ) => (
               <AccordionItem
-                key={[token.address, "transfer"].join("-")}
+                key={[token.address, "transfer", dataIndex].join("-")}
                 border="none"
                 color="white"
                 isDisabled={isEmpty(approvals) && isEmpty(recipients)}
@@ -79,71 +82,96 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                 {({ isDisabled }) => (
                   <>
                     <h2>
-                      <AccordionButton
-                        display="flex"
-                        width="100%"
-                        justifyContent="space-between"
-                        outline="none"
-                        px="3"
-                        pb={
-                          dataIndex !== aggregatedData.length - 1 ? "3" : "3.5"
-                        }
-                        _expanded={{
-                          backgroundColor: "neutrals.700",
-                          pb: "3.5",
-                        }}
-                        disabled={isDisabled}
-                        _disabled={{
-                          cursor: "auto",
-                          opacity: 1,
-                        }}
-                        _hover={{
-                          backgroundColor: isDisabled ? "" : "neutrals.700",
-                          borderBottomRadius:
-                            dataIndex === aggregatedData.length - 1
-                              ? "xl"
-                              : "0",
-                        }}
-                      >
-                        <Flex alignItems="center" gap="2">
-                          <Image src={token.image} w="5" h="5" />
-                          <P4 fontWeight="bold">
-                            {token.name === "Ether" ? "Ethereum" : token.name}{" "}
-                          </P4>
-                          {!safe && (
-                            <P3 color="error.500" fontWeight="bold" mt="0.25">
-                              <AlertIcon />
-                            </P3>
-                          )}
-                        </Flex>
-                        <Flex
-                          direction="column"
-                          gap="0.5"
-                          alignItems="flex-end"
+                      {token.type === "erc20" ? (
+                        <AccordionButton
+                          display="flex"
+                          width="100%"
+                          justifyContent="space-between"
+                          outline="none"
+                          px="3"
+                          pb={
+                            dataIndex !== aggregatedData.length - 1
+                              ? "3"
+                              : "3.5"
+                          }
+                          _expanded={{
+                            backgroundColor: "neutrals.700",
+                            pb: "3.5",
+                          }}
+                          disabled={isDisabled}
+                          _disabled={{
+                            cursor: "auto",
+                            opacity: 1,
+                          }}
+                          _hover={{
+                            backgroundColor: isDisabled ? "" : "neutrals.700",
+                            borderBottomRadius:
+                              dataIndex === aggregatedData.length - 1
+                                ? "xl"
+                                : "0",
+                          }}
                         >
-                          <P4
-                            color={
-                              amount.isNegative()
-                                ? "error.500"
-                                : "secondary.500"
-                            }
-                            fontWeight="bold"
+                          <Flex alignItems="center" gap="2">
+                            {token.image ? (
+                              <Image src={token.image} w="5" h="5" />
+                            ) : (
+                              <UnknownTokenIcon w="5" h="5" fontSize="10px" />
+                            )}
+                            <P4 fontWeight="bold">
+                              {token.name === "Ether" ? "Ethereum" : token.name}{" "}
+                            </P4>
+                            {!safe && (
+                              <P3 color="error.500" fontWeight="bold" mt="0.25">
+                                <AlertIcon />
+                              </P3>
+                            )}
+                          </Flex>
+                          <Flex
+                            direction="column"
+                            gap="0.5"
+                            alignItems="flex-end"
                           >
-                            {prettifyTokenAmount({
-                              amount: amount.toString(),
-                              ...token,
-                              showPlusSign: true,
-                            })}
-                          </P4>
+                            <P4
+                              color={
+                                amount.isNegative()
+                                  ? "error.500"
+                                  : "secondary.500"
+                              }
+                              fontWeight="bold"
+                            >
+                              {prettifyTokenAmount({
+                                amount: amount.toFixed(),
+                                decimals: token.decimals,
+                                symbol:
+                                  token.type === "erc20" ? token.symbol : "NFT",
+                                showPlusSign: true,
+                              })}
+                            </P4>
 
-                          {/** 0 usdValue means we don't have any value */}
-                          {isMainnet && !!usdValue && usdValue !== 0 && (
-                            <L2 color="neutrals.300">
-                              {prettifyCurrencyValue(Math.abs(usdValue))}
-                            </L2>
-                          )}
-                        </Flex>
-                      </AccordionButton>
+                            {/** 0 usdValue means we don't have any value */}
+                            {isMainnet && !!usdValue && !usdValue.isZero() && (
+                              <L2 color="neutrals.300">
+                                {prettifyCurrencyValue(
+                                  usdValue.abs().toString(),
+                                )}
+                              </L2>
+                            )}
+                          </Flex>
+                        </AccordionButton>
+                      ) : (
+                        <NftDetails
+                          contractAddress={token.address}
+                          tokenId={token.tokenId}
+                          networkId={network.id}
+                          dataIndex={dataIndex}
+                          totalData={aggregatedData.length}
+                          amount={amount}
+                          usdValue={usdValue}
+                          safe={safe}
+                          isMainnet={isMainnet}
+                          isDisabled={isDisabled}
+                        />
+                      )}
                     </h2>
                     <AccordionPanel
                       backgroundColor="neutrals.700"
@@ -170,11 +198,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               </Flex>
                             </Flex>
 
-                            {approvals.map((approval) => (
+                            {approvals.map((approval, approvalIndex) => (
                               <Flex
-                                key={[approval.token.address, "approval"].join(
-                                  "-",
-                                )}
+                                key={approvalIndex}
                                 justifyContent="space-between"
                               >
                                 <CopyTooltip
@@ -195,8 +221,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
-                                    amount: approval.amount.toString(16),
+                                    amount: approval.amount.toFixed(),
                                     ...approval.token,
+                                    unlimitedText: "All your",
                                   })}
                                 </P4>
                               </Flex>
@@ -214,9 +241,13 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               </P4>
                             </Flex>
 
-                            {recipients.map((recipient) => (
+                            {recipients.map((recipient, recipientIndex) => (
                               <Flex
-                                key={["recipient", recipient.address].join("-")}
+                                key={[
+                                  "recipient",
+                                  recipient.address,
+                                  recipientIndex,
+                                ].join("-")}
                                 justifyContent="space-between"
                               >
                                 <CopyTooltip
@@ -239,9 +270,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
                                 <P4 color="neutrals.400" fontWeight="bold">
                                   {prettifyTokenAmount({
-                                    amount: recipient.amount
-                                      .multipliedBy(-1)
-                                      .toString(),
+                                    amount: recipient.amount.toFixed(),
                                     ...token,
                                     withSymbol: false,
                                   })}

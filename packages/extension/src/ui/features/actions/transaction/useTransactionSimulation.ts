@@ -25,6 +25,9 @@ export const useTransactionSimulationEnabled = () => {
     "privacyUseArgentServices",
   )
 
+  // const TRANSACTION_SIMULATION_ENABLED =
+  //   process.env.FEATURE_TRANSACTION_SIMULATION === "true"
+
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_TRANSACTION_SIMULATION_API_ENABLED
@@ -39,8 +42,8 @@ export const useTransactionSimulation = ({
   transactions,
   actionHash,
 }: IUseTransactionSimulation) => {
-  const transactionReviewEnabled = useTransactionSimulationEnabled()
-  const transactionReviewFetcher = useCallback(async () => {
+  const transactionSimulationEnabled = useTransactionSimulationEnabled()
+  const transactionSimulationFetcher = useCallback(async () => {
     if (!account || account.needsDeploy) {
       // TODO: handle account deployment
       return
@@ -51,8 +54,11 @@ export const useTransactionSimulation = ({
     })
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<ApiTransactionSimulationResponse>(
-    Boolean(transactionReviewEnabled),
+    Boolean(transactionSimulationEnabled),
     [actionHash, "transactionSimulation"],
-    transactionReviewFetcher,
+    transactionSimulationFetcher,
+    {
+      revalidateOnFocus: false,
+    },
   )
 }

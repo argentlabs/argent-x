@@ -13,6 +13,8 @@ env:
   FEATURE_BANXA: "true"
   FEATURE_LAYERSWAP: "true"
   FEATURE_ORBITER: "true"
+  FEATURE_TRANSACTION_SIMULATION: "true"
+  FEATURE_VERIFIED_DAPPS: "false"
 
 jobs:
   build:

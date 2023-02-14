@@ -25,7 +25,7 @@ export interface TransactionSimulationTransfer {
 }
 
 export interface TokenDetails {
-  decimals: string
+  decimals: string | null
   symbol: string
   name: string
   tokenURI: string | null

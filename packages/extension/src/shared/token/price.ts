@@ -204,6 +204,7 @@ export interface IPrettifyTokenAmount {
   symbol?: string
   showPlusSign?: boolean
   withSymbol?: boolean
+  unlimitedText?: string
 }
 
 export const prettifyTokenAmount = ({
@@ -212,6 +213,7 @@ export const prettifyTokenAmount = ({
   symbol,
   showPlusSign = false,
   withSymbol = true,
+  unlimitedText,
 }: IPrettifyTokenAmount) => {
   if (!isNumeric(amount)) {
     return null
@@ -219,13 +221,19 @@ export const prettifyTokenAmount = ({
   let prettyValue
   let isPositiveValue = false
   if (isUnlimitedAmount(amount)) {
-    prettyValue = PRETTY_UNLIMITED
+    prettyValue = unlimitedText ?? PRETTY_UNLIMITED
   } else {
     const decimalsNumber = Number(decimals)
     const balanceBn = BigNumber.from(amount)
     isPositiveValue = balanceBn.gt(0)
-    const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
-    prettyValue = prettifyTokenNumber(balanceFullString)
+    const balanceFullString =
+      decimalsNumber > 0
+        ? utils.formatUnits(balanceBn, decimalsNumber)
+        : balanceBn.toString()
+    prettyValue =
+      decimalsNumber > 0
+        ? prettifyTokenNumber(balanceFullString)
+        : balanceFullString
   }
 
   const prettyValueWithSymbol = [
