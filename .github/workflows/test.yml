@@ -16,6 +16,15 @@ jobs:
           - 5050:5050
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "true"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ secrets.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
+      ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
     steps:
       - name: If github.head_ref not filled, we are merging
