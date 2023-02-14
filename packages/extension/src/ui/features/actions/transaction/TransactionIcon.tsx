@@ -6,6 +6,7 @@ import {
   Image,
   ImageProps,
   Skeleton,
+  SystemStyleObject,
 } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
@@ -17,6 +18,7 @@ import { ApiTransactionReviewResponse } from "../../../../shared/transactionRevi
 import { useAspectNft } from "../../accountNfts/aspect.service"
 import { useToken } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/useNetworks"
+import { UnknownTokenIcon } from "./UnknownTokenIcon"
 import { useERC721Transfers } from "./useErc721Transfers"
 import { AggregatedSimData } from "./useTransactionSimulatedData"
 
@@ -91,30 +93,42 @@ const UnknownDappIcon = () => {
 const SwapTokensImage: FC<{ srcTokenImg?: string; dstTokenImg?: string }> = ({
   srcTokenImg,
   dstTokenImg,
-}) => (
-  <Center>
-    <Box height="14" width="14" position="relative">
-      <Image
-        src={srcTokenImg}
-        height="9"
-        width="9"
-        position="absolute"
-        zIndex="1"
-        top="0"
-        left="0"
-      />
-      <Image
-        src={dstTokenImg}
-        height="10"
-        width="10"
-        position="absolute"
-        zIndex="2"
-        bottom="0"
-        right="0"
-      />
-    </Box>
-  </Center>
-)
+}) => {
+  const token1Styling: SystemStyleObject = {
+    height: "9",
+    width: "9",
+    position: "absolute",
+    zIndex: "1",
+    top: "0",
+    left: "0",
+  }
+
+  const token2Styling: SystemStyleObject = {
+    height: "10",
+    width: "10",
+    position: "absolute",
+    zIndex: "2",
+    bottom: "0",
+    right: "0",
+  }
+
+  return (
+    <Center>
+      <Box height="14" width="14" position="relative">
+        {srcTokenImg ? (
+          <Image src={srcTokenImg} sx={token1Styling} />
+        ) : (
+          <UnknownTokenIcon sx={token1Styling} />
+        )}
+        {dstTokenImg ? (
+          <Image src={dstTokenImg} sx={token2Styling} />
+        ) : (
+          <UnknownTokenIcon sx={token2Styling} />
+        )}
+      </Box>
+    </Center>
+  )
+}
 
 interface NFTPictureProps extends ImageProps {
   nftTransfers: AggregatedSimData[]

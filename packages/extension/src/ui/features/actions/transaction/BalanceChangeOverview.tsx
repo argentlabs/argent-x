@@ -25,6 +25,7 @@ import {
 } from "../../../services/addresses"
 import { useCurrentNetwork, useIsMainnet } from "../../networks/useNetworks"
 import { NftDetails } from "./NftDetails"
+import { UnknownTokenIcon } from "./UnknownTokenIcon"
 import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
@@ -111,7 +112,11 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                           }}
                         >
                           <Flex alignItems="center" gap="2">
-                            <Image src={token.image} w="5" h="5" />
+                            {token.image ? (
+                              <Image src={token.image} w="5" h="5" />
+                            ) : (
+                              <UnknownTokenIcon w="5" h="5" fontSize="10px" />
+                            )}
                             <P4 fontWeight="bold">
                               {token.name === "Ether" ? "Ethereum" : token.name}{" "}
                             </P4>
