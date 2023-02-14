@@ -35,4 +35,17 @@ test.describe("Recovery Wallet", () => {
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
   })
+
+  test("Set up account recovery banner should be available until user copy phrase", async ({
+    extension,
+  }) => {
+    await extension.wallet.newWalletOnboarding()
+    await extension.open()
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.account.setUpAccountRecovery.click()
+    await extension.account.saveTheRecoveryPhrase.click()
+    await extension.navigation.continue.click()
+    await extension.navigation.yes.click()
+    await expect(extension.account.setUpAccountRecovery).toBeHidden()
+  })
 })

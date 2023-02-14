@@ -33,4 +33,12 @@ export default class Navigation {
       .locator(`button:has-text("${lang.common.continue}")`)
       .first()
   }
+
+  get yes() {
+    return this.page.locator(`button:has-text("${lang.common.yes}")`)
+  }
+
+  get no() {
+    return this.page.locator(`button:has-text("${lang.common.no}")`)
+  }
 }
