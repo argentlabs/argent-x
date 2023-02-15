@@ -3,8 +3,11 @@ import { Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { Link, To } from "react-router-dom"
 
-import { ShieldHeader } from "./ui/ShieldHeader"
-import { ChangeGuardian } from "./usePendingChangingGuardian"
+import { ShieldHeader, ShieldHeaderProps } from "./ui/ShieldHeader"
+import {
+  ChangeGuardian,
+  LiveAccountGuardianState,
+} from "./usePendingChangingGuardian"
 
 const SHARE_FEEDBACK_URL = "https://discord.gg/T4PDFHxm6T"
 
@@ -13,76 +16,95 @@ const {
   ArgentShieldDeactivateIcon,
   TickIcon,
   AnnouncementIcon,
+  AlertIcon,
 } = icons
+
+export interface GetShieldHeaderProps {
+  accountName?: string
+  liveAccountGuardianState?: LiveAccountGuardianState
+}
+
+const getShieldHeaderProps = ({
+  liveAccountGuardianState,
+  accountName,
+}: GetShieldHeaderProps): ShieldHeaderProps => {
+  if (!liveAccountGuardianState) {
+    return {
+      title: "Argent Shield",
+    }
+  }
+  const { status, type } = liveAccountGuardianState
+  if (status === "ERROR") {
+    return {
+      icon: AlertIcon,
+      title:
+        type === ChangeGuardian.ADDING
+          ? "Adding Argent Shield Failed"
+          : "Removing Argent Shield Failed",
+      subtitle: `${accountName} was not modified because the transaction failed. Please try again later`,
+      variant: "danger",
+    }
+  }
+  const isAdding = type === ChangeGuardian.ADDING
+  if (status === "PENDING") {
+    return {
+      icon: isAdding ? ArgentShieldIcon : ArgentShieldDeactivateIcon,
+      title: isAdding ? "Adding Argent Shield…" : "Removing Argent Shield…",
+      subtitle: isAdding ? (
+        <>
+          Argent Shield is being added to {accountName}. A{" "}
+          <ArgentShieldIcon
+            display={"inline"}
+            position={"relative"}
+            top={"0.125em"}
+          />{" "}
+          icon will appear next to your account name once it’s added
+        </>
+      ) : (
+        <>
+          Argent Shield is being removed from {accountName}. This can take a few
+          minutes
+        </>
+      ),
+      isLoading: true,
+    }
+  }
+  if (status === "SUCCESS") {
+    return {
+      icon: isAdding ? TickIcon : ArgentShieldDeactivateIcon,
+      title: isAdding ? "Argent Shield Added" : "Argent Shield Removed",
+      subtitle: isAdding
+        ? `${accountName} is now protected by Argent Shield two-factor authentication`
+        : `${accountName} is not protected by Argent Shield two-factor authentication`,
+      variant: isAdding ? "success" : "removed",
+    }
+  }
+  /** 'UNKNOWN' - no transaction */
+  return {
+    title: "Argent Shield",
+  }
+}
 
 export interface ShieldBaseFinishScreenProps {
   accountName?: string
-  pendingChangeGuardian?: ChangeGuardian
-  guardian?: string
+  liveAccountGuardianState?: LiveAccountGuardianState
   returnRoute: To
 }
 
 export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   accountName,
-  pendingChangeGuardian,
-  guardian,
+  liveAccountGuardianState,
   returnRoute,
 }) => {
-  let icon
-  if (pendingChangeGuardian) {
-    icon = ChangeGuardian.ADDING ? ArgentShieldIcon : ArgentShieldDeactivateIcon
-  } else {
-    icon = guardian ? TickIcon : ArgentShieldDeactivateIcon
-  }
-
-  const variant = pendingChangeGuardian
-    ? "default"
-    : guardian
-    ? "success"
-    : "removed"
-
-  const title = pendingChangeGuardian
-    ? `${
-        pendingChangeGuardian === ChangeGuardian.ADDING ? "Adding" : "Removing"
-      } Argent Shield…`
-    : `Argent Shield ${guardian ? "added" : "removed"}`
-
-  const subtitle = pendingChangeGuardian ? (
-    pendingChangeGuardian === ChangeGuardian.ADDING ? (
-      <>
-        Argent Shield is being added to {accountName}. A{" "}
-        <ArgentShieldIcon
-          display={"inline"}
-          position={"relative"}
-          top={"0.125em"}
-        />{" "}
-        icon will appear next to your account name once it’s added
-      </>
-    ) : (
-      <>
-        Argent Shield is being removed from {accountName}. This can take a few
-        minutes
-      </>
-    )
-  ) : guardian ? (
-    `${accountName} is now protected by Argent Shield two-factor authentication`
-  ) : (
-    `${accountName} is not protected by Argent Shield two-factor authentication`
-  )
-
-  const isLoading = Boolean(pendingChangeGuardian)
+  const headerProps = getShieldHeaderProps({
+    accountName,
+    liveAccountGuardianState,
+  })
 
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>
-        <ShieldHeader
-          icon={icon}
-          title={title}
-          subtitle={subtitle}
-          isLoading={isLoading}
-          variant={variant}
-          size={"lg"}
-        />
+        <ShieldHeader size={"lg"} {...headerProps} />
         <Center
           bg={"accent.800"}
           rounded={"xl"}
@@ -118,7 +140,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
         </Center>
       </Center>
       <Button as={Link} to={returnRoute} colorScheme={"primary"}>
-        {isLoading ? "Dismiss" : "Done"}
+        {headerProps.isLoading ? "Dismiss" : "Done"}
       </Button>
     </CellStack>
   )

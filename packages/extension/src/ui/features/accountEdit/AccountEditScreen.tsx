@@ -104,7 +104,9 @@ export const AccountEditScreen: FC = () => {
 
   const accountSubtitle = pendingChangeGuardian
     ? `${
-        pendingChangeGuardian === ChangeGuardian.ADDING ? "Adding" : "Removing"
+        pendingChangeGuardian.type === ChangeGuardian.ADDING
+          ? "Adding"
+          : "Removing"
       } Argent Shield…`
     : `Two-factor account protection`
 

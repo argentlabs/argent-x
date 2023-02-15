@@ -6,13 +6,13 @@ import {
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
 import { ShieldBaseFinishScreen } from "./ShieldBaseFinishScreen"
-import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
+import { useLiveAccountGuardianState } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
 
 export const ShieldAccountFinishScreen: FC = () => {
   const account = useRouteAccount()
   const accountAddress = useRouteAccountAddress()
-  const pendingChangeGuardian = usePendingChangeGuardian(account)
+  const liveAccountGuardianState = useLiveAccountGuardianState(account)
   const { accountNames } = useAccountMetadata()
   const accountName = account
     ? getAccountName(account, accountNames)
@@ -27,7 +27,7 @@ export const ShieldAccountFinishScreen: FC = () => {
   return (
     <ShieldBaseFinishScreen
       accountName={accountName}
-      pendingChangeGuardian={pendingChangeGuardian}
+      liveAccountGuardianState={liveAccountGuardianState}
       guardian={account?.guardian}
       returnRoute={returnRoute}
     />
