@@ -6,3 +6,10 @@ export const reviveJsonBigNumber = (_: string, value: any) => {
   }
   return value
 }
+
+export const serializeJsonBigNumber = (_: string, value: any) => {
+  if (typeof value === "bigint") {
+    return { type: "BigNumber", hex: value.toString(16) }
+  }
+  return value
+}
