@@ -11,16 +11,16 @@ test.describe("Recovery Wallet", () => {
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
 
-    await extension.settingsButton.click()
+    await extension.navigation.showSettings.click()
     await extension.settings.showRecoveryPhase.click()
     await extension.wallet.password.fill(config.password)
     await extension.navigation.continue.click()
     await extension.settings.copy.click()
     await extension.navigation.back.click()
 
-    await extension.lockWallet.click()
-    await extension.reset.click()
-    await extension.confirmReset.click()
+    await extension.navigation.lockWallet.click()
+    await extension.navigation.reset.click()
+    await extension.navigation.confirmReset.click()
 
     await extension.wallet.restoreExistingWallet.click()
     await extension.paste()

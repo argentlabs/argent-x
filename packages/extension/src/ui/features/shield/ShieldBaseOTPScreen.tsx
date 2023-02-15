@@ -36,7 +36,7 @@ const schema = yup
     otp: yup
       .string()
       .matches(/^[0-9]{6}$/, "Must be 6 digits")
-      .required(),
+      .required("Passcode is required"),
   })
 
 export interface ShieldBaseOTPScreenProps {
