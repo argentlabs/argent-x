@@ -168,7 +168,6 @@ export const ActionScreen: FC = () => {
               } else {
                 closePopupIfLastAction()
                 useAppState.setState({ isLoading: false })
-                console.log("location", location.pathname)
                 if (location.pathname === routes.swap()) {
                   navigate(routes.accountActivity())
                 }
