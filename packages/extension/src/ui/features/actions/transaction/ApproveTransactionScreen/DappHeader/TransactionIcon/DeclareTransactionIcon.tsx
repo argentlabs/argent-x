@@ -10,7 +10,7 @@ export const DeclareContractIcon = () => {
       position="relative"
       borderRadius="90"
     >
-      <DocumentIcon />
+      <DocumentIcon fontSize="2xl" />
     </IconWrapper>
   )
 }

@@ -228,10 +228,7 @@ export const getTransactionReviewWithType = (
     return
   }
   for (const review of transactionReview.reviews) {
-    if (
-      review.activity?.type &&
-      apiTransactionReviewActivityType[review.activity?.type]
-    ) {
+    if (review.activity?.type) {
       return {
         ...review,
         type: apiTransactionReviewActivityType[review.activity?.type],
