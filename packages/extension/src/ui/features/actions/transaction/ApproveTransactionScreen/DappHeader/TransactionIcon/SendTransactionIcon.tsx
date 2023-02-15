@@ -31,7 +31,6 @@ export const SendTransactionIcon = ({
           padding="4"
         >
           <SendIcon fontSize={"4xl"} color="white" />
-          {/* // what's the fallback token image ?  */}
           {srcToken ? (
             <Center
               w="28px"

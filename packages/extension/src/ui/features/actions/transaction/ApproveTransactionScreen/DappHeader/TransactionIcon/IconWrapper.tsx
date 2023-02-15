@@ -1,5 +1,4 @@
-import { Center } from "@chakra-ui/react"
-import { BoxProps } from "@mui/material"
+import { BoxProps, Center } from "@chakra-ui/react"
 import { FC } from "react"
 
 export const IconWrapper: FC<BoxProps> = ({
