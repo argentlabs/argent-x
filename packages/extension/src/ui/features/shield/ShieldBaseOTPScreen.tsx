@@ -7,7 +7,7 @@ import {
   useToast,
 } from "@argent/ui"
 import { Center, HStack, PinInputField } from "@chakra-ui/react"
-import { FC, MouseEvent, useCallback, useMemo, useRef } from "react"
+import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
@@ -16,14 +16,18 @@ import {
   EmailVerificationStatus,
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
-import { ARGENT_SHIELD_ERROR_EMAIL_IN_USE } from "../../../shared/shield/constants"
 import { confirmEmail, requestEmail } from "../../../shared/shield/register"
+import {
+  ShieldValidationErrorMessage,
+  getShieldValidationErrorFromBackendError,
+} from "../../../shared/shield/validation"
 import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
 import { shieldValidateAccount } from "../../services/shieldAccount"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
+import { ShieldValidationErrorScreen } from "./ShieldValidationErrorScreen"
 import { ShieldHeader } from "./ui/ShieldHeader"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
@@ -56,6 +60,12 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
   const resolver = useYupValidationResolver(schema)
   const formRef = useRef<HTMLFormElement>(null)
   const toast = useToast()
+  const [shieldValdationError, setShieldValdationError] =
+    useState<ShieldValidationErrorMessage | null>(null)
+
+  const onShieldValdationErrorDone = useCallback(() => {
+    onOTPReEnterEmail()
+  }, [onOTPReEnterEmail])
 
   const onResendEmail = useCallback(
     async (e: MouseEvent) => {
@@ -99,6 +109,16 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
     },
     resolver,
   })
+
+  if (shieldValdationError) {
+    return (
+      <ShieldValidationErrorScreen
+        onBack={onBack}
+        error={shieldValdationError}
+        onDone={onShieldValdationErrorDone}
+      />
+    )
+  }
 
   return (
     <NavigationContainer
@@ -147,22 +167,16 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                       })
                     }
                   }
-                  if (
-                    (e as Error)?.message?.toString() ===
-                    `Error: ${ARGENT_SHIELD_ERROR_EMAIL_IN_USE}`
-                  ) {
-                    toast({
-                      title:
-                        "Email in use - You must use a different email for this wallet",
-                      status: "error",
-                      duration: 3000,
+                  const shieldError =
+                    getShieldValidationErrorFromBackendError(e)
+                  if (shieldError) {
+                    setShieldValdationError(shieldError)
+                  } else {
+                    return setError("otp", {
+                      type: "manual",
+                      message: "Unknown error - please try again later",
                     })
-                    onOTPReEnterEmail()
                   }
-                  return setError("otp", {
-                    type: "manual",
-                    message: "Unknown error - please try again later",
-                  })
                 }
               })}
             >

@@ -17,29 +17,41 @@ import { FC, useMemo } from "react"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
-} from "../../../../shared/token/price"
-import { ApiTransactionSimulationResponse } from "../../../../shared/transactionSimulation/types"
+} from "../../../../../../shared/token/price"
+import {
+  ApiTransactionReviewResponse,
+  getTransactionReviewWithType,
+} from "../../../../../../shared/transactionReview.service"
+import { ApiTransactionSimulationResponse } from "../../../../../../shared/transactionSimulation/types"
 import {
   formatTruncatedAddress,
   normalizeAddress,
-} from "../../../services/addresses"
-import { useCurrentNetwork, useIsMainnet } from "../../networks/useNetworks"
+} from "../../../../../services/addresses"
+import {
+  useCurrentNetwork,
+  useIsMainnet,
+} from "../../../../networks/useNetworks"
+import { useAggregatedSimData } from "../../useTransactionSimulatedData"
+import { UnknownTokenIcon } from "../DappHeader/TransactionIcon/UnknownTokenIcon"
 import { NftDetails } from "./NftDetails"
-import { UnknownTokenIcon } from "./UnknownTokenIcon"
-import { useAggregatedSimData } from "./useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
 
 export interface BalanceChangeOverviewProps {
   transactionSimulation: ApiTransactionSimulationResponse
+  transactionReview?: ApiTransactionReviewResponse
 }
 
 export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionSimulation,
+  transactionReview,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
   const network = useCurrentNetwork()
-
+  const transactionReviewWithType = useMemo(
+    () => getTransactionReviewWithType(transactionReview),
+    [transactionReview],
+  )
   const allTransferSafe = useMemo(
     () => aggregatedData.every((t) => t.safe),
     [aggregatedData],
@@ -51,14 +63,22 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
     <Box borderRadius="xl">
       <Box backgroundColor="neutrals.700" px="3" py="2.5" borderTopRadius="xl">
         <Flex alignItems="center" gap="1">
-          <P4 fontWeight="bold" color="neutrals.100">
-            Estimated balance change
-          </P4>
-          <Tooltip label="The balance change after successful swap">
-            <Text color="neutrals.300" cursor="pointer">
-              <InfoIcon />
-            </Text>
-          </Tooltip>
+          {transactionReviewWithType?.type === "transfer" ? (
+            <P4 fontWeight="bold" color="neutrals.100">
+              Balance change
+            </P4>
+          ) : (
+            <>
+              <P4 fontWeight="bold" color="neutrals.100">
+                Estimated balance change
+              </P4>
+              <Tooltip label="The balance change after successful swap">
+                <Text color="neutrals.300" cursor="pointer">
+                  <InfoIcon />
+                </Text>
+              </Tooltip>
+            </>
+          )}
         </Flex>
       </Box>
       <Flex

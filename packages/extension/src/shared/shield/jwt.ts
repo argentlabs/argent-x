@@ -21,28 +21,18 @@ const createDevice = async (): Promise<Device> => {
   }
 }
 
-let _device: Device | null = null
-
 export const resetDevice = async () => {
-  await idb.transaction("rw", idb.devices, async () => {
-    await idb.devices.delete(0)
-    _device = null
-  })
+  await idb.devices.delete(0)
 }
 
 export const getDevice = async () => {
-  if (!_device) {
-    const newDevice = await createDevice()
-    _device = await idb.transaction("rw", idb.devices, async () => {
-      const device = await idb.devices.get(0)
-      if (device) {
-        return device
-      }
-      await idb.devices.put(newDevice)
-      return newDevice
-    })
+  const device = await idb.devices.get(0)
+  if (device) {
+    return device
   }
-  return _device
+  const newDevice = await createDevice()
+  await idb.devices.put(newDevice)
+  return newDevice
 }
 
 export const generateJwt = async () => {

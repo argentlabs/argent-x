@@ -1,33 +1,34 @@
 import { P4 } from "@argent/ui"
+import { WarningIcon } from "@chakra-ui/icons"
 import { Center } from "@chakra-ui/react"
 import { isArray, isEmpty } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { Call } from "starknet"
+import { Call, DeclareContractPayload } from "starknet"
 
-import { getDisplayWarnAndReasonForTransactionReview } from "../../../shared/transactionReview.service"
-import { WarningIcon } from "../../components/Icons/WarningIcon"
-import { routes } from "../../routes"
-import { usePageTracking } from "../../services/analytics"
-import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
-import { UpgradeScreenV4 } from "../accounts/UpgradeScreenV4"
-import { useFeeTokenBalance } from "../accountTokens/tokens.service"
-import { useIsMainnet } from "../networks/useNetworks"
+import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
+import { routes } from "../../../../routes"
+import { normalizeAddress } from "../../../../services/addresses"
+import { usePageTracking } from "../../../../services/analytics"
+import { useAccountTransactions } from "../../../accounts/accountTransactions.state"
+import { useCheckUpgradeAvailable } from "../../../accounts/upgrade.service"
+import { UpgradeScreenV4 } from "../../../accounts/UpgradeScreenV4"
+import { useFeeTokenBalance } from "../../../accountTokens/tokens.service"
+import { useIsMainnet } from "../../../networks/useNetworks"
+import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
+import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
+import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
+import { LoadingScreen } from "../../LoadingScreen"
+import { useTransactionReview } from "../useTransactionReview"
+import { useAggregatedSimData } from "../useTransactionSimulatedData"
+import { useTransactionSimulation } from "../useTransactionSimulation"
+import { AccountNetworkInfo } from "./AccountNetworkInfo"
+import { BalanceChangeOverview } from "./BalanceChangeOverview"
 import { ConfirmScreen } from "./ConfirmScreen"
-import { ConfirmPageProps } from "./DeprecatedConfirmScreen"
-import { CombinedFeeEstimation } from "./feeEstimation/CombinedFeeEstimation"
-import { FeeEstimation } from "./feeEstimation/FeeEstimation"
-import { LoadingScreen } from "./LoadingScreen"
-import { AccountNetworkInfo } from "./transaction/AccountNetworkInfo"
-import { BalanceChangeOverview } from "./transaction/BalanceChangeOverview"
-import { DappHeader } from "./transaction/DappHeader"
-import { TransactionActions } from "./transaction/TransactionActions"
-import { TransactionBanner } from "./transaction/TransactionBanner"
-import { useTransactionReview } from "./transaction/useTransactionReview"
-import { useAggregatedSimData } from "./transaction/useTransactionSimulatedData"
-import { useTransactionSimulation } from "./transaction/useTransactionSimulation"
-import { VerifiedDappBanner } from "./transaction/VerifiedDappBanner"
+import { DappHeader } from "./DappHeader"
+import { TransactionActions } from "./TransactionActions"
+import { TransactionBanner } from "./TransactionBanner"
+import { VerifiedDappBanner } from "./VerifiedDappBanner"
 
 const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
 
@@ -36,6 +37,7 @@ export interface ApproveTransactionScreenProps
   actionHash: string
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
+  declareContractPayload?: DeclareContractPayload
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
@@ -43,6 +45,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   selectedAccount,
   actionHash,
   onSubmit,
+  declareContractPayload,
   ...props
 }) => {
   usePageTracking("signTransaction", {
@@ -58,7 +61,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-
   const { data: transactionSimulation, isValidating: isSimulationLoading } =
     useTransactionSimulation({
       account: selectedAccount,
@@ -95,12 +97,16 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     [transactionSimulation],
   )
 
+  const isDeclareContract = useMemo(
+    () => Boolean(declareContractPayload),
+    [declareContractPayload],
+  )
   // Show balance change if there is a transaction simulation and there are approvals or transfers
   const hasBalanceChange = transactionSimulation && txnHasTransfers
 
   // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
   const showTransactionActions =
-    !hasBalanceChange || (txDetails && hasBalanceChange)
+    (!hasBalanceChange || (txDetails && hasBalanceChange)) && !isDeclareContract
 
   const verifiedDapp =
     VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp
@@ -157,28 +163,38 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         transactionReview={transactionReview}
         aggregatedData={aggregatedData}
         verifiedDapp={verifiedDapp || undefined}
+        isDeclareContract={isDeclareContract}
       />
 
-      {warn ? (
+      {warn && (
         <TransactionBanner
           variant={transactionReview?.assessment}
           icon={WarningIcon}
           message={reason}
         />
-      ) : verifiedDapp ? (
-        <VerifiedDappBanner dapp={verifiedDapp} />
-      ) : (
-        <></>
       )}
+      {verifiedDapp && <VerifiedDappBanner dapp={verifiedDapp} />}
 
       {hasBalanceChange && (
-        <BalanceChangeOverview transactionSimulation={transactionSimulation} />
+        <BalanceChangeOverview
+          transactionSimulation={transactionSimulation}
+          transactionReview={transactionReview}
+        />
       )}
       {showTransactionActions && (
         <TransactionActions transactions={transactionsArray} />
       )}
 
-      <AccountNetworkInfo account={selectedAccount} />
+      <AccountNetworkInfo
+        account={selectedAccount}
+        to={
+          transactionReview?.reviews[0].activity?.recipient
+            ? normalizeAddress(
+                transactionReview?.reviews[0].activity?.recipient,
+              )
+            : undefined
+        }
+      />
 
       {hasBalanceChange && (
         <Center>

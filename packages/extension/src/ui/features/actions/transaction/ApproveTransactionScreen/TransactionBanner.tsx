@@ -2,7 +2,7 @@ import React, { FC } from "react"
 import styled from "styled-components"
 import { DefaultTheme } from "styled-components"
 
-import { ApiTransactionReviewAssessment } from "../../../../shared/transactionReview.service"
+import { ApiTransactionReviewAssessment } from "../../../../../shared/transactionReview.service"
 
 type Variant = ApiTransactionReviewAssessment | undefined
 

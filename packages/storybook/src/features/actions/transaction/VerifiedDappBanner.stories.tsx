@@ -1,4 +1,4 @@
-import { VerifiedDappBanner } from "@argent-x/extension/src/ui/features/actions/transaction/VerifiedDappBanner"
+import { VerifiedDappBanner } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/VerifiedDappBanner"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {

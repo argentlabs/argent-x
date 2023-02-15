@@ -137,7 +137,7 @@ export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
   }
 }
 
-interface Account {
+export interface BackendAccount {
   name: string | null
   address: string
   ownerAddress: string
@@ -150,7 +150,7 @@ interface Account {
   salt: string | null
 }
 
-export const getAccounts = async (): Promise<Account[]> => {
+export const getBackendAccounts = async (): Promise<BackendAccount[]> => {
   try {
     const json = await jwtFetcher(
       `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
@@ -166,7 +166,7 @@ interface AddAccountResponse {
   guardianAddress?: string
 }
 
-export const addAccount = async (
+export const addBackendAccount = async (
   pubKey: string,
   accountAddress: string,
   signature: string[],
