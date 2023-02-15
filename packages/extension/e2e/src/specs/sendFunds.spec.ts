@@ -25,11 +25,13 @@ test.describe("Send funds", () => {
       amount: 0.5,
     })
     //check activity
-    await extension.pendingTransationsIndicator.click()
+    await extension.navigation.menuPendingTransationsIndicator.click()
     await extension.activity.ensurePendingTransactions(1)
-    await extension.tokens.click()
+    await extension.navigation.menuTokens.click()
     await Promise.race([
-      expect(extension.pendingTransationsIndicator).not.toBeVisible({
+      expect(
+        extension.navigation.menuPendingTransationsIndicator,
+      ).not.toBeVisible({
         timeout: 90000,
       }),
       expect(extension.account.currentBalance("Ether")).not.toContainText(
@@ -87,11 +89,13 @@ test.describe("Send funds", () => {
       amount: 0.5,
     })
     //check activity
-    await extension.pendingTransationsIndicator.click()
+    await extension.navigation.menuPendingTransationsIndicator.click()
     await extension.activity.ensurePendingTransactions(1)
-    await extension.tokens.click()
+    await extension.navigation.menuTokens.click()
     await Promise.race([
-      expect(extension.pendingTransationsIndicator).not.toBeVisible({
+      expect(
+        extension.navigation.menuPendingTransationsIndicator,
+      ).not.toBeVisible({
         timeout: 90000,
       }),
       expect(extension.account.currentBalance("Ether")).toContainText("0.", {
@@ -131,11 +135,13 @@ test.describe("Send funds", () => {
       amount: "MAX",
     })
     //check activity
-    await extension.pendingTransationsIndicator.click()
+    await extension.navigation.menuPendingTransationsIndicator.click()
     await extension.activity.ensurePendingTransactions(1)
-    await extension.tokens.click()
+    await extension.navigation.menuTokens.click()
     await Promise.race([
-      expect(extension.pendingTransationsIndicator).not.toBeVisible({
+      expect(
+        extension.navigation.menuPendingTransationsIndicator,
+      ).not.toBeVisible({
         timeout: 90000,
       }),
       expect(extension.account.currentBalance("Ether")).not.toContainText(
@@ -193,11 +199,13 @@ test.describe("Send funds", () => {
       amount: "MAX",
     })
     //check activity
-    await extension.pendingTransationsIndicator.click()
+    await extension.navigation.menuPendingTransationsIndicator.click()
     await extension.activity.ensurePendingTransactions(1)
-    await extension.tokens.click()
+    await extension.navigation.menuTokens.click()
     await Promise.race([
-      expect(extension.pendingTransationsIndicator).not.toBeVisible({
+      expect(
+        extension.navigation.menuPendingTransationsIndicator,
+      ).not.toBeVisible({
         timeout: 90000,
       }),
       expect(extension.account.currentBalance("Ether")).not.toContainText(
