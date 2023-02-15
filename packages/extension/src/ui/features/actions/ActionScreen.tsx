@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
 import { removePreAuthorization } from "../../../shared/preAuthorizations"
@@ -26,6 +26,7 @@ import { ApproveTransactionScreen } from "./transaction/ApproveTransactionScreen
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const account = useSelectedAccount()
   const extensionIsInTab = useExtensionIsInTab()
   const actions = useActions()
@@ -166,6 +167,9 @@ export const ActionScreen: FC = () => {
               } else {
                 closePopupIfLastAction()
                 useAppState.setState({ isLoading: false })
+                if (location.pathname === routes.swap()) {
+                  navigate(routes.accountActivity())
+                }
               }
             }}
             onReject={onReject}
