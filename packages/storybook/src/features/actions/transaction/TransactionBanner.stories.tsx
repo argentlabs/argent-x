@@ -1,6 +1,6 @@
 import { CheckCircleOutlineIcon } from "@argent-x/extension/src/ui/components/Icons/MuiIcons"
 import { WarningIcon } from "@argent-x/extension/src/ui/components/Icons/WarningIcon"
-import { TransactionBanner } from "@argent-x/extension/src/ui/features/actions/transaction/TransactionBanner"
+import { TransactionBanner } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/TransactionBanner"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {

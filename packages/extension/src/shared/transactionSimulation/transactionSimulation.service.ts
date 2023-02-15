@@ -49,7 +49,6 @@ export const fetchTransactionSimulation = async ({
         }),
       },
     )
-
     return backendSimulation
   } catch (e) {
     console.error("Failed to fetch transaction simulation from backend", e)
