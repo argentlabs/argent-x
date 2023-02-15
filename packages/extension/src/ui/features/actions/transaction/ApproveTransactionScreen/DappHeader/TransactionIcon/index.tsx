@@ -3,7 +3,6 @@ import { FC, useMemo } from "react"
 import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
-  apiTransactionReviewActivityType,
   getTransactionReviewWithType,
 } from "../../../../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../../../../networks/useNetworks"
@@ -39,9 +38,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   if (isDeclareContract) {
     return <DeclareContractIcon />
   }
-  if (
-    transactionReviewWithType?.type === apiTransactionReviewActivityType.swap
-  ) {
+  if (transactionReviewWithType?.type === "swap") {
     return (
       <SwapTransactionIcon
         network={network}
@@ -50,10 +47,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     )
   }
 
-  if (
-    transactionReviewWithType?.type ===
-    apiTransactionReviewActivityType.transfer
-  ) {
+  if (transactionReviewWithType?.type === "transfer") {
     return (
       <SendTransactionIcon
         network={network}

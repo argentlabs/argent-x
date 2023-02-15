@@ -3,10 +3,7 @@ import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, useMemo } from "react"
 
 import { prettifyTokenAmount } from "../../../../../../shared/token/price"
-import {
-  apiTransactionReviewActivityType,
-  getTransactionReviewWithType,
-} from "../../../../../../shared/transactionReview.service"
+import { getTransactionReviewWithType } from "../../../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../../../accountNfts/aspect.service"
 import { useCurrentNetwork } from "../../../../networks/useNetworks"
@@ -44,9 +41,7 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     )
   }
 
-  if (
-    transactionReviewWithType?.type === apiTransactionReviewActivityType.swap
-  ) {
+  if (transactionReviewWithType?.type === "swap") {
     return (
       <Flex alignItems="center" gap="1">
         Swap {transactionReviewWithType.activity?.src?.token.symbol}
@@ -57,8 +52,7 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
   }
 
   if (
-    transactionReviewWithType?.type ===
-      apiTransactionReviewActivityType.transfer &&
+    transactionReviewWithType?.type === "transfer" &&
     transactionReviewWithType?.activity?.value?.amount
   ) {
     return (

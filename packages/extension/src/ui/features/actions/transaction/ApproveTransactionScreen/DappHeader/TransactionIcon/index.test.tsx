@@ -42,7 +42,7 @@ describe("TransactionIcon", () => {
     ).mockImplementation(() =>
       vi.fn(() => {
         return {
-          type: transactionReviewService.apiTransactionReviewActivityType.swap,
+          type: "swap",
         } as transactionReviewService.TransactionReviewWithType
       })(),
     )
@@ -58,8 +58,7 @@ describe("TransactionIcon", () => {
     ).mockImplementation(() =>
       vi.fn(() => {
         return {
-          type: transactionReviewService.apiTransactionReviewActivityType
-            .transfer,
+          type: "transfer",
         } as transactionReviewService.TransactionReviewWithType
       })(),
     )

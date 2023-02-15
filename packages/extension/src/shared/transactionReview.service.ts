@@ -44,16 +44,16 @@ export interface ApiTransactionReviewResponse {
   targetedDapp: ApiTransactionReviewTargettedDapp
 }
 
-export const apiTransactionReviewActivityType = {
-  "account-upgrade": "account-upgrade",
-  approve: "approve",
-  "set-approval-for-all": "set-approval-for-all",
-  swap: "swap",
-  transfer: "transfer",
-} as const
+export const apiTransactionReviewActivityType = [
+  "account-upgrade",
+  "approve",
+  "set-approval-for-all",
+  "swap",
+  "transfer",
+] as const
 
 export type ApiTransactionReviewActivityType =
-  (typeof apiTransactionReviewActivityType)[keyof typeof apiTransactionReviewActivityType]
+  (typeof apiTransactionReviewActivityType)[number]
 
 export type TransactionReviewWithType = ApiTransactionReview & {
   type: ApiTransactionReviewActivityType
@@ -231,7 +231,7 @@ export const getTransactionReviewWithType = (
     if (review.activity?.type) {
       return {
         ...review,
-        type: apiTransactionReviewActivityType[review.activity?.type],
+        type: review.activity?.type,
       }
     }
   }
