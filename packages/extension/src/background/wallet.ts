@@ -134,10 +134,11 @@ export class Wallet {
     }
 
     const ethersWallet = ethers.Wallet.createRandom()
-    const encryptedBackup = await ethersWallet.encrypt(
+
+    const encryptedBackup = await encryptKeystoreJson(
+      ethersWallet as KeystoreAccount,
       password,
-      // { scrypt: { N: SCRYPT_N } },
-      progressCallback,
+      { scrypt: { N: SCRYPT_N }, progressCallback },
     )
 
     await this.store.set("discoveredOnce", true)
