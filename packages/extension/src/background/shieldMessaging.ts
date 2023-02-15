@@ -6,11 +6,14 @@ import {
   getNetworkSelector,
   withGuardianSelector,
 } from "../shared/account/selectors"
-import { getAccounts } from "../shared/account/store"
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import {
   addBackendAccount,
+  getAccounts,
   getBackendAccounts,
+  register,
+  requestEmailAuthentication,
+  verifyEmail,
 } from "../shared/shield/backend/account"
 import {
   ARGENT_SHIELD_ENABLED,
@@ -113,6 +116,38 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
       } catch (error) {
         return sendMessageToUi({
           type: "SHIELD_VALIDATE_ACCOUNT_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+    case "SHIELD_REQUEST_EMAIL": {
+      const email = msg.data
+      try {
+        await requestEmailAuthentication(email)
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_EMAIL_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_EMAIL_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+    case "SHIELD_CONFIRM_EMAIL": {
+      const code = msg.data
+      try {
+        const { userRegistrationStatus } = await verifyEmail(code)
+
+        if (userRegistrationStatus === "notRegistered") {
+          await register()
+        }
+        return sendMessageToUi({
+          type: "SHIELD_CONFIRM_EMAIL_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_CONFIRM_EMAIL_REJ",
           data: `${error}`,
         })
       }
