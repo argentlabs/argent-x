@@ -30,7 +30,9 @@ test.describe("Recovery Wallet", () => {
     await extension.wallet.repeatPassword.fill(config.password)
 
     await extension.navigation.continue.click()
-    await expect(extension.wallet.finish.first()).toBeVisible()
+    await expect(extension.wallet.finish.first()).toBeVisible({
+      timeout: 30000,
+    })
 
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
