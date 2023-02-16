@@ -23683,9 +23683,9 @@ yocto-queue@^1.0.0:
   integrity sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==
 
 yup@^1.0.0-beta.4:
-  version "1.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/yup/-/yup-1.0.0-beta.8.tgz#46c2807d7c84119e3a3e98b508a22b7c02c0434e"
-  integrity sha512-vczv/4dfMGp47A4cS633mrp6bLIIIFL113bSmnAWajKLXzRlEENNaTNRbQyr6iwlCincjvFAeYXwRsURq7vp+A==
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/yup/-/yup-1.0.0.tgz#de4e32f9d2e45b1ab428076fc916c84db861b8ce"
+  integrity sha512-bRZIyMkoe212ahGJTE32cr2dLkJw53Va+Uw5mzsBKpcef9zCGQ23k/xtpQUfGwdWPKvCIlR8CzFwchs2rm2XpQ==
   dependencies:
     property-expr "^2.0.5"
     tiny-case "^1.0.3"
