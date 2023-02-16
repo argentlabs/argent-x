@@ -182,9 +182,8 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(session?.secret)
 
-    const networks = defaultNetworks
-      .map((network) => network.id)
-      .filter((networkId) => networkId !== "localhost")
+    const networks = defaultNetworks.map((network) => network.id)
+
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)
@@ -236,12 +235,14 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    const accountClassHashes = union(
-      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash?.argentAccount
-        ? [network.accountClassHash.argentAccount]
-        : [],
+    const networkAccountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "argent",
     )
+
+    const accountClassHashes = union(ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES, [
+      networkAccountClassHash,
+    ])
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
     if (!accountClassHashes?.length) {
@@ -301,8 +302,9 @@ export class Wallet {
       },
     )
 
+    await Promise.allSettled(promises)
+
     try {
-      await Promise.all(promises)
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
