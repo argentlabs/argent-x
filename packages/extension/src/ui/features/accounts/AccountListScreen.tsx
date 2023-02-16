@@ -5,7 +5,7 @@ import {
   icons,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { groupBy, partition, some } from "lodash-es"
+import { groupBy, isEmpty, partition, some } from "lodash-es"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -83,7 +83,8 @@ export const AccountListScreen: FC = () => {
   const argentAccounts = accountByTypes.argent
   const multisigAccounts = accountByTypes.multisig
 
-  const hasMultipleAccountTypes = argentAccounts && multisigAccounts
+  const hasMultipleAccountTypes =
+    !isEmpty(argentAccounts) && !isEmpty(multisigAccounts)
 
   return (
     <>

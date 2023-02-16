@@ -23,8 +23,7 @@ export const JoinMultisigScreen: FC = () => {
     if (encodedPubKey) {
       setValue(encodedPubKey)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [encodedPubKey])
+  }, [encodedPubKey, setValue])
 
   const onDone = async () => {
     navigate(await recover({ showAccountList: true }))
