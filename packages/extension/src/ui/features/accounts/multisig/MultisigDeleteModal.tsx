@@ -23,7 +23,7 @@ export const MultisigDeleteModal: FC<MaxEthModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
-      <ModalContent background="neutrals.700">
+      <ModalContent background="neutrals.700" borderRadius="2xl">
         <ModalHeader>
           <H5 fontWeight="600" textAlign="center">
             Are you sure?
