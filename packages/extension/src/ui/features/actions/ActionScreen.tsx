@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import { waitForMessage } from "../../../shared/messages"
 import { removePreAuthorization } from "../../../shared/preAuthorizations"
@@ -18,15 +18,15 @@ import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
 import { AddTokenScreen } from "./AddTokenScreen"
-import { ApproveDeclareContractScreen } from "./ApproveDeclareContractScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveDeployContractScreen } from "./ApproveDeployContractScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
-import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
+import { ApproveTransactionScreen } from "./transaction/ApproveTransactionScreen"
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const account = useSelectedAccount()
   const extensionIsInTab = useExtensionIsInTab()
   const actions = useActions()
@@ -167,6 +167,9 @@ export const ActionScreen: FC = () => {
               } else {
                 closePopupIfLastAction()
                 useAppState.setState({ isLoading: false })
+                if (location.pathname === routes.swap()) {
+                  navigate(routes.accountActivity())
+                }
               }
             }}
             onReject={onReject}
@@ -247,9 +250,10 @@ export const ActionScreen: FC = () => {
     case "DECLARE_CONTRACT_ACTION":
       return (
         <WithArgentShieldVerified>
-          <ApproveDeclareContractScreen
+          <ApproveTransactionScreen
             actionHash={action.meta.hash}
-            payload={action.payload}
+            transactions={[]}
+            declareContractPayload={action.payload}
             onSubmit={async () => {
               analytics.track("signedDeclareTransaction", {
                 networkId: account?.networkId || "unknown",

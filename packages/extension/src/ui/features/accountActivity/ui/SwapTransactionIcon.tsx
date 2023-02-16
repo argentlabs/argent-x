@@ -24,7 +24,12 @@ export const SwapTransactionIcon: FC<SwapTransactionIconProps> = ({
   const toIconSize = Math.round((Number(size) * 28) / 36)
   const { fromToken, toToken } = transaction
   return (
-    <Square size={size} position={"relative"} {...rest}>
+    <Square
+      size={size}
+      position={"relative"}
+      {...rest}
+      data-testid="swap-transaction-icon"
+    >
       {fromToken && (
         <TokenIcon
           name={fromToken?.name || "?"}

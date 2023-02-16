@@ -108,6 +108,9 @@ export interface Events {
     networkId: string
     pair: string
   }
+  executeTransaction: {
+    usesCachedFees: boolean
+  }
 }
 
 export interface Pages {

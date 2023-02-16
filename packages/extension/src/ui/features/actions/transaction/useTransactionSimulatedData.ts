@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js"
-import { Dictionary, orderBy } from "lodash"
-import { groupBy, reduce } from "lodash-es"
+import type { Dictionary } from "lodash"
+import { flatten, groupBy, orderBy, partition, reduce } from "lodash-es"
 import { useMemo } from "react"
 
 import { TransactionSimulationApproval } from "./../../../../shared/transactionSimulation/types"
@@ -63,6 +63,40 @@ export type ValidatedTokenApproval = Omit<
 > & {
   token: TokenWithType
   usdValue: string | undefined
+}
+
+function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
+  return partition(transfers, (t) => t.amount.isGreaterThan(0))
+}
+
+function orderAggregatedSimData(
+  simData: AggregatedSimData[],
+): AggregatedSimData[] {
+  const orderedSimData = orderBy(simData, (t) => t.amount.toString(16), "desc")
+
+  const [erc721Transfers, restTransfers] = partition(
+    orderedSimData,
+    (t) => t.token.type === "erc721",
+  )
+  const [erc20Transfers, erc1155Transfers] = partition(
+    restTransfers,
+    (t) => t.token.type === "erc20",
+  )
+  const [incomingErc721Transfers, outgoingErc721Transfers] =
+    partitionIncomingOutgoingTransfers(erc721Transfers)
+  const [incomingErc1155Transfers, outgoingErc1155Transfers] =
+    partitionIncomingOutgoingTransfers(erc1155Transfers)
+  const [incomingErc20Transfers, outgoingErc20Transfers] =
+    partitionIncomingOutgoingTransfers(erc20Transfers)
+
+  return flatten([
+    incomingErc721Transfers,
+    incomingErc1155Transfers,
+    incomingErc20Transfers,
+    outgoingErc721Transfers,
+    outgoingErc1155Transfers,
+    outgoingErc20Transfers,
+  ])
 }
 
 export const useAggregatedSimData = (
@@ -238,7 +272,7 @@ export const useAggregatedSimData = (
   return useMemo(() => {
     const aggregatedDataValues = Object.values(aggregatedData)
 
-    return orderBy(aggregatedDataValues, (t) => t.amount.toString(16), "desc")
+    return orderAggregatedSimData(aggregatedDataValues)
   }, [aggregatedData])
 }
 

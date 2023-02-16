@@ -40,5 +40,17 @@ module.exports = {
     ],
     "@typescript-eslint/no-non-null-assertion": "error",
     curly: "error",
+    "@typescript-eslint/no-restricted-imports": [
+      "error",
+      {
+        paths: [
+          {
+            name: "lodash",
+            message: "Please use lodash-es instead.",
+            allowTypeImports: true,
+          },
+        ],
+      },
+    ],
   },
 }
