@@ -21,10 +21,6 @@ const byAccountSelector = memoize(
   (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
 )
 
-const byHashSelector = memoize(
-  (hash: string) => (transaction: Transaction) => transaction.hash === hash,
-)
-
 export const useAccountTransactions: UseAccountTransactions = (account) => {
   const transactions = useArrayStorage(
     transactionsStore,
@@ -41,9 +37,4 @@ export const useAccountTransactions: UseAccountTransactions = (account) => {
   )
 
   return { transactions, pendingTransactions }
-}
-
-export const useTransactionWithHash = (hash: string) => {
-  const [hit] = useArrayStorage(transactionsStore, byHashSelector(hash))
-  return hit
 }

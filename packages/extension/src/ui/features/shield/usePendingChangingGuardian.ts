@@ -68,6 +68,8 @@ export interface LiveAccountGuardianState {
   type: ChangeGuardian
   /** the status of the change */
   status: ReturnType<typeof useTransactionStatus>
+  /** if the account currently has guardian */
+  hasGuardian: boolean
 }
 
 /**
@@ -107,6 +109,7 @@ export const useLiveAccountGuardianState = (
       return {
         type: pendingChangeGuardianType.current,
         status: transactionStatus,
+        hasGuardian,
       }
     }
 
@@ -118,6 +121,7 @@ export const useLiveAccountGuardianState = (
       return {
         type: pendingChangeGuardianType.current,
         status: transactionStatus,
+        hasGuardian,
       }
     }
 
@@ -125,6 +129,7 @@ export const useLiveAccountGuardianState = (
     return {
       type: pendingChangeGuardianType.current,
       status: "PENDING",
+      hasGuardian,
     }
   }, [hasGuardian, transactionStatus])
 }

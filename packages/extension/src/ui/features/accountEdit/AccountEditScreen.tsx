@@ -9,7 +9,7 @@ import {
   icons,
 } from "@argent/ui"
 import { Center, Flex, Image, Spinner } from "@chakra-ui/react"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { settingsStore } from "../../../shared/settings"
@@ -38,7 +38,7 @@ import { useCurrentNetwork } from "../networks/useNetworks"
 import { useArgentShieldEnabled } from "../shield/useArgentShieldEnabled"
 import {
   ChangeGuardian,
-  usePendingChangeGuardian,
+  useLiveAccountGuardianState,
 } from "../shield/usePendingChangingGuardian"
 import { AccountEditName } from "./AccountEditName"
 
@@ -58,7 +58,7 @@ export const AccountEditScreen: FC = () => {
     ? getAccountName(account, accountNames)
     : "Not found"
   const blockExplorerTitle = useBlockExplorerTitle()
-  const pendingChangeGuardian = usePendingChangeGuardian(account)
+  const liveAccountGuardianState = useLiveAccountGuardianState(account)
 
   const [liveEditingAccountName, setLiveEditingAccountName] =
     useState(accountName)
@@ -102,13 +102,22 @@ export const AccountEditScreen: FC = () => {
     setLiveEditingAccountName(accountName)
   }, [accountName])
 
-  const accountSubtitle = pendingChangeGuardian
-    ? `${
-        pendingChangeGuardian.type === ChangeGuardian.ADDING
-          ? "Adding"
-          : "Removing"
-      } Argent Shield…`
-    : `Two-factor account protection`
+  const { status, type, hasGuardian } = liveAccountGuardianState
+  const isAdding = type === ChangeGuardian.ADDING
+
+  const accountSubtitle = useMemo(() => {
+    if (status === "ERROR") {
+      return isAdding
+        ? "Adding Argent Shield Failed"
+        : "Removing Argent Shield Failed"
+    }
+    if (status === "PENDING") {
+      return isAdding ? "Adding Argent Shield…" : "Removing Argent Shield…"
+    }
+    return "Two-factor account protection"
+  }, [isAdding, status])
+
+  const shieldIsLoading = liveAccountGuardianState.status === "PENDING"
 
   const handleDeploy = () => {
     const feeToken = getFeeToken(currentNetwork.id)?.address
@@ -176,16 +185,18 @@ export const AccountEditScreen: FC = () => {
                 leftIcon={
                   <ArgentShieldIcon
                     fontSize={"xl"}
-                    opacity={!pendingChangeGuardian ? 1 : 0.6}
+                    opacity={!shieldIsLoading ? 1 : 0.6}
                   />
                 }
                 rightIcon={
-                  pendingChangeGuardian ? (
+                  shieldIsLoading ? (
                     <Spinner size={"sm"} />
                   ) : (
                     <Switch
                       size={"lg"}
-                      isChecked={Boolean(account?.guardian)}
+                      isChecked={Boolean(
+                        shieldIsLoading ? isAdding : hasGuardian,
+                      )}
                       onChange={() =>
                         navigate(routes.shieldAccountStart(accountAddress))
                       }

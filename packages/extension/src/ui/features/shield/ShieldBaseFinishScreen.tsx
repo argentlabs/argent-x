@@ -34,18 +34,17 @@ const getShieldHeaderProps = ({
     }
   }
   const { status, type } = liveAccountGuardianState
+  const isAdding = type === ChangeGuardian.ADDING
   if (status === "ERROR") {
     return {
       icon: AlertIcon,
-      title:
-        type === ChangeGuardian.ADDING
-          ? "Adding Argent Shield Failed"
-          : "Removing Argent Shield Failed",
+      title: isAdding
+        ? "Adding Argent Shield Failed"
+        : "Removing Argent Shield Failed",
       subtitle: `${accountName} was not modified because the transaction failed. Please try again later`,
       variant: "danger",
     }
   }
-  const isAdding = type === ChangeGuardian.ADDING
   if (status === "PENDING") {
     return {
       icon: isAdding ? ArgentShieldIcon : ArgentShieldDeactivateIcon,

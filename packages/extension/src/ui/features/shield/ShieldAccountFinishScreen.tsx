@@ -28,7 +28,6 @@ export const ShieldAccountFinishScreen: FC = () => {
     <ShieldBaseFinishScreen
       accountName={accountName}
       liveAccountGuardianState={liveAccountGuardianState}
-      guardian={account?.guardian}
       returnRoute={returnRoute}
     />
   )
