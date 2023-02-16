@@ -11,7 +11,7 @@ test.describe("Account settings", () => {
     await extension.network.selectNetwork("Localhost 5050")
     const [accountName1] = await extension.account.addAccount({})
 
-    await extension.settingsButton.click()
+    await extension.navigation.showSettings.click()
     await extension.settings.account(accountName1!).click()
     await extension.settings.setAccountName("My new account name")
     await expect(extension.settings.accountName).toHaveValue(
@@ -30,7 +30,7 @@ test.describe("Account settings", () => {
     await extension.network.selectNetwork("Localhost 5050")
     const [accountName1] = await extension.account.addAccount({})
 
-    await extension.settingsButton.click()
+    await extension.navigation.showSettings.click()
     await extension.settings.account(accountName1!).click()
     await extension.settings.exportPrivateKey.click()
     await extension.account.password.fill(config.password)
@@ -55,7 +55,7 @@ test.describe("Account settings", () => {
     await extension.network.selectNetwork("Testnet 2")
     const [accountName1] = await extension.account.addAccount({})
 
-    await extension.settingsButton.click()
+    await extension.navigation.showSettings.click()
     await extension.settings.account(accountName1!).click()
     await extension.settings.hideAccount.click()
     await extension.settings.confirmHide.click()
@@ -77,12 +77,26 @@ test.describe("Account settings", () => {
     await extension.network.selectNetwork("Localhost 5050")
     const [accountName1] = await extension.account.addAccount({})
 
-    await extension.settingsButton.click()
+    await extension.navigation.showSettings.click()
     await extension.settings.account(accountName1!).click()
     await extension.settings.deleteAccount.click()
     await extension.settings.confirmDelete.click()
 
     await expect(extension.account.account(accountName1!)).toBeHidden()
     await expect(extension.settings.hiddenAccounts).toBeHidden()
+  })
+
+  test("User should be able unlock wallet using password", async ({
+    extension,
+  }) => {
+    await extension.wallet.newWalletOnboarding()
+    await extension.open()
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.navigation.showSettings.click()
+    await extension.navigation.lockWallet.click()
+
+    await extension.account.password.fill(config.password)
+    await extension.navigation.unlock.click()
+    await expect(extension.network.networkSelector).toBeVisible()
   })
 })

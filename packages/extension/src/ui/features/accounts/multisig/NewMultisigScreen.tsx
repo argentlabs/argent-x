@@ -53,7 +53,6 @@ export const NewMultisigScreen: FC = () => {
           break
         case "join": {
           const newAccount = await addAccount("multisig", true)
-          console.log("newAccount", newAccount)
           navigate(routes.multisigJoin())
           break
         }

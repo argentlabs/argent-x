@@ -8,6 +8,11 @@ const texts = {
     next: "Next",
     yes: "Yes",
     no: "No",
+    unlock: "Unlock",
+    showSettings: "Show settings",
+    lockWallet: "Lock wallet",
+    reset: "Reset",
+    confirmReset: "RESET",
   },
   account: {
     noAccounts: "You have no accounts on ",
