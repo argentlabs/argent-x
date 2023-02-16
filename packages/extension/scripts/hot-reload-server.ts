@@ -1,10 +1,10 @@
 import path from "path"
 
 import chokidar from "chokidar"
-import { debounce } from "lodash-es"
 import WebSocket from "ws"
 
 import { HOT_RELOAD_MESSAGE, HOT_RELOAD_PORT } from "../src/shared/utils/dev"
+import { debounce } from "./utils"
 
 /** watch webpack output changes to trigger reload */
 const watchChangesInPath = path.join(__dirname, "../dist")
