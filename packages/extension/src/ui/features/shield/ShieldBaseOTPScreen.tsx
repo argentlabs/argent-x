@@ -10,10 +10,11 @@ import { Center, HStack, PinInputField } from "@chakra-ui/react"
 import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
+import { z } from "zod"
 
-import { isFetcherError } from "../../../shared/api/fetcher"
 import {
   EmailVerificationStatus,
+  emailVerificationStatusErrorSchema,
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
 import { confirmEmail, requestEmail } from "../../../shared/shield/register"
@@ -149,8 +150,16 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
 
                   onOTPConfirmed()
                 } catch (e) {
-                  if (isFetcherError(e)) {
-                    if (e.responseJson.status === "notRequested") {
+                  const errorObject = z
+                    .object({
+                      message: z.string(),
+                    })
+                    .parse(e)
+                  const error = emailVerificationStatusErrorSchema.safeParse(
+                    JSON.parse(errorObject.message),
+                  )
+                  if (error.success) {
+                    if (error.data.responseJson.status === "notRequested") {
                       /** need to start verification over again */
                       toast({
                         title: "Please re-enter email",
@@ -162,7 +171,8 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                       return setError("otp", {
                         type: "manual",
                         message: getVerificationErrorMessage(
-                          e.responseJson.status as EmailVerificationStatus,
+                          error.data.responseJson
+                            .status as EmailVerificationStatus,
                         ),
                       })
                     }
