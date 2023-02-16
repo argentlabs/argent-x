@@ -40,7 +40,7 @@ export const MultisigDeleteModal: FC<MaxEthModalProps> = ({
           <Button w="100%" colorScheme="primary" onClick={onDelete}>
             Delete
           </Button>
-          <Button w="100%" colorScheme="neutrals" onClick={onClose}>
+          <Button w="100%" backgroundColor="neutrals.600" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>

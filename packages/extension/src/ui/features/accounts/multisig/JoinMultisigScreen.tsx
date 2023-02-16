@@ -1,13 +1,14 @@
 import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/ui"
-import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
+import { Box, Center, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import { utils } from "ethers"
 import { FC, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { IconWrapper } from "../../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
 import { recover } from "../../recovery/recovery.service"
 import { usePublicKey } from "../usePublicKey"
 
-const { CopyIcon } = icons
+const { CopyIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
@@ -41,6 +42,9 @@ export const JoinMultisigScreen: FC = () => {
         px={4}
         gap={6}
       >
+        <IconWrapper borderRadius="90">
+          <ShareIcon height="7" width="7" />
+        </IconWrapper>
         <H5>Share your signer key with the multisig creator</H5>
         <Box
           borderRadius="xl"
