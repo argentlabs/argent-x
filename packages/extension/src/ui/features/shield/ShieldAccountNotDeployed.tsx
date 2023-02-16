@@ -7,7 +7,7 @@ export const ShieldAccountNotDeployed: FC = () => {
     <ShieldHeader
       title={"Add Argent Shield"}
       subtitle={
-        "You must be deploy this account before Argent Shield can be added"
+        "You must deploy this account before Argent Shield can be added"
       }
     />
   )

@@ -1,7 +1,7 @@
 import path from "path"
 
 import chokidar from "chokidar"
-import { debounce } from "lodash"
+import { debounce } from "lodash-es"
 import WebSocket from "ws"
 
 import { HOT_RELOAD_MESSAGE, HOT_RELOAD_PORT } from "../src/shared/utils/dev"

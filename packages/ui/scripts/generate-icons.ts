@@ -4,7 +4,7 @@ import path from "path"
 import { Config, transform } from "@svgr/core"
 import fetch from "cross-fetch"
 import * as dotenv from "dotenv"
-import { camelCase, upperFirst } from "lodash"
+import { camelCase, upperFirst } from "lodash-es"
 
 dotenv.config()
 

@@ -12,8 +12,11 @@ import { FC } from "react"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
-} from "../../../../shared/token/price"
-import { getNftPicture, useAspectNft } from "../../accountNfts/aspect.service"
+} from "../../../../../../shared/token/price"
+import {
+  getNftPicture,
+  useAspectNft,
+} from "../../../../accountNfts/aspect.service"
 
 const { AlertIcon } = icons
 
