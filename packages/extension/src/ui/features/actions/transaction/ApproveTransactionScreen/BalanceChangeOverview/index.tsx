@@ -15,6 +15,7 @@ import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import {
+  isUnlimitedAmount,
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../../../shared/token/price"
@@ -239,7 +240,14 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                   </P4>
                                 </CopyTooltip>
 
-                                <P4 color="neutrals.400" fontWeight="bold">
+                                <P4
+                                  color={
+                                    isUnlimitedAmount(approval.amount.toFixed())
+                                      ? "red.50"
+                                      : "neutrals.400"
+                                  }
+                                  fontWeight="bold"
+                                >
                                   {prettifyTokenAmount({
                                     amount: approval.amount.toFixed(),
                                     ...approval.token,
