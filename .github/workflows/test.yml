@@ -11,7 +11,10 @@ jobs:
 
     services:
       devnet:
-        image: shardlabs/starknet-devnet:latest-seed0
+        image: shardlabs/starknet-devnet:latest
+        env:
+          - accounts: 1
+          - lite-mode: true
         ports:
           - 5050:5050
     env:
