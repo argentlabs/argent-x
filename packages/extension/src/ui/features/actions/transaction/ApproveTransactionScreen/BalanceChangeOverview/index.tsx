@@ -72,7 +72,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
               <P4 fontWeight="bold" color="neutrals.100">
                 Estimated balance change
               </P4>
-              <Tooltip label="The balance change after successful swap">
+              <Tooltip label="The estimated balance change after transaction execution">
                 <Text color="neutrals.300" cursor="pointer">
                   <InfoIcon />
                 </Text>
@@ -210,7 +210,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 <P4 fontWeight="bold" color="neutrals.300">
                                   Approved spending limit
                                 </P4>
-                                <Tooltip label="Amount approved for swap">
+                                <Tooltip label="The approved spending limit to one or multiple addresses after transaction execution">
                                   <Text color="neutrals.300" cursor="pointer">
                                     <InfoIcon />
                                   </Text>
