@@ -59,6 +59,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
   const isMainnet = useIsMainnet()
 
+  if (aggregatedData.length === 0) {
+    return null
+  }
+
   return (
     <Box borderRadius="xl">
       <Box backgroundColor="neutrals.700" px="3" py="2.5" borderTopRadius="xl">
