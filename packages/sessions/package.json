@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-sessions",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "Manage sessions for Argent X wallets",
   "keywords": [
     "starknet",

@@ -10,6 +10,7 @@ import {
   TokenDetails,
   TransactionSimulationTransfer,
 } from "../../../../shared/transactionSimulation/types"
+import { isEqualAddress } from "../../../services/addresses"
 import { useAspectContractAddresses } from "./../../accountNfts/aspect.service"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
@@ -300,6 +301,11 @@ export function apiTokenDetailsToToken({
     }
   }
 
+  // FIXME: This is a temporary solution until we have a better way to identify NFTs
+  const isKnownNftContract = nftContracts.some((nft) =>
+    isEqualAddress(nft, tokenAddress),
+  )
+
   // If the token is not in the tokensRecord, try to get it from the details
   if (details) {
     const token = {
@@ -316,10 +322,7 @@ export function apiTokenDetailsToToken({
         ...token,
         type: "erc20",
       }
-    } else if (
-      details.tokenType === "erc721" ||
-      nftContracts.includes(tokenAddress)
-    ) {
+    } else if (details.tokenType === "erc721" || isKnownNftContract) {
       return {
         ...token,
         tokenId,
@@ -334,8 +337,7 @@ export function apiTokenDetailsToToken({
   }
 
   // Check if the token is an NFT
-  // FIXME: This is a temporary solution until we have a better way to identify NFTs
-  if (nftContracts.includes(tokenAddress)) {
+  if (isKnownNftContract) {
     return {
       address: tokenAddress,
       name: "NFT",
@@ -355,5 +357,8 @@ export const transferAffectsBalance = (
   t: TransactionSimulationTransfer,
   account: Account,
 ): boolean => {
-  return t.from === account.address || t.to === account.address
+  return (
+    isEqualAddress(t.from, account.address) ||
+    isEqualAddress(t.to, account.address)
+  )
 }
