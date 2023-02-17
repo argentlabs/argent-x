@@ -1,4 +1,4 @@
-import { Call, constants } from "starknet"
+import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_SIMULATION_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
@@ -9,8 +9,6 @@ import type {
   TransactionSimulationApproval,
   TransactionSimulationTransfer,
 } from "./types"
-
-const supportedBackendSimulationChainIds = [constants.StarknetChainId.MAINNET]
 
 export const fetchTransactionSimulation = async ({
   transactions,
@@ -34,31 +32,30 @@ export const fetchTransactionSimulation = async ({
     throw data.error
   }
 
-  if (supportedBackendSimulationChainIds.includes(data.chainId)) {
-    try {
-      const { invocation, chainId } = data
+  try {
+    const { invocation, chainId } = data
 
-      const backendSimulation = await fetcherImpl(
-        ARGENT_TRANSACTION_SIMULATION_URL,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...invocation,
-            chainId,
-          }),
+    const backendSimulation = await fetcherImpl(
+      ARGENT_TRANSACTION_SIMULATION_URL,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      )
-      return backendSimulation
-    } catch (e) {
-      console.error("Failed to fetch transaction simulation from backend", e)
-      console.warn("Falling back to client-side simulation")
-    }
+        body: JSON.stringify({
+          ...invocation,
+          chainId,
+        }),
+      },
+    )
+    return backendSimulation
+  } catch (e) {
+    console.error("Failed to fetch transaction simulation from backend", e)
+    console.warn("Falling back to client-side simulation")
+
+    return doTransactionSimulation(transactions)
   }
-  return doTransactionSimulation(transactions)
 }
 
 export const doTransactionSimulation = async (transactions: Call | Call[]) => {
