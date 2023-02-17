@@ -47,6 +47,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   transactionReview,
 }) => {
   const aggregatedData = useAggregatedSimData(transactionSimulation)
+  console.log("aggregatedData", aggregatedData)
   const network = useCurrentNetwork()
   const transactionReviewWithType = useMemo(
     () => getTransactionReviewWithType(transactionReview),
@@ -58,6 +59,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   )
 
   const isMainnet = useIsMainnet()
+
+  if (aggregatedData.length === 0) {
+    return null
+  }
 
   return (
     <Box borderRadius="xl">
