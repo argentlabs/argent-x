@@ -31,8 +31,20 @@ export type WindowMessageType = MessageType & {
   extensionId: string
 }
 
-export const [sendMessage, messageStream, _waitForMessage] =
+export const [_sendMessage, messageStream, _waitForMessage] =
   getMessage<MessageType>("ARGENTX")
+
+export function sendMessage<T extends MessageType>(message: T) {
+  // remove all functions from the message object
+  // as they cannot be sent over the message bus (and make firefox crash)
+  const cleanMessage = JSON.parse(
+    JSON.stringify(message, (_, value) =>
+      typeof value === "function" ? undefined : value,
+    ),
+  )
+
+  return _sendMessage(cleanMessage)
+}
 
 export async function waitForMessage<
   K extends MessageType["type"],
