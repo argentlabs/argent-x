@@ -120,7 +120,6 @@ const isNonceManagedOnAccountContract = memoize(
     const id = getAccountIdentifier(account)
     // memoize for max 5 minutes
     const timestamp = Math.floor(Date.now() / 1000 / 60 / 5)
-    console.log(`isNonceManagedOnAccountContract: ${id}-${timestamp}`)
     return `${id}-${timestamp}`
   },
 )
