@@ -69,7 +69,7 @@ const Estimation: FC<any> = ({
   useEffect(() => {
     onErrorChange?.(hasError)
     // only rerun when error changes
-  }, [hasError])
+  }, [hasError, onErrorChange])
 
   return (
     <FieldGroup error={showError}>

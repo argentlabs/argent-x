@@ -15,6 +15,7 @@ import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import {
+  isUnlimitedAmount,
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../../../shared/token/price"
@@ -59,6 +60,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
   const isMainnet = useIsMainnet()
 
+  if (aggregatedData.length === 0) {
+    return null
+  }
+
   return (
     <Box borderRadius="xl">
       <Box backgroundColor="neutrals.700" px="3" py="2.5" borderTopRadius="xl">
@@ -72,7 +77,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
               <P4 fontWeight="bold" color="neutrals.100">
                 Estimated balance change
               </P4>
-              <Tooltip label="The balance change after successful swap">
+              <Tooltip label="The estimated balance change after transaction execution">
                 <Text color="neutrals.300" cursor="pointer">
                   <InfoIcon />
                 </Text>
@@ -87,7 +92,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
         pt="3.5"
         borderBottomRadius="xl"
       >
-        <Accordion allowToggle>
+        <Accordion allowToggle defaultIndex={!allTransferSafe ? 0 : undefined}>
           {aggregatedData.map(
             (
               { amount, recipients, token, usdValue, approvals, safe },
@@ -210,7 +215,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 <P4 fontWeight="bold" color="neutrals.300">
                                   Approved spending limit
                                 </P4>
-                                <Tooltip label="Amount approved for swap">
+                                <Tooltip label="The approved spending limit to one or multiple addresses after transaction execution">
                                   <Text color="neutrals.300" cursor="pointer">
                                     <InfoIcon />
                                   </Text>
@@ -239,7 +244,14 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                   </P4>
                                 </CopyTooltip>
 
-                                <P4 color="neutrals.400" fontWeight="bold">
+                                <P4
+                                  color={
+                                    isUnlimitedAmount(approval.amount.toFixed())
+                                      ? "red.50"
+                                      : "neutrals.400"
+                                  }
+                                  fontWeight="bold"
+                                >
                                   {prettifyTokenAmount({
                                     amount: approval.amount.toFixed(),
                                     ...approval.token,

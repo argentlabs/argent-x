@@ -25,9 +25,6 @@ export const useTransactionSimulationEnabled = () => {
     "privacyUseArgentServices",
   )
 
-  // const TRANSACTION_SIMULATION_ENABLED =
-  //   process.env.FEATURE_TRANSACTION_SIMULATION === "true"
-
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
     return ARGENT_TRANSACTION_SIMULATION_API_ENABLED
