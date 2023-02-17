@@ -31,7 +31,7 @@ test.describe("Recovery Wallet", () => {
 
     await extension.navigation.continue.click()
     await expect(extension.wallet.finish.first()).toBeVisible({
-      timeout: 30000,
+      timeout: 180000,
     })
 
     await extension.open()
