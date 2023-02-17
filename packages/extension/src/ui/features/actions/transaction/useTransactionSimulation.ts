@@ -12,6 +12,10 @@ import { ApiTransactionSimulationResponse } from "../../../../shared/transaction
 import { argentApiFetcher } from "../../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
+import { useIsMainnet } from "../../networks/useNetworks"
+
+export const isTransactionSimulationEnabled =
+  (process.env.FEATURE_TRANSACTION_SIMULATION || "false") === "true"
 
 export interface IUseTransactionSimulation {
   account?: Account
@@ -25,8 +29,12 @@ export const useTransactionSimulationEnabled = () => {
     "privacyUseArgentServices",
   )
 
-  // const TRANSACTION_SIMULATION_ENABLED =
-  //   process.env.FEATURE_TRANSACTION_SIMULATION === "true"
+  /** only Mainnet is supported right now */
+  const isMainnet = useIsMainnet()
+
+  if (!isTransactionSimulationEnabled || !isMainnet) {
+    return false
+  }
 
   /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
   if (!isPrivacySettingsEnabled) {
