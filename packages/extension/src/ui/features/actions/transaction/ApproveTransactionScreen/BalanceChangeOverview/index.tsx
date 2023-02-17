@@ -15,6 +15,7 @@ import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import {
+  isUnlimitedAmount,
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../../../shared/token/price"
@@ -58,7 +59,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
   )
 
   const isMainnet = useIsMainnet()
-
+  console.log(aggregatedData)
   return (
     <Box borderRadius="xl">
       <Box backgroundColor="neutrals.700" px="3" py="2.5" borderTopRadius="xl">
@@ -87,7 +88,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
         pt="3.5"
         borderBottomRadius="xl"
       >
-        <Accordion allowToggle>
+        <Accordion allowToggle defaultIndex={!allTransferSafe ? 0 : undefined}>
           {aggregatedData.map(
             (
               { amount, recipients, token, usdValue, approvals, safe },
@@ -160,7 +161,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               fontWeight="bold"
                             >
                               {prettifyTokenAmount({
-                                amount: amount.toFixed(),
+                                amount: isUnlimitedAmount(amount.toFixed())
+                                  ? 0
+                                  : amount.toFixed(),
                                 decimals: token.decimals,
                                 symbol:
                                   token.type === "erc20" ? token.symbol : "NFT",
@@ -171,9 +174,11 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                             {/** 0 usdValue means we don't have any value */}
                             {isMainnet && !!usdValue && !usdValue.isZero() && (
                               <L2 color="neutrals.300">
-                                {prettifyCurrencyValue(
-                                  usdValue.abs().toString(),
-                                )}
+                                {isUnlimitedAmount(amount.toFixed())
+                                  ? "$0.0"
+                                  : prettifyCurrencyValue(
+                                      usdValue.abs().toString(),
+                                    )}
                               </L2>
                             )}
                           </Flex>
@@ -239,7 +244,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                   </P4>
                                 </CopyTooltip>
 
-                                <P4 color="neutrals.400" fontWeight="bold">
+                                <P4 color="error.500" fontWeight="bold">
                                   {prettifyTokenAmount({
                                     amount: approval.amount.toFixed(),
                                     ...approval.token,
