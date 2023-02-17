@@ -1,8 +1,6 @@
 import { isNumber } from "lodash-es"
-import { FC, PropsWithChildren, ReactNode, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { FC, PropsWithChildren, ReactNode } from "react"
 import styled from "styled-components"
-import browser from "webextension-polyfill"
 
 import { PressableButton } from "../../../../components/Button"
 import {
@@ -13,13 +11,7 @@ import {
 import { ArrowBackIcon } from "../../../../components/Icons/MuiIcons"
 import { Title } from "../../../../components/Page"
 import { StepIndicator } from "../../../../components/StepIndicator"
-import { routes } from "../../../../routes"
-import { isInitialized } from "../../../../services/backgroundSessions"
 import { P3 } from "../../../../theme/Typography"
-import {
-  useExtensionIsInTab,
-  useOpenExtensionInTab,
-} from "../../../browser/tabs"
 import LogoSvg from "../../../lock/logo.svg"
 
 export interface CreateMultisigScreen extends PropsWithChildren {
@@ -29,6 +21,7 @@ export interface CreateMultisigScreen extends PropsWithChildren {
   length?: number
   currentIndex?: number
   icon?: ReactNode
+  goBack?: () => void
 }
 
 const Header = styled.div`
@@ -71,15 +64,14 @@ export const CreateMultisigScreen: FC<CreateMultisigScreen> = ({
   length = 3,
   currentIndex,
   icon = <LogoSvg />,
+  goBack,
 }) => {
-  const navigate = useNavigate()
-
   const indicator = isNumber(length) && isNumber(currentIndex)
 
   return (
     <StyledPageWrapper>
-      {back && (
-        <BackButton variant="neutrals800" onClick={() => navigate(-1)}>
+      {back && goBack && (
+        <BackButton variant="neutrals800" onClick={() => goBack()}>
           <ArrowBackIcon />
         </BackButton>
       )}
