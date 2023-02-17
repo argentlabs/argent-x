@@ -7,8 +7,9 @@ import {
   SkeletonCircle,
 } from "@chakra-ui/react"
 import BigNumber from "bignumber.js"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 
+import { generateAvatarImage } from "../../../../../../shared/avatarImage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
@@ -17,6 +18,7 @@ import {
   getNftPicture,
   useAspectNft,
 } from "../../../../accountNfts/aspect.service"
+import { getColor } from "../../../../accounts/accounts.service"
 
 const { AlertIcon } = icons
 
@@ -45,15 +47,23 @@ export const NftDetails: FC<NftDetailsProps> = ({
   amount,
   usdValue,
 }) => {
-  const { data: nft, isValidating } = useAspectNft(
+  const { data: fetchedNft, isValidating } = useAspectNft(
     contractAddress,
     tokenId,
     networkId,
   )
 
-  if (!nft) {
-    return <></>
-  }
+  const nft = useMemo(
+    () => ({
+      name: "Unknown NFT",
+      description: "Unknown NFT",
+      image_url_copy: generateAvatarImage("Unknown NFT", {
+        background: getColor(contractAddress),
+      }),
+      ...fetchedNft,
+    }),
+    [contractAddress, fetchedNft],
+  )
 
   const buttonDisabled = isDisabled || isValidating
 
