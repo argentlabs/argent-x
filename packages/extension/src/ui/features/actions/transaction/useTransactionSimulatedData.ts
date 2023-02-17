@@ -196,7 +196,8 @@ export const useAggregatedSimData = (
     >(
       mergedRecords,
       (acc, transfers, key) => {
-        const approvalsForTokens = approvalsRecord[key]
+        const approvalsForTokens: ValidatedTokenApproval[] =
+          approvalsRecord[key]
         const transfersExist = Boolean(transfersRecord[key])
 
         const approvals: ApprovalSimulationData[] =
@@ -209,6 +210,20 @@ export const useAggregatedSimData = (
               usdValue: a.usdValue ? BigNumber(a.usdValue) : undefined,
             }))
             .filter((a) => a.owner === account?.address) ?? []
+
+        if (approvalsForTokens && !transfersExist) {
+          return {
+            ...acc,
+            [key]: {
+              token: approvalsForTokens[0].token,
+              approvals,
+              amount: ZERO,
+              usdValue: undefined,
+              recipients: [],
+              safe: false,
+            },
+          }
+        }
 
         const amount = transfers.reduce<BigNumber>((acc, t) => {
           const isTokenTranfer = checkIsTokenTransfer(t)

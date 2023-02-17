@@ -161,9 +161,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               fontWeight="bold"
                             >
                               {prettifyTokenAmount({
-                                amount: isUnlimitedAmount(amount.toFixed())
-                                  ? 0
-                                  : amount.toFixed(),
+                                amount: amount.toFixed(),
                                 decimals: token.decimals,
                                 symbol:
                                   token.type === "erc20" ? token.symbol : "NFT",
@@ -174,11 +172,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                             {/** 0 usdValue means we don't have any value */}
                             {isMainnet && !!usdValue && !usdValue.isZero() && (
                               <L2 color="neutrals.300">
-                                {isUnlimitedAmount(amount.toFixed())
-                                  ? "$0.0"
-                                  : prettifyCurrencyValue(
-                                      usdValue.abs().toString(),
-                                    )}
+                                {prettifyCurrencyValue(
+                                  usdValue.abs().toString(),
+                                )}
                               </L2>
                             )}
                           </Flex>
