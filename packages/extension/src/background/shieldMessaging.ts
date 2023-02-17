@@ -11,6 +11,9 @@ import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import {
   addBackendAccount,
   getBackendAccounts,
+  register,
+  requestEmailAuthentication,
+  verifyEmail,
 } from "../shared/shield/backend/account"
 import {
   ARGENT_SHIELD_ENABLED,
@@ -117,7 +120,40 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         })
       }
     }
-  }
+    case "SHIELD_REQUEST_EMAIL": {
+      const email = msg.data
+      try {
+        await requestEmailAuthentication(email)
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_EMAIL_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_EMAIL_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+    case "SHIELD_CONFIRM_EMAIL":
+      {
+        const code = msg.data
+        try {
+          const { userRegistrationStatus } = await verifyEmail(code)
 
-  throw new UnhandledMessage()
+          if (userRegistrationStatus === "notRegistered") {
+            await register()
+          }
+          return sendMessageToUi({
+            type: "SHIELD_CONFIRM_EMAIL_RES",
+          })
+        } catch (e) {
+          return sendMessageToUi({
+            type: "SHIELD_CONFIRM_EMAIL_REJ",
+            data: JSON.stringify(e),
+          })
+        }
+      }
+
+      throw new UnhandledMessage()
+  }
 }
