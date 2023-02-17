@@ -60,6 +60,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
   const isMainnet = useIsMainnet()
 
+
   if (aggregatedData.length === 0) {
     return null
   }
@@ -92,7 +93,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
         pt="3.5"
         borderBottomRadius="xl"
       >
-        <Accordion allowToggle>
+        <Accordion allowToggle defaultIndex={!allTransferSafe ? 0 : undefined}>
           {aggregatedData.map(
             (
               { amount, recipients, token, usdValue, approvals, safe },

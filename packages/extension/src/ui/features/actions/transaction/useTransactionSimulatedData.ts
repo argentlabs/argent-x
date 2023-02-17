@@ -183,16 +183,23 @@ export const useAggregatedSimData = (
       keyForGrouping,
     )
 
+    const mergedRecords = groupBy(
+      [...transfersWithValidatedTokens, ...approvalsWithValidatedTokens],
+      keyForGrouping,
+    )
+
     const ZERO = BigNumber(0)
     const ONE = BigNumber(1)
 
     return reduce<
-      Dictionary<ValidatedTokenTransfer[]>,
+      Dictionary<(ValidatedTokenTransfer | ValidatedTokenApproval)[]>,
       Record<string, AggregatedSimData>
     >(
-      transfersRecord,
+      mergedRecords,
       (acc, transfers, key) => {
-        const approvalsForTokens = approvalsRecord[key]
+        const approvalsForTokens: ValidatedTokenApproval[] =
+          approvalsRecord[key]
+        const transfersExist = Boolean(transfersRecord[key])
 
         const approvals: ApprovalSimulationData[] =
           approvalsForTokens
@@ -205,8 +212,23 @@ export const useAggregatedSimData = (
             }))
             .filter((a) => a.owner === account?.address) ?? []
 
+        if (approvalsForTokens && !transfersExist) {
+          return {
+            ...acc,
+            [key]: {
+              token: approvalsForTokens[0].token,
+              approvals,
+              amount: ZERO,
+              usdValue: undefined,
+              recipients: [],
+              safe: false,
+            },
+          }
+        }
+
         const amount = transfers.reduce<BigNumber>((acc, t) => {
-          if (t.from === account?.address) {
+          const isTokenTranfer = checkIsTokenTransfer(t)
+          if (isTokenTranfer && t.from === account?.address) {
             return t.token.type === "erc721" ? acc.minus(1) : acc.minus(t.value)
           }
 
@@ -217,8 +239,9 @@ export const useAggregatedSimData = (
           if (!t.usdValue) {
             return acc
           }
+          const isTokenTranfer = checkIsTokenTransfer(t)
 
-          if (t.from === account?.address) {
+          if (isTokenTranfer && t.from === account?.address) {
             return acc.minus(t.usdValue)
           }
 
@@ -229,7 +252,10 @@ export const useAggregatedSimData = (
           const amount = t.token.type === "erc721" ? ONE : BigNumber(t.value)
 
           const negated = amount.negated()
-
+          const isTokenTranfer = checkIsTokenTransfer(t)
+          if (!isTokenTranfer) {
+            return []
+          }
           return [
             ...acc,
             {
@@ -245,7 +271,7 @@ export const useAggregatedSimData = (
           ZERO,
         )
 
-        const safe = totalApprovalAmount.lte(amount.abs())
+        const safe = totalApprovalAmount.lte(amount.abs()) && transfersExist
 
         return {
           ...acc,
@@ -275,6 +301,12 @@ export const useAggregatedSimData = (
 
     return orderAggregatedSimData(aggregatedDataValues)
   }, [aggregatedData])
+}
+
+function checkIsTokenTransfer(
+  transfer: ValidatedTokenTransfer | ValidatedTokenApproval,
+): transfer is ValidatedTokenTransfer {
+  return (transfer as ValidatedTokenTransfer).from !== undefined
 }
 
 export function apiTokenDetailsToToken({
