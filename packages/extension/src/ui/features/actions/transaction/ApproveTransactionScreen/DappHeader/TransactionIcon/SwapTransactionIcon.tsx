@@ -1,7 +1,7 @@
 import { Box, Center, Image, SystemStyleObject } from "@chakra-ui/react"
 
 import { Network } from "../../../../../../../shared/network"
-import { TransactionReviewWithType } from "../../../../../../../shared/transactionReview.service"
+import { ApiTransactionReview } from "../../../../../../../shared/transactionReview.service"
 import { useToken } from "../../../../../accountTokens/tokens.state"
 import { UnknownTokenIcon } from "./UnknownTokenIcon"
 
@@ -9,16 +9,16 @@ export const SwapTransactionIcon = ({
   transaction,
   network,
 }: {
-  transaction: TransactionReviewWithType
+  transaction: ApiTransactionReview
   network: Network
 }) => {
   const srcToken = useToken({
-    address: transaction?.activity?.src?.token.address || "0x0",
+    address: transaction.activity?.src?.token.address || "0x0",
     networkId: network.id,
   })
 
   const dstToken = useToken({
-    address: transaction?.activity?.dst?.token.address || "0x0",
+    address: transaction.activity?.dst?.token.address || "0x0",
     networkId: network.id,
   })
   const token1Styling: SystemStyleObject = {
