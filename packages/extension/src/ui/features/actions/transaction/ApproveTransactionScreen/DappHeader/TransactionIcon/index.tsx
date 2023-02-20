@@ -39,12 +39,13 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   const nftTransfers = useERC721Transfers(aggregatedData)
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
 
-  if (!transactionReviewWithType) {
-    return <UnknownDappIcon />
-  }
-
+  // ignore transaction review if it is a DeclareContract transaction
   if (isDeclareContract) {
     return <DeclareContractIcon />
+  }
+
+  if (!transactionReviewWithType) {
+    return <UnknownDappIcon />
   }
 
   if (swapTxnReview) {
