@@ -188,7 +188,10 @@ export const openAspectNft = (
   window.open(url, "_blank")?.focus()
 }
 
-export const getNftPicture = ({ image_uri, image_url_copy }: AspectNft) => {
+export const getNftPicture = ({
+  image_uri,
+  image_url_copy,
+}: Pick<AspectNft, "image_uri" | "image_url_copy">) => {
   if (image_uri && image_url_copy) {
     if (!image_url_copy.startsWith("ipfs://")) {
       return image_url_copy

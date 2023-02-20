@@ -97,12 +97,19 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     [transactionSimulation],
   )
 
+  const txnHasApprovals = useMemo(
+    () => !isEmpty(transactionSimulation?.approvals),
+    [transactionSimulation],
+  )
+
   const isDeclareContract = useMemo(
     () => Boolean(declareContractPayload),
     [declareContractPayload],
   )
+
   // Show balance change if there is a transaction simulation and there are approvals or transfers
-  const hasBalanceChange = transactionSimulation && txnHasTransfers
+  const hasBalanceChange =
+    transactionSimulation && (txnHasTransfers || txnHasApprovals)
 
   // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
   const showTransactionActions =

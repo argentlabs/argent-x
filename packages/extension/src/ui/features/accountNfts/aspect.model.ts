@@ -28,8 +28,8 @@ export const AspectNftSchema = z.object({
   best_bid_order: z
     .object({
       payment_address: z.string(),
-      payment_amount: z.number().optional(),
-      payment_amount_per: z.number().optional(),
+      payment_amount: z.string().optional(),
+      payment_amount_per: z.string().optional(),
     })
     .optional()
     .nullable(),
