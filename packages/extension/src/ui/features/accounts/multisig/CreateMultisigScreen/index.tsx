@@ -1,5 +1,6 @@
 import { isNumber } from "lodash-es"
 import { FC, PropsWithChildren, ReactNode } from "react"
+import { render } from "react-dom"
 import styled from "styled-components"
 
 import { PressableButton } from "../../../../components/Button"
@@ -16,7 +17,7 @@ import LogoSvg from "../../../lock/logo.svg"
 
 export interface CreateMultisigScreen extends PropsWithChildren {
   back?: boolean
-  title?: string
+  title?: string | ReactNode
   subtitle?: string
   length?: number
   currentIndex?: number
@@ -81,7 +82,11 @@ export const CreateMultisigScreen: FC<CreateMultisigScreen> = ({
             <StepIndicator length={length} currentIndex={currentIndex} />
           )}
           <Header>
-            {title && <StyledTitle>{title}</StyledTitle>}
+            {title && typeof title === "string" ? (
+              <StyledTitle>{title}</StyledTitle>
+            ) : (
+              <>{title}</>
+            )}
             {subtitle && <StyledP3>{subtitle}</StyledP3>}
           </Header>
           {children}

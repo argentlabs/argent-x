@@ -1,5 +1,16 @@
 import { H1, P3 } from "@argent/ui"
-import { Box, Button, Center, Divider, Flex } from "@chakra-ui/react"
+import { icons } from "@argent/ui"
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Center,
+  Circle,
+  Divider,
+  Flex,
+  InputGroup,
+  InputRightElement,
+} from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
@@ -9,6 +20,8 @@ import { StyledControlledInput } from "../../../../components/InputText"
 import { FormError } from "../../../../theme/Typography"
 import { useSignerKey } from "../useSignerKey"
 import { CreateMultisigScreen } from "."
+
+const { CloseIcon, AddIcon, MinusIcon, TickCircleIcon } = icons
 
 const formSchema = z
   .object({
@@ -43,17 +56,27 @@ export const CreateMultisigStartScreen = () => {
     register,
     getValues,
   } = useForm<FieldValues>({
-    // criteriaMode: "firstError",
     mode: "all",
     resolver: zodResolver(formSchema),
   })
 
   const [currentStep, setStep] = useState(0)
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: "signerKeys",
     control,
   })
   const goNext = () => setStep((step) => step + 1)
+  const handleNavigationToConfirmationScreen = () => {
+    if (!errors.signerKeys) {
+      goNext()
+    }
+  }
+  const handleCreateMultisig = () => {
+    if (!errors) {
+      // create multisig here
+      goNext()
+    }
+  }
   const goBack = () => setStep((step) => step - 1)
   return (
     <>
@@ -83,14 +106,21 @@ export const CreateMultisigStartScreen = () => {
             return (
               <Box key={field.id} my="2" width="100%">
                 <P3 mb="1">Owner {index + 2}</P3>
-                <StyledControlledInput
-                  placeholder="Signer key..."
-                  {...register(`signerKeys.${index}.key` as const, {
-                    required: true,
-                  })}
-                  control={control}
-                  className={errors?.signerKeys?.[index]?.key ? "error" : ""}
-                />
+                <InputGroup display="flex" alignItems="center">
+                  <StyledControlledInput
+                    placeholder="Signer key..."
+                    {...register(`signerKeys.${index}.key` as const, {
+                      required: true,
+                    })}
+                    control={control}
+                    className={errors?.signerKeys?.[index]?.key ? "error" : ""}
+                  />
+                  <InputRightElement my="auto">
+                    <RoundButton onClick={() => remove(index)}>
+                      <CloseIcon />
+                    </RoundButton>
+                  </InputRightElement>
+                </InputGroup>
                 {errors.signerKeys && (
                   <FormError>
                     {errors.signerKeys?.[index]?.key?.message}
@@ -108,7 +138,10 @@ export const CreateMultisigStartScreen = () => {
               + Add another owner
             </Button>
           </Center>
-          <Button colorScheme="primary" onClick={() => goNext()}>
+          <Button
+            colorScheme="primary"
+            onClick={handleNavigationToConfirmationScreen}
+          >
             Next
           </Button>
         </CreateMultisigScreen>
@@ -130,22 +163,31 @@ export const CreateMultisigStartScreen = () => {
               render={({ field }) => (
                 <>
                   <Center>
-                    <Flex direction="column">
-                      <Flex alignItems="space-between" width="100%">
+                    <Flex direction="column" width="100%">
+                      <Flex
+                        justifyContent="space-between"
+                        width="100%"
+                        p="3"
+                        backgroundColor="neutrals.800"
+                        borderRadius="8px"
+                        mb="1.5"
+                      >
                         <Button
                           borderRadius="90"
                           backgroundColor="neutrals.900"
                           onClick={() => field.onChange(field.value - 1)}
+                          px="1em"
                         >
-                          -
+                          <MinusIcon />
                         </Button>
                         <H1>{field.value}</H1>
                         <Button
                           borderRadius="90"
                           backgroundColor="neutrals.900"
                           onClick={() => field.onChange(field.value + 1)}
+                          px="1em"
                         >
-                          +
+                          <AddIcon />
                         </Button>
                       </Flex>
                       <Center>
@@ -160,7 +202,7 @@ export const CreateMultisigStartScreen = () => {
               <FormError>{errors.confirmations.message}</FormError>
             )}
           </Box>
-          <Button colorScheme="primary" onClick={() => goNext()}>
+          <Button colorScheme="primary" onClick={handleCreateMultisig} mt="3">
             Create multisig
           </Button>
         </CreateMultisigScreen>
@@ -169,7 +211,12 @@ export const CreateMultisigStartScreen = () => {
         <CreateMultisigScreen
           subtitle="Reopen the Argent X extension and add funds to your multisig to activate"
           currentIndex={THIRD_STEP}
-          title="Multisig created"
+          title={
+            <H1 display="flex">
+              Multisig created{" "}
+              <TickCircleIcon color="#3ED373" alignSelf="flex-end" ml="1" />
+            </H1>
+          }
           goBack={goBack}
           back={true}
         >
@@ -179,5 +226,30 @@ export const CreateMultisigStartScreen = () => {
         </CreateMultisigScreen>
       )}
     </>
+  )
+}
+
+const RoundButton = ({ onClick, children }: ButtonProps) => {
+  return (
+    <Button
+      onClick={onClick}
+      height="5"
+      size="xs"
+      mr="2"
+      my="0"
+      mt="0.5em"
+      pb="0"
+      variant="link"
+    >
+      <Circle
+        backgroundColor="neutrals.800"
+        p="0.5em"
+        _hover={{
+          backgroundColor: "neutrals.600",
+        }}
+      >
+        {children}
+      </Circle>
+    </Button>
   )
 }
