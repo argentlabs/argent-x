@@ -120,6 +120,59 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         })
       }
     }
+    case "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS": {
+      if (!ARGENT_SHIELD_ENABLED) {
+        /** should never happen */
+        throw new Error("Argent Shield is not enabled")
+      }
+
+      if (!ARGENT_SHIELD_NETWORK_ID) {
+        /** should never happen */
+        throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
+      }
+
+      /** Check if account is valid for current wallet and exists in backend */
+      try {
+        const selectedAccount = await wallet.getSelectedAccount()
+
+        if (!selectedAccount) {
+          throw Error("no selected account")
+        }
+        const backendAccounts = await getBackendAccounts()
+
+        if (!backendAccounts.length) {
+          throw new Error("Account not added to Argent Services")
+        }
+
+        const existingAccount = backendAccounts.find(
+          (x) =>
+            number.hexToDecimalString(x.address) ===
+            number.hexToDecimalString(selectedAccount.address),
+        )
+
+        let guardianAddress: string | undefined
+
+        if (existingAccount) {
+          guardianAddress = existingAccount.guardianAddresses[0]
+        }
+        if (!guardianAddress) {
+          throw new Error(
+            "Unable to fetch Guardian address from Argent Services",
+          )
+        }
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_RES",
+          data: {
+            guardianAddress,
+          },
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_REJ",
+          data: `${error}`,
+        })
+      }
+    }
     case "SHIELD_REQUEST_EMAIL": {
       const email = msg.data
       try {

@@ -5,6 +5,12 @@ export type ShieldMessage =
       data: { guardianAddress: string }
     }
   | { type: "SHIELD_VALIDATE_ACCOUNT_REJ"; data: string }
+  | { type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS" }
+  | {
+      type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_RES"
+      data: { guardianAddress: string }
+    }
+  | { type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_REJ"; data: string }
   | { type: "SHIELD_REQUEST_EMAIL"; data: string }
   | {
       type: "SHIELD_REQUEST_EMAIL_RES"

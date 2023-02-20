@@ -25,3 +25,18 @@ export const confirmEmail = async (code: string) => {
 
   return result
 }
+
+export const shieldRequestAccountGuardianAddress = async () => {
+  sendMessage({ type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS" })
+
+  const result = await Promise.race([
+    waitForMessage("SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_RES"),
+    waitForMessage("SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_REJ").then(
+      (error) => {
+        throw new Error(error)
+      },
+    ),
+  ])
+
+  return result
+}
