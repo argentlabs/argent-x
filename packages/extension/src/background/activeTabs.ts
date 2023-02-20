@@ -1,11 +1,11 @@
 import browser from "webextension-polyfill"
 
-import { MessageType } from "../shared/messages"
-import { sendMessage } from "../shared/messages"
+import { MessageType, sendMessage } from "../shared/messages"
 
 interface Tab {
   id: number
   host: string
+  port: browser.runtime.Port
 }
 const activeTabs: Tab[] = []
 
@@ -48,9 +48,8 @@ export async function sendMessageToHost(
   host: string,
 ): Promise<void> {
   const tabIds = getTabIdsOfHost(host)
-  await Promise.allSettled(
-    tabIds.map((tabId) => sendMessage(message, { tabId })),
-  )
+  const tabs = activeTabs.filter((tab) => tabIds.includes(tab.id))
+  await Promise.allSettled(tabs.map((tab) => tab.port.postMessage(message)))
 }
 
 export async function sendMessageToActiveTabs(
@@ -63,8 +62,9 @@ export async function sendMessageToActiveTabs(
     ...activeTabs.map((tab) => tab.id),
     ...additionalTargets,
   ])) {
-    if (tabId !== undefined) {
-      promises.push(sendMessage(message, { tabId }))
+    const tab = activeTabs.find((tab) => tab.id === tabId)
+    if (tab) {
+      promises.push(tab.port.postMessage(message))
     }
   }
   await Promise.allSettled(promises)

@@ -80,6 +80,7 @@
     "@argent/x-multicall": "^5.3.1",
     "@argent/x-sessions": "^5.3.1",
     "@argent/x-swap": "^5.3.1",
+    "@argent/x-window": "^6.0.1",
     "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/react": "2.4.9",
     "@extend-chrome/messages": "^1.2.2",

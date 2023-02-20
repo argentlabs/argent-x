@@ -133,7 +133,10 @@ const safeMessages: MessageType["type"][] = [
   "DECLARE_CONTRACT_ACTION_SUBMITTED",
 ]
 
-messageStream.subscribe(async ([msg, sender]) => {
+const handleMessage = async (
+  [msg, sender]: [MessageType, browser.runtime.MessageSender],
+  port?: browser.runtime.Port,
+) => {
   await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages
 
   const messagingKeys = await getMessagingKeys()
@@ -156,8 +159,8 @@ messageStream.subscribe(async ([msg, sender]) => {
 
   const extensionUrl = browser.extension.getURL("")
   const safeOrigin = extensionUrl.replace(/\/$/, "")
-  const origin = sender.origin ?? sender.url // Firefox uses url, Chrome uses origin
-  const isSafeOrigin = Boolean(origin?.startsWith(safeOrigin))
+  const { origin } = new URL(sender.origin ?? sender.url ?? "") // Firefox uses url, Chrome uses origin
+  const isSafeOrigin = Boolean(origin === safeOrigin)
 
   if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
     console.warn(
@@ -167,12 +170,13 @@ messageStream.subscribe(async ([msg, sender]) => {
   }
 
   // forward UI messages to rest of the tabs
-  if (isSafeOrigin && hasTab(sender.tab?.id)) {
-    sendMessageToActiveTabs(msg)
+  if (isSafeOrigin) {
+    if (hasTab(sender.tab?.id)) {
+      sendMessageToActiveTabs(msg)
+    }
   }
 
   const respond = async (msg: MessageType) => {
-    console.log("respond", msg)
     if (safeMessages.includes(msg.type)) {
       sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
     } else {
@@ -187,6 +191,7 @@ messageStream.subscribe(async ([msg, sender]) => {
         sender,
         background,
         messagingKeys,
+        port,
         respond,
       })
     } catch (error) {
@@ -197,7 +202,18 @@ messageStream.subscribe(async ([msg, sender]) => {
     }
     break
   }
+}
+
+browser.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener(async (msg, port) => {
+    const sender = port.sender
+    if (sender) {
+      handleMessage([msg, sender], port)
+    }
+  })
 })
+
+messageStream.subscribe(handleMessage)
 
 // open onboarding flow on initial install
 

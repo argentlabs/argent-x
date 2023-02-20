@@ -23,6 +23,7 @@ export class UnhandledMessage extends Error {
 interface HandlerParams<T> {
   msg: T
   sender: browser.runtime.MessageSender
+  port?: browser.runtime.Port
   background: BackgroundService
   messagingKeys: MessagingKeys
   respond: (msg: MessageType) => Promise<void>

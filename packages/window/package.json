@@ -30,8 +30,5 @@
   "peerDependencies": {
     "starknet": "^4.21.0"
   },
-  "dependencies": {
-    "get-starknet-core": "^2.0.0"
-  },
   "gitHead": "54c5d4dc549cc4d0ac044f7c0c1c80936becadde"
 }

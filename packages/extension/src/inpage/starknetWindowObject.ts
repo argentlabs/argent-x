@@ -1,13 +1,16 @@
-import { assertNever } from "./../ui/services/assertNever"
-import { getProvider } from "../shared/network/provider"
-import { ArgentXAccount } from "./ArgentXAccount"
-import { ArgentXAccount3, getProvider3 } from "./ArgentXAccount3"
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type {
   AccountChangeEventHandler,
   NetworkChangeEventHandler,
   StarknetWindowObject,
   WalletEvents,
-} from "./inpage.model"
+} from "@argent/x-window"
+
+import { assertNever } from "./../ui/services/assertNever"
+import { getProvider } from "../shared/network/provider"
+import { ArgentXAccount } from "./ArgentXAccount"
+import { ArgentXAccount3, getProvider3 } from "./ArgentXAccount3"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import {
