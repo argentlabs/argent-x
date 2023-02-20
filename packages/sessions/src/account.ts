@@ -30,6 +30,7 @@ import {
 
 export class SessionAccount extends Account implements AccountInterface {
   public merkleTree: merkle.MerkleTree
+  private openTransactions: string[] = []
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
@@ -135,6 +136,32 @@ export class SessionAccount extends Account implements AccountInterface {
     }
   }
 
+  // check for resolution of any transactions that are not yet counted by account's nonce
+  async getOpenTransactionsCount() {
+    const receipts = await Promise.all(
+      this.openTransactions
+        .filter((txHash) => !!txHash)
+        .map((txHash) => this.getTransactionReceipt(txHash)),
+    )
+    receipts.forEach((receipt) => {
+      // if the the transaction status is not "pending" (or prior), transaction should have been counted by nonce
+      if (
+        receipt &&
+        !["NOT_RECEIVED", "RECEIVED", "PENDING"].includes(receipt.status)
+      ) {
+        const removeIndex = this.openTransactions.indexOf(
+          receipt.transaction_hash,
+        )
+        if (removeIndex > -1) {
+          this.openTransactions.splice(removeIndex, 1)
+        }
+      }
+    })
+
+    // return the number of transactions not yet counted by nonce
+    return this.openTransactions.length
+  }
+
   /**
    * Invoke execute function in account contract
    *
@@ -172,9 +199,13 @@ export class SessionAccount extends Account implements AccountInterface {
 
     const version = number.toBN(hash.transactionVersion)
 
+    const optimisticNonce = transactionsDetail.nonce
+      ? nonce
+      : number.toBN(parseInt(nonce) + (await this.getOpenTransactionsCount()))
+
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
-      nonce,
+      nonce: optimisticNonce,
       maxFee,
       version,
       chainId: this.chainId,
@@ -188,7 +219,8 @@ export class SessionAccount extends Account implements AccountInterface {
 
     const calldata = transaction.fromCallsToExecuteCalldata(transactions)
 
-    return this.invokeFunction(
+    this.openTransactions.push("")
+    const invocation = this.invokeFunction(
       {
         contractAddress: this.address,
         calldata,
@@ -197,8 +229,23 @@ export class SessionAccount extends Account implements AccountInterface {
       {
         maxFee,
         version,
-        nonce,
+        nonce: optimisticNonce,
       },
     )
+    invocation.then((response) => {
+      const removeIndex = this.openTransactions.indexOf("")
+      if (removeIndex > -1) {
+        this.openTransactions[removeIndex] = response.transaction_hash
+      } else {
+        this.openTransactions.push(response.transaction_hash)
+      }
+    })
+    invocation.catch(() => {
+      const removeIndex = this.openTransactions.indexOf("")
+      if (removeIndex > -1) {
+        this.openTransactions.splice(removeIndex, 1)
+      }
+    })
+    return invocation
   }
 }
