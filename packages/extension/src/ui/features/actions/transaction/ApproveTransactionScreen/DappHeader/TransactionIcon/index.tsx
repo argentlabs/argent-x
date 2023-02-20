@@ -44,10 +44,6 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     return <DeclareContractIcon />
   }
 
-  if (!transactionReviewWithType) {
-    return <UnknownDappIcon />
-  }
-
   if (swapTxnReview) {
     return <SwapTransactionIcon network={network} transaction={swapTxnReview} />
   }
