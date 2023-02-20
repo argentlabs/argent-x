@@ -155,43 +155,48 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
 
                   onOTPConfirmed()
                 } catch (e) {
-                  const errorObject = z
-                    .object({
-                      message: z.string(),
-                    })
-                    .parse(e)
-                  const error = emailVerificationStatusErrorSchema.safeParse(
-                    JSON.parse(errorObject.message),
-                  )
-                  if (error.success) {
-                    if (error.data.responseJson.status === "notRequested") {
-                      /** need to start verification over again */
-                      toast({
-                        title: "Please re-enter email",
-                        status: "error",
-                        duration: 3000,
-                      })
-                      onOTPReEnterEmail()
-                    } else {
-                      return setError("otp", {
-                        type: "manual",
-                        message: getVerificationErrorMessage(
-                          error.data.responseJson
-                            .status as EmailVerificationStatus,
-                        ),
-                      })
-                    }
-                  }
+                  /** Email validation error */
                   const shieldError =
                     getShieldValidationErrorFromBackendError(e)
                   if (shieldError) {
-                    setShieldValdationError(shieldError)
-                  } else {
-                    return setError("otp", {
-                      type: "manual",
-                      message: "Unknown error - please try again later",
-                    })
+                    return setShieldValdationError(shieldError)
                   }
+                  /** Other possible error status from backend */
+                  try {
+                    const errorObject = z
+                      .object({
+                        message: z.string(),
+                      })
+                      .parse(e)
+                    const error = emailVerificationStatusErrorSchema.safeParse(
+                      JSON.parse(errorObject.message),
+                    )
+                    if (error.success) {
+                      if (error.data.responseJson.status === "notRequested") {
+                        /** need to start verification over again */
+                        toast({
+                          title: "Please re-enter email",
+                          status: "error",
+                          duration: 3000,
+                        })
+                        onOTPReEnterEmail()
+                      } else {
+                        return setError("otp", {
+                          type: "manual",
+                          message: getVerificationErrorMessage(
+                            error.data.responseJson
+                              .status as EmailVerificationStatus,
+                          ),
+                        })
+                      }
+                    }
+                  } catch {
+                    // couldn't parse the error
+                  }
+                  return setError("otp", {
+                    type: "manual",
+                    message: "Unknown error - please try again later",
+                  })
                 }
               })}
             >

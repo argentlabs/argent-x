@@ -23,7 +23,6 @@ import { validateEmailForAccounts } from "../shared/shield/validation"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { Wallet } from "./wallet"
 
 export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
   msg,
