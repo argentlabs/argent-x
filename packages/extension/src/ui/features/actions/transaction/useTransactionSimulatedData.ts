@@ -1,6 +1,13 @@
 import BigNumber from "bignumber.js"
 import type { Dictionary } from "lodash"
-import { flatten, groupBy, orderBy, partition, reduce } from "lodash-es"
+import {
+  flatten,
+  groupBy,
+  isEmpty,
+  orderBy,
+  partition,
+  reduce,
+} from "lodash-es"
 import { useMemo } from "react"
 
 import { TransactionSimulationApproval } from "./../../../../shared/transactionSimulation/types"
@@ -196,10 +203,13 @@ export const useAggregatedSimData = (
       Record<string, AggregatedSimData>
     >(
       mergedRecords,
-      (acc, transfers, key) => {
+      (acc, _, key) => {
         const approvalsForTokens: ValidatedTokenApproval[] =
           approvalsRecord[key]
-        const transfersExist = Boolean(transfersRecord[key])
+
+        const transfers: ValidatedTokenTransfer[] = transfersRecord[key]
+
+        const noTransfers = isEmpty(transfers)
 
         const approvals: ApprovalSimulationData[] =
           approvalsForTokens
@@ -212,7 +222,7 @@ export const useAggregatedSimData = (
             }))
             .filter((a) => a.owner === account?.address) ?? []
 
-        if (approvalsForTokens && !transfersExist) {
+        if (!isEmpty(approvalsForTokens) && noTransfers) {
           return {
             ...acc,
             [key]: {
@@ -271,7 +281,7 @@ export const useAggregatedSimData = (
           ZERO,
         )
 
-        const safe = totalApprovalAmount.lte(amount.abs()) && transfersExist
+        const safe = totalApprovalAmount.lte(amount.abs()) && !noTransfers
 
         return {
           ...acc,
@@ -306,7 +316,7 @@ export const useAggregatedSimData = (
 function checkIsTokenTransfer(
   transfer: ValidatedTokenTransfer | ValidatedTokenApproval,
 ): transfer is ValidatedTokenTransfer {
-  return (transfer as ValidatedTokenTransfer).from !== undefined
+  return "from" in transfer && transfer.from !== undefined
 }
 
 export function apiTokenDetailsToToken({
