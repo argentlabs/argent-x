@@ -23,6 +23,7 @@ import { validateEmailForAccounts } from "../shared/shield/validation"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
+import { Wallet } from "./wallet"
 
 export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
   msg,
@@ -40,7 +41,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
       }
 
-      /** Check if account is valid for current wallet and exists in backend */
+      /** Check if account is valid for current wallet */
       try {
         const selectedAccount = await wallet.getSelectedAccount()
         const starknetAccount = await wallet.getSelectedStarknetAccount()
@@ -67,7 +68,34 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           backendAccounts,
         })
 
+        return sendMessageToUi({
+          type: "SHIELD_VALIDATE_ACCOUNT_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_VALIDATE_ACCOUNT_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+    case "SHIELD_ADD_ACCOUNT": {
+      if (!ARGENT_SHIELD_ENABLED) {
+        /** should never happen */
+        throw new Error("Argent Shield is not enabled")
+      }
+
+      if (!ARGENT_SHIELD_NETWORK_ID) {
+        /** should never happen */
+        throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
+      }
+      try {
+        const selectedAccount = await wallet.getSelectedAccount()
+        if (!selectedAccount) {
+          throw Error("no account selected")
+        }
+
         /** Check if this account already exists in backend */
+        const backendAccounts = await getBackendAccounts()
 
         const existingAccount = backendAccounts.find(
           (x) =>
@@ -108,67 +136,14 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           throw new Error("Unable to add account")
         }
         return sendMessageToUi({
-          type: "SHIELD_VALIDATE_ACCOUNT_RES",
+          type: "SHIELD_ADD_ACCOUNT_RES",
           data: {
             guardianAddress,
           },
         })
       } catch (error) {
         return sendMessageToUi({
-          type: "SHIELD_VALIDATE_ACCOUNT_REJ",
-          data: `${error}`,
-        })
-      }
-    }
-    case "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS": {
-      if (!ARGENT_SHIELD_ENABLED) {
-        /** should never happen */
-        throw new Error("Argent Shield is not enabled")
-      }
-
-      if (!ARGENT_SHIELD_NETWORK_ID) {
-        /** should never happen */
-        throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
-      }
-
-      /** Check if account is valid for current wallet and exists in backend */
-      try {
-        const selectedAccount = await wallet.getSelectedAccount()
-
-        if (!selectedAccount) {
-          throw Error("no selected account")
-        }
-        const backendAccounts = await getBackendAccounts()
-
-        if (!backendAccounts.length) {
-          throw new Error("Account not added to Argent Services")
-        }
-
-        const existingAccount = backendAccounts.find(
-          (x) =>
-            number.hexToDecimalString(x.address) ===
-            number.hexToDecimalString(selectedAccount.address),
-        )
-
-        let guardianAddress: string | undefined
-
-        if (existingAccount) {
-          guardianAddress = existingAccount.guardianAddresses[0]
-        }
-        if (!guardianAddress) {
-          throw new Error(
-            "Unable to fetch Guardian address from Argent Services",
-          )
-        }
-        return sendMessageToUi({
-          type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_RES",
-          data: {
-            guardianAddress,
-          },
-        })
-      } catch (error) {
-        return sendMessageToUi({
-          type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_REJ",
+          type: "SHIELD_ADD_ACCOUNT_REJ",
           data: `${error}`,
         })
       }
@@ -187,26 +162,24 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         })
       }
     }
-    case "SHIELD_CONFIRM_EMAIL":
-      {
-        const code = msg.data
-        try {
-          const { userRegistrationStatus } = await verifyEmail(code)
+    case "SHIELD_CONFIRM_EMAIL": {
+      const code = msg.data
+      try {
+        const { userRegistrationStatus } = await verifyEmail(code)
 
-          if (userRegistrationStatus === "notRegistered") {
-            await register()
-          }
-          return sendMessageToUi({
-            type: "SHIELD_CONFIRM_EMAIL_RES",
-          })
-        } catch (e) {
-          return sendMessageToUi({
-            type: "SHIELD_CONFIRM_EMAIL_REJ",
-            data: JSON.stringify(e),
-          })
+        if (userRegistrationStatus === "notRegistered") {
+          await register()
         }
+        return sendMessageToUi({
+          type: "SHIELD_CONFIRM_EMAIL_RES",
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "SHIELD_CONFIRM_EMAIL_REJ",
+          data: JSON.stringify(e),
+        })
       }
-
-      throw new UnhandledMessage()
+    }
   }
+  throw new UnhandledMessage()
 }

@@ -26,16 +26,27 @@ export const confirmEmail = async (code: string) => {
   return result
 }
 
-export const shieldRequestAccountGuardianAddress = async () => {
-  sendMessage({ type: "SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS" })
+export const shieldValidateAccount = async () => {
+  sendMessage({ type: "SHIELD_VALIDATE_ACCOUNT" })
 
   const result = await Promise.race([
-    waitForMessage("SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_RES"),
-    waitForMessage("SHIELD_REQUEST_ACCOUNT_GUARDIAN_ADDRESS_REJ").then(
-      (error) => {
-        throw new Error(error)
-      },
-    ),
+    waitForMessage("SHIELD_VALIDATE_ACCOUNT_RES"),
+    waitForMessage("SHIELD_VALIDATE_ACCOUNT_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
+
+export const shieldAddAccount = async () => {
+  sendMessage({ type: "SHIELD_ADD_ACCOUNT" })
+
+  const result = await Promise.race([
+    waitForMessage("SHIELD_ADD_ACCOUNT_RES"),
+    waitForMessage("SHIELD_ADD_ACCOUNT_REJ").then((error) => {
+      throw new Error(error)
+    }),
   ])
 
   return result

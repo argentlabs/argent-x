@@ -3,7 +3,7 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
 
-import { shieldRequestAccountGuardianAddress } from "../../../shared/shield/register"
+import { shieldAddAccount } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { routes } from "../../routes"
@@ -38,7 +38,7 @@ export const ShieldAccountActionScreen: FC = () => {
         await accountChangeGuardian(account, constants.ZERO.toString())
       } else {
         // add
-        const { guardianAddress } = await shieldRequestAccountGuardianAddress()
+        const { guardianAddress } = await shieldAddAccount()
         await accountChangeGuardian(account, guardianAddress)
       }
     } catch (error) {
