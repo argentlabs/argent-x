@@ -229,7 +229,7 @@ export const useAggregatedSimData = (
               token: approvalsForTokens[0].token,
               approvals,
               amount: ZERO,
-              usdValue: undefined,
+              usdValue: ZERO,
               recipients: [],
               safe: false,
             },
