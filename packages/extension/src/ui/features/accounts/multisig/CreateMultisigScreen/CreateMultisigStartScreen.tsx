@@ -29,7 +29,8 @@ const formSchema = z
       .object({
         key: z.string().regex(/^[a-zA-Z0-9]{43}$/, "Incorrect signer key"),
       })
-      .array(),
+      .array()
+      .min(1, "You need at least one co-owner"),
     confirmations: z
       .number()
       .positive()
@@ -55,8 +56,8 @@ export const CreateMultisigStartScreen = () => {
     formState: { errors },
     register,
     getValues,
+    trigger,
   } = useForm<FieldValues>({
-    mode: "all",
     resolver: zodResolver(formSchema),
   })
 
@@ -67,9 +68,11 @@ export const CreateMultisigStartScreen = () => {
   })
   const goNext = () => setStep((step) => step + 1)
   const handleNavigationToConfirmationScreen = () => {
-    if (!errors.signerKeys) {
-      goNext()
-    }
+    trigger("signerKeys").then((isValid) => {
+      if (isValid) {
+        goNext()
+      }
+    })
   }
   const handleCreateMultisig = () => {
     if (!errors) {
@@ -129,6 +132,9 @@ export const CreateMultisigStartScreen = () => {
               </Box>
             )
           })}
+          {errors.signerKeys?.message && (
+            <FormError>{errors.signerKeys?.message}</FormError>
+          )}
           <Center width="100%">
             <Button
               variant="link"
