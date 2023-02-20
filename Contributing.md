@@ -14,9 +14,9 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 ## Development workflow
 
-ALways start from `develop` branch and merge back to `develop` branch.
+Always start from `develop` branch and merge back to `develop` branch.
 
-To build you changes run:
+To build your changes run:
 
 ```bash
 yarn build
