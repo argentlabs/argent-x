@@ -55,8 +55,6 @@ export const NewMultisigScreen: FC = () => {
           chrome.tabs.create({
             url,
           })
-
-          // navigate()
           break
         case "join": {
           const newAccount = await addAccount("multisig", true)
