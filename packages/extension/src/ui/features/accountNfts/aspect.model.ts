@@ -20,8 +20,12 @@ export const AspectNftContractSchema = z.object({
   symbol: z.string().nullable().optional(),
   schema: z.string(), // Might be useful in future
   name_custom: z.string().nullable(), // Collection Name
-  image_url: z.string(),
-  floor_list_price: z.string().transform((s) => BigNumber.from(s)),
+  image_url: z.string().nullable().optional(),
+  floor_list_price: z
+    .string()
+    .nullable()
+    .transform((s) => (s ? BigNumber.from(s) : undefined)) // BigNumber or undefined
+    .optional(),
 })
 
 export const AspectNftSchema = z.object({

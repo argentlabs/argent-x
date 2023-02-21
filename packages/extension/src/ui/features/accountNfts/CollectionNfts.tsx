@@ -83,14 +83,12 @@ export const CollectionNfts: FC = () => {
               borderRadius="lg"
             />
             <H4>{collectible?.name || "Loading..."}</H4>
-            <P4 color="neutrals.300">
-              Floor price:{" "}
-              {collectible.floorPrice ? (
-                <>{ethers.utils.formatEther(collectible.floorPrice)} ETH</>
-              ) : (
-                "-"
-              )}
-            </P4>
+            {collectible.floorPrice && (
+              <P4 color="neutrals.300">
+                Floor price: {ethers.utils.formatEther(collectible.floorPrice)}{" "}
+                ETH
+              </P4>
+            )}
           </Flex>
           <SimpleGrid
             gridTemplateColumns="repeat(auto-fill, 158px)"
