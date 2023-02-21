@@ -1,30 +1,19 @@
 import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/ui"
-import { Box, Center, Flex, Spinner, useClipboard } from "@chakra-ui/react"
-import { utils } from "ethers"
-import { FC, useEffect, useMemo } from "react"
+import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { IconWrapper } from "../../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
 import { recover } from "../../recovery/recovery.service"
-import { usePublicKey } from "../usePublicKey"
+import { useSignerKey } from "./useSignerKey"
 
 const { CopyIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
-  const pubKey = usePublicKey()
-  const { onCopy, setValue, hasCopied } = useClipboard("", 2000)
+  const { onCopy, hasCopied } = useClipboard("", 2000)
 
-  const encodedPubKey = useMemo(
-    () => pubKey && utils.base58.encode(pubKey),
-    [pubKey],
-  )
-
-  useEffect(() => {
-    if (encodedPubKey) {
-      setValue(encodedPubKey)
-    }
-  }, [encodedPubKey, setValue])
+  const { encodedPubKey, pubKey } = useSignerKey()
 
   const onDone = async () => {
     navigate(await recover({ showAccountList: true }))

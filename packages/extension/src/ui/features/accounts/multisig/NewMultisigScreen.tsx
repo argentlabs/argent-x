@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom"
 import { CustomButtonCell } from "../../../components/CustomButtonCell"
 import { routes } from "../../../routes"
 import { assertNever } from "../../../services/assertNever"
+import { useOpenExtensionInTab } from "../../browser/tabs"
 import { useAddAccount } from "../useAddAccount"
 
 const { AddIcon, MultisigJoinIcon } = icons
@@ -29,7 +30,7 @@ interface MultisigOption {
 
 const multisigOptions: MultisigOption[] = [
   {
-    title: "Create a new multisig",
+    title: "Create new multisig",
     type: "create",
     icon: <AddIcon />,
   },
@@ -49,7 +50,11 @@ export const NewMultisigScreen: FC = () => {
     async (type: MultisigOptionType) => {
       switch (type) {
         case "create":
-          navigate(routes.multisigCreate())
+          // eslint-disable-next-line no-case-declarations
+          const url = `index.html?initialHardReloadRoute=${routes.multisigCreate()}`
+          chrome.tabs.create({
+            url,
+          })
           break
         case "join": {
           const newAccount = await addAccount("multisig", true)
