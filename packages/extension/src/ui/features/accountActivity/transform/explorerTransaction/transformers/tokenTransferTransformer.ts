@@ -26,7 +26,7 @@ export default function ({
       const eventParameters = events?.[0]?.parameters
       const fromAddress =
         explorerTransaction.contractAddress ||
-        getParameter(eventParameters, "from_")
+        getParameter(eventParameters ?? undefined, "from_")
       const toAddress = getParameter(parameters, "recipient")
       const amount = getParameter(parameters, "amount")
       if (accountAddress && toAddress && fromAddress) {

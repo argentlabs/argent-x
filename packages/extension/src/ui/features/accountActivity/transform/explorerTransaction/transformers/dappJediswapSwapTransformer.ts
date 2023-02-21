@@ -26,8 +26,14 @@ export default function ({
         const dappContractAddress = call.address
         const fromTokenAddress = path[0]
         const toTokenAddress = path[path.length - 1]
-        const fromAmount = getParameter(event.parameters, "amount1In")
-        const toAmount = getParameter(event.parameters, "amount0Out")
+        const fromAmount = getParameter(
+          event.parameters ?? undefined,
+          "amount1In",
+        )
+        const toAmount = getParameter(
+          event.parameters ?? undefined,
+          "amount0Out",
+        )
         result = {
           ...result,
           action,

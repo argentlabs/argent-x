@@ -1,8 +1,8 @@
 import { IExplorerTransaction } from "@argent-x/extension/src/shared/explorer/type"
 import { defaultNetwork } from "@argent-x/extension/src/shared/network"
 import {
-  ITransactionListItem,
   TransactionListItem,
+  TransactionListItemProps,
 } from "@argent-x/extension/src/ui/features/accountActivity/TransactionListItem"
 import { transformExplorerTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform"
 import {
@@ -31,7 +31,7 @@ import { MemoryRouter } from "react-router-dom"
 import { tokensByNetwork } from "../../tokensByNetwork"
 
 interface ITransactionListItemWrapped
-  extends Omit<ITransactionListItem, "transactionTransformed"> {
+  extends Omit<TransactionListItemProps, "transactionTransformed"> {
   accountAddress: string
   explorerTransaction: IExplorerTransaction
 }
