@@ -69,9 +69,10 @@ export const CollectionSchema = z.object({
   name: z.string(),
   contractAddress: z.string(),
   nfts: AspectNftSchema.array(),
-  imageUri: z.string().optional(),
+  imageUri: z.string().nullable().optional(),
   floorPrice: z
     .string()
+    .nullable()
     .transform((s) => BigNumber.from(s))
     .optional(),
 })
