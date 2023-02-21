@@ -29,6 +29,7 @@ import { routes } from "../../routes"
 import { addressSchema, isEqualAddress } from "../../services/addresses"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { TokenMenu } from "../accountTokens/TokenMenu"
+import { getNftPicture } from "./aspect.service"
 import { useNfts } from "./useNfts"
 import { ViewOnMenu } from "./ViewOnMenu"
 
@@ -94,7 +95,7 @@ export const NftScreen: FC = () => {
             alignItems="center"
           >
             <Box
-              backgroundImage={nft.image_url_copy}
+              backgroundImage={getNftPicture(nft)}
               backgroundPosition="center"
               backgroundSize="cover"
               backgroundRepeat="no-repeat"
@@ -114,7 +115,7 @@ export const NftScreen: FC = () => {
                 borderColor="transparent"
                 borderRadius="lg"
                 alt={nft.name}
-                src={nft.image_url_copy}
+                src={getNftPicture(nft)}
               />
             )}
           </Box>

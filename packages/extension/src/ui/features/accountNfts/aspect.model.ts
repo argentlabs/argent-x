@@ -42,7 +42,11 @@ export const AspectNftSchema = z.object({
   name: z.string().optional(),
   description: z.string().nullable().optional(),
   image_uri: z.string().optional(),
-  image_url_copy: z.string().optional(),
+  image_url_copy: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((s) => s ?? undefined),
   animation_uri: z.string().nullable().optional(),
   external_uri: z.string().nullable().optional(),
   owner: AspectNftOwnerSchema.optional(),
