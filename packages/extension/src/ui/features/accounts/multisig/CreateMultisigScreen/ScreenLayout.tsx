@@ -2,13 +2,8 @@ import { H1, P2 } from "@argent/ui"
 import { Box, Button } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import { FC, PropsWithChildren, ReactNode } from "react"
-import styled from "styled-components"
 
-import {
-  ContentWrapper,
-  PageWrapper,
-  Panel,
-} from "../../../../components/FullScreenPage"
+import { ContentWrapper } from "../../../../components/FullScreenPage"
 import { ArrowBackIcon } from "../../../../components/Icons/MuiIcons"
 import { StepIndicator } from "../../../../components/StepIndicator"
 import LogoSvg from "../../../lock/logo.svg"
@@ -19,18 +14,47 @@ export interface CreateMultisigScreen extends PropsWithChildren {
   subtitle?: string
   length?: number
   currentIndex?: number
-  icon?: ReactNode
   goBack?: () => void
 }
 
-const StyledPageWrapper = styled(PageWrapper)`
-  ${({ theme }) => theme.mediaMinWidth.md`
-    > ${Panel}:last-child {
-      background:url('./assets/onboarding-background.svg') no-repeat center;
-      background-size: cover;
-    }
-  `}
-`
+const Panel = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <Box
+    display="flex"
+    flexDirection="column"
+    alignItems="center"
+    justifyContent="center"
+    width="100%"
+    padding="0 56px"
+    {...props}
+  />
+)
+
+const PageWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <Box
+      display="flex"
+      flexDirection={{ base: "column-reverse", md: "row" }}
+      alignItems="center"
+      justifyContent={{ base: "flex-end", md: "flex-start" }}
+      width="100%"
+      marginTop={{ base: "max(120px, 15vh)", md: 0 }}
+      height={{ md: "100vh" }}
+      {...props}
+    >
+      {props.children}
+      <Box
+        width={{ md: "40%" }}
+        display={{ md: "flex" }}
+        backgroundColor={{ md: "black" }}
+        height={{ md: "100%" }}
+        background={`url('./assets/onboarding-background.svg') no-repeat center`}
+        backgroundSize="cover"
+      >
+        <Panel> {/* <LogoSvg /> */}</Panel>
+      </Box>
+    </Box>
+  )
+}
 
 export const ScreenLayout: FC<CreateMultisigScreen> = ({
   back,
@@ -39,13 +63,12 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
   children,
   length = 3,
   currentIndex,
-  icon = <LogoSvg />,
   goBack,
 }) => {
   const indicator = isNumber(length) && isNumber(currentIndex)
 
   return (
-    <StyledPageWrapper>
+    <PageWrapper>
       {back && goBack && (
         <Button
           position="absolute"
@@ -82,7 +105,6 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
           {children}
         </ContentWrapper>
       </Panel>
-      <Panel>{icon}</Panel>
-    </StyledPageWrapper>
+    </PageWrapper>
   )
 }
