@@ -1,72 +1,62 @@
 import browser from "webextension-polyfill"
 
 import { MessageType, sendMessage } from "../shared/messages"
+import { ArrayStorage } from "../shared/storage"
 
 interface Tab {
   id: number
   host: string
   port: browser.runtime.Port
 }
-const activeTabs: Tab[] = []
+const activeTabs = new ArrayStorage<Tab>([], {
+  namespace: "core:activeTabs",
+  areaName: "session",
+  compare(a, b) {
+    return a.id === b.id
+  },
+})
 
-export function addTab(tab: Tab) {
-  if (tab.id !== undefined && !hasTab(tab.id)) {
-    activeTabs.push(tab)
+browser.tabs.onRemoved.addListener(removeTab)
+
+export async function addTab(tab: Tab) {
+  if (tab.id !== undefined) {
+    return activeTabs.push(tab)
   }
 }
 
 export function removeTab(tabId?: number) {
-  if (tabId !== undefined && hasTab(tabId)) {
-    activeTabs.splice(
-      activeTabs.findIndex((tab) => tab.id === tabId),
-      1,
-    )
-  }
+  return activeTabs.remove((tab) => tab.id === tabId)
 }
 
-export function hasTab(tabId?: number) {
+export async function hasTab(tabId?: number) {
   if (tabId === undefined) {
     return false
   }
-  return activeTabs.some((tab) => tab.id === tabId)
+  const [hit] = await activeTabs.get((tab) => tab.id === tabId)
+  return Boolean(hit)
 }
 
-browser.tabs.onRemoved.addListener(removeTab)
-
-export function getTabIdsOfHost(host: string) {
-  return activeTabs.filter((tab) => tab.host === host).map((tab) => tab.id)
-}
-
-export function removeTabOfHost(host: string) {
-  getTabIdsOfHost(host).forEach((tabId) => {
-    removeTab(tabId)
-  })
+export async function getTabIdsOfHost(host: string) {
+  const hits = await activeTabs.get((tab) => tab.host === host)
+  return hits ? hits.map((tab) => tab.id) : []
 }
 
 export async function sendMessageToHost(
   message: MessageType,
   host: string,
 ): Promise<void> {
-  const tabIds = getTabIdsOfHost(host)
-  const tabs = activeTabs.filter((tab) => tabIds.includes(tab.id))
+  const tabIds = await getTabIdsOfHost(host)
+  const tabs = await activeTabs.get((tab) => tabIds.includes(tab.id))
   await Promise.allSettled(tabs.map((tab) => tab.port.postMessage(message)))
 }
 
 export async function sendMessageToActiveTabs(
   message: MessageType,
-  additionalTargets: Array<number | undefined> = [],
 ): Promise<void> {
-  const promises = []
-  // Set avoids duplicates
-  for (const tabId of new Set([
-    ...activeTabs.map((tab) => tab.id),
-    ...additionalTargets,
-  ])) {
-    const tab = activeTabs.find((tab) => tab.id === tabId)
-    if (tab) {
-      promises.push(tab.port.postMessage(message))
-    }
-  }
+  const tabs = await activeTabs.get()
+
+  const promises = tabs.map((tab) => tab.port.postMessage(message))
+
   await Promise.allSettled(promises)
 }
 
@@ -74,10 +64,7 @@ export async function sendMessageToUi(message: MessageType) {
   await Promise.allSettled([sendMessage(message)])
 }
 
-export async function sendMessageToActiveTabsAndUi(
-  message: MessageType,
-  additionalTargets: Array<number | undefined> = [],
-) {
+export async function sendMessageToActiveTabsAndUi(message: MessageType) {
   await sendMessageToUi(message)
-  await sendMessageToActiveTabs(message, additionalTargets)
+  await sendMessageToActiveTabs(message)
 }

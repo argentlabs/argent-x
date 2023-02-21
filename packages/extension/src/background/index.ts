@@ -28,7 +28,10 @@ import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
 import { initOnboarding } from "./onboarding"
-import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
+import {
+  getOriginFromSender,
+  handlePreAuthorizationMessage,
+} from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { handleShieldMessage } from "./shieldMessaging"
@@ -159,7 +162,7 @@ const handleMessage = async (
 
   const extensionUrl = browser.extension.getURL("")
   const safeOrigin = extensionUrl.replace(/\/$/, "")
-  const { origin } = new URL(sender.origin ?? sender.url ?? "") // Firefox uses url, Chrome uses origin
+  const origin = getOriginFromSender(sender)
   const isSafeOrigin = Boolean(origin === safeOrigin)
 
   if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
@@ -171,16 +174,16 @@ const handleMessage = async (
 
   // forward UI messages to rest of the tabs
   if (isSafeOrigin) {
-    if (hasTab(sender.tab?.id)) {
-      sendMessageToActiveTabs(msg)
+    if (await hasTab(sender.tab?.id)) {
+      await sendMessageToActiveTabs(msg)
     }
   }
 
   const respond = async (msg: MessageType) => {
     if (safeMessages.includes(msg.type)) {
-      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
+      await sendMessageToActiveTabsAndUi(msg)
     } else {
-      sendMessageToUi(msg)
+      await sendMessageToUi(msg)
     }
   }
 
