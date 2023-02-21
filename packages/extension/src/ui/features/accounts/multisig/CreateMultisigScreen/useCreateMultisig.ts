@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { createNewAccount } from "../../../../services/backgroundAccounts"
+import { createNewMultisigAccount } from "../../../../services/backgroundAccounts"
 
 export const useCreateMultisig = () => {
   const [isError, setIsError] = useState(false)
@@ -13,7 +13,7 @@ export const useCreateMultisig = () => {
     networkId: string
     threshold: string
   }) => {
-    const result = await createNewAccount(networkId, "multisig", {
+    const result = await createNewMultisigAccount(networkId, {
       signers,
       threshold,
     })

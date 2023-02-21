@@ -28,7 +28,28 @@ export const createNewAccount = async (
       waitForMessage("NEW_ACCOUNT_REJ").then(() => "error" as const),
     ])
   } catch {
-    throw Error("Could add new account")
+    throw Error("Could not add new account")
+  }
+}
+
+export const createNewMultisigAccount = async (
+  networkId: string,
+  multisigPayload: MultisigPayload,
+) => {
+  sendMessage({
+    type: "NEW_MULTISIG_ACCOUNT",
+    data: {
+      networkId,
+      ...multisigPayload,
+    },
+  })
+  try {
+    return await Promise.race([
+      waitForMessage("NEW_MULTISIG_ACCOUNT_RES"),
+      waitForMessage("NEW_MULTISIG_ACCOUNT_REJ").then(() => "error" as const),
+    ])
+  } catch {
+    throw Error("Could not add new account")
   }
 }
 
