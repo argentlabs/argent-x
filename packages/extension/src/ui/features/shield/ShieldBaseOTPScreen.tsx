@@ -17,7 +17,12 @@ import {
   emailVerificationStatusErrorSchema,
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
-import { confirmEmail, requestEmail } from "../../../shared/shield/register"
+import {
+  confirmEmail,
+  requestEmail,
+  shieldAddAccount,
+  shieldValidateAccount,
+} from "../../../shared/shield/register"
 import {
   ShieldValidationErrorMessage,
   getShieldValidationErrorFromBackendError,
@@ -26,7 +31,6 @@ import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
-import { shieldValidateAccount } from "../../services/shieldAccount"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { ShieldValidationErrorScreen } from "./ShieldValidationErrorScreen"
 import { ShieldHeader } from "./ui/ShieldHeader"
@@ -144,49 +148,55 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
 
                   /** always check the account can be used and exists in backend */
                   await shieldValidateAccount()
+                  await shieldAddAccount()
 
-                  /** successfully verifified with backend - persist this email in the local db */
+                  /** successfully verifified and added account with backend - persist this email in the local db */
                   await updateVerifiedEmail(email)
 
                   onOTPConfirmed()
                 } catch (e) {
-                  const errorObject = z
-                    .object({
-                      message: z.string(),
-                    })
-                    .parse(e)
-                  const error = emailVerificationStatusErrorSchema.safeParse(
-                    JSON.parse(errorObject.message),
-                  )
-                  if (error.success) {
-                    if (error.data.responseJson.status === "notRequested") {
-                      /** need to start verification over again */
-                      toast({
-                        title: "Please re-enter email",
-                        status: "error",
-                        duration: 3000,
-                      })
-                      onOTPReEnterEmail()
-                    } else {
-                      return setError("otp", {
-                        type: "manual",
-                        message: getVerificationErrorMessage(
-                          error.data.responseJson
-                            .status as EmailVerificationStatus,
-                        ),
-                      })
-                    }
-                  }
+                  /** Email validation error */
                   const shieldError =
                     getShieldValidationErrorFromBackendError(e)
                   if (shieldError) {
-                    setShieldValdationError(shieldError)
-                  } else {
-                    return setError("otp", {
-                      type: "manual",
-                      message: "Unknown error - please try again later",
-                    })
+                    return setShieldValdationError(shieldError)
                   }
+                  /** Other possible error status from backend */
+                  try {
+                    const errorObject = z
+                      .object({
+                        message: z.string(),
+                      })
+                      .parse(e)
+                    const error = emailVerificationStatusErrorSchema.safeParse(
+                      JSON.parse(errorObject.message),
+                    )
+                    if (error.success) {
+                      if (error.data.responseJson.status === "notRequested") {
+                        /** need to start verification over again */
+                        toast({
+                          title: "Please re-enter email",
+                          status: "error",
+                          duration: 3000,
+                        })
+                        onOTPReEnterEmail()
+                      } else {
+                        return setError("otp", {
+                          type: "manual",
+                          message: getVerificationErrorMessage(
+                            error.data.responseJson
+                              .status as EmailVerificationStatus,
+                          ),
+                        })
+                      }
+                    }
+                  } catch {
+                    // couldn't parse the error
+                  }
+                  return setError("otp", {
+                    type: "manual",
+                    message: "Unknown error - please try again later",
+                  })
                 }
               })}
             >

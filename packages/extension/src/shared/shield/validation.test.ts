@@ -7,10 +7,57 @@ import {
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3,
   getLocalAccountsMatchBackendAccounts,
+  getShieldValidationErrorFromBackendError,
   validateEmailForAccounts,
 } from "./validation"
 
 describe("shield/validation", () => {
+  describe("getShieldValidationErrorFromBackendError", () => {
+    describe("when valid", () => {
+      describe("and error contains a Shield validation error", () => {
+        test("should return the enum", () => {
+          expect(
+            getShieldValidationErrorFromBackendError(
+              new Error(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1),
+            ),
+          ).toEqual(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1)
+          expect(
+            getShieldValidationErrorFromBackendError(
+              new Error(`Error: ${SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2}`),
+            ),
+          ).toEqual(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2)
+          expect(
+            getShieldValidationErrorFromBackendError(
+              new Error(
+                `Error: Error: Error: ${SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3}`,
+              ),
+            ),
+          ).toEqual(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3)
+        })
+      })
+      describe("and error does not contain a Shield validation error", () => {
+        test("should return undefined", () => {
+          expect(
+            getShieldValidationErrorFromBackendError(new Error()),
+          ).toBeUndefined()
+        })
+        test("should return undefined", () => {
+          expect(
+            getShieldValidationErrorFromBackendError(new Error("foo bar")),
+          ).toBeUndefined()
+        })
+      })
+    })
+    describe("when invalid", () => {
+      test("should return undefined", () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        expect(getShieldValidationErrorFromBackendError()).toBeUndefined()
+        expect(getShieldValidationErrorFromBackendError(null)).toBeUndefined()
+        expect(getShieldValidationErrorFromBackendError("")).toBeUndefined()
+      })
+    })
+  })
   describe("getLocalAccountsMatchBackendAccounts", () => {
     describe("when accounts do not exist in backend", () => {
       test("should return true", () => {
