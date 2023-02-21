@@ -11,6 +11,8 @@ export type AccountMessage =
       data: {
         networkId: string
         type?: CreateAccountType
+        signers?: string[]
+        threshold?: string
       }
     }
   | {

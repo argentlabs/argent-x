@@ -40,9 +40,20 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         throw Error("you need an open session")
       }
 
-      const { networkId, type } = msg.data
+      const { networkId, type, signers, threshold } = msg.data
       try {
-        const account = await wallet.newAccount(networkId, type)
+        let multisigPayload = undefined
+        if (signers && threshold) {
+          multisigPayload = {
+            signers,
+            threshold,
+          }
+        }
+        const account = await wallet.newAccount(
+          networkId,
+          type,
+          multisigPayload,
+        )
 
         tryToMintFeeToken(account)
 

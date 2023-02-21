@@ -32,7 +32,7 @@ const StyledPageWrapper = styled(PageWrapper)`
   `}
 `
 
-export const CreateMultisigScreen: FC<CreateMultisigScreen> = ({
+export const ScreenLayout: FC<CreateMultisigScreen> = ({
   back,
   title,
   subtitle,

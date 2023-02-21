@@ -3,6 +3,7 @@ import {
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
+  MultisigPayload,
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
@@ -11,12 +12,14 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 export const createNewAccount = async (
   networkId: string,
   type?: CreateAccountType,
+  multisigPayload?: MultisigPayload,
 ) => {
   sendMessage({
     type: "NEW_ACCOUNT",
     data: {
       networkId,
       type,
+      ...multisigPayload,
     },
   })
   try {

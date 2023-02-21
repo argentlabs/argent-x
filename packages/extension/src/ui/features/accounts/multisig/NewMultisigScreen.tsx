@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom"
 import { CustomButtonCell } from "../../../components/CustomButtonCell"
 import { routes } from "../../../routes"
 import { assertNever } from "../../../services/assertNever"
-import { useOpenExtensionInTab } from "../../browser/tabs"
 import { useAddAccount } from "../useAddAccount"
 
 const { AddIcon, MultisigJoinIcon } = icons
