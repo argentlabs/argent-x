@@ -50,7 +50,9 @@ const PageWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => {
         background={`url('./assets/onboarding-background.svg') no-repeat center`}
         backgroundSize="cover"
       >
-        <Panel> {/* <LogoSvg /> */}</Panel>
+        <Panel>
+          <LogoSvg />
+        </Panel>
       </Box>
     </Box>
   )

@@ -85,12 +85,10 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
       const { networkId, signers, threshold } = msg.data
       try {
-        console.log("entering here")
         const account = await wallet.newAccount(networkId, "multisig", {
           signers,
           threshold,
         })
-        console.log(account)
         tryToMintFeeToken(account)
 
         analytics.track("createAccount", {
