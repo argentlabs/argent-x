@@ -236,8 +236,6 @@ export class SessionAccount extends Account implements AccountInterface {
       const removeIndex = this.openTransactions.indexOf("")
       if (removeIndex > -1) {
         this.openTransactions[removeIndex] = response.transaction_hash
-      } else {
-        this.openTransactions.push(response.transaction_hash)
       }
     })
     invocation.catch(() => {
