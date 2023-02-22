@@ -158,7 +158,7 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 (Max &nbsp;
                 {feeToken ? (
                   prettifyTokenAmount({
-                    amount: totalMaxFee,
+                    amount: totalFee,
                     decimals: feeToken.decimals,
                     symbol: feeToken.symbol,
                   })
