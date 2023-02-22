@@ -22,7 +22,7 @@ export const MultisigThirdStep = ({
       title={
         <H1 display="flex">
           Multisig created{" "}
-          <TickCircleIcon color="#3ED373" alignSelf="flex-end" ml="1" />
+          <TickCircleIcon color="success.500" alignSelf="flex-end" ml="1" />
         </H1>
       }
       goBack={goBack}

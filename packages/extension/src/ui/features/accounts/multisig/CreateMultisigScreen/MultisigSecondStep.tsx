@@ -1,11 +1,10 @@
-import { H1 } from "@argent/ui"
+import { FieldError, H1 } from "@argent/ui"
 import { icons } from "@argent/ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
 import { isEmptyValue } from "../../../../../shared/utils/object"
 import { useAppState } from "../../../../app.state"
-import { FormError } from "../../../../theme/Typography"
 import { useNetwork } from "../../../networks/useNetworks"
 import { useSignerKey } from "../useSignerKey"
 import { ScreenLayout } from "./ScreenLayout"
@@ -99,7 +98,7 @@ export const MultisigSecondStep = ({
           )}
         />
         {errors.confirmations && (
-          <FormError>{errors.confirmations.message}</FormError>
+          <FieldError>{errors.confirmations.message}</FieldError>
         )}
       </Box>
       <Button colorScheme="primary" onClick={handleCreateMultisig} mt="3">
@@ -107,7 +106,7 @@ export const MultisigSecondStep = ({
       </Button>
       {isError && (
         <Box mt="2">
-          <FormError>Something went wrong creating the multisig</FormError>
+          <FieldError>Something went wrong creating the multisig</FieldError>
         </Box>
       )}
     </ScreenLayout>
