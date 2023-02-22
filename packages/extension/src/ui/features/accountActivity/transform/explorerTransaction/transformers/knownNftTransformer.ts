@@ -18,7 +18,8 @@ export default function ({
   for (const event of events) {
     if (
       event.name === "Transfer" &&
-      includesAddress(event.address, nftContractAddresses)
+      includesAddress(event.address, nftContractAddresses) &&
+      event.parameters
     ) {
       const contractAddress = event.address
       let displayName = "Transfer NFT"

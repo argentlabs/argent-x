@@ -377,15 +377,17 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
                   </StyledCopyIconButton>
                 </FieldValue>
               </Field>
-              {parameters.map((parameter, index) => {
-                return (
-                  <ParameterField
-                    key={index}
-                    parameter={parameter}
-                    networkId={network.id}
-                  />
-                )
-              })}
+              {parameters
+                ? parameters.map((parameter, index) => {
+                    return (
+                      <ParameterField
+                        key={index}
+                        parameter={parameter}
+                        networkId={network.id}
+                      />
+                    )
+                  })
+                : null}
             </ExpandableFieldGroup>
           )
         })}

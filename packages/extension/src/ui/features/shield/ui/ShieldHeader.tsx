@@ -31,12 +31,12 @@ const variants = {
   },
 }
 
-type Variant = keyof typeof variants
+export type ShieldHeaderVariant = keyof typeof variants
 
-interface ShieldHeaderProps {
+export interface ShieldHeaderProps {
   title: ReactNode
   subtitle?: ReactNode
-  variant?: Variant
+  variant?: ShieldHeaderVariant
   size?: "md" | "lg"
   icon?: ChakraComponent<"svg">
   isLoading?: boolean

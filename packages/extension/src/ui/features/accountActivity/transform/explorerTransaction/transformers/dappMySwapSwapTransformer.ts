@@ -21,8 +21,11 @@ export default function ({
       const entity = "TOKEN"
       const fromTokenAddress = events[1].address
       const toTokenAddress = events[2].address
-      const fromAmount = getParameter(events[1].parameters, "value")
-      const toAmount = getParameter(events[2].parameters, "value")
+      const fromAmount = getParameter(
+        events[1].parameters ?? undefined,
+        "value",
+      )
+      const toAmount = getParameter(events[2].parameters ?? undefined, "value")
       result = {
         ...result,
         action,
