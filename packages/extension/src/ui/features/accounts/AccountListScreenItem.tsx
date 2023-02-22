@@ -86,13 +86,9 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       e.stopPropagation()
       e.preventDefault()
 
-      if (account.type === "multisig") {
-        onMenuOpen()
-      } else {
-        navigate(routes.editAccount(account.address))
-      }
+      navigate(routes.editAccount(account.address))
     },
-    [account.address, account.type, navigate, onMenuOpen],
+    [account.address, navigate],
   )
 
   const onDeleteClicked = useCallback(

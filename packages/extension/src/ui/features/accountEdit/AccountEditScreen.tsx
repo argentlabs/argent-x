@@ -59,7 +59,7 @@ export const AccountEditScreen: FC = () => {
     : "Not found"
   const blockExplorerTitle = useBlockExplorerTitle()
   const pendingChangeGuardian = usePendingChangeGuardian(account)
-
+  console.log(account)
   const [liveEditingAccountName, setLiveEditingAccountName] =
     useState(accountName)
 
@@ -199,15 +199,17 @@ export const AccountEditScreen: FC = () => {
               <SpacerCell />
             </>
           )}
-          <ButtonCell
-            onClick={() =>
-              account &&
-              openBlockExplorerAddress(currentNetwork, account.address)
-            }
-            rightIcon={<ExpandIcon />}
-          >
-            View on {blockExplorerTitle}
-          </ButtonCell>
+          {account && !account.needsDeploy && (
+            <ButtonCell
+              onClick={() =>
+                account &&
+                openBlockExplorerAddress(currentNetwork, account.address)
+              }
+              rightIcon={<ExpandIcon />}
+            >
+              View on {blockExplorerTitle}
+            </ButtonCell>
+          )}
           <ButtonCell
             onClick={() => account && handleHideOrDeleteAccount(account)}
           >

@@ -37,7 +37,10 @@ export const fetcherError = (
   return error
 }
 
-export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+export const fetcher = async <T>(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<T> => {
   const response = await fetch(input, init)
   /** capture text here in the case of json parse failure we can include it in the error */
   const responseText = await response.text()
