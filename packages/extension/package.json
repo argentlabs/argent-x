@@ -81,7 +81,7 @@
     "@argent/x-sessions": "^5.3.1",
     "@argent/x-swap": "^5.3.1",
     "@chakra-ui/icons": "^2.0.15",
-    "@chakra-ui/react": "2.4.9",
+    "@chakra-ui/react": "2.5.1",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^3.0.0",
     "@mui/icons-material": "^5.3.1",
