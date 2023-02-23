@@ -34,7 +34,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
-import { useMultisigAccount } from "../accounts/multisig/useMultisigData"
+import { useMultisigData } from "../accounts/multisig/useMultisigData"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useArgentShieldEnabled } from "../shield/useArgentShieldEnabled"
 import {
@@ -60,7 +60,7 @@ export const AccountEditScreen: FC = () => {
     : "Not found"
   const blockExplorerTitle = useBlockExplorerTitle()
   const pendingChangeGuardian = usePendingChangeGuardian(account)
-  const { creator, threshold, signers } = useMultisigAccount(account)
+  const { creator, threshold, signers } = useMultisigData(account)
 
   const [liveEditingAccountName, setLiveEditingAccountName] =
     useState(accountName)

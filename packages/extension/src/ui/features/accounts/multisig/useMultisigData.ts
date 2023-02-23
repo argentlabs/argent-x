@@ -5,7 +5,7 @@ import { useCurrentNetwork } from "../../networks/useNetworks"
 import { Account } from "../Account"
 import { MultisigAccount } from "./types"
 
-export const useMultisigAccount = (account?: Account) => {
+export const useMultisigData = (account?: Account) => {
   const currentNetwork = useCurrentNetwork()
   const { data, error } = useSWR<MultisigAccount | undefined>(
     [account?.address, "multisigData"],
