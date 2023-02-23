@@ -7,7 +7,7 @@ import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
-import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
+import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { formatDate } from "../../services/dates"
 import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
@@ -37,7 +37,15 @@ export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
       <Center>
         <H4>Activity</H4>
       </Center>
-      <AccountActivityLoader account={account} />
+      <ErrorBoundary
+        fallback={
+          <ErrorBoundaryFallbackWithCopyError
+            message={"Sorry, an error occurred fetching activity"}
+          />
+        }
+      >
+        <AccountActivityLoader account={account} />
+      </ErrorBoundary>
     </CellStack>
   )
 }
