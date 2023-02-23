@@ -1,9 +1,11 @@
+import { utils } from "ethers"
+
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import {
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
-  MultisigPayload,
+  MultisigData,
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
@@ -12,7 +14,7 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 export const createNewAccount = async (
   networkId: string,
   type?: CreateAccountType,
-  multisigPayload?: MultisigPayload,
+  multisigPayload?: MultisigData,
 ) => {
   sendMessage({
     type: "NEW_ACCOUNT",
@@ -34,13 +36,18 @@ export const createNewAccount = async (
 
 export const createNewMultisigAccount = async (
   networkId: string,
-  multisigPayload: MultisigPayload,
+  multisigPayload: MultisigData,
 ) => {
+  const decodedSigners = multisigPayload.signers.map((signer) =>
+    utils.hexlify(utils.base58.decode(signer)),
+  )
+
   sendMessage({
     type: "NEW_MULTISIG_ACCOUNT",
     data: {
       networkId,
-      ...multisigPayload,
+      signers: decodedSigners,
+      threshold: multisigPayload.threshold,
     },
   })
   try {

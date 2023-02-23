@@ -1,8 +1,9 @@
-import { ethers, utils } from "ethers"
+import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, memoize, noop, throttle, union } from "lodash-es"
 import {
   Account,
+  DeployAccountContractPayload,
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
@@ -18,8 +19,9 @@ import browser from "webextension-polyfill"
 
 import {
   ArgentAccountType,
+  BaseMultisigWalletAccount,
   CreateAccountType,
-  MultisigPayload,
+  MultisigData,
 } from "./../shared/wallet.model"
 import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
@@ -30,6 +32,7 @@ import {
 } from "../shared/account/details/getAndMergeAccountDetails"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
+import { getMultisigAccountFromBaseWallet } from "../shared/multisig/storage"
 import {
   Network,
   defaultNetwork,
@@ -134,6 +137,7 @@ export class Wallet {
     private readonly store: IKeyValueStorage<WalletStorageProps>,
     private readonly walletStore: IArrayStorage<WalletAccount>,
     private readonly sessionStore: IObjectStorage<WalletSession | null>,
+    private readonly multisigStore: IArrayStorage<BaseMultisigWalletAccount>,
     private readonly loadContracts: LoadContracts,
     private readonly getNetwork: GetNetwork,
   ) {}
@@ -430,7 +434,7 @@ export class Wallet {
   public async newAccount(
     networkId: string,
     type: CreateAccountType = "standard", // Should not be able to create plugin accounts. Default to argent account
-    multisigPayload?: MultisigPayload,
+    multisigPayload?: MultisigData,
   ): Promise<WalletAccount> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session) {
@@ -453,12 +457,10 @@ export class Wallet {
     let payload
 
     if (type === "multisig" && multisigPayload) {
-      const { threshold, signers } = multisigPayload
       payload = await this.getDeployContractPayloadForMultisig({
-        threshold,
-        signers,
         index,
         networkId,
+        ...multisigPayload,
       })
     } else {
       payload = await this.getDeployContractPayloadForAccountIndex(
@@ -489,6 +491,10 @@ export class Wallet {
 
     await this.walletStore.push([account])
 
+    if (type === "multisig" && multisigPayload) {
+      await this.multisigStore.push({ ...multisigPayload, ...account })
+    }
+
     await this.selectAccount(account)
 
     return account
@@ -504,9 +510,17 @@ export class Wallet {
       throw Error("Cannot deploy old accounts")
     }
 
-    const deployAccountPayload = await this.getAccountDeploymentPayload(
-      walletAccount,
-    )
+    let deployAccountPayload: DeployAccountContractPayload
+
+    if (walletAccount.type === "multisig") {
+      deployAccountPayload = await this.getMultisigDeploymentPayload(
+        walletAccount,
+      )
+    } else {
+      deployAccountPayload = await this.getAccountDeploymentPayload(
+        walletAccount,
+      )
+    }
 
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
@@ -562,11 +576,14 @@ export class Wallet {
 
     return { account, txHash: deployTransaction.transaction_hash }
   }
+
   /** Get the Account Deployment Payload
    * Use it in the deployAccount and getAccountDeploymentFee methods
    * @param  {WalletAccount} walletAccount
    */
-  public async getAccountDeploymentPayload(walletAccount: WalletAccount) {
+  public async getAccountDeploymentPayload(
+    walletAccount: WalletAccount,
+  ): Promise<Required<DeployAccountContractPayload>> {
     const starkPair = await this.getKeyPairByDerivationPath(
       walletAccount.signer.derivationPath,
     )
@@ -575,7 +592,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
-      "standard",
+      walletAccount.type,
     )
 
     const constructorCallData = {
@@ -625,6 +642,60 @@ export class Wallet {
     }
 
     return deployAccountPayload
+  }
+
+  public async getMultisigDeploymentPayload(
+    walletAccount: WalletAccount,
+  ): Promise<Required<DeployAccountContractPayload>> {
+    const multisigAccount = await getMultisigAccountFromBaseWallet(
+      walletAccount,
+    )
+
+    if (!multisigAccount) {
+      throw new Error("This multisig account does not exist")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      multisigAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      multisigAccount.network,
+      "multisig", // make sure to always use the multisig implementation
+    )
+
+    const constructorCallData = {
+      implementation: accountClassHash,
+      selector: getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({
+        threshold: multisigAccount.threshold,
+        signers: multisigAccount.signers,
+      }),
+    }
+
+    const deployMultisigPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contractAddress: multisigAccount.address,
+      constructorCalldata: stark.compileCalldata(constructorCallData),
+      addressSalt: starkPub,
+    }
+
+    // Mostly we don't need to calculate the address,
+    // but we do it here just to make sure the address is correct
+    const calculatedMultisigAddress = calculateContractAddressFromHash(
+      deployMultisigPayload.addressSalt,
+      deployMultisigPayload.classHash,
+      deployMultisigPayload.constructorCalldata,
+      0,
+    )
+
+    if (!isEqualAddress(multisigAccount.address, calculatedMultisigAddress)) {
+      throw new Error("Calculated address does not match multisig address")
+    }
+
+    return deployMultisigPayload
   }
 
   public async getDeployContractPayloadForAccountIndex(
@@ -695,9 +766,6 @@ export class Wallet {
       network,
       "multisig",
     )
-    const decodedPublicKeys = signers.map((signer) =>
-      utils.hexlify(utils.base58.decode(signer)),
-    )
 
     const payload = {
       classHash: accountClassHash,
@@ -705,7 +773,7 @@ export class Wallet {
         implementation: accountClassHash,
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({
-          signers: decodedPublicKeys,
+          signers,
           threshold,
         }),
       }),
