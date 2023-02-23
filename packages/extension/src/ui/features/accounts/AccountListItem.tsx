@@ -165,79 +165,81 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     />
   ) : null
   return (
-    <CustomButtonCell {...rest}>
-      <AccountAvatar
-        outlined={avatarOutlined}
-        src={getNetworkAccountImageUrl({
-          accountName,
-          accountAddress,
-          networkId,
-          backgroundColor: hidden ? "333332" : undefined,
-        })}
-      >
-        {avatarBadge}
-      </AccountAvatar>
-      <Flex
-        flex={1}
-        overflow={"hidden"}
-        alignItems={"center"}
-        justifyContent={"space-between"}
-      >
-        <Flex direction={"column"} overflow={"hidden"}>
-          <Flex gap={1} alignItems={"center"}>
-            <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
-              {accountName}
-            </H6>
-            {accountType !== "argent" && (
-              <L2
-                backgroundColor={"neutrals.900"}
-                px={1}
-                py={0.5}
-                textTransform="uppercase"
-                fontWeight={"extrabold"}
-                color={"neutrals.200"}
-                borderRadius={"base"}
-                border={"1px solid"}
-                borderColor={"neutrals.700"}
-              >
-                {accountType === "argent-plugin" && "Plugin"}
-                {accountType === "argent-better-multicall" && "Better MC"}
-              </L2>
+    <>
+      <CustomButtonCell {...rest}>
+        <AccountAvatar
+          outlined={avatarOutlined}
+          src={getNetworkAccountImageUrl({
+            accountName,
+            accountAddress,
+            networkId,
+            backgroundColor: hidden ? "333332" : undefined,
+          })}
+        >
+          {avatarBadge}
+        </AccountAvatar>
+        <Flex
+          flex={1}
+          overflow={"hidden"}
+          alignItems={"center"}
+          justifyContent={"space-between"}
+        >
+          <Flex direction={"column"} overflow={"hidden"}>
+            <Flex gap={1} alignItems={"center"}>
+              <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
+                {accountName}
+              </H6>
+              {accountType !== "argent" && (
+                <L2
+                  backgroundColor={"neutrals.900"}
+                  px={1}
+                  py={0.5}
+                  textTransform="uppercase"
+                  fontWeight={"extrabold"}
+                  color={"neutrals.200"}
+                  borderRadius={"base"}
+                  border={"1px solid"}
+                  borderColor={"neutrals.700"}
+                >
+                  {accountType === "argent-plugin" && "Plugin"}
+                  {accountType === "argent-better-multicall" && "Better MC"}
+                </L2>
+              )}
+            </Flex>
+            <Flex gap={2} color={"neutrals.300"}>
+              <P4 fontWeight={"semibold"}>
+                {formatTruncatedAddress(accountAddress)}
+              </P4>
+              {networkName && <P4 noOfLines={1}>{networkName}</P4>}
+            </Flex>
+          </Flex>
+          <Flex direction={"column"}>
+            {deploying ? (
+              <NetworkStatusWrapper>
+                <TransactionStatusIndicator color="orange" />
+                Deploying
+              </NetworkStatusWrapper>
+            ) : connectedHost ? (
+              <Tooltip label={`Connected to ${connectedHost}`}>
+                <Circle size={8} bg={"neutrals.900"}>
+                  <Circle size={6} bg={"secondary.500"} color={"white"}>
+                    <LinkIcon />
+                  </Circle>
+                </Circle>
+              </Tooltip>
+            ) : (
+              hidden && (
+                <Circle size={10} bg={"neutrals.600"}>
+                  <Text fontSize={"2xl"}>
+                    <ViewIcon />
+                  </Text>
+                </Circle>
+              )
             )}
           </Flex>
-          <Flex gap={2} color={"neutrals.300"}>
-            <P4 fontWeight={"semibold"}>
-              {formatTruncatedAddress(accountAddress)}
-            </P4>
-            {networkName && <P4 noOfLines={1}>{networkName}</P4>}
-          </Flex>
         </Flex>
-        <Flex direction={"column"}>
-          {deploying ? (
-            <NetworkStatusWrapper>
-              <TransactionStatusIndicator color="orange" />
-              Deploying
-            </NetworkStatusWrapper>
-          ) : connectedHost ? (
-            <Tooltip label={`Connected to ${connectedHost}`}>
-              <Circle size={8} bg={"neutrals.900"}>
-                <Circle size={6} bg={"secondary.500"} color={"white"}>
-                  <LinkIcon />
-                </Circle>
-              </Circle>
-            </Tooltip>
-          ) : (
-            hidden && (
-              <Circle size={10} bg={"neutrals.600"}>
-                <Text fontSize={"2xl"}>
-                  <ViewIcon />
-                </Text>
-              </Circle>
-            )
-          )}
-          {children}
-        </Flex>
-      </Flex>
-    </CustomButtonCell>
+      </CustomButtonCell>
+      {children}
+    </>
   )
 }
