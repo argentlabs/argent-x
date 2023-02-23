@@ -8,7 +8,7 @@
     "@sentry/webpack-plugin": "^1.18.9",
     "@svgr/webpack": "^6.0.0",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.3.0",
+    "@testing-library/react": "^14.0.0",
     "@types/async-retry": "^1.4.5",
     "@types/chrome": "^0.0.200",
     "@types/lodash-es": "^4.17.6",
