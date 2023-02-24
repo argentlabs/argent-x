@@ -34,6 +34,8 @@ export default defineConfig({
     exclude: ["**/node_modules/**", "**/*.mock.ts"],
     coverage: {
       exclude: ["**/node_modules/**", "**/*.mock.ts"],
+      reportsDirectory: "./coverage",
+      reporter: ["text", "lcov"],
     },
   },
   esbuild: {

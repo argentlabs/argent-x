@@ -16,6 +16,8 @@ export default defineConfig({
     ],
     coverage: {
       exclude: ["**/*.mock.ts", "**/setup.ts"],
+      reportsDirectory: "./coverage",
+      reporter: ["text", "lcov"],
     },
   },
 })
