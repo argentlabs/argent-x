@@ -1,24 +1,13 @@
 import { Component, cloneElement } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { Location, RouterProps } from "react-router-dom"
 
 import { routes } from "../routes"
-
-/* https://reactrouter.com/en/main/start/faq#what-happened-to-withrouter-i-need-it */
-function withRouter(Component: any) {
-  function ComponentWithRouterProp(props: any) {
-    const location = useLocation()
-    const navigate = useNavigate()
-    const params = useParams()
-    return <Component {...props} router={{ location, navigate, params }} />
-  }
-
-  return ComponentWithRouterProp
-}
+import { withRouter } from "../services/withRouter"
 
 interface ErrorBoundaryProps {
   fallback: React.ReactElement
   children: React.ReactNode
-  router: any
+  router: RouterProps
 }
 
 export interface ErrorBoundaryState {
@@ -43,7 +32,8 @@ class ErrorBoundaryComponent extends Component<
     const { router } = this.props
     if (
       router &&
-      router.location.pathname === routes.settingsPrivacyStatement.path &&
+      (router.location as Location).pathname ===
+        routes.settingsPrivacyStatement.path &&
       this.state.error
     ) {
       this.setState({ error: null })
@@ -59,7 +49,6 @@ class ErrorBoundaryComponent extends Component<
   }
 
   render() {
-    console.log(this.props)
     if (this.state.error) {
       const { error, errorInfo } = this.state
       return cloneElement(this.props.fallback, { error, errorInfo })
