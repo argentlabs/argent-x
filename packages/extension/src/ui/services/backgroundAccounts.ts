@@ -14,14 +14,18 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 export const createNewAccount = async (
   networkId: string,
   type?: CreateAccountType,
-  multisigPayload?: MultisigData,
 ) => {
+  if (type === "multisig") {
+    throw new Error(
+      "Multisig accounts should be created with createNewMultisigAccount",
+    )
+  }
+
   sendMessage({
     type: "NEW_ACCOUNT",
     data: {
       networkId,
       type,
-      ...multisigPayload,
     },
   })
   try {

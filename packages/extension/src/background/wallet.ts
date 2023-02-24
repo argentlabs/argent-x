@@ -32,7 +32,7 @@ import {
 } from "../shared/account/details/getAndMergeAccountDetails"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
-import { getMultisigAccountFromBaseWallet } from "../shared/multisig/storage"
+import { getMultisigAccountFromBaseWallet } from "../shared/multisig/store"
 import {
   Network,
   defaultNetwork,

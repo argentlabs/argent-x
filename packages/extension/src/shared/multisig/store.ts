@@ -88,6 +88,12 @@ export async function addMultisigAccounts(
   await addBaseMultisigAccounts(account)
 }
 
+export async function updateBaseMultisigAccount(
+  baseAccount: BaseMultisigWalletAccount,
+): Promise<void> {
+  await multisigBaseWalletStore.push(baseAccount)
+}
+
 export async function removeMultisigAccount(
   baseAccount: BaseMultisigWalletAccount,
 ): Promise<void> {

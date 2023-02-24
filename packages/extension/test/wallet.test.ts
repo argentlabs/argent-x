@@ -17,7 +17,10 @@ import {
   KeyValueStorage,
   ObjectStorage,
 } from "../src/shared/storage"
-import { WalletAccount } from "../src/shared/wallet.model"
+import {
+  BaseMultisigWalletAccount,
+  WalletAccount,
+} from "../src/shared/wallet.model"
 import { accountsEqual } from "../src/shared/wallet.service"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
@@ -53,6 +56,16 @@ const getSessionStore = (name: string) => {
   return new ObjectStorage<WalletSession | null>(null, name)
 }
 
+const getMultisigStore = (
+  name: string,
+  defaults: BaseMultisigWalletAccount[] = [],
+) => {
+  return new ArrayStorage<BaseMultisigWalletAccount>(defaults, {
+    namespace: name,
+    compare: accountsEqual,
+  })
+}
+
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 
 const NETWORK = "testnetwork"
@@ -70,10 +83,12 @@ describe("Wallet", () => {
     const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet1")
     const accountStore = getAccountStore("test:accounts1")
     const sessionStore = getSessionStore("test:sessions1")
+    const baseMultisigStore = getMultisigStore("test:multisig1")
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -128,11 +143,13 @@ describe("Wallet", () => {
       },
     ])
     const sessionStore = getSessionStore("test:sessions2")
+    const baseMultisigStore = getMultisigStore("test:multisig2")
 
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -176,11 +193,13 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts3")
     const sessionStore = getSessionStore("test:sessions3")
+    const baseMultisigStore = getMultisigStore("test:multisig3")
 
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -201,11 +220,13 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts4")
     const sessionStore = getSessionStore("test:sessions4")
+    const baseMultisigStore = getMultisigStore("test:multisig4")
 
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -230,10 +251,13 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts5")
     const sessionStore = getSessionStore("test:sessions5")
+    const baseMultisigStore = getMultisigStore("test:multisig5")
+
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
       loadContracts,
       getNetwork,
     )
