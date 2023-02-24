@@ -18,7 +18,7 @@ export const LockScreen: FC = () => {
   const navigate = useNavigate()
   const actions = useActions()
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | undefined>(undefined)
+  const [error, setError] = useState<string>()
   return (
     <Flex flex={1} flexDirection={"column"} py={6} px={5}>
       <Flex
