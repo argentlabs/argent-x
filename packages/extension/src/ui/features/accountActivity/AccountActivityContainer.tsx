@@ -1,22 +1,26 @@
-import { CellStack, H4, SpacerCell } from "@argent/ui"
+import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/ui"
 import { Center, Skeleton } from "@chakra-ui/react"
 import { get } from "lodash-es"
-import { FC, Suspense, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
-import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
+import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { formatDate } from "../../services/dates"
 import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { AccountActivity } from "./AccountActivity"
-import { PendingTransactionsContainer } from "./PendingTransactions"
+import { PendingTransactions } from "./PendingTransactions"
 import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
+
+const { ActivityIcon } = icons
 
 export interface AccountActivityContainerProps {
   account: Account
@@ -27,29 +31,20 @@ const PAGE_SIZE = 10
 export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
   account,
 }) => {
+  const accountIdentifier = getAccountIdentifier(account)
   return (
-    <CellStack>
+    <CellStack key={accountIdentifier} flex={1}>
       <Center>
         <H4>Activity</H4>
       </Center>
-      <PendingTransactionsContainer account={account} />
       <ErrorBoundary
         fallback={
-          <ErrorBoundaryFallback title="Seems like Voyager API is down..." />
+          <ErrorBoundaryFallbackWithCopyError
+            message={"Sorry, an error occurred fetching activity"}
+          />
         }
       >
-        <Suspense
-          fallback={
-            <>
-              <SpacerCell />
-              <Skeleton height="16" rounded={"xl"} />
-              <Skeleton height="16" rounded={"xl"} />
-              <Skeleton height="16" rounded={"xl"} />
-            </>
-          }
-        >
-          <AccountActivityLoader account={account} />
-        </Suspense>
+        <AccountActivityLoader account={account} />
       </ErrorBoundary>
     </CellStack>
   )
@@ -58,19 +53,21 @@ export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
 export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   account,
 }) => {
+  const network = useCurrentNetwork()
+  const { pendingTransactions } = useAccountTransactions(account)
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data: nftContractAddresses } = useAspectContractAddresses()
-  const { data, setSize } = useArgentExplorerAccountTransactionsInfinite(
-    {
+
+  const { data, setSize, error, isValidating } =
+    useArgentExplorerAccountTransactionsInfinite({
       accountAddress: account.address,
       network: switcherNetworkId,
       pageSize: PAGE_SIZE,
-    },
-    {
-      suspense: true,
-    },
-  )
+    })
+
+  const isInitialExplorerFetch =
+    isValidating && data === undefined && error === undefined
 
   const explorerTransactions = useMemo(() => {
     if (!data) {
@@ -201,14 +198,39 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     }
   }, [isReachingEnd, setSize])
 
+  if (isInitialExplorerFetch) {
+    return (
+      <>
+        <SpacerCell />
+        <Skeleton height="16" rounded={"xl"} />
+        <Skeleton height="16" rounded={"xl"} />
+        <Skeleton height="16" rounded={"xl"} />
+      </>
+    )
+  }
+
+  if (!pendingTransactions.length && !Object.keys(mergedActivity).length) {
+    return (
+      <Empty icon={<ActivityIcon />} title={"No activity for this network"} />
+    )
+  }
+
   return (
-    <AccountActivity
-      activity={mergedActivity}
-      loadMoreHashes={loadMoreHashes}
-      account={account}
-      tokensByNetwork={tokensByNetwork}
-      nftContractAddresses={nftContractAddresses}
-      onLoadMore={onLoadMore}
-    />
+    <>
+      <PendingTransactions
+        pendingTransactions={pendingTransactions}
+        network={network}
+        tokensByNetwork={tokensByNetwork}
+        accountAddress={account.address}
+      />
+      <AccountActivity
+        activity={mergedActivity}
+        loadMoreHashes={loadMoreHashes}
+        account={account}
+        tokensByNetwork={tokensByNetwork}
+        nftContractAddresses={nftContractAddresses}
+        onLoadMore={onLoadMore}
+      />
+    </>
   )
 }

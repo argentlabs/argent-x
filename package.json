@@ -25,8 +25,8 @@
   ],
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
-    "dev": "lerna run dev --parallel",
-    "dev:ui": "lerna run dev:ui --parallel",
+    "dev": "NODE_ENV=development lerna run dev --parallel",
+    "dev:ui": "NODE_ENV=development lerna run dev:ui --parallel",
     "build-storybook": "lerna run build-storybook --",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
     "build": "lerna run build --stream",

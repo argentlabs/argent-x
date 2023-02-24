@@ -102,7 +102,7 @@ const NftTitle: FC<{
 }> = ({ nftTransfer, networkId, totalTransfers, index }) => {
   const amount = nftTransfer?.amount
 
-  const { data: nft } = useAspectNft(
+  const { data: nft, isValidating } = useAspectNft(
     nftTransfer?.token.address,
     nftTransfer?.token.tokenId,
     networkId,
@@ -119,7 +119,11 @@ const NftTitle: FC<{
   }, [index, totalTransfers])
 
   if (!nft || !amount) {
-    return <></>
+    if (isValidating) {
+      return <></>
+    }
+
+    return <>Confirm Transaction</>
   }
 
   const action = amount.eq(0) ? "" : amount.gt(0) ? "Buy " : "Sell "
