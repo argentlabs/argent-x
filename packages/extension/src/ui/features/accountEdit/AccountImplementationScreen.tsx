@@ -13,10 +13,15 @@ import { useNavigate } from "react-router-dom"
 
 import { mapArgentAccountTypeToImplementationKey } from "../../../shared/network/utils"
 import { ArgentAccountType } from "../../../shared/wallet.model"
+import { accountsEqual } from "../../../shared/wallet.service"
 import { AutoColumn } from "../../components/Column"
 import { routes } from "../../routes"
-import { upgradeAccount } from "../../services/backgroundAccounts"
+import {
+  selectAccount,
+  upgradeAccount,
+} from "../../services/backgroundAccounts"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { useRouteAccount } from "../shield/useRouteAccount"
 
 const { WalletIcon, PluginIcon, MulticallIcon, TickIcon } = icons
 
@@ -79,14 +84,20 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
 }
 
 export const AccountImplementationScreen: FC = () => {
-  const account = useSelectedAccount()
+  const selectedAccount = useSelectedAccount()
+  const account = useRouteAccount()
   const navigate = useNavigate()
 
-  if (!account) {
+  if (!account || !selectedAccount) {
     return <></>
   }
 
+  const isSelectedAccount = accountsEqual(selectedAccount, account)
+
   const handleImplementationClick = (i: Implementation) => async () => {
+    if (!isSelectedAccount) {
+      await selectAccount(account)
+    }
     await upgradeAccount(account, i.id)
     navigate(routes.accountTokens(), { replace: true })
   }
