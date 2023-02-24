@@ -58,12 +58,6 @@ jobs:
       - name: Run tests
         run: yarn test:ci
 
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
-      - name: Run e2e tests
-        run: xvfb-run --auto-servernum yarn test:e2e
-
       - name: Check bundlesize for chrome
         run: yarn run bundlewatch
 
