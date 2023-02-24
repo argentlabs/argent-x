@@ -27,28 +27,28 @@ jobs:
       ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
-  steps:
-    - name: If github.head_ref not filled, we are merging
-      run: |
-        if [ "${{ github.head_ref }}" == "" ]; then
-          echo "PUBLISH_COMMENT=no" >> $GITHUB_ENV
-        else
-          echo "PUBLISH_COMMENT=yes" >> $GITHUB_ENV
-        fi
+    steps:
+      - name: If github.head_ref not filled, we are merging
+        run: |
+          if [ "${{ github.head_ref }}" == "" ]; then
+            echo "PUBLISH_COMMENT=no" >> $GITHUB_ENV
+          else
+            echo "PUBLISH_COMMENT=yes" >> $GITHUB_ENV
+          fi
 
-    - name: Check out repository code
-      uses: actions/checkout@v3
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-    - uses: actions/setup-node@v3
-      with:
-        node-version: "16"
-        cache: "yarn"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-    - name: Install Playwright Browsers
-      run: npx playwright install chromium
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
 
-    - name: Run e2e tests
-      run: xvfb-run --auto-servernum yarn test:e2e
+      - name: Run e2e tests
+        run: xvfb-run --auto-servernum yarn test:e2e
