@@ -64,7 +64,7 @@ export const LockScreen: FC = () => {
                 navigate(target)
                 return true
               } catch {
-                setError("Invalid password")
+                setError("Incorrect password")
                 return false
               } finally {
                 setIsLoading(false)
