@@ -146,6 +146,7 @@ export const useArgentExplorerAccountTransactionsInfinite = (
   )
   return useSWRInfinite<IExplorerTransaction[]>(key, argentApiFetcher, {
     revalidateAll: true,
+    shouldRetryOnError: false /** expect errors on unsupported networks */,
     ...withPolling(15 * 1000) /** 15 seconds */,
     ...config,
   })

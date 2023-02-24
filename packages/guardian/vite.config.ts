@@ -30,4 +30,7 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
   ],
+  esbuild: {
+    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
+  },
 })

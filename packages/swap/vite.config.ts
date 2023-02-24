@@ -35,4 +35,7 @@ export default defineConfig({
     target: "esnext",
     minify: true,
   },
+  esbuild: {
+    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
+  },
 })
