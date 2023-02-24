@@ -104,7 +104,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
               height={8}
               size="auto"
               rounded="full"
-              onClick={onAccountEdit}
+              onMouseDown={onAccountEdit}
               bg="black"
               _hover={{
                 bg: "neutrals.600",
