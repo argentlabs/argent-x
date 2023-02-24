@@ -15,8 +15,17 @@ export default defineConfig({
       "**/.{idea,git,cache,output,temp}/**",
     ],
     coverage: {
-      exclude: ["**/*.mock.ts", "**/setup.ts"],
+      exclude: [
+        "**/*.mock.ts",
+        "**/setup.ts",
+        "**/*.json",
+        "**/*.config.{js,ts}",
+        "test{,s}/**",
+        "test{,-*}.{js,cjs,mjs,ts,tsx,jsx}",
+        "**/*.d.ts",
+      ],
       reportsDirectory: "./coverage",
+      excludeNodeModules: true,
       reporter: ["text", "lcov"],
       all: true,
     },
