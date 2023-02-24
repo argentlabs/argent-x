@@ -24,6 +24,10 @@ export const NftTransactionIcon: FC<NFTPictureProps> = ({
     nftTransfers[0].token.address,
     nftTransfers[0].token.tokenId,
     network.id,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
   if (!nft) {

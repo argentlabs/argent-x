@@ -110,6 +110,10 @@ const NftTitle: FC<{
     nftTransfer?.token.address,
     nftTransfer?.token.tokenId,
     networkId,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
   const prefix = useMemo(() => {

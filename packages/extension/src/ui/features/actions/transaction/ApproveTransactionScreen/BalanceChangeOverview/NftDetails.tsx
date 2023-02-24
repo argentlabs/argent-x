@@ -51,6 +51,10 @@ export const NftDetails: FC<NftDetailsProps> = ({
     contractAddress,
     tokenId,
     networkId,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
   const nft = useMemo(
