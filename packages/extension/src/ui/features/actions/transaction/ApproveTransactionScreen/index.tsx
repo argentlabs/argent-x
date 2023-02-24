@@ -61,12 +61,14 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-  const { data: transactionSimulation, isValidating: isSimulationLoading } =
+  const { data: transactionSimulation, isValidating: isSimulationValidating } =
     useTransactionSimulation({
       account: selectedAccount,
       transactions,
       actionHash,
     })
+
+  const isSimulationLoading = isSimulationValidating && !transactionSimulation
 
   const aggregatedData = useAggregatedSimData(transactionSimulation)
 

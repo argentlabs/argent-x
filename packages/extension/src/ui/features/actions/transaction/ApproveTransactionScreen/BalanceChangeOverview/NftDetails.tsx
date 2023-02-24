@@ -65,7 +65,9 @@ export const NftDetails: FC<NftDetailsProps> = ({
     [contractAddress, fetchedNft],
   )
 
-  const buttonDisabled = isDisabled || isValidating
+  const isLoading = !nft && isValidating
+
+  const buttonDisabled = isDisabled || isLoading
 
   return (
     <AccordionButton
@@ -74,7 +76,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
       justifyContent="space-between"
       outline="none"
       px="3"
-      pb={dataIndex !== totalData - 1 || isValidating ? "3" : "3.5"}
+      pb={dataIndex !== totalData - 1 || isLoading ? "3" : "3.5"}
       _expanded={{
         backgroundColor: "neutrals.700",
         pb: "3.5",
@@ -89,7 +91,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
         borderBottomRadius: dataIndex === totalData - 1 ? "xl" : "0",
       }}
     >
-      {!isValidating ? (
+      {!isLoading ? (
         <>
           <Flex alignItems="center" gap="2">
             <Image src={getNftPicture(nft)} w="5" h="5" borderRadius="base" />
