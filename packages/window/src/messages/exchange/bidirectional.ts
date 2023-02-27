@@ -56,7 +56,7 @@ export class BidirectionalExchange<
       })
       this.postMessenger.postMessage({
         id,
-        type: "REQ",
+        type: "REQUEST",
         method: method.toString(),
         args,
         meta: {
@@ -70,25 +70,25 @@ export class BidirectionalExchange<
     if (message.meta?.sender === this.id) {
       return
     }
-    if (message.type === "REQ") {
+    if (message.type === "REQUEST") {
       const method = this.localMethods[message.method]
       if (method) {
         try {
           const result = await method(origin)(...(message.args as any))
           this.postMessenger.postMessage({
             id: message.id,
-            type: "RES",
+            type: "RESPONSE",
             result,
           })
         } catch (error) {
           this.postMessenger.postMessage({
             id: message.id,
-            type: "RES",
+            type: "RESPONSE",
             error,
           })
         }
       }
-    } else if (message.type === "RES") {
+    } else if (message.type === "RESPONSE") {
       const pendingRequest = this.pendingRequests.get(message.id)
       if (pendingRequest) {
         this.pendingRequests.delete(message.id)

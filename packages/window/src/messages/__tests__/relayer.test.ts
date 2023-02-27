@@ -27,7 +27,7 @@ describe("Relayer", () => {
     const listener2 = vi.fn()
     const message = {
       id: "1",
-      type: "REQ",
+      type: "REQUEST",
       method: "someMethod",
       args: ["a", "b"],
     } satisfies Message
@@ -61,7 +61,7 @@ describe("Relayer", () => {
     const listener2 = vi.fn()
     const message = {
       id: "1",
-      type: "REQ",
+      type: "REQUEST",
       method: "someMethod",
       args: ["a", "b"],
     } satisfies Message
@@ -96,7 +96,7 @@ describe("Relayer", () => {
     const listener3 = vi.fn()
     const message = {
       id: "1",
-      type: "REQ",
+      type: "REQUEST",
       method: "someMethod",
       args: ["a", "b"],
     } satisfies Message

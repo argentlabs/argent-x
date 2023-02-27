@@ -4,18 +4,18 @@ interface BaseMessage {
 }
 
 export interface RequestMessage extends BaseMessage {
-  type: "REQ"
+  type: "REQUEST"
   method: string
   args: unknown[]
 }
 
 export interface ResponseResultMessage extends BaseMessage {
-  type: "RES"
+  type: "RESPONSE"
   result: unknown
 }
 
 export interface ResponseErrorMessage extends BaseMessage {
-  type: "RES"
+  type: "RESPONSE"
   error: unknown
 }
 

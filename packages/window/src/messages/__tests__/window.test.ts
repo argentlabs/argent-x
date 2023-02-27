@@ -21,7 +21,7 @@ describe("WindowMessenger", () => {
 
     const requestMessage = {
       id: "1",
-      type: "REQ",
+      type: "REQUEST",
       method: "someMethod",
       args: ["a", "b"],
     } satisfies Message
