@@ -1,8 +1,13 @@
 import { Component, cloneElement } from "react"
+import { Location, RouterProps } from "react-router-dom"
+
+import { routes } from "../routes"
+import { withRouter } from "../services/withRouter"
 
 interface ErrorBoundaryProps {
   fallback: React.ReactElement
   children: React.ReactNode
+  router: RouterProps
 }
 
 export interface ErrorBoundaryState {
@@ -10,7 +15,7 @@ export interface ErrorBoundaryState {
   errorInfo?: any
 }
 
-export class ErrorBoundary extends Component<
+class ErrorBoundaryComponent extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
@@ -20,6 +25,18 @@ export class ErrorBoundary extends Component<
   static getDerivedStateFromError(error: unknown) {
     return {
       error,
+    }
+  }
+
+  componentDidUpdate() {
+    const { router } = this.props
+    if (
+      router &&
+      (router.location as Location).pathname ===
+        routes.settingsPrivacyStatement.path &&
+      this.state.error
+    ) {
+      this.setState({ error: null })
     }
   }
 
@@ -39,3 +56,5 @@ export class ErrorBoundary extends Component<
     return <>{this.props.children}</>
   }
 }
+
+export const ErrorBoundary = withRouter(ErrorBoundaryComponent)

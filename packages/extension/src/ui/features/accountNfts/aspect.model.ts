@@ -20,25 +20,33 @@ export const AspectNftContractSchema = z.object({
   symbol: z.string().nullable().optional(),
   schema: z.string(), // Might be useful in future
   name_custom: z.string().nullable(), // Collection Name
-  image_url: z.string(),
-  floor_list_price: z.string().transform((s) => BigNumber.from(s)),
+  image_url: z.string().nullable().optional(),
+  floor_list_price: z
+    .string()
+    .nullable()
+    .transform((s) => (s ? BigNumber.from(s) : undefined)) // BigNumber or undefined
+    .optional(),
 })
 
 export const AspectNftSchema = z.object({
   best_bid_order: z
     .object({
       payment_address: z.string(),
-      payment_amount: z.number().optional(),
-      payment_amount_per: z.number().optional(),
+      payment_amount: z.string().optional(),
+      payment_amount_per: z.string().optional(),
     })
     .optional()
     .nullable(),
   contract_address: z.string(),
   token_id: z.string(),
   name: z.string().optional(),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   image_uri: z.string().optional(),
-  image_url_copy: z.string().optional(),
+  image_url_copy: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((s) => s ?? undefined),
   animation_uri: z.string().nullable().optional(),
   external_uri: z.string().nullable().optional(),
   owner: AspectNftOwnerSchema.optional(),
@@ -51,27 +59,28 @@ export const AspectContractSchema = z.object({
   symbol: z.string(),
   schema: z.string(),
   name_custom: z.string(),
-  image_url: z.string(),
-  banner_image_url: z.string(),
+  image_url: z.string().nullable(),
+  banner_image_url: z.string().nullable(),
   total_volume_all_time: z.string(),
   total_volume_720_hours: z.string(),
   total_volume_168_hours: z.string(),
   total_volume_24_hours: z.string(),
-  volume_change_basis_points_720_hours: z.string(),
+  volume_change_basis_points_720_hours: z.string().nullable(),
   volume_change_basis_points_168_hours: z.string().nullable(),
   volume_change_basis_points_24_hours: z.string().nullable(),
   number_of_owners: z.string(),
   number_of_assets: z.string(),
-  floor_list_price: z.string(),
+  floor_list_price: z.string().nullable(),
 })
 
 export const CollectionSchema = z.object({
   name: z.string(),
   contractAddress: z.string(),
   nfts: AspectNftSchema.array(),
-  imageUri: z.string().optional(),
+  imageUri: z.string().nullable().optional(),
   floorPrice: z
     .string()
+    .nullable()
     .transform((s) => BigNumber.from(s))
     .optional(),
 })

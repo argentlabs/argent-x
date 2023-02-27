@@ -7,7 +7,7 @@ import { NftThumbnailImage } from "./NftThumbnailImage"
 interface NftItemProps {
   name: string
   thumbnailSrc: string
-  logoSrc?: string
+  logoSrc?: string | null
   total?: number
 }
 

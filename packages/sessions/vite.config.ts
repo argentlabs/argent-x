@@ -36,4 +36,7 @@ export default defineConfig({
       exclude: ["**/node_modules/**", "**/*.mock.ts"],
     },
   },
+  esbuild: {
+    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
+  },
 })

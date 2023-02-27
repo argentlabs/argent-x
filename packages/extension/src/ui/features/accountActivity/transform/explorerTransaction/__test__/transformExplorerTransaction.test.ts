@@ -290,6 +290,8 @@ describe("transformExplorerTransaction", () => {
           explorerTransaction: erc721MintAspect as IExplorerTransaction,
           tokensByNetwork,
           nftContractAddresses,
+          accountAddress:
+            "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
         }),
       ).toMatchInlineSnapshot(`
         {
@@ -299,7 +301,9 @@ describe("transformExplorerTransaction", () => {
           "date": "2022-08-18T11:50:28.000Z",
           "displayName": "Mint NFT",
           "entity": "NFT",
+          "fromAddress": "0x0",
           "maxFee": "15870000000000",
+          "toAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
           "tokenId": "3462",
         }
       `)
@@ -311,13 +315,15 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "MINT",
+          "action": "TRANSFER",
           "actualFee": "12404500000000",
           "contractAddress": "0x07861c4e276294a7e859ff0ae2eec0c68300ad9cbb43219db907da9bad786488",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Mint NFT",
+          "displayName": "Transfer NFT",
           "entity": "NFT",
+          "fromAddress": "0x0",
           "maxFee": "18606750037213",
+          "toAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
           "tokenId": "45416",
         }
       `)

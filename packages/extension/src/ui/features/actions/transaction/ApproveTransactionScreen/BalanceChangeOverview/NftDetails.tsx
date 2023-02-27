@@ -7,8 +7,9 @@ import {
   SkeletonCircle,
 } from "@chakra-ui/react"
 import BigNumber from "bignumber.js"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 
+import { generateAvatarImage } from "../../../../../../shared/avatarImage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
@@ -17,6 +18,7 @@ import {
   getNftPicture,
   useAspectNft,
 } from "../../../../accountNfts/aspect.service"
+import { getColor } from "../../../../accounts/accounts.service"
 
 const { AlertIcon } = icons
 
@@ -45,17 +47,31 @@ export const NftDetails: FC<NftDetailsProps> = ({
   amount,
   usdValue,
 }) => {
-  const { data: nft, isValidating } = useAspectNft(
+  const { data: fetchedNft, isValidating } = useAspectNft(
     contractAddress,
     tokenId,
     networkId,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
-  if (!nft) {
-    return <></>
-  }
+  const nft = useMemo(
+    () => ({
+      name: "Unknown NFT",
+      description: "Unknown NFT",
+      image_url_copy: generateAvatarImage("Unknown NFT", {
+        background: getColor(contractAddress),
+      }),
+      ...fetchedNft,
+    }),
+    [contractAddress, fetchedNft],
+  )
 
-  const buttonDisabled = isDisabled || isValidating
+  const isLoading = !nft && isValidating
+
+  const buttonDisabled = isDisabled || isLoading
 
   return (
     <AccordionButton
@@ -64,7 +80,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
       justifyContent="space-between"
       outline="none"
       px="3"
-      pb={dataIndex !== totalData - 1 || isValidating ? "3" : "3.5"}
+      pb={dataIndex !== totalData - 1 || isLoading ? "3" : "3.5"}
       _expanded={{
         backgroundColor: "neutrals.700",
         pb: "3.5",
@@ -79,7 +95,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
         borderBottomRadius: dataIndex === totalData - 1 ? "xl" : "0",
       }}
     >
-      {!isValidating ? (
+      {!isLoading ? (
         <>
           <Flex alignItems="center" gap="2">
             <Image src={getNftPicture(nft)} w="5" h="5" borderRadius="base" />

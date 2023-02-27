@@ -4,6 +4,7 @@ import {
   CosignerOffchainMessage,
 } from "@argent/guardian"
 import retry from "async-retry"
+import { z } from "zod"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
 import { isFetcherError } from "../../api/fetcher"
@@ -33,12 +34,27 @@ export const requestEmailAuthentication = async (
   }
 }
 
-export type EmailVerificationStatus =
-  | "expired"
-  | "maxAttemptsReached"
-  | "unverified"
-  | "verified"
-  | "notRequested"
+const emailVerificationStatus = [
+  "expired",
+  "maxAttemptsReached",
+  "unverified",
+  "verified",
+  "notRequested",
+] as const
+
+export type EmailVerificationStatus = (typeof emailVerificationStatus)[number]
+
+export const emailVerificationStatusErrorSchema = z.object({
+  name: z.string(),
+  url: z.string().nullable(),
+  status: z.number(),
+  statusText: z.string(),
+  responseText: z.string(),
+  responseJson: z.object({
+    status: z.enum(emailVerificationStatus),
+  }),
+})
+
 export const getEmailVerificationStatus =
   async (): Promise<EmailVerificationStatus> => {
     try {

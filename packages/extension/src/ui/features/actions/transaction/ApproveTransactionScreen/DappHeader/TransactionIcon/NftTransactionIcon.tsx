@@ -16,25 +16,32 @@ export const NftTransactionIcon: FC<NFTPictureProps> = ({
   nftTransfers,
   network,
 }) => {
-  const { data: nft, isValidating } = useAspectNft(
+  const {
+    data: nft,
+    isValidating,
+    error,
+  } = useAspectNft(
     nftTransfers[0].token.address,
     nftTransfers[0].token.tokenId,
     network.id,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
-  if (isValidating) {
-    return (
-      <IconWrapper>
-        <Skeleton
-          borderRadius="2xl"
-          startColor="neutrals.500"
-          endColor="neutrals.700"
-        />
-      </IconWrapper>
-    )
-  }
-
   if (!nft) {
+    if (isValidating && !error) {
+      return (
+        <IconWrapper>
+          <Skeleton
+            borderRadius="2xl"
+            startColor="neutrals.500"
+            endColor="neutrals.700"
+          />
+        </IconWrapper>
+      )
+    }
     return <UnknownDappIcon />
   }
 
