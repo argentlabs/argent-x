@@ -3,16 +3,16 @@ import type { CosignerMessage } from "@argent/guardian"
 import type { Signature } from "starknet"
 import { number } from "starknet"
 
-import { getVerifiedEmailIsExpired } from "./verifiedEmail"
+import { isTokenExpired } from "./backend/account"
 
 export class GuardianSignerArgentX extends GuardianSigner {
   public async cosignMessage(
     cosignerMessage: CosignerMessage,
   ): Promise<Signature> {
-    const verifiedEmailIsExpired = await getVerifiedEmailIsExpired()
+    const tokenExpired = await isTokenExpired()
 
-    if (verifiedEmailIsExpired) {
-      throw new Error("Email verification expired")
+    if (tokenExpired) {
+      throw new Error("Argent Shield token is expired")
     }
 
     const response = await this.cosigner(cosignerMessage)

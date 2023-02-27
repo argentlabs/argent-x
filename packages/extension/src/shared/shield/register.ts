@@ -51,3 +51,9 @@ export const shieldAddAccount = async () => {
 
   return result
 }
+
+export const shieldIsTokenExpired = async () => {
+  sendMessage({ type: "SHIELD_IS_TOKEN_EXPIRED" })
+  const result = await waitForMessage("SHIELD_IS_TOKEN_EXPIRED_RES")
+  return result
+}
