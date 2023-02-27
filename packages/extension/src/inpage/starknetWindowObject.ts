@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import type {
   AccountChangeEventHandler,
   NetworkChangeEventHandler,
@@ -35,11 +33,18 @@ export const starknetWindowObject: StarknetWindowObject = {
   isConnected: false,
   version: VERSION,
   request: async (call) => {
-    if (call.type === "wallet_watchAsset" && call.params.type === "ERC20") {
+    if (
+      call.type === "wallet_watchAsset" &&
+      "type" in call.params &&
+      call.params.type === "ERC20"
+    ) {
       return await handleAddTokenRequest(call.params)
-    } else if (call.type === "wallet_addStarknetChain") {
+    } else if (call.type === "wallet_addStarknetChain" && "id" in call.params) {
       return await handleAddNetworkRequest(call.params)
-    } else if (call.type === "wallet_switchStarknetChain") {
+    } else if (
+      call.type === "wallet_switchStarknetChain" &&
+      "chainId" in call.params
+    ) {
       return await handleSwitchNetworkRequest(call.params)
     }
     throw Error("Not implemented")
@@ -53,7 +58,6 @@ export const starknetWindowObject: StarknetWindowObject = {
     ])
     sendMessage({
       type: "CONNECT_DAPP",
-      data: { host: window.location.host },
     })
     const walletAccount = await walletAccountP
 
@@ -72,14 +76,14 @@ export const starknetWindowObject: StarknetWindowObject = {
 
     if (starknetVersion === "v4") {
       const provider = getProvider(network)
-      starknet.starknetJsVersion = "v4"
+      ;(starknet as any).starknetJsVersion = "v4"
       starknet.provider = provider
       starknet.account = new ArgentXAccount(address, provider)
     } else {
       const provider = getProvider3(network)
-      starknet.starknetJsVersion = "v3"
-      starknet.provider = provider
-      starknet.account = new ArgentXAccount3(address, provider)
+      ;(starknet as any).starknetJsVersion = "v3"
+      ;(starknet as any).provider = provider
+      ;(starknet as any).account = new ArgentXAccount3(address, provider)
     }
 
     starknet.selectedAddress = address
