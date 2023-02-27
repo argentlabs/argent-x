@@ -4,7 +4,6 @@ import { FC, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 
-import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { unlockedExtensionTracking } from "../../services/analytics"
 import { startSession } from "../../services/backgroundSessions"
@@ -19,6 +18,7 @@ export const LockScreen: FC = () => {
   const navigate = useNavigate()
   const actions = useActions()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>()
   return (
     <Flex flex={1} flexDirection={"column"} py={6} px={5}>
       <Flex
@@ -48,6 +48,7 @@ export const LockScreen: FC = () => {
 
         <Box width="100%">
           <PasswordForm
+            error={error}
             verifyPassword={async (password) => {
               setIsLoading(true)
               try {
@@ -63,9 +64,7 @@ export const LockScreen: FC = () => {
                 navigate(target, { replace: true })
                 return true
               } catch {
-                useAppState.setState({
-                  error: "Incorrect password",
-                })
+                setError("Incorrect password")
                 return false
               } finally {
                 setIsLoading(false)

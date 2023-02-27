@@ -38,7 +38,7 @@ export async function getTransactionHistory(
   metadataTransactions: Transaction[],
 ) {
   const accountsWithHistory = accountsToPopulate.filter((account) =>
-    Boolean(account.network.explorerUrl),
+    Boolean(account.network?.explorerUrl),
   )
   const transactionsPerAccount = await Promise.all(
     accountsWithHistory.map(async (account) => {
