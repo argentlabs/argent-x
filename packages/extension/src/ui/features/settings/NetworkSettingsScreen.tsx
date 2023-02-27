@@ -19,7 +19,10 @@ import { P } from "../../theme/Typography"
 import { useCustomNetworks, useNetworks } from "../networks/useNetworks"
 import { DappConnection } from "./DappConnection"
 import { useSelectedNetwork } from "./selectedNetwork.state"
-import { validateRemoveNetwork } from "./validateRemoveNetwork"
+import {
+  validateRemoveNetwork,
+  validateRestoreDefaultNetworks,
+} from "./validateRemoveNetwork"
 
 const IconButtonCenter = styled(IconButton)`
   margin: 0 auto;
@@ -95,6 +98,23 @@ export const NetworkSettingsScreen: FC = () => {
     }
   }, [])
 
+  const restoreDefaultsClick = useCallback(async () => {
+    try {
+      const shouldRemoveNetwork = await validateRestoreDefaultNetworks()
+      if (shouldRemoveNetwork) {
+        await restoreDefaultCustomNetworks()
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message)
+        setAlertDialogIsOpen(true)
+      } else {
+        // unexpected, throw to error boundary
+        throw error
+      }
+    }
+  }, [])
+
   const onCancel = useCallback(() => {
     setAlertDialogIsOpen(false)
   }, [])
@@ -139,9 +159,7 @@ export const NetworkSettingsScreen: FC = () => {
 
         {!isDefaultCustomNetworks && (
           <Footer>
-            <RestoreDefaultsButton
-              onClick={async () => await restoreDefaultCustomNetworks()}
-            >
+            <RestoreDefaultsButton onClick={restoreDefaultsClick}>
               <RestoreDefaultsButtonIcon>
                 <RefreshIcon fontSize="inherit" />
               </RestoreDefaultsButtonIcon>
