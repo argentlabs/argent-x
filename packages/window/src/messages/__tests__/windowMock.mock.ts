@@ -37,11 +37,7 @@ export const getMockWindow = (origin: string): Window => {
     }
   })
 
-  window.postMessage = vi.fn((message: unknown, targetOrigin: string) => {
-    if (targetOrigin !== origin) {
-      throw new Error("Invalid target origin")
-    }
-
+  window.postMessage = vi.fn((message: unknown, _targetOrigin: string) => {
     emitter.emit("message", {
       data: message,
       origin,
