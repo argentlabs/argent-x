@@ -20,3 +20,8 @@ export type ShieldMessage =
       type: "SHIELD_CONFIRM_EMAIL_RES"
     }
   | { type: "SHIELD_CONFIRM_EMAIL_REJ"; data: string }
+  | { type: "SHIELD_IS_TOKEN_EXPIRED" }
+  | {
+      type: "SHIELD_IS_TOKEN_EXPIRED_RES"
+      data: boolean
+    }
