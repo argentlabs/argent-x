@@ -1,4 +1,8 @@
+import { useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+
 import { sendMessage, waitForMessage } from "../../shared/messages"
+import { routes } from "../routes"
 import { encryptForBackground } from "./crypto"
 
 export const hasActiveSession = async () => {
@@ -28,8 +32,17 @@ export const startSession = async (password: string): Promise<void> => {
   }
 }
 
-export const stopSession = () => {
-  sendMessage({ type: "STOP_SESSION" })
+export const useStopSession = () => {
+  const navigate = useNavigate()
+  return useCallback(
+    (initiatedByUI = false) => {
+      if (initiatedByUI) {
+        sendMessage({ type: "STOP_SESSION" })
+      }
+      navigate(routes.lockScreen(), { replace: true })
+    },
+    [navigate],
+  )
 }
 
 export const checkPassword = async (password: string): Promise<boolean> => {
