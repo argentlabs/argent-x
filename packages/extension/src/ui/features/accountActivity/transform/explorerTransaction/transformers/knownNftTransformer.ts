@@ -1,6 +1,6 @@
 import { includesAddress } from "../../../../../../shared/knownDapps"
 import { isEqualAddress } from "../../../../../services/addresses"
-import { NFTTransaction, NFTTransferTransaction } from "../../type"
+import { NFTTransferTransaction } from "../../type"
 import { IExplorerTransactionTransformer } from "./type"
 
 /** adds erc721 token transfer data */
