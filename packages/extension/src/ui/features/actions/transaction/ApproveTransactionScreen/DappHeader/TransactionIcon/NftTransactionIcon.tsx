@@ -56,6 +56,9 @@ export const NftTransactionIcon: FC<NFTPictureProps> = ({
         filter="auto"
         dropShadow="menu"
         zIndex={3}
+        height="100%"
+        width="100%"
+        objectFit="cover"
       />
       {nftTransfers.length > 1 && (
         <>
