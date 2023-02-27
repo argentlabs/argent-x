@@ -10,7 +10,7 @@ export interface IExplorerTransactionEvent {
   /** @example transaction_executed */
   name: string
   address: string
-  parameters: IExplorerTransactionParameters[]
+  parameters: IExplorerTransactionParameters[] | null // sometimes null for some reason
 }
 
 export interface IExplorerTransactionCall {

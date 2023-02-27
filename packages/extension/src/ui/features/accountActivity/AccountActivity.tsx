@@ -4,99 +4,115 @@ import { useNavigate } from "react-router-dom"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { Token } from "../../../shared/token/type"
+import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
+import { TransactionListErrorItem } from "./TransactionListErrorItem"
 import { TransactionListItem } from "./TransactionListItem"
 import { transformExplorerTransaction, transformTransaction } from "./transform"
 import { isActivityTransaction, isExplorerTransaction } from "./transform/is"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
 
-interface AccountActivityProps {
+interface AccountActivityBaseProps {
   account: Account
   tokensByNetwork?: Token[]
   nftContractAddresses?: string[]
-  activity: Record<string, Array<ActivityTransaction | IExplorerTransaction>>
   loadMoreHashes: string[]
   onLoadMore: () => void
 }
 
+interface AccountActivityProps extends AccountActivityBaseProps {
+  activity: Record<string, Array<ActivityTransaction | IExplorerTransaction>>
+}
+
+interface AccountActivityItemProps extends AccountActivityBaseProps {
+  transaction: ActivityTransaction | IExplorerTransaction
+}
+
 export const AccountActivity: FC<AccountActivityProps> = ({
-  account,
-  tokensByNetwork,
-  nftContractAddresses,
   activity,
-  loadMoreHashes = [],
-  onLoadMore,
+  ...rest
 }) => {
-  const navigate = useNavigate()
   return (
     <>
       {Object.entries(activity).map(([dateLabel, transactions]) => (
         <Fragment key={dateLabel}>
           <HeaderCell>{dateLabel}</HeaderCell>
           {transactions.map((transaction) => {
-            if (isActivityTransaction(transaction)) {
-              const { hash, isRejected } = transaction
-              const transactionTransformed = transformTransaction({
-                transaction,
-                accountAddress: account.address,
-                tokensByNetwork,
-                nftContractAddresses,
-              })
-              if (transactionTransformed) {
-                return (
-                  <TransactionListItem
-                    key={hash}
-                    txHash={hash}
-                    transactionTransformed={transactionTransformed}
-                    network={account.network}
-                    onClick={() => navigate(routes.transactionDetail(hash))}
-                  >
-                    {isRejected ? (
-                      <div style={{ display: "flex" }}>
-                        <TransactionStatusIndicator color={"red"} />
-                      </div>
-                    ) : null}
-                  </TransactionListItem>
-                )
-              }
-              return null
-            } else if (isExplorerTransaction(transaction)) {
-              const explorerTransactionTransformed =
-                transaction &&
-                transformExplorerTransaction({
-                  explorerTransaction: transaction,
-                  accountAddress: account.address,
-                  tokensByNetwork,
-                  nftContractAddresses,
-                })
-              if (explorerTransactionTransformed) {
-                const { transactionHash } = transaction
-                const loadMore = loadMoreHashes.includes(transactionHash)
-                return (
-                  <Fragment key={transactionHash}>
-                    <TransactionListItem
-                      txHash={transactionHash}
-                      transactionTransformed={explorerTransactionTransformed}
-                      network={account.network}
-                      onClick={() =>
-                        navigate(routes.transactionDetail(transactionHash))
-                      }
-                    />
-                    {loadMore && (
-                      <LoadMoreTrigger onLoadMore={onLoadMore} mt={-2} />
-                    )}
-                  </Fragment>
-                )
-              }
-            } else {
-              return null
-            }
+            const key = isActivityTransaction(transaction)
+              ? transaction.hash
+              : transaction.transactionHash
+            return (
+              <ErrorBoundary key={key} fallback={<TransactionListErrorItem />}>
+                <AccountActivityItem transaction={transaction} {...rest} />
+              </ErrorBoundary>
+            )
           })}
         </Fragment>
       ))}
     </>
   )
+}
+
+const AccountActivityItem: FC<AccountActivityItemProps> = ({
+  account,
+  tokensByNetwork,
+  nftContractAddresses,
+  loadMoreHashes = [],
+  onLoadMore,
+  transaction,
+}) => {
+  const navigate = useNavigate()
+  if (isActivityTransaction(transaction)) {
+    const { hash, isRejected } = transaction
+    const transactionTransformed = transformTransaction({
+      transaction,
+      accountAddress: account.address,
+      tokensByNetwork,
+      nftContractAddresses,
+    })
+    if (transactionTransformed) {
+      return (
+        <TransactionListItem
+          txHash={hash}
+          transactionTransformed={transactionTransformed}
+          network={account.network}
+          onClick={() => navigate(routes.transactionDetail(hash))}
+        >
+          {isRejected ? (
+            <div style={{ display: "flex" }}>
+              <TransactionStatusIndicator color={"red"} />
+            </div>
+          ) : null}
+        </TransactionListItem>
+      )
+    }
+  } else if (isExplorerTransaction(transaction)) {
+    const explorerTransactionTransformed =
+      transaction &&
+      transformExplorerTransaction({
+        explorerTransaction: transaction,
+        accountAddress: account.address,
+        tokensByNetwork,
+        nftContractAddresses,
+      })
+    if (explorerTransactionTransformed) {
+      const { transactionHash } = transaction
+      const loadMore = loadMoreHashes.includes(transactionHash)
+      return (
+        <>
+          <TransactionListItem
+            txHash={transactionHash}
+            transactionTransformed={explorerTransactionTransformed}
+            network={account.network}
+            onClick={() => navigate(routes.transactionDetail(transactionHash))}
+          />
+          {loadMore && <LoadMoreTrigger onLoadMore={onLoadMore} mt={-2} />}
+        </>
+      )
+    }
+  }
+  return <TransactionListErrorItem />
 }

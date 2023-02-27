@@ -147,13 +147,9 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                       </Button>
                     )}
                     <Button
-                      disabled={confirmButtonDisabled}
+                      isDisabled={confirmButtonDisabled}
                       variant={confirmButtonVariant}
-                      backgroundColor={
-                        !confirmButtonDisabled
-                          ? confirmButtonBackgroundColor ?? "primary.500"
-                          : undefined
-                      }
+                      colorScheme="primary"
                       w="full"
                       type="submit"
                     >
@@ -182,12 +178,8 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                       </Button>
                     )}
                     <Button
-                      disabled={confirmButtonDisabled}
-                      backgroundColor={
-                        !confirmButtonDisabled
-                          ? confirmButtonBackgroundColor ?? "primary.500"
-                          : undefined
-                      }
+                      isDisabled={confirmButtonDisabled}
+                      colorScheme="primary"
                       variant={confirmButtonVariant}
                       type="submit"
                     >
