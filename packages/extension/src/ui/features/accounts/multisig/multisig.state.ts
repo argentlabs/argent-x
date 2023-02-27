@@ -71,5 +71,8 @@ export function useMultisigAccount(base: BaseWalletAccount) {
 }
 
 export function isZeroMultisigAccount(account: BaseMultisigWalletAccount) {
-  return account.signers.length === 0 && account.threshold === 0
+  return (
+    (account.signers.length === 0 && account.threshold === 0) ||
+    !account.multisigAddress
+  )
 }

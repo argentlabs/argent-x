@@ -123,6 +123,22 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
+    case "GET_CALCULATED_MULTISIG_ADDRESS": {
+      try {
+        const address = await wallet.getCalculatedMultisigAddress(msg.data)
+
+        return sendMessageToUi({
+          type: "GET_CALCULATED_MULTISIG_ADDRESS_RES",
+          data: address,
+        })
+      } catch (e) {
+        console.error(e)
+        return sendMessageToUi({
+          type: "GET_CALCULATED_MULTISIG_ADDRESS_REJ",
+        })
+      }
+    }
+
     case "DEPLOY_ACCOUNT": {
       try {
         await deployAccountAction({

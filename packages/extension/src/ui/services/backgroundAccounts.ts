@@ -3,6 +3,7 @@ import { utils } from "ethers"
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import {
   ArgentAccountType,
+  BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
   MultisigData,
@@ -60,6 +61,32 @@ export const createNewMultisigAccount = async (
       waitForMessage("NEW_MULTISIG_ACCOUNT_REJ").then(() => "error" as const),
     ])
   } catch {
+    throw Error("Could not add new account")
+  }
+}
+
+export const getCalculatedMultisigAddress = async (
+  baseMultisigAccount: BaseMultisigWalletAccount,
+) => {
+  sendMessage({
+    type: "GET_CALCULATED_MULTISIG_ADDRESS",
+    data: baseMultisigAccount,
+  })
+  try {
+    const res = await Promise.race([
+      waitForMessage("GET_CALCULATED_MULTISIG_ADDRESS_RES"),
+      waitForMessage("GET_CALCULATED_MULTISIG_ADDRESS_REJ").then(
+        () => "error" as const,
+      ),
+    ])
+
+    if (res === "error") {
+      throw Error("Could not calculate multisig address")
+    }
+
+    return res
+  } catch (e) {
+    console.error(e)
     throw Error("Could not add new account")
   }
 }

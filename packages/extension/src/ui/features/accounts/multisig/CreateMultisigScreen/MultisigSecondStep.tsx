@@ -3,9 +3,12 @@ import { icons } from "@argent/ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
+import { updateBaseMultisigAccount } from "../../../../../shared/multisig/store"
 import { isEmptyValue } from "../../../../../shared/utils/object"
 import { useAppState } from "../../../../app.state"
-import { useNetwork } from "../../../networks/useNetworks"
+import { getCalculatedMultisigAddress } from "../../../../services/backgroundAccounts"
+import { useSelectedAccount } from "../../accounts.state"
+import { usePublicKey } from "../../usePublicKey"
 import { useSignerKey } from "../useSignerKey"
 import { ScreenLayout } from "./ScreenLayout"
 import { useCreateMultisig } from "./useCreateMultisig"
@@ -24,20 +27,36 @@ export const MultisigSecondStep = ({
 }) => {
   const { switcherNetworkId } = useAppState()
   const { encodedPubKey } = useSignerKey()
+  const pubKey = usePublicKey()
   const { createMultisigAccount, isError } = useCreateMultisig()
-  const network = useNetwork(switcherNetworkId)
   const {
     control,
     formState: { errors },
     getValues,
   } = useFormContext<FieldValues>()
 
+  const selectedAccount = useSelectedAccount()
+
   const handleCreateMultisig = async () => {
-    if (isEmptyValue(errors) && encodedPubKey) {
-      const result = await createMultisigAccount({
-        networkId: network.id,
-        signers: [...getValues("signerKeys").map((i) => i.key), encodedPubKey],
-        threshold: getValues("confirmations").toString(),
+    if (isEmptyValue(errors) && encodedPubKey && selectedAccount) {
+      const signers = [
+        ...getValues("signerKeys").map((i) => i.key),
+        encodedPubKey,
+      ]
+      const threshold = getValues("confirmations")
+
+      const multisigAddress = await getCalculatedMultisigAddress({
+        ...selectedAccount,
+        signers,
+        threshold,
+      })
+
+      const result = await updateBaseMultisigAccount({
+        ...selectedAccount,
+        creator: pubKey,
+        signers,
+        threshold,
+        multisigAddress,
       })
       if (result) {
         goNext()

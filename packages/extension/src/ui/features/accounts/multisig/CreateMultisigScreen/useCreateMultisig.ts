@@ -11,7 +11,7 @@ export const useCreateMultisig = () => {
   }: {
     signers: string[]
     networkId: string
-    threshold: string
+    threshold: number
   }) => {
     const result = await createNewMultisigAccount(networkId, {
       signers,

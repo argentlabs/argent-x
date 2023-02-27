@@ -2,6 +2,8 @@ import { isString } from "lodash-es"
 import urlJoin from "url-join"
 
 export const ARGENT_API_BASE_URL = process.env.ARGENT_API_BASE_URL as string
+export const ARGENT_MULTISIG_BASE_URL = process.env
+  .ARGENT_MULTISIG_BASE_URL as string
 
 export const ARGENT_API_ENABLED =
   isString(ARGENT_API_BASE_URL) && ARGENT_API_BASE_URL.length > 0
@@ -47,6 +49,11 @@ export const ARGENT_TRANSACTION_SIMULATION_API_ENABLED =
   isString(ARGENT_TRANSACTION_SIMULATION_URL) &&
   ARGENT_TRANSACTION_SIMULATION_URL.length > 0
 
-export const ARGENT_MULTISIG_URL = ARGENT_API_ENABLED
-  ? urlJoin(ARGENT_API_BASE_URL, "starknet/multisig")
+export const ARGENT_MULTISIG_ENABLED =
+  process.env.FEATURE_MULTISIG === "true" &&
+  isString(ARGENT_MULTISIG_BASE_URL) &&
+  ARGENT_MULTISIG_BASE_URL.length > 0
+
+export const ARGENT_MULTISIG_URL = ARGENT_MULTISIG_ENABLED
+  ? ARGENT_MULTISIG_BASE_URL
   : undefined

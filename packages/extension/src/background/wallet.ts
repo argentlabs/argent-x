@@ -1,4 +1,4 @@
-import { ethers } from "ethers"
+import { ethers, utils } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, memoize, noop, throttle, union } from "lodash-es"
 import {
@@ -666,18 +666,22 @@ export class Wallet {
       "multisig", // make sure to always use the multisig implementation
     )
 
+    const decodedSigners = multisigAccount.signers.map((signer) =>
+      utils.hexlify(utils.base58.decode(signer)),
+    )
+
     const constructorCallData = {
       implementation: accountClassHash,
       selector: getSelectorFromName("initialize"),
       calldata: stark.compileCalldata({
         threshold: multisigAccount.threshold.toString(),
-        signers: multisigAccount.signers,
+        signers: decodedSigners,
       }),
     }
 
     const deployMultisigPayload = {
       classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      contractAddress: multisigAccount.address,
+      contractAddress: multisigAccount.multisigAddress ?? "",
       constructorCalldata: stark.compileCalldata(constructorCallData),
       addressSalt: starkPub,
     }
@@ -691,7 +695,12 @@ export class Wallet {
       0,
     )
 
-    if (!isEqualAddress(multisigAccount.address, calculatedMultisigAddress)) {
+    if (
+      !isEqualAddress(
+        calculatedMultisigAddress,
+        multisigAccount.multisigAddress,
+      )
+    ) {
       throw new Error("Calculated address does not match multisig address")
     }
 
@@ -883,6 +892,55 @@ export class Wallet {
     }
 
     return this.getStarknetAccount(account)
+  }
+
+  public async getCalculatedMultisigAddress(
+    baseMultisigAccount: BaseMultisigWalletAccount,
+  ): Promise<string> {
+    const multisigAccount = await getMultisigAccountFromBaseWallet(
+      baseMultisigAccount,
+    )
+
+    if (!multisigAccount) {
+      throw new Error("This multisig account does not exist")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      multisigAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      multisigAccount.network,
+      "multisig", // make sure to always use the multisig implementation
+    )
+
+    const decodedSigners = baseMultisigAccount.signers.map((signer) =>
+      utils.hexlify(utils.base58.decode(signer)),
+    )
+
+    const constructorCallData = {
+      implementation: accountClassHash,
+      selector: getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({
+        threshold: baseMultisigAccount.threshold.toString(),
+        signers: decodedSigners,
+      }),
+    }
+
+    const deployMultisigPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      constructorCalldata: stark.compileCalldata(constructorCallData),
+      addressSalt: starkPub,
+    }
+
+    return calculateContractAddressFromHash(
+      deployMultisigPayload.addressSalt,
+      deployMultisigPayload.classHash,
+      deployMultisigPayload.constructorCalldata,
+      0,
+    )
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {

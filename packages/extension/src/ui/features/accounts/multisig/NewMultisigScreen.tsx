@@ -48,6 +48,12 @@ export const NewMultisigScreen: FC = () => {
 
   const onClick = useCallback(
     async (type: MultisigOptionType) => {
+      // Initialize the multisig account with a zero multisig
+      await addAccount({
+        type: "multisig",
+        multisigPayload: ZERO_MULTISIG,
+      })
+
       switch (type) {
         case "create": {
           const url = `index.html?goto=multisig`
@@ -58,11 +64,6 @@ export const NewMultisigScreen: FC = () => {
         }
 
         case "join": {
-          await addAccount({
-            type: "multisig",
-            multisigPayload: ZERO_MULTISIG,
-            skipNavigate: true,
-          })
           navigate(routes.multisigJoin())
           break
         }

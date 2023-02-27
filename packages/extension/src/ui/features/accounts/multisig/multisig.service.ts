@@ -22,18 +22,18 @@ export const networkToStarknetNetwork = (network: Network) => {
   }
 }
 
+export interface ApiMultsigContent {
+  address: string
+  creator: string
+  signers: string[]
+  threshold: number
+}
+
 export interface ApiMultsigDataForSigner {
   totalPages: number
   totalElements: number
   size: number
-  content: [
-    {
-      address: string
-      creator: string
-      signers: string[]
-      threshold: number
-    },
-  ]
+  content: ApiMultsigContent[]
 }
 
 export function fetchMultisigDataForSigner({
