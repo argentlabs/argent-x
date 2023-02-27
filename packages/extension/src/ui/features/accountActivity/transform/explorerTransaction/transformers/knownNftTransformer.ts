@@ -1,6 +1,6 @@
 import { includesAddress } from "../../../../../../shared/knownDapps"
 import { isEqualAddress } from "../../../../../services/addresses"
-import { NFTTransaction, NFTTransferTransaction } from "../../type"
+import { NFTTransferTransaction } from "../../type"
 import { IExplorerTransactionTransformer } from "./type"
 
 /** adds erc721 token transfer data */
@@ -30,23 +30,15 @@ export default function ({
       const fromAddress = event.parameters[0].value
       const toAddress = event.parameters[1].value
       const tokenId = event.parameters[2].value
-      if (fromAddress === "0x0") {
-        action = "MINT"
-        displayName = "Mint NFT"
-        result = {
-          ...result,
-          action,
-          entity,
-          displayName,
-          contractAddress,
-          tokenId,
-        } as NFTTransaction
-        return result
-      }
+
       if (accountAddress && toAddress && fromAddress) {
         if (isEqualAddress(toAddress, accountAddress)) {
           action = "RECEIVE"
           displayName = "Receive NFT"
+          if (fromAddress === "0x0") {
+            action = "MINT"
+            displayName = "Mint NFT"
+          }
         }
         if (isEqualAddress(fromAddress, accountAddress)) {
           action = "SEND"
