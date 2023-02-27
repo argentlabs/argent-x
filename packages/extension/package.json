@@ -64,6 +64,7 @@
     "lint": "eslint . --cache --ext .ts,.tsx",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:ci": "vitest run --coverage",
     "test:e2e": "playwright test",
     "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes && yarn run push-release-branch",
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",
