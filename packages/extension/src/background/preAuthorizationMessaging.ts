@@ -84,7 +84,6 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
       const origin = getOriginFromSender(sender)
       const valid = await isPreAuthorized(selectedAccount, origin)
-      console.log("IS_PREAUTHORIZED", valid)
       return respond({ type: "IS_PREAUTHORIZED_RES", data: valid })
     }
   }

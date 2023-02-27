@@ -79,10 +79,7 @@ export const getArgentStarknetWindowObject = (
       if (ops?.starknetVersion === "v3") {
         throw Error("not implemented")
       }
-      console.log("enable")
       const [selectedAddress] = await remoteHandle.call("enable")
-
-      console.log("selectedAddress", selectedAddress)
 
       updateStarknetWindowObject(
         wallet,

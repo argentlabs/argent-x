@@ -7,9 +7,6 @@ import {
 } from "@argent/x-window"
 import browser from "webextension-polyfill"
 
-// import { WindowMessageType } from "./shared/messages"
-// import { messageStream, sendMessage } from "./shared/messages"
-
 const container = document.head || document.documentElement
 const script = document.createElement("script")
 
@@ -58,4 +55,5 @@ const portMessenger = new ExtensionMessenger(port)
 
 const bridge = new Relayer(windowMessenger, portMessenger)
 
+// Please keep this log statement, it is used to detect if the bridge is loaded
 console.log("Bridge ID:", bridge.id)
