@@ -2,7 +2,11 @@ import { useMemo } from "react"
 
 import { multisigBaseWalletStore } from "../../../../shared/multisig/store"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
-import { MultisigWalletAccount } from "../../../../shared/wallet.model"
+import {
+  BaseMultisigWalletAccount,
+  BaseWalletAccount,
+  MultisigWalletAccount,
+} from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/wallet.service"
 import { useAccounts } from "../accounts.state"
 import { Multisig } from "./Multisig"
@@ -54,4 +58,18 @@ export function useMultisigAccounts() {
       })
       .filter((account): account is MultisigWalletAccount => !!account)
   }, [accounts, baseMultisigAccounts])
+}
+
+export function useMultisigAccount(base: BaseWalletAccount) {
+  const multisigAccounts = useMultisigAccounts()
+
+  return useMemo(() => {
+    return multisigAccounts.find((multisigAccount) =>
+      accountsEqual(multisigAccount, base),
+    )
+  }, [base, multisigAccounts])
+}
+
+export function isZeroMultisigAccount(account: BaseMultisigWalletAccount) {
+  return account.signers.length === 0 && account.threshold === 0
 }

@@ -26,7 +26,7 @@ export type AccountMessage =
       data: {
         networkId: string
         signers: string[]
-        threshold: string
+        threshold: number
       }
     }
   | {
@@ -89,6 +89,7 @@ export type AccountMessage =
     }
   | {
       type: "GET_PUBLIC_KEY"
+      data?: BaseWalletAccount
     }
   | {
       type: "GET_PUBLIC_KEY_RES"

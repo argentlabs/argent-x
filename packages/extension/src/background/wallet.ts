@@ -670,7 +670,7 @@ export class Wallet {
       implementation: accountClassHash,
       selector: getSelectorFromName("initialize"),
       calldata: stark.compileCalldata({
-        threshold: multisigAccount.threshold,
+        threshold: multisigAccount.threshold.toString(),
         signers: multisigAccount.signers,
       }),
     }
@@ -742,7 +742,7 @@ export class Wallet {
     index,
     networkId,
   }: {
-    threshold: string
+    threshold: number
     signers: string[]
     index: number
     networkId: string
@@ -774,7 +774,7 @@ export class Wallet {
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({
           signers,
-          threshold,
+          threshold: threshold.toString(),
         }),
       }),
       addressSalt: starkPub,
@@ -960,8 +960,10 @@ export class Wallet {
     return starkPair.getPrivate().toString()
   }
 
-  public async getPublicKey(): Promise<string> {
-    const account = await this.getSelectedAccount()
+  public async getPublicKey(baseAccount?: BaseWalletAccount): Promise<string> {
+    const account = baseAccount
+      ? await this.getAccount(baseAccount)
+      : await this.getSelectedAccount()
 
     if (!account) {
       throw new Error("no selected account")

@@ -207,7 +207,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "GET_PUBLIC_KEY": {
-      const publicKey = await wallet.getPublicKey()
+      const publicKey = await wallet.getPublicKey(msg.data)
 
       return sendMessageToUi({
         type: "GET_PUBLIC_KEY_RES",

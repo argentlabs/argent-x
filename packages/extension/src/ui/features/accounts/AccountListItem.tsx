@@ -13,7 +13,7 @@ import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
-import { MultisigStatus } from "./multisig/types"
+import { MultisigStatus } from "./multisig/hooks"
 
 const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon } = icons
 

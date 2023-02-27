@@ -8,22 +8,30 @@ import { Account, AccountConstructorProps } from "../Account"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {
   signers: string[]
-  threshold: string
+  threshold: number
+  multisigAddress?: string
+  creator?: string
 }
 
 export const ZERO_MULTISIG: MultisigData = {
   signers: [],
-  threshold: "0",
+  threshold: 0,
+  multisigAddress: undefined,
+  creator: undefined,
 }
 
 export class Multisig extends Account {
   signers: string[]
-  threshold: string
+  threshold: number
+  multisigAddress?: string
+  creator?: string
 
   constructor(props: MultisigConstructorProps) {
     super(props)
     this.signers = props.signers
     this.threshold = props.threshold
+    this.multisigAddress = props.multisigAddress
+    this.creator = props.creator
   }
 
   // Create Method Overload
@@ -77,6 +85,8 @@ export class Multisig extends Account {
       type: "multisig",
       signers: multisigPayload.signers,
       threshold: multisigPayload.threshold,
+      multisigAddress: multisigPayload.multisigAddress,
+      creator: multisigPayload.creator,
     })
   }
 
@@ -88,5 +98,9 @@ export class Multisig extends Account {
       signers,
       threshold,
     }
+  }
+
+  public isZeroMultisig(): boolean {
+    return this.signers.length === 0 && this.threshold === 0
   }
 }
