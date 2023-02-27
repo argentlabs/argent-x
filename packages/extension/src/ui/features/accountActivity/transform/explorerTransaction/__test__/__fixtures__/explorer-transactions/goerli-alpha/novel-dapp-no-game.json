@@ -3,7 +3,7 @@
   "blockNumber": 271167,
   "timestamp": 1660823428,
   "transactionHash": "0x3e6c83914355eaf85977bed0338d20405745e361bde07035547a6a60b69ff93",
-  "contractAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  "contractAddress": "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
   "entryPoint": "__execute__",
   "maxFee": "0x12a4fccd3f2e",
   "actualFee": "0xc6dfdde2a1f",
@@ -30,7 +30,7 @@
     },
     {
       "name": "transaction_executed",
-      "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "address": "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
       "parameters": [
         {
           "name": "hash",
