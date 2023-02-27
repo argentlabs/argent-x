@@ -26,6 +26,7 @@ import {
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 import { GroupedAccountList } from "./GroupedAccountList"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
+import { MultisigListScreenItem } from "./multisig/MultisigListScreenItem"
 import { usePartitionDeprecatedAccounts } from "./upgrade.service"
 import { useAddAccount } from "./useAddAccount"
 
@@ -76,15 +77,15 @@ export const AccountListScreen: FC = () => {
     return <LoadingScreen />
   }
 
-  const [deprecatedAccounts, newAccounts] = partitionedAccounts
+  const [newAccounts, deprecatedAccounts] = partitionedAccounts
 
   const accountByTypes = groupBy(newAccounts, "type")
 
-  const argentAccounts = accountByTypes.argent
+  const standardAccounts = accountByTypes.standard
   const multisigAccounts = accountByTypes.multisig
 
   const hasMultipleAccountTypes =
-    !isEmpty(argentAccounts) && !isEmpty(multisigAccounts)
+    !isEmpty(standardAccounts) && !isEmpty(multisigAccounts)
 
   return (
     <>
@@ -113,10 +114,11 @@ export const AccountListScreen: FC = () => {
             <Flex direction="column" gap={6}>
               <GroupedAccountList
                 title="Standard Accounts"
-                accounts={argentAccounts}
+                accounts={standardAccounts}
                 icon={<WalletIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="standard"
               />
               <GroupedAccountList
                 title="Multisig Accounts"
@@ -124,17 +126,27 @@ export const AccountListScreen: FC = () => {
                 icon={<MultisigIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="multisig"
               />
             </Flex>
           ) : (
-            newAccounts.map((account) => (
-              <AccountListScreenItem
-                key={account.address}
-                account={account}
-                selectedAccount={selectedAccount}
-                returnTo={returnTo}
-              />
-            ))
+            newAccounts.map((account) =>
+              account.type === "multisig" ? (
+                <MultisigListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                />
+              ) : (
+                <AccountListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                />
+              ),
+            )
           )}
           {some(deprecatedAccounts) && (
             <>

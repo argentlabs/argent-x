@@ -5,6 +5,7 @@ import { FC } from "react"
 
 import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
+import { MultisigListScreenItem } from "./multisig/MultisigListScreenItem"
 
 export interface GroupedAccountListProps {
   title: string
@@ -12,6 +13,7 @@ export interface GroupedAccountListProps {
   icon: React.ReactNode
   selectedAccount?: Account
   returnTo?: string
+  type: "standard" | "multisig"
 }
 
 export const GroupedAccountList: FC<GroupedAccountListProps> = ({
@@ -20,6 +22,7 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
   icon,
   selectedAccount,
   returnTo,
+  type,
 }) => {
   return !isEmpty(accounts) ? (
     <Flex direction="column" gap={3} alignItems="flex-start">
@@ -27,15 +30,28 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
         {icon}
         <H6>{title}</H6>
       </Flex>
-      {accounts.map((account) => (
-        <Box key={account.address} w="full">
-          <AccountListScreenItem
-            account={account}
-            selectedAccount={selectedAccount}
-            returnTo={returnTo}
-          />
-        </Box>
-      ))}
+      {/** Render standard account list items for standard accounts */}
+      {type === "standard" &&
+        accounts.map((account) => (
+          <Box key={account.address} w="full">
+            <AccountListScreenItem
+              account={account}
+              selectedAccount={selectedAccount}
+              returnTo={returnTo}
+            />
+          </Box>
+        ))}
+      {/** Render multisig account list items for multisig accounts */}
+      {type === "multisig" &&
+        accounts.map((account) => (
+          <Box key={account.address} w="full">
+            <MultisigListScreenItem
+              account={account}
+              selectedAccount={selectedAccount}
+              returnTo={returnTo}
+            />
+          </Box>
+        ))}
     </Flex>
   ) : (
     <></>
