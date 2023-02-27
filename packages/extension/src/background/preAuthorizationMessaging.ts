@@ -70,8 +70,6 @@ export const handlePreAuthorizationMessage: HandleMessage<
         })
       }
 
-      console.log("CONNECT_DAPP", isAuthorized)
-
       return openUi()
     }
 
