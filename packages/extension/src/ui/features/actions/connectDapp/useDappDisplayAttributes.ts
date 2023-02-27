@@ -14,7 +14,6 @@ export const getDappDisplayAttributes = async (
 ): Promise<DappDisplayAttributes> => {
   const background = getColor(host)
   const knownDapp = getKnownDappForHost(host)
-  console.log(JSON.stringify({ host, knownDapp }))
   const title = knownDapp?.title || host
   const iconUrl = knownDapp?.icon || generateAvatarImage(title, { background })
   const result: DappDisplayAttributes = {
