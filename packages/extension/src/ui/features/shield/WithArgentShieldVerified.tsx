@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom"
 
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { resetDevice } from "../../../shared/shield/jwt"
-import { requestEmail } from "../../../shared/shield/register"
-import { getVerifiedEmailIsExpired } from "../../../shared/shield/verifiedEmail"
+import {
+  requestEmail,
+  shieldIsTokenExpired,
+} from "../../../shared/shield/register"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { WithArgentServicesEnabled } from "../settings/WithArgentServicesEnabled"
 import { useShieldState } from "./shield.state"
@@ -112,8 +114,8 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
             setState(ArgentShieldVerifiedState.VERIFY_EMAIL)
           }
         } else {
-          const verifiedEmailIsExpired = await getVerifiedEmailIsExpired()
-          if (verifiedEmailIsExpired) {
+          const isTokenExpired = await shieldIsTokenExpired()
+          if (isTokenExpired) {
             // need to re-verify existing email
             await requestEmail(verifiedEmail)
             setState(ArgentShieldVerifiedState.VERIFY_OTP)
