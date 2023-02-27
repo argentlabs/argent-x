@@ -45,7 +45,7 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn setup
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium
