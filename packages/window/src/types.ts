@@ -1,22 +1,98 @@
-import type {
-  AddStarknetChainParameters,
-  SwitchStarknetChainParameter,
-  WatchAssetParameters,
-} from "get-starknet-core"
-import { AccountInterface } from "starknet"
+import { InvokeFunctionResponse, Signature } from "starknet"
+import { z } from "zod"
+
+const callSchema = z.object({
+  contractAddress: z.string(),
+  entrypoint: z.string(),
+  calldata: z.array(z.string()).optional(),
+})
+
+const bignumberishSchema = z.union([
+  z.string().regex(/^0x[0-9a-fA-F]+$/),
+  z.number(),
+  z.bigint(),
+])
+
+export const StarknetMethodArgumentsSchemas = {
+  enable: z
+    .tuple([
+      z.object({
+        starknetVersion: z.union([z.literal("v3"), z.literal("v4")]).optional(),
+      }),
+    ])
+    .or(z.tuple([])),
+  addStarknetChain: z.tuple([
+    z.object({
+      id: z.string(),
+      chainId: z.string(),
+      chainName: z.string(),
+      rpcUrls: z.array(z.string()).optional(),
+      nativeCurrency: z
+        .object({
+          name: z.string(),
+          symbol: z.string(),
+          decimals: z.number(),
+        })
+        .optional(),
+      blockExplorerUrls: z.array(z.string()).optional(),
+    }),
+  ]),
+  switchStarknetChain: z.tuple([
+    z.object({
+      chainId: z.string(),
+    }),
+  ]),
+  watchAsset: z.tuple([
+    z.object({
+      type: z.literal("ERC20"),
+      options: z.object({
+        address: z.string(),
+        symbol: z.string().optional(),
+        decimals: z.number().optional(),
+        image: z.string().optional(),
+        name: z.string().optional(),
+      }),
+    }),
+  ]),
+  execute: z.tuple([
+    z.array(callSchema).or(callSchema),
+    z.array(z.any()).optional(),
+    z
+      .object({
+        nonce: bignumberishSchema.optional(),
+        maxFee: bignumberishSchema.optional(),
+        version: bignumberishSchema.optional(),
+      })
+      .optional(),
+  ]),
+  signMessage: z.tuple([z.custom<any>((_) => true)]),
+} as const
 
 export type StarknetMethods = {
-  enable: (options?: { starknetVersion?: "v3" | "v4" }) => Promise<string[]>
+  enable: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.enable>
+  ) => Promise<string[]>
+  addStarknetChain: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.addStarknetChain>
+  ) => Promise<boolean>
+  switchStarknetChain: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.switchStarknetChain>
+  ) => Promise<boolean>
+  watchAsset: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.watchAsset>
+  ) => Promise<boolean>
+  execute: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.execute>
+  ) => Promise<InvokeFunctionResponse>
+  signMessage: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.signMessage>
+  ) => Promise<Signature>
+
   getLoginStatus: () => Promise<
     | { isLoggedIn: false }
     | { isLoggedIn: true; hasSession: boolean; isPreauthorized: boolean }
   >
-  addStarknetChain: (params: AddStarknetChainParameters) => Promise<boolean>
-  switchStarknetChain: (
-    params: SwitchStarknetChainParameter,
-  ) => Promise<boolean>
-  watchAsset: (params: WatchAssetParameters) => Promise<boolean>
-} & Pick<AccountInterface, "execute" | "signMessage">
+}
 
 export type ConnectMethods = {
   connect: () => void
