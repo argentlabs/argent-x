@@ -1,9 +1,13 @@
 name: Run e2e tests
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
+      - feature/*
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
+      - feature/*
 
 jobs:
   test:
