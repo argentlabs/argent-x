@@ -52,7 +52,6 @@ const SwitchDirectionButton = chakra(IconButton, {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    zIndex: 1,
     minHeight: "32px",
     minWidth: "32px",
     padding: "10.25px",
@@ -240,15 +239,6 @@ const Swap = () => {
             tradeLoading={tradeLoading}
             insufficientBalance={!isValid && !!formattedAmounts[Field.INPUT]}
           />
-          <SwitchDirectionButton
-            animation={rotate ? `${spin} 0.125s linear` : ""}
-            icon={<StyledSwitchDirectionIcon />}
-            onClick={() => {
-              setRotate(true)
-              setTimeout(() => setRotate(false), 150)
-              switchCurrencies()
-            }}
-          />
           <SwapInputPanel
             type="receive"
             id="swap-input-receive-panel"
@@ -259,6 +249,15 @@ const Swap = () => {
             otherCurrency={currencies[Field.INPUT]}
             currentBalance={currencyBalances[Field.OUTPUT]}
             tradeLoading={tradeLoading}
+          />
+          <SwitchDirectionButton
+            animation={rotate ? `${spin} 0.125s linear` : ""}
+            icon={<StyledSwitchDirectionIcon />}
+            onClick={() => {
+              setRotate(true)
+              setTimeout(() => setRotate(false), 150)
+              switchCurrencies()
+            }}
           />
         </Flex>
 
