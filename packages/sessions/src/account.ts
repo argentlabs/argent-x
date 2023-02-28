@@ -30,6 +30,8 @@ import {
 
 export class SessionAccount extends Account implements AccountInterface {
   public merkleTree: merkle.MerkleTree
+  public pendingTransactionHashes: string[] = []
+  private pendingExecuteCalls = 0
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
@@ -135,6 +137,31 @@ export class SessionAccount extends Account implements AccountInterface {
     }
   }
 
+  // check for resolution of any transactions that are not yet counted by account's nonce
+  async getOpenTransactionsCount() {
+    try {
+      const receipts = await Promise.all(
+        this.pendingTransactionHashes
+          .filter((txHash) => !!txHash)
+          .map((txHash) => this.getTransactionReceipt(txHash)),
+      )
+      this.pendingTransactionHashes = receipts
+        .filter(
+          (receipt) =>
+            receipt &&
+            !["NOT_RECEIVED", "RECEIVED", "PENDING"].includes(
+              receipt.status ?? "",
+            ),
+        )
+        .map((receipt) => receipt.transaction_hash)
+
+      // return the number of transactions not yet counted by nonce
+      return this.pendingTransactionHashes.length
+    } catch {
+      return 0
+    }
+  }
+
   /**
    * Invoke execute function in account contract
    *
@@ -150,55 +177,72 @@ export class SessionAccount extends Account implements AccountInterface {
     abis: Abi[] | undefined = undefined,
     transactionsDetail: InvocationsDetails = {},
   ): Promise<InvokeFunctionResponse> {
-    const transactions = await this.extendCallsBySession(
-      Array.isArray(calls) ? calls : [calls],
-      this.signedSession,
-    )
-    const nonce = number.toBN(
-      transactionsDetail.nonce ?? (await this.getNonce()),
-    )
-    let maxFee: number.BigNumberish = "0"
-    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
-      maxFee = transactionsDetail.maxFee
-    } else {
-      const { suggestedMaxFee } = await this.estimateInvokeFee(
+    this.pendingExecuteCalls += 1
+
+    try {
+      const transactions = await this.extendCallsBySession(
         Array.isArray(calls) ? calls : [calls],
+        this.signedSession,
+      )
+      const nonce = number.toBN(
+        transactionsDetail.nonce ?? (await this.getNonce()),
+      )
+      let maxFee: number.BigNumberish = "0"
+      if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
+        maxFee = transactionsDetail.maxFee
+      } else {
+        const { suggestedMaxFee } = await this.estimateInvokeFee(
+          Array.isArray(calls) ? calls : [calls],
+          {
+            nonce,
+          },
+        )
+        maxFee = suggestedMaxFee.toString()
+      }
+
+      const version = number.toBN(hash.transactionVersion)
+
+      // if explicit nonce passed, use it; otherwise, use the optimistically incremented nonce
+      // (estimateInvokeFee above must use the "current"/non-optimistic nonce on the account or
+      // it will fail, but the actual execution should use the "optimistic" nonce)
+      let optimisticNonce = number.toBN(nonce)
+      if (!transactionsDetail.nonce) {
+        const openTransactionCount = await this.getOpenTransactionsCount()
+        optimisticNonce = nonce
+          .add(number.toBN(openTransactionCount))
+          .add(number.toBN(this.pendingExecuteCalls))
+      }
+
+      const signerDetails: InvocationsSignerDetails = {
+        walletAddress: this.address,
+        nonce: optimisticNonce,
+        maxFee,
+        version,
+        chainId: this.chainId,
+      }
+
+      const signature = await this.signer.signTransaction(
+        transactions,
+        signerDetails,
+        abis,
+      )
+
+      const calldata = transaction.fromCallsToExecuteCalldata(transactions)
+
+      return this.invokeFunction(
         {
+          contractAddress: this.address,
+          calldata,
+          signature,
+        },
+        {
+          maxFee,
+          version,
           nonce,
         },
       )
-      maxFee = suggestedMaxFee.toString()
+    } finally {
+      this.pendingExecuteCalls = Math.max(this.pendingExecuteCalls - 1, 0)
     }
-
-    const version = number.toBN(hash.transactionVersion)
-
-    const signerDetails: InvocationsSignerDetails = {
-      walletAddress: this.address,
-      nonce,
-      maxFee,
-      version,
-      chainId: this.chainId,
-    }
-
-    const signature = await this.signer.signTransaction(
-      transactions,
-      signerDetails,
-      abis,
-    )
-
-    const calldata = transaction.fromCallsToExecuteCalldata(transactions)
-
-    return this.invokeFunction(
-      {
-        contractAddress: this.address,
-        calldata,
-        signature,
-      },
-      {
-        maxFee,
-        version,
-        nonce,
-      },
-    )
   }
 }
