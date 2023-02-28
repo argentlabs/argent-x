@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers"
 import {
   Call,
   DeclareContractPayload,
@@ -7,8 +6,8 @@ import {
 
 export interface TransactionsFeeEstimationProps {
   transactions: Call | Call[]
-  defaultMaxFee?: BigNumber
-  onChange?: (fee: BigNumber) => void
+  defaultMaxFee?: bigint
+  onChange?: (fee: bigint) => void
   onErrorChange?: (error: boolean) => void
   accountAddress: string
   networkId: string

@@ -1,13 +1,14 @@
-import { BigNumber, BigNumberish, utils } from "ethers"
+import { arrayify, concat } from "@ethersproject/bytes"
+import { HDNodeWallet, sha256, toUtf8Bytes } from "ethers"
 import { isNumber } from "lodash-es"
 import { KeyPair, ec, number } from "starknet"
 
 export function getStarkPair<T extends number | string>(
   indexOrPath: T,
-  secret: BigNumberish,
+  secret: string,
   ...[baseDerivationPath]: T extends string ? [] : [string]
 ): KeyPair {
-  const masterNode = utils.HDNode.fromSeed(BigNumber.from(secret).toHexString())
+  const masterNode = HDNodeWallet.fromSeed(secret)
 
   // baseDerivationPath will never be undefined because of the extends statement below,
   // but somehow TS doesnt get this. As this will be removed in the near future I didnt bother
@@ -74,14 +75,14 @@ export function grindKey(keySeed: string): string {
 }
 
 function hashKeyWithIndex(key: string, index: number) {
-  const payload = utils.concat([utils.arrayify(key), utils.arrayify(index)])
-  const hash = utils.sha256(payload)
+  const payload = concat([arrayify(key), arrayify(index)])
+  const hash = sha256(payload)
   return number.toBN(hash)
 }
 
 export function pathHash(name: string): number {
   return number
-    .toBN(utils.sha256(utils.toUtf8Bytes(name)))
+    .toBN(sha256(toUtf8Bytes(name)))
     .maskn(31)
     .toNumber()
 }

@@ -1,4 +1,4 @@
-import { wordlists } from "ethers"
+import { LangEn } from "ethers"
 import { FC } from "react"
 import styled, { keyframes } from "styled-components"
 
@@ -63,12 +63,14 @@ interface SeedPhraseProps {
 export const SeedPhrase: FC<SeedPhraseProps> = ({ seedPhrase }) =>
   seedPhrase ? (
     <SeedPhraseGrid>
-      {wordlists.en.split(seedPhrase).map((word, index) => (
-        <SeedWordBadge key={word + index}>
-          <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
-          {word}
-        </SeedWordBadge>
-      ))}
+      {LangEn.wordlist()
+        .split(seedPhrase)
+        .map((word, index) => (
+          <SeedWordBadge key={word + index}>
+            <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
+            {word}
+          </SeedWordBadge>
+        ))}
     </SeedPhraseGrid>
   ) : (
     <SeedPhraseGrid>

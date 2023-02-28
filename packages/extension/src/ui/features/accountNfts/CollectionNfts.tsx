@@ -1,6 +1,6 @@
 import { BarBackButton, H1, H4, H6, NavigationContainer, P4 } from "@argent/ui"
 import { Flex, Image, SimpleGrid } from "@chakra-ui/react"
-import { ethers } from "ethers"
+import { formatEther } from "ethers"
 import { FC } from "react"
 import { Location, useLocation, useNavigate, useParams } from "react-router-dom"
 
@@ -73,22 +73,23 @@ export const CollectionNfts: FC = () => {
             direction="column"
             alignItems="center"
           >
-            <Image
-              w="64px"
-              h="64px"
-              src={collectible.imageUri ?? undefined}
-              backgroundColor={
-                !collectible.imageUri ? "neutrals.300" : "transparent"
-              }
-              borderRadius="lg"
-            />
-            <H4>{collectible?.name || "Loading..."}</H4>
-            {collectible.floorPrice && (
-              <P4 color="neutrals.300">
-                Floor price: {ethers.utils.formatEther(collectible.floorPrice)}{" "}
-                ETH
-              </P4>
-            )}
+            <>
+              <Image
+                w="64px"
+                h="64px"
+                src={collectible.imageUri ?? undefined}
+                backgroundColor={
+                  !collectible.imageUri ? "neutrals.300" : "transparent"
+                }
+                borderRadius="lg"
+              />
+              <H4>{collectible?.name || "Loading..."}</H4>
+              {collectible.floorPrice && (
+                <P4 color="neutrals.300">
+                  Floor price: {formatEther(collectible.floorPrice)} ETH
+                </P4>
+              )}
+            </>
           </Flex>
           <SimpleGrid
             gridTemplateColumns="repeat(auto-fill, 158px)"

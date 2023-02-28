@@ -1,5 +1,9 @@
-import { ethers } from "ethers"
-import { ProgressCallback } from "ethers/lib/utils"
+import {
+  KeystoreAccount,
+  ProgressCallback,
+  encryptKeystoreJson,
+  ethers,
+} from "ethers"
 import { find, memoize, noop, throttle, union } from "lodash-es"
 import {
   Account,
@@ -152,10 +156,11 @@ export class Wallet {
     }
 
     const ethersWallet = ethers.Wallet.createRandom()
-    const encryptedBackup = await ethersWallet.encrypt(
+
+    const encryptedBackup = await encryptKeystoreJson(
+      ethersWallet as KeystoreAccount,
       password,
-      { scrypt: { N: SCRYPT_N } },
-      progressCallback,
+      { scrypt: { N: SCRYPT_N }, progressCallback },
     )
 
     await this.store.set("discoveredOnce", true)
@@ -176,7 +181,11 @@ export class Wallet {
       session.password,
     )
 
-    return wallet.mnemonic.phrase
+    if ("mnemonic" in wallet && wallet.mnemonic?.phrase) {
+      return wallet.mnemonic.phrase
+    }
+
+    throw new Error("No seed phrase found")
   }
 
   public async restoreSeedPhrase(seedPhrase: string, newPassword: string) {
@@ -184,10 +193,15 @@ export class Wallet {
     if ((await this.isInitialized()) || session) {
       throw new Error("Wallet is already initialized")
     }
-    const ethersWallet = ethers.Wallet.fromMnemonic(seedPhrase)
-    const encryptedBackup = await ethersWallet.encrypt(newPassword, {
-      scrypt: { N: SCRYPT_N },
-    })
+    const ethersWallet = ethers.Wallet.fromPhrase(seedPhrase)
+
+    const encryptedBackup = await encryptKeystoreJson(
+      ethersWallet as KeystoreAccount,
+      newPassword,
+      {
+        scrypt: { N: SCRYPT_N },
+      },
+    )
 
     await this.importBackup(encryptedBackup)
     await this.setSession(ethersWallet.privateKey, newPassword)
@@ -835,7 +849,10 @@ export class Wallet {
   }
 
   private async setSession(secret: string, password: string) {
-    await this.sessionStore.set({ secret, password })
+    await this.sessionStore.set({
+      secret,
+      password,
+    })
 
     browser.alarms.onAlarm.addListener(async (alarm) => {
       if (alarm.name === "session_timeout") {

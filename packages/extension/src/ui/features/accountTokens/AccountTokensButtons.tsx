@@ -27,7 +27,7 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
   const accountIsDeployed = useAccountIsDeployed(account)
 
   const hasNonZeroBalance = useMemo(() => {
-    return tokenDetails.some(({ balance }) => balance?.gt(0))
+    return tokenDetails.some(({ balance }) => (balance ?? 0) > 0)
   }, [tokenDetails])
 
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
