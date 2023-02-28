@@ -1,5 +1,5 @@
 import { Collapse } from "@mui/material"
-import { BigNumber } from "ethers"
+import { toBigInt } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 
 import { EstimateFeeResponse } from "../../../../../shared/messages/TransactionMessage"
@@ -38,7 +38,7 @@ export interface EstimationProps {
   needsDeploy?: boolean
   fee?: EstimateFeeResponse
   feeToken?: Token
-  feeTokenBalance?: BigNumber
+  feeTokenBalance?: bigint
   error: any
   onErrorChange?: (hasError: boolean) => void
 }
@@ -56,7 +56,8 @@ const Estimation: FC<EstimationProps> = ({
     useState(false)
 
   const enoughBalance = useMemo(
-    () => Boolean(fee && feeTokenBalance?.gte(fee?.suggestedMaxFee)),
+    () =>
+      Boolean(fee && (feeTokenBalance ?? 0) >= toBigInt(fee?.suggestedMaxFee)),
     [fee, feeTokenBalance],
   )
 
