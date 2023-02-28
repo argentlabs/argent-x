@@ -1,4 +1,5 @@
 import CurrencyConversionNumber from "bignumber.js"
+import { BigNumber } from "ethers"
 import { number } from "starknet"
 
 import {
@@ -74,7 +75,7 @@ describe("isNumeric()", () => {
     test("should return true", () => {
       expect(isNumeric(0)).toBeTruthy()
       expect(isNumeric("123")).toBeTruthy()
-      expect(isNumeric(123n)).toBeTruthy()
+      expect(isNumeric(BigNumber.from(123))).toBeTruthy()
       expect(isNumeric(new CurrencyConversionNumber("1.23"))).toBeTruthy()
       expect(isNumeric(toBN(123))).toBeTruthy()
     })

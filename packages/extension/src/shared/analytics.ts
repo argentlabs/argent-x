@@ -1,4 +1,4 @@
-import { encodeBase64 } from "ethers"
+import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
 import browser from "webextension-polyfill"
 import create from "zustand"
@@ -175,7 +175,7 @@ const defaultPayload = {
 }
 const headers = {
   "Content-Type": "application/json",
-  Authorization: `Basic ${encodeBase64(
+  Authorization: `Basic ${base64.encode(
     encode.utf8ToArray(`${SEGMENT_WRITE_KEY}:`),
   )}`,
 }

@@ -3,6 +3,8 @@ import useSWR from "swr"
 import { useSwapProvider } from "../providers"
 import { getProviderForNetworkId } from "../services/provider"
 
+// import { BigNumber } from 'ethers'
+
 // gets the current timestamp from the blockchain
 export default function useCurrentBlockTimestamp(): number | undefined {
   const { networkId } = useSwapProvider()

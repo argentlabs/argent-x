@@ -8,6 +8,7 @@ import {
   useCurrencyBalance,
   wrappedCurrency,
 } from "@argent/x-swap"
+import { BigNumber } from "ethers"
 import { FC } from "react"
 
 import {
@@ -54,7 +55,7 @@ const OwnedToken: FC<OwnedTokenProps> = ({ onClick, currency }) => {
     address: token.address,
     networkId: token.networkId,
     image: tokenImage,
-    balance: BigInt(balance?.raw.toString() || "0"),
+    balance: BigNumber.from(balance?.raw.toString() || "0"),
   }
 
   const displayBalance = prettifyTokenBalance(tokenDetailsWithBalance)

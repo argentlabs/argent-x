@@ -8,7 +8,7 @@ import {
   wrappedCurrency,
 } from "@argent/x-swap"
 import { Text } from "@chakra-ui/react"
-import { parseUnits } from "ethers"
+import { ethers } from "ethers"
 import { FC } from "react"
 
 import { prettifyCurrencyValue } from "../../../../shared/token/price"
@@ -32,7 +32,7 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
 
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
-    parseUnits("1", token?.decimals ?? 18),
+    ethers.utils.parseUnits("1", token?.decimals ?? 18),
   )
 
   const priceDetails = useTokenPriceDetails(token)

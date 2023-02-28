@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers"
 import { Call, number, stark } from "starknet"
 import useSWR from "swr"
 
@@ -11,7 +12,7 @@ const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
 
 export const useMaxFeeEstimateForTransfer = (
   tokenAddress?: string,
-  balance?: bigint,
+  balance?: BigNumber,
   account?: Account,
 ): {
   maxFee?: string
