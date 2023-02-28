@@ -138,12 +138,14 @@ export const SendScreen: FC = () => {
           >
             Tokens
           </Tab>
-          <Tab
-            active={selectedTab === "nfts"}
-            onClick={() => setSelectedTab("nfts")}
-          >
-            NFTs
-          </Tab>
+          {collectibles.length > 0 && (
+            <Tab
+              active={selectedTab === "nfts"}
+              onClick={() => setSelectedTab("nfts")}
+            >
+              NFTs
+            </Tab>
+          )}
         </TabGroup>
 
         <TabView>
