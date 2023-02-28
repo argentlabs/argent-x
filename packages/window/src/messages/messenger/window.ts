@@ -46,6 +46,10 @@ export class WindowMessenger implements Messenger {
   }
 
   private handleMessage = (event: MessageEvent) => {
+    if (event.source !== document.defaultView) {
+      // this event is from an external source and should not be handled
+      return
+    }
     this.listeners.forEach((listener) => {
       if (event.origin === this.origins.listen || this.origins.listen === "*") {
         listener(event.data, event.origin) // origin need to be from a trusted source
