@@ -51,7 +51,7 @@ export default class Navigation {
   }
 
   get lockWallet() {
-    return this.page.locator(`a:text-is("${lang.common.lockWallet}")`)
+    return this.page.locator(`button:has-text("${lang.common.lockWallet}")`)
   }
 
   get reset() {

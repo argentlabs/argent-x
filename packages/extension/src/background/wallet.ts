@@ -4,7 +4,7 @@ import {
   encryptKeystoreJson,
   ethers,
 } from "ethers"
-import { find, noop, throttle, union } from "lodash-es"
+import { find, memoize, noop, throttle, union } from "lodash-es"
 import {
   Account,
   DeployAccountContractTransaction,
@@ -48,7 +48,11 @@ import {
   ObjectStorage,
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
-import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
+import {
+  accountsEqual,
+  baseDerivationPath,
+  getAccountIdentifier,
+} from "../shared/wallet.service"
 import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
 import {
@@ -105,6 +109,24 @@ export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
   namespace: "core:wallet:session",
   areaName: "session",
 })
+
+const isNonceManagedOnAccountContract = memoize(
+  async (account: Accountv4, _: BaseWalletAccount) => {
+    try {
+      // This will fetch nonce from account contract instead of Starknet OS
+      await account.getNonce()
+      return true
+    } catch {
+      return false
+    }
+  },
+  (_, account) => {
+    const id = getAccountIdentifier(account)
+    // memoize for max 5 minutes
+    const timestamp = Math.floor(Date.now() / 1000 / 60 / 5)
+    return `${id}-${timestamp}`
+  },
+)
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -196,9 +218,8 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(session?.secret)
 
-    const networks = defaultNetworks
-      .map((network) => network.id)
-      .filter((networkId) => networkId !== "localhost")
+    const networks = defaultNetworks.map((network) => network.id)
+
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)
@@ -250,12 +271,14 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    const accountClassHashes = union(
-      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash?.argentAccount
-        ? [network.accountClassHash.argentAccount]
-        : [],
+    const networkAccountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "argent",
     )
+
+    const accountClassHashes = union(ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES, [
+      networkAccountClassHash,
+    ])
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
     if (!accountClassHashes?.length) {
@@ -315,8 +338,9 @@ export class Wallet {
       },
     )
 
+    await Promise.allSettled(promises)
+
     try {
-      await Promise.all(promises)
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
@@ -690,35 +714,28 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
-    const providerV4 = getProviderv4(
-      account.network && account.network.baseUrl
-        ? account.network
-        : await this.getNetwork(selector.networkId),
-    )
-
     const signer = await this.getSignerForAccount(account)
 
     if (account.needsDeploy || useLatest) {
       return new Account(provider, account.address, signer)
     }
 
+    const providerV4 = getProviderv4(
+      account.network && account.network.baseUrl
+        ? account.network
+        : await this.getNetwork(selector.networkId),
+    )
+
     const oldAccount = new Accountv4(providerV4, account.address, signer)
 
-    const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
+    const isOldAccount = await isNonceManagedOnAccountContract(
+      oldAccount,
+      account,
+    )
 
     return isOldAccount
       ? oldAccount
       : new Account(provider, account.address, signer)
-  }
-
-  public async isNonceManagedOnAccountContract(account: Accountv4) {
-    try {
-      // This will fetch nonce from account contract instead of Starknet OS
-      await account.getNonce()
-      return true
-    } catch {
-      return false
-    }
   }
 
   public async getCurrentImplementation(

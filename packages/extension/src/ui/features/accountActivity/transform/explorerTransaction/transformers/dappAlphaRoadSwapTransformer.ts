@@ -18,7 +18,7 @@ export default function ({
     const { events, calls } = explorerTransaction
     const event = getEntityWithName(events, "Swap")
     const call = getEntityWithName(calls, "swapExactTokensForTokens")
-    if (event && call) {
+    if (event && call && event.parameters) {
       const action = "SWAP"
       const entity = "TOKEN"
       const parameters = event.parameters

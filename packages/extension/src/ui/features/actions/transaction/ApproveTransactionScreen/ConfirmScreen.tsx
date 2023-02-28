@@ -4,12 +4,12 @@ import { FC, ReactNode, useState } from "react"
 import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
 
-import { formatTruncatedAddress } from "../../services/addresses"
-import { Account } from "../accounts/Account"
+import { formatTruncatedAddress } from "../../../../services/addresses"
+import { Account } from "../../../accounts/Account"
 import {
   getAccountName,
   useAccountMetadata,
-} from "../accounts/accountMetadata.state"
+} from "../../../accounts/accountMetadata.state"
 
 export interface ConfirmPageProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
@@ -147,13 +147,9 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                       </Button>
                     )}
                     <Button
-                      disabled={confirmButtonDisabled}
+                      isDisabled={confirmButtonDisabled}
                       variant={confirmButtonVariant}
-                      backgroundColor={
-                        !confirmButtonDisabled
-                          ? confirmButtonBackgroundColor ?? "primary.500"
-                          : undefined
-                      }
+                      colorScheme="primary"
                       w="full"
                       type="submit"
                     >
@@ -182,12 +178,8 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                       </Button>
                     )}
                     <Button
-                      disabled={confirmButtonDisabled}
-                      backgroundColor={
-                        !confirmButtonDisabled
-                          ? confirmButtonBackgroundColor ?? "primary.500"
-                          : undefined
-                      }
+                      isDisabled={confirmButtonDisabled}
+                      colorScheme="primary"
                       variant={confirmButtonVariant}
                       type="submit"
                     >

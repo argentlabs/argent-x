@@ -6,22 +6,24 @@ import { Call } from "starknet"
 import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
-} from "../../../../shared/transactionReview.service"
+} from "../../../../../../shared/transactionReview.service"
+import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
-import { AggregatedSimData } from "./useTransactionSimulatedData"
 
 export interface DappHeaderProps {
   transactions: Call[]
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
+  isDeclareContract: boolean
 }
 
 export const DappHeader = ({
   transactions,
   transactionReview,
   aggregatedData,
+  isDeclareContract,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -41,6 +43,7 @@ export const DappHeader = ({
           transactionReview={transactionReview}
           aggregatedData={aggregatedData}
           verifiedDapp={transactionReview?.targetedDapp}
+          isDeclareContract={isDeclareContract}
         />
         <Flex
           direction="column"
@@ -55,6 +58,7 @@ export const DappHeader = ({
               fallback={
                 transactions.length > 1 ? "transactions" : "transaction"
               }
+              isDeclareContract={isDeclareContract}
             />
           </H5>
           {targetedDappWebsite && (

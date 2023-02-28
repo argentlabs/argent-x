@@ -44,14 +44,22 @@ export interface ApiTransactionReviewResponse {
   targetedDapp: ApiTransactionReviewTargettedDapp
 }
 
-export type ApiTransactionReviewActivityType =
-  | "account-upgrade"
-  | "approve"
-  | "set-approval-for-all"
-  | "swap"
-  | "transfer"
+export const apiTransactionReviewActivityType = [
+  "account-upgrade",
+  "approve",
+  "set-approval-for-all",
+  "swap",
+  "transfer",
+] as const
 
-export type ApiTransactionReviewSlippageType = "equals" | "at_least" | "at_most"
+export type ApiTransactionReviewActivityType =
+  (typeof apiTransactionReviewActivityType)[number]
+
+export type TransactionReviewWithType = ApiTransactionReview & {
+  type: ApiTransactionReviewActivityType
+}
+
+export type ApiTransactionReviewSlippageType = "equal" | "at_least" | "at_most"
 
 export interface ApiTransactionReviewToken {
   address: string
@@ -211,4 +219,20 @@ export const getTransactionReviewHasSwap = (
   transactionReview?: ApiTransactionReviewResponse,
 ) => {
   return !!getTransactionReviewSwap(transactionReview)
+}
+
+export const getTransactionReviewWithType = (
+  transactionReview?: ApiTransactionReviewResponse,
+): TransactionReviewWithType | undefined => {
+  if (!transactionReview) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.activity?.type) {
+      return {
+        ...review,
+        type: review.activity?.type,
+      }
+    }
+  }
 }

@@ -20,3 +20,6 @@ export const withHiddenSelector = memoize(
   () => true,
   () => "default",
 )
+
+export const withGuardianSelector = (account: StoredWalletAccount) =>
+  Boolean(account.guardian)

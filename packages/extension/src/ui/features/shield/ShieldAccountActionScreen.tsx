@@ -3,11 +3,11 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
 
+import { shieldAddAccount } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { routes } from "../../routes"
 import { accountChangeGuardian } from "../../services/backgroundAccounts"
-import { shieldValidateAccount } from "../../services/shieldAccount"
 import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
@@ -33,13 +33,12 @@ export const ShieldAccountActionScreen: FC = () => {
     }
     setIsLoading(true)
     try {
-      // always check the account exists in backend
-      const { guardianAddress } = await shieldValidateAccount()
       if (account.guardian) {
         // remove
         await accountChangeGuardian(account, constants.ZERO.toString())
       } else {
         // add
+        const { guardianAddress } = await shieldAddAccount()
         await accountChangeGuardian(account, guardianAddress)
       }
     } catch (error) {

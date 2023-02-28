@@ -10,7 +10,7 @@ export interface IExplorerTransactionEvent {
   /** @example transaction_executed */
   name: string
   address: string
-  parameters: IExplorerTransactionParameters[]
+  parameters: IExplorerTransactionParameters[] | null // sometimes null for some reason
 }
 
 export interface IExplorerTransactionCall {
@@ -29,7 +29,7 @@ export interface IExplorerTransaction {
   timestamp: number
   /** @example 0x1e122f27e74c51082bc19377a76002889fa6b4b00508398f23f9dedc9f56b5c */
   transactionHash: string
-  /** @example 0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25 */
+  /** @example 0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a */
   contractAddress: string
   /** @example __execute__ */
   entryPoint?: string

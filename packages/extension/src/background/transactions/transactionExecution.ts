@@ -22,6 +22,7 @@ import { analytics } from "../analytics"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
+import { getEstimatedFees } from "./fees/store"
 import { addTransaction, transactionsStore } from "./store"
 
 export const checkTransactionHash = (
@@ -52,6 +53,11 @@ export const executeTransactionAction = async (
 ) => {
   const { transactions, abis, transactionsDetail, meta = {} } = action.payload
   const allTransactions = await transactionsStore.get()
+  const preComputedFees = await getEstimatedFees(transactions)
+
+  analytics.track("executeTransaction", {
+    usesCachedFees: Boolean(preComputedFees),
+  })
 
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
@@ -85,8 +91,8 @@ export const executeTransactionAction = async (
     ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
     : await getNonce(selectedAccount, wallet)
 
-  let maxFee = "0"
-  let maxADFee = "0"
+  let maxFee = preComputedFees?.suggestedMaxFee ?? "0"
+  let maxADFee = preComputedFees?.maxADFee ?? "0"
 
   if (
     selectedAccount.needsDeploy &&
@@ -107,8 +113,12 @@ export const executeTransactionAction = async (
         bulkTransactions,
       )
 
-      maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-      maxFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
+      maxADFee =
+        preComputedFees?.maxADFee ??
+        argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+      maxFee =
+        preComputedFees?.suggestedMaxFee ??
+        argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
     }
     const { account, txHash } = await wallet.deployAccount(selectedAccount, {
       maxFee: maxADFee,
@@ -137,7 +147,7 @@ export const executeTransactionAction = async (
       },
     })
   } else {
-    if (hasUpgradePending) {
+    if (hasUpgradePending && !preComputedFees?.suggestedMaxFee) {
       const oldStarknetAccount = await wallet.getStarknetAccount(
         selectedAccount,
         false,
@@ -147,11 +157,12 @@ export const executeTransactionAction = async (
         transactions,
       )
       maxFee = argentMaxFee(suggestedMaxFee)
-    } else {
+    } else if (!preComputedFees?.suggestedMaxFee) {
       // estimate fee with onchain nonce even tho transaction nonce may be different
       const { suggestedMaxFee } = await starknetAccount.estimateFee(
         transactions,
       )
+
       maxFee = argentMaxFee(suggestedMaxFee)
     }
   }

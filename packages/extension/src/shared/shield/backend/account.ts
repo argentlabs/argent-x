@@ -4,6 +4,7 @@ import {
   CosignerOffchainMessage,
 } from "@argent/guardian"
 import retry from "async-retry"
+import { z } from "zod"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
 import { isFetcherError } from "../../api/fetcher"
@@ -33,12 +34,27 @@ export const requestEmailAuthentication = async (
   }
 }
 
-export type EmailVerificationStatus =
-  | "expired"
-  | "maxAttemptsReached"
-  | "unverified"
-  | "verified"
-  | "notRequested"
+const emailVerificationStatus = [
+  "expired",
+  "maxAttemptsReached",
+  "unverified",
+  "verified",
+  "notRequested",
+] as const
+
+export type EmailVerificationStatus = (typeof emailVerificationStatus)[number]
+
+export const emailVerificationStatusErrorSchema = z.object({
+  name: z.string(),
+  url: z.string().nullable(),
+  status: z.number(),
+  statusText: z.string(),
+  responseText: z.string(),
+  responseJson: z.object({
+    status: z.enum(emailVerificationStatus),
+  }),
+})
+
 export const getEmailVerificationStatus =
   async (): Promise<EmailVerificationStatus> => {
     try {
@@ -137,7 +153,7 @@ export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
   }
 }
 
-interface Account {
+export interface BackendAccount {
   name: string | null
   address: string
   ownerAddress: string
@@ -150,7 +166,7 @@ interface Account {
   salt: string | null
 }
 
-export const getAccounts = async (): Promise<Account[]> => {
+export const getBackendAccounts = async (): Promise<BackendAccount[]> => {
   try {
     const json = await jwtFetcher(
       `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
@@ -166,7 +182,7 @@ interface AddAccountResponse {
   guardianAddress?: string
 }
 
-export const addAccount = async (
+export const addBackendAccount = async (
   pubKey: string,
   accountAddress: string,
   signature: string[],

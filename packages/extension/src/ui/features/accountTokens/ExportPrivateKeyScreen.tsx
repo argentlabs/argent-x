@@ -85,11 +85,9 @@ export const ExportPrivateKeyScreen: FC = () => {
         <Paragraph>Enter your password to export your private key.</Paragraph>
 
         <PasswordForm verifyPassword={handleVerifyPassword}>
-          {({ isDirty, isSubmitting }) => (
+          {() => (
             <StickyGroup>
-              <Button type="submit" disabled={!isDirty || isSubmitting}>
-                Export
-              </Button>
+              <Button type="submit">Export</Button>
             </StickyGroup>
           )}
         </PasswordForm>

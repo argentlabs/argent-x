@@ -1,5 +1,5 @@
 import { isString } from "lodash-es"
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 import join from "url-join"
 import { z } from "zod"
 
@@ -168,12 +168,17 @@ export const useAspectNft = (
   contractAddress: string | undefined,
   tokenId: string | undefined,
   networkId: string,
+  swrConfig?: SWRConfiguration,
 ) => {
   const url =
     networkId === "goerli-alpha"
       ? `https://api-testnet.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
       : `https://api.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
-  return useSWR<AspectNft>(contractAddress && tokenId && url, fetcher)
+  return useSWR<AspectNft>(
+    contractAddress && tokenId && url,
+    fetcher,
+    swrConfig,
+  )
 }
 
 export const openAspectNft = (
@@ -188,7 +193,10 @@ export const openAspectNft = (
   window.open(url, "_blank")?.focus()
 }
 
-export const getNftPicture = ({ image_uri, image_url_copy }: AspectNft) => {
+export const getNftPicture = ({
+  image_uri,
+  image_url_copy,
+}: Pick<AspectNft, "image_uri" | "image_url_copy">) => {
   if (image_uri && image_url_copy) {
     if (!image_url_copy.startsWith("ipfs://")) {
       return image_url_copy

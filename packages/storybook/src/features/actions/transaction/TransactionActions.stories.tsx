@@ -1,4 +1,4 @@
-import { TransactionActions } from "@argent-x/extension/src/ui/features/actions/transaction/TransactionActions"
+import { TransactionActions } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/TransactionActions"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 import { frenslandCalls } from "./__fixtures__/calldata/generic"

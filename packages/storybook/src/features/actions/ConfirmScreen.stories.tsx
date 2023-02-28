@@ -1,4 +1,4 @@
-import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/ConfirmScreen"
+import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { Center } from "@chakra-ui/layout"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { MemoryRouter } from "react-router-dom"

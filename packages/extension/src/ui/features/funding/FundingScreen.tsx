@@ -1,8 +1,9 @@
-import { BarCloseButton, NavigationContainer } from "@argent/ui"
+import { BarCloseButton, NavigationContainer, useToast } from "@argent/ui"
 import { FC } from "react"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { tryToMintFeeToken } from "../../../shared/devnet/mintFeeToken"
 import { Option, OptionsWrapper } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
@@ -27,6 +28,7 @@ export const Title = styled.h1`
 export const FundingScreen: FC = () => {
   const account = useSelectedAccount()
   const navigate = useNavigate()
+  const toast = useToast()
   usePageTracking("addFunds", {
     networkId: account?.networkId || "unknown",
   })
@@ -40,6 +42,7 @@ export const FundingScreen: FC = () => {
   const isLayerswapEnabled =
     (process.env.FEATURE_LAYERSWAP || "false") === "true"
   const isDeprecatedAccount = false // isDeprecated(account) // Allow purchases on deprecated accounts as some people may want to buy some eth to transfer funds out of their wallet
+  const isDevnet = account?.networkId === "localhost"
   const allowFiatPurchase = isBanxaEnabled && isMainnet && !isDeprecatedAccount
   const allowLayerswap = isLayerswapEnabled && isMainnet && !isDeprecatedAccount
 
@@ -52,6 +55,37 @@ export const FundingScreen: FC = () => {
       <PageWrapper>
         <Title>How would you like to fund your account?</Title>
         <OptionsWrapper>
+          {isDevnet && (
+            <Option
+              title="Mint Ethereum"
+              description="Only possible on devnets"
+              icon={<EthereumSvg />}
+              hideArrow
+              onClick={async () => {
+                const success = await tryToMintFeeToken(account)
+
+                if (success) {
+                  toast({
+                    title: "Minted 1 ETH",
+                    description: "You can now send ETH to your account",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                  })
+                } else {
+                  toast({
+                    title: "Failed to mint ETH",
+                    description: "Make sure you're using devnet",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                  })
+                }
+
+                return navigate(routes.accountTokens())
+              }}
+            />
+          )}
           {allowFiatPurchase ? (
             <Link to={routes.fundingProvider()}>
               <Option
@@ -97,11 +131,13 @@ export const FundingScreen: FC = () => {
               />
             </A>
           )}
-          <Option
-            title="Bridge from Ethereum and other chains"
-            icon={<EthereumSvg />}
-            onClick={() => navigate(routes.fundingBridge())}
-          />
+          {!isDevnet && (
+            <Option
+              title="Bridge from Ethereum and other chains"
+              icon={<EthereumSvg />}
+              onClick={() => navigate(routes.fundingBridge())}
+            />
+          )}
         </OptionsWrapper>
       </PageWrapper>
     </NavigationContainer>

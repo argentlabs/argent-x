@@ -1,6 +1,13 @@
 import BigNumber from "bignumber.js"
-import { Dictionary, orderBy } from "lodash"
-import { groupBy, reduce } from "lodash-es"
+import type { Dictionary } from "lodash"
+import {
+  flatten,
+  groupBy,
+  isEmpty,
+  orderBy,
+  partition,
+  reduce,
+} from "lodash-es"
 import { useMemo } from "react"
 
 import { TransactionSimulationApproval } from "./../../../../shared/transactionSimulation/types"
@@ -10,6 +17,7 @@ import {
   TokenDetails,
   TransactionSimulationTransfer,
 } from "../../../../shared/transactionSimulation/types"
+import { isEqualAddress } from "../../../services/addresses"
 import { useAspectContractAddresses } from "./../../accountNfts/aspect.service"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
@@ -63,6 +71,40 @@ export type ValidatedTokenApproval = Omit<
 > & {
   token: TokenWithType
   usdValue: string | undefined
+}
+
+function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
+  return partition(transfers, (t) => t.amount.isGreaterThan(0))
+}
+
+function orderAggregatedSimData(
+  simData: AggregatedSimData[],
+): AggregatedSimData[] {
+  const orderedSimData = orderBy(simData, (t) => t.amount.toString(16), "desc")
+
+  const [erc721Transfers, restTransfers] = partition(
+    orderedSimData,
+    (t) => t.token.type === "erc721",
+  )
+  const [erc20Transfers, erc1155Transfers] = partition(
+    restTransfers,
+    (t) => t.token.type === "erc20",
+  )
+  const [incomingErc721Transfers, outgoingErc721Transfers] =
+    partitionIncomingOutgoingTransfers(erc721Transfers)
+  const [incomingErc1155Transfers, outgoingErc1155Transfers] =
+    partitionIncomingOutgoingTransfers(erc1155Transfers)
+  const [incomingErc20Transfers, outgoingErc20Transfers] =
+    partitionIncomingOutgoingTransfers(erc20Transfers)
+
+  return flatten([
+    incomingErc721Transfers,
+    incomingErc1155Transfers,
+    incomingErc20Transfers,
+    outgoingErc721Transfers,
+    outgoingErc1155Transfers,
+    outgoingErc20Transfers,
+  ])
 }
 
 export const useAggregatedSimData = (
@@ -148,16 +190,26 @@ export const useAggregatedSimData = (
       keyForGrouping,
     )
 
+    const mergedRecords = groupBy(
+      [...transfersWithValidatedTokens, ...approvalsWithValidatedTokens],
+      keyForGrouping,
+    )
+
     const ZERO = BigNumber(0)
     const ONE = BigNumber(1)
 
     return reduce<
-      Dictionary<ValidatedTokenTransfer[]>,
+      Dictionary<(ValidatedTokenTransfer | ValidatedTokenApproval)[]>,
       Record<string, AggregatedSimData>
     >(
-      transfersRecord,
-      (acc, transfers, key) => {
-        const approvalsForTokens = approvalsRecord[key]
+      mergedRecords,
+      (acc, _, key) => {
+        const approvalsForTokens: ValidatedTokenApproval[] =
+          approvalsRecord[key]
+
+        const transfers: ValidatedTokenTransfer[] = transfersRecord[key]
+
+        const noTransfers = isEmpty(transfers)
 
         const approvals: ApprovalSimulationData[] =
           approvalsForTokens
@@ -170,8 +222,23 @@ export const useAggregatedSimData = (
             }))
             .filter((a) => a.owner === account?.address) ?? []
 
+        if (!isEmpty(approvalsForTokens) && noTransfers) {
+          return {
+            ...acc,
+            [key]: {
+              token: approvalsForTokens[0].token,
+              approvals,
+              amount: ZERO,
+              usdValue: ZERO,
+              recipients: [],
+              safe: false,
+            },
+          }
+        }
+
         const amount = transfers.reduce<BigNumber>((acc, t) => {
-          if (t.from === account?.address) {
+          const isTokenTranfer = checkIsTokenTransfer(t)
+          if (isTokenTranfer && t.from === account?.address) {
             return t.token.type === "erc721" ? acc.minus(1) : acc.minus(t.value)
           }
 
@@ -182,8 +249,9 @@ export const useAggregatedSimData = (
           if (!t.usdValue) {
             return acc
           }
+          const isTokenTranfer = checkIsTokenTransfer(t)
 
-          if (t.from === account?.address) {
+          if (isTokenTranfer && t.from === account?.address) {
             return acc.minus(t.usdValue)
           }
 
@@ -194,7 +262,10 @@ export const useAggregatedSimData = (
           const amount = t.token.type === "erc721" ? ONE : BigNumber(t.value)
 
           const negated = amount.negated()
-
+          const isTokenTranfer = checkIsTokenTransfer(t)
+          if (!isTokenTranfer) {
+            return []
+          }
           return [
             ...acc,
             {
@@ -210,7 +281,7 @@ export const useAggregatedSimData = (
           ZERO,
         )
 
-        const safe = totalApprovalAmount.lte(amount.abs())
+        const safe = totalApprovalAmount.lte(amount.abs()) && !noTransfers
 
         return {
           ...acc,
@@ -238,8 +309,14 @@ export const useAggregatedSimData = (
   return useMemo(() => {
     const aggregatedDataValues = Object.values(aggregatedData)
 
-    return orderBy(aggregatedDataValues, (t) => t.amount.toString(16), "desc")
+    return orderAggregatedSimData(aggregatedDataValues)
   }, [aggregatedData])
+}
+
+function checkIsTokenTransfer(
+  transfer: ValidatedTokenTransfer | ValidatedTokenApproval,
+): transfer is ValidatedTokenTransfer {
+  return "from" in transfer && transfer.from !== undefined
 }
 
 export function apiTokenDetailsToToken({
@@ -266,6 +343,11 @@ export function apiTokenDetailsToToken({
     }
   }
 
+  // FIXME: This is a temporary solution until we have a better way to identify NFTs
+  const isKnownNftContract = nftContracts.some((nft) =>
+    isEqualAddress(nft, tokenAddress),
+  )
+
   // If the token is not in the tokensRecord, try to get it from the details
   if (details) {
     const token = {
@@ -282,10 +364,7 @@ export function apiTokenDetailsToToken({
         ...token,
         type: "erc20",
       }
-    } else if (
-      details.tokenType === "erc721" ||
-      nftContracts.includes(tokenAddress)
-    ) {
+    } else if (details.tokenType === "erc721" || isKnownNftContract) {
       return {
         ...token,
         tokenId,
@@ -300,8 +379,7 @@ export function apiTokenDetailsToToken({
   }
 
   // Check if the token is an NFT
-  // FIXME: This is a temporary solution until we have a better way to identify NFTs
-  if (nftContracts.includes(tokenAddress)) {
+  if (isKnownNftContract) {
     return {
       address: tokenAddress,
       name: "NFT",
@@ -321,5 +399,8 @@ export const transferAffectsBalance = (
   t: TransactionSimulationTransfer,
   account: Account,
 ): boolean => {
-  return t.from === account.address || t.to === account.address
+  return (
+    isEqualAddress(t.from, account.address) ||
+    isEqualAddress(t.to, account.address)
+  )
 }
