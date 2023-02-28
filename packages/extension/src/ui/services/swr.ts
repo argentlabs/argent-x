@@ -8,7 +8,7 @@ import useSWR, {
   useSWRConfig,
 } from "swr"
 
-import { reviveJsonBigNumber } from "../../shared/json"
+import { reviveJsonBigNumber, serializeJsonBigNumber } from "../../shared/json"
 
 export interface SWRConfigCommon {
   suspense?: boolean
@@ -20,7 +20,10 @@ const swrStateCache: Cache = new Map()
 
 const swrPersistedCache: Cache = {
   set: (key, value) => {
-    return localStorage.setItem(unstable_serialize(key), JSON.stringify(value))
+    return localStorage.setItem(
+      unstable_serialize(key),
+      JSON.stringify(value, serializeJsonBigNumber),
+    )
   },
   get: (key) => {
     try {

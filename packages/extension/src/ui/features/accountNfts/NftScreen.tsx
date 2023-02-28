@@ -20,7 +20,7 @@ import {
   Image,
   SimpleGrid,
 } from "@chakra-ui/react"
-import { ethers } from "ethers"
+import { formatEther } from "ethers"
 import { FC, lazy } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import { Schema, object } from "yup"
@@ -146,7 +146,7 @@ export const NftScreen: FC = () => {
             <P4 color="neutrals.300">Best Offer</P4>
             <P4>
               {nft.best_bid_order?.payment_amount
-                ? ethers.utils.formatEther(nft.best_bid_order?.payment_amount)
+                ? formatEther(nft.best_bid_order?.payment_amount)
                 : "0"}{" "}
               ETH
             </P4>

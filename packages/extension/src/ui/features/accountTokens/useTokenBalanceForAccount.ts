@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers"
+import { toBigInt } from "ethers"
 import { get } from "lodash-es"
 import { useEffect, useMemo, useRef } from "react"
 import useSWR, { SWRConfiguration } from "swr"
@@ -95,7 +95,7 @@ export const useTokenBalanceForAccount = (
     }
     let errorMessage: TokenBalanceErrorMessage | undefined
     if (isNumeric(data)) {
-      tokenWithBalance.balance = BigNumber.from(data)
+      tokenWithBalance.balance = toBigInt(data as string | number)
     } else {
       errorMessage = data as TokenBalanceErrorMessage
     }

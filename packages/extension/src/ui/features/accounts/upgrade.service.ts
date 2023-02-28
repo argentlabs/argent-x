@@ -99,7 +99,7 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
       network,
     )
 
-    return Object.values(feeTokenBalances).some((balance) => balance.gt(0))
+    return Object.values(feeTokenBalances).some((balance) => balance > 0)
   } catch (error) {
     console.error("Error checking for account upgrade on network", error)
     return false

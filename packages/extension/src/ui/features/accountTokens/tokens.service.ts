@@ -1,5 +1,4 @@
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
-import { utils } from "ethers"
+import { BigNumberish, formatUnits, toBigInt } from "ethers"
 import { Abi, Contract, number, shortString, uint256 } from "starknet"
 import useSWR from "swr"
 
@@ -27,8 +26,7 @@ export interface TokenView {
 const formatTokenBalanceToCharLength =
   (length: number) =>
   (balance: BigNumberish = 0, decimals = 18): string => {
-    const balanceBn = BigNumber.from(balance)
-    const balanceFullString = utils.formatUnits(balanceBn, decimals)
+    const balanceFullString = formatUnits(toBigInt(balance), decimals)
 
     // show max ${length} characters or what's needed to show everything before the decimal point
     const balanceString = balanceFullString.slice(
@@ -76,7 +74,7 @@ export const fetchTokenDetails = async (
     address,
     account.provider,
   )
-  const [decimals, name, symbol] = await Promise.all([
+  const [decimalsString, name, symbol] = await Promise.all([
     tokenContract
       .call("decimals")
       .then((x) => number.toHex(x.decimals))
@@ -90,30 +88,30 @@ export const fetchTokenDetails = async (
       .then((x) => shortString.decodeShortString(number.toHex(x.symbol)))
       .catch(() => ""),
   ])
-  const decimalsBigNumber = BigNumber.from(decimals)
+  const decimals = parseInt(decimalsString)
   return {
     address,
     name,
     symbol,
     networkId: account.networkId,
-    decimals: decimalsBigNumber.toNumber(),
+    decimals,
   }
 }
 
 export const fetchTokenBalance = async (
   address: string,
   account: Account,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   const tokenContract = new Contract(
     parsedErc20Abi as Abi,
     address,
     account.provider,
   )
   const result = await tokenContract.balanceOf(account.address)
-  return BigNumber.from(uint256.uint256ToBN(result.balance).toString())
+  return BigInt(uint256.uint256ToBN(result.balance).toString())
 }
 
-export type BalancesMap = Record<string, BigNumber | undefined>
+export type BalancesMap = Record<string, bigint | undefined>
 
 export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
@@ -129,22 +127,20 @@ export const fetchAllTokensBalance = async (
     return {
       ...acc,
       [addr]:
-        balance.status === "fulfilled"
-          ? BigNumber.from(balance.value)
-          : undefined, // Error will be surfaced to user by useTokenBalanceForAccount()
+        balance.status === "fulfilled" ? BigInt(balance.value) : undefined, // Error will be surfaced to user by useTokenBalanceForAccount()
     }
   }, {})
 }
 
 export const fetchFeeTokenBalance = async (
   account: Account,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   const token = await getNetworkFeeToken(account.networkId)
   if (!token) {
-    return BigNumber.from(0)
+    return BigInt(0)
   }
   const balance = await getTokenBalanceForAccount(token.address, account)
-  return BigNumber.from(balance)
+  return BigInt(balance)
 }
 
 export const fetchFeeTokenBalanceForAccounts = async (
@@ -175,10 +171,10 @@ export const fetchFeeTokenBalanceForAccounts = async (
     ),
   )
 
-  return accountAddresses.reduce<Record<string, BigNumber>>((acc, addr, i) => {
+  return accountAddresses.reduce<Record<string, bigint>>((acc, addr, i) => {
     const [res_low, res_high] = response[i]
 
-    const balance = BigNumber.from(
+    const balance = BigInt(
       uint256.uint256ToBN({ low: res_low, high: res_high }).toString(),
     )
     return {

@@ -1,4 +1,4 @@
-import { BigNumber, utils } from "ethers"
+import { BigNumberish, formatEther, toBigInt } from "ethers"
 import { Call, UniversalDeployerContractPayload } from "starknet"
 import useSWR from "swr"
 
@@ -89,7 +89,7 @@ type FeeStatus = "loading" | "error" | "success"
 
 export function getCombinedFeeTooltipText(
   maxFee?: string,
-  feeTokenBalance?: BigNumber,
+  feeTokenBalance?: bigint,
 ): {
   status: FeeStatus
   message: string
@@ -100,7 +100,8 @@ export function getCombinedFeeTooltipText(
       message: "Network fee is still loading.",
     }
   }
-  if (feeTokenBalance.gte(maxFee)) {
+  const maxFeeBigInt = toBigInt(maxFee)
+  if (feeTokenBalance >= maxFeeBigInt) {
     return {
       status: "success",
       message:
@@ -109,20 +110,25 @@ export function getCombinedFeeTooltipText(
   }
   return {
     status: "error",
-    message: `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-      BigNumber.from(maxFee).sub(feeTokenBalance),
+    message: `Insufficient balance to pay network fees. You need at least ${formatEther(
+      maxFeeBigInt - feeTokenBalance,
     )} ETH more.`,
   }
 }
 
-export function getTooltipText(maxFee?: string, feeTokenBalance?: BigNumber) {
+export function getTooltipText(
+  maxFee?: string,
+  feeTokenBalance?: BigNumberish,
+) {
   if (!maxFee || !feeTokenBalance) {
     return "Network fee is still loading."
   }
-  if (feeTokenBalance.gte(maxFee)) {
+  const feeTokenBalanceBigInt = toBigInt(feeTokenBalance)
+  const maxFeeBigInt = toBigInt(maxFee)
+  if (feeTokenBalanceBigInt >= maxFeeBigInt) {
     return "Network fees are paid to the network to include transactions in blocks"
   }
-  return `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-    BigNumber.from(maxFee).sub(feeTokenBalance),
+  return `Insufficient balance to pay network fees. You need at least ${formatEther(
+    maxFeeBigInt - feeTokenBalanceBigInt,
   )} ETH more.`
 }

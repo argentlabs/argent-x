@@ -89,7 +89,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   )
   const shouldShowUpgrade = Boolean(
     needsUpgrade &&
-      feeTokenBalance?.gt(0) &&
+      (feeTokenBalance ?? 0) > 0 &&
       !hasUpgradeTransactionPending &&
       !isUpgradeTransaction,
   )

@@ -1,6 +1,7 @@
 import { L1, L2, P4, Pre, icons } from "@argent/ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
+import { toBigInt } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
 
@@ -49,7 +50,8 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
 
   const enoughBalance = useMemo(
-    () => Boolean(totalMaxFee && feeTokenBalance?.gte(totalMaxFee)),
+    () =>
+      Boolean(totalMaxFee && (feeTokenBalance ?? 0) >= toBigInt(totalMaxFee)),
     [feeTokenBalance, totalMaxFee],
   )
 

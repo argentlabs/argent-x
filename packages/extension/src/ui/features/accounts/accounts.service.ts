@@ -1,4 +1,4 @@
-import { ethers } from "ethers"
+import { id } from "ethers"
 import { number } from "starknet"
 import useSWR from "swr"
 
@@ -33,7 +33,7 @@ const argentColorsArray = [
 ]
 
 export const getColor = (name: string) => {
-  const hash = ethers.utils.id(name).slice(-2)
+  const hash = id(name).slice(-2)
   const index = parseInt(hash, 16) % argentColorsArray.length
   return argentColorsArray[index]
 }

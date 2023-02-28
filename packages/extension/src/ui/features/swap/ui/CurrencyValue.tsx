@@ -1,6 +1,6 @@
 import { L2 } from "@argent/ui"
 import { WrappedTokenInfo } from "@argent/x-swap"
-import { ethers } from "ethers"
+import { parseUnits } from "ethers"
 import { FC } from "react"
 
 import { prettifyCurrencyValue } from "../../../../shared/token/price"
@@ -16,7 +16,7 @@ interface CurrencyValueProps {
 const CurrencyValue: FC<CurrencyValueProps> = ({ amount, approx, token }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token as Token,
-    amount ? ethers.utils.parseUnits(amount, token.decimals) : 0,
+    amount ? parseUnits(amount, token.decimals) : 0,
   )
 
   return (
