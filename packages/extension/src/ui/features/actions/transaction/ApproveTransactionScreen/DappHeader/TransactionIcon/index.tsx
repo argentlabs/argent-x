@@ -19,14 +19,14 @@ import { VerifiedDappIcon } from "./VerifiedDappIcon"
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
-  isDeclareContract: boolean
   verifiedDapp?: ApiTransactionReviewTargettedDapp
+  declareOrDeployType?: "declare" | "deploy"
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
-  isDeclareContract,
+  declareOrDeployType,
   verifiedDapp,
 }) => {
   const network = useCurrentNetwork()
@@ -40,7 +40,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
 
   // ignore transaction review if it is a DeclareContract transaction
-  if (isDeclareContract) {
+  if (declareOrDeployType) {
     return <DeclareContractIcon />
   }
 

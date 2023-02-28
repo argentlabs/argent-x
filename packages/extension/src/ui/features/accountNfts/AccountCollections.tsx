@@ -73,7 +73,7 @@ const CollectionsFallback: FC<AccountCollectionsProps> = ({ account }) => {
     errorRetryInterval: 30e3 /* 30 seconds */,
   })
 
-  return <ErrorBoundaryFallback title="Seems like Aspect API is down..." />
+  return <ErrorBoundaryFallback title="Something went wrong..." />
 }
 
 export const AccountCollections: FC<AccountCollectionsProps> = ({
