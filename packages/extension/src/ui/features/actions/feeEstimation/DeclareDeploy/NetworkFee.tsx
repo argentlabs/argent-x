@@ -11,7 +11,7 @@ import {
 import { getTooltipText } from "../utils"
 
 const NetworkFee: FC<{
-  needsDeploy: boolean
+  needsDeploy?: boolean
   fee: any
   feeTokenBalance: any
   enoughBalance: boolean
