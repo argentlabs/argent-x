@@ -64,15 +64,19 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     // the config below will run transaction updates 4x per minute, if there are in-flight transactions
     // By default it will update on second 0, 15, 30 and 45 but by updating WAIT_TIME we can change the number of executions
     const maxExecutionTimeInMs = 60000 // 1 minute max execution time
-    const waitTimeInS = parseInt(process.env.WAIT_TIME ?? "15") // use environment variable for wait time, default to 15 seconds
+    const transactionPollingIntervalInS = parseInt(
+      process.env.TRANSACTION_POLLING_INTERVAL ?? "15",
+    ) // use environment variable for wait time, default to 15 seconds
     const startTime = Date.now()
 
     while (
       hasInFlightTransactions &&
       Date.now() - startTime < maxExecutionTimeInMs
     ) {
-      console.info(`~> waiting ${waitTimeInS}s for transaction updates`)
-      await delay(waitTimeInS * 1000)
+      console.info(
+        `~> waiting ${transactionPollingIntervalInS}s for transaction updates`,
+      )
+      await delay(transactionPollingIntervalInS * 1000)
       console.info(
         "~> fetching transaction updates as pending transactions were detected",
       )
