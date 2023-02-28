@@ -90,10 +90,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [account])
 
   const showUpgradeBanner = Boolean(
-    needsUpgrade && !hasPendingTransactions && (feeTokenBalance ?? 0) > 0,
+    needsUpgrade && !hasPendingTransactions && feeTokenBalance?.gt(0),
   )
   const showNoBalanceForUpgrade = Boolean(
-    needsUpgrade && !hasPendingTransactions && (feeTokenBalance ?? 0) <= 0,
+    needsUpgrade && !hasPendingTransactions && feeTokenBalance?.lte(0),
   )
 
   const showBackupBanner = isBackupRequired && !showUpgradeBanner

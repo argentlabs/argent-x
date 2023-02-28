@@ -1,7 +1,7 @@
 import { L1, L2, P4, Pre, icons } from "@argent/ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
-import { formatEther, toBigInt } from "ethers"
+import { BigNumber, utils } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
 
@@ -52,18 +52,15 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
 
   const totalMaxFee = useMemo(() => {
     if (account.needsDeploy && fee?.maxADFee) {
-      return toBigInt(
-        number
-          .toBN(fee.maxADFee)
-          .add(number.toBN(fee.suggestedMaxFee))
-          .toString(),
+      return number.toHex(
+        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
       )
     }
-    return toBigInt(fee?.suggestedMaxFee ?? 0)
+    return fee?.suggestedMaxFee
   }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
 
   const enoughBalance = useMemo(
-    () => Boolean(totalMaxFee && (feeTokenBalance ?? 0) >= totalMaxFee),
+    () => Boolean(totalMaxFee && feeTokenBalance?.gte(totalMaxFee)),
     [feeTokenBalance, totalMaxFee],
   )
 
@@ -271,8 +268,8 @@ interface FeeEstimationTooltipProps {
   feeToken: Token
   maxNetworkFee?: string
   maxAccountDeploymentFee?: string
-  totalMaxFee?: bigint
-  feeTokenBalance?: bigint
+  totalMaxFee?: string
+  feeTokenBalance?: BigNumber
 }
 
 function getTooltipText({
@@ -290,7 +287,7 @@ function getTooltipText({
   ) {
     return <P4 color="neutrals.100">Network fee is still loading.</P4>
   }
-  if (feeTokenBalance >= totalMaxFee) {
+  if (feeTokenBalance.gte(totalMaxFee)) {
     return (
       <Flex flexDirection="column" gap="3">
         <P4 color="neutrals.100">
@@ -327,7 +324,8 @@ function getTooltipText({
   return (
     <P4 color="neutrals.500">
       Insufficient balance to pay network fees. You need at least $
-      {formatEther(totalMaxFee - feeTokenBalance)} ETH more.
+      {utils.formatEther(BigNumber.from(totalMaxFee).sub(feeTokenBalance))} ETH
+      more.
     </P4>
   )
 }

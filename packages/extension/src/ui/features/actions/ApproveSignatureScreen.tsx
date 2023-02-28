@@ -45,7 +45,7 @@ export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
     (t) => t.meta?.isUpgrade,
   )
   const shouldShowUpgrade = Boolean(
-    needsUpgrade && (feeTokenBalance ?? 0) > 0 && !hasUpgradeTransactionPending,
+    needsUpgrade && feeTokenBalance?.gt(0) && !hasUpgradeTransactionPending,
   )
 
   if (selectedAccount?.needsDeploy && !selectedAccount.deployTransaction) {

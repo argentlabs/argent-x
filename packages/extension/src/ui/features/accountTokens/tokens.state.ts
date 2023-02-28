@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers"
 import { memoize } from "lodash-es"
 import { useEffect, useMemo, useRef } from "react"
 import { number } from "starknet"
@@ -14,7 +15,7 @@ import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { fetchAllTokensBalance } from "./tokens.service"
 
 export interface TokenDetailsWithBalance extends Token {
-  balance?: bigint
+  balance?: BigNumber
 }
 
 interface UseTokensWithBalance {
@@ -172,9 +173,11 @@ export const useTokensWithBalance = (
     return tokensInNetwork
       .map((token) => ({
         ...token,
-        balance: data?.[token.address] ?? BigInt(0),
+        balance: data?.[token.address] ?? BigNumber.from(0),
       }))
-      .filter((token) => token.showAlways || (token.balance ?? 0) > 0)
+      .filter(
+        (token) => token.showAlways || (token.balance && token.balance.gt(0)),
+      )
   }, [tokensInNetwork, data])
 
   return {

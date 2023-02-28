@@ -1,5 +1,5 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
-import { formatUnits, toBigInt } from "ethers"
+import { utils } from "ethers"
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
@@ -274,7 +274,6 @@ export const SendTokenScreen: FC = () => {
   const setMaxInputAmount = useCallback(
     (token?: TokenDetailsWithBalance, maxFee?: string) => {
       if (token?.balance && maxFee) {
-        const maxFeeBn = toBigInt(maxFee)
         const tokenDecimals = token.decimals ?? 18
         const tokenBalance = formatTokenBalance(token.balance, tokenDecimals)
         const balanceBn = token.balance
@@ -282,13 +281,17 @@ export const SendTokenScreen: FC = () => {
         const maxAmount =
           account?.networkId ===
           "localhost" /** FIXME: workaround for localhost fee estimate with devnet 0.3.4 */
-            ? balanceBn - maxFeeBn - BigInt(100000000000000)
-            : balanceBn - maxFeeBn
+            ? balanceBn.sub(maxFee).sub(100000000000000)
+            : balanceBn.sub(maxFee)
 
-        const formattedMaxAmount = formatUnits(maxAmount, tokenDecimals)
-        setValue("amount", maxAmount <= 0 ? tokenBalance : formattedMaxAmount, {
-          shouldDirty: true,
-        })
+        const formattedMaxAmount = utils.formatUnits(maxAmount, tokenDecimals)
+        setValue(
+          "amount",
+          maxAmount.lte(0) ? tokenBalance : formattedMaxAmount,
+          {
+            shouldDirty: true,
+          },
+        )
       }
     },
     [account?.networkId, setValue],
@@ -348,10 +351,10 @@ export const SendTokenScreen: FC = () => {
     tokenWithBalance?.balance || parseAmount("0", decimals)
 
   const isInputAmountGtBalance =
-    parsedInputAmount > (tokenWithBalance?.balance ?? 0) ||
+    parsedInputAmount.gt(tokenWithBalance?.balance?.toString() ?? 0) ||
     (feeToken?.address === token.address &&
       (inputAmount === tokenWithBalance?.balance?.toString() ||
-        parsedInputAmount + toBigInt(maxFee ?? 0) > parsedTokenBalance))
+        parsedInputAmount.add(maxFee?.toString() ?? 0).gt(parsedTokenBalance)))
 
   const handleMaxClick = () => {
     setMaxClicked(true)

@@ -4,6 +4,7 @@ import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens
 import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { CellStack } from "@argent/ui"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
+import { BigNumber } from "ethers"
 
 export default {
   title: "features/TokenListItem",
@@ -33,7 +34,7 @@ const tokenWithBalance = (
 ): TokenDetailsWithBalance => {
   return {
     ...token,
-    balance: balance ? BigInt(balance) : undefined,
+    balance: balance ? BigNumber.from(balance) : undefined,
   }
 }
 

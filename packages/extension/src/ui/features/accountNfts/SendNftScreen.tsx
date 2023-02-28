@@ -1,5 +1,5 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
-import { toBigInt } from "ethers"
+import { BigNumber } from "ethers"
 import { FC, lazy, useCallback, useMemo, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
@@ -103,9 +103,8 @@ export const SendNftScreen: FC = () => {
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
-  >()
+  const [addressBookRecipient, setAddressBookRecipient] =
+    useState<Account | AddressBookContact>()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
@@ -177,7 +176,7 @@ export const SendNftScreen: FC = () => {
         calldata: {
           from_: account.address,
           to: recipient,
-          tokenId: getUint256CalldataFromBN(toBigInt(tokenId)), // OZ specs need a uint256 as tokenId
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)), // OZ specs need a uint256 as tokenId
         },
       })
     } else {
@@ -187,8 +186,8 @@ export const SendNftScreen: FC = () => {
         calldata: {
           from_: account.address,
           to: recipient,
-          tokenId: getUint256CalldataFromBN(toBigInt(tokenId)),
-          amount: getUint256CalldataFromBN(toBigInt(1)),
+          tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
+          amount: getUint256CalldataFromBN(BigNumber.from(1)),
           data_len: "0",
         },
       })

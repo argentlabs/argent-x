@@ -1,4 +1,5 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { BigNumber } from "@ethersproject/bignumber"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { number } from "starknet"
@@ -220,7 +221,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                 }
                 onChange={(e: any) => {
                   try {
-                    BigInt(e.target.value || "0")
+                    BigNumber.from(e.target.value || "0")
                     setTokenDecimals(e.target.value)
                   } catch {
                     // pass

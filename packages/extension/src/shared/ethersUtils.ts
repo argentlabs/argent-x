@@ -1,7 +1,7 @@
-import { getDefaultProvider } from "ethers"
+import { ethers } from "ethers"
 
 export const getDefaultEthersProvider = (networkId: string) => {
-  return getDefaultProvider(
+  return ethers.getDefaultProvider(
     networkId === "mainnet-alpha" ? "mainnet" : "goerli",
   )
 }
@@ -9,7 +9,7 @@ export const getDefaultEthersProvider = (networkId: string) => {
 export const getL1GasPrice = async (networkId: string) => {
   const ethersProvider = getDefaultEthersProvider(networkId)
 
-  const { gasPrice } = await ethersProvider.getFeeData()
+  const gasInWei = await ethersProvider.getGasPrice()
 
-  return gasPrice
+  return gasInWei
 }
