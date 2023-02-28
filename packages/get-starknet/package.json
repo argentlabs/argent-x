@@ -11,7 +11,7 @@
     "dist/"
   ],
   "scripts": {
-    "prepare": "rollup -c",
+    "setup": "rollup -c",
     "build": "rollup -c",
     "dev": "rollup -c -w"
   },

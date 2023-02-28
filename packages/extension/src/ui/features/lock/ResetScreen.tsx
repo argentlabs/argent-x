@@ -1,15 +1,13 @@
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
 import { useTheme } from "styled-components"
 
-import { routes } from "../../routes"
-import { resetAll } from "../../services/background"
+import { useResetAll } from "../../services/background"
 import { P } from "../../theme/Typography"
 import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 
 export const ResetScreen: FC = () => {
-  const navigate = useNavigate()
   const theme = useTheme()
+  const resetAll = useResetAll()
 
   return (
     <DeprecatedConfirmScreen
@@ -18,9 +16,7 @@ export const ResetScreen: FC = () => {
       confirmButtonBackgroundColor={theme.red1}
       rejectButtonText="Cancel"
       onSubmit={() => {
-        resetAll()
-        localStorage.clear()
-        navigate(routes.onboardingStart())
+        resetAll(true)
       }}
     >
       <P>

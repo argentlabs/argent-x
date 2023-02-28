@@ -58,19 +58,21 @@ export type ShieldValidationErrorMessage =
 
 /** retreive shield error passed from background process via messages */
 
+const shieldValidationErrors: ShieldValidationErrorMessage[] = [
+  SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
+  SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
+  SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3,
+]
+
 export const getShieldValidationErrorFromBackendError = (error: unknown) => {
   const message = (error as Error)?.message?.toString()
-  const errorMessage = message.match(/Error: (.+)/)?.[1]
-  if (
-    errorMessage &&
-    [
-      SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
-      SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
-      SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3,
-    ].includes(errorMessage)
-  ) {
-    return errorMessage as ShieldValidationErrorMessage
+  if (!message) {
+    return
   }
+  const shieldValidationError = shieldValidationErrors.find(
+    (shieldValidationError) => message.includes(shieldValidationError),
+  )
+  return shieldValidationError
 }
 
 interface ValidateEmailForAccountsProps {

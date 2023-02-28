@@ -18,7 +18,7 @@ import {
 } from "./__fixtures__/transaction-calls/goerli-alpha"
 
 const accountAddress =
-  "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+  "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
 
 const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
@@ -72,7 +72,7 @@ describe("transformTransaction", () => {
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Transfer",
           "entity": "TOKEN",
-          "fromAddress": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          "fromAddress": "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
           "toAddress": "0x05417Fc252d9b7B6EA311485a9e946cC814E3AA4D00F740F7e5F6b11Ce0db9fa",
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",

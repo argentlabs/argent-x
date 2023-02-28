@@ -1,6 +1,7 @@
 import { constants, number } from "starknet"
 
 import { getAccounts, removeAccount } from "../shared/account/store"
+import { tryToMintFeeToken } from "../shared/devnet/mintFeeToken"
 import { AccountMessage } from "../shared/messages/AccountMessage"
 import { deployAccountAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
@@ -8,7 +9,6 @@ import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
-import { tryToMintFeeToken } from "./devnet/mintFeeToken"
 import { addTransaction } from "./transactions/store"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({

@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: "16"
           cache: "yarn"
-      - run: yarn install --frozen-lockfile
+      - run: yarn setup
       - run: yarn build
       - name: Release npm packages
         # if flow is triggered by a tag, publish to npm

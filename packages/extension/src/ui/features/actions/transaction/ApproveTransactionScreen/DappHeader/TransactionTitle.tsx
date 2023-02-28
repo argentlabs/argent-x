@@ -102,10 +102,18 @@ const NftTitle: FC<{
 }> = ({ nftTransfer, networkId, totalTransfers, index }) => {
   const amount = nftTransfer?.amount
 
-  const { data: nft } = useAspectNft(
+  const {
+    data: nft,
+    isValidating,
+    error,
+  } = useAspectNft(
     nftTransfer?.token.address,
     nftTransfer?.token.tokenId,
     networkId,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
   const prefix = useMemo(() => {
@@ -119,7 +127,11 @@ const NftTitle: FC<{
   }, [index, totalTransfers])
 
   if (!nft || !amount) {
-    return <></>
+    if (isValidating && !error) {
+      return <></>
+    }
+
+    return <>Confirm Transaction</>
   }
 
   const action = amount.eq(0) ? "" : amount.gt(0) ? "Buy " : "Sell "

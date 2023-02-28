@@ -45,6 +45,10 @@ export const useAccounts = ({
   const filteredAccounts = useMemo(
     () =>
       accounts
+        .filter((account) => {
+          /** omit if custom network no longer exists */
+          return account.network !== undefined
+        })
         .filter(
           allNetworks
             ? () => true

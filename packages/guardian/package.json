@@ -19,7 +19,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "prepare": "yarn build"
+    "setup": "yarn build"
   },
   "dependencies": {
     "jose": "^4.11.2",
