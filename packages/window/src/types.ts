@@ -13,6 +13,27 @@ const bignumberishSchema = z.union([
   z.bigint(),
 ])
 
+export const typedDataSchema = z.object({
+  types: z.record(
+    z.array(
+      z.union([
+        z.object({
+          name: z.string(),
+          type: z.string(),
+        }),
+        z.object({
+          name: z.string(),
+          type: z.literal("merkletree"),
+          contains: z.string(),
+        }),
+      ]),
+    ),
+  ),
+  primaryType: z.string(),
+  domain: z.record(z.unknown()),
+  message: z.record(z.unknown()),
+})
+
 export const StarknetMethodArgumentsSchemas = {
   enable: z
     .tuple([
@@ -55,7 +76,7 @@ export const StarknetMethodArgumentsSchemas = {
     }),
   ]),
   execute: z.tuple([
-    z.array(callSchema).or(callSchema),
+    z.array(callSchema).nonempty().or(callSchema),
     z.array(z.any()).optional(),
     z
       .object({
@@ -65,7 +86,7 @@ export const StarknetMethodArgumentsSchemas = {
       })
       .optional(),
   ]),
-  signMessage: z.tuple([z.custom<any>((_) => true)]),
+  signMessage: z.tuple([typedDataSchema]),
 } as const
 
 export type StarknetMethods = {

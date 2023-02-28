@@ -1,11 +1,6 @@
 import {
-  Abi,
   Account,
   AccountInterface,
-  AllowArray,
-  Call,
-  InvocationsDetails,
-  InvokeFunctionResponse,
   ProviderInterface,
   Signature,
   SignerInterface,
@@ -48,11 +43,7 @@ export class MessageAccount extends Account implements AccountInterface {
     super(provider, address, new UnimplementedSigner())
   }
 
-  execute(
-    calls: AllowArray<Call>,
-    abis?: Abi[] | undefined,
-    transactionsDetail?: InvocationsDetails | undefined,
-  ): Promise<InvokeFunctionResponse> {
+  execute: StarknetMethods["execute"] = (calls, abis, transactionsDetail) => {
     return this.remoteHandle.call("execute", calls, abis, transactionsDetail)
   }
 

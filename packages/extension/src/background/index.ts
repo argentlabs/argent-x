@@ -1,3 +1,4 @@
+import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
 import browser from "webextension-polyfill"
 
 import { accountStore, getAccounts } from "../shared/account/store"
@@ -5,7 +6,10 @@ import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
-import { migratePreAuthorizations } from "../shared/preAuthorizations"
+import {
+  isPreAuthorized,
+  migratePreAuthorizations,
+} from "../shared/preAuthorizations"
 import { delay } from "../shared/utils/delay"
 import { migrateWallet } from "../shared/wallet/storeMigration"
 import { walletStore } from "../shared/wallet/walletStore"
@@ -103,13 +107,7 @@ const safeMessages: MessageType["type"][] = [
   "IS_PREAUTHORIZED",
   "CONNECT_DAPP",
   "DISCONNECT_ACCOUNT",
-  "EXECUTE_TRANSACTION",
   "OPEN_UI",
-  "SIGN_MESSAGE",
-  "REQUEST_TOKEN",
-  "REQUEST_ADD_CUSTOM_NETWORK",
-  "REQUEST_SWITCH_CUSTOM_NETWORK",
-  "REQUEST_DECLARE_CONTRACT",
   // answers
   "EXECUTE_TRANSACTION_RES",
   "TRANSACTION_SUBMITTED",
@@ -134,6 +132,15 @@ const safeMessages: MessageType["type"][] = [
   "REQUEST_DECLARE_CONTRACT_RES",
   "DECLARE_CONTRACT_ACTION_FAILED",
   "DECLARE_CONTRACT_ACTION_SUBMITTED",
+]
+
+const safeIfPreauthorizedMessages: MessageType["type"][] = [
+  "EXECUTE_TRANSACTION",
+  "SIGN_MESSAGE",
+  "REQUEST_TOKEN",
+  "REQUEST_ADD_CUSTOM_NETWORK",
+  "REQUEST_SWITCH_CUSTOM_NETWORK",
+  "REQUEST_DECLARE_CONTRACT",
 ]
 
 const handleMessage = async (
@@ -165,9 +172,17 @@ const handleMessage = async (
   const origin = getOriginFromSender(sender)
   const isSafeOrigin = Boolean(origin === safeOrigin)
 
-  if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
+  const currentAccount = await wallet.getSelectedAccount()
+  const senderIsPreauthorized =
+    !!currentAccount && (await isPreAuthorized(currentAccount, origin))
+
+  if (
+    !isSafeOrigin && // allow all messages from the extension itself
+    !safeMessages.includes(msg.type) && // allow messages that are needed to get into preauthorization state
+    !(senderIsPreauthorized && safeIfPreauthorizedMessages.includes(msg.type)) // allow additional messages if sender is preauthorized
+  ) {
     console.warn(
-      "message received from unknown origin is trying to use unsafe method",
+      `received message of type ${msg.type} from ${origin} but it is not allowed`,
     )
     return // this return must not be removed
   }
@@ -208,10 +223,37 @@ const handleMessage = async (
 }
 
 browser.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener(async (msg, port) => {
+  port.onMessage.addListener(async (msg: MessageType, port) => {
     const sender = port.sender
     if (sender) {
-      handleMessage([msg, sender], port)
+      switch (msg.type) {
+        case "EXECUTE_TRANSACTION": {
+          const [transactions, abis, transactionsDetail] =
+            await StarknetMethodArgumentsSchemas.execute.parseAsync([
+              msg.data.transactions,
+              msg.data.abis,
+              msg.data.transactionsDetail,
+            ])
+          return handleMessage(
+            [
+              { ...msg, data: { transactions, abis, transactionsDetail } },
+              sender,
+            ],
+            port,
+          )
+        }
+
+        case "SIGN_MESSAGE": {
+          const [message] =
+            await StarknetMethodArgumentsSchemas.signMessage.parseAsync([
+              msg.data.message,
+            ])
+          return handleMessage([{ ...msg, data: message }, sender], port)
+        }
+
+        default:
+          return handleMessage([msg, sender], port)
+      }
     }
   })
 })
