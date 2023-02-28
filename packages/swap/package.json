@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "vite build --watch",
-    "prepare": "vite build",
+    "setup": "vite build",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --cache --ext .ts,.tsx --fix"
