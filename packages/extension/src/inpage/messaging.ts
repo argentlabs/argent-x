@@ -5,7 +5,6 @@ export const getIsPreauthorized = async () => {
   try {
     sendMessage({
       type: "IS_PREAUTHORIZED",
-      data: window.location.host,
     })
     const isPreauthorized = await waitForMessage("IS_PREAUTHORIZED_RES", 1000)
     return isPreauthorized

@@ -5,6 +5,8 @@
   "repository": "github:argentlabs/argent-x",
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
+    "@lavamoat/allow-scripts": "^2.3.0",
+    "@lavamoat/preinstall-always-fail": "^1.0.0",
     "bundlewatch": "^0.3.3",
     "husky": "^8.0.0",
     "import-sort-style-module": "^6.0.0",
@@ -35,8 +37,8 @@
     "test": "lerna run test --stream",
     "test:watch": "lerna run test:watch --stream",
     "test:e2e": "lerna run test:e2e --stream",
-    "prepare": "husky install && lerna run prepare --stream",
-    "postinstall": "patch-package && lerna run postinstall --stream",
+    "setup": "yarn install --frozen-lockfile && yarn allow-scripts && husky install && patch-package && lerna run setup --stream",
+    "test:ci": "lerna run test:ci --stream",
     "storybook": "cd packages/storybook && yarn storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts"
@@ -60,5 +62,14 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md,yml,json}": "prettier --write",
     "*.{ts,tsx}": "eslint --cache --ext .ts,.tsx"
+  },
+  "lavamoat": {
+    "allowScripts": {
+      "$root$": true,
+      "@lavamoat/preinstall-always-fail": false,
+      "nx": false,
+      "nx>@parcel/watcher": false,
+      "nx>@swc/core": false
+    }
   }
 }

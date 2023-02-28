@@ -1,9 +1,14 @@
 name: Run Tests
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
+      - feature/*
+
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
+      - feature/*
 
 jobs:
   test:
@@ -45,7 +50,7 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn setup
 
       - name: Lint
         run: yarn lint
@@ -56,13 +61,7 @@ jobs:
           UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run tests
-        run: yarn test
-
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
-      - name: Run e2e tests
-        run: xvfb-run --auto-servernum yarn test:e2e
+        run: yarn test:ci
 
       - name: Check bundlesize for chrome
         run: yarn run bundlewatch
@@ -134,3 +133,8 @@ jobs:
           INPUT_OWNER: ${{ github.repository_owner }}
         run: |
           gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
