@@ -59,7 +59,7 @@ function useSwapCallArguments(
         feeOnTransfer: false,
         allowedSlippage: new Percent(JSBI.BigInt(allowedSlippage), BIPS_BASE),
         recipient,
-        deadline: deadline.toNumber(),
+        deadline: parseInt(deadline.toString()),
       }),
     )
 
@@ -69,7 +69,7 @@ function useSwapCallArguments(
           feeOnTransfer: true,
           allowedSlippage: new Percent(JSBI.BigInt(allowedSlippage), BIPS_BASE),
           recipient,
-          deadline: deadline.toNumber(),
+          deadline: parseInt(deadline.toString()),
         }),
       )
     }
