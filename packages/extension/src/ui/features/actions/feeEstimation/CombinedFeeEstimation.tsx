@@ -1,4 +1,4 @@
-import { L1, L2, P4, Pre, icons } from "@argent/ui"
+import { L1, L2, P4, Pre, TextWithAmount, icons } from "@argent/ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import { BigNumber, utils } from "ethers"
@@ -154,19 +154,21 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 (Max {prettifyCurrencyValue(totalMaxFeeCurrencyValue)})
               </L2>
             ) : (
-              <L2 color="neutrals.300">
-                (Max &nbsp;
-                {feeToken ? (
-                  prettifyTokenAmount({
-                    amount: totalMaxFee,
-                    decimals: feeToken.decimals,
-                    symbol: feeToken.symbol,
-                  })
-                ) : (
-                  <>{totalMaxFee} Unknown</>
-                )}
-                )
-              </L2>
+              <TextWithAmount amount={totalMaxFee}>
+                <L2 color="neutrals.300">
+                  (Max &nbsp;
+                  {feeToken ? (
+                    prettifyTokenAmount({
+                      amount: totalMaxFee,
+                      decimals: feeToken.decimals,
+                      symbol: feeToken.symbol,
+                    })
+                  ) : (
+                    <>{totalMaxFee} Unknown</>
+                  )}
+                  )
+                </L2>
+              </TextWithAmount>
             )}
 
             <Flex alignItems="center">
@@ -175,18 +177,20 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                   ≈ {prettifyCurrencyValue(amountCurrencyValue)}
                 </P4>
               ) : (
-                <P4 fontWeight="bold">
-                  ≈{" "}
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: totalFee,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{totalFee} Unknown</>
-                  )}
-                </P4>
+                <TextWithAmount amount={totalFee}>
+                  <P4 fontWeight="bold">
+                    ≈{" "}
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: totalFee,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{totalFee} Unknown</>
+                    )}
+                  </P4>
+                </TextWithAmount>
               )}
             </Flex>
           </Flex>
@@ -297,25 +301,29 @@ function getTooltipText({
         <Flex flexDirection="column" gap="1">
           <Flex justifyContent="space-between">
             <L1 color="white">Starknet Network</L1>
-            <L1 color="white">
-              ≈{" "}
-              {prettifyTokenAmount({
-                amount: maxNetworkFee,
-                decimals: feeToken.decimals,
-                symbol: feeToken.symbol,
-              })}
-            </L1>
+            <TextWithAmount amount={maxNetworkFee}>
+              <L1 color="white">
+                ≈{" "}
+                {prettifyTokenAmount({
+                  amount: maxNetworkFee,
+                  decimals: feeToken.decimals,
+                  symbol: feeToken.symbol,
+                })}
+              </L1>
+            </TextWithAmount>
           </Flex>
           <Flex justifyContent="space-between">
             <L1 color="white">One-time activation fee</L1>
-            <L1 color="white">
-              ≈{" "}
-              {prettifyTokenAmount({
-                amount: maxAccountDeploymentFee,
-                decimals: feeToken.decimals,
-                symbol: feeToken.symbol,
-              })}
-            </L1>
+            <TextWithAmount amount={maxAccountDeploymentFee}>
+              <L1 color="white">
+                ≈{" "}
+                {prettifyTokenAmount({
+                  amount: maxAccountDeploymentFee,
+                  decimals: feeToken.decimals,
+                  symbol: feeToken.symbol,
+                })}
+              </L1>
+            </TextWithAmount>
           </Flex>
         </Flex>
       </Flex>

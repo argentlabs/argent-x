@@ -1,3 +1,4 @@
+import { TextWithAmount } from "@argent/ui"
 import { FC } from "react"
 import styled from "styled-components"
 
@@ -38,7 +39,9 @@ export const FeeField: FC<IFeeField> = ({
     <Field>
       <FieldKey>{title}</FieldKey>
       <LeftPaddedField>
-        <FeeAmount>{displayAmount}</FeeAmount>
+        <TextWithAmount amount={fee}>
+          <FeeAmount>{displayAmount}</FeeAmount>
+        </TextWithAmount>
         {displayValue && <FeeValue>{displayValue}</FeeValue>}
       </LeftPaddedField>
     </Field>

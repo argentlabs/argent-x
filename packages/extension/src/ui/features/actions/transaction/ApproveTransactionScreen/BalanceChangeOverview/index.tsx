@@ -1,4 +1,4 @@
-import { CopyTooltip, L2, P3, P4, icons } from "@argent/ui"
+import { CopyTooltip, L2, P3, P4, TextWithAmount, icons } from "@argent/ui"
 import {
   Accordion,
   AccordionButton,
@@ -156,22 +156,26 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                             gap="0.5"
                             alignItems="flex-end"
                           >
-                            <P4
-                              color={
-                                amount.isNegative()
-                                  ? "error.500"
-                                  : "secondary.500"
-                              }
-                              fontWeight="bold"
-                            >
-                              {prettifyTokenAmount({
-                                amount: amount.toFixed(),
-                                decimals: token.decimals,
-                                symbol:
-                                  token.type === "erc20" ? token.symbol : "NFT",
-                                showPlusSign: true,
-                              })}
-                            </P4>
+                            <TextWithAmount amount={amount.toFixed()}>
+                              <P4
+                                color={
+                                  amount.isNegative()
+                                    ? "error.500"
+                                    : "secondary.500"
+                                }
+                                fontWeight="bold"
+                              >
+                                {prettifyTokenAmount({
+                                  amount: amount.toFixed(),
+                                  decimals: token.decimals,
+                                  symbol:
+                                    token.type === "erc20"
+                                      ? token.symbol
+                                      : "NFT",
+                                  showPlusSign: true,
+                                })}
+                              </P4>
+                            </TextWithAmount>
 
                             {/** 0 usdValue means we don't have any value */}
                             {isMainnet && !!usdValue && !usdValue.isZero() && (
@@ -243,21 +247,26 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                     {formatTruncatedAddress(approval.spender)}
                                   </P4>
                                 </CopyTooltip>
-
-                                <P4
-                                  color={
-                                    isUnlimitedAmount(approval.amount.toFixed())
-                                      ? "error.500"
-                                      : "neutrals.400"
-                                  }
-                                  fontWeight="bold"
+                                <TextWithAmount
+                                  amount={approval.amount.toFixed()}
                                 >
-                                  {prettifyTokenAmount({
-                                    amount: approval.amount.toFixed(),
-                                    ...approval.token,
-                                    unlimitedText: "All your",
-                                  })}
-                                </P4>
+                                  <P4
+                                    color={
+                                      isUnlimitedAmount(
+                                        approval.amount.toFixed(),
+                                      )
+                                        ? "error.500"
+                                        : "neutrals.400"
+                                    }
+                                    fontWeight="bold"
+                                  >
+                                    {prettifyTokenAmount({
+                                      amount: approval.amount.toFixed(),
+                                      ...approval.token,
+                                      unlimitedText: "All your",
+                                    })}
+                                  </P4>
+                                </TextWithAmount>
                               </Flex>
                             ))}
                           </Flex>
@@ -299,14 +308,17 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                     {formatTruncatedAddress(recipient.address)}
                                   </P4>
                                 </CopyTooltip>
-
-                                <P4 color="neutrals.400" fontWeight="bold">
-                                  {prettifyTokenAmount({
-                                    amount: recipient.amount.toFixed(),
-                                    ...token,
-                                    withSymbol: false,
-                                  })}
-                                </P4>
+                                <TextWithAmount
+                                  amount={recipient.amount.toFixed()}
+                                >
+                                  <P4 color="neutrals.400" fontWeight="bold">
+                                    {prettifyTokenAmount({
+                                      amount: recipient.amount.toFixed(),
+                                      ...token,
+                                      withSymbol: false,
+                                    })}
+                                  </P4>
+                                </TextWithAmount>
                               </Flex>
                             ))}
                           </Flex>
