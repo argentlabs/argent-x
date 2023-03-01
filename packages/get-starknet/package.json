@@ -1,6 +1,6 @@
 {
   "name": "@argent/get-starknet",
-  "version": "5.3.1",
+  "version": "5.3.4",
   "repository": "github:argentlabs/argent-x",
   "private": false,
   "main": "dist/",
@@ -11,7 +11,7 @@
     "dist/"
   ],
   "scripts": {
-    "prepare": "rollup -c",
+    "setup": "rollup -c",
     "build": "rollup -c",
     "dev": "rollup -c -w"
   },

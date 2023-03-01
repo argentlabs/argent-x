@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-sessions",
-  "version": "5.3.1",
+  "version": "5.3.4",
   "description": "Manage sessions for Argent X wallets",
   "keywords": [
     "starknet",
@@ -38,8 +38,9 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:ci": "vitest run --coverage",
     "dev": "vite build --watch",
-    "prepare": "vite build",
+    "setup": "vite build",
     "build": "vite build"
   },
   "bugs": {
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/minimalistic-assert": "^1.0.1",
+    "@vitest/coverage-c8": "^0.28.5",
     "happy-dom": "^8.1.0",
     "vite": "^4.0.3",
     "vite-plugin-dts": "^1.4.1",

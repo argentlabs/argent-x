@@ -1,6 +1,6 @@
 {
   "name": "@argent/guardian",
-  "version": "5.3.1",
+  "version": "5.3.4",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -19,7 +19,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "prepare": "yarn build"
+    "setup": "yarn build"
   },
   "dependencies": {
     "jose": "^4.11.2",

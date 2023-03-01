@@ -1,6 +1,6 @@
 import { Button, icons } from "@argent/ui"
 import { Circle, Flex } from "@chakra-ui/react"
-import { FC, MouseEvent, ReactNode, useCallback } from "react"
+import { FC, MouseEvent, ReactNode, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
@@ -59,25 +59,38 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   //   { suspense: false, ...withPolling(60 * 1000) },
   // )
 
-  const onClick = useCallback(async () => {
-    await selectAccount(account)
-    navigate(returnTo || routes.accountTokens())
-  }, [account, navigate, returnTo])
+  /**
+   * this control has a button-within-button
+   * the inner button shifts screen position as the button animates on click
+   * which means the click action may fire on the unintended component
+   * we keep state of which button the click action was initiated
+   * in order to honor user intent
+   */
 
-  const onAccountEdit = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+  const mouseDownSettings = useRef(false)
+
+  const onClick = useCallback(
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
-      e.preventDefault()
-      navigate(routes.editAccount(account.address))
+      if (clickNavigateSettings || mouseDownSettings.current) {
+        navigate(routes.editAccount(account.address))
+      } else {
+        await selectAccount(account)
+        navigate(returnTo || routes.accountTokens())
+      }
     },
-    [account.address, navigate],
+    [account, clickNavigateSettings, navigate, returnTo, mouseDownSettings],
   )
 
   return (
     <Flex position={"relative"} direction={"column"}>
       <AccountListItem
         aria-label={`Select ${accountName}`}
-        onClick={clickNavigateSettings ? onAccountEdit : onClick}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          mouseDownSettings.current = false
+        }}
+        onClick={onClick}
         accountName={accountName}
         accountAddress={account.address}
         networkId={account.networkId}
@@ -97,14 +110,18 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
         {!clickNavigateSettings && (
           <IconContaier>
             <Button
-              as={Circle}
               aria-label={`${accountName} options`}
+              onMouseDown={(e) => {
+                e.stopPropagation()
+                mouseDownSettings.current = true
+              }}
+              onClick={onClick}
+              as={Circle}
               colorScheme="transparent"
               width={8}
               height={8}
               size="auto"
               rounded="full"
-              onClick={onAccountEdit}
               bg="black"
               _hover={{
                 bg: "neutrals.600",

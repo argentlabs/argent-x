@@ -3,7 +3,7 @@
   "blockNumber": 4825,
   "timestamp": 1662540991,
   "transactionHash": "0x20ba690b3238049dc13b3bed098ed599a312dba89080a1ef2b515bf47c83ab8",
-  "contractAddress": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+  "contractAddress": "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
   "entryPoint": "__execute__",
   "maxFee": "0xd6916bf78694",
   "actualFee": "0x4785cea7d787",
@@ -15,7 +15,7 @@
       "parameters": [
         {
           "name": "owner",
-          "value": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa"
+          "value": "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79"
         },
         {
           "name": "spender",
@@ -29,7 +29,7 @@
     },
     {
       "name": "transaction_executed",
-      "address": "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
+      "address": "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
       "parameters": [
         {
           "name": "hash",
