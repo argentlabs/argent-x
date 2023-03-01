@@ -54,7 +54,7 @@ const TokenAmounts: FC<{
             ~{prettifyCurrencyValue(amountCurrencyValue)}
           </FeeEstimationValue>
         ) : (
-          <TextWithAmount amount={totalFee}>
+          <TextWithAmount amount={totalFee} decimals={feeToken.decimals}>
             <FeeEstimationValue>
               ~
               {feeToken ? (
@@ -76,7 +76,7 @@ const TokenAmounts: FC<{
             Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
           </FeeEstimationValue>
         ) : (
-          <TextWithAmount amount={totalMaxFee}>
+          <TextWithAmount amount={totalMaxFee} decimals={feeToken.decimals}>
             <FeeEstimationValue>
               Max ~
               {feeToken ? (

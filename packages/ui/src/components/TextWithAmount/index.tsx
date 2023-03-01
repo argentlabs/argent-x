@@ -1,16 +1,20 @@
+import { BigNumberish, formatUnits } from "ethers"
 import React, { ReactElement } from "react"
 
 export const TextWithAmount = ({
   amount,
+  decimals = 0,
   children,
 }: {
-  amount: string | number
+  amount: BigNumberish
   children: ReactElement
+  decimals?: number
 }) => {
+  const convertedAmount = BigInt(amount)
   const element = React.Children.only(children)
 
   return React.cloneElement(element, {
-    alt: amount,
+    "data-value": formatUnits(convertedAmount, decimals),
   })
 }
 

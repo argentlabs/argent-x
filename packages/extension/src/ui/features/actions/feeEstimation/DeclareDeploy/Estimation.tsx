@@ -127,7 +127,10 @@ const Estimation: FC<EstimationProps> = ({
                     ~{prettifyCurrencyValue(amountCurrencyValue)}
                   </FeeEstimationValue>
                 ) : (
-                  <TextWithAmount amount={fee.amount}>
+                  <TextWithAmount
+                    amount={fee.amount}
+                    decimals={feeToken?.decimals}
+                  >
                     <FeeEstimationValue>
                       ~
                       {feeToken ? (
@@ -149,7 +152,10 @@ const Estimation: FC<EstimationProps> = ({
                     ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
                   </FeeEstimationValue>
                 ) : (
-                  <TextWithAmount amount={fee.accountDeploymentFee}>
+                  <TextWithAmount
+                    amount={fee.accountDeploymentFee}
+                    decimals={feeToken?.decimals}
+                  >
                     <FeeEstimationValue>
                       ~
                       {feeToken ? (
