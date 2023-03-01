@@ -57,26 +57,26 @@ export default class Settings {
   }
 
   get confirmHide() {
-    return this.page.locator(`button:has-text("${lang.settings.hide}")`)
+    return this.page.locator(`button:text-is("${lang.settings.hide}")`)
   }
   get hiddenAccounts() {
     return this.page.locator(
-      `button:has-text("${lang.settings.hiddenAccounts}")`,
+      `button:text-is("${lang.settings.hiddenAccounts}")`,
     )
   }
 
   unhideAccount(accountName: string) {
-    return this.page.locator(`button:has-text("${accountName}")`)
+    return this.page.locator(`button :text-is("${accountName}")`)
   }
 
   get deleteAccount() {
     return this.page.locator(
-      `button:has-text("${lang.settings.deleteAccount}")`,
+      `button :text-is("${lang.settings.deleteAccount}")`,
     )
   }
 
   get confirmDelete() {
-    return this.page.locator(`button:has-text("${lang.settings.delete}")`)
+    return this.page.locator(`button:text-is("${lang.settings.delete}")`)
   }
 
   get privateKey() {
@@ -84,6 +84,6 @@ export default class Settings {
   }
 
   get copy() {
-    return this.page.locator(`button:has-text("${lang.settings.copy}")`)
+    return this.page.locator(`button:text-is("${lang.settings.copy}")`)
   }
 }

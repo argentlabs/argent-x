@@ -1,6 +1,5 @@
 import path from "path"
 
-// playwright.config.ts
 import type { PlaywrightTestConfig } from "@playwright/test"
 
 import config from "./e2e/src/config"
@@ -8,7 +7,7 @@ import config from "./e2e/src/config"
 const isCI = Boolean(process.env.CI)
 
 const playwrightConfig: PlaywrightTestConfig = {
-  workers: 2,
+  workers: 1,
   timeout: 2 * 60e3, // 2 minutes
   reportSlowTests: {
     threshold: 1 * 60e3, // 1 minute
@@ -40,7 +39,7 @@ const playwrightConfig: PlaywrightTestConfig = {
     trace: "on-first-retry",
     viewport: { width: 360, height: 600 },
     actionTimeout: 60 * 1000, // 1 minute
-    permissions: ["clipboard-read"],
+    permissions: ["clipboard-read", "clipboard-write"],
   },
   outputDir: config.artifactsDir,
   preserveOutput: isCI ? "failures-only" : "never",
