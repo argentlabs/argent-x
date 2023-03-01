@@ -5,8 +5,10 @@ export default {
   artifactsDir: path.resolve(__dirname, "../artifacts/playwright"),
   reportsDir: path.resolve(__dirname, "../artifacts/reports"),
   distDir: path.join(__dirname, "../../dist/"),
+
   wallets: [
     {
+      // NOTE: Seed phrase is here intentionally and is used only for local testing. DO NOT use for any other purpose
       seed: "dove luxury shield hill chronic radio used barely rifle brick author bounce",
       accounts: [
         // 0.9992 ETH, deployed
@@ -16,6 +18,7 @@ export default {
       ],
     },
     {
+      // NOTE: Seed phrase is here intentionally and is used only for local testing. DO NOT use for any other purpose
       seed: "muffin abandon fancy enhance neglect fit team biology loyal traffic ocean wash",
       accounts: [
         // 1 ETH, not deployed
