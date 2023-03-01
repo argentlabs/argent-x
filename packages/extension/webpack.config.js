@@ -20,6 +20,11 @@ const manifestV3 = process.env.MANIFEST_VERSION === "v3"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
 const uploadSentrySourcemaps = process.env.UPLOAD_SENTRY_SOURCEMAPS === "true"
 
+// Sentry does not work with scripts ignored
+// we should use the CLI tool directly, without webpack, soon
+// https://github.com/getsentry/sentry-cli/issues/1290
+const disableSentry = true
+
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
 }
@@ -106,7 +111,8 @@ module.exports = {
     }),
 
     // Only use sentry-sourcemaping on Prod
-    isProd &&
+    !disableSentry &&
+      isProd &&
       uploadSentrySourcemaps &&
       new SentryWebpackPlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
