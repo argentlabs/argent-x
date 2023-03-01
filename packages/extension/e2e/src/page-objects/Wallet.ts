@@ -9,24 +9,24 @@ export default class Wallet extends Navigation {
     super(page)
   }
   get banner() {
-    return this.page.locator(`div h1:has-text("${lang.wallet.banner1}")`)
+    return this.page.locator(`div h1:text-is("${lang.wallet.banner1}")`)
   }
   get description() {
-    return this.page.locator(`div p:has-text("${lang.wallet.desc1}")`)
+    return this.page.locator(`div p:text-is("${lang.wallet.desc1}")`)
   }
   get createNewWallet() {
-    return this.page.locator(`button:has-text("${lang.wallet.createButton}")`)
+    return this.page.locator(`button:text-is("${lang.wallet.createButton}")`)
   }
   get restoreExistingWallet() {
-    return this.page.locator(`button:has-text("${lang.wallet.restoreButton}")`)
+    return this.page.locator(`button:text-is("${lang.wallet.restoreButton}")`)
   }
 
   //second screen
   get banner2() {
-    return this.page.locator(`div h1:has-text("${lang.wallet.banner2}")`)
+    return this.page.locator(`div h1:text-is("${lang.wallet.banner2}")`)
   }
   get description2() {
-    return this.page.locator(`div p:has-text("${lang.wallet.desc2}")`)
+    return this.page.locator(`div p:text-is("${lang.wallet.desc2}")`)
   }
 
   get disclaimerLostOfFunds() {
@@ -42,10 +42,10 @@ export default class Wallet extends Navigation {
 
   //third screen
   get banner3() {
-    return this.page.locator(`div h1:has-text("${lang.wallet.banner3}")`)
+    return this.page.locator(`div h1:text-is("${lang.wallet.banner3}")`)
   }
   get description3() {
-    return this.page.locator(`div p:has-text("${lang.wallet.desc3}")`)
+    return this.page.locator(`div p:text-is("${lang.wallet.desc3}")`)
   }
   get password() {
     return this.page.locator(
@@ -63,10 +63,10 @@ export default class Wallet extends Navigation {
 
   //fourth screen
   get banner4() {
-    return this.page.locator(`div h1:has-text("${lang.wallet.banner4}")`)
+    return this.page.locator(`div h1:text-is("${lang.wallet.banner4}")`)
   }
   get description4() {
-    return this.page.locator(`div p:has-text("${lang.wallet.desc4}")`)
+    return this.page.locator(`div p:text-is("${lang.wallet.desc4}")`)
   }
   get twitter() {
     return this.page.locator(`a:text-is("${lang.wallet.twitter}")`)

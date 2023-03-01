@@ -44,4 +44,8 @@ export default class ExtensionPage {
     const key = process.env.CI ? "Control" : "Meta"
     await this.page.keyboard.press(`${key}+KeyV`)
   }
+
+  async setClipBoardContent(text: string) {
+    await this.page.evaluate(`navigator.clipboard.writeText('${text}')`)
+  }
 }
