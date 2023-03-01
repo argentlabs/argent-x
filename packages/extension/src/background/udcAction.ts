@@ -110,6 +110,24 @@ export const udcDeclareContract = async (
         type: "DEPLOY_ACCOUNT",
       },
     })
+  } else {
+    if ("getSuggestedMaxFee" in starknetAccount) {
+      const suggestedMaxFee = await starknetAccount.getSuggestedMaxFee(
+        {
+          type: "DECLARE",
+          payload: {
+            classHash: payload.classHash,
+            contract: payload.contract,
+          },
+        },
+        {
+          nonce: declareNonce,
+        },
+      )
+      maxDeclareFee = argentMaxFee(suggestedMaxFee)
+    } else {
+      throw Error("Account does not support Starknet Declare Fee")
+    }
   }
 
   if ("declare" in starknetAccount) {
@@ -235,6 +253,26 @@ export const udcDeployContract = async (
         type: "DEPLOY_ACCOUNT",
       },
     })
+  } else {
+    if ("getSuggestedMaxFee" in starknetAccount) {
+      const suggestedMaxFee = await starknetAccount.getSuggestedMaxFee(
+        {
+          type: "DEPLOY",
+          payload: {
+            classHash: payload.classHash,
+            constructorCalldata: payload.constructorCalldata,
+            salt: payload.salt,
+            unique: payload.unique,
+          },
+        },
+        {
+          nonce: deployNonce,
+        },
+      )
+      maxDeployFee = argentMaxFee(suggestedMaxFee)
+    } else {
+      throw Error("Account does not support Starknet Deploy Fee")
+    }
   }
 
   if ("deploy" in starknetAccount) {

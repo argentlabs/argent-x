@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-swap",
-  "version": "5.3.1",
+  "version": "5.3.4",
   "license": "MIT",
   "private": true,
   "files": [
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "vite build --watch",
-    "prepare": "vite build",
+    "setup": "vite build",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --cache --ext .ts,.tsx --fix"

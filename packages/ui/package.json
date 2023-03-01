@@ -1,6 +1,6 @@
 {
   "name": "@argent/ui",
-  "version": "5.3.1",
+  "version": "5.3.4",
   "license": "MIT",
   "private": true,
   "files": [
@@ -36,13 +36,12 @@
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "postinstall": "yarn gen:theme-typings",
+    "setup": "yarn gen:theme-typings && vite build",
     "dev": "vite build --watch",
-    "prepare": "vite build",
     "build": "vite build"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.4.9",
+    "@chakra-ui/react": "2.5.1",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^9.0.3",

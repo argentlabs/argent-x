@@ -40,4 +40,7 @@ export default defineConfig({
       },
     },
   },
+  esbuild: {
+    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
+  },
 })
