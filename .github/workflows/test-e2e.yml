@@ -11,11 +11,6 @@ jobs:
     # Allow the job to fail without failing the entire workflow as e2e tests seem to be flaky right now - please remove asap
     continue-on-error: true
 
-    services:
-      devnet:
-        image: shardlabs/starknet-devnet:latest-seed0
-        ports:
-          - 5050:5050
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
       FEATURE_PRIVACY_SETTINGS: "true"
@@ -41,6 +36,11 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
+      - name: Build starknet-devnet
+        run: docker build -f ./packages/extension/e2e/Dockerfile . --tag e2e-starknet-devnet:latest
+      - name: Run starknet-devnet
+        run: docker run -d -it --name devnet -p 5050:5050 e2e-starknet-devnet:latest
+
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
@@ -59,6 +59,9 @@ jobs:
 
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
+
+      - name: Stop starknet-devnet
+        run: docker stop devnet
 
       - uses: actions/upload-artifact@v3
         if: always()
