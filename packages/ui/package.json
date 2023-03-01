@@ -20,6 +20,7 @@
     "@svgr/core": "^6.5.0",
     "@svgr/plugin-jsx": "^6.5.0",
     "@svgr/plugin-prettier": "^6.5.0",
+    "@testing-library/react": "^14.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
@@ -30,7 +31,8 @@
     "jsdom": "^21.0.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
-    "vite-plugin-dts": "^1.6.6"
+    "vite-plugin-dts": "^1.6.6",
+    "vitest": "^0.29.2"
   },
   "scripts": {
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
@@ -38,7 +40,9 @@
     "lint": "eslint . --cache --ext .ts,.tsx",
     "setup": "yarn gen:theme-typings && vite build",
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage"
   },
   "dependencies": {
     "@chakra-ui/react": "2.5.1",
