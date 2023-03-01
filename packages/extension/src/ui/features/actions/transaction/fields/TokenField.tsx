@@ -44,7 +44,7 @@ export const TokenField: FC<ITokenField> = ({
       <FieldKey>{label}</FieldKey>
       <FieldValue>
         {token && <TokenIcon url={token.image} name={token.name} size={6} />}
-        <TextWithAmount amount={amount.toString()}>
+        <TextWithAmount amount={amount.toString()} decimals={token?.decimals}>
           <LeftPaddedField>{displayAmount}</LeftPaddedField>
         </TextWithAmount>
       </FieldValue>

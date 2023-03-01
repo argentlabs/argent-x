@@ -126,7 +126,10 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                   ≈ {prettifyCurrencyValue(amountCurrencyValue)}
                 </P4>
               ) : (
-                <TextWithAmount amount={fee.amount}>
+                <TextWithAmount
+                  amount={fee.amount}
+                  decimals={feeToken.decimals}
+                >
                   <P4 fontWeight="bold">
                     ≈{" "}
                     {feeToken ? (
@@ -148,7 +151,10 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
               </L2>
             ) : (
-              <TextWithAmount amount={fee.suggestedMaxFee}>
+              <TextWithAmount
+                amount={fee.suggestedMaxFee}
+                decimals={feeToken.decimals}
+              >
                 <L2 color="neutrals.300">
                   (Max &nbsp;
                   {feeToken ? (

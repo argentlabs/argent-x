@@ -13,7 +13,7 @@ export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
   const { fromAmount, fromToken, toAmount, toToken } = transaction
   return (
     <Flex direction={"column"} overflow="hidden">
-      <TextWithAmount amount={toAmount}>
+      <TextWithAmount amount={toAmount} decimals={toToken.decimals}>
         <H6
           overflow="hidden"
           textOverflow={"ellipsis"}
@@ -32,7 +32,7 @@ export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
           )}
         </H6>
       </TextWithAmount>
-      <TextWithAmount amount={fromAmount}>
+      <TextWithAmount amount={fromAmount} decimals={fromToken.decimals}>
         <P4
           color="neutrals.400"
           fontWeight={"semibold"}

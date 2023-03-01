@@ -154,7 +154,10 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 (Max {prettifyCurrencyValue(totalMaxFeeCurrencyValue)})
               </L2>
             ) : (
-              <TextWithAmount amount={totalMaxFee}>
+              <TextWithAmount
+                amount={totalMaxFee}
+                decimals={feeToken?.decimals}
+              >
                 <L2 color="neutrals.300">
                   (Max &nbsp;
                   {feeToken ? (
@@ -177,7 +180,7 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                   ≈ {prettifyCurrencyValue(amountCurrencyValue)}
                 </P4>
               ) : (
-                <TextWithAmount amount={totalFee}>
+                <TextWithAmount amount={totalFee} decimals={feeToken?.decimals}>
                   <P4 fontWeight="bold">
                     ≈{" "}
                     {feeToken ? (
@@ -301,7 +304,7 @@ function getTooltipText({
         <Flex flexDirection="column" gap="1">
           <Flex justifyContent="space-between">
             <L1 color="white">Starknet Network</L1>
-            <TextWithAmount amount={maxNetworkFee}>
+            <TextWithAmount amount={maxNetworkFee} decimals={feeToken.decimals}>
               <L1 color="white">
                 ≈{" "}
                 {prettifyTokenAmount({
@@ -314,7 +317,10 @@ function getTooltipText({
           </Flex>
           <Flex justifyContent="space-between">
             <L1 color="white">One-time activation fee</L1>
-            <TextWithAmount amount={maxAccountDeploymentFee}>
+            <TextWithAmount
+              amount={maxAccountDeploymentFee}
+              decimals={feeToken.decimals}
+            >
               <L1 color="white">
                 ≈{" "}
                 {prettifyTokenAmount({

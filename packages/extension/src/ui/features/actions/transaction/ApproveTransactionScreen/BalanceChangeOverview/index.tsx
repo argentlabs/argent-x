@@ -156,7 +156,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                             gap="0.5"
                             alignItems="flex-end"
                           >
-                            <TextWithAmount amount={amount.toFixed()}>
+                            <TextWithAmount
+                              amount={amount.toFixed()}
+                              decimals={token.decimals}
+                            >
                               <P4
                                 color={
                                   amount.isNegative()
@@ -249,6 +252,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 </CopyTooltip>
                                 <TextWithAmount
                                   amount={approval.amount.toFixed()}
+                                  decimals={approval.token.decimals}
                                 >
                                   <P4
                                     color={
@@ -310,6 +314,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 </CopyTooltip>
                                 <TextWithAmount
                                   amount={recipient.amount.toFixed()}
+                                  decimals={token.decimals}
                                 >
                                   <P4 color="neutrals.400" fontWeight="bold">
                                     {prettifyTokenAmount({

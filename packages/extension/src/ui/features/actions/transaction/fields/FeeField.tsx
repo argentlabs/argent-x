@@ -39,7 +39,7 @@ export const FeeField: FC<IFeeField> = ({
     <Field>
       <FieldKey>{title}</FieldKey>
       <LeftPaddedField>
-        <TextWithAmount amount={fee}>
+        <TextWithAmount amount={fee} decimals={feeToken.decimals}>
           <FeeAmount>{displayAmount}</FeeAmount>
         </TextWithAmount>
         {displayValue && <FeeValue>{displayValue}</FeeValue>}
