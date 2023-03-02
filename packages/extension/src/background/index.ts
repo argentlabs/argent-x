@@ -46,6 +46,9 @@ import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { handleUdcMessaging } from "./udcMessaging"
 import { Wallet, sessionStore } from "./wallet"
 
+const DEFAULT_POLLING_INTERVAL = 15
+const LOCAL_POLLING_INTERVAL = 5
+
 browser.alarms.create("core:transactionTracker:history", {
   periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager
 })
@@ -59,20 +62,25 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
   }
   if (alarm.name === "core:transactionTracker:update") {
     console.info("~> fetching transaction updates")
-    let hasInFlightTransactions = await transactionTracker.update()
-
+    let inFlightTransactions = await transactionTracker.update()
     // the config below will run transaction updates 4x per minute, if there are in-flight transactions
     // By default it will update on second 0, 15, 30 and 45 but by updating WAIT_TIME we can change the number of executions
     const maxExecutionTimeInMs = 60000 // 1 minute max execution time
-    const transactionPollingIntervalInS = parseInt(
-      process.env.TRANSACTION_POLLING_INTERVAL ?? "15",
-    ) // use environment variable for wait time, default to 15 seconds
+    let transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
     const startTime = Date.now()
 
     while (
-      hasInFlightTransactions &&
+      inFlightTransactions.length > 0 &&
       Date.now() - startTime < maxExecutionTimeInMs
     ) {
+      const localTransaction = inFlightTransactions.find(
+        (tx) => tx.account.networkId === "localhost",
+      )
+      if (localTransaction) {
+        transactionPollingIntervalInS = LOCAL_POLLING_INTERVAL
+      } else {
+        transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
+      }
       console.info(
         `~> waiting ${transactionPollingIntervalInS}s for transaction updates`,
       )
@@ -80,7 +88,7 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
       console.info(
         "~> fetching transaction updates as pending transactions were detected",
       )
-      hasInFlightTransactions = await transactionTracker.update()
+      inFlightTransactions = await transactionTracker.update()
     }
   }
 })
