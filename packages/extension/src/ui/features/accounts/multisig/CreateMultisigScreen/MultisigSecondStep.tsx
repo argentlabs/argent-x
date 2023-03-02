@@ -72,7 +72,7 @@ export const MultisigSecondStep = ({
                     mb="1.5"
                   >
                     <Button
-                      borderRadius="90"
+                      borderRadius="full"
                       backgroundColor="neutrals.900"
                       onClick={() => field.onChange(field.value - 1)}
                       px="1em"
