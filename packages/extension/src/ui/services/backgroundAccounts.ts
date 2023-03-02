@@ -53,6 +53,7 @@ export const createNewMultisigAccount = async (
       networkId,
       signers: decodedSigners,
       threshold: multisigPayload.threshold,
+      creator: multisigPayload.creator,
     },
   })
   try {
@@ -211,6 +212,17 @@ export const getPublicKey = async (account?: BaseWalletAccount) => {
   })
 
   const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
+}
+
+export const getNextPublicKey = async (networkId: string) => {
+  sendMessage({
+    type: "GET_NEXT_PUBLIC_KEY",
+    data: { networkId },
+  })
+
+  const { publicKey } = await waitForMessage("GET_NEXT_PUBLIC_KEY_RES")
 
   return publicKey
 }

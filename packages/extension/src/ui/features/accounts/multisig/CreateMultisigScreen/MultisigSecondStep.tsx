@@ -3,13 +3,10 @@ import { icons } from "@argent/ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
-import { updateBaseMultisigAccount } from "../../../../../shared/multisig/store"
 import { isEmptyValue } from "../../../../../shared/utils/object"
 import { useAppState } from "../../../../app.state"
-import { getCalculatedMultisigAddress } from "../../../../services/backgroundAccounts"
 import { useSelectedAccount } from "../../accounts.state"
-import { usePublicKey } from "../../usePublicKey"
-import { useSignerKey } from "../useSignerKey"
+import { useNextPublicKey, useNextSignerKey } from "../../usePublicKey"
 import { ScreenLayout } from "./ScreenLayout"
 import { useCreateMultisig } from "./useCreateMultisig"
 import { FieldValues } from "./useCreateMultisigForm"
@@ -26,8 +23,8 @@ export const MultisigSecondStep = ({
   goNext: () => void
 }) => {
   const { switcherNetworkId } = useAppState()
-  const { encodedPubKey } = useSignerKey()
-  const pubKey = usePublicKey()
+  const creatorPubKey = useNextPublicKey()
+  const creatorSignerKey = useNextSignerKey()
   const { createMultisigAccount, isError } = useCreateMultisig()
   const {
     control,
@@ -38,25 +35,18 @@ export const MultisigSecondStep = ({
   const selectedAccount = useSelectedAccount()
 
   const handleCreateMultisig = async () => {
-    if (isEmptyValue(errors) && encodedPubKey && selectedAccount) {
-      const signers = [
-        ...getValues("signerKeys").map((i) => i.key),
-        encodedPubKey,
-      ]
+    if (isEmptyValue(errors) && creatorSignerKey && selectedAccount) {
+      const signers = [creatorSignerKey].concat(
+        getValues("signerKeys").map((i) => i.key),
+      )
+
       const threshold = getValues("confirmations")
 
-      const multisigAddress = await getCalculatedMultisigAddress({
-        ...selectedAccount,
+      const result = await createMultisigAccount({
+        creator: creatorPubKey,
         signers,
         threshold,
-      })
-
-      const result = await updateBaseMultisigAccount({
-        ...selectedAccount,
-        creator: pubKey,
-        signers,
-        threshold,
-        multisigAddress,
+        networkId: switcherNetworkId,
       })
       if (result) {
         goNext()

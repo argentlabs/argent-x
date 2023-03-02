@@ -3,6 +3,7 @@ import {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
+  MultisigData,
   WalletAccount,
 } from "../wallet.model"
 
@@ -24,11 +25,7 @@ export type AccountMessage =
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
   | {
       type: "NEW_MULTISIG_ACCOUNT"
-      data: {
-        networkId: string
-        signers: string[]
-        threshold: number
-      }
+      data: MultisigData & { networkId: string }
     }
   | {
       type: "NEW_MULTISIG_ACCOUNT_RES"
@@ -95,6 +92,17 @@ export type AccountMessage =
   | {
       type: "GET_PUBLIC_KEY_RES"
       data: { publicKey: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY"
+      data: { networkId: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY_RES"
+      data: { publicKey: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY_REJ"
     }
   | {
       type: "GET_CALCULATED_MULTISIG_ADDRESS"

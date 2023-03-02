@@ -9,14 +9,12 @@ import { Account, AccountConstructorProps } from "../Account"
 export interface MultisigConstructorProps extends AccountConstructorProps {
   signers: string[]
   threshold: number
-  multisigAddress?: string
   creator?: string
 }
 
 export const ZERO_MULTISIG: MultisigData = {
   signers: [],
   threshold: 0,
-  multisigAddress: undefined,
   creator: undefined,
 }
 
@@ -30,7 +28,6 @@ export class Multisig extends Account {
     super(props)
     this.signers = props.signers
     this.threshold = props.threshold
-    this.multisigAddress = props.multisigAddress
     this.creator = props.creator
   }
 
@@ -85,7 +82,6 @@ export class Multisig extends Account {
       type: "multisig",
       signers: multisigPayload.signers,
       threshold: multisigPayload.threshold,
-      multisigAddress: multisigPayload.multisigAddress,
       creator: multisigPayload.creator,
     })
   }

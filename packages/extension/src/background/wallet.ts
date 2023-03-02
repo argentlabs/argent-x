@@ -666,22 +666,18 @@ export class Wallet {
       "multisig", // make sure to always use the multisig implementation
     )
 
-    const decodedSigners = multisigAccount.signers.map((signer) =>
-      utils.hexlify(utils.base58.decode(signer)),
-    )
-
     const constructorCallData = {
       implementation: accountClassHash,
       selector: getSelectorFromName("initialize"),
       calldata: stark.compileCalldata({
         threshold: multisigAccount.threshold.toString(),
-        signers: decodedSigners,
+        signers: multisigAccount.signers,
       }),
     }
 
     const deployMultisigPayload = {
       classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      contractAddress: multisigAccount.multisigAddress ?? "",
+      contractAddress: multisigAccount.address,
       constructorCalldata: stark.compileCalldata(constructorCallData),
       addressSalt: starkPub,
     }
@@ -695,12 +691,7 @@ export class Wallet {
       0,
     )
 
-    if (
-      !isEqualAddress(
-        calculatedMultisigAddress,
-        multisigAccount.multisigAddress,
-      )
-    ) {
+    if (!isEqualAddress(calculatedMultisigAddress, multisigAccount.address)) {
       throw new Error("Calculated address does not match multisig address")
     }
 
@@ -782,8 +773,8 @@ export class Wallet {
         implementation: accountClassHash,
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({
-          signers,
           threshold: threshold.toString(),
+          signers,
         }),
       }),
       addressSalt: starkPub,
@@ -1034,6 +1025,34 @@ export class Wallet {
     const starkPub = ec.getStarkKey(starkPair)
 
     return starkPub
+  }
+
+  /**
+   * Given networkId, returns the next public key that will be used for a new account
+   * @param networkId
+   * @returns Public key
+   */
+  public async getNextPublicKey(networkId: string): Promise<string> {
+    const session = await this.sessionStore.get()
+
+    if (!session?.secret) {
+      throw Error("session is not open")
+    }
+
+    const accounts = await this.walletStore.get(withHiddenSelector)
+
+    const currentPaths = accounts
+      .filter(
+        (account) =>
+          account.signer.type === "local_secret" &&
+          account.network.id === networkId,
+      )
+      .map((account) => account.signer.derivationPath)
+
+    const index = getNextPathIndex(currentPaths, baseDerivationPath)
+
+    const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
+    return ec.getStarkKey(starkPair)
   }
 
   public static validateBackup(backupString: string): boolean {

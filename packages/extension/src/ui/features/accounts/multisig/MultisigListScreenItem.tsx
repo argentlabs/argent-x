@@ -46,7 +46,6 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
   const { status: multisigStatus, multisig } = useMultisigInfo(account)
-  console.log("🚀 ~ file: MultisigListScreenItem.tsx:51 ~ multisig:", multisig)
 
   const onClick = useCallback(async () => {
     if (multisigStatus === "pending") {

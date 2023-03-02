@@ -1,27 +1,34 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 
 import { createNewMultisigAccount } from "../../../../services/backgroundAccounts"
 
 export const useCreateMultisig = () => {
   const [isError, setIsError] = useState(false)
-  const createMultisigAccount = async ({
-    signers,
-    networkId,
-    threshold,
-  }: {
-    signers: string[]
-    networkId: string
-    threshold: number
-  }) => {
-    const result = await createNewMultisigAccount(networkId, {
+
+  const createMultisigAccount = useCallback(
+    async ({
       signers,
+      networkId,
       threshold,
-    })
-    if (result === "error") {
-      setIsError(true)
-    } else {
-      return result
-    }
-  }
+      creator,
+    }: {
+      signers: string[]
+      networkId: string
+      threshold: number
+      creator?: string
+    }) => {
+      const result = await createNewMultisigAccount(networkId, {
+        signers,
+        threshold,
+        creator,
+      })
+      if (result === "error") {
+        setIsError(true)
+      } else {
+        return result
+      }
+    },
+    [],
+  )
   return { createMultisigAccount, isError }
 }

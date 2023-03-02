@@ -83,11 +83,12 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         throw Error("you need an open session")
       }
 
-      const { networkId, signers, threshold } = msg.data
+      const { networkId, signers, threshold, creator } = msg.data
       try {
         const account = await wallet.newAccount(networkId, "multisig", {
           signers,
           threshold,
+          creator,
         })
         tryToMintFeeToken(account)
 
@@ -246,6 +247,22 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         type: "GET_ENCRYPTED_SEED_PHRASE_RES",
         data: { encryptedSeedPhrase },
       })
+    }
+
+    case "GET_NEXT_PUBLIC_KEY": {
+      try {
+        const publicKey = await wallet.getNextPublicKey(msg.data.networkId)
+
+        return sendMessageToUi({
+          type: "GET_NEXT_PUBLIC_KEY_RES",
+          data: { publicKey },
+        })
+      } catch (e) {
+        console.error(e)
+        return sendMessageToUi({
+          type: "GET_NEXT_PUBLIC_KEY_REJ",
+        })
+      }
     }
 
     case "DEPLOY_ACCOUNT_ACTION_FAILED": {

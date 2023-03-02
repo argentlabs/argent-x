@@ -39,7 +39,6 @@ export type StoredWalletAccount = Omit<WalletAccount, "network">
 export type MultisigData = {
   signers: string[]
   threshold: number
-  multisigAddress?: string
   creator?: string
 }
 

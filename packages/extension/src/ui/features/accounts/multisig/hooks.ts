@@ -59,6 +59,13 @@ export function useMultisigDataForSigner(account: BaseWalletAccount) {
     })
 
     if (!data || !data.content || data.content.length === 0) {
+      if (!isZeroMultisigAccount(multisigAccount)) {
+        return {
+          signers: multisigAccount.signers,
+          threshold: multisigAccount.threshold,
+          creator: multisigAccount.creator,
+        }
+      }
       return
     }
 
@@ -92,10 +99,6 @@ export interface IMultisigInfo {
 export function useMultisigInfo(account: BaseWalletAccount): IMultisigInfo {
   const multisigAccount = useMultisigAccount(account)
   const { data: multisigData } = useMultisigDataForSigner(account)
-  console.log(
-    "🚀 ~ file: hooks.ts:99 ~ useMultisigInfo ~ multisigData:",
-    multisigData,
-  )
   const multisigStatus = useMultisigStatus(account)
 
   useEffect(() => {
