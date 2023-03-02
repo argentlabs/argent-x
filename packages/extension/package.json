@@ -10,7 +10,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/async-retry": "^1.4.5",
-    "@types/chrome": "^0.0.200",
+    "@types/chrome": "^0.0.218",
     "@types/lodash-es": "^4.17.6",
     "@types/object-hash": "^3.0.2",
     "@types/react": "^18.0.0",
