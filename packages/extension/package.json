@@ -47,7 +47,7 @@
     "typescript-styled-plugin": "^0.18.2",
     "url-loader": "^4.1.1",
     "vite": "^4.0.3",
-    "vitest": "^0.28.3",
+    "vitest": "^0.29.2",
     "wait-for-expect": "^3.0.2",
     "webpack": "^5.62.1",
     "webpack-cli": "^5.0.1",
