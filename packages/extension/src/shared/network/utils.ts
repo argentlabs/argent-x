@@ -10,7 +10,7 @@ export function mapImplementationToArgentAccountType(
     return "plugin"
   }
 
-  if (isEqualAddress(implementation, network.accountClassHash?.plugin)) {
+  if (isEqualAddress(implementation, network.accountClassHash?.multisig)) {
     return "multisig"
   }
 
