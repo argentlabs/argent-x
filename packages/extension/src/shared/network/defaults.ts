@@ -41,7 +41,7 @@ export const defaultNetworks: Network[] = [
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
       plugin:
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
-      multicall2:
+      betterMulticall:
         "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede",
     },
     multicallAddress:
@@ -61,7 +61,7 @@ export const defaultNetworks: Network[] = [
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
       multisig:
         "0x052d25b9752b2f95aa0857c157370e0a631124627cf6e4945c01b7f9b350373c",
-      multicall2:
+      betterMulticall:
         "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede",
     },
     multicallAddress:

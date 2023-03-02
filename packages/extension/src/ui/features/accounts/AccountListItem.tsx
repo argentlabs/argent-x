@@ -204,7 +204,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 borderColor={"neutrals.700"}
               >
                 {accountType === "plugin" && "Plugin"}
-                {accountType === "multicall2" && "Better MC"}
+                {accountType === "betterMulticall" && "Better MC"}
               </L2>
             )}
           </Flex>

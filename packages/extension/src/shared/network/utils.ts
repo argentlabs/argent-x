@@ -14,8 +14,10 @@ export function mapImplementationToArgentAccountType(
     return "multisig"
   }
 
-  if (isEqualAddress(implementation, network.accountClassHash?.multicall2)) {
-    return "multicall2"
+  if (
+    isEqualAddress(implementation, network.accountClassHash?.betterMulticall)
+  ) {
+    return "betterMulticall"
   }
 
   return "standard"

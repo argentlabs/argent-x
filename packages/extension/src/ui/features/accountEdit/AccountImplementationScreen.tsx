@@ -44,7 +44,7 @@ const implementations: Implementation[] = [
     icon: <PluginIcon />,
   },
   {
-    id: "multicall2",
+    id: "betterMulticall",
     title: "Better multicall",
     description:
       "The Argent account implementation with better multicall support",

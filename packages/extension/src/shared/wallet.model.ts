@@ -5,11 +5,11 @@ export type ArgentAccountType =
   | "standard"
   | "plugin"
   | "multisig"
-  | "multicall2"
+  | "betterMulticall"
 
 export type CreateAccountType = Exclude<
   ArgentAccountType,
-  "plugin" | "multicall2"
+  "plugin" | "betterMulticall"
 > // Should not be able to create plugin accounts
 export interface WalletAccountSigner {
   type: "local_secret"
