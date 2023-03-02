@@ -20,7 +20,7 @@
     "starknet5": "npm:starknet@5.0.0-beta.3"
   },
   "devDependencies": {
-    "@types/node": "18.11.18",
+    "@types/node": "18.14.2",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "eslint": "8",
