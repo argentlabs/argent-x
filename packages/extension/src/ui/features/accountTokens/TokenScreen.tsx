@@ -1,4 +1,4 @@
-import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { BarBackButton, NavigationContainer, TextWithAmount } from "@argent/ui"
 import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
@@ -122,13 +122,29 @@ export const TokenScreen: FC = () => {
                 alignItems="flex-end"
                 gap="1"
               >
-                <H3
-                  data-testid={
-                    isValidating ? "tokenBalanceIsLoading" : "tokenBalance"
-                  }
-                >
-                  {displayBalance}
-                </H3>
+                {tokenWithBalance?.balance ? (
+                  <TextWithAmount
+                    amount={tokenWithBalance.balance.toString()}
+                    decimals={tokenWithBalance.decimals}
+                  >
+                    <H3
+                      data-testid={
+                        isValidating ? "tokenBalanceIsLoading" : "tokenBalance"
+                      }
+                    >
+                      {displayBalance}
+                    </H3>
+                  </TextWithAmount>
+                ) : (
+                  <H3
+                    data-testid={
+                      isValidating ? "tokenBalanceIsLoading" : "tokenBalance"
+                    }
+                  >
+                    {displayBalance}
+                  </H3>
+                )}
+
                 <H3>{symbol}</H3>
               </LoadingPulse>
             </TokenBalanceContainer>
