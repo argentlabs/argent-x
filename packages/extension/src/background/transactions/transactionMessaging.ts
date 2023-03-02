@@ -207,15 +207,17 @@ export const handleTransactionMessage: HandleMessage<
             maxTxFee = estimateFeeBulk[1].suggestedMaxFee
           }
         } else {
-          const { overall_fee, suggestedMaxFee } = await (
-            selectedStarknetAccount as Account
-          ).estimateDeclareFee({
-            classHash,
-            contract,
-          })
-
-          txFee = number.toHex(overall_fee)
-          maxTxFee = number.toHex(suggestedMaxFee)
+          if ("estimateDeclareFee" in selectedStarknetAccount) {
+            const { overall_fee, suggestedMaxFee } =
+              await selectedStarknetAccount.estimateDeclareFee({
+                classHash,
+                contract,
+              })
+            txFee = number.toHex(overall_fee)
+            maxTxFee = number.toHex(suggestedMaxFee)
+          } else {
+            throw Error("estimateDeclareFee not supported")
+          }
         }
 
         const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
@@ -249,7 +251,7 @@ export const handleTransactionMessage: HandleMessage<
       const selectedAccount = await wallet.getSelectedAccount()
       const selectedStarknetAccount = await wallet.getSelectedStarknetAccount()
 
-      if (!selectedStarknetAccount) {
+      if (!selectedStarknetAccount || !selectedAccount) {
         throw Error("no accounts")
       }
 
@@ -295,16 +297,19 @@ export const handleTransactionMessage: HandleMessage<
             maxTxFee = estimateFeeBulk[1].suggestedMaxFee
           }
         } else {
-          const { overall_fee, suggestedMaxFee } = await (
-            selectedStarknetAccount as Account
-          ).estimateDeployFee({
-            classHash,
-            salt,
-            unique,
-            constructorCalldata,
-          })
-          txFee = number.toHex(overall_fee)
-          maxTxFee = number.toHex(suggestedMaxFee)
+          if ("estimateDeployFee" in selectedStarknetAccount) {
+            const { overall_fee, suggestedMaxFee } =
+              await selectedStarknetAccount.estimateDeployFee({
+                classHash,
+                salt,
+                unique,
+                constructorCalldata,
+              })
+            txFee = number.toHex(overall_fee)
+            maxTxFee = number.toHex(suggestedMaxFee)
+          } else {
+            throw Error("estimateDeployFee not supported")
+          }
         }
 
         const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x

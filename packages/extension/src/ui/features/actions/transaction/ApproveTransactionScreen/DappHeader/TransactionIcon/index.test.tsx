@@ -23,9 +23,18 @@ beforeAll(() => {
 })
 
 describe("TransactionIcon", () => {
-  it("should render DeclareContractIcon if isDeclareContract is true", () => {
+  it("should render DeclareContractIcon if it's a declare transaction", () => {
     const props: TransactionIconProps = {
-      isDeclareContract: true,
+      declareOrDeployType: "declare",
+    }
+
+    const { queryByTestId } = render(<TransactionIcon {...props} />)
+    expect(queryByTestId("declare-contract-icon")).toBeInTheDocument()
+  })
+
+  it("should render DeclareContractIcon if it's a deploy transaction", () => {
+    const props: TransactionIconProps = {
+      declareOrDeployType: "deploy",
     }
 
     const { queryByTestId } = render(<TransactionIcon {...props} />)
@@ -44,7 +53,7 @@ describe("TransactionIcon", () => {
       })(),
     )
     const props: TransactionIconProps = {
-      isDeclareContract: false,
+      declareOrDeployType: undefined,
     }
 
     const { queryByTestId } = render(<TransactionIcon {...props} />)
@@ -53,7 +62,7 @@ describe("TransactionIcon", () => {
 
   it("should render SwapTransactionIcon if type is apiTransactionReviewActivityType.swap", () => {
     const props: TransactionIconProps = {
-      isDeclareContract: false,
+      declareOrDeployType: undefined,
     }
 
     vi.spyOn(

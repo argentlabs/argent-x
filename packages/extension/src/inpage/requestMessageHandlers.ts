@@ -1,8 +1,9 @@
-import type { Network } from "../shared/network"
 import type {
   AddStarknetChainParameters,
   WatchAssetParameters,
-} from "./inpage.model"
+} from "@argent/x-window"
+
+import type { Network } from "../shared/network"
 import { sendMessage, waitForMessage } from "./messageActions"
 
 export async function handleAddTokenRequest(
@@ -64,9 +65,9 @@ export async function handleAddNetworkRequest(
       name: callParams.chainName,
       chainId: callParams.chainId,
       baseUrl: callParams.baseUrl,
-      rpcUrl: callParams.rpcUrl,
-      explorerUrl: callParams.blockExplorerUrl,
-      accountClassHash: callParams.accountImplementation,
+      rpcUrl: callParams.rpcUrls?.[0],
+      explorerUrl: callParams.blockExplorerUrls?.[0],
+      accountClassHash: (callParams as any).accountImplementation,
     },
   })
 
