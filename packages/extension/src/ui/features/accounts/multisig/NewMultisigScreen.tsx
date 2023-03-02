@@ -50,7 +50,7 @@ export const NewMultisigScreen: FC = () => {
       switch (type) {
         case "create":
           // eslint-disable-next-line no-case-declarations
-          const url = `index.html?initialHardReloadRoute=${routes.multisigCreate()}`
+          const url = `index.html?goto=${routes.multisigCreate()}`
           chrome.tabs.create({
             url,
           })

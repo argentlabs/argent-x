@@ -74,15 +74,16 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
       {back && goBack && (
         <Button
           position="absolute"
-          left="32px"
-          top="32px"
+          left={8}
+          top={8}
           width="unset"
           display="flex"
           alignItems="center"
           justifyContent="center"
-          padding="16px 24px"
+          px={4}
+          py={6}
           backgroundColor="neutrals.800"
-          onClick={() => goBack()}
+          onClick={goBack}
         >
           <ArrowBackIcon />
         </Button>
@@ -92,14 +93,14 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
           {indicator && (
             <StepIndicator length={length} currentIndex={currentIndex} />
           )}
-          <Box margin="32px 0">
+          <Box my={8} mx={0}>
             {title && typeof title === "string" ? (
               <H1 marginBottom="0">{title}</H1>
             ) : (
               <>{title}</>
             )}
             {subtitle && (
-              <P2 marginTop="8px" color="neutrals.100">
+              <P2 mt={2} color="neutrals.100">
                 {subtitle}
               </P2>
             )}

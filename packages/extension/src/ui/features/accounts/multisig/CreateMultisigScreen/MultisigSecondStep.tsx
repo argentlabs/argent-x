@@ -68,7 +68,7 @@ export const MultisigSecondStep = ({
                     width="100%"
                     p="3"
                     backgroundColor="neutrals.800"
-                    borderRadius="8px"
+                    borderRadius={2}
                     mb="1.5"
                   >
                     <Button
