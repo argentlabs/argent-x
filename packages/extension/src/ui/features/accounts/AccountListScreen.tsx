@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { routes, useReturnTo } from "../../routes"
+import { isEqualAddress } from "../../services/addresses"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -63,6 +64,17 @@ export const AccountListScreen: FC = () => {
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
+  const accountFromAddress = useCallback(
+    (accountAddress: string) => {
+      return allAccounts.find(
+        (account) =>
+          isEqualAddress(account.address, accountAddress) &&
+          currentNetwork.id === account.networkId,
+      )
+    },
+    [allAccounts, currentNetwork],
+  )
+
   const onClose = useCallback(async () => {
     if (returnTo) {
       navigate(returnTo)
@@ -100,26 +112,32 @@ export const AccountListScreen: FC = () => {
               click below to add one.
             </Paragraph>
           )}
-          {newAccounts.map((account) => (
-            <AccountListScreenItem
-              key={account.address}
-              account={account}
-              selectedAccount={selectedAccount}
-              returnTo={returnTo}
-            />
-          ))}
+          {newAccounts.map((accountAddress) => {
+            const account = accountFromAddress(accountAddress)
+            return account ? (
+              <AccountListScreenItem
+                key={account.address}
+                account={account}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+              />
+            ) : null
+          })}
           {some(deprecatedAccounts) && (
             <>
               <DeprecatedAccountsWarning />
-              {deprecatedAccounts.map((account) => (
-                <AccountListScreenItem
-                  key={account.address}
-                  account={account}
-                  selectedAccount={selectedAccount}
-                  returnTo={returnTo}
-                  needsUpgrade
-                />
-              ))}
+              {deprecatedAccounts.map((accountAddress) => {
+                const account = accountFromAddress(accountAddress)
+                return account ? (
+                  <AccountListScreenItem
+                    key={account.address}
+                    account={account}
+                    selectedAccount={selectedAccount}
+                    returnTo={returnTo}
+                    needsUpgrade
+                  />
+                ) : null
+              })}
             </>
           )}
           {isAdding && <DimmingContainer />}
