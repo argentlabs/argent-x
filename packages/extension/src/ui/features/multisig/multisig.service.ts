@@ -2,6 +2,10 @@ import { ARGENT_MULTISIG_URL } from "../../../shared/api/constants"
 import { Fetcher, fetcher } from "../../../shared/api/fetcher"
 import { Network } from "../../../shared/network"
 import { urlWithQuery } from "../../../shared/utils/url"
+import {
+  ApiMultisigDataForSigner,
+  ApiMultisigDataForSignerSchema,
+} from "./multisig.model"
 
 export interface IFetchMultisigDataForSigner {
   signer: string
@@ -22,25 +26,11 @@ export const networkToStarknetNetwork = (network: Network) => {
   }
 }
 
-export interface ApiMultsigContent {
-  address: string
-  creator: string
-  signers: string[]
-  threshold: number
-}
-
-export interface ApiMultsigDataForSigner {
-  totalPages: number
-  totalElements: number
-  size: number
-  content: ApiMultsigContent[]
-}
-
-export function fetchMultisigDataForSigner({
+export async function fetchMultisigDataForSigner({
   signer,
   network,
   fetcher: fetcherImpl = fetcher,
-}: IFetchMultisigDataForSigner): Promise<ApiMultsigDataForSigner> {
+}: IFetchMultisigDataForSigner): Promise<ApiMultisigDataForSigner> {
   if (!ARGENT_MULTISIG_URL) {
     throw "Argent Multisig endpoint is not defined"
   }
@@ -51,11 +41,13 @@ export function fetchMultisigDataForSigner({
     signer,
   })
 
-  return fetcherImpl(url, {
+  const data = await fetcherImpl(url, {
     method: "GET",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
   })
+
+  return ApiMultisigDataForSignerSchema.parse(data)
 }
