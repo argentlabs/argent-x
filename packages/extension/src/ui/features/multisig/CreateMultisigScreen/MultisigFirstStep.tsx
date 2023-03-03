@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
-import { useNextSignerKey } from "../../usePublicKey"
+import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { ScreenLayout } from "./ScreenLayout"
 import { FieldValues } from "./useCreateMultisigForm"
 

@@ -1,10 +1,10 @@
-import { getNetwork } from "../../../../shared/network"
+import { getNetwork } from "../../../shared/network"
 import {
   BaseMultisigWalletAccount,
   MultisigData,
-} from "../../../../shared/wallet.model"
-import { createNewMultisigAccount } from "../../../services/backgroundAccounts"
-import { Account, AccountConstructorProps } from "../Account"
+} from "../../../shared/wallet.model"
+import { createNewMultisigAccount } from "../../services/backgroundAccounts"
+import { Account, AccountConstructorProps } from "../accounts/Account"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {
   signers: string[]

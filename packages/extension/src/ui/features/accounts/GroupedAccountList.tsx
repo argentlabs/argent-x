@@ -3,9 +3,9 @@ import { Box, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC } from "react"
 
+import { MultisigListScreenItem } from "../multisig/MultisigListScreenItem"
 import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
-import { MultisigListScreenItem } from "./multisig/MultisigListScreenItem"
 
 export interface GroupedAccountListProps {
   title: string

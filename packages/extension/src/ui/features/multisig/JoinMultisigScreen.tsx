@@ -3,9 +3,9 @@ import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { IconWrapper } from "../../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
-import { recover } from "../../recovery/recovery.service"
-import { useSignerKey } from "../usePublicKey"
+import { useSignerKey } from "../accounts/usePublicKey"
+import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
+import { recover } from "../recovery/recovery.service"
 
 const { CopyIcon, ShareIcon } = icons
 

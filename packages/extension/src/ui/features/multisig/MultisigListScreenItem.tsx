@@ -3,20 +3,23 @@ import { Box, Circle, Flex, useDisclosure } from "@chakra-ui/react"
 import { FC, MouseEvent, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useIsPreauthorized } from "../../../../shared/preAuthorizations"
-import { routes } from "../../../routes"
-import { selectAccount } from "../../../services/backgroundAccounts"
-import { useAccountStatus } from "../../accountTokens/useAccountStatus"
-import { useOriginatingHost } from "../../browser/useOriginatingHost"
-import { AccountListItem } from "../AccountListItem"
+import { useIsPreauthorized } from "../../../shared/preAuthorizations"
+import { routes } from "../../routes"
+import { selectAccount } from "../../services/backgroundAccounts"
+import { AccountListItem } from "../accounts/AccountListItem"
 import {
   AccountItemIconContainer,
   IAccountListScreenItem,
-} from "../AccountListScreenItem"
-import { getAccountName, useAccountMetadata } from "../accountMetadata.state"
-import { useRemoveAccountCallback } from "../accounts.state"
-import { useMultisigInfo } from "../multisig/hooks"
-import { MultisigDeleteModal } from "../multisig/MultisigDeleteModal"
+} from "../accounts/AccountListScreenItem"
+import {
+  getAccountName,
+  useAccountMetadata,
+} from "../accounts/accountMetadata.state"
+import { useRemoveAccountCallback } from "../accounts/accounts.state"
+import { useAccountStatus } from "../accountTokens/useAccountStatus"
+import { useOriginatingHost } from "../browser/useOriginatingHost"
+import { useMultisigInfo } from "./hooks/useMultisigInfo"
+import { MultisigDeleteModal } from "./MultisigDeleteModal"
 
 const { MoreIcon, ChevronRightIcon } = icons
 

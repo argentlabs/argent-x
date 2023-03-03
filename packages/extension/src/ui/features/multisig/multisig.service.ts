@@ -1,7 +1,7 @@
-import { ARGENT_MULTISIG_URL } from "../../../../shared/api/constants"
-import { Fetcher, fetcher } from "../../../../shared/api/fetcher"
-import { Network } from "../../../../shared/network"
-import { urlWithQuery } from "../../../../shared/utils/url"
+import { ARGENT_MULTISIG_URL } from "../../../shared/api/constants"
+import { Fetcher, fetcher } from "../../../shared/api/fetcher"
+import { Network } from "../../../shared/network"
+import { urlWithQuery } from "../../../shared/utils/url"
 
 export interface IFetchMultisigDataForSigner {
   signer: string

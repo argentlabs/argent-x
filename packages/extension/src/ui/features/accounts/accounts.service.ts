@@ -12,9 +12,9 @@ import {
 import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { withPolling } from "../../services/swr"
+import { Multisig } from "../multisig/Multisig"
 import { Account } from "./Account"
 import { useAccounts } from "./accounts.state"
-import { Multisig } from "./multisig/Multisig"
 
 const { toBN } = number
 

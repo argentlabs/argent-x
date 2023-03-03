@@ -1,14 +1,14 @@
 import { useMemo } from "react"
 
-import { multisigBaseWalletStore } from "../../../../shared/multisig/store"
-import { useArrayStorage } from "../../../../shared/storage/hooks"
+import { multisigBaseWalletStore } from "../../../shared/multisig/store"
+import { useArrayStorage } from "../../../shared/storage/hooks"
 import {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   MultisigWalletAccount,
-} from "../../../../shared/wallet.model"
-import { accountsEqual } from "../../../../shared/wallet.service"
-import { useAccounts } from "../accounts.state"
+} from "../../../shared/wallet.model"
+import { accountsEqual } from "../../../shared/wallet.service"
+import { useAccounts } from "../accounts/accounts.state"
 import { Multisig } from "./Multisig"
 
 export const mapMultisigWalletAccountsToMultisig = (

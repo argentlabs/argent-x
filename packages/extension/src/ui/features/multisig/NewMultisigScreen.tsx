@@ -10,10 +10,10 @@ import { Center, Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { CustomButtonCell } from "../../../components/CustomButtonCell"
-import { routes } from "../../../routes"
-import { assertNever } from "../../../services/assertNever"
-import { useAddAccount } from "../useAddAccount"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
+import { routes } from "../../routes"
+import { assertNever } from "../../services/assertNever"
+import { useAddAccount } from "../accounts/useAddAccount"
 import { ZERO_MULTISIG } from "./Multisig"
 
 const { AddIcon, MultisigJoinIcon } = icons
