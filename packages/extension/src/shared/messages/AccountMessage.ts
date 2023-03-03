@@ -1,11 +1,18 @@
 import {
   ArgentAccountType,
   BaseWalletAccount,
+  CreateAccountType,
   WalletAccount,
 } from "../wallet.model"
 
 export type AccountMessage =
-  | { type: "NEW_ACCOUNT"; data: string }
+  | {
+      type: "NEW_ACCOUNT"
+      data: {
+        networkId: string
+        type?: CreateAccountType
+      }
+    }
   | {
       type: "NEW_ACCOUNT_RES"
       data: {
@@ -14,6 +21,22 @@ export type AccountMessage =
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
+  | {
+      type: "NEW_MULTISIG_ACCOUNT"
+      data: {
+        networkId: string
+        signers: string[]
+        threshold: string
+      }
+    }
+  | {
+      type: "NEW_MULTISIG_ACCOUNT_RES"
+      data: {
+        account: WalletAccount
+        accounts: WalletAccount[]
+      }
+    }
+  | { type: "NEW_MULTISIG_ACCOUNT_REJ"; data: { error: string } }
   | { type: "DEPLOY_ACCOUNT"; data: BaseWalletAccount }
   | { type: "DEPLOY_ACCOUNT_RES" }
   | { type: "DEPLOY_ACCOUNT_REJ" }
@@ -63,6 +86,13 @@ export type AccountMessage =
   | {
       type: "GET_ENCRYPTED_PRIVATE_KEY_RES"
       data: { encryptedPrivateKey: string }
+    }
+  | {
+      type: "GET_PUBLIC_KEY"
+    }
+  | {
+      type: "GET_PUBLIC_KEY_RES"
+      data: { publicKey: string }
     }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE"

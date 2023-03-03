@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 
 import {
   getNetworkSelector,
@@ -103,4 +103,10 @@ export const isHiddenAccount = (account: Account) => !!account.hidden
 export const useSelectedAccount = () => {
   const baseWalletAccount = useKeyValueStorage(walletStore, "selected")
   return useAccount(baseWalletAccount ?? undefined)
+}
+
+export const useRemoveAccountCallback = () => {
+  return useCallback(async (account: Account) => {
+    await accountStore.remove(account)
+  }, [])
 }

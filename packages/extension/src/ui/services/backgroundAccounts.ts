@@ -2,20 +2,54 @@ import { sendMessage, waitForMessage } from "../../shared/messages"
 import {
   ArgentAccountType,
   BaseWalletAccount,
+  CreateAccountType,
+  MultisigPayload,
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
-export const createNewAccount = async (networkId: string) => {
-  sendMessage({ type: "NEW_ACCOUNT", data: networkId })
+export const createNewAccount = async (
+  networkId: string,
+  type?: CreateAccountType,
+  multisigPayload?: MultisigPayload,
+) => {
+  sendMessage({
+    type: "NEW_ACCOUNT",
+    data: {
+      networkId,
+      type,
+      ...multisigPayload,
+    },
+  })
   try {
     return await Promise.race([
       waitForMessage("NEW_ACCOUNT_RES"),
       waitForMessage("NEW_ACCOUNT_REJ").then(() => "error" as const),
     ])
   } catch {
-    throw Error("Could add new account")
+    throw Error("Could not add new account")
+  }
+}
+
+export const createNewMultisigAccount = async (
+  networkId: string,
+  multisigPayload: MultisigPayload,
+) => {
+  sendMessage({
+    type: "NEW_MULTISIG_ACCOUNT",
+    data: {
+      networkId,
+      ...multisigPayload,
+    },
+  })
+  try {
+    return await Promise.race([
+      waitForMessage("NEW_MULTISIG_ACCOUNT_RES"),
+      waitForMessage("NEW_MULTISIG_ACCOUNT_REJ").then(() => "error" as const),
+    ])
+  } catch {
+    throw Error("Could not add new account")
   }
 }
 
@@ -130,6 +164,16 @@ export const getPrivateKey = async () => {
   )
 
   return await decryptFromBackground(encryptedPrivateKey, secret)
+}
+
+export const getPublicKey = async () => {
+  sendMessage({
+    type: "GET_PUBLIC_KEY",
+  })
+
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
 }
 
 export const getSeedPhrase = async (): Promise<string> => {

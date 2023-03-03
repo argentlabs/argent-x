@@ -2,7 +2,6 @@ import { stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue/types"
 import { getNetwork } from "../shared/network"
-import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
 import { Queue } from "./actionQueue"
 import { Wallet } from "./wallet"
@@ -34,8 +33,7 @@ export const upgradeAccount = async ({
   }
 
   const implementationClassHash =
-    newImplementation[mapArgentAccountTypeToImplementationKey(accountType)] ??
-    newImplementation.argentAccount
+    newImplementation[accountType] ?? newImplementation.standard
 
   const calldata = stark.compileCalldata({
     implementation: implementationClassHash,

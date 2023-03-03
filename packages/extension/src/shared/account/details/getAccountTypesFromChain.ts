@@ -41,6 +41,19 @@ export async function getAccountTypesFromChain(
         > => {
           const network = await getNetwork(networkId)
 
+          const hasOnlyArgentAccounts =
+            network.accountClassHash &&
+            Object.entries(network.accountClassHash).every(
+              ([key, value]) => key === "argent" || value === undefined,
+            )
+
+          if (hasOnlyArgentAccounts) {
+            return calls.map((call) => ({
+              address: call.contractAddress,
+              type: "standard",
+            }))
+          }
+
           if (network.multicallAddress) {
             const multicall = getMulticallForNetwork(network)
             const responses = await Promise.all(
@@ -48,10 +61,8 @@ export async function getAccountTypesFromChain(
             )
             const result = responses.map((response, i) => {
               const call = calls[i]
-              const type = mapImplementationToArgentAccountType(
-                response[0],
-                network,
-              )
+              const type: ArgentAccountType =
+                mapImplementationToArgentAccountType(response[0], network)
               return {
                 address: call.contractAddress,
                 type,

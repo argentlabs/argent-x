@@ -13,6 +13,7 @@ import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
+import { MultisigStatus } from "./multisig/types"
 
 const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon } = icons
 
@@ -28,6 +29,7 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   hidden?: boolean
   avatarOutlined?: boolean
   isShield?: boolean
+  multisigStatus?: MultisigStatus
 }
 
 interface AccountAvatarProps extends ComponentProps<"img"> {
@@ -65,7 +67,7 @@ export const AccountAvatar: FC<AccountAvatarProps> = ({
   )
 }
 
-const NetworkStatusWrapper = chakra(Flex, {
+export const NetworkStatusWrapper = chakra(Flex, {
   baseStyle: {
     alignItems: "center",
     justifyContent: "right",
@@ -153,6 +155,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   connectedHost,
   hidden,
   avatarOutlined,
+  multisigStatus,
   children,
   ...rest
 }) => {
@@ -172,7 +175,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           accountName,
           accountAddress,
           networkId,
-          backgroundColor: hidden ? "333332" : undefined,
+          backgroundColor: hidden ? "#333332" : undefined,
         })}
       >
         {avatarBadge}
@@ -188,7 +191,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
-            {accountType !== "argent" && (
+            {accountType !== "standard" && (
               <L2
                 backgroundColor={"neutrals.900"}
                 px={1}
@@ -200,14 +203,16 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 border={"1px solid"}
                 borderColor={"neutrals.700"}
               >
-                {accountType === "argent-plugin" && "Plugin"}
-                {accountType === "argent-better-multicall" && "Better MC"}
+                {accountType === "plugin" && "Plugin"}
+                {accountType === "betterMulticall" && "Better MC"}
               </L2>
             )}
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             <P4 fontWeight={"semibold"}>
-              {formatTruncatedAddress(accountAddress)}
+              {accountType === "multisig" && multisigStatus === "pending"
+                ? "Awaiting owner to finish setup"
+                : formatTruncatedAddress(accountAddress)}
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>

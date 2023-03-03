@@ -4,7 +4,10 @@ import useSWR from "swr"
 
 import { updateAccountDetails } from "../../../shared/account/update"
 import { generateAvatarImage } from "../../../shared/avatarImage"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import {
+  BaseWalletAccount,
+  CreateAccountType,
+} from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { withPolling } from "../../services/swr"
@@ -13,12 +16,22 @@ import { useAccounts } from "./accounts.state"
 
 const { toBN } = number
 
-export const createAccount = async (networkId: string, password?: string) => {
+interface CreateAccountOptions {
+  networkId: string
+  type?: CreateAccountType
+  password?: string
+}
+
+export const createAccount = async ({
+  networkId,
+  type,
+  password,
+}: CreateAccountOptions) => {
   if (password) {
     await startSession(password)
   }
 
-  return Account.create(networkId)
+  return Account.create(networkId, type)
 }
 
 const argentColorsArray = [

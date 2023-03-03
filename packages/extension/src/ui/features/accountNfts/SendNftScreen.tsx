@@ -103,8 +103,9 @@ export const SendNftScreen: FC = () => {
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] =
-    useState<Account | AddressBookContact>()
+  const [addressBookRecipient, setAddressBookRecipient] = useState<
+    Account | AddressBookContact
+  >()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)

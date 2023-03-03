@@ -124,7 +124,7 @@ describe("Wallet", () => {
           derivationPath: backup.argent.accounts[0].signer.derivationPath,
         },
         network: await getNetwork(backup.argent.accounts[0].network),
-        type: "argent",
+        type: "standard",
       },
     ])
     const sessionStore = getSessionStore("test:sessions2")

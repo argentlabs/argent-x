@@ -217,6 +217,7 @@ export const routes = {
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
 
+  multisigNew: route("/account/new/multisig"),
   multisigSetup: route("/multisig/setup"),
   multisigCreate: route("/multisig/create"),
   multisigJoin: route("/multisig/join"),

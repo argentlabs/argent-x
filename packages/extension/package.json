@@ -85,6 +85,7 @@
     "@chakra-ui/react": "2.5.1",
     "@extend-chrome/messages": "^1.2.2",
     "@google/model-viewer": "^3.0.0",
+    "@hookform/resolvers": "^2.9.11",
     "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.1.0",
     "@mui/styled-engine-sc": "^5.10.3",

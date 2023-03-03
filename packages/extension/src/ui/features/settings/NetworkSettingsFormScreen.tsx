@@ -190,7 +190,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
                 autoComplete="off"
                 control={control}
                 placeholder="Account class hash"
-                name="accountClassHash.argentAccount"
+                name="accountClassHash.argent"
                 type="text"
                 disabled={defaultNetwork.readonly}
               />
@@ -198,7 +198,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
                 autoComplete="off"
                 control={control}
                 placeholder="Plugin account class hash"
-                name="accountClassHash.argentPluginAccount"
+                name="accountClassHash.plugin"
                 type="text"
                 disabled={defaultNetwork.readonly}
               />

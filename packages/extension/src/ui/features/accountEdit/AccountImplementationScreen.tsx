@@ -11,7 +11,6 @@ import { filter, partition } from "lodash-es"
 import { FC, ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { mapArgentAccountTypeToImplementationKey } from "../../../shared/network/utils"
 import { ArgentAccountType } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { AutoColumn } from "../../components/Column"
@@ -33,19 +32,19 @@ interface Implementation {
 }
 const implementations: Implementation[] = [
   {
-    id: "argent",
+    id: "standard",
     title: "Default",
     description: "The default Argent account implementation",
     icon: <WalletIcon />,
   },
   {
-    id: "argent-plugin",
+    id: "plugin",
     title: "Plugin",
     description: "The Argent account implementation with plugin support",
     icon: <PluginIcon />,
   },
   {
-    id: "argent-better-multicall",
+    id: "betterMulticall",
     title: "Better multicall",
     description:
       "The Argent account implementation with better multicall support",
@@ -104,11 +103,7 @@ export const AccountImplementationScreen: FC = () => {
 
   const [[activeImplementation], otherImplementations] = partition(
     filter(implementations, (i) =>
-      Boolean(
-        account.network.accountClassHash?.[
-          mapArgentAccountTypeToImplementationKey(i.id)
-        ],
-      ),
+      Boolean(account.network.accountClassHash?.[i.id]),
     ),
     (i) => i.id === account.type,
   )

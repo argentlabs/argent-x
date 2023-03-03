@@ -2,9 +2,15 @@ import { Escape } from "./account/details/getEscape"
 import { Network } from "./network"
 
 export type ArgentAccountType =
-  | "argent"
-  | "argent-plugin"
-  | "argent-better-multicall"
+  | "standard"
+  | "plugin"
+  | "multisig"
+  | "betterMulticall"
+
+export type CreateAccountType = Exclude<
+  ArgentAccountType,
+  "plugin" | "betterMulticall"
+> // Should not be able to create plugin accounts
 export interface WalletAccountSigner {
   type: "local_secret"
   derivationPath: string
@@ -29,3 +35,8 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
 }
 
 export type StoredWalletAccount = Omit<WalletAccount, "network">
+
+export type MultisigPayload = {
+  signers: string[]
+  threshold: string
+}

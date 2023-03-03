@@ -1,3 +1,9 @@
+import { ArgentAccountType } from "../wallet.model"
+
+export type AccountClassHash = { [key in ArgentAccountType]?: string } & {
+  standard: string
+}
+
 export interface Network {
   id: string
   name: string
@@ -7,11 +13,7 @@ export interface Network {
   explorerUrl?: string
   /** URL of the user-facing block explorer web interface */
   blockExplorerUrl?: string
-  accountClassHash?: {
-    argentAccount: string
-    argentPluginAccount?: string
-    argentBetterMulticallAccount?: string
-  }
+  accountClassHash?: AccountClassHash
   rpcUrl?: string
   readonly?: boolean
   multicallAddress?: string

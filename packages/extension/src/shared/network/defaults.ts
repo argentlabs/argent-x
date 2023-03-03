@@ -7,7 +7,7 @@ const DEV_ONLY_NETWORKS: Network[] = [
     chainId: "SN_GOERLI",
     baseUrl: "https://external.integration.starknet.io",
     accountClassHash: {
-      argentAccount:
+      standard:
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
     },
     multicallAddress:
@@ -23,7 +23,7 @@ export const defaultNetworks: Network[] = [
     baseUrl: "https://alpha-mainnet.starknet.io",
     explorerUrl: "https://voyager.online",
     accountClassHash: {
-      argentAccount:
+      standard:
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
     },
     multicallAddress:
@@ -37,11 +37,11 @@ export const defaultNetworks: Network[] = [
     baseUrl: "https://alpha4.starknet.io",
     explorerUrl: "https://goerli.voyager.online",
     accountClassHash: {
-      argentAccount:
+      standard:
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
-      argentPluginAccount:
+      plugin:
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
-      argentBetterMulticallAccount:
+      betterMulticall:
         "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede",
     },
     multicallAddress:
@@ -55,11 +55,13 @@ export const defaultNetworks: Network[] = [
     baseUrl: "https://alpha4-2.starknet.io",
     explorerUrl: "https://goerli-2.voyager.online/",
     accountClassHash: {
-      argentAccount:
+      standard:
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
-      argentPluginAccount:
+      plugin:
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
-      argentBetterMulticallAccount:
+      multisig:
+        "0x052d25b9752b2f95aa0857c157370e0a631124627cf6e4945c01b7f9b350373c",
+      betterMulticall:
         "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede",
     },
     multicallAddress:

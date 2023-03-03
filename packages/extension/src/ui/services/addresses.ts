@@ -70,6 +70,7 @@ export const isValidAddress = (address: string) =>
   addressSchema.isValidSync(address)
 
 export const isEqualAddress = (a: string, b?: string) => {
+
   try {
     if (!b) {
       return false

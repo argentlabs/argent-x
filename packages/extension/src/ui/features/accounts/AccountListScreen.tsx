@@ -5,7 +5,7 @@ import {
   icons,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { partition, some } from "lodash-es"
+import { groupBy, isEmpty, partition, some } from "lodash-es"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -24,11 +24,12 @@ import {
   useSelectedAccount,
 } from "./accounts.state"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
+import { GroupedAccountList } from "./GroupedAccountList"
 import { HiddenAccountsBar } from "./HiddenAccountsBar"
 import { usePartitionDeprecatedAccounts } from "./upgrade.service"
 import { useAddAccount } from "./useAddAccount"
 
-const { AddIcon } = icons
+const { AddIcon, WalletIcon, MultisigIcon } = icons
 
 const Paragraph = styled(P)`
   text-align: center;
@@ -77,6 +78,14 @@ export const AccountListScreen: FC = () => {
 
   const [deprecatedAccounts, newAccounts] = partitionedAccounts
 
+  const accountByTypes = groupBy(newAccounts, "type")
+
+  const argentAccounts = accountByTypes.argent
+  const multisigAccounts = accountByTypes.multisig
+
+  const hasMultipleAccountTypes =
+    !isEmpty(argentAccounts) && !isEmpty(multisigAccounts)
+
   return (
     <>
       <NavigationContainer
@@ -100,14 +109,33 @@ export const AccountListScreen: FC = () => {
               click below to add one.
             </Paragraph>
           )}
-          {newAccounts.map((account) => (
-            <AccountListScreenItem
-              key={account.address}
-              account={account}
-              selectedAccount={selectedAccount}
-              returnTo={returnTo}
-            />
-          ))}
+          {hasMultipleAccountTypes ? (
+            <Flex direction="column" gap={6}>
+              <GroupedAccountList
+                title="Standard Accounts"
+                accounts={argentAccounts}
+                icon={<WalletIcon w={4} h={4} />}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+              />
+              <GroupedAccountList
+                title="Multisig Accounts"
+                accounts={multisigAccounts}
+                icon={<MultisigIcon w={4} h={4} />}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+              />
+            </Flex>
+          ) : (
+            newAccounts.map((account) => (
+              <AccountListScreenItem
+                key={account.address}
+                account={account}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+              />
+            ))
+          )}
           {some(deprecatedAccounts) && (
             <>
               <DeprecatedAccountsWarning />

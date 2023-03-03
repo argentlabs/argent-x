@@ -24,10 +24,10 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
     account: {
       address: accountAddress,
-      type: "argent",
+      type: "standard",
       network: {
         accountClassHash: {
-          argentAccount:
+          standard:
             "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
         },
         baseUrl: "https://alpha4.starknet.io",

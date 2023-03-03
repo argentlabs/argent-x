@@ -40,15 +40,16 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         throw Error("you need an open session")
       }
 
-      const network = msg.data
+      const { networkId, type } = msg.data
       try {
-        const account = await wallet.newAccount(network)
+        const account = await wallet.newAccount(networkId, type)
 
         tryToMintFeeToken(account)
 
         analytics.track("createAccount", {
           status: "success",
-          networkId: network,
+          networkId,
+          type: type || "standard",
         })
 
         const accounts = await getAccounts()
@@ -65,12 +66,58 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
         analytics.track("createAccount", {
           status: "failure",
-          networkId: network,
+          networkId: networkId,
+          type: type || "standard",
           errorMessage: error,
         })
 
         return sendMessageToUi({
           type: "NEW_ACCOUNT_REJ",
+          data: { error },
+        })
+      }
+    }
+
+    case "NEW_MULTISIG_ACCOUNT": {
+      if (!(await wallet.isSessionOpen())) {
+        throw Error("you need an open session")
+      }
+
+      const { networkId, signers, threshold } = msg.data
+      try {
+        const account = await wallet.newAccount(networkId, "multisig", {
+          signers,
+          threshold,
+        })
+        tryToMintFeeToken(account)
+
+        analytics.track("createAccount", {
+          status: "success",
+          networkId,
+          type: "multisig",
+        })
+
+        const accounts = await getAccounts()
+
+        return sendMessageToUi({
+          type: "NEW_MULTISIG_ACCOUNT_RES",
+          data: {
+            account,
+            accounts,
+          },
+        })
+      } catch (exception) {
+        const error = `${exception}`
+
+        analytics.track("createAccount", {
+          status: "failure",
+          networkId: networkId,
+          type: "multisig",
+          errorMessage: error,
+        })
+
+        return sendMessageToUi({
+          type: "NEW_MULTISIG_ACCOUNT_REJ",
           data: { error },
         })
       }
@@ -148,7 +195,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
 
       const encryptedPrivateKey = await encryptForUi(
-        await wallet.exportPrivateKey(),
+        await wallet.getPrivateKey(),
         msg.data.encryptedSecret,
         privateKey,
       )
@@ -156,6 +203,15 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       return sendMessageToUi({
         type: "GET_ENCRYPTED_PRIVATE_KEY_RES",
         data: { encryptedPrivateKey },
+      })
+    }
+
+    case "GET_PUBLIC_KEY": {
+      const publicKey = await wallet.getPublicKey()
+
+      return sendMessageToUi({
+        type: "GET_PUBLIC_KEY_RES",
+        data: { publicKey },
       })
     }
 

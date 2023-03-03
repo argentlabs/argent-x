@@ -8,6 +8,7 @@ import { Network, getNetwork, getProvider } from "../../../shared/network"
 import {
   ArgentAccountType,
   BaseWalletAccount,
+  CreateAccountType,
   WalletAccount,
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
@@ -102,7 +103,7 @@ export class Account {
 
   public async getCurrentImplementation(): Promise<string | undefined> {
     if (this.needsDeploy) {
-      return this.network.accountClassHash?.argentAccount // cuz we always deploy regular accounts
+      return this.network.accountClassHash?.standard // cuz we always deploy regular accounts
     }
 
     const multicall = getMulticallForNetwork(this.network)
@@ -114,8 +115,11 @@ export class Account {
     return stark.makeAddress(number.toHex(number.toBN(implementation)))
   }
 
-  public static async create(networkId: string): Promise<Account> {
-    const result = await createNewAccount(networkId)
+  public static async create(
+    networkId: string,
+    type?: CreateAccountType,
+  ): Promise<Account> {
+    const result = await createNewAccount(networkId, type)
     if (result === "error") {
       throw new Error(result)
     }

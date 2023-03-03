@@ -1,4 +1,4 @@
-import { ethers } from "ethers"
+import { ethers, utils } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
 import { find, memoize, noop, throttle, union } from "lodash-es"
 import {
@@ -16,7 +16,11 @@ import {
 import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
-import { ArgentAccountType } from "./../shared/wallet.model"
+import {
+  ArgentAccountType,
+  CreateAccountType,
+  MultisigPayload,
+} from "./../shared/wallet.model"
 import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
@@ -33,7 +37,6 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
-import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
@@ -228,9 +231,8 @@ export class Wallet {
   ): Promise<string> {
     if (network.accountClassHash) {
       return (
-        network.accountClassHash[
-          mapArgentAccountTypeToImplementationKey(accountType)
-        ] ?? network.accountClassHash.argentAccount
+        network.accountClassHash[accountType] ??
+        network.accountClassHash.standard
       )
     }
 
@@ -259,7 +261,7 @@ export class Wallet {
 
     const networkAccountClassHash = await this.getAccountClassHashForNetwork(
       network,
-      "argent",
+      "standard",
     )
 
     const accountClassHashes = union(ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES, [
@@ -314,7 +316,7 @@ export class Wallet {
                 type: "local_secret",
                 derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
               },
-              type: "argent",
+              type: "standard",
               needsDeploy: false, // Only deployed accounts will be recovered
             })
           }
@@ -425,7 +427,11 @@ export class Wallet {
     await this.walletStore.push(accounts)
   }
 
-  public async newAccount(networkId: string): Promise<WalletAccount> {
+  public async newAccount(
+    networkId: string,
+    type: CreateAccountType = "standard", // Should not be able to create plugin accounts. Default to argent account
+    multisigPayload?: MultisigPayload,
+  ): Promise<WalletAccount> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session) {
       throw Error("no open session")
@@ -444,12 +450,22 @@ export class Wallet {
       .map((account) => account.signer.derivationPath)
 
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
+    let payload
 
-    const payload = await this.getDeployContractPayloadForAccountIndex(
-      index,
-      networkId,
-    )
-
+    if (type === "multisig" && multisigPayload) {
+      const { threshold, signers } = multisigPayload
+      payload = await this.getDeployContractPayloadForMultisig({
+        threshold,
+        signers,
+        index,
+        networkId,
+      })
+    } else {
+      payload = await this.getDeployContractPayloadForAccountIndex(
+        index,
+        networkId,
+      )
+    }
     const proxyClassHash = PROXY_CONTRACT_CLASS_HASHES[0]
 
     const proxyAddress = calculateContractAddressFromHash(
@@ -467,7 +483,7 @@ export class Wallet {
         type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
-      type: "argent",
+      type,
       needsDeploy: true,
     }
 
@@ -559,7 +575,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
-      "argent",
+      "standard",
     )
 
     const constructorCallData = {
@@ -632,7 +648,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       network,
-      "argent",
+      "standard",
     )
 
     const payload = {
@@ -641,6 +657,57 @@ export class Wallet {
         implementation: accountClassHash,
         selector: getSelectorFromName("initialize"),
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
+      }),
+      addressSalt: starkPub,
+      signature: starkPair.getPrivate(),
+    }
+
+    return payload
+  }
+
+  public async getDeployContractPayloadForMultisig({
+    signers,
+    threshold,
+    index,
+    networkId,
+  }: {
+    threshold: string
+    signers: string[]
+    index: number
+    networkId: string
+  }): Promise<Required<DeployAccountContractTransaction>> {
+    const hasSession = await this.isSessionOpen()
+    const session = await this.sessionStore.get()
+    const initialised = await this.isInitialized()
+
+    if (!initialised) {
+      throw Error("wallet is not initialized")
+    }
+    if (!hasSession || !session) {
+      throw Error("no open session")
+    }
+
+    const network = await this.getNetwork(networkId)
+    const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "multisig",
+    )
+    const decodedPublicKeys = signers.map((signer) =>
+      utils.hexlify(utils.base58.decode(signer)),
+    )
+
+    const payload = {
+      classHash: accountClassHash,
+      constructorCalldata: stark.compileCalldata({
+        implementation: accountClassHash,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({
+          signers: decodedPublicKeys,
+          threshold,
+        }),
       }),
       addressSalt: starkPub,
       signature: starkPair.getPrivate(),
@@ -806,7 +873,7 @@ export class Wallet {
     return { url, filename }
   }
 
-  public async exportPrivateKey(): Promise<string> {
+  public async getPrivateKey(): Promise<string> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session?.secret) {
       throw new Error("Session is not open")
@@ -823,6 +890,22 @@ export class Wallet {
     )
 
     return starkPair.getPrivate().toString()
+  }
+
+  public async getPublicKey(): Promise<string> {
+    const account = await this.getSelectedAccount()
+
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    return starkPub
   }
 
   public static validateBackup(backupString: string): boolean {

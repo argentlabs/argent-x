@@ -18,6 +18,9 @@ import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { AddNewAccountScreen } from "./features/accounts/AddNewAccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
+import { CreateMultisigStartScreen } from "./features/accounts/multisig/CreateMultisigScreen/CreateMultisigStartScreen"
+import { JoinMultisigScreen } from "./features/accounts/multisig/JoinMultisigScreen"
+import { NewMultisigScreen } from "./features/accounts/multisig/NewMultisigScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
@@ -382,6 +385,10 @@ const walletRoutes = (
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
     />
+
+    {/* Multisig */}
+    <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
+    <Route path={routes.multisigJoin.path} element={<JoinMultisigScreen />} />
   </>
 )
 
@@ -423,6 +430,10 @@ const fullscreenRoutes = (
     <Route
       path={routes.userReviewFeedback.path}
       element={<ReviewFeedbackScreen />}
+    />
+    <Route
+      path={routes.multisigCreate.path}
+      element={<CreateMultisigStartScreen />}
     />
   </>
 )
