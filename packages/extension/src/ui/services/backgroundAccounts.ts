@@ -74,21 +74,14 @@ export const getCalculatedMultisigAddress = async (
     data: baseMultisigAccount,
   })
   try {
-    const res = await Promise.race([
+    return await Promise.race([
       waitForMessage("GET_CALCULATED_MULTISIG_ADDRESS_RES"),
       waitForMessage("GET_CALCULATED_MULTISIG_ADDRESS_REJ").then(
         () => "error" as const,
       ),
     ])
-
-    if (res === "error") {
-      throw Error("Could not calculate multisig address")
-    }
-
-    return res
-  } catch (e) {
-    console.error(e)
-    throw Error("Could not add new account")
+  } catch {
+    throw Error("Could not calculate multisig account address")
   }
 }
 
