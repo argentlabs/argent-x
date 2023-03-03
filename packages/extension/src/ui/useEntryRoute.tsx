@@ -37,7 +37,7 @@ const determineEntry = async (query: URLSearchParams) => {
     return routes.ledgerEntry()
   }
 
-  if (query.get("goto") === "/multisig/create") {
+  if (query.get("goto") === "multisig") {
     return routes.multisigCreate()
   }
 
