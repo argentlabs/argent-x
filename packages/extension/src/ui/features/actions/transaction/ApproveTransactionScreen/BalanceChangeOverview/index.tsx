@@ -60,7 +60,6 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
 
   const isMainnet = useIsMainnet()
 
-
   if (aggregatedData.length === 0) {
     return null
   }
@@ -248,7 +247,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 <P4
                                   color={
                                     isUnlimitedAmount(approval.amount.toFixed())
-                                      ? "red.50"
+                                      ? "error.500"
                                       : "neutrals.400"
                                   }
                                   fontWeight="bold"

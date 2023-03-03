@@ -3,6 +3,7 @@ import { FC, useMemo } from "react"
 import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
+  getTransactionReviewSwap,
   getTransactionReviewWithType,
 } from "../../../../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../../../../networks/useNetworks"
@@ -18,14 +19,14 @@ import { VerifiedDappIcon } from "./VerifiedDappIcon"
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
-  isDeclareContract: boolean
   verifiedDapp?: ApiTransactionReviewTargettedDapp
+  declareOrDeployType?: "declare" | "deploy"
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
-  isDeclareContract,
+  declareOrDeployType,
   verifiedDapp,
 }) => {
   const network = useCurrentNetwork()
@@ -34,19 +35,22 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     () => getTransactionReviewWithType(transactionReview),
     [transactionReview],
   )
+
   const nftTransfers = useERC721Transfers(aggregatedData)
-  if (isDeclareContract) {
+  const swapTxnReview = getTransactionReviewSwap(transactionReview)
+
+  // ignore transaction review if it is a DeclareContract transaction
+  if (declareOrDeployType) {
     return <DeclareContractIcon />
   }
-  if (transactionReviewWithType?.type === "swap") {
-    return (
-      <SwapTransactionIcon
-        network={network}
-        transaction={transactionReviewWithType}
-      />
-    )
+
+  if (swapTxnReview) {
+    return <SwapTransactionIcon network={network} transaction={swapTxnReview} />
   }
 
+  // Here the assumption is that if the transaction is a transfer, it is a send transaction
+  // and that it will be done in-app without approval
+  // If there is approval, this will not render
   if (transactionReviewWithType?.type === "transfer") {
     return (
       <SendTransactionIcon

@@ -4,7 +4,7 @@ import { FC, ReactNode, isValidElement, useMemo } from "react"
 // import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
 import { Outlet, useLocation } from "react-router-dom"
 
-import { useAppState, useStopSessionHandler } from "./app.state"
+import { useAppState, useMessageStreamHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
@@ -447,7 +447,7 @@ const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
 
 export const AppRoutes: FC = () => {
   useEntryRoute()
-  useStopSessionHandler()
+  useMessageStreamHandler()
   const location = useLocation()
 
   const { isLoading } = useAppState()

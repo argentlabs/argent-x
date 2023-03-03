@@ -1,6 +1,6 @@
 import { Button, P4, icons } from "@argent/ui"
 import { Box, Circle, Flex, useDisclosure } from "@chakra-ui/react"
-import { FC, MouseEvent, ReactNode, useCallback } from "react"
+import { FC, MouseEvent, ReactNode, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
@@ -76,23 +76,31 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   //   { suspense: false, ...withPolling(60 * 1000) },
   // )
 
-  const onClick = useCallback(async () => {
-    await selectAccount(account)
-    navigate(returnTo || routes.accountTokens())
-  }, [account, navigate, returnTo])
+  /**
+   * this control has a button-within-button
+   * the inner button shifts screen position as the button animates on click
+   * which means the click action may fire on the unintended component
+   * we keep state of which button the click action was initiated
+   * in order to honor user intent
+   */
 
-  const onOptionsClick = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+  const mouseDownSettings = useRef(false)
+
+  const onClick = useCallback(
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
       e.preventDefault()
 
-      if (account.type === "multisig") {
-        onMenuOpen()
+      if (clickNavigateSettings || mouseDownSettings.current) {
+        account.type === "multisig"
+          ? onMenuOpen()
+          : navigate(routes.editAccount(account.address))
       } else {
-        navigate(routes.editAccount(account.address))
+        await selectAccount(account)
+        navigate(returnTo || routes.accountTokens())
       }
     },
-    [account.address, account.type, navigate, onMenuOpen],
+    [clickNavigateSettings, account, onMenuOpen, navigate, returnTo],
   )
 
   const onDeleteClicked = useCallback(
@@ -118,7 +126,11 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
       <Flex position={"relative"} direction={"column"}>
         <AccountListItem
           aria-label={`Select ${accountName}`}
-          onClick={clickNavigateSettings ? onOptionsClick : onClick}
+          onMouseDown={(e) => {
+            e.stopPropagation()
+            mouseDownSettings.current = false
+          }}
+          onClick={onClick}
           accountName={accountName}
           accountAddress={account.address}
           networkId={account.networkId}
@@ -139,23 +151,25 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
           {!clickNavigateSettings && (
             <IconContainer>
               <Button
-                as={Circle}
                 aria-label={`${accountName} options`}
+                onMouseDown={(e) => {
+                  e.stopPropagation()
+                  mouseDownSettings.current = true
+                }}
+                onClick={onClick}
+                as={Circle}
                 colorScheme="transparent"
                 width={8}
                 height={8}
                 size="auto"
                 rounded="full"
-                onClick={onOptionsClick}
                 bg="black"
                 _hover={{
                   bg: "neutrals.600",
                 }}
-                position="relative"
               >
                 <MoreIcon />
               </Button>
-
               {account.type === "multisig" && isMenuOpen && (
                 <Box
                   boxShadow="menu"
@@ -189,7 +203,6 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
           )}
         </AccountListItem>
       </Flex>
-
       <MultisigDeleteModal
         onClose={onDeleteModalClose}
         isOpen={isDeleteModalOpen}

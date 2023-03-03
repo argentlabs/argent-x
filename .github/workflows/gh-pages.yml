@@ -20,7 +20,7 @@ jobs:
           node-version: "16"
           cache: "yarn"
 
-      - run: yarn install --frozen-lockfile
+      - run: yarn setup
       - run: |
           echo 'module.exports = { basePath: "/argent-x" }' > packages/dapp/next.config.js
       - run: yarn build

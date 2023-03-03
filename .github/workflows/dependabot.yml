@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: "16"
           cache: "yarn"
-      - run: yarn install --frozen-lockfile
+      - run: yarn setup
       - name: Install Playwright Browsers
         run: npx playwright install chromium
       - run: yarn build
