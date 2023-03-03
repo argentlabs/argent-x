@@ -25,5 +25,10 @@ export default {
         "0x035508Aaf6C124D348686F31ca9981568F0c0d29b563a2Ecb045aA8C81334057",
       ],
     },
+    {
+      // NOTE: Seed phrase is here intentionally and is used only for local testing. DO NOT use for any other purpose
+      seed: "slam water student cotton chalk okay auto police frown smart vague salon",
+      // 32 accounts
+    },
   ],
 }
