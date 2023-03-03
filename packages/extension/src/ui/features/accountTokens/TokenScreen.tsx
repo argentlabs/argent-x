@@ -91,7 +91,7 @@ export const TokenScreen: FC = () => {
     account,
   })
 
-  const currencyValue = useTokenBalanceToCurrencyValue(token)
+  const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
   const returnTo = useCurrentPathnameWithQuery()
 
   if (!token) {
