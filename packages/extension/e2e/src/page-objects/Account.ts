@@ -15,19 +15,19 @@ export default class Account extends Navigation {
     super(page)
   }
   get noAccountBanner() {
-    return this.page.locator(`div h5:has-text("${lang.account.noAccounts}")`)
+    return this.page.locator(`div h5:text-is("${lang.account.noAccounts}")`)
   }
 
   get createAccount() {
-    return this.page.locator(`button:has-text("${lang.account.createAccount}")`)
+    return this.page.locator(`button:text-is("${lang.account.createAccount}")`)
   }
 
   get addFunds() {
-    return this.page.locator(`button:has-text("${lang.account.addFunds}")`)
+    return this.page.locator(`button:text-is("${lang.account.addFunds}")`)
   }
 
   get addFundsFromStartNet() {
-    return this.page.locator(`a:has-text("${lang.account.fundsFromStarkNet}")`)
+    return this.page.locator(`a :text-is("${lang.account.fundsFromStarkNet}")`)
   }
 
   get accountAddress() {
@@ -41,7 +41,7 @@ export default class Account extends Navigation {
   }
 
   token(tkn: TokenName) {
-    return this.page.locator(`button:has-text('${tkn}')`)
+    return this.page.locator(`button :text-is('${tkn}')`)
   }
 
   get accountList() {
@@ -65,7 +65,7 @@ export default class Account extends Navigation {
   }
 
   get sendMax() {
-    return this.page.locator('button:has-text("MAX")')
+    return this.page.locator('button:text-is("MAX")')
   }
 
   get recepientAddress() {
@@ -199,12 +199,12 @@ export default class Account extends Navigation {
   }
 
   get exportPrivateKey() {
-    return this.page.locator(`button:has-text("${lang.account.export}")`)
+    return this.page.locator(`button:text-is("${lang.account.export}")`)
   }
 
   get setUpAccountRecovery() {
     return this.page.locator(
-      `button:has-text("${lang.account.accountRecovery}")`,
+      `button :text-is("${lang.account.accountRecovery}")`,
     )
   }
 
