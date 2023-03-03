@@ -49,7 +49,7 @@ export const NewMultisigScreen: FC = () => {
     async (type: MultisigOptionType) => {
       switch (type) {
         case "create": {
-          const url = `index.html?goto=${routes.multisigCreate()}`
+          const url = `index.html?goto=multisig`
           chrome.tabs.create({
             url,
           })
