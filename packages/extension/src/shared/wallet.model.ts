@@ -35,3 +35,8 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
 }
 
 export type StoredWalletAccount = Omit<WalletAccount, "network">
+
+export type MultisigPayload = {
+  signers: string[]
+  threshold: string
+}

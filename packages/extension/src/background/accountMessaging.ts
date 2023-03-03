@@ -78,6 +78,51 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
+    case "NEW_MULTISIG_ACCOUNT": {
+      if (!(await wallet.isSessionOpen())) {
+        throw Error("you need an open session")
+      }
+
+      const { networkId, signers, threshold } = msg.data
+      try {
+        const account = await wallet.newAccount(networkId, "multisig", {
+          signers,
+          threshold,
+        })
+        tryToMintFeeToken(account)
+
+        analytics.track("createAccount", {
+          status: "success",
+          networkId,
+          type: "multisig",
+        })
+
+        const accounts = await getAccounts()
+
+        return sendMessageToUi({
+          type: "NEW_MULTISIG_ACCOUNT_RES",
+          data: {
+            account,
+            accounts,
+          },
+        })
+      } catch (exception) {
+        const error = `${exception}`
+
+        analytics.track("createAccount", {
+          status: "failure",
+          networkId: networkId,
+          type: "multisig",
+          errorMessage: error,
+        })
+
+        return sendMessageToUi({
+          type: "NEW_MULTISIG_ACCOUNT_REJ",
+          data: { error },
+        })
+      }
+    }
+
     case "DEPLOY_ACCOUNT": {
       try {
         await deployAccountAction({

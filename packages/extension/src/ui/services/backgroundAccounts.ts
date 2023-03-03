@@ -3,6 +3,7 @@ import {
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
+  MultisigPayload,
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
@@ -11,12 +12,14 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 export const createNewAccount = async (
   networkId: string,
   type?: CreateAccountType,
+  multisigPayload?: MultisigPayload,
 ) => {
   sendMessage({
     type: "NEW_ACCOUNT",
     data: {
       networkId,
       type,
+      ...multisigPayload,
     },
   })
   try {
@@ -25,7 +28,28 @@ export const createNewAccount = async (
       waitForMessage("NEW_ACCOUNT_REJ").then(() => "error" as const),
     ])
   } catch {
-    throw Error("Could add new account")
+    throw Error("Could not add new account")
+  }
+}
+
+export const createNewMultisigAccount = async (
+  networkId: string,
+  multisigPayload: MultisigPayload,
+) => {
+  sendMessage({
+    type: "NEW_MULTISIG_ACCOUNT",
+    data: {
+      networkId,
+      ...multisigPayload,
+    },
+  })
+  try {
+    return await Promise.race([
+      waitForMessage("NEW_MULTISIG_ACCOUNT_RES"),
+      waitForMessage("NEW_MULTISIG_ACCOUNT_REJ").then(() => "error" as const),
+    ])
+  } catch {
+    throw Error("Could not add new account")
   }
 }
 

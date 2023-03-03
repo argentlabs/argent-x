@@ -21,6 +21,22 @@ export type AccountMessage =
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
+  | {
+      type: "NEW_MULTISIG_ACCOUNT"
+      data: {
+        networkId: string
+        signers: string[]
+        threshold: string
+      }
+    }
+  | {
+      type: "NEW_MULTISIG_ACCOUNT_RES"
+      data: {
+        account: WalletAccount
+        accounts: WalletAccount[]
+      }
+    }
+  | { type: "NEW_MULTISIG_ACCOUNT_REJ"; data: { error: string } }
   | { type: "DEPLOY_ACCOUNT"; data: BaseWalletAccount }
   | { type: "DEPLOY_ACCOUNT_RES" }
   | { type: "DEPLOY_ACCOUNT_REJ" }
