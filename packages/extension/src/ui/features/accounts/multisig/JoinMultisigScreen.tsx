@@ -1,6 +1,6 @@
 import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/ui"
 import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { IconWrapper } from "../../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
@@ -11,9 +11,15 @@ const { CopyIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
-  const { onCopy, hasCopied } = useClipboard("", 2000)
+  const { onCopy, hasCopied, setValue } = useClipboard("", 2000)
 
   const { encodedPubKey, pubKey } = useSignerKey()
+
+  useEffect(() => {
+    if (encodedPubKey) {
+      setValue(encodedPubKey)
+    }
+  }, [encodedPubKey, setValue])
 
   const onDone = async () => {
     navigate(await recover({ showAccountList: true }))
