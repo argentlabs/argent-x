@@ -1,5 +1,3 @@
-import "vi-fetch/setup"
-
 import { describe, expect, test, vi } from "vitest"
 
 import { useAppState } from "../src/ui/app.state"

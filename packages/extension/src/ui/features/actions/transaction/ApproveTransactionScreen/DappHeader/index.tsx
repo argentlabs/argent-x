@@ -16,14 +16,14 @@ export interface DappHeaderProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
-  isDeclareContract: boolean
+  declareOrDeployType?: "declare" | "deploy"
 }
 
 export const DappHeader = ({
   transactions,
   transactionReview,
   aggregatedData,
-  isDeclareContract,
+  declareOrDeployType,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -43,7 +43,7 @@ export const DappHeader = ({
           transactionReview={transactionReview}
           aggregatedData={aggregatedData}
           verifiedDapp={transactionReview?.targetedDapp}
-          isDeclareContract={isDeclareContract}
+          declareOrDeployType={declareOrDeployType}
         />
         <Flex
           direction="column"
@@ -58,7 +58,7 @@ export const DappHeader = ({
               fallback={
                 transactions.length > 1 ? "transactions" : "transaction"
               }
-              isDeclareContract={isDeclareContract}
+              declareOrDeployType={declareOrDeployType}
             />
           </H5>
           {targetedDappWebsite && (

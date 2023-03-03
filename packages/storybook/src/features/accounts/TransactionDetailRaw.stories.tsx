@@ -113,7 +113,7 @@ Cairo traceback (most recent call last):
 Unknown location (pc=0:161)
 Unknown location (pc=0:147)
 
-Error in the called contract (0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25):
+Error in the called contract (0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a):
 Error message: nonce invalid
 Error at pc=0:1638:
 An ASSERT_EQ instruction failed: 48 != 49.

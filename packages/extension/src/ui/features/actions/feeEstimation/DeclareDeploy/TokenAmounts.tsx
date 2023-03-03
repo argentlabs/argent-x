@@ -1,9 +1,12 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
+import { number } from "starknet"
 
+import { EstimateFeeResponse } from "../../../../../shared/messages/TransactionMessage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../../shared/token/price"
+import { Token } from "../../../../../shared/token/type"
 import {
   FieldValue,
   FieldValueGroup,
@@ -12,14 +15,34 @@ import {
 import { useTokenAmountToCurrencyValue } from "../../../accountTokens/tokenPriceHooks"
 import { FeeEstimationValue } from "../styled"
 
-const TokenAmounts: FC<{ feeToken: any; fee: any }> = ({ feeToken, fee }) => {
-  const amountCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.amount,
-  )
+const TokenAmounts: FC<{
+  feeToken: Token
+  fee: EstimateFeeResponse
+  needsDeploy?: boolean
+}> = ({ feeToken, fee, needsDeploy }) => {
+  const totalFee = useMemo(() => {
+    if (needsDeploy && fee?.accountDeploymentFee) {
+      return number.toHex(
+        number.toBN(fee.accountDeploymentFee).add(number.toBN(fee.amount)),
+      )
+    }
+    return fee?.amount
+  }, [needsDeploy, fee?.accountDeploymentFee, fee?.amount])
+
+  const totalMaxFee = useMemo(() => {
+    if (needsDeploy && fee?.maxADFee) {
+      return number.toHex(
+        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
+      )
+    }
+    return fee?.suggestedMaxFee
+  }, [needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
+
+  const amountCurrencyValue = useTokenAmountToCurrencyValue(feeToken, totalFee)
+
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
-    fee?.maxADFee,
+    totalMaxFee,
   )
 
   return (
@@ -34,12 +57,12 @@ const TokenAmounts: FC<{ feeToken: any; fee: any }> = ({ feeToken, fee }) => {
             ~
             {feeToken ? (
               prettifyTokenAmount({
-                amount: fee.amount,
+                amount: totalFee,
                 decimals: feeToken.decimals,
                 symbol: feeToken.symbol,
               })
             ) : (
-              <>{fee.amount} Unknown</>
+              <>{totalFee} Unknown</>
             )}
           </FeeEstimationValue>
         )}
@@ -54,12 +77,12 @@ const TokenAmounts: FC<{ feeToken: any; fee: any }> = ({ feeToken, fee }) => {
             Max ~
             {feeToken ? (
               prettifyTokenAmount({
-                amount: fee.maxADFee,
+                amount: totalMaxFee,
                 decimals: feeToken.decimals,
                 symbol: feeToken.symbol,
               })
             ) : (
-              <>{fee.maxADFee} Unknown</>
+              <>{totalMaxFee} Unknown</>
             )}
           </FeeEstimationValue>
         )}

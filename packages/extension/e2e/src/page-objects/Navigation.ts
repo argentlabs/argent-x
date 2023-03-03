@@ -17,33 +17,33 @@ export default class Navigation {
   }
 
   get approve() {
-    return this.page.locator(`button:has-text("${lang.common.confirm}")`)
+    return this.page.locator(`button:text-is("${lang.common.confirm}")`)
   }
 
   get next() {
-    return this.page.locator(`button:has-text("${lang.common.next}")`)
+    return this.page.locator(`button:text-is("${lang.common.next}")`)
   }
 
   get done() {
-    return this.page.locator(`button:has-text("${lang.common.done}")`)
+    return this.page.locator(`button:text-is("${lang.common.done}")`)
   }
 
   get continue() {
     return this.page
-      .locator(`button:has-text("${lang.common.continue}")`)
+      .locator(`button:text-is("${lang.common.continue}")`)
       .first()
   }
 
   get yes() {
-    return this.page.locator(`button:has-text("${lang.common.yes}")`)
+    return this.page.locator(`button:text-is("${lang.common.yes}")`)
   }
 
   get no() {
-    return this.page.locator(`button:has-text("${lang.common.no}")`)
+    return this.page.locator(`button:text-is("${lang.common.no}")`)
   }
 
   get unlock() {
-    return this.page.locator(`button:has-text("${lang.common.unlock}")`)
+    return this.page.locator(`button:text-is("${lang.common.unlock}")`)
   }
 
   get showSettings() {
@@ -51,7 +51,7 @@ export default class Navigation {
   }
 
   get lockWallet() {
-    return this.page.locator(`a:text-is("${lang.common.lockWallet}")`)
+    return this.page.locator(`button:text-is("${lang.common.lockWallet}")`)
   }
 
   get reset() {
@@ -59,7 +59,7 @@ export default class Navigation {
   }
 
   get confirmReset() {
-    return this.page.locator(`button:has-text("${lang.common.confirmReset}")`)
+    return this.page.locator(`button:text-is("${lang.common.confirmReset}")`)
   }
 
   get menuPendingTransationsIndicator() {
