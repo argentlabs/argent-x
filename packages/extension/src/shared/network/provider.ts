@@ -1,5 +1,5 @@
 import { memoize } from "lodash-es"
-import { SequencerProvider } from "starknet"
+import { ProviderInterface, RpcProvider, SequencerProvider } from "starknet"
 import { SequencerProvider as SequencerProviderv4 } from "starknet4"
 
 import { Network } from "./type"
@@ -8,7 +8,14 @@ const getProviderForBaseUrl = memoize((baseUrl: string) => {
   return new SequencerProvider({ baseUrl })
 })
 
-export function getProvider(network: Network) {
+const getProviderForRpcUrl = memoize((rpcUrl: string) => {
+  return new RpcProvider({ nodeUrl: rpcUrl })
+})
+
+export function getProvider(network: Network): ProviderInterface {
+  if (network.rpcUrl) {
+    return getProviderForRpcUrl(network.rpcUrl)
+  }
   return getProviderForBaseUrl(network.baseUrl)
 }
 
