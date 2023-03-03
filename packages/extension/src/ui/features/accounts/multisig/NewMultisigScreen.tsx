@@ -48,15 +48,16 @@ export const NewMultisigScreen: FC = () => {
   const onClick = useCallback(
     async (type: MultisigOptionType) => {
       switch (type) {
-        case "create":
-          // eslint-disable-next-line no-case-declarations
+        case "create": {
           const url = `index.html?goto=${routes.multisigCreate()}`
           chrome.tabs.create({
             url,
           })
           break
+        }
+
         case "join": {
-          const newAccount = await addAccount("multisig", true)
+          await addAccount("multisig", true)
           navigate(routes.multisigJoin())
           break
         }
