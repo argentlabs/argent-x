@@ -1,3 +1,4 @@
+import { TextWithAmount } from "@argent/ui"
 import { FC, useMemo } from "react"
 import { number } from "starknet"
 
@@ -53,18 +54,20 @@ const TokenAmounts: FC<{
             ~{prettifyCurrencyValue(amountCurrencyValue)}
           </FeeEstimationValue>
         ) : (
-          <FeeEstimationValue>
-            ~
-            {feeToken ? (
-              prettifyTokenAmount({
-                amount: totalFee,
-                decimals: feeToken.decimals,
-                symbol: feeToken.symbol,
-              })
-            ) : (
-              <>{totalFee} Unknown</>
-            )}
-          </FeeEstimationValue>
+          <TextWithAmount amount={totalFee} decimals={feeToken.decimals}>
+            <FeeEstimationValue>
+              ~
+              {feeToken ? (
+                prettifyTokenAmount({
+                  amount: totalFee,
+                  decimals: feeToken.decimals,
+                  symbol: feeToken.symbol,
+                })
+              ) : (
+                <>{totalFee} Unknown</>
+              )}
+            </FeeEstimationValue>
+          </TextWithAmount>
         )}
       </FieldValue>
       <FieldValueMeta>
@@ -73,18 +76,20 @@ const TokenAmounts: FC<{
             Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
           </FeeEstimationValue>
         ) : (
-          <FeeEstimationValue>
-            Max ~
-            {feeToken ? (
-              prettifyTokenAmount({
-                amount: totalMaxFee,
-                decimals: feeToken.decimals,
-                symbol: feeToken.symbol,
-              })
-            ) : (
-              <>{totalMaxFee} Unknown</>
-            )}
-          </FeeEstimationValue>
+          <TextWithAmount amount={totalMaxFee} decimals={feeToken.decimals}>
+            <FeeEstimationValue>
+              Max ~
+              {feeToken ? (
+                prettifyTokenAmount({
+                  amount: totalMaxFee,
+                  decimals: feeToken.decimals,
+                  symbol: feeToken.symbol,
+                })
+              ) : (
+                <>{totalMaxFee} Unknown</>
+              )}
+            </FeeEstimationValue>
+          </TextWithAmount>
         )}
       </FieldValueMeta>
     </FieldValueGroup>

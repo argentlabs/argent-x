@@ -5,18 +5,20 @@ import {
   icons,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { groupBy, isEmpty, partition, some } from "lodash-es"
-import { FC, useCallback } from "react"
+import { isEmpty, partition, some } from "lodash-es"
+import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { routes, useReturnTo } from "../../routes"
+import { isEqualAddress } from "../../services/addresses"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
+import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import {
   isHiddenAccount,
@@ -64,6 +66,35 @@ export const AccountListScreen: FC = () => {
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
+  const accountFromAddress = useCallback(
+    (accountAddress: string) => {
+      return allAccounts.find(
+        (account) =>
+          isEqualAddress(account.address, accountAddress) &&
+          currentNetwork.id === account.networkId,
+      )
+    },
+    [allAccounts, currentNetwork],
+  )
+
+  const fullPartitionedAccounts = useMemo(() => {
+    if (!partitionedAccounts) {
+      return
+    }
+
+    const [deprecatedAccounts, newAccounts] = partitionedAccounts
+
+    const deprecatedFullAccounts = deprecatedAccounts
+      .map((accountAddress) => accountFromAddress(accountAddress))
+      .filter((account): account is Account => Boolean(account))
+
+    const newFullAccounts = newAccounts
+      .map((accountAddress) => accountFromAddress(accountAddress))
+      .filter((account): account is Account => Boolean(account))
+
+    return [deprecatedFullAccounts, newFullAccounts]
+  }, [accountFromAddress, partitionedAccounts])
+
   const onClose = useCallback(async () => {
     if (returnTo) {
       navigate(returnTo)
@@ -72,16 +103,13 @@ export const AccountListScreen: FC = () => {
     }
   }, [navigate, returnTo])
 
-  if (!partitionedAccounts) {
+  if (!fullPartitionedAccounts) {
     return <LoadingScreen />
   }
 
-  const [deprecatedAccounts, newAccounts] = partitionedAccounts
+  const [deprecatedAccounts, newAccounts] = fullPartitionedAccounts
 
-  const accountByTypes = groupBy(newAccounts, "type")
-
-  const argentAccounts = accountByTypes.argent
-  const multisigAccounts = accountByTypes.multisig
+  const [multisigAccounts, argentAccounts] = partition(newAccounts, "type")
 
   const hasMultipleAccountTypes =
     !isEmpty(argentAccounts) && !isEmpty(multisigAccounts)
