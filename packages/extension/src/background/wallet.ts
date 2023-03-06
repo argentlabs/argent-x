@@ -32,6 +32,7 @@ import {
 } from "../shared/account/details/getAndMergeAccountDetails"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
+import { MultisigSigner } from "../shared/multisig/signer"
 import { getMultisigAccountFromBaseWallet } from "../shared/multisig/store"
 import {
   Network,
@@ -809,12 +810,18 @@ export class Wallet {
       account.signer.derivationPath,
     )
 
-    const keyPairOrSigner =
-      ARGENT_SHIELD_ENABLED && account.guardian
-        ? new GuardianSignerArgentX(keyPair, cosignerSign)
-        : keyPair
+    // Return Multisig Signer if account is multisig
+    if (account.type === "multisig") {
+      return new MultisigSigner(keyPair)
+    }
 
-    return keyPairOrSigner
+    // Return Guardian Signer if Cosigner is enabled
+    if (ARGENT_SHIELD_ENABLED && account.guardian) {
+      return new GuardianSignerArgentX(keyPair, cosignerSign)
+    }
+
+    // Else return KeyPair
+    return keyPair
   }
 
   public async getStarknetAccount(

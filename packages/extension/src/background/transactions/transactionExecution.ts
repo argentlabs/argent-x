@@ -99,10 +99,15 @@ export const executeTransactionAction = async (
     !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
   ) {
     if ("estimateFeeBulk" in starknetAccount) {
+      const deployAccountPayload =
+        selectedAccount.type === "multisig"
+          ? await wallet.getMultisigDeploymentPayload(selectedAccount)
+          : await wallet.getAccountDeploymentPayload(selectedAccount)
+
       const bulkTransactions: TransactionBulk = [
         {
           type: "DEPLOY_ACCOUNT",
-          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
+          payload: deployAccountPayload,
         },
         {
           type: "INVOKE_FUNCTION",
