@@ -42,11 +42,7 @@ export class MultisigAccount extends Account {
   }
 
   static fromAccount(account: Account): MultisigAccount {
-    return new MultisigAccount(
-      account,
-      account.address,
-      new MultisigSigner(account.signer),
-    )
+    return new MultisigAccount(account, account.address, account.signer)
   }
 
   public async execute(
@@ -83,13 +79,18 @@ export class MultisigAccount extends Account {
 
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
 
+    const txnWithHexCalldata = transactions.map((transaction) => ({
+      ...transaction,
+      calldata: number.getHexStringArray(transaction.calldata ?? []),
+    }))
+
     const request = ApiMultisigPostRequestTxnSchema.parse({
       creator,
       transaction: {
-        nonce,
-        version,
+        nonce: number.toHex(nonce),
+        version: number.toHex(version),
         maxFee: maxFee.toString(),
-        calls: transactions,
+        calls: txnWithHexCalldata,
       },
       starknetSignature: { r, s },
     })
@@ -109,7 +110,6 @@ export class MultisigAccount extends Account {
       },
       body: JSON.stringify(request),
     })
-
     const data = ApiMultisigTxnResponseSchema.parse(response)
 
     return {

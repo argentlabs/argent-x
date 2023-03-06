@@ -3,12 +3,17 @@ import {
   Call,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
+  KeyPair,
   Signature,
   Signer,
-  SignerInterface,
+  number,
 } from "starknet"
 
-export class MultisigSigner extends Signer implements SignerInterface {
+export class MultisigSigner extends Signer {
+  constructor(keyPair: KeyPair) {
+    super(keyPair)
+  }
+
   public async signDeployAccountTransaction(
     deployAccountSignerDetails: DeployAccountSignerDetails,
   ): Promise<Signature> {
@@ -18,7 +23,7 @@ export class MultisigSigner extends Signer implements SignerInterface {
 
     const publicSigner = await this.getPubKey()
 
-    return [publicSigner, ...signatures]
+    return [publicSigner, ...signatures].map(number.getHexString)
   }
 
   public async signTransaction(
@@ -34,6 +39,6 @@ export class MultisigSigner extends Signer implements SignerInterface {
 
     const publicSigner = await this.getPubKey()
 
-    return [publicSigner, ...signatures]
+    return [publicSigner, ...signatures].map(number.getHexString)
   }
 }
