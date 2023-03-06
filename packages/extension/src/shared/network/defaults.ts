@@ -70,6 +70,7 @@ export const defaultNetworks: Network[] = [
     id: "localhost",
     chainId: "SN_GOERLI",
     baseUrl: "http://localhost:5050",
+    explorerUrl: "https://devnet.starkscan.co",
     name: "Localhost 5050",
   },
 ]

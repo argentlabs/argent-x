@@ -1,3 +1,4 @@
+import { TextWithAmount } from "@argent/ui"
 import { Collapse } from "@mui/material"
 import { BigNumber } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
@@ -126,18 +127,23 @@ const Estimation: FC<EstimationProps> = ({
                     ~{prettifyCurrencyValue(amountCurrencyValue)}
                   </FeeEstimationValue>
                 ) : (
-                  <FeeEstimationValue>
-                    ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.amount,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.amount} Unknown</>
-                    )}
-                  </FeeEstimationValue>
+                  <TextWithAmount
+                    amount={fee.amount}
+                    decimals={feeToken?.decimals}
+                  >
+                    <FeeEstimationValue>
+                      ~
+                      {feeToken ? (
+                        prettifyTokenAmount({
+                          amount: fee.amount,
+                          decimals: feeToken.decimals,
+                          symbol: feeToken.symbol,
+                        })
+                      ) : (
+                        <>{fee.amount} Unknown</>
+                      )}
+                    </FeeEstimationValue>
+                  </TextWithAmount>
                 )}
               </FieldValueSub>
               <FieldValueSub>
@@ -146,18 +152,23 @@ const Estimation: FC<EstimationProps> = ({
                     ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
                   </FeeEstimationValue>
                 ) : (
-                  <FeeEstimationValue>
-                    ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.accountDeploymentFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.accountDeploymentFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
+                  <TextWithAmount
+                    amount={fee.accountDeploymentFee}
+                    decimals={feeToken?.decimals}
+                  >
+                    <FeeEstimationValue>
+                      ~
+                      {feeToken ? (
+                        prettifyTokenAmount({
+                          amount: fee.accountDeploymentFee,
+                          decimals: feeToken.decimals,
+                          symbol: feeToken.symbol,
+                        })
+                      ) : (
+                        <>{fee.accountDeploymentFee} Unknown</>
+                      )}
+                    </FeeEstimationValue>
+                  </TextWithAmount>
                 )}
               </FieldValueSub>
             </FieldValueGroup>

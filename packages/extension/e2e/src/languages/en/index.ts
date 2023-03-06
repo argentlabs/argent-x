@@ -25,6 +25,7 @@ const texts = {
     export: "Export",
     accountRecovery: "Set up account recovery",
     saveTheRecoveryPhrase: "Save the recovery phrase",
+    pendingTransactions: "Pending transactions",
   },
   wallet: {
     //first screen

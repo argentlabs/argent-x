@@ -25,6 +25,7 @@ export interface ILanguage {
     export: string
     accountRecovery: string
     saveTheRecoveryPhrase: string
+    pendingTransactions: string
   }
   wallet: {
     //first screen
