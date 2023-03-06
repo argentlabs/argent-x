@@ -56,21 +56,21 @@ export async function getMultisigAccountFromBaseWallet(
   const baseMultisigWalletAccounts = await getBaseMultisigAccounts()
   const walletAccounts = await getAccounts()
 
-  const bma = baseMultisigWalletAccounts.find((baseMultisigWalletAccount) =>
-    accountsEqual(baseMultisigWalletAccount, baseWalletAccount),
+  const baseMultisigAccount = baseMultisigWalletAccounts.find((acc) =>
+    accountsEqual(acc, baseWalletAccount),
   )
 
-  const wa = walletAccounts.find((walletAccount) =>
-    accountsEqual(walletAccount, baseWalletAccount),
+  const walletAccount = walletAccounts.find((acc) =>
+    accountsEqual(acc, baseWalletAccount),
   )
 
-  if (!bma || !wa) {
+  if (!baseMultisigAccount || !walletAccount) {
     return undefined
   }
 
   return {
-    ...wa,
-    ...bma,
+    ...walletAccount,
+    ...baseMultisigAccount,
     type: "multisig",
   }
 }

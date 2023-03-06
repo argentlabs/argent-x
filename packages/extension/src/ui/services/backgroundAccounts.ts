@@ -215,7 +215,12 @@ export const getNextPublicKey = async (networkId: string) => {
     data: { networkId },
   })
 
-  const { publicKey } = await waitForMessage("GET_NEXT_PUBLIC_KEY_RES")
+  const { publicKey } = await Promise.race([
+    waitForMessage("GET_NEXT_PUBLIC_KEY_RES"),
+    waitForMessage("GET_NEXT_PUBLIC_KEY_REJ").then(() => {
+      throw new Error("Getting next public key failed")
+    }),
+  ])
 
   return publicKey
 }
