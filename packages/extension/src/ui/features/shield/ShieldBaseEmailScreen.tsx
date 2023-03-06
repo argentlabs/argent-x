@@ -30,12 +30,14 @@ export interface ShieldBaseEmailScreenProps {
   onBack?: () => void
   onCancel?: () => void
   onEmailRequested: (email: string) => void
+  hasGuardian?: boolean
 }
 
 export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
   onBack,
   onCancel,
   onEmailRequested,
+  hasGuardian,
 }) => {
   const resolver = useYupValidationResolver(schema)
   const toast = useToast()
@@ -77,9 +79,11 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
       >
         <ShieldHeader
           icon={LockIcon}
-          title={"Enter email"}
+          title={hasGuardian ? "Verify Argent Shield" : "Enter email"}
           subtitle={
-            "Enter email that should be used for two-factor authentication"
+            hasGuardian
+              ? "Enter email that is used for two-factor authentication"
+              : "Enter email that should be used for two-factor authentication"
           }
         />
         <Input
