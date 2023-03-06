@@ -64,4 +64,7 @@ const defaultAccount: Account = {
   }),
 }
 
-export const getMockAccount = () => defaultAccount
+export const getMockAccount = (overrides: Partial<Account>) => ({
+  ...defaultAccount,
+  ...overrides,
+})
