@@ -42,7 +42,7 @@
     "storybook": "cd packages/storybook && yarn storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts",
-    "version": "lerna version --no-push && yarn --cwd packages/extension run version"
+    "version": "lerna version --no-push --no-git-tag-version && yarn --cwd packages/extension run version"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
