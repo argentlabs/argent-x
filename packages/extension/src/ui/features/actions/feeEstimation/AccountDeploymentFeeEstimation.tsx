@@ -1,5 +1,6 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
 
+import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
 import { Estimation } from "./DeclareDeploy/Estimation"
 import { useEstimationAccountFees } from "./DeclareDeploy/useEstimationAccountFees"
 import { DeployAccountFeeEstimationProps } from "./types"
@@ -18,9 +19,21 @@ export const AccountDeploymentFeeEstimation: FC<
     actionHash,
   )
 
+  const deployAccountFeeToEstimateFeeResponse: EstimateFeeResponse | undefined =
+    useMemo(() => {
+      if (!fee) {
+        return undefined
+      }
+
+      return {
+        suggestedMaxFee: fee.maxADFee,
+        amount: fee.amount,
+      }
+    }, [fee])
+
   return (
     <Estimation
-      fee={fee}
+      fee={deployAccountFeeToEstimateFeeResponse}
       feeToken={feeToken}
       feeTokenBalance={feeTokenBalance}
       error={error}

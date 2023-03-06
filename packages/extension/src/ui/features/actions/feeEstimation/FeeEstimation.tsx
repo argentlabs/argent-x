@@ -1,4 +1,4 @@
-import { L1, L2, P4, Pre, icons } from "@argent/ui"
+import { L1, L2, P4, Pre, TextWithAmount, icons } from "@argent/ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
@@ -126,18 +126,23 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                   ≈ {prettifyCurrencyValue(amountCurrencyValue)}
                 </P4>
               ) : (
-                <P4 fontWeight="bold">
-                  ≈{" "}
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.amount,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.amount} Unknown</>
-                  )}
-                </P4>
+                <TextWithAmount
+                  amount={fee.amount}
+                  decimals={feeToken.decimals}
+                >
+                  <P4 fontWeight="bold">
+                    ≈{" "}
+                    {feeToken ? (
+                      prettifyTokenAmount({
+                        amount: fee.amount,
+                        decimals: feeToken.decimals,
+                        symbol: feeToken.symbol,
+                      })
+                    ) : (
+                      <>{fee.amount} Unknown</>
+                    )}
+                  </P4>
+                </TextWithAmount>
               )}
             </Flex>
 
@@ -146,19 +151,24 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
                 (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
               </L2>
             ) : (
-              <L2 color="neutrals.300">
-                (Max &nbsp;
-                {feeToken ? (
-                  prettifyTokenAmount({
-                    amount: fee.suggestedMaxFee,
-                    decimals: feeToken.decimals,
-                    symbol: feeToken.symbol,
-                  })
-                ) : (
-                  <>{fee.suggestedMaxFee} Unknown</>
-                )}
-                )
-              </L2>
+              <TextWithAmount
+                amount={fee.suggestedMaxFee}
+                decimals={feeToken.decimals}
+              >
+                <L2 color="neutrals.300">
+                  (Max &nbsp;
+                  {feeToken ? (
+                    prettifyTokenAmount({
+                      amount: fee.suggestedMaxFee,
+                      decimals: feeToken.decimals,
+                      symbol: feeToken.symbol,
+                    })
+                  ) : (
+                    <>{fee.suggestedMaxFee} Unknown</>
+                  )}
+                  )
+                </L2>
+              </TextWithAmount>
             )}
           </Flex>
         ) : showEstimateError ? (

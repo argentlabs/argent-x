@@ -1,9 +1,13 @@
-import { FC } from "react"
+import { TextWithAmount } from "@argent/ui"
+import { FC, useMemo } from "react"
+import { number } from "starknet"
 
+import { EstimateFeeResponse } from "../../../../../shared/messages/TransactionMessage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../../shared/token/price"
+import { Token } from "../../../../../shared/token/type"
 import {
   FieldValue,
   FieldValueGroup,
@@ -12,14 +16,34 @@ import {
 import { useTokenAmountToCurrencyValue } from "../../../accountTokens/tokenPriceHooks"
 import { FeeEstimationValue } from "../styled"
 
-const TokenAmounts: FC<{ feeToken: any; fee: any }> = ({ feeToken, fee }) => {
-  const amountCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
-    fee?.amount,
-  )
+const TokenAmounts: FC<{
+  feeToken: Token
+  fee: EstimateFeeResponse
+  needsDeploy?: boolean
+}> = ({ feeToken, fee, needsDeploy }) => {
+  const totalFee = useMemo(() => {
+    if (needsDeploy && fee?.accountDeploymentFee) {
+      return number.toHex(
+        number.toBN(fee.accountDeploymentFee).add(number.toBN(fee.amount)),
+      )
+    }
+    return fee?.amount
+  }, [needsDeploy, fee?.accountDeploymentFee, fee?.amount])
+
+  const totalMaxFee = useMemo(() => {
+    if (needsDeploy && fee?.maxADFee) {
+      return number.toHex(
+        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
+      )
+    }
+    return fee?.suggestedMaxFee
+  }, [needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
+
+  const amountCurrencyValue = useTokenAmountToCurrencyValue(feeToken, totalFee)
+
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
-    fee?.maxADFee,
+    totalMaxFee,
   )
 
   return (
@@ -30,18 +54,20 @@ const TokenAmounts: FC<{ feeToken: any; fee: any }> = ({ feeToken, fee }) => {
             ~{prettifyCurrencyValue(amountCurrencyValue)}
           </FeeEstimationValue>
         ) : (
-          <FeeEstimationValue>
-            ~
-            {feeToken ? (
-              prettifyTokenAmount({
-                amount: fee.amount,
-                decimals: feeToken.decimals,
-                symbol: feeToken.symbol,
-              })
-            ) : (
-              <>{fee.amount} Unknown</>
-            )}
-          </FeeEstimationValue>
+          <TextWithAmount amount={totalFee} decimals={feeToken.decimals}>
+            <FeeEstimationValue>
+              ~
+              {feeToken ? (
+                prettifyTokenAmount({
+                  amount: totalFee,
+                  decimals: feeToken.decimals,
+                  symbol: feeToken.symbol,
+                })
+              ) : (
+                <>{totalFee} Unknown</>
+              )}
+            </FeeEstimationValue>
+          </TextWithAmount>
         )}
       </FieldValue>
       <FieldValueMeta>
@@ -50,18 +76,20 @@ const TokenAmounts: FC<{ feeToken: any; fee: any }> = ({ feeToken, fee }) => {
             Max ~{prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)}
           </FeeEstimationValue>
         ) : (
-          <FeeEstimationValue>
-            Max ~
-            {feeToken ? (
-              prettifyTokenAmount({
-                amount: fee.maxADFee,
-                decimals: feeToken.decimals,
-                symbol: feeToken.symbol,
-              })
-            ) : (
-              <>{fee.maxADFee} Unknown</>
-            )}
-          </FeeEstimationValue>
+          <TextWithAmount amount={totalMaxFee} decimals={feeToken.decimals}>
+            <FeeEstimationValue>
+              Max ~
+              {feeToken ? (
+                prettifyTokenAmount({
+                  amount: totalMaxFee,
+                  decimals: feeToken.decimals,
+                  symbol: feeToken.symbol,
+                })
+              ) : (
+                <>{totalMaxFee} Unknown</>
+              )}
+            </FeeEstimationValue>
+          </TextWithAmount>
         )}
       </FieldValueMeta>
     </FieldValueGroup>

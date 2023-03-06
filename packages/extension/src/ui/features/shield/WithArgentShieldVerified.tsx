@@ -153,6 +153,7 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
           <ShieldBaseEmailScreen
             onCancel={onEmailCancel}
             onEmailRequested={onEmailRequested}
+            hasGuardian={hasGuardian}
           />
         </>
       )

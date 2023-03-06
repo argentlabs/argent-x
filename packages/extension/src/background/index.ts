@@ -1,3 +1,4 @@
+import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
 import browser from "webextension-polyfill"
 
 import { accountStore, getAccounts } from "../shared/account/store"
@@ -5,7 +6,10 @@ import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
 import { getNetwork } from "../shared/network"
-import { migratePreAuthorizations } from "../shared/preAuthorizations"
+import {
+  isPreAuthorized,
+  migratePreAuthorizations,
+} from "../shared/preAuthorizations"
 import { delay } from "../shared/utils/delay"
 import { migrateWallet } from "../shared/wallet/storeMigration"
 import { walletStore } from "../shared/wallet/walletStore"
@@ -28,7 +32,10 @@ import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
 import { initOnboarding } from "./onboarding"
-import { handlePreAuthorizationMessage } from "./preAuthorizationMessaging"
+import {
+  getOriginFromSender,
+  handlePreAuthorizationMessage,
+} from "./preAuthorizationMessaging"
 import { handleRecoveryMessage } from "./recoveryMessaging"
 import { handleSessionMessage } from "./sessionMessaging"
 import { handleShieldMessage } from "./shieldMessaging"
@@ -100,13 +107,7 @@ const safeMessages: MessageType["type"][] = [
   "IS_PREAUTHORIZED",
   "CONNECT_DAPP",
   "DISCONNECT_ACCOUNT",
-  "EXECUTE_TRANSACTION",
   "OPEN_UI",
-  "SIGN_MESSAGE",
-  "REQUEST_TOKEN",
-  "REQUEST_ADD_CUSTOM_NETWORK",
-  "REQUEST_SWITCH_CUSTOM_NETWORK",
-  "REQUEST_DECLARE_CONTRACT",
   // answers
   "EXECUTE_TRANSACTION_RES",
   "TRANSACTION_SUBMITTED",
@@ -133,7 +134,19 @@ const safeMessages: MessageType["type"][] = [
   "DECLARE_CONTRACT_ACTION_SUBMITTED",
 ]
 
-messageStream.subscribe(async ([msg, sender]) => {
+const safeIfPreauthorizedMessages: MessageType["type"][] = [
+  "EXECUTE_TRANSACTION",
+  "SIGN_MESSAGE",
+  "REQUEST_TOKEN",
+  "REQUEST_ADD_CUSTOM_NETWORK",
+  "REQUEST_SWITCH_CUSTOM_NETWORK",
+  "REQUEST_DECLARE_CONTRACT",
+]
+
+const handleMessage = async (
+  [msg, sender]: [MessageType, browser.runtime.MessageSender],
+  port?: browser.runtime.Port,
+) => {
   await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages
 
   const messagingKeys = await getMessagingKeys()
@@ -156,27 +169,36 @@ messageStream.subscribe(async ([msg, sender]) => {
 
   const extensionUrl = browser.extension.getURL("")
   const safeOrigin = extensionUrl.replace(/\/$/, "")
-  const origin = sender.origin ?? sender.url // Firefox uses url, Chrome uses origin
-  const isSafeOrigin = Boolean(origin?.startsWith(safeOrigin))
+  const origin = getOriginFromSender(sender)
+  const isSafeOrigin = Boolean(origin === safeOrigin)
 
-  if (!isSafeOrigin && !safeMessages.includes(msg.type)) {
+  const currentAccount = await wallet.getSelectedAccount()
+  const senderIsPreauthorized =
+    !!currentAccount && (await isPreAuthorized(currentAccount, origin))
+
+  if (
+    !isSafeOrigin && // allow all messages from the extension itself
+    !safeMessages.includes(msg.type) && // allow messages that are needed to get into preauthorization state
+    !(senderIsPreauthorized && safeIfPreauthorizedMessages.includes(msg.type)) // allow additional messages if sender is preauthorized
+  ) {
     console.warn(
-      "message received from unknown origin is trying to use unsafe method",
+      `received message of type ${msg.type} from ${origin} but it is not allowed`,
     )
     return // this return must not be removed
   }
 
   // forward UI messages to rest of the tabs
-  if (isSafeOrigin && hasTab(sender.tab?.id)) {
-    sendMessageToActiveTabs(msg)
+  if (isSafeOrigin) {
+    if (await hasTab(sender.tab?.id)) {
+      await sendMessageToActiveTabs(msg)
+    }
   }
 
   const respond = async (msg: MessageType) => {
-    console.log("respond", msg)
     if (safeMessages.includes(msg.type)) {
-      sendMessageToActiveTabsAndUi(msg, [sender.tab?.id])
+      await sendMessageToActiveTabsAndUi(msg)
     } else {
-      sendMessageToUi(msg)
+      await sendMessageToUi(msg)
     }
   }
 
@@ -187,6 +209,7 @@ messageStream.subscribe(async ([msg, sender]) => {
         sender,
         background,
         messagingKeys,
+        port,
         respond,
       })
     } catch (error) {
@@ -197,7 +220,45 @@ messageStream.subscribe(async ([msg, sender]) => {
     }
     break
   }
+}
+
+browser.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener(async (msg: MessageType, port) => {
+    const sender = port.sender
+    if (sender) {
+      switch (msg.type) {
+        case "EXECUTE_TRANSACTION": {
+          const [transactions, abis, transactionsDetail] =
+            await StarknetMethodArgumentsSchemas.execute.parseAsync([
+              msg.data.transactions,
+              msg.data.abis,
+              msg.data.transactionsDetail,
+            ])
+          return handleMessage(
+            [
+              { ...msg, data: { transactions, abis, transactionsDetail } },
+              sender,
+            ],
+            port,
+          )
+        }
+
+        case "SIGN_MESSAGE": {
+          const [message] =
+            await StarknetMethodArgumentsSchemas.signMessage.parseAsync([
+              msg.data,
+            ])
+          return handleMessage([{ ...msg, data: message }, sender], port)
+        }
+
+        default:
+          return handleMessage([msg, sender], port)
+      }
+    }
+  })
 })
+
+messageStream.subscribe(handleMessage)
 
 // open onboarding flow on initial install
 

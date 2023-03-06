@@ -21,7 +21,8 @@ export const getBlockExplorerUrlForNetwork = async (network: Network) => {
   if (
     network.id === "mainnet-alpha" ||
     network.id === "goerli-alpha" ||
-    network.id === "goerli-alpha-2"
+    network.id === "goerli-alpha-2" ||
+    network.id === "localhost"
   ) {
     return settingsBlockExplorer.url[network.id]
   }

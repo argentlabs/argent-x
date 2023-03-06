@@ -1,10 +1,14 @@
+import { TextWithAmount } from "@argent/ui"
 import { Collapse } from "@mui/material"
+import { BigNumber } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 
+import { EstimateFeeResponse } from "../../../../../shared/messages/TransactionMessage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../../shared/token/price"
+import { Token } from "../../../../../shared/token/type"
 import { CopyTooltip } from "../../../../components/CopyTooltip"
 import {
   Field,
@@ -31,7 +35,16 @@ import { getParsedError } from "../utils"
 import { NetworkFee } from "./NetworkFee"
 import { TokenAmounts } from "./TokenAmounts"
 
-const Estimation: FC<any> = ({
+export interface EstimationProps {
+  needsDeploy?: boolean
+  fee?: EstimateFeeResponse
+  feeToken?: Token
+  feeTokenBalance?: BigNumber
+  error: any
+  onErrorChange?: (hasError: boolean) => void
+}
+
+const Estimation: FC<EstimationProps> = ({
   needsDeploy,
   fee,
   feeToken,
@@ -85,8 +98,12 @@ const Estimation: FC<any> = ({
           feeTokenBalance={feeTokenBalance}
           enoughBalance={enoughBalance}
         />
-        {fee ? (
-          <TokenAmounts feeToken={feeToken} fee={fee} />
+        {fee && feeToken ? (
+          <TokenAmounts
+            feeToken={feeToken}
+            fee={fee}
+            needsDeploy={needsDeploy}
+          />
         ) : showEstimateError ? (
           <FeeEstimationValue>Error</FeeEstimationValue>
         ) : (
@@ -110,18 +127,23 @@ const Estimation: FC<any> = ({
                     ~{prettifyCurrencyValue(amountCurrencyValue)}
                   </FeeEstimationValue>
                 ) : (
-                  <FeeEstimationValue>
-                    ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.amount,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.amount} Unknown</>
-                    )}
-                  </FeeEstimationValue>
+                  <TextWithAmount
+                    amount={fee.amount}
+                    decimals={feeToken?.decimals}
+                  >
+                    <FeeEstimationValue>
+                      ~
+                      {feeToken ? (
+                        prettifyTokenAmount({
+                          amount: fee.amount,
+                          decimals: feeToken.decimals,
+                          symbol: feeToken.symbol,
+                        })
+                      ) : (
+                        <>{fee.amount} Unknown</>
+                      )}
+                    </FeeEstimationValue>
+                  </TextWithAmount>
                 )}
               </FieldValueSub>
               <FieldValueSub>
@@ -130,18 +152,23 @@ const Estimation: FC<any> = ({
                     ~{prettifyCurrencyValue(accountDeploymentCurrencyValue)}
                   </FeeEstimationValue>
                 ) : (
-                  <FeeEstimationValue>
-                    ~
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: fee.accountDeploymentFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{fee.accountDeploymentFee} Unknown</>
-                    )}
-                  </FeeEstimationValue>
+                  <TextWithAmount
+                    amount={fee.accountDeploymentFee}
+                    decimals={feeToken?.decimals}
+                  >
+                    <FeeEstimationValue>
+                      ~
+                      {feeToken ? (
+                        prettifyTokenAmount({
+                          amount: fee.accountDeploymentFee,
+                          decimals: feeToken.decimals,
+                          symbol: feeToken.symbol,
+                        })
+                      ) : (
+                        <>{fee.accountDeploymentFee} Unknown</>
+                      )}
+                    </FeeEstimationValue>
+                  </TextWithAmount>
                 )}
               </FieldValueSub>
             </FieldValueGroup>
