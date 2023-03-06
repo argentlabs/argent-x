@@ -14,9 +14,14 @@ export const usePublicKey = (account?: BaseWalletAccount) => {
   const getPubKeyCallback = useCallback(() => getPublicKey(account), [account])
 
   useEffect(() => {
-    getPubKeyCallback().then(setPubKey)
     // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    getPubKeyCallback().then(setPubKey)
+
+    return () => {
+      // on unmount
+      setPubKey(undefined)
+    }
+  }, [getPubKeyCallback])
 
   return pubKey
 }
@@ -31,9 +36,14 @@ export const useNextPublicKey = () => {
   )
 
   useEffect(() => {
-    getNextPubKeyCallback().then(setPubKey)
     // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    getNextPubKeyCallback().then(setPubKey)
+
+    return () => {
+      // on unmount
+      setPubKey(undefined)
+    }
+  }, [getNextPubKeyCallback])
 
   return pubKey
 }
