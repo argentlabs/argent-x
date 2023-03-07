@@ -29,20 +29,29 @@ import { MultisigSigner } from "./signer"
 const ZERO_HASH = number.toHex(constants.ZERO)
 
 export class MultisigAccount extends Account {
+  public readonly multsigBaseUrl?: string
+
   constructor(
     providerOrOptions: ProviderInterface | ProviderOptions,
     address: string,
     keyPairOrSigner: MultisigSigner | KeyPair,
+    multisigBaseUrl?: string,
   ) {
     const multisigSigner =
       "getPubKey" in keyPairOrSigner
         ? keyPairOrSigner
         : new MultisigSigner(keyPairOrSigner)
     super(providerOrOptions, address, multisigSigner)
+    this.multsigBaseUrl = multisigBaseUrl ?? ARGENT_MULTISIG_URL
   }
 
-  static fromAccount(account: Account): MultisigAccount {
-    return new MultisigAccount(account, account.address, account.signer)
+  static fromAccount(account: Account, baseUrl?: string): MultisigAccount {
+    return new MultisigAccount(
+      account,
+      account.address,
+      account.signer,
+      baseUrl,
+    )
   }
 
   public async execute(
@@ -50,8 +59,8 @@ export class MultisigAccount extends Account {
     abis?: Abi[] | undefined,
     transactionsDetail: InvocationsDetails = {},
   ): Promise<MultisigInvokeResponse> {
-    if (!ARGENT_MULTISIG_URL) {
-      throw "Argent Multisig endpoint is not defined"
+    if (!this.multsigBaseUrl) {
+      throw Error("Argent Multisig endpoint is not defined")
     }
 
     const transactions = Array.isArray(calls) ? calls : [calls]
@@ -96,7 +105,7 @@ export class MultisigAccount extends Account {
     })
 
     const url = urlJoin(
-      ARGENT_MULTISIG_URL,
+      this.multsigBaseUrl,
       starknetNetwork,
       this.address,
       "request",
@@ -125,8 +134,8 @@ export class MultisigAccount extends Account {
     requestId: string,
     transaction: ApiMultisigTransaction,
   ) {
-    if (!ARGENT_MULTISIG_URL) {
-      throw "Argent Multisig endpoint is not defined"
+    if (!this.multsigBaseUrl) {
+      throw Error("Argent Multisig endpoint is not defined")
     }
 
     const chainId = await this.getChainId()
@@ -148,7 +157,7 @@ export class MultisigAccount extends Account {
     )
 
     const url = urlJoin(
-      ARGENT_MULTISIG_URL,
+      this.multsigBaseUrl,
       starknetNetwork,
       this.address,
       "request",
