@@ -26,18 +26,10 @@ export const getVerifiedEmailAge = async () => {
   throw new Error("Argent Shield email not verified")
 }
 
-/** backend expiry is 30 days, be optimistic and check 29 here */
-
-export const getVerifiedEmailIsExpired = async () => {
-  const age = await getVerifiedEmailAge()
-  const days = age / (1000 * 60 * 60 * 24)
-  return days > 29
-}
-
-/** for guardian removal, backend expiry is 30 minutes, be optimistic and check 25 here */
+/** for guardian removal, have user authenticated within last 5 minutes */
 
 export const getVerifiedEmailIsExpiredForRemoval = async () => {
   const age = await getVerifiedEmailAge()
   const minutes = age / (1000 * 60)
-  return minutes > 25
+  return minutes > 5
 }
