@@ -34,7 +34,7 @@ test.describe("Send funds", () => {
       ).not.toBeVisible({
         timeout: 90000,
       }),
-      expect(extension.account.currentBalance("Ether")).not.toContainText(
+      expect(extension.account.currentBalance("ETH")).not.toContainText(
         "1.00",
         {
           timeout: 90000,
@@ -49,7 +49,7 @@ test.describe("Send funds", () => {
     await extension.account.token("Ethereum").click()
     await expect(extension.account.balance).toContainText("1.5")
     await extension.account.back.click()
-    await expect(extension.account.currentBalance("Ether")).toContainText("1.5")
+    await expect(extension.account.currentBalance("ETH")).toContainText("1.5")
   })
 
   test("send partial funds to other wallet/account", async ({
@@ -98,7 +98,7 @@ test.describe("Send funds", () => {
       ).not.toBeVisible({
         timeout: 90000,
       }),
-      expect(extension.account.currentBalance("Ether")).toContainText("0.", {
+      expect(extension.account.currentBalance("ETH")).toContainText("0.", {
         timeout: 90000,
       }),
     ])
@@ -108,7 +108,7 @@ test.describe("Send funds", () => {
 
     await secondExtension.account.token("Ethereum").click()
     await secondExtension.account.back.click()
-    await expect(secondExtension.account.currentBalance("Ether")).toContainText(
+    await expect(secondExtension.account.currentBalance("ETH")).toContainText(
       "1.5",
     )
   })
@@ -144,7 +144,7 @@ test.describe("Send funds", () => {
       ).not.toBeVisible({
         timeout: 90000,
       }),
-      expect(extension.account.currentBalance("Ether")).not.toContainText(
+      expect(extension.account.currentBalance("ETH")).not.toContainText(
         "1.00",
         {
           timeout: 90000,
@@ -159,7 +159,7 @@ test.describe("Send funds", () => {
     await extension.account.token("Ethereum").click()
     await expect(extension.account.balance).toContainText("1.9")
     await extension.account.back.click()
-    await expect(extension.account.currentBalance("Ether")).toContainText("1.9")
+    await expect(extension.account.currentBalance("ETH")).toContainText("1.9")
   })
 
   test("send MAX funds to other wallet/account", async ({
@@ -208,7 +208,7 @@ test.describe("Send funds", () => {
       ).not.toBeVisible({
         timeout: 90000,
       }),
-      expect(extension.account.currentBalance("Ether")).not.toContainText(
+      expect(extension.account.currentBalance("ETH")).not.toContainText(
         "1.00",
         {
           timeout: 90000,
@@ -222,7 +222,7 @@ test.describe("Send funds", () => {
     await secondExtension.account.token("Ethereum").click()
     await expect(secondExtension.account.balance).toContainText("1.9")
     await secondExtension.account.back.click()
-    await expect(secondExtension.account.currentBalance("Ether")).toContainText(
+    await expect(secondExtension.account.currentBalance("ETH")).toContainText(
       "1.9",
     )
   })

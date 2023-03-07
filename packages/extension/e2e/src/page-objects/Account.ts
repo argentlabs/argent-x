@@ -80,8 +80,8 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="tokenBalance"]')
   }
 
-  currentBalance(tkn: "Ether") {
-    return this.page.locator(`//img[@alt="${tkn}"]/parent::*/parent::button`)
+  currentBalance(tkn: "ETH") {
+    return this.page.locator(` //button//h6[contains(text(), '${tkn}')]`)
   }
 
   get accountName() {
