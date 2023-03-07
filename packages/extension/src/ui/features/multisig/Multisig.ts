@@ -9,7 +9,7 @@ import { Account, AccountConstructorProps } from "../accounts/Account"
 export interface MultisigConstructorProps extends AccountConstructorProps {
   signers: string[]
   threshold: number
-  creator?: string
+  creator?: string // Creator is the public key of the account that created the multisig account
 }
 
 export const ZERO_MULTISIG: MultisigData = {
@@ -21,7 +21,6 @@ export const ZERO_MULTISIG: MultisigData = {
 export class Multisig extends Account {
   signers: string[]
   threshold: number
-  multisigAddress?: string
   creator?: string
 
   constructor(props: MultisigConstructorProps) {
