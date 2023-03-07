@@ -11,11 +11,11 @@ import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { ARGENT_SHIELD_NETWORK_ID } from "../../../shared/shield/constants"
-import { requestEmail } from "../../../shared/shield/register"
 import {
-  getVerifiedEmailIsExpired,
-  getVerifiedEmailIsExpiredForRemoval,
-} from "../../../shared/shield/verifiedEmail"
+  requestEmail,
+  shieldIsTokenExpired,
+} from "../../../shared/shield/register"
+import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
@@ -38,10 +38,10 @@ export const ShieldAccountStartScreen: FC = () => {
     if (verifiedEmail) {
       try {
         setIsLoading(true)
-        const verifiedEmailIsExpired = account?.guardian
+        const isExpired = account?.guardian
           ? await getVerifiedEmailIsExpiredForRemoval()
-          : await getVerifiedEmailIsExpired()
-        if (verifiedEmailIsExpired) {
+          : await shieldIsTokenExpired()
+        if (isExpired) {
           await requestEmail(verifiedEmail)
           navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
         } else {

@@ -3,7 +3,6 @@ import { Call, number } from "starknet"
 import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork } from "../../network"
 import { BaseWalletAccount } from "../../wallet.model"
-import { getIsCurrentImplementation } from "./getImplementation"
 
 /** https://github.com/argentlabs/argent-contracts-starknet/blob/main/contracts/account/library.cairo#L249-L250 */
 
@@ -21,13 +20,6 @@ export interface Escape {
  */
 
 export const getEscapeForAccount = async (account: BaseWalletAccount) => {
-  /**
-   * Skip older implementations which may use 'get_escape'
-   */
-  const isCurrent = await getIsCurrentImplementation(account)
-  if (!isCurrent) {
-    return
-  }
   const network = await getNetwork(account.networkId)
   const call: Call = {
     contractAddress: account.address,

@@ -260,7 +260,7 @@ browser.runtime.onConnect.addListener((port) => {
         case "SIGN_MESSAGE": {
           const [message] =
             await StarknetMethodArgumentsSchemas.signMessage.parseAsync([
-              msg.data.message,
+              msg.data,
             ])
           return handleMessage([{ ...msg, data: message }, sender], port)
         }
