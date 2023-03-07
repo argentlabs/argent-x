@@ -23,6 +23,11 @@ export const getKnownDappForExplorerTransaction = (
     if (dapp) {
       return { dapp, dappContractAddress: address }
     }
+
+    if (!parameters) {
+      continue
+    }
+
     for (const { value } of parameters) {
       const dapp = getKnownDappForContractAddress(value, network)
       if (dapp) {

@@ -4,7 +4,7 @@ import { FC, ReactNode, isValidElement, useMemo } from "react"
 // import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
 import { Outlet, useLocation } from "react-router-dom"
 
-import { useAppState, useStopSessionHandler } from "./app.state"
+import { useAppState, useMessageStreamHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
@@ -18,9 +18,6 @@ import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { AddNewAccountScreen } from "./features/accounts/AddNewAccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
-import { CreateMultisigStartScreen } from "./features/accounts/multisig/CreateMultisigScreen/CreateMultisigStartScreen"
-import { JoinMultisigScreen } from "./features/accounts/multisig/JoinMultisigScreen"
-import { NewMultisigScreen } from "./features/accounts/multisig/NewMultisigScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
@@ -38,6 +35,9 @@ import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { LockScreen } from "./features/lock/LockScreen"
 import { ResetScreen } from "./features/lock/ResetScreen"
+import { CreateMultisigStartScreen } from "./features/multisig/CreateMultisigScreen/CreateMultisigStartScreen"
+import { JoinMultisigScreen } from "./features/multisig/JoinMultisigScreen"
+import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisclaimerScreen"
@@ -447,7 +447,7 @@ const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
 
 export const AppRoutes: FC = () => {
   useEntryRoute()
-  useStopSessionHandler()
+  useMessageStreamHandler()
   const location = useLocation()
 
   const { isLoading } = useAppState()

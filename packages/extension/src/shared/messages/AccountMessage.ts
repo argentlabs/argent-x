@@ -1,8 +1,10 @@
 import { MultisigAccount } from "../../ui/features/accounts/multisig/types"
 import {
   ArgentAccountType,
+  BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
+  MultisigData,
   WalletAccount,
 } from "../wallet.model"
 
@@ -24,11 +26,7 @@ export type AccountMessage =
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
   | {
       type: "NEW_MULTISIG_ACCOUNT"
-      data: {
-        networkId: string
-        signers: string[]
-        threshold: string
-      }
+      data: MultisigData & { networkId: string }
     }
   | {
       type: "NEW_MULTISIG_ACCOUNT_RES"
@@ -90,10 +88,33 @@ export type AccountMessage =
     }
   | {
       type: "GET_PUBLIC_KEY"
+      data?: BaseWalletAccount
     }
   | {
       type: "GET_PUBLIC_KEY_RES"
       data: { publicKey: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY"
+      data: { networkId: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY_RES"
+      data: { publicKey: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY_REJ"
+    }
+  | {
+      type: "GET_CALCULATED_MULTISIG_ADDRESS"
+      data: BaseMultisigWalletAccount
+    }
+  | {
+      type: "GET_CALCULATED_MULTISIG_ADDRESS_RES"
+      data: string
+    }
+  | {
+      type: "GET_CALCULATED_MULTISIG_ADDRESS_REJ"
     }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE"

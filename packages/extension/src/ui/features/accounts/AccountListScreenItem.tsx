@@ -1,6 +1,6 @@
-import { Button, P4, icons } from "@argent/ui"
-import { Box, Circle, Flex, useDisclosure } from "@chakra-ui/react"
-import { FC, MouseEvent, ReactNode, useCallback } from "react"
+import { Button, icons } from "@argent/ui"
+import { Circle, Flex } from "@chakra-ui/react"
+import React, { FC, MouseEvent, ReactNode, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
@@ -12,12 +12,10 @@ import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
 import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useRemoveAccountCallback } from "./accounts.state"
-import { MultisigDeleteModal } from "./multisig/MultisigDeleteModal"
 
 const { MoreIcon, ChevronRightIcon } = icons
 
-interface IAccountListScreenItem {
+export interface IAccountListScreenItem {
   account: Account
   selectedAccount?: BaseWalletAccount
   needsUpgrade?: boolean
@@ -25,7 +23,9 @@ interface IAccountListScreenItem {
   returnTo?: string
 }
 
-const IconContainer: FC<{ children: ReactNode }> = ({ children }) => (
+export const AccountItemIconContainer: FC<{ children: ReactNode }> = ({
+  children,
+}) => (
   <Flex
     position={"absolute"}
     right={4}
@@ -49,23 +49,8 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
 
   const { accountNames } = useAccountMetadata()
   const accountName = getAccountName(account, accountNames)
-  const {
-    isOpen: isMenuOpen,
-    onOpen: onMenuOpen,
-    onClose: onMenuClose,
-  } = useDisclosure()
-
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure()
-
-  const removeAccount = useRemoveAccountCallback()
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
-
-  const hasJoinedMultiSig = false // TODO: useMultiSigStatus(account)
 
   // this is unnecessary for now, as we can easily source the upgrade status from the the list item (props)
   // may be useful in the future if dont partition the list by upgrade status anymore
@@ -76,45 +61,39 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   //   { suspense: false, ...withPolling(60 * 1000) },
   // )
 
-  const onClick = useCallback(async () => {
-    await selectAccount(account)
-    navigate(returnTo || routes.accountTokens())
-  }, [account, navigate, returnTo])
+  /**
+   * this control has a button-within-button
+   * the inner button shifts screen position as the button animates on click
+   * which means the click action may fire on the unintended component
+   * we keep state of which button the click action was initiated
+   * in order to honor user intent
+   */
 
-  const onOptionsClick = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+  const mouseDownSettings = useRef(false)
+
+  const onClick = useCallback(
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
-      e.preventDefault()
-
-      navigate(routes.editAccount(account.address))
+      if (clickNavigateSettings || mouseDownSettings.current) {
+        navigate(routes.editAccount(account.address))
+      } else {
+        await selectAccount(account)
+        navigate(returnTo || routes.accountTokens())
+      }
     },
-    [account.address, navigate],
+    [account, clickNavigateSettings, navigate, returnTo, mouseDownSettings],
   )
-
-  const onDeleteClicked = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation()
-      e.preventDefault()
-
-      onDeleteModalOpen()
-    },
-    [onDeleteModalOpen],
-  )
-
-  const onDeleteConfirmed = async (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    e.preventDefault()
-
-    await removeAccount(account)
-    onDeleteModalClose()
-  }
 
   return (
     <>
       <Flex position={"relative"} direction={"column"}>
         <AccountListItem
           aria-label={`Select ${accountName}`}
-          onClick={clickNavigateSettings ? onOptionsClick : onClick}
+          onMouseDown={(e) => {
+            e.stopPropagation()
+            mouseDownSettings.current = false
+          }}
+          onClick={onClick}
           accountName={accountName}
           accountAddress={account.address}
           networkId={account.networkId}
@@ -124,73 +103,39 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
           deploying={status.code === "DEPLOYING"}
           upgrade={needsUpgrade}
           connectedHost={isConnected ? originatingHost : undefined}
-          multisigStatus={"pending"} // TODO: hasJoinedMultiSig ? "joined" : "pending"
           pr={14}
         >
           {clickNavigateSettings && (
-            <IconContainer>
+            <AccountItemIconContainer>
               <ChevronRightIcon opacity={0.6} />
-            </IconContainer>
+            </AccountItemIconContainer>
           )}
           {!clickNavigateSettings && (
-            <IconContainer>
+            <AccountItemIconContainer>
               <Button
-                as={Circle}
                 aria-label={`${accountName} options`}
+                onMouseDown={(e) => {
+                  e.stopPropagation()
+                  mouseDownSettings.current = true
+                }}
+                onClick={onClick}
+                as={Circle}
                 colorScheme="transparent"
                 width={8}
                 height={8}
                 size="auto"
                 rounded="full"
-                onClick={onOptionsClick}
                 bg="black"
                 _hover={{
                   bg: "neutrals.600",
                 }}
-                position="relative"
               >
                 <MoreIcon />
               </Button>
-
-              {account.type === "multisig" && isMenuOpen && (
-                <Box
-                  boxShadow="menu"
-                  bg="black"
-                  border="1px solid"
-                  borderColor="neutrals.700"
-                  position="absolute"
-                  top={5}
-                  right={3}
-                  borderRadius="xl"
-                  py={2}
-                  w={40}
-                >
-                  <Button
-                    as={Circle}
-                    px={5}
-                    py={2}
-                    variant="ghost"
-                    borderRadius={0}
-                    w="full"
-                    justifyContent="flex-start"
-                    minH={0}
-                    height="auto"
-                    onClick={onDeleteClicked}
-                  >
-                    <P4 color="neutrals.200">Delete</P4>
-                  </Button>
-                </Box>
-              )}
-            </IconContainer>
+            </AccountItemIconContainer>
           )}
         </AccountListItem>
       </Flex>
-
-      <MultisigDeleteModal
-        onClose={onDeleteModalClose}
-        isOpen={isDeleteModalOpen}
-        onDelete={onDeleteConfirmed}
-      />
     </>
   )
 }

@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        run: yarn
+        run: yarn setup
         # 👇 Adds Chromatic as a step in the workflow
       - name: Change to storybook directory
         run: cd packages/storybook

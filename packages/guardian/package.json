@@ -1,6 +1,6 @@
 {
   "name": "@argent/guardian",
-  "version": "5.3.1",
+  "version": "5.3.6",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -19,7 +19,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "prepare": "yarn build"
+    "setup": "yarn build"
   },
   "dependencies": {
     "jose": "^4.11.2",
@@ -33,6 +33,6 @@
     "vite-plugin-dts": "^1.4.0"
   },
   "peerDependencies": {
-    "starknet": "^4.19.2"
+    "starknet": "^4.21.0"
   }
 }

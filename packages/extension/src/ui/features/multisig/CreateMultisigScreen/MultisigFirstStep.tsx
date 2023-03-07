@@ -1,24 +1,20 @@
-import { P3 } from "@argent/ui"
-import { icons } from "@argent/ui"
+import { FieldError, P3, RoundButton, icons } from "@argent/ui"
 import {
   Box,
   Button,
-  ButtonProps,
   Center,
-  Circle,
   Divider,
+  Input,
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
-import { StyledControlledInput } from "../../../../components/InputText"
-import { FormError } from "../../../../theme/Typography"
-import { useSignerKey } from "../useSignerKey"
+import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { ScreenLayout } from "./ScreenLayout"
 import { FieldValues } from "./useCreateMultisigForm"
 
-const { CloseIcon } = icons
+const { CloseIcon, AddIcon } = icons
 
 export const MultisigFirstStep = ({
   index,
@@ -33,17 +29,20 @@ export const MultisigFirstStep = ({
     register,
     trigger,
   } = useFormContext<FieldValues>()
-  const { encodedPubKey } = useSignerKey()
+  const creatorSignerKey = useNextSignerKey()
   const { fields, append, remove } = useFieldArray({
     name: "signerKeys",
     control,
   })
-  const handleNavigationToConfirmationScreen = () => {
-    trigger("signerKeys").then((isValid) => {
-      if (isValid) {
-        goNext()
-      }
-    })
+  const handleNavigationToConfirmationScreen = async () => {
+    const isValid = await trigger("signerKeys")
+    if (isValid) {
+      goNext()
+    }
+  }
+
+  const addOwner = () => {
+    append({ key: "" })
   }
 
   return (
@@ -56,16 +55,14 @@ export const MultisigFirstStep = ({
       <Divider color="neutrals.700" my="4" />
       <Box my="2" width="100%">
         <P3 mb="1">Owner 1 (Me)</P3>
-        <StyledControlledInput
-          placeholder={encodedPubKey}
+        <Input
+          placeholder={creatorSignerKey}
           {...register(`signerKeys.-1.key` as const, {
             required: true,
-            value: encodedPubKey,
+            value: creatorSignerKey,
           })}
-          control={control}
           disabled={true}
-          value={encodedPubKey}
-          className={errors?.signerKeys?.[-1]?.key ? "error" : ""}
+          value={creatorSignerKey}
         />
       </Box>
       {fields.map((field, index) => {
@@ -73,32 +70,47 @@ export const MultisigFirstStep = ({
           <Box key={field.id} my="2" width="100%">
             <P3 mb="1">Owner {index + 2}</P3>
             <InputGroup display="flex" alignItems="center">
-              <StyledControlledInput
+              <Input
+                isInvalid={Boolean(errors?.signerKeys?.[index]?.key)}
                 placeholder="Signer key..."
                 {...register(`signerKeys.${index}.key` as const, {
                   required: true,
                 })}
-                control={control}
-                className={errors?.signerKeys?.[index]?.key ? "error" : ""}
               />
               <InputRightElement my="auto">
-                <RoundButton onClick={() => remove(index)}>
+                <RoundButton
+                  onClick={() => remove(index)}
+                  height="5"
+                  size="xs"
+                  mr="2"
+                  my="0"
+                  mt="1em"
+                  pb="0"
+                  variant="link"
+                >
                   <CloseIcon />
                 </RoundButton>
               </InputRightElement>
             </InputGroup>
             {errors.signerKeys && (
-              <FormError>{errors.signerKeys?.[index]?.key?.message}</FormError>
+              <FieldError>
+                {errors.signerKeys?.[index]?.key?.message}
+              </FieldError>
             )}
           </Box>
         )
       })}
       {errors.signerKeys?.message && (
-        <FormError>{errors.signerKeys?.message}</FormError>
+        <FieldError>{errors.signerKeys?.message}</FieldError>
       )}
       <Center width="100%">
-        <Button variant="link" onClick={() => append({ key: "" })} size="xs">
-          + Add another owner
+        <Button
+          variant="link"
+          onClick={addOwner}
+          size="xs"
+          leftIcon={<AddIcon />}
+        >
+          Add another owner
         </Button>
       </Center>
       <Button
@@ -108,30 +120,5 @@ export const MultisigFirstStep = ({
         Next
       </Button>
     </ScreenLayout>
-  )
-}
-
-const RoundButton = ({ onClick, children }: ButtonProps) => {
-  return (
-    <Button
-      onClick={onClick}
-      height="5"
-      size="xs"
-      mr="2"
-      my="0"
-      mt="0.5em"
-      pb="0"
-      variant="link"
-    >
-      <Circle
-        backgroundColor="neutrals.800"
-        p="0.5em"
-        _hover={{
-          backgroundColor: "neutrals.600",
-        }}
-      >
-        {children}
-      </Circle>
-    </Button>
   )
 }

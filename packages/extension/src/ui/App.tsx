@@ -9,6 +9,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary"
 import { AppDimensions } from "./components/Responsive"
 import { LoadingScreen } from "./features/actions/LoadingScreen"
 import DevUI from "./features/dev/DevUI"
+import { useAutoEnableArgentShield } from "./features/shield/useArgentShieldEnabled"
 import { useCaptureEntryRouteRestorationState } from "./features/stateRestoration/useRestorationState"
 import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
@@ -20,6 +21,7 @@ export const App: FC = () => {
   useTracking()
   useSentryInit()
   useCaptureEntryRouteRestorationState()
+  useAutoEnableArgentShield()
   return (
     <SoftReloadProvider>
       <SWRConfig value={{ provider: () => swrCacheProvider }}>

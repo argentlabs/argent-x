@@ -5,18 +5,21 @@ import {
   icons,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { groupBy, isEmpty, partition, some } from "lodash-es"
-import { FC, useCallback } from "react"
+import { isEmpty, partition, some } from "lodash-es"
+import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { routes, useReturnTo } from "../../routes"
+import { isEqualAddress } from "../../services/addresses"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
+import { MultisigListScreenItem } from "../multisig/MultisigListScreenItem"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
+import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import {
   isHiddenAccount,
@@ -64,6 +67,35 @@ export const AccountListScreen: FC = () => {
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
 
+  const accountFromAddress = useCallback(
+    (accountAddress: string) => {
+      return allAccounts.find(
+        (account) =>
+          isEqualAddress(account.address, accountAddress) &&
+          currentNetwork.id === account.networkId,
+      )
+    },
+    [allAccounts, currentNetwork],
+  )
+
+  const fullPartitionedAccounts = useMemo(() => {
+    if (!partitionedAccounts) {
+      return
+    }
+
+    const [newAccounts, deprecatedAccounts] = partitionedAccounts
+
+    const deprecatedFullAccounts = deprecatedAccounts
+      .map((accountAddress) => accountFromAddress(accountAddress))
+      .filter((account): account is Account => Boolean(account))
+
+    const newFullAccounts = newAccounts
+      .map((accountAddress) => accountFromAddress(accountAddress))
+      .filter((account): account is Account => Boolean(account))
+
+    return [newFullAccounts, deprecatedFullAccounts]
+  }, [accountFromAddress, partitionedAccounts])
+
   const onClose = useCallback(async () => {
     if (returnTo) {
       navigate(returnTo)
@@ -72,19 +104,16 @@ export const AccountListScreen: FC = () => {
     }
   }, [navigate, returnTo])
 
-  if (!partitionedAccounts) {
+  if (!fullPartitionedAccounts) {
     return <LoadingScreen />
   }
 
-  const [deprecatedAccounts, newAccounts] = partitionedAccounts
+  const [newAccounts, deprecatedAccounts] = fullPartitionedAccounts
 
-  const accountByTypes = groupBy(newAccounts, "type")
-
-  const argentAccounts = accountByTypes.argent
-  const multisigAccounts = accountByTypes.multisig
+  const [multisigAccounts, standardAccounts] = partition(newAccounts, "type")
 
   const hasMultipleAccountTypes =
-    !isEmpty(argentAccounts) && !isEmpty(multisigAccounts)
+    !isEmpty(standardAccounts) && !isEmpty(multisigAccounts)
 
   return (
     <>
@@ -113,10 +142,11 @@ export const AccountListScreen: FC = () => {
             <Flex direction="column" gap={6}>
               <GroupedAccountList
                 title="Standard Accounts"
-                accounts={argentAccounts}
+                accounts={standardAccounts}
                 icon={<WalletIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="standard"
               />
               <GroupedAccountList
                 title="Multisig Accounts"
@@ -124,17 +154,27 @@ export const AccountListScreen: FC = () => {
                 icon={<MultisigIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="multisig"
               />
             </Flex>
           ) : (
-            newAccounts.map((account) => (
-              <AccountListScreenItem
-                key={account.address}
-                account={account}
-                selectedAccount={selectedAccount}
-                returnTo={returnTo}
-              />
-            ))
+            newAccounts.map((account) =>
+              account.type === "multisig" ? (
+                <MultisigListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                />
+              ) : (
+                <AccountListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                />
+              ),
+            )
           )}
           {some(deprecatedAccounts) && (
             <>

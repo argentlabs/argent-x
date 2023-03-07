@@ -1,13 +1,12 @@
-import { H1 } from "@argent/ui"
+import { FieldError, H1 } from "@argent/ui"
 import { icons } from "@argent/ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
-import { isEmptyValue } from "../../../../../shared/utils/object"
-import { useAppState } from "../../../../app.state"
-import { FormError } from "../../../../theme/Typography"
-import { useNetwork } from "../../../networks/useNetworks"
-import { useSignerKey } from "../useSignerKey"
+import { isEmptyValue } from "../../../../shared/utils/object"
+import { useAppState } from "../../../app.state"
+import { useSelectedAccount } from "../../accounts/accounts.state"
+import { useNextPublicKey, useNextSignerKey } from "../../accounts/usePublicKey"
 import { ScreenLayout } from "./ScreenLayout"
 import { useCreateMultisig } from "./useCreateMultisig"
 import { FieldValues } from "./useCreateMultisigForm"
@@ -24,21 +23,30 @@ export const MultisigSecondStep = ({
   goNext: () => void
 }) => {
   const { switcherNetworkId } = useAppState()
-  const { encodedPubKey } = useSignerKey()
+  const creatorPubKey = useNextPublicKey()
+  const creatorSignerKey = useNextSignerKey()
   const { createMultisigAccount, isError } = useCreateMultisig()
-  const network = useNetwork(switcherNetworkId)
   const {
     control,
     formState: { errors },
     getValues,
   } = useFormContext<FieldValues>()
 
+  const selectedAccount = useSelectedAccount()
+
   const handleCreateMultisig = async () => {
-    if (isEmptyValue(errors) && encodedPubKey) {
+    if (isEmptyValue(errors) && creatorSignerKey && selectedAccount) {
+      const signers = [creatorSignerKey].concat(
+        getValues("signerKeys").map((i) => i.key),
+      )
+
+      const threshold = getValues("confirmations")
+
       const result = await createMultisigAccount({
-        networkId: network.id,
-        signers: [...getValues("signerKeys").map((i) => i.key), encodedPubKey],
-        threshold: getValues("confirmations").toString(),
+        creator: creatorPubKey,
+        signers,
+        threshold,
+        networkId: switcherNetworkId,
       })
       if (result) {
         goNext()
@@ -69,11 +77,11 @@ export const MultisigSecondStep = ({
                     width="100%"
                     p="3"
                     backgroundColor="neutrals.800"
-                    borderRadius="8px"
+                    borderRadius={"lg"}
                     mb="1.5"
                   >
                     <Button
-                      borderRadius="90"
+                      borderRadius="full"
                       backgroundColor="neutrals.900"
                       onClick={() => field.onChange(field.value - 1)}
                       px="1em"
@@ -99,7 +107,7 @@ export const MultisigSecondStep = ({
           )}
         />
         {errors.confirmations && (
-          <FormError>{errors.confirmations.message}</FormError>
+          <FieldError>{errors.confirmations.message}</FieldError>
         )}
       </Box>
       <Button colorScheme="primary" onClick={handleCreateMultisig} mt="3">
@@ -107,7 +115,7 @@ export const MultisigSecondStep = ({
       </Button>
       {isError && (
         <Box mt="2">
-          <FormError>Something went wrong creating the multisig</FormError>
+          <FieldError>Something went wrong creating the multisig</FieldError>
         </Box>
       )}
     </ScreenLayout>

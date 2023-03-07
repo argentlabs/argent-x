@@ -5,11 +5,11 @@ export type ArgentAccountType =
   | "standard"
   | "plugin"
   | "multisig"
-  | "multicall2"
+  | "betterMulticall"
 
 export type CreateAccountType = Exclude<
   ArgentAccountType,
-  "plugin" | "multicall2"
+  "plugin" | "betterMulticall"
 > // Should not be able to create plugin accounts
 export interface WalletAccountSigner {
   type: "local_secret"
@@ -36,7 +36,14 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
 
 export type StoredWalletAccount = Omit<WalletAccount, "network">
 
-export type MultisigPayload = {
+export type MultisigData = {
   signers: string[]
-  threshold: string
+  threshold: number
+  creator?: string // Creator is the public key of the account that created the multisig account
+}
+
+export type BaseMultisigWalletAccount = BaseWalletAccount & MultisigData
+
+export interface MultisigWalletAccount extends WalletAccount, MultisigData {
+  type: "multisig"
 }

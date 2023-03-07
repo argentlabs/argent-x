@@ -4,7 +4,7 @@ import { Center } from "@chakra-ui/react"
 import { isArray, isEmpty } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { Call, DeclareContractPayload } from "starknet"
+import { Call } from "starknet"
 
 import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
 import { routes } from "../../../../routes"
@@ -37,7 +37,7 @@ export interface ApproveTransactionScreenProps
   actionHash: string
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
-  declareContractPayload?: DeclareContractPayload
+  declareOrDeployType?: "declare" | "deploy"
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
@@ -45,7 +45,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   selectedAccount,
   actionHash,
   onSubmit,
-  declareContractPayload,
+  declareOrDeployType,
   ...props
 }) => {
   usePageTracking("signTransaction", {
@@ -61,12 +61,14 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactions,
     actionHash,
   })
-  const { data: transactionSimulation, isValidating: isSimulationLoading } =
+  const { data: transactionSimulation, isValidating: isSimulationValidating } =
     useTransactionSimulation({
       account: selectedAccount,
       transactions,
       actionHash,
     })
+
+  const isSimulationLoading = isSimulationValidating && !transactionSimulation
 
   const aggregatedData = useAggregatedSimData(transactionSimulation)
 
@@ -102,9 +104,9 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     [transactionSimulation],
   )
 
-  const isDeclareContract = useMemo(
-    () => Boolean(declareContractPayload),
-    [declareContractPayload],
+  const isUdcAction = useMemo(
+    () => Boolean(declareOrDeployType),
+    [declareOrDeployType],
   )
 
   // Show balance change if there is a transaction simulation and there are approvals or transfers
@@ -113,7 +115,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
   const showTransactionActions =
-    (!hasBalanceChange || (txDetails && hasBalanceChange)) && !isDeclareContract
+    (!hasBalanceChange || (txDetails && hasBalanceChange)) && !isUdcAction
 
   const verifiedDapp =
     VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp
@@ -170,7 +172,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         transactionReview={transactionReview}
         aggregatedData={aggregatedData}
         verifiedDapp={verifiedDapp || undefined}
-        isDeclareContract={isDeclareContract}
+        declareOrDeployType={declareOrDeployType}
       />
 
       {warn && (

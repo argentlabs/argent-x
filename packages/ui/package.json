@@ -1,6 +1,6 @@
 {
   "name": "@argent/ui",
-  "version": "5.3.1",
+  "version": "5.3.6",
   "license": "MIT",
   "private": true,
   "files": [
@@ -20,6 +20,7 @@
     "@svgr/core": "^6.5.0",
     "@svgr/plugin-jsx": "^6.5.0",
     "@svgr/plugin-prettier": "^6.5.0",
+    "@testing-library/react": "^14.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
@@ -30,21 +31,24 @@
     "jsdom": "^21.0.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
-    "vite-plugin-dts": "^1.6.6"
+    "vite-plugin-dts": "^1.6.6",
+    "vitest": "^0.29.2"
   },
   "scripts": {
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "postinstall": "yarn gen:theme-typings",
+    "setup": "yarn gen:theme-typings && vite build",
     "dev": "vite build --watch",
-    "prepare": "vite build",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.4.9",
+    "@chakra-ui/react": "2.5.1",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
+    "ethers": "^6.0.8",
     "framer-motion": "^9.0.3",
     "popmotion": "^11.0.5"
   },

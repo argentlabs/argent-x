@@ -1,4 +1,4 @@
-import { L2, P3, P4, icons } from "@argent/ui"
+import { L2, P3, P4, TextWithAmount, icons } from "@argent/ui"
 import {
   AccordionButton,
   Flex,
@@ -51,6 +51,10 @@ export const NftDetails: FC<NftDetailsProps> = ({
     contractAddress,
     tokenId,
     networkId,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
   )
 
   const nft = useMemo(
@@ -65,7 +69,9 @@ export const NftDetails: FC<NftDetailsProps> = ({
     [contractAddress, fetchedNft],
   )
 
-  const buttonDisabled = isDisabled || isValidating
+  const isLoading = !nft && isValidating
+
+  const buttonDisabled = isDisabled || isLoading
 
   return (
     <AccordionButton
@@ -74,7 +80,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
       justifyContent="space-between"
       outline="none"
       px="3"
-      pb={dataIndex !== totalData - 1 || isValidating ? "3" : "3.5"}
+      pb={dataIndex !== totalData - 1 || isLoading ? "3" : "3.5"}
       _expanded={{
         backgroundColor: "neutrals.700",
         pb: "3.5",
@@ -89,7 +95,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
         borderBottomRadius: dataIndex === totalData - 1 ? "xl" : "0",
       }}
     >
-      {!isValidating ? (
+      {!isLoading ? (
         <>
           <Flex alignItems="center" gap="2">
             <Image src={getNftPicture(nft)} w="5" h="5" borderRadius="base" />
@@ -101,17 +107,19 @@ export const NftDetails: FC<NftDetailsProps> = ({
             )}
           </Flex>
           <Flex direction="column" gap="0.5" alignItems="flex-end">
-            <P4
-              color={amount.isNegative() ? "error.500" : "secondary.500"}
-              fontWeight="bold"
-            >
-              {prettifyTokenAmount({
-                amount: amount.toString(),
-                decimals: 0,
-                symbol: "NFT",
-                showPlusSign: true,
-              })}
-            </P4>
+            <TextWithAmount amount={amount.toString()}>
+              <P4
+                color={amount.isNegative() ? "error.500" : "secondary.500"}
+                fontWeight="bold"
+              >
+                {prettifyTokenAmount({
+                  amount: amount.toString(),
+                  decimals: 0,
+                  symbol: "NFT",
+                  showPlusSign: true,
+                })}
+              </P4>
+            </TextWithAmount>
 
             {/** 0 usdValue means we don't have any value */}
             {isMainnet && !!usdValue && !usdValue.isZero() && (

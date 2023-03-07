@@ -59,7 +59,7 @@ export type TransactionReviewWithType = ApiTransactionReview & {
   type: ApiTransactionReviewActivityType
 }
 
-export type ApiTransactionReviewSlippageType = "equals" | "at_least" | "at_most"
+export type ApiTransactionReviewSlippageType = "equal" | "at_least" | "at_most"
 
 export interface ApiTransactionReviewToken {
   address: string

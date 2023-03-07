@@ -22,7 +22,7 @@ export default function ({
       const entity = "NFT"
       const displayName = "Buy NFT"
       const contractAddress = events[2].address
-      const tokenId = getParameter(events[2].parameters, "value")
+      const tokenId = getParameter(events[2].parameters ?? undefined, "value")
       result = {
         ...result,
         action,

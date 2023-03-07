@@ -6,7 +6,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Portal,
 } from "@chakra-ui/react"
 import { FC, useCallback, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -69,63 +68,61 @@ export const NetworkSwitcher: FC<NetworkSwitcherProps> = ({ disabled }) => {
       >
         {currentNetwork.name}
       </MenuButton>
-      <Portal>
-        <MenuList>
-          {allNetworks.map(({ id, name, baseUrl }) => {
-            const isCurrent = id === currentNetwork.id
-            return (
-              <MenuItem
-                key={id}
-                onClick={() => onChangeNetwork(id)}
-                data-testid={name}
-                sx={
-                  isCurrent
-                    ? {
-                        backgroundColor: "neutrals.600",
-                      }
-                    : {}
-                }
-                data-group
+      <MenuList>
+        {allNetworks.map(({ id, name, baseUrl }) => {
+          const isCurrent = id === currentNetwork.id
+          return (
+            <MenuItem
+              key={id}
+              onClick={() => onChangeNetwork(id)}
+              data-testid={name}
+              sx={
+                isCurrent
+                  ? {
+                      backgroundColor: "neutrals.600",
+                    }
+                  : {}
+              }
+              data-group
+            >
+              <Flex
+                ml={"auto"}
+                justifyContent={"flex-end"}
+                alignItems={"center"}
+                pointerEvents={"none"}
               >
                 <Flex
-                  ml={"auto"}
-                  justifyContent={"flex-end"}
-                  alignItems={"center"}
-                  pointerEvents={"none"}
+                  direction={"column"}
+                  alignItems={"flex-end"}
+                  textAlign={"right"}
+                  mr={2}
                 >
-                  <Flex
-                    direction={"column"}
-                    alignItems={"flex-end"}
-                    textAlign={"right"}
-                    mr={2}
+                  <B3
+                    sx={{
+                      color: "neutrals.100",
+                      _groupHover: { color: "white" },
+                    }}
                   >
-                    <B3
-                      sx={{
-                        color: "neutrals.100",
-                        _groupHover: { color: "white" },
-                      }}
-                    >
-                      {name}
-                    </B3>
-                    <L2
-                      sx={{
-                        color: "neutrals.400",
-                        _groupHover: { color: "neutrals.300" },
-                      }}
-                      noOfLines={1}
-                    >
-                      {baseUrl}
-                    </L2>
-                  </Flex>
-                  <StatusIndicator
-                    color={mapNetworkStatusToColor(networkStatuses[id])}
-                  />
+                    {name}
+                  </B3>
+                  <L2
+                    sx={{
+                      color: "neutrals.400",
+                      _groupHover: { color: "neutrals.300" },
+                    }}
+                    noOfLines={1}
+                  >
+                    {baseUrl}
+                  </L2>
                 </Flex>
-              </MenuItem>
-            )
-          })}
-        </MenuList>
-      </Portal>
+                <StatusIndicator
+                  color={mapNetworkStatusToColor(networkStatuses[id])}
+                />
+              </Flex>
+            </MenuItem>
+          )
+        })}
+      </MenuList>
     </Menu>
   )
 }

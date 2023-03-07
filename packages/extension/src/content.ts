@@ -1,7 +1,7 @@
+import { Relayer, WindowMessenger } from "@argent/x-window"
 import browser from "webextension-polyfill"
 
-import { WindowMessageType } from "./shared/messages"
-import { messageStream, sendMessage } from "./shared/messages"
+import { ExtensionMessenger } from "./shared/extensionMessenger"
 
 const container = document.head || document.documentElement
 const script = document.createElement("script")
@@ -13,21 +13,13 @@ script.setAttribute("data-extension-id", argentExtensionId)
 
 container.insertBefore(script, container.children[0])
 
-window.addEventListener(
-  "message",
-  function (event: MessageEvent<WindowMessageType>) {
-    // forward messages which were not forwarded before and belong to the extension
-    if (
-      !event.data?.forwarded &&
-      event.data?.extensionId === argentExtensionId
-    ) {
-      sendMessage({ ...event.data })
-    }
-  },
-)
-messageStream.subscribe(([msg]) => {
-  window.postMessage(
-    { ...msg, forwarded: true, extensionId: argentExtensionId },
-    window.location.origin,
-  )
+const windowMessenger = new WindowMessenger(window, {
+  post: window.location.origin,
 })
+const port = browser.runtime.connect()
+const portMessenger = new ExtensionMessenger(port)
+
+const bridge = new Relayer(windowMessenger, portMessenger)
+
+// Please keep this log statement, it is used to detect if the bridge is loaded
+console.log("Bridge ID:", bridge.id)

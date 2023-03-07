@@ -10,10 +10,11 @@ import { Center, Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { CustomButtonCell } from "../../../components/CustomButtonCell"
-import { routes } from "../../../routes"
-import { assertNever } from "../../../services/assertNever"
-import { useAddAccount } from "../useAddAccount"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
+import { routes } from "../../routes"
+import { assertNever } from "../../services/assertNever"
+import { useAddAccount } from "../accounts/useAddAccount"
+import { ZERO_MULTISIG } from "./Multisig"
 
 const { AddIcon, MultisigJoinIcon } = icons
 const { MultisigDiagram } = logos
@@ -48,15 +49,21 @@ export const NewMultisigScreen: FC = () => {
   const onClick = useCallback(
     async (type: MultisigOptionType) => {
       switch (type) {
-        case "create":
-          // eslint-disable-next-line no-case-declarations
-          const url = `index.html?initialHardReloadRoute=${routes.multisigCreate()}`
+        case "create": {
+          const url = `index.html?goto=multisig`
           chrome.tabs.create({
             url,
           })
           break
+        }
+
         case "join": {
-          const newAccount = await addAccount("multisig", true)
+          // Initialize the multisig account with a zero multisig
+          await addAccount({
+            type: "multisig",
+            multisigPayload: ZERO_MULTISIG,
+            skipNavigate: true,
+          })
           navigate(routes.multisigJoin())
           break
         }

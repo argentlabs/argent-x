@@ -22,7 +22,7 @@ export default function ({
       const displayName = "Buy NFT"
       const dappContractAddress = getParameter(call.parameters, "spender")
       const contractAddress = events[2].address
-      const tokenId = getParameter(events[2].parameters, "value")
+      const tokenId = getParameter(events[2].parameters ?? undefined, "value")
       result = {
         ...result,
         action,

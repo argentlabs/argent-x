@@ -1,6 +1,6 @@
 import { some } from "lodash-es"
 
-import { defaultNetwork } from "../../../shared/network"
+import { defaultNetwork, getNetwork } from "../../../shared/network"
 import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
@@ -27,7 +27,12 @@ export const recover = async ({
 }: RecoveryOptions = {}) => {
   try {
     const lastSelectedAccount = await getLastSelectedAccount()
-    networkId ??= lastSelectedAccount?.networkId ?? defaultNetwork.id
+
+    /** validate that network exists (may have been a custom that was deleted), or use default */
+    const network = await getNetwork(
+      lastSelectedAccount?.networkId || networkId || defaultNetwork.id,
+    )
+    networkId = network.id
 
     const allAccounts = await getAccounts(true)
     const walletAccounts = accountsOnNetwork(allAccounts, networkId)

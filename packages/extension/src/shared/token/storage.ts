@@ -1,5 +1,6 @@
 import * as yup from "yup"
 
+import { addressSchema } from "../../ui/services/addresses"
 import { ArrayStorage } from "../storage"
 import { assertSchema } from "../utils/schema"
 import { BaseToken, Token } from "./type"
@@ -15,7 +16,7 @@ export const baseTokenSchema: yup.Schema<BaseToken> = yup
   .object()
   .required("BaseToken is required")
   .shape({
-    address: yup.string().required("Address is required"),
+    address: addressSchema.required("Address is required"),
     networkId: yup.string().required("Network is required"),
   })
 
@@ -23,8 +24,11 @@ export const tokenSchema: yup.Schema<Token> = baseTokenSchema
   .required("Token is required")
   .shape({
     name: yup.string().required("Name is required"),
-    symbol: yup.string().required("Symbol is required"),
-    decimals: yup.string().required("Decimals is required"),
+    symbol: yup.string().required("Symbol is required").min(1).max(6),
+    decimals: yup
+      .string()
+      .matches(/^\d+$/, "Decimals must be a number")
+      .required("Decimals is required"),
     image: yup.string(),
     showAlways: yup.boolean(),
   })

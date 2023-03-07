@@ -117,9 +117,11 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
 export async function partitionDeprecatedAccount(
   accounts: Account[],
   network: Network,
-): Promise<[Account[], Account[]]> {
+): Promise<[string[], string[]]> {
+  const accountAddresses = accounts.map((account) => account.address)
+
   if (!network.accountClassHash) {
-    return [[], accounts]
+    return [[], accountAddresses]
   }
 
   const multicall = getMulticallForNetwork(network)
@@ -170,20 +172,18 @@ export async function partitionDeprecatedAccount(
       (ti) => number.toBN(ti),
     )
 
-    return partition(
-      accounts,
-      (account) =>
-        !targetImplementations.some((ti) => {
-          const impl = implementationsToAccountsMap[account.address]
-          if (impl) {
-            return ti.eq(number.toBN(impl))
-          }
-          return false
-        }),
+    return partition(accountAddresses, (accountAddress) =>
+      targetImplementations.some((ti) => {
+        const impl = implementationsToAccountsMap[accountAddress]
+        if (impl) {
+          return ti.eq(number.toBN(impl))
+        }
+        return true
+      }),
     )
   } catch (error) {
     console.error("Error while checking for deprecated accounts", error)
-    return [[], accounts]
+    return [accountAddresses, []]
   }
 }
 
@@ -204,12 +204,7 @@ export const usePartitionDeprecatedAccounts = (
   network: Network,
 ) => {
   return useSWR(
-    [
-      network.id,
-      accounts.length,
-      "partition-deprecated-accounts",
-      "whatever___",
-    ],
+    [network.id, accounts.length, "partition-deprecated-accounts"],
     () => partitionDeprecatedAccount(accounts, network),
     { refreshInterval: 30000, revalidateIfStale: true },
   )
@@ -234,7 +229,7 @@ export const useCheckUpgradeAvailable = (account?: Account) => {
 
       return checkIfUpgradeAvailable(account, accountClassHash)
     },
-    { suspense: false, ...withPolling(60 * 1000) },
+    { ...withPolling(60 * 1000) },
   )
 
   return { needsUpgrade, needsUpgradeError, needsUpgradeValidating, mutate }

@@ -1,9 +1,12 @@
+import { utils } from "ethers"
+
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import {
   ArgentAccountType,
+  BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
-  MultisigPayload,
+  MultisigData,
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
@@ -12,14 +15,18 @@ import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 export const createNewAccount = async (
   networkId: string,
   type?: CreateAccountType,
-  multisigPayload?: MultisigPayload,
 ) => {
+  if (type === "multisig") {
+    throw new Error(
+      "Multisig accounts should be created with createNewMultisigAccount",
+    )
+  }
+
   sendMessage({
     type: "NEW_ACCOUNT",
     data: {
       networkId,
       type,
-      ...multisigPayload,
     },
   })
   try {
@@ -34,13 +41,19 @@ export const createNewAccount = async (
 
 export const createNewMultisigAccount = async (
   networkId: string,
-  multisigPayload: MultisigPayload,
+  multisigPayload: MultisigData,
 ) => {
+  const decodedSigners = multisigPayload.signers.map((signer) =>
+    utils.hexlify(utils.base58.decode(signer)),
+  )
+
   sendMessage({
     type: "NEW_MULTISIG_ACCOUNT",
     data: {
       networkId,
-      ...multisigPayload,
+      signers: decodedSigners,
+      threshold: multisigPayload.threshold,
+      creator: multisigPayload.creator,
     },
   })
   try {
@@ -50,6 +63,25 @@ export const createNewMultisigAccount = async (
     ])
   } catch {
     throw Error("Could not add new account")
+  }
+}
+
+export const getCalculatedMultisigAddress = async (
+  baseMultisigAccount: BaseMultisigWalletAccount,
+) => {
+  sendMessage({
+    type: "GET_CALCULATED_MULTISIG_ADDRESS",
+    data: baseMultisigAccount,
+  })
+  try {
+    return await Promise.race([
+      waitForMessage("GET_CALCULATED_MULTISIG_ADDRESS_RES"),
+      waitForMessage("GET_CALCULATED_MULTISIG_ADDRESS_REJ").then(
+        () => "error" as const,
+      ),
+    ])
+  } catch {
+    throw Error("Could not calculate multisig account address")
   }
 }
 
@@ -166,12 +198,29 @@ export const getPrivateKey = async () => {
   return await decryptFromBackground(encryptedPrivateKey, secret)
 }
 
-export const getPublicKey = async () => {
+export const getPublicKey = async (account?: BaseWalletAccount) => {
   sendMessage({
     type: "GET_PUBLIC_KEY",
+    data: account,
   })
 
   const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
+}
+
+export const getNextPublicKey = async (networkId: string) => {
+  sendMessage({
+    type: "GET_NEXT_PUBLIC_KEY",
+    data: { networkId },
+  })
+
+  const { publicKey } = await Promise.race([
+    waitForMessage("GET_NEXT_PUBLIC_KEY_RES"),
+    waitForMessage("GET_NEXT_PUBLIC_KEY_REJ").then(() => {
+      throw new Error("Getting next public key failed")
+    }),
+  ])
 
   return publicKey
 }

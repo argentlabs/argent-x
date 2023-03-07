@@ -56,6 +56,7 @@ export const useTransactionSimulation = ({
     transactionSimulationFetcher,
     {
       revalidateOnFocus: false,
+      refreshInterval: 15e3,
     },
   )
 }
