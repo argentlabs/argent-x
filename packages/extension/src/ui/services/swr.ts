@@ -4,6 +4,7 @@ import useSWR, {
   Cache,
   Key,
   SWRConfiguration,
+  State,
   unstable_serialize,
   useSWRConfig,
 } from "swr"
@@ -19,16 +20,33 @@ export interface SWRConfigCommon {
 const swrStateCache: Cache = new Map()
 
 const swrPersistedCache: Cache = {
-  set: (key, value) => {
-    return localStorage.setItem(unstable_serialize(key), JSON.stringify(value))
+  keys: function* (): IterableIterator<string> {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key !== null) {
+        yield key
+      }
+    }
   },
-  get: (key) => {
+  set: (key, value) => {
+    try {
+      if (value && value.data) {
+        return localStorage.setItem(
+          unstable_serialize(key),
+          JSON.stringify(value.data),
+        )
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  },
+  get: <K extends keyof Cache>(key: K): State<Cache[K]> | undefined => {
     try {
       const value = localStorage.getItem(unstable_serialize(key))
       if (!value) {
-        throw new Error("No value found")
+        return { error: "No value found" }
       }
-      return JSON.parse(value, reviveJsonBigNumber) ?? undefined
+      return { data: JSON.parse(value, reviveJsonBigNumber) ?? undefined }
     } catch {
       return undefined
     }
@@ -105,6 +123,15 @@ export const swrCacheProvider: Cache = {
       return swrStateCache.delete(key)
     } else {
       return swrPersistedCache.delete(key)
+    }
+  },
+  keys: function* (): IterableIterator<string> {
+    const keys = [...swrStateCache.keys(), ...swrPersistedCache.keys()]
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i]
+      if (key !== null) {
+        yield key
+      }
     }
   },
 }

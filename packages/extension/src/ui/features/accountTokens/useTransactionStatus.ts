@@ -30,7 +30,6 @@ export const useTransactionStatus = (
     transactionsStore,
     transactionSelector(transactionHash, networkId),
   )
-
   return useMemo(() => {
     if (!transaction?.status) {
       return "UNKNOWN"

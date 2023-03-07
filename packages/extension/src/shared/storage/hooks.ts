@@ -10,9 +10,9 @@ import { SelectorFn } from "./types"
 export function useKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
   K extends keyof T = keyof T,
->(storage: IKeyValueStorage<T>, key: K): T[K] {
+>(storage: IKeyValueStorage<T>, key: K) {
   const [value, setValue] = useState<T[K]>(
-    swrCacheProvider.get(storage.namespace + ":" + key.toString()) ??
+    swrCacheProvider.get(storage.namespace + ":" + key.toString())?.data ??
       storage.defaults[key],
   )
 
@@ -34,21 +34,20 @@ export function useKeyValueStorage<
 }
 
 export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
-  const [value, setValue] = useState<T>(
-    swrCacheProvider.get(storage.namespace) ?? storage.defaults,
-  )
+  const storedValue = swrCacheProvider.get(storage.namespace)
+  const [value, setValue] = useState<T>(storedValue?.data ?? storage.defaults)
 
   const set = useCallback(
     (value: T) => {
-      swrCacheProvider.set(storage.namespace, value)
+      swrCacheProvider.set(storage.namespace, { data: value })
       setValue(value)
     },
     [storage.namespace],
   )
 
   useEffect(() => {
-    storage.get().then(set)
-    const sub = storage.subscribe(set)
+    storage.get().then((value) => set(value))
+    const sub = storage.subscribe((value) => set(value))
     return () => sub()
   }, [set, storage])
 
@@ -65,12 +64,12 @@ export function useArrayStorage<T>(
   selector: SelectorFn<T> = defaultSelector,
 ): T[] {
   const [value, setValue] = useState<T[]>(
-    swrCacheProvider.get(storage.namespace) ?? storage.defaults,
+    swrCacheProvider.get(storage.namespace)?.data ?? storage.defaults,
   )
 
   const set = useCallback(
     (value: T[]) => {
-      swrCacheProvider.set(storage.namespace, value)
+      swrCacheProvider.set(storage.namespace, { data: value })
       setValue(value)
     },
     [storage.namespace],
