@@ -172,20 +172,18 @@ export async function partitionDeprecatedAccount(
       (ti) => number.toBN(ti),
     )
 
-    return partition(
-      accountAddresses,
-      (accountAddress) =>
-        !targetImplementations.some((ti) => {
-          const impl = implementationsToAccountsMap[accountAddress]
-          if (impl) {
-            return ti.eq(number.toBN(impl))
-          }
-          return false
-        }),
+    return partition(accountAddresses, (accountAddress) =>
+      targetImplementations.some((ti) => {
+        const impl = implementationsToAccountsMap[accountAddress]
+        if (impl) {
+          return ti.eq(number.toBN(impl))
+        }
+        return true
+      }),
     )
   } catch (error) {
     console.error("Error while checking for deprecated accounts", error)
-    return [[], accountAddresses]
+    return [accountAddresses, []]
   }
 }
 
@@ -206,12 +204,7 @@ export const usePartitionDeprecatedAccounts = (
   network: Network,
 ) => {
   return useSWR(
-    [
-      network.id,
-      accounts.length,
-      "partition-deprecated-accounts",
-      "whatever___",
-    ],
+    [network.id, accounts.length, "partition-deprecated-accounts"],
     () => partitionDeprecatedAccount(accounts, network),
     { refreshInterval: 30000, revalidateIfStale: true },
   )

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
-import { useSignerKey } from "../useSignerKey"
+import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { ScreenLayout } from "./ScreenLayout"
 import { FieldValues } from "./useCreateMultisigForm"
 
@@ -29,7 +29,7 @@ export const MultisigFirstStep = ({
     register,
     trigger,
   } = useFormContext<FieldValues>()
-  const { encodedPubKey } = useSignerKey()
+  const creatorSignerKey = useNextSignerKey()
   const { fields, append, remove } = useFieldArray({
     name: "signerKeys",
     control,
@@ -53,13 +53,13 @@ export const MultisigFirstStep = ({
       <Box my="2" width="100%">
         <P3 mb="1">Owner 1 (Me)</P3>
         <Input
-          placeholder={encodedPubKey}
+          placeholder={creatorSignerKey}
           {...register(`signerKeys.-1.key` as const, {
             required: true,
-            value: encodedPubKey,
+            value: creatorSignerKey,
           })}
           disabled={true}
-          value={encodedPubKey}
+          value={creatorSignerKey}
         />
       </Box>
       {fields.map((field, index) => {

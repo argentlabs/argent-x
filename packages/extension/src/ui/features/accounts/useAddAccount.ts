@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { CreateAccountType } from "../../../shared/wallet.model"
+import { CreateAccountType, MultisigData } from "../../../shared/wallet.model"
 import { useAppState } from "../../app.state"
 import { selectAccount } from "../../services/backgroundAccounts"
 import { recover } from "../recovery/recovery.service"
-import { createAccount } from "./accounts.service"
+import { Account } from "./Account"
+import { createAccount, createMultisig } from "./accounts.service"
+
+export interface AddAccountProps {
+  type?: CreateAccountType
+  skipNavigate?: boolean
+  multisigPayload?: MultisigData
+}
 
 export const useAddAccount = () => {
   const navigate = useNavigate()
@@ -19,14 +26,25 @@ export const useAddAccount = () => {
   }, [switcherNetworkId])
 
   const addAccount = useCallback(
-    async (type?: CreateAccountType, skipNavigate = false) => {
+    async ({ type, multisigPayload, skipNavigate }: AddAccountProps) => {
       setIsAdding(true)
       setAddingFailed(false)
       try {
-        const newAccount = await createAccount({
-          networkId: switcherNetworkId,
-          type,
-        })
+        let newAccount: Account
+
+        if (type === "multisig") {
+          newAccount = await createMultisig({
+            networkId: switcherNetworkId,
+            type,
+            multisigPayload,
+          })
+        } else {
+          newAccount = await createAccount({
+            networkId: switcherNetworkId,
+            type,
+          })
+        }
+
         // switch background wallet to the account that was selected
         await selectAccount(newAccount)
 

@@ -83,11 +83,12 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         throw Error("you need an open session")
       }
 
-      const { networkId, signers, threshold } = msg.data
+      const { networkId, signers, threshold, creator } = msg.data
       try {
         const account = await wallet.newAccount(networkId, "multisig", {
           signers,
           threshold,
+          creator,
         })
         tryToMintFeeToken(account)
 
@@ -119,6 +120,22 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendMessageToUi({
           type: "NEW_MULTISIG_ACCOUNT_REJ",
           data: { error },
+        })
+      }
+    }
+
+    case "GET_CALCULATED_MULTISIG_ADDRESS": {
+      try {
+        const address = await wallet.getCalculatedMultisigAddress(msg.data)
+
+        return sendMessageToUi({
+          type: "GET_CALCULATED_MULTISIG_ADDRESS_RES",
+          data: address,
+        })
+      } catch (e) {
+        console.error(e)
+        return sendMessageToUi({
+          type: "GET_CALCULATED_MULTISIG_ADDRESS_REJ",
         })
       }
     }
@@ -207,7 +224,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "GET_PUBLIC_KEY": {
-      const publicKey = await wallet.getPublicKey()
+      const publicKey = await wallet.getPublicKey(msg.data)
 
       return sendMessageToUi({
         type: "GET_PUBLIC_KEY_RES",
@@ -230,6 +247,22 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         type: "GET_ENCRYPTED_SEED_PHRASE_RES",
         data: { encryptedSeedPhrase },
       })
+    }
+
+    case "GET_NEXT_PUBLIC_KEY": {
+      try {
+        const publicKey = await wallet.getNextPublicKey(msg.data.networkId)
+
+        return sendMessageToUi({
+          type: "GET_NEXT_PUBLIC_KEY_RES",
+          data: { publicKey },
+        })
+      } catch (e) {
+        console.error(e)
+        return sendMessageToUi({
+          type: "GET_NEXT_PUBLIC_KEY_REJ",
+        })
+      }
     }
 
     case "DEPLOY_ACCOUNT_ACTION_FAILED": {

@@ -3,27 +3,27 @@ import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { IconWrapper } from "../../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
-import { recover } from "../../recovery/recovery.service"
-import { useSignerKey } from "./useSignerKey"
+import { useSignerKey } from "../accounts/usePublicKey"
+import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
+import { recover } from "../recovery/recovery.service"
 
 const { CopyIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
+  const signerKey = useSignerKey()
+
   const { onCopy, hasCopied, setValue } = useClipboard("", 2000)
-
-  const { encodedPubKey, pubKey } = useSignerKey()
-
-  useEffect(() => {
-    if (encodedPubKey) {
-      setValue(encodedPubKey)
-    }
-  }, [encodedPubKey, setValue])
 
   const onDone = async () => {
     navigate(await recover({ showAccountList: true }))
   }
+
+  useEffect(() => {
+    if (signerKey) {
+      setValue(signerKey)
+    }
+  }, [setValue, signerKey])
 
   return (
     <NavigationContainer title="Join existing multisig">
@@ -49,16 +49,16 @@ export const JoinMultisigScreen: FC = () => {
           boxSizing="border-box"
           w="full"
         >
-          {pubKey ? (
+          {signerKey ? (
             <P3 fontWeight="bold" color="white50">
-              {encodedPubKey}
+              {signerKey}
             </P3>
           ) : (
             <Spinner w={6} h={6} />
           )}
         </Box>
 
-        {encodedPubKey && (
+        {signerKey && (
           <Button onClick={onCopy} variant="link" gap={1}>
             <CopyIcon />
             <B3 color="neutrals.400">{hasCopied ? "Copied" : "Copy"}</B3>

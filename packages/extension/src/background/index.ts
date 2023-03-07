@@ -5,6 +5,7 @@ import { accountStore, getAccounts } from "../shared/account/store"
 import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
+import { multisigBaseWalletStore } from "../shared/multisig/store"
 import { getNetwork } from "../shared/network"
 import {
   isPreAuthorized,
@@ -155,6 +156,7 @@ const handleMessage = async (
     walletStore,
     accountStore,
     sessionStore,
+    multisigBaseWalletStore,
     loadContracts,
     getNetwork,
   )
