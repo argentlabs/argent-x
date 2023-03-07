@@ -200,3 +200,18 @@ export const accounTriggerEscapeGuardian = async (
 
   return result
 }
+
+export const accountEscapeAndChangeGuardian = async (
+  account: BaseWalletAccount,
+) => {
+  sendMessage({ type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_RES"),
+    waitForMessage("ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}

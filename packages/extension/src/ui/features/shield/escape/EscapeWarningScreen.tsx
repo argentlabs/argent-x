@@ -10,6 +10,7 @@ import { routes } from "../../../routes"
 import {
   accounTriggerEscapeGuardian,
   accountCancelEscape,
+  accountEscapeAndChangeGuardian,
 } from "../../../services/backgroundAccounts"
 import { ShieldHeader } from "../ui/ShieldHeader"
 import { useRouteAccount } from "../useRouteAccount"
@@ -66,6 +67,24 @@ export const EscapeWarningScreen: FC = () => {
     }
   }, [account, toast])
 
+  const onEscapeAndChangeGuardian = useCallback(async () => {
+    if (!account) {
+      console.error("Cannot escape and change guardian - no account")
+      return
+    }
+    await hideEscapeWarning(account)
+    try {
+      await accountEscapeAndChangeGuardian(account)
+    } catch (error) {
+      IS_DEV && console.warn(coerceErrorToString(error))
+      toast({
+        title: "Unable to escape and change guardian",
+        status: "error",
+        duration: 3000,
+      })
+    }
+  }, [account, toast])
+
   const liveAccountEscape = useLiveAccountEscape(account)
   const pending = useAccountHasPendingCancelEscape(account)
   if (pending) {
@@ -99,6 +118,7 @@ export const EscapeWarningScreen: FC = () => {
           liveAccountEscape={liveAccountEscape}
           onKeep={onCancelEscape}
           onContinue={onClose}
+          onRemove={onEscapeAndChangeGuardian}
         />
       ) : (
         <EscapeSigner
