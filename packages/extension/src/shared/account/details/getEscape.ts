@@ -9,6 +9,8 @@ import { BaseWalletAccount } from "../../wallet.model"
 export const ESCAPE_TYPE_GUARDIAN = 1
 export const ESCAPE_TYPE_SIGNER = 2
 
+export const ESCAPE_SECURITY_PERIOD_DAYS = 7
+
 export interface Escape {
   /** Time stamp escape will be active, in seconds */
   activeAt: number

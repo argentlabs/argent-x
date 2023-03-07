@@ -246,6 +246,34 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         })
       }
     }
+
+    case "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN": {
+      try {
+        const { account } = msg.data
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: {
+              contractAddress: account.address,
+              entrypoint: "triggerEscapeGuardian",
+              calldata: [],
+            },
+            meta: {
+              title: "Trigger escape guardian",
+              type: "INVOKE_FUNCTION",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_REJ",
+          data: `${error}`,
+        })
+      }
+    }
   }
 
   throw new UnhandledMessage()

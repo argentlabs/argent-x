@@ -24,12 +24,13 @@ export const getEscapeDisplayAttributes = (
     return {}
   }
   const { activeFromNowMs, activeFromNowPretty, type } = liveAccountEscape
+  const action = type === ESCAPE_TYPE_GUARDIAN ? "Removing" : "Changing"
   const entity = type === ESCAPE_TYPE_GUARDIAN ? "Argent Shield" : "Account Key"
   const colorScheme: "warning" | "danger" =
     type === ESCAPE_TYPE_GUARDIAN ? "warning" : "danger"
   const title =
     activeFromNowMs > 0
-      ? `Removing ${entity} in ${activeFromNowPretty}`
+      ? `${action} ${entity} in ${activeFromNowPretty}`
       : `${entity} removed`
   return {
     entity,

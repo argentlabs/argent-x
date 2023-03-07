@@ -7,7 +7,10 @@ import { ESCAPE_TYPE_GUARDIAN } from "../../../../shared/account/details/getEsca
 import { IS_DEV } from "../../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../../shared/utils/error"
 import { routes } from "../../../routes"
-import { accountCancelEscape } from "../../../services/backgroundAccounts"
+import {
+  accounTriggerEscapeGuardian,
+  accountCancelEscape,
+} from "../../../services/backgroundAccounts"
 import { ShieldHeader } from "../ui/ShieldHeader"
 import { useRouteAccount } from "../useRouteAccount"
 import { EscapeGuardian } from "./EscapeGuardian"
@@ -39,6 +42,24 @@ export const EscapeWarningScreen: FC = () => {
       IS_DEV && console.warn(coerceErrorToString(error))
       toast({
         title: "Unable to cancel escape",
+        status: "error",
+        duration: 3000,
+      })
+    }
+  }, [account, toast])
+
+  const onTriggerEscapeGuardian = useCallback(async () => {
+    if (!account) {
+      console.error("Cannot trigger escape guardian - no account")
+      return
+    }
+    await hideEscapeWarning(account)
+    try {
+      await accounTriggerEscapeGuardian(account)
+    } catch (error) {
+      IS_DEV && console.warn(coerceErrorToString(error))
+      toast({
+        title: "Unable to trigger escape guardian",
         status: "error",
         duration: 3000,
       })
@@ -82,7 +103,8 @@ export const EscapeWarningScreen: FC = () => {
       ) : (
         <EscapeSigner
           liveAccountEscape={liveAccountEscape}
-          onRemove={onCancelEscape}
+          onCancel={onCancelEscape}
+          onRemove={onTriggerEscapeGuardian}
         />
       )}
     </NavigationContainer>

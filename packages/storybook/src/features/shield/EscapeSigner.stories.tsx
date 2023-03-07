@@ -4,7 +4,11 @@ import { getActiveFromNow } from "@argent-x/extension/src/ui/features/shield/esc
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { MemoryRouter } from "react-router-dom"
 
-import { activeAt5d, activeAt5h, activeAt5m, activeAtNow } from "./activeAt"
+const activeAtNow = new Date().getTime() / 1000
+
+const activeAt5m = activeAtNow + 60 * 5
+const activeAt5h = activeAtNow + 60 * 60 * 5
+const activeAt5d = activeAtNow + 24 * 60 * 60 * 5
 
 export default {
   title: "shield/EscapeSigner",
