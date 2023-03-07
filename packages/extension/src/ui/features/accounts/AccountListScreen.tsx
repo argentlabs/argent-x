@@ -110,7 +110,10 @@ export const AccountListScreen: FC = () => {
 
   const [newAccounts, deprecatedAccounts] = fullPartitionedAccounts
 
-  const [multisigAccounts, standardAccounts] = partition(newAccounts, "type")
+  const [multisigAccounts, standardAccounts] = partition(
+    newAccounts,
+    (account) => account.type === "multisig",
+  )
 
   const hasMultipleAccountTypes =
     !isEmpty(standardAccounts) && !isEmpty(multisigAccounts)
