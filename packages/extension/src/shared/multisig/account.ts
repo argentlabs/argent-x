@@ -16,6 +16,7 @@ import urlJoin from "url-join"
 
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
+import { chainIdToStarknetNetwork } from "../utils/starknetNetwork"
 import {
   ApiMultisigAddRequestSignatureSchema,
   ApiMultisigPostRequestTxnSchema,
@@ -24,7 +25,6 @@ import {
   MultisigInvokeResponse,
 } from "./multisig.model"
 import { MultisigSigner } from "./signer"
-import { chainIdToStarknetNetwork } from "./utils"
 
 const ZERO_HASH = number.toHex(constants.ZERO)
 

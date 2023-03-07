@@ -1,12 +1,12 @@
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { Fetcher, fetcher } from "../api/fetcher"
 import { Network } from "../network"
+import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
 import {
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
 } from "./multisig.model"
-import { networkToStarknetNetwork } from "./utils"
 
 export interface IFetchMultisigDataForSigner {
   signer: string
