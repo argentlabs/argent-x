@@ -34,12 +34,15 @@ export const MultisigFirstStep = ({
     name: "signerKeys",
     control,
   })
-  const handleNavigationToConfirmationScreen = () => {
-    trigger("signerKeys").then((isValid) => {
-      if (isValid) {
-        goNext()
-      }
-    })
+  const handleNavigationToConfirmationScreen = async () => {
+    const isValid = await trigger("signerKeys")
+    if (isValid) {
+      goNext()
+    }
+  }
+
+  const addOwner = () => {
+    append({ key: "" })
   }
 
   return (
@@ -103,7 +106,7 @@ export const MultisigFirstStep = ({
       <Center width="100%">
         <Button
           variant="link"
-          onClick={() => append({ key: "" })}
+          onClick={addOwner}
           size="xs"
           leftIcon={<AddIcon />}
         >

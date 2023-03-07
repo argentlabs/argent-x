@@ -1,4 +1,4 @@
-import { H1, P2 } from "@argent/ui"
+import { H1, P2, logos } from "@argent/ui"
 import { Box, Button } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import { FC, PropsWithChildren, ReactNode } from "react"
@@ -6,7 +6,8 @@ import { FC, PropsWithChildren, ReactNode } from "react"
 import { ContentWrapper } from "../../../components/FullScreenPage"
 import { ArrowBackIcon } from "../../../components/Icons/MuiIcons"
 import { StepIndicator } from "../../../components/StepIndicator"
-import LogoSvg from "../../lock/logo.svg"
+
+const { ArgentXLogo } = logos
 
 export interface CreateMultisigScreen extends PropsWithChildren {
   back?: boolean
@@ -51,7 +52,7 @@ const PageWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => {
         backgroundSize="cover"
       >
         <Panel>
-          <LogoSvg />
+          <ArgentXLogo />
         </Panel>
       </Box>
     </Box>
