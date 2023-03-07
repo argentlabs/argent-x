@@ -14,6 +14,7 @@ import { routes, useReturnTo } from "../../routes"
 import { isEqualAddress } from "../../services/addresses"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
+import { MultisigListScreenItem } from "../multisig/MultisigListScreenItem"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
@@ -82,7 +83,7 @@ export const AccountListScreen: FC = () => {
       return
     }
 
-    const [deprecatedAccounts, newAccounts] = partitionedAccounts
+    const [newAccounts, deprecatedAccounts] = partitionedAccounts
 
     const deprecatedFullAccounts = deprecatedAccounts
       .map((accountAddress) => accountFromAddress(accountAddress))
@@ -92,7 +93,7 @@ export const AccountListScreen: FC = () => {
       .map((accountAddress) => accountFromAddress(accountAddress))
       .filter((account): account is Account => Boolean(account))
 
-    return [deprecatedFullAccounts, newFullAccounts]
+    return [newFullAccounts, deprecatedFullAccounts]
   }, [accountFromAddress, partitionedAccounts])
 
   const onClose = useCallback(async () => {
@@ -107,12 +108,12 @@ export const AccountListScreen: FC = () => {
     return <LoadingScreen />
   }
 
-  const [deprecatedAccounts, newAccounts] = fullPartitionedAccounts
+  const [newAccounts, deprecatedAccounts] = fullPartitionedAccounts
 
-  const [multisigAccounts, argentAccounts] = partition(newAccounts, "type")
+  const [multisigAccounts, standardAccounts] = partition(newAccounts, "type")
 
   const hasMultipleAccountTypes =
-    !isEmpty(argentAccounts) && !isEmpty(multisigAccounts)
+    !isEmpty(standardAccounts) && !isEmpty(multisigAccounts)
 
   return (
     <>
@@ -141,10 +142,11 @@ export const AccountListScreen: FC = () => {
             <Flex direction="column" gap={6}>
               <GroupedAccountList
                 title="Standard Accounts"
-                accounts={argentAccounts}
+                accounts={standardAccounts}
                 icon={<WalletIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="standard"
               />
               <GroupedAccountList
                 title="Multisig Accounts"
@@ -152,17 +154,27 @@ export const AccountListScreen: FC = () => {
                 icon={<MultisigIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="multisig"
               />
             </Flex>
           ) : (
-            newAccounts.map((account) => (
-              <AccountListScreenItem
-                key={account.address}
-                account={account}
-                selectedAccount={selectedAccount}
-                returnTo={returnTo}
-              />
-            ))
+            newAccounts.map((account) =>
+              account.type === "multisig" ? (
+                <MultisigListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                />
+              ) : (
+                <AccountListScreenItem
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                />
+              ),
+            )
           )}
           {some(deprecatedAccounts) && (
             <>

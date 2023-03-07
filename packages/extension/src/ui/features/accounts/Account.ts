@@ -103,7 +103,7 @@ export class Account {
 
   public async getCurrentImplementation(): Promise<string | undefined> {
     if (this.needsDeploy) {
-      return this.network.accountClassHash?.standard // cuz we always deploy regular accounts
+      return this.network.accountClassHash?.[this.type] // We deploy Standard and Multisig accounts now
     }
 
     const multicall = getMulticallForNetwork(this.network)

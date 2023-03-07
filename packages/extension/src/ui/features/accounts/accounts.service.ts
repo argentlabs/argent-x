@@ -7,10 +7,12 @@ import { generateAvatarImage } from "../../../shared/avatarImage"
 import {
   BaseWalletAccount,
   CreateAccountType,
+  MultisigData,
 } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { startSession } from "../../services/backgroundSessions"
 import { withPolling } from "../../services/swr"
+import { Multisig } from "../multisig/Multisig"
 import { Account } from "./Account"
 import { useAccounts } from "./accounts.state"
 
@@ -32,6 +34,23 @@ export const createAccount = async ({
   }
 
   return Account.create(networkId, type)
+}
+
+interface CreateMultisigOptions extends CreateAccountOptions {
+  multisigPayload?: MultisigData
+  type: "multisig"
+}
+
+export const createMultisig = async ({
+  networkId,
+  password,
+  multisigPayload,
+}: CreateMultisigOptions) => {
+  if (password) {
+    await startSession(password)
+  }
+
+  return Multisig.create(networkId, multisigPayload)
 }
 
 const argentColorsArray = [

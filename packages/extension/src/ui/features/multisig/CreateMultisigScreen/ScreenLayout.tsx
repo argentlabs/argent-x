@@ -3,9 +3,9 @@ import { Box, Button } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import { FC, PropsWithChildren, ReactNode } from "react"
 
-import { ContentWrapper } from "../../../../components/FullScreenPage"
-import { ArrowBackIcon } from "../../../../components/Icons/MuiIcons"
-import { StepIndicator } from "../../../../components/StepIndicator"
+import { ContentWrapper } from "../../../components/FullScreenPage"
+import { ArrowBackIcon } from "../../../components/Icons/MuiIcons"
+import { StepIndicator } from "../../../components/StepIndicator"
 
 const { ArgentXLogo } = logos
 

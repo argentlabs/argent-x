@@ -9,11 +9,11 @@ import {
 } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
+import { MultisigStatus } from "../multisig/hooks/useMultisigStatus"
 import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
-import { MultisigStatus } from "./multisig/types"
 
 const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon } = icons
 

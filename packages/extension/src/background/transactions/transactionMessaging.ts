@@ -51,12 +51,15 @@ export const handleTransactionMessage: HandleMessage<
           ))
         ) {
           if ("estimateFeeBulk" in starknetAccount) {
+            const deployPayload =
+              selectedAccount.type === "multisig"
+                ? await wallet.getMultisigDeploymentPayload(selectedAccount)
+                : await wallet.getAccountDeploymentPayload(selectedAccount)
+
             const bulkTransactions: TransactionBulk = [
               {
                 type: "DEPLOY_ACCOUNT",
-                payload: await wallet.getAccountDeploymentPayload(
-                  selectedAccount,
-                ),
+                payload: deployPayload,
               },
               {
                 type: "INVOKE_FUNCTION",

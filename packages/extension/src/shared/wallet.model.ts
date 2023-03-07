@@ -36,7 +36,14 @@ export interface WalletAccount extends BaseWalletAccount, WithSigner {
 
 export type StoredWalletAccount = Omit<WalletAccount, "network">
 
-export type MultisigPayload = {
+export type MultisigData = {
   signers: string[]
-  threshold: string
+  threshold: number
+  creator?: string // Creator is the public key of the account that created the multisig account
+}
+
+export type BaseMultisigWalletAccount = BaseWalletAccount & MultisigData
+
+export interface MultisigWalletAccount extends WalletAccount, MultisigData {
+  type: "multisig"
 }
