@@ -50,7 +50,7 @@ export class GuardianSigner extends Signer {
     const signatures = await super.signMessage(typedData, accountAddress)
     const cosignerMessage: CosignerOffchainMessage = {
       message: typedData,
-      accountAddress,
+      accountAddress: addAddressPadding(accountAddress),
       chain: "starknet",
     }
 
