@@ -24,26 +24,15 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: 0.5,
     })
-    //check activity
-    await extension.navigation.menuPendingTransationsIndicator.click()
-    await extension.activity.ensurePendingTransactions(1)
+    await extension.activity.checkActivity(1)
     await extension.navigation.menuTokens.click()
-    await Promise.race([
-      expect(
-        extension.navigation.menuPendingTransationsIndicator,
-      ).not.toBeVisible({
-        timeout: 90000,
-      }),
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        "1.00",
-        {
-          timeout: 90000,
-        },
-      ),
-    ])
+    await expect(
+      extension.navigation.menuPendingTransationsIndicator,
+    ).not.toBeVisible()
 
+    await expect(extension.account.currentBalance("ETH")).toContainText("0.4")
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).not.toContainText("1.00")
+    await expect(extension.account.balance).toContainText("0.4")
     await extension.account.back.click()
     await extension.account.ensureSelectedAccount(accountName2)
     await extension.account.token("Ethereum").click()
@@ -88,23 +77,14 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: 0.5,
     })
-    //check activity
-    await extension.navigation.menuPendingTransationsIndicator.click()
-    await extension.activity.ensurePendingTransactions(1)
+    await extension.activity.checkActivity(1)
     await extension.navigation.menuTokens.click()
-    await Promise.race([
-      expect(
-        extension.navigation.menuPendingTransationsIndicator,
-      ).not.toBeVisible({
-        timeout: 90000,
-      }),
-      expect(extension.account.currentBalance("ETH")).toContainText("0.", {
-        timeout: 90000,
-      }),
-    ])
-
+    await expect(
+      extension.navigation.menuPendingTransationsIndicator,
+    ).not.toBeVisible()
+    await expect(extension.account.currentBalance("ETH")).toContainText("0.4")
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).not.toContainText("1.00")
+    await expect(extension.account.balance).toContainText("0.4")
 
     await secondExtension.account.token("Ethereum").click()
     await secondExtension.account.back.click()
@@ -134,26 +114,15 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: "MAX",
     })
-    //check activity
-    await extension.navigation.menuPendingTransationsIndicator.click()
-    await extension.activity.ensurePendingTransactions(1)
+    await extension.activity.checkActivity(1)
     await extension.navigation.menuTokens.click()
-    await Promise.race([
-      expect(
-        extension.navigation.menuPendingTransationsIndicator,
-      ).not.toBeVisible({
-        timeout: 90000,
-      }),
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        "1.00",
-        {
-          timeout: 90000,
-        },
-      ),
-    ])
+    await expect(
+      extension.navigation.menuPendingTransationsIndicator,
+    ).not.toBeVisible()
+    await expect(extension.account.currentBalance("ETH")).toContainText("0.0")
 
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).not.toContainText("1.00")
+    await expect(extension.account.balance).toContainText("0.0")
     await extension.account.back.click()
     await extension.account.ensureSelectedAccount(accountName2)
     await extension.account.token("Ethereum").click()
@@ -198,26 +167,15 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: "MAX",
     })
-    //check activity
-    await extension.navigation.menuPendingTransationsIndicator.click()
-    await extension.activity.ensurePendingTransactions(1)
+    await extension.activity.checkActivity(1)
     await extension.navigation.menuTokens.click()
-    await Promise.race([
-      expect(
-        extension.navigation.menuPendingTransationsIndicator,
-      ).not.toBeVisible({
-        timeout: 90000,
-      }),
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        "1.00",
-        {
-          timeout: 90000,
-        },
-      ),
-    ])
+    await expect(
+      extension.navigation.menuPendingTransationsIndicator,
+    ).not.toBeVisible()
+    await expect(extension.account.currentBalance("ETH")).toContainText("0.0")
 
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).not.toContainText("1.00")
+    await expect(extension.account.balance).toContainText("0.0")
 
     await secondExtension.account.token("Ethereum").click()
     await expect(secondExtension.account.balance).toContainText("1.9")

@@ -96,6 +96,7 @@ export default class Account extends Navigation {
       await this.addANewccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
+    await expect(this.accountList).toBeVisible()
     await this.addFunds.click()
     await this.addFundsFromStartNet.click()
     const accountAddress = await this.accountAddress

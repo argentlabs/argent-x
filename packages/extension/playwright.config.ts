@@ -13,7 +13,7 @@ const playwrightConfig: PlaywrightTestConfig = {
     threshold: 1 * 60e3, // 1 minute
     max: 5,
   },
-  expect: { timeout: 30 * 1000 }, // 30 seconds
+  expect: { timeout: 90 * 1000 }, // 90 seconds
   reporter: isCI
     ? [
         ["github"],
