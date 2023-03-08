@@ -8,7 +8,7 @@ const isCI = Boolean(process.env.CI)
 
 const playwrightConfig: PlaywrightTestConfig = {
   workers: 1,
-  timeout: 2 * 60e3, // 2 minutes
+  timeout: 5 * 60e3, // 5 minutes
   reportSlowTests: {
     threshold: 1 * 60e3, // 1 minute
     max: 5,

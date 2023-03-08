@@ -30,9 +30,11 @@ test.describe("Send funds", () => {
       extension.navigation.menuPendingTransationsIndicator,
     ).not.toBeVisible()
 
-    await expect(extension.account.currentBalance("ETH")).toContainText("0.4")
+    await expect(extension.account.currentBalance("ETH")).toContainText(
+      "0.4988",
+    )
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).toContainText("0.4")
+    await expect(extension.account.balance).toContainText("0.4988")
     await extension.account.back.click()
     await extension.account.ensureSelectedAccount(accountName2)
     await extension.account.token("Ethereum").click()
@@ -82,9 +84,11 @@ test.describe("Send funds", () => {
     await expect(
       extension.navigation.menuPendingTransationsIndicator,
     ).not.toBeVisible()
-    await expect(extension.account.currentBalance("ETH")).toContainText("0.4")
+    await expect(extension.account.currentBalance("ETH")).toContainText(
+      "0.4988",
+    )
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).toContainText("0.4")
+    await expect(extension.account.balance).toContainText("0.4988")
 
     await secondExtension.account.token("Ethereum").click()
     await secondExtension.account.back.click()
@@ -119,14 +123,16 @@ test.describe("Send funds", () => {
     await expect(
       extension.navigation.menuPendingTransationsIndicator,
     ).not.toBeVisible()
-    await expect(extension.account.currentBalance("ETH")).toContainText("0.0")
+    await expect(extension.account.currentBalance("ETH")).toContainText(
+      "0.0023",
+    )
 
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).toContainText("0.0")
+    await expect(extension.account.balance).toContainText("0.0023")
     await extension.account.back.click()
     await extension.account.ensureSelectedAccount(accountName2)
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).toContainText("1.9")
+    await expect(extension.account.balance).toContainText("1.9965")
     await extension.account.back.click()
     await expect(extension.account.currentBalance("ETH")).toContainText("1.9")
   })
@@ -172,13 +178,15 @@ test.describe("Send funds", () => {
     await expect(
       extension.navigation.menuPendingTransationsIndicator,
     ).not.toBeVisible()
-    await expect(extension.account.currentBalance("ETH")).toContainText("0.0")
+    await expect(extension.account.currentBalance("ETH")).toContainText(
+      "0.0023",
+    )
 
     await extension.account.token("Ethereum").click()
-    await expect(extension.account.balance).toContainText("0.0")
+    await expect(extension.account.balance).toContainText("0.0023")
 
     await secondExtension.account.token("Ethereum").click()
-    await expect(secondExtension.account.balance).toContainText("1.9")
+    await expect(secondExtension.account.balance).toContainText("1.9965")
     await secondExtension.account.back.click()
     await expect(secondExtension.account.currentBalance("ETH")).toContainText(
       "1.9",
