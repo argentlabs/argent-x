@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { FormProvider } from "react-hook-form"
+import { useParams } from "react-router-dom"
 
+import { useCurrentNetwork } from "../../networks/useNetworks"
 import { MultisigFirstStep } from "./MultisigFirstStep"
 import { MultisigSecondStep } from "./MultisigSecondStep"
 import { MultisigThirdStep } from "./MultisigThirdStep"
@@ -15,17 +17,27 @@ export const CreateMultisigStartScreen = () => {
   const methods = useCreateMultisigForm()
   const goBack = () => setStep((step) => step - 1)
   const goNext = () => setStep((step) => step + 1)
+  const { networkId } = useParams()
+
+  if (!networkId) {
+    return <></>
+  }
 
   return (
     <FormProvider {...methods}>
       {currentStep === FIRST_STEP && (
-        <MultisigFirstStep goNext={goNext} index={FIRST_STEP} />
+        <MultisigFirstStep
+          goNext={goNext}
+          index={FIRST_STEP}
+          networkId={networkId}
+        />
       )}
       {currentStep === SECOND_STEP && (
         <MultisigSecondStep
           goNext={goNext}
           index={SECOND_STEP}
           goBack={goBack}
+          networkId={networkId}
         />
       )}
       {currentStep === THIRD_STEP && (

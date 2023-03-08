@@ -10,6 +10,7 @@ import { Center, Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { useAppState } from "../../app.state"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
@@ -45,12 +46,13 @@ const multisigOptions: MultisigOption[] = [
 export const NewMultisigScreen: FC = () => {
   const navigate = useNavigate()
   const { addAccount } = useAddAccount()
+  const { switcherNetworkId } = useAppState()
 
   const onClick = useCallback(
     async (type: MultisigOptionType) => {
       switch (type) {
         case "create": {
-          const url = `index.html?goto=multisig`
+          const url = `index.html?goto=multisig&networkId=${switcherNetworkId}`
           chrome.tabs.create({
             url,
           })
@@ -72,7 +74,7 @@ export const NewMultisigScreen: FC = () => {
           assertNever(type)
       }
     },
-    [navigate, addAccount],
+    [switcherNetworkId, addAccount, navigate],
   )
 
   return (

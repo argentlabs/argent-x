@@ -19,7 +19,9 @@ const { CloseIcon, AddIcon } = icons
 export const MultisigFirstStep = ({
   index,
   goNext,
+  networkId,
 }: {
+  networkId: string
   index: number
   goNext: () => void
 }) => {
@@ -29,7 +31,7 @@ export const MultisigFirstStep = ({
     register,
     trigger,
   } = useFormContext<FieldValues>()
-  const creatorSignerKey = useNextSignerKey()
+  const creatorSignerKey = useNextSignerKey(networkId)
   const { fields, append, remove } = useFieldArray({
     name: "signerKeys",
     control,
