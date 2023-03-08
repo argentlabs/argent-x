@@ -20,7 +20,7 @@ import { Signer, typedData } from "starknet"
  * such signatures
  */
 
-export class GuardianSignerArgentX2Of2Multisig extends Signer {
+export class GuardianSelfSigner extends Signer {
   public async signMessage(
     typedData: typedData.TypedData,
     accountAddress: string,

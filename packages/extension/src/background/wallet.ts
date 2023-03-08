@@ -36,8 +36,8 @@ import { getProviderv4 } from "../shared/network/provider"
 import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSelfSigner } from "../shared/shield/GuardianSelfSigner"
 import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
-import { GuardianSignerArgentX2Of2Multisig } from "../shared/shield/GuardianSignerArgentX2Of2Multisig"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -679,7 +679,7 @@ export class Wallet {
       const publicKey = ec.getStarkKey(keyPair)
       if (isEqualAddress(account.guardian, publicKey)) {
         /** Account guardian is the same as local signer */
-        return new GuardianSignerArgentX2Of2Multisig(keyPair)
+        return new GuardianSelfSigner(keyPair)
       }
       return new GuardianSignerArgentX(keyPair, cosignerSign)
     }
