@@ -9,10 +9,13 @@ import {
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { usePublicKey } from "../../accounts/usePublicKey"
-import { isZeroMultisigAccount, useMultisigAccount } from "../multisig.state"
+import {
+  isZeroMultisigAccount,
+  useMultisigWalletAccount,
+} from "../multisig.state"
 
 export function useMultisigDataForSigner(account: BaseWalletAccount) {
-  const multisigAccount = useMultisigAccount(account)
+  const multisigAccount = useMultisigWalletAccount(account)
   const publicSigner = usePublicKey(account)
 
   const multisigDataForSignerFetcher = useCallback(async () => {

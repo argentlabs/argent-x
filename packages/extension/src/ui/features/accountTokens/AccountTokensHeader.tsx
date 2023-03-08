@@ -6,7 +6,7 @@ import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { AccountStatus } from "../accounts/accounts.service"
-import { useMultisigAccount } from "../multisig/multisig.state"
+import { useMultisig } from "../multisig/multisig.state"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
 
@@ -28,7 +28,7 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
   const { tokenDetails } = useTokensWithBalance(account)
   const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
   const accountAddress = account.address
-  const multisig = useMultisigAccount(account) // This will be undefined if the account is not a multisig
+  const multisig = useMultisig(account) // This will be undefined if the account is not a multisig
 
   return (
     <VStack spacing={0.5}>

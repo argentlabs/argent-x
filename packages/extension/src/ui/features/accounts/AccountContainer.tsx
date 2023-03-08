@@ -11,7 +11,7 @@ import { FC, PropsWithChildren } from "react"
 import { NavLink } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { useMultisigAccount } from "../multisig/multisig.state"
+import { useMultisig } from "../multisig/multisig.state"
 import { WithEscapeWarning } from "../shield/escape/WithEscapeWarning"
 import { AccountNavigationBar } from "./AccountNavigationBar"
 import { useSelectedAccount } from "./accounts.state"
@@ -31,7 +31,7 @@ export const AccountContainer: FC<AccountContainerProps> = ({
   const { pendingTransactions } = useAccountTransactions(account)
   const { scrollRef, scroll } = useScrollRestoration(scrollKey)
 
-  const multisig = useMultisigAccount(account)
+  const multisig = useMultisig(account)
   const showActivateBanner = Boolean(multisig?.needsDeploy) // False if multisig is undefined
 
   if (!account) {

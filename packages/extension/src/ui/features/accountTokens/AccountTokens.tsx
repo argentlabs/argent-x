@@ -1,6 +1,6 @@
-import { CellStack } from "@argent/ui"
-import { Flex, VStack } from "@chakra-ui/react"
-import { FC, useCallback, useEffect, useRef } from "react"
+import { CellStack, H5, icons } from "@argent/ui"
+import { Center, Flex, VStack } from "@chakra-ui/react"
+import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
@@ -14,6 +14,7 @@ import {
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
+import { useMultisig } from "../multisig/multisig.state"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
@@ -27,6 +28,8 @@ import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountStatus } from "./useAccountStatus"
+
+const { MultisigIcon } = icons
 
 interface AccountTokensProps {
   account: Account
@@ -65,6 +68,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const { needsUpgrade = false, mutate } = useCheckUpgradeAvailable(account)
+
+  const multisig = useMultisig(account)
 
   const onRedeploy = useCallback(async () => {
     const data = account.toBaseWalletAccount()
@@ -108,6 +113,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
+  const showAddFundsBackdrop = useMemo(() => {
+    return multisig?.needsDeploy && feeTokenBalance?.lte(0)
+  }, [feeTokenBalance, multisig?.needsDeploy])
+
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mt={4} mb={6}>
@@ -132,7 +141,19 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
-        <TokenList variant={tokenListVariant} showNewTokenButton />
+        {showAddFundsBackdrop && (
+          <CellStack alignItems="center">
+            <Center borderRadius="full" bg="black" width="20" h="20">
+              <MultisigIcon color="neutrals.500" fontSize="5xl" />
+            </Center>
+            <H5 textAlign="center" color="neutrals.500" maxW="75%">
+              Add funds to activate multisig
+            </H5>
+          </CellStack>
+        )}
+        {!showAddFundsBackdrop && (
+          <TokenList variant={tokenListVariant} showNewTokenButton />
+        )}
       </CellStack>
     </Flex>
   )

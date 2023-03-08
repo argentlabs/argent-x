@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
+import { useMultisig } from "../multisig/multisig.state"
 import { useNetworkFeeToken, useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
 
@@ -20,6 +21,7 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
+  const multisig = useMultisig(account)
 
   const sendToken = useNetworkFeeToken(switcherNetworkId)
   const { tokenDetails, tokenDetailsIsInitialising } =
@@ -68,6 +70,14 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
       : "wait for this account to deploy"
   } before you can send`
 
+  const showSendButton = useMemo(() => {
+    if (multisig?.needsDeploy) {
+      return false
+    }
+
+    return !!sendToken
+  }, [multisig?.needsDeploy, sendToken])
+
   return (
     <Flex gap={2} mx={"auto"}>
       <AlertDialog
@@ -79,7 +89,7 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
         confirmTitle="Add funds"
         onConfirm={accountIsDeployed ? onAddFunds : undefined}
       />
-      <SimpleGrid columns={sendToken ? 2 : 1} spacing={2}>
+      <SimpleGrid columns={showSendButton ? 2 : 1} spacing={2}>
         <Button
           onClick={onAddFunds}
           colorScheme={"tertiary"}
@@ -88,7 +98,7 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
         >
           Add funds
         </Button>
-        {sendToken && (
+        {showSendButton && (
           <Button
             onClick={onSend}
             colorScheme={"tertiary"}
