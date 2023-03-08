@@ -49,6 +49,9 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
 
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
 
+  const displayPriceDetails =
+    parseFloat(priceDetails?.ccyDayChange || "0") * 100
+
   return (
     <TokenButton
       onClick={onClick}
@@ -60,8 +63,8 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
       valueLabelPrimary={displayCurrencyValue}
       valueLabelSecondary={
         priceDetails ? (
-          <P4 color={+priceDetails.ccyDayChange > 0 ? "green" : "red"}>
-            {priceDetails.ccyDayChange}%
+          <P4 color={displayPriceDetails > 0 ? "green" : "red"}>
+            {displayPriceDetails.toFixed(2)}%
           </P4>
         ) : null
       }
