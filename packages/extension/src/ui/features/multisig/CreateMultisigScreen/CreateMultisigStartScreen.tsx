@@ -2,7 +2,6 @@ import { useState } from "react"
 import { FormProvider } from "react-hook-form"
 import { useParams } from "react-router-dom"
 
-import { useCurrentNetwork } from "../../networks/useNetworks"
 import { MultisigFirstStep } from "./MultisigFirstStep"
 import { MultisigSecondStep } from "./MultisigSecondStep"
 import { MultisigThirdStep } from "./MultisigThirdStep"
