@@ -199,7 +199,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             transactions: {
               contractAddress: account.address,
               entrypoint: "changeGuardian",
-              calldata: [number.hexToDecimalString(guardian || constants.ZERO)],
+              calldata: [
+                number.hexToDecimalString(
+                  guardian || constants.ZERO.toString(),
+                ),
+              ],
             },
             meta: {
               isChangeGuardian: true,
@@ -291,6 +295,28 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           throw Error("no account selected")
         }
 
+        /** Treat actionQueue as a stack, push tx 2 before 1  */
+
+        /** 2. changeGuardian to ZERO, signed twice by same signer key (like 2/2 multisig with same key) */
+
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: {
+              contractAddress: account.address,
+              entrypoint: "changeGuardian",
+              calldata: [number.hexToDecimalString(constants.ZERO.toString())],
+            },
+            meta: {
+              isChangeGuardian: true,
+              title: "Change account guardian",
+              type: "INVOKE_FUNCTION",
+            },
+          },
+        })
+
+        /** 1. call escapeGuardian with current account signer publicKey as new guardian key */
+
         const keyPair = await wallet.getKeyPairByDerivationPath(
           selectedAccount?.signer.derivationPath,
         )
@@ -300,9 +326,9 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           selectedAccount.guardian &&
           isEqualAddress(selectedAccount.guardian, publicKey)
         ) {
-          /** 1. user already successfully used `escapeGuardian` to change guardian to this account pub key */
+          /** 1. user already successfully used `escapeGuardian` to change guardian to this account publicKey*/
         } else {
-          /** 1. need to call `escapeGuardian` to change guardian to this account pub key */
+          /** 1. need to call `escapeGuardian` to change guardian to this account publicKey */
           await actionQueue.push({
             type: "TRANSACTION",
             payload: {
@@ -320,23 +346,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           })
         }
 
-        /** 2. changeGuardian to ZERO, signed twice by same signer key (like 2/2 multisig with same key) */
-
-        await actionQueue.push({
-          type: "TRANSACTION",
-          payload: {
-            transactions: {
-              contractAddress: account.address,
-              entrypoint: "changeGuardian",
-              calldata: [number.hexToDecimalString(constants.ZERO)],
-            },
-            meta: {
-              isChangeGuardian: true,
-              title: "Change account guardian",
-              type: "INVOKE_FUNCTION",
-            },
-          },
-        })
         return sendMessageToUi({
           type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_RES",
         })
