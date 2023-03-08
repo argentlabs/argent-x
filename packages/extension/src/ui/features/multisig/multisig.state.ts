@@ -60,10 +60,13 @@ export function useMultisigAccounts() {
   }, [accounts, baseMultisigAccounts])
 }
 
-export function useMultisigAccount(base: BaseWalletAccount) {
+export function useMultisigAccount(base?: BaseWalletAccount) {
   const multisigAccounts = useMultisigAccounts()
 
   return useMemo(() => {
+    if (!base) {
+      return
+    }
     return multisigAccounts.find((multisigAccount) =>
       accountsEqual(multisigAccount, base),
     )
