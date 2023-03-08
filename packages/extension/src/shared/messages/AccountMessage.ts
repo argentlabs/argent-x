@@ -91,7 +91,7 @@ export type AccountMessage =
     }
   | {
       type: "GET_PUBLIC_KEY_RES"
-      data: { publicKey: string }
+      data: { publicKey: string; account: BaseWalletAccount }
     }
   | {
       type: "GET_NEXT_PUBLIC_KEY"

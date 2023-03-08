@@ -1028,7 +1028,9 @@ export class Wallet {
     return starkPair.getPrivate().toString()
   }
 
-  public async getPublicKey(baseAccount?: BaseWalletAccount): Promise<string> {
+  public async getPublicKey(
+    baseAccount?: BaseWalletAccount,
+  ): Promise<{ publicKey: string; account: BaseWalletAccount }> {
     const account = baseAccount
       ? await this.getAccount(baseAccount)
       : await this.getSelectedAccount()
@@ -1043,7 +1045,7 @@ export class Wallet {
 
     const starkPub = ec.getStarkKey(starkPair)
 
-    return starkPub
+    return { publicKey: starkPub, account }
   }
 
   /**

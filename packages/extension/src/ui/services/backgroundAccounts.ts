@@ -204,7 +204,9 @@ export const getPublicKey = async (account?: BaseWalletAccount) => {
     data: account,
   })
 
-  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES", (x) =>
+    account ? x.data.account.address === account.address : true,
+  )
 
   return publicKey
 }
