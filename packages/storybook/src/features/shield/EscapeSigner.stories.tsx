@@ -47,12 +47,3 @@ Signer5Minutes.args = {
     ...getActiveFromNow(activeAt5m),
   },
 }
-
-export const SignerNow = Template.bind({})
-SignerNow.args = {
-  liveAccountEscape: {
-    activeAt: activeAtNow,
-    type: ESCAPE_TYPE_SIGNER,
-    ...getActiveFromNow(activeAtNow),
-  },
-}

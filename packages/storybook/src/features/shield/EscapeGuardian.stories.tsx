@@ -47,12 +47,3 @@ Shield5Minutes.args = {
     ...getActiveFromNow(activeAt5m),
   },
 }
-
-export const ShieldNow = Template.bind({})
-ShieldNow.args = {
-  liveAccountEscape: {
-    activeAt: activeAtNow,
-    type: ESCAPE_TYPE_GUARDIAN,
-    ...getActiveFromNow(activeAtNow),
-  },
-}
