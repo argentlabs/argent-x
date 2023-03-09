@@ -1,22 +1,17 @@
-import { ButtonCell, icons } from "@argent/ui"
-import React, { useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { ButtonCell, H6, icons } from "@argent/ui"
+import { Button, Flex } from "@chakra-ui/react"
+import { useNavigate } from "react-router-dom"
 
-import {
-  getMultisigAccountFromBaseWallet,
-  getMultisigAccounts,
-} from "../../../shared/multisig/store"
 import { routes } from "../../routes"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
 import { useMultisigInfo } from "../multisig/hooks/useMultisigInfo"
 import { useCurrentNetwork } from "../networks/useNetworks"
 
-const { ExpandIcon, HideIcon } = icons
+const { ExpandIcon, HideIcon, ChevronRightIcon } = icons
 
 export const AccountEditButtonsMultisig = ({
   account,
@@ -33,15 +28,25 @@ export const AccountEditButtonsMultisig = ({
 
   return (
     <>
-      <ButtonCell onClick={() => navigate(routes.exportPrivateKey())}>
-        Connected dapps
-      </ButtonCell>
-      <ButtonCell onClick={() => navigate(routes.exportPrivateKey())}>
+      <ButtonCell
+        onClick={() => navigate(routes.multisigOwners(account.address))}
+      >
         View owners
       </ButtonCell>
-      <ButtonCell onClick={() => navigate(routes.exportPrivateKey())}>
-        View confirmations {multisig?.threshold}/{multisig?.signers}
-      </ButtonCell>
+      <Button
+        onClick={() => navigate(routes.multisigConfirmations(account.address))}
+        width="100%"
+        rightIcon={<ChevronRightIcon />}
+        borderRadius="lg"
+        p={4}
+      >
+        <Flex width="100%" justifyContent="space-between">
+          <H6>View confirmations </H6>
+          <H6 color="neutrals.200">
+            {multisig?.threshold}/{multisig?.signers.length}
+          </H6>
+        </Flex>
+      </Button>
       {account && !account.needsDeploy && (
         <ButtonCell
           onClick={() =>

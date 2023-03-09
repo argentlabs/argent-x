@@ -9,6 +9,11 @@ import * as yup from "yup"
 
 export const normalizeAddress = (address: string) => getChecksumAddress(address)
 
+export const formatTruncatedSignerKey = (signerKey: string) => {
+  const start = signerKey.slice(0, 6)
+  const end = signerKey.slice(-4)
+  return `${start}…${end}`
+}
 export const formatTruncatedAddress = (address: string) => {
   const normalized = normalizeAddress(address)
   const hex = normalized.slice(0, 2)

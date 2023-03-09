@@ -221,5 +221,13 @@ export const routes = {
   multisigSetup: route("/multisig/setup"),
   multisigCreate: route("/multisig/create"),
   multisigJoin: route("/multisig/join"),
+  multisigOwners: route(
+    (accountAddress) => `/multisig/${accountAddress}/owners`,
+    "/multisig/:accountAddress/owners",
+  ),
+  multisigConfirmations: route(
+    (accountAddress) => `/multisig/${accountAddress}/confirmations`,
+    "/multisig/:accountAddress/confirmations",
+  ),
   swap: route("/swap"),
 }

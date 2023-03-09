@@ -5,9 +5,10 @@ import {
   SpacerCell,
 } from "@argent/ui"
 import { Center, Flex, Image } from "@chakra-ui/react"
-import React, { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
+import { getMultisigAccounts } from "../../../shared/multisig/store"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { useReturnTo } from "../../routes"
 import {
@@ -16,7 +17,6 @@ import {
 } from "../accounts/accountMetadata.state"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
-import { useMultisigInfo } from "../multisig/hooks/useMultisigInfo"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { AccountEditButtons } from "./AccountEditButtons"
 import { AccountEditButtonsMultisig } from "./AccountEditButtonsMultisig"
@@ -32,7 +32,6 @@ export const AccountEditScreen: FC = () => {
     address: accountAddress,
     networkId: currentNetwork.id,
   })
-
   const accountName = account
     ? getAccountName(account, accountNames)
     : "Not found"
@@ -61,6 +60,9 @@ export const AccountEditScreen: FC = () => {
     setLiveEditingAccountName(accountName)
   }, [accountName])
 
+  useEffect(() => {
+    getMultisigAccounts().then((accs) => console.log(accs))
+  }, [])
   return (
     <>
       <NavigationContainer

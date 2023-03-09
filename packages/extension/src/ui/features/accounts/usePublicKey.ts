@@ -35,27 +35,13 @@ export const useNextPublicKey = () => {
     [network.id],
   )
   useEffect(() => {
-    console.log("called3")
     // on mount
-    getNextPubKeyCallback().then((key) => {
-      console.log(key)
-      setPubKey(key)
-    })
-    const getPublicKey = async () => {
-      console.log("fetching")
-      try {
-        const key = await getNextPublicKey(network.id)
-        console.log(key)
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    getPublicKey()
+    getNextPubKeyCallback().then(setPubKey)
     return () => {
       // on unmount
       setPubKey(undefined)
     }
-  }, [])
+  }, [getNextPubKeyCallback])
 
   return pubKey
 }
@@ -64,6 +50,12 @@ export const useEncodedPublicKey = (pubKey: string | undefined) => {
   return useMemo(() => pubKey && utils.base58.encode(pubKey), [pubKey])
 }
 
+export const useEncodedPublicKeys = (pubKeys: string[]) => {
+  return useMemo(
+    () => pubKeys.map((key) => utils.base58.encode(key)),
+    [pubKeys],
+  )
+}
 /**
  *
  * @returns Signer Key (encoded public key) of the current account
