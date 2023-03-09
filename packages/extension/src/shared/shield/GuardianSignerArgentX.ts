@@ -12,7 +12,7 @@ import { isTokenExpired } from "./backend/account"
 export const guardianSignerNotRequired = [
   "escapeGuardian",
   "triggerEscapeGuardian",
-] as const
+]
 
 export const guardianSignerNotRequiredSelectors = guardianSignerNotRequired.map(
   (entrypoint) => hash.getSelectorFromName(entrypoint),
