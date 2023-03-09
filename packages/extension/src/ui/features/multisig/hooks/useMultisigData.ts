@@ -1,13 +1,13 @@
 import useSWR from "swr"
 
+import { BaseMultisigWalletAccount } from "../../../../shared/wallet.model"
 import { getMultisigAccount } from "../../../services/backgroundAccounts"
+import { Account } from "../../accounts/Account"
 import { useCurrentNetwork } from "../../networks/useNetworks"
-import { Account } from "../Account"
-import { MultisigAccount } from "./types"
 
 export const useMultisigData = (account?: Account) => {
   const currentNetwork = useCurrentNetwork()
-  const { data, error } = useSWR<MultisigAccount | undefined>(
+  const { data, error } = useSWR<BaseMultisigWalletAccount | undefined>(
     [account?.address, "multisigData"],
     () => {
       if (account?.type === "multisig") {
@@ -21,9 +21,9 @@ export const useMultisigData = (account?: Account) => {
     },
   )
   return {
-    creator: data?.content.creator,
-    signers: data?.content.signers,
-    threshold: data?.content.threshold,
+    creator: data?.creator,
+    signers: data?.signers,
+    threshold: data?.threshold,
     error,
   }
 }

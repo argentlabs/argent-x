@@ -335,7 +335,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           address,
           networkId,
         })
-        return multisigAccount
+        return multisigAccount.content
       } catch (error) {
         return sendMessageToUi({
           type: "GET_MULTISIG_ACCOUNT_REJ",

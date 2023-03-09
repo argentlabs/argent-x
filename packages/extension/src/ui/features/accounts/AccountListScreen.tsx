@@ -4,7 +4,7 @@ import {
   NavigationContainer,
   icons,
 } from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import React, { Flex } from "@chakra-ui/react"
 import { isEmpty, partition, some } from "lodash-es"
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"

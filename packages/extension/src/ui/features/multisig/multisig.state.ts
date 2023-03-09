@@ -38,7 +38,6 @@ export function useBaseMultisigAccounts() {
 export function useMultisigAccounts() {
   const accounts = useAccounts({ allNetworks: true, showHidden: true })
   const baseMultisigAccounts = useBaseMultisigAccounts()
-
   return useMemo(() => {
     return baseMultisigAccounts
       .map((baseMultisigAccount) => {

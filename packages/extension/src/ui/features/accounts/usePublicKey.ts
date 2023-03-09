@@ -34,16 +34,28 @@ export const useNextPublicKey = () => {
     () => getNextPublicKey(network.id),
     [network.id],
   )
-
   useEffect(() => {
+    console.log("called3")
     // on mount
-    getNextPubKeyCallback().then(setPubKey)
-
+    getNextPubKeyCallback().then((key) => {
+      console.log(key)
+      setPubKey(key)
+    })
+    const getPublicKey = async () => {
+      console.log("fetching")
+      try {
+        const key = await getNextPublicKey(network.id)
+        console.log(key)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    getPublicKey()
     return () => {
       // on unmount
       setPubKey(undefined)
     }
-  }, [getNextPubKeyCallback])
+  }, [])
 
   return pubKey
 }
@@ -70,6 +82,6 @@ export const useSignerKey = () => {
 export const useNextSignerKey = () => {
   const pubKey = useNextPublicKey()
   const encodedPubKey = useEncodedPublicKey(pubKey)
-
+  console.log({ pubKey })
   return encodedPubKey
 }

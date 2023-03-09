@@ -30,6 +30,6 @@ export const getMultisigAccountData = async ({
       },
     })
   } catch (e) {
-    throw `An error occured ${e}`
+    throw new Error(`An error occured ${e}`)
   }
 }

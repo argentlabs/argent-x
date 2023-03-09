@@ -1,4 +1,3 @@
-import { MultisigAccount } from "../../ui/features/accounts/multisig/types"
 import {
   ArgentAccountType,
   BaseMultisigWalletAccount,
@@ -146,6 +145,6 @@ export type AccountMessage =
     }
   | {
       type: "GET_MULTISIG_ACCOUNT_RES"
-      data: MultisigAccount
+      data: BaseMultisigWalletAccount
     }
   | { type: "GET_MULTISIG_ACCOUNT_REJ"; data: string }
