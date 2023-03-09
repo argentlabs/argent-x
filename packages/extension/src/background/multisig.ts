@@ -12,7 +12,7 @@ export const getMultisigAccountData = async ({
 }) => {
   try {
     if (!ARGENT_MULTISIG_URL) {
-      throw "Multisig endpoint is not defined"
+      throw new Error("Multisig endpoint is not defined")
     }
     urlJoin(ARGENT_MULTISIG_URL, `${networkId}/${address}`)
     return fetcher<{
