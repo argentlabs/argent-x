@@ -23,6 +23,7 @@ import { accountHasEscape } from "../shield/escape/useAccountEscape"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
+import { ActivateMultisigBanner } from "./ActivateMultisigBanner"
 import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
@@ -117,6 +118,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     return multisig?.needsDeploy && feeTokenBalance?.lte(0)
   }, [feeTokenBalance, multisig?.needsDeploy])
 
+  const showActivateMultisigBanner = useMemo(
+    () => multisig?.needsDeploy && feeTokenBalance?.gt(0),
+    [feeTokenBalance, multisig?.needsDeploy],
+  )
+
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mt={4} mb={6}>
@@ -141,16 +147,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
-        {showAddFundsBackdrop && (
-          <CellStack alignItems="center">
-            <Center borderRadius="full" bg="black" width="20" h="20">
-              <MultisigIcon color="neutrals.500" fontSize="5xl" />
-            </Center>
-            <H5 textAlign="center" color="neutrals.500" maxW="75%">
-              Add funds to activate multisig
-            </H5>
-          </CellStack>
-        )}
+        {showActivateMultisigBanner && <ActivateMultisigBanner />}
+        {showAddFundsBackdrop && <AddFundBackdrop />}
         {!showAddFundsBackdrop && (
           <TokenList variant={tokenListVariant} showNewTokenButton />
         )}
@@ -158,3 +156,14 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     </Flex>
   )
 }
+
+export const AddFundBackdrop: FC = () => (
+  <CellStack alignItems="center">
+    <Center borderRadius="full" bg="black" width="20" h="20">
+      <MultisigIcon color="neutrals.500" fontSize="5xl" />
+    </Center>
+    <H5 textAlign="center" color="neutrals.500" maxW="75%">
+      Add funds to activate multisig
+    </H5>
+  </CellStack>
+)
