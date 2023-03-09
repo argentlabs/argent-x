@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-window",
-  "version": "5.3.7",
+  "version": "5.3.8",
   "license": "MIT",
   "files": [
     "dist"
