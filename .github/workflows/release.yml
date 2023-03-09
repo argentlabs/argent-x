@@ -14,6 +14,8 @@ env:
   FEATURE_LAYERSWAP: "true"
   FEATURE_ORBITER: "true"
   FEATURE_VERIFIED_DAPPS: "false"
+  FEATURE_ARGENT_SHIELD: "true"
+  ARGENT_SHIELD_NETWORK_ID: "mainnet-alpha"
 
 jobs:
   build:
