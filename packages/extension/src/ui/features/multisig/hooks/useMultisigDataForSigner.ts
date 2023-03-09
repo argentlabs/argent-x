@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 
 import { ARGENT_MULTISIG_ENABLED } from "../../../../shared/api/constants"
+import { fetchMultisigDataForSigner } from "../../../../shared/multisig/multisig.service"
 import {
   BaseWalletAccount,
   MultisigData,
@@ -8,7 +9,6 @@ import {
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { usePublicKey } from "../../accounts/usePublicKey"
-import { fetchMultisigDataForSigner } from "../multisig.service"
 import { isZeroMultisigAccount, useMultisigAccount } from "../multisig.state"
 
 export function useMultisigDataForSigner(account: BaseWalletAccount) {

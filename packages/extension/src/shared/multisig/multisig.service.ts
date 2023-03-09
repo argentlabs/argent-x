@@ -1,7 +1,8 @@
-import { ARGENT_MULTISIG_URL } from "../../../shared/api/constants"
-import { Fetcher, fetcher } from "../../../shared/api/fetcher"
-import { Network } from "../../../shared/network"
-import { urlWithQuery } from "../../../shared/utils/url"
+import { ARGENT_MULTISIG_URL } from "../api/constants"
+import { Fetcher, fetcher } from "../api/fetcher"
+import { Network } from "../network"
+import { networkToStarknetNetwork } from "../utils/starknetNetwork"
+import { urlWithQuery } from "../utils/url"
 import {
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
@@ -11,19 +12,6 @@ export interface IFetchMultisigDataForSigner {
   signer: string
   network: Network
   fetcher?: Fetcher
-}
-
-export const networkToStarknetNetwork = (network: Network) => {
-  switch (network.chainId) {
-    case "SN_MAIN":
-      return "mainnet"
-    case "SN_GOERLI":
-      return "testnet"
-    case "SN_GOERLI2":
-      return "testnet2"
-    default:
-      return "testnet"
-  }
 }
 
 export async function fetchMultisigDataForSigner({
