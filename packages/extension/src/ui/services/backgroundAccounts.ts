@@ -132,6 +132,17 @@ export const getPrivateKey = async () => {
   return await decryptFromBackground(encryptedPrivateKey, secret)
 }
 
+export const getPublicKey = async (account?: BaseWalletAccount) => {
+  sendMessage({
+    type: "GET_PUBLIC_KEY",
+    data: account,
+  })
+
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
+}
+
 export const getSeedPhrase = async (): Promise<string> => {
   const { secret, encryptedSecret } = await generateEncryptedSecret()
   sendMessage({
