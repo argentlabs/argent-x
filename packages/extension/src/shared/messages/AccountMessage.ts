@@ -65,6 +65,14 @@ export type AccountMessage =
       data: { encryptedPrivateKey: string }
     }
   | {
+      type: "GET_PUBLIC_KEY"
+      data?: BaseWalletAccount
+    }
+  | {
+      type: "GET_PUBLIC_KEY_RES"
+      data: { publicKey: string }
+    }
+  | {
       type: "GET_ENCRYPTED_SEED_PHRASE"
       data: { encryptedSecret: string }
     }

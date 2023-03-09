@@ -806,6 +806,24 @@ export class Wallet {
     return { url, filename }
   }
 
+  public async getPublicKey(baseAccount?: BaseWalletAccount): Promise<string> {
+    const account = baseAccount
+      ? await this.getAccount(baseAccount)
+      : await this.getSelectedAccount()
+
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    return starkPub
+  }
+
   public async exportPrivateKey(): Promise<string> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session?.secret) {

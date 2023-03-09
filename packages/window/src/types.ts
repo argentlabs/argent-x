@@ -1,17 +1,13 @@
 import { InvokeFunctionResponse, Signature } from "starknet"
 import { z } from "zod"
 
+const bignumberishSchema = z.union([z.string(), z.number(), z.bigint()])
+
 const callSchema = z.object({
   contractAddress: z.string(),
   entrypoint: z.string(),
-  calldata: z.array(z.string()).optional(),
+  calldata: z.array(bignumberishSchema).optional(),
 })
-
-const bignumberishSchema = z.union([
-  z.string().regex(/^0x[0-9a-fA-F]+$/),
-  z.number(),
-  z.bigint(),
-])
 
 export const typedDataSchema = z.object({
   types: z.record(
