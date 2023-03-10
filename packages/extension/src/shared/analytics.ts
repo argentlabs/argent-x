@@ -4,6 +4,8 @@ import browser from "webextension-polyfill"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
+import { IS_DEV } from "./utils/dev"
+
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
@@ -107,6 +109,77 @@ export interface Events {
   executeTransaction: {
     usesCachedFees: boolean
   }
+  onboardingStepFinished: {
+    timeSpent?: number
+    successful?: boolean
+    stepId:
+      | "welcome"
+      | "disclaimer"
+      | "restoreSeedphrase"
+      | "newWalletPassword"
+      | "finish"
+  }
+  argentShieldOnboardingStepFinished: {
+    timeSpent?: number
+    successful?: boolean
+    stepId:
+      | "welcome"
+      | "enterEmail"
+      | "enterPasscode"
+      | "addArgentShield"
+      // | "addArgentShieldTransaction"
+      // | "addArgentShieldTransactionLoading"
+      // | "finishSuccess"
+      | "addArgentShieldFinish"
+    accountsWith2fa?: number
+    authenticated?: boolean
+  }
+  argentShieldRemovalStepFinished: {
+    timeSpent?: number
+    successful?: boolean
+    stepId:
+      | "welcome"
+      | "enterPasscode"
+      | "removeArgentShield"
+      // | "removeArgentShieldTransaction"
+      // | "removeArgentShieldTransactionLoading"
+      // | "finishSuccess"
+      | "removeArgentShieldFinish"
+    accountsWith2fa?: number
+    authenticated?: boolean
+  }
+  argentShieldError: {
+    errorId: "emailNotMatch" | "emailAlreadyInUseForOtherSeedphrase"
+    accountsWith2fa?: number
+    authenticated?: boolean
+  }
+  argentShieldEscapeScreenSeen: {
+    escapeId: "escapeGuardian" | "escapeSigner"
+    remainingTime: number
+  }
+  argentShieldEscapeScreenAction:
+    | {
+        remainingTime: number
+      } & (
+        | {
+            escapeId: "escapeGuardian"
+            action:
+              | "dismiss"
+              | "detailedInstructions"
+              | "keepArgentShield"
+              | "continueWithRemoval"
+              | "removeArgentShield"
+          }
+        | {
+            escapeId: "escapeSigner"
+            action:
+              | "dismiss"
+              | "detailedInstructions"
+              | "contactArgentSupport"
+              | "cancelKeyChange"
+              | "startRemoval"
+          }
+      )
 }
 
 export interface Pages {
@@ -196,6 +269,7 @@ export function getAnalytics(
   }
   return {
     track: async (event, ...[data]) => {
+      IS_DEV && console.log("track", JSON.stringify({ event, data }, null, 2))
       if (!SEGMENT_WRITE_KEY) {
         return
       }

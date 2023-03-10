@@ -22,6 +22,7 @@ import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
 import { ShieldAccountNotDeployed } from "./ShieldAccountNotDeployed"
 import { useRouteAccount } from "./useRouteAccount"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
 const { ArgentShieldIcon } = icons
@@ -34,7 +35,12 @@ export const ShieldAccountStartScreen: FC = () => {
   const toast = useToast()
   const network = useCurrentNetwork()
 
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: "welcome",
+  })
+
   const onActivate = useCallback(async () => {
+    trackSuccess()
     if (verifiedEmail) {
       try {
         setIsLoading(true)
@@ -59,7 +65,14 @@ export const ShieldAccountStartScreen: FC = () => {
     } else {
       navigate(routes.shieldAccountEmail(account?.address))
     }
-  }, [account?.address, account?.guardian, navigate, toast, verifiedEmail])
+  }, [
+    account?.address,
+    account?.guardian,
+    navigate,
+    toast,
+    trackSuccess,
+    verifiedEmail,
+  ])
 
   const isAvailable = network.id === ARGENT_SHIELD_NETWORK_ID
 

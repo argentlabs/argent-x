@@ -14,7 +14,10 @@ import {
 } from "../../components/Icons/MuiIcons"
 import { PrivacyStatementLink } from "../../components/PrivacyStatementLink"
 import { routes } from "../../routes"
-import { usePageTracking } from "../../services/analytics"
+import {
+  usePageTracking,
+  useTimeSpentWithSuccessTracking,
+} from "../../services/analytics"
 import { P3 } from "../../theme/Typography"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
@@ -40,6 +43,10 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 
 export const OnboardingDisclaimerScreen: FC = () => {
   usePageTracking("disclaimer")
+  const { trackSuccess } = useTimeSpentWithSuccessTracking(
+    "onboardingStepFinished",
+    { stepId: "disclaimer" },
+  )
   const navigate = useNavigate()
   const [conditions, setConditions] = useState({
     lossOfFunds: false,
@@ -101,7 +108,10 @@ export const OnboardingDisclaimerScreen: FC = () => {
       <div>
         <OnboardingButton
           disabled={!conditions.lossOfFunds || !conditions.alphaVersion}
-          onClick={() => navigate(routes.onboardingPassword())}
+          onClick={() => {
+            trackSuccess()
+            navigate(routes.onboardingPassword())
+          }}
         >
           Continue
         </OnboardingButton>

@@ -3,6 +3,7 @@ import { Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/getEscape"
+import { analytics } from "../../../services/analytics"
 import { ZENDESK_LINK } from "../../userReview/ReviewFeedbackScreen"
 import { ShieldExternalLinkButton } from "../ui/ShieldExternalLinkButton"
 import { ShieldHeader } from "../ui/ShieldHeader"
@@ -42,6 +43,13 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({
         {ESCAPE_SECURITY_PERIOD_DAYS} days. Check detailed instructions here:
       </P4>
       <ShieldExternalLinkButton
+        onClick={() => {
+          analytics.track("argentShieldEscapeScreenAction", {
+            escapeId: "escapeSigner",
+            remainingTime: liveAccountEscape.activeFromNowMs,
+            action: "detailedInstructions",
+          })
+        }}
         href={"https://www.argent.xyz/argent-x/"}
         my={3}
       >
@@ -50,6 +58,13 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({
       <Flex flex={1} />
       <VStack spacing={1} alignItems={"stretch"}>
         <Button
+          onClick={() => {
+            analytics.track("argentShieldEscapeScreenAction", {
+              escapeId: "escapeSigner",
+              remainingTime: liveAccountEscape.activeFromNowMs,
+              action: "contactArgentSupport",
+            })
+          }}
           as={"a"}
           colorScheme={"primary"}
           href={ZENDESK_LINK}
