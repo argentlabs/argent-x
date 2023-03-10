@@ -78,10 +78,8 @@ export const CollectionNfts: FC = () => {
               <Image
                 w="64px"
                 h="64px"
-                src={collectible.imageUri ?? undefined}
-                backgroundColor={
-                  !collectible.imageUri ? "neutrals.300" : "transparent"
-                }
+                src={collectible.imageUri}
+                backgroundColor={"neutrals.300"}
                 borderRadius="lg"
               />
             ) : (
