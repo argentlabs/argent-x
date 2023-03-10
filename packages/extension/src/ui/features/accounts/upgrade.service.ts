@@ -224,7 +224,6 @@ export const useCheckUpgradeAvailable = (account?: Account) => {
     () => account && checkIfUpgradeAvailable(account, accountClassHash),
     { suspense: false },
   )
-  return { needsUpgrade: false, needsUpgradeError, needsUpgradeValidating }
 
-  // return { needsUpgrade, needsUpgradeError, needsUpgradeValidating }
+  return { needsUpgrade, needsUpgradeError, needsUpgradeValidating }
 }
