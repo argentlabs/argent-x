@@ -7,6 +7,7 @@ import { Location, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { UnknownDappIcon } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/UnknownDappIcon"
 import { getNftPicture } from "./aspect.service"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
@@ -73,15 +74,19 @@ export const CollectionNfts: FC = () => {
             direction="column"
             alignItems="center"
           >
-            <Image
-              w="64px"
-              h="64px"
-              src={collectible.imageUri ?? undefined}
-              backgroundColor={
-                !collectible.imageUri ? "neutrals.300" : "transparent"
-              }
-              borderRadius="lg"
-            />
+            {collectible.imageUri ? (
+              <Image
+                w="64px"
+                h="64px"
+                src={collectible.imageUri ?? undefined}
+                backgroundColor={
+                  !collectible.imageUri ? "neutrals.300" : "transparent"
+                }
+                borderRadius="lg"
+              />
+            ) : (
+              <UnknownDappIcon />
+            )}
             <H4>{collectible?.name || "Loading..."}</H4>
             {collectible.floorPrice && (
               <P4 color="neutrals.300">
