@@ -68,6 +68,17 @@ export interface Events {
         errorMessage: string
         networkId: string
       }
+  deployMultisig:
+    | {
+        status: "success"
+        trigger: "sign" | "transaction"
+        networkId: string
+      }
+    | {
+        status: "failure"
+        errorMessage: string
+        networkId: string
+      }
   preauthorizeDapp: {
     host: string
     networkId: string

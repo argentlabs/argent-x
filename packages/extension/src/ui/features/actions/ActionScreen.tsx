@@ -14,6 +14,7 @@ import { useSelectedAccount } from "../accounts/accounts.state"
 import { EXTENSION_IS_POPUP } from "../browser/constants"
 import { focusExtensionTab, useExtensionIsInTab } from "../browser/tabs"
 import { getOriginatingHost } from "../browser/useOriginatingHost"
+import { useMultisig } from "../multisig/multisig.state"
 import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActions } from "./actions.state"
 import { AddNetworkScreen } from "./AddNetworkScreen"
@@ -21,12 +22,14 @@ import { AddTokenScreen } from "./AddTokenScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
+import { ApproveDeployMultisig } from "./transaction/ApproveDeployMultisig"
 import { ApproveTransactionScreen } from "./transaction/ApproveTransactionScreen"
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const account = useSelectedAccount()
+  const multisig = useMultisig(account)
   const extensionIsInTab = useExtensionIsInTab()
   const actions = useActions()
 
@@ -221,6 +224,50 @@ export const ActionScreen: FC = () => {
             selectedAccount={account}
           />
         </WithArgentShieldVerified>
+      )
+
+    case "DEPLOY_MULTISIG_ACTION":
+      return (
+        <ApproveDeployMultisig
+          actionHash={action.meta.hash}
+          onSubmit={async () => {
+            analytics.track("signedTransaction", {
+              networkId: account?.networkId || "unknown",
+            })
+            await approveAction(action)
+            useAppState.setState({ isLoading: true })
+            const result = await Promise.race([
+              waitForMessage(
+                "DEPLOY_MULTISIG_ACTION_SUBMITTED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+              waitForMessage(
+                "DEPLOY_MULTISIG_ACTION_FAILED",
+                ({ data }) => data.actionHash === action.meta.hash,
+              ),
+            ])
+            // (await) blocking as the window may closes afterwards
+            await analytics.track("sentTransaction", {
+              success: !("error" in result),
+              networkId: account?.networkId || "unknown",
+            })
+            if ("error" in result) {
+              useAppState.setState({
+                error: `Sending transaction failed: ${result.error}`,
+                isLoading: false,
+              })
+              navigate(routes.error())
+            } else {
+              if ("txHash" in result) {
+                multisig?.updateDeployTx(result.txHash)
+              }
+              closePopupIfLastAction()
+              useAppState.setState({ isLoading: false })
+            }
+          }}
+          onReject={rejectAllActions}
+          selectedAccount={multisig}
+        />
       )
 
     case "SIGN":

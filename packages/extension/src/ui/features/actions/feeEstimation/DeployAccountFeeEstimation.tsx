@@ -1,25 +1,15 @@
 import { FC, useMemo } from "react"
 
 import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
-import { Estimation } from "./DeclareDeploy/Estimation"
-import { useEstimationAccountFees } from "./DeclareDeploy/useEstimationAccountFees"
+import { FeeEstimation } from "./FeeEstimation"
 import { DeployAccountFeeEstimationProps } from "./types"
 import { useMaxAccountDeploymentFeeEstimation } from "./utils"
 
-/**
- *
- * @deprecated Please use the new Component `DeployAccountFeeEstimation`
- */
-export const AccountDeploymentFeeEstimation: FC<
+export const DeployAccountFeeEstimation: FC<
   DeployAccountFeeEstimationProps
 > = ({ accountAddress, actionHash, onErrorChange, networkId }) => {
-  const { account, feeToken, feeTokenBalance } = useEstimationAccountFees(
-    accountAddress,
-    networkId,
-  )
-
   const { fee, error } = useMaxAccountDeploymentFeeEstimation(
-    account,
+    { address: accountAddress, networkId },
     actionHash,
   )
 
@@ -36,11 +26,11 @@ export const AccountDeploymentFeeEstimation: FC<
     }, [fee])
 
   return (
-    <Estimation
+    <FeeEstimation
       fee={deployAccountFeeToEstimateFeeResponse}
-      feeToken={feeToken}
-      feeTokenBalance={feeTokenBalance}
-      error={error}
+      feeError={error}
+      accountAddress={accountAddress}
+      networkId={networkId}
       onErrorChange={onErrorChange}
     />
   )

@@ -3,7 +3,7 @@ import { constants, number } from "starknet"
 import { getAccounts, removeAccount } from "../shared/account/store"
 import { tryToMintFeeToken } from "../shared/devnet/mintFeeToken"
 import { AccountMessage } from "../shared/messages/AccountMessage"
-import { deployAccountAction } from "./accountDeploy"
+import { deployAccountAction, deployMultisigAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
@@ -150,6 +150,19 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendMessageToUi({ type: "DEPLOY_ACCOUNT_RES" })
       } catch (e) {
         return sendMessageToUi({ type: "DEPLOY_ACCOUNT_REJ" })
+      }
+    }
+
+    case "DEPLOY_MULTISIG": {
+      try {
+        await deployMultisigAction({
+          account: msg.data,
+          actionQueue,
+        })
+
+        return sendMessageToUi({ type: "DEPLOY_MULTISIG_RES" })
+      } catch (e) {
+        return sendMessageToUi({ type: "DEPLOY_MULTISIG_REJ" })
       }
     }
 

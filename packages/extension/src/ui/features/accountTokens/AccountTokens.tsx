@@ -6,7 +6,10 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { userReviewStore } from "../../../shared/userReview"
 import { routes } from "../../routes"
-import { redeployAccount } from "../../services/backgroundAccounts"
+import {
+  deployNewMultisig,
+  redeployAccount,
+} from "../../services/backgroundAccounts"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -123,6 +126,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     [feeTokenBalance, multisig?.needsDeploy],
   )
 
+  const onActivateMultisig = useCallback(async () => {
+    if (multisig) {
+      await deployNewMultisig(multisig)
+    }
+  }, [multisig])
+
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mt={4} mb={6}>
@@ -147,7 +156,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
-        {showActivateMultisigBanner && <ActivateMultisigBanner />}
+        {showActivateMultisigBanner && (
+          <ActivateMultisigBanner onClick={onActivateMultisig} />
+        )}
         {showAddFundsBackdrop && <AddFundBackdrop />}
         {!showAddFundsBackdrop && (
           <TokenList variant={tokenListVariant} showNewTokenButton />

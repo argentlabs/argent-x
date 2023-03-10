@@ -17,12 +17,14 @@ export interface TransactionTitleProps {
   aggregatedData?: AggregatedSimData[]
   fallback?: string
   declareOrDeployType?: "declare" | "deploy"
+  isMultisigDeploy: boolean
 }
 
 export const TransactionTitle: FC<TransactionTitleProps> = ({
   transactionReview,
   aggregatedData,
   declareOrDeployType,
+  isMultisigDeploy,
   fallback = "transaction",
 }) => {
   const nftTransfers = useERC721Transfers(aggregatedData)
@@ -87,6 +89,14 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
             )
           ),
         )}
+      </Flex>
+    )
+  }
+
+  if (isMultisigDeploy) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Activate multisig
       </Flex>
     )
   }

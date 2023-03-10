@@ -12,11 +12,12 @@ import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
 
 export interface DappHeaderProps {
-  transactions: Call[]
+  transactions?: Call[]
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
   declareOrDeployType?: "declare" | "deploy"
+  isMultisigDeploy?: boolean
 }
 
 export const DappHeader = ({
@@ -24,6 +25,7 @@ export const DappHeader = ({
   transactionReview,
   aggregatedData,
   declareOrDeployType,
+  isMultisigDeploy = false,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -56,9 +58,12 @@ export const DappHeader = ({
               transactionReview={transactionReview}
               aggregatedData={aggregatedData}
               fallback={
-                transactions.length > 1 ? "transactions" : "transaction"
+                transactions && transactions.length > 1
+                  ? "transactions"
+                  : "transaction"
               }
               declareOrDeployType={declareOrDeployType}
+              isMultisigDeploy={isMultisigDeploy}
             />
           </H5>
           {targetedDappWebsite && (

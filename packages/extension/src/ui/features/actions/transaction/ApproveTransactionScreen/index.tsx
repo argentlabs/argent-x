@@ -17,7 +17,7 @@ import { useFeeTokenBalance } from "../../../accountTokens/tokens.service"
 import { useIsMainnet } from "../../../networks/useNetworks"
 import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
-import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
+import { TransactionFeeEstimation } from "../../feeEstimation/TransactionFeeEstimation"
 import { LoadingScreen } from "../../LoadingScreen"
 import { useTransactionReview } from "../useTransactionReview"
 import { useAggregatedSimData } from "../useTransactionSimulatedData"
@@ -155,7 +155,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
             actionHash={actionHash}
           />
         ) : (
-          <FeeEstimation
+          <TransactionFeeEstimation
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}

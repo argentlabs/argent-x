@@ -99,6 +99,21 @@ export const deployNewAccount = async (account: BaseWalletAccount) => {
   }
 }
 
+export const deployNewMultisig = async (account: BaseWalletAccount) => {
+  sendMessage({ type: "DEPLOY_MULTISIG", data: account })
+
+  try {
+    await Promise.race([
+      waitForMessage("DEPLOY_MULTISIG_RES"),
+      waitForMessage("DEPLOY_MULTISIG_REJ").then(() => {
+        throw new Error("Rejected")
+      }),
+    ])
+  } catch {
+    throw Error("Could not deploy account")
+  }
+}
+
 export const getLastSelectedAccount = async () => {
   sendMessage({ type: "GET_SELECTED_ACCOUNT" })
   return waitForMessage("GET_SELECTED_ACCOUNT_RES")

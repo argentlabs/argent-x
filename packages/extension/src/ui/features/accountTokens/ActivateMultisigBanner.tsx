@@ -3,7 +3,13 @@ import { FC } from "react"
 
 const { MultisigIcon } = icons
 
-export const ActivateMultisigBanner: FC = () => (
+export interface ActivateMultisigBannerProps {
+  onClick: () => void
+}
+
+export const ActivateMultisigBanner: FC<ActivateMultisigBannerProps> = ({
+  onClick,
+}) => (
   <AlertButton
     size="md"
     title="Activate multisig"
@@ -11,5 +17,6 @@ export const ActivateMultisigBanner: FC = () => (
     icon={<MultisigIcon color="neutrals.900" fontSize="2xl" />}
     colorScheme="primary"
     bg="primaryExtraDark.500"
+    onClick={onClick}
   />
 )
