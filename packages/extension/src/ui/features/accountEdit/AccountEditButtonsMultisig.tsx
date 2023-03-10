@@ -31,7 +31,7 @@ export const AccountEditButtonsMultisig = ({
       <ButtonCell
         onClick={() => navigate(routes.multisigOwners(account.address))}
       >
-        View owners
+        {account.needsDeploy ? <>View owners</> : <>Manage owners</>}
       </ButtonCell>
       <Button
         onClick={() => navigate(routes.multisigConfirmations(account.address))}
@@ -41,7 +41,14 @@ export const AccountEditButtonsMultisig = ({
         p={4}
       >
         <Flex width="100%" justifyContent="space-between">
-          <H6>View confirmations </H6>
+          <H6>
+            {" "}
+            {account.needsDeploy ? (
+              <>View confirmations</>
+            ) : (
+              <>Set confirmations</>
+            )}
+          </H6>
           <H6 color="neutrals.200">
             {multisig?.threshold}/{multisig?.signers.length}
           </H6>

@@ -52,7 +52,7 @@ const PageWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => {
         backgroundSize="cover"
       >
         <Panel>
-          <ArgentXLogo />
+          <ArgentXLogo w={20} h={20} />
         </Panel>
       </Box>
     </Box>

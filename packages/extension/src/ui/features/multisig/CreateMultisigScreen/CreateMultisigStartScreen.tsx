@@ -1,10 +1,10 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { FormProvider } from "react-hook-form"
 
+import { useCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { MultisigFirstStep } from "./MultisigFirstStep"
 import { MultisigSecondStep } from "./MultisigSecondStep"
 import { MultisigThirdStep } from "./MultisigThirdStep"
-import { useCreateMultisigForm } from "./useCreateMultisigForm"
 
 const FIRST_STEP = 0
 const SECOND_STEP = 1
