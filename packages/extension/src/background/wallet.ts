@@ -495,7 +495,13 @@ export class Wallet {
     await this.walletStore.push([account])
 
     if (type === "multisig" && multisigPayload) {
-      await this.multisigStore.push({ ...multisigPayload, ...account })
+      await this.multisigStore.push({
+        address: account.address,
+        networkId: account.networkId,
+        signers: multisigPayload.signers,
+        threshold: multisigPayload.threshold,
+        creator: multisigPayload.creator,
+      })
     }
 
     await this.selectAccount(account)

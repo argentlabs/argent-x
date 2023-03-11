@@ -18,10 +18,16 @@ export function useMultisigInfo(account: BaseWalletAccount): IMultisigInfo {
   const multisigStatus = useMultisigStatus(account)
 
   useEffect(() => {
-    if (!multisigAccount) {
+    if (!multisigAccount || !multisigData) {
       return
     }
-    updateBaseMultisigAccount({ ...multisigAccount, ...multisigData })
+    updateBaseMultisigAccount({
+      address: multisigAccount.address,
+      networkId: multisigAccount.networkId,
+      signers: multisigData.signers,
+      threshold: multisigData.threshold,
+      creator: multisigData.creator,
+    })
   }, [multisigAccount, multisigData, multisigStatus])
 
   return useMemo(() => {

@@ -1,8 +1,11 @@
+import { number } from "starknet"
+
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { BaseWalletAccount } from "../shared/wallet.model"
 import { BackgroundService } from "./background"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
+import { argentMaxFee } from "./utils/argentMaxFee"
 
 type DeployMultisigAction = ExtQueueItem<{
   type: "DEPLOY_MULTISIG_ACTION"
@@ -24,7 +27,22 @@ export const multisigDeployAction = async (
     throw Error("Account already deployed")
   }
 
-  const { account, txHash } = await wallet.deployAccount(selectedMultisig)
+  let maxFee: string
+
+  try {
+    const { suggestedMaxFee } = await wallet.getAccountDeploymentFee(
+      selectedMultisig,
+    )
+
+    maxFee = argentMaxFee(suggestedMaxFee)
+  } catch (error) {
+    const fallbackPrice = number.toBN(10e14)
+    maxFee = argentMaxFee(fallbackPrice)
+  }
+
+  const { account, txHash } = await wallet.deployAccount(selectedMultisig, {
+    maxFee,
+  })
 
   if (!checkTransactionHash(txHash)) {
     throw Error(
