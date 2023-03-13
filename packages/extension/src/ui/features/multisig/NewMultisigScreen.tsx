@@ -10,6 +10,7 @@ import { Center, Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { urlWithQuery } from "../../../shared/utils/url"
 import { useAppState } from "../../app.state"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
@@ -52,7 +53,10 @@ export const NewMultisigScreen: FC = () => {
     async (type: MultisigOptionType) => {
       switch (type) {
         case "create": {
-          const url = `index.html?goto=multisig&networkId=${switcherNetworkId}`
+          const url = urlWithQuery("index.html", {
+            goto: "multisig",
+            networkId: switcherNetworkId,
+          })
           chrome.tabs.create({
             url,
           })
