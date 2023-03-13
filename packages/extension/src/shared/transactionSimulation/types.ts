@@ -12,7 +12,8 @@ export interface TransactionSimulationApproval {
   tokenAddress: string
   owner: string
   spender: string
-  value: string
+  value?: string
+  tokenId?: string
   details?: TokenDetails
 }
 
@@ -20,7 +21,8 @@ export interface TransactionSimulationTransfer {
   tokenAddress: string
   from: string
   to: string
-  value: string
+  value?: string
+  tokenId?: string
   details?: TokenDetails
 }
 

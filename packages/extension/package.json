@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.3.7",
+  "version": "5.3.9",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -80,7 +80,7 @@
     "@argent/x-multicall": "^5.3.6",
     "@argent/x-sessions": "^5.3.6",
     "@argent/x-swap": "^5.3.6",
-    "@argent/x-window": "^5.3.7",
+    "@argent/x-window": "^5.3.8",
     "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/react": "2.5.1",
     "@extend-chrome/messages": "^1.2.2",
