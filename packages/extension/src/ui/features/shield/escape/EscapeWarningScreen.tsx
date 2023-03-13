@@ -96,13 +96,11 @@ export const EscapeWarningScreen: FC = () => {
       console.error("Cannot trigger escape guardian - no account")
       return
     }
-    if (liveAccountEscape) {
-      analytics.track("argentShieldEscapeScreenAction", {
-        escapeId: "escapeSigner",
-        remainingTime: liveAccountEscape.activeFromNowMs,
-        action: "startRemoval",
-      })
-    }
+    analytics.track("argentShieldEscapeScreenAction", {
+      escapeId: "escapeSigner",
+      remainingTime: liveAccountEscape?.activeFromNowMs || 0,
+      action: "startRemoval",
+    })
     await hideEscapeWarning(account)
     try {
       await accounTriggerEscapeGuardian(account)
@@ -121,15 +119,13 @@ export const EscapeWarningScreen: FC = () => {
       console.error("Cannot escape and change guardian - no account")
       return
     }
-    if (liveAccountEscape) {
-      analytics.track("argentShieldEscapeScreenAction", {
-        escapeId: "escapeGuardian",
-        remainingTime: liveAccountEscape.activeFromNowMs,
-        action: accountGuardianIsSelf
-          ? "continueWithRemoval"
-          : "removeArgentShield",
-      })
-    }
+    analytics.track("argentShieldEscapeScreenAction", {
+      escapeId: "escapeGuardian",
+      remainingTime: liveAccountEscape?.activeFromNowMs || 0,
+      action: accountGuardianIsSelf
+        ? "continueWithRemoval"
+        : "removeArgentShield",
+    })
 
     await hideEscapeWarning(account)
     try {
@@ -143,6 +139,15 @@ export const EscapeWarningScreen: FC = () => {
       })
     }
   }, [account, accountGuardianIsSelf, liveAccountEscape, toast])
+
+  const onContinue = useCallback(() => {
+    analytics.track("argentShieldEscapeScreenAction", {
+      escapeId: "escapeGuardian",
+      remainingTime: liveAccountEscape?.activeFromNowMs || 0,
+      action: "continueWithRemoval",
+    })
+    onClose()
+  }, [liveAccountEscape?.activeFromNowMs, onClose])
 
   const content = useMemo(() => {
     if (pending) {
@@ -183,7 +188,7 @@ export const EscapeWarningScreen: FC = () => {
           <EscapeGuardian
             liveAccountEscape={liveAccountEscape}
             onKeep={onCancelEscape}
-            onContinue={onClose}
+            onContinue={onContinue}
           />
         )
       } else {

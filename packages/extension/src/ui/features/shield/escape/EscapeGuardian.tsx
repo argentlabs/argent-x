@@ -60,11 +60,6 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
       <Button
         colorScheme={"primary"}
         onClick={() => {
-          analytics.track("argentShieldEscapeScreenAction", {
-            escapeId: "escapeGuardian",
-            remainingTime: liveAccountEscape.activeFromNowMs,
-            action: "keepArgentShield",
-          })
           onKeep()
         }}
       >
@@ -73,11 +68,6 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
       <Button
         mt={3}
         onClick={() => {
-          analytics.track("argentShieldEscapeScreenAction", {
-            escapeId: "escapeGuardian",
-            remainingTime: liveAccountEscape.activeFromNowMs,
-            action: "continueWithRemoval",
-          })
           onContinue()
         }}
       >
