@@ -1,23 +1,29 @@
+import { useCallback } from "react"
+
 import { Events } from "../../../shared/analytics"
+import { getVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
 import { useAccountsWithGuardian } from "./useAccountGuardian"
 import { useRouteAccount } from "./useRouteAccount"
-import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
 export const useShieldTracking = <T extends keyof Events>(
   event: T,
   args: Events[T],
 ) => {
   const accountsWithGuardian = useAccountsWithGuardian()
-  const verifiedEmail = useShieldVerifiedEmail()
-  const authenticated = Boolean(verifiedEmail)
   const accountsWith2fa = accountsWithGuardian.length
 
-  return useTimeSpentWithSuccessTracking(event, {
-    ...args,
-    accountsWith2fa,
-    authenticated,
-  })
+  const makeArgs = useCallback(async () => {
+    const verifiedEmail = await getVerifiedEmail()
+    const authenticated = Boolean(verifiedEmail)
+    return {
+      ...args,
+      accountsWith2fa,
+      authenticated,
+    }
+  }, [accountsWith2fa, args])
+
+  return useTimeSpentWithSuccessTracking(event, makeArgs)
 }
 
 export const useShieldOnboardingTracking = (

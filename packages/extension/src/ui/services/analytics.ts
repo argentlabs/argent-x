@@ -1,3 +1,4 @@
+import { isFunction } from "lodash-es"
 import { useCallback, useEffect, useRef } from "react"
 
 import {
@@ -47,14 +48,14 @@ export const usePageTracking = <T extends keyof Pages>(
 
 export const useTimeSpentWithSuccessTracking = <T extends keyof Events>(
   event: T,
-  args: Events[T],
+  args: Events[T] | (() => Promise<Events[T]>),
 ) => {
   const didTrack = useRef(false)
   const startedAt = useRef(new Date().getTime())
 
   /** track once with success flag */
   const trackWithSuccess = useCallback(
-    (success: boolean) => {
+    async (success: boolean) => {
       if (didTrack.current) {
         /** already tracked */
         return
@@ -64,8 +65,9 @@ export const useTimeSpentWithSuccessTracking = <T extends keyof Events>(
         window.localStorage.setItem("failure", new Date().toISOString())
       }
       didTrack.current = true
+      const resolvedArgs = isFunction(args) ? await args() : args
       analytics.track(event, {
-        ...args,
+        ...resolvedArgs,
         success,
         timeSpent,
       })

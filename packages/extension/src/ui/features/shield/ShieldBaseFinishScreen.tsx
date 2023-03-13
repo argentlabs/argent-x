@@ -106,8 +106,8 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   const { trackSuccess } = useShieldOnboardingTracking({
     stepId:
       liveAccountGuardianState?.type === ChangeGuardian.ADDING
-        ? "removeArgentShieldFinish"
-        : "addArgentShieldFinish",
+        ? "addArgentShieldFinish"
+        : "removeArgentShieldFinish",
   })
 
   const onFinish = useCallback(() => {
