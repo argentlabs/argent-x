@@ -159,6 +159,15 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       })
     }
 
+    case "GET_PUBLIC_KEY": {
+      const publicKey = await wallet.getPublicKey(msg.data)
+
+      return sendMessageToUi({
+        type: "GET_PUBLIC_KEY_RES",
+        data: { publicKey },
+      })
+    }
+
     case "GET_ENCRYPTED_SEED_PHRASE": {
       if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
