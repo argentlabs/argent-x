@@ -75,7 +75,7 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
       return false
     }
 
-    return !!sendToken
+    return Boolean(sendToken)
   }, [multisig?.needsDeploy, sendToken])
 
   return (
