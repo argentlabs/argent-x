@@ -206,7 +206,7 @@ export const EscapeWarningScreen: FC = () => {
     accountGuardianIsSelf,
     liveAccountEscape,
     onCancelEscape,
-    onClose,
+    onContinue,
     onEscapeAndChangeGuardian,
     onTriggerEscapeGuardian,
     pending,

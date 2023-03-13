@@ -4,8 +4,6 @@ import browser from "webextension-polyfill"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-import { IS_DEV } from "./utils/dev"
-
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
@@ -127,9 +125,6 @@ export interface Events {
       | "enterEmail"
       | "enterPasscode"
       | "addArgentShield"
-      // | "addArgentShieldTransaction"
-      // | "addArgentShieldTransactionLoading"
-      // | "finishSuccess"
       | "addArgentShieldFinish"
     accountsWith2fa?: number
     authenticated?: boolean
@@ -139,11 +134,9 @@ export interface Events {
     successful?: boolean
     stepId:
       | "welcome"
+      | "enterEmail"
       | "enterPasscode"
       | "removeArgentShield"
-      // | "removeArgentShieldTransaction"
-      // | "removeArgentShieldTransactionLoading"
-      // | "finishSuccess"
       | "removeArgentShieldFinish"
     accountsWith2fa?: number
     authenticated?: boolean
@@ -269,7 +262,6 @@ export function getAnalytics(
   }
   return {
     track: async (event, ...[data]) => {
-      IS_DEV && console.log("track", JSON.stringify({ event, data }, null, 2))
       if (!SEGMENT_WRITE_KEY) {
         return
       }
