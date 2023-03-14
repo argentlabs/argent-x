@@ -1,4 +1,4 @@
-import { Button, FieldError, H6, P4, icons } from "@argent/ui"
+import { Button, FieldError, H6, P4, TextWithAmount, icons } from "@argent/ui"
 import { Flex, Skeleton, Tooltip } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
@@ -91,9 +91,14 @@ export const TokenListItem: FC<TokenListItemProps> = ({
                 </FieldError>
               </Tooltip>
             ) : (
-              <H6 overflow="hidden" textOverflow={"ellipsis"}>
-                {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
-              </H6>
+              <TextWithAmount
+                amount={token.balance?.toString() ?? 0}
+                decimals={token.decimals}
+              >
+                <H6 overflow="hidden" textOverflow={"ellipsis"}>
+                  {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
+                </H6>
+              </TextWithAmount>
             )}
           </LoadingPulse>
         </Flex>

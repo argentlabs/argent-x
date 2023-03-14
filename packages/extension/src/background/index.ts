@@ -46,6 +46,9 @@ import { handleTransactionMessage } from "./transactions/transactionMessaging"
 import { handleUdcMessaging } from "./udcMessaging"
 import { Wallet, sessionStore } from "./wallet"
 
+const DEFAULT_POLLING_INTERVAL = 15
+const LOCAL_POLLING_INTERVAL = 5
+
 browser.alarms.create("core:transactionTracker:history", {
   periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager
 })
@@ -59,22 +62,33 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
   }
   if (alarm.name === "core:transactionTracker:update") {
     console.info("~> fetching transaction updates")
-    let hasInFlightTransactions = await transactionTracker.update()
-
+    let inFlightTransactions = await transactionTracker.update()
     // the config below will run transaction updates 4x per minute, if there are in-flight transactions
-    // it will update on second 0, 15, 30 and 45
-    const maxRetries = 3 // max 3 retries
-    const waitTimeInS = 15 // wait 15 seconds between retries
+    // By default it will update on second 0, 15, 30 and 45 but by updating WAIT_TIME we can change the number of executions
+    const maxExecutionTimeInMs = 60000 // 1 minute max execution time
+    let transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
+    const startTime = Date.now()
 
-    let runs = 0
-    while (hasInFlightTransactions && runs < maxRetries) {
-      console.info(`~> waiting ${waitTimeInS}s for transaction updates`)
-      await delay(waitTimeInS * 1000)
+    while (
+      inFlightTransactions.length > 0 &&
+      Date.now() - startTime < maxExecutionTimeInMs
+    ) {
+      const localTransaction = inFlightTransactions.find(
+        (tx) => tx.account.networkId === "localhost",
+      )
+      if (localTransaction) {
+        transactionPollingIntervalInS = LOCAL_POLLING_INTERVAL
+      } else {
+        transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
+      }
+      console.info(
+        `~> waiting ${transactionPollingIntervalInS}s for transaction updates`,
+      )
+      await delay(transactionPollingIntervalInS * 1000)
       console.info(
         "~> fetching transaction updates as pending transactions were detected",
       )
-      runs++
-      hasInFlightTransactions = await transactionTracker.update()
+      inFlightTransactions = await transactionTracker.update()
     }
   }
 })

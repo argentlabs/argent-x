@@ -7,7 +7,7 @@ export default class Network {
   }
 
   networkOption(name: string) {
-    return this.page.locator(`button[role="menuitem"]:has-text("${name}")`)
+    return this.page.locator(`button[role="menuitem"] span:text-is("${name}")`)
   }
 
   async selectNetwork(networkName: NetworkName) {

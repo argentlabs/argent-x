@@ -109,9 +109,11 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
 export async function partitionDeprecatedAccount(
   accounts: Account[],
   network: Network,
-): Promise<[Account[], Account[]]> {
+): Promise<[string[], string[]]> {
+  const accountAddresses = accounts.map((account) => account.address)
+
   if (!network.accountClassHash) {
-    return [[], accounts]
+    return [[], accountAddresses]
   }
 
   const multicall = getMulticallForNetwork(network)
@@ -166,10 +168,10 @@ export async function partitionDeprecatedAccount(
     )
 
     return partition(
-      accounts,
-      (account) =>
+      accountAddresses,
+      (accountAddress) =>
         !targetImplementations.some((ti) => {
-          const impl = implementationsToAccountsMap[account.address]
+          const impl = implementationsToAccountsMap[accountAddress]
           if (impl) {
             return ti.eq(number.toBN(impl))
           }
@@ -178,7 +180,7 @@ export async function partitionDeprecatedAccount(
     )
   } catch (error) {
     console.error("Error while checking for deprecated accounts", error)
-    return [[], accounts]
+    return [[], accountAddresses]
   }
 }
 

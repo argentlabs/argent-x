@@ -1,6 +1,6 @@
 {
   "name": "@argent/guardian",
-  "version": "5.3.6",
+  "version": "5.3.11",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -33,6 +33,6 @@
     "vite-plugin-dts": "^1.4.0"
   },
   "peerDependencies": {
-    "starknet": "^4.19.2"
+    "starknet": "^4.21.0"
   }
 }

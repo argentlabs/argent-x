@@ -1,3 +1,4 @@
+import { TextWithAmount } from "@argent/ui"
 import { BigNumberish } from "ethers"
 import { FC } from "react"
 
@@ -43,7 +44,9 @@ export const TokenField: FC<ITokenField> = ({
       <FieldKey>{label}</FieldKey>
       <FieldValue>
         {token && <TokenIcon url={token.image} name={token.name} size={6} />}
-        <LeftPaddedField>{displayAmount}</LeftPaddedField>
+        <TextWithAmount amount={amount.toString()} decimals={token?.decimals}>
+          <LeftPaddedField>{displayAmount}</LeftPaddedField>
+        </TextWithAmount>
       </FieldValue>
     </Field>
   )

@@ -132,6 +132,17 @@ export const getPrivateKey = async () => {
   return await decryptFromBackground(encryptedPrivateKey, secret)
 }
 
+export const getPublicKey = async (account?: BaseWalletAccount) => {
+  sendMessage({
+    type: "GET_PUBLIC_KEY",
+    data: account,
+  })
+
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
+}
+
 export const getSeedPhrase = async (): Promise<string> => {
   const { secret, encryptedSecret } = await generateEncryptedSecret()
   sendMessage({
@@ -168,6 +179,36 @@ export const accountCancelEscape = async (account: BaseWalletAccount) => {
   const result = await Promise.race([
     waitForMessage("ACCOUNT_CANCEL_ESCAPE_RES"),
     waitForMessage("ACCOUNT_CANCEL_ESCAPE_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
+
+export const accounTriggerEscapeGuardian = async (
+  account: BaseWalletAccount,
+) => {
+  sendMessage({ type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_RES"),
+    waitForMessage("ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
+
+export const accountEscapeAndChangeGuardian = async (
+  account: BaseWalletAccount,
+) => {
+  sendMessage({ type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_RES"),
+    waitForMessage("ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_REJ").then((error) => {
       throw new Error(error)
     }),
   ])

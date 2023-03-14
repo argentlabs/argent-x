@@ -8,11 +8,16 @@ import {
   useRouteEmailAddress,
 } from "../../routes"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 export const ShieldAccountOTPScreen: FC = () => {
   const accountAddress = useRouteAccountAddress()
   const email = useRouteEmailAddress()
   const navigate = useNavigate()
+
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: "enterPasscode",
+  })
 
   const onBack = useCallback(() => {
     navigate(routes.shieldAccountEmail(accountAddress))
@@ -24,8 +29,9 @@ export const ShieldAccountOTPScreen: FC = () => {
   }, [accountAddress, navigate])
 
   const onOTPConfirmed = useCallback(() => {
+    trackSuccess()
     navigate(routes.shieldAccountAction(accountAddress), { replace: true })
-  }, [accountAddress, navigate])
+  }, [accountAddress, navigate, trackSuccess])
 
   if (!email) {
     return <Navigate to={routes.shieldAccountEmail(accountAddress)} />

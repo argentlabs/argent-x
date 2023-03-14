@@ -23,6 +23,7 @@ import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { EscapeBanner } from "../shield/escape/EscapeBanner"
 import { accountHasEscape } from "../shield/escape/useAccountEscape"
+import { useAccountGuardianIsSelf } from "../shield/useAccountGuardian"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
@@ -99,6 +100,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hasEscape = accountHasEscape(account)
+  const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
 
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
@@ -134,7 +136,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       </VStack>
       <CellStack pt={0}>
         <StatusMessageBannerContainer />
-        {hasEscape && <EscapeBanner account={account} />}
+        {(hasEscape || accountGuardianIsSelf) && (
+          <EscapeBanner account={account} />
+        )}
         {showBackupBanner && <RecoveryBanner />}
         {showUpgradeBanner && (
           <UpgradeBanner

@@ -65,6 +65,14 @@ export type AccountMessage =
       data: { encryptedPrivateKey: string }
     }
   | {
+      type: "GET_PUBLIC_KEY"
+      data?: BaseWalletAccount
+    }
+  | {
+      type: "GET_PUBLIC_KEY_RES"
+      data: { publicKey: string }
+    }
+  | {
       type: "GET_ENCRYPTED_SEED_PHRASE"
       data: { encryptedSecret: string }
     }
@@ -88,3 +96,19 @@ export type AccountMessage =
       type: "ACCOUNT_CANCEL_ESCAPE_RES"
     }
   | { type: "ACCOUNT_CANCEL_ESCAPE_REJ"; data: string }
+  | {
+      type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN"
+      data: { account: BaseWalletAccount }
+    }
+  | {
+      type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_RES"
+    }
+  | { type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_REJ"; data: string }
+  | {
+      type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN"
+      data: { account: BaseWalletAccount }
+    }
+  | {
+      type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_RES"
+    }
+  | { type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_REJ"; data: string }
