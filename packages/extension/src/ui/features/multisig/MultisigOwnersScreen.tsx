@@ -37,6 +37,8 @@ const MultisigOwners = ({ account }: { account: Account }) => {
   const handleAddOwnerClick = () => {
     navigate(routes.multisigAddOwners(account.address))
   }
+
+  account.needsDeploy = false
   return (
     <Box m={4} height="100%">
       <Flex flexDirection="column" height="100%" justifyContent="space-between">
@@ -74,14 +76,16 @@ const MultisigOwners = ({ account }: { account: Account }) => {
               )
             })}
         </Box>
-        <Button
-          leftIcon={<MultisigJoinIcon />}
-          variant="link"
-          color="neutrals.400"
-          onClick={handleAddOwnerClick}
-        >
-          <B2 color="neutrals.400">Add owners</B2>
-        </Button>
+        {!account.needsDeploy && (
+          <Button
+            leftIcon={<MultisigJoinIcon />}
+            variant="link"
+            color="neutrals.400"
+            onClick={handleAddOwnerClick}
+          >
+            <B2 color="neutrals.400">Add owners</B2>
+          </Button>
+        )}
       </Flex>
     </Box>
   )

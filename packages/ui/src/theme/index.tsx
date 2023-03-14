@@ -17,6 +17,7 @@ import { buttonTheme } from "../components/Button"
 import { inputTheme } from "../components/Input"
 import { listTheme } from "../components/List"
 import { pinInputTheme } from "../components/PinInput"
+import { progressTheme } from "../components/Progress"
 import { switchTheme } from "../components/Switch"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
@@ -61,6 +62,7 @@ const extendedTheme = extendTheme({
     Textarea: textareaTheme,
     Tooltip: tooltipTheme,
     Switch: switchTheme,
+    Progress: progressTheme,
   },
 })
 

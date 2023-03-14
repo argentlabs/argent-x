@@ -26,6 +26,7 @@ import { AccountNetworkInfo } from "./AccountNetworkInfo"
 import { BalanceChangeOverview } from "./BalanceChangeOverview"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { DappHeader } from "./DappHeader"
+import { MultisigBanner } from "./MultisigBanner"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
 import { VerifiedDappBanner } from "./VerifiedDappBanner"
@@ -174,7 +175,9 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         verifiedDapp={verifiedDapp || undefined}
         declareOrDeployType={declareOrDeployType}
       />
-
+      {selectedAccount.type === "multisig" && (
+        <MultisigBanner account={selectedAccount} />
+      )}
       {warn && (
         <TransactionBanner
           variant={transactionReview?.assessment}
