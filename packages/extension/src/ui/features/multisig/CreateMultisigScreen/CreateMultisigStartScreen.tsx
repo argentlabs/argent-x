@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { FormProvider } from "react-hook-form"
 
+import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { useCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { MultisigFirstStep } from "./MultisigFirstStep"
 import { MultisigSecondStep } from "./MultisigSecondStep"
@@ -12,7 +13,9 @@ const THIRD_STEP = 2
 
 export const CreateMultisigStartScreen = () => {
   const [currentStep, setStep] = useState(FIRST_STEP)
-  const methods = useCreateMultisigForm()
+  const creatorSignerKey = useNextSignerKey()
+
+  const methods = useCreateMultisigForm(creatorSignerKey)
   const goBack = () => setStep((step) => step - 1)
   const goNext = () => setStep((step) => step + 1)
 
