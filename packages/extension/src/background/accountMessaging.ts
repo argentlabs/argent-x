@@ -3,6 +3,7 @@ import { constants, number } from "starknet"
 import { getAccounts, removeAccount } from "../shared/account/store"
 import { tryToMintFeeToken } from "../shared/devnet/mintFeeToken"
 import { AccountMessage } from "../shared/messages/AccountMessage"
+import { isEqualAddress } from "../ui/services/addresses"
 import { deployAccountAction, deployMultisigAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
@@ -291,7 +292,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
             transactions: {
               contractAddress: account.address,
               entrypoint: "changeGuardian",
-              calldata: [number.hexToDecimalString(guardian || constants.ZERO)],
+              calldata: [
+                number.hexToDecimalString(
+                  guardian || constants.ZERO.toString(),
+                ),
+              ],
             },
             meta: {
               isChangeGuardian: true,
@@ -335,6 +340,110 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       } catch (error) {
         return sendMessageToUi({
           type: "ACCOUNT_CANCEL_ESCAPE_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+
+    case "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN": {
+      try {
+        const { account } = msg.data
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: {
+              contractAddress: account.address,
+              entrypoint: "triggerEscapeGuardian",
+              calldata: [],
+            },
+            meta: {
+              isCancelEscape: true,
+              title: "Trigger escape guardian",
+              type: "INVOKE_FUNCTION",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+
+    case "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN": {
+      try {
+        const { account } = msg.data
+        /**
+         * This is a two-stage process
+         *
+         * 1. call escapeGuardian with current signer key as new guardian key
+         * 2. changeGuardian to ZERO, signed twice by same signer key (like 2/2 multisig with same key)
+         */
+
+        const selectedAccount = await wallet.getAccount(account)
+        if (!selectedAccount) {
+          throw Error("no account selected")
+        }
+
+        const { publicKey } = await wallet.getPublicKey(account)
+
+        if (
+          selectedAccount.guardian &&
+          isEqualAddress(selectedAccount.guardian, publicKey)
+        ) {
+          /**
+           * Account already used `escapeGuardian` to change guardian to this account publicKey
+           * Call `changeGuardian` to ZERO
+           */
+
+          await actionQueue.push({
+            type: "TRANSACTION",
+            payload: {
+              transactions: {
+                contractAddress: account.address,
+                entrypoint: "changeGuardian",
+                calldata: [
+                  number.hexToDecimalString(constants.ZERO.toString()),
+                ],
+              },
+              meta: {
+                isChangeGuardian: true,
+                title: "Change account guardian",
+                type: "INVOKE_FUNCTION",
+              },
+            },
+          })
+        } else {
+          /**
+           * Call `escapeGuardian` to change guardian to this account publicKey
+           */
+          await actionQueue.push({
+            type: "TRANSACTION",
+            payload: {
+              transactions: {
+                contractAddress: account.address,
+                entrypoint: "escapeGuardian",
+                calldata: [number.hexToDecimalString(publicKey)],
+              },
+              meta: {
+                isChangeGuardian: true,
+                title: "Escape account guardian",
+                type: "INVOKE_FUNCTION",
+              },
+            },
+          })
+        }
+
+        return sendMessageToUi({
+          type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_REJ",
           data: `${error}`,
         })
       }

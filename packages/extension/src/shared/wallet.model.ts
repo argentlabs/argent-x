@@ -6,6 +6,7 @@ export type ArgentAccountType =
   | "plugin"
   | "multisig"
   | "betterMulticall"
+  | "argent5MinuteEscapeTestingAccount"
 
 export type CreateAccountType = Exclude<
   ArgentAccountType,

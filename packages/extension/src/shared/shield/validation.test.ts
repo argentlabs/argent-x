@@ -139,38 +139,71 @@ describe("shield/validation", () => {
       })
     })
     describe("when at least one account matches in backend and locally", () => {
-      test("should not throw an error", () => {
-        const localAccounts = [
-          {
-            address: "0x123",
-          },
-          {
-            address: "0x546",
-          },
-        ] as WalletAccount[]
-        const localAccountsWithGuardian = [
-          {
-            address: "0x123",
-          },
-        ] as WalletAccount[]
-        const backendAccounts = [
-          {
-            address: "0x123",
-          },
-          {
-            address: "0x321",
-          },
-          {
-            address: "0x567",
-          },
-        ] as BackendAccount[]
-        expect(
-          validateEmailForAccounts({
-            localAccounts,
-            localAccountsWithGuardian,
-            backendAccounts,
-          }),
-        ).toBeUndefined()
+      describe("and there are no guardians locally", () => {
+        test("should not throw an error", () => {
+          const localAccounts = [
+            {
+              address: "0x123",
+            },
+            {
+              address: "0x546",
+            },
+          ] as WalletAccount[]
+          const localAccountsWithGuardian = [] as WalletAccount[]
+          const backendAccounts = [
+            {
+              address: "0x321",
+            },
+            {
+              address: "0x546",
+            },
+            {
+              address: "0x567",
+            },
+          ] as BackendAccount[]
+          expect(
+            validateEmailForAccounts({
+              localAccounts,
+              localAccountsWithGuardian,
+              backendAccounts,
+            }),
+          ).toBeUndefined()
+        })
+      })
+      describe("and there are guardians locally", () => {
+        test("should not throw an error", () => {
+          const localAccounts = [
+            {
+              address: "0x123",
+            },
+            {
+              address: "0x546",
+            },
+          ] as WalletAccount[]
+          const localAccountsWithGuardian = [
+            {
+              address: "0x546",
+            },
+          ] as WalletAccount[]
+          const backendAccounts = [
+            {
+              address: "0x321",
+            },
+            {
+              address: "0x546",
+            },
+            {
+              address: "0x567",
+            },
+          ] as BackendAccount[]
+          expect(
+            validateEmailForAccounts({
+              localAccounts,
+              localAccountsWithGuardian,
+              backendAccounts,
+            }),
+          ).toBeUndefined()
+        })
       })
     })
     describe("When there is no 2FA locally", () => {

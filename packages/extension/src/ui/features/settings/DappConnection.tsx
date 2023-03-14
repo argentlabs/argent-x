@@ -1,17 +1,7 @@
-import { ButtonCell } from "@argent/ui"
+import { Button, H6, icons } from "@argent/ui"
 import { FC } from "react"
-import styled from "styled-components"
 
-import { IconButton } from "../../components/IconButton"
-import { RemoveIcon } from "../../components/Icons/MuiIcons"
-
-const RemoveConnectionIconButton = styled(IconButton)`
-  &:hover,
-  &:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-    outline: 0;
-  }
-`
+const { MinusIcon } = icons
 
 interface DappConnectionProps {
   host: string
@@ -28,28 +18,35 @@ export const DappConnection: FC<DappConnectionProps> = ({
   ...props
 }) => {
   return (
-    <ButtonCell
-      rightIcon={
-        <>
-          {!hideRemove && (
-            <RemoveConnectionIconButton
-              size={40}
-              onClick={(e) => {
-                e.stopPropagation()
-                onRemoveClick?.()
-              }}
-            >
-              {/* TODO: need icon from design */}
-              <RemoveIcon />
-            </RemoveConnectionIconButton>
-          )}
-        </>
-      }
-      width="100%"
+    <Button
+      width={"full"}
+      overflow={"hidden"}
+      rounded={"lg"}
+      textAlign={"left"}
+      p={4}
       onClick={onClick}
+      size={"auto"}
       {...props}
     >
-      {host}
-    </ButtonCell>
+      <H6 overflow={"hidden"} textOverflow={"ellipsis"} mr={"auto"}>
+        {host}
+      </H6>
+      {!hideRemove && (
+        <Button
+          rounded={"full"}
+          size={"auto"}
+          p={2.5}
+          bg={"neutrals.600"}
+          _hover={{ bg: "neutrals.500" }}
+          ml={4}
+          onClick={(e) => {
+            e.stopPropagation()
+            onRemoveClick?.()
+          }}
+        >
+          <MinusIcon fontSize={"xl"} />
+        </Button>
+      )}
+    </Button>
   )
 }

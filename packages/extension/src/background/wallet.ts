@@ -45,6 +45,7 @@ import {
 import { getProviderv4 } from "../shared/network/provider"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSelfSigner } from "../shared/shield/GuardianSelfSigner"
 import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
 import {
   IArrayStorage,
@@ -845,17 +846,20 @@ export class Wallet {
       account.signer.derivationPath,
     )
 
+    if (ARGENT_SHIELD_ENABLED && account.guardian) {
+      const publicKey = ec.getStarkKey(keyPair)
+      if (isEqualAddress(account.guardian, publicKey)) {
+        /** Account guardian is the same as local signer */
+        return new GuardianSelfSigner(keyPair)
+      }
+      return new GuardianSignerArgentX(keyPair, cosignerSign)
+    }
+
     // Return Multisig Signer if account is multisig
     if (account.type === "multisig") {
       return new MultisigSigner(keyPair)
     }
 
-    // Return Guardian Signer if Cosigner is enabled
-    if (ARGENT_SHIELD_ENABLED && account.guardian) {
-      return new GuardianSignerArgentX(keyPair, cosignerSign)
-    }
-
-    // Else return KeyPair
     return keyPair
   }
 

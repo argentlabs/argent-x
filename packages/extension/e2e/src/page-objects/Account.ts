@@ -80,8 +80,8 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="tokenBalance"]')
   }
 
-  currentBalance(tkn: "Ether") {
-    return this.page.locator(`//img[@alt="${tkn}"]/parent::*/parent::button`)
+  currentBalance(tkn: "ETH") {
+    return this.page.locator(` //button//h6[contains(text(), '${tkn}')]`)
   }
 
   get accountName() {
@@ -96,6 +96,7 @@ export default class Account extends Navigation {
       await this.addANewccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
+    await expect(this.accountList).toBeVisible()
     await this.account("").last().click()
     await this.addFunds.click()
     await this.addFundsFromStartNet.click()

@@ -134,7 +134,7 @@ export const ActionScreen: FC = () => {
 
     case "TRANSACTION":
       return (
-        <WithArgentShieldVerified>
+        <WithArgentShieldVerified transactions={action.payload.transactions}>
           <ApproveTransactionScreen
             transactions={action.payload.transactions}
             actionHash={action.meta.hash}

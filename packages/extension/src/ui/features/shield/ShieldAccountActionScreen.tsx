@@ -11,6 +11,7 @@ import { accountChangeGuardian } from "../../services/backgroundAccounts"
 import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 export const ShieldAccountActionScreen: FC = () => {
   const account = useRouteAccount()
@@ -18,13 +19,19 @@ export const ShieldAccountActionScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const pendingChangeGuardian = usePendingChangeGuardian(account)
   const toast = useToast()
+  const hasGuardian = Boolean(account?.guardian)
+
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: hasGuardian ? "removeArgentShield" : "addArgentShield",
+  })
 
   useEffect(() => {
     if (pendingChangeGuardian && account) {
       /** a guardian transaction for this account is now pending - move to finish */
+      trackSuccess()
       navigate(routes.shieldAccountFinish(account?.address), { replace: true })
     }
-  }, [account, navigate, pendingChangeGuardian])
+  }, [account, navigate, pendingChangeGuardian, trackSuccess])
 
   const onAddOrRemove = useCallback(async () => {
     if (!account) {

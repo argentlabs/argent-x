@@ -38,6 +38,17 @@ export const handlePreAuthorizationMessage: HandleMessage<
   background: { wallet, actionQueue },
   respond,
 }) => {
+  async function addSenderTab() {
+    const origin = getOriginFromSender(sender)
+    if (sender.tab?.id && port) {
+      await addTab({
+        id: sender.tab?.id,
+        host: origin,
+        port,
+      })
+    }
+  }
+
   switch (msg.type) {
     case "CONNECT_DAPP": {
       const selectedAccount = await wallet.getSelectedAccount()
@@ -47,14 +58,7 @@ export const handlePreAuthorizationMessage: HandleMessage<
       }
       const origin = getOriginFromSender(sender)
       const isAuthorized = await isPreAuthorized(selectedAccount, origin)
-
-      if (sender.tab?.id && port) {
-        await addTab({
-          id: sender.tab?.id,
-          host: origin,
-          port,
-        })
-      }
+      await addSenderTab()
 
       if (!isAuthorized) {
         await actionQueue.push({
@@ -75,6 +79,7 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
     case "IS_PREAUTHORIZED": {
       const selectedAccount = await wallet.getSelectedAccount()
+      await addSenderTab()
 
       if (!selectedAccount) {
         return respond({ type: "IS_PREAUTHORIZED_RES", data: false })
@@ -82,6 +87,7 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
       const origin = getOriginFromSender(sender)
       const valid = await isPreAuthorized(selectedAccount, origin)
+
       return respond({ type: "IS_PREAUTHORIZED_RES", data: valid })
     }
   }

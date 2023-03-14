@@ -153,6 +153,16 @@ export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
   }
 }
 
+export const isTokenExpired = async () => {
+  try {
+    await jwtFetcher(`${ARGENT_API_BASE_URL}/account`)
+    return false
+  } catch (error) {
+    IS_DEV && console.warn(coerceErrorToString(error))
+  }
+  return true
+}
+
 export interface BackendAccount {
   name: string | null
   address: string

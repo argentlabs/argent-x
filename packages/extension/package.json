@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.3.6",
+  "version": "5.3.10",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -65,12 +65,12 @@
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-version-changes && yarn run push-release-branch",
+    "version": "yarn run change-to-release-branch && yarn run sync-manifest-version && yarn run commit-and-tag-version-changes && yarn run push-release-branch",
     "change-to-release-branch": "git checkout -b release/v$npm_package_version",
     "sync-manifest-version": "concurrently \"yarn sync-manifest-version:v2\" \"yarn sync-manifest-version:v3\"",
     "sync-manifest-version:v2": "node -p \"JSON.stringify({...require('./manifest/v2.json'), version: '$npm_package_version'}, null, 2)\" > ./manifest/v2.temp.json && prettier --write ./manifest/v2.temp.json && mv ./manifest/v2.temp.json ./manifest/v2.json",
     "sync-manifest-version:v3": "node -p \"JSON.stringify({...require('./manifest/v3.json'), version: '$npm_package_version'}, null, 2)\" > ./manifest/v3.temp.json && prettier --write ./manifest/v3.temp.json && mv ./manifest/v3.temp.json ./manifest/v3.json",
-    "commit-version-changes": "git add ./manifest/* && git commit -m \"chore(release): manifest v$npm_package_version\"",
+    "commit-and-tag-version-changes": "git add --update && git commit -m v$npm_package_version && git tag -a v$npm_package_version -m \"v$npm_package_version\"",
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
@@ -80,7 +80,7 @@
     "@argent/x-multicall": "^5.3.6",
     "@argent/x-sessions": "^5.3.6",
     "@argent/x-swap": "^5.3.6",
-    "@argent/x-window": "^5.3.6",
+    "@argent/x-window": "^5.3.8",
     "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/react": "2.5.1",
     "@extend-chrome/messages": "^1.2.2",
