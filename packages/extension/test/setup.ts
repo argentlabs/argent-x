@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/extend-expect"
+import "whatwg-fetch"
 
 import fetch from "cross-fetch"
 import { noop } from "lodash-es"
