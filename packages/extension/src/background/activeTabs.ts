@@ -47,7 +47,14 @@ export async function sendMessageToHost(
 ): Promise<void> {
   const tabIds = await getTabIdsOfHost(host)
   const tabs = await activeTabs.get((tab) => tabIds.includes(tab.id))
-  await Promise.allSettled(tabs.map((tab) => tab.port.postMessage(message)))
+
+  for (const tab of tabs) {
+    try {
+      tab.port.postMessage(message)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
 }
 
 export async function sendMessageToActiveTabs(
@@ -55,9 +62,13 @@ export async function sendMessageToActiveTabs(
 ): Promise<void> {
   const tabs = await activeTabs.get()
 
-  const promises = tabs.map((tab) => tab.port.postMessage(message))
-
-  await Promise.allSettled(promises)
+  for (const tab of tabs) {
+    try {
+      tab.port.postMessage(message)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
 }
 
 export async function sendMessageToUi(message: MessageType) {
