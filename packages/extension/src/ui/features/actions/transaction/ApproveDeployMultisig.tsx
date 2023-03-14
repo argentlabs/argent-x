@@ -20,7 +20,7 @@ export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
   selectedAccount,
   actionHash,
   onSubmit,
-  ...props
+  ...rest
 }) => {
   usePageTracking("signTransaction", {
     networkId: selectedAccount?.networkId || "unknown",
