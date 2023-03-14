@@ -47,7 +47,7 @@ export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
           onErrorChange={setDisableConfirm}
         />
       }
-      {...props}
+      {...rest}
     >
       {/** Use Transaction Review to get DappHeader */}
       <DappHeader isMultisigDeploy />
