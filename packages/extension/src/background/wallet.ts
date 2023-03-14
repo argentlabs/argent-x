@@ -36,6 +36,7 @@ import { getProviderv4 } from "../shared/network/provider"
 import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSelfSigner } from "../shared/shield/GuardianSelfSigner"
 import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
 import {
   IArrayStorage,
@@ -674,12 +675,16 @@ export class Wallet {
       account.signer.derivationPath,
     )
 
-    const keyPairOrSigner =
-      ARGENT_SHIELD_ENABLED && account.guardian
-        ? new GuardianSignerArgentX(keyPair, cosignerSign)
-        : keyPair
+    if (ARGENT_SHIELD_ENABLED && account.guardian) {
+      const publicKey = ec.getStarkKey(keyPair)
+      if (isEqualAddress(account.guardian, publicKey)) {
+        /** Account guardian is the same as local signer */
+        return new GuardianSelfSigner(keyPair)
+      }
+      return new GuardianSignerArgentX(keyPair, cosignerSign)
+    }
 
-    return keyPairOrSigner
+    return keyPair
   }
 
   public async getStarknetAccount(

@@ -1,6 +1,12 @@
 import { useMemo } from "react"
+import useSWR from "swr"
 
 import { withGuardianSelector } from "../../../shared/account/selectors"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
+import { isEqualAddress } from "../../services/addresses"
+import { getPublicKey } from "../../services/backgroundAccounts"
+import { withPolling } from "../../services/swr"
+import { Account } from "../accounts/Account"
 import { useAccounts } from "../accounts/accounts.state"
 
 export const useAccountsWithGuardian = () => {
@@ -12,4 +18,22 @@ export const useAccountsWithGuardian = () => {
   )
 
   return filteredAccounts
+}
+
+export const useAccountGuardianIsSelf = (account?: Account) => {
+  const { data: accountGuardianIsSelf = null } = useSWR(
+    account ? [getAccountIdentifier(account), "accountGuardianIsSelf"] : null,
+    async () => {
+      if (!account?.guardian) {
+        return false
+      }
+      const publicKey = await getPublicKey(account)
+      const accountGuardianIsSelf = isEqualAddress(account.guardian, publicKey)
+      return accountGuardianIsSelf
+    },
+    {
+      ...withPolling(1000) /** 1 second - purely cosmetic */,
+    },
+  )
+  return accountGuardianIsSelf
 }

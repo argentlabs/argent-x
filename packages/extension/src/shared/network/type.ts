@@ -11,6 +11,7 @@ export interface Network {
     argentAccount: string
     argentPluginAccount?: string
     argentBetterMulticallAccount?: string
+    argent5MinuteEscapeTestingAccount?: string
   }
   rpcUrl?: string
   readonly?: boolean

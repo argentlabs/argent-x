@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom"
 import { Call } from "starknet"
 
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
+import { guardianSignerNotRequired } from "../../../shared/shield/GuardianSignerArgentX"
 import { resetDevice } from "../../../shared/shield/jwt"
 import {
   requestEmail,
@@ -24,6 +25,7 @@ import { WithArgentServicesEnabled } from "../settings/WithArgentServicesEnabled
 import { useShieldState } from "./shield.state"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
+import { useAccountGuardianIsSelf } from "./useAccountGuardian"
 import {
   ChangeGuardian,
   changeGuardianCallDataToType,
@@ -74,6 +76,8 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   const verifiedEmail = useShieldVerifiedEmail()
   const navigate = useNavigate()
   const hasGuardian = Boolean(account?.guardian)
+  const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
+
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
   const [state, setState] = useState(
     hasGuardian
@@ -83,14 +87,26 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
 
   // check if it is remove guardian
 
+  const calls = useMemo(
+    () => (isArray(transactions) ? transactions : [transactions]),
+    [transactions],
+  )
+
   const isRemoveGuardian = useMemo(() => {
-    const calls = isArray(transactions) ? transactions : [transactions]
     if (calls?.[0]?.entrypoint === "changeGuardian") {
       const type = changeGuardianCallDataToType(transactions)
       return type === ChangeGuardian.REMOVING
     }
     return false
-  }, [transactions])
+  }, [calls, transactions])
+
+  const cosignNotRequired = useMemo(() => {
+    return calls.find((call) => {
+      return (
+        call?.entrypoint && guardianSignerNotRequired.includes(call.entrypoint)
+      )
+    })
+  }, [calls])
 
   const resetUnverifiedEmail = useCallback(() => {
     useShieldState.setState({ unverifiedEmail: undefined })
@@ -135,7 +151,9 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   useEffect(() => {
     ;(async () => {
       if (hasGuardian) {
-        if (verifiedEmail === null) {
+        if (cosignNotRequired || accountGuardianIsSelf) {
+          setState(ArgentShieldVerifiedState.NOT_REQUIRED)
+        } else if (verifiedEmail === null) {
           /** still retreiving email */
         } else if (verifiedEmail === undefined) {
           if (unverifiedEmail) {
@@ -159,7 +177,15 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
         }
       }
     })()
-  }, [hasGuardian, isRemoveGuardian, navigate, unverifiedEmail, verifiedEmail])
+  }, [
+    accountGuardianIsSelf,
+    cosignNotRequired,
+    hasGuardian,
+    isRemoveGuardian,
+    navigate,
+    unverifiedEmail,
+    verifiedEmail,
+  ])
 
   switch (state) {
     case ArgentShieldVerifiedState.INITIALISING:
