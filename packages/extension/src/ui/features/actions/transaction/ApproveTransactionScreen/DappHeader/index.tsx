@@ -30,7 +30,6 @@ export const DappHeader = ({
       transactionReview?.targetedDapp?.links.find((l) => l.name === "website"),
     [transactionReview?.targetedDapp?.links],
   )
-  console.log(transactions)
   return (
     <Box mb="6">
       <Flex
@@ -44,6 +43,7 @@ export const DappHeader = ({
           aggregatedData={aggregatedData}
           verifiedDapp={transactionReview?.targetedDapp}
           declareOrDeployType={declareOrDeployType}
+          transactions={transactions}
         />
         <Flex
           direction="column"
@@ -59,6 +59,7 @@ export const DappHeader = ({
                 transactions.length > 1 ? "transactions" : "transaction"
               }
               declareOrDeployType={declareOrDeployType}
+              transactions={transactions}
             />
           </H5>
           {targetedDappWebsite && (

@@ -87,3 +87,13 @@ export function transactionNamesToTitle(
     : lastName
   return upperFirst(title)
 }
+
+export function transformEntrypointName(entryPoint: string) {
+  if (entryPoint === "changeThreshold") {
+    return "setConfirmations"
+  } else if (entryPoint === "addSigners") {
+    return "addOwner"
+  } else {
+    return entryPoint
+  }
+}

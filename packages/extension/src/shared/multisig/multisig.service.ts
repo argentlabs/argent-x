@@ -1,3 +1,5 @@
+import { Call } from "starknet"
+
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { Fetcher, fetcher } from "../api/fetcher"
 import { Network } from "../network"
@@ -8,6 +10,12 @@ import {
   ApiMultisigDataForSignerSchema,
 } from "./multisig.model"
 
+const multisigTransactionTypes = {
+  addSigners: "addSigners",
+  changeThreshold: "changeThreshold",
+  removeSigners: "removeSigners",
+  replaceSigner: "replaceSigner",
+} as const
 export interface IFetchMultisigDataForSigner {
   signer: string
   network: Network
@@ -38,4 +46,19 @@ export async function fetchMultisigDataForSigner({
   })
 
   return ApiMultisigDataForSignerSchema.parse(data)
+}
+
+export const getMultisigTransactionType = (transactions: Call[]) => {
+  const entryPoints = transactions.map((tx) => tx.entrypoint)
+  switch (true) {
+    case entryPoints.includes("addSigners"): {
+      return multisigTransactionTypes.addSigners
+    }
+    case entryPoints.includes("changeThreshold"): {
+      return multisigTransactionTypes.changeThreshold
+    }
+    default: {
+      return undefined
+    }
+  }
 }

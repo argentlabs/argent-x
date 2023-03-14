@@ -31,17 +31,18 @@ export const MultisigBanner = ({
           <ChevronRightIcon color="neutrals.400" ml={1} />
         </Flex>
       </Flex>
-      {multisig?.threshold && multisig?.threshold > 10 ? (
-        <Progress
-          max={multisig.threshold}
-          value={confirmations}
-          size="xs"
-          mt={3}
-          borderRadius="lg"
-        />
-      ) : (
-        <SplitProgress max={10} value={2} />
-      )}
+      {multisig?.threshold &&
+        (multisig?.threshold > 10 ? (
+          <Progress
+            max={multisig.threshold}
+            value={confirmations}
+            size="xs"
+            mt={3}
+            borderRadius="lg"
+          />
+        ) : (
+          <SplitProgress max={multisig.threshold} value={confirmations} />
+        ))}
     </Box>
   )
 }

@@ -1,7 +1,9 @@
 import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, useMemo } from "react"
+import { Call } from "starknet"
 
+import { getMultisigTransactionType } from "../../../../../../shared/multisig/multisig.service"
 import { prettifyTokenAmount } from "../../../../../../shared/token/price"
 import { getTransactionReviewWithType } from "../../../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
@@ -17,6 +19,7 @@ export interface TransactionTitleProps {
   aggregatedData?: AggregatedSimData[]
   fallback?: string
   declareOrDeployType?: "declare" | "deploy"
+  transactions: Call[]
 }
 
 export const TransactionTitle: FC<TransactionTitleProps> = ({
@@ -24,6 +27,7 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
   aggregatedData,
   declareOrDeployType,
   fallback = "transaction",
+  transactions,
 }) => {
   const nftTransfers = useERC721Transfers(aggregatedData)
   const network = useCurrentNetwork()
@@ -32,11 +36,20 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     () => getTransactionReviewWithType(transactionReview),
     [transactionReview],
   )
+  const multisigTransactionType = getMultisigTransactionType(transactions)
 
   if (declareOrDeployType) {
     return (
       <Flex alignItems="center" gap="1">
         {declareOrDeployType === "declare" ? "Declare" : "Deploy"} contract
+      </Flex>
+    )
+  }
+
+  if (multisigTransactionType === "addSigners") {
+    return (
+      <Flex alignItems="center" gap="1">
+        Add multisig owner
       </Flex>
     )
   }
