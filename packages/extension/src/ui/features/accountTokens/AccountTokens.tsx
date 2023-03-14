@@ -6,10 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { userReviewStore } from "../../../shared/userReview"
 import { routes } from "../../routes"
-import {
-  deployNewMultisig,
-  redeployAccount,
-} from "../../services/backgroundAccounts"
+import { redeployAccount } from "../../services/backgroundAccounts"
 import { Account } from "../accounts/Account"
 import {
   getAccountName,
@@ -18,6 +15,7 @@ import {
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { useMultisig } from "../multisig/multisig.state"
+import { MultisigBanner } from "../multisig/MultisigBanner"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
@@ -26,7 +24,6 @@ import { accountHasEscape } from "../shield/escape/useAccountEscape"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
-import { ActivateMultisigBanner } from "./ActivateMultisigBanner"
 import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
@@ -117,20 +114,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
+
   const showAddFundsBackdrop = useMemo(() => {
     return multisig?.needsDeploy && feeTokenBalance?.lte(0)
   }, [feeTokenBalance, multisig?.needsDeploy])
-
-  const showActivateMultisigBanner = useMemo(
-    () => multisig?.needsDeploy && feeTokenBalance?.gt(0),
-    [feeTokenBalance, multisig?.needsDeploy],
-  )
-
-  const onActivateMultisig = useCallback(async () => {
-    if (multisig) {
-      await deployNewMultisig(multisig)
-    }
-  }, [multisig])
 
   return (
     <Flex direction={"column"} data-testid="account-tokens">
@@ -156,8 +143,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
-        {showActivateMultisigBanner && (
-          <ActivateMultisigBanner onClick={onActivateMultisig} />
+        {multisig && (
+          <MultisigBanner
+            multisig={multisig}
+            feeTokenBalance={feeTokenBalance}
+          />
         )}
         {showAddFundsBackdrop && (
           <Empty
