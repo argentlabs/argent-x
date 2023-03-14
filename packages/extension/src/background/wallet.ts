@@ -22,6 +22,7 @@ import {
   BaseMultisigWalletAccount,
   CreateAccountType,
   MultisigData,
+  MultisigWalletAccount,
 } from "./../shared/wallet.model"
 import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
@@ -494,7 +495,13 @@ export class Wallet {
     await this.walletStore.push([account])
 
     if (type === "multisig" && multisigPayload) {
-      await this.multisigStore.push({ ...multisigPayload, ...account })
+      await this.multisigStore.push({
+        address: account.address,
+        networkId: account.networkId,
+        signers: multisigPayload.signers,
+        threshold: multisigPayload.threshold,
+        creator: multisigPayload.creator,
+      })
     }
 
     await this.selectAccount(account)
@@ -543,9 +550,10 @@ export class Wallet {
       throw Error("Cannot estimate fee to deploy old accounts")
     }
 
-    const deployAccountPayload = await this.getAccountDeploymentPayload(
-      walletAccount,
-    )
+    const deployAccountPayload =
+      walletAccount.type === "multisig"
+        ? await this.getMultisigDeploymentPayload(walletAccount)
+        : await this.getAccountDeploymentPayload(walletAccount)
 
     return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
   }
@@ -796,6 +804,32 @@ export class Wallet {
     return hit
   }
 
+  public async getMultisigAccount(
+    selector: BaseWalletAccount,
+  ): Promise<MultisigWalletAccount> {
+    const [walletAccount] = await this.walletStore.get(
+      (account) =>
+        accountsEqual(account, selector) && account.type === "multisig",
+    )
+    if (!walletAccount) {
+      throw Error("multisig wallet account not found")
+    }
+
+    const [multisigBaseWalletAccount] = await this.multisigStore.get(
+      (account) => accountsEqual(account, selector),
+    )
+
+    if (!multisigBaseWalletAccount) {
+      throw Error("multisig base wallet account not found")
+    }
+
+    return {
+      ...walletAccount,
+      ...multisigBaseWalletAccount,
+      type: "multisig",
+    }
+  }
+
   public async getKeyPairByDerivationPath(derivationPath: string) {
     const session = await this.sessionStore.get()
     if (!session?.secret) {
@@ -1028,7 +1062,9 @@ export class Wallet {
     return starkPair.getPrivate().toString()
   }
 
-  public async getPublicKey(baseAccount?: BaseWalletAccount): Promise<string> {
+  public async getPublicKey(
+    baseAccount?: BaseWalletAccount,
+  ): Promise<{ publicKey: string; account: BaseWalletAccount }> {
     const account = baseAccount
       ? await this.getAccount(baseAccount)
       : await this.getSelectedAccount()
@@ -1043,7 +1079,7 @@ export class Wallet {
 
     const starkPub = ec.getStarkKey(starkPair)
 
-    return starkPub
+    return { publicKey: starkPub, account }
   }
 
   /**

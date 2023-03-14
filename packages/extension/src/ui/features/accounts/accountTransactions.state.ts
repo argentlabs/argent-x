@@ -38,3 +38,23 @@ export const useAccountTransactions: UseAccountTransactions = (account) => {
 
   return { transactions, pendingTransactions }
 }
+
+export const useDeployAccountTransactions: UseAccountTransactions = (
+  account,
+) => {
+  const transactions = useArrayStorage(
+    transactionsStore,
+    byAccountSelector(account),
+  )
+
+  const sortedTransactions = useMemo(
+    () => transactions.sort((a, b) => b.timestamp - a.timestamp),
+    [transactions],
+  )
+
+  const pendingTransactions = sortedTransactions.filter(
+    ({ status, meta }) => status === "RECEIVED" && meta?.isDeployAccount,
+  )
+
+  return { transactions, pendingTransactions }
+}

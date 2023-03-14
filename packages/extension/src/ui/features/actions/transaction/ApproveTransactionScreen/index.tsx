@@ -17,8 +17,9 @@ import { useFeeTokenBalance } from "../../../accountTokens/tokens.service"
 import { useIsMainnet } from "../../../networks/useNetworks"
 import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
-import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
+import { TransactionFeeEstimation } from "../../feeEstimation/TransactionFeeEstimation"
 import { LoadingScreen } from "../../LoadingScreen"
+import { ApproveScreenType } from "../types"
 import { useTransactionReview } from "../useTransactionReview"
 import { useAggregatedSimData } from "../useTransactionSimulatedData"
 import { useTransactionSimulation } from "../useTransactionSimulation"
@@ -37,7 +38,7 @@ export interface ApproveTransactionScreenProps
   actionHash: string
   transactions: Call | Call[]
   onSubmit: (transactions: Call | Call[]) => void
-  declareOrDeployType?: "declare" | "deploy"
+  approveScreenType: ApproveScreenType
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
@@ -45,7 +46,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   selectedAccount,
   actionHash,
   onSubmit,
-  declareOrDeployType,
+  approveScreenType,
   ...props
 }) => {
   usePageTracking("signTransaction", {
@@ -105,8 +106,10 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   )
 
   const isUdcAction = useMemo(
-    () => Boolean(declareOrDeployType),
-    [declareOrDeployType],
+    () =>
+      approveScreenType === ApproveScreenType.DECLARE ||
+      approveScreenType === ApproveScreenType.DEPLOY,
+    [approveScreenType],
   )
 
   // Show balance change if there is a transaction simulation and there are approvals or transfers
@@ -155,7 +158,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
             actionHash={actionHash}
           />
         ) : (
-          <FeeEstimation
+          <TransactionFeeEstimation
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}
@@ -172,7 +175,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         transactionReview={transactionReview}
         aggregatedData={aggregatedData}
         verifiedDapp={verifiedDapp || undefined}
-        declareOrDeployType={declareOrDeployType}
+        approveScreenType={approveScreenType}
       />
 
       {warn && (

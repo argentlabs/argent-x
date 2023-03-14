@@ -3,7 +3,7 @@ import { constants, number } from "starknet"
 import { getAccounts, removeAccount } from "../shared/account/store"
 import { tryToMintFeeToken } from "../shared/devnet/mintFeeToken"
 import { AccountMessage } from "../shared/messages/AccountMessage"
-import { deployAccountAction } from "./accountDeploy"
+import { deployAccountAction, deployMultisigAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
@@ -153,6 +153,19 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
+    case "DEPLOY_MULTISIG": {
+      try {
+        await deployMultisigAction({
+          account: msg.data,
+          actionQueue,
+        })
+
+        return sendMessageToUi({ type: "DEPLOY_MULTISIG_RES" })
+      } catch (e) {
+        return sendMessageToUi({ type: "DEPLOY_MULTISIG_REJ" })
+      }
+    }
+
     case "GET_SELECTED_ACCOUNT": {
       const selectedAccount = await wallet.getSelectedAccount()
       return sendMessageToUi({
@@ -224,11 +237,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "GET_PUBLIC_KEY": {
-      const publicKey = await wallet.getPublicKey(msg.data)
+      const { publicKey, account } = await wallet.getPublicKey(msg.data)
 
       return sendMessageToUi({
         type: "GET_PUBLIC_KEY_RES",
-        data: { publicKey },
+        data: { publicKey, account },
       })
     }
 

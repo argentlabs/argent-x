@@ -7,6 +7,7 @@ import { getTransactionReviewWithType } from "../../../../../../shared/transacti
 import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../../../accountNfts/aspect.service"
 import { useCurrentNetwork } from "../../../../networks/useNetworks"
+import { ApproveScreenType } from "../../types"
 import { useERC721Transfers } from "../../useErc721Transfers"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 
@@ -16,13 +17,13 @@ export interface TransactionTitleProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   fallback?: string
-  declareOrDeployType?: "declare" | "deploy"
+  approveScreenType: ApproveScreenType
 }
 
 export const TransactionTitle: FC<TransactionTitleProps> = ({
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
   fallback = "transaction",
 }) => {
   const nftTransfers = useERC721Transfers(aggregatedData)
@@ -33,10 +34,26 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     [transactionReview],
   )
 
-  if (declareOrDeployType) {
+  if (approveScreenType === ApproveScreenType.DECLARE) {
     return (
       <Flex alignItems="center" gap="1">
-        {declareOrDeployType === "declare" ? "Declare" : "Deploy"} contract
+        Declare contract
+      </Flex>
+    )
+  }
+
+  if (approveScreenType === ApproveScreenType.DEPLOY) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Deploy contract
+      </Flex>
+    )
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_DEPLOY) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Activate multisig
       </Flex>
     )
   }

@@ -6,7 +6,6 @@ import {
   getNextPublicKey,
   getPublicKey,
 } from "../../services/backgroundAccounts"
-import { useCurrentNetwork } from "../networks/useNetworks"
 
 export const usePublicKey = (account?: BaseWalletAccount) => {
   const [pubKey, setPubKey] = useState<string>()
@@ -26,13 +25,12 @@ export const usePublicKey = (account?: BaseWalletAccount) => {
   return pubKey
 }
 
-export const useNextPublicKey = () => {
-  const network = useCurrentNetwork()
+export const useNextPublicKey = (networkId: string) => {
   const [pubKey, setPubKey] = useState<string>()
 
   const getNextPubKeyCallback = useCallback(
-    () => getNextPublicKey(network.id),
-    [network.id],
+    () => getNextPublicKey(networkId),
+    [networkId],
   )
 
   useEffect(() => {
@@ -67,8 +65,8 @@ export const useSignerKey = () => {
  *
  * @returns Signer Key (encoded public key) of the next account
  */
-export const useNextSignerKey = () => {
-  const pubKey = useNextPublicKey()
+export const useNextSignerKey = (networkId: string) => {
+  const pubKey = useNextPublicKey(networkId)
   const encodedPubKey = useEncodedPublicKey(pubKey)
 
   return encodedPubKey

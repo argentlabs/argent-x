@@ -46,6 +46,17 @@ export type AccountMessage =
       type: "DEPLOY_ACCOUNT_ACTION_FAILED"
       data: { actionHash: string; error?: string }
     }
+  | { type: "DEPLOY_MULTISIG"; data: BaseWalletAccount }
+  | { type: "DEPLOY_MULTISIG_RES" }
+  | { type: "DEPLOY_MULTISIG_REJ" }
+  | {
+      type: "DEPLOY_MULTISIG_ACTION_SUBMITTED"
+      data: { txHash: string; actionHash: string }
+    }
+  | {
+      type: "DEPLOY_MULTISIG_ACTION_FAILED"
+      data: { actionHash: string; error?: string }
+    }
   | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
   | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
   | { type: "CONNECT_ACCOUNT"; data?: BaseWalletAccount }
@@ -91,7 +102,7 @@ export type AccountMessage =
     }
   | {
       type: "GET_PUBLIC_KEY_RES"
-      data: { publicKey: string }
+      data: { publicKey: string; account: BaseWalletAccount }
     }
   | {
       type: "GET_NEXT_PUBLIC_KEY"
