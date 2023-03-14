@@ -48,13 +48,13 @@
     "@chakra-ui/react": "2.5.1",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
-    "ethers": "^6.0.8",
     "framer-motion": "^9.0.3",
     "popmotion": "^11.0.5"
   },
   "peerDependencies": {
     "@emotion/react": "^11.10.4",
     "colord": "^2.9.2",
+    "ethers": "^5.5.1",
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
