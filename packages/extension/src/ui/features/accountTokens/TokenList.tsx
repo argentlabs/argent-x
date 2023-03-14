@@ -18,6 +18,7 @@ interface TokenListProps {
   showTokenSymbol?: boolean
   variant?: TokenListItemVariant
   navigateToSend?: boolean
+  onItemClick?: () => void
 }
 
 export const TokenList: FC<TokenListProps> = ({
@@ -26,6 +27,7 @@ export const TokenList: FC<TokenListProps> = ({
   showTokenSymbol = false,
   variant,
   navigateToSend = false,
+  onItemClick,
 }) => {
   const navigate = useNavigate()
   const account = useSelectedAccount()
@@ -54,6 +56,10 @@ export const TokenList: FC<TokenListProps> = ({
             variant={variant}
             showTokenSymbol={showTokenSymbol}
             onClick={() => {
+              if (onItemClick) {
+                return onItemClick()
+              }
+
               navigate(
                 navigateToSend
                   ? routes.sendToken(token.address, returnTo)

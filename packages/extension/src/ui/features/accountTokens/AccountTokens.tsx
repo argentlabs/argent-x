@@ -156,7 +156,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           />
         )}
         {!showAddFundsBackdrop && (
-          <TokenList variant={tokenListVariant} showNewTokenButton />
+          <TokenList
+            variant={tokenListVariant}
+            showNewTokenButton
+            onItemClick={multisig?.needsDeploy ? () => null : undefined}
+          />
         )}
       </CellStack>
     </Flex>
