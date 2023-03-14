@@ -35,7 +35,7 @@ export const AccountEditButtonsMultisig = ({
       </ButtonCell>
       <Button
         onClick={() => navigate(routes.multisigConfirmations(account.address))}
-        width="100%"
+        width="full"
         rightIcon={<ChevronRightIcon />}
         borderRadius="lg"
         p={4}

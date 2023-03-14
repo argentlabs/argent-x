@@ -126,10 +126,8 @@ interface VerifyEmailResponse {
   userRegistrationStatus: "registered" | "notRegistered"
 }
 
-export const verifyEmail = async (
-  verificationCode: string,
-): Promise<VerifyEmailResponse> => {
-  const json: VerifyEmailResponse = await jwtFetcher(
+export const verifyEmail = async (verificationCode: string) => {
+  const json = await jwtFetcher<VerifyEmailResponse>(
     `${ARGENT_API_BASE_URL}/verifyEmail`,
     {
       method: "POST",
@@ -143,7 +141,7 @@ export const verifyEmail = async (
 
 type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
 
-export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
+export const getRegistrationStatus = async () => {
   try {
     const json = await jwtFetcher<{ status: RegistrationStatus }>(
       `${ARGENT_API_BASE_URL}/account/registrationStatus`,
@@ -167,7 +165,7 @@ export interface BackendAccount {
   salt: string | null
 }
 
-export const getBackendAccounts = async (): Promise<BackendAccount[]> => {
+export const getBackendAccounts = async () => {
   try {
     const json = await jwtFetcher<{ accounts: BackendAccount[] }>(
       `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
@@ -187,7 +185,7 @@ export const addBackendAccount = async (
   pubKey: string,
   accountAddress: string,
   signature: string[],
-): Promise<AddAccountResponse> => {
+) => {
   try {
     const json = await jwtFetcher<AddAccountResponse>(
       `${ARGENT_API_BASE_URL}/account`,

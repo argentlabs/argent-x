@@ -1,6 +1,6 @@
 import { Button, icons } from "@argent/ui"
 import { Circle, Flex } from "@chakra-ui/react"
-import React, { FC, MouseEvent, ReactNode, useCallback, useRef } from "react"
+import { FC, MouseEvent, ReactNode, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"

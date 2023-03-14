@@ -139,12 +139,3 @@ export type AccountMessage =
       type: "ACCOUNT_CANCEL_ESCAPE_RES"
     }
   | { type: "ACCOUNT_CANCEL_ESCAPE_REJ"; data: string }
-  | {
-      type: "GET_MULTISIG_ACCOUNT"
-      data: { address: string; networkId: string }
-    }
-  | {
-      type: "GET_MULTISIG_ACCOUNT_RES"
-      data: BaseMultisigWalletAccount
-    }
-  | { type: "GET_MULTISIG_ACCOUNT_REJ"; data: string }

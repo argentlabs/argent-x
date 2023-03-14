@@ -74,6 +74,5 @@ export const useSignerKey = () => {
 export const useNextSignerKey = () => {
   const pubKey = useNextPublicKey()
   const encodedPubKey = useEncodedPublicKey(pubKey)
-  console.log({ pubKey })
   return encodedPubKey
 }

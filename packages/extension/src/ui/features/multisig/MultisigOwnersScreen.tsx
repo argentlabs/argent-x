@@ -1,23 +1,17 @@
 import { H4, H6, P3 } from "@argent/ui"
 import { Box, Divider } from "@chakra-ui/react"
 import { FC } from "react"
-import { useParams } from "react-router-dom"
 
 import { formatTruncatedSignerKey } from "../../services/addresses"
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
 import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 
 export const MultisigOwnersScreen: FC = () => {
-  const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
+  const account = useRouteAccount()
+
   return (
     <MultisigSettingsWrapper>
       {account && <MultisigOwners account={account} />}

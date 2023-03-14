@@ -9,7 +9,6 @@ import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
-import { getMultisigAccountData } from "./multisig"
 import { addTransaction } from "./transactions/store"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
@@ -323,22 +322,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       } catch (error) {
         return sendMessageToUi({
           type: "ACCOUNT_CANCEL_ESCAPE_REJ",
-          data: `${error}`,
-        })
-      }
-    }
-
-    case "GET_MULTISIG_ACCOUNT": {
-      try {
-        const { address, networkId } = msg.data
-        const multisigAccount = await getMultisigAccountData({
-          address,
-          networkId,
-        })
-        return multisigAccount.content
-      } catch (error) {
-        return sendMessageToUi({
-          type: "GET_MULTISIG_ACCOUNT_REJ",
           data: `${error}`,
         })
       }

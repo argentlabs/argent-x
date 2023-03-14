@@ -267,19 +267,3 @@ export const accountCancelEscape = async (account: BaseWalletAccount) => {
 
   return result
 }
-
-export const getMultisigAccount = async (
-  address: string,
-  networkId: string,
-) => {
-  sendMessage({ type: "GET_MULTISIG_ACCOUNT", data: { address, networkId } })
-
-  const result = await Promise.race([
-    waitForMessage("GET_MULTISIG_ACCOUNT_RES"),
-    waitForMessage("GET_MULTISIG_ACCOUNT_REJ").then((error) => {
-      throw new Error(error)
-    }),
-  ])
-
-  return result
-}
