@@ -28,7 +28,6 @@ import { ConfirmScreen } from "./ConfirmScreen"
 import { DappHeader } from "./DappHeader"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
-import { VerifiedDappBanner } from "./VerifiedDappBanner"
 
 const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
 
@@ -182,7 +181,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           message={reason}
         />
       )}
-      {verifiedDapp && <VerifiedDappBanner dapp={verifiedDapp} />}
 
       {hasBalanceChange && (
         <BalanceChangeOverview
