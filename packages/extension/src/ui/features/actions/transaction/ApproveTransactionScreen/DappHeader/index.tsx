@@ -7,6 +7,7 @@ import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
 } from "../../../../../../shared/transactionReview.service"
+import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
@@ -16,16 +17,14 @@ export interface DappHeaderProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
-  declareOrDeployType?: "declare" | "deploy"
-  isMultisigDeploy?: boolean
+  approveScreenType: ApproveScreenType
 }
 
 export const DappHeader = ({
   transactions,
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
-  isMultisigDeploy = false,
+  approveScreenType,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -45,7 +44,7 @@ export const DappHeader = ({
           transactionReview={transactionReview}
           aggregatedData={aggregatedData}
           verifiedDapp={transactionReview?.targetedDapp}
-          declareOrDeployType={declareOrDeployType}
+          approveScreenType={approveScreenType}
         />
         <Flex
           direction="column"
@@ -62,8 +61,7 @@ export const DappHeader = ({
                   ? "transactions"
                   : "transaction"
               }
-              declareOrDeployType={declareOrDeployType}
-              isMultisigDeploy={isMultisigDeploy}
+              approveScreenType={approveScreenType}
             />
           </H5>
           {targetedDappWebsite && (

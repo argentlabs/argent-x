@@ -9,6 +9,7 @@ import { AccountNetworkInfo } from "./ApproveTransactionScreen/AccountNetworkInf
 import { ConfirmScreen } from "./ApproveTransactionScreen/ConfirmScreen"
 import { DappHeader } from "./ApproveTransactionScreen/DappHeader"
 import { TransactionActions } from "./ApproveTransactionScreen/TransactionActions"
+import { ApproveScreenType } from "./types"
 
 export interface ApproveDeployMultisigScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
@@ -50,7 +51,7 @@ export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
       {...rest}
     >
       {/** Use Transaction Review to get DappHeader */}
-      <DappHeader isMultisigDeploy />
+      <DappHeader approveScreenType={ApproveScreenType.MULTISIG_DEPLOY} />
 
       <TransactionActions
         transactions={[

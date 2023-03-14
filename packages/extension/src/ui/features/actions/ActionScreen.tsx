@@ -24,6 +24,7 @@ import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
 import { ApproveDeployMultisig } from "./transaction/ApproveDeployMultisig"
 import { ApproveTransactionScreen } from "./transaction/ApproveTransactionScreen"
+import { ApproveScreenType } from "./transaction/types"
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
@@ -137,6 +138,7 @@ export const ActionScreen: FC = () => {
           <ApproveTransactionScreen
             transactions={action.payload.transactions}
             actionHash={action.meta.hash}
+            approveScreenType={ApproveScreenType.TRANSACTION}
             onSubmit={async () => {
               analytics.track("signedTransaction", {
                 networkId: account?.networkId || "unknown",
@@ -299,7 +301,7 @@ export const ActionScreen: FC = () => {
           <ApproveTransactionScreen
             actionHash={action.meta.hash}
             transactions={[]}
-            declareOrDeployType={"declare"}
+            approveScreenType={ApproveScreenType.DECLARE}
             onSubmit={async () => {
               analytics.track("signedDeclareTransaction", {
                 networkId: account?.networkId || "unknown",
@@ -348,7 +350,7 @@ export const ActionScreen: FC = () => {
         <WithArgentShieldVerified>
           <ApproveTransactionScreen
             actionHash={action.meta.hash}
-            declareOrDeployType={"deploy"}
+            approveScreenType={ApproveScreenType.DEPLOY}
             transactions={[]}
             onSubmit={async () => {
               analytics.track("signedDeployTransaction", {
