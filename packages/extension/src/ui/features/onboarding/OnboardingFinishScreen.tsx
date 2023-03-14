@@ -11,6 +11,7 @@ import {
   PushPinIcon,
 } from "../../components/Icons/MuiIcons"
 import Row from "../../components/Row"
+import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import {
@@ -90,9 +91,14 @@ const TransitionLeft: FC<SlideProps> = (props) => {
 }
 
 export const OnboardingFinishScreen: FC = () => {
+  const { trackSuccess } = useTimeSpentWithSuccessTracking(
+    "onboardingStepFinished",
+    { stepId: "finish" },
+  )
   const onFinishClick = useCallback(() => {
+    trackSuccess()
     window.close()
-  }, [])
+  }, [trackSuccess])
   return (
     <>
       <StyledSnackbar

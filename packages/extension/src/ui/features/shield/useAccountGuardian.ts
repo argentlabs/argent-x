@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import useSWR from "swr"
 
 import { withGuardianSelector } from "../../../shared/account/selectors"
@@ -21,14 +21,20 @@ export const useAccountsWithGuardian = () => {
 }
 
 export const useAccountGuardianIsSelf = (account?: Account) => {
+  const publicKey = useRef<string>()
   const { data: accountGuardianIsSelf = null } = useSWR(
     account ? [getAccountIdentifier(account), "accountGuardianIsSelf"] : null,
     async () => {
       if (!account?.guardian) {
         return false
       }
-      const publicKey = await getPublicKey(account)
-      const accountGuardianIsSelf = isEqualAddress(account.guardian, publicKey)
+      if (!publicKey.current) {
+        publicKey.current = await getPublicKey(account)
+      }
+      const accountGuardianIsSelf = isEqualAddress(
+        account.guardian,
+        publicKey.current,
+      )
       return accountGuardianIsSelf
     },
     {

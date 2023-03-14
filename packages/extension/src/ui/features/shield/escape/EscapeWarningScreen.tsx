@@ -1,12 +1,13 @@
 import { BarCloseButton, NavigationContainer, useToast } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
-import { FC, useCallback, useMemo } from "react"
+import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { ESCAPE_TYPE_GUARDIAN } from "../../../../shared/account/details/getEscape"
 import { IS_DEV } from "../../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../../shared/utils/error"
 import { routes } from "../../../routes"
+import { analytics } from "../../../services/analytics"
 import {
   accounTriggerEscapeGuardian,
   accountCancelEscape,
@@ -38,10 +39,44 @@ export const EscapeWarningScreen: FC = () => {
   const pending = useAccountHasPendingCancelEscape(account)
   const pendingChangeGuardian = usePendingChangeGuardian(account)
 
+  const didTrack = useRef(false)
+  useEffect(() => {
+    if (!liveAccountEscape) {
+      return
+    }
+    if (didTrack.current) {
+      return
+    }
+    didTrack.current = true
+    const escapeId =
+      liveAccountEscape?.type === ESCAPE_TYPE_GUARDIAN
+        ? "escapeGuardian"
+        : "escapeSigner"
+    analytics.track("argentShieldEscapeScreenSeen", {
+      escapeId,
+      remainingTime: liveAccountEscape.activeFromNowMs,
+    })
+  }, [liveAccountEscape])
+
   const onCancelEscape = useCallback(async () => {
     if (!account) {
       console.error("Cannot cancel escape - no account")
       return
+    }
+    if (liveAccountEscape) {
+      if (liveAccountEscape.type === ESCAPE_TYPE_GUARDIAN) {
+        analytics.track("argentShieldEscapeScreenAction", {
+          escapeId: "escapeGuardian",
+          remainingTime: liveAccountEscape.activeFromNowMs,
+          action: "keepArgentShield",
+        })
+      } else {
+        analytics.track("argentShieldEscapeScreenAction", {
+          escapeId: "escapeSigner",
+          remainingTime: liveAccountEscape.activeFromNowMs,
+          action: "cancelKeyChange",
+        })
+      }
     }
     await hideEscapeWarning(account)
     try {
@@ -54,13 +89,18 @@ export const EscapeWarningScreen: FC = () => {
         duration: 3000,
       })
     }
-  }, [account, toast])
+  }, [account, liveAccountEscape, toast])
 
   const onTriggerEscapeGuardian = useCallback(async () => {
     if (!account) {
       console.error("Cannot trigger escape guardian - no account")
       return
     }
+    analytics.track("argentShieldEscapeScreenAction", {
+      escapeId: "escapeSigner",
+      remainingTime: liveAccountEscape?.activeFromNowMs || 0,
+      action: "startRemoval",
+    })
     await hideEscapeWarning(account)
     try {
       await accounTriggerEscapeGuardian(account)
@@ -72,13 +112,21 @@ export const EscapeWarningScreen: FC = () => {
         duration: 3000,
       })
     }
-  }, [account, toast])
+  }, [account, liveAccountEscape, toast])
 
   const onEscapeAndChangeGuardian = useCallback(async () => {
     if (!account) {
       console.error("Cannot escape and change guardian - no account")
       return
     }
+    analytics.track("argentShieldEscapeScreenAction", {
+      escapeId: "escapeGuardian",
+      remainingTime: liveAccountEscape?.activeFromNowMs || 0,
+      action: accountGuardianIsSelf
+        ? "continueWithRemoval"
+        : "removeArgentShield",
+    })
+
     await hideEscapeWarning(account)
     try {
       await accountEscapeAndChangeGuardian(account)
@@ -90,7 +138,16 @@ export const EscapeWarningScreen: FC = () => {
         duration: 3000,
       })
     }
-  }, [account, toast])
+  }, [account, accountGuardianIsSelf, liveAccountEscape, toast])
+
+  const onContinue = useCallback(() => {
+    analytics.track("argentShieldEscapeScreenAction", {
+      escapeId: "escapeGuardian",
+      remainingTime: liveAccountEscape?.activeFromNowMs || 0,
+      action: "continueWithRemoval",
+    })
+    onClose()
+  }, [liveAccountEscape?.activeFromNowMs, onClose])
 
   const content = useMemo(() => {
     if (pending) {
@@ -131,7 +188,7 @@ export const EscapeWarningScreen: FC = () => {
           <EscapeGuardian
             liveAccountEscape={liveAccountEscape}
             onKeep={onCancelEscape}
-            onContinue={onClose}
+            onContinue={onContinue}
           />
         )
       } else {
@@ -149,7 +206,7 @@ export const EscapeWarningScreen: FC = () => {
     accountGuardianIsSelf,
     liveAccountEscape,
     onCancelEscape,
-    onClose,
+    onContinue,
     onEscapeAndChangeGuardian,
     onTriggerEscapeGuardian,
     pending,
