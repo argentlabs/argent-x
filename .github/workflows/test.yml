@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: If github.head_ref not filled, we are merging
         run: |
-          if [ "${{ github.head_ref }}" == "" || ${{ github.actor == 'dependabot[bot]' }} ]; then
+          if [ "${{ github.head_ref }}" == "" || ${{ github.actor == 'dependabot[bot]' || github.event_name != 'pull_request'}} ]; then
             echo "PUBLISH_COMMENT=no" >> $GITHUB_ENV
           else
             echo "PUBLISH_COMMENT=yes" >> $GITHUB_ENV
