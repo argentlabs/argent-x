@@ -1,5 +1,5 @@
-import { CellStack, H5, icons } from "@argent/ui"
-import { Center, Flex, VStack } from "@chakra-ui/react"
+import { CellStack, Empty, icons } from "@argent/ui"
+import { Flex, VStack } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -159,7 +159,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showActivateMultisigBanner && (
           <ActivateMultisigBanner onClick={onActivateMultisig} />
         )}
-        {showAddFundsBackdrop && <AddFundBackdrop />}
+        {showAddFundsBackdrop && (
+          <Empty
+            icon={<MultisigIcon color="neutrals.500" />}
+            title="Add funds to activate multisig"
+          />
+        )}
         {!showAddFundsBackdrop && (
           <TokenList variant={tokenListVariant} showNewTokenButton />
         )}
@@ -167,14 +172,3 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
     </Flex>
   )
 }
-
-export const AddFundBackdrop: FC = () => (
-  <CellStack alignItems="center">
-    <Center borderRadius="full" bg="black" width="20" h="20">
-      <MultisigIcon color="neutrals.500" fontSize="5xl" />
-    </Center>
-    <H5 textAlign="center" color="neutrals.500" maxW="75%">
-      Add funds to activate multisig
-    </H5>
-  </CellStack>
-)
