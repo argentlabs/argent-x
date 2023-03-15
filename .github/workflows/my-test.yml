@@ -1,4 +1,4 @@
-name: Dependabot Automerge
+name: My Test
 on: pull_request_target
 jobs:
   checkout:
