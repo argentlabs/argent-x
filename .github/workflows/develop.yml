@@ -1,0 +1,36 @@
+name: Develop
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v3
+  e2e:
+    uses: ./.github/workflows/test-e2e.yml
+    secrets:
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ secrets.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
+      ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
+    needs: checkout
+  tests:
+    uses: ./.github/workflows/test.yml
+    needs: checkout
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SONARCLOUD_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+  build:
+    uses: ./.github/workflows/test-build.yml
+    secrets:
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ secrets.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
+      ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: [tests, e2e]

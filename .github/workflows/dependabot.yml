@@ -2,39 +2,34 @@ name: Dependabot Automerge
 on: pull_request_target
 jobs:
   checkout:
-    # if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "yarn"
   e2e:
-    steps:
-      - uses: argent-x/.github/workflows/test-e2e@develop
+    uses: ./.github/workflows/test-e2e.yml
     needs: checkout
   tests:
-    steps:
-      - uses: argent-x/.github/workflows/test@develop
+    uses: ./.github/workflows/test.yml
     needs: checkout
-  publish:
+  open-pr:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT }}
           script: |-
             await github.rest.pulls.createReview({
-            owner: context.payload.repository.owner.login,
-            repo: context.payload.repository.name,
-            pull_number: context.payload.pull_request.number,
-            event: 'APPROVE'
+              owner: context.payload.repository.owner.login,
+              repo: context.payload.repository.name,
+              pull_number: context.payload.pull_request.number,
+              event: 'APPROVE'
             })
             await exec.exec("sleep 2")
             await github.rest.pulls.merge({
-            owner: context.payload.repository.owner.login,
-            repo: context.payload.repository.name,
-            pull_number: context.payload.pull_request.number,
-            merge_method: 'squash'
+              owner: context.payload.repository.owner.login,
+              repo: context.payload.repository.name,
+              pull_number: context.payload.pull_request.number,
+              merge_method: 'squash'
             })
     needs: [tests, e2e]
