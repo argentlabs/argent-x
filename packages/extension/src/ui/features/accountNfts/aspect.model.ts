@@ -41,7 +41,7 @@ export const AspectNftSchema = z.object({
   token_id: z.string(),
   name: z.string().optional(),
   description: z.string().nullable().optional(),
-  image_uri: z.string().optional(),
+  image_uri: z.string().nullable().optional(),
   image_url_copy: z
     .string()
     .nullable()
