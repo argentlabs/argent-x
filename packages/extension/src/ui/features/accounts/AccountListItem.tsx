@@ -1,4 +1,4 @@
-import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
+import { H6, P4, icons, typographyStyles } from "@argent/ui"
 import { Circle, Flex, Image, Text, Tooltip, chakra } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
@@ -12,6 +12,7 @@ import { formatTruncatedAddress } from "../../services/addresses"
 import { MultisigStatus } from "../multisig/hooks/useMultisigStatus"
 import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
+import { AccountLabel } from "./AccountLabel"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
 
@@ -191,22 +192,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
-            {accountType !== "standard" && (
-              <L2
-                backgroundColor={"neutrals.900"}
-                px={1}
-                py={0.5}
-                textTransform="uppercase"
-                fontWeight={"extrabold"}
-                color={"neutrals.200"}
-                borderRadius={"base"}
-                border={"1px solid"}
-                borderColor={"neutrals.700"}
-              >
-                {accountType === "plugin" && "Plugin"}
-                {accountType === "betterMulticall" && "Better MC"}
-              </L2>
-            )}
+            {accountType && <AccountLabel accountType={accountType} />}
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             <P4 fontWeight={"semibold"}>
