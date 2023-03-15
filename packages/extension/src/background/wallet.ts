@@ -73,7 +73,7 @@ const isDevOrTest = isDev || isTest
 const SCRYPT_N = isDevOrTest ? 64 : 262144 // 131072 is the default value used by ethers
 
 const CURRENT_BACKUP_VERSION = 1
-export const SESSION_DURATION = isDev ? 24 * 60 * 60 : 30 * 60 // 30 mins in prod, 24 hours in dev
+export const SESSION_DURATION = isDev ? 24 * 60 : 30 // 30 mins in prod, 24 hours in dev. Note that the unit is minute, not second
 
 const CHECK_OFFSET = 10
 
