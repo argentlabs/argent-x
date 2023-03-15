@@ -13,17 +13,20 @@ const SECOND_STEP = 1
 const THIRD_STEP = 2
 
 export const CreateMultisigStartScreen = () => {
+  const { networkId } = useParams()
+  if (!networkId) {
+    return <></>
+  }
+  return <MultisigCreationForm networkId={networkId} />
+}
+
+const MultisigCreationForm = ({ networkId }: { networkId: string }) => {
   const [currentStep, setStep] = useState(FIRST_STEP)
-  const creatorSignerKey = useNextSignerKey()
+  const creatorSignerKey = useNextSignerKey(networkId)
 
   const methods = useCreateMultisigForm(creatorSignerKey)
   const goBack = () => setStep((step) => step - 1)
   const goNext = () => setStep((step) => step + 1)
-  const { networkId } = useParams()
-
-  if (!networkId) {
-    return <></>
-  }
 
   return (
     <FormProvider {...methods}>
