@@ -181,7 +181,7 @@ const handleMessage = async (
     actionQueue,
   }
 
-  const extensionUrl = browser.extension.getURL("")
+  const extensionUrl = browser.runtime.getURL("")
   const safeOrigin = extensionUrl.replace(/\/$/, "")
   const origin = getOriginFromSender(sender)
   const isSafeOrigin = Boolean(origin === safeOrigin)
