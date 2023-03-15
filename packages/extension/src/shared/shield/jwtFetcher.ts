@@ -20,9 +20,9 @@ export const jwtFetcher = async <T>(
     },
   }
   const { switcherNetworkId } = useAppState.getState()
-  const fetcher = fetcherWithArgentApiHeadersForNetwork(switcherNetworkId)
+  const fetcher = fetcherWithArgentApiHeadersForNetwork<T>(switcherNetworkId)
   try {
-    return fetcher<T>(input, initWithArgentJwtHeaders)
+    return fetcher(input, initWithArgentJwtHeaders)
   } catch (error) {
     IS_DEV && console.warn(coerceErrorToString(error))
     throw error

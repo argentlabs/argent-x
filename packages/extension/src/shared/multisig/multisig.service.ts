@@ -13,7 +13,7 @@ import {
 export interface IFetchMultisigDataForSigner {
   signer: string
   network: Network
-  fetcher?: Fetcher
+  fetcher?: Fetcher<ApiMultisigDataForSigner>
 }
 
 export async function fetchMultisigDataForSigner({

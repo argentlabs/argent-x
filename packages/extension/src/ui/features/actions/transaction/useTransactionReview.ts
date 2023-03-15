@@ -8,10 +8,7 @@ import {
   settingsStore,
 } from "../../../../shared/settings"
 import { useKeyValueStorage } from "../../../../shared/storage/hooks"
-import {
-  ApiTransactionReviewResponse,
-  fetchTransactionReview,
-} from "../../../../shared/transactionReview.service"
+import { fetchTransactionReview } from "../../../../shared/transactionReview.service"
 import { argentApiFetcher } from "../../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
@@ -59,7 +56,7 @@ export const useTransactionReview = ({
     })
     // TODO: come back - dont rerender when fetcher reference changes
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
-  return useConditionallyEnabledSWR<ApiTransactionReviewResponse>(
+  return useConditionallyEnabledSWR(
     Boolean(transactionReviewEnabled),
     [actionHash, "transactionReview"],
     transactionReviewFetcher,

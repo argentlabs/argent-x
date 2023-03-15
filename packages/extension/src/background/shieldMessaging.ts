@@ -9,7 +9,6 @@ import {
 import { getAccounts } from "../shared/account/store"
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import {
-  BackendAccount,
   addBackendAccount,
   getBackendAccounts,
   isTokenExpired,
@@ -99,7 +98,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
         const backendAccounts = await getBackendAccounts()
 
         const existingAccount = backendAccounts.find(
-          (x: BackendAccount) =>
+          (x) =>
             number.hexToDecimalString(x.address) ===
             number.hexToDecimalString(selectedAccount.address),
         )

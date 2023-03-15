@@ -1,9 +1,9 @@
 /** generic json fetcher */
 
-export type Fetcher = (
+export type Fetcher<T> = (
   input: RequestInfo | URL,
   init?: RequestInit,
-) => Promise<any>
+) => Promise<T>
 
 export interface FetcherError extends Error {
   url?: string
@@ -63,9 +63,9 @@ export const fetcher = async <T>(
   }
 }
 
-export const fetcherWithArgentApiHeadersForNetwork = (
+export const fetcherWithArgentApiHeadersForNetwork = <T>(
   network: string,
-  fetcherImpl: Fetcher = fetcher,
+  fetcherImpl: Fetcher<T> = fetcher,
 ) => {
   const fetcherWithArgentApiHeaders = (
     input: RequestInfo | URL,
