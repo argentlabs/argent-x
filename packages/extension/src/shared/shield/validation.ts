@@ -86,9 +86,14 @@ export const validateEmailForAccounts = ({
   localAccountsWithGuardian,
   backendAccounts,
 }: ValidateEmailForAccountsProps) => {
-  /** Scenario 1 */
+  const localAccountsMatchBackendAccounts =
+    getLocalAccountsMatchBackendAccounts(localAccounts, backendAccounts)
   if (localAccountsWithGuardian.length === 0) {
     if (backendAccounts.length > 0) {
+      if (localAccountsMatchBackendAccounts) {
+        return
+      }
+      /** Scenario 1 */
       throw new Error(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1)
     }
   }
@@ -99,8 +104,6 @@ export const validateEmailForAccounts = ({
       throw new Error(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2)
     }
     /** Scenario 3 */
-    const localAccountsMatchBackendAccounts =
-      getLocalAccountsMatchBackendAccounts(localAccounts, backendAccounts)
     if (backendAccounts.length > 0 && !localAccountsMatchBackendAccounts) {
       throw new Error(SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3)
     }

@@ -132,18 +132,27 @@ export const handleTransactionMessage: HandleMessage<
         const { overall_fee, suggestedMaxFee } =
           await wallet.getAccountDeploymentFee(account)
 
-        const maxADFee = number.toHex(
-          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
-        )
-
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
           data: {
             amount: number.toHex(overall_fee),
-            maxADFee,
+            maxADFee: argentMaxFee(suggestedMaxFee),
           },
         })
       } catch (error) {
+        // FIXME: This is a temporary fix for the case where the user has a multisig account.
+        // Once starknet 0.11 is released, we can remove this.
+        if (account.type === "multisig") {
+          const fallbackPrice = number.toBN(10e14)
+          return respond({
+            type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
+            data: {
+              amount: number.toHex(fallbackPrice),
+              maxADFee: argentMaxFee(fallbackPrice),
+            },
+          })
+        }
+
         console.error(error)
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ",

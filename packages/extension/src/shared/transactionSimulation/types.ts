@@ -5,14 +5,15 @@ import { AllowArray } from "../storage/types"
 
 export interface IFetchTransactionSimulation {
   transactions: AllowArray<Call>
-  fetcher?: Fetcher
+  fetcher?: Fetcher<ApiTransactionSimulationResponse>
 }
 
 export interface TransactionSimulationApproval {
   tokenAddress: string
   owner: string
   spender: string
-  value: string
+  value?: string
+  tokenId?: string
   details?: TokenDetails
 }
 
@@ -20,7 +21,8 @@ export interface TransactionSimulationTransfer {
   tokenAddress: string
   from: string
   to: string
-  value: string
+  value?: string
+  tokenId?: string
   details?: TokenDetails
 }
 

@@ -1,4 +1,5 @@
 import { Call } from "starknet"
+import urlJoin from "url-join"
 
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { Fetcher, fetcher } from "../api/fetcher"
@@ -19,7 +20,7 @@ const multisigTransactionTypes = {
 export interface IFetchMultisigDataForSigner {
   signer: string
   network: Network
-  fetcher?: Fetcher
+  fetcher?: Fetcher<ApiMultisigDataForSigner>
 }
 
 export async function fetchMultisigDataForSigner({
@@ -60,5 +61,36 @@ export const getMultisigTransactionType = (transactions: Call[]) => {
     default: {
       return undefined
     }
+  }
+}
+
+export const getMultisigAccountData = async ({
+  address,
+  networkId,
+}: {
+  address: string
+  networkId: string
+}) => {
+  try {
+    if (!ARGENT_MULTISIG_URL) {
+      throw new Error("Multisig endpoint is not defined")
+    }
+    const url = urlJoin(ARGENT_MULTISIG_URL, `${networkId}/${address}`)
+    return fetcher<{
+      content: {
+        address: string
+        creator: string
+        signers: string[]
+        threshold: number
+      }
+    }>(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+  } catch (e) {
+    throw new Error(`An error occured ${e}`)
   }
 }

@@ -2,6 +2,7 @@ import { Button, P4, icons } from "@argent/ui"
 import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
 import { FC } from "react"
 
+import { analytics } from "../../../services/analytics"
 import { ShieldExternalLinkButton } from "../ui/ShieldExternalLinkButton"
 import { ShieldHeader } from "../ui/ShieldHeader"
 import { getEscapeDisplayAttributes } from "./EscapeBanner"
@@ -42,6 +43,13 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
       </OrderedList>
       <Center>
         <ShieldExternalLinkButton
+          onClick={() => {
+            analytics.track("argentShieldEscapeScreenAction", {
+              escapeId: "escapeGuardian",
+              remainingTime: liveAccountEscape.activeFromNowMs,
+              action: "detailedInstructions",
+            })
+          }}
           href={"https://www.argent.xyz/argent-x/"}
           my={3}
         >
@@ -49,10 +57,20 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
         </ShieldExternalLinkButton>
       </Center>
       <Flex flex={1} />
-      <Button colorScheme={"primary"} onClick={onKeep}>
+      <Button
+        colorScheme={"primary"}
+        onClick={() => {
+          onKeep()
+        }}
+      >
         Keep Argent Shield
       </Button>
-      <Button mt={3} onClick={onContinue}>
+      <Button
+        mt={3}
+        onClick={() => {
+          onContinue()
+        }}
+      >
         Continue with removal
       </Button>
     </Flex>

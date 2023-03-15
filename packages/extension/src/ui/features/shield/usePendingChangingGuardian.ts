@@ -22,7 +22,7 @@ export enum ChangeGuardian {
  * @returns `ChangeGuardian` status if there is a pending transaction, otherwise `undefined`
  */
 
-const callDataToType = (transactions?: Call | Call[]) => {
+export const changeGuardianCallDataToType = (transactions?: Call | Call[]) => {
   const calldata = Array.isArray(transactions)
     ? transactions[0].calldata
     : transactions?.calldata
@@ -52,7 +52,7 @@ export const usePendingChangeGuardian = (
     )
     if (changeGuardianTransaction) {
       const transactions = changeGuardianTransaction.meta?.transactions
-      const type = callDataToType(transactions)
+      const type = changeGuardianCallDataToType(transactions)
       return {
         transaction: changeGuardianTransaction,
         type,

@@ -10,13 +10,14 @@ import { ScreenLayout } from "./ScreenLayout"
 export const MultisigFirstStep = ({
   index,
   goNext,
+  networkId,
 }: {
+  networkId: string
   index: number
   goNext: () => void
 }) => {
   const { register, trigger } = useFormContext<FieldValues>()
-  const creatorSignerKey = useNextSignerKey()
-
+  const creatorSignerKey = useNextSignerKey(networkId)
   const handleNavigationToConfirmationScreen = async () => {
     const isValid = await trigger("signerKeys")
     if (isValid) {

@@ -1,14 +1,13 @@
 import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, useMemo } from "react"
-import { Call } from "starknet"
 
-import { getMultisigTransactionType } from "../../../../../../shared/multisig/multisig.service"
 import { prettifyTokenAmount } from "../../../../../../shared/token/price"
 import { getTransactionReviewWithType } from "../../../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../../../accountNfts/aspect.service"
 import { useCurrentNetwork } from "../../../../networks/useNetworks"
+import { ApproveScreenType } from "../../types"
 import { useERC721Transfers } from "../../useErc721Transfers"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 
@@ -18,16 +17,14 @@ export interface TransactionTitleProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   fallback?: string
-  declareOrDeployType?: "declare" | "deploy"
-  transactions: Call[]
+  approveScreenType: ApproveScreenType
 }
 
 export const TransactionTitle: FC<TransactionTitleProps> = ({
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
   fallback = "transaction",
-  transactions,
 }) => {
   const nftTransfers = useERC721Transfers(aggregatedData)
   const network = useCurrentNetwork()
@@ -36,17 +33,32 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     () => getTransactionReviewWithType(transactionReview),
     [transactionReview],
   )
-  const multisigTransactionType = getMultisigTransactionType(transactions)
 
-  if (declareOrDeployType) {
+  if (approveScreenType === ApproveScreenType.DECLARE) {
     return (
       <Flex alignItems="center" gap="1">
-        {declareOrDeployType === "declare" ? "Declare" : "Deploy"} contract
+        Declare contract
       </Flex>
     )
   }
 
-  if (multisigTransactionType === "addSigners") {
+  if (approveScreenType === ApproveScreenType.DEPLOY) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Deploy contract
+      </Flex>
+    )
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_DEPLOY) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Activate multisig
+      </Flex>
+    )
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_ADD_SIGNERS) {
     return (
       <Flex alignItems="center" gap="1">
         Add multisig owner

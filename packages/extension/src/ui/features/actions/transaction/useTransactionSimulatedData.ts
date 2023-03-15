@@ -138,7 +138,7 @@ export const useAggregatedSimData = (
             details: t.details,
             erc20TokensRecord,
             nftContracts,
-            tokenId: t.value,
+            tokenId: t.tokenId ?? t.value, // For fallback compatibility, we use the value as the tokenId. This will be ignored for ERC20 tokens
             networkId: network.id,
           })
 
@@ -157,7 +157,7 @@ export const useAggregatedSimData = (
           details: a.details,
           erc20TokensRecord,
           nftContracts,
-          tokenId: a.value,
+          tokenId: a.tokenId ?? a.value, // For fallback compatibility, we use the value as the tokenId. This will be ignored for ERC20 tokens
           networkId: network.id,
         })
 
@@ -217,7 +217,7 @@ export const useAggregatedSimData = (
               token: a.token,
               owner: a.owner,
               spender: a.spender,
-              amount: BigNumber(a.token.type === "erc721" ? 1 : a.value),
+              amount: BigNumber(a.value ?? 1),
               usdValue: a.usdValue ? BigNumber(a.usdValue) : undefined,
             }))
             .filter((a) => a.owner === account?.address) ?? []
@@ -239,10 +239,10 @@ export const useAggregatedSimData = (
         const amount = transfers.reduce<BigNumber>((acc, t) => {
           const isTokenTranfer = checkIsTokenTransfer(t)
           if (isTokenTranfer && t.from === account?.address) {
-            return t.token.type === "erc721" ? acc.minus(1) : acc.minus(t.value)
+            return acc.minus(t.value ?? ONE) // This works because ERC721 tokens have value undefined and the amount is always 1
           }
 
-          return t.token.type === "erc721" ? acc.plus(1) : acc.plus(t.value)
+          return acc.plus(t.value ?? ONE)
         }, ZERO)
 
         const usdValue = transfers.reduce<BigNumber>((acc, t) => {
@@ -259,7 +259,7 @@ export const useAggregatedSimData = (
         }, ZERO)
 
         const recipients = transfers.reduce<Recipient[]>((acc, t) => {
-          const amount = t.token.type === "erc721" ? ONE : BigNumber(t.value)
+          const amount = BigNumber(t.value ?? 1)
 
           const negated = amount.negated()
           const isTokenTranfer = checkIsTokenTransfer(t)
@@ -330,7 +330,7 @@ export function apiTokenDetailsToToken({
   tokenAddress: string
   details?: TokenDetails
   networkId: string
-  tokenId: string
+  tokenId?: string
   erc20TokensRecord: Record<string, Token>
   nftContracts?: string[]
 }): TokenWithType | undefined {

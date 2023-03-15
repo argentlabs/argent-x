@@ -1,7 +1,7 @@
 import { Call, constants, number, uint256 } from "starknet"
 
 import { getMulticallForNetwork } from "../../multicall"
-import { getNetwork, getProvider } from "../../network"
+import { getNetwork } from "../../network"
 import { BaseWalletAccount } from "../../wallet.model"
 import { getIsCurrentImplementation } from "./getImplementation"
 
@@ -24,15 +24,9 @@ export const getGuardianForAccount = async (
     contractAddress: account.address,
     entrypoint: "getGuardian",
   }
-  if (network.multicallAddress) {
-    const multicall = getMulticallForNetwork(network)
-    const response = await multicall.call(call)
-    return shapeResponse(response)
-  }
-  /** fallback to single call */
-  const provider = getProvider(network)
-  const response = await provider.callContract(call)
-  return shapeResponse(response.result)
+  const multicall = getMulticallForNetwork(network)
+  const response = await multicall.call(call)
+  return shapeResponse(response)
 }
 
 const shapeResponse = (response: string[]) => {

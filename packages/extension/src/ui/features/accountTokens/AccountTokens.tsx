@@ -1,6 +1,6 @@
-import { CellStack } from "@argent/ui"
+import { CellStack, Empty, icons } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
-import { FC, useCallback, useEffect, useRef } from "react"
+import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
@@ -14,11 +14,14 @@ import {
 } from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
+import { useMultisig } from "../multisig/multisig.state"
+import { MultisigBanner } from "../multisig/MultisigBanner"
 import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgrade"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
 import { EscapeBanner } from "../shield/escape/EscapeBanner"
 import { accountHasEscape } from "../shield/escape/useAccountEscape"
+import { useAccountGuardianIsSelf } from "../shield/useAccountGuardian"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
@@ -27,6 +30,8 @@ import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { useAccountStatus } from "./useAccountStatus"
+
+const { MultisigIcon } = icons
 
 interface AccountTokensProps {
   account: Account
@@ -66,6 +71,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const { needsUpgrade = false, mutate } = useCheckUpgradeAvailable(account)
 
+  const multisig = useMultisig(account)
+
   const onRedeploy = useCallback(async () => {
     const data = account.toBaseWalletAccount()
     try {
@@ -86,6 +93,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
   const hasEscape = accountHasEscape(account)
+  const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
 
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
@@ -108,6 +116,11 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   }, [shouldShowNetworkUpgradeMessage])
 
   const tokenListVariant = currencyDisplayEnabled ? "default" : "no-currency"
+
+  const showAddFundsBackdrop = useMemo(() => {
+    return multisig?.needsDeploy && feeTokenBalance?.lte(0)
+  }, [feeTokenBalance, multisig?.needsDeploy])
+
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mt={4} mb={6}>
@@ -121,7 +134,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       </VStack>
       <CellStack pt={0}>
         <StatusMessageBannerContainer />
-        {hasEscape && <EscapeBanner account={account} />}
+        {(hasEscape || accountGuardianIsSelf) && (
+          <EscapeBanner account={account} />
+        )}
         {showBackupBanner && <RecoveryBanner />}
         {showUpgradeBanner && (
           <UpgradeBanner
@@ -132,7 +147,25 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
-        <TokenList variant={tokenListVariant} showNewTokenButton />
+        {multisig && (
+          <MultisigBanner
+            multisig={multisig}
+            feeTokenBalance={feeTokenBalance}
+          />
+        )}
+        {showAddFundsBackdrop && (
+          <Empty
+            icon={<MultisigIcon color="neutrals.500" />}
+            title="Add funds to activate multisig"
+          />
+        )}
+        {!showAddFundsBackdrop && (
+          <TokenList
+            variant={tokenListVariant}
+            showNewTokenButton
+            onItemClick={multisig?.needsDeploy ? () => null : undefined}
+          />
+        )}
       </CellStack>
     </Flex>
   )

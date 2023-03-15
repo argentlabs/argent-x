@@ -1,7 +1,5 @@
 import { FC, useMemo } from "react"
-import { Call } from "starknet"
 
-import { getMultisigTransactionType } from "../../../../../../../shared/multisig/multisig.service"
 import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
@@ -9,6 +7,7 @@ import {
   getTransactionReviewWithType,
 } from "../../../../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../../../../networks/useNetworks"
+import { ApproveScreenType } from "../../../types"
 import { useERC721Transfers } from "../../../useErc721Transfers"
 import { AggregatedSimData } from "../../../useTransactionSimulatedData"
 import { AddOwnerIcon } from "./AddOwnerIcon"
@@ -23,16 +22,14 @@ export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
-  declareOrDeployType?: "declare" | "deploy"
-  transactions: Call[]
+  approveScreenType: ApproveScreenType
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
   verifiedDapp,
-  transactions,
 }) => {
   const network = useCurrentNetwork()
 
@@ -43,13 +40,15 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 
   const nftTransfers = useERC721Transfers(aggregatedData)
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
-  const multisigTransactionType = getMultisigTransactionType(transactions)
   // ignore transaction review if it is a DeclareContract transaction
-  if (declareOrDeployType) {
+  if (
+    approveScreenType === ApproveScreenType.DECLARE ||
+    approveScreenType === ApproveScreenType.DEPLOY
+  ) {
     return <DeclareContractIcon />
   }
 
-  if (multisigTransactionType === "addSigners") {
+  if (approveScreenType === ApproveScreenType.MULTISIG_ADD_SIGNERS) {
     return <AddOwnerIcon />
   }
 

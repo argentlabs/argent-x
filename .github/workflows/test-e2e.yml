@@ -27,14 +27,6 @@ jobs:
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
     steps:
-      - name: If github.head_ref not filled, we are merging
-        run: |
-          if [ "${{ github.head_ref }}" == "" ]; then
-            echo "PUBLISH_COMMENT=no" >> $GITHUB_ENV
-          else
-            echo "PUBLISH_COMMENT=yes" >> $GITHUB_ENV
-          fi
-
       - name: Check out repository code
         uses: actions/checkout@v3
 

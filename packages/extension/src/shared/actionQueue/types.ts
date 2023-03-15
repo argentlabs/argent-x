@@ -42,6 +42,10 @@ export type ActionItem =
       payload: BaseWalletAccount
     }
   | {
+      type: "DEPLOY_MULTISIG_ACTION"
+      payload: BaseWalletAccount
+    }
+  | {
       type: "SIGN"
       payload: typedData.TypedData
     }

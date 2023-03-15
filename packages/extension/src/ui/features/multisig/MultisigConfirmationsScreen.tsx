@@ -3,27 +3,19 @@ import { Box, Button, Center } from "@chakra-ui/react"
 import { BigNumber, utils } from "ethers"
 import { FC } from "react"
 import { useFormContext } from "react-hook-form"
-import { useParams } from "react-router-dom"
 import { stark } from "starknet"
 
 import { executeTransaction } from "../../services/backgroundTransactions"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useRouteAccount } from "../shield/useRouteAccount"
 import { FieldValues } from "./hooks/useCreateMultisigForm"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
 
 export const MultisigConfirmationsScreen: FC = () => {
-  const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
-
+  const account = useRouteAccount()
   return (
     <MultisigSettingsWrapper>
       {account && <MultisigConfirmations account={account} />}
@@ -61,18 +53,11 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
     const signers_to_add_len = getUint256CalldataFromBN(
       BigNumber.from(getValues("signerKeys").length),
     )
-    console.log(newSigners.length)
     return {
       entrypoint: "addSigners",
       calldata: stark.compileCalldata({
         new_threshold,
         signers_to_add_len,
-        // new_threshold: getUint256CalldataFromBN(
-        //   BigNumber.from(getValues("confirmations")),
-        // ),
-        // signers_to_add_len: getUint256CalldataFromBN(
-        //   BigNumber.from(newSigners.length),
-        // ),
         signers_to_add: newSigners.map((signer) =>
           utils.hexlify(utils.base58.decode(signer.key)),
         ),
@@ -83,10 +68,6 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
 
   const handleNextClick = () => {
     trigger()
-    console.log(
-      getUint256CalldataFromBN(BigNumber.from(getValues("signerKeys").length)),
-      getUint256CalldataFromBN(BigNumber.from(getValues("confirmations"))),
-    )
     if (!Object.keys(errors).length) {
       const thresholdPayload = getThresholdPayload()
       const signersPayload = getSignersPayload()
@@ -95,9 +76,8 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
         : signersPayload
       executeTransaction({ transactions })
     }
-    // TODO: implement
   }
-  account.needsDeploy = false
+
   return (
     <Box m={4}>
       <H4>Set confirmations</H4>

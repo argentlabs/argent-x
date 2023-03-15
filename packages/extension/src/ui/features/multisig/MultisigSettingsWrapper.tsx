@@ -1,25 +1,19 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { FC, PropsWithChildren, ReactNode, useCallback } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
-import { useAccount } from "../accounts/accounts.state"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useRouteAccount } from "../shield/useRouteAccount"
 
 export const MultisigSettingsWrapper: FC<
   PropsWithChildren & { goBack?: () => void }
 > = ({ children, goBack }: { children?: ReactNode; goBack?: () => void }) => {
-  const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
   const { accountNames } = useAccountMetadata()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
+  const account = useRouteAccount()
 
   const accountName = account
     ? getAccountName(account, accountNames)

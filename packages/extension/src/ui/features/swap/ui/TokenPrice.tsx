@@ -1,4 +1,4 @@
-import { TokenButton } from "@argent/ui"
+import { P4, TokenButton } from "@argent/ui"
 import {
   Currency,
   ETHER,
@@ -7,7 +7,6 @@ import {
   WrappedTokenInfo,
   wrappedCurrency,
 } from "@argent/x-swap"
-import { Text } from "@chakra-ui/react"
 import { ethers } from "ethers"
 import { FC } from "react"
 
@@ -50,6 +49,9 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
 
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
 
+  const displayPriceDetails =
+    parseFloat(priceDetails?.ccyDayChange || "0") * 100
+
   return (
     <TokenButton
       onClick={onClick}
@@ -61,9 +63,9 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
       valueLabelPrimary={displayCurrencyValue}
       valueLabelSecondary={
         priceDetails ? (
-          <Text color={+priceDetails.ccyDayChange > 0 ? "green" : "red"}>
-            {priceDetails.ccyDayChange}%
-          </Text>
+          <P4 color={displayPriceDetails > 0 ? "green" : "red"}>
+            {displayPriceDetails.toFixed(2)}%
+          </P4>
         ) : null
       }
       currencyValue={currencyValue}

@@ -2,12 +2,10 @@ import { H4, P3 } from "@argent/ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
-import { useParams } from "react-router-dom"
 
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
-import { useEncodedPublicKeys } from "../accounts/usePublicKey"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
+import { useRouteAccount } from "../shield/useRouteAccount"
 import { AddOwnersForm } from "./AddOwnerForm"
 import {
   FieldValues,
@@ -18,13 +16,9 @@ import { MultisigConfirmations } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 
 export const MultisigAddOwnersScreen: FC = () => {
-  const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
-  const methods = useCreateMultisigForm()
+  const account = useRouteAccount()
+  const signerKey = useSignerKey()
+  const methods = useCreateMultisigForm(signerKey)
   const [step, setStep] = useState(0)
   const [goBack, setGoBack] = useState<undefined | (() => void)>(undefined)
   const goNext = () => {

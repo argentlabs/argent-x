@@ -44,8 +44,8 @@ export default class Account extends Navigation {
     return this.page.locator(`button :text-is('${tkn}')`)
   }
 
-  get accountList() {
-    return this.page.locator(`[aria-label="${lang.account.showAccountList}"]`)
+  get accountListSelector() {
+    return this.page.locator(`[aria-label="Show account list"]`)
   }
 
   get addANewccountFromAccountList() {
@@ -80,8 +80,8 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="tokenBalance"]')
   }
 
-  currentBalance(tkn: "Ether") {
-    return this.page.locator(`//img[@alt="${tkn}"]/parent::*/parent::button`)
+  currentBalance(tkn: "ETH") {
+    return this.page.locator(` //button//h6[contains(text(), '${tkn}')]`)
   }
 
   get accountName() {
@@ -92,28 +92,30 @@ export default class Account extends Navigation {
     if (firstAccount) {
       await this.createAccount.click()
     } else {
-      await this.accountList.click()
+      await this.accountListSelector.click()
       await this.addANewccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
+
     await this.account("").last().click()
+    await expect(this.accountListSelector).toBeVisible()
     await this.addFunds.click()
     await this.addFundsFromStartNet.click()
     const accountAddress = await this.accountAddress
       .textContent()
       .then((v) => v?.replaceAll(" ", ""))
     await this.close.last().click()
-    const accountName = await this.accountList.textContent()
+    const accountName = await this.accountListSelector.textContent()
     return [accountName, accountAddress]
   }
 
   async selectAccount(accountName: string) {
-    await this.accountList.click()
+    await this.accountListSelector.click()
     await this.account(accountName).click()
   }
 
   async ensureSelectedAccount(accountName: string) {
-    const currentAccount = await this.accountList.textContent()
+    const currentAccount = await this.accountListSelector.textContent()
     if (currentAccount != accountName) {
       await this.selectAccount(accountName)
     }

@@ -37,4 +37,30 @@ test.describe("Recovery Wallet", () => {
     await extension.navigation.yes.click()
     await expect(extension.account.setUpAccountRecovery).toBeHidden()
   })
+
+  test("User should be able to recover wallet with more than 30 accounts", async ({
+    extension,
+  }) => {
+    await extension.open()
+    await extension.wallet.restoreExistingWallet.click()
+    await extension.setClipBoardContent(config.wallets[2].seed)
+    await extension.paste()
+    await extension.navigation.continue.click()
+
+    await extension.wallet.password.fill(config.password)
+    await extension.wallet.repeatPassword.fill(config.password)
+
+    await extension.navigation.continue.click()
+    await expect(extension.wallet.finish.first()).toBeVisible({
+      timeout: 180000,
+    })
+
+    await extension.open()
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.network.selectNetwork("Localhost 5050")
+    await extension.account.selectAccount("Account 32")
+    await expect(extension.account.currentBalance("ETH")).toContainText(
+      "0.9991 ETH",
+    )
+  })
 })

@@ -2,7 +2,6 @@ import { L1, L2, P4, Pre, TextWithAmount, icons } from "@argent/ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
-import { number } from "starknet"
 
 import {
   prettifyCurrencyValue,
@@ -15,18 +14,18 @@ import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHoo
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 import { ExtendableControl, FeeEstimationValue, LoadingInput } from "./styled"
-import { TransactionsFeeEstimationProps } from "./types"
-import { getTooltipText, useMaxFeeEstimation } from "./utils"
+import { FeeEstimationProps } from "./types"
+import { getTooltipText } from "./utils"
 import { getParsedError } from "./utils"
 
 const { AlertIcon, ChevronDownIcon, InfoIcon } = icons
 
-export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
+export const FeeEstimation: FC<FeeEstimationProps> = ({
   accountAddress,
-  transactions,
-  actionHash,
-  onErrorChange,
   networkId,
+  fee,
+  feeError,
+  onErrorChange,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
@@ -37,33 +36,24 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
-  const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
-
-  const totalMaxFee = useMemo(() => {
-    if (account.needsDeploy && fee?.maxADFee) {
-      return number.toHex(
-        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
-      )
-    }
-    return fee?.suggestedMaxFee
-  }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
-
   const enoughBalance = useMemo(
-    () => Boolean(totalMaxFee && feeTokenBalance?.gte(totalMaxFee)),
-    [feeTokenBalance, totalMaxFee],
+    () =>
+      Boolean(
+        fee?.suggestedMaxFee && feeTokenBalance?.gte(fee.suggestedMaxFee),
+      ),
+    [feeTokenBalance, fee?.suggestedMaxFee],
   )
 
   const showFeeError = Boolean(fee && feeTokenBalance && !enoughBalance)
-  const showEstimateError = Boolean(error)
+  const showEstimateError = Boolean(feeError)
   const showError = showFeeError || showEstimateError
 
   const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
   useEffect(() => {
     onErrorChange?.(hasError)
-    // only rerun when error changes
-  }, [hasError]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hasError, onErrorChange])
 
-  const parsedFeeEstimationError = showEstimateError && getParsedError(error)
+  const parsedFeeEstimationError = showEstimateError && getParsedError(feeError)
   const feeToken = useNetworkFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,

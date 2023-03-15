@@ -11,6 +11,7 @@ export const colors = {
   white50: "rgba(255,255,255,0.5)",
   gray: makeColorVariants("#58585b"),
   primary: makeColorVariants("#f36a3d"),
+  primaryExtraDark: makeColorVariants("#371709"),
   secondary: makeColorVariants("#08a681"),
   secondaryDark: "#068063",
   tertiary: makeColorVariants("#404043"),

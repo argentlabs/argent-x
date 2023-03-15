@@ -1,5 +1,11 @@
-import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
-import { VStack } from "@chakra-ui/react"
+import {
+  BarBackButton,
+  CellStack,
+  Empty,
+  HeaderCell,
+  NavigationContainer,
+  icons,
+} from "@argent/ui"
 import { uniq } from "lodash-es"
 import { FC, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
@@ -10,54 +16,66 @@ import {
   usePreAuthorizations,
 } from "../../../shared/preAuthorizations"
 import { Button } from "../../components/Button"
-import { P } from "../../theme/Typography"
 import { DappConnection } from "./DappConnection"
 
-export const DappConnectionsSettingsScreen: FC = () => {
-  const navigate = useNavigate()
+const { NetworkIcon } = icons
 
+export const DappConnectionsSettingsScreen: FC = () => {
   const preAuthorizations = usePreAuthorizations()
 
-  const preauthorizedHosts = useMemo<string[]>(() => {
+  const preauthorizedHosts = useMemo(() => {
     return uniq(
       preAuthorizations.map((preAuthorization) => preAuthorization.host),
     )
   }, [preAuthorizations])
 
+  return <DappConnectionsSettings preauthorizedHosts={preauthorizedHosts} />
+}
+
+interface DappConnectionsSettingsProps {
+  preauthorizedHosts: string[]
+}
+
+export const DappConnectionsSettings: FC<DappConnectionsSettingsProps> = ({
+  preauthorizedHosts = [],
+}) => {
+  const navigate = useNavigate()
   return (
     <NavigationContainer
       leftButton={<BarBackButton />}
       title={"Dapp connections"}
     >
-      <VStack gap="6">
-        {preauthorizedHosts === null ? null : preauthorizedHosts.length ===
-          0 ? (
-          <P>You haven&apos;t connected to any dapp yet.</P>
-        ) : (
-          <CellStack gap="4">
-            {preauthorizedHosts.map((host) => (
-              <DappConnection
-                key={host}
-                host={host}
-                onRemoveClick={async () => {
-                  /** passing null as accountAddress will remove all accounts */
-                  await removePreAuthorization(host)
-                }}
-              />
-            ))}
-
-            <P>Require all dapps to request a new connection to your wallet?</P>
-            <Button
-              onClick={() => {
-                resetPreAuthorizations()
-                navigate(-1)
+      {preauthorizedHosts.length === 0 ? (
+        <Empty
+          icon={<NetworkIcon />}
+          title={"You haven’t connected to any dapp yet."}
+        />
+      ) : (
+        <CellStack width={"full"}>
+          {preauthorizedHosts.map((host) => (
+            <DappConnection
+              key={host}
+              host={host}
+              onRemoveClick={async () => {
+                /** passing null as accountAddress will remove all accounts */
+                await removePreAuthorization(host)
               }}
-            >
-              Reset all dapp connections
-            </Button>
-          </CellStack>
-        )}
-      </VStack>
+            />
+          ))}
+
+          <HeaderCell>
+            Require all dapps to request a new connection to your wallet?
+          </HeaderCell>
+          <Button
+            onClick={() => {
+              resetPreAuthorizations()
+              navigate(-1)
+            }}
+          >
+            Reset all dapp connections
+          </Button>
+        </CellStack>
+      )}
     </NavigationContainer>
   )
 }

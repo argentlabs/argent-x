@@ -1,4 +1,4 @@
-import { Circle, Flex, Image, Tooltip } from "@chakra-ui/react"
+import { Box, Circle, Flex, Image, Tooltip } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode } from "react"
 
 import { Button } from "./Button"
@@ -115,14 +115,14 @@ const TokenButton: FC<TokenListItemProps> = ({
                   {valueLabelPrimary}
                 </H6>
                 {valueLabelSecondary && (
-                  <P4
+                  <Box
                     color="neutrals.400"
                     fontWeight={"semibold"}
                     textOverflow={"ellipsis"}
                     textAlign="end"
                   >
                     {valueLabelSecondary}
-                  </P4>
+                  </Box>
                 )}
               </>
             )}

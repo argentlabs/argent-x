@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { routes, useRouteAccountAddress } from "../../routes"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
 import { useRouteAccount } from "./useRouteAccount"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 export const ShieldAccountEmailScreen: FC = () => {
   const account = useRouteAccount()
@@ -11,15 +12,20 @@ export const ShieldAccountEmailScreen: FC = () => {
   const navigate = useNavigate()
   const hasGuardian = Boolean(account?.guardian)
 
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: "enterEmail",
+  })
+
   const onBack = useCallback(() => {
     navigate(routes.accountTokens())
   }, [navigate])
 
   const onEmailRequested = useCallback(
     (email: string) => {
+      trackSuccess()
       navigate(routes.shieldAccountOTP(accountAddress, email))
     },
-    [accountAddress, navigate],
+    [accountAddress, navigate, trackSuccess],
   )
 
   return (
