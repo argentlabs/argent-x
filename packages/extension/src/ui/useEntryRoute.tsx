@@ -38,7 +38,8 @@ const determineEntry = async (query: URLSearchParams) => {
   }
 
   if (query.get("goto") === "multisig") {
-    return routes.multisigCreate()
+    const networkId = query.get("networkId")
+    return routes.multisigCreate(networkId)
   }
 
   const { initialized } = await isInitialized()

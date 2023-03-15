@@ -11,17 +11,18 @@ import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { ARGENT_SHIELD_NETWORK_ID } from "../../../shared/shield/constants"
-import { requestEmail } from "../../../shared/shield/register"
 import {
-  getVerifiedEmailIsExpired,
-  getVerifiedEmailIsExpiredForRemoval,
-} from "../../../shared/shield/verifiedEmail"
+  requestEmail,
+  shieldIsTokenExpired,
+} from "../../../shared/shield/register"
+import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
 import { ShieldAccountNotDeployed } from "./ShieldAccountNotDeployed"
 import { useRouteAccount } from "./useRouteAccount"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
 const { ArgentShieldIcon } = icons
@@ -34,14 +35,19 @@ export const ShieldAccountStartScreen: FC = () => {
   const toast = useToast()
   const network = useCurrentNetwork()
 
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: "welcome",
+  })
+
   const onActivate = useCallback(async () => {
+    trackSuccess()
     if (verifiedEmail) {
       try {
         setIsLoading(true)
-        const verifiedEmailIsExpired = account?.guardian
+        const isExpired = account?.guardian
           ? await getVerifiedEmailIsExpiredForRemoval()
-          : await getVerifiedEmailIsExpired()
-        if (verifiedEmailIsExpired) {
+          : await shieldIsTokenExpired()
+        if (isExpired) {
           await requestEmail(verifiedEmail)
           navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
         } else {
@@ -59,7 +65,14 @@ export const ShieldAccountStartScreen: FC = () => {
     } else {
       navigate(routes.shieldAccountEmail(account?.address))
     }
-  }, [account?.address, account?.guardian, navigate, toast, verifiedEmail])
+  }, [
+    account?.address,
+    account?.guardian,
+    navigate,
+    toast,
+    trackSuccess,
+    verifiedEmail,
+  ])
 
   const isAvailable = network.id === ARGENT_SHIELD_NETWORK_ID
 

@@ -20,7 +20,6 @@ const texts = {
     addFunds: "Add funds",
     fundsFromStarkNet: "From another StarkNet account",
     fullAccountAddress: "Full account address",
-    showAccountList: "Show account list",
     send: "Send",
     export: "Export",
     accountRecovery: "Set up account recovery",

@@ -1,10 +1,13 @@
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { isZeroMultisigAccount, useMultisigAccount } from "../multisig.state"
+import {
+  isZeroMultisigAccount,
+  useMultisigWalletAccount,
+} from "../multisig.state"
 
 export type MultisigStatus = "pending" | "ready" | "unknown"
 
 export function useMultisigStatus(account: BaseWalletAccount): MultisigStatus {
-  const multisigAccount = useMultisigAccount(account)
+  const multisigAccount = useMultisigWalletAccount(account)
 
   if (!multisigAccount) {
     return "unknown"

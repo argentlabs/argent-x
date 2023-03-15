@@ -7,23 +7,24 @@ import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
 } from "../../../../../../shared/transactionReview.service"
+import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
 
 export interface DappHeaderProps {
-  transactions: Call[]
+  transactions?: Call[]
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
-  declareOrDeployType?: "declare" | "deploy"
+  approveScreenType: ApproveScreenType
 }
 
 export const DappHeader = ({
   transactions,
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -43,7 +44,7 @@ export const DappHeader = ({
           transactionReview={transactionReview}
           aggregatedData={aggregatedData}
           verifiedDapp={transactionReview?.targetedDapp}
-          declareOrDeployType={declareOrDeployType}
+          approveScreenType={approveScreenType}
         />
         <Flex
           direction="column"
@@ -56,9 +57,11 @@ export const DappHeader = ({
               transactionReview={transactionReview}
               aggregatedData={aggregatedData}
               fallback={
-                transactions.length > 1 ? "transactions" : "transaction"
+                transactions && transactions.length > 1
+                  ? "transactions"
+                  : "transaction"
               }
-              declareOrDeployType={declareOrDeployType}
+              approveScreenType={approveScreenType}
             />
           </H5>
           {targetedDappWebsite && (

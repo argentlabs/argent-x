@@ -4,7 +4,6 @@ import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
 import { isEmptyValue } from "../../../../shared/utils/object"
-import { useAppState } from "../../../app.state"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useNextPublicKey, useNextSignerKey } from "../../accounts/usePublicKey"
 import { ScreenLayout } from "./ScreenLayout"
@@ -17,14 +16,15 @@ export const MultisigSecondStep = ({
   index,
   goBack,
   goNext,
+  networkId,
 }: {
+  networkId: string
   index: number
   goBack: () => void
   goNext: () => void
 }) => {
-  const { switcherNetworkId } = useAppState()
-  const creatorPubKey = useNextPublicKey()
-  const creatorSignerKey = useNextSignerKey()
+  const creatorPubKey = useNextPublicKey(networkId)
+  const creatorSignerKey = useNextSignerKey(networkId)
   const { createMultisigAccount, isError } = useCreateMultisig()
   const {
     control,
@@ -46,7 +46,7 @@ export const MultisigSecondStep = ({
         creator: creatorPubKey,
         signers,
         threshold,
-        networkId: switcherNetworkId,
+        networkId,
       })
       if (result) {
         goNext()

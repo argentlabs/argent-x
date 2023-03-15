@@ -17,6 +17,16 @@ export const deployAccountAction = async ({
   })
 }
 
+export const deployMultisigAction = async ({
+  actionQueue,
+  account,
+}: IDeployAccount) => {
+  await actionQueue.push({
+    type: "DEPLOY_MULTISIG_ACTION",
+    payload: account,
+  })
+}
+
 export const isAccountDeployed = async (
   account: WalletAccount,
   getClassAt: (address: string, blockIdentifier?: unknown) => Promise<unknown>,

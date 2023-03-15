@@ -12,6 +12,7 @@ import {
   BackendAccount,
   addBackendAccount,
   getBackendAccounts,
+  isTokenExpired,
   register,
   requestEmailAuthentication,
   verifyEmail,
@@ -179,6 +180,13 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           data: JSON.stringify(e),
         })
       }
+    }
+    case "SHIELD_IS_TOKEN_EXPIRED": {
+      const data = await isTokenExpired()
+      return sendMessageToUi({
+        type: "SHIELD_IS_TOKEN_EXPIRED_RES",
+        data,
+      })
     }
   }
   throw new UnhandledMessage()

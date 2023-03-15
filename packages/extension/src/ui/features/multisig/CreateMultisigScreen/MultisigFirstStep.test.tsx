@@ -27,7 +27,13 @@ test("renders the MultisigFirstStep component", () => {
 
   const goNext = () => undefined
   describe("it should allow to add owners", () => {
-    render(<MultisigFirstStep index={0} goNext={goNext} />)
+    render(
+      <MultisigFirstStep
+        index={0}
+        goNext={goNext}
+        networkId={"goerli-alpha"}
+      />,
+    )
     // Assert that the title and subtitle are rendered
     expect(screen.getByText("Add owners")).toBeInTheDocument()
     expect(
@@ -47,7 +53,11 @@ test("renders the MultisigFirstStep component", () => {
   })
   describe("it should match the snapshots", () => {
     const { container } = render(
-      <MultisigFirstStep index={0} goNext={goNext} />,
+      <MultisigFirstStep
+        index={0}
+        goNext={goNext}
+        networkId={"goerli-alpha"}
+      />,
     )
     expect(container.firstChild).toMatchSnapshot()
   })

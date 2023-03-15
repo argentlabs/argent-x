@@ -56,8 +56,13 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
     }
 
     await selectAccount(account)
-    navigate(returnTo || routes.accountTokens())
-  }, [account, multisigStatus, navigate, returnTo])
+
+    const navigationRoute = multisig?.needsDeploy
+      ? routes.accountTokens()
+      : returnTo || routes.accountTokens()
+
+    navigate(navigationRoute)
+  }, [account, multisig?.needsDeploy, multisigStatus, navigate, returnTo])
 
   const onOptionsClick = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {

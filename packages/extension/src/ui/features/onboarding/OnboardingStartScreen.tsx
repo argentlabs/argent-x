@@ -7,7 +7,10 @@ import {
 } from "../../components/Icons/MuiIcons"
 import Row from "../../components/Row"
 import { routes } from "../../routes"
-import { usePageTracking } from "../../services/analytics"
+import {
+  usePageTracking,
+  useTimeSpentWithSuccessTracking,
+} from "../../services/analytics"
 import { extensionIsInTab, openExtensionInTab } from "../browser/tabs"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import {
@@ -20,6 +23,10 @@ export const OnboardingStartScreen: FC = () => {
   const didRunInit = useRef(false)
   const navigate = useNavigate()
   usePageTracking("welcome")
+  const { trackSuccess } = useTimeSpentWithSuccessTracking(
+    "onboardingStepFinished",
+    { stepId: "welcome" },
+  )
 
   useEffect(() => {
     const init = async () => {
@@ -46,13 +53,23 @@ export const OnboardingStartScreen: FC = () => {
       subtitle="Enjoy the security of Ethereum with the scale of StarkNet"
     >
       <Row gap={"12px"} align="stretch">
-        <RectButton onClick={() => navigate(routes.onboardingDisclaimer())}>
+        <RectButton
+          onClick={() => {
+            trackSuccess()
+            navigate(routes.onboardingDisclaimer())
+          }}
+        >
           <CreateWalletRectButtonIcon>
             <AccountBalanceWalletIcon />
           </CreateWalletRectButtonIcon>
           Create a new wallet
         </RectButton>
-        <RectButton onClick={() => navigate(routes.onboardingRestoreSeed())}>
+        <RectButton
+          onClick={() => {
+            trackSuccess()
+            navigate(routes.onboardingRestoreSeed())
+          }}
+        >
           <RestoreWalletRectButtonIcon>
             <RefreshIcon />
           </RestoreWalletRectButtonIcon>
