@@ -43,39 +43,42 @@ export const useAccountMetadata = create<State>(
 
 export const getAccountName = (
   { address, network }: Account,
-  accountNames: Record<string, Record<string, string>>,
+  accountNames: AccountNames = {},
 ): string => accountNames[network.id]?.[address] || defaultAccountName
 
 export const setDefaultAccountNames = (accounts: Account[]) => {
-  const { accountNames } = useAccountMetadata.getState()
-
   // Group accounts by type such that plugin and argent accounts are grouped together
   // and multisig accounts are grouped together
   const accountsByTypes = groupBy(accounts, (account) =>
-    account.type === "multisig" ? "multisig" : "argent",
+    account.type === "multisig" ? "multisig" : "standard",
   )
 
   // Default account names should be "MultiSig Account 1", "MultiSig Account 2", etc. if they are multisig accounts
   // and "Account 1", "Account 2", etc. if they are not.
 
   const accountNamesByTypes: AccountNamesByType = {
-    argent: {},
+    standard: {},
     multisig: {},
   }
+
+  const getAccountTypeName = (accountType: string): string =>
+    accountType === "multisig" ? "Multisig" : "Account"
 
   const preMerged = Object.entries(accountsByTypes).reduce<AccountNamesByType>(
     (acc, [type, accounts]) => {
       const accountNames = accounts.reduce<AccountNames>(
         (nestedAcc, account) => {
-          const { network } = account
-          const name = `${type === "multisig" ? "Multisig" : "Account"} ${
-            accounts.map((a) => a.address).indexOf(account.address) + 1
-          }`
+          const { network, address } = account
+          const accountIndex =
+            accounts.findIndex((a) => a.address === address) + 1
+          const name = `${getAccountTypeName(type)} ${accountIndex}`
+          const networkId = network.id
+
           return {
             ...nestedAcc,
-            [network.id]: {
-              ...nestedAcc[network.id],
-              [account.address]: name,
+            [networkId]: {
+              ...nestedAcc[networkId],
+              [address]: name,
             },
           }
         },
@@ -95,9 +98,10 @@ export const setDefaultAccountNames = (accounts: Account[]) => {
       return Object.entries(networks).reduce<AccountNames>(
         (nestedAcc, [networkId, addresses]) => {
           return {
-            ...accountNames,
+            ...acc,
             ...nestedAcc,
             [networkId]: {
+              ...(acc[networkId] || {}), // ensure we don't override existing data
               ...nestedAcc[networkId],
               ...addresses,
             },
