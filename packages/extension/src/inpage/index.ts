@@ -28,6 +28,7 @@ function attach() {
     }
     try {
       ;(window as any)[name] = starknetWindowObject
+      window.dispatchEvent(new Event(`starknet/${name}#initialized`)) // dApps could subscribe this event to detect whether the window object is available
     } catch {
       // ignore
     }
@@ -36,13 +37,10 @@ function attach() {
 
 function attachHandler() {
   attach()
-  setTimeout(attach, 100)
+  // setTimeout(attach, 100) // no need to wait due to `initialized` event
 }
 // inject script
 attachHandler()
-window.addEventListener("load", () => attachHandler())
-document.addEventListener("DOMContentLoaded", () => attachHandler())
-document.addEventListener("readystatechange", () => attachHandler())
 
 window.addEventListener(
   "message",
