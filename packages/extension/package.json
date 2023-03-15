@@ -54,11 +54,11 @@
     "ws": "^8.8.1"
   },
   "scripts": {
-    "build": "NODE_ENV=production webpack",
-    "build:sourcemaps": "GEN_SOURCE_MAPS=true yarn build",
+    "build": "cross-env NODE_ENV=production webpack",
+    "build:sourcemaps": "cross-env GEN_SOURCE_MAPS=true yarn build",
     "start": "webpack",
     "dev": "concurrently -k -r \"webpack --color --watch\" \"yarn dev:hot-reload-server\"",
-    "dev:ui": "SHOW_DEV_UI=true yarn dev",
+    "dev:ui": "cross-env SHOW_DEV_UI=true yarn dev",
     "dev:hot-reload-server": "ts-node ./scripts/hot-reload-server.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "test": "vitest run",
@@ -96,6 +96,7 @@
     "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
     "colord": "^2.9.2",
+    "cross-env": "^7.0.3",
     "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.1.1",
     "ethers": "^5.5.1",
