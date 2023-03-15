@@ -27,6 +27,7 @@ export const mapMultisigWalletAccountsToMultisig = (
         needsDeploy: walletAccount.needsDeploy,
         signers: walletAccount.signers,
         threshold: walletAccount.threshold,
+        creator: walletAccount.creator,
       }),
   )
 }
@@ -59,14 +60,41 @@ export function useMultisigAccounts() {
   }, [accounts, baseMultisigAccounts])
 }
 
-export function useMultisigAccount(base: BaseWalletAccount) {
+export function useMultisigWalletAccount(base?: BaseWalletAccount) {
   const multisigAccounts = useMultisigAccounts()
 
   return useMemo(() => {
+    if (!base) {
+      return
+    }
     return multisigAccounts.find((multisigAccount) =>
       accountsEqual(multisigAccount, base),
     )
   }, [base, multisigAccounts])
+}
+
+export function useMultisig(base?: BaseWalletAccount) {
+  const multisigWalletAccount = useMultisigWalletAccount(base)
+
+  return useMemo(() => {
+    if (!multisigWalletAccount) {
+      return
+    }
+
+    return new Multisig({
+      address: multisigWalletAccount.address,
+      network: multisigWalletAccount.network,
+      signer: multisigWalletAccount.signer,
+      hidden: multisigWalletAccount.hidden,
+      type: multisigWalletAccount.type,
+      guardian: multisigWalletAccount.guardian,
+      escape: multisigWalletAccount.escape,
+      needsDeploy: multisigWalletAccount.needsDeploy,
+      signers: multisigWalletAccount.signers,
+      threshold: multisigWalletAccount.threshold,
+      creator: multisigWalletAccount.creator,
+    })
+  }, [multisigWalletAccount])
 }
 
 export function isZeroMultisigAccount(account: BaseMultisigWalletAccount) {

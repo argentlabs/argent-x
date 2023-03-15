@@ -127,7 +127,7 @@ export interface IFetchTransactionReview {
   network: ApiTransactionReviewNetwork
   accountAddress: string
   transactions: Call | Call[]
-  fetcher?: Fetcher
+  fetcher?: Fetcher<ApiTransactionReviewResponse>
 }
 
 export const fetchTransactionReview = ({

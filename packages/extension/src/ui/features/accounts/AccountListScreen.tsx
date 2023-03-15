@@ -4,7 +4,7 @@ import {
   NavigationContainer,
   icons,
 } from "@argent/ui"
-import React, { Flex } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react"
 import { isEmpty, partition, some } from "lodash-es"
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
@@ -110,7 +110,10 @@ export const AccountListScreen: FC = () => {
 
   const [newAccounts, deprecatedAccounts] = fullPartitionedAccounts
 
-  const [multisigAccounts, standardAccounts] = partition(newAccounts, "type")
+  const [multisigAccounts, standardAccounts] = partition(
+    newAccounts,
+    (account) => account.type === "multisig",
+  )
 
   const hasMultipleAccountTypes =
     !isEmpty(standardAccounts) && !isEmpty(multisigAccounts)

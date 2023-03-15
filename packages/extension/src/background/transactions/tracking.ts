@@ -1,6 +1,6 @@
 import { uniqWith } from "lodash-es"
 
-import { getInFlightTransactions } from "../../shared/transactions"
+import { Transaction, getInFlightTransactions } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/wallet.service"
 import { getTransactionsUpdate } from "./sources/onchain"
@@ -9,7 +9,7 @@ import { transactionsStore } from "./store"
 
 export interface TransactionTracker {
   loadHistory: (accountsToPopulate: WalletAccount[]) => Promise<void>
-  update: () => Promise<boolean>
+  update: () => Promise<Transaction[]>
 }
 
 export const transactionTracker: TransactionTracker = {
@@ -29,8 +29,6 @@ export const transactionTracker: TransactionTracker = {
       allTransactions,
     )
     await transactionsStore.push(updatedTransactions)
-    const hasPendingTransactions =
-      getInFlightTransactions(allTransactions).length > 0
-    return hasPendingTransactions
+    return getInFlightTransactions(allTransactions)
   },
 }

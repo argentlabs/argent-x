@@ -20,7 +20,6 @@ export interface ILanguage {
     addFunds: string
     fundsFromStarkNet: string
     fullAccountAddress: string
-    showAccountList: string
     send: string
     export: string
     accountRecovery: string

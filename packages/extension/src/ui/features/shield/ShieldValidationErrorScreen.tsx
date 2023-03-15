@@ -6,7 +6,7 @@ import {
   icons,
 } from "@argent/ui"
 import { Flex, Link } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 
 import {
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
@@ -15,6 +15,7 @@ import {
 } from "../../../shared/shield/validation"
 import { ZENDESK_LINK } from "../userReview/ReviewFeedbackScreen"
 import { ShieldHeader } from "./ui/ShieldHeader"
+import { useShieldTracking } from "./useShieldTracking"
 
 const { AlertIcon } = icons
 
@@ -27,6 +28,18 @@ export interface ShieldValidationErrorScreenProps {
 export const ShieldValidationErrorScreen: FC<
   ShieldValidationErrorScreenProps
 > = ({ onBack, error, onDone }) => {
+  const { trackSuccess } = useShieldTracking("argentShieldError", {
+    errorId:
+      error === SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2
+        ? "emailNotMatch"
+        : "emailAlreadyInUseForOtherSeedphrase",
+  })
+
+  const onDoneClick = useCallback(() => {
+    trackSuccess()
+    onDone()
+  }, [onDone, trackSuccess])
+
   const subtitle =
     error === SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1 ? (
       <>
@@ -66,7 +79,7 @@ export const ShieldValidationErrorScreen: FC<
           subtitle={subtitle}
         />
         <Flex flex={1} />
-        <Button onClick={onDone} colorScheme={"primary"}>
+        <Button onClick={onDoneClick} colorScheme={"primary"}>
           Try again
         </Button>
       </CellStack>

@@ -1,13 +1,14 @@
 import { Button, CellStack, P3, P4, icons } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
-import { FC } from "react"
-import { Link, To } from "react-router-dom"
+import { FC, useCallback } from "react"
+import { To, useNavigate } from "react-router-dom"
 
 import { ShieldHeader, ShieldHeaderProps } from "./ui/ShieldHeader"
 import {
   ChangeGuardian,
   LiveAccountGuardianState,
 } from "./usePendingChangingGuardian"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 const SHARE_FEEDBACK_URL = "https://discord.gg/T4PDFHxm6T"
 
@@ -95,11 +96,24 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   liveAccountGuardianState,
   returnRoute,
 }) => {
+  const navigate = useNavigate()
+
   const headerProps = getShieldHeaderProps({
     accountName,
     liveAccountGuardianState,
   })
 
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId:
+      liveAccountGuardianState?.type === ChangeGuardian.ADDING
+        ? "addArgentShieldFinish"
+        : "removeArgentShieldFinish",
+  })
+
+  const onFinish = useCallback(() => {
+    trackSuccess()
+    navigate(returnRoute)
+  }, [navigate, returnRoute, trackSuccess])
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>
@@ -138,7 +152,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
           </Button>
         </Center>
       </Center>
-      <Button as={Link} to={returnRoute} colorScheme={"primary"}>
+      <Button onClick={onFinish} colorScheme={"primary"}>
         {headerProps.isLoading ? "Dismiss" : "Done"}
       </Button>
     </CellStack>

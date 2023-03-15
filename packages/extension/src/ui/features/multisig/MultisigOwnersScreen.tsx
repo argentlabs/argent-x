@@ -1,26 +1,21 @@
 import { B2, H4, H6, P3, icons } from "@argent/ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
 import { formatTruncatedSignerKey } from "../../services/addresses"
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
 import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 
 const { MultisigJoinIcon } = icons
 
 export const MultisigOwnersScreen: FC = () => {
-  const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
+  const account = useRouteAccount()
+
   return (
     <MultisigSettingsWrapper>
       {account && <MultisigOwners account={account} />}

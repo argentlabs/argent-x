@@ -35,7 +35,10 @@ const OwnedToken: FC<OwnedTokenProps> = ({ onClick, currency }) => {
 
   const balance = useCurrencyBalance(account?.address, token)
 
-  const currencyValue = useTokenAmountToCurrencyValue(token, balance?.toExact())
+  const currencyValue = useTokenAmountToCurrencyValue(
+    token,
+    balance?.raw.toString(),
+  )
 
   if (!token) {
     return <></>

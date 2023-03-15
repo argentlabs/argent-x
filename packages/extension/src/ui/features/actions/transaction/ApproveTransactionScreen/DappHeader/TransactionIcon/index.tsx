@@ -7,6 +7,7 @@ import {
   getTransactionReviewWithType,
 } from "../../../../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../../../../networks/useNetworks"
+import { ApproveScreenType } from "../../../types"
 import { useERC721Transfers } from "../../../useErc721Transfers"
 import { AggregatedSimData } from "../../../useTransactionSimulatedData"
 import { DeclareContractIcon } from "./DeclareTransactionIcon"
@@ -20,13 +21,13 @@ export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
-  declareOrDeployType?: "declare" | "deploy"
+  approveScreenType: ApproveScreenType
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
   verifiedDapp,
 }) => {
   const network = useCurrentNetwork()
@@ -40,7 +41,10 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
 
   // ignore transaction review if it is a DeclareContract transaction
-  if (declareOrDeployType) {
+  if (
+    approveScreenType === ApproveScreenType.DECLARE ||
+    approveScreenType === ApproveScreenType.DEPLOY
+  ) {
     return <DeclareContractIcon />
   }
 

@@ -1,24 +1,17 @@
 import { H1, H4, P3 } from "@argent/ui"
 import { Box, Button, Center } from "@chakra-ui/react"
 import { FC } from "react"
-import { FieldValues, useFormContext } from "react-hook-form"
-import { useParams } from "react-router-dom"
+import { useFormContext } from "react-hook-form"
 
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useRouteAccount } from "../shield/useRouteAccount"
+import { FieldValues } from "./hooks/useCreateMultisigForm"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
 
 export const MultisigConfirmationsScreen: FC = () => {
-  const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
-
+  const account = useRouteAccount()
   return (
     <MultisigSettingsWrapper>
       {account && <MultisigConfirmations account={account} />}

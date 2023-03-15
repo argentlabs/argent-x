@@ -6,6 +6,10 @@ import { useEstimationAccountFees } from "./DeclareDeploy/useEstimationAccountFe
 import { DeployAccountFeeEstimationProps } from "./types"
 import { useMaxAccountDeploymentFeeEstimation } from "./utils"
 
+/**
+ *
+ * @deprecated Please use the new Component `DeployAccountFeeEstimation`
+ */
 export const AccountDeploymentFeeEstimation: FC<
   DeployAccountFeeEstimationProps
 > = ({ accountAddress, actionHash, onErrorChange, networkId }) => {

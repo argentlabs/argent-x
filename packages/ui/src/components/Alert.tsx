@@ -99,6 +99,21 @@ const sizes = {
       rounded: "base",
     },
   }),
+  md: definePartsStyle({
+    container: {
+      py: "13px",
+      px: 4,
+      rounded: "xl",
+    },
+    title: {
+      fontSize: "md",
+      fontWeight: "bold",
+      lineHeight: 5,
+    },
+    description: {
+      ...typographyStyles.P4,
+    },
+  }),
   lg: definePartsStyle({
     container: {
       p: 4,

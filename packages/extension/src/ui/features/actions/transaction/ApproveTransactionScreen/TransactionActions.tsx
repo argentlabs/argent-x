@@ -23,7 +23,13 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
 }) => {
   return (
     <Box borderRadius="xl">
-      <Box backgroundColor="neutrals.700" px="3" py="2.5" borderTopRadius="xl">
+      <Box
+        backgroundColor="neutrals.700"
+        px="3"
+        py="2.5"
+        borderTopRadius="xl"
+        borderBottom={"1px solid black"}
+      >
         <P4 fontWeight="bold" color="neutrals.100">
           Actions
         </P4>

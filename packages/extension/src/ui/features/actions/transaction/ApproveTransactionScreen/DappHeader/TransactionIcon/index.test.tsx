@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react"
 
 import * as transactionReviewService from "../../../../../../../shared/transactionReview.service"
+import { ApproveScreenType } from "../../../types"
 import { TransactionIcon, TransactionIconProps } from "."
 
 vi.mock("../../../../../networks/useNetworks", () => {
@@ -25,7 +26,7 @@ beforeAll(() => {
 describe("TransactionIcon", () => {
   it("should render DeclareContractIcon if it's a declare transaction", () => {
     const props: TransactionIconProps = {
-      declareOrDeployType: "declare",
+      approveScreenType: ApproveScreenType.DECLARE,
     }
 
     const { queryByTestId } = render(<TransactionIcon {...props} />)
@@ -34,7 +35,7 @@ describe("TransactionIcon", () => {
 
   it("should render DeclareContractIcon if it's a deploy transaction", () => {
     const props: TransactionIconProps = {
-      declareOrDeployType: "deploy",
+      approveScreenType: ApproveScreenType.DEPLOY,
     }
 
     const { queryByTestId } = render(<TransactionIcon {...props} />)
@@ -53,7 +54,7 @@ describe("TransactionIcon", () => {
       })(),
     )
     const props: TransactionIconProps = {
-      declareOrDeployType: undefined,
+      approveScreenType: ApproveScreenType.TRANSACTION,
     }
 
     const { queryByTestId } = render(<TransactionIcon {...props} />)
@@ -62,7 +63,7 @@ describe("TransactionIcon", () => {
 
   it("should render SwapTransactionIcon if type is apiTransactionReviewActivityType.swap", () => {
     const props: TransactionIconProps = {
-      declareOrDeployType: undefined,
+      approveScreenType: ApproveScreenType.TRANSACTION,
     }
 
     vi.spyOn(
