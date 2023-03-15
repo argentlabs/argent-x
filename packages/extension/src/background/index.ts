@@ -119,7 +119,7 @@ getAccounts()
 
 const safeMessages: MessageType["type"][] = [
   "IS_PREAUTHORIZED",
-  "CONNECT_DAPP",
+  "ARGENT_CONNECT_DAPP",
   "DISCONNECT_ACCOUNT",
   "OPEN_UI",
   // answers
@@ -151,9 +151,9 @@ const safeMessages: MessageType["type"][] = [
 const safeIfPreauthorizedMessages: MessageType["type"][] = [
   "EXECUTE_TRANSACTION",
   "SIGN_MESSAGE",
-  "REQUEST_TOKEN",
-  "REQUEST_ADD_CUSTOM_NETWORK",
-  "REQUEST_SWITCH_CUSTOM_NETWORK",
+  "ARGENT_REQUEST_TOKEN",
+  "ARGENT_REQUEST_ADD_CUSTOM_NETWORK",
+  "ARGENT_REQUEST_SWITCH_CUSTOM_NETWORK",
   "REQUEST_DECLARE_CONTRACT",
 ]
 

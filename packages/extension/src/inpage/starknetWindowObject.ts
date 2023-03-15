@@ -57,7 +57,7 @@ export const starknetWindowObject: StarknetWindowObject = {
       ),
     ])
     sendMessage({
-      type: "CONNECT_DAPP",
+      type: "ARGENT_CONNECT_DAPP",
     })
     const walletAccount = await walletAccountP
 

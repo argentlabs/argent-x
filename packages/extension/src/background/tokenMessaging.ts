@@ -9,7 +9,7 @@ export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
   respond,
 }) => {
   switch (msg.type) {
-    case "REQUEST_TOKEN": {
+    case "ARGENT_REQUEST_TOKEN": {
       const selectedAccount = await wallet.getSelectedAccount()
       const exists = await hasToken({
         networkId:

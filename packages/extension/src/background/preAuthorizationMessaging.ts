@@ -50,7 +50,7 @@ export const handlePreAuthorizationMessage: HandleMessage<
   }
 
   switch (msg.type) {
-    case "CONNECT_DAPP": {
+    case "ARGENT_CONNECT_DAPP": {
       const selectedAccount = await wallet.getSelectedAccount()
       if (!selectedAccount) {
         openUi()

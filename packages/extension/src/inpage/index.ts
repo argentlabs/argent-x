@@ -70,7 +70,7 @@ window.addEventListener(
           10 * 60 * 1000,
         )
         sendMessage({
-          type: "CONNECT_DAPP",
+          type: "ARGENT_CONNECT_DAPP",
         })
         const walletAccount = await walletAccountP
 
