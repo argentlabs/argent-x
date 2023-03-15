@@ -129,6 +129,7 @@ jobs:
         run: |
           gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
       - name: SonarCloud Scan
+        if: ${{ github.actor != 'dependabot[bot]' }} ]
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
