@@ -6,7 +6,7 @@ import { isEmptyValue } from "../../../../shared/utils/object"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useNextPublicKey, useNextSignerKey } from "../../accounts/usePublicKey"
 import { useCreateMultisig } from "../hooks/useCreateMultisig"
-import { FieldValues } from "../hooks/useCreateMultisigForm"
+import { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { SetConfirmationsInput } from "../SetConfirmationsInput"
 import { ScreenLayout } from "./ScreenLayout"
 
@@ -28,7 +28,7 @@ export const MultisigSecondStep = ({
     formState: { errors },
     getValues,
     trigger,
-  } = useFormContext<FieldValues>()
+  } = useFormContext<FieldValuesCreateMultisigForm>()
 
   const selectedAccount = useSelectedAccount()
 

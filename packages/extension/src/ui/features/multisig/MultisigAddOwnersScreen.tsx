@@ -8,11 +8,11 @@ import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { AddOwnersForm } from "./AddOwnerForm"
 import {
-  FieldValues,
+  FieldValuesCreateMultisigForm,
   useCreateMultisigForm,
 } from "./hooks/useCreateMultisigForm"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
-import { MultisigConfirmations } from "./MultisigConfirmationsScreen"
+import { MultisigConfirmationsWithOwners } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 
 export const MultisigAddOwnersScreen: FC = () => {
@@ -34,7 +34,9 @@ export const MultisigAddOwnersScreen: FC = () => {
             {step === 0 && (
               <MultisigAddOwners account={account} goNext={goNext} />
             )}
-            {step === 1 && <MultisigConfirmations account={account} />}
+            {step === 1 && (
+              <MultisigConfirmationsWithOwners account={account} />
+            )}
           </>
         )}
       </FormProvider>
@@ -50,7 +52,7 @@ const MultisigAddOwners = ({
   goNext: () => void
 }) => {
   const { multisig } = useMultisigInfo(account)
-  const { trigger } = useFormContext<FieldValues>()
+  const { trigger } = useFormContext<FieldValuesCreateMultisigForm>()
 
   const signerKeys = useEncodedPublicKeys(multisig?.signers ?? [])
   const handleNavigationToConfirmationScreen = async () => {

@@ -3,25 +3,22 @@ import { icons } from "@argent/ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
-import { FieldValues } from "./hooks/useCreateMultisigForm"
+import { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
 
 const { AddIcon, MinusIcon } = icons
 
 export const SetConfirmationsInput = ({
   existingThreshold,
-  existingSigners,
+  totalSigners,
 }: {
   existingThreshold?: number
-  existingSigners?: number
+  totalSigners?: number
 }) => {
   const {
     control,
     formState: { errors },
-    getValues,
-  } = useFormContext<FieldValues>()
-  const totalSigners = existingSigners
-    ? existingSigners + getValues("signerKeys").length
-    : getValues("signerKeys").length
+  } = useFormContext<FieldValuesThresholdForm>()
+
   return (
     <Box my="2" width="100%">
       <Controller

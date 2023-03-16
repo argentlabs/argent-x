@@ -10,7 +10,7 @@ import {
 import { useCallback, useEffect } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
-import { FieldValues } from "./hooks/useCreateMultisigForm"
+import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 
 const { CloseIcon, AddIcon } = icons
 
@@ -23,7 +23,7 @@ export const AddOwnersForm = ({
     control,
     formState: { errors },
     register,
-  } = useFormContext<FieldValues>()
+  } = useFormContext<FieldValuesCreateMultisigForm>()
 
   const { fields, append, remove } = useFieldArray({
     name: "signerKeys",
