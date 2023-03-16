@@ -1,12 +1,9 @@
 import { H1, H4, P3 } from "@argent/ui"
 import { Box, Button, Center } from "@chakra-ui/react"
-import { BigNumber, utils } from "ethers"
 import { FC } from "react"
 import { useFormContext } from "react-hook-form"
-import { stark } from "starknet"
 
 import { addMultisigOwners } from "../../../shared/multisig/multisig.service"
-import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { FieldValues } from "./hooks/useCreateMultisigForm"
@@ -31,41 +28,6 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
     getValues,
   } = useFormContext<FieldValues>()
 
-  const getThresholdPayload = () => {
-    const newThreshold = getValues("confirmations")
-    if (newThreshold === multisig?.threshold) {
-      return null
-    }
-    return {
-      entrypoint: "changeThreshold",
-      calldata: stark.compileCalldata({
-        new_threshold: getUint256CalldataFromBN(BigNumber.from(newThreshold)),
-      }),
-      contractAddress: account.address,
-    }
-  }
-
-  const getSignersPayload = () => {
-    const newSigners = getValues("signerKeys")
-    const new_threshold = getUint256CalldataFromBN(
-      BigNumber.from(getValues("confirmations")),
-    )
-    const signers_to_add_len = getUint256CalldataFromBN(
-      BigNumber.from(getValues("signerKeys").length),
-    )
-    return {
-      entrypoint: "addSigners",
-      calldata: stark.compileCalldata({
-        new_threshold,
-        signers_to_add_len,
-        signers_to_add: newSigners.map((signer) =>
-          utils.hexlify(utils.base58.decode(signer.key)),
-        ),
-      }),
-      contractAddress: account.address,
-    }
-  }
-
   const handleNextClick = () => {
     trigger()
     if (!Object.keys(errors).length) {
@@ -77,7 +39,7 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
       })
     }
   }
-
+  account.needsDeploy = false
   return (
     <Box m={4}>
       <H4>Set confirmations</H4>
