@@ -481,17 +481,10 @@ export const handleTransactionMessage: HandleMessage<
                 }),
                 contractAddress: address,
               }
-        const new_threshold = getUint256CalldataFromBN(
-          BigNumber.from(newThreshold),
-        )
-        const signers_to_add_len = getUint256CalldataFromBN(
-          BigNumber.from(signersToAdd.length),
-        )
         const signersPayload = {
           entrypoint: "addSigners",
           calldata: stark.compileCalldata({
-            new_threshold,
-            signers_to_add_len,
+            new_threshold: newThreshold.toString(),
             signers_to_add: signersToAdd.map((signer) =>
               utils.hexlify(utils.base58.decode(signer)),
             ),
