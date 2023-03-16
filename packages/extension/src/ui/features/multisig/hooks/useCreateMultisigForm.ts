@@ -17,7 +17,8 @@ const getFormSchema = (accountSignerKey?: string) =>
               ? [...arr.map((item) => item.key), accountSignerKey]
               : arr.map((item) => item.key)
             const uniqueValues = new Set(extendedArr)
-            return uniqueValues.size === arr.length
+
+            return uniqueValues.size === extendedArr.length
           },
           {
             message: "You cannot use the same key twice",

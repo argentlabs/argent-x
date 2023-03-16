@@ -1,3 +1,4 @@
+import { BigNumber, utils } from "ethers"
 import {
   Account,
   InvocationsSignerDetails,
@@ -8,7 +9,9 @@ import {
 } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
+import { getUint256CalldataFromBN } from "../../ui/services/transactions"
 import { isAccountDeployed } from "../accountDeploy"
+import { sendMessageToUi } from "../activeTabs"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { getNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
@@ -459,6 +462,65 @@ export const handleTransactionMessage: HandleMessage<
 
     case "TRANSACTION_FAILED": {
       return await actionQueue.remove(msg.data.actionHash)
+    }
+
+    case "ADD_MULTISIG_OWNERS": {
+      try {
+        const { address, signersToAdd, newThreshold, currentThreshold } =
+          msg.data
+
+        const thresholdPayload =
+          newThreshold === currentThreshold
+            ? null
+            : {
+                entrypoint: "changeThreshold",
+                calldata: stark.compileCalldata({
+                  new_threshold: getUint256CalldataFromBN(
+                    BigNumber.from(newThreshold),
+                  ),
+                }),
+                contractAddress: address,
+              }
+        const new_threshold = getUint256CalldataFromBN(
+          BigNumber.from(newThreshold),
+        )
+        const signers_to_add_len = getUint256CalldataFromBN(
+          BigNumber.from(signersToAdd.length),
+        )
+        const signersPayload = {
+          entrypoint: "addSigners",
+          calldata: stark.compileCalldata({
+            new_threshold,
+            signers_to_add_len,
+            signers_to_add: signersToAdd.map((signer) =>
+              utils.hexlify(utils.base58.decode(signer)),
+            ),
+          }),
+          contractAddress: address,
+        }
+        const transactions = thresholdPayload
+          ? [thresholdPayload, signersPayload]
+          : signersPayload
+
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions,
+            meta: {
+              title: "Add multisig owners",
+              type: "MULTISIG_ADD_SIGNERS",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_RES",
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_REJ",
+          data: { error: `${e}` },
+        })
+      }
     }
   }
 

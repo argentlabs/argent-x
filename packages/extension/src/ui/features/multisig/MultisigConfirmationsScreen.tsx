@@ -5,7 +5,7 @@ import { FC } from "react"
 import { useFormContext } from "react-hook-form"
 import { stark } from "starknet"
 
-import { executeTransaction } from "../../services/backgroundTransactions"
+import { addMultisigOwners } from "../../../shared/multisig/multisig.service"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
@@ -69,12 +69,12 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
   const handleNextClick = () => {
     trigger()
     if (!Object.keys(errors).length) {
-      const thresholdPayload = getThresholdPayload()
-      const signersPayload = getSignersPayload()
-      const transactions = thresholdPayload
-        ? [thresholdPayload, signersPayload]
-        : signersPayload
-      executeTransaction({ transactions })
+      addMultisigOwners({
+        address: account.address,
+        newThreshold: getValues("confirmations"),
+        signersToAdd: getValues("signerKeys").map((signer) => signer.key),
+        currentThreshold: multisig?.threshold,
+      })
     }
   }
 

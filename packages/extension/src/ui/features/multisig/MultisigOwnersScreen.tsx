@@ -33,7 +33,6 @@ const MultisigOwners = ({ account }: { account: Account }) => {
     navigate(routes.multisigAddOwners(account.address))
   }
 
-  account.needsDeploy = false
   return (
     <Box m={4} height="100%">
       <Flex flexDirection="column" height="100%" justifyContent="space-between">

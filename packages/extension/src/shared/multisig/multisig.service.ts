@@ -3,9 +3,11 @@ import urlJoin from "url-join"
 
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { Fetcher, fetcher } from "../api/fetcher"
+import { sendMessage, waitForMessage } from "../messages"
 import { Network } from "../network"
 import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
+import { AddOwnerMultisiPayload } from "../wallet.model"
 import {
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
@@ -92,5 +94,18 @@ export const getMultisigAccountData = async ({
     })
   } catch (e) {
     throw new Error(`An error occured ${e}`)
+  }
+}
+
+export const addMultisigOwners = async (data: AddOwnerMultisiPayload) => {
+  sendMessage({ type: "ADD_MULTISIG_OWNERS", data })
+
+  const response = await Promise.race([
+    waitForMessage("TRANSACTION_SUBMITTED"),
+    waitForMessage("TRANSACTION_FAILED"),
+  ])
+
+  if ("error" in response) {
+    throw new Error(response.error)
   }
 }

@@ -14,6 +14,7 @@ export const TRANSACTION_STATUSES_TO_TRACK: Status[] = [
   "RECEIVED",
   "NOT_RECEIVED",
 ]
+type ExtendedTransactionType = TransactionType | "MULTISIG_ADD_SIGNERS"
 
 export interface TransactionMeta {
   title?: string
@@ -23,7 +24,7 @@ export interface TransactionMeta {
   isDeployAccount?: boolean
   isCancelEscape?: boolean
   transactions?: Call | Call[]
-  type?: TransactionType
+  type?: ExtendedTransactionType
 }
 
 export interface TransactionBase {

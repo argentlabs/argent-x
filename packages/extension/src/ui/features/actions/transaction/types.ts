@@ -3,4 +3,5 @@ export enum ApproveScreenType {
   DEPLOY,
   DECLARE,
   MULTISIG_DEPLOY,
+  MULTISIG_ADD_SIGNERS,
 }

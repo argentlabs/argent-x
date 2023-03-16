@@ -138,7 +138,11 @@ export const ActionScreen: FC = () => {
           <ApproveTransactionScreen
             transactions={action.payload.transactions}
             actionHash={action.meta.hash}
-            approveScreenType={ApproveScreenType.TRANSACTION}
+            approveScreenType={
+              action.payload.meta?.type === "MULTISIG_ADD_SIGNERS"
+                ? ApproveScreenType.MULTISIG_ADD_SIGNERS
+                : ApproveScreenType.TRANSACTION
+            }
             onSubmit={async () => {
               analytics.track("signedTransaction", {
                 networkId: account?.networkId || "unknown",
