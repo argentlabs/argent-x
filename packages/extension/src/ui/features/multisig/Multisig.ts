@@ -72,6 +72,7 @@ export class Multisig extends Account {
     }
 
     return new Multisig({
+      name: result.account.name,
       address: result.account.address,
       network,
       signer: result.account.signer,

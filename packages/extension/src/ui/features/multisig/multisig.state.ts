@@ -17,6 +17,7 @@ export const mapMultisigWalletAccountsToMultisig = (
   return walletAccounts.map(
     (walletAccount) =>
       new Multisig({
+        name: walletAccount.name,
         address: walletAccount.address,
         network: walletAccount.network,
         signer: walletAccount.signer,
@@ -83,6 +84,7 @@ export function useMultisig(base?: BaseWalletAccount) {
     }
 
     return new Multisig({
+      name: multisigWalletAccount.name,
       address: multisigWalletAccount.address,
       network: multisigWalletAccount.network,
       signer: multisigWalletAccount.signer,

@@ -2,6 +2,8 @@ import { groupBy } from "lodash-es"
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
+import { withHiddenSelector } from "./../../../shared/account/selectors"
+import { accountStore } from "../../../shared/account/store"
 import type { Account } from "./Account"
 
 export const defaultAccountName = "Unnamed account"
@@ -22,6 +24,10 @@ interface State {
   setAccountName: (networkId: string, address: string, name: string) => void
 }
 
+/**
+ * @deprecated Don't use this store anymore. Use account.name instead
+ * To update accountName use updateAccountName() from account store file
+ */
 export const useAccountMetadata = create<State>(
   persist(
     (set, _get) => ({
@@ -41,11 +47,20 @@ export const useAccountMetadata = create<State>(
   ),
 )
 
+/**
+ * @deprecated use account.name instead
+ * @param accountNames
+ * @returns account name
+ */
 export const getAccountName = (
   { address, network }: Account,
   accountNames: AccountNames = {},
 ): string => accountNames[network.id]?.[address] || defaultAccountName
 
+/**
+ * @deprecated This is not needed anymore. Name is part of the account object
+ * @param accounts
+ */
 export const setDefaultAccountNames = (accounts: Account[]) => {
   // Group accounts by type such that plugin and argent accounts are grouped together
   // and multisig accounts are grouped together
@@ -114,3 +129,34 @@ export const setDefaultAccountNames = (accounts: Account[]) => {
   )
   useAccountMetadata.setState({ accountNames: merged })
 }
+
+// This is a migration function that migrates the account names from zustand store
+// to the WalletAccounts stored in accountStore
+// This makes the name a property of the account, and not a separate entity
+export async function migrate(accountNames: AccountNames): Promise<string> {
+  const walletAccounts = await accountStore.get(withHiddenSelector)
+
+  const hasAccountNames = walletAccounts.every((account) =>
+    Boolean(account.name),
+  )
+
+  if (hasAccountNames) {
+    return "Migration not needed"
+  }
+
+  const updatedWalletAccounts = walletAccounts.map((account) => ({
+    ...account,
+    name: accountNames[account.network.id]?.[account.address],
+  }))
+
+  await accountStore.push(updatedWalletAccounts)
+  return "Migration successful"
+}
+
+migrate(useAccountMetadata.getState().accountNames)
+  .then((m) => {
+    console.log(m)
+  })
+  .catch(() => {
+    console.error("Migration failed")
+  })

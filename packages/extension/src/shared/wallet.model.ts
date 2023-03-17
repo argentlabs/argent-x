@@ -27,6 +27,7 @@ export interface BaseWalletAccount {
 }
 
 export interface WalletAccount extends BaseWalletAccount, WithSigner {
+  name: string
   network: Network
   type: ArgentAccountType
   hidden?: boolean

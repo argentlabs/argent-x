@@ -5,10 +5,6 @@ import {
   AccountListItem,
   AccountListItemProps,
 } from "../../accounts/AccountListItem"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
 
 interface IConnectDappAccountListItem
   extends Omit<
@@ -22,12 +18,9 @@ export const ConnectDappAccountListItem: FC<IConnectDappAccountListItem> = ({
   account,
   ...rest
 }) => {
-  const { accountNames } = useAccountMetadata()
-  const accountName = getAccountName(account, accountNames)
-
   return (
     <AccountListItem
-      accountName={accountName}
+      accountName={account.name}
       accountAddress={account.address}
       networkId={account.networkId}
       {...rest}

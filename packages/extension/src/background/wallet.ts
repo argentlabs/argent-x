@@ -17,6 +17,7 @@ import {
 import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
+import { updateAccountsWithNames } from "./../shared/account/details/updateAccountsWithNames"
 import {
   ArgentAccountType,
   BaseMultisigWalletAccount,
@@ -317,6 +318,7 @@ export class Wallet {
           if (code.bytecode.length > 0) {
             lastHit = lastCheck
             accounts.push({
+              name: "Unnamed Account",
               address,
               networkId: network.id,
               network,
@@ -349,7 +351,12 @@ export class Wallet {
         accountDetailFetchers,
       )
 
-      return accountsWithDetails
+      const accountDetailsWithNames =
+        updateAccountsWithNames(accountsWithDetails)
+
+      await this.walletStore.push(accountDetailsWithNames)
+
+      return accountDetailsWithNames
     } catch (error) {
       console.error(
         "Error getting account types or guardians from chain",
@@ -448,6 +455,7 @@ export class Wallet {
     const network = await this.getNetwork(networkId)
 
     const accounts = await this.walletStore.get(withHiddenSelector)
+    const multisigAccounts = await this.multisigStore.get(withHiddenSelector)
 
     const currentPaths = accounts
       .filter(
@@ -481,7 +489,13 @@ export class Wallet {
       0,
     )
 
+    const defaultAccountName =
+      type === "multisig"
+        ? `Multisig ${multisigAccounts.length}`
+        : `Account ${accounts.length}`
+
     const account: WalletAccount = {
+      name: defaultAccountName,
       network,
       networkId: network.id,
       address: proxyAddress,

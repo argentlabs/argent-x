@@ -8,10 +8,6 @@ import { userReviewStore } from "../../../shared/userReview"
 import { routes } from "../../routes"
 import { redeployAccount } from "../../services/backgroundAccounts"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { useMultisig } from "../multisig/multisig.state"
@@ -42,7 +38,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const location = useLocation()
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
-  const { accountNames } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
@@ -53,7 +48,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const userHasReviewed = useKeyValueStorage(userReviewStore, "hasReviewed")
 
   const hasPendingTransactions = pendingTransactions.length > 0
-  const accountName = getAccountName(account, accountNames)
   const {
     shouldShow: shouldShowNetworkUpgradeMessage,
     updateLastShown: updateLastShownNetworkUpgradeMessage,
@@ -127,7 +121,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         <AccountTokensHeader
           status={status}
           account={account}
-          accountName={accountName}
+          accountName={account.name}
           onRedeploy={onRedeploy}
         />
         <AccountTokensButtons account={account} />

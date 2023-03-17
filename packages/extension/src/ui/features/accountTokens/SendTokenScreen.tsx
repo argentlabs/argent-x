@@ -42,10 +42,6 @@ import {
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { H3, H5 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
@@ -217,17 +213,8 @@ export const SendTokenScreen: FC = () => {
     Account | AddressBookContact
   >()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
-  const { accountNames } = useAccountMetadata()
 
-  const accountName = useMemo(
-    () =>
-      addressBookRecipient
-        ? "name" in addressBookRecipient
-          ? addressBookRecipient.name
-          : getAccountName(addressBookRecipient, accountNames)
-        : undefined,
-    [accountNames, addressBookRecipient],
-  )
+  const accountName = addressBookRecipient?.name
 
   const { id: currentNetworkId } = useCurrentNetwork()
 

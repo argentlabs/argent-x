@@ -12,6 +12,7 @@ import { Center, Flex, Image, Spinner } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
+import { updateAccountName } from "../../../shared/account/store"
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { parseAmount } from "../../../shared/token/amount"
@@ -28,10 +29,6 @@ import {
   sendTransaction,
 } from "../../services/transactions"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -49,14 +46,11 @@ export const AccountEditScreen: FC = () => {
   const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { accountNames, setAccountName } = useAccountMetadata()
   const account = useAccount({
     address: accountAddress,
     networkId: currentNetwork.id,
   })
-  const accountName = account
-    ? getAccountName(account, accountNames)
-    : "Not found"
+  const accountName = account ? account.name : "Not found"
   const blockExplorerTitle = useBlockExplorerTitle()
   const liveAccountGuardianState = useLiveAccountGuardianState(account)
 
@@ -93,10 +87,9 @@ export const AccountEditScreen: FC = () => {
     setLiveEditingAccountName(name)
   }, [])
 
-  const onSubmitChangeName = useCallback(() => {
-    account &&
-      setAccountName(account.networkId, account.address, liveEditingAccountName)
-  }, [account, liveEditingAccountName, setAccountName])
+  const onSubmitChangeName = useCallback(async () => {
+    account && (await updateAccountName(account, liveEditingAccountName))
+  }, [account, liveEditingAccountName])
 
   const onCancelChangeName = useCallback(() => {
     setLiveEditingAccountName(accountName)

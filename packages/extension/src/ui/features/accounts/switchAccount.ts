@@ -1,3 +1,4 @@
+import { withHiddenSelector } from "../../../shared/account/selectors"
 import { getAccounts } from "../../../shared/account/store"
 import { isEqualWalletAddress } from "../../../shared/wallet.service"
 import { walletStore } from "../../../shared/wallet/walletStore"
@@ -14,11 +15,13 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
 
   /** switch network and set default account names */
   if (switcherNetworkId !== networkId) {
-    const allAccountsOnNetwork = await getAccounts((account) => {
-      return account.networkId === networkId
-    })
-    const accounts = mapWalletAccountsToAccounts(allAccountsOnNetwork)
-    setDefaultAccountNames(accounts)
+    const allWalletAccounts = await getAccounts(withHiddenSelector)
+    const allAccounts = mapWalletAccountsToAccounts(allWalletAccounts)
+    const allAccountsHasNames = allAccounts.every((account) => account.name)
+    // FIXME: Remove this when migration is done
+    if (!allAccountsHasNames) {
+      setDefaultAccountNames(allAccounts)
+    }
     useAppState.setState({ switcherNetworkId: networkId })
   }
 

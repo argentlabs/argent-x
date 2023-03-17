@@ -132,6 +132,7 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts2", [
       {
+        name: backup.argent.accounts[0].name,
         address: backup.argent.accounts[0].address,
         networkId: backup.argent.accounts[0].network,
         signer: {

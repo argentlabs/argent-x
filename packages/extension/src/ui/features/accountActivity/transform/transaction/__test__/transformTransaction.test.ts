@@ -23,6 +23,7 @@ const accountAddress =
 const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
     account: {
+      name: "Account 1",
       address: accountAddress,
       type: "standard",
       network: {
