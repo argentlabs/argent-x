@@ -120,7 +120,6 @@ const BaseMultisigConfirmations = ({
   totalSigners?: number
 }) => {
   const { multisig } = useMultisigInfo(account)
-  console.log(multisig)
   return (
     <Box m={4}>
       <H4>Set confirmations</H4>

@@ -2,11 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-export const confirmationsSchema = z
-  .number()
-  .positive()
-  .min(1, "You need at least one confirmation")
-  .default(1)
+import { confirmationsSchema } from "./useCreateMultisigForm"
 
 const getFormSchema = (signerKeysLength?: number) =>
   z
