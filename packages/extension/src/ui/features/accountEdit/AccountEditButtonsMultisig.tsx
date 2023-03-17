@@ -42,7 +42,6 @@ export const AccountEditButtonsMultisig = ({
       >
         <Flex width="100%" justifyContent="space-between">
           <H6>
-            {" "}
             {account.needsDeploy ? (
               <>View confirmations</>
             ) : (
