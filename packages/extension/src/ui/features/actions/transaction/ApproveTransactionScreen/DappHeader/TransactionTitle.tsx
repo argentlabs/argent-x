@@ -66,6 +66,14 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     )
   }
 
+  if (approveScreenType === ApproveScreenType.MULTISIG_UPDATE_THRESHOLD) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Set confirmations
+      </Flex>
+    )
+  }
+
   if (transactionReviewWithType?.type === "swap") {
     return (
       <Flex alignItems="center" gap="1">

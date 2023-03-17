@@ -1,5 +1,5 @@
 import { H1, H4, P3 } from "@argent/ui"
-import { Box, Button, Center } from "@chakra-ui/react"
+import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 
@@ -94,6 +94,7 @@ export const MultisigConfirmationsWithoutOwners = ({
     trigger()
     const newThreshold = getValues("confirmations")
     if (!Object.keys(errors).length && newThreshold !== multisig?.threshold) {
+      console.log("in")
       updateMultisigThreshold({
         address: account.address,
         newThreshold: getValues("confirmations"),
@@ -106,6 +107,7 @@ export const MultisigConfirmationsWithoutOwners = ({
       account={account}
       handleNextClick={handleNextClick}
       totalSigners={multisig?.signers.length}
+      buttonTitle="Update confirmations"
     />
   )
 }
@@ -114,18 +116,27 @@ const BaseMultisigConfirmations = ({
   account,
   handleNextClick,
   totalSigners,
+  buttonTitle = "Next",
 }: {
   account: Account
   handleNextClick: () => void
   totalSigners?: number
+  buttonTitle?: string
 }) => {
   const { multisig } = useMultisigInfo(account)
   return (
-    <Box m={4}>
-      <H4>Set confirmations</H4>
-      <P3 color="neutrals.100" pb={4}>
-        How many owners must confirm each transaction before it&apos;s sent?
-      </P3>
+    <Flex
+      m={4}
+      justifyContent="space-between"
+      flexDirection="column"
+      height="full"
+    >
+      <>
+        <H4>Set confirmations</H4>
+        <P3 color="neutrals.100" pb={4}>
+          How many owners must confirm each transaction before it&apos;s sent?
+        </P3>
+      </>
       {account.needsDeploy ? (
         <Box>
           <Box borderRadius="lg" backgroundColor="neutrals.800" p={4} my={4}>
@@ -140,16 +151,20 @@ const BaseMultisigConfirmations = ({
           </Center>
         </Box>
       ) : (
-        <>
+        <Flex
+          height="full"
+          justifyContent="space-between"
+          flexDirection="column"
+        >
           <SetConfirmationsInput
             existingThreshold={multisig?.threshold}
             totalSigners={totalSigners}
           />
           <Button colorScheme="primary" onClick={handleNextClick}>
-            Next
+            {buttonTitle}
           </Button>
-        </>
+        </Flex>
       )}
-    </Box>
+    </Flex>
   )
 }

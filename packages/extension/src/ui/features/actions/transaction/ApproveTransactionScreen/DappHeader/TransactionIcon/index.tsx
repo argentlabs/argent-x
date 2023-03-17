@@ -16,6 +16,7 @@ import { NftTransactionIcon } from "./NftTransactionIcon"
 import { SendTransactionIcon } from "./SendTransactionIcon"
 import { SwapTransactionIcon } from "./SwapTransactionIcon"
 import { UnknownDappIcon } from "./UnknownDappIcon"
+import { UpdateThresholdIcon } from "./UpdateThresholdIcon"
 import { VerifiedDappIcon } from "./VerifiedDappIcon"
 
 export interface TransactionIconProps {
@@ -50,6 +51,10 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 
   if (approveScreenType === ApproveScreenType.MULTISIG_ADD_SIGNERS) {
     return <AddOwnerIcon />
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_UPDATE_THRESHOLD) {
+    return <UpdateThresholdIcon />
   }
 
   if (swapTxnReview) {

@@ -1,4 +1,4 @@
-import { BigNumber, utils } from "ethers"
+import { utils } from "ethers"
 import {
   Account,
   InvocationsSignerDetails,
@@ -9,7 +9,6 @@ import {
 } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
-import { getUint256CalldataFromBN } from "../../ui/services/transactions"
 import { isAccountDeployed } from "../accountDeploy"
 import { sendMessageToUi } from "../activeTabs"
 import { HandleMessage, UnhandledMessage } from "../background"
@@ -475,9 +474,7 @@ export const handleTransactionMessage: HandleMessage<
             : {
                 entrypoint: "changeThreshold",
                 calldata: stark.compileCalldata({
-                  new_threshold: getUint256CalldataFromBN(
-                    BigNumber.from(newThreshold),
-                  ),
+                  new_threshold: newThreshold.toString(),
                 }),
                 contractAddress: address,
               }
@@ -523,9 +520,7 @@ export const handleTransactionMessage: HandleMessage<
         const thresholdPayload = {
           entrypoint: "changeThreshold",
           calldata: stark.compileCalldata({
-            new_threshold: getUint256CalldataFromBN(
-              BigNumber.from(newThreshold),
-            ),
+            new_threshold: newThreshold.toString(),
           }),
           contractAddress: address,
         }
@@ -541,12 +536,12 @@ export const handleTransactionMessage: HandleMessage<
           },
         })
         return sendMessageToUi({
-          type: "ADD_MULTISIG_OWNERS_RES",
+          type: "UPDATE_MULTISIG_THRESHOLD_RES",
           data: { requestId: "TODO" },
         })
       } catch (e) {
         return sendMessageToUi({
-          type: "ADD_MULTISIG_OWNERS_REJ",
+          type: "UPDATE_MULTISIG_THRESHOLD_REJ",
           data: { error: `${e}` },
         })
       }

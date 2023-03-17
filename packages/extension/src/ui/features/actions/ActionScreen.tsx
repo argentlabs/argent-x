@@ -25,6 +25,7 @@ import { ConnectDappScreen } from "./connectDapp/ConnectDappScreen"
 import { ApproveDeployMultisig } from "./transaction/ApproveDeployMultisig"
 import { ApproveTransactionScreen } from "./transaction/ApproveTransactionScreen"
 import { ApproveScreenType } from "./transaction/types"
+import { getApproveScreenType } from "./utils"
 
 export const ActionScreen: FC = () => {
   const navigate = useNavigate()
@@ -138,11 +139,7 @@ export const ActionScreen: FC = () => {
           <ApproveTransactionScreen
             transactions={action.payload.transactions}
             actionHash={action.meta.hash}
-            approveScreenType={
-              action.payload.meta?.type === "MULTISIG_ADD_SIGNERS"
-                ? ApproveScreenType.MULTISIG_ADD_SIGNERS
-                : ApproveScreenType.TRANSACTION
-            }
+            approveScreenType={getApproveScreenType(action)}
             onSubmit={async () => {
               analytics.track("signedTransaction", {
                 networkId: account?.networkId || "unknown",
