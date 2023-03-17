@@ -27,6 +27,7 @@ jobs:
       ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
+    if: github.actor != 'dependabot[bot]'
     steps:
       - name: If github.head_ref not filled, we are merging
         run: |
