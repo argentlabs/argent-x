@@ -3,7 +3,10 @@ import { Box, Button, Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 
-import { addMultisigOwners } from "../../../shared/multisig/multisig.service"
+import {
+  addMultisigOwners,
+  updateMultisigThreshold,
+} from "../../../shared/multisig/multisig.service"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
@@ -91,10 +94,10 @@ export const MultisigConfirmationsWithoutOwners = ({
     trigger()
     const newThreshold = getValues("confirmations")
     if (!Object.keys(errors).length && newThreshold !== multisig?.threshold) {
-      // updateThreshold({
-      //   address: account.address,
-      //   newThreshold: getValues("confirmations"),
-      // })
+      updateMultisigThreshold({
+        address: account.address,
+        newThreshold: getValues("confirmations"),
+      })
     }
   }
 

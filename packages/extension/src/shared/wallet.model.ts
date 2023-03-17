@@ -55,3 +55,8 @@ export type AddOwnerMultisiPayload = {
   signersToAdd: string[]
   currentThreshold?: number
 }
+
+export type UpdateMultisigThresholdPayload = {
+  newThreshold: number
+  address: string
+}

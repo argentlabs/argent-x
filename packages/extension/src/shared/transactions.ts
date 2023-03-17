@@ -14,7 +14,10 @@ export const TRANSACTION_STATUSES_TO_TRACK: Status[] = [
   "RECEIVED",
   "NOT_RECEIVED",
 ]
-type ExtendedTransactionType = TransactionType | "MULTISIG_ADD_SIGNERS"
+type ExtendedTransactionType =
+  | TransactionType
+  | "MULTISIG_ADD_SIGNERS"
+  | "MULTISIG_UPDATE_THRESHOLD"
 
 export interface TransactionMeta {
   title?: string

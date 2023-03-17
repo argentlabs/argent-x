@@ -7,7 +7,10 @@ import { sendMessage, waitForMessage } from "../messages"
 import { Network } from "../network"
 import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
-import { AddOwnerMultisiPayload } from "../wallet.model"
+import {
+  AddOwnerMultisiPayload,
+  UpdateMultisigThresholdPayload,
+} from "../wallet.model"
 import {
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
@@ -101,8 +104,23 @@ export const addMultisigOwners = async (data: AddOwnerMultisiPayload) => {
   sendMessage({ type: "ADD_MULTISIG_OWNERS", data })
 
   const response = await Promise.race([
-    waitForMessage("TRANSACTION_SUBMITTED"),
-    waitForMessage("TRANSACTION_FAILED"),
+    waitForMessage("ADD_MULTISIG_OWNERS_RES"),
+    waitForMessage("ADD_MULTISIG_OWNERS_REJ"),
+  ])
+
+  if ("error" in response) {
+    throw new Error(response.error)
+  }
+}
+
+export const updateMultisigThreshold = async (
+  data: UpdateMultisigThresholdPayload,
+) => {
+  sendMessage({ type: "UPDATE_MULTISIG_THRESHOLD", data })
+
+  const response = await Promise.race([
+    waitForMessage("UPDATE_MULTISIG_THRESHOLD_RES"),
+    waitForMessage("UPDATE_MULTISIG_THRESHOLD_REJ"),
   ])
 
   if ("error" in response) {

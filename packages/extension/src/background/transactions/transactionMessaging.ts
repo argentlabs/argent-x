@@ -507,6 +507,42 @@ export const handleTransactionMessage: HandleMessage<
         })
         return sendMessageToUi({
           type: "ADD_MULTISIG_OWNERS_RES",
+          data: { requestId: "TODO" },
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_REJ",
+          data: { error: `${e}` },
+        })
+      }
+    }
+    case "UPDATE_MULTISIG_THRESHOLD": {
+      try {
+        const { address, newThreshold } = msg.data
+
+        const thresholdPayload = {
+          entrypoint: "changeThreshold",
+          calldata: stark.compileCalldata({
+            new_threshold: getUint256CalldataFromBN(
+              BigNumber.from(newThreshold),
+            ),
+          }),
+          contractAddress: address,
+        }
+
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: thresholdPayload,
+            meta: {
+              title: "Set confirmations threshold",
+              type: "MULTISIG_UPDATE_THRESHOLD",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_RES",
+          data: { requestId: "TODO" },
         })
       } catch (e) {
         return sendMessageToUi({
