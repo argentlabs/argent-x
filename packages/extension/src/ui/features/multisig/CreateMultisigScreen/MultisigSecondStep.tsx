@@ -61,7 +61,9 @@ export const MultisigSecondStep = ({
       goBack={goBack}
       back={true}
     >
-      <SetConfirmationsInput />
+      <SetConfirmationsInput
+        totalSigners={getValues("signerKeys").length + 1}
+      />
       <Button colorScheme="primary" onClick={handleCreateMultisig} mt="3">
         Create multisig
       </Button>
