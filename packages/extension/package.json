@@ -36,7 +36,7 @@
     "eslint-webpack-plugin": "^4.0.0",
     "fetch-intercept": "^2.4.0",
     "file-loader": "^6.2.0",
-    "fork-ts-checker-webpack-plugin": "^7.2.11",
+    "fork-ts-checker-webpack-plugin": "^8.0.0",
     "html-webpack-plugin": "^5.5.0",
     "isomorphic-fetch": "^3.0.0",
     "jsdom": "^21.0.0",
