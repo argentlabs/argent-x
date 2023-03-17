@@ -1,6 +1,6 @@
 import { ethers, utils } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { find, memoize, noop, throttle, union } from "lodash-es"
+import { find, memoize, noop, partition, throttle, union } from "lodash-es"
 import {
   Account,
   DeployAccountContractPayload,
@@ -442,6 +442,28 @@ export class Wallet {
     await this.walletStore.push(accounts)
   }
 
+  public getDefaultAccountName(
+    accounts: WalletAccount[],
+    networkId: string,
+    type: CreateAccountType,
+  ): string {
+    const networkAccounts = accounts.filter(
+      (account) => account.network.id === networkId,
+    )
+
+    const [multisigs, standards] = partition(
+      networkAccounts,
+      (account) => account.type === "multisig",
+    )
+
+    const defaultAccountName =
+      type === "multisig"
+        ? `Multisig ${multisigs.length + 1}`
+        : `Account ${standards.length + 1}`
+
+    return defaultAccountName
+  }
+
   public async newAccount(
     networkId: string,
     type: CreateAccountType = "standard", // Should not be able to create plugin accounts. Default to argent account
@@ -455,7 +477,6 @@ export class Wallet {
     const network = await this.getNetwork(networkId)
 
     const accounts = await this.walletStore.get(withHiddenSelector)
-    const multisigAccounts = await this.multisigStore.get(withHiddenSelector)
 
     const currentPaths = accounts
       .filter(
@@ -489,10 +510,11 @@ export class Wallet {
       0,
     )
 
-    const defaultAccountName =
-      type === "multisig"
-        ? `Multisig ${multisigAccounts.length}`
-        : `Account ${accounts.length}`
+    const defaultAccountName = this.getDefaultAccountName(
+      accounts,
+      networkId,
+      type,
+    )
 
     const account: WalletAccount = {
       name: defaultAccountName,
