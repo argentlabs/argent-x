@@ -13,6 +13,8 @@ const texts = {
     lockWallet: "Lock wallet",
     reset: "Reset",
     confirmReset: "RESET",
+    save: "Save",
+    cancel: "Cancel",
   },
   account: {
     noAccounts: "You have no accounts on ",
@@ -26,6 +28,8 @@ const texts = {
     accountRecovery: "Set up account recovery",
     saveTheRecoveryPhrase: "Save the recovery phrase",
     pendingTransactions: "Pending transactions",
+    recipientAddress: "Recipient's address",
+    saveAddress: "Save address",
   },
   wallet: {
     //first screen
@@ -68,6 +72,12 @@ const texts = {
     hiddenAccounts: "Hidden accounts",
     delete: "Delete",
     copy: "Copy",
+  },
+  address: {
+    nameRequired: "Contact Name is required",
+    addressRequired: "Address is required",
+    removeAddress: "Remove from address book",
+    delete: "Delete",
   },
 }
 

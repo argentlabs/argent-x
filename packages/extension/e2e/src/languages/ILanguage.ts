@@ -13,6 +13,8 @@ export interface ILanguage {
     lockWallet: string
     reset: string
     confirmReset: string
+    save: string
+    cancel: string
   }
   account: {
     noAccounts: string
@@ -26,6 +28,8 @@ export interface ILanguage {
     accountRecovery: string
     saveTheRecoveryPhrase: string
     pendingTransactions: string
+    recipientAddress: string
+    saveAddress: string
   }
   wallet: {
     //first screen
@@ -65,5 +69,11 @@ export interface ILanguage {
     hiddenAccounts: string
     delete: string
     copy: string
+  }
+  address: {
+    nameRequired: string
+    addressRequired: string
+    removeAddress: string
+    delete: string
   }
 }
