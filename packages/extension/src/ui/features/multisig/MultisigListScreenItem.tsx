@@ -25,7 +25,7 @@ const { MoreIcon, ChevronRightIcon } = icons
  * Same as IAccountListScreenItem, but with account as optional
  */
 export interface IMultisigListScreenItem {
-  account?: Account
+  account: Account
   selectedAccount?: BaseWalletAccount
   needsUpgrade?: boolean
   clickNavigateSettings?: boolean
@@ -105,7 +105,7 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
 
   return (
     <>
-      <Flex position={"relative"} direction={"column"}>
+      <Flex position={"relative"} direction={"column"} w="full">
         <AccountListItem
           aria-label={`Select ${accountName}`}
           onClick={clickNavigateSettings ? onOptionsClick : onClick}

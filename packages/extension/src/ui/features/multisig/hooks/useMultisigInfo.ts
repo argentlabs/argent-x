@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 
-import { updateBaseMultisigAccount } from "../../../../shared/multisig/store"
+import { updateBaseMultisigAccount } from "../../../../shared/multisig/utils/baseMultisig"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { Multisig } from "../Multisig"
 import { useMultisigWalletAccount } from "../multisig.state"

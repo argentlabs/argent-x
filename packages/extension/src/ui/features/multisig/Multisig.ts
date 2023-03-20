@@ -3,7 +3,7 @@ import {
   BaseMultisigWalletAccount,
   MultisigData,
 } from "../../../shared/wallet.model"
-import { createNewMultisigAccount } from "../../services/backgroundAccounts"
+import { createNewMultisigAccount } from "../../services/backgroundMultisigs"
 import { Account, AccountConstructorProps } from "../accounts/Account"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {

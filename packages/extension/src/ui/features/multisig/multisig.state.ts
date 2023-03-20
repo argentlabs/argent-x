@@ -1,6 +1,9 @@
 import { useMemo } from "react"
 
-import { multisigBaseWalletStore } from "../../../shared/multisig/store"
+import {
+  multisigBaseWalletStore,
+  pendingMultisigStore,
+} from "../../../shared/multisig/store"
 import { useArrayStorage } from "../../../shared/storage/hooks"
 import {
   BaseMultisigWalletAccount,
@@ -102,4 +105,8 @@ export function useMultisig(base?: BaseWalletAccount) {
 
 export function isZeroMultisigAccount(account: BaseMultisigWalletAccount) {
   return account.signers.length === 0 && account.threshold === 0
+}
+
+export function usePendingMultisigs() {
+  return useArrayStorage(pendingMultisigStore)
 }

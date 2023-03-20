@@ -1,6 +1,6 @@
 import { H6, P4, icons, typographyStyles } from "@argent/ui"
-import { Circle, Flex, Image, Text, Tooltip, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { Circle, Flex, Text, Tooltip, chakra } from "@chakra-ui/react"
+import { FC } from "react"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
 import {
@@ -12,6 +12,7 @@ import { formatTruncatedAddress } from "../../services/addresses"
 import { MultisigStatus } from "../multisig/hooks/useMultisigStatus"
 import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
+import { AccountAvatar } from "./AccountAvatar"
 import { AccountLabel } from "./AccountLabel"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
@@ -31,41 +32,6 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   avatarOutlined?: boolean
   isShield?: boolean
   multisigStatus?: MultisigStatus
-}
-
-interface AccountAvatarProps extends ComponentProps<"img"> {
-  outlined?: boolean
-}
-
-export const AccountAvatar: FC<AccountAvatarProps> = ({
-  outlined,
-  children,
-  ...rest
-}) => {
-  return (
-    <Flex position={"relative"} flexShrink={0}>
-      <Image borderRadius={"full"} width={12} height={12} {...rest} />
-      {outlined && (
-        <>
-          <Circle
-            position={"absolute"}
-            top={0}
-            size={12}
-            borderWidth={"0.25rem"}
-            borderColor={"black"}
-          />
-          <Circle
-            position={"absolute"}
-            top={0}
-            size={12}
-            borderWidth={"0.125rem"}
-            borderColor={"white"}
-          />
-        </>
-      )}
-      {children}
-    </Flex>
-  )
 }
 
 export const NetworkStatusWrapper = chakra(Flex, {

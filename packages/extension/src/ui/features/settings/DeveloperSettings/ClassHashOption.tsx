@@ -5,7 +5,7 @@ import { FC } from "react"
 import { Transaction } from "../../../../shared/transactions"
 import { formatTruncatedAddress } from "../../../services/addresses"
 import { formatDateTimeBase } from "../../../services/dates"
-import { AccountAvatar } from "../../accounts/AccountListItem"
+import { AccountAvatar } from "../../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
 
 interface ClassHashOptionProps {
