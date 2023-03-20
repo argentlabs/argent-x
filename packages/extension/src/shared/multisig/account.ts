@@ -92,11 +92,10 @@ export class MultisigAccount extends Account {
       ...transaction,
       calldata: number.getHexStringArray(transaction.calldata ?? []),
     }))
-
     const request = ApiMultisigPostRequestTxnSchema.parse({
       creator,
       transaction: {
-        nonce: number.toHex(nonce),
+        nonce: number.toHexString(nonce),
         version: number.toHex(version),
         maxFee: maxFee.toString(),
         calls: txnWithHexCalldata,

@@ -1,3 +1,4 @@
+import { SupportedNetworks } from "@argent/x-swap"
 import { constants } from "starknet"
 
 import { Network } from "../network"
@@ -27,5 +28,20 @@ export const chainIdToStarknetNetwork = (
       return "testnet2"
     default:
       return "testnet"
+  }
+}
+
+export const networkNameToChainId = (
+  networkName: SupportedNetworks,
+): constants.StarknetChainId => {
+  switch (networkName) {
+    case SupportedNetworks.MAINNET:
+      return constants.StarknetChainId.MAINNET
+    case SupportedNetworks.TESTNET:
+      return constants.StarknetChainId.TESTNET
+    case SupportedNetworks.TESTNET2:
+      return constants.StarknetChainId.TESTNET2
+    default:
+      return constants.StarknetChainId.TESTNET
   }
 }

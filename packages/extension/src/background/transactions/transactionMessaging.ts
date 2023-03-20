@@ -491,7 +491,7 @@ export const handleTransactionMessage: HandleMessage<
         const transactions = thresholdPayload
           ? [thresholdPayload, signersPayload]
           : signersPayload
-
+        console.log(transactions, signersPayload)
         await actionQueue.push({
           type: "TRANSACTION",
           payload: {
@@ -502,9 +502,9 @@ export const handleTransactionMessage: HandleMessage<
             },
           },
         })
+
         return sendMessageToUi({
           type: "ADD_MULTISIG_OWNERS_RES",
-          data: { requestId: "TODO" },
         })
       } catch (e) {
         return sendMessageToUi({
@@ -537,7 +537,6 @@ export const handleTransactionMessage: HandleMessage<
         })
         return sendMessageToUi({
           type: "UPDATE_MULTISIG_THRESHOLD_RES",
-          data: { requestId: "TODO" },
         })
       } catch (e) {
         return sendMessageToUi({

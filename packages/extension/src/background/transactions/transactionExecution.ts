@@ -13,6 +13,7 @@ import {
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
 import { getL1GasPrice } from "../../shared/ethersUtils"
+import { addToMultisigPendingTransactions } from "../../shared/multisig/pendingTransactionsStore"
 import { AllowArray } from "../../shared/storage/types"
 import { nameTransaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
@@ -177,6 +178,20 @@ export const executeTransactionAction = async (
     nonce,
     maxFee,
   })
+
+  if (
+    "requestId" in transaction &&
+    typeof transaction.requestId === "string" &&
+    selectedAccount.type === "multisig"
+  ) {
+    addToMultisigPendingTransactions({
+      requestId: transaction.requestId,
+      address: selectedAccount.address,
+      networkId: selectedAccount.networkId,
+      timestamp: Date.now(),
+      type: action.payload.meta?.type,
+    })
+  }
 
   if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
     throw Error("Transaction could not get added to the sequencer")
