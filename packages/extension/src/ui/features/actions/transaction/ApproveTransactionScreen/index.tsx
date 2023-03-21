@@ -18,7 +18,6 @@ import { useIsMainnet } from "../../../networks/useNetworks"
 import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
-import { LoadingScreen } from "../../LoadingScreen"
 import { useTransactionReview } from "../useTransactionReview"
 import { useAggregatedSimData } from "../useTransactionSimulatedData"
 import { useTransactionSimulation } from "../useTransactionSimulation"
@@ -26,6 +25,7 @@ import { AccountNetworkInfo } from "./AccountNetworkInfo"
 import { BalanceChangeOverview } from "./BalanceChangeOverview"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { DappHeader } from "./DappHeader"
+import { SimulationLoadingBanner } from "./SimulationLoadingBanner"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
 
@@ -130,10 +130,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     return <UpgradeScreenV4 upgradeType="account" {...props} />
   }
 
-  if (isSimulationLoading) {
-    return <LoadingScreen />
-  }
-
   return (
     <ConfirmScreen
       confirmButtonText="Confirm"
@@ -182,11 +178,13 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         />
       )}
 
-      {hasBalanceChange && (
+      {hasBalanceChange ? (
         <BalanceChangeOverview
           transactionSimulation={transactionSimulation}
           transactionReview={transactionReview}
         />
+      ) : (
+        isSimulationLoading && <SimulationLoadingBanner />
       )}
       {showTransactionActions && (
         <TransactionActions transactions={transactionsArray} />
