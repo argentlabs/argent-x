@@ -11,10 +11,8 @@ import {
   WalletStorageProps,
 } from "../src/background/wallet"
 import { deserialize, serialize } from "../src/shared/account/serialize"
-import {
-  PendingMultisig,
-  pendingMultisigEqual,
-} from "../src/shared/multisig/store"
+import { pendingMultisigEqual } from "../src/shared/multisig/store"
+import { PendingMultisig } from "../src/shared/multisig/types"
 import { Network } from "../src/shared/network"
 import {
   ArrayStorage,

@@ -1,6 +1,6 @@
 import { getIndexForPath } from "../../background/keys/keyDerivation"
 import { Account } from "../../ui/features/accounts/Account"
-import { PendingMultisig } from "../multisig/store"
+import { PendingMultisig } from "../multisig/types"
 import { WalletAccount } from "../wallet.model"
 import { baseDerivationPath } from "../wallet.service"
 

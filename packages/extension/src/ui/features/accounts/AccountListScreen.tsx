@@ -55,10 +55,6 @@ export const AccountListScreen: FC = () => {
   const selectedAccount = useSelectedAccount()
   const allAccounts = useAccounts({ showHidden: true })
   const pendingMultisigs = usePendingMultisigs()
-  console.log(
-    "🚀 ~ file: AccountListScreen.tsx:58 ~ pendingMultisigs:",
-    pendingMultisigs,
-  )
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
     isHiddenAccount,

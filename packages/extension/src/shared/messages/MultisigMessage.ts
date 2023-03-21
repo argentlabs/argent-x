@@ -1,4 +1,4 @@
-import { PendingMultisig } from "./../multisig/store"
+import { PendingMultisig } from "../multisig/types"
 import { BaseWalletAccount, MultisigData, WalletAccount } from "../wallet.model"
 
 export type MultisigMessage =

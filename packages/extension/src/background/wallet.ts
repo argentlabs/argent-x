@@ -37,7 +37,7 @@ import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
 import { MultisigAccount } from "../shared/multisig/account"
 import { MultisigSigner } from "../shared/multisig/signer"
-import { PendingMultisig } from "../shared/multisig/store"
+import { PendingMultisig } from "../shared/multisig/types"
 import { getMultisigAccountFromBaseWallet } from "../shared/multisig/utils/baseMultisig"
 import {
   Network,

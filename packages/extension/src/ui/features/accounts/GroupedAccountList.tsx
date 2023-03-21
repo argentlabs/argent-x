@@ -3,7 +3,7 @@ import { Box, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
-import { PendingMultisig } from "../../../shared/multisig/store"
+import { PendingMultisig } from "../../../shared/multisig/types"
 import { multisigAndAccountSort } from "../../../shared/utils/accountsMultisigSort"
 import { MultisigListScreenItem } from "../multisig/MultisigListScreenItem"
 import { PendingMultisigListScreenItem } from "../multisig/PendingMultisigListScreenItem"
