@@ -55,12 +55,12 @@ export const useMultisigAccountPendingTransactions: UseMultisigAccountPendingTra
             ),
             requestId: transaction.requestId,
           })
-          //   if (request.content.state === "AWAITING_SIGNATURES") {
-          enrichedPendingMultisigTransactions.push({
-            ...transaction,
-            data: request,
-          })
-          //   }
+          if (request.content.state === "AWAITING_SIGNATURES") {
+            enrichedPendingMultisigTransactions.push({
+              ...transaction,
+              data: request,
+            })
+          }
         }
         return enrichedPendingMultisigTransactions
       },

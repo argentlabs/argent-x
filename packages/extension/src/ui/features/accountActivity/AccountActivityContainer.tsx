@@ -214,7 +214,11 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     )
   }
 
-  if (!pendingTransactions.length && !Object.keys(mergedActivity).length) {
+  if (
+    !pendingTransactions.length &&
+    !Object.keys(mergedActivity).length &&
+    !enrichedPendingMultisigTransactions?.length
+  ) {
     return (
       <Empty icon={<ActivityIcon />} title={"No activity for this network"} />
     )
@@ -222,11 +226,14 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
 
   return (
     <>
-      {enrichedPendingMultisigTransactions && (
-        <PendingMultisigTransactions
-          pendingTransactions={enrichedPendingMultisigTransactions}
-        />
-      )}
+      {enrichedPendingMultisigTransactions &&
+        enrichedPendingMultisigTransactions.length > 0 && (
+          <PendingMultisigTransactions
+            pendingTransactions={enrichedPendingMultisigTransactions}
+            account={account}
+            network={network}
+          />
+        )}
       <PendingTransactions
         pendingTransactions={pendingTransactions}
         network={network}

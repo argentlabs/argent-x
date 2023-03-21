@@ -94,7 +94,6 @@ export const MultisigConfirmationsWithoutOwners = ({
     trigger()
     const newThreshold = getValues("confirmations")
     if (!Object.keys(errors).length && newThreshold !== multisig?.threshold) {
-      console.log("in")
       updateMultisigThreshold({
         address: account.address,
         newThreshold: getValues("confirmations"),

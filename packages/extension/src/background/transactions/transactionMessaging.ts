@@ -465,19 +465,8 @@ export const handleTransactionMessage: HandleMessage<
 
     case "ADD_MULTISIG_OWNERS": {
       try {
-        const { address, signersToAdd, newThreshold, currentThreshold } =
-          msg.data
+        const { address, signersToAdd, newThreshold } = msg.data
 
-        const thresholdPayload =
-          newThreshold === currentThreshold
-            ? null
-            : {
-                entrypoint: "changeThreshold",
-                calldata: stark.compileCalldata({
-                  new_threshold: newThreshold.toString(),
-                }),
-                contractAddress: address,
-              }
         const signersPayload = {
           entrypoint: "addSigners",
           calldata: stark.compileCalldata({
@@ -488,14 +477,11 @@ export const handleTransactionMessage: HandleMessage<
           }),
           contractAddress: address,
         }
-        const transactions = thresholdPayload
-          ? [thresholdPayload, signersPayload]
-          : signersPayload
-        console.log(transactions, signersPayload)
+
         await actionQueue.push({
           type: "TRANSACTION",
           payload: {
-            transactions,
+            transactions: signersPayload,
             meta: {
               title: "Add multisig owners",
               type: "MULTISIG_ADD_SIGNERS",

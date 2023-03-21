@@ -1,3 +1,5 @@
+import { Call } from "starknet"
+
 import { ArrayStorage } from "../storage"
 import { ExtendedTransactionType } from "../transactions"
 
@@ -6,6 +8,7 @@ export type MultisigPendingTransaction = {
   address: string
   networkId: string
   timestamp: number
+  transactions?: Call | Call[]
   type?: ExtendedTransactionType
 }
 export const multisigPendingTransactionsStore =

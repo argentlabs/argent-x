@@ -179,7 +179,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         approveScreenType={approveScreenType}
       />
       {selectedAccount.type === "multisig" && (
-        <MultisigBanner account={selectedAccount} />
+        <MultisigBanner account={selectedAccount} confirmations={1} />
       )}
       {warn && (
         <TransactionBanner

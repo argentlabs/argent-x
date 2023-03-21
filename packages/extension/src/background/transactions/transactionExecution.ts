@@ -190,6 +190,7 @@ export const executeTransactionAction = async (
       networkId: selectedAccount.networkId,
       timestamp: Date.now(),
       type: action.payload.meta?.type,
+      transactions,
     })
   }
 

@@ -3,7 +3,10 @@ import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode, useMemo } from "react"
 
 import { Network } from "../../../shared/network"
-import { CustomButtonCell } from "../../components/CustomButtonCell"
+import {
+  CustomButtonCell,
+  CustomButtonCellProps,
+} from "../../components/CustomButtonCell"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
   isDeclareContractTransaction,
@@ -22,11 +25,10 @@ import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
 
-export interface TransactionListItemProps {
+export interface TransactionListItemProps extends CustomButtonCellProps {
   transactionTransformed: TransformedTransaction
   network: Network
   highlighted?: boolean
-  onClick?: () => void
   children?: ReactNode | ReactNode[]
   txHash: string
 }
@@ -36,7 +38,6 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   network,
   highlighted,
   children,
-  txHash,
   ...props
 }) => {
   const { action, displayName, dapp } = transactionTransformed
