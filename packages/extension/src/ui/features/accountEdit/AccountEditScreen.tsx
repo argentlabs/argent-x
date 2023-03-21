@@ -12,6 +12,7 @@ import { Center, Flex, Image, Spinner } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
+import { useCanEnableArgentShieldForAccount } from "../../../shared/account/details/getImplementation"
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { parseAmount } from "../../../shared/token/amount"
@@ -72,6 +73,9 @@ export const AccountEditScreen: FC = () => {
   }, [navigate, returnTo])
 
   const argentShieldEnabled = useArgentShieldEnabled()
+
+  const canEnableArgentShieldForAccount =
+    useCanEnableArgentShieldForAccount(account)
 
   const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
@@ -177,7 +181,7 @@ export const AccountEditScreen: FC = () => {
             </Center>
           </Flex>
           <SpacerCell />
-          {argentShieldEnabled && (
+          {argentShieldEnabled && canEnableArgentShieldForAccount && (
             <>
               <ButtonCell
                 as={Link}
