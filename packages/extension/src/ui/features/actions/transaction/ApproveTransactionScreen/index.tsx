@@ -1,6 +1,4 @@
-import { P4 } from "@argent/ui"
 import { WarningIcon } from "@chakra-ui/icons"
-import { Center } from "@chakra-ui/react"
 import { isArray, isEmpty } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
@@ -51,8 +49,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     networkId: selectedAccount?.networkId || "unknown",
   })
   const [disableConfirm, setDisableConfirm] = useState(true)
-  const [txDetails, setTxDetails] = useState(false)
-
   const isMainnet = useIsMainnet()
 
   const { data: transactionReview } = useTransactionReview({
@@ -113,8 +109,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactionSimulation && (txnHasTransfers || txnHasApprovals)
 
   // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
-  const showTransactionActions =
-    (!hasBalanceChange || (txDetails && hasBalanceChange)) && !isUdcAction
+  const showTransactionActions = !isUdcAction
 
   const verifiedDapp =
     VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp
@@ -200,19 +195,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
             : undefined
         }
       />
-
-      {hasBalanceChange && (
-        <Center>
-          <P4
-            fontWeight="bold"
-            color="neutrals.400"
-            _hover={{ textDecoration: "underline", cursor: "pointer" }}
-            onClick={() => setTxDetails(!txDetails)}
-          >
-            {txDetails ? "Hide" : "View more"} details
-          </P4>
-        </Center>
-      )}
     </ConfirmScreen>
   )
 }
