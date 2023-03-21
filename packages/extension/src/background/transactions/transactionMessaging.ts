@@ -222,7 +222,7 @@ export const handleTransactionMessage: HandleMessage<TransactionMessage> =
             }
           }
 
-          const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+          const suggestedMaxFee = argentMaxFee(maxTxFee) // This add the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
 
           return respond({
             type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
