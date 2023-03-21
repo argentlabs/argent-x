@@ -15,6 +15,9 @@ import { VerifiedDappBannerProps } from "."
 
 const { VerifiedIcon, CloseIcon } = icons
 
+const VERIFIED_DAPPS_LINK =
+  "https://support.argent.xyz/hc/en-us/articles/9950642428829"
+
 interface VerifiedDappModalProps extends VerifiedDappBannerProps {
   isOpen: boolean
   onClose: () => void
@@ -69,12 +72,14 @@ const VerifiedDappModal: FC<VerifiedDappModalProps> = ({
         </ModalHeader>
         <ModalFooter p={0}>
           <Button
+            as={"a"}
             mt={4}
             w={"full"}
             size={"sm"}
             bg="neutrals.600"
             _hover={{ bg: "neutrals.500" }}
-            onClick={onClose}
+            href={VERIFIED_DAPPS_LINK}
+            target="_blank"
           >
             Learn more
           </Button>
