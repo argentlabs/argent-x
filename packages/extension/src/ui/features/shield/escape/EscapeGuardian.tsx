@@ -3,7 +3,10 @@ import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { analytics } from "../../../services/analytics"
-import { ShieldExternalLinkButton } from "../ui/ShieldExternalLinkButton"
+import {
+  ESCAPE_GUARDIAN_LINK,
+  ShieldExternalLinkButton,
+} from "../ui/ShieldExternalLinkButton"
 import { ShieldHeader } from "../ui/ShieldHeader"
 import { getEscapeDisplayAttributes } from "./EscapeBanner"
 import { LiveAccountEscapeProps } from "./useAccountEscape"
@@ -50,7 +53,7 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
               action: "detailedInstructions",
             })
           }}
-          href={"https://www.argent.xyz/argent-x/"}
+          href={ESCAPE_GUARDIAN_LINK}
           my={3}
         >
           Detailed instructions
