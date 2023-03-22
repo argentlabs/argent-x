@@ -1,5 +1,6 @@
 import { BigNumber } from "ethers"
 import {
+  Account,
   Call,
   EstimateFee,
   TransactionBulk,
@@ -152,7 +153,8 @@ export const executeTransactionAction = async (
         type: "DEPLOY_ACCOUNT",
       },
     })
-  } else {
+    // Have to add this condition to avoid throwing errors with estimate for multisigs
+  } else if (selectedAccount.type !== "multisig") {
     if (hasUpgradePending && !preComputedFees?.suggestedMaxFee) {
       const oldStarknetAccount = await wallet.getStarknetAccount(
         selectedAccount,
@@ -173,7 +175,11 @@ export const executeTransactionAction = async (
     }
   }
 
-  const transaction = await starknetAccount.execute(transactions, abis, {
+  const acc =
+    selectedAccount.type === "multisig"
+      ? wallet.getStarknetAccountOfType(starknetAccount as Account, "multisig")
+      : starknetAccount
+  const transaction = await acc.execute(transactions, abis, {
     ...transactionsDetail,
     nonce,
     maxFee,

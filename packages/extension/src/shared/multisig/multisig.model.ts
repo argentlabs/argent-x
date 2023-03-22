@@ -37,6 +37,7 @@ export const ApiMultisigPostRequestTxnSchema = z.object({
   creator: z.string(),
   transaction: ApiMultisigTransactionSchema,
   starknetSignature: ApiMultisigStarknetSignature,
+  signature: ApiMultisigStarknetSignature,
 })
 
 export const ApiMultisigStateSchema = z.union([
