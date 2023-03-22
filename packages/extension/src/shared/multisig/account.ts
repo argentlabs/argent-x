@@ -64,9 +64,9 @@ export class MultisigAccount extends Account {
     }
 
     const transactions = Array.isArray(calls) ? calls : [calls]
-    const nonce = number
-      .toBN(transactionsDetail.nonce ?? (await this.getNonce()))
-      .toString()
+    const nonce = number.toHex(
+      number.toBN(transactionsDetail.nonce ?? (await this.getNonce())),
+    )
     const version = number.toBN(hash.transactionVersion).toString()
     const chainId = await this.getChainId()
 

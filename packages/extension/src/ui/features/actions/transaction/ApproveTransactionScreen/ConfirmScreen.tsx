@@ -147,7 +147,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                       </Button>
                     )}
                     <Button
-                      isDisabled={confirmButtonDisabled}
+                      // isDisabled={confirmButtonDisabled}
                       variant={confirmButtonVariant}
                       colorScheme="primary"
                       w="full"
