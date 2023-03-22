@@ -4,10 +4,16 @@ import { FC, useMemo, useState } from "react"
 import { Navigate } from "react-router-dom"
 import { Call } from "starknet"
 
-import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
+import {
+  ApiTransactionReviewResponse,
+  ApiTransactionReviewTargettedDapp,
+  getDisplayWarnAndReasonForTransactionReview,
+} from "../../../../../shared/transactionReview.service"
+import { ApiTransactionSimulationResponse } from "../../../../../shared/transactionSimulation/types"
 import { routes } from "../../../../routes"
 import { normalizeAddress } from "../../../../services/addresses"
 import { usePageTracking } from "../../../../services/analytics"
+import { Account } from "../../../accounts/Account"
 import { useAccountTransactions } from "../../../accounts/accountTransactions.state"
 import { useCheckUpgradeAvailable } from "../../../accounts/upgrade.service"
 import { UpgradeScreenV4 } from "../../../accounts/UpgradeScreenV4"
@@ -17,11 +23,14 @@ import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
 import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
 import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
 import { useTransactionReview } from "../useTransactionReview"
-import { useAggregatedSimData } from "../useTransactionSimulatedData"
+import {
+  AggregatedSimData,
+  useAggregatedSimData,
+} from "../useTransactionSimulatedData"
 import { useTransactionSimulation } from "../useTransactionSimulation"
 import { AccountNetworkInfo } from "./AccountNetworkInfo"
 import { BalanceChangeOverview } from "./BalanceChangeOverview"
-import { ConfirmScreen } from "./ConfirmScreen"
+import { ConfirmScreen, ConfirmScreenProps } from "./ConfirmScreen"
 import { DappHeader } from "./DappHeader"
 import { SimulationLoadingBanner } from "./SimulationLoadingBanner"
 import { TransactionActions } from "./TransactionActions"
@@ -32,18 +41,30 @@ const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
 export interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
-  transactions: Call | Call[]
-  onSubmit: (transactions: Call | Call[]) => void
   declareOrDeployType?: "declare" | "deploy"
+  onSubmit: (transactions: Call | Call[]) => void
+  selectedAccount?: Account
+  transactions: Call | Call[]
+}
+
+export interface ApproveTransactionProps
+  extends ApproveTransactionScreenProps,
+    Omit<ConfirmScreenProps, "onSubmit"> {
+  aggregatedData: AggregatedSimData[]
+  isMainnet: boolean
+  isSimulationLoading: boolean
+  transactionReview?: ApiTransactionReviewResponse
+  transactionSimulation?: ApiTransactionSimulationResponse
+  selectedAccount: Account
+  disableConfirm: boolean
+  verifiedDapp?: ApiTransactionReviewTargettedDapp
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactions,
   selectedAccount,
   actionHash,
-  onSubmit,
-  declareOrDeployType,
-  ...props
+  ...rest
 }) => {
   usePageTracking("signTransaction", {
     networkId: selectedAccount?.networkId || "unknown",
@@ -72,11 +93,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
   const { pendingTransactions } = useAccountTransactions(selectedAccount)
 
-  const transactionsArray: Call[] = useMemo(
-    () => (isArray(transactions) ? transactions : [transactions]),
-    [transactions],
-  )
-
   const isUpgradeTransaction =
     !Array.isArray(transactions) && transactions.entrypoint === "upgrade"
   const hasUpgradeTransactionPending = pendingTransactions.some(
@@ -89,52 +105,30 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       !isUpgradeTransaction,
   )
 
-  const txnHasTransfers = useMemo(
-    () => !isEmpty(transactionSimulation?.transfers),
-    [transactionSimulation],
-  )
-
-  const txnHasApprovals = useMemo(
-    () => !isEmpty(transactionSimulation?.approvals),
-    [transactionSimulation],
-  )
-
-  const isUdcAction = useMemo(
-    () => Boolean(declareOrDeployType),
-    [declareOrDeployType],
-  )
-
-  // Show balance change if there is a transaction simulation and there are approvals or transfers
-  const hasBalanceChange =
-    transactionSimulation && (txnHasTransfers || txnHasApprovals)
-
-  // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
-  const showTransactionActions = !isUdcAction
-
   const verifiedDapp =
-    VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp
-
-  const { warn, reason } =
-    getDisplayWarnAndReasonForTransactionReview(transactionReview)
+    (VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp) ||
+    undefined
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
 
   if (shouldShowUpgrade) {
-    return <UpgradeScreenV4 upgradeType="account" {...props} />
+    return <UpgradeScreenV4 upgradeType="account" {...rest} />
   }
 
   return (
-    <ConfirmScreen
-      confirmButtonText="Confirm"
-      rejectButtonText="Cancel"
-      confirmButtonDisabled={disableConfirm}
+    <ApproveTransaction
+      actionHash={actionHash}
+      aggregatedData={aggregatedData}
+      disableConfirm={disableConfirm}
+      isMainnet={isMainnet}
+      isSimulationLoading={isSimulationLoading}
       selectedAccount={selectedAccount}
-      onSubmit={() => {
-        onSubmit(transactions)
-      }}
-      showHeader={true}
+      transactionReview={transactionReview}
+      transactions={transactions}
+      transactionSimulation={transactionSimulation}
+      verifiedDapp={verifiedDapp}
       footer={
         selectedAccount.needsDeploy ? (
           <CombinedFeeEstimation
@@ -154,7 +148,67 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           />
         )
       }
-      {...props}
+      {...rest}
+    />
+  )
+}
+
+export const ApproveTransaction: FC<ApproveTransactionProps> = ({
+  actionHash,
+  aggregatedData,
+  declareOrDeployType,
+  disableConfirm,
+  isMainnet,
+  isSimulationLoading,
+  onSubmit,
+  selectedAccount,
+  transactionReview,
+  transactions,
+  transactionSimulation,
+  verifiedDapp,
+  ...rest
+}) => {
+  const transactionsArray: Call[] = useMemo(
+    () => (isArray(transactions) ? transactions : [transactions]),
+    [transactions],
+  )
+
+  const txnHasTransfers = useMemo(
+    () => !isEmpty(transactionSimulation?.transfers),
+    [transactionSimulation],
+  )
+
+  const txnHasApprovals = useMemo(
+    () => !isEmpty(transactionSimulation?.approvals),
+    [transactionSimulation],
+  )
+
+  const isUdcAction = useMemo(
+    () => Boolean(declareOrDeployType),
+    [declareOrDeployType],
+  )
+
+  const { warn, reason } =
+    getDisplayWarnAndReasonForTransactionReview(transactionReview)
+
+  // Show balance change if there is a transaction simulation and there are approvals or transfers
+  const hasBalanceChange =
+    transactionSimulation && (txnHasTransfers || txnHasApprovals)
+
+  // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
+  const showTransactionActions = !isUdcAction
+
+  return (
+    <ConfirmScreen
+      confirmButtonText="Confirm"
+      rejectButtonText="Cancel"
+      confirmButtonDisabled={disableConfirm}
+      selectedAccount={selectedAccount}
+      onSubmit={() => {
+        onSubmit(transactions)
+      }}
+      showHeader={true}
+      {...rest}
     >
       {/** Use Transaction Review to get DappHeader */}
       <DappHeader
@@ -175,7 +229,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
       {hasBalanceChange ? (
         <BalanceChangeOverview
-          transactionSimulation={transactionSimulation}
+          aggregatedData={aggregatedData}
           transactionReview={transactionReview}
         />
       ) : (
