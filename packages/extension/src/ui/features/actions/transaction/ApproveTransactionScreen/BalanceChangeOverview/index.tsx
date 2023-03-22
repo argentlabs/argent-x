@@ -12,8 +12,9 @@ import {
   icons,
 } from "@argent/ui"
 import { Box, Divider, Flex, Image, Text, Tooltip } from "@chakra-ui/react"
+import BigNumber from "bignumber.js"
 import { motion } from "framer-motion"
-import { isEmpty } from "lodash-es"
+import { isEmpty, isString } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import {
@@ -95,7 +96,9 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
               { amount, recipients, token, usdValue, approvals, safe },
               dataIndex,
             ) => {
-              console.log({ aggregatedData, recipients })
+              if (isString(amount)) {
+                amount = new BigNumber(amount)
+              }
               return (
                 <DetailAccordionItem
                   key={[token.address, "transfer", dataIndex].join("-")}
@@ -198,35 +201,42 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 </>
                               }
                             />
-                            {approvals.map((approval, approvalIndex) => (
-                              <DetailAccordionRow
-                                key={approvalIndex}
-                                label={formatTruncatedAddress(approval.spender)}
-                                copyLabel={normalizeAddress(approval.spender)}
-                                value={
-                                  <TextWithAmount
-                                    amount={approval.amount.toFixed()}
-                                    decimals={approval.token.decimals}
-                                  >
-                                    <Text
-                                      color={
-                                        isUnlimitedAmount(
-                                          approval.amount.toFixed(),
-                                        )
-                                          ? "error.500"
-                                          : undefined
-                                      }
+                            {approvals.map((approval, approvalIndex) => {
+                              if (isString(approval.amount)) {
+                                approval.amount = new BigNumber(approval.amount)
+                              }
+                              return (
+                                <DetailAccordionRow
+                                  key={approvalIndex}
+                                  label={formatTruncatedAddress(
+                                    approval.spender,
+                                  )}
+                                  copyLabel={normalizeAddress(approval.spender)}
+                                  value={
+                                    <TextWithAmount
+                                      amount={approval.amount.toFixed()}
+                                      decimals={approval.token.decimals}
                                     >
-                                      {prettifyTokenAmount({
-                                        amount: approval.amount.toFixed(),
-                                        ...approval.token,
-                                        unlimitedText: "All your",
-                                      })}
-                                    </Text>
-                                  </TextWithAmount>
-                                }
-                              />
-                            ))}
+                                      <Text
+                                        color={
+                                          isUnlimitedAmount(
+                                            approval.amount.toFixed(),
+                                          )
+                                            ? "error.500"
+                                            : undefined
+                                        }
+                                      >
+                                        {prettifyTokenAmount({
+                                          amount: approval.amount.toFixed(),
+                                          ...approval.token,
+                                          unlimitedText: "All your",
+                                        })}
+                                      </Text>
+                                    </TextWithAmount>
+                                  }
+                                />
+                              )
+                            })}
                           </>
                         )}
                         {!isEmpty(recipients) && (
@@ -235,33 +245,42 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                               <Divider color="black" opacity="1" />
                             )}
                             <DetailAccordionRow header={"Recipients"} />
-                            {recipients.map((recipient, recipientIndex) => (
-                              <DetailAccordionRow
-                                key={[
-                                  "recipient",
-                                  recipient.address,
-                                  recipientIndex,
-                                ].join("-")}
-                                label={formatTruncatedAddress(
-                                  recipient.address,
-                                )}
-                                copyLabel={normalizeAddress(recipient.address)}
-                                value={
-                                  <TextWithAmount
-                                    amount={recipient.amount.toFixed()}
-                                    decimals={token.decimals}
-                                  >
-                                    <Text>
-                                      {prettifyTokenAmount({
-                                        amount: recipient.amount.toFixed(),
-                                        ...token,
-                                        withSymbol: false,
-                                      })}
-                                    </Text>
-                                  </TextWithAmount>
-                                }
-                              />
-                            ))}
+                            {recipients.map((recipient, recipientIndex) => {
+                              if (isString(recipient.amount)) {
+                                recipient.amount = new BigNumber(
+                                  recipient.amount,
+                                )
+                              }
+                              return (
+                                <DetailAccordionRow
+                                  key={[
+                                    "recipient",
+                                    recipient.address,
+                                    recipientIndex,
+                                  ].join("-")}
+                                  label={formatTruncatedAddress(
+                                    recipient.address,
+                                  )}
+                                  copyLabel={normalizeAddress(
+                                    recipient.address,
+                                  )}
+                                  value={
+                                    <TextWithAmount
+                                      amount={recipient.amount.toFixed()}
+                                      decimals={token.decimals}
+                                    >
+                                      <Text>
+                                        {prettifyTokenAmount({
+                                          amount: recipient.amount.toFixed(),
+                                          ...token,
+                                          withSymbol: false,
+                                        })}
+                                      </Text>
+                                    </TextWithAmount>
+                                  }
+                                />
+                              )
+                            })}
                           </>
                         )}
                       </DetailAccordionPanel>
