@@ -13,6 +13,9 @@ const texts = {
     lockWallet: "Lock wallet",
     reset: "Reset",
     confirmReset: "RESET",
+    save: "Save",
+    create: "Create",
+    cancel: "Cancel",
   },
   account: {
     noAccounts: "You have no accounts on ",
@@ -68,6 +71,13 @@ const texts = {
     hiddenAccounts: "Hidden accounts",
     delete: "Delete",
     copy: "Copy",
+  },
+  developerSettings: {
+    manageNetworks: "Manage networks",
+    blockExplorer: "Block explorer",
+    smartContractDevelopment: "Smart Contract Development",
+    experimental: "Experimental",
+    restoreDefaultNetworks: "Restore default networks",
   },
 }
 

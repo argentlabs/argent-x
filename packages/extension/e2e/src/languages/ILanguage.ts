@@ -13,6 +13,9 @@ export interface ILanguage {
     lockWallet: string
     reset: string
     confirmReset: string
+    save: string
+    create: string
+    cancel: string
   }
   account: {
     noAccounts: string
@@ -65,5 +68,12 @@ export interface ILanguage {
     hiddenAccounts: string
     delete: string
     copy: string
+  }
+  developerSettings: {
+    manageNetworks: string
+    blockExplorer: string
+    smartContractDevelopment: string
+    experimental: string
+    restoreDefaultNetworks: string
   }
 }
