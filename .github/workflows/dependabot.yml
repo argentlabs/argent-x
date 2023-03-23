@@ -3,11 +3,6 @@ on: pull_request_target
 jobs:
   worker:
     runs-on: ubuntu-latest
-    services:
-      devnet:
-        image: shardlabs/starknet-devnet:latest-seed0
-        ports:
-          - 5050:5050
     if: github.actor == 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
@@ -16,6 +11,10 @@ jobs:
         with:
           node-version: "16"
           cache: "yarn"
+      - name: Build starknet-devnet
+        run: docker build -f ./packages/extension/e2e/Dockerfile . --tag e2e-starknet-devnet:latest
+      - name: Run starknet-devnet
+        run: docker run -d -it --name devnet -p 5050:5050 e2e-starknet-devnet:latest
       - run: yarn setup
       - name: Install Playwright Browsers
         run: npx playwright install chromium
