@@ -1,4 +1,5 @@
 import { CellStack, DapplandBanner } from "@argent/ui"
+import dapplandBanner from "@argent/ui/assets/dapplandBannerBackground.png"
 import { Flex, VStack } from "@chakra-ui/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { FC, useCallback, useEffect, useRef } from "react"
@@ -167,6 +168,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
               transition={{ duration: 0.2 }}
             >
               <DapplandBanner
+                backgroundImageUrl={dapplandBanner}
                 href="https://www.dappland.com?utm_source=argent&utm_medium=extension&utm_content=banner"
                 onClose={() => {
                   useDapplandBanner.setState({ hasSeenBanner: true })
