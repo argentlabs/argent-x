@@ -1,6 +1,5 @@
-import { P4, icons } from "@argent/ui"
-import { Center, Flex, Image, useDisclosure } from "@chakra-ui/react"
-import { upperFirst } from "lodash-es"
+import { Button, icons } from "@argent/ui"
+import { Center, useDisclosure } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ApiTransactionReviewTargettedDapp } from "../../../../../../shared/transactionReview.service"
@@ -8,37 +7,30 @@ import { VerifiedDappModal } from "./VerifiedDappModal"
 
 const { VerifiedIcon } = icons
 
-export interface IVerifiedDappBanner {
+export interface VerifiedDappBannerProps {
   dapp: ApiTransactionReviewTargettedDapp
 }
 
-export const VerifiedDappBanner: FC<IVerifiedDappBanner> = ({ dapp }) => {
+export const VerifiedDappBanner: FC<VerifiedDappBannerProps> = ({ dapp }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <>
-      <Flex
-        w="full"
-        backgroundColor="secondaryDark"
-        boxShadow="menu"
-        borderRadius="xl"
-        justifyContent="center"
-        alignItems="center"
-        gap="2"
-        py="2.5"
-        _hover={{ cursor: "pointer" }}
-        onClick={onOpen}
-      >
-        <Center>
-          <Image src={dapp.iconUrl} w="5" h="5" borderRadius="base" mx="-1" />
-          <VerifiedIcon width="4.5" height="4.5" color="white" />
-        </Center>
-        <P4 color="white" fontWeight="bold">
-          Verified {upperFirst(dapp.name.toLowerCase())} transaction
-        </P4>
-      </Flex>
-
-      <VerifiedDappModal isOpen={isOpen} onClose={onClose} />
+      <Center>
+        <Button
+          leftIcon={<VerifiedIcon fontSize={"base"} />}
+          colorScheme={"success"}
+          variant={"outline"}
+          size={"auto"}
+          fontSize={"2xs"}
+          py={1}
+          px={2}
+          onClick={onOpen}
+        >
+          Verified
+        </Button>
+      </Center>
+      <VerifiedDappModal dapp={dapp} isOpen={isOpen} onClose={onClose} />
     </>
   )
 }

@@ -8,6 +8,7 @@ import {
   ApiTransactionReviewTargettedDapp,
 } from "../../../../../../shared/transactionReview.service"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
+import { VerifiedDappBanner } from "../VerifiedDappBanner"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
 
@@ -24,6 +25,7 @@ export const DappHeader = ({
   transactionReview,
   aggregatedData,
   declareOrDeployType,
+  verifiedDapp,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -45,6 +47,7 @@ export const DappHeader = ({
           verifiedDapp={transactionReview?.targetedDapp}
           declareOrDeployType={declareOrDeployType}
         />
+        {verifiedDapp && <VerifiedDappBanner dapp={verifiedDapp} />}
         <Flex
           direction="column"
           justifyContent="center"

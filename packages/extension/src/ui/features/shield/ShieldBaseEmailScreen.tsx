@@ -14,6 +14,7 @@ import { FC } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
+import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
@@ -65,6 +66,8 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
         flex={1}
         onSubmit={handleSubmit(async ({ email }) => {
           try {
+            /** reset to ensure if new email validates it is always associated with fresh device */
+            await resetDevice()
             await requestEmail(email)
             onEmailRequested(email)
           } catch (error) {

@@ -238,13 +238,13 @@ export class Wallet {
 
     const deployerAccount = await getPreDeployedAccount(network)
     if (deployerAccount) {
-      const { account } = await declareContracts(
+      const { accountClassHash } = await declareContracts(
         network,
         deployerAccount,
         this.loadContracts,
       )
 
-      return account.class_hash
+      return accountClassHash
     }
 
     return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
