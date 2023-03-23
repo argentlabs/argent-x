@@ -125,6 +125,7 @@ jobs:
 
       - name: comment PR
         if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_REPO: ${{ env.GHA_BRANCH }}
