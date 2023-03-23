@@ -41,6 +41,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 
   const nftTransfers = useERC721Transfers(aggregatedData)
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
+
   // ignore transaction review if it is a DeclareContract transaction
   if (
     approveScreenType === ApproveScreenType.DECLARE ||
