@@ -29,6 +29,8 @@ export interface ILanguage {
     accountRecovery: string
     saveTheRecoveryPhrase: string
     pendingTransactions: string
+    recipientAddress: string
+    saveAddress: string
   }
   wallet: {
     //first screen
@@ -75,5 +77,11 @@ export interface ILanguage {
     smartContractDevelopment: string
     experimental: string
     restoreDefaultNetworks: string
+  }
+  address: {
+    nameRequired: string
+    addressRequired: string
+    removeAddress: string
+    delete: string
   }
 }

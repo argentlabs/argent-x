@@ -29,6 +29,8 @@ const texts = {
     accountRecovery: "Set up account recovery",
     saveTheRecoveryPhrase: "Save the recovery phrase",
     pendingTransactions: "Pending transactions",
+    recipientAddress: "Recipient's address",
+    saveAddress: "Save address",
   },
   wallet: {
     //first screen
@@ -78,6 +80,12 @@ const texts = {
     smartContractDevelopment: "Smart Contract Development",
     experimental: "Experimental",
     restoreDefaultNetworks: "Restore default networks",
+  },
+  address: {
+    nameRequired: "Contact Name is required",
+    addressRequired: "Address is required",
+    removeAddress: "Remove from address book",
+    delete: "Delete",
   },
 }
 

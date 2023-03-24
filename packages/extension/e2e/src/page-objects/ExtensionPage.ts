@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test"
 import Messages from "../utils/Messages"
 import Account from "./Account"
 import Activity from "./Activity"
+import AddressBook from "./AddressBook"
 import DeveloperSettings from "./DeveloperSettings"
 import Navigation from "./Navigation"
 import Network from "./Network"
@@ -19,6 +20,7 @@ export default class ExtensionPage {
   settings: Settings
   navigation: Navigation
   developerSettings: DeveloperSettings
+  addressBook: AddressBook
   constructor(page: Page, private extensionUrl: string) {
     this.page = page
     this.wallet = new Wallet(page)
@@ -30,6 +32,7 @@ export default class ExtensionPage {
     this.settings = new Settings(page)
     this.navigation = new Navigation(page)
     this.developerSettings = new DeveloperSettings(page)
+    this.addressBook = new AddressBook(page)
   }
 
   async open() {

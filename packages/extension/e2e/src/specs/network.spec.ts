@@ -28,7 +28,7 @@ test.describe("Network", () => {
     await extension.developerSettings.addNetwork.click()
     await extension.developerSettings.networkName.fill("My Network")
     await extension.developerSettings.chainId.fill("SN_GOERLI")
-    await extension.developerSettings.baseUrl.fill("http://domain.com:1111")
+    await extension.developerSettings.baseUrl.fill("https://alpha4.starknet.io")
 
     await extension.navigation.create.click()
     await expect(
@@ -80,7 +80,7 @@ test.describe("Network", () => {
     await extension.developerSettings.addNetwork.click()
     await extension.developerSettings.networkName.fill("My Network")
     await extension.developerSettings.chainId.fill("SN_GOERLI")
-    await extension.developerSettings.baseUrl.fill("http://domain.com:1111")
+    await extension.developerSettings.baseUrl.fill("https://alpha4.starknet.io")
 
     await extension.navigation.create.click()
     await expect(
