@@ -11,12 +11,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      devnet:
-        image: canlopes/e2e-starknet-devnet:latest
-        ports:
-          - 5050:5050
-
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
       FEATURE_PRIVACY_SETTINGS: "true"
@@ -35,12 +29,12 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      #- name: Build starknet-devnet
-      #  run: docker build -f ./packages/extension/e2e/Dockerfile . --tag e2e-starknet-devnet:latest
-      #- name: Run starknet-devnet
-      #  run: docker run -d -it --name devnet -p 5050:5050 e2e-starknet-devnet:latest
-      #- name: Test docker
-      #  run: curl http://localhost:5050/is_alive
+      - name: Build starknet-devnet
+        run: docker build -f ./packages/extension/e2e/Dockerfile . --tag e2e-starknet-devnet:latest
+      - name: Run starknet-devnet
+        run: docker run -d -it --name devnet -p 5050:5050 e2e-starknet-devnet:latest
+      - name: Test docker
+        run: curl http://localhost:5050/is_alive
 
       - uses: actions/setup-node@v3
         with:
