@@ -11,7 +11,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      docker:
+      localhost:
         image: canlopes/e2e-starknet-devnet:latest
         ports:
           - 5000:5000
