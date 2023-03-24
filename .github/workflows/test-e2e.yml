@@ -38,8 +38,8 @@ jobs:
       #  run: docker build -f ./packages/extension/e2e/Dockerfile . --tag e2e-starknet-devnet:latest
       #- name: Run starknet-devnet
       #  run: docker run -d -it --name devnet -p 5050:5050 e2e-starknet-devnet:latest
-      - name: Test docker
-        run: curl http://localhost:5050/is_alive
+      #- name: Test docker
+      #  run: curl http://localhost:5050/is_alive
 
       - uses: actions/setup-node@v3
         with:
