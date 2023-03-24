@@ -56,7 +56,7 @@ export async function pendingMultisigToMultisig(
     address: multisigData.address,
     name: pendingMultisig.name,
     type: "multisig",
-    networkId: multisigData.networkId,
+    networkId: pendingMultisig.networkId,
     signer: pendingMultisig.signer,
     signers: multisigData.signers,
     threshold: multisigData.threshold,

@@ -1,11 +1,13 @@
 import { Button, icons } from "@argent/ui"
 import { Circle, Flex } from "@chakra-ui/react"
-import { FC, useCallback, useRef } from "react"
+import { FC, useCallback, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { PendingMultisig } from "../../../shared/multisig/store"
+import { PendingMultisig } from "../../../shared/multisig/types"
+import { pendingMultisigToMultisig } from "../../../shared/multisig/utils/pendingMultisig"
 import { routes } from "../../routes"
 import { AccountItemIconContainer } from "../accounts/AccountListScreenItem"
+import { useMultisigDataForSigner } from "./hooks/useMultisigDataForSigner"
 import { PendingMultisigListItem } from "./PendingMultisigListItem"
 
 const { ChevronRightIcon, MoreIcon } = icons
@@ -21,7 +23,13 @@ export const PendingMultisigListScreenItem: FC<
   const navigate = useNavigate()
   const mouseDownSettings = useRef(false)
 
-  //   const accountName = pendingMultisig.name
+  const { data: multisigData } = useMultisigDataForSigner(pendingMultisig)
+
+  useEffect(() => {
+    if (multisigData) {
+      pendingMultisigToMultisig(pendingMultisig, multisigData)
+    }
+  }, [multisigData, pendingMultisig])
 
   const onClick = useCallback(() => {
     navigate(routes.multisigJoin(pendingMultisig.publicKey))
