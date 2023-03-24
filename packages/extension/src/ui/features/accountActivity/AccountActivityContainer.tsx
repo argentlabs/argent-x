@@ -63,7 +63,6 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   const { enrichedPendingMultisigTransactions } =
     useMultisigAccountPendingTransactions(account)
 
-  console.log(enrichedPendingMultisigTransactions)
   const { data, setSize, error, isValidating } =
     useArgentExplorerAccountTransactionsInfinite({
       accountAddress: account.address,

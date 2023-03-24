@@ -41,7 +41,7 @@ export const useMultisigAccountPendingTransactions: UseMultisigAccountPendingTra
       [transactions],
     )
     const { data } = useSWR(
-      [account?.address, "multisigRequests"],
+      [account ? getAccountIdentifier(account) : "", "multisigRequests"],
       async () => {
         if (!account) {
           return []
