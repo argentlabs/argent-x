@@ -17,10 +17,11 @@ import {
 } from "../../../shared/shield/register"
 import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
+import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
-import { ShieldAccountNotDeployed } from "./ShieldAccountNotDeployed"
+import { ShieldAccountNotReady } from "./ShieldAccountNotDeployed"
 import { useRouteAccount } from "./useRouteAccount"
 import { useShieldOnboardingTracking } from "./useShieldTracking"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
@@ -34,6 +35,7 @@ export const ShieldAccountStartScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const network = useCurrentNetwork()
+  const { needsUpgrade = false } = useCheckUpgradeAvailable(account)
 
   const { trackSuccess } = useShieldOnboardingTracking({
     stepId: "welcome",
@@ -80,7 +82,9 @@ export const ShieldAccountStartScreen: FC = () => {
     <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
       {isAvailable ? (
         account?.needsDeploy ? (
-          <ShieldAccountNotDeployed />
+          <ShieldAccountNotReady />
+        ) : needsUpgrade ? (
+          <ShieldAccountNotReady needsUpgrade />
         ) : (
           <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
             {account?.guardian ? (

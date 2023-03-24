@@ -1,7 +1,6 @@
 import { FC, useCallback } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
-import { resetDevice } from "../../../shared/shield/jwt"
 import {
   routes,
   useRouteAccountAddress,
@@ -24,7 +23,6 @@ export const ShieldAccountOTPScreen: FC = () => {
   }, [accountAddress, navigate])
 
   const onOTPReEnterEmail = useCallback(async () => {
-    await resetDevice()
     navigate(routes.shieldAccountEmail(accountAddress), { replace: true })
   }, [accountAddress, navigate])
 
