@@ -10,12 +10,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     services:
-      localhost:
+      devnet:
         image: canlopes/e2e-starknet-devnet:latest
         ports:
           - 5050:5050
-    #test
+
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
       FEATURE_PRIVACY_SETTINGS: "true"
