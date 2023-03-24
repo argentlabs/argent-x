@@ -13,7 +13,8 @@ jobs:
     services:
       docker:
         image: canlopes/e2e-starknet-devnet:latest
-        ports: -5000:5000
+        ports:
+          - 5000:5000
     #test
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
