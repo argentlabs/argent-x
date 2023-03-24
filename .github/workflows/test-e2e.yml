@@ -14,7 +14,7 @@ jobs:
       docker:
         image: canlopes/e2e-starknet-devnet:latest
         ports: -5000:5000
-
+    #test
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
       FEATURE_PRIVACY_SETTINGS: "true"
