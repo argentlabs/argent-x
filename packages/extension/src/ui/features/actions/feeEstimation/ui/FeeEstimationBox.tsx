@@ -55,7 +55,6 @@ export const FeeEstimationBox: FC<FeeEstimationBoxProps> = ({
             </Tooltip>
           )}
         </Center>
-        {/* </Flex> */}
         {isLoading ? (
           <Spinner size={"sm"} />
         ) : hasError ? (
