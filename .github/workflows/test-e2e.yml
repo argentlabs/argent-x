@@ -14,7 +14,7 @@ jobs:
       localhost:
         image: canlopes/e2e-starknet-devnet:latest
         ports:
-          - 5000:5000
+          - 5050:5050
     #test
     env:
       FILENAME: argent-extension-${{ github.ref_name }}
