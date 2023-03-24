@@ -63,7 +63,6 @@ export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
                 pendingTransaction.requestId,
               ),
             )
-            // TODO
           }
           return (
             <Flex key={hash} flexDirection="column">
