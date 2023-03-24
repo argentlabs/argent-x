@@ -7,6 +7,7 @@ import { getMultisigRequestData } from "../../../shared/multisig/multisig.servic
 import {
   MultisigPendingTransaction,
   multisigPendingTransactionsStore,
+  removeFromMultisigPendingTransactions,
 } from "../../../shared/multisig/pendingTransactionsStore"
 import { useArrayStorage } from "../../../shared/storage/hooks"
 import {
@@ -60,6 +61,9 @@ export const useMultisigAccountPendingTransactions: UseMultisigAccountPendingTra
               ...transaction,
               data: request,
             })
+          } else {
+            // If it's not awaiting signatures it should not be stored here anymore
+            removeFromMultisigPendingTransactions(transaction)
           }
         }
         return enrichedPendingMultisigTransactions

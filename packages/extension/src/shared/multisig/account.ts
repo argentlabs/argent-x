@@ -103,7 +103,7 @@ export class MultisigAccount extends Account {
       starknetSignature: { r, s },
       signature: { r, s },
     })
-    console.log(request)
+
     const url = urlJoin(
       this.multsigBaseUrl,
       starknetNetwork,
@@ -119,7 +119,7 @@ export class MultisigAccount extends Account {
       },
       body: JSON.stringify(request),
     })
-    console.log(response)
+
     const data = ApiMultisigTxnResponseSchema.parse(response)
 
     return {

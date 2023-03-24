@@ -28,3 +28,9 @@ export async function addToMultisigPendingTransactions(
 ): Promise<void> {
   return multisigPendingTransactionsStore.push(pendingTransaction)
 }
+
+export async function removeFromMultisigPendingTransactions(
+  pendingTransaction: MultisigPendingTransaction,
+): Promise<void> {
+  multisigPendingTransactionsStore.remove(pendingTransaction)
+}
