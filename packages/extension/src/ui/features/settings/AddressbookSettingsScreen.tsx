@@ -63,7 +63,6 @@ export const AddressbookSettingsScreen: FC = () => {
       rightButton={
         <BarAddButton
           onClick={() => navigate(routes.settingsAddressbookAdd())}
-          aria-label="add"
         />
       }
       title={"Address book"}

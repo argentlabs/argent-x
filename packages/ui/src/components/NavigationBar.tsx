@@ -92,7 +92,7 @@ export const BarAddButton: FC<ComponentProps<typeof BarIconButton>> = (
   props,
 ) => {
   return (
-    <BarIconButton {...props}>
+    <BarIconButton aria-label="add" {...props}>
       <AddIcon />
     </BarIconButton>
   )
