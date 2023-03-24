@@ -1,29 +1,18 @@
-import { BarBackButton, H5, NavigationContainer, P4, icons } from "@argent/ui"
-import { SupportedNetworks } from "@argent/x-swap"
+import { BarBackButton, H5, NavigationContainer, P4 } from "@argent/ui"
 import { Box, Center, Flex } from "@chakra-ui/react"
 import { useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
-import { transaction } from "starknet"
-import useSWR from "swr"
 
-import { getMultisigRequestData } from "../../../shared/multisig/multisig.service"
-import {
-  chainIdToStarknetNetwork,
-  networkNameToChainId,
-} from "../../../shared/utils/starknetNetwork"
 import { routes, useRouteRequestId } from "../../routes"
 import { transformTransaction } from "../accountActivity/transform"
 import { getTransactionFromPendingMultisigTransaction } from "../accountActivity/transform/transaction/transformers/pendingMultisigTransactionAdapter"
 import { TransactionIcon } from "../accountActivity/ui/TransactionIcon"
 import { AccountNetworkInfo } from "../actions/transaction/ApproveTransactionScreen/AccountNetworkInfo"
-import { DappHeader } from "../actions/transaction/ApproveTransactionScreen/DappHeader"
 import { MultisigBanner } from "../actions/transaction/ApproveTransactionScreen/MultisigBanner"
 import { TransactionActions } from "../actions/transaction/ApproveTransactionScreen/TransactionActions"
-import { getApproveScreenTypeFromPendingTransaction } from "../actions/utils"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisigPendingTransaction } from "./hooks/useMultisigPendingTransaction"
-
-const { MultisigIcon } = icons
+import { useMultisigRequest } from "./hooks/useMultisigRequest"
 
 export const MultisigPendingTransactionDetailsScreen = () => {
   const [showtxDetails, setShowTxDetails] = useState(true)
@@ -33,22 +22,10 @@ export const MultisigPendingTransactionDetailsScreen = () => {
   const pendingTransaction = useMultisigPendingTransaction(requestId)
   const navigate = useNavigate()
 
-  const { data } = useSWR(
-    [selectedAccount?.address, "multisigRequest", requestId],
-    async () => {
-      if (!selectedAccount || !requestId) {
-        return undefined
-      }
-      const request = await getMultisigRequestData({
-        address: selectedAccount.address,
-        networkId: chainIdToStarknetNetwork(
-          networkNameToChainId(selectedAccount.networkId as SupportedNetworks),
-        ),
-        requestId: requestId,
-      })
-      return request
-    },
-  )
+  const { data } = useMultisigRequest({
+    account: selectedAccount,
+    requestId,
+  })
   const transactionTransformed = useMemo(() => {
     if (data && pendingTransaction && selectedAccount) {
       return transformTransaction({
@@ -66,7 +43,14 @@ export const MultisigPendingTransactionDetailsScreen = () => {
   if (!selectedAccount || !requestId) {
     return <Navigate to={routes.accounts()} />
   }
-  console.log(transactionTransformed)
+  const goToTransactionsConfirmations = () => {
+    navigate(
+      routes.multisigPendingTransactionConfirmations(
+        selectedAccount.address,
+        requestId,
+      ),
+    )
+  }
   return (
     <NavigationContainer
       leftButton={<BarBackButton onClick={() => navigate(-1)} />}
@@ -95,6 +79,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
           <MultisigBanner
             confirmations={data?.content.approvedSigners.length}
             account={selectedAccount}
+            onClick={goToTransactionsConfirmations}
           />
         </Box>
       )}

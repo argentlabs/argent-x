@@ -246,5 +246,10 @@ export const routes = {
       `/multisig/${accountAddress}/${requestId}/details`,
     "/multisig/:accountAddress/:requestId/details",
   ),
+  multisigPendingTransactionConfirmations: route(
+    (accountAddress, requestId) =>
+      `/multisig/${accountAddress}/${requestId}/confirmations`,
+    "/multisig/:accountAddress/:requestId/confirmations",
+  ),
   swap: route("/swap"),
 }

@@ -42,6 +42,7 @@ import { MultisigConfirmationsScreen } from "./features/multisig/MultisigConfirm
 import { MultisigOwnersScreen } from "./features/multisig/MultisigOwnersScreen"
 import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
 import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
+import { TransactionConfirmationsScreen } from "./features/multisig/TransactionConfirmationsScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
 import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisclaimerScreen"
@@ -412,6 +413,11 @@ const walletRoutes = (
       presentation="push"
       path={routes.multisigPendingTransactionDetails.path}
       element={<MultisigPendingTransactionDetailsScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigPendingTransactionConfirmations.path}
+      element={<TransactionConfirmationsScreen />}
     />
   </>
 )
