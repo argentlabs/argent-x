@@ -1,24 +1,13 @@
-import { useEffect, useState } from "react"
+import useSWR from "swr"
 
-import {
-  MultisigPendingTransaction,
-  getMultisigPendingTransactions,
-} from "../../../../shared/multisig/pendingTransactionsStore"
+import { getMultisigPendingTransactions } from "../../../../shared/multisig/pendingTransactionsStore"
 
 export const useMultisigPendingTransaction = (requestId?: string) => {
-  const [pendingTransaction, setPendingTransaction] = useState<
-    MultisigPendingTransaction | undefined
-  >(undefined)
-  useEffect(() => {
-    const retrievePendingTransaction = async () => {
-      const pendingTransactions = await getMultisigPendingTransactions()
-      console.log(pendingTransactions)
-      const pendingTransaction = pendingTransactions.find(
-        (transaction) => transaction.requestId === requestId,
-      )
-      setPendingTransaction(pendingTransaction)
-    }
-    retrievePendingTransaction()
-  }, [requestId])
-  return pendingTransaction
+  return useSWR(requestId, async () => {
+    const pendingTransactions = await getMultisigPendingTransactions()
+    const pendingTransaction = pendingTransactions.find(
+      (transaction) => transaction.requestId === requestId,
+    )
+    return pendingTransaction
+  })
 }

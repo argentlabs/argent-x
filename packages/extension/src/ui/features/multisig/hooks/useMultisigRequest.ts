@@ -6,6 +6,7 @@ import {
   chainIdToStarknetNetwork,
   networkNameToChainId,
 } from "../../../../shared/utils/starknetNetwork"
+import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { Account } from "../../accounts/Account"
 
 export const useMultisigRequest = ({
@@ -15,17 +16,24 @@ export const useMultisigRequest = ({
   account?: Account
   requestId?: string
 }) => {
-  return useSWR([account?.address, "multisigRequest", requestId], async () => {
-    if (!account || !requestId) {
-      return undefined
-    }
-    const request = await getMultisigRequestData({
-      address: account.address,
-      networkId: chainIdToStarknetNetwork(
-        networkNameToChainId(account.networkId as SupportedNetworks),
-      ),
-      requestId: requestId,
-    })
-    return request
-  })
+  return useSWR(
+    [
+      account ? getAccountIdentifier(account) : "",
+      "multisigRequest",
+      requestId,
+    ],
+    async () => {
+      if (!account || !requestId) {
+        return undefined
+      }
+      const request = await getMultisigRequestData({
+        address: account.address,
+        networkId: chainIdToStarknetNetwork(
+          networkNameToChainId(account.networkId as SupportedNetworks),
+        ),
+        requestId: requestId,
+      })
+      return request
+    },
+  )
 }

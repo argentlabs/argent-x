@@ -8,7 +8,6 @@ import {
 } from "@argent/ui"
 import { Box, Divider, Flex } from "@chakra-ui/react"
 import { useMemo } from "react"
-import { useNavigate } from "react-router-dom"
 
 import { useRouteRequestId } from "../../routes"
 import { formatTruncatedSignerKey } from "../../services/addresses"
@@ -25,8 +24,7 @@ const { TickIcon } = icons
 export const TransactionConfirmationsScreen = () => {
   const selectedAccount = useRouteAccount()
   const requestId = useRouteRequestId()
-  const navigate = useNavigate()
-  const pendingTransaction = useMultisigPendingTransaction(requestId)
+  const { data: pendingTransaction } = useMultisigPendingTransaction(requestId)
   const { data } = useMultisigRequest({
     account: selectedAccount,
     requestId,
@@ -56,7 +54,7 @@ export const TransactionConfirmationsScreen = () => {
   )
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
+      leftButton={<BarBackButton />}
       title={transactionTransformed?.displayName}
     >
       <Box p={4}>

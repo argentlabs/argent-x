@@ -19,7 +19,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
 
   const selectedAccount = useRouteAccount()
   const requestId = useRouteRequestId()
-  const pendingTransaction = useMultisigPendingTransaction(requestId)
+  const { data: pendingTransaction } = useMultisigPendingTransaction(requestId)
   const navigate = useNavigate()
 
   const { data } = useMultisigRequest({
