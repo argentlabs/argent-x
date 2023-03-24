@@ -31,35 +31,24 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
               !transaction.calldata || transaction.calldata?.length === 0
             }
           >
-            {({ isDisabled, isExpanded }) => {
-              return (
-                <>
-                  <DetailAccordionButton
-                    isDisabled={isDisabled}
-                    isExpanded={isExpanded}
-                    label={entryPointToHumanReadable(transaction.entrypoint)}
-                    value={formatTruncatedAddress(transaction.contractAddress)}
-                  />
-                  <DetailAccordionPanel
-                    isDisabled={isDisabled}
-                    isExpanded={isExpanded}
-                  >
-                    {transaction.calldata?.map((calldata, cdIndex) => (
-                      <DetailAccordionRow
-                        key={cdIndex}
-                        label={`Calldata ${cdIndex + 1}`}
-                        value={
-                          number.isHex(calldata)
-                            ? formatTruncatedAddress(calldata)
-                            : calldata
-                        }
-                        copyValue={calldata}
-                      />
-                    ))}
-                  </DetailAccordionPanel>
-                </>
-              )
-            }}
+            <DetailAccordionButton
+              label={entryPointToHumanReadable(transaction.entrypoint)}
+              value={formatTruncatedAddress(transaction.contractAddress)}
+            />
+            <DetailAccordionPanel>
+              {transaction.calldata?.map((calldata, cdIndex) => (
+                <DetailAccordionRow
+                  key={cdIndex}
+                  label={`Calldata ${cdIndex + 1}`}
+                  value={
+                    number.isHex(calldata)
+                      ? formatTruncatedAddress(calldata)
+                      : calldata
+                  }
+                  copyValue={calldata}
+                />
+              ))}
+            </DetailAccordionPanel>
           </DetailAccordionItem>
         ))}
       </DetailAccordion>

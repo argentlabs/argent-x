@@ -104,13 +104,10 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                   key={[token.address, "transfer", dataIndex].join("-")}
                   isDisabled={isEmpty(approvals) && isEmpty(recipients)}
                 >
-                  {({ isDisabled, isExpanded }) => (
+                  {({ isDisabled }) => (
                     <>
                       {token.type === "erc20" ? (
-                        <DetailAccordionButton
-                          isDisabled={isDisabled}
-                          isExpanded={isExpanded}
-                        >
+                        <DetailAccordionButton>
                           <Flex alignItems="center" gap="2">
                             {token.image ? (
                               <Image src={token.image} w="5" h="5" />
@@ -183,10 +180,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                           isDisabled={isDisabled}
                         />
                       )}
-                      <DetailAccordionPanel
-                        isDisabled={isDisabled}
-                        isExpanded={isExpanded}
-                      >
+                      <DetailAccordionPanel>
                         {!isEmpty(approvals) && (
                           <>
                             <DetailAccordionRow

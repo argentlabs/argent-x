@@ -5,12 +5,12 @@ import {
   AccordionItem,
   AccordionItemProps,
   AccordionPanel,
-  AccordionPanelProps,
   AccordionProps,
   Box,
   Divider,
   Flex,
   FlexProps,
+  useAccordionItemState,
 } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactNode } from "react"
 
@@ -105,12 +105,11 @@ export const DetailAccordionItem: FC<AccordionItemProps> = (props) => {
 
 export const DetailAccordionButton: FC<
   AccordionButtonProps & {
-    isExpanded: boolean
-    isDisabled: boolean
     label?: ReactNode
     value?: ReactNode
   }
-> = ({ isExpanded, isDisabled, label, value, children, ...rest }) => {
+> = ({ label, value, children, ...rest }) => {
+  const { isDisabled } = useAccordionItemState()
   return (
     <AccordionButton
       transitionProperty="margin, padding, background"
@@ -143,16 +142,11 @@ export const DetailAccordionButton: FC<
   )
 }
 
-export const DetailAccordionPanel: FC<
-  AccordionPanelProps & {
-    isExpanded: boolean
-    isDisabled: boolean
-  }
-> = ({ isExpanded, isDisabled, ...rest }) => {
+export const DetailAccordionPanel: FC<FlexProps> = (props) => {
   return (
     <AccordionPanel backgroundColor="neutrals.700" px="3" pb="0">
       <Divider color="black" opacity="1" />
-      <Flex flexDirection="column" gap="3" py="3" {...rest} />
+      <Flex flexDirection="column" gap="3" py="3" {...props} />
     </AccordionPanel>
   )
 }

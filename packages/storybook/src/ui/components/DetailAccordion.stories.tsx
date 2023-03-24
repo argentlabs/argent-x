@@ -14,92 +14,65 @@ export default {
 
 const Inner = () => (
   <DetailAccordion>
-    <DetailAccordionItem>
-      {({ isDisabled, isExpanded }) => (
-        <>
-          <DetailAccordionButton
-            isDisabled={isDisabled}
-            isExpanded={isExpanded}
-            label={"Label"}
-            value={"Value"}
-          />
-          <DetailAccordionPanel isDisabled={isDisabled} isExpanded={isExpanded}>
-            <DetailAccordionRow
-              label={"Label 1"}
-              value={"Value 1"}
-              copyValue={"Copy value 1"}
-            />
-            <DetailAccordionRow
-              label={"Label 2"}
-              value={"Value 2"}
-              copyValue={"Copy value 2"}
-            />
-            <DetailAccordionRow
-              label={"Label 3"}
-              value={"Value 3"}
-              copyValue={"Copy value 3"}
-            />
-          </DetailAccordionPanel>
-        </>
-      )}
+    <DetailAccordionItem isDisabled>
+      <DetailAccordionButton label={"Label (disabled)"} value={"Value"} />
+      <DetailAccordionPanel>
+        <DetailAccordionRow
+          label={"Label 1"}
+          value={"Value 1"}
+          copyValue={"Copy value 1"}
+        />
+        <DetailAccordionRow
+          label={"Label 2"}
+          value={"Value 2"}
+          copyValue={"Copy value 2"}
+        />
+        <DetailAccordionRow
+          label={"Label 3"}
+          value={"Value 3"}
+          copyValue={"Copy value 3"}
+        />
+      </DetailAccordionPanel>
     </DetailAccordionItem>
     <DetailAccordionItem>
-      {({ isDisabled, isExpanded }) => (
-        <>
-          <DetailAccordionButton
-            isDisabled={isDisabled}
-            isExpanded={isExpanded}
-            label={"Label"}
-            value={"Value"}
-          />
-          <DetailAccordionPanel isDisabled={isDisabled} isExpanded={isExpanded}>
-            <DetailAccordionRow
-              label={"Label 1"}
-              value={"Value 1"}
-              copyValue={"Copy value 1"}
-            />
-            <DetailAccordionRow
-              label={"Label 2"}
-              value={"Value 2"}
-              copyValue={"Copy value 2"}
-            />
-            <DetailAccordionRow
-              label={"Label 3"}
-              value={"Value 3"}
-              copyValue={"Copy value 3"}
-            />
-          </DetailAccordionPanel>
-        </>
-      )}
+      <DetailAccordionButton label={"Label"} value={"Value"} />
+      <DetailAccordionPanel>
+        <DetailAccordionRow
+          label={"Label 1"}
+          value={"Value 1"}
+          copyValue={"Copy value 1"}
+        />
+        <DetailAccordionRow
+          label={"Label 2"}
+          value={"Value 2"}
+          copyValue={"Copy value 2"}
+        />
+        <DetailAccordionRow
+          label={"Label 3"}
+          value={"Value 3"}
+          copyValue={"Copy value 3"}
+        />
+      </DetailAccordionPanel>
     </DetailAccordionItem>
     <DetailAccordionItem>
-      {({ isDisabled, isExpanded }) => (
-        <>
-          <DetailAccordionButton
-            isDisabled={isDisabled}
-            isExpanded={isExpanded}
-            label={"Label"}
-            value={"Value"}
-          />
-          <DetailAccordionPanel isDisabled={isDisabled} isExpanded={isExpanded}>
-            <DetailAccordionRow
-              label={"Label 1"}
-              value={"Value 1"}
-              copyValue={"Copy value 1"}
-            />
-            <DetailAccordionRow
-              label={"Label 2"}
-              value={"Value 2"}
-              copyValue={"Copy value 2"}
-            />
-            <DetailAccordionRow
-              label={"Label 3"}
-              value={"Value 3"}
-              copyValue={"Copy value 3"}
-            />
-          </DetailAccordionPanel>
-        </>
-      )}
+      <DetailAccordionButton label={"Label"} value={"Value"} />
+      <DetailAccordionPanel>
+        <DetailAccordionRow
+          label={"Label 1"}
+          value={"Value 1"}
+          copyValue={"Copy value 1"}
+        />
+        <DetailAccordionRow
+          label={"Label 2"}
+          value={"Value 2"}
+          copyValue={"Copy value 2"}
+        />
+        <DetailAccordionRow
+          label={"Label 3"}
+          value={"Value 3"}
+          copyValue={"Copy value 3"}
+        />
+      </DetailAccordionPanel>
     </DetailAccordionItem>
   </DetailAccordion>
 )
