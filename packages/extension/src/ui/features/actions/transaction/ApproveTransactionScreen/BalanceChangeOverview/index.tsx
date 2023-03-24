@@ -14,7 +14,7 @@ import {
 import { Box, Divider, Flex, Image, Text, Tooltip } from "@chakra-ui/react"
 import BigNumber from "bignumber.js"
 import { motion } from "framer-motion"
-import { isEmpty, isString } from "lodash-es"
+import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import {
@@ -95,200 +95,169 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
             (
               { amount, recipients, token, usdValue, approvals, safe },
               dataIndex,
-            ) => {
-              if (isString(amount)) {
-                amount = new BigNumber(amount)
-              }
-              return (
-                <DetailAccordionItem
-                  key={[token.address, "transfer", dataIndex].join("-")}
-                  isDisabled={isEmpty(approvals) && isEmpty(recipients)}
-                >
-                  {({ isDisabled, isExpanded }) => (
-                    <>
-                      {token.type === "erc20" ? (
-                        <DetailAccordionButton
-                          isDisabled={isDisabled}
-                          isExpanded={isExpanded}
-                        >
-                          <Flex alignItems="center" gap="2">
-                            {token.image ? (
-                              <Image src={token.image} w="5" h="5" />
-                            ) : (
-                              <UnknownTokenIcon w="5" h="5" fontSize="10px" />
-                            )}
-                            <P4 fontWeight="medium">
-                              {token.name === "Ether" ? "Ethereum" : token.name}{" "}
-                            </P4>
-                            {!safe && (
-                              <P3
-                                color="error.500"
-                                fontWeight="medium"
-                                mt="0.25"
-                              >
-                                <AlertIcon />
-                              </P3>
-                            )}
-                          </Flex>
-                          <Flex
-                            direction="column"
-                            gap="0.5"
-                            alignItems="flex-end"
-                          >
-                            <TextWithAmount
-                              amount={amount.toFixed()}
-                              decimals={token.decimals}
-                            >
-                              <P4
-                                color={
-                                  amount.isNegative()
-                                    ? "error.500"
-                                    : "secondary.500"
-                                }
-                                fontWeight="medium"
-                              >
-                                {prettifyTokenAmount({
-                                  amount: amount.toFixed(),
-                                  decimals: token.decimals,
-                                  symbol:
-                                    token.type === "erc20"
-                                      ? token.symbol
-                                      : "NFT",
-                                  showPlusSign: true,
-                                })}
-                              </P4>
-                            </TextWithAmount>
-
-                            {/** 0 usdValue means we don't have any value */}
-                            {isMainnet && !!usdValue && !usdValue.isZero() && (
-                              <L2 color="neutrals.300">
-                                {prettifyCurrencyValue(
-                                  usdValue.abs().toString(),
-                                )}
-                              </L2>
-                            )}
-                          </Flex>
-                        </DetailAccordionButton>
-                      ) : (
-                        <NftDetails
-                          contractAddress={token.address}
-                          tokenId={token.tokenId}
-                          networkId={network.id}
-                          dataIndex={dataIndex}
-                          totalData={aggregatedData.length}
-                          amount={amount}
-                          usdValue={usdValue}
-                          safe={safe}
-                          isMainnet={isMainnet}
-                          isDisabled={isDisabled}
-                        />
-                      )}
-                      <DetailAccordionPanel
+            ) => (
+              <DetailAccordionItem
+                key={[token.address, "transfer", dataIndex].join("-")}
+                isDisabled={isEmpty(approvals) && isEmpty(recipients)}
+              >
+                {({ isDisabled, isExpanded }) => (
+                  <>
+                    {token.type === "erc20" ? (
+                      <DetailAccordionButton
                         isDisabled={isDisabled}
                         isExpanded={isExpanded}
                       >
-                        {!isEmpty(approvals) && (
-                          <>
+                        <Flex alignItems="center" gap="2">
+                          {token.image ? (
+                            <Image src={token.image} w="5" h="5" />
+                          ) : (
+                            <UnknownTokenIcon w="5" h="5" fontSize="10px" />
+                          )}
+                          <P4 fontWeight="medium">
+                            {token.name === "Ether" ? "Ethereum" : token.name}{" "}
+                          </P4>
+                          {!safe && (
+                            <P3 color="error.500" fontWeight="medium" mt="0.25">
+                              <AlertIcon />
+                            </P3>
+                          )}
+                        </Flex>
+                        <Flex
+                          direction="column"
+                          gap="0.5"
+                          alignItems="flex-end"
+                        >
+                          <TextWithAmount
+                            amount={amount.toFixed()}
+                            decimals={token.decimals}
+                          >
+                            <P4
+                              color={
+                                amount.isNegative()
+                                  ? "error.500"
+                                  : "secondary.500"
+                              }
+                              fontWeight="medium"
+                            >
+                              {prettifyTokenAmount({
+                                amount: amount.toFixed(),
+                                decimals: token.decimals,
+                                symbol:
+                                  token.type === "erc20" ? token.symbol : "NFT",
+                                showPlusSign: true,
+                              })}
+                            </P4>
+                          </TextWithAmount>
+
+                          {/** 0 usdValue means we don't have any value */}
+                          {isMainnet && !!usdValue && !usdValue.isZero() && (
+                            <L2 color="neutrals.300">
+                              {prettifyCurrencyValue(usdValue.abs().toFixed())}
+                            </L2>
+                          )}
+                        </Flex>
+                      </DetailAccordionButton>
+                    ) : (
+                      <NftDetails
+                        contractAddress={token.address}
+                        tokenId={token.tokenId}
+                        networkId={network.id}
+                        dataIndex={dataIndex}
+                        totalData={aggregatedData.length}
+                        amount={amount}
+                        usdValue={usdValue}
+                        safe={safe}
+                        isMainnet={isMainnet}
+                        isDisabled={isDisabled}
+                      />
+                    )}
+                    <DetailAccordionPanel
+                      isDisabled={isDisabled}
+                      isExpanded={isExpanded}
+                    >
+                      {!isEmpty(approvals) && (
+                        <>
+                          <DetailAccordionRow
+                            header={
+                              <>
+                                Approved spending limit
+                                <Tooltip label="The approved spending limit to one or multiple addresses after transaction execution">
+                                  <Text color="neutrals.300" cursor="pointer">
+                                    <InfoIcon />
+                                  </Text>
+                                </Tooltip>
+                              </>
+                            }
+                          />
+                          {approvals.map((approval, approvalIndex) => (
                             <DetailAccordionRow
-                              header={
-                                <>
-                                  Approved spending limit
-                                  <Tooltip label="The approved spending limit to one or multiple addresses after transaction execution">
-                                    <Text color="neutrals.300" cursor="pointer">
-                                      <InfoIcon />
-                                    </Text>
-                                  </Tooltip>
-                                </>
+                              key={approvalIndex}
+                              label={formatTruncatedAddress(approval.spender)}
+                              copyLabel={normalizeAddress(approval.spender)}
+                              value={
+                                <TextWithAmount
+                                  amount={approval.amount.toFixed()}
+                                  decimals={approval.token.decimals}
+                                >
+                                  <Text
+                                    color={
+                                      isUnlimitedAmount(
+                                        approval.amount.toFixed(),
+                                      )
+                                        ? "error.500"
+                                        : undefined
+                                    }
+                                  >
+                                    {prettifyTokenAmount({
+                                      amount: approval.amount.toFixed(),
+                                      ...approval.token,
+                                      unlimitedText: "All your",
+                                    })}
+                                  </Text>
+                                </TextWithAmount>
                               }
                             />
-                            {approvals.map((approval, approvalIndex) => {
-                              if (isString(approval.amount)) {
-                                approval.amount = new BigNumber(approval.amount)
+                          ))}
+                        </>
+                      )}
+                      {!isEmpty(recipients) && (
+                        <>
+                          {!isEmpty(approvals) && (
+                            <Divider color="black" opacity="1" />
+                          )}
+                          <DetailAccordionRow header={"Recipients"} />
+                          {recipients.map((recipient, recipientIndex) => (
+                            <DetailAccordionRow
+                              key={[
+                                "recipient",
+                                recipient.address,
+                                recipientIndex,
+                              ].join("-")}
+                              label={formatTruncatedAddress(recipient.address)}
+                              copyLabel={normalizeAddress(recipient.address)}
+                              value={
+                                <TextWithAmount
+                                  amount={recipient.amount.toFixed()}
+                                  decimals={token.decimals}
+                                >
+                                  <Text>
+                                    {prettifyTokenAmount({
+                                      amount: recipient.amount.toFixed(),
+                                      ...token,
+                                      withSymbol: false,
+                                    })}
+                                  </Text>
+                                </TextWithAmount>
                               }
-                              return (
-                                <DetailAccordionRow
-                                  key={approvalIndex}
-                                  label={formatTruncatedAddress(
-                                    approval.spender,
-                                  )}
-                                  copyLabel={normalizeAddress(approval.spender)}
-                                  value={
-                                    <TextWithAmount
-                                      amount={approval.amount.toFixed()}
-                                      decimals={approval.token.decimals}
-                                    >
-                                      <Text
-                                        color={
-                                          isUnlimitedAmount(
-                                            approval.amount.toFixed(),
-                                          )
-                                            ? "error.500"
-                                            : undefined
-                                        }
-                                      >
-                                        {prettifyTokenAmount({
-                                          amount: approval.amount.toFixed(),
-                                          ...approval.token,
-                                          unlimitedText: "All your",
-                                        })}
-                                      </Text>
-                                    </TextWithAmount>
-                                  }
-                                />
-                              )
-                            })}
-                          </>
-                        )}
-                        {!isEmpty(recipients) && (
-                          <>
-                            {!isEmpty(approvals) && (
-                              <Divider color="black" opacity="1" />
-                            )}
-                            <DetailAccordionRow header={"Recipients"} />
-                            {recipients.map((recipient, recipientIndex) => {
-                              if (isString(recipient.amount)) {
-                                recipient.amount = new BigNumber(
-                                  recipient.amount,
-                                )
-                              }
-                              return (
-                                <DetailAccordionRow
-                                  key={[
-                                    "recipient",
-                                    recipient.address,
-                                    recipientIndex,
-                                  ].join("-")}
-                                  label={formatTruncatedAddress(
-                                    recipient.address,
-                                  )}
-                                  copyLabel={normalizeAddress(
-                                    recipient.address,
-                                  )}
-                                  value={
-                                    <TextWithAmount
-                                      amount={recipient.amount.toFixed()}
-                                      decimals={token.decimals}
-                                    >
-                                      <Text>
-                                        {prettifyTokenAmount({
-                                          amount: recipient.amount.toFixed(),
-                                          ...token,
-                                          withSymbol: false,
-                                        })}
-                                      </Text>
-                                    </TextWithAmount>
-                                  }
-                                />
-                              )
-                            })}
-                          </>
-                        )}
-                      </DetailAccordionPanel>
-                    </>
-                  )}
-                </DetailAccordionItem>
-              )
-            },
+                            />
+                          ))}
+                        </>
+                      )}
+                    </DetailAccordionPanel>
+                  </>
+                )}
+              </DetailAccordionItem>
+            ),
           )}
           {!allTransferSafe && (
             <DetailAccordionItem>
@@ -298,11 +267,11 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                   alignItems="flex-start"
                   gap="2"
                 >
-                  <P3 color="error.500" fontWeight="bold" mt="0.25">
+                  <P3 color="error.500" fontWeight="medium" mt="0.25">
                     <AlertIcon />
                   </P3>
                   <Flex direction="column" gap="1" alignItems="flex-start">
-                    <P4 color="error.500" fontWeight="bold">
+                    <P4 color="error.500" fontWeight="medium">
                       Warning: Approved spending limit
                     </P4>
                     <P4 color="neutrals.100">
