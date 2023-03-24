@@ -4,6 +4,7 @@ export default {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     "@storybook/addon-links",
+    "@storybook/addon-actions",
     {
       name: "@storybook/addon-essentials",
       options: {
@@ -60,5 +61,5 @@ export default {
     }
     return config
   },
-  staticDirs: ["../../extension/src"],
+  staticDirs: ["../../extension/src", "../../ui/assets"],
 }
