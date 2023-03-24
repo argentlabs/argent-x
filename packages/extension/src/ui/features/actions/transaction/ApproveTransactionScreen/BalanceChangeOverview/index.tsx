@@ -206,7 +206,7 @@ export const BalanceChangeOverview: FC<BalanceChangeOverviewProps> = ({
                                 !usdValue.isZero() && (
                                   <L2 color="neutrals.300">
                                     {prettifyCurrencyValue(
-                                      usdValue.abs().toString(),
+                                      usdValue.abs().toFixed(),
                                     )}
                                   </L2>
                                 )}

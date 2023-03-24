@@ -1,11 +1,8 @@
 import { Call, number } from "starknet"
-import useSWR from "swr"
 
-import { useArgentShieldEnabled } from "../../../ui/features/shield/useArgentShieldEnabled"
 import { getMulticallForNetwork } from "../../multicall"
 import { getNetwork } from "../../network"
 import { BaseWalletAccount } from "../../wallet.model"
-import { getAccountIdentifier } from "../../wallet.service"
 import { uint256ToHexString } from "./util"
 
 /**
@@ -40,21 +37,4 @@ export const getIsCurrentImplementation = async (
       number.toBN(currentImplementation).eq(number.toBN(accountImplementation)),
   )
   return isCurrentImplementation
-}
-
-/**
- * Returns result of `getIsCurrentImplementation` if shield is enabled and account is defined
- */
-
-export const useCanEnableArgentShieldForAccount = (
-  account?: BaseWalletAccount,
-) => {
-  const argentShieldEnabled = useArgentShieldEnabled()
-  const { data: canEnableGuardianForAccount } = useSWR(
-    argentShieldEnabled && account
-      ? [getAccountIdentifier(account), "canEnableGuardianForAccount"]
-      : null,
-    () => account && getIsCurrentImplementation(account),
-  )
-  return canEnableGuardianForAccount
 }
