@@ -6,6 +6,7 @@ import { Network } from "../network"
 import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
 import {
+  ApiMultisigContent,
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
 } from "./multisig.model"
@@ -55,12 +56,7 @@ export const getMultisigAccountData = async ({
     }
     const url = urlJoin(ARGENT_MULTISIG_URL, `${networkId}/${address}`)
     return fetcher<{
-      content: {
-        address: string
-        creator: string
-        signers: string[]
-        threshold: number
-      }
+      content: ApiMultisigContent
     }>(url, {
       method: "GET",
       headers: {
