@@ -14,6 +14,7 @@ const texts = {
     reset: "Reset",
     confirmReset: "RESET",
     save: "Save",
+    create: "Create",
     cancel: "Cancel",
   },
   account: {
@@ -72,6 +73,13 @@ const texts = {
     hiddenAccounts: "Hidden accounts",
     delete: "Delete",
     copy: "Copy",
+  },
+  developerSettings: {
+    manageNetworks: "Manage networks",
+    blockExplorer: "Block explorer",
+    smartContractDevelopment: "Smart Contract Development",
+    experimental: "Experimental",
+    restoreDefaultNetworks: "Restore default networks",
   },
   address: {
     nameRequired: "Contact Name is required",

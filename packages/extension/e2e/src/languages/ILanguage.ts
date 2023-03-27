@@ -14,6 +14,7 @@ export interface ILanguage {
     reset: string
     confirmReset: string
     save: string
+    create: string
     cancel: string
   }
   account: {
@@ -69,6 +70,13 @@ export interface ILanguage {
     hiddenAccounts: string
     delete: string
     copy: string
+  }
+  developerSettings: {
+    manageNetworks: string
+    blockExplorer: string
+    smartContractDevelopment: string
+    experimental: string
+    restoreDefaultNetworks: string
   }
   address: {
     nameRequired: string
