@@ -5,10 +5,9 @@ import {
   SpacerCell,
 } from "@argent/ui"
 import { Center, Flex, Image } from "@chakra-ui/react"
-import React, { FC, useCallback, useEffect, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
-import { getMultisigAccounts } from "../../../shared/multisig/store"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { useReturnTo } from "../../routes"
 import {
@@ -60,9 +59,6 @@ export const AccountEditScreen: FC = () => {
     setLiveEditingAccountName(accountName)
   }, [accountName])
 
-  useEffect(() => {
-    getMultisigAccounts().then((accs) => console.log(accs))
-  }, [])
   return (
     <>
       <NavigationContainer
