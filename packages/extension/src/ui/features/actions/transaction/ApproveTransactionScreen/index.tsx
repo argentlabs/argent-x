@@ -20,8 +20,8 @@ import { UpgradeScreenV4 } from "../../../accounts/UpgradeScreenV4"
 import { useFeeTokenBalance } from "../../../accountTokens/tokens.service"
 import { useIsMainnet } from "../../../networks/useNetworks"
 import { ConfirmPageProps } from "../../DeprecatedConfirmScreen"
-import { CombinedFeeEstimation } from "../../feeEstimation/CombinedFeeEstimation"
-import { FeeEstimation } from "../../feeEstimation/FeeEstimation"
+import { CombinedFeeEstimationContainer } from "../../feeEstimation/CombinedFeeEstimation"
+import { FeeEstimationContainer } from "../../feeEstimation/FeeEstimation"
 import { useTransactionReview } from "../useTransactionReview"
 import {
   AggregatedSimData,
@@ -61,9 +61,9 @@ export interface ApproveTransactionProps
 }
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
-  transactions,
-  selectedAccount,
   actionHash,
+  selectedAccount,
+  transactions,
   ...rest
 }) => {
   usePageTracking("signTransaction", {
@@ -131,7 +131,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       verifiedDapp={verifiedDapp}
       footer={
         selectedAccount.needsDeploy ? (
-          <CombinedFeeEstimation
+          <CombinedFeeEstimationContainer
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}
@@ -139,7 +139,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
             actionHash={actionHash}
           />
         ) : (
-          <FeeEstimation
+          <FeeEstimationContainer
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}
