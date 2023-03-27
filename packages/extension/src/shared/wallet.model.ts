@@ -56,6 +56,12 @@ export type AddOwnerMultisiPayload = {
   currentThreshold?: number
 }
 
+export type RemoveOwnerMultisigPayload = {
+  address: string
+  newThreshold: number
+  signerToRemove: string
+}
+
 export type UpdateMultisigThresholdPayload = {
   newThreshold: number
   address: string

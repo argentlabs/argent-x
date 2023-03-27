@@ -11,7 +11,7 @@ import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 
-const { MultisigJoinIcon } = icons
+const { MultisigJoinIcon, MinusIcon } = icons
 
 export const MultisigOwnersScreen: FC = () => {
   const account = useRouteAccount()
@@ -33,6 +33,10 @@ const MultisigOwners = ({ account }: { account: Account }) => {
     navigate(routes.multisigAddOwners(account.address))
   }
 
+  const handleRemoveOwnerClick = (signerToRemove: string) => {
+    navigate(routes.multisigRemoveOwners(account.address, signerToRemove))
+  }
+
   return (
     <Box m={4} height="100%">
       <Flex flexDirection="column" height="100%" justifyContent="space-between">
@@ -46,7 +50,13 @@ const MultisigOwners = ({ account }: { account: Account }) => {
           <P3 color="neutrals.300" mb={1}>
             Me
           </P3>
-          <Box borderRadius="lg" backgroundColor="neutrals.800" p={4} mb={3}>
+          <Box
+            borderRadius="lg"
+            backgroundColor="neutrals.800"
+            px={4}
+            py={6}
+            mb={3}
+          >
             {signerKey && (
               <H6 color="white">{formatTruncatedSignerKey(signerKey)}</H6>
             )}
@@ -58,15 +68,25 @@ const MultisigOwners = ({ account }: { account: Account }) => {
             .filter((signer) => signer !== signerKey)
             .map((signer) => {
               return (
-                <Box
+                <Flex
                   borderRadius="lg"
                   backgroundColor="neutrals.800"
                   p={4}
                   key={signer}
-                  my={1}
+                  my={2}
+                  justifyContent="space-between"
+                  alignItems="center"
                 >
                   <H6 color="white">{formatTruncatedSignerKey(signer)}</H6>
-                </Box>
+                  <Button
+                    borderRadius="full"
+                    backgroundColor="neutrals.900"
+                    onClick={() => handleRemoveOwnerClick(signer)}
+                    px="1em"
+                  >
+                    <MinusIcon />
+                  </Button>
+                </Flex>
               )
             })}
         </Box>

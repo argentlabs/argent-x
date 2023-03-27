@@ -13,6 +13,7 @@ import { DeclareContract } from "../udc/type"
 import {
   AddOwnerMultisiPayload,
   BaseWalletAccount,
+  RemoveOwnerMultisigPayload,
   UpdateMultisigThresholdPayload,
 } from "../wallet.model"
 
@@ -121,4 +122,12 @@ export type TransactionMessage =
     }
   | {
       type: "UPDATE_MULTISIG_THRESHOLD_RES"
+    }
+  | { type: "REMOVE_MULTISIG_OWNER"; data: RemoveOwnerMultisigPayload }
+  | {
+      type: "REMOVE_MULTISIG_OWNER_REJ"
+      data: { error: string }
+    }
+  | {
+      type: "REMOVE_MULTISIG_OWNER_RES"
     }

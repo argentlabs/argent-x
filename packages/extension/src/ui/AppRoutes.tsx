@@ -41,6 +41,7 @@ import { MultisigAddOwnersScreen } from "./features/multisig/MultisigAddOwnersSc
 import { MultisigConfirmationsScreen } from "./features/multisig/MultisigConfirmationsScreen"
 import { MultisigOwnersScreen } from "./features/multisig/MultisigOwnersScreen"
 import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
+import { MultisigRemoveOwnersScreen } from "./features/multisig/MultisigRemoveOwnerScreen"
 import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
 import { TransactionConfirmationsScreen } from "./features/multisig/TransactionConfirmationsScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
@@ -408,6 +409,11 @@ const walletRoutes = (
       presentation="push"
       path={routes.multisigAddOwners.path}
       element={<MultisigAddOwnersScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigRemoveOwners.path}
+      element={<MultisigRemoveOwnersScreen />}
     />
     <Route
       presentation="push"

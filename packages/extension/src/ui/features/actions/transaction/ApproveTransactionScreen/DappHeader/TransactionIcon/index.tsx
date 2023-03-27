@@ -13,6 +13,7 @@ import { AggregatedSimData } from "../../../useTransactionSimulatedData"
 import { AddOwnerIcon } from "./AddOwnerIcon"
 import { DeclareContractIcon } from "./DeclareTransactionIcon"
 import { NftTransactionIcon } from "./NftTransactionIcon"
+import { RemoveOwnerIcon } from "./RemoveOwnerIcon"
 import { SendTransactionIcon } from "./SendTransactionIcon"
 import { SwapTransactionIcon } from "./SwapTransactionIcon"
 import { UnknownDappIcon } from "./UnknownDappIcon"
@@ -52,6 +53,10 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 
   if (approveScreenType === ApproveScreenType.MULTISIG_ADD_SIGNERS) {
     return <AddOwnerIcon />
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_REMOVE_SIGNER) {
+    return <RemoveOwnerIcon />
   }
 
   if (approveScreenType === ApproveScreenType.MULTISIG_UPDATE_THRESHOLD) {

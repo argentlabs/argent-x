@@ -499,6 +499,44 @@ export const handleTransactionMessage: HandleMessage<
         })
       }
     }
+
+    case "REMOVE_MULTISIG_OWNER": {
+      try {
+        const { address, signerToRemove, newThreshold } = msg.data
+
+        const signersPayload = {
+          entrypoint: "removeSigners",
+          calldata: stark.compileCalldata({
+            new_threshold: newThreshold.toString(),
+            signers_to_remove_len: "1",
+            signers_to_remove: utils.hexlify(
+              utils.base58.decode(signerToRemove),
+            ),
+          }),
+          contractAddress: address,
+        }
+
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: signersPayload,
+            meta: {
+              title: "Remove multisig owner",
+              type: "MULTISIG_REMOVE_SIGNER",
+            },
+          },
+        })
+
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_RES",
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_REJ",
+          data: { error: `${e}` },
+        })
+      }
+    }
     case "UPDATE_MULTISIG_THRESHOLD": {
       try {
         const { address, newThreshold } = msg.data

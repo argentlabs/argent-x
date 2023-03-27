@@ -44,6 +44,11 @@ export const useRouteRequestId = () => {
   return requestId
 }
 
+export const useRouteSignerToRemove = () => {
+  const { signerToRemove } = useParams()
+  return signerToRemove
+}
+
 export const useRouteEmailAddress = () => {
   return useQuery().get("email") || undefined
 }
@@ -240,6 +245,11 @@ export const routes = {
   multisigAddOwners: route(
     (accountAddress) => `/multisig/${accountAddress}/add-owners`,
     "/multisig/:accountAddress/add-owners",
+  ),
+  multisigRemoveOwners: route(
+    (accountAddress, signerToRemove) =>
+      `/multisig/${accountAddress}/${signerToRemove}/remove-owners`,
+    "/multisig/:accountAddress/:signerToRemove/remove-owners",
   ),
   multisigPendingTransactionDetails: route(
     (accountAddress, requestId) =>

@@ -66,6 +66,14 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     )
   }
 
+  if (approveScreenType === ApproveScreenType.MULTISIG_REMOVE_SIGNER) {
+    return (
+      <Flex alignItems="center" gap="1">
+        Remove multisig owner
+      </Flex>
+    )
+  }
+
   if (approveScreenType === ApproveScreenType.MULTISIG_UPDATE_THRESHOLD) {
     return (
       <Flex alignItems="center" gap="1">

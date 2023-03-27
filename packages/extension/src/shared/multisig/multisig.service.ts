@@ -9,6 +9,7 @@ import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
 import {
   AddOwnerMultisiPayload,
+  RemoveOwnerMultisigPayload,
   UpdateMultisigThresholdPayload,
 } from "../wallet.model"
 import {
@@ -151,6 +152,19 @@ export const updateMultisigThreshold = async (
   const response = await Promise.race([
     waitForMessage("UPDATE_MULTISIG_THRESHOLD_RES"),
     waitForMessage("UPDATE_MULTISIG_THRESHOLD_REJ"),
+  ])
+
+  if (response && "error" in response) {
+    throw new Error(response.error)
+  }
+}
+
+export const removeMultisigOwner = async (data: RemoveOwnerMultisigPayload) => {
+  sendMessage({ type: "REMOVE_MULTISIG_OWNER", data })
+
+  const response = await Promise.race([
+    waitForMessage("REMOVE_MULTISIG_OWNER_RES"),
+    waitForMessage("REMOVE_MULTISIG_OWNER_REJ"),
   ])
 
   if (response && "error" in response) {
