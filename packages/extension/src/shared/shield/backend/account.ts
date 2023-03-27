@@ -2,6 +2,7 @@ import {
   Cosigner,
   CosignerMessage,
   CosignerOffchainMessage,
+  CosignerResponse,
 } from "@argent/guardian"
 import retry from "async-retry"
 import { z } from "zod"
@@ -58,7 +59,7 @@ export const emailVerificationStatusErrorSchema = z.object({
 export const getEmailVerificationStatus =
   async (): Promise<EmailVerificationStatus> => {
     try {
-      const json = await jwtFetcher(
+      const json = await jwtFetcher<{ status: EmailVerificationStatus }>(
         `${ARGENT_API_BASE_URL}/account/emailVerificationStatus`,
       )
       return json.status
@@ -86,7 +87,7 @@ export const getVerificationErrorMessage = (
 
 export const register = async (): Promise<void> => {
   try {
-    const json = await jwtFetcher(
+    const json = await jwtFetcher<void>(
       `${ARGENT_API_BASE_URL}/account/asyncRegister`,
       {
         method: "POST",
@@ -125,10 +126,8 @@ interface VerifyEmailResponse {
   userRegistrationStatus: "registered" | "notRegistered"
 }
 
-export const verifyEmail = async (
-  verificationCode: string,
-): Promise<VerifyEmailResponse> => {
-  const json: VerifyEmailResponse = await jwtFetcher(
+export const verifyEmail = async (verificationCode: string) => {
+  const json = await jwtFetcher<VerifyEmailResponse>(
     `${ARGENT_API_BASE_URL}/verifyEmail`,
     {
       method: "POST",
@@ -142,9 +141,9 @@ export const verifyEmail = async (
 
 type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
 
-export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
+export const getRegistrationStatus = async () => {
   try {
-    const json = await jwtFetcher(
+    const json = await jwtFetcher<{ status: RegistrationStatus }>(
       `${ARGENT_API_BASE_URL}/account/registrationStatus`,
     )
     return json.status
@@ -176,9 +175,9 @@ export interface BackendAccount {
   salt: string | null
 }
 
-export const getBackendAccounts = async (): Promise<BackendAccount[]> => {
+export const getBackendAccounts = async () => {
   try {
-    const json = await jwtFetcher(
+    const json = await jwtFetcher<{ accounts: BackendAccount[] }>(
       `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
     )
     return json.accounts
@@ -196,22 +195,25 @@ export const addBackendAccount = async (
   pubKey: string,
   accountAddress: string,
   signature: string[],
-): Promise<AddAccountResponse> => {
+) => {
   try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/account`, {
-      method: "POST",
-      body: JSON.stringify({
-        chain: "starknet",
-        application: "argentx",
-        ownerAddress: pubKey,
-        accountAddress,
-        signature: {
-          r: signature[0],
-          s: signature[1],
-        },
-        assignCosigner: true,
-      }),
-    })
+    const json = await jwtFetcher<AddAccountResponse>(
+      `${ARGENT_API_BASE_URL}/account`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          chain: "starknet",
+          application: "argentx",
+          ownerAddress: pubKey,
+          accountAddress,
+          signature: {
+            r: signature[0],
+            s: signature[1],
+          },
+          assignCosigner: true,
+        }),
+      },
+    )
     return json
   } catch (error) {
     throw new Error("Failed to add account")
@@ -227,10 +229,13 @@ export const cosignerSign: Cosigner = async (
     : `/cosigner/sign`
 
   try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}${beEndpoint}`, {
-      method: "POST",
-      body: JSON.stringify(message),
-    })
+    const json = await jwtFetcher<CosignerResponse>(
+      `${ARGENT_API_BASE_URL}${beEndpoint}`,
+      {
+        method: "POST",
+        body: JSON.stringify(message),
+      },
+    )
     return json
   } catch (error) {
     if (isFetcherError(error) && error.responseJson?.status) {

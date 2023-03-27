@@ -37,6 +37,8 @@ import { LockScreen } from "./features/lock/LockScreen"
 import { ResetScreen } from "./features/lock/ResetScreen"
 import { CreateMultisigStartScreen } from "./features/multisig/CreateMultisigScreen/CreateMultisigStartScreen"
 import { JoinMultisigScreen } from "./features/multisig/JoinMultisigScreen"
+import { MultisigConfirmationsScreen } from "./features/multisig/MultisigConfirmationsScreen"
+import { MultisigOwnersScreen } from "./features/multisig/MultisigOwnersScreen"
 import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
 import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
 import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
@@ -389,6 +391,16 @@ const walletRoutes = (
     {/* Multisig */}
     <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
     <Route path={routes.multisigJoin.path} element={<JoinMultisigScreen />} />
+    <Route
+      presentation="push"
+      path={routes.multisigOwners.path}
+      element={<MultisigOwnersScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigConfirmations.path}
+      element={<MultisigConfirmationsScreen />}
+    />
   </>
 )
 

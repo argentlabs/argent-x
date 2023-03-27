@@ -16,7 +16,6 @@ export function useMultisigInfo(account: BaseWalletAccount): IMultisigInfo {
   const multisigAccount = useMultisigWalletAccount(account)
   const { data: multisigData } = useMultisigDataForSigner(account)
   const multisigStatus = useMultisigStatus(account)
-
   useEffect(() => {
     if (!multisigAccount || !multisigData) {
       return

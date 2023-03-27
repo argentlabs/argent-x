@@ -6,7 +6,7 @@ import { generateJwt } from "./jwt"
 
 /** wraps fetcher, generates and uses bearer jwt */
 
-export const jwtFetcher = async (
+export const jwtFetcher = async <T>(
   input: RequestInfo | URL,
   init?: RequestInit,
 ) => {
@@ -20,7 +20,7 @@ export const jwtFetcher = async (
     },
   }
   const { switcherNetworkId } = useAppState.getState()
-  const fetcher = fetcherWithArgentApiHeadersForNetwork(switcherNetworkId)
+  const fetcher = fetcherWithArgentApiHeadersForNetwork<T>(switcherNetworkId)
   try {
     return fetcher(input, initWithArgentJwtHeaders)
   } catch (error) {

@@ -12,10 +12,10 @@ import { useAppState } from "../app.state"
  * @see argentApiHeadersForNetwork
  */
 
-export const argentApiFetcher = (
+export const argentApiFetcher = <T>(
   input: RequestInfo | URL,
   init?: RequestInit,
-  fetcherImpl: Fetcher = fetcher,
+  fetcherImpl: Fetcher<T> = fetcher,
 ) => {
   const { switcherNetworkId } = useAppState.getState()
   const initWithArgentApiHeaders = {
