@@ -39,6 +39,22 @@ jobs:
           node-version: "16"
           cache: "yarn"
 
+      - name: Check docker local network
+        run: |
+          CODE=`curl --write-out '%{http_code}' \
+              --silent \
+              --output /dev/null \
+              --request GET \
+              --url 'http://localhost:5050/is_alive' \
+            `
+          if [[ "$CODE" != "200" ]] 
+          then
+            echo "Local network is offline! $CODE"
+            exit 1
+          else
+            echo "Local network is online."
+          fi
+
       - name: Install dependencies
         run: yarn setup
 
