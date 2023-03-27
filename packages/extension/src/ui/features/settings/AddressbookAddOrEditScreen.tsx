@@ -244,7 +244,7 @@ export const AddressbookAddOrEditScreen: FC<AddressbookAddOrEditProps> = ({
               )}
             </div>
 
-            <div>
+            <div aria-label="network-selector">
               <StyledControlledSelect
                 name="networkId"
                 options={networksToOptions}
