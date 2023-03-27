@@ -1,5 +1,5 @@
 
-FROM shardlabs/starknet-devnet:latest
+FROM shardlabs/starknet-devnet:0.4.6
 RUN addgroup -S localuser \
     && adduser -S localuser -G localuser
 
