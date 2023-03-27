@@ -1,3 +1,4 @@
+import { utils } from "ethers"
 import {
   Account,
   InvocationsSignerDetails,
@@ -9,6 +10,7 @@ import {
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
+import { sendMessageToUi } from "../activeTabs"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { getNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
@@ -459,6 +461,90 @@ export const handleTransactionMessage: HandleMessage<
 
     case "TRANSACTION_FAILED": {
       return await actionQueue.remove(msg.data.actionHash)
+    }
+
+    case "ADD_MULTISIG_OWNERS": {
+      try {
+        const { address, signersToAdd, newThreshold, currentThreshold } =
+          msg.data
+
+        const thresholdPayload =
+          newThreshold === currentThreshold
+            ? null
+            : {
+                entrypoint: "changeThreshold",
+                calldata: stark.compileCalldata({
+                  new_threshold: newThreshold.toString(),
+                }),
+                contractAddress: address,
+              }
+        const signersPayload = {
+          entrypoint: "addSigners",
+          calldata: stark.compileCalldata({
+            new_threshold: newThreshold.toString(),
+            signers_to_add: signersToAdd.map((signer) =>
+              utils.hexlify(utils.base58.decode(signer)),
+            ),
+          }),
+          contractAddress: address,
+        }
+        const transactions = thresholdPayload
+          ? [thresholdPayload, signersPayload]
+          : signersPayload
+
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions,
+            meta: {
+              title: "Add multisig owners",
+              type: "MULTISIG_ADD_SIGNERS",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_RES",
+          data: { requestId: "TODO" },
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "ADD_MULTISIG_OWNERS_REJ",
+          data: { error: `${e}` },
+        })
+      }
+    }
+    case "UPDATE_MULTISIG_THRESHOLD": {
+      try {
+        const { address, newThreshold } = msg.data
+
+        const thresholdPayload = {
+          entrypoint: "changeThreshold",
+          calldata: stark.compileCalldata({
+            new_threshold: newThreshold.toString(),
+          }),
+          contractAddress: address,
+        }
+
+        await actionQueue.push({
+          type: "TRANSACTION",
+          payload: {
+            transactions: thresholdPayload,
+            meta: {
+              title: "Set confirmations threshold",
+              type: "MULTISIG_UPDATE_THRESHOLD",
+            },
+          },
+        })
+        return sendMessageToUi({
+          type: "UPDATE_MULTISIG_THRESHOLD_RES",
+          data: { requestId: "TODO" },
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "UPDATE_MULTISIG_THRESHOLD_REJ",
+          data: { error: `${e}` },
+        })
+      }
     }
   }
 

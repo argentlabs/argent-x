@@ -1,12 +1,21 @@
 import { H1, H4, P3 } from "@argent/ui"
-import { Box, Button, Center } from "@chakra-ui/react"
+import { Box, Button, Center, Flex } from "@chakra-ui/react"
+import { isEmpty } from "lodash-es"
 import { FC } from "react"
-import { useFormContext } from "react-hook-form"
+import { FormProvider, useFormContext } from "react-hook-form"
 
+import {
+  addMultisigOwners,
+  updateMultisigThreshold,
+} from "../../../shared/multisig/multisig.service"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
-import { FieldValues } from "./hooks/useCreateMultisigForm"
+import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
+import {
+  FieldValuesThresholdForm,
+  useUpdateThresholdForm,
+} from "./hooks/useUpdateThreshold"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
 
@@ -14,24 +23,121 @@ export const MultisigConfirmationsScreen: FC = () => {
   const account = useRouteAccount()
   return (
     <MultisigSettingsWrapper>
-      {account && <MultisigConfirmations account={account} />}
+      {account && <MultisigConfirmationsWithFormProvider account={account} />}
     </MultisigSettingsWrapper>
   )
 }
 
-export const MultisigConfirmations = ({ account }: { account: Account }) => {
+const MultisigConfirmationsWithFormProvider = ({
+  account,
+}: {
+  account: Account
+}) => {
   const { multisig } = useMultisigInfo(account)
-  const { trigger } = useFormContext<FieldValues>()
+
+  const methods = useUpdateThresholdForm(multisig?.threshold)
+  return (
+    <FormProvider {...methods}>
+      <MultisigConfirmationsWithoutOwners account={account} />
+    </FormProvider>
+  )
+}
+export const MultisigConfirmationsWithOwners = ({
+  account,
+}: {
+  account: Account
+}) => {
+  const { multisig } = useMultisigInfo(account)
+  const {
+    trigger,
+    formState: { errors },
+    getValues,
+  } = useFormContext<FieldValuesCreateMultisigForm>()
+
   const handleNextClick = () => {
     trigger()
-    // TODO: implement
+    if (isEmpty(errors)) {
+      addMultisigOwners({
+        address: account.address,
+        newThreshold: getValues("confirmations"),
+        signersToAdd: getValues("signerKeys").map((signer) => signer.key),
+        currentThreshold: multisig?.threshold,
+      })
+    }
   }
+  const totalSigners = multisig?.signers
+    ? multisig.signers.length + getValues("signerKeys").length
+    : getValues("signerKeys").length
+
   return (
-    <Box m={4}>
-      <H4>Set confirmations</H4>
-      <P3 color="neutrals.100" pb={4}>
-        How many owners must confirm each transaction before it&apos;s sent?
-      </P3>
+    <BaseMultisigConfirmations
+      account={account}
+      handleNextClick={handleNextClick}
+      totalSigners={totalSigners}
+    />
+  )
+}
+
+export const MultisigConfirmationsWithoutOwners = ({
+  account,
+}: {
+  account: Account
+}) => {
+  const { multisig } = useMultisigInfo(account)
+
+  const {
+    trigger,
+    formState: { errors },
+    getValues,
+  } = useFormContext<FieldValuesThresholdForm>()
+
+  const handleNextClick = () => {
+    trigger()
+    const newThreshold = getValues("confirmations")
+    if (!Object.keys(errors).length && newThreshold !== multisig?.threshold) {
+      console.log("in")
+      updateMultisigThreshold({
+        address: account.address,
+        newThreshold: getValues("confirmations"),
+      })
+    }
+  }
+
+  return (
+    <BaseMultisigConfirmations
+      account={account}
+      handleNextClick={handleNextClick}
+      totalSigners={multisig?.signers.length}
+      buttonTitle="Update confirmations"
+    />
+  )
+}
+
+const BaseMultisigConfirmations = ({
+  account,
+  handleNextClick,
+  totalSigners,
+  buttonTitle = "Next",
+}: {
+  account: Account
+  handleNextClick: () => void
+  totalSigners?: number
+  buttonTitle?: string
+}) => {
+  const { multisig } = useMultisigInfo(account)
+  return (
+    <Flex
+      m={4}
+      justifyContent="space-between"
+      flexDirection="column"
+      height="full"
+    >
+      <>
+        <H4>Set confirmations</H4>
+        <P3 color="neutrals.100" pb={4}>
+          How many owners must confirm each transaction before it&apos;s sent?
+        </P3>
+      </>
       {account.needsDeploy ? (
         <Box>
           <Box borderRadius="lg" backgroundColor="neutrals.800" p={4} my={4}>
@@ -46,16 +152,20 @@ export const MultisigConfirmations = ({ account }: { account: Account }) => {
           </Center>
         </Box>
       ) : (
-        <>
+        <Flex
+          height="full"
+          justifyContent="space-between"
+          flexDirection="column"
+        >
           <SetConfirmationsInput
             existingThreshold={multisig?.threshold}
-            existingSigners={multisig?.signers.length}
+            totalSigners={totalSigners}
           />
           <Button colorScheme="primary" onClick={handleNextClick}>
-            Next
+            {buttonTitle}
           </Button>
-        </>
+        </Flex>
       )}
-    </Box>
+    </Flex>
   )
 }

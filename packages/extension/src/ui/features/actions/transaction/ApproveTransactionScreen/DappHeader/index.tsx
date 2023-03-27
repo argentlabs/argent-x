@@ -31,7 +31,6 @@ export const DappHeader = ({
       transactionReview?.targetedDapp?.links.find((l) => l.name === "website"),
     [transactionReview?.targetedDapp?.links],
   )
-
   return (
     <Box mb="6">
       <Flex

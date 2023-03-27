@@ -2,6 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+export const confirmationsSchema = z
+  .number()
+  .positive()
+  .min(1, "You need at least one confirmation")
+  .default(1)
+
 const getFormSchema = (accountSignerKey?: string) =>
   z
     .object({
@@ -17,17 +23,14 @@ const getFormSchema = (accountSignerKey?: string) =>
               ? [...arr.map((item) => item.key), accountSignerKey]
               : arr.map((item) => item.key)
             const uniqueValues = new Set(extendedArr)
-            return uniqueValues.size === arr.length
+
+            return uniqueValues.size === extendedArr.length
           },
           {
             message: "You cannot use the same key twice",
           },
         ),
-      confirmations: z
-        .number()
-        .positive()
-        .min(1, "You need at least one confirmation")
-        .default(1),
+      confirmations: confirmationsSchema,
     })
     // We increment by 1 to include the owner
     .refine((data) => data.confirmations <= data.signerKeys.length + 1, {
@@ -35,10 +38,12 @@ const getFormSchema = (accountSignerKey?: string) =>
       path: ["confirmations"],
     })
 
-export type FieldValues = z.infer<ReturnType<typeof getFormSchema>>
+export type FieldValuesCreateMultisigForm = z.infer<
+  ReturnType<typeof getFormSchema>
+>
 
 export const useCreateMultisigForm = (accountSignerKey?: string) => {
-  return useForm<FieldValues>({
+  return useForm<FieldValuesCreateMultisigForm>({
     resolver: zodResolver(getFormSchema(accountSignerKey)),
   })
 }

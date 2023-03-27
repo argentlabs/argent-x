@@ -27,13 +27,14 @@ import { addTransaction, transactionsStore } from "./store"
 
 export const checkTransactionHash = (
   transactionHash?: number.BigNumberish,
+  account?: WalletAccount,
 ): boolean => {
   try {
     if (!transactionHash) {
       throw Error("transactionHash not defined")
     }
     const bn = number.toBN(transactionHash)
-    if (bn.lte(constants.ZERO)) {
+    if (bn.lte(constants.ZERO) && account?.type !== "multisig") {
       throw Error("transactionHash needs to be >0")
     }
     return true
@@ -128,7 +129,6 @@ export const executeTransactionAction = async (
     const { account, txHash } = await wallet.deployAccount(selectedAccount, {
       maxFee: maxADFee,
     })
-
     if (!checkTransactionHash(txHash)) {
       throw Error(
         "Deploy Account Transaction could not get added to the sequencer",
@@ -178,7 +178,7 @@ export const executeTransactionAction = async (
     maxFee,
   })
 
-  if (!checkTransactionHash(transaction.transaction_hash)) {
+  if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
     throw Error("Transaction could not get added to the sequencer")
   }
 

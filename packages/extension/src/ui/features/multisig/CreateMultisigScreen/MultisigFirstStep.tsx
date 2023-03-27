@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form"
 
 import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { AddOwnersForm } from "../AddOwnerForm"
-import { FieldValues } from "../hooks/useCreateMultisigForm"
+import { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { ScreenLayout } from "./ScreenLayout"
 
 export const MultisigFirstStep = ({
@@ -16,7 +16,7 @@ export const MultisigFirstStep = ({
   index: number
   goNext: () => void
 }) => {
-  const { register, trigger } = useFormContext<FieldValues>()
+  const { register, trigger } = useFormContext<FieldValuesCreateMultisigForm>()
   const creatorSignerKey = useNextSignerKey(networkId)
   const handleNavigationToConfirmationScreen = async () => {
     const isValid = await trigger("signerKeys")
