@@ -232,5 +232,9 @@ export const routes = {
     (accountAddress) => `/multisig/${accountAddress}/confirmations`,
     "/multisig/:accountAddress/confirmations",
   ),
+  multisigAddOwners: route(
+    (accountAddress) => `/multisig/${accountAddress}/add-owners`,
+    "/multisig/:accountAddress/add-owners",
+  ),
   swap: route("/swap"),
 }

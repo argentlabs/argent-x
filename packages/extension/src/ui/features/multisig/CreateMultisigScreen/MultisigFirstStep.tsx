@@ -1,20 +1,11 @@
-import { FieldError, P3, RoundButton, icons } from "@argent/ui"
-import {
-  Box,
-  Button,
-  Center,
-  Divider,
-  Input,
-  InputGroup,
-  InputRightElement,
-} from "@chakra-ui/react"
-import { useFieldArray, useFormContext } from "react-hook-form"
+import { P3 } from "@argent/ui"
+import { Box, Button, Divider, Input } from "@chakra-ui/react"
+import { useFormContext } from "react-hook-form"
 
 import { useNextSignerKey } from "../../accounts/usePublicKey"
+import { AddOwnersForm } from "../AddOwnerForm"
+import { FieldValues } from "../hooks/useCreateMultisigForm"
 import { ScreenLayout } from "./ScreenLayout"
-import { FieldValues } from "./useCreateMultisigForm"
-
-const { CloseIcon, AddIcon } = icons
 
 export const MultisigFirstStep = ({
   index,
@@ -25,26 +16,13 @@ export const MultisigFirstStep = ({
   index: number
   goNext: () => void
 }) => {
-  const {
-    control,
-    formState: { errors },
-    register,
-    trigger,
-  } = useFormContext<FieldValues>()
+  const { register, trigger } = useFormContext<FieldValues>()
   const creatorSignerKey = useNextSignerKey(networkId)
-  const { fields, append, remove } = useFieldArray({
-    name: "signerKeys",
-    control,
-  })
   const handleNavigationToConfirmationScreen = async () => {
     const isValid = await trigger("signerKeys")
     if (isValid) {
       goNext()
     }
-  }
-
-  const addOwner = () => {
-    append({ key: "" })
   }
 
   return (
@@ -67,54 +45,7 @@ export const MultisigFirstStep = ({
           value={creatorSignerKey}
         />
       </Box>
-      {fields.map((field, index) => {
-        return (
-          <Box key={field.id} my="2" width="100%">
-            <P3 mb="1">Owner {index + 2}</P3>
-            <InputGroup display="flex" alignItems="center">
-              <Input
-                isInvalid={Boolean(errors?.signerKeys?.[index]?.key)}
-                placeholder="Signer key..."
-                {...register(`signerKeys.${index}.key` as const, {
-                  required: true,
-                })}
-              />
-              <InputRightElement my="auto">
-                <RoundButton
-                  onClick={() => remove(index)}
-                  height="5"
-                  size="xs"
-                  mr="2"
-                  my="0"
-                  mt="1em"
-                  pb="0"
-                  variant="link"
-                >
-                  <CloseIcon />
-                </RoundButton>
-              </InputRightElement>
-            </InputGroup>
-            {errors.signerKeys && (
-              <FieldError>
-                {errors.signerKeys?.[index]?.key?.message}
-              </FieldError>
-            )}
-          </Box>
-        )
-      })}
-      {errors.signerKeys?.message && (
-        <FieldError>{errors.signerKeys?.message}</FieldError>
-      )}
-      <Center width="100%">
-        <Button
-          variant="link"
-          onClick={addOwner}
-          size="xs"
-          leftIcon={<AddIcon />}
-        >
-          Add another owner
-        </Button>
-      </Center>
+      <AddOwnersForm nextOwnerIndex={2} />
       <Button
         colorScheme="primary"
         onClick={handleNavigationToConfirmationScreen}

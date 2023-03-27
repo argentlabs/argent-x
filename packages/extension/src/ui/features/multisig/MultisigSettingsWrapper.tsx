@@ -2,20 +2,16 @@ import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { FC, PropsWithChildren, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useReturnTo } from "../../routes"
 import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
 import { useRouteAccount } from "../shield/useRouteAccount"
 
-export const MultisigSettingsWrapper: FC<PropsWithChildren> = ({
-  children,
-}: {
-  children?: ReactNode
-}) => {
+export const MultisigSettingsWrapper: FC<
+  PropsWithChildren & { goBack?: () => void }
+> = ({ children, goBack }: { children?: ReactNode; goBack?: () => void }) => {
   const navigate = useNavigate()
-  const returnTo = useReturnTo()
   const { accountNames } = useAccountMetadata()
   const account = useRouteAccount()
 
@@ -24,12 +20,12 @@ export const MultisigSettingsWrapper: FC<PropsWithChildren> = ({
     : "Not found"
 
   const onClose = useCallback(() => {
-    if (returnTo) {
-      navigate(returnTo)
+    if (goBack) {
+      goBack()
     } else {
       navigate(-1)
     }
-  }, [navigate, returnTo])
+  }, [navigate, goBack])
 
   return (
     <>
