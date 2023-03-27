@@ -1,5 +1,5 @@
 import { P4 } from "@argent/ui"
-import { Center, Spinner, Text } from "@chakra-ui/react"
+import { Center, Spinner } from "@chakra-ui/react"
 
 export const SimulationLoadingBanner = () => {
   return (

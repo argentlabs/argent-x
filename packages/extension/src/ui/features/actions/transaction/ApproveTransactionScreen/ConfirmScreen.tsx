@@ -1,6 +1,6 @@
 import { Button, H6, P3, ScrollContainer } from "@argent/ui"
 import { Box, ButtonProps, Flex, ThemingProps, chakra } from "@chakra-ui/react"
-import { FC, ReactNode, useState } from "react"
+import { FC, PropsWithChildren, ReactNode, useState } from "react"
 import Measure from "react-measure"
 import { useNavigate } from "react-router-dom"
 
@@ -17,7 +17,9 @@ export interface ConfirmPageProps {
   selectedAccount?: Account
 }
 
-interface ConfirmScreenProps extends ConfirmPageProps {
+export interface ConfirmScreenProps
+  extends ConfirmPageProps,
+    PropsWithChildren {
   title?: string
   rejectButtonText?: string
   confirmButtonText?: string
@@ -34,7 +36,6 @@ interface ConfirmScreenProps extends ConfirmPageProps {
   showHeader?: boolean
   px?: string
   footer?: ReactNode
-  children: ReactNode
 }
 
 export const StickyGroup = chakra(Box, {
@@ -48,7 +49,7 @@ export const StickyGroup = chakra(Box, {
       "linear-gradient(180deg, rgba(16, 16, 20, 0) 0%, #101014 66.54%)",
     zIndex: 100,
 
-    "& > * + *": { marginTop: "24px" },
+    "& > * + *": { marginTop: 3 },
   },
 })
 
@@ -137,11 +138,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                         onClick={onReject}
                         type="button"
                         w="full"
-                        backgroundColor={
-                          !rejectButtonDisabled
-                            ? rejectButtonBackgroundColor ?? "neutrals.700"
-                            : undefined
-                        }
+                        isDisabled={rejectButtonDisabled}
                       >
                         {rejectButtonText}
                       </Button>

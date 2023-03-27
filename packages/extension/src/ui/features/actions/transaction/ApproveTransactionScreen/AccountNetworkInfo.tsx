@@ -18,34 +18,35 @@ export const AccountNetworkInfo = ({
     <VStack
       borderRadius="xl"
       backgroundColor="neutrals.800"
-      gap="3"
-      px="3"
-      py="3.5"
+      spacing={3}
+      p={3}
+      alignItems={"stretch"}
     >
-      <Flex w="full" justifyContent="space-between" alignItems="flex-end">
-        <P4 fontWeight="bold" color="neutrals.300" textAlign="end">
+      <Flex justifyContent="space-between" alignItems="center">
+        <P4 fontWeight="medium" color="neutrals.300" textAlign="end">
           From
         </P4>
-        <PrettyAccountAddress
-          size={6}
-          accountAddress={account.address}
-          networkId={account.networkId}
-          bold
-        />
+        <P4 fontWeight="medium">
+          <PrettyAccountAddress
+            size={6}
+            accountAddress={account.address}
+            networkId={account.networkId}
+          />
+        </P4>
       </Flex>
       {to && (
-        <Flex w="full" justifyContent="space-between">
-          <P4 fontWeight="bold" color="neutrals.300">
+        <Flex justifyContent="space-between">
+          <P4 fontWeight="medium" color="neutrals.300">
             To
           </P4>
           <P4>{formatTruncatedAddress(to)}</P4>
         </Flex>
       )}
-      <Flex w="full" justifyContent="space-between" pb="1">
-        <P4 fontWeight="bold" color="neutrals.300">
+      <Flex justifyContent="space-between">
+        <P4 fontWeight="medium" color="neutrals.300">
           Network
         </P4>
-        <P4 fontWeight="bold" color="white">
+        <P4 fontWeight="medium" color="white">
           {account.network.name}
         </P4>
       </Flex>
