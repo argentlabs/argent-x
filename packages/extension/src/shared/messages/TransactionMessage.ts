@@ -113,7 +113,6 @@ export type TransactionMessage =
     }
   | {
       type: "ADD_MULTISIG_OWNERS_RES"
-      data: { requestId: string }
     }
   | { type: "UPDATE_MULTISIG_THRESHOLD"; data: UpdateMultisigThresholdPayload }
   | {
@@ -122,5 +121,4 @@ export type TransactionMessage =
     }
   | {
       type: "UPDATE_MULTISIG_THRESHOLD_RES"
-      data: { requestId: string }
     }

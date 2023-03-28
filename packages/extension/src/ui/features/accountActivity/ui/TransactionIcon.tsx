@@ -23,6 +23,8 @@ const {
   ActivityIcon,
   ArgentShieldIcon,
   ArgentShieldDeactivateIcon,
+  MultisigJoinIcon,
+  MultisigRemoveIcon,
 } = icons
 
 export interface TransactionIconProps
@@ -49,6 +51,13 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     case "GUARDIAN":
       iconComponent =
         action === "ADD" ? <ArgentShieldIcon /> : <ArgentShieldDeactivateIcon />
+      break
+    case "SIGNER":
+      iconComponent =
+        action === "ADD" ? <MultisigJoinIcon /> : <MultisigRemoveIcon />
+      break
+    case "THRESHOLD":
+      iconComponent = <ApproveIcon />
       break
   }
   switch (action) {

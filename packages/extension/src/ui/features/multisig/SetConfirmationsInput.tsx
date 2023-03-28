@@ -24,7 +24,7 @@ export const SetConfirmationsInput = ({
       <Controller
         name="confirmations"
         control={control}
-        defaultValue={1}
+        defaultValue={existingThreshold}
         rules={{ required: true }}
         render={({ field }) => (
           <>

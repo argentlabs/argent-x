@@ -15,6 +15,7 @@ import {
   ApiMultisigContent,
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
+  ApiMultisigTxnResponse,
 } from "./multisig.model"
 
 const multisigTransactionTypes = {
@@ -96,6 +97,35 @@ export const getMultisigAccountData = async ({
   }
 }
 
+export const getMultisigRequestData = async ({
+  address,
+  networkId,
+  requestId,
+}: {
+  address: string
+  networkId: string
+  requestId: string
+}) => {
+  try {
+    if (!ARGENT_MULTISIG_URL) {
+      throw new Error("Multisig endpoint is not defined")
+    }
+    const url = urlJoin(
+      ARGENT_MULTISIG_URL,
+      `${networkId}/${address}/request/${requestId}`,
+    )
+    return fetcher<ApiMultisigTxnResponse>(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+  } catch (e) {
+    throw new Error(`An error occured ${e}`)
+  }
+}
+
 export const addMultisigOwners = async (data: AddOwnerMultisiPayload) => {
   sendMessage({ type: "ADD_MULTISIG_OWNERS", data })
 
@@ -104,7 +134,7 @@ export const addMultisigOwners = async (data: AddOwnerMultisiPayload) => {
     waitForMessage("ADD_MULTISIG_OWNERS_REJ"),
   ])
 
-  if ("error" in response) {
+  if (response && "error" in response) {
     throw new Error(response.error)
   }
 }
@@ -119,7 +149,7 @@ export const updateMultisigThreshold = async (
     waitForMessage("UPDATE_MULTISIG_THRESHOLD_REJ"),
   ])
 
-  if ("error" in response) {
+  if (response && "error" in response) {
     throw new Error(response.error)
   }
 }
