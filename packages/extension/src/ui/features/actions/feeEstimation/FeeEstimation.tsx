@@ -19,7 +19,7 @@ import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 import { ExtendableControl } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
 import { FeeEstimationBox } from "./ui/FeeEstimationBox"
-import { getTooltipText } from "./utils"
+import { getTooltipText, useMaxFeeEstimation } from "./utils"
 import { getParsedError } from "./utils"
 
 const { AlertIcon, ChevronDownIcon } = icons
@@ -27,9 +27,9 @@ const { AlertIcon, ChevronDownIcon } = icons
 export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
   accountAddress,
   networkId,
-  fee,
-  feeError,
   onErrorChange,
+  transactions,
+  actionHash,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
@@ -37,6 +37,7 @@ export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
   }
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
+  const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
 
   const enoughBalance = useMemo(
     () =>
@@ -47,7 +48,7 @@ export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
   )
 
   const showFeeError = Boolean(fee && feeTokenBalance && !enoughBalance)
-  const showEstimateError = Boolean(feeError)
+  const showEstimateError = Boolean(error)
   const showError = showFeeError || showEstimateError
 
   const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
@@ -55,7 +56,7 @@ export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
     onErrorChange?.(hasError)
   }, [hasError, onErrorChange])
 
-  const parsedFeeEstimationError = showEstimateError && getParsedError(feeError)
+  const parsedFeeEstimationError = showEstimateError && getParsedError(error)
   const feeToken = useNetworkFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken,
