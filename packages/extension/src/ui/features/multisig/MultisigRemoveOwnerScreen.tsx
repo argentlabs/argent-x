@@ -72,7 +72,6 @@ const MultisigRemove = ({
   const handleSubmit = () => {
     trigger()
     const newThreshold = getValues("confirmations")
-    console.log(isEmpty(errors), signerToRemove, account?.address)
     if (isEmpty(errors) && signerToRemove && account?.address) {
       removeMultisigOwner({
         signerToRemove,
