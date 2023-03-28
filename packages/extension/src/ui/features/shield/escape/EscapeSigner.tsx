@@ -5,7 +5,10 @@ import { FC } from "react"
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/getEscape"
 import { analytics } from "../../../services/analytics"
 import { ZENDESK_LINK } from "../../userReview/ReviewFeedbackScreen"
-import { ShieldExternalLinkButton } from "../ui/ShieldExternalLinkButton"
+import {
+  ESCAPE_GUARDIAN_LINK,
+  ShieldExternalLinkButton,
+} from "../ui/ShieldExternalLinkButton"
 import { ShieldHeader } from "../ui/ShieldHeader"
 import { getEscapeDisplayAttributes } from "./EscapeBanner"
 import { LiveAccountEscapeProps } from "./useAccountEscape"
@@ -50,7 +53,7 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({
             action: "detailedInstructions",
           })
         }}
-        href={"https://www.argent.xyz/argent-x/"}
+        href={ESCAPE_GUARDIAN_LINK}
         my={3}
       >
         Detailed instructions

@@ -236,15 +236,13 @@ export const prettifyTokenAmount = ({
         : balanceFullString
   }
 
-  const prettyValueWithSymbol = [
-    showPlusSign && isPositiveValue && "+",
-    prettyValue,
-    withSymbol && symbol,
-  ]
+  const prettyValueWithSymbol = [prettyValue, withSymbol && symbol]
     .filter(Boolean)
     .join(" ")
 
-  return prettyValueWithSymbol
+  return showPlusSign && isPositiveValue
+    ? `+${prettyValueWithSymbol}`
+    : prettyValueWithSymbol
 }
 
 export interface IConvertTokenAmount {

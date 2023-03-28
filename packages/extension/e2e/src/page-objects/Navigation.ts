@@ -81,4 +81,16 @@ export default class Navigation {
   get menuActivity() {
     return this.page.locator('[aria-label="Activity"]')
   }
+
+  get save() {
+    return this.page.locator(`button:text-is("${lang.common.save}")`)
+  }
+
+  get create() {
+    return this.page.locator(`button:text-is("${lang.common.create}")`)
+  }
+
+  get cancel() {
+    return this.page.locator(`button:text-is("${lang.common.cancel}")`)
+  }
 }
