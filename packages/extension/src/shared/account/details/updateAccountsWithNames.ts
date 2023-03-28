@@ -1,4 +1,3 @@
-// Write a function that takes in an array of accounts and returns an array of accounts with the name property added to each account. The name property should be the first and last name of the account holder. The function should be able to handle both individual and business accounts.
 
 import { partition } from "lodash-es"
 
