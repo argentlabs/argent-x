@@ -5,7 +5,7 @@ import { AllowArray } from "../storage/types"
 
 export interface IFetchTransactionSimulation {
   transactions: AllowArray<Call>
-  fetcher?: Fetcher
+  fetcher?: Fetcher<ApiTransactionSimulationResponse>
 }
 
 export interface TransactionSimulationApproval {

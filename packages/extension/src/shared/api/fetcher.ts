@@ -1,9 +1,9 @@
 /** generic json fetcher */
 
-export type Fetcher = (
+export type Fetcher<T> = (
   input: RequestInfo | URL,
   init?: RequestInit,
-) => Promise<any>
+) => Promise<T>
 
 export interface FetcherError extends Error {
   url?: string
@@ -37,7 +37,10 @@ export const fetcherError = (
   return error
 }
 
-export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+export const fetcher = async <T>(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<T> => {
   const response = await fetch(input, init)
   /** capture text here in the case of json parse failure we can include it in the error */
   const responseText = await response.text()
@@ -60,9 +63,9 @@ export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
   }
 }
 
-export const fetcherWithArgentApiHeadersForNetwork = (
+export const fetcherWithArgentApiHeadersForNetwork = <T>(
   network: string,
-  fetcherImpl: Fetcher = fetcher,
+  fetcherImpl: Fetcher<T> = fetcher,
 ) => {
   const fetcherWithArgentApiHeaders = (
     input: RequestInfo | URL,

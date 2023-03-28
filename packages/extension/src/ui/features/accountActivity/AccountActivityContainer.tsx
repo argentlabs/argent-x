@@ -13,8 +13,10 @@ import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
+import { useMultisigAccountPendingTransactions } from "../multisig/multisigTransactions.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { AccountActivity } from "./AccountActivity"
+import { PendingMultisigTransactions } from "./PendingMultisigTransactions"
 import { PendingTransactions } from "./PendingTransactions"
 import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
@@ -58,6 +60,8 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data: nftContractAddresses } = useAspectContractAddresses()
+  const { enrichedPendingMultisigTransactions } =
+    useMultisigAccountPendingTransactions(account)
 
   const { data, setSize, error, isValidating } =
     useArgentExplorerAccountTransactionsInfinite({
@@ -209,7 +213,11 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     )
   }
 
-  if (!pendingTransactions.length && !Object.keys(mergedActivity).length) {
+  if (
+    !pendingTransactions.length &&
+    !Object.keys(mergedActivity).length &&
+    !enrichedPendingMultisigTransactions?.length
+  ) {
     return (
       <Empty icon={<ActivityIcon />} title={"No activity for this network"} />
     )
@@ -217,6 +225,14 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
 
   return (
     <>
+      {enrichedPendingMultisigTransactions &&
+        enrichedPendingMultisigTransactions.length > 0 && (
+          <PendingMultisigTransactions
+            pendingTransactions={enrichedPendingMultisigTransactions}
+            account={account}
+            network={network}
+          />
+        )}
       <PendingTransactions
         pendingTransactions={pendingTransactions}
         network={network}

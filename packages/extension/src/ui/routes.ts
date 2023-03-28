@@ -227,5 +227,17 @@ export const routes = {
     (publicKey: string) => `/multisig/join/${publicKey}`,
     "/multisig/join/:signer",
   ),
+  multisigOwners: route(
+    (accountAddress) => `/multisig/${accountAddress}/owners`,
+    "/multisig/:accountAddress/owners",
+  ),
+  multisigConfirmations: route(
+    (accountAddress) => `/multisig/${accountAddress}/confirmations`,
+    "/multisig/:accountAddress/confirmations",
+  ),
+  multisigAddOwners: route(
+    (accountAddress) => `/multisig/${accountAddress}/add-owners`,
+    "/multisig/:accountAddress/add-owners",
+  ),
   swap: route("/swap"),
 }

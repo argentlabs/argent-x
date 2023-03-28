@@ -14,6 +14,10 @@ export const TRANSACTION_STATUSES_TO_TRACK: Status[] = [
   "RECEIVED",
   "NOT_RECEIVED",
 ]
+export type ExtendedTransactionType =
+  | TransactionType
+  | "MULTISIG_ADD_SIGNERS"
+  | "MULTISIG_UPDATE_THRESHOLD"
 
 export interface TransactionMeta {
   title?: string
@@ -23,7 +27,7 @@ export interface TransactionMeta {
   isDeployAccount?: boolean
   isCancelEscape?: boolean
   transactions?: Call | Call[]
-  type?: TransactionType
+  type?: ExtendedTransactionType
 }
 
 export interface TransactionBase {
@@ -86,4 +90,14 @@ export function transactionNamesToTitle(
     ? `${entrypointNames.join(", ")} and ${lastName}`
     : lastName
   return upperFirst(title)
+}
+
+export function transformEntrypointName(entryPoint: string) {
+  if (entryPoint === "changeThreshold") {
+    return "setConfirmations"
+  } else if (entryPoint === "addSigners") {
+    return "addOwner"
+  } else {
+    return entryPoint
+  }
 }

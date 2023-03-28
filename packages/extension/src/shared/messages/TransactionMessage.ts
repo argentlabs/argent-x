@@ -10,7 +10,11 @@ import type {
 
 import { Transaction } from "../transactions"
 import { DeclareContract } from "../udc/type"
-import { BaseWalletAccount } from "../wallet.model"
+import {
+  AddOwnerMultisiPayload,
+  BaseWalletAccount,
+  UpdateMultisigThresholdPayload,
+} from "../wallet.model"
 
 export interface EstimateFeeResponse {
   amount: string
@@ -101,4 +105,20 @@ export type TransactionMessage =
   | {
       type: "SIMULATE_TRANSACTION_FALLBACK_REJ"
       data: { error: string }
+    }
+  | { type: "ADD_MULTISIG_OWNERS"; data: AddOwnerMultisiPayload }
+  | {
+      type: "ADD_MULTISIG_OWNERS_REJ"
+      data: { error: string }
+    }
+  | {
+      type: "ADD_MULTISIG_OWNERS_RES"
+    }
+  | { type: "UPDATE_MULTISIG_THRESHOLD"; data: UpdateMultisigThresholdPayload }
+  | {
+      type: "UPDATE_MULTISIG_THRESHOLD_REJ"
+      data: { error: string }
+    }
+  | {
+      type: "UPDATE_MULTISIG_THRESHOLD_RES"
     }

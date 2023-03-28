@@ -8,7 +8,6 @@ import {
 } from "../../../../shared/settings"
 import { useKeyValueStorage } from "../../../../shared/storage/hooks"
 import { fetchTransactionSimulation } from "../../../../shared/transactionSimulation/transactionSimulation.service"
-import { ApiTransactionSimulationResponse } from "../../../../shared/transactionSimulation/types"
 import { argentApiFetcher } from "../../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
 import { Account } from "../../accounts/Account"
@@ -50,7 +49,7 @@ export const useTransactionSimulation = ({
       fetcher: argentApiFetcher,
     })
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
-  return useConditionallyEnabledSWR<ApiTransactionSimulationResponse>(
+  return useConditionallyEnabledSWR(
     Boolean(transactionSimulationEnabled),
     [actionHash, "transactionSimulation"],
     transactionSimulationFetcher,

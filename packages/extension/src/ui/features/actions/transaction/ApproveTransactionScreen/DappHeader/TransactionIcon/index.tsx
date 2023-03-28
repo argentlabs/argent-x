@@ -10,11 +10,13 @@ import { useCurrentNetwork } from "../../../../../networks/useNetworks"
 import { ApproveScreenType } from "../../../types"
 import { useERC721Transfers } from "../../../useErc721Transfers"
 import { AggregatedSimData } from "../../../useTransactionSimulatedData"
+import { AddOwnerIcon } from "./AddOwnerIcon"
 import { DeclareContractIcon } from "./DeclareTransactionIcon"
 import { NftTransactionIcon } from "./NftTransactionIcon"
 import { SendTransactionIcon } from "./SendTransactionIcon"
 import { SwapTransactionIcon } from "./SwapTransactionIcon"
 import { UnknownDappIcon } from "./UnknownDappIcon"
+import { UpdateThresholdIcon } from "./UpdateThresholdIcon"
 import { VerifiedDappIcon } from "./VerifiedDappIcon"
 
 export interface TransactionIconProps {
@@ -39,13 +41,20 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 
   const nftTransfers = useERC721Transfers(aggregatedData)
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
-
   // ignore transaction review if it is a DeclareContract transaction
   if (
     approveScreenType === ApproveScreenType.DECLARE ||
     approveScreenType === ApproveScreenType.DEPLOY
   ) {
     return <DeclareContractIcon />
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_ADD_SIGNERS) {
+    return <AddOwnerIcon />
+  }
+
+  if (approveScreenType === ApproveScreenType.MULTISIG_UPDATE_THRESHOLD) {
+    return <UpdateThresholdIcon />
   }
 
   if (swapTxnReview) {

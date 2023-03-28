@@ -11,7 +11,10 @@ import {
 import { FC } from "react"
 import { Call, number } from "starknet"
 
-import { entryPointToHumanReadable } from "../../../../../shared/transactions"
+import {
+  entryPointToHumanReadable,
+  transformEntrypointName,
+} from "../../../../../shared/transactions"
 import { formatTruncatedAddress } from "../../../../services/addresses"
 
 export interface TransactionActionsProps {
@@ -80,7 +83,9 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                     }}
                   >
                     <P4 fontWeight="bold">
-                      {entryPointToHumanReadable(transaction.entrypoint)}
+                      {entryPointToHumanReadable(
+                        transformEntrypointName(transaction.entrypoint),
+                      )}
                     </P4>
                     <P4 color="neutrals.400" fontWeight="bold">
                       {formatTruncatedAddress(transaction.contractAddress)}

@@ -32,11 +32,9 @@ export const useNextPublicKey = (networkId: string) => {
     () => getNextPublicKey(networkId),
     [networkId],
   )
-
   useEffect(() => {
     // on mount
     getNextPubKeyCallback().then(setPubKey)
-
     return () => {
       // on unmount
       setPubKey(undefined)
@@ -50,6 +48,12 @@ export const useEncodedPublicKey = (pubKey: string | undefined) => {
   return useMemo(() => pubKey && utils.base58.encode(pubKey), [pubKey])
 }
 
+export const useEncodedPublicKeys = (pubKeys: string[]) => {
+  return useMemo(
+    () => pubKeys.map((key) => utils.base58.encode(key)),
+    [pubKeys],
+  )
+}
 /**
  *
  * @returns Signer Key (encoded public key) of the current account
@@ -68,6 +72,5 @@ export const useSignerKey = () => {
 export const useNextSignerKey = (networkId: string) => {
   const pubKey = useNextPublicKey(networkId)
   const encodedPubKey = useEncodedPublicKey(pubKey)
-
   return encodedPubKey
 }

@@ -64,13 +64,13 @@ export class MultisigAccount extends Account {
     }
 
     const transactions = Array.isArray(calls) ? calls : [calls]
-    const nonce = number
-      .toBN(transactionsDetail.nonce ?? (await this.getNonce()))
-      .toString()
+    const nonce = number.toHex(
+      number.toBN(transactionsDetail.nonce ?? (await this.getNonce())),
+    )
     const version = number.toBN(hash.transactionVersion).toString()
     const chainId = await this.getChainId()
 
-    const maxFee = transactionsDetail.maxFee ?? constants.ZERO // TODO: implement estimateFee
+    const maxFee = transactionsDetail.maxFee ?? "0x77d87d677d1a0" // TODO: implement estimateFee (also cant be 0)
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
@@ -79,7 +79,6 @@ export class MultisigAccount extends Account {
       version,
       maxFee,
     }
-
     const [creator, r, s] = await this.signer.signTransaction(
       transactions,
       signerDetails,
@@ -92,16 +91,17 @@ export class MultisigAccount extends Account {
       ...transaction,
       calldata: number.getHexStringArray(transaction.calldata ?? []),
     }))
-
     const request = ApiMultisigPostRequestTxnSchema.parse({
       creator,
       transaction: {
-        nonce: number.toHex(nonce),
+        nonce: number.toHexString(nonce),
         version: number.toHex(version),
-        maxFee: maxFee.toString(),
+        // todo remove once we have 0.11
+        maxFee: number.toHex(maxFee),
         calls: txnWithHexCalldata,
       },
       starknetSignature: { r, s },
+      signature: { r, s },
     })
 
     const url = urlJoin(
@@ -119,6 +119,7 @@ export class MultisigAccount extends Account {
       },
       body: JSON.stringify(request),
     })
+
     const data = ApiMultisigTxnResponseSchema.parse(response)
 
     return {
