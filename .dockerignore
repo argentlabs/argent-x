@@ -1,0 +1,14 @@
+.github
+.husky
+.vscode
+.idea
+docs
+node_modules
+**/dist
+
+*.log
+.dockerignore
+.gitignore
+*.md
+Dockerfile*
+sonar-project.properties
