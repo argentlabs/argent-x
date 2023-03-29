@@ -1,9 +1,8 @@
-import { Button, P3, icons } from "@argent/ui"
+import { Button, FlowHeader, P3, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/getEscape"
-import { ShieldHeader } from "../ui/ShieldHeader"
 
 const { ArgentShieldDeactivateIcon } = icons
 
@@ -24,7 +23,7 @@ export const EscapeGuardianReady: FC<EscapeGuardianReadyProps> = ({
       : `1 more transaction needed to remove Argent Shield due to our security model`
   return (
     <Flex flexDirection={"column"} flex={1} px={4} pt={8} pb={4}>
-      <ShieldHeader
+      <FlowHeader
         icon={ArgentShieldDeactivateIcon}
         title={title}
         subtitle={`The ${ESCAPE_SECURITY_PERIOD_DAYS}-day security period is over. You can now remove Argent Shield instantly`}

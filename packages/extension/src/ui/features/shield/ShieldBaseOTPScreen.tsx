@@ -2,6 +2,7 @@ import {
   BarBackButton,
   Button,
   FieldError,
+  FlowHeader,
   NavigationContainer,
   icons,
   useToast,
@@ -33,7 +34,6 @@ import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { ShieldValidationErrorScreen } from "./ShieldValidationErrorScreen"
-import { ShieldHeader } from "./ui/ShieldHeader"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
 const { EmailIcon, ResendIcon } = icons
@@ -130,7 +130,7 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
       leftButton={onBack ? <BarBackButton onClick={onBack} /> : null}
       title={"Argent Shield"}
     >
-      <ShieldHeader
+      <FlowHeader
         icon={EmailIcon}
         title={"Check your email"}
         subtitle={`If you signed up for the beta we have sent a verification code to ${obfuscatedEmail}`}

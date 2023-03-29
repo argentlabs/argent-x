@@ -2,6 +2,7 @@ import {
   BarBackButton,
   Button,
   CellStack,
+  FlowHeader,
   NavigationContainer,
   icons,
 } from "@argent/ui"
@@ -14,7 +15,6 @@ import {
   ShieldValidationErrorMessage,
 } from "../../../shared/shield/validation"
 import { ZENDESK_LINK } from "../userReview/ReviewFeedbackScreen"
-import { ShieldHeader } from "./ui/ShieldHeader"
 import { useShieldTracking } from "./useShieldTracking"
 
 const { AlertIcon } = icons
@@ -73,7 +73,7 @@ export const ShieldValidationErrorScreen: FC<
       title={"Argent Shield"}
     >
       <CellStack flex={1}>
-        <ShieldHeader
+        <FlowHeader
           icon={AlertIcon}
           title={"Oops, wrong email"}
           subtitle={subtitle}

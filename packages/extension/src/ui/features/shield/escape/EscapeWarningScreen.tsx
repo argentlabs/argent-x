@@ -1,4 +1,9 @@
-import { BarCloseButton, NavigationContainer, useToast } from "@argent/ui"
+import {
+  BarCloseButton,
+  FlowHeader,
+  NavigationContainer,
+  useToast,
+} from "@argent/ui"
 import { Center } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
@@ -13,7 +18,6 @@ import {
   accountCancelEscape,
   accountEscapeAndChangeGuardian,
 } from "../../../services/backgroundAccounts"
-import { ShieldHeader } from "../ui/ShieldHeader"
 import { useAccountGuardianIsSelf } from "../useAccountGuardian"
 import { usePendingChangeGuardian } from "../usePendingChangingGuardian"
 import { useRouteAccount } from "../useRouteAccount"
@@ -153,7 +157,7 @@ export const EscapeWarningScreen: FC = () => {
     if (pending) {
       return (
         <Center flex={1}>
-          <ShieldHeader
+          <FlowHeader
             title={"Pending Escape Transaction"}
             subtitle={"This account has a pending escape transaction"}
             isLoading
@@ -165,7 +169,7 @@ export const EscapeWarningScreen: FC = () => {
     if (pendingChangeGuardian) {
       return (
         <Center flex={1}>
-          <ShieldHeader
+          <FlowHeader
             title={"Pending Change Guardian"}
             subtitle={"This account has a pending change guardian transaction"}
             isLoading

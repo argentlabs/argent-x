@@ -1,8 +1,7 @@
-import { icons } from "@argent/ui"
+import { FlowHeader, icons } from "@argent/ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { ShieldHeader } from "./ui/ShieldHeader"
 import { ShieldIconRow } from "./ui/ShieldIconRow"
 import { ShieldLearnMoreButton } from "./ui/ShieldLearnMoreButton"
 
@@ -11,7 +10,7 @@ const { EmailIcon, LockIcon, InfoIcon, ArgentShieldDeactivateIcon } = icons
 export const ShieldAccountActivate: FC = () => {
   return (
     <>
-      <ShieldHeader
+      <FlowHeader
         variant={"primary"}
         title={"Argent Shield"}
         subtitle={"By doing this you’ll protect your account with Argent:"}

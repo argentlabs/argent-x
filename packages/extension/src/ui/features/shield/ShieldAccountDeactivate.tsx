@@ -1,4 +1,4 @@
-import { icons } from "@argent/ui"
+import { FlowHeader, icons } from "@argent/ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -6,7 +6,6 @@ import {
   getAccountName,
   useAccountMetadata,
 } from "../accounts/accountMetadata.state"
-import { ShieldHeader } from "./ui/ShieldHeader"
 import { ShieldIconRow } from "./ui/ShieldIconRow"
 import { ShieldLearnMoreButton } from "./ui/ShieldLearnMoreButton"
 import { useRouteAccount } from "./useRouteAccount"
@@ -22,7 +21,7 @@ export const ShieldAccountDeactivate: FC = () => {
 
   return (
     <>
-      <ShieldHeader
+      <FlowHeader
         variant={"primary"}
         title={"Remove Argent Shield"}
         subtitle={`Two-factor account protection will be removed from ${accountName}`}

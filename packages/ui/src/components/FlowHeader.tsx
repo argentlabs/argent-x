@@ -31,18 +31,18 @@ const variants = {
   },
 }
 
-export type ShieldHeaderVariant = keyof typeof variants
+export type FlowHeaderVariant = keyof typeof variants
 
-export interface ShieldHeaderProps {
+export interface FlowHeaderProps {
   title: ReactNode
   subtitle?: ReactNode
-  variant?: ShieldHeaderVariant
+  variant?: FlowHeaderVariant
   size?: "md" | "lg"
   icon?: ChakraComponent<"svg">
   isLoading?: boolean
 }
 
-const FlowHeader: FC<ShieldHeaderProps> = ({
+const FlowHeader: FC<FlowHeaderProps> = ({
   title,
   subtitle,
   variant: variantKey = "default",

@@ -4,6 +4,7 @@ import {
   Button,
   CellStack,
   FieldError,
+  FlowHeader,
   Input,
   NavigationContainer,
   icons,
@@ -19,7 +20,6 @@ import { requestEmail } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { ShieldHeader } from "./ui/ShieldHeader"
 
 const { LockIcon } = icons
 
@@ -80,7 +80,7 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
           }
         })}
       >
-        <ShieldHeader
+        <FlowHeader
           icon={LockIcon}
           title={hasGuardian ? "Verify Argent Shield" : "Enter email"}
           subtitle={
