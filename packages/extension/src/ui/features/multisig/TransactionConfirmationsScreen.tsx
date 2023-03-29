@@ -74,7 +74,7 @@ export const TransactionConfirmationsScreen = () => {
           {signerKey && (
             <Flex alignItems="center" justifyContent="space-between">
               <H6 color="white">{formatTruncatedSignerKey(signerKey)} </H6>
-              {approvedSignersPublicKey.find((key) => key === signerKey) && (
+              {approvedSignersPublicKey.some((key) => key === signerKey) && (
                 <TickIcon color="primary.500" />
               )}
             </Flex>

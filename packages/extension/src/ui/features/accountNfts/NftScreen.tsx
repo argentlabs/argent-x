@@ -114,7 +114,7 @@ export const NftScreen: FC = () => {
                 border="solid 2px"
                 borderColor="transparent"
                 borderRadius="lg"
-                alt={nft.name}
+                alt={nft.name ?? "NFT"}
                 src={getNftPicture(nft)}
               />
             )}
