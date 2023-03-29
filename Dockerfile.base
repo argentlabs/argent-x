@@ -1,0 +1,23 @@
+#FROM arm64v8/node:16-alpine
+FROM node:16-alpine AS builder
+WORKDIR /argent-x
+COPY package.json .
+COPY *yarn* .
+COPY packages packages
+RUN find packages \! -name "package.json" -mindepth 2 -maxdepth 2 -print | xargs rm -rf
+
+RUN yarn install --frozen-lockfile --network-timeout 1000000
+COPY . .
+
+RUN yarn patch-package 
+RUN yarn lerna run setup --stream
+RUN yarn lint
+RUN yarn lerna run --scope @argent-x/extension build
+#RUN yarn test:ci
+
+FROM mcr.microsoft.com/playwright:v1.32.0-focal AS runner
+WORKDIR /extension
+COPY --from=builder /argent-x/packages/extension .
+WORKDIR /extension/e2e
+RUN yarn
+ENTRYPOINT ["sh", "-c", " xvfb-run --auto-servernum npm run test"]

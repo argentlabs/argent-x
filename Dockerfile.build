@@ -1,0 +1,5 @@
+FROM canlopes/argent-base:latest
+WORKDIR /app
+COPY . ./
+RUN npm i lerna
+RUN yarn build

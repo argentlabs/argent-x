@@ -1,0 +1,12 @@
+{
+  "name": "@argent-x/extension-e2e",
+  "version": "5.3.14",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.32.0"
+  },
+  "scripts": {
+    "test": "playwright test"
+  }
+}
