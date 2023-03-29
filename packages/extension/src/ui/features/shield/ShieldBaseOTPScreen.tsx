@@ -36,7 +36,7 @@ import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { ShieldValidationErrorScreen } from "./ShieldValidationErrorScreen"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
-const { EmailIcon, ResendIcon } = icons
+const { EmailIcon, ResendIcon, ArgentShieldIcon } = icons
 
 const schema = yup
   .object()

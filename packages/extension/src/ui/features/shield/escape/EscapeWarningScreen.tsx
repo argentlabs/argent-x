@@ -2,6 +2,7 @@ import {
   BarCloseButton,
   FlowHeader,
   NavigationContainer,
+  icons,
   useToast,
 } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
@@ -29,6 +30,8 @@ import {
   useAccountHasPendingCancelEscape,
   useLiveAccountEscape,
 } from "./useAccountEscape"
+
+const { ArgentShieldIcon } = icons
 
 export const EscapeWarningScreen: FC = () => {
   const navigate = useNavigate()
@@ -162,6 +165,7 @@ export const EscapeWarningScreen: FC = () => {
             subtitle={"This account has a pending escape transaction"}
             isLoading
             size={"lg"}
+            icon={ArgentShieldIcon}
           />
         </Center>
       )
@@ -174,6 +178,7 @@ export const EscapeWarningScreen: FC = () => {
             subtitle={"This account has a pending change guardian transaction"}
             isLoading
             size={"lg"}
+            icon={ArgentShieldIcon}
           />
         </Center>
       )

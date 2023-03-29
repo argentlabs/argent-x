@@ -124,7 +124,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>
-        <FlowHeader size={"lg"} {...headerProps} />
+        <FlowHeader size={"lg"} {...headerProps} icon={ArgentShieldIcon} />
         <Center
           bg={"accent.800"}
           rounded={"xl"}

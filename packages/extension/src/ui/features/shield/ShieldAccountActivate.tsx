@@ -5,7 +5,13 @@ import { FC } from "react"
 import { ShieldIconRow } from "./ui/ShieldIconRow"
 import { ShieldLearnMoreButton } from "./ui/ShieldLearnMoreButton"
 
-const { EmailIcon, LockIcon, InfoIcon, ArgentShieldDeactivateIcon } = icons
+const {
+  EmailIcon,
+  LockIcon,
+  InfoIcon,
+  ArgentShieldDeactivateIcon,
+  ArgentShieldIcon,
+} = icons
 
 export const ShieldAccountActivate: FC = () => {
   return (
@@ -14,6 +20,7 @@ export const ShieldAccountActivate: FC = () => {
         variant={"primary"}
         title={"Argent Shield"}
         subtitle={"By doing this you’ll protect your account with Argent:"}
+        icon={ArgentShieldIcon}
       />
       <VStack spacing={4} px={4} alignItems={"start"}>
         <ShieldIconRow icon={EmailIcon}>
