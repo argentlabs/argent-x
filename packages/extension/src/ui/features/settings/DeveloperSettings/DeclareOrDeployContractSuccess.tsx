@@ -95,7 +95,7 @@ export const DeclareOrDeployContractSuccess: FC = () => {
             colorScheme="primary"
             width="100%"
           >
-            Go to account
+            Done
           </Button>
         )}
       </StickyGroup>
