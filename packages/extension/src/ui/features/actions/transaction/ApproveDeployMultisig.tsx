@@ -62,7 +62,7 @@ export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
         ]}
       />
 
-      <AccountNetworkInfo networkName={selectedAccount.network.name} />
+      <AccountNetworkInfo account={selectedAccount} />
     </ConfirmScreen>
   )
 }

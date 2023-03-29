@@ -208,5 +208,5 @@ export const getNftPicture = ({
   if (image_url_copy) {
     return image_url_copy
   }
-  return image_uri
+  return image_uri ?? undefined
 }

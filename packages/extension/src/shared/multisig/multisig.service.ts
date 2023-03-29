@@ -12,6 +12,7 @@ import {
   UpdateMultisigThresholdPayload,
 } from "../wallet.model"
 import {
+  ApiMultisigContent,
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
   ApiMultisigTxnResponse,
@@ -83,12 +84,7 @@ export const getMultisigAccountData = async ({
     }
     const url = urlJoin(ARGENT_MULTISIG_URL, `${networkId}/${address}`)
     return fetcher<{
-      content: {
-        address: string
-        creator: string
-        signers: string[]
-        threshold: number
-      }
+      content: ApiMultisigContent
     }>(url, {
       method: "GET",
       headers: {

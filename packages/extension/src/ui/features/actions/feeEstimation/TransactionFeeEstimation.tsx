@@ -1,8 +1,7 @@
 import { FC } from "react"
 
-import { FeeEstimation } from "./FeeEstimation"
+import { FeeEstimationContainer } from "./FeeEstimation"
 import { TransactionsFeeEstimationProps } from "./types"
-import { useMaxFeeEstimation } from "./utils"
 
 export const TransactionFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   accountAddress,
@@ -11,15 +10,13 @@ export const TransactionFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   onErrorChange,
   networkId,
 }) => {
-  const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
-
   return (
-    <FeeEstimation
-      fee={fee}
+    <FeeEstimationContainer
       accountAddress={accountAddress}
       networkId={networkId}
-      feeError={error}
       onErrorChange={onErrorChange}
+      transactions={transactions}
+      actionHash={actionHash}
     />
   )
 }

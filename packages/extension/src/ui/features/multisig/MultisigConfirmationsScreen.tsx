@@ -1,5 +1,6 @@
 import { H1, H4, P3 } from "@argent/ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
+import { isEmpty } from "lodash-es"
 import { FC } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 
@@ -55,7 +56,7 @@ export const MultisigConfirmationsWithOwners = ({
 
   const handleNextClick = () => {
     trigger()
-    if (!Object.keys(errors).length) {
+    if (isEmpty(errors)) {
       addMultisigOwners({
         address: account.address,
         newThreshold: getValues("confirmations"),

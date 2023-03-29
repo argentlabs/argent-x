@@ -1,10 +1,11 @@
 import { L1, L2, P4, Pre, TextWithAmount, icons } from "@argent/ui"
-import { Flex, Text, Tooltip } from "@chakra-ui/react"
+import { Flex, Text } from "@chakra-ui/react"
 import { Collapse } from "@mui/material"
 import { BigNumber, utils } from "ethers"
 import { FC, useEffect, useMemo, useState } from "react"
 import { number } from "starknet"
 
+import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
@@ -16,14 +17,16 @@ import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
-import { useExtensionIsInTab } from "../../browser/tabs"
-import { ExtendableControl, FeeEstimationValue, LoadingInput } from "./styled"
+import { ExtendableControl } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
+import { FeeEstimationBox } from "./ui/FeeEstimationBox"
 import { getParsedError, useMaxFeeEstimation } from "./utils"
 
-const { AlertIcon, ChevronDownIcon, InfoIcon } = icons
+const { AlertIcon, ChevronDownIcon } = icons
 
-export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
+export const CombinedFeeEstimationContainer: FC<
+  TransactionsFeeEstimationProps
+> = ({
   accountAddress,
   transactions,
   actionHash,
@@ -34,8 +37,6 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   if (!account) {
     throw new Error("Account not found")
   }
-
-  const [feeErrorExpanded, setFeeErrorExpanded] = useState(false)
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
@@ -87,123 +88,135 @@ export const CombinedFeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   )
 
   const hasTransactions = typeof transactions !== undefined
-  const extensionInTab = useExtensionIsInTab()
 
   if (!hasTransactions) {
-    return <></>
+    return null
   }
 
   return (
-    <Flex direction="column" gap="1">
-      <Flex
-        borderRadius="xl"
-        backgroundColor="neutrals.900"
-        border="1px"
-        borderColor="neutrals.500"
-        boxShadow="menu"
-        justifyContent="space-between"
-        alignItems="flex-start"
-        px="3"
-        py="3.5"
-        gap="1.5"
-      >
-        <Flex flexDirection="column" gap="2" alignItems="flex-start">
-          <Flex alignItems="center" justifyContent="center" gap="5px">
-            <P4 fontWeight="bold" color="neutrals.300">
-              Network fees
-            </P4>
-            {feeToken && (
-              <Tooltip
-                label={getTooltipText({
-                  feeToken,
-                  feeTokenBalance,
-                  totalMaxFee,
-                  maxAccountDeploymentFee: fee?.maxADFee,
-                  maxNetworkFee: fee?.suggestedMaxFee,
-                })}
-                p="3"
-                placement="top"
-                backgroundColor="black"
-                border="1px solid"
-                borderColor="neutrals.700"
-                borderRadius="4px"
-              >
-                <Text
-                  color="neutrals.300"
-                  _hover={{
-                    cursor: "pointer",
-                    color: "white",
-                  }}
-                >
-                  <InfoIcon />
-                </Text>
-              </Tooltip>
-            )}
-          </Flex>
+    <CombinedFeeEstimation
+      amountCurrencyValue={amountCurrencyValue}
+      fee={fee}
+      feeToken={feeToken}
+      feeTokenBalance={feeTokenBalance}
+      parsedFeeEstimationError={parsedFeeEstimationError}
+      showError={showError}
+      showEstimateError={showEstimateError}
+      showFeeError={showFeeError}
+      totalFee={totalFee}
+      totalMaxFee={totalMaxFee}
+      totalMaxFeeCurrencyValue={totalMaxFeeCurrencyValue}
+    />
+  )
+}
 
-          <L2 color="neutrals.300">Includes one-time activation fee</L2>
-        </Flex>
-        {totalFee && totalMaxFee ? (
-          <Flex
-            gap="1"
-            alignItems="center"
-            direction={extensionInTab ? "row" : "column-reverse"}
-          >
-            {totalMaxFeeCurrencyValue !== undefined ? (
-              <L2 color="neutrals.300">
-                (Max {prettifyCurrencyValue(totalMaxFeeCurrencyValue)})
-              </L2>
+export interface CombinedFeeEstimationProps {
+  amountCurrencyValue?: string
+  fee?: EstimateFeeResponse
+  feeToken?: Token
+  feeTokenBalance?: BigNumber
+  parsedFeeEstimationError: string | false
+  showError: boolean
+  showEstimateError: boolean
+  showFeeError: boolean
+  totalFee?: string
+  totalMaxFee?: string
+  totalMaxFeeCurrencyValue?: string
+}
+
+export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
+  amountCurrencyValue,
+  fee,
+  feeToken,
+  feeTokenBalance,
+  parsedFeeEstimationError,
+  showError,
+  showEstimateError,
+  showFeeError,
+  totalFee,
+  totalMaxFee,
+  totalMaxFeeCurrencyValue,
+}) => {
+  const tooltipText = useMemo(() => {
+    if (feeToken) {
+      return (
+        <TooltipText
+          feeToken={feeToken}
+          feeTokenBalance={feeTokenBalance}
+          totalMaxFee={totalMaxFee}
+          maxAccountDeploymentFee={fee?.maxADFee}
+          maxNetworkFee={fee?.suggestedMaxFee}
+        />
+      )
+    }
+  }, [
+    fee?.maxADFee,
+    fee?.suggestedMaxFee,
+    feeToken,
+    feeTokenBalance,
+    totalMaxFee,
+  ])
+  const primaryText = useMemo(() => {
+    if (totalFee && totalMaxFee) {
+      if (amountCurrencyValue !== undefined) {
+        return `≈ ${prettifyCurrencyValue(amountCurrencyValue)}`
+      }
+      return (
+        <TextWithAmount amount={totalFee} decimals={feeToken?.decimals}>
+          <P4 fontWeight="medium">
+            ≈{" "}
+            {feeToken ? (
+              prettifyTokenAmount({
+                amount: totalFee,
+                decimals: feeToken.decimals,
+                symbol: feeToken.symbol,
+              })
             ) : (
-              <TextWithAmount
-                amount={totalMaxFee}
-                decimals={feeToken?.decimals}
-              >
-                <L2 color="neutrals.300">
-                  (Max &nbsp;
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: totalMaxFee,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{totalMaxFee} Unknown</>
-                  )}
-                  )
-                </L2>
-              </TextWithAmount>
+              <>{totalFee} Unknown</>
             )}
-
-            <Flex alignItems="center">
-              {amountCurrencyValue !== undefined ? (
-                <P4 fontWeight="bold">
-                  ≈ {prettifyCurrencyValue(amountCurrencyValue)}
-                </P4>
-              ) : (
-                <TextWithAmount amount={totalFee} decimals={feeToken?.decimals}>
-                  <P4 fontWeight="bold">
-                    ≈{" "}
-                    {feeToken ? (
-                      prettifyTokenAmount({
-                        amount: totalFee,
-                        decimals: feeToken.decimals,
-                        symbol: feeToken.symbol,
-                      })
-                    ) : (
-                      <>{totalFee} Unknown</>
-                    )}
-                  </P4>
-                </TextWithAmount>
-              )}
-            </Flex>
-          </Flex>
-        ) : showEstimateError ? (
-          <FeeEstimationValue>Error</FeeEstimationValue>
-        ) : (
-          <LoadingInput />
-        )}
-      </Flex>
-
+          </P4>
+        </TextWithAmount>
+      )
+    }
+  }, [amountCurrencyValue, feeToken, totalFee, totalMaxFee])
+  const secondaryText = useMemo(() => {
+    if (totalFee && totalMaxFee) {
+      if (totalMaxFeeCurrencyValue !== undefined) {
+        return `(Max ${prettifyCurrencyValue(totalMaxFeeCurrencyValue)})`
+      }
+      return (
+        <TextWithAmount amount={totalMaxFee} decimals={feeToken?.decimals}>
+          <L2 color="neutrals.300">
+            (Max &nbsp;
+            {feeToken ? (
+              prettifyTokenAmount({
+                amount: totalMaxFee,
+                decimals: feeToken.decimals,
+                symbol: feeToken.symbol,
+              })
+            ) : (
+              <>{totalMaxFee} Unknown</>
+            )}
+            )
+          </L2>
+        </TextWithAmount>
+      )
+    }
+  }, [feeToken, totalFee, totalMaxFee, totalMaxFeeCurrencyValue])
+  const [feeErrorExpanded, setFeeErrorExpanded] = useState(false)
+  const hasError = !(totalFee && totalMaxFee) && showEstimateError
+  const isLoading = !(totalFee && totalMaxFee) && !showEstimateError
+  return (
+    <Flex direction="column" gap="1">
+      <FeeEstimationBox
+        title={"Network fees"}
+        tooltipText={tooltipText}
+        subtitle={"Includes one-time activation fee"}
+        primaryText={primaryText}
+        secondaryText={secondaryText}
+        hasError={hasError}
+        isLoading={isLoading}
+      />
       {showError && (
         <Flex
           direction="column"
@@ -279,25 +292,29 @@ interface FeeEstimationTooltipProps {
   feeTokenBalance?: BigNumber
 }
 
-function getTooltipText({
+const TooltipText: FC<FeeEstimationTooltipProps> = ({
   feeToken,
   feeTokenBalance,
   maxAccountDeploymentFee,
   maxNetworkFee,
   totalMaxFee,
-}: FeeEstimationTooltipProps): JSX.Element {
+}) => {
   if (
     !maxNetworkFee ||
     !maxAccountDeploymentFee ||
     !totalMaxFee ||
     !feeTokenBalance
   ) {
-    return <P4 color="neutrals.100">Network fee is still loading.</P4>
+    return (
+      <P4 color="neutrals.300" fontWeight={"normal"}>
+        Network fee is still loading
+      </P4>
+    )
   }
   if (feeTokenBalance.gte(totalMaxFee)) {
     return (
-      <Flex flexDirection="column" gap="3">
-        <P4 color="neutrals.100">
+      <Flex flexDirection="column" gap={3} px={1} py={2}>
+        <P4 color="neutrals.300" fontWeight={"normal"}>
           Network fees are paid to the network to include transactions in blocks
         </P4>
 

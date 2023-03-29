@@ -18,6 +18,7 @@ import { H2 } from "../../theme/Typography"
 import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
 import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
+import { DapplandFooter } from "./DapplandFooter"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 import { SupportFooter } from "./SupportFooter"
 
@@ -145,6 +146,7 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
+          <DapplandFooter />
           <SupportFooter />
         </CellStack>
       </NavigationContainer>
