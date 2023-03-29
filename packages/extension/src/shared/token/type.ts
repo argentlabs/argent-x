@@ -1,17 +1,28 @@
-export interface BaseToken {
-  address: string
-  networkId: string
-}
+import { z } from "zod"
 
-export interface RequestToken extends Omit<BaseToken, "networkId"> {
-  address: string
-  networkId?: string
-  name?: string
-  symbol?: string
-  decimals?: number
-}
+export const BaseTokenSchema = z.object(
+  {
+    address: z.string({ required_error: "Address is required" }),
+    networkId: z.string({ required_error: "Network is required" }),
+  },
+  { required_error: "BaseToken is required" },
+)
 
-export interface Token extends Required<RequestToken> {
-  image?: string
-  showAlways?: boolean
-}
+export type BaseToken = z.infer<typeof BaseTokenSchema>
+
+export const RequestTokenSchema = z.object({
+  address: z.string(),
+  networkId: z.string().optional(),
+  name: z.string().optional(),
+  symbol: z.string().optional(),
+  decimals: z.number().optional(),
+})
+
+export type RequestToken = z.infer<typeof RequestTokenSchema>
+
+export const TokenSchema = RequestTokenSchema.required().extend({
+  image: z.string().optional(),
+  showAlways: z.boolean().optional(),
+})
+
+export type Token = z.infer<typeof TokenSchema>
