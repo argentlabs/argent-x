@@ -9,7 +9,6 @@ import {
 } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { MultisigStatus } from "../multisig/hooks/useMultisigStatus"
 import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
 import { AccountAvatar } from "./AccountAvatar"
@@ -31,7 +30,6 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   hidden?: boolean
   avatarOutlined?: boolean
   isShield?: boolean
-  multisigStatus?: MultisigStatus
 }
 
 export const NetworkStatusWrapper = chakra(Flex, {
@@ -122,7 +120,6 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   connectedHost,
   hidden,
   avatarOutlined,
-  multisigStatus,
   children,
   ...rest
 }) => {
@@ -162,9 +159,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             <P4 fontWeight={"semibold"}>
-              {accountType === "multisig" && multisigStatus === "pending"
-                ? "Awaiting owner to finish setup"
-                : formatTruncatedAddress(accountAddress)}
+              {formatTruncatedAddress(accountAddress)}
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>

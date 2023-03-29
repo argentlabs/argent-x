@@ -21,9 +21,6 @@ import { MultisigDeleteModal } from "./MultisigDeleteModal"
 
 const { MoreIcon, ChevronRightIcon } = icons
 
-/**
- * Same as IAccountListScreenItem, but with account as optional
- */
 export interface IMultisigListScreenItem {
   account: Account
   selectedAccount?: BaseWalletAccount
@@ -43,7 +40,7 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
   const accountName = account.name
-  const { isOpen: isMenuOpen, onOpen: onMenuOpen } = useDisclosure()
+  const { isOpen: isMenuOpen } = useDisclosure()
 
   const {
     isOpen: isDeleteModalOpen,
@@ -55,13 +52,9 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
-  const { status: multisigStatus, multisig } = useMultisigInfo(account)
+  const { multisig } = useMultisigInfo(account)
 
   const onClick = useCallback(async () => {
-    if (multisigStatus === "pending") {
-      return
-    }
-
     await selectAccount(account)
 
     const navigationRoute = multisig?.needsDeploy
@@ -69,20 +62,15 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
       : returnTo || routes.accountTokens()
 
     navigate(navigationRoute)
-  }, [account, multisig?.needsDeploy, multisigStatus, navigate, returnTo])
+  }, [account, multisig?.needsDeploy, navigate, returnTo])
 
   const onOptionsClick = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
       e.preventDefault()
-
-      if (multisigStatus === "pending") {
-        onMenuOpen()
-      } else {
-        navigate(routes.editAccount(account.address))
-      }
+      navigate(routes.editAccount(account.address))
     },
-    [account.address, multisigStatus, navigate, onMenuOpen],
+    [account.address, navigate],
   )
 
   const onDeleteClicked = useCallback(
@@ -110,7 +98,7 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
           aria-label={`Select ${accountName}`}
           onClick={clickNavigateSettings ? onOptionsClick : onClick}
           accountName={accountName}
-          accountAddress={multisig?.address || account.address} // TODO: remove this when we have a better way to display multisig accounts
+          accountAddress={account.address}
           networkId={account.networkId}
           accountType={account.type}
           isShield={Boolean(account.guardian)}
@@ -118,7 +106,6 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
           deploying={status.code === "DEPLOYING"}
           upgrade={needsUpgrade}
           connectedHost={isConnected ? originatingHost : undefined}
-          multisigStatus={multisigStatus}
           pr={14}
         >
           {clickNavigateSettings && (
