@@ -12,7 +12,6 @@ import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
 import { sendMessageToUi } from "../activeTabs"
 import { HandleMessage, UnhandledMessage } from "../background"
-import { getNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
 import { addEstimatedFees } from "./fees/store"
 
@@ -53,15 +52,12 @@ export const handleTransactionMessage: HandleMessage<
           ))
         ) {
           if ("estimateFeeBulk" in starknetAccount) {
-            const deployPayload =
-              selectedAccount.type === "multisig"
-                ? await wallet.getMultisigDeploymentPayload(selectedAccount)
-                : await wallet.getAccountDeploymentPayload(selectedAccount)
-
             const bulkTransactions: TransactionBulk = [
               {
                 type: "DEPLOY_ACCOUNT",
-                payload: deployPayload,
+                payload: await wallet.getAccountDeploymentPayload(
+                  selectedAccount,
+                ),
               },
               {
                 type: "INVOKE_FUNCTION",
@@ -134,11 +130,15 @@ export const handleTransactionMessage: HandleMessage<
         const { overall_fee, suggestedMaxFee } =
           await wallet.getAccountDeploymentFee(account)
 
+        const maxADFee = number.toHex(
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        )
+
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
           data: {
             amount: number.toHex(overall_fee),
-            maxADFee: argentMaxFee(suggestedMaxFee),
+            maxADFee,
           },
         })
       } catch (error) {
@@ -195,12 +195,14 @@ export const handleTransactionMessage: HandleMessage<
           ))
         ) {
           if ("estimateFeeBulk" in selectedStarknetAccount) {
+            const deployPayload =
+              selectedAccount.type === "multisig"
+                ? await wallet.getMultisigDeploymentPayload(selectedAccount)
+                : await wallet.getAccountDeploymentPayload(selectedAccount)
             const bulkTransactions: TransactionBulk = [
               {
                 type: "DEPLOY_ACCOUNT",
-                payload: await wallet.getAccountDeploymentPayload(
-                  selectedAccount,
-                ),
+                payload: deployPayload,
               },
               {
                 type: "DECLARE",
@@ -234,7 +236,7 @@ export const handleTransactionMessage: HandleMessage<
           }
         }
 
-        const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        const suggestedMaxFee = argentMaxFee(maxTxFee) // This add the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
 
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
@@ -363,7 +365,7 @@ export const handleTransactionMessage: HandleMessage<
           throw Error("no accounts")
         }
 
-        const nonce = await getNonce(selectedAccount, wallet)
+        const nonce = await starknetAccount.getNonce()
 
         const chainId = starknetAccount.chainId
 
@@ -426,6 +428,10 @@ export const handleTransactionMessage: HandleMessage<
       }
     }
 
+    case "TRANSACTION_FAILED": {
+      return await actionQueue.remove(msg.data.actionHash)
+    }
+
     case "SIMULATE_TRANSACTION_FALLBACK": {
       const selectedAccount = await wallet.getSelectedAccount()
       const starknetAccount =
@@ -435,7 +441,7 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
 
-      const nonce = await starknetAccount.getNonce(selectedAccount)
+      const nonce = await starknetAccount.getNonce()
 
       try {
         const simulated = await starknetAccount.simulateTransaction(msg.data, {
@@ -457,10 +463,6 @@ export const handleTransactionMessage: HandleMessage<
           },
         })
       }
-    }
-
-    case "TRANSACTION_FAILED": {
-      return await actionQueue.remove(msg.data.actionHash)
     }
 
     case "ADD_MULTISIG_OWNERS": {
@@ -499,39 +501,39 @@ export const handleTransactionMessage: HandleMessage<
         })
       }
     }
-    case "UPDATE_MULTISIG_THRESHOLD": {
-      try {
-        const { address, newThreshold } = msg.data
+    case "UPDATE_MULTISIG_THRESHOLD":
+      {
+        try {
+          const { address, newThreshold } = msg.data
 
-        const thresholdPayload = {
-          entrypoint: "changeThreshold",
-          calldata: stark.compileCalldata({
-            new_threshold: newThreshold.toString(),
-          }),
-          contractAddress: address,
-        }
+          const thresholdPayload = {
+            entrypoint: "changeThreshold",
+            calldata: stark.compileCalldata({
+              new_threshold: newThreshold.toString(),
+            }),
+            contractAddress: address,
+          }
 
-        await actionQueue.push({
-          type: "TRANSACTION",
-          payload: {
-            transactions: thresholdPayload,
-            meta: {
-              title: "Set confirmations threshold",
-              type: "MULTISIG_UPDATE_THRESHOLD",
+          await actionQueue.push({
+            type: "TRANSACTION",
+            payload: {
+              transactions: thresholdPayload,
+              meta: {
+                title: "Set confirmations threshold",
+                type: "MULTISIG_UPDATE_THRESHOLD",
+              },
             },
-          },
-        })
-        return sendMessageToUi({
-          type: "UPDATE_MULTISIG_THRESHOLD_RES",
-        })
-      } catch (e) {
-        return sendMessageToUi({
-          type: "UPDATE_MULTISIG_THRESHOLD_REJ",
-          data: { error: `${e}` },
-        })
+          })
+          return sendMessageToUi({
+            type: "UPDATE_MULTISIG_THRESHOLD_RES",
+          })
+        } catch (e) {
+          return sendMessageToUi({
+            type: "UPDATE_MULTISIG_THRESHOLD_REJ",
+            data: { error: `${e}` },
+          })
+        }
       }
-    }
+      throw new UnhandledMessage()
   }
-
-  throw new UnhandledMessage()
 }

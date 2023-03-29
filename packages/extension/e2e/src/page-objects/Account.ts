@@ -217,4 +217,18 @@ export default class Account extends Navigation {
       `//a//*[text()="${lang.account.saveTheRecoveryPhrase}"]`,
     )
   }
+
+  get recipientAddress() {
+    return this.page.locator(
+      `//textarea[@placeholder="${lang.account.recipientAddress}"]/following::button[1]`,
+    )
+  }
+
+  get saveAddress() {
+    return this.page.locator(`button:text-is("${lang.account.saveAddress}")`)
+  }
+
+  get contact() {
+    return this.page.locator("div h5")
+  }
 }

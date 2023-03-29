@@ -1,10 +1,13 @@
 import { FC } from "react"
 
-import { ShieldExternalLinkButton } from "./ShieldExternalLinkButton"
+import {
+  ARGENT_GUARDIAN_LINK,
+  ShieldExternalLinkButton,
+} from "./ShieldExternalLinkButton"
 
 export const ShieldLearnMoreButton: FC = () => {
   return (
-    <ShieldExternalLinkButton href={"https://www.argent.xyz/argent-x/"}>
+    <ShieldExternalLinkButton href={ARGENT_GUARDIAN_LINK}>
       Learn more about Argent Shield
     </ShieldExternalLinkButton>
   )

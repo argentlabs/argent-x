@@ -107,13 +107,13 @@ export const NftDetails: FC<NftDetailsProps> = ({
             )}
           </Flex>
           <Flex direction="column" gap="0.5" alignItems="flex-end">
-            <TextWithAmount amount={amount.toString()}>
+            <TextWithAmount amount={amount.toFixed()}>
               <P4
                 color={amount.isNegative() ? "error.500" : "secondary.500"}
                 fontWeight="bold"
               >
                 {prettifyTokenAmount({
-                  amount: amount.toString(),
+                  amount: amount.toFixed(),
                   decimals: 0,
                   symbol: "NFT",
                   showPlusSign: true,
@@ -124,7 +124,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
             {/** 0 usdValue means we don't have any value */}
             {isMainnet && !!usdValue && !usdValue.isZero() && (
               <L2 color="neutrals.300">
-                {prettifyCurrencyValue(usdValue.abs().toString())}
+                {prettifyCurrencyValue(usdValue.abs().toFixed())}
               </L2>
             )}
           </Flex>

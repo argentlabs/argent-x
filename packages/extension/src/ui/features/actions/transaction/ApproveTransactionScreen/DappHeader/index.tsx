@@ -9,6 +9,7 @@ import {
 } from "../../../../../../shared/transactionReview.service"
 import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
+import { VerifiedDappBanner } from "../VerifiedDappBanner"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
 
@@ -25,6 +26,7 @@ export const DappHeader = ({
   transactionReview,
   aggregatedData,
   approveScreenType,
+  verifiedDapp,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -45,6 +47,7 @@ export const DappHeader = ({
           verifiedDapp={transactionReview?.targetedDapp}
           approveScreenType={approveScreenType}
         />
+        {verifiedDapp && <VerifiedDappBanner dapp={verifiedDapp} />}
         <Flex
           direction="column"
           justifyContent="center"

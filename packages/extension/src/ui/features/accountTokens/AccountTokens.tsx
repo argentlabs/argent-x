@@ -1,5 +1,7 @@
-import { CellStack, Empty, icons } from "@argent/ui"
+import { CellStack, DapplandBanner, Empty, icons } from "@argent/ui"
+import dapplandBanner from "@argent/ui/assets/dapplandBannerBackground.png"
 import { Flex, VStack } from "@chakra-ui/react"
+import { AnimatePresence, motion } from "framer-motion"
 import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -21,6 +23,7 @@ import { useAccountGuardianIsSelf } from "../shield/useAccountGuardian"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
+import { useDapplandBanner } from "./dappland/banner.state"
 import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
@@ -39,6 +42,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const status = useAccountStatus(account)
   const { pendingTransactions } = useAccountTransactions(account)
   const { isBackupRequired } = useBackupRequired()
+  const { hasSeenBanner } = useDapplandBanner()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
     userReviewStore,
@@ -88,6 +92,13 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const hasEscape = accountHasEscape(account)
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
+
+  const showDapplandBanner =
+    !hasSeenBanner &&
+    !showBackupBanner &&
+    !needsUpgrade &&
+    !hasPendingTransactions &&
+    !hasEscape
 
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
@@ -160,6 +171,24 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
             onItemClick={multisig?.needsDeploy ? () => null : undefined}
           />
         )}
+        <AnimatePresence initial={false}>
+          {showDapplandBanner && (
+            <motion.div
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <DapplandBanner
+                backgroundImageUrl={dapplandBanner}
+                href="https://www.dappland.com?utm_source=argent&utm_medium=extension&utm_content=banner"
+                onClose={() => {
+                  useDapplandBanner.setState({ hasSeenBanner: true })
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <TokenList variant={tokenListVariant} showNewTokenButton />
       </CellStack>
     </Flex>
   )
