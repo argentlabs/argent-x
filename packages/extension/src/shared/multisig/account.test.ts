@@ -49,7 +49,7 @@ describe("MultisigAccount", () => {
       ],
       undefined,
       {
-        maxFee: 1000,
+        maxFee: 10,
         nonce: "0",
       },
     )
