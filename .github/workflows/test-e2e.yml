@@ -3,7 +3,9 @@ on:
   push:
     branches: [develop]
   pull_request:
-    branches: [develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
@@ -22,6 +24,7 @@ jobs:
       ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
+    if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -35,6 +38,22 @@ jobs:
         with:
           node-version: "16"
           cache: "yarn"
+
+      - name: Check docker local network
+        run: |
+          CODE=`curl --write-out '%{http_code}' \
+              --silent \
+              --output /dev/null \
+              --request GET \
+              --url 'http://localhost:5050/is_alive' \
+            `
+          if [[ "$CODE" != "200" ]] 
+          then
+            echo "Local network is offline! $CODE"
+            exit 1
+          else
+            echo "Local network is online."
+          fi
 
       - name: Install dependencies
         run: yarn setup

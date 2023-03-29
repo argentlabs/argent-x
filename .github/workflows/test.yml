@@ -3,7 +3,9 @@ on:
   push:
     branches: [develop]
   pull_request:
-    branches: [develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
@@ -27,6 +29,7 @@ jobs:
       ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
+    if: github.actor != 'dependabot[bot]'
     steps:
       - name: If github.head_ref not filled, we are merging
         run: |
@@ -122,6 +125,7 @@ jobs:
 
       - name: comment PR
         if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_REPO: ${{ env.GHA_BRANCH }}
