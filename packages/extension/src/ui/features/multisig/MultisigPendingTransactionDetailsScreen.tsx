@@ -97,7 +97,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
         </Box>
       )}
       <Box mx={4} my={1}>
-        <AccountNetworkInfo networkName={selectedAccount.network.name} />
+        <AccountNetworkInfo account={selectedAccount} />
       </Box>
 
       <Center>
