@@ -53,7 +53,7 @@ export const apiTransactionReviewActivityType = [
 ] as const
 
 export type ApiTransactionReviewActivityType =
-  (typeof apiTransactionReviewActivityType)[number]
+  typeof apiTransactionReviewActivityType[number]
 
 export type TransactionReviewWithType = ApiTransactionReview & {
   type: ApiTransactionReviewActivityType
@@ -145,14 +145,17 @@ export const fetchTransactionReview = ({
     account: accountAddress,
     calls,
   }
-  return fetcherImpl(ARGENT_TRANSACTION_REVIEW_STARKNET_URL, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+  return fetcherImpl<ApiTransactionReviewResponse>(
+    ARGENT_TRANSACTION_REVIEW_STARKNET_URL,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  })
+  )
 }
 
 export const getDisplayWarnAndReasonForTransactionReview = (
