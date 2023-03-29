@@ -19,10 +19,6 @@ export function useMultisigDataForSigner({
       signer: publicKey,
       network,
     })
-    console.log(
-      "🚀 ~ file: useMultisigDataForSigner.ts:22 ~ multisigDataForSignerFetcher ~ data:",
-      data,
-    )
 
     if (!data || !data.content || data.content.length === 0) {
       return

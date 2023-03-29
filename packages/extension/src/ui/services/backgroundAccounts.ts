@@ -188,10 +188,6 @@ export const getNextPublicKey = async (networkId: string) => {
       throw new Error("Getting next public key failed")
     }),
   ])
-  console.log(
-    "🚀 ~ file: backgroundAccounts.ts:191 ~ getNextPublicKey ~ publicKey:",
-    publicKey,
-  )
 
   return publicKey
 }
