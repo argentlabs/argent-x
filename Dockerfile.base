@@ -15,9 +15,14 @@ RUN yarn lint
 RUN yarn lerna run --scope @argent-x/extension build
 #RUN yarn test:ci
 
-FROM mcr.microsoft.com/playwright:v1.32.0-focal AS runner
+FROM node:16-alpine
+FROM mcr.microsoft.com/playwright:focal AS runner
 WORKDIR /extension
+ENV PATH /app/node_modules/.bin:$PATH
 COPY --from=builder /argent-x/packages/extension .
 WORKDIR /extension/e2e
+# Get the needed libraries to run Playwright
+RUN apt-get update && apt-get -y install libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev
+
 RUN yarn
 ENTRYPOINT ["sh", "-c", " xvfb-run --auto-servernum npm run test"]
