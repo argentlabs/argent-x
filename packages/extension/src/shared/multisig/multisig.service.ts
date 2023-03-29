@@ -8,14 +8,12 @@ import { Network } from "../network"
 import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
 import {
-  AddOwnerMultisiPayload,
-  RemoveOwnerMultisigPayload,
-  UpdateMultisigThresholdPayload,
-} from "../wallet.model"
-import {
+  AddOwnerMultisigPayload,
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
   ApiMultisigTxnResponse,
+  RemoveOwnerMultisigPayload,
+  UpdateMultisigThresholdPayload,
 } from "./multisig.model"
 
 const multisigTransactionTypes = {
@@ -131,7 +129,7 @@ export const getMultisigRequestData = async ({
   }
 }
 
-export const addMultisigOwners = async (data: AddOwnerMultisiPayload) => {
+export const addMultisigOwners = async (data: AddOwnerMultisigPayload) => {
   sendMessage({ type: "ADD_MULTISIG_OWNERS", data })
 
   const response = await Promise.race([

@@ -82,7 +82,7 @@ const MultisigOwners = ({ account }: { account: Account }) => {
                     borderRadius="full"
                     backgroundColor="neutrals.900"
                     onClick={() => handleRemoveOwnerClick(signer)}
-                    px="1em"
+                    px={1}
                   >
                     <MinusIcon />
                   </Button>

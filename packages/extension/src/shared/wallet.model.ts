@@ -48,21 +48,3 @@ export type BaseMultisigWalletAccount = BaseWalletAccount & MultisigData
 export interface MultisigWalletAccount extends WalletAccount, MultisigData {
   type: "multisig"
 }
-
-export type AddOwnerMultisiPayload = {
-  address: string
-  newThreshold: number
-  signersToAdd: string[]
-  currentThreshold?: number
-}
-
-export type RemoveOwnerMultisigPayload = {
-  address: string
-  newThreshold: number
-  signerToRemove: string
-}
-
-export type UpdateMultisigThresholdPayload = {
-  newThreshold: number
-  address: string
-}

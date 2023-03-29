@@ -508,7 +508,6 @@ export const handleTransactionMessage: HandleMessage<
           entrypoint: "removeSigners",
           calldata: stark.compileCalldata({
             new_threshold: newThreshold.toString(),
-            signers_to_remove_len: "1",
             signers_to_remove: utils.hexlify(
               utils.base58.decode(signerToRemove),
             ),
