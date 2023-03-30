@@ -164,13 +164,6 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
             title="Add funds to activate multisig"
           />
         )}
-        {!showAddFundsBackdrop && (
-          <TokenList
-            variant={tokenListVariant}
-            showNewTokenButton
-            onItemClick={multisig?.needsDeploy ? () => null : undefined}
-          />
-        )}
         <AnimatePresence initial={false}>
           {showDapplandBanner && (
             <motion.div
@@ -188,7 +181,13 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
             </motion.div>
           )}
         </AnimatePresence>
-        <TokenList variant={tokenListVariant} showNewTokenButton />
+        {!showAddFundsBackdrop && (
+          <TokenList
+            variant={tokenListVariant}
+            showNewTokenButton
+            onItemClick={multisig?.needsDeploy ? () => null : undefined}
+          />
+        )}
       </CellStack>
     </Flex>
   )
