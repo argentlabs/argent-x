@@ -62,7 +62,7 @@ export const RecoverySetupScreen: FC = () => {
               </svg>
             }
           />
-          <Link to={routes.setupSeedRecovery(returnTo)}>
+          <Link to={routes.settingsSeed(returnTo)}>
             <Option
               title="Save the recovery phrase"
               icon={
