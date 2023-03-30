@@ -7,7 +7,9 @@ interface GetTimeResponse {
   time: number
 }
 
-export const getBackendTime = async () => {
+/** backend time - at the time the response was generated - in seconds (aka 'epoch') -  */
+
+export const getBackendTimeSeconds = async () => {
   try {
     const fetcher = fetcherWithArgentApiHeaders()
     const { time } = await fetcher<GetTimeResponse>(
@@ -15,40 +17,31 @@ export const getBackendTime = async () => {
     )
     return time
   } catch (error) {
-    throw new Error("failed to request email verification")
+    throw new Error("failed to request time")
   }
 }
 
-let _backendTimeSkew: number
+/** determine skew (difference) between local time and backend time */
 
 export const getBackendTimeSkew = async () => {
-  if (_backendTimeSkew !== undefined) {
-    return _backendTimeSkew
-  }
   const timeStart = new Date().getTime()
-  const backendTime = await getBackendTime()
+  const backendTimeSeconds = await getBackendTimeSeconds()
   const timeNow = new Date().getTime()
+  /** average how long it took for one hop client -> server, or server -> client */
   const responseTime = (timeNow - timeStart) / 2
-  const backendTimeNow = backendTime * 1000 + responseTime
+  /** approximate what backend time should be right now */
+  const backendTimeNow = backendTimeSeconds * 1000 + responseTime
+  /** determine skew (difference) between local time and backend time */
   const backendTimeSkew = backendTimeNow - timeNow
-  if (_backendTimeSkew) {
-    console.log("Predicted backendTime", timeStart + backendTimeSkew)
-    console.log("Predicted backendTimeNow", timeNow + backendTimeSkew)
-  }
-  _backendTimeSkew = backendTimeSkew
-  console.log({
-    timeStart,
-    backendTime: backendTime * 1000,
-    timeNow,
-    responseTime,
-    backendTimeNow,
-    backendTimeSkew,
-  })
-  return _backendTimeSkew
+  return backendTimeSkew
 }
 
-export const getBackendTimeNow = async () => {
-  const timeNow = new Date().getTime()
+/** determine the expected backend time right now in seconds (aka 'epoch') */
+
+export const getBackendTimeNowSeconds = async () => {
   const backendTimeSkew = await getBackendTimeSkew()
-  return timeNow + backendTimeSkew
+  const timeNow = new Date().getTime()
+  const backendTimeNow = timeNow + backendTimeSkew
+  /** conver to epoch */
+  return Math.floor(backendTimeNow / 1000)
 }
