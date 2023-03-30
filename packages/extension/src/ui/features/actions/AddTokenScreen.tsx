@@ -4,6 +4,7 @@ import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { number } from "starknet"
 import styled from "styled-components"
+import { ZodError } from "zod"
 
 import { addToken } from "../../../shared/token/storage"
 import { RequestToken, Token } from "../../../shared/token/type"
@@ -181,7 +182,11 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                 onSubmit?.()
                 navigate(routes.accountTokens())
               } catch (e) {
-                setError("Token already exists")
+                if (e instanceof ZodError) {
+                  setError(e.issues[0].message)
+                } else {
+                  setError("Token not supported")
+                }
               }
             }
           }}

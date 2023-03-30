@@ -12,32 +12,32 @@ export const tokenStore = new ArrayStorage(parsedDefaultTokens, {
 
 export const tokenSchema = BaseTokenSchema.extend({
   name: z.string({ required_error: "Name is required" }),
-  symbol: z.string({ required_error: "Symbol is required" }).min(1),
+  symbol: z
+    .string({
+      required_error: "Symbol is required",
+    })
+    .min(1, { message: "Symbol must be atleast 1 character" }),
   decimals: z.number({ required_error: "Decimals is required" }),
   image: z.string().optional(),
   showAlways: z.boolean().optional(),
 })
 
 export async function addToken(token: Token) {
-  try {
-    const newToken: Token = await tokenSchema.parseAsync({
-      ...token,
-      showAlways: true,
-    })
+  const newToken: Token = tokenSchema.parse({
+    ...token,
+    showAlways: true,
+  })
 
-    return tokenStore.push(newToken)
-  } catch (error) {
-    console.error("🚀 ~ file: storage.ts:46 ~ addToken ~ error", error)
-  }
+  return tokenStore.push(newToken)
 }
 
 export async function hasToken(token: BaseToken) {
-  const parsedToken = await BaseTokenSchema.parseAsync(token)
+  const parsedToken = BaseTokenSchema.parse(token)
   const [hit] = await tokenStore.get((t) => equalToken(t, parsedToken))
   return Boolean(hit)
 }
 
 export async function removeToken(token: BaseToken) {
-  const parsedToken = await BaseTokenSchema.parseAsync(token)
+  const parsedToken = BaseTokenSchema.parse(token)
   return tokenStore.remove((t) => equalToken(t, parsedToken))
 }
