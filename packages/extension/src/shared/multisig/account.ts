@@ -95,9 +95,9 @@ export class MultisigAccount extends Account {
       creator,
       transaction: {
         nonce: number.toHexString(nonce),
-        version: number.toHex(version),
+        version: number.toHexString(version),
         // todo remove once we have 0.11
-        maxFee: number.toHex(maxFee),
+        maxFee: number.toHexString(maxFee),
         calls: txnWithHexCalldata,
       },
       starknetSignature: { r, s },
