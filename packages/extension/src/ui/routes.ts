@@ -39,6 +39,11 @@ export const useRouteAccountAddress = () => {
   return accountAddress
 }
 
+export const useRouteRequestId = () => {
+  const { requestId } = useParams()
+  return requestId
+}
+
 export const useRouteEmailAddress = () => {
   return useQuery().get("email") || undefined
 }
@@ -238,6 +243,16 @@ export const routes = {
   multisigAddOwners: route(
     (accountAddress) => `/multisig/${accountAddress}/add-owners`,
     "/multisig/:accountAddress/add-owners",
+  ),
+  multisigPendingTransactionDetails: route(
+    (accountAddress, requestId) =>
+      `/multisig/${accountAddress}/${requestId}/details`,
+    "/multisig/:accountAddress/:requestId/details",
+  ),
+  multisigPendingTransactionConfirmations: route(
+    (accountAddress, requestId) =>
+      `/multisig/${accountAddress}/${requestId}/confirmations`,
+    "/multisig/:accountAddress/:requestId/confirmations",
   ),
   swap: route("/swap"),
 }

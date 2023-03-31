@@ -42,6 +42,17 @@ jobs:
           node-version: "16"
           cache: "yarn"
 
+      - name: Install dependencies
+        run: yarn setup
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      - name: Build
+        run: yarn lerna run --scope @argent-x/extension build
+        env:
+          UPLOAD_SENTRY_SOURCEMAPS: false
+
       - name: Check docker local network
         run: |
           CODE=`curl --write-out '%{http_code}' \
@@ -57,17 +68,6 @@ jobs:
           else
             echo "Local network is online."
           fi
-
-      - name: Install dependencies
-        run: yarn setup
-
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
-      - name: Build
-        run: yarn lerna run --scope @argent-x/extension build
-        env:
-          UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e

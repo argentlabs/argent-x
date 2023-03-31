@@ -2,8 +2,10 @@ import { HeaderCell, L2, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { memoize } from "lodash-es"
 import { FC } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { Network } from "../../../shared/network"
+import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { useMultisigInfo } from "../multisig/hooks/useMultisigInfo"
 import { EnrichedMultisigPendingTransaction } from "../multisig/multisigTransactions.state"
@@ -24,6 +26,7 @@ export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
   network,
 }) => {
   const { multisig } = useMultisigInfo(account)
+  const navigate = useNavigate()
   if (!multisig) {
     return null
   }
@@ -54,7 +57,12 @@ export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
         if (transactionTransformed) {
           const { hash } = transaction
           const onClick = () => {
-            // TODO
+            navigate(
+              routes.multisigPendingTransactionDetails(
+                account.address,
+                pendingTransaction.requestId,
+              ),
+            )
           }
           return (
             <Flex key={hash} flexDirection="column">

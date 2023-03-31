@@ -8,13 +8,28 @@ const { MultisigIcon, ChevronRightIcon } = icons
 export const MultisigBanner = ({
   confirmations = 0,
   account,
+  onClick,
 }: {
   confirmations?: number
   account: Account
+  onClick?: () => void
 }) => {
   const { multisig } = useMultisigInfo(account)
   return (
-    <Box backgroundColor="neutrals.700" p={3} borderRadius="lg">
+    <Box
+      backgroundColor="neutrals.700"
+      p={3}
+      borderRadius="lg"
+      _hover={
+        onClick
+          ? {
+              cursor: "pointer",
+              backgroundColor: "neutrals.600",
+            }
+          : {}
+      }
+      onClick={onClick}
+    >
       <Flex justifyContent="space-between">
         <Flex alignItems="center">
           <MultisigIcon color="white" mr={1} />
