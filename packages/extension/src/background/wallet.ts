@@ -1,6 +1,14 @@
 import { ethers, utils } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { find, memoize, noop, partition, throttle, union } from "lodash-es"
+import {
+  find,
+  isEmpty,
+  memoize,
+  noop,
+  partition,
+  throttle,
+  union,
+} from "lodash-es"
 import {
   Account,
   DeployAccountContractPayload,
@@ -36,6 +44,7 @@ import {
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
 import { MultisigAccount } from "../shared/multisig/account"
+import { fetchMultisigDataForSigner } from "../shared/multisig/multisig.service"
 import { MultisigSigner } from "../shared/multisig/signer"
 import { PendingMultisig } from "../shared/multisig/types"
 import { getMultisigAccountFromBaseWallet } from "../shared/multisig/utils/baseMultisig"
@@ -109,11 +118,6 @@ export interface WalletStorageProps {
   selected?: BaseWalletAccount | null
   discoveredOnce?: boolean
 }
-/*
-export const walletStore = new KeyValueStorage<WalletStorageProps>(
-  {},
-  "core:wallet",
-) */
 
 export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
   namespace: "core:wallet:session",
@@ -272,13 +276,21 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    const networkAccountClassHash = await this.getAccountClassHashForNetwork(
+    const standardAccountClassHash = await this.getAccountClassHashForNetwork(
       network,
       "standard",
     )
 
+    // This will be a standard account hash if multisig is not supported on the network
+    // It will be handled by the union function below
+    const multisigAccountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "multisig",
+    )
+
     const accountClassHashes = union(ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES, [
-      networkAccountClassHash,
+      standardAccountClassHash,
+      multisigAccountClassHash,
     ])
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
@@ -317,22 +329,58 @@ export class Wallet {
             0,
           )
 
+          const account: WalletAccount = {
+            name: "Unnamed Account",
+            address,
+            networkId: network.id,
+            network,
+            signer: {
+              type: "local_secret",
+              derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
+            },
+            type: "standard",
+            needsDeploy: false, // Only deployed accounts will be recovered
+          }
+
           const code = await provider.getCode(address)
 
           if (code.bytecode.length > 0) {
             lastHit = lastCheck
-            accounts.push({
-              name: "Unnamed Account",
-              address,
-              networkId: network.id,
+            accounts.push(account) // add a standard account
+          } else if (
+            isEqualAddress(accountClassHash, multisigAccountClassHash) // this is required to ensure multisig accounts are only checked on networks that support them
+          ) {
+            // If it's not a standard account, check if the signer is a part of a Multisig
+            const multisigData = await fetchMultisigDataForSigner({
+              signer: starkPub,
               network,
-              signer: {
-                type: "local_secret",
-                derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
-              },
-              type: "standard",
-              needsDeploy: false, // Only deployed accounts will be recovered
             })
+
+            // If the signer is not a part of multisig, the api doesn't throw an error
+            // but returns an empty content array
+            if (!isEmpty(multisigData.content)) {
+              lastHit = lastCheck
+              const {
+                address: multisigAddress,
+                creator,
+                signers,
+                threshold,
+              } = multisigData.content[0]
+
+              accounts.push({
+                ...account,
+                type: "multisig",
+                address: multisigAddress,
+              }) // add a multisig account
+
+              await this.multisigStore.push({
+                address: multisigAddress,
+                networkId: network.id,
+                signers,
+                threshold,
+                creator,
+              })
+            }
           }
 
           ++lastCheck
