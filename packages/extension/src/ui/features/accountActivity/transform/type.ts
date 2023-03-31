@@ -110,9 +110,9 @@ export interface ChangeGuardianTransaction extends BaseTransformedTransaction {
   entity: "GUARDIAN"
 }
 
-export interface AddMultisigSignerTransaction
+export interface ChangeMultisigSignerTransaction
   extends BaseTransformedTransaction {
-  action: "ADD"
+  action: "ADD" | "REMOVE"
   entity: "SIGNER"
 }
 
@@ -133,5 +133,5 @@ export type TransformedTransaction =
   | DeclareContractTransaction
   | DeployContractTransaction
   | ChangeGuardianTransaction
-  | AddMultisigSignerTransaction
+  | ChangeMultisigSignerTransaction
   | ChangeMultisigThresholdTransaction

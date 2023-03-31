@@ -16,6 +16,8 @@ export const getApproveScreenTypeFromAction = (
       return ApproveScreenType.MULTISIG_ADD_SIGNERS
     case "MULTISIG_UPDATE_THRESHOLD":
       return ApproveScreenType.MULTISIG_UPDATE_THRESHOLD
+    case "MULTISIG_REMOVE_SIGNER":
+      return ApproveScreenType.MULTISIG_REMOVE_SIGNER
     default:
       return ApproveScreenType.TRANSACTION
   }
@@ -29,6 +31,9 @@ export const getApproveScreenTypeFromPendingTransaction = (
       return ApproveScreenType.MULTISIG_ADD_SIGNERS
     case "MULTISIG_UPDATE_THRESHOLD":
       return ApproveScreenType.MULTISIG_UPDATE_THRESHOLD
+    case "MULTISIG_REMOVE_SIGNER":
+      return ApproveScreenType.MULTISIG_REMOVE_SIGNER
+
     default:
       return ApproveScreenType.TRANSACTION
   }

@@ -18,6 +18,7 @@ export type ExtendedTransactionType =
   | TransactionType
   | "MULTISIG_ADD_SIGNERS"
   | "MULTISIG_UPDATE_THRESHOLD"
+  | "MULTISIG_REMOVE_SIGNER"
 
 export interface TransactionMeta {
   title?: string

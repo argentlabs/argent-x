@@ -112,7 +112,7 @@ export const MultisigConfirmationsWithoutOwners = ({
   )
 }
 
-const BaseMultisigConfirmations = ({
+export const BaseMultisigConfirmations = ({
   account,
   handleNextClick,
   totalSigners,

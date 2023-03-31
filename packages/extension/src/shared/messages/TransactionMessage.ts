@@ -8,13 +8,14 @@ import type {
   constants,
 } from "starknet"
 
+import {
+  AddOwnerMultisigPayload,
+  RemoveOwnerMultisigPayload,
+  UpdateMultisigThresholdPayload,
+} from "../multisig/multisig.model"
 import { Transaction } from "../transactions"
 import { DeclareContract } from "../udc/type"
-import {
-  AddOwnerMultisiPayload,
-  BaseWalletAccount,
-  UpdateMultisigThresholdPayload,
-} from "../wallet.model"
+import { BaseWalletAccount } from "../wallet.model"
 
 export interface EstimateFeeResponse {
   amount: string
@@ -106,7 +107,7 @@ export type TransactionMessage =
       type: "SIMULATE_TRANSACTION_FALLBACK_REJ"
       data: { error: string }
     }
-  | { type: "ADD_MULTISIG_OWNERS"; data: AddOwnerMultisiPayload }
+  | { type: "ADD_MULTISIG_OWNERS"; data: AddOwnerMultisigPayload }
   | {
       type: "ADD_MULTISIG_OWNERS_REJ"
       data: { error: string }
@@ -121,4 +122,12 @@ export type TransactionMessage =
     }
   | {
       type: "UPDATE_MULTISIG_THRESHOLD_RES"
+    }
+  | { type: "REMOVE_MULTISIG_OWNER"; data: RemoveOwnerMultisigPayload }
+  | {
+      type: "REMOVE_MULTISIG_OWNER_REJ"
+      data: { error: string }
+    }
+  | {
+      type: "REMOVE_MULTISIG_OWNER_RES"
     }

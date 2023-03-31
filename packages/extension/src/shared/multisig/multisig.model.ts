@@ -93,3 +93,21 @@ export type ApiMultisigTxnResponse = z.infer<
 export type ApiMultisigAddRequestSignature = z.infer<
   typeof ApiMultisigAddRequestSignatureSchema
 >
+
+export type AddOwnerMultisigPayload = {
+  address: string
+  newThreshold: number
+  signersToAdd: string[]
+  currentThreshold?: number
+}
+
+export type RemoveOwnerMultisigPayload = {
+  address: string
+  newThreshold: number
+  signerToRemove: string
+}
+
+export type UpdateMultisigThresholdPayload = {
+  newThreshold: number
+  address: string
+}

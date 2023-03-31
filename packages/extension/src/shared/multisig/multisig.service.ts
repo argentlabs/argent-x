@@ -8,14 +8,13 @@ import { Network } from "../network"
 import { networkToStarknetNetwork } from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
 import {
-  AddOwnerMultisiPayload,
-  UpdateMultisigThresholdPayload,
-} from "../wallet.model"
-import {
+  AddOwnerMultisigPayload,
   ApiMultisigContent,
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
   ApiMultisigTxnResponse,
+  RemoveOwnerMultisigPayload,
+  UpdateMultisigThresholdPayload,
 } from "./multisig.model"
 
 const multisigTransactionTypes = {
@@ -126,7 +125,7 @@ export const getMultisigRequestData = async ({
   }
 }
 
-export const addMultisigOwners = async (data: AddOwnerMultisiPayload) => {
+export const addMultisigOwners = async (data: AddOwnerMultisigPayload) => {
   sendMessage({ type: "ADD_MULTISIG_OWNERS", data })
 
   const response = await Promise.race([
@@ -147,6 +146,19 @@ export const updateMultisigThreshold = async (
   const response = await Promise.race([
     waitForMessage("UPDATE_MULTISIG_THRESHOLD_RES"),
     waitForMessage("UPDATE_MULTISIG_THRESHOLD_REJ"),
+  ])
+
+  if (response && "error" in response) {
+    throw new Error(response.error)
+  }
+}
+
+export const removeMultisigOwner = async (data: RemoveOwnerMultisigPayload) => {
+  sendMessage({ type: "REMOVE_MULTISIG_OWNER", data })
+
+  const response = await Promise.race([
+    waitForMessage("REMOVE_MULTISIG_OWNER_RES"),
+    waitForMessage("REMOVE_MULTISIG_OWNER_REJ"),
   ])
 
   if (response && "error" in response) {
