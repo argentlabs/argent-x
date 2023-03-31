@@ -12,16 +12,21 @@ jobs:
     # Job steps
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v1
+      # 👇 Version 2 of the action
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # 👈 Required to retrieve git history
       - name: Install dependencies
         run: yarn setup
         # 👇 Adds Chromatic as a step in the workflow
-      - name: Change to storybook directory
-        run: cd packages/storybook
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
         with:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBaseDir: packages/storybook
+          workingDir: packages/storybook
+          autoAcceptChanges: true
+          # 👇 Enables Chromatic in debug mode. TODO: Remove before merging
+          debug: true
