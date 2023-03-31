@@ -1,6 +1,5 @@
 import { ArrowBackIcon } from "@argent-x/extension/src/ui/components/Icons/MuiIcons"
-import { Button } from "@argent/ui"
-import { theme } from "@argent/ui"
+import { Button, theme } from "@argent/ui"
 import { getThemingArgTypes } from "@chakra-ui/storybook-addon"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
