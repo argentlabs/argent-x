@@ -16,6 +16,8 @@ const texts = {
     save: "Save",
     create: "Create",
     cancel: "Cancel",
+    privacyStatement:
+      "GDPR statement for browser extension wallet: Argent takes the privacy and security of individuals very seriously and takes every reasonable measure and precaution to protect and secure the personal data that we process. The browser extension wallet does not collect any personal information nor does it correlate any of your personal information with anonymous data processed as part of its services. On top of this Argent has robust information security policies and procedures in place to make sure any processing complies with applicable laws. If you would like to know more or have any questions then please visit our website at https://www.argent.xyz/",
   },
   account: {
     noAccounts: "You have no accounts on ",
