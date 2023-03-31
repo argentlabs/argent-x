@@ -1,4 +1,4 @@
-name: Dependabot Automerge
+name: Dependabot
 on: pull_request_target
 jobs:
   worker:
@@ -22,20 +22,3 @@ jobs:
       - run: yarn test
       - run: xvfb-run --auto-servernum yarn test:e2e
       - run: yarn --cwd packages/dapp export
-      - uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.PAT }}
-          script: |-
-            await github.rest.pulls.createReview({
-              owner: context.payload.repository.owner.login,
-              repo: context.payload.repository.name,
-              pull_number: context.payload.pull_request.number,
-              event: 'APPROVE'
-            })
-            await exec.exec("sleep 2")
-            await github.rest.pulls.merge({
-              owner: context.payload.repository.owner.login,
-              repo: context.payload.repository.name,
-              pull_number: context.payload.pull_request.number,
-              merge_method: 'squash'
-            })

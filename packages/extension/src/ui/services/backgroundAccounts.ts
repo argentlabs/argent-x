@@ -6,6 +6,7 @@ import {
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
+import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
 export const createNewAccount = async (
@@ -79,9 +80,19 @@ export const accountsOnNetwork = (
   networkId: string,
 ) => accounts.filter((account) => account.networkId === networkId)
 
+function isNotBaseWalletAccount(
+  account?: BaseWalletAccount,
+): account is Account {
+  return Boolean(account && "toBaseWalletAccount" in account)
+}
+
 export const selectAccount = async (
   account?: BaseWalletAccount,
 ): Promise<void> => {
+  /** coerce to sparse BaseWalletAccount to prevent DataCloneError from full Account class instance on FireFox */
+  if (isNotBaseWalletAccount(account)) {
+    account = account.toBaseWalletAccount()
+  }
   await walletStore.set("selected", account ?? null)
 
   return connectAccount(account)
