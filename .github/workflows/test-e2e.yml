@@ -24,7 +24,6 @@ jobs:
       ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
       ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
-    if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -38,6 +37,17 @@ jobs:
         with:
           node-version: "16"
           cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn setup
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      - name: Build
+        run: yarn lerna run --scope @argent-x/extension build
+        env:
+          UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Check docker local network
         run: |
@@ -54,17 +64,6 @@ jobs:
           else
             echo "Local network is online."
           fi
-
-      - name: Install dependencies
-        run: yarn setup
-
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
-      - name: Build
-        run: yarn lerna run --scope @argent-x/extension build
-        env:
-          UPLOAD_SENTRY_SOURCEMAPS: false
 
       - name: Run e2e tests
         run: xvfb-run --auto-servernum yarn test:e2e
