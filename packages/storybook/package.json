@@ -14,6 +14,7 @@
     "@storybook/builder-webpack5": "^6.5.9",
     "@storybook/manager-webpack5": "^6.5.9",
     "@storybook/react": "^6.5.9",
+    "@storybook/test-runner": "^0.9.4",
     "@storybook/testing-library": "^0.0.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -23,6 +24,7 @@
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "sinon-chrome": "^3.0.1",
     "starknet": "^4.21.0",
     "storybook-addon-swc": "^1.1.7",
     "typescript": "^4.9.4"
@@ -31,6 +33,11 @@
     "storybook": "start-storybook -p 6006",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "build-storybook": "build-storybook",
+    "test-storybook": "test-storybook",
     "chromatic": "chromatic --exit-zero-on-changes --exit-once-uploaded"
+  },
+  "dependencies": {
+    "@types/webextension-polyfill": "^0.10.0",
+    "webextension-polyfill": "^0.10.0"
   }
 }
