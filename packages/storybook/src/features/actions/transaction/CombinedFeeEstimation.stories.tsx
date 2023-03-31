@@ -6,6 +6,7 @@ import {
   combinedFeeEstimationFixture2,
   combinedFeeEstimationFixture3,
   combinedFeeEstimationFixture4,
+  combinedFeeEstimationFixture5,
 } from "./__fixtures__/fees/combinedFeeEstimationFixtures"
 
 export default {
@@ -17,22 +18,27 @@ const Template: ComponentStory<typeof CombinedFeeEstimation> = (props) => (
   <CombinedFeeEstimation {...props} />
 )
 
-export const NoWrap = Template.bind({})
-NoWrap.args = {
-  ...combinedFeeEstimationFixture2,
-}
-
-export const Wrap = Template.bind({})
-Wrap.args = {
-  ...combinedFeeEstimationFixture4,
-}
-
-export const Error = Template.bind({})
-Error.args = {
+export const Scenario1 = Template.bind({})
+Scenario1.args = {
   ...combinedFeeEstimationFixture1,
 }
 
-export const Loading = Template.bind({})
-Loading.args = {
+export const Scenario2 = Template.bind({})
+Scenario2.args = {
+  ...combinedFeeEstimationFixture2,
+}
+
+export const Scenario3 = Template.bind({})
+Scenario3.args = {
   ...combinedFeeEstimationFixture3,
+}
+
+export const Scenario4 = Template.bind({})
+Scenario4.args = {
+  ...combinedFeeEstimationFixture4,
+}
+
+export const Scenario5 = Template.bind({})
+Scenario5.args = {
+  ...combinedFeeEstimationFixture5,
 }
