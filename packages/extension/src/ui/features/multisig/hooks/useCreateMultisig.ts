@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 
-import { createNewMultisigAccount } from "../../../services/backgroundAccounts"
+import { createNewMultisigAccount } from "../../../services/backgroundMultisigs"
 
 export const useCreateMultisig = () => {
   const [isError, setIsError] = useState(false)

@@ -1,6 +1,6 @@
-import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
-import { Circle, Flex, Image, Text, Tooltip, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { H6, P4, icons, typographyStyles } from "@argent/ui"
+import { Circle, Flex, Text, Tooltip, chakra } from "@chakra-ui/react"
+import { FC } from "react"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
 import {
@@ -9,9 +9,10 @@ import {
 } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { MultisigStatus } from "../multisig/hooks/useMultisigStatus"
 import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
+import { AccountAvatar } from "./AccountAvatar"
+import { AccountLabel } from "./AccountLabel"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
 
@@ -29,42 +30,6 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   hidden?: boolean
   avatarOutlined?: boolean
   isShield?: boolean
-  multisigStatus?: MultisigStatus
-}
-
-interface AccountAvatarProps extends ComponentProps<"img"> {
-  outlined?: boolean
-}
-
-export const AccountAvatar: FC<AccountAvatarProps> = ({
-  outlined,
-  children,
-  ...rest
-}) => {
-  return (
-    <Flex position={"relative"} flexShrink={0}>
-      <Image borderRadius={"full"} width={12} height={12} {...rest} />
-      {outlined && (
-        <>
-          <Circle
-            position={"absolute"}
-            top={0}
-            size={12}
-            borderWidth={"0.25rem"}
-            borderColor={"black"}
-          />
-          <Circle
-            position={"absolute"}
-            top={0}
-            size={12}
-            borderWidth={"0.125rem"}
-            borderColor={"white"}
-          />
-        </>
-      )}
-      {children}
-    </Flex>
-  )
 }
 
 export const NetworkStatusWrapper = chakra(Flex, {
@@ -155,7 +120,6 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   connectedHost,
   hidden,
   avatarOutlined,
-  multisigStatus,
   children,
   ...rest
 }) => {
@@ -191,28 +155,11 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
-            {accountType !== "standard" && (
-              <L2
-                backgroundColor={"neutrals.900"}
-                px={1}
-                py={0.5}
-                textTransform="uppercase"
-                fontWeight={"extrabold"}
-                color={"neutrals.200"}
-                borderRadius={"base"}
-                border={"1px solid"}
-                borderColor={"neutrals.700"}
-              >
-                {accountType === "plugin" && "Plugin"}
-                {accountType === "betterMulticall" && "Better MC"}
-              </L2>
-            )}
+            {accountType && <AccountLabel accountType={accountType} />}
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             <P4 fontWeight={"semibold"}>
-              {accountType === "multisig" && multisigStatus === "pending"
-                ? "Awaiting owner to finish setup"
-                : formatTruncatedAddress(accountAddress)}
+              {formatTruncatedAddress(accountAddress)}
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>

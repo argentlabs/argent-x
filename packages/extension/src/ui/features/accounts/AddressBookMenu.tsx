@@ -9,7 +9,6 @@ import { AddressBook } from "../../services/addressBook"
 import { formatTruncatedAddress } from "../../services/addresses"
 import { H5 } from "../../theme/Typography"
 import { Account } from "./Account"
-import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { getAccountImageUrl } from "./accounts.service"
 import { ProfilePicture } from "./ProfilePicture"
 
@@ -77,7 +76,6 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
   addressBook,
   onAddressSelect,
 }) => {
-  const { accountNames } = useAccountMetadata()
   const [selectedTab, setSelectedTab] = useState<AddressBookMenuTabs>(
     addressBook.contacts.length > 0 ? "external" : "user",
   )
@@ -86,8 +84,7 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
 
   const accountsToList = (accounts: Account[] | AddressBookContact[]) => {
     return accounts.map((account) => {
-      const accountName =
-        "name" in account ? account.name : getAccountName(account, accountNames)
+      const accountName = account.name
 
       return (
         <MenuItemWrapper

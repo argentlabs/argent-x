@@ -3,7 +3,7 @@ import {
   BaseMultisigWalletAccount,
   MultisigData,
 } from "../../../shared/wallet.model"
-import { createNewMultisigAccount } from "../../services/backgroundAccounts"
+import { createNewMultisigAccount } from "../../services/backgroundMultisigs"
 import { Account, AccountConstructorProps } from "../accounts/Account"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {
@@ -72,6 +72,7 @@ export class Multisig extends Account {
     }
 
     return new Multisig({
+      name: result.account.name,
       address: result.account.address,
       network,
       signer: result.account.signer,

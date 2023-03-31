@@ -16,6 +16,7 @@ import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { createNewAccount } from "../../services/backgroundAccounts"
 
 export interface AccountConstructorProps {
+  name: string
   address: string
   network: Network
   signer: WalletAccountSigner
@@ -29,6 +30,7 @@ export interface AccountConstructorProps {
 }
 
 export class Account {
+  name: string
   address: string
   network: Network
   networkId: string
@@ -44,6 +46,7 @@ export class Account {
   needsDeploy?: boolean
 
   constructor({
+    name,
     address,
     network,
     signer,
@@ -55,6 +58,7 @@ export class Account {
     needsDeploy = false,
     contract,
   }: AccountConstructorProps) {
+    this.name = name
     this.address = address
     this.network = network
     this.networkId =
@@ -131,6 +135,7 @@ export class Account {
     }
 
     return new Account({
+      name: result.account.name,
       address: result.account.address,
       network,
       signer: result.account.signer,
@@ -143,6 +148,7 @@ export class Account {
 
   public toWalletAccount(): WalletAccount {
     const {
+      name,
       networkId,
       address,
       network,
@@ -153,6 +159,7 @@ export class Account {
       needsDeploy,
     } = this
     return {
+      name,
       networkId,
       address,
       network,

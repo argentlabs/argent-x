@@ -394,7 +394,11 @@ const walletRoutes = (
 
     {/* Multisig */}
     <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
-    <Route path={routes.multisigJoin.path} element={<JoinMultisigScreen />} />
+    <Route
+      presentation="push"
+      path={routes.multisigJoin.path}
+      element={<JoinMultisigScreen />}
+    />
     <Route
       presentation="push"
       path={routes.multisigOwners.path}

@@ -12,10 +12,6 @@ import { ColumnCenter } from "../../../components/Column"
 import { LinkIcon } from "../../../components/Icons/MuiIcons"
 import { Account } from "../../accounts/Account"
 import { AccountListItemProps } from "../../accounts/AccountListItem"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
 import { useAccounts, useSelectedAccount } from "../../accounts/accounts.state"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import {
@@ -44,11 +40,10 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
   onSelectedAccountChange,
   host,
 }) => {
-  const { accountNames } = useAccountMetadata()
   const preAuths = usePreAuthorizations()
   const makeAccountListItem = useCallback(
     (account: Account): AccountListItemProps => {
-      const accountName = getAccountName(account, accountNames)
+      const accountName = account.name
       const connected = Boolean(
         preAuths.some((preAuth) =>
           equalPreAuthorization(preAuth, {
@@ -65,7 +60,7 @@ export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
         accountType: account.type,
       }
     },
-    [accountNames, host, preAuths],
+    [host, preAuths],
   )
   const accountItems = useMemo(
     () => accounts.map(makeAccountListItem),

@@ -4,9 +4,11 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { booleanifyEnv } from "../../../shared/utils/booleanifyEnv"
+import { CreateAccountType } from "../../../shared/wallet.model"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { useAddAccount } from "./useAddAccount"
 
 const { WalletIcon, MultisigIcon } = icons
@@ -19,6 +21,7 @@ export enum AccountTypeId {
 
 interface AccountType {
   id: AccountTypeId
+  type: CreateAccountType
   title: string
   subtitle?: string
   icon: React.ReactNode
@@ -28,6 +31,7 @@ interface AccountType {
 const accountTypes: AccountType[] = [
   {
     id: AccountTypeId.STANDARD,
+    type: "standard",
     title: "Standard Account",
     subtitle: "Create a new Argent X account",
     icon: <WalletIcon />,
@@ -35,6 +39,7 @@ const accountTypes: AccountType[] = [
   },
   {
     id: AccountTypeId.MULTISIG,
+    type: "multisig",
     title: "Multisig Account",
     subtitle: "For multiple owners",
     icon: <MultisigIcon />,
@@ -52,6 +57,7 @@ const accountTypes: AccountType[] = [
 export const AddNewAccountScreen: FC = () => {
   const navigate = useNavigate()
   const { addAccount, isAdding } = useAddAccount()
+  const { accountClassHash } = useCurrentNetwork()
 
   const onAccountTypeClick = useCallback(
     async (accountTypeId: AccountTypeId) => {
@@ -93,8 +99,9 @@ export const AddNewAccountScreen: FC = () => {
     >
       <Flex p={4} gap={2} direction="column">
         {accountTypes.map(
-          ({ icon, id, enabled, title, subtitle }) =>
-            enabled && (
+          ({ type, icon, id, enabled, title, subtitle }) =>
+            enabled &&
+            accountClassHash?.[type] && (
               <CustomButtonCell
                 key={`account-type-${id}`}
                 aria-label={title}

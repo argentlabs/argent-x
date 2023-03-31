@@ -55,3 +55,17 @@ export async function unhideAccount(
     hidden: false,
   })
 }
+
+export async function updateAccountName(
+  account: BaseWalletAccount,
+  name: string,
+) {
+  const [hit] = await getAccounts(getAccountSelector(account))
+  if (!hit) {
+    return
+  }
+  await accountStore.push({
+    ...hit,
+    name,
+  })
+}

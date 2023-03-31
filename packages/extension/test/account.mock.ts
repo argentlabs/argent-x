@@ -25,8 +25,10 @@ const defaultPromise = () => Promise.resolve("")
 const defaultNeedsDeploy = false
 const defaultAddress = "0x0"
 const defaultHidden = false
+const defaultName = "Account 1"
 
 const defaultAccount: Account = {
+  name: defaultName,
   address: defaultAddress,
   network: defaultNetwork,
   networkId: defaultNetwork.id,
@@ -51,6 +53,7 @@ const defaultAccount: Account = {
   completeDeployTx: defaultFn,
   getCurrentImplementation: defaultPromise,
   toWalletAccount: () => ({
+    name: defaultName,
     networkId: defaultNetwork.id,
     address: defaultAddress,
     network: defaultNetwork,

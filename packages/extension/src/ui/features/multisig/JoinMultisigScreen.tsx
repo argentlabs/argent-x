@@ -1,9 +1,9 @@
 import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/ui"
 import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import { FC, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
-import { useSignerKey } from "../accounts/usePublicKey"
+import { useEncodedPublicKey } from "../accounts/usePublicKey"
 import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
 import { recover } from "../recovery/recovery.service"
 
@@ -11,7 +11,10 @@ const { CopyIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
-  const signerKey = useSignerKey()
+
+  const { signer } = useParams()
+
+  const signerKey = useEncodedPublicKey(signer)
 
   const { onCopy, hasCopied, setValue } = useClipboard("", 2000)
 

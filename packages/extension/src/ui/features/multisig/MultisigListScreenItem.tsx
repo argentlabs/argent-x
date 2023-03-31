@@ -2,8 +2,10 @@ import { Button, P4, icons } from "@argent/ui"
 import { Box, Circle, Flex, useDisclosure } from "@chakra-ui/react"
 import { FC, MouseEvent, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
+import { Account } from "starknet"
 
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { routes } from "../../routes"
 import { selectAccount } from "../../services/backgroundAccounts"
 import { AccountListItem } from "../accounts/AccountListItem"
@@ -11,10 +13,6 @@ import {
   AccountItemIconContainer,
   IAccountListScreenItem,
 } from "../accounts/AccountListScreenItem"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { useRemoveAccountCallback } from "../accounts/accounts.state"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
@@ -22,6 +20,14 @@ import { useMultisigInfo } from "./hooks/useMultisigInfo"
 import { MultisigDeleteModal } from "./MultisigDeleteModal"
 
 const { MoreIcon, ChevronRightIcon } = icons
+
+export interface IMultisigListScreenItem {
+  account: Account
+  selectedAccount?: BaseWalletAccount
+  needsUpgrade?: boolean
+  clickNavigateSettings?: boolean
+  returnTo?: string
+}
 
 export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
   account,
@@ -33,10 +39,8 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
   const navigate = useNavigate()
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
-
-  const { accountNames } = useAccountMetadata()
-  const accountName = getAccountName(account, accountNames)
-  const { isOpen: isMenuOpen, onOpen: onMenuOpen } = useDisclosure()
+  const accountName = account.name
+  const { isOpen: isMenuOpen } = useDisclosure()
 
   const {
     isOpen: isDeleteModalOpen,
@@ -48,13 +52,9 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
-  const { status: multisigStatus, multisig } = useMultisigInfo(account)
+  const { multisig } = useMultisigInfo(account)
 
   const onClick = useCallback(async () => {
-    if (multisigStatus === "pending") {
-      return
-    }
-
     await selectAccount(account)
 
     const navigationRoute = multisig?.needsDeploy
@@ -62,20 +62,15 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
       : returnTo || routes.accountTokens()
 
     navigate(navigationRoute)
-  }, [account, multisig?.needsDeploy, multisigStatus, navigate, returnTo])
+  }, [account, multisig?.needsDeploy, navigate, returnTo])
 
   const onOptionsClick = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
       e.preventDefault()
-
-      if (multisigStatus === "pending") {
-        onMenuOpen()
-      } else {
-        navigate(routes.editAccount(account.address))
-      }
+      navigate(routes.editAccount(account.address))
     },
-    [account.address, multisigStatus, navigate, onMenuOpen],
+    [account.address, navigate],
   )
 
   const onDeleteClicked = useCallback(
@@ -98,12 +93,12 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
 
   return (
     <>
-      <Flex position={"relative"} direction={"column"}>
+      <Flex position={"relative"} direction={"column"} w="full">
         <AccountListItem
           aria-label={`Select ${accountName}`}
           onClick={clickNavigateSettings ? onOptionsClick : onClick}
           accountName={accountName}
-          accountAddress={multisig?.address || account.address} // TODO: remove this when we have a better way to display multisig accounts
+          accountAddress={account.address}
           networkId={account.networkId}
           accountType={account.type}
           isShield={Boolean(account.guardian)}
@@ -111,7 +106,6 @@ export const MultisigListScreenItem: FC<IAccountListScreenItem> = ({
           deploying={status.code === "DEPLOYING"}
           upgrade={needsUpgrade}
           connectedHost={isConnected ? originatingHost : undefined}
-          multisigStatus={multisigStatus}
           pr={14}
         >
           {clickNavigateSettings && (
