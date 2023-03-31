@@ -14,10 +14,6 @@ import {
 import { Header } from "../../components/Header"
 import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { ProfilePicture } from "../accounts/ProfilePicture"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
@@ -109,7 +105,6 @@ export const DeprecatedConfirmScreen: FC<DeprecatedConfirmScreenProps> = ({
   ...props
 }) => {
   const navigate = useNavigate()
-  const { accountNames } = useAccountMetadata()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
   onReject ??= () => navigate(-1)
 
@@ -127,10 +122,7 @@ export const DeprecatedConfirmScreen: FC<DeprecatedConfirmScreenProps> = ({
         {showHeader && selectedAccount && (
           <Header style={{ margin: "0 -32px 16px" }}>
             <ProfilePicture
-              src={getAccountImageUrl(
-                getAccountName(selectedAccount, accountNames),
-                selectedAccount,
-              )}
+              src={getAccountImageUrl(selectedAccount.name, selectedAccount)}
               disabled
             />
             <NetworkSwitcher disabled />

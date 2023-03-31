@@ -1,9 +1,7 @@
 import {
   ArgentAccountType,
-  BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
-  MultisigData,
   WalletAccount,
 } from "../wallet.model"
 
@@ -23,18 +21,6 @@ export type AccountMessage =
       }
     }
   | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
-  | {
-      type: "NEW_MULTISIG_ACCOUNT"
-      data: MultisigData & { networkId: string }
-    }
-  | {
-      type: "NEW_MULTISIG_ACCOUNT_RES"
-      data: {
-        account: WalletAccount
-        accounts: WalletAccount[]
-      }
-    }
-  | { type: "NEW_MULTISIG_ACCOUNT_REJ"; data: { error: string } }
   | { type: "DEPLOY_ACCOUNT"; data: BaseWalletAccount }
   | { type: "DEPLOY_ACCOUNT_RES" }
   | { type: "DEPLOY_ACCOUNT_REJ" }
@@ -44,17 +30,6 @@ export type AccountMessage =
     }
   | {
       type: "DEPLOY_ACCOUNT_ACTION_FAILED"
-      data: { actionHash: string; error?: string }
-    }
-  | { type: "DEPLOY_MULTISIG"; data: BaseWalletAccount }
-  | { type: "DEPLOY_MULTISIG_RES" }
-  | { type: "DEPLOY_MULTISIG_REJ" }
-  | {
-      type: "DEPLOY_MULTISIG_ACTION_SUBMITTED"
-      data: { txHash: string; actionHash: string }
-    }
-  | {
-      type: "DEPLOY_MULTISIG_ACTION_FAILED"
       data: { actionHash: string; error?: string }
     }
   | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
@@ -114,17 +89,6 @@ export type AccountMessage =
     }
   | {
       type: "GET_NEXT_PUBLIC_KEY_REJ"
-    }
-  | {
-      type: "GET_CALCULATED_MULTISIG_ADDRESS"
-      data: BaseMultisigWalletAccount
-    }
-  | {
-      type: "GET_CALCULATED_MULTISIG_ADDRESS_RES"
-      data: string
-    }
-  | {
-      type: "GET_CALCULATED_MULTISIG_ADDRESS_REJ"
     }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE"

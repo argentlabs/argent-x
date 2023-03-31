@@ -10,7 +10,6 @@ import { formatFullAddress } from "../../services/addresses"
 import { deleteAccount } from "../../services/backgroundAccounts"
 import { P } from "../../theme/Typography"
 import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
-import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useAccount } from "./accounts.state"
 import { autoSelectAccountOnNetwork } from "./switchAccount"
 
@@ -42,7 +41,6 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
   const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const { accountNames } = useAccountMetadata()
   const account = useAccount({
     address: accountAddress,
     networkId: switcherNetworkId,
@@ -87,7 +85,7 @@ export const HideOrDeleteAccountConfirmScreen: FC<{
           : "You are about to delete the following account:"}
       </StyledP>
       <AddressWrapper>
-        <AccountName>{getAccountName(account, accountNames)}</AccountName>
+        <AccountName>{account.name}</AccountName>
         <AccountAddress>{formatFullAddress(account.address)}</AccountAddress>
       </AddressWrapper>
       <StyledP>

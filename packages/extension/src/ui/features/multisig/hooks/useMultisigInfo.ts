@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react"
 
-import { updateBaseMultisigAccount } from "../../../../shared/multisig/store"
+import { updateBaseMultisigAccount } from "../../../../shared/multisig/utils/baseMultisig"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { Multisig } from "../Multisig"
 import { useMultisigWalletAccount } from "../multisig.state"
-import { useMultisigDataForSigner } from "./useMultisigDataForSigner"
+import { useMultisigDataForAccount } from "./useMultisigDataforAccount"
 import { MultisigStatus, useMultisigStatus } from "./useMultisigStatus"
 
 export interface IMultisigInfo {
@@ -14,7 +14,7 @@ export interface IMultisigInfo {
 
 export function useMultisigInfo(account: BaseWalletAccount): IMultisigInfo {
   const multisigAccount = useMultisigWalletAccount(account)
-  const { data: multisigData } = useMultisigDataForSigner(account)
+  const { data: multisigData } = useMultisigDataForAccount(account)
   const multisigStatus = useMultisigStatus(account)
   useEffect(() => {
     if (!multisigAccount || !multisigData) {

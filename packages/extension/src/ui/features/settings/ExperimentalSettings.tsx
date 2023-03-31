@@ -13,19 +13,12 @@ import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { resetDevice } from "../../../shared/shield/jwt"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { useAccountsWithGuardian } from "../shield/useAccountGuardian"
 import { SettingsScreenWrapper } from "./SettingsScreen"
 
 const useAccountNames = (accounts: Account[]) => {
-  const { accountNames } = useAccountMetadata()
   const elements = accounts.map((account) => {
-    const accountName = account
-      ? getAccountName(account, accountNames)
-      : "Unknown"
+    const accountName = account ? account.name : "Unknown"
     return accountName
   })
   const formatter = new Intl.ListFormat("en", {

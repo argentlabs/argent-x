@@ -23,6 +23,7 @@ export const mapWalletAccountsToAccounts = (
   return walletAccounts.map(
     (walletAccount) =>
       new Account({
+        name: walletAccount.name,
         address: walletAccount.address,
         network: walletAccount.network,
         signer: walletAccount.signer,

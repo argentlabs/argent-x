@@ -1,7 +1,11 @@
 import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
+import { accountStore } from "../../../shared/account/store"
 import { Network } from "../../../shared/network"
+import { WalletAccount } from "../../../shared/wallet.model"
 import { Account } from "./Account"
 import {
+  migrate,
   setDefaultAccountNames,
   useAccountMetadata,
 } from "./accountMetadata.state"
@@ -56,5 +60,57 @@ describe("setDefaultAccountNames", () => {
     expect(spy).toHaveBeenCalledWith({
       accountNames: {},
     })
+  })
+})
+
+describe("Test migration", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+  it("should update the names in the wallet accounts", async () => {
+    const mockWalletAccounts = [
+      getMockWalletAccount({
+        address: "0x123",
+        type: "standard",
+        networkId: "localhost",
+      }),
+      getMockWalletAccount({
+        address: "0x456",
+        type: "multisig",
+        networkId: "localhost",
+      }),
+      getMockWalletAccount({
+        address: "0x789",
+        type: "standard",
+        networkId: "localhost",
+      }),
+    ]
+
+    const getMock = vi
+      .spyOn(accountStore, "get")
+      .mockResolvedValueOnce(mockWalletAccounts as any) // Doing this to test the migration
+
+    const pushSpy = vi.spyOn(accountStore, "push")
+
+    await migrate(mockAccountNames)
+
+    const expectedUpdatedWalletAccounts: WalletAccount[] = [
+      {
+        ...mockWalletAccounts[0],
+        name: "Account 1",
+      },
+      {
+        ...mockWalletAccounts[1],
+        name: "Multisig 1",
+      },
+      {
+        ...mockWalletAccounts[2],
+        name: "Account 2",
+      },
+    ]
+
+    expect(pushSpy).toHaveBeenCalledWith(expectedUpdatedWalletAccounts)
+    getMock.mockRestore()
+    pushSpy.mockRestore()
   })
 })

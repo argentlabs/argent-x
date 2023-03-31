@@ -39,6 +39,9 @@ const determineEntry = async (query: URLSearchParams) => {
 
   if (query.get("goto") === "multisig") {
     const networkId = query.get("networkId")
+    if (!networkId) {
+      throw new Error("Missing networkId query param")
+    }
     return routes.multisigCreate(networkId)
   }
 

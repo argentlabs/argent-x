@@ -2,25 +2,36 @@ import { useCallback } from "react"
 
 import { ARGENT_MULTISIG_ENABLED } from "../../../../shared/api/constants"
 import { fetchMultisigDataForSigner } from "../../../../shared/multisig/multisig.service"
-import { BasePendingMultisig } from "../../../../shared/multisig/types"
-import { BaseMultisigWalletAccount } from "../../../../shared/wallet.model"
-import { getPendingMultisigIdentifier } from "../../../../shared/wallet.service"
+import {
+  BaseMultisigWalletAccount,
+  BaseWalletAccount,
+} from "../../../../shared/wallet.model"
+import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { useConditionallyEnabledSWR } from "../../../services/swr"
-import { useNetwork } from "./../../networks/useNetworks"
+import { usePublicKey } from "../../accounts/usePublicKey"
+import {
+  isZeroMultisigAccount,
+  useMultisigWalletAccount,
+} from "../multisig.state"
 
-export function useMultisigDataForSigner({
-  publicKey,
-  networkId,
-}: BasePendingMultisig) {
-  const network = useNetwork(networkId)
+export function useMultisigDataForAccount(account: BaseWalletAccount) {
+  const multisigAccount = useMultisigWalletAccount(account)
+  const publicSigner = usePublicKey(account)
 
   const multisigDataForSignerFetcher = useCallback(async () => {
+    if (!multisigAccount || !publicSigner) {
+      return
+    }
+
     const data = await fetchMultisigDataForSigner({
-      signer: publicKey,
-      network,
+      signer: publicSigner,
+      network: multisigAccount.network,
     })
 
     if (!data || !data.content || data.content.length === 0) {
+      if (!isZeroMultisigAccount(multisigAccount)) {
+        return multisigAccount
+      }
       return
     }
 
@@ -29,15 +40,16 @@ export function useMultisigDataForSigner({
       threshold: data.content[0].threshold,
       address: data.content[0].address,
       creator: data.content[0].creator,
-      networkId: network.id,
+      networkId: account.networkId,
     }
-  }, [network, publicKey])
+  }, [account.networkId, multisigAccount, publicSigner])
 
   return useConditionallyEnabledSWR<BaseMultisigWalletAccount | undefined>(
     Boolean(ARGENT_MULTISIG_ENABLED),
     [
       "multisigDataForSigner",
-      publicKey && getPendingMultisigIdentifier({ publicKey, networkId }),
+      multisigAccount && getAccountIdentifier(multisigAccount),
+      publicSigner,
     ],
     multisigDataForSignerFetcher,
     {

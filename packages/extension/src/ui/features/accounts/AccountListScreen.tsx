@@ -14,6 +14,7 @@ import { routes, useReturnTo } from "../../routes"
 import { isEqualAddress } from "../../services/addresses"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
+import { usePendingMultisigs } from "../multisig/multisig.state"
 import { MultisigListScreenItem } from "../multisig/MultisigListScreenItem"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
@@ -53,6 +54,7 @@ export const AccountListScreen: FC = () => {
   const returnTo = useReturnTo()
   const selectedAccount = useSelectedAccount()
   const allAccounts = useAccounts({ showHidden: true })
+  const pendingMultisigs = usePendingMultisigs()
   const [hiddenAccounts, visibleAccounts] = partition(
     allAccounts,
     isHiddenAccount,
@@ -115,8 +117,11 @@ export const AccountListScreen: FC = () => {
     (account) => account.type === "multisig",
   )
 
+  const hasMultisigAccounts =
+    !isEmpty(multisigAccounts) || !isEmpty(pendingMultisigs)
+
   const hasMultipleAccountTypes =
-    !isEmpty(standardAccounts) && !isEmpty(multisigAccounts)
+    !isEmpty(standardAccounts) && hasMultisigAccounts
 
   return (
     <>
@@ -158,6 +163,7 @@ export const AccountListScreen: FC = () => {
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
                 type="multisig"
+                pendingMultisigs={pendingMultisigs}
               />
             </Flex>
           ) : (
