@@ -31,7 +31,6 @@
     "storybook": "start-storybook -p 6006",
     "lint": "eslint . --cache --ext .ts,.tsx",
     "build-storybook": "build-storybook",
-    "test-storybook": "test-storybook",
     "chromatic": "chromatic --exit-zero-on-changes --exit-once-uploaded"
   }
 }
