@@ -32,10 +32,6 @@ import {
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { H3, H5 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
@@ -106,8 +102,6 @@ export const SendNftScreen: FC = () => {
   const [addressBookRecipient, setAddressBookRecipient] = useState<
     Account | AddressBookContact
   >()
-
-  const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
 
   const accountName = useMemo(
@@ -115,9 +109,9 @@ export const SendNftScreen: FC = () => {
       addressBookRecipient
         ? "name" in addressBookRecipient
           ? addressBookRecipient.name
-          : getAccountName(addressBookRecipient, accountNames)
+          : account?.name
         : undefined,
-    [accountNames, addressBookRecipient],
+    [account?.name, addressBookRecipient],
   )
 
   const {

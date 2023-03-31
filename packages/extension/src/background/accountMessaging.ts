@@ -4,7 +4,7 @@ import { getAccounts, removeAccount } from "../shared/account/store"
 import { tryToMintFeeToken } from "../shared/devnet/mintFeeToken"
 import { AccountMessage } from "../shared/messages/AccountMessage"
 import { isEqualAddress } from "../ui/services/addresses"
-import { deployAccountAction, deployMultisigAction } from "./accountDeploy"
+import { deployAccountAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
 import { analytics } from "./analytics"
@@ -79,68 +79,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
     }
 
-    case "NEW_MULTISIG_ACCOUNT": {
-      if (!(await wallet.isSessionOpen())) {
-        throw Error("you need an open session")
-      }
-
-      const { networkId, signers, threshold, creator } = msg.data
-      try {
-        const account = await wallet.newAccount(networkId, "multisig", {
-          signers,
-          threshold,
-          creator,
-        })
-        tryToMintFeeToken(account)
-
-        analytics.track("createAccount", {
-          status: "success",
-          networkId,
-          type: "multisig",
-        })
-
-        const accounts = await getAccounts()
-
-        return sendMessageToUi({
-          type: "NEW_MULTISIG_ACCOUNT_RES",
-          data: {
-            account,
-            accounts,
-          },
-        })
-      } catch (exception) {
-        const error = `${exception}`
-
-        analytics.track("createAccount", {
-          status: "failure",
-          networkId: networkId,
-          type: "multisig",
-          errorMessage: error,
-        })
-
-        return sendMessageToUi({
-          type: "NEW_MULTISIG_ACCOUNT_REJ",
-          data: { error },
-        })
-      }
-    }
-
-    case "GET_CALCULATED_MULTISIG_ADDRESS": {
-      try {
-        const address = await wallet.getCalculatedMultisigAddress(msg.data)
-
-        return sendMessageToUi({
-          type: "GET_CALCULATED_MULTISIG_ADDRESS_RES",
-          data: address,
-        })
-      } catch (e) {
-        console.error(e)
-        return sendMessageToUi({
-          type: "GET_CALCULATED_MULTISIG_ADDRESS_REJ",
-        })
-      }
-    }
-
     case "DEPLOY_ACCOUNT": {
       try {
         await deployAccountAction({
@@ -151,19 +89,6 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         return sendMessageToUi({ type: "DEPLOY_ACCOUNT_RES" })
       } catch (e) {
         return sendMessageToUi({ type: "DEPLOY_ACCOUNT_REJ" })
-      }
-    }
-
-    case "DEPLOY_MULTISIG": {
-      try {
-        await deployMultisigAction({
-          account: msg.data,
-          actionQueue,
-        })
-
-        return sendMessageToUi({ type: "DEPLOY_MULTISIG_RES" })
-      } catch (e) {
-        return sendMessageToUi({ type: "DEPLOY_MULTISIG_REJ" })
       }
     }
 
@@ -265,7 +190,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "GET_NEXT_PUBLIC_KEY": {
       try {
-        const publicKey = await wallet.getNextPublicKey(msg.data.networkId)
+        const { publicKey } = await wallet.getNextPublicKey(msg.data.networkId)
 
         return sendMessageToUi({
           type: "GET_NEXT_PUBLIC_KEY_RES",

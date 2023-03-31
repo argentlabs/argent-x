@@ -29,6 +29,7 @@
     "version": 1,
     "accounts": [
       {
+        "name": "Account 1",
         "network": "http://localhost:5050",
         "address": "0x06c67629cae87e7a1b284f1002747af681b39b8199f9263b9aed985e200d8f59",
         "signer": {

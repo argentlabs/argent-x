@@ -11,7 +11,6 @@ import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { Account } from "./Account"
 import { AccountListItem } from "./AccountListItem"
-import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 
 const { MoreIcon, ChevronRightIcon } = icons
 
@@ -46,9 +45,6 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
   const navigate = useNavigate()
   const status = useAccountStatus(account, selectedAccount)
   const originatingHost = useOriginatingHost()
-
-  const { accountNames } = useAccountMetadata()
-  const accountName = getAccountName(account, accountNames)
 
   const isConnected = useIsPreauthorized(originatingHost || "", account)
 
@@ -88,13 +84,13 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
     <>
       <Flex position={"relative"} direction={"column"}>
         <AccountListItem
-          aria-label={`Select ${accountName}`}
+          aria-label={`Select ${account.name}`}
           onMouseDown={(e) => {
             e.stopPropagation()
             mouseDownSettings.current = false
           }}
           onClick={onClick}
-          accountName={accountName}
+          accountName={account.name}
           accountAddress={account.address}
           networkId={account.networkId}
           accountType={account.type}
@@ -113,7 +109,7 @@ export const AccountListScreenItem: FC<IAccountListScreenItem> = ({
           {!clickNavigateSettings && (
             <AccountItemIconContainer>
               <Button
-                aria-label={`${accountName} options`}
+                aria-label={`${account.name} options`}
                 onMouseDown={(e) => {
                   e.stopPropagation()
                   mouseDownSettings.current = true

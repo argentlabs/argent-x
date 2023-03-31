@@ -9,24 +9,8 @@ import {
   isEqualAddress,
 } from "../../services/addresses"
 import { TokenIcon } from "../accountTokens/TokenIcon"
-import { useAccountMetadata } from "./accountMetadata.state"
 import { getNetworkAccountImageUrl } from "./accounts.service"
-
-const getAccountNameForAddress = (
-  accountAddress: string,
-  networkId: string,
-  accountNames?: Record<string, Record<string, string>>,
-): string | undefined => {
-  if (!accountNames || !accountNames[networkId]) {
-    return
-  }
-  for (const entry of Object.entries(accountNames[networkId])) {
-    const [address, accountName] = entry
-    if (isEqualAddress(address, accountAddress)) {
-      return accountName
-    }
-  }
-}
+import { useAccounts } from "./accounts.state"
 
 const getContactNameForAddress = (
   accountAddress: string,
@@ -50,7 +34,7 @@ interface PrettyAccountAddressProps
   extends Pick<ComponentProps<typeof TokenIcon>, "size"> {
   accountAddress: string
   networkId: string
-  accountNames?: Record<string, Record<string, string>>
+  accountNames?: string[]
   contacts?: AddressBookContact[]
   fallbackValue?: (accountAddress: string) => ReactNode
   icon?: boolean
@@ -67,20 +51,24 @@ export const PrettyAccountAddress: FC<PrettyAccountAddressProps> = ({
   icon = true,
   bold = false,
 }) => {
-  const defaultAccountNames = useAccountMetadata((x) => x.accountNames)
+  const accounts = useAccounts()
+
+  const defaultAccountNames = accounts.map((account) => account.name)
+
   const { contacts: defaultContacts } = useAddressBook()
+
   if (!accountNames) {
     accountNames = defaultAccountNames
   }
   if (!contacts) {
     contacts = defaultContacts
   }
+
   const accountName = useMemo(() => {
-    const accountName = getAccountNameForAddress(
-      accountAddress,
-      networkId,
-      accountNames,
-    )
+    const accountName = accounts.find((acc) =>
+      isEqualAddress(acc.address, accountAddress),
+    )?.name
+
     if (accountName) {
       return accountName
     }
@@ -90,7 +78,7 @@ export const PrettyAccountAddress: FC<PrettyAccountAddressProps> = ({
       contacts,
     )
     return contactName
-  }, [accountAddress, accountNames, contacts, networkId])
+  }, [accountAddress, accounts, contacts, networkId])
   const accountImageUrl = getNetworkAccountImageUrl({
     accountName: accountName || accountAddress,
     networkId,

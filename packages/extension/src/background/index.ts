@@ -5,7 +5,10 @@ import { accountStore, getAccounts } from "../shared/account/store"
 import { globalActionQueueStore } from "../shared/actionQueue/store"
 import { ActionItem } from "../shared/actionQueue/types"
 import { MessageType, messageStream } from "../shared/messages"
-import { multisigBaseWalletStore } from "../shared/multisig/store"
+import {
+  multisigBaseWalletStore,
+  pendingMultisigStore,
+} from "../shared/multisig/store"
 import { getNetwork } from "../shared/network"
 import {
   isPreAuthorized,
@@ -31,6 +34,7 @@ import {
 } from "./background"
 import { getMessagingKeys } from "./keys/messagingKeys"
 import { handleMiscellaneousMessage } from "./miscellaneousMessaging"
+import { handleMultisigMessage } from "./multisigMessaging"
 import { handleNetworkMessage } from "./networkMessaging"
 import { initOnboarding } from "./onboarding"
 import {
@@ -112,6 +116,7 @@ const handlers = [
   handleTokenMessaging,
   handleUdcMessaging,
   handleShieldMessage,
+  handleMultisigMessage,
 ] as Array<HandleMessage<MessageType>>
 
 getAccounts()
@@ -171,6 +176,7 @@ const handleMessage = async (
     accountStore,
     sessionStore,
     multisigBaseWalletStore,
+    pendingMultisigStore,
     loadContracts,
     getNetwork,
   )

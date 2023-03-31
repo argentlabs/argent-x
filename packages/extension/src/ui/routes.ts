@@ -225,10 +225,13 @@ export const routes = {
   multisigNew: route("/account/new/multisig"),
   multisigSetup: route("/multisig/setup"),
   multisigCreate: route(
-    (networkId) => `/multisig/create/${networkId}`,
+    (networkId: string) => `/multisig/create/${networkId}`,
     "/multisig/create/:networkId",
   ),
-  multisigJoin: route("/multisig/join"),
+  multisigJoin: route(
+    (publicKey: string) => `/multisig/join/${publicKey}`,
+    "/multisig/join/:signer",
+  ),
   multisigOwners: route(
     (accountAddress) => `/multisig/${accountAddress}/owners`,
     "/multisig/:accountAddress/owners",

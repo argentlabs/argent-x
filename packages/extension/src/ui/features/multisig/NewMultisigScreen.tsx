@@ -15,8 +15,7 @@ import { useAppState } from "../../app.state"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
-import { useAddAccount } from "../accounts/useAddAccount"
-import { ZERO_MULTISIG } from "./Multisig"
+import { useCreatePendingMultisig } from "./hooks/useJoinMultisigCallback"
 
 const { AddIcon, MultisigJoinIcon } = icons
 const { MultisigDiagram } = logos
@@ -46,8 +45,8 @@ const multisigOptions: MultisigOption[] = [
 
 export const NewMultisigScreen: FC = () => {
   const navigate = useNavigate()
-  const { addAccount } = useAddAccount()
   const { switcherNetworkId } = useAppState()
+  const { createPendingMultisig } = useCreatePendingMultisig()
 
   const onClick = useCallback(
     async (type: MultisigOptionType) => {
@@ -65,12 +64,10 @@ export const NewMultisigScreen: FC = () => {
 
         case "join": {
           // Initialize the multisig account with a zero multisig
-          await addAccount({
-            type: "multisig",
-            multisigPayload: ZERO_MULTISIG,
-            skipNavigate: true,
-          })
-          navigate(routes.multisigJoin())
+          const pendingMultisig = await createPendingMultisig(switcherNetworkId)
+          if (pendingMultisig) {
+            navigate(routes.multisigJoin(pendingMultisig.publicKey))
+          }
           break
         }
 
@@ -78,7 +75,7 @@ export const NewMultisigScreen: FC = () => {
           assertNever(type)
       }
     },
-    [switcherNetworkId, addAccount, navigate],
+    [switcherNetworkId, createPendingMultisig, navigate],
   )
 
   return (

@@ -1,12 +1,13 @@
 import { some } from "lodash-es"
 
+import { withHiddenSelector } from "../../../shared/account/selectors"
+import { getAccounts } from "../../../shared/account/store"
 import { defaultNetwork, getNetwork } from "../../../shared/network"
 import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import {
   accountsOnNetwork,
-  getAccounts,
   getLastSelectedAccount,
   selectAccount,
 } from "../../services/backgroundAccounts"
@@ -34,8 +35,8 @@ export const recover = async ({
     )
     networkId = network.id
 
-    const allAccounts = await getAccounts(true)
-    const walletAccounts = accountsOnNetwork(allAccounts, networkId)
+    const allWalletAccounts = await getAccounts(withHiddenSelector)
+    const walletAccounts = accountsOnNetwork(allWalletAccounts, networkId)
 
     const selectedWalletAccount = walletAccounts.find(
       (account) =>
@@ -48,9 +49,13 @@ export const recover = async ({
       ? selectedWalletAccount
       : firstUnhiddenAccount
 
-    const accounts = mapWalletAccountsToAccounts(walletAccounts)
+    const allAccounts = mapWalletAccountsToAccounts(allWalletAccounts)
+    const allAccountsHasNames = allAccounts.every((account) => account.name)
 
-    setDefaultAccountNames(accounts)
+    // FIXME: Remove this when migration is done
+    if (!allAccountsHasNames) {
+      setDefaultAccountNames(allAccounts)
+    }
     await selectAccount(selectedAccount)
     useAppState.setState({ switcherNetworkId: networkId })
 

@@ -8,12 +8,9 @@ import { Center, Flex, Image } from "@chakra-ui/react"
 import React, { FC, useCallback, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
+import { updateAccountName } from "../../../shared/account/store"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { useReturnTo } from "../../routes"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -26,14 +23,11 @@ export const AccountEditScreen: FC = () => {
   const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { accountNames, setAccountName } = useAccountMetadata()
   const account = useAccount({
     address: accountAddress,
     networkId: currentNetwork.id,
   })
-  const accountName = account
-    ? getAccountName(account, accountNames)
-    : "Not found"
+  const accountName = account ? account.name : "Not found"
 
   const [liveEditingAccountName, setLiveEditingAccountName] =
     useState(accountName)
@@ -50,10 +44,9 @@ export const AccountEditScreen: FC = () => {
     setLiveEditingAccountName(name)
   }, [])
 
-  const onSubmitChangeName = useCallback(() => {
-    account &&
-      setAccountName(account.networkId, account.address, liveEditingAccountName)
-  }, [account, liveEditingAccountName, setAccountName])
+  const onSubmitChangeName = useCallback(async () => {
+    account && (await updateAccountName(account, liveEditingAccountName))
+  }, [account, liveEditingAccountName])
 
   const onCancelChangeName = useCallback(() => {
     setLiveEditingAccountName(accountName)

@@ -6,10 +6,6 @@ import { useNavigate } from "react-router-dom"
 
 import { formatTruncatedAddress } from "../../../../services/addresses"
 import { Account } from "../../../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../../accounts/accountMetadata.state"
 
 export interface ConfirmPageProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
@@ -76,7 +72,6 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   ...props
 }) => {
   const navigate = useNavigate()
-  const { accountNames } = useAccountMetadata()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
   onReject ??= () => navigate(-1)
 
@@ -106,7 +101,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               py="18px"
               gap={1}
             >
-              <H6>{getAccountName(selectedAccount, accountNames)}</H6>
+              <H6>{selectedAccount.name}</H6>
               <P3 color="neutrals.300">
                 ({formatTruncatedAddress(selectedAccount.address)})
               </P3>

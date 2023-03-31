@@ -9,10 +9,6 @@ import { PageWrapper } from "../../components/Page"
 import { routes } from "../../routes"
 import { formatFullAddress, normalizeAddress } from "../../services/addresses"
 import { usePageTracking } from "../../services/analytics"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { QrCode } from "./QrCode"
 
@@ -33,7 +29,6 @@ export const FundingQrCodeScreen: FC = () => {
   usePageTracking("addFundsFromOtherAccount", {
     networkId: account?.networkId || "unknown",
   })
-  const { accountNames } = useAccountMetadata()
   const copyAccountAddress = account ? normalizeAddress(account.address) : ""
 
   /** Intercept 'copy' event and replace fragmented address with plain text address */
@@ -82,7 +77,7 @@ export const FundingQrCodeScreen: FC = () => {
         {account && (
           <Container>
             <QrCode size={220} data={account?.address} />
-            <AccountName>{getAccountName(account, accountNames)}</AccountName>
+            <AccountName>{account.name}</AccountName>
             <AccountAddress
               ref={setAddressRef}
               aria-label="Full account address"

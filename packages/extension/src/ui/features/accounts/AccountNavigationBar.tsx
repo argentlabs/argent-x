@@ -10,7 +10,6 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 import { routes, useCurrentPathnameWithQuery } from "../../routes"
 import { NetworkSwitcher } from "../networks/NetworkSwitcher"
-import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
 import { useSelectedAccount } from "./accounts.state"
 
 const { SettingsIcon, DropdownDownIcon, ArgentShieldIcon } = icons
@@ -24,7 +23,6 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   scroll,
   showAccountButton = true,
 }) => {
-  const { accountNames } = useAccountMetadata()
   const account = useSelectedAccount()
   const navigate = useNavigate()
   const location = useLocation()
@@ -39,7 +37,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
     navigate(routes.settings(returnTo))
   }, [navigate, returnTo])
 
-  const accountName = account && getAccountName(account, accountNames)
+  const accountName = account && account.name
   return (
     <NavigationBar scroll={scroll}>
       {showAccountButton && account && (

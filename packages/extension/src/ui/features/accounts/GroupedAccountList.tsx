@@ -1,9 +1,12 @@
 import { H6 } from "@argent/ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 
+import { PendingMultisig } from "../../../shared/multisig/types"
+import { multisigAndAccountSort } from "../../../shared/utils/accountsMultisigSort"
 import { MultisigListScreenItem } from "../multisig/MultisigListScreenItem"
+import { PendingMultisigListScreenItem } from "../multisig/PendingMultisigListScreenItem"
 import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 
@@ -14,6 +17,7 @@ export interface GroupedAccountListProps {
   selectedAccount?: Account
   returnTo?: string
   type: "standard" | "multisig"
+  pendingMultisigs?: PendingMultisig[]
 }
 
 export const GroupedAccountList: FC<GroupedAccountListProps> = ({
@@ -23,8 +27,16 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
   selectedAccount,
   returnTo,
   type,
+  pendingMultisigs,
 }) => {
-  return !isEmpty(accounts) ? (
+  const multisigsOrAccounts = useMemo(() => {
+    if (type === "multisig" && pendingMultisigs && !isEmpty(pendingMultisigs)) {
+      return multisigAndAccountSort(pendingMultisigs, accounts)
+    }
+    return accounts
+  }, [accounts, pendingMultisigs, type])
+
+  return !isEmpty(multisigsOrAccounts) ? (
     <Flex direction="column" gap={3} alignItems="flex-start">
       <Flex gap={2} align="center" color="neutrals.300" px={2}>
         {icon}
@@ -43,17 +55,29 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
         ))}
       {/** Render multisig account list items for multisig accounts */}
       {type === "multisig" &&
-        accounts.map((account) => (
-          <Box key={account.address} w="full">
+        multisigsOrAccounts.map((multisig) =>
+          multisigIsPending(multisig) ? (
+            <PendingMultisigListScreenItem
+              key={multisig.publicKey}
+              pendingMultisig={multisig}
+            />
+          ) : (
             <MultisigListScreenItem
-              account={account}
+              key={multisig.address}
+              account={multisig}
               selectedAccount={selectedAccount}
               returnTo={returnTo}
             />
-          </Box>
-        ))}
+          ),
+        )}
     </Flex>
   ) : (
     <></>
   )
+}
+
+const multisigIsPending = (
+  multisig: Account | PendingMultisig,
+): multisig is PendingMultisig => {
+  return "publicKey" in multisig && !("address" in multisig)
 }
