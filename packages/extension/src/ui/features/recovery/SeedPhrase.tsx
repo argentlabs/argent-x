@@ -14,7 +14,7 @@ const SeedPhraseGrid = styled.div`
 const SeedWordBadge = styled.div`
   padding: 4px 12px 4px 4px;
   border-radius: 20px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 13px;
   line-height: 18px;
   text-align: center;
