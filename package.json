@@ -10,10 +10,8 @@
     "bundlewatch": "^0.3.3",
     "husky": "^8.0.0",
     "import-sort-style-module": "^6.0.0",
-    "lerna": "^6.4.1",
     "lint-staged": ">=10",
     "nx": "^15.6.3",
-    "patch-package": "^6.4.7",
     "prettier": ">=2",
     "prettier-plugin-import-sort": "^0.0.7",
     "ts-node": "^10.8.1"
@@ -22,27 +20,24 @@
     "@babel/preset-react": "7.17.12",
     "@babel/plugin-transform-react-jsx": "7.17.12"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
     "dev": "NODE_ENV=development lerna run dev --parallel",
     "dev:ui": "NODE_ENV=development lerna run dev:ui --parallel",
     "build-storybook": "lerna run build-storybook --",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
-    "build": "lerna run build --stream",
+    "build": "pnpm --stream -r run build",
     "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
     "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
     "test:watch": "lerna run test:watch --stream",
     "test:e2e": "lerna run test:e2e --stream",
-    "setup": "yarn install --frozen-lockfile && yarn allow-scripts && husky install && patch-package && lerna run setup --stream",
+    "setup": "pnpm install --frozen-lockfile && pnpm allow-scripts && husky install && pnpm patch && lerna run setup --stream",
     "test:ci": "lerna run test:ci --stream",
-    "storybook": "cd packages/storybook && yarn storybook",
+    "storybook": "cd packages/storybook && pnpm storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts",
-    "version": "lerna version --no-push --no-git-tag-version && yarn --cwd packages/extension run version"
+    "version": "lerna version --no-push --no-git-tag-version && pnpm --cwd packages/extension run version"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {

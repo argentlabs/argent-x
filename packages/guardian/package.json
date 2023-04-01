@@ -19,7 +19,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "setup": "yarn build"
+    "setup": "pnpm build"
   },
   "dependencies": {
     "jose": "^4.11.2",
