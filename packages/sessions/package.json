@@ -12,9 +12,16 @@
     "wallet",
     "dapp"
   ],
-  "author": "Janek Rahrt <janek.rahrt@me.com>",
   "homepage": "https://github.com/argentlabs/argent-x/tree/main/packages/sessions#readme",
+  "bugs": {
+    "url": "https://github.com/argentlabs/argent-x/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/argentlabs/argent-x.git"
+  },
   "license": "MIT",
+  "author": "Janek Rahrt <janek.rahrt@me.com>",
   "type": "module",
   "exports": {
     ".": {
@@ -28,23 +35,17 @@
   "files": [
     "dist"
   ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/argentlabs/argent-x.git"
-  },
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ci": "vitest run --coverage",
+    "build": "vite build",
     "dev": "vite build --watch",
     "setup": "vite build",
-    "build": "vite build"
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage",
+    "test:watch": "vitest"
   },
-  "bugs": {
-    "url": "https://github.com/argentlabs/argent-x/issues"
+  "dependencies": {
+    "minimalistic-assert": "^1.0.1",
+    "starknet": "^4.21.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.0",
@@ -55,8 +56,7 @@
     "vite-plugin-dts": "^1.4.1",
     "vitest": "^0.29.2"
   },
-  "dependencies": {
-    "minimalistic-assert": "^1.0.1",
-    "starknet": "^4.21.0"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   }
 }

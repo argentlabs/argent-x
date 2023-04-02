@@ -1,31 +1,32 @@
 {
   "name": "@argent/stack-router",
   "version": "5.3.14",
-  "license": "MIT",
   "private": true,
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/stack-router.umd.js",
-  "module": "./dist/stack-router.es.js",
-  "types": "./dist/stack-router.d.ts",
+  "license": "MIT",
   "exports": {
     ".": {
       "import": "./dist/stack-router.es.js",
       "require": "./dist/stack-router.umd.js"
     }
   },
+  "main": "./dist/stack-router.umd.js",
+  "module": "./dist/stack-router.es.js",
+  "types": "./dist/stack-router.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "eslint . --cache --ext .ts,.tsx",
-    "dev": "vite build --watch",
-    "setup": "vite build",
     "build": "vite build",
-    "example": "cd example && react-scripts start"
+    "dev": "vite build --watch",
+    "example": "cd example && react-scripts start",
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "setup": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.4.6",
+    "@chakra-ui/system": "^2.4.6",
     "@emotion/styled": "^11.10.5",
     "framer-motion": "^9.0.3",
     "history": "^5.3.0",

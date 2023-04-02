@@ -2,23 +2,23 @@
   "name": "@argent/x-window",
   "version": "5.3.14",
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/window.umd.js",
-  "module": "./dist/window.es.js",
-  "types": "./dist/window.d.ts",
   "exports": {
     ".": {
       "import": "./dist/window.es.js",
       "require": "./dist/window.umd.js"
     }
   },
+  "main": "./dist/window.umd.js",
+  "module": "./dist/window.es.js",
+  "types": "./dist/window.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "vite build --watch",
-    "test": "vitest",
     "build": "tsc && vite build",
-    "setup": "yarn build"
+    "dev": "vite build --watch",
+    "setup": "yarn build",
+    "test": "vitest"
   },
   "devDependencies": {
     "get-starknet-core": "^2.0.0",

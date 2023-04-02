@@ -59,6 +59,7 @@ export default defineConfig({
         "framer-motion",
         "popmotion",
         "@ethersproject/wordlists",
+        "react-copy-to-clipboard",
       ],
       output: {
         globals: {

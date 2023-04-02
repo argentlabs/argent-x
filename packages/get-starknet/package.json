@@ -1,8 +1,8 @@
 {
   "name": "@argent/get-starknet",
   "version": "5.3.14",
-  "repository": "github:argentlabs/argent-x",
   "private": false,
+  "repository": "github:argentlabs/argent-x",
   "main": "dist/",
   "browser": {
     "crypto": false
@@ -11,9 +11,12 @@
     "dist/"
   ],
   "scripts": {
-    "setup": "rollup -c",
     "build": "rollup -c",
-    "dev": "rollup -c -w"
+    "dev": "rollup -c -w",
+    "setup": "rollup -c"
+  },
+  "dependencies": {
+    "get-starknet": "^1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
@@ -24,8 +27,5 @@
     "starknet": "^4.21.0",
     "tslib": "^2.0.0",
     "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "get-starknet": "^1.0.0"
   }
 }

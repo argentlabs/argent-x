@@ -3,11 +3,11 @@
   "version": "5.3.14",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev",
     "export": "next export",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start": "next start"
   },
   "dependencies": {
     "@argent/get-starknet": "^5.3.14",

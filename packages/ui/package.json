@@ -1,21 +1,38 @@
 {
   "name": "@argent/ui",
   "version": "5.3.14",
-  "license": "MIT",
   "private": true,
-  "files": [
-    "dist",
-    "assets"
-  ],
-  "main": "./dist/ui.umd.js",
-  "module": "./dist/ui.es.js",
-  "types": "./dist/ui.d.ts",
+  "license": "MIT",
   "exports": {
     ".": {
       "import": "./dist/ui.es.js",
       "require": "./dist/ui.umd.js"
     },
     "./assets/dapplandBannerBackground.png": "./assets/dapplandBannerBackground.png"
+  },
+  "main": "./dist/ui.umd.js",
+  "module": "./dist/ui.es.js",
+  "types": "./dist/ui.d.ts",
+  "files": [
+    "dist",
+    "assets"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "gen:icons": "ts-node ./scripts/generate-icons.ts",
+    "gen:theme-typings": "chakra-cli tokens ./src/theme",
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "setup": "yarn gen:theme-typings && vite build",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "2.5.1",
+    "@emotion/styled": "^11.10.4",
+    "@ethersproject/wordlists": "^5.7.0",
+    "framer-motion": "^9.0.3",
+    "popmotion": "^11.0.5"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^2.1.8",
@@ -35,23 +52,6 @@
     "vite": "^4.0.3",
     "vite-plugin-dts": "^1.6.6",
     "vitest": "^0.29.2"
-  },
-  "scripts": {
-    "gen:theme-typings": "chakra-cli tokens ./src/theme",
-    "gen:icons": "ts-node ./scripts/generate-icons.ts",
-    "lint": "eslint . --cache --ext .ts,.tsx",
-    "setup": "yarn gen:theme-typings && vite build",
-    "dev": "vite build --watch",
-    "build": "vite build",
-    "test": "vitest run",
-    "test:ci": "vitest run --coverage"
-  },
-  "dependencies": {
-    "@chakra-ui/react": "2.5.1",
-    "@emotion/styled": "^11.10.4",
-    "@ethersproject/wordlists": "^5.7.0",
-    "framer-motion": "^9.0.3",
-    "popmotion": "^11.0.5"
   },
   "peerDependencies": {
     "@emotion/react": "^11.10.4",

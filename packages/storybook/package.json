@@ -2,6 +2,12 @@
   "name": "@argent-x/storybook",
   "version": "5.3.14",
   "private": true,
+  "scripts": {
+    "build-storybook": "build-storybook",
+    "chromatic": "chromatic --exit-zero-on-changes --exit-once-uploaded",
+    "lint": "eslint . --cache --ext .ts,.tsx",
+    "storybook": "start-storybook -p 6006"
+  },
   "devDependencies": {
     "@argent-x/extension": "^5.3.14",
     "@argent/ui": "^5.3.14",
@@ -26,11 +32,5 @@
     "starknet": "^4.21.0",
     "storybook-addon-swc": "^1.1.7",
     "typescript": "^4.9.4"
-  },
-  "scripts": {
-    "storybook": "start-storybook -p 6006",
-    "lint": "eslint . --cache --ext .ts,.tsx",
-    "build-storybook": "build-storybook",
-    "chromatic": "chromatic --exit-zero-on-changes --exit-once-uploaded"
   }
 }
