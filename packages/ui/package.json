@@ -23,7 +23,7 @@
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "gen:theme-typings": "chakra-cli tokens ./src/theme",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "setup": "yarn gen:theme-typings && vite build",
+    "setup": "pnpm gen:theme-typings && vite build",
     "test": "vitest run",
     "test:ci": "vitest run --coverage"
   },

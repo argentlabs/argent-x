@@ -33,4 +33,4 @@ done
 
 # format license-report.md
 echo "Formatting license report..."
-yarn prettier --write license-report.md
+pnpm prettier --write license-report.md

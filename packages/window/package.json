@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite build --watch",
-    "setup": "yarn build",
+    "setup": "pnpm build",
     "test": "vitest"
   },
   "devDependencies": {

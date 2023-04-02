@@ -5,7 +5,7 @@ We automated some parts of the release process to make things easier. This file 
 - Check and ensure the previous release branch `release/vX.Y.Z` was merged into `main`
 - Check and ensure `main` was back-merged into `develop`
 - Check and ensure you are working in the latest `develop` branch
-- Run `yarn run version` - this will:
+- Run `pnpm run version` - this will:
   - update the `version` in each `package.json` and `manifest.json`
   - create branch `release/vX.Y.Z`
   - create tag `vX.Y.Z`

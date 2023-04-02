@@ -10,7 +10,7 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 - If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
 - Fork the repository and clone your fork.
-- Setup project: `yarn setup`.
+- Setup project: `pnpm run setup`.
 
 ## Development workflow
 
@@ -19,10 +19,10 @@ Always start from `develop` branch and merge back to `develop` branch.
 To build your changes run:
 
 ```bash
-yarn build
+pnpm run build
 ```
 
-**Please update yarn lock file (`yarn.lock`) if you add or update dependencies.**
+**Please update pnpm lock file (`pnpm-lock.yaml`) if you add or update dependencies.**
 
 ## Other notes
 
