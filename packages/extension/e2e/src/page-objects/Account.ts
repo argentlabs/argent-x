@@ -229,4 +229,12 @@ export default class Account extends Navigation {
   get contact() {
     return this.page.locator("div h5")
   }
+
+  get dappsBanner() {
+    return this.page.locator('[title="Dappland"]')
+  }
+
+  get dappsBannerClose() {
+    return this.page.locator('[title="Dappland"] svg')
+  }
 }
