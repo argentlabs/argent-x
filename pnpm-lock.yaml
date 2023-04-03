@@ -64,7 +64,7 @@ importers:
         version: link:../window
       '@chakra-ui/anatomy':
         specifier: ^2.1.1
-        version: 2.1.1
+        version: 2.1.2
       '@chakra-ui/icons':
         specifier: ^2.0.15
         version: 2.0.17(@chakra-ui/system@2.5.4)(react@18.2.0)
@@ -94,10 +94,10 @@ importers:
         version: 5.11.15(@emotion/react@11.10.6)(@emotion/styled@11.10.6)(@types/react@18.0.31)(react-dom@18.2.0)(react@18.2.0)
       '@mui/styled-engine-sc':
         specifier: ^5.10.3
-        version: 5.11.11(@types/styled-components@5.1.26)(styled-components@5.3.9)
+        version: 5.10.3(@types/styled-components@5.1.26)(styled-components@5.3.9)
       '@noble/hashes':
         specifier: ^1.1.3
-        version: 1.3.0
+        version: 1.1.5
       '@scure/base':
         specifier: ^1.1.1
         version: 1.1.1
@@ -106,7 +106,7 @@ importers:
         version: 7.45.0(react@18.2.0)
       '@sentry/tracing':
         specifier: ^7.6.0
-        version: 7.45.0
+        version: 7.6.0
       '@sentry/utils':
         specifier: ^7.46.0
         version: 7.46.0
@@ -321,9 +321,6 @@ importers:
       eslint-webpack-plugin:
         specifier: ^4.0.0
         version: 4.0.0(eslint@8.37.0)(webpack@5.76.3)
-      fetch-intercept:
-        specifier: ^2.4.0
-        version: 2.4.0
       file-loader:
         specifier: ^6.2.0
         version: 6.2.0(webpack@5.76.3)
@@ -333,9 +330,6 @@ importers:
       html-webpack-plugin:
         specifier: ^5.5.0
         version: 5.5.0(webpack@5.76.3)
-      isomorphic-fetch:
-        specifier: ^3.0.0
-        version: 3.0.0
       jsdom:
         specifier: ^21.0.0
         version: 21.1.1
@@ -348,33 +342,18 @@ importers:
       prettier:
         specifier: '>=2'
         version: 2.3.0
-      prettier-plugin-import-sort:
-        specifier: ^0.0.7
-        version: 0.0.7(prettier@2.3.0)
-      raw-loader:
-        specifier: ^4.0.2
-        version: 4.0.2(webpack@5.76.3)
       ts-node:
         specifier: ^10.8.1
         version: 10.9.1(@swc/core@1.3.42)(@types/node@18.15.5)(typescript@4.9.5)
       typescript:
         specifier: ^4.9.4
         version: 4.9.5
-      typescript-styled-plugin:
-        specifier: ^0.18.2
-        version: 0.18.2
       url-loader:
         specifier: ^4.1.1
         version: 4.1.1(file-loader@6.2.0)(webpack@5.76.3)
-      vite:
-        specifier: ^4.0.3
-        version: 4.2.1(@types/node@18.15.5)
       vitest:
         specifier: ^0.29.2
         version: 0.29.8(jsdom@21.1.1)
-      wait-for-expect:
-        specifier: ^3.0.2
-        version: 3.0.2
       webpack:
         specifier: ^5.62.1
         version: 5.76.3(webpack-cli@5.0.1)
@@ -747,9 +726,18 @@ importers:
 
   packages/ui:
     dependencies:
+      '@chakra-ui/anatomy':
+        specifier: ^2.1.2
+        version: 2.1.2
       '@chakra-ui/react':
         specifier: 2.5.1
         version: 2.5.1(@emotion/react@11.10.6)(@emotion/styled@11.10.6)(@types/react@18.0.31)(framer-motion@9.1.7)(react-dom@18.2.0)(react@18.2.0)
+      '@chakra-ui/styled-system':
+        specifier: ^2.8.0
+        version: 2.8.0
+      '@chakra-ui/theme-tools':
+        specifier: ^2.0.16
+        version: 2.0.16(@chakra-ui/styled-system@2.8.0)
       '@emotion/react':
         specifier: ^11.10.4
         version: 11.10.6(@types/react@18.0.31)(react@18.2.0)
@@ -796,6 +784,9 @@ importers:
       '@svgr/plugin-prettier':
         specifier: ^6.5.0
         version: 6.5.1(@svgr/core@6.5.1)
+      '@testing-library/jest-dom':
+        specifier: ^5.16.5
+        version: 5.16.5
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -811,6 +802,12 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^5.10.1
         version: 5.57.0(eslint@8.37.0)(typescript@4.9.5)
+      '@vitejs/plugin-react':
+        specifier: ^3.0.0
+        version: 3.1.0(vite@4.2.1)
+      cross-fetch:
+        specifier: ^3.1.5
+        version: 3.1.5
       eslint:
         specifier: ^8.7.0
         version: 8.37.0
@@ -4477,22 +4474,6 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
-  /@emmetio/abbreviation@2.2.3:
-    resolution: {integrity: sha512-87pltuCPt99aL+y9xS6GPZ+Wmmyhll2WXH73gG/xpGcQ84DRnptBsI2r0BeIQ0EB/SQTOe2ANPqFqj3Rj5FOGA==}
-    dependencies:
-      '@emmetio/scanner': 1.0.0
-    dev: true
-
-  /@emmetio/css-abbreviation@2.1.4:
-    resolution: {integrity: sha512-qk9L60Y+uRtM5CPbB0y+QNl/1XKE09mSO+AhhSauIfr2YOx/ta3NJw2d8RtCFxgzHeRqFRr8jgyzThbu+MZ4Uw==}
-    dependencies:
-      '@emmetio/scanner': 1.0.0
-    dev: true
-
-  /@emmetio/scanner@1.0.0:
-    resolution: {integrity: sha512-8HqW8EVqjnCmWXVpqAOZf+EGESdkR27odcMMMGefgKXtar00SoYNSryGv//TELI4T3QFsECo78p+0lmalk/CFA==}
-    dev: true
-
   /@emotion/babel-plugin@11.10.6:
     resolution: {integrity: sha512-p2dAqtVrkhSa7xz1u/m9eHYdLi+en8NowrmXeF/dKtJpU8lCWli8RUAati7NcSl0afsBott48pdnANuD0wh9QQ==}
     dependencies:
@@ -6036,8 +6017,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@mui/styled-engine-sc@5.11.11(@types/styled-components@5.1.26)(styled-components@5.3.9):
-    resolution: {integrity: sha512-6+HsfcKHlhjQklDoEup7Itl+Xgn+BCsqEpIdIIhlxED4YlOZ38xghxIKrx78XFZznTorbhAspUgDDKIaB5vDMg==}
+  /@mui/styled-engine-sc@5.10.3(@types/styled-components@5.1.26)(styled-components@5.3.9):
+    resolution: {integrity: sha512-IHcNTnGEcFCQgghHqBo6BXOzMOpqGXxSu5JEoVCncPVxVZ3/CEtFTyUqnMaiFkpK5DY1Qx1YnqdNBSMhzP1IhQ==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@types/styled-components': ^5.1.14
@@ -6147,10 +6128,6 @@ packages:
 
   /@noble/hashes@1.2.0:
     resolution: {integrity: sha512-FZfhjEDbT5GRswV3C6uvLPHMiVD6lQBmpoX5+eSiPaMTXte/IKqI5dykDxzZB/WBeK/CDuQRBWarPdi3FNY2zQ==}
-
-  /@noble/hashes@1.3.0:
-    resolution: {integrity: sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==}
-    dev: false
 
   /@noble/secp256k1@1.7.1:
     resolution: {integrity: sha512-hOUk6AyBFmqVrv7k5WAw/LpszxVbj9gGN4JRkIX52fdFAj1UA61KXmZDvqVEm+pOyec3+fIeZB02LYa/pWOArw==}
@@ -6612,6 +6589,15 @@ packages:
       tslib: 1.14.1
     dev: false
 
+  /@sentry/hub@7.6.0:
+    resolution: {integrity: sha512-TbieNZInpnR5STXykT1zXoKVAsm8ju1RZyzMqYR8nzURbjlMVVEzFRglNY1Ap5MRkbEuYpAc6zUvgLQe8b6Q3w==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/types': 7.6.0
+      '@sentry/utils': 7.6.0
+      tslib: 1.14.1
+    dev: false
+
   /@sentry/react@7.45.0(react@18.2.0):
     resolution: {integrity: sha512-Dbz85nfvMUikbLHUuIt6fBNPmTvThFn+rWB5KS1NIOJifyWAdpIU3X7yCUJE5xhsUObNLiHlNJlqhaQI4nR1bQ==}
     engines: {node: '>=8'}
@@ -6635,11 +6621,14 @@ packages:
       '@sentry/utils': 7.45.0
     dev: false
 
-  /@sentry/tracing@7.45.0:
-    resolution: {integrity: sha512-FsoFmZPzTBGvWeJH73NxSF1ot61Zw3aIZo5XolengiKnRmcrQOFxebtMKBiZ61QBRYGqsm5uT7QB7zITU6Ikgg==}
+  /@sentry/tracing@7.6.0:
+    resolution: {integrity: sha512-ydlIk8FpuXiQm3Y0cLwXMOUYv5UtniP8ylWw3ix0sF5sTpJWSaC/g8P8yrzkYV+pm28kde5qfE3nocGhpwxZcA==}
     engines: {node: '>=8'}
     dependencies:
-      '@sentry-internal/tracing': 7.45.0
+      '@sentry/hub': 7.6.0
+      '@sentry/types': 7.6.0
+      '@sentry/utils': 7.6.0
+      tslib: 1.14.1
     dev: false
 
   /@sentry/types@7.45.0:
@@ -6649,6 +6638,11 @@ packages:
 
   /@sentry/types@7.46.0:
     resolution: {integrity: sha512-2FMEMgt2h6u7AoELhNhu9L54GAh67KKfK2pJ1kEXJHmWxM9FSCkizjLs/t+49xtY7jEXr8qYq8bV967VfDPQ9g==}
+    engines: {node: '>=8'}
+    dev: false
+
+  /@sentry/types@7.6.0:
+    resolution: {integrity: sha512-POimbDwr9tmHSKksJTXe5VQpvjkFO4/UWUptigwqf8684rkS7Ie2BT2uyp5GD2EgYFf0BwUOWi98FTYTvUGT+Q==}
     engines: {node: '>=8'}
     dev: false
 
@@ -6665,6 +6659,14 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       '@sentry/types': 7.46.0
+      tslib: 1.14.1
+    dev: false
+
+  /@sentry/utils@7.6.0:
+    resolution: {integrity: sha512-p0Byi6hgawp/sBMY88RY8OmkiAR2jxbjnl8gSo+y3YEu+KeXBUxXMBsI7YeW+1lSb6z8DGhUAOBszTeI4wAr2w==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/types': 7.6.0
       tslib: 1.14.1
     dev: false
 
@@ -13100,13 +13102,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /emmet@2.3.6:
-    resolution: {integrity: sha512-pLS4PBPDdxuUAmw7Me7+TcHbykTsBKN/S9XJbUOMFQrNv9MoshzyMFK/R57JBm94/6HSL4vHnDeEmxlC82NQ4A==}
-    dependencies:
-      '@emmetio/abbreviation': 2.2.3
-      '@emmetio/css-abbreviation': 2.1.4
-    dev: true
-
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
     dev: true
@@ -14362,10 +14357,6 @@ packages:
     resolution: {integrity: sha512-p5161BqbuCaSnB8jIbzQHOlpgsPmK5rJVDfDKO91Axs5NC1uu3HRQm6wt9cd9/+GtQQIO53JdGXXoyDpTAsgYA==}
     dependencies:
       bser: 2.1.1
-    dev: true
-
-  /fetch-intercept@2.4.0:
-    resolution: {integrity: sha512-BPZ2LM9Dh1ua2ovQf03N6rhWg1qxdVD5qK/G4llvcemt6M+jjxCuIDxJ+6IiG+uz//3UQmgfKEv0gOGvYIxZ7g==}
     dev: true
 
   /fetch-retry@5.0.4:
@@ -17488,10 +17479,6 @@ packages:
     hasBin: true
     dev: true
 
-  /jsonc-parser@2.3.1:
-    resolution: {integrity: sha512-H8jvkz1O50L3dMZCsLqiuB2tA7muqbSg1AtGEkN0leAqGjsUzDJir3Zwr02BhqdcITPg3ei3mZ+HjMocAknhhg==}
-    dev: true
-
   /jsonc-parser@3.2.0:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
     dev: true
@@ -20408,20 +20395,6 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /prettier-plugin-import-sort@0.0.7(prettier@2.3.0):
-    resolution: {integrity: sha512-O0KlUSq+lwvh+UiN3wZDT6wWkf7TNxTVv2/XXE5KqpRNbFJq3nRg2ftzBYFFO8QGpdWIrOB0uCTCtFjIxmVKQw==}
-    peerDependencies:
-      prettier: '>= 2.0'
-    dependencies:
-      import-sort: 6.0.0
-      import-sort-config: 6.0.0
-      import-sort-parser-babylon: 6.0.0
-      import-sort-parser-typescript: 6.0.0
-      prettier: 2.3.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /prettier-plugin-import-sort@0.0.7(prettier@2.8.7):
     resolution: {integrity: sha512-O0KlUSq+lwvh+UiN3wZDT6wWkf7TNxTVv2/XXE5KqpRNbFJq3nRg2ftzBYFFO8QGpdWIrOB0uCTCtFjIxmVKQw==}
     peerDependencies:
@@ -20776,17 +20749,6 @@ packages:
       loader-utils: 2.0.4
       schema-utils: 3.1.1
       webpack: 4.46.0
-    dev: true
-
-  /raw-loader@4.0.2(webpack@5.76.3):
-    resolution: {integrity: sha512-ZnScIV3ag9A4wPX/ZayxL/jZH+euYb6FcUinPcgiQW0+UBtEv0O6Q3lGd3cqJ+GHH+rksEv3Pj99oxJ3u3VIKA==}
-    engines: {node: '>= 10.13.0'}
-    peerDependencies:
-      webpack: ^4.0.0 || ^5.0.0
-    dependencies:
-      loader-utils: 2.0.4
-      schema-utils: 3.1.1
-      webpack: 5.76.3(webpack-cli@5.0.1)
     dev: true
 
   /rc@1.2.8:
@@ -23743,20 +23705,6 @@ packages:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
     dev: true
 
-  /typescript-styled-plugin@0.18.2:
-    resolution: {integrity: sha512-eBs898Zz5C+k59ZydKVYBHjw4dC5WRxidOT7wfGkjLRZHKL6zIl6xkjIHMuctDE9hctxTq+GJcaXgk30lKEM9A==}
-    dependencies:
-      typescript-template-language-service-decorator: 2.3.1
-      vscode-css-languageservice: 5.4.2
-      vscode-emmet-helper: 2.6.4
-      vscode-languageserver-textdocument: 1.0.8
-      vscode-languageserver-types: 3.17.3
-    dev: true
-
-  /typescript-template-language-service-decorator@2.3.1:
-    resolution: {integrity: sha512-+Q5+cvBtPO4VKNyyI6O+XnIne+/hq/WfNhBaF4hJP8nB8TbikTg+2h9uBMsqduwX1+kVfwG9SBSwMTtvi2Ep7w==}
-    dev: true
-
   /typescript@3.9.10:
     resolution: {integrity: sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==}
     engines: {node: '>=4.2.0'}
@@ -24613,47 +24561,6 @@ packages:
     resolution: {integrity: sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==}
     dev: true
 
-  /vscode-css-languageservice@5.4.2:
-    resolution: {integrity: sha512-DT7+7vfdT2HDNjDoXWtYJ0lVDdeDEdbMNdK4PKqUl2MS8g7PWt7J5G9B6k9lYox8nOfhCEjLnoNC3UKHHCR1lg==}
-    dependencies:
-      vscode-languageserver-textdocument: 1.0.8
-      vscode-languageserver-types: 3.17.3
-      vscode-nls: 5.2.0
-      vscode-uri: 3.0.7
-    dev: true
-
-  /vscode-emmet-helper@2.6.4:
-    resolution: {integrity: sha512-fP0nunW1RUWEKGf4gqiYLOVNFFGXSRHjCl0pikxtwCFlty8WwimM+RBJ5o0aIiwerrYD30HqeaVyvDW027Sseg==}
-    deprecated: This package has been renamed to @vscode/emmet-helper, please update to the new name
-    dependencies:
-      emmet: 2.3.6
-      jsonc-parser: 2.3.1
-      vscode-languageserver-textdocument: 1.0.8
-      vscode-languageserver-types: 3.17.3
-      vscode-nls: 5.2.0
-      vscode-uri: 2.1.2
-    dev: true
-
-  /vscode-languageserver-textdocument@1.0.8:
-    resolution: {integrity: sha512-1bonkGqQs5/fxGT5UchTgjGVnfysL0O8v1AYMBjqTbWQTFn721zaPGDYFkOKtfDgFiSgXM3KwaG3FMGfW4Ed9Q==}
-    dev: true
-
-  /vscode-languageserver-types@3.17.3:
-    resolution: {integrity: sha512-SYU4z1dL0PyIMd4Vj8YOqFvHu7Hz/enbWtpfnVbJHU4Nd1YNYx8u0ennumc6h48GQNeOLxmwySmnADouT/AuZA==}
-    dev: true
-
-  /vscode-nls@5.2.0:
-    resolution: {integrity: sha512-RAaHx7B14ZU04EU31pT+rKz2/zSl7xMsfIZuo8pd+KZO6PXtQmpevpq3vxvWNcrGbdmhM/rr5Uw5Mz+NBfhVng==}
-    dev: true
-
-  /vscode-uri@2.1.2:
-    resolution: {integrity: sha512-8TEXQxlldWAuIODdukIb+TR5s+9Ds40eSJrw+1iDDA9IFORPjMELarNQE3myz5XIkWWpdprmJjm1/SxMlWOC8A==}
-    dev: true
-
-  /vscode-uri@3.0.7:
-    resolution: {integrity: sha512-eOpPHogvorZRobNqJGhapa0JdwaxpjVvyBp0QIUMRMSf8ZAlqOdEquKuRmw9Qwu0qXtJIWqFtMkmvJjUZmMjVA==}
-    dev: true
-
   /w3c-hr-time@1.0.2:
     resolution: {integrity: sha512-z8P5DvDNjKDoFIHK7q8r8lackT6l+jo/Ye3HOle7l9nICP9lf1Ci25fy9vHd0JOWewkIFzXIEig3TdKT7JQ5fQ==}
     deprecated: Use your platform's native performance.now() and performance.timeOrigin.
@@ -24673,10 +24580,6 @@ packages:
     engines: {node: '>=14'}
     dependencies:
       xml-name-validator: 4.0.0
-    dev: true
-
-  /wait-for-expect@3.0.2:
-    resolution: {integrity: sha512-cfS1+DZxuav1aBYbaO/kE06EOS8yRw7qOFoD3XtjTkYvCvh3zUvNST8DXK/nPaeqIzIv3P3kL3lRJn8iwOiSag==}
     dev: true
 
   /walker@1.0.8:

@@ -29,12 +29,18 @@
   },
   "dependencies": {
     "@chakra-ui/react": "2.5.1",
+    "@chakra-ui/anatomy": "^2.1.2",
+    "@chakra-ui/theme-tools": "^2.0.16",
+    "@chakra-ui/styled-system": "^2.8.0",
     "@emotion/styled": "^11.10.4",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^9.0.3",
     "popmotion": "^11.0.5"
   },
   "devDependencies": {
+    "cross-fetch": "^3.1.5",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@vitejs/plugin-react": "^3.0.0",
     "@chakra-ui/cli": "^2.1.8",
     "@svgr/core": "^6.5.0",
     "@svgr/plugin-jsx": "^6.5.0",

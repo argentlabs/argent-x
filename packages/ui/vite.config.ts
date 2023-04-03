@@ -74,6 +74,7 @@ export default defineConfig({
           "framer-motion": "FramerMotion",
           popmotion: "PopMotion",
           "@ethersproject/wordlists": "EthersProjectWordLists",
+          "react-copy-to-clipboard": "CopyToClipboard",
         },
       },
     },
