@@ -11,6 +11,7 @@ import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { argentMaxFee } from "../utils/argentMaxFee"
+import { getEstimatedFeeForMultisigTx } from "./fees/multisigFeeEstimation"
 import { addEstimatedFees } from "./fees/store"
 
 export const handleTransactionMessage: HandleMessage<
@@ -73,6 +74,11 @@ export const handleTransactionMessage: HandleMessage<
             maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
             maxTxFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
           }
+        } else if (selectedAccount.type === "multisig") {
+          const { overall_fee, suggestedMaxFee } =
+            await getEstimatedFeeForMultisigTx(selectedAccount, transactions)
+          txFee = number.toHex(overall_fee)
+          maxTxFee = number.toHex(suggestedMaxFee)
         } else {
           const { overall_fee, suggestedMaxFee } =
             await starknetAccount.estimateFee(transactions)
@@ -81,9 +87,8 @@ export const handleTransactionMessage: HandleMessage<
           maxTxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
         }
 
-        const suggestedMaxFee = number.toHex(
-          stark.estimatedFeeToMaxFee(maxTxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
-        )
+        const suggestedMaxFee = argentMaxFee(maxTxFee)
+
         addEstimatedFees({
           amount: txFee,
           suggestedMaxFee,
