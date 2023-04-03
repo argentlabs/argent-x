@@ -1,4 +1,3 @@
-import { utils } from "ethers"
 import {
   Account,
   InvocationsSignerDetails,
@@ -10,7 +9,6 @@ import {
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
 import { isAccountDeployed } from "../accountDeploy"
-import { sendMessageToUi } from "../activeTabs"
 import { HandleMessage, UnhandledMessage } from "../background"
 import { argentMaxFee } from "../utils/argentMaxFee"
 import { addEstimatedFees } from "./fees/store"
@@ -432,145 +430,43 @@ export const handleTransactionMessage: HandleMessage<
       return await actionQueue.remove(msg.data.actionHash)
     }
 
-    case "SIMULATE_TRANSACTION_FALLBACK": {
-      const selectedAccount = await wallet.getSelectedAccount()
-      const starknetAccount =
-        (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
-
-      if (!selectedAccount) {
-        throw Error("no accounts")
-      }
-
-      const nonce = await starknetAccount.getNonce()
-
-      try {
-        const simulated = await starknetAccount.simulateTransaction(msg.data, {
-          nonce,
-        })
-
-        return respond({
-          type: "SIMULATE_TRANSACTION_FALLBACK_RES",
-          data: simulated,
-        })
-      } catch (error) {
-        return respond({
-          type: "SIMULATE_TRANSACTION_FALLBACK_REJ",
-          data: {
-            error:
-              (error as any)?.message?.toString() ??
-              (error as any)?.toString() ??
-              "Unkown error",
-          },
-        })
-      }
-    }
-
-    case "ADD_MULTISIG_OWNERS": {
-      try {
-        const { address, signersToAdd, newThreshold } = msg.data
-
-        const signersPayload = {
-          entrypoint: "addSigners",
-          calldata: stark.compileCalldata({
-            new_threshold: newThreshold.toString(),
-            signers_to_add: signersToAdd.map((signer) =>
-              utils.hexlify(utils.base58.decode(signer)),
-            ),
-          }),
-          contractAddress: address,
-        }
-
-        await actionQueue.push({
-          type: "TRANSACTION",
-          payload: {
-            transactions: signersPayload,
-            meta: {
-              title: "Add multisig owners",
-              type: "MULTISIG_ADD_SIGNERS",
-            },
-          },
-        })
-
-        return sendMessageToUi({
-          type: "ADD_MULTISIG_OWNERS_RES",
-        })
-      } catch (e) {
-        return sendMessageToUi({
-          type: "ADD_MULTISIG_OWNERS_REJ",
-          data: { error: `${e}` },
-        })
-      }
-    }
-
-    case "REMOVE_MULTISIG_OWNER": {
-      try {
-        const { address, signerToRemove, newThreshold } = msg.data
-
-        const signersPayload = {
-          entrypoint: "removeSigners",
-          calldata: stark.compileCalldata({
-            new_threshold: newThreshold.toString(),
-            signers_to_remove: utils.hexlify(
-              utils.base58.decode(signerToRemove),
-            ),
-          }),
-          contractAddress: address,
-        }
-
-        await actionQueue.push({
-          type: "TRANSACTION",
-          payload: {
-            transactions: signersPayload,
-            meta: {
-              title: "Remove multisig owner",
-              type: "MULTISIG_REMOVE_SIGNER",
-            },
-          },
-        })
-
-        return sendMessageToUi({
-          type: "ADD_MULTISIG_OWNERS_RES",
-        })
-      } catch (e) {
-        return sendMessageToUi({
-          type: "ADD_MULTISIG_OWNERS_REJ",
-          data: { error: `${e}` },
-        })
-      }
-    }
-    case "UPDATE_MULTISIG_THRESHOLD":
+    case "SIMULATE_TRANSACTION_FALLBACK":
       {
+        const selectedAccount = await wallet.getSelectedAccount()
+        const starknetAccount =
+          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+
+        if (!selectedAccount) {
+          throw Error("no accounts")
+        }
+
+        const nonce = await starknetAccount.getNonce()
+
         try {
-          const { address, newThreshold } = msg.data
-
-          const thresholdPayload = {
-            entrypoint: "changeThreshold",
-            calldata: stark.compileCalldata({
-              new_threshold: newThreshold.toString(),
-            }),
-            contractAddress: address,
-          }
-
-          await actionQueue.push({
-            type: "TRANSACTION",
-            payload: {
-              transactions: thresholdPayload,
-              meta: {
-                title: "Set confirmations threshold",
-                type: "MULTISIG_UPDATE_THRESHOLD",
-              },
+          const simulated = await starknetAccount.simulateTransaction(
+            msg.data,
+            {
+              nonce,
             },
+          )
+
+          return respond({
+            type: "SIMULATE_TRANSACTION_FALLBACK_RES",
+            data: simulated,
           })
-          return sendMessageToUi({
-            type: "UPDATE_MULTISIG_THRESHOLD_RES",
-          })
-        } catch (e) {
-          return sendMessageToUi({
-            type: "UPDATE_MULTISIG_THRESHOLD_REJ",
-            data: { error: `${e}` },
+        } catch (error) {
+          return respond({
+            type: "SIMULATE_TRANSACTION_FALLBACK_REJ",
+            data: {
+              error:
+                (error as any)?.message?.toString() ??
+                (error as any)?.toString() ??
+                "Unkown error",
+            },
           })
         }
       }
+
       throw new UnhandledMessage()
   }
 }
