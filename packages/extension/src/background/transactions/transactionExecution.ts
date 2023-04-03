@@ -185,12 +185,18 @@ export const executeTransactionAction = async (
     maxFee,
   })
 
+  if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
+    throw Error("Transaction could not get added to the sequencer")
+  }
+
+  const title = nameTransaction(transactions)
+
   if (
     "requestId" in transaction &&
     typeof transaction.requestId === "string" &&
     selectedAccount.type === "multisig"
   ) {
-    addToMultisigPendingTransactions({
+    await addToMultisigPendingTransactions({
       requestId: transaction.requestId,
       address: selectedAccount.address,
       networkId: selectedAccount.networkId,
@@ -198,26 +204,20 @@ export const executeTransactionAction = async (
       type: action.payload.meta?.type,
       transactions,
     })
+  } else {
+    await addTransaction({
+      hash: transaction.transaction_hash,
+      account: selectedAccount,
+      meta: {
+        ...meta,
+        title,
+        transactions,
+        type: "INVOKE_FUNCTION",
+      },
+    })
   }
 
-  if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
-    throw Error("Transaction could not get added to the sequencer")
-  }
-
-  const title = nameTransaction(transactions)
-
-  await addTransaction({
-    hash: transaction.transaction_hash,
-    account: selectedAccount,
-    meta: {
-      ...meta,
-      title,
-      transactions,
-      type: "DEPLOY_ACCOUNT",
-    },
-  })
-
-  if (!nonceWasProvidedByUI) {
+  if (!nonceWasProvidedByUI && selectedAccount.type !== "multisig") {
     await increaseStoredNonce(selectedAccount)
   }
 

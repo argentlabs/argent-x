@@ -191,9 +191,7 @@ export const handleMultisigMessage: HandleMessage<MultisigMessage> = async ({
 
         const thresholdPayload = {
           entrypoint: "changeThreshold",
-          calldata: stark.compileCalldata({
-            new_threshold: newThreshold.toString(),
-          }),
+          calldata: [newThreshold.toString()],
           contractAddress: address,
         }
 
