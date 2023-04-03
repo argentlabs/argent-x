@@ -1,4 +1,5 @@
 import { difference } from "lodash-es"
+import browser from "webextension-polyfill"
 
 import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
 import { isPreAuthorized, preAuthorizeStore } from "../shared/preAuthorizations"
@@ -6,6 +7,17 @@ import { addTab, sendMessageToHost } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 import { openUi } from "./openUi"
+
+export function getOriginFromSender(
+  sender: browser.runtime.MessageSender,
+): string {
+  const url = sender.origin ?? sender.url
+  if (!url) {
+    throw new Error("Message sender has no origin or url")
+  }
+  const { origin } = new URL(url) // Firefox uses url, Chrome uses origin
+  return origin
+}
 
 preAuthorizeStore.subscribe(async (_, changeSet) => {
   const removed = difference(changeSet.oldValue ?? [], changeSet.newValue ?? [])
@@ -19,7 +31,24 @@ preAuthorizeStore.subscribe(async (_, changeSet) => {
 
 export const handlePreAuthorizationMessage: HandleMessage<
   PreAuthorisationMessage
-> = async ({ msg, sender, background: { wallet, actionQueue }, respond }) => {
+> = async ({
+  msg,
+  sender,
+  port,
+  background: { wallet, actionQueue },
+  respond,
+}) => {
+  async function addSenderTab() {
+    const origin = getOriginFromSender(sender)
+    if (sender.tab?.id && port) {
+      await addTab({
+        id: sender.tab?.id,
+        host: origin,
+        port,
+      })
+    }
+  }
+
   switch (msg.type) {
     case "CONNECT_DAPP": {
       const selectedAccount = await wallet.getSelectedAccount()
@@ -27,19 +56,14 @@ export const handlePreAuthorizationMessage: HandleMessage<
         openUi()
         return
       }
-      const isAuthorized = await isPreAuthorized(selectedAccount, msg.data.host)
-
-      if (sender.tab?.id) {
-        addTab({
-          id: sender.tab?.id,
-          host: msg.data.host,
-        })
-      }
+      const origin = getOriginFromSender(sender)
+      const isAuthorized = await isPreAuthorized(selectedAccount, origin)
+      await addSenderTab()
 
       if (!isAuthorized) {
         await actionQueue.push({
           type: "CONNECT_DAPP",
-          payload: { host: msg.data.host },
+          payload: { host: origin },
         })
       }
 
@@ -55,12 +79,15 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
     case "IS_PREAUTHORIZED": {
       const selectedAccount = await wallet.getSelectedAccount()
+      await addSenderTab()
 
       if (!selectedAccount) {
         return respond({ type: "IS_PREAUTHORIZED_RES", data: false })
       }
 
-      const valid = await isPreAuthorized(selectedAccount, msg.data)
+      const origin = getOriginFromSender(sender)
+      const valid = await isPreAuthorized(selectedAccount, origin)
+
       return respond({ type: "IS_PREAUTHORIZED_RES", data: valid })
     }
   }

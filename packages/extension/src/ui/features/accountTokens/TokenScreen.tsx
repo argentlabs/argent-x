@@ -1,5 +1,5 @@
-import { BarBackButton, NavigationContainer } from "@argent/ui"
-import { FC, useMemo } from "react"
+import { BarBackButton, NavigationContainer, TextWithAmount } from "@argent/ui"
+import { FC } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 import styled from "styled-components"
 
@@ -7,6 +7,7 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../shared/token/price"
+import { useAppState } from "../../app.state"
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { FormatListBulletedIcon } from "../../components/Icons/MuiIcons"
@@ -19,7 +20,8 @@ import { TokenIcon } from "./TokenIcon"
 import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { toTokenView } from "./tokens.service"
-import { useTokensWithBalance } from "./tokens.state"
+import { useToken } from "./tokens.state"
+import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
 
 const TokenScreenWrapper = styled(ColumnCenter)`
   width: 100%;
@@ -79,22 +81,27 @@ export const TokenScreen: FC = () => {
   const navigate = useNavigate()
   const { tokenAddress } = useParams()
   const account = useSelectedAccount()
-  const { tokenDetails, tokenDetailsIsInitialising, isValidating } =
-    useTokensWithBalance(account)
-  const token = useMemo(
-    () => tokenDetails.find(({ address }) => address === tokenAddress),
-    [tokenAddress, tokenDetails],
-  )
-  const currencyValue = useTokenBalanceToCurrencyValue(token)
+  const { switcherNetworkId } = useAppState()
+  const token = useToken({
+    address: tokenAddress || "0x0",
+    networkId: switcherNetworkId || "Unknown",
+  })
+  const { tokenWithBalance, isValidating } = useTokenBalanceForAccount({
+    token,
+    account,
+  })
+
+  const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
   const returnTo = useCurrentPathnameWithQuery()
 
   if (!token) {
     return <Navigate to={routes.accountTokens()} />
   }
 
-  const { address, name, symbol, image } = toTokenView(token)
-  const displayBalance = prettifyTokenBalance(token, false)
-  const isLoading = isValidating || tokenDetailsIsInitialising
+  const { address, name, image, symbol } = toTokenView(token)
+  const displayBalance = tokenWithBalance
+    ? prettifyTokenBalance(tokenWithBalance, false)
+    : "––"
 
   return (
     <NavigationContainer
@@ -110,18 +117,34 @@ export const TokenScreen: FC = () => {
             <TokenIcon name={name} url={image} size={12} />
             <TokenBalanceContainer>
               <LoadingPulse
-                isLoading={isLoading}
+                isLoading={isValidating}
                 display="flex"
-                alignItems="center"
-                gap="2"
+                alignItems="flex-end"
+                gap="1"
               >
-                <H3
-                  data-testid={
-                    isLoading ? "tokenBalanceIsLoading" : "tokenBalance"
-                  }
-                >
-                  {displayBalance}
-                </H3>
+                {tokenWithBalance?.balance ? (
+                  <TextWithAmount
+                    amount={tokenWithBalance.balance.toString()}
+                    decimals={tokenWithBalance.decimals}
+                  >
+                    <H3
+                      data-testid={
+                        isValidating ? "tokenBalanceIsLoading" : "tokenBalance"
+                      }
+                    >
+                      {displayBalance}
+                    </H3>
+                  </TextWithAmount>
+                ) : (
+                  <H3
+                    data-testid={
+                      isValidating ? "tokenBalanceIsLoading" : "tokenBalance"
+                    }
+                  >
+                    {displayBalance}
+                  </H3>
+                )}
+
                 <H3>{symbol}</H3>
               </LoadingPulse>
             </TokenBalanceContainer>

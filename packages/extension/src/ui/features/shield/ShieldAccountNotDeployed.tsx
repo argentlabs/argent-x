@@ -1,14 +1,19 @@
 import { FC } from "react"
 
-import { ShieldHeader } from "./ShieldHeader"
+import { ShieldHeader } from "./ui/ShieldHeader"
 
-export const ShieldAccountNotDeployed: FC = () => {
+interface ShieldAccountNotReadyProps {
+  needsUpgrade?: boolean
+}
+
+export const ShieldAccountNotReady: FC<ShieldAccountNotReadyProps> = ({
+  needsUpgrade = false,
+}) => {
+  const action = needsUpgrade ? "upgrade" : "deploy"
   return (
     <ShieldHeader
-      title={"Activate Argent Shield"}
-      subtitle={
-        "You must be deploy this account before Argent Shield can be activated"
-      }
+      title={"Add Argent Shield"}
+      subtitle={`You must ${action} this account before Argent Shield can be added`}
     />
   )
 }

@@ -1,16 +1,35 @@
 import { AlertDialog } from "@argent/ui"
 import { Skeleton, VStack } from "@chakra-ui/react"
-import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react"
+import { isArray } from "lodash-es"
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { useNavigate } from "react-router-dom"
+import { Call } from "starknet"
 
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
+import { guardianSignerNotRequired } from "../../../shared/shield/GuardianSignerArgentX"
 import { resetDevice } from "../../../shared/shield/jwt"
-import { requestEmail } from "../../../shared/shield/register"
-import { getVerifiedEmailIsExpired } from "../../../shared/shield/verifiedEmail"
+import {
+  requestEmail,
+  shieldIsTokenExpired,
+} from "../../../shared/shield/register"
+import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { WithArgentServicesEnabled } from "../settings/WithArgentServicesEnabled"
 import { useShieldState } from "./shield.state"
 import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
+import { useAccountGuardianIsSelf } from "./useAccountGuardian"
+import {
+  ChangeGuardian,
+  changeGuardianCallDataToType,
+} from "./usePendingChangingGuardian"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
 enum ArgentShieldVerifiedState {
@@ -28,32 +47,66 @@ enum ArgentShieldVerifiedState {
  * If the current account has a Guardian, check and handle the email / otp verification flow using local state
  */
 
-export const WithArgentShieldVerified: FC<PropsWithChildren> = ({
+interface PropsWithTransactions extends PropsWithChildren {
+  /** if provided transactions, check if it is remove guardian as this also affects expiry check  */
+  transactions?: Call | Call[]
+}
+
+export const WithArgentShieldVerified: FC<PropsWithTransactions> = ({
   children,
+  transactions,
 }) => {
   return ARGENT_SHIELD_ENABLED ? (
-    <WithArgentShieldEnabledVerified>
-      {children}
-    </WithArgentShieldEnabledVerified>
+    <WithArgentServicesEnabled>
+      <WithArgentShieldEnabledVerified transactions={transactions}>
+        {children}
+      </WithArgentShieldEnabledVerified>
+    </WithArgentServicesEnabled>
   ) : (
     <>{children}</>
   )
 }
 
-const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
+const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   children,
+  transactions,
 }) => {
   const unverifiedEmail = useShieldState((state) => state.unverifiedEmail)
   const account = useSelectedAccount()
   const verifiedEmail = useShieldVerifiedEmail()
   const navigate = useNavigate()
   const hasGuardian = Boolean(account?.guardian)
+  const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
+
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
   const [state, setState] = useState(
     hasGuardian
       ? ArgentShieldVerifiedState.INITIALISING
       : ArgentShieldVerifiedState.NOT_REQUIRED,
   )
+
+  // check if it is remove guardian
+
+  const calls = useMemo(
+    () => (isArray(transactions) ? transactions : [transactions]),
+    [transactions],
+  )
+
+  const isRemoveGuardian = useMemo(() => {
+    if (calls?.[0]?.entrypoint === "changeGuardian") {
+      const type = changeGuardianCallDataToType(transactions)
+      return type === ChangeGuardian.REMOVING
+    }
+    return false
+  }, [calls, transactions])
+
+  const cosignNotRequired = useMemo(() => {
+    return calls.find((call) => {
+      return (
+        call?.entrypoint && guardianSignerNotRequired.includes(call.entrypoint)
+      )
+    })
+  }, [calls])
 
   const resetUnverifiedEmail = useCallback(() => {
     useShieldState.setState({ unverifiedEmail: undefined })
@@ -98,7 +151,9 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
   useEffect(() => {
     ;(async () => {
       if (hasGuardian) {
-        if (verifiedEmail === null) {
+        if (cosignNotRequired || accountGuardianIsSelf) {
+          setState(ArgentShieldVerifiedState.NOT_REQUIRED)
+        } else if (verifiedEmail === null) {
           /** still retreiving email */
         } else if (verifiedEmail === undefined) {
           if (unverifiedEmail) {
@@ -109,8 +164,10 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
             setState(ArgentShieldVerifiedState.VERIFY_EMAIL)
           }
         } else {
-          const verifiedEmailIsExpired = await getVerifiedEmailIsExpired()
-          if (verifiedEmailIsExpired) {
+          const isTokenExpired = isRemoveGuardian
+            ? await getVerifiedEmailIsExpiredForRemoval()
+            : await shieldIsTokenExpired()
+          if (isTokenExpired) {
             // need to re-verify existing email
             await requestEmail(verifiedEmail)
             setState(ArgentShieldVerifiedState.VERIFY_OTP)
@@ -120,7 +177,15 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
         }
       }
     })()
-  }, [hasGuardian, navigate, unverifiedEmail, verifiedEmail])
+  }, [
+    accountGuardianIsSelf,
+    cosignNotRequired,
+    hasGuardian,
+    isRemoveGuardian,
+    navigate,
+    unverifiedEmail,
+    verifiedEmail,
+  ])
 
   switch (state) {
     case ArgentShieldVerifiedState.INITIALISING:
@@ -148,6 +213,7 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
           <ShieldBaseEmailScreen
             onCancel={onEmailCancel}
             onEmailRequested={onEmailRequested}
+            hasGuardian={hasGuardian}
           />
         </>
       )
@@ -156,7 +222,7 @@ const WithArgentShieldEnabledVerified: FC<PropsWithChildren> = ({
         <ShieldBaseOTPScreen
           onBack={onResetEmailRequest}
           email={unverifiedEmail}
-          onOTPNotRequested={onResetEmailRequest}
+          onOTPReEnterEmail={onResetEmailRequest}
           onOTPConfirmed={onOTPConfirmed}
         />
       )

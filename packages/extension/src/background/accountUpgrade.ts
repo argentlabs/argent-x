@@ -2,6 +2,7 @@ import { stark } from "starknet"
 
 import { ActionItem } from "../shared/actionQueue/types"
 import { getNetwork } from "../shared/network"
+import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
 import { Queue } from "./actionQueue"
 import { Wallet } from "./wallet"
@@ -33,9 +34,8 @@ export const upgradeAccount = async ({
   }
 
   const implementationClassHash =
-    accountType === "argent-plugin" && newImplementation.argentPluginAccount
-      ? newImplementation.argentPluginAccount
-      : newImplementation.argentAccount
+    newImplementation[mapArgentAccountTypeToImplementationKey(accountType)] ??
+    newImplementation.argentAccount
 
   const calldata = stark.compileCalldata({
     implementation: implementationClassHash,

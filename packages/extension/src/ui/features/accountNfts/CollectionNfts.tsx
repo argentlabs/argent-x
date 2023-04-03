@@ -7,6 +7,7 @@ import { Location, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { useSelectedAccount } from "../accounts/accounts.state"
+import { UnknownDappIcon } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/UnknownDappIcon"
 import { getNftPicture } from "./aspect.service"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
@@ -58,7 +59,7 @@ export const CollectionNfts: FC = () => {
           <Image
             w="28px"
             h="28px"
-            src={collectible?.imageUri}
+            src={collectible?.imageUri ?? undefined}
             borderRadius="lg"
           />
           <H6>{collectible?.name}</H6>
@@ -73,24 +74,24 @@ export const CollectionNfts: FC = () => {
             direction="column"
             alignItems="center"
           >
-            <Image
-              w="64px"
-              h="64px"
-              src={collectible.imageUri}
-              backgroundColor={
-                !collectible.imageUri ? "neutrals.300" : "transparent"
-              }
-              borderRadius="lg"
-            />
+            {collectible.imageUri ? (
+              <Image
+                w={16}
+                h={16}
+                src={collectible.imageUri}
+                backgroundColor={"neutrals.300"}
+                borderRadius="lg"
+              />
+            ) : (
+              <UnknownDappIcon />
+            )}
             <H4>{collectible?.name || "Loading..."}</H4>
-            <P4 color="neutrals.300">
-              Floor price:{" "}
-              {collectible.floorPrice ? (
-                <>{ethers.utils.formatEther(collectible.floorPrice)} ETH</>
-              ) : (
-                "-"
-              )}
-            </P4>
+            {collectible.floorPrice && (
+              <P4 color="neutrals.300">
+                Floor price: {ethers.utils.formatEther(collectible.floorPrice)}{" "}
+                ETH
+              </P4>
+            )}
           </Flex>
           <SimpleGrid
             gridTemplateColumns="repeat(auto-fill, 158px)"

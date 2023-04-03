@@ -10,13 +10,13 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 - If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
 - Fork the repository and clone your fork.
-- Install dependencies: `yarn install`.
+- Setup project: `yarn setup`.
 
 ## Development workflow
 
-ALways start from `develop` branch and merge back to `develop` branch.
+Always start from `develop` branch and merge back to `develop` branch.
 
-To build you changes run:
+To build your changes run:
 
 ```bash
 yarn build

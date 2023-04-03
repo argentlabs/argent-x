@@ -1,14 +1,40 @@
-import "vi-fetch/setup"
-
-import { mockFetch, mockGet } from "vi-fetch"
-import { describe, expect, test, vi } from "vitest"
+import { rest } from "msw"
+import { setupServer } from "msw/node"
+import { afterEach, describe, expect, test, vi } from "vitest"
 
 import {
+  Fetcher,
   FetcherError,
   fetcher,
   fetcherWithArgentApiHeadersForNetwork,
 } from "../src/shared/api/fetcher"
 
+const BASE_URL_ENDPOINT = "http://foo/v1/bar"
+const INVALID_URL_ENDPOINT = "http://foo/v1/bar/invalid"
+const INVALID_PAYLOAD_URL_ENDPOINT = "http://foo/v1/bar/invalid/payload"
+
+const server = setupServer(
+  rest.get(BASE_URL_ENDPOINT, (req, res, ctx) => {
+    return res(ctx.json({ foo: "bar" }))
+  }),
+  rest.get(INVALID_URL_ENDPOINT, (req, res, ctx) => {
+    return res(
+      ctx.status(429),
+      ctx.body("<html><body>Non-json error response</body></html>"),
+    )
+  }),
+  rest.get(INVALID_PAYLOAD_URL_ENDPOINT, (req, res, ctx) => {
+    return res(ctx.body("<html><body>Non-json error response</body></html>"))
+  }),
+)
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterAll(() => server.close())
+
+afterEach(() => server.resetHandlers())
 /** capture and return expected errors, otherwise vi-fetch test will fail even with expect...toThrow... etc. */
 const captureFetcherError = async (invocation: Promise<any | FetcherError>) => {
   try {
@@ -21,50 +47,37 @@ const captureFetcherError = async (invocation: Promise<any | FetcherError>) => {
 
 describe("fetcher", () => {
   describe("fetcher", () => {
-    beforeEach(() => {
-      mockFetch.clearAll()
-    })
     describe("when valid", () => {
       test("returns parsed json", async () => {
-        const mock =
-          mockGet("http://foo/v1/bar").willResolve('{ "foo": "bar" }')
-        const response = await fetcher("http://foo/v1/bar")
+        const response = await fetcher(BASE_URL_ENDPOINT)
         expect(response).toEqual({ foo: "bar" })
-        expect(mock).toHaveFetched()
       })
     })
     describe("when invalid", () => {
       describe("and the server returns a status error", () => {
         test("returns a useful FetcherError object", async () => {
-          const mock = mockGet("http://foo/v1/bar").willFail(
-            "<html><body>Non-json error response</body></html>",
-            429,
-          )
-          const error = await captureFetcherError(fetcher("http://foo/v1/bar"))
-          expect(error).toHaveProperty("url", "http://foo/v1/bar")
+          const error = await captureFetcherError(fetcher(INVALID_URL_ENDPOINT))
+          expect(error).toHaveProperty("url", INVALID_URL_ENDPOINT)
           expect(error).toHaveProperty("status", 429)
           expect(error).toHaveProperty("statusText", "Too Many Requests")
           expect(error).toHaveProperty(
             "responseText",
             "<html><body>Non-json error response</body></html>",
           )
-          expect(mock).toHaveFetched()
         })
       })
       describe("and the server returns success but invalid playload", () => {
         test("returns a useful FetcherError object", async () => {
-          const mock = mockGet("http://foo/v1/bar").willResolve(
-            "<html><body>Non-json error response</body></html>",
+          const error = await captureFetcherError(
+            fetcher(INVALID_PAYLOAD_URL_ENDPOINT),
           )
-          const error = await captureFetcherError(fetcher("http://foo/v1/bar"))
-          expect(error).toHaveProperty("url", "http://foo/v1/bar")
+          expect(error).toHaveProperty("url", INVALID_PAYLOAD_URL_ENDPOINT)
           expect(error).toHaveProperty("status", 200)
           expect(error).toHaveProperty("statusText", "OK")
           expect(error).toHaveProperty(
             "responseText",
             "<html><body>Non-json error response</body></html>",
           )
-          expect(mock).toHaveFetched()
         })
       })
     })
@@ -73,7 +86,7 @@ describe("fetcher", () => {
   describe("fetcherWithArgentApiHeadersForNetwork()", () => {
     const ORIGINAL_PROCESS_ENV = process.env
     const MOCK_VERSION = "testing.1.2.3"
-    const fetcher = vi.fn(async () => "foo")
+    const fetcher = vi.fn(async () => "foo") as Fetcher
     const fetcherWithArgentApiHeaders = fetcherWithArgentApiHeadersForNetwork(
       "goerli-alpha",
       fetcher,

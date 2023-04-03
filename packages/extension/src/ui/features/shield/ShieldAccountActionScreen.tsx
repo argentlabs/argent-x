@@ -1,23 +1,17 @@
-import {
-  BarBackButton,
-  Button,
-  CellStack,
-  NavigationContainer,
-  useToast,
-} from "@argent/ui"
-import { Flex } from "@chakra-ui/react"
+import { useToast } from "@argent/ui"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
 
+import { shieldAddAccount } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { routes } from "../../routes"
 import { accountChangeGuardian } from "../../services/backgroundAccounts"
-import { shieldMaybeAddAccount } from "../../services/shieldAccount"
-import { ShieldHeader } from "./ShieldHeader"
+import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 export const ShieldAccountActionScreen: FC = () => {
   const account = useRouteAccount()
@@ -25,13 +19,19 @@ export const ShieldAccountActionScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const pendingChangeGuardian = usePendingChangeGuardian(account)
   const toast = useToast()
+  const hasGuardian = Boolean(account?.guardian)
+
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: hasGuardian ? "removeArgentShield" : "addArgentShield",
+  })
 
   useEffect(() => {
     if (pendingChangeGuardian && account) {
       /** a guardian transaction for this account is now pending - move to finish */
+      trackSuccess()
       navigate(routes.shieldAccountFinish(account?.address), { replace: true })
     }
-  }, [account, navigate, pendingChangeGuardian])
+  }, [account, navigate, pendingChangeGuardian, trackSuccess])
 
   const onAddOrRemove = useCallback(async () => {
     if (!account) {
@@ -40,13 +40,12 @@ export const ShieldAccountActionScreen: FC = () => {
     }
     setIsLoading(true)
     try {
-      // always check the account exists in backend
-      const { guardianAddress } = await shieldMaybeAddAccount()
       if (account.guardian) {
         // remove
         await accountChangeGuardian(account, constants.ZERO.toString())
       } else {
         // add
+        const { guardianAddress } = await shieldAddAccount()
         await accountChangeGuardian(account, guardianAddress)
       }
     } catch (error) {
@@ -62,28 +61,10 @@ export const ShieldAccountActionScreen: FC = () => {
   }, [account, toast])
 
   return (
-    <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
-      <CellStack flex={1}>
-        <ShieldHeader
-          title={`3 - ${account?.guardian ? "Remove" : "Add"} Argent Shield`}
-          subtitle={`You need to approve a transaction in order to ${
-            account?.guardian
-              ? "remove Argent Shield from"
-              : "add Argent Shield to"
-          } your account`}
-        />
-        <Flex flex={1} />
-        <Button
-          onClick={onAddOrRemove}
-          colorScheme={"primary"}
-          isLoading={isLoading}
-          loadingText={`${
-            account?.guardian ? "Removing" : "Adding"
-          } Argent Shield`}
-        >
-          {account?.guardian ? "Remove" : "Add"} Argent Shield
-        </Button>
-      </CellStack>
-    </NavigationContainer>
+    <ShieldBaseActionScreen
+      guardian={account?.guardian}
+      onAddOrRemove={onAddOrRemove}
+      isLoading={isLoading}
+    />
   )
 }

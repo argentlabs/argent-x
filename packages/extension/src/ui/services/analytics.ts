@@ -1,7 +1,9 @@
-import { useEffect } from "react"
+import { isFunction } from "lodash-es"
+import { useCallback, useEffect, useRef } from "react"
 
 import {
   AddFundsServices,
+  Events,
   Pages,
   activeStore,
   getAnalytics,
@@ -42,6 +44,66 @@ export const usePageTracking = <T extends keyof Pages>(
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, rest[0]]) // as React in strict mode renders every component twice, this page will be tracked 2x in development. This is not the case in production.
+}
+
+export const useTimeSpentWithSuccessTracking = <T extends keyof Events>(
+  event: T,
+  args: Events[T] | (() => Promise<Events[T]>),
+) => {
+  const didTrack = useRef(false)
+  const startedAt = useRef(new Date().getTime())
+
+  /** track once with success flag */
+  const trackWithSuccess = useCallback(
+    async (success: boolean) => {
+      if (didTrack.current) {
+        /** already tracked */
+        return
+      }
+      const timeSpent = new Date().getTime() - startedAt.current
+      if (!success) {
+        window.localStorage.setItem("failure", new Date().toISOString())
+      }
+      didTrack.current = true
+      const resolvedArgs = isFunction(args) ? await args() : args
+      analytics.track(event, {
+        ...resolvedArgs,
+        success,
+        timeSpent,
+      })
+    },
+    [args, event],
+  )
+
+  const trackSuccess = useCallback(
+    () => trackWithSuccess(true),
+    [trackWithSuccess],
+  )
+  const trackFailure = useCallback(
+    () => trackWithSuccess(false),
+    [trackWithSuccess],
+  )
+
+  /** track failure on document close */
+  useEffect(() => {
+    const onvisibilitychange = () => {
+      if (document.visibilityState === "hidden") {
+        const timeSpent = new Date().getTime() - startedAt.current
+        /** don't track failure unless window was open > 500ms */
+        if (timeSpent > 500) {
+          trackFailure()
+        }
+      }
+    }
+    document.addEventListener("visibilitychange", onvisibilitychange)
+    return () =>
+      document.removeEventListener("visibilitychange", onvisibilitychange)
+  }, [trackFailure])
+
+  return {
+    trackSuccess,
+    trackFailure,
+  }
 }
 
 const N_5_MINUTES = 5 * 60 * 1000

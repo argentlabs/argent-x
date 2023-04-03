@@ -5,6 +5,7 @@ import {
   WalletAccount,
 } from "../../shared/wallet.model"
 import { walletStore } from "../../shared/wallet/walletStore"
+import { Account } from "../features/accounts/Account"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
 export const createNewAccount = async (networkId: string) => {
@@ -48,9 +49,19 @@ export const accountsOnNetwork = (
   networkId: string,
 ) => accounts.filter((account) => account.networkId === networkId)
 
+function isNotBaseWalletAccount(
+  account?: BaseWalletAccount,
+): account is Account {
+  return Boolean(account && "toBaseWalletAccount" in account)
+}
+
 export const selectAccount = async (
   account?: BaseWalletAccount,
 ): Promise<void> => {
+  /** coerce to sparse BaseWalletAccount to prevent DataCloneError from full Account class instance on FireFox */
+  if (isNotBaseWalletAccount(account)) {
+    account = account.toBaseWalletAccount()
+  }
   await walletStore.set("selected", account ?? null)
 
   return connectAccount(account)
@@ -132,6 +143,17 @@ export const getPrivateKey = async () => {
   return await decryptFromBackground(encryptedPrivateKey, secret)
 }
 
+export const getPublicKey = async (account?: BaseWalletAccount) => {
+  sendMessage({
+    type: "GET_PUBLIC_KEY",
+    data: account,
+  })
+
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+
+  return publicKey
+}
+
 export const getSeedPhrase = async (): Promise<string> => {
   const { secret, encryptedSecret } = await generateEncryptedSecret()
   sendMessage({
@@ -155,6 +177,49 @@ export const accountChangeGuardian = async (
   const result = await Promise.race([
     waitForMessage("ACCOUNT_CHANGE_GUARDIAN_RES"),
     waitForMessage("ACCOUNT_CHANGE_GUARDIAN_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
+
+export const accountCancelEscape = async (account: BaseWalletAccount) => {
+  sendMessage({ type: "ACCOUNT_CANCEL_ESCAPE", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_CANCEL_ESCAPE_RES"),
+    waitForMessage("ACCOUNT_CANCEL_ESCAPE_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
+
+export const accounTriggerEscapeGuardian = async (
+  account: BaseWalletAccount,
+) => {
+  sendMessage({ type: "ACCOUNT_TRIGGER_ESCAPE_GUARDIAN", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_RES"),
+    waitForMessage("ACCOUNT_TRIGGER_ESCAPE_GUARDIAN_REJ").then((error) => {
+      throw new Error(error)
+    }),
+  ])
+
+  return result
+}
+
+export const accountEscapeAndChangeGuardian = async (
+  account: BaseWalletAccount,
+) => {
+  sendMessage({ type: "ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN", data: { account } })
+
+  const result = await Promise.race([
+    waitForMessage("ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_RES"),
+    waitForMessage("ACCOUNT_ESCAPE_AND_CHANGE_GUARDIAN_REJ").then((error) => {
       throw new Error(error)
     }),
   ])

@@ -27,6 +27,7 @@ export type ApiTransactionReviewAssessmentReason =
   | "unknown_token"
 
 export type ApiTransactionReviewTargettedDapp = {
+  name: string
   description: string
   iconUrl: string
   links: {
@@ -34,7 +35,6 @@ export type ApiTransactionReviewTargettedDapp = {
     url: string
     position: number
   }[]
-  name: string
 }
 
 export interface ApiTransactionReviewResponse {
@@ -44,14 +44,22 @@ export interface ApiTransactionReviewResponse {
   targetedDapp: ApiTransactionReviewTargettedDapp
 }
 
-export type ApiTransactionReviewActivityType =
-  | "account-upgrade"
-  | "approve"
-  | "set-approval-for-all"
-  | "swap"
-  | "transfer"
+export const apiTransactionReviewActivityType = [
+  "account-upgrade",
+  "approve",
+  "set-approval-for-all",
+  "swap",
+  "transfer",
+] as const
 
-export type ApiTransactionReviewSlippageType = "equals" | "at_least" | "at_most"
+export type ApiTransactionReviewActivityType =
+  (typeof apiTransactionReviewActivityType)[number]
+
+export type TransactionReviewWithType = ApiTransactionReview & {
+  type: ApiTransactionReviewActivityType
+}
+
+export type ApiTransactionReviewSlippageType = "equal" | "at_least" | "at_most"
 
 export interface ApiTransactionReviewToken {
   address: string
@@ -137,14 +145,17 @@ export const fetchTransactionReview = ({
     account: accountAddress,
     calls,
   }
-  return fetcherImpl(ARGENT_TRANSACTION_REVIEW_STARKNET_URL, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+  return fetcherImpl<ApiTransactionReviewResponse>(
+    ARGENT_TRANSACTION_REVIEW_STARKNET_URL,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  })
+  )
 }
 
 export const getDisplayWarnAndReasonForTransactionReview = (
@@ -185,8 +196,46 @@ export const getTransactionReviewSwap = (
   }
 }
 
+export const getNFTTransferActivity = (
+  transactionReview?: ApiTransactionReviewResponse,
+) => {
+  if (!transactionReview) {
+    return
+  }
+}
+
+export const getTransactionReviewActivityOfType = (
+  type: ApiTransactionReviewActivityType,
+  transactionReview?: ApiTransactionReviewResponse,
+): ApiTransactionReviewActivity | undefined => {
+  if (!transactionReview) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.activity?.type === type) {
+      return review.activity
+    }
+  }
+}
+
 export const getTransactionReviewHasSwap = (
   transactionReview?: ApiTransactionReviewResponse,
 ) => {
   return !!getTransactionReviewSwap(transactionReview)
+}
+
+export const getTransactionReviewWithType = (
+  transactionReview?: ApiTransactionReviewResponse,
+): TransactionReviewWithType | undefined => {
+  if (!transactionReview) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.activity?.type) {
+      return {
+        ...review,
+        type: review.activity?.type,
+      }
+    }
+  }
 }

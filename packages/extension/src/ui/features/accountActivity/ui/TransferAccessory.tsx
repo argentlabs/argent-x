@@ -1,4 +1,4 @@
-import { H6, P4 } from "@argent/ui"
+import { H6, P4, TextWithAmount } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -30,15 +30,17 @@ export const TransferAccessory: FC<TransferAccessoryProps> = ({
     action === "SEND" ? <>&minus;</> : action === "RECEIVE" ? <>+</> : null
   return (
     <Flex direction={"column"} overflow="hidden">
-      <H6
-        overflow="hidden"
-        textOverflow={"ellipsis"}
-        textAlign={"right"}
-        color={action === "RECEIVE" ? "secondary.500" : undefined}
-      >
-        {prefix}
-        {displayAmount}
-      </H6>
+      <TextWithAmount amount={amount}>
+        <H6
+          overflow="hidden"
+          textOverflow={"ellipsis"}
+          textAlign={"right"}
+          color={action === "RECEIVE" ? "secondary.500" : undefined}
+        >
+          {prefix}
+          {displayAmount}
+        </H6>
+      </TextWithAmount>
       {displayValue && (
         <P4
           color="neutrals.400"

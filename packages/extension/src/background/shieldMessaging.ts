@@ -1,11 +1,26 @@
 import { stringToBytes } from "@scure/base"
 import { Signature, keccak, pedersen, sign } from "micro-starknet"
-import { ec, encode } from "starknet"
+import { ec, encode, number } from "starknet"
 
+import {
+  getNetworkSelector,
+  withGuardianSelector,
+} from "../shared/account/selectors"
+import { getAccounts } from "../shared/account/store"
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
-import { addAccount, getAccounts } from "../shared/shield/backend/account"
-import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
-import { isEqualAddress } from "../ui/services/addresses"
+import {
+  addBackendAccount,
+  getBackendAccounts,
+  isTokenExpired,
+  register,
+  requestEmailAuthentication,
+  verifyEmail,
+} from "../shared/shield/backend/account"
+import {
+  ARGENT_SHIELD_ENABLED,
+  ARGENT_SHIELD_NETWORK_ID,
+} from "../shared/shield/constants"
+import { validateEmailForAccounts } from "../shared/shield/validation"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
@@ -15,12 +30,18 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
   background: { wallet },
 }) => {
   switch (msg.type) {
-    case "SHIELD_MAYBE_ADD_ACCOUNT": {
+    case "SHIELD_VALIDATE_ACCOUNT": {
       if (!ARGENT_SHIELD_ENABLED) {
         /** should never happen */
         throw new Error("Argent Shield is not enabled")
       }
-      /** Check if account exists in backend and add it if not */
+
+      if (!ARGENT_SHIELD_NETWORK_ID) {
+        /** should never happen */
+        throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
+      }
+
+      /** Check if account is valid for current wallet */
       try {
         const selectedAccount = await wallet.getSelectedAccount()
         const starknetAccount = await wallet.getSelectedStarknetAccount()
@@ -29,10 +50,57 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           throw Error("no accounts")
         }
 
+        /** Get current account state */
+
+        const localAccounts = await getAccounts(
+          getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
+        )
+        const localAccountsWithGuardian = await getAccounts(
+          withGuardianSelector,
+        )
+        const backendAccounts = await getBackendAccounts()
+
+        /** Validate email against account state */
+
+        validateEmailForAccounts({
+          localAccounts,
+          localAccountsWithGuardian,
+          backendAccounts,
+        })
+
+        return sendMessageToUi({
+          type: "SHIELD_VALIDATE_ACCOUNT_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_VALIDATE_ACCOUNT_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+    case "SHIELD_ADD_ACCOUNT": {
+      if (!ARGENT_SHIELD_ENABLED) {
+        /** should never happen */
+        throw new Error("Argent Shield is not enabled")
+      }
+
+      if (!ARGENT_SHIELD_NETWORK_ID) {
+        /** should never happen */
+        throw new Error("ARGENT_SHIELD_NETWORK_ID is not defined")
+      }
+      try {
+        const selectedAccount = await wallet.getSelectedAccount()
+        if (!selectedAccount) {
+          throw Error("no account selected")
+        }
+
         /** Check if this account already exists in backend */
-        const accounts = await getAccounts()
-        const existingAccount = accounts.find((x) =>
-          isEqualAddress(x.address, selectedAccount.address),
+        const backendAccounts = await getBackendAccounts()
+
+        const existingAccount = backendAccounts.find(
+          (x) =>
+            number.hexToDecimalString(x.address) ===
+            number.hexToDecimalString(selectedAccount.address),
         )
 
         let guardianAddress: string | undefined
@@ -54,7 +122,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           )
 
           const { r, s } = Signature.fromHex(deploySignature)
-          const response = await addAccount(
+          const response = await addBackendAccount(
             publicKey,
             selectedAccount.address,
             [
@@ -68,19 +136,57 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
           throw new Error("Unable to add account")
         }
         return sendMessageToUi({
-          type: "SHIELD_MAYBE_ADD_ACCOUNT_RES",
+          type: "SHIELD_ADD_ACCOUNT_RES",
           data: {
             guardianAddress,
           },
         })
       } catch (error) {
         return sendMessageToUi({
-          type: "SHIELD_MAYBE_ADD_ACCOUNT_REJ",
+          type: "SHIELD_ADD_ACCOUNT_REJ",
           data: `${error}`,
         })
       }
     }
-  }
+    case "SHIELD_REQUEST_EMAIL": {
+      const email = msg.data
+      try {
+        await requestEmailAuthentication(email)
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_EMAIL_RES",
+        })
+      } catch (error) {
+        return sendMessageToUi({
+          type: "SHIELD_REQUEST_EMAIL_REJ",
+          data: `${error}`,
+        })
+      }
+    }
+    case "SHIELD_CONFIRM_EMAIL": {
+      const code = msg.data
+      try {
+        const { userRegistrationStatus } = await verifyEmail(code)
 
+        if (userRegistrationStatus === "notRegistered") {
+          await register()
+        }
+        return sendMessageToUi({
+          type: "SHIELD_CONFIRM_EMAIL_RES",
+        })
+      } catch (e) {
+        return sendMessageToUi({
+          type: "SHIELD_CONFIRM_EMAIL_REJ",
+          data: JSON.stringify(e),
+        })
+      }
+    }
+    case "SHIELD_IS_TOKEN_EXPIRED": {
+      const data = await isTokenExpired()
+      return sendMessageToUi({
+        type: "SHIELD_IS_TOKEN_EXPIRED_RES",
+        data,
+      })
+    }
+  }
   throw new UnhandledMessage()
 }

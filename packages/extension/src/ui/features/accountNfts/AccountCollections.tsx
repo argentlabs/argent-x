@@ -8,7 +8,7 @@ import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
-import { Collections } from "./aspect.service"
+import { Collection } from "./aspect.model"
 import { EmptyCollections } from "./EmptyCollections"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
@@ -18,7 +18,7 @@ import { useNfts } from "./useNfts"
 interface AccountCollectionsProps {
   account: Account
   withHeader?: boolean
-  customList?: Collections
+  customList?: Collection[]
   navigateToSend?: boolean
 }
 
@@ -73,7 +73,7 @@ const CollectionsFallback: FC<AccountCollectionsProps> = ({ account }) => {
     errorRetryInterval: 30e3 /* 30 seconds */,
   })
 
-  return <ErrorBoundaryFallback title="Seems like Aspect API is down..." />
+  return <ErrorBoundaryFallback title="Something went wrong..." />
 }
 
 export const AccountCollections: FC<AccountCollectionsProps> = ({

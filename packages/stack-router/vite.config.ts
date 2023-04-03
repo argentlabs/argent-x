@@ -24,6 +24,7 @@ export default defineConfig({
         "react",
         "react-dom",
         "react-router-dom",
+        "react/jsx-runtime",
         "@chakra-ui/react",
         "framer-motion",
       ],
@@ -32,10 +33,14 @@ export default defineConfig({
           react: "React",
           "react-dom": "ReactDOM",
           "react-router-dom": "ReactRouterDOM",
+          "react/jsx-runtime": "ReactJSXRuntime",
           "@chakra-ui/react": "ChakraUIReact",
           "framer-motion": "FramerMotion",
         },
       },
     },
+  },
+  esbuild: {
+    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
   },
 })

@@ -5,6 +5,8 @@
   "repository": "github:argentlabs/argent-x",
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
+    "@lavamoat/allow-scripts": "^2.3.0",
+    "@lavamoat/preinstall-always-fail": "^1.0.0",
     "bundlewatch": "^0.3.3",
     "husky": "^8.0.0",
     "import-sort-style-module": "^6.0.0",
@@ -36,7 +38,8 @@
     "postinstall": "pnpm patch patches && pnpm run -r postinstall",
     "storybook": "cd packages/storybook && pnpm storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
-    "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts"
+    "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts",
+    "version": "lerna version --no-push --no-git-tag-version && yarn --cwd packages/extension run version"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
@@ -57,5 +60,14 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md,yml,json}": "prettier --write",
     "*.{ts,tsx}": "eslint --cache --ext .ts,.tsx"
+  },
+  "lavamoat": {
+    "allowScripts": {
+      "$root$": true,
+      "@lavamoat/preinstall-always-fail": false,
+      "nx": false,
+      "nx>@parcel/watcher": false,
+      "nx>@swc/core": false
+    }
   }
 }

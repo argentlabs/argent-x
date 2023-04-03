@@ -6,7 +6,11 @@ import styled from "styled-components"
 import { useAppState } from "../../app.state"
 import { StyledControlledInput } from "../../components/InputText"
 import { routes } from "../../routes"
-import { analytics, usePageTracking } from "../../services/analytics"
+import {
+  analytics,
+  usePageTracking,
+  useTimeSpentWithSuccessTracking,
+} from "../../services/analytics"
 import { selectAccount } from "../../services/backgroundAccounts"
 import { FormError } from "../../theme/Typography"
 import { createAccount } from "../accounts/accounts.service"
@@ -42,6 +46,10 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
   overrideSubmitText,
 }) => {
   usePageTracking("createWallet")
+  const { trackSuccess } = useTimeSpentWithSuccessTracking(
+    "onboardingStepFinished",
+    { stepId: "newWalletPassword" },
+  )
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { control, handleSubmit, formState, watch } = useForm<FieldValues>({
@@ -73,6 +81,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
             networkId: newAccount.networkId,
           })
           setIsDeploying(false)
+          trackSuccess()
           navigate(routes.onboardingFinish.path, { replace: true })
         } catch (error: any) {
           analytics.track("createWallet", {
@@ -85,7 +94,7 @@ export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
         }
       }
     },
-    [navigate, overrideSubmit, switcherNetworkId],
+    [navigate, overrideSubmit, switcherNetworkId, trackSuccess],
   )
 
   const buttonText = useMemo(() => {

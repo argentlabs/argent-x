@@ -12,7 +12,7 @@ import { useAppState } from "../app.state"
  * @see argentApiHeadersForNetwork
  */
 
-export const argentApiFetcher = (
+export const argentApiFetcher = <T>(
   input: RequestInfo | URL,
   init?: RequestInit,
   fetcherImpl: Fetcher = fetcher,
@@ -25,5 +25,5 @@ export const argentApiFetcher = (
       ...argentApiHeadersForNetwork(switcherNetworkId),
     },
   }
-  return fetcherImpl(input, initWithArgentApiHeaders)
+  return fetcherImpl<T>(input, initWithArgentApiHeaders)
 }

@@ -52,6 +52,7 @@ import { NFTTitle } from "./ui/NFTTitle"
 import { TransactionCallDataBottomSheet } from "./ui/TransactionCallDataBottomSheet"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferTitle } from "./ui/TransferTitle"
+import { useTransactionFees } from "./useTransactionFees"
 
 const { ActivityIcon } = icons
 
@@ -159,8 +160,14 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   network,
   tokensByNetwork,
 }) => {
+  const hash = explorerTransaction?.transactionHash || transaction?.hash
+  const txFee = useTransactionFees({
+    hash,
+    transactionTransformed,
+    network,
+  })
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
-  const { action, date, displayName, actualFee, dapp } = transactionTransformed
+  const { action, date, displayName, dapp } = transactionTransformed
   const isRejected =
     explorerTransaction?.status === "REJECTED" ||
     transaction?.status === "REJECTED"
@@ -263,13 +270,13 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const displayContractAddress =
     !!explorerTransaction &&
     formatTruncatedAddress(explorerTransaction.contractAddress)
-  const hash = explorerTransaction?.transactionHash || transaction?.hash
   const displayTransactionHash = !!hash && formatTruncatedAddress(hash)
   const calls = explorerTransaction?.calls || transaction?.meta?.transactions
   const errorMessage =
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
+
   return (
     <StyledTransactionDetailWrapper
       scrollContent={transactionTransformed.displayName || "Transaction"}
@@ -370,15 +377,17 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
                   </StyledCopyIconButton>
                 </FieldValue>
               </Field>
-              {parameters.map((parameter, index) => {
-                return (
-                  <ParameterField
-                    key={index}
-                    parameter={parameter}
-                    networkId={network.id}
-                  />
-                )
-              })}
+              {parameters
+                ? parameters.map((parameter, index) => {
+                    return (
+                      <ParameterField
+                        key={index}
+                        parameter={parameter}
+                        networkId={network.id}
+                      />
+                    )
+                  })
+                : null}
             </ExpandableFieldGroup>
           )
         })}
@@ -396,7 +405,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         )}
         {dapp && <DappContractField knownContract={dapp} />}
         {additionalFields}
-        {actualFee && <FeeField fee={actualFee} networkId={network.id} />}
+        {txFee && <FeeField fee={txFee} networkId={network.id} />}
       </FieldGroup>
       {isRejected && transaction && (
         <FieldGroup>

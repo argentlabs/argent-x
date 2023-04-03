@@ -3,7 +3,9 @@ on:
   push:
     branches: [develop]
   pull_request:
-    branches: [develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
@@ -14,6 +16,18 @@ jobs:
         image: shardlabs/starknet-devnet:latest-seed0
         ports:
           - 5050:5050
+    env:
+      FILENAME: argent-extension-${{ github.ref_name }}
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "true"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      FEATURE_VERIFIED_DAPPS: "false"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ secrets.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
+      ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
 
     steps:
       - uses: pnpm/action-setup@v2
@@ -48,10 +62,78 @@ jobs:
         run: xvfb-run --auto-servernum pnpm test:e2e
 
       - uses: actions/upload-artifact@v3
-        if: failure()
+        if: always()
         with:
           name: test-results
-          path: packages/extension/test-results/
+          path: |
+            packages/extension/test-results/
+            packages/extension/e2e/artifacts/playwright/
+            packages/extension/e2e/artifacts/reports/
+          retention-days: 5
 
       - name: Check bundlesize
         run: pnpm run bundlewatch
+      ## Upload build and comment PR if not merging into develop
+      - name: Set filename prefix
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: echo "FILENAME_PREFIX=$(echo ${{ env.FILENAME }}  | tr / -)" >> $GITHUB_ENV
+
+      - name: Create chrome zip
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME_PREFIX }}-chrome.zip ./*
+          mv ${{ env.FILENAME_PREFIX }}-chrome.zip ../../../
+          cd ../../../
+
+      - name: Build Firefox version
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+
+      - name: Create firefox zip
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: |
+          cd packages/extension/dist
+          zip -r ${{ env.FILENAME_PREFIX }}-firefox.zip ./*
+          mv ${{ env.FILENAME_PREFIX }}-firefox.zip ../../../
+          cd ../../../
+
+      - name: Check bundlesize for firefox
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: yarn run bundlewatch
+
+      - name: Upload artifacts for firefox
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-firefox.zip
+          path: "*-firefox.zip"
+          retention-days: 5
+
+      - name: Upload artifacts for chrome
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-chrome.zip
+          path: "*-chrome.zip"
+          retention-days: 5
+
+      - name: Set GHA_BRANCH
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        run: echo "GHA_BRANCH=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+
+      - name: comment PR
+        if: ${{ env.PUBLISH_COMMENT == 'yes' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_REPO: ${{ env.GHA_BRANCH }}
+          INPUT_OWNER: ${{ github.repository_owner }}
+        run: |
+          gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+      - name: SonarCloud Scan
+        if: github.actor != 'dependabot[bot]'
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}

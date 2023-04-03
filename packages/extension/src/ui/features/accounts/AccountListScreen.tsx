@@ -10,7 +10,8 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { useReturnTo } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
+import { isEqualAddress } from "../../services/addresses"
 import { P } from "../../theme/Typography"
 import { LoadingScreen } from "../actions/LoadingScreen"
 import { useCurrentNetwork } from "../networks/useNetworks"
@@ -55,13 +56,24 @@ export const AccountListScreen: FC = () => {
   )
   const { isBackupRequired } = useBackupRequired()
   const currentNetwork = useCurrentNetwork()
-  const { addAccount, isDeploying } = useAddAccount()
+  const { isAdding } = useAddAccount()
 
   const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
     visibleAccounts,
     currentNetwork,
   )
   const hasHiddenAccounts = hiddenAccounts.length > 0
+
+  const accountFromAddress = useCallback(
+    (accountAddress: string) => {
+      return allAccounts.find(
+        (account) =>
+          isEqualAddress(account.address, accountAddress) &&
+          currentNetwork.id === account.networkId,
+      )
+    },
+    [allAccounts, currentNetwork],
+  )
 
   const onClose = useCallback(async () => {
     if (returnTo) {
@@ -80,13 +92,13 @@ export const AccountListScreen: FC = () => {
   return (
     <>
       <NavigationContainer
-        leftButton={<BarCloseButton onClick={onClose} disabled={isDeploying} />}
+        leftButton={<BarCloseButton onClick={onClose} disabled={isAdding} />}
         title={`${currentNetwork.name} accounts`}
         rightButton={
           <BarIconButton
             aria-label="Create new wallet"
-            onClick={addAccount}
-            isLoading={isDeploying}
+            onClick={() => navigate(routes.newAccount())}
+            isLoading={isAdding}
           >
             <AddIcon />
           </BarIconButton>
@@ -100,29 +112,35 @@ export const AccountListScreen: FC = () => {
               click below to add one.
             </Paragraph>
           )}
-          {newAccounts.map((account) => (
-            <AccountListScreenItem
-              key={account.address}
-              account={account}
-              selectedAccount={selectedAccount}
-              returnTo={returnTo}
-            />
-          ))}
+          {newAccounts.map((accountAddress) => {
+            const account = accountFromAddress(accountAddress)
+            return account ? (
+              <AccountListScreenItem
+                key={account.address}
+                account={account}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+              />
+            ) : null
+          })}
           {some(deprecatedAccounts) && (
             <>
               <DeprecatedAccountsWarning />
-              {deprecatedAccounts.map((account) => (
-                <AccountListScreenItem
-                  key={account.address}
-                  account={account}
-                  selectedAccount={selectedAccount}
-                  returnTo={returnTo}
-                  needsUpgrade
-                />
-              ))}
+              {deprecatedAccounts.map((accountAddress) => {
+                const account = accountFromAddress(accountAddress)
+                return account ? (
+                  <AccountListScreenItem
+                    key={account.address}
+                    account={account}
+                    selectedAccount={selectedAccount}
+                    returnTo={returnTo}
+                    needsUpgrade
+                  />
+                ) : null
+              })}
             </>
           )}
-          {isDeploying && <DimmingContainer />}
+          {isAdding && <DimmingContainer />}
         </Flex>
       </NavigationContainer>
       {hasHiddenAccounts && <HiddenAccountsBar />}

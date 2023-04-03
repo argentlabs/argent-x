@@ -1,25 +1,20 @@
 import { isString } from "lodash-es"
-import { number } from "starknet"
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 import join from "url-join"
+import { z } from "zod"
 
 import { fetcher } from "../../../shared/api/fetcher"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { withPolling } from "../../services/swr"
-import { AspectContract, AspectNft } from "./aspect.model"
+import {
+  AspectContract,
+  AspectNft,
+  AspectNftArraySchema,
+  Collection,
+} from "./aspect.model"
 
 const baseUrlGoerli = "https://api-testnet.aspect.co/api/v0/assets"
 const baseUrlMainnet = "https://api.aspect.co/api/v0/assets"
-
-export interface Collection {
-  name: string
-  contractAddress: string
-  nfts: AspectNft[]
-  imageUri?: string
-  floorPrice?: number.BigNumberish
-}
-
-export type Collections = Collection[]
 
 const getAspectBaseUrl = (account: BaseWalletAccount) => {
   const url =
@@ -75,8 +70,7 @@ export const fetchNextAspectNftsByUrl = async (
       await fetchNextAspectNftsByUrl(data.next_url, address),
     )
   }
-
-  return data.assets
+  return AspectNftArraySchema.parse(data.assets)
 }
 
 export const fetchAspectCollection = async (
@@ -96,7 +90,7 @@ export const fetchAspectCollection = async (
 
   const url = join(baseUrl, `?${params}`, "&limit=50")
   const assets = await fetchNextAspectCollection(url, account, contractAddress)
-  if (Array.isArray(assets) && assets.length > 0) {
+  if (assets.length > 0) {
     return {
       name:
         assets[0].contract.name_custom || assets[0].contract.name || "Untitled",
@@ -130,8 +124,7 @@ export const fetchNextAspectCollection = async (
       await fetchNextAspectCollection(data.next_url, account, contractAddress),
     )
   }
-
-  return data.assets
+  return AspectNftArraySchema.parse(data.assets)
 }
 
 export const fetchNextAspectContractAddresses = async (
@@ -152,8 +145,7 @@ export const fetchNextAspectContractAddresses = async (
       await fetchNextAspectContractAddresses(data.next_url),
     )
   }
-
-  return contractAddresses
+  return z.string().array().parse(contractAddresses)
 }
 
 export const fetchAspectContractAddresses = async () => {
@@ -176,12 +168,17 @@ export const useAspectNft = (
   contractAddress: string | undefined,
   tokenId: string | undefined,
   networkId: string,
+  swrConfig?: SWRConfiguration,
 ) => {
   const url =
     networkId === "goerli-alpha"
       ? `https://api-testnet.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
       : `https://api.aspect.co/api/v0/asset/${contractAddress}/${tokenId}`
-  return useSWR<AspectNft>(contractAddress && tokenId && url, fetcher)
+  return useSWR<AspectNft>(
+    contractAddress && tokenId && url,
+    fetcher,
+    swrConfig,
+  )
 }
 
 export const openAspectNft = (
@@ -196,7 +193,10 @@ export const openAspectNft = (
   window.open(url, "_blank")?.focus()
 }
 
-export const getNftPicture = ({ image_uri, image_url_copy }: AspectNft) => {
+export const getNftPicture = ({
+  image_uri,
+  image_url_copy,
+}: Pick<AspectNft, "image_uri" | "image_url_copy">) => {
   if (image_uri && image_url_copy) {
     if (!image_url_copy.startsWith("ipfs://")) {
       return image_url_copy
@@ -208,5 +208,5 @@ export const getNftPicture = ({ image_uri, image_url_copy }: AspectNft) => {
   if (image_url_copy) {
     return image_url_copy
   }
-  return image_uri
+  return image_uri ?? undefined
 }

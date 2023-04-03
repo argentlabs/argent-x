@@ -4,7 +4,10 @@ import styled from "styled-components"
 
 import { RowBetween } from "../../components/Row"
 import { routes } from "../../routes"
-import { usePageTracking } from "../../services/analytics"
+import {
+  usePageTracking,
+  useTimeSpentWithSuccessTracking,
+} from "../../services/analytics"
 import { FormError } from "../../theme/Typography"
 import { validateAndSetSeedPhrase } from "../recovery/seedRecovery.state"
 import { useCustomNavigate } from "../recovery/useCustomNavigate"
@@ -23,6 +26,10 @@ const RestoreBackupLink = styled.span`
 
 export const OnboardingRestoreSeed: FC = () => {
   usePageTracking("restoreWallet")
+  const { trackSuccess } = useTimeSpentWithSuccessTracking(
+    "onboardingStepFinished",
+    { stepId: "restoreSeedphrase" },
+  )
   const [seedPhraseInput, setSeedPhraseInput] = useState("")
   const [error, setError] = useState("")
   const customNavigate = useCustomNavigate()
@@ -34,6 +41,7 @@ export const OnboardingRestoreSeed: FC = () => {
   const handleRestoreClick = async () => {
     try {
       validateAndSetSeedPhrase(seedPhraseInput)
+      trackSuccess()
       customNavigate(routes.onboardingRestorePassword())
     } catch {
       setError("Invalid seed phrase")

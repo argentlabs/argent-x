@@ -4,8 +4,8 @@ import { ComponentProps, FC } from "react"
 import { useAspectNft } from "../../accountNfts/aspect.service"
 
 export interface NFTImageProps extends ComponentProps<typeof Image> {
-  contractAddress: string
-  tokenId: string
+  contractAddress?: string
+  tokenId?: string
   networkId: string
 }
 

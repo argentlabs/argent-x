@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
-    }),
+    }) as PluginOption,
     react() as PluginOption, // stops TS from complaining
   ],
   build: {
@@ -22,19 +22,20 @@ export default defineConfig({
 
     emptyOutDir: false,
     rollupOptions: {
-      external: ["react", "react-dom"],
+      external: ["react", "react-dom", "react/jsx-runtime"],
       output: {
-        // sourcemapExcludeSources: true,
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
+          "react/jsx-runtime": "ReactJSXRuntime",
         },
       },
     },
     sourcemap: true,
     target: "esnext",
-
-    // Leave minification up to applications.
-    minify: false,
+    minify: true,
+  },
+  esbuild: {
+    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
   },
 })

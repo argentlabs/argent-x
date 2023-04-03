@@ -1,5 +1,7 @@
-import { CellStack } from "@argent/ui"
+import { CellStack, DapplandBanner } from "@argent/ui"
+import dapplandBanner from "@argent/ui/assets/dapplandBannerBackground.png"
 import { Flex, VStack } from "@chakra-ui/react"
+import { AnimatePresence, motion } from "framer-motion"
 import { FC, useCallback, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import useSWR from "swr"
@@ -21,9 +23,13 @@ import { useShouldShowNetworkUpgradeMessage } from "../networks/showNetworkUpgra
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { useBackupRequired } from "../recovery/backupDownload.state"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
+import { EscapeBanner } from "../shield/escape/EscapeBanner"
+import { accountHasEscape } from "../shield/escape/useAccountEscape"
+import { useAccountGuardianIsSelf } from "../shield/useAccountGuardian"
 import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { AccountTokensHeader } from "./AccountTokensHeader"
+import { useDapplandBanner } from "./dappland/banner.state"
 import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { useFeeTokenBalance } from "./tokens.service"
@@ -41,6 +47,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const { pendingTransactions } = useAccountTransactions(account)
   const { accountNames } = useAccountMetadata()
   const { isBackupRequired } = useBackupRequired()
+  const { hasSeenBanner } = useDapplandBanner()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
     userReviewStore,
@@ -96,6 +103,16 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
 
   const showBackupBanner = isBackupRequired && !showUpgradeBanner
 
+  const hasEscape = accountHasEscape(account)
+  const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
+
+  const showDapplandBanner =
+    !hasSeenBanner &&
+    !showBackupBanner &&
+    !needsUpgrade &&
+    !hasPendingTransactions &&
+    !hasEscape
+
   const hadPendingTransactions = useRef(false)
   useEffect(() => {
     if (hasPendingTransactions) {
@@ -130,6 +147,9 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       </VStack>
       <CellStack pt={0}>
         <StatusMessageBannerContainer />
+        {(hasEscape || accountGuardianIsSelf) && (
+          <EscapeBanner account={account} />
+        )}
         {showBackupBanner && <RecoveryBanner />}
         {showUpgradeBanner && (
           <UpgradeBanner
@@ -140,6 +160,23 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
         {showNoBalanceForUpgrade && (
           <UpgradeBanner canNotPay to={routes.funding()} />
         )}
+        <AnimatePresence initial={false}>
+          {showDapplandBanner && (
+            <motion.div
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <DapplandBanner
+                backgroundImageUrl={dapplandBanner}
+                href="https://www.dappland.com?utm_source=argent&utm_medium=extension&utm_content=banner"
+                onClose={() => {
+                  useDapplandBanner.setState({ hasSeenBanner: true })
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
         <TokenList variant={tokenListVariant} showNewTokenButton />
       </CellStack>
     </Flex>

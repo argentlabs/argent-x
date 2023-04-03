@@ -73,7 +73,6 @@ window.addEventListener(
         )
         sendMessage({
           type: "CONNECT_DAPP",
-          data: { host: window.location.host },
         })
         const walletAccount = await walletAccountP
 

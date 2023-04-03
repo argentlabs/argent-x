@@ -1,11 +1,10 @@
 {
   "name": "@argent-x/storybook",
-  "version": "5.2.0",
+  "version": "5.3.16",
   "private": true,
   "devDependencies": {
-    "webpack": "^5.62.1",
-    "@argent-x/extension": "^5.2.0",
-    "@argent/ui": "^5.2.0",
+    "@argent-x/extension": "^5.3.16",
+    "@argent/ui": "^5.3.16",
     "@babel/core": "^7.18.5",
     "@chakra-ui/storybook-addon": "^4.0.12",
     "@storybook/addon-actions": "^6.5.9",
@@ -24,8 +23,8 @@
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "starknet": "^4.21.0",
     "storybook-addon-swc": "^1.1.7",
-    "starknet": "^4.19.1",
     "typescript": "^4.9.4"
   },
   "scripts": {

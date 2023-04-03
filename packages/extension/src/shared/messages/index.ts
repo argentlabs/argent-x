@@ -1,5 +1,7 @@
 import { getMessage } from "@extend-chrome/messages"
+import type { SendOptions } from "@extend-chrome/messages/types/types"
 
+import { IS_DEV } from "../utils/dev"
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
@@ -30,8 +32,23 @@ export type WindowMessageType = MessageType & {
   extensionId: string
 }
 
-export const [sendMessage, messageStream, _waitForMessage] =
+export const [_sendMessage, messageStream, _waitForMessage] =
   getMessage<MessageType>("ARGENTX")
+
+export function sendMessage(
+  data: MessageType,
+  options?: SendOptions | undefined,
+) {
+  // remove all functions from the message object
+  // as they cannot be sent over the message bus (and make firefox crash)
+  const cleanMessage = JSON.parse(
+    JSON.stringify(data, (_, value) =>
+      typeof value === "function" ? undefined : value,
+    ),
+  )
+
+  return _sendMessage(cleanMessage, options)
+}
 
 export async function waitForMessage<
   K extends MessageType["type"],
@@ -43,4 +60,10 @@ export async function waitForMessage<
   return _waitForMessage(
     ([msg]: any) => msg.type === type && predicate(msg),
   ).then(([msg]: any) => msg.data)
+}
+
+if ((<any>window).PLAYWRIGHT || IS_DEV) {
+  ;(<any>window).messageStream = messageStream
+  ;(<any>window).sendMessage = sendMessage
+  ;(<any>window).waitForMessage = waitForMessage
 }

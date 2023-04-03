@@ -41,6 +41,10 @@ export const defaultNetworks: Network[] = [
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
       argentPluginAccount:
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
+      argentBetterMulticallAccount:
+        "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede",
+      argent5MinuteEscapeTestingAccount:
+        "0x058a42e2553e65e301b7f22fb89e4a2576e9867c1e20bb1d32746c74ff823639",
     },
     multicallAddress:
       "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
@@ -57,6 +61,10 @@ export const defaultNetworks: Network[] = [
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
       argentPluginAccount:
         "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091",
+      argentBetterMulticallAccount:
+        "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede",
+      argent5MinuteEscapeTestingAccount:
+        "0x058a42e2553e65e301b7f22fb89e4a2576e9867c1e20bb1d32746c74ff823639",
     },
     multicallAddress:
       "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
@@ -66,6 +74,7 @@ export const defaultNetworks: Network[] = [
     id: "localhost",
     chainId: "SN_GOERLI",
     baseUrl: "http://localhost:5050",
+    explorerUrl: "https://devnet.starkscan.co",
     name: "Localhost 5050",
   },
 ]

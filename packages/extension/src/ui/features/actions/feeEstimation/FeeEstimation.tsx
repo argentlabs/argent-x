@@ -1,35 +1,27 @@
-import { L1, L2, P4, icons } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
-import { Collapse } from "@mui/material"
-import Tippy from "@tippyjs/react"
-import { FC, useEffect, useMemo, useState } from "react"
+import { TextWithAmount } from "@argent/ui"
+import { BigNumber } from "ethers"
+import { FC, useEffect, useMemo } from "react"
 import { number } from "starknet"
 
+import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { CopyTooltip, Tooltip } from "../../../components/CopyTooltip"
-import { makeClickable } from "../../../services/a11y"
+import { Token } from "../../../../shared/token/type"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
-import { useExtensionIsInTab } from "../../browser/tabs"
-import {
-  ExtendableControl,
-  FeeEstimationValue,
-  LoadingInput,
-  StyledInfoRoundedIcon,
-  StyledReportGmailerrorredRoundedIcon,
-} from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
+import { FeeEstimationBox } from "./ui/FeeEstimationBox"
+import { FeeEstimationText } from "./ui/FeeEstimationText"
+import { InsufficientFundsAccordion } from "./ui/InsufficientFundsAccordion"
+import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
 import { getTooltipText, useMaxFeeEstimation } from "./utils"
 import { getParsedError } from "./utils"
 
-const { AlertIcon, ChevronDownIcon } = icons
-
-export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
+export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
   accountAddress,
   transactions,
   actionHash,
@@ -40,8 +32,6 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   if (!account) {
     throw new Error("Account not found")
   }
-
-  const [feeEstimateExpanded, setFeeEstimateExpanded] = useState(false)
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
@@ -82,157 +72,122 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
     fee?.suggestedMaxFee,
   )
 
-  const extensionInTab = useExtensionIsInTab()
-
   return (
-    <Flex direction="column" gap="1">
-      <Flex
-        borderRadius="xl"
-        backgroundColor="neutrals.900"
-        border="1px"
-        borderColor="neutrals.500"
-        boxShadow="menu"
-        justifyContent="space-between"
-        px="3"
-        py="3.5"
-      >
-        <Flex alignItems="center" justifyContent="center">
-          <P4 fontWeight="bold" color="neutrals.300">
-            Network fee
-          </P4>
-          <Tippy
-            content={
-              <Tooltip as="div">
-                {getTooltipText(fee?.suggestedMaxFee, feeTokenBalance)}
-              </Tooltip>
-            }
-          >
-            {enoughBalance ? (
-              <StyledInfoRoundedIcon />
-            ) : (
-              <StyledReportGmailerrorredRoundedIcon />
-            )}
-          </Tippy>
-        </Flex>
-        {fee ? (
-          <Flex
-            gap="1"
-            alignItems="center"
-            direction={extensionInTab ? "row" : "column-reverse"}
-          >
-            {suggestedMaxFeeCurrencyValue !== undefined ? (
-              <L2 color="neutrals.300">
-                (Max {prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})
-              </L2>
-            ) : (
-              <L2 color="neutrals.300">
-                (Max &nbsp;
-                {feeToken ? (
-                  prettifyTokenAmount({
-                    amount: fee.suggestedMaxFee,
-                    decimals: feeToken.decimals,
-                    symbol: feeToken.symbol,
-                  })
-                ) : (
-                  <>{fee.suggestedMaxFee} Unknown</>
-                )}
-                )
-              </L2>
-            )}
+    <FeeEstimation
+      amountCurrencyValue={amountCurrencyValue}
+      fee={fee}
+      feeToken={feeToken}
+      feeTokenBalance={feeTokenBalance}
+      parsedFeeEstimationError={parsedFeeEstimationError}
+      showError={showError}
+      showEstimateError={showEstimateError}
+      showFeeError={showFeeError}
+      suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
+    />
+  )
+}
 
-            <Flex alignItems="center">
-              {amountCurrencyValue !== undefined ? (
-                <P4 fontWeight="bold">
-                  ≈ {prettifyCurrencyValue(amountCurrencyValue)}
-                </P4>
-              ) : (
-                <P4 fontWeight="bold">
-                  ≈{" "}
-                  {feeToken ? (
-                    prettifyTokenAmount({
-                      amount: fee.amount,
-                      decimals: feeToken.decimals,
-                      symbol: feeToken.symbol,
-                    })
-                  ) : (
-                    <>{fee.amount} Unknown</>
-                  )}
-                </P4>
-              )}
-            </Flex>
-          </Flex>
-        ) : showEstimateError ? (
-          <FeeEstimationValue>Error</FeeEstimationValue>
-        ) : (
-          <LoadingInput />
-        )}
-      </Flex>
+export interface FeeEstimationProps {
+  amountCurrencyValue?: string
+  fee?: EstimateFeeResponse
+  feeToken: Token
+  feeTokenBalance?: BigNumber
+  parsedFeeEstimationError: string | false
+  showError: boolean
+  showEstimateError: boolean
+  showFeeError: boolean
+  suggestedMaxFeeCurrencyValue?: string
+}
 
-      {showError && (
-        <Flex
-          direction="column"
-          backgroundColor="#330105"
-          boxShadow="menu"
-          py="3.5"
-          px="3.5"
-          borderRadius="xl"
+export const FeeEstimation: FC<FeeEstimationProps> = ({
+  amountCurrencyValue,
+  fee,
+  feeToken,
+  feeTokenBalance,
+  parsedFeeEstimationError,
+  showError,
+  showFeeError,
+  suggestedMaxFeeCurrencyValue,
+}) => {
+  const tooltipText = useMemo(() => {
+    if (fee) {
+      return getTooltipText(fee.suggestedMaxFee, feeTokenBalance)
+    }
+  }, [fee, feeTokenBalance])
+  const primaryText = useMemo(() => {
+    if (fee) {
+      return amountCurrencyValue !== undefined ? (
+        `≈ ${prettifyCurrencyValue(amountCurrencyValue)}`
+      ) : (
+        <TextWithAmount amount={fee.amount} decimals={feeToken.decimals}>
+          <>
+            ≈{" "}
+            {feeToken ? (
+              prettifyTokenAmount({
+                amount: fee.amount,
+                decimals: feeToken.decimals,
+                symbol: feeToken.symbol,
+              })
+            ) : (
+              <>{fee.amount} Unknown</>
+            )}
+          </>
+        </TextWithAmount>
+      )
+    }
+  }, [amountCurrencyValue, fee, feeToken])
+  const secondaryText = useMemo(() => {
+    if (fee) {
+      if (suggestedMaxFeeCurrencyValue !== undefined) {
+        return `(Max ${prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})`
+      }
+      return (
+        <TextWithAmount
+          amount={fee.suggestedMaxFee}
+          decimals={feeToken.decimals}
         >
-          <Flex justifyContent="space-between" alignItems="center">
-            <Flex gap="1" align="center">
-              <Text color="errorText">
-                <AlertIcon />
-              </Text>
-              <L1 color="errorText">
-                {showFeeError
-                  ? "Not enough funds to cover for fees"
-                  : "Transaction failure predicted"}
-              </L1>
-            </Flex>
-            {!showFeeError && (
-              <ExtendableControl
-                {...makeClickable(() => setFeeEstimateExpanded((x) => !x), {
-                  label: "Show error details",
-                })}
-              >
-                <Text color="errorText">
-                  <ChevronDownIcon
-                    style={{
-                      transition: "transform 0.2s ease-in-out",
-                      transform: feeEstimateExpanded
-                        ? "rotate(-180deg)"
-                        : "rotate(0deg)",
-                    }}
-                    height="14px"
-                    width="16px"
-                  />
-                </Text>
-              </ExtendableControl>
+          <>
+            (Max&nbsp;
+            {feeToken ? (
+              prettifyTokenAmount({
+                amount: fee.suggestedMaxFee,
+                decimals: feeToken.decimals,
+                symbol: feeToken.symbol,
+              })
+            ) : (
+              <>{fee.suggestedMaxFee} Unknown</>
             )}
-          </Flex>
-
-          <Collapse
-            in={feeEstimateExpanded}
-            timeout="auto"
-            style={{
-              maxHeight: "80vh",
-              overflow: "auto",
-            }}
-          >
-            {parsedFeeEstimationError && (
-              <CopyTooltip
-                copyValue={parsedFeeEstimationError}
-                message="Copied"
-              >
-                <P4 color="errorText" pt="3">
-                  <pre style={{ whiteSpace: "pre-wrap" }}>
-                    {parsedFeeEstimationError}
-                  </pre>
-                </P4>
-              </CopyTooltip>
-            )}
-          </Collapse>
-        </Flex>
-      )}
-    </Flex>
+            )
+          </>
+        </TextWithAmount>
+      )
+    }
+  }, [fee, feeToken, suggestedMaxFeeCurrencyValue])
+  const isLoading = !fee || !feeTokenBalance
+  if (!showError) {
+    return (
+      <FeeEstimationBox>
+        <FeeEstimationText
+          tooltipText={tooltipText}
+          primaryText={primaryText}
+          secondaryText={secondaryText}
+          isLoading={isLoading}
+        />
+      </FeeEstimationBox>
+    )
+  }
+  if (showFeeError) {
+    return (
+      <InsufficientFundsAccordion
+        tooltipText={tooltipText}
+        primaryText={primaryText}
+        secondaryText={secondaryText}
+      />
+    )
+  }
+  return (
+    <TransactionFailureAccordion
+      parsedFeeEstimationError={parsedFeeEstimationError}
+    />
   )
 }

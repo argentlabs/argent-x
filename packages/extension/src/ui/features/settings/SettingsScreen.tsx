@@ -9,16 +9,16 @@ import {
 import { Center } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
 import { routes, useCurrentPathnameWithQuery, useReturnTo } from "../../routes"
-import { stopSession } from "../../services/backgroundSessions"
+import { useStopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
 import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
+import { DapplandFooter } from "./DapplandFooter"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 import { SupportFooter } from "./SupportFooter"
 
@@ -84,6 +84,7 @@ export const SettingsScreen: FC = () => {
   const returnTo = useCurrentPathnameWithQuery()
   const account = useAccount(selectedAccount)
   const navigate = useNavigate()
+  const stopSession = useStopSession()
   return (
     <>
       <NavigationContainer
@@ -145,6 +146,7 @@ export const SettingsScreen: FC = () => {
               title="Privacy"
             />
           )}
+          <DapplandFooter />
           <SupportFooter />
         </CellStack>
       </NavigationContainer>
@@ -156,9 +158,9 @@ export const SettingsScreen: FC = () => {
         boxShadow="menu"
       >
         <Button
-          as={Link}
-          onClick={stopSession}
-          to={routes.lockScreen()}
+          onClick={() => {
+            stopSession(true)
+          }}
           size="sm"
           colorScheme="transparent"
           color="white50"

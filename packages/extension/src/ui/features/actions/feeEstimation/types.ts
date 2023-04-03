@@ -24,6 +24,7 @@ export type DeclareContractFeeEstimationProps = Omit<
   TransactionsFeeEstimationProps,
   "transactions"
 > & {
+  needsDeploy?: boolean
   payload: DeclareContractPayload
 }
 
@@ -31,5 +32,6 @@ export type DeployContractFeeEstimationProps = Omit<
   TransactionsFeeEstimationProps,
   "transactions"
 > & {
+  needsDeploy?: boolean
   payload: UniversalDeployerContractPayload
 }

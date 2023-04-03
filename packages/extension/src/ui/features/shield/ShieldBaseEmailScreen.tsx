@@ -6,6 +6,7 @@ import {
   FieldError,
   Input,
   NavigationContainer,
+  icons,
   useToast,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
@@ -13,11 +14,14 @@ import { FC } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
+import { resetDevice } from "../../../shared/shield/jwt"
 import { requestEmail } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
-import { ShieldHeader } from "./ShieldHeader"
+import { ShieldHeader } from "./ui/ShieldHeader"
+
+const { LockIcon } = icons
 
 const schema = yup.object().required().shape({
   email: yup.string().email().required(),
@@ -27,12 +31,14 @@ export interface ShieldBaseEmailScreenProps {
   onBack?: () => void
   onCancel?: () => void
   onEmailRequested: (email: string) => void
+  hasGuardian?: boolean
 }
 
 export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
   onBack,
   onCancel,
   onEmailRequested,
+  hasGuardian,
 }) => {
   const resolver = useYupValidationResolver(schema)
   const toast = useToast()
@@ -60,7 +66,8 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
         flex={1}
         onSubmit={handleSubmit(async ({ email }) => {
           try {
-            console.log("Registering email", email)
+            /** reset to ensure if new email validates it is always associated with fresh device */
+            await resetDevice()
             await requestEmail(email)
             onEmailRequested(email)
           } catch (error) {
@@ -74,12 +81,17 @@ export const ShieldBaseEmailScreen: FC<ShieldBaseEmailScreenProps> = ({
         })}
       >
         <ShieldHeader
-          title={"1 - Enter email"}
-          subtitle={"Enter email that should be used for 2FA"}
+          icon={LockIcon}
+          title={hasGuardian ? "Verify Argent Shield" : "Enter email"}
+          subtitle={
+            hasGuardian
+              ? "Enter email that is used for two-factor authentication"
+              : "Enter email that should be used for two-factor authentication"
+          }
         />
         <Input
           isInvalid={Boolean(formState.errors.email)}
-          placeholder="Enter email"
+          placeholder="Email"
           autoFocus
           disabled={formState.isSubmitting}
           {...register("email")}

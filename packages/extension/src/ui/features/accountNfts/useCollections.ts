@@ -4,11 +4,8 @@ import useSWR from "swr"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { SWRConfigCommon } from "../../services/swr"
-import {
-  Collection,
-  Collections,
-  fetchAspectCollection,
-} from "./aspect.service"
+import { Collection } from "./aspect.model"
+import { fetchAspectCollection } from "./aspect.service"
 import { useNfts } from "./useNfts"
 
 type SerialisedCollectibles = Record<string, Collection>
@@ -16,7 +13,7 @@ type SerialisedCollectibles = Record<string, Collection>
 export const useCollections = (
   account?: BaseWalletAccount,
   config?: SWRConfigCommon,
-): Collections => {
+): Collection[] => {
   const { nfts = [] } = useNfts(account, config)
   return useMemo(
     () =>

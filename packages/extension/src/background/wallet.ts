@@ -1,12 +1,13 @@
 import { ethers } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { find, noop, throttle, union } from "lodash-es"
+import { find, memoize, noop, throttle, union } from "lodash-es"
 import {
   Account,
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
-  Signer,
+  KeyPair,
+  SignerInterface,
   ec,
   hash,
   number,
@@ -16,6 +17,7 @@ import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
 import { ArgentAccountType } from "./../shared/wallet.model"
+import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
 import {
@@ -31,7 +33,11 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
+import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
+import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
+import { GuardianSelfSigner } from "../shared/shield/GuardianSelfSigner"
+import { GuardianSignerArgentX } from "../shared/shield/GuardianSignerArgentX"
 import {
   IArrayStorage,
   IKeyValueStorage,
@@ -39,14 +45,17 @@ import {
   ObjectStorage,
 } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
-import { accountsEqual, baseDerivationPath } from "../shared/wallet.service"
+import {
+  accountsEqual,
+  baseDerivationPath,
+  getAccountIdentifier,
+} from "../shared/wallet.service"
 import { isEqualAddress } from "../ui/services/addresses"
 import { LoadContracts } from "./accounts"
 import {
   declareContracts,
   getPreDeployedAccount,
 } from "./devnet/declareAccounts"
-import { GuardianSigner } from "./GuardianSigner"
 import {
   getIndexForPath,
   getNextPathIndex,
@@ -72,6 +81,7 @@ export const PROXY_CONTRACT_CLASS_HASHES = [
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918",
 ]
 export const ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES = [
+  "0x33434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",
   "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f",
   "0x3e327de1c40540b98d05cbcb13552008e36f0ec8d61d46956d2f9752c294328",
   "0x7e28fb0161d10d1cf7fe1f13e7ca57bce062731a3bd04494dfd2d0412699727",
@@ -97,6 +107,24 @@ export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
   namespace: "core:wallet:session",
   areaName: "session",
 })
+
+const isNonceManagedOnAccountContract = memoize(
+  async (account: Accountv4, _: BaseWalletAccount) => {
+    try {
+      // This will fetch nonce from account contract instead of Starknet OS
+      await account.getNonce()
+      return true
+    } catch {
+      return false
+    }
+  },
+  (_, account) => {
+    const id = getAccountIdentifier(account)
+    // memoize for max 5 minutes
+    const timestamp = Math.floor(Date.now() / 1000 / 60 / 5)
+    return `${id}-${timestamp}`
+  },
+)
 
 export type GetNetwork = (networkId: string) => Promise<Network>
 
@@ -165,8 +193,10 @@ export class Wallet {
 
     await this.importBackup(encryptedBackup)
     await this.setSession(ethersWallet.privateKey, newPassword)
-
-    await this.discoverAccounts()
+    const accounts = await this.discoverAccounts()
+    if (accounts.length === 0) {
+      this.newAccount(defaultNetwork.id)
+    }
   }
 
   public async discoverAccounts() {
@@ -176,9 +206,8 @@ export class Wallet {
     }
     const wallet = new ethers.Wallet(session?.secret)
 
-    const networks = defaultNetworks
-      .map((network) => network.id)
-      .filter((networkId) => networkId !== "localhost")
+    const networks = defaultNetworks.map((network) => network.id)
+
     const accountsResults = await Promise.all(
       networks.map(async (networkId) => {
         const network = await this.getNetwork(networkId)
@@ -191,8 +220,8 @@ export class Wallet {
     const accounts = accountsResults.flatMap((x) => x)
 
     await this.walletStore.push(accounts)
-
     this.store.set("discoveredOnce", true)
+    return accounts
   }
 
   private async getAccountClassHashForNetwork(
@@ -200,24 +229,22 @@ export class Wallet {
     accountType: ArgentAccountType,
   ): Promise<string> {
     if (network.accountClassHash) {
-      if (
-        accountType === "argent-plugin" &&
-        network.accountClassHash.argentPluginAccount
-      ) {
-        return network.accountClassHash.argentPluginAccount
-      }
-      return network.accountClassHash.argentAccount
+      return (
+        network.accountClassHash[
+          mapArgentAccountTypeToImplementationKey(accountType)
+        ] ?? network.accountClassHash.argentAccount
+      )
     }
 
     const deployerAccount = await getPreDeployedAccount(network)
     if (deployerAccount) {
-      const { account } = await declareContracts(
+      const { accountClassHash } = await declareContracts(
         network,
         deployerAccount,
         this.loadContracts,
       )
 
-      return account.class_hash
+      return accountClassHash
     }
 
     return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
@@ -232,12 +259,14 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    const accountClassHashes = union(
-      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-      network?.accountClassHash?.argentAccount
-        ? [network.accountClassHash.argentAccount]
-        : [],
+    const networkAccountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "argent",
     )
+
+    const accountClassHashes = union(ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES, [
+      networkAccountClassHash,
+    ])
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
     if (!accountClassHashes?.length) {
@@ -297,12 +326,13 @@ export class Wallet {
       },
     )
 
-    await Promise.all(promises)
+    await Promise.allSettled(promises)
 
     try {
       const accountDetailFetchers: DetailFetchers[] = [getAccountTypesFromChain]
 
       if (ARGENT_SHIELD_ENABLED) {
+        accountDetailFetchers.push(getAccountEscapeFromChain)
         accountDetailFetchers.push(getAccountGuardiansFromChain)
       }
 
@@ -310,13 +340,14 @@ export class Wallet {
         accounts,
         accountDetailFetchers,
       )
+
       return accountsWithDetails
     } catch (error) {
       console.error(
         "Error getting account types or guardians from chain",
         error,
       )
-      return accounts
+      throw new Error(JSON.stringify(error, Object.getOwnPropertyNames(error)))
     }
   }
 
@@ -638,17 +669,23 @@ export class Wallet {
     return getStarkPair(derivationPath, session.secret)
   }
 
-  public async getSignerForAccount(account: WalletAccount) {
+  public async getSignerForAccount(
+    account: WalletAccount,
+  ): Promise<KeyPair | SignerInterface> {
     const keyPair = await this.getKeyPairByDerivationPath(
       account.signer.derivationPath,
     )
 
-    const signer =
-      ARGENT_SHIELD_ENABLED && account.guardian
-        ? new GuardianSigner(keyPair)
-        : new Signer(keyPair)
+    if (ARGENT_SHIELD_ENABLED && account.guardian) {
+      const publicKey = ec.getStarkKey(keyPair)
+      if (isEqualAddress(account.guardian, publicKey)) {
+        /** Account guardian is the same as local signer */
+        return new GuardianSelfSigner(keyPair)
+      }
+      return new GuardianSignerArgentX(keyPair, cosignerSign)
+    }
 
-    return signer
+    return keyPair
   }
 
   public async getStarknetAccount(
@@ -669,35 +706,28 @@ export class Wallet {
         : await this.getNetwork(selector.networkId),
     )
 
-    const providerV4 = getProviderv4(
-      account.network && account.network.baseUrl
-        ? account.network
-        : await this.getNetwork(selector.networkId),
-    )
-
     const signer = await this.getSignerForAccount(account)
 
     if (account.needsDeploy || useLatest) {
       return new Account(provider, account.address, signer)
     }
 
+    const providerV4 = getProviderv4(
+      account.network && account.network.baseUrl
+        ? account.network
+        : await this.getNetwork(selector.networkId),
+    )
+
     const oldAccount = new Accountv4(providerV4, account.address, signer)
 
-    const isOldAccount = await this.isNonceManagedOnAccountContract(oldAccount)
+    const isOldAccount = await isNonceManagedOnAccountContract(
+      oldAccount,
+      account,
+    )
 
     return isOldAccount
       ? oldAccount
       : new Account(provider, account.address, signer)
-  }
-
-  public async isNonceManagedOnAccountContract(account: Accountv4) {
-    try {
-      // This will fetch nonce from account contract instead of Starknet OS
-      await account.getNonce()
-      return true
-    } catch {
-      return false
-    }
   }
 
   public async getCurrentImplementation(
@@ -780,6 +810,24 @@ export class Wallet {
     const url = URL.createObjectURL(blob)
     const filename = "argent-x-backup.json"
     return { url, filename }
+  }
+
+  public async getPublicKey(baseAccount?: BaseWalletAccount): Promise<string> {
+    const account = baseAccount
+      ? await this.getAccount(baseAccount)
+      : await this.getSelectedAccount()
+
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    return starkPub
   }
 
   public async exportPrivateKey(): Promise<string> {

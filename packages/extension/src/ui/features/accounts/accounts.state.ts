@@ -29,6 +29,7 @@ export const mapWalletAccountsToAccounts = (
         hidden: walletAccount.hidden,
         type: walletAccount.type,
         guardian: walletAccount.guardian,
+        escape: walletAccount.escape,
         needsDeploy: walletAccount.needsDeploy,
       }),
   )
@@ -44,6 +45,10 @@ export const useAccounts = ({
   const filteredAccounts = useMemo(
     () =>
       accounts
+        .filter((account) => {
+          /** omit if custom network no longer exists */
+          return account.network !== undefined
+        })
         .filter(
           allNetworks
             ? () => true

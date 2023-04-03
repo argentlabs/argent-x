@@ -1,5 +1,5 @@
 import { lowerCase, upperFirst } from "lodash-es"
-import { Call, Status } from "starknet"
+import { Call, Status, TransactionType, number } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
 
@@ -21,8 +21,9 @@ export interface TransactionMeta {
   isUpgrade?: boolean
   isChangeGuardian?: boolean
   isDeployAccount?: boolean
+  isCancelEscape?: boolean
   transactions?: Call | Call[]
-  type?: string // TODO: in future can be DECLARE | DEPLOY | CALL
+  type?: TransactionType
 }
 
 export interface TransactionBase {
@@ -77,7 +78,9 @@ export function transactionNamesToTitle(
   if (!Array.isArray(names)) {
     names = [names]
   }
-  const entrypointNames = names.map((name) => lowerCase(name))
+  /** backend returns hex selectors for unknown names - filter them out */
+  const nonHexNames = names.filter((name) => !number.isHex(name))
+  const entrypointNames = nonHexNames.map((name) => lowerCase(name))
   const lastName = entrypointNames.pop()
   const title = entrypointNames.length
     ? `${entrypointNames.join(", ")} and ${lastName}`

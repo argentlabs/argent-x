@@ -38,7 +38,11 @@ const swrPersistedCache: Cache = {
   },
 }
 
-/** SWR config - keep default behaviour with refresh and dedepe for 'polling' behaviour */
+/**
+ * SWR config - refresh and dedupe for 'polling' behaviour, useful for polling services
+ * NOTE: enabling deduping will naturally disable revalidation on mount etc.
+ */
+
 export const withPolling = (interval: number) => {
   return {
     refreshInterval: interval,

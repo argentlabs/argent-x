@@ -4,10 +4,11 @@ import { FC, ReactNode, isValidElement, useMemo } from "react"
 // import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
 import { Outlet, useLocation } from "react-router-dom"
 
-import { useAppState, useStopSessionHandler } from "./app.state"
+import { useAppState, useMessageStreamHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
+import { AccountImplementationScreen } from "./features/accountEdit/AccountImplementationScreen"
 import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
@@ -15,6 +16,7 @@ import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
 import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
 import { AccountListScreen } from "./features/accounts/AccountListScreen"
 import { AccountScreen } from "./features/accounts/AccountScreen"
+import { AddNewAccountScreen } from "./features/accounts/AddNewAccountScreen"
 import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
 import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
 import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
@@ -65,6 +67,8 @@ import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
+import { WithArgentServicesEnabled } from "./features/settings/WithArgentServicesEnabled"
+import { EscapeWarningScreen } from "./features/shield/escape/EscapeWarningScreen"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
 import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
@@ -157,14 +161,28 @@ const walletRoutes = (
       element={<AccountListScreen />}
     />
     <Route
+      presentation="modal"
+      path={routes.newAccount.path}
+      element={<AddNewAccountScreen />}
+    />
+    <Route
       presentation="push"
       path={routes.editAccount.path}
       element={<AccountEditScreen />}
     />
     <Route
       presentation="push"
+      path={routes.accountImplementations.path}
+      element={<AccountImplementationScreen />}
+    />
+    <Route
+      presentation="push"
       path={routes.shieldAccountStart.path}
-      element={<ShieldAccountStartScreen />}
+      element={
+        <WithArgentServicesEnabled>
+          <ShieldAccountStartScreen />
+        </WithArgentServicesEnabled>
+      }
     />
     <Route
       presentation="push"
@@ -185,6 +203,10 @@ const walletRoutes = (
       presentation="push"
       path={routes.shieldAccountFinish.path}
       element={<ShieldAccountFinishScreen />}
+    />
+    <Route
+      path={routes.shieldEscapeWarning.path}
+      element={<EscapeWarningScreen />}
     />
     <Route
       presentation="modal"
@@ -414,7 +436,7 @@ const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
 
 export const AppRoutes: FC = () => {
   useEntryRoute()
-  useStopSessionHandler()
+  useMessageStreamHandler()
   const location = useLocation()
 
   const { isLoading } = useAppState()

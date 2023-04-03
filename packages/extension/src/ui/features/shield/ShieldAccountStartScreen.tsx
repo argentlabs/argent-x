@@ -1,7 +1,6 @@
 import {
   BarBackButton,
   Button,
-  CellStack,
   Empty,
   NavigationContainer,
   icons,
@@ -11,20 +10,23 @@ import { Flex } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { requestEmail } from "../../../shared/shield/register"
+import { ARGENT_SHIELD_NETWORK_ID } from "../../../shared/shield/constants"
 import {
-  getVerifiedEmailIsExpired,
-  getVerifiedEmailIsExpiredForRemoval,
-} from "../../../shared/shield/verifiedEmail"
+  requestEmail,
+  shieldIsTokenExpired,
+} from "../../../shared/shield/register"
+import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
+import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
-import { ShieldAccountNotDeployed } from "./ShieldAccountNotDeployed"
+import { ShieldAccountNotReady } from "./ShieldAccountNotDeployed"
 import { useRouteAccount } from "./useRouteAccount"
+import { useShieldOnboardingTracking } from "./useShieldTracking"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
-const { ShieldIcon } = icons
+const { ArgentShieldIcon } = icons
 
 export const ShieldAccountStartScreen: FC = () => {
   const navigate = useNavigate()
@@ -33,16 +35,21 @@ export const ShieldAccountStartScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const network = useCurrentNetwork()
+  const { needsUpgrade = false } = useCheckUpgradeAvailable(account)
+
+  const { trackSuccess } = useShieldOnboardingTracking({
+    stepId: "welcome",
+  })
 
   const onActivate = useCallback(async () => {
+    trackSuccess()
     if (verifiedEmail) {
       try {
         setIsLoading(true)
-        const verifiedEmailIsExpired = account?.guardian
+        const isExpired = account?.guardian
           ? await getVerifiedEmailIsExpiredForRemoval()
-          : await getVerifiedEmailIsExpired()
-        console.log({ verifiedEmailIsExpired })
-        if (verifiedEmailIsExpired) {
+          : await shieldIsTokenExpired()
+        if (isExpired) {
           await requestEmail(verifiedEmail)
           navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
         } else {
@@ -60,36 +67,47 @@ export const ShieldAccountStartScreen: FC = () => {
     } else {
       navigate(routes.shieldAccountEmail(account?.address))
     }
-  }, [account?.address, account?.guardian, navigate, toast, verifiedEmail])
+  }, [
+    account?.address,
+    account?.guardian,
+    navigate,
+    toast,
+    trackSuccess,
+    verifiedEmail,
+  ])
 
-  const isAvailable = network.id === "goerli-alpha-2"
+  const isAvailable = network.id === ARGENT_SHIELD_NETWORK_ID
 
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
       {isAvailable ? (
-        <CellStack flex={1}>
-          {account?.needsDeploy ? (
-            <ShieldAccountNotDeployed />
-          ) : account?.guardian ? (
-            <ShieldAccountDeactivate />
-          ) : (
-            <ShieldAccountActivate />
-          )}
-          <Flex flex={1} />
-          <Button
-            onClick={onActivate}
-            colorScheme={"primary"}
-            disabled={isLoading || account?.needsDeploy}
-            isLoading={isLoading}
-            loadingText={"Verifying email"}
-          >
-            {account?.guardian ? "Deactivate" : "Activate"}
-          </Button>
-        </CellStack>
+        account?.needsDeploy ? (
+          <ShieldAccountNotReady />
+        ) : needsUpgrade ? (
+          <ShieldAccountNotReady needsUpgrade />
+        ) : (
+          <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
+            {account?.guardian ? (
+              <ShieldAccountDeactivate />
+            ) : (
+              <ShieldAccountActivate />
+            )}
+            <Flex flex={1} />
+            <Button
+              onClick={onActivate}
+              colorScheme={"primary"}
+              disabled={isLoading || account?.needsDeploy}
+              isLoading={isLoading}
+              loadingText={"Verifying email"}
+            >
+              Next
+            </Button>
+          </Flex>
+        )
       ) : (
         <Empty
-          icon={<ShieldIcon />}
-          title={"Argent Shield is currently available only on Testnet 2"}
+          icon={<ArgentShieldIcon />}
+          title={"Argent Shield is not enabled for this network"}
         />
       )}
     </NavigationContainer>

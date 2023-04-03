@@ -20,10 +20,14 @@
 - [🧒 Example dapp](#-example-dapp)
 - [🌐 Usage with your dapp](#-usage-with-your-dapp)
 - [🚀 Install from sources](#-install-from-sources)
+  - [Chrome](#chrome)
+  - [Firefox](#firefox)
 - [👩🏾‍💻 Development](#-development)
 - [🧪 Testing](#-testing)
   - [Setup](#setup)
+  - [Run devnet locally](#run-devnet-locally)
   - [Run tests](#run-tests)
+  - [Tools to help with testing](#tools-to-help-with-testing)
 - [✏️ Contributing](#️-contributing)
 - [❤️ Family and friends](#️-family-and-friends)
 - [👨🏼‍🎨 Authors and license](#-authors-and-license)
@@ -80,11 +84,13 @@ Checkout [starknet.js](https://github.com/0xs34n/starknet.js) to learn more abou
 First clone this repository on your machine then run:
 
 ```bash
-yarn        # setup dependencies
+yarn setup  # setup dependencies
 yarn build  # run build process for all packages
 ```
 
 Now you need to load the locally built chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
+
+### Chrome
 
 1. Open the Extension Management page by navigating to `chrome://extensions`.
 2. Enable Developer Mode by clicking the toggle switch next to **Developer mode**.
@@ -94,6 +100,13 @@ Now you need to load the locally built chrome extension into your browser, by lo
 
 [Source](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest)
 
+### Firefox
+
+1. Open the Extension Management page by navigating to `about:debugging#/runtime/this-firefox`
+2. Select the `manifest.json` from the dist folder
+
+[Source](https://firefox-source-docs.mozilla.org/devtools-user/about_colon_debugging/index.html)
+
 ## 👩🏾‍💻 Development
 
 To contribute to this repository please read the [contributing guidelines](Contributing.md) first.
@@ -101,8 +114,8 @@ To contribute to this repository please read the [contributing guidelines](Contr
 To setup the repo on your machine just run:
 
 ```bash
-yarn      # setup dependencies
-yarn dev  # run build process for all packages in watch mode
+yarn setup # setup dependencies
+yarn dev   # run build process for all packages in watch mode
 ```
 
 This project contains 3 packages:

@@ -70,10 +70,16 @@ export interface Events {
   }
   signedTransaction: {
     networkId: string
+    host?: string
   }
   sentTransaction: {
     success: boolean
     networkId: string
+    host?: string
+  }
+  rejectedTransaction: {
+    networkId: string
+    host?: string
   }
   signedMessage: {
     networkId: string
@@ -98,6 +104,75 @@ export interface Events {
     networkId: string
     pair: string
   }
+  executeTransaction: {
+    usesCachedFees: boolean
+  }
+  onboardingStepFinished: {
+    timeSpent?: number
+    successful?: boolean
+    stepId:
+      | "welcome"
+      | "disclaimer"
+      | "restoreSeedphrase"
+      | "newWalletPassword"
+      | "finish"
+  }
+  argentShieldOnboardingStepFinished: {
+    timeSpent?: number
+    successful?: boolean
+    stepId:
+      | "welcome"
+      | "enterEmail"
+      | "enterPasscode"
+      | "addArgentShield"
+      | "addArgentShieldFinish"
+    accountsWith2fa?: number
+    authenticated?: boolean
+  }
+  argentShieldRemovalStepFinished: {
+    timeSpent?: number
+    successful?: boolean
+    stepId:
+      | "welcome"
+      | "enterEmail"
+      | "enterPasscode"
+      | "removeArgentShield"
+      | "removeArgentShieldFinish"
+    accountsWith2fa?: number
+    authenticated?: boolean
+  }
+  argentShieldError: {
+    errorId: "emailNotMatch" | "emailAlreadyInUseForOtherSeedphrase"
+    accountsWith2fa?: number
+    authenticated?: boolean
+  }
+  argentShieldEscapeScreenSeen: {
+    escapeId: "escapeGuardian" | "escapeSigner"
+    remainingTime: number
+  }
+  argentShieldEscapeScreenAction:
+    | {
+        remainingTime: number
+      } & (
+        | {
+            escapeId: "escapeGuardian"
+            action:
+              | "dismiss"
+              | "detailedInstructions"
+              | "keepArgentShield"
+              | "continueWithRemoval"
+              | "removeArgentShield"
+          }
+        | {
+            escapeId: "escapeSigner"
+            action:
+              | "dismiss"
+              | "detailedInstructions"
+              | "contactArgentSupport"
+              | "cancelKeyChange"
+              | "startRemoval"
+          }
+      )
 }
 
 export interface Pages {

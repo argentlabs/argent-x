@@ -1,10 +1,10 @@
-import { TransactionActions } from "@argent-x/extension/src/ui/features/actions/transaction/TransactionActions"
+import { TransactionActions } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/TransactionActions"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
-import { frenslandCalls } from "./__fixtures__/calldata/generic"
+import { frenslandCalls, jediswapCalls } from "./__fixtures__/calldata/generic"
 
 export default {
-  title: "features/TransactionsActions",
+  title: "features/TransactionActions",
   component: TransactionActions,
 } as ComponentMeta<typeof TransactionActions>
 
@@ -15,4 +15,9 @@ const Template: ComponentStory<typeof TransactionActions> = (props) => (
 export const FrensLand = Template.bind({})
 FrensLand.args = {
   transactions: frenslandCalls,
+}
+
+export const Jediswap = Template.bind({})
+Jediswap.args = {
+  transactions: jediswapCalls,
 }

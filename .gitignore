@@ -12,3 +12,5 @@ package-lock.json
 .env
 sourcemaps
 coverage
+*.tsbuildinfo
+license-report.md

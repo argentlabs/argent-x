@@ -1,3 +1,4 @@
+import { Device } from "@argent/guardian"
 import {
   SignJWT,
   calculateJwkThumbprint,
@@ -5,7 +6,8 @@ import {
   generateKeyPair,
 } from "jose"
 
-import { Device, idb } from "./idb"
+import { getBackendTimeNowSeconds } from "./backend/time"
+import { idb } from "./idb"
 
 /** important that signingKey stays not 'extractable' from browser */
 
@@ -20,28 +22,18 @@ const createDevice = async (): Promise<Device> => {
   }
 }
 
-let _device: Device | null = null
-
 export const resetDevice = async () => {
-  await idb.transaction("rw", idb.devices, async () => {
-    await idb.devices.delete(0)
-    _device = null
-  })
+  await idb.devices.delete(0)
 }
 
 export const getDevice = async () => {
-  if (!_device) {
-    const newDevice = await createDevice()
-    _device = await idb.transaction("rw", idb.devices, async () => {
-      const device = await idb.devices.get(0)
-      if (device) {
-        return device
-      }
-      await idb.devices.put(newDevice)
-      return newDevice
-    })
+  const device = await idb.devices.get(0)
+  if (device) {
+    return device
   }
-  return _device
+  const newDevice = await createDevice()
+  await idb.devices.put(newDevice)
+  return newDevice
 }
 
 export const generateJwt = async () => {
@@ -54,11 +46,14 @@ export const generateJwt = async () => {
   const publicJwk = await exportJWK(publicKey)
   const thumbprint = await calculateJwkThumbprint(publicJwk)
 
+  /** set issuer time from backend in case of discrepancy with local machine time */
+  const backendTimeNowSeconds = await getBackendTimeNowSeconds()
+
   const jwt = await new SignJWT({})
     .setProtectedHeader({ alg, jwk: publicJwk })
-    .setIssuedAt()
+    .setIssuedAt(backendTimeNowSeconds)
     .setIssuer("kid:" + thumbprint)
-    .setExpirationTime("2h")
+    .setExpirationTime("5m")
     .sign(privateKey)
 
   return jwt

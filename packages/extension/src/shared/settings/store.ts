@@ -8,7 +8,8 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     privacyShareAnalyticsData: true,
     privacyErrorReporting: Boolean(process.env.SENTRY_DSN), // use SENRY_DSN to enable error reporting
     privacyAutomaticErrorReporting: false,
-    experimentalPluginAccount: false, // Used experimental as namespace for now. Should be changed in future according to the place of the setting.
+    experimentalAllowChooseAccount: false,
+    experimentalEnableArgentShield: false,
     blockExplorerKey: defaultBlockExplorerKey,
   },
   "core:settings",

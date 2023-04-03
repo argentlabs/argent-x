@@ -7,7 +7,14 @@ import { useMaxDeployContractFeeEstimation } from "./utils"
 
 export const DeployContractFeeEstimation: FC<
   DeployContractFeeEstimationProps
-> = ({ accountAddress, networkId, payload, actionHash, onErrorChange }) => {
+> = ({
+  accountAddress,
+  needsDeploy,
+  networkId,
+  payload,
+  actionHash,
+  onErrorChange,
+}) => {
   const { feeToken, feeTokenBalance } = useEstimationAccountFees(
     accountAddress,
     networkId,
@@ -15,6 +22,7 @@ export const DeployContractFeeEstimation: FC<
   const { fee, error } = useMaxDeployContractFeeEstimation(payload, actionHash)
   return (
     <Estimation
+      needsDeploy={needsDeploy}
       fee={fee}
       feeToken={feeToken}
       feeTokenBalance={feeTokenBalance}

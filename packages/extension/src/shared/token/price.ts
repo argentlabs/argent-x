@@ -202,27 +202,47 @@ export interface IPrettifyTokenAmount {
   amount: BigNumberish
   decimals: BigNumberish
   symbol?: string
+  showPlusSign?: boolean
+  withSymbol?: boolean
+  unlimitedText?: string
 }
 
 export const prettifyTokenAmount = ({
   amount,
   decimals,
   symbol,
+  showPlusSign = false,
+  withSymbol = true,
+  unlimitedText = PRETTY_UNLIMITED,
 }: IPrettifyTokenAmount) => {
   if (!isNumeric(amount)) {
     return null
   }
   let prettyValue
+  let isPositiveValue = false
   if (isUnlimitedAmount(amount)) {
-    prettyValue = PRETTY_UNLIMITED
+    prettyValue = unlimitedText
   } else {
     const decimalsNumber = Number(decimals)
     const balanceBn = BigNumber.from(amount)
-    const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
-    prettyValue = prettifyTokenNumber(balanceFullString)
+    isPositiveValue = balanceBn.gt(0)
+    const balanceFullString =
+      decimalsNumber > 0
+        ? utils.formatUnits(balanceBn, decimalsNumber)
+        : balanceBn.toString()
+    prettyValue =
+      decimalsNumber > 0
+        ? prettifyTokenNumber(balanceFullString)
+        : balanceFullString
   }
-  const prettyValueWithSymbol = [prettyValue, symbol].filter(Boolean).join(" ")
-  return prettyValueWithSymbol
+
+  const prettyValueWithSymbol = [prettyValue, withSymbol && symbol]
+    .filter(Boolean)
+    .join(" ")
+
+  return showPlusSign && isPositiveValue
+    ? `+${prettyValueWithSymbol}`
+    : prettyValueWithSymbol
 }
 
 export interface IConvertTokenAmount {
