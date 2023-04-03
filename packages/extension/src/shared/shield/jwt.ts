@@ -6,6 +6,7 @@ import {
   generateKeyPair,
 } from "jose"
 
+import { getBackendTimeNowSeconds } from "./backend/time"
 import { idb } from "./idb"
 
 /** important that signingKey stays not 'extractable' from browser */
@@ -45,9 +46,12 @@ export const generateJwt = async () => {
   const publicJwk = await exportJWK(publicKey)
   const thumbprint = await calculateJwkThumbprint(publicJwk)
 
+  /** set issuer time from backend in case of discrepancy with local machine time */
+  const backendTimeNowSeconds = await getBackendTimeNowSeconds()
+
   const jwt = await new SignJWT({})
     .setProtectedHeader({ alg, jwk: publicJwk })
-    .setIssuedAt()
+    .setIssuedAt(backendTimeNowSeconds)
     .setIssuer("kid:" + thumbprint)
     .setExpirationTime("5m")
     .sign(privateKey)

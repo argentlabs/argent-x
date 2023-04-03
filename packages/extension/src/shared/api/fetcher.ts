@@ -1,9 +1,11 @@
 /** generic json fetcher */
 
-export type Fetcher = (
+import { useAppState } from "../../ui/app.state"
+
+export type Fetcher = <T>(
   input: RequestInfo | URL,
   init?: RequestInit,
-) => Promise<any>
+) => Promise<T>
 
 export interface FetcherError extends Error {
   url?: string
@@ -37,7 +39,10 @@ export const fetcherError = (
   return error
 }
 
-export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+export const fetcher = async <T>(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<T> => {
   const response = await fetch(input, init)
   /** capture text here in the case of json parse failure we can include it in the error */
   const responseText = await response.text()
@@ -64,7 +69,7 @@ export const fetcherWithArgentApiHeadersForNetwork = (
   network: string,
   fetcherImpl: Fetcher = fetcher,
 ) => {
-  const fetcherWithArgentApiHeaders = (
+  const fetcherWithArgentApiHeaders: Fetcher = (
     input: RequestInfo | URL,
     init?: RequestInit,
   ) => {
@@ -78,6 +83,15 @@ export const fetcherWithArgentApiHeadersForNetwork = (
     return fetcherImpl(input, initWithArgentApiHeaders)
   }
   return fetcherWithArgentApiHeaders
+}
+
+export const fetcherWithArgentApiHeaders = (fetcherImpl: Fetcher = fetcher) => {
+  const { switcherNetworkId } = useAppState.getState()
+  const fetcher = fetcherWithArgentApiHeadersForNetwork(
+    switcherNetworkId,
+    fetcherImpl,
+  )
+  return fetcher
 }
 
 /** convert KnownNetworksType to 'goerli' or 'mainnet' expected by API */
