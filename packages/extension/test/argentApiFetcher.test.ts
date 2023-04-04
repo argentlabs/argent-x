@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 
+import { Fetcher } from "../src/shared/api/fetcher"
 import { useAppState } from "../src/ui/app.state"
 import { argentApiFetcher } from "../src/ui/services/argentApiFetcher"
 
@@ -7,7 +8,7 @@ describe("fetcher", () => {
   describe("argentApiFetcher()", () => {
     const ORIGINAL_PROCESS_ENV = process.env
     const MOCK_VERSION = "testing.1.2.3"
-    const fetcher = vi.fn(async () => "foo")
+    const fetcher = vi.fn(async () => "foo") as Fetcher
 
     beforeAll(() => {
       process.env = {

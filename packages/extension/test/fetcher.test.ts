@@ -3,6 +3,7 @@ import { setupServer } from "msw/node"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 import {
+  Fetcher,
   FetcherError,
   fetcher,
   fetcherWithArgentApiHeadersForNetwork,
@@ -85,7 +86,7 @@ describe("fetcher", () => {
   describe("fetcherWithArgentApiHeadersForNetwork()", () => {
     const ORIGINAL_PROCESS_ENV = process.env
     const MOCK_VERSION = "testing.1.2.3"
-    const fetcher = vi.fn(async () => "foo")
+    const fetcher = vi.fn(async () => "foo") as Fetcher
     const fetcherWithArgentApiHeaders = fetcherWithArgentApiHeadersForNetwork(
       "goerli-alpha",
       fetcher,
