@@ -1,8 +1,8 @@
-import { H4, P3, icons } from "@argent/ui"
 import { Center, ChakraComponent, Circle, Spinner } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
-const { ArgentShieldIcon } = icons
+import { TickIcon } from "./icons"
+import { H4, P3 } from "./Typography"
 
 const variants = {
   default: {
@@ -31,23 +31,23 @@ const variants = {
   },
 }
 
-export type ShieldHeaderVariant = keyof typeof variants
+export type FlowHeaderVariant = keyof typeof variants
 
-export interface ShieldHeaderProps {
+export interface FlowHeaderProps {
   title: ReactNode
   subtitle?: ReactNode
-  variant?: ShieldHeaderVariant
+  variant?: FlowHeaderVariant
   size?: "md" | "lg"
   icon?: ChakraComponent<"svg">
   isLoading?: boolean
 }
 
-export const ShieldHeader: FC<ShieldHeaderProps> = ({
+const FlowHeader: FC<FlowHeaderProps> = ({
   title,
   subtitle,
   variant: variantKey = "default",
   size = "md",
-  icon: Icon = ArgentShieldIcon,
+  icon: Icon = TickIcon,
   isLoading,
 }) => {
   const variant = variants[variantKey]
@@ -72,3 +72,5 @@ export const ShieldHeader: FC<ShieldHeaderProps> = ({
     </Center>
   )
 }
+
+export { FlowHeader }

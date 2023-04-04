@@ -2,20 +2,19 @@ import {
   BarCloseButton,
   Button,
   CopyTooltip,
-  H3,
-  H6,
+  FlowHeader,
   NavigationContainer,
   P3,
   icons,
 } from "@argent/ui"
-import { Box, Flex, Text } from "@chakra-ui/react"
+import { Box, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { routes } from "../../../routes"
 import { StickyGroup } from "../../actions/DeprecatedConfirmScreen"
 
-const { TickCircleIcon } = icons
+const { CopyIcon } = icons
 
 export const DeclareOrDeployContractSuccess: FC = () => {
   const navigate = useNavigate()
@@ -32,25 +31,26 @@ export const DeclareOrDeployContractSuccess: FC = () => {
       }
     >
       {value && (
-        <Flex flex={1} mx={6} mt={16} direction="column" alignItems="center">
-          <Text fontSize="6xl" mb={7}>
-            <TickCircleIcon />
-          </Text>
+        <Flex flex={1} mx={6} mt={6} direction="column" alignItems="center">
           {isDeclare ? (
-            <>
-              <H3 mb={4}>Contract declared</H3>
-              <H6 mb={6}>Contract declared with class hash:</H6>
-            </>
+            <FlowHeader
+              title="Contract declared"
+              subtitle="Contract declared with class hash:"
+              variant="success"
+            />
           ) : (
-            <>
-              <H3 mb={4}>Contract deployed</H3>
-              <H6 mb={6}>Contract deployed with address:</H6>
-            </>
+            <FlowHeader
+              title="Contract deployed"
+              subtitle="Contract deployed with address:"
+              variant="success"
+            />
           )}
           <Box
             maxW="100%"
             backgroundColor="neutrals.800"
             borderRadius={8}
+            textAlign={"center"}
+            color={"white50"}
             py="4.5"
             px="4.5"
             overflowWrap="break-word"
@@ -66,13 +66,14 @@ export const DeclareOrDeployContractSuccess: FC = () => {
             copyValue={value}
           >
             <Button
-              mt={3}
+              mt="6"
+              gap="1"
               size="3xs"
               color={"white50"}
               bg={"transparent"}
               _hover={{ bg: "neutrals.700", color: "text" }}
             >
-              copy
+              <CopyIcon /> Copy
             </Button>
           </CopyTooltip>
         </Flex>
@@ -94,7 +95,7 @@ export const DeclareOrDeployContractSuccess: FC = () => {
             colorScheme="primary"
             width="100%"
           >
-            Go to account
+            Done
           </Button>
         )}
       </StickyGroup>

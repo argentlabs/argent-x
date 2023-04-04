@@ -1,8 +1,12 @@
-import { BarBackButton, Button, NavigationContainer, icons } from "@argent/ui"
+import {
+  BarBackButton,
+  Button,
+  FlowHeader,
+  NavigationContainer,
+  icons,
+} from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
-
-import { ShieldHeader } from "./ui/ShieldHeader"
 
 const { ArgentShieldIcon, ArgentShieldDeactivateIcon } = icons
 
@@ -20,7 +24,7 @@ export const ShieldBaseActionScreen: FC<ShieldBaseActionScreenProps> = ({
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Argent Shield"}>
       <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
-        <ShieldHeader
+        <FlowHeader
           icon={guardian ? ArgentShieldDeactivateIcon : ArgentShieldIcon}
           title={`${guardian ? "Remove" : "Add"} Argent Shield`}
           subtitle={`You need to approve a transaction in order to ${
