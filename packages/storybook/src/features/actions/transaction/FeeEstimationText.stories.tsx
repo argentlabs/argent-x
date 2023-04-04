@@ -1,13 +1,13 @@
-import { FeeEstimationBox } from "@argent-x/extension/src/ui/features/actions/feeEstimation/ui/FeeEstimationBox"
+import { FeeEstimationText } from "@argent-x/extension/src/ui/features/actions/feeEstimation/ui/FeeEstimationText"
 import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "features/FeeEstimationBox",
-  component: FeeEstimationBox,
-} as ComponentMeta<typeof FeeEstimationBox>
+  title: "features/FeeEstimationText",
+  component: FeeEstimationText,
+} as ComponentMeta<typeof FeeEstimationText>
 
-const Template: ComponentStory<typeof FeeEstimationBox> = (props) => (
-  <FeeEstimationBox {...props} />
+const Template: ComponentStory<typeof FeeEstimationText> = (props) => (
+  <FeeEstimationText {...props} />
 )
 
 const tooltipText =
@@ -54,6 +54,15 @@ CombinedNoWrap.args = {
 export const CombinedWrap = Template.bind({})
 CombinedWrap.args = {
   ...wrap,
+  tooltipText,
+  title: "Network fees",
+  subtitle: "Includes one-time activation fee",
+}
+
+export const CombinedWrapError = Template.bind({})
+CombinedWrapError.args = {
+  ...wrap,
+  colorScheme: "error",
   tooltipText,
   title: "Network fees",
   subtitle: "Includes one-time activation fee",

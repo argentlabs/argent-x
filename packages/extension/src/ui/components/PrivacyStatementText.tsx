@@ -13,7 +13,7 @@ const Container = styled.span`
 
 export const PrivacyStatementText: FC = () => {
   return (
-    <Container>
+    <Container aria-label="privacyStatementText">
       GDPR statement for browser extension wallet: Argent takes the privacy and
       security of individuals very seriously and takes every reasonable measure
       and precaution to protect and secure the personal data that we process.

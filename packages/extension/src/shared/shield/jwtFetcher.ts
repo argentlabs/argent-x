@@ -1,12 +1,11 @@
-import { useAppState } from "../../ui/app.state"
-import { fetcherWithArgentApiHeadersForNetwork } from "../api/fetcher"
+import { fetcherWithArgentApiHeaders } from "../api/fetcher"
 import { IS_DEV } from "../utils/dev"
 import { coerceErrorToString } from "../utils/error"
 import { generateJwt } from "./jwt"
 
 /** wraps fetcher, generates and uses bearer jwt */
 
-export const jwtFetcher = async (
+export const jwtFetcher = async <T>(
   input: RequestInfo | URL,
   init?: RequestInit,
 ) => {
@@ -19,10 +18,9 @@ export const jwtFetcher = async (
       "Content-Type": "application/json",
     },
   }
-  const { switcherNetworkId } = useAppState.getState()
-  const fetcher = fetcherWithArgentApiHeadersForNetwork(switcherNetworkId)
+  const fetcher = fetcherWithArgentApiHeaders()
   try {
-    return fetcher(input, initWithArgentJwtHeaders)
+    return fetcher<T>(input, initWithArgentJwtHeaders)
   } catch (error) {
     IS_DEV && console.warn(coerceErrorToString(error))
     throw error

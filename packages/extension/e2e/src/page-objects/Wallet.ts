@@ -40,6 +40,14 @@ export default class Wallet extends Navigation {
     )
   }
 
+  get privacyStatement() {
+    return this.page.getByRole("link", { name: "Privacy Statement" })
+  }
+
+  get privacyStatementText() {
+    return this.page.locator('[aria-label="privacyStatementText"]')
+  }
+
   //third screen
   get banner3() {
     return this.page.locator(`div h1:text-is("${lang.wallet.banner3}")`)
@@ -90,6 +98,13 @@ export default class Wallet extends Navigation {
       expect(this.banner2).toBeVisible(),
       expect(this.description2).toBeVisible(),
     ])
+    await expect(this.privacyStatement).toBeVisible()
+    await this.privacyStatement.click()
+    await expect(this.privacyStatementText).toHaveText(
+      lang.common.privacyStatement,
+    )
+
+    await this.page.locator('button:text-is("Back")').click()
     await this.disclaimerLostOfFunds.click()
     await this.disclaimerAlphaVersion.click()
     await this.continue.click()

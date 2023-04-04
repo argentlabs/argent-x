@@ -1,8 +1,7 @@
-import { L1, L2, P4, Pre, TextWithAmount, icons } from "@argent/ui"
-import { Flex, Text } from "@chakra-ui/react"
-import { Collapse } from "@mui/material"
+import { L1, P4, TextWithAmount } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
 import { BigNumber, utils } from "ethers"
-import { FC, useEffect, useMemo, useState } from "react"
+import { FC, useEffect, useMemo } from "react"
 import { number } from "starknet"
 
 import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
@@ -12,17 +11,15 @@ import {
 } from "../../../../shared/token/price"
 import { Token } from "../../../../shared/token/type"
 import { getFeeToken } from "../../../../shared/token/utils"
-import { CopyTooltip } from "../../../components/CopyTooltip"
-import { makeClickable } from "../../../services/a11y"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
-import { ExtendableControl } from "./styled"
 import { TransactionsFeeEstimationProps } from "./types"
 import { FeeEstimationBox } from "./ui/FeeEstimationBox"
+import { FeeEstimationText } from "./ui/FeeEstimationText"
+import { InsufficientFundsAccordion } from "./ui/InsufficientFundsAccordion"
+import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
 import { getParsedError, useMaxFeeEstimation } from "./utils"
-
-const { AlertIcon, ChevronDownIcon } = icons
 
 export const CombinedFeeEstimationContainer: FC<
   TransactionsFeeEstimationProps
@@ -163,7 +160,7 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
       }
       return (
         <TextWithAmount amount={totalFee} decimals={feeToken?.decimals}>
-          <P4 fontWeight="medium">
+          <>
             ≈{" "}
             {feeToken ? (
               prettifyTokenAmount({
@@ -174,7 +171,7 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
             ) : (
               <>{totalFee} Unknown</>
             )}
-          </P4>
+          </>
         </TextWithAmount>
       )
     }
@@ -186,8 +183,8 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
       }
       return (
         <TextWithAmount amount={totalMaxFee} decimals={feeToken?.decimals}>
-          <L2 color="neutrals.300">
-            (Max &nbsp;
+          <>
+            (Max&nbsp;
             {feeToken ? (
               prettifyTokenAmount({
                 amount: totalMaxFee,
@@ -198,89 +195,41 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
               <>{totalMaxFee} Unknown</>
             )}
             )
-          </L2>
+          </>
         </TextWithAmount>
       )
     }
   }, [feeToken, totalFee, totalMaxFee, totalMaxFeeCurrencyValue])
-  const [feeErrorExpanded, setFeeErrorExpanded] = useState(false)
-  const hasError = !(totalFee && totalMaxFee) && showEstimateError
   const isLoading = !(totalFee && totalMaxFee) && !showEstimateError
-  return (
-    <Flex direction="column" gap="1">
-      <FeeEstimationBox
+  if (!showError) {
+    return (
+      <FeeEstimationBox>
+        <FeeEstimationText
+          title={"Network fees"}
+          tooltipText={tooltipText}
+          subtitle={"Includes one-time activation fee"}
+          primaryText={primaryText}
+          secondaryText={secondaryText}
+          isLoading={isLoading}
+        />
+      </FeeEstimationBox>
+    )
+  }
+  if (showFeeError) {
+    return (
+      <InsufficientFundsAccordion
         title={"Network fees"}
         tooltipText={tooltipText}
         subtitle={"Includes one-time activation fee"}
         primaryText={primaryText}
         secondaryText={secondaryText}
-        hasError={hasError}
-        isLoading={isLoading}
       />
-      {showError && (
-        <Flex
-          direction="column"
-          backgroundColor="#330105"
-          boxShadow="menu"
-          py="3.5"
-          px="3.5"
-          borderRadius="xl"
-        >
-          <Flex justifyContent="space-between" alignItems="center">
-            <Flex gap="1" align="center">
-              <Text color="errorText">
-                <AlertIcon />
-              </Text>
-              <L1 color="errorText">
-                {showFeeError
-                  ? "Not enough funds to cover for fees"
-                  : "Transaction failure predicted"}
-              </L1>
-            </Flex>
-            {!showFeeError && (
-              <ExtendableControl
-                {...makeClickable(() => setFeeErrorExpanded((x) => !x), {
-                  label: "Show error details",
-                })}
-              >
-                <Text color="errorText">
-                  <ChevronDownIcon
-                    style={{
-                      transition: "transform 0.2s ease-in-out",
-                      transform: feeErrorExpanded
-                        ? "rotate(-180deg)"
-                        : "rotate(0deg)",
-                    }}
-                    height="14px"
-                    width="16px"
-                  />
-                </Text>
-              </ExtendableControl>
-            )}
-          </Flex>
-
-          <Collapse
-            in={feeErrorExpanded}
-            timeout="auto"
-            style={{
-              maxHeight: "80vh",
-              overflow: "auto",
-            }}
-          >
-            {parsedFeeEstimationError && (
-              <CopyTooltip
-                copyValue={parsedFeeEstimationError}
-                message="Copied"
-              >
-                <Pre color="errorText" pt="3" whiteSpace="pre-wrap">
-                  {parsedFeeEstimationError}
-                </Pre>
-              </CopyTooltip>
-            )}
-          </Collapse>
-        </Flex>
-      )}
-    </Flex>
+    )
+  }
+  return (
+    <TransactionFailureAccordion
+      parsedFeeEstimationError={parsedFeeEstimationError}
+    />
   )
 }
 
