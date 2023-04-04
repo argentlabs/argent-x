@@ -16,6 +16,7 @@ export interface ILanguage {
     save: string
     create: string
     cancel: string
+    privacyStatement: string
   }
   account: {
     noAccounts: string

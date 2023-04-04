@@ -86,4 +86,24 @@ export default class Settings {
   get copy() {
     return this.page.locator(`button:text-is("${lang.settings.copy}")`)
   }
+
+  get help() {
+    return this.page.getByRole("link", { name: "Help" })
+  }
+
+  get discord() {
+    return this.page.getByRole("link", { name: "Discord" })
+  }
+
+  get github() {
+    return this.page.getByRole("link", { name: "Github" })
+  }
+
+  get privacyStatement() {
+    return this.page.getByRole("link", { name: "Privacy Statement" })
+  }
+
+  get privacyStatementText() {
+    return this.page.locator('[aria-label="privacyStatementText"]')
+  }
 }
