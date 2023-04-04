@@ -645,7 +645,7 @@ export class Wallet {
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
       addressSalt: starkPub,
-      signature: starkPair.getPrivate(),
+      signature: [],
     }
 
     return payload
