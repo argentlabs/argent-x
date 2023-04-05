@@ -6,11 +6,12 @@ import styled from "styled-components"
 import { Button } from "../../components/Button"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { Paragraph } from "../../components/Page"
-import { routes } from "../../routes"
+import { routes, useRouteAccountAddress } from "../../routes"
 import { checkPassword } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/DeprecatedConfirmScreen"
 import { PasswordForm } from "../lock/PasswordForm"
+import { useCurrentNetwork } from "../networks/useNetworks"
 import { StatusMessageBanner } from "../statusMessage/StatusMessageBanner"
 import { usePrivateKey } from "./usePrivateKey"
 
@@ -70,8 +71,10 @@ export const ExportPrivateKeyScreen: FC = () => {
   const [isPasswordValid, setPasswordValid] = useState(false)
 
   const navigate = useNavigate()
+  const accountAddress = useRouteAccountAddress()
+  const network = useCurrentNetwork()
 
-  const privateKey = usePrivateKey()
+  const privateKey = usePrivateKey(accountAddress, network.id)
 
   const handleVerifyPassword = async (password: any) => {
     const isValid = await checkPassword(password)

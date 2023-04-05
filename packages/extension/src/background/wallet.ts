@@ -811,13 +811,16 @@ export class Wallet {
     return starkPub
   }
 
-  public async exportPrivateKey(): Promise<string> {
+  public async exportPrivateKey(
+    baseWalletAccount: BaseWalletAccount,
+  ): Promise<string> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session?.secret) {
       throw new Error("Session is not open")
     }
 
-    const account = await this.getSelectedAccount()
+    const account = await this.getAccount(baseWalletAccount)
+
     if (!account) {
       throw new Error("no selected account")
     }
