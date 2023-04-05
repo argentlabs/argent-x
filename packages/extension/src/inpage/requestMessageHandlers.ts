@@ -10,7 +10,7 @@ export async function handleAddTokenRequest(
   callParams: WatchAssetParameters,
 ): Promise<boolean> {
   sendMessage({
-    type: "REQUEST_TOKEN",
+    type: "ARGENT_REQUEST_TOKEN",
     data: {
       address: callParams.options.address,
       symbol: callParams.options.symbol,
@@ -59,7 +59,7 @@ export async function handleAddNetworkRequest(
   callParams: AddStarknetChainParameters,
 ): Promise<boolean> {
   sendMessage({
-    type: "REQUEST_ADD_CUSTOM_NETWORK",
+    type: "ARGENT_REQUEST_ADD_CUSTOM_NETWORK",
     data: {
       id: callParams.id,
       name: callParams.chainName,
@@ -119,7 +119,7 @@ export async function handleSwitchNetworkRequest(callParams: {
   chainId: Network["chainId"]
 }): Promise<boolean> {
   sendMessage({
-    type: "REQUEST_SWITCH_CUSTOM_NETWORK",
+    type: "ARGENT_REQUEST_SWITCH_CUSTOM_NETWORK",
     data: { chainId: callParams.chainId },
   })
 

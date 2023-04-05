@@ -43,7 +43,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
       })
     }
 
-    case "REQUEST_ADD_CUSTOM_NETWORK": {
+    case "ARGENT_REQUEST_ADD_CUSTOM_NETWORK": {
       const exists = await getNetwork(msg.data.chainId)
 
       if (exists) {
@@ -68,7 +68,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
       })
     }
 
-    case "REQUEST_SWITCH_CUSTOM_NETWORK": {
+    case "ARGENT_REQUEST_SWITCH_CUSTOM_NETWORK": {
       const { chainId } = msg.data
 
       const isHexChainId = number.isHex(chainId)

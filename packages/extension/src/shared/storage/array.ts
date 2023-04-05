@@ -24,7 +24,7 @@ export function mergeArrayStableWith<T>(
   compareFn: (a: T, b: T) => boolean = isEqual,
   insertMode: "unshift" | "push" = "push",
 ): T[] {
-  const result = reverse(uniqWith(reverse(source), compareFn)) // 2x reverse to keep the order while keeping the last occurence of duplicates
+  const result = reverse(uniqWith(reverse(source), compareFn)) // 2x reverse to keep the order while keeping the last occurrence of duplicates
   for (const element of other) {
     const index = result.findIndex((e) => compareFn(e, element))
     if (index === -1) {

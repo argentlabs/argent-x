@@ -1,3 +1,4 @@
+import type { StarknetWindowObject } from "@argent/x-window"
 import { assertNever } from "./../ui/services/assertNever"
 import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
@@ -6,20 +7,24 @@ import { ArgentXAccount } from "./ArgentXAccount"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
+import { isPlainObject } from "lodash-es"
 
 const INJECT_NAMES = ["starknet", "starknet_argentX"]
 
 function attach() {
+  window.starknetProviders =
+    window.starknetProviders && isPlainObject(window.starknetProviders) ? window.starknetProviders : {}
+
   INJECT_NAMES.forEach((name) => {
     // we need 2 different try catch blocks because we want to execute both even if one of them fails
     try {
-      delete (window as any)[name]
+      delete (window.starknetProviders as any)[name]
     } catch (e) {
       // ignore
     }
     try {
       // set read only property to window
-      Object.defineProperty(window, name, {
+      Object.defineProperty(window.starknetProviders, name, {
         value: starknetWindowObject,
         writable: false,
       })
@@ -27,7 +32,8 @@ function attach() {
       // ignore
     }
     try {
-      ;(window as any)[name] = starknetWindowObject
+      ;(window.starknetProviders as any)[name] = starknetWindowObject
+      window.dispatchEvent(new Event(`starknet/${name}#initialized`)) // dApps could subscribe this event to detect whether the window object is available
     } catch {
       // ignore
     }
@@ -36,13 +42,10 @@ function attach() {
 
 function attachHandler() {
   attach()
-  setTimeout(attach, 100)
+  // setTimeout(attach, 100) // no need to wait due to `initialized` event
 }
 // inject script
 attachHandler()
-window.addEventListener("load", () => attachHandler())
-document.addEventListener("DOMContentLoaded", () => attachHandler())
-document.addEventListener("readystatechange", () => attachHandler())
 
 window.addEventListener(
   "message",
@@ -72,7 +75,7 @@ window.addEventListener(
           10 * 60 * 1000,
         )
         sendMessage({
-          type: "CONNECT_DAPP",
+          type: "ARGENT_CONNECT_DAPP",
         })
         const walletAccount = await walletAccountP
 
@@ -118,3 +121,10 @@ window.addEventListener(
     }
   },
 )
+
+declare global {
+  interface Window {
+    // Inspired by EIP-5749: https://eips.ethereum.org/EIPS/eip-5749
+    starknetProviders?: Record<string, StarknetWindowObject>
+  }
+}

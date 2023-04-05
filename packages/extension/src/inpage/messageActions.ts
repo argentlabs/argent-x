@@ -5,7 +5,10 @@ const extensionId = document
   ?.getAttribute("data-extension-id")
 
 export function sendMessage(msg: MessageType): void {
-  return window.postMessage({ ...msg, extensionId }, window.location.origin)
+  // `bigint` can not be serialized by `window.postMessage`
+  const stringified = JSON.stringify(msg)
+  const parsed = JSON.parse(stringified)
+  return window.postMessage({ ...parsed, extensionId }, window.location.origin)
 }
 
 export function waitForMessage<
