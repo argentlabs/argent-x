@@ -149,7 +149,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
 
       const encryptedPrivateKey = await encryptForUi(
-        await wallet.exportPrivateKey(),
+        await wallet.exportPrivateKey(msg.data.account),
         msg.data.encryptedSecret,
         privateKey,
       )

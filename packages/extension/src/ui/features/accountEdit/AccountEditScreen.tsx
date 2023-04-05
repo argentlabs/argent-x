@@ -240,7 +240,7 @@ export const AccountEditScreen: FC = () => {
           )}
           <ButtonCell
             color={"error.500"}
-            onClick={() => navigate(routes.exportPrivateKey())}
+            onClick={() => navigate(routes.exportPrivateKey(accountAddress))}
           >
             Export private key
           </ButtonCell>

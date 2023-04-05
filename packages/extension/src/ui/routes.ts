@@ -150,7 +150,10 @@ export const routes = {
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),
-  exportPrivateKey: route("/export-private-key"),
+  exportPrivateKey: route(
+    (accountAddress) => `/export-private-key/${accountAddress}`,
+    "/export-private-key/:accountAddress",
+  ),
   fundingQrCode: route("/funding/qr-code"),
   fundingProvider: route("/funding/provider"),
   token: route(
