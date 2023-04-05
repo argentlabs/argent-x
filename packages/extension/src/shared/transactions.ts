@@ -102,3 +102,9 @@ export function transformEntrypointName(entryPoint: string) {
     return entryPoint
   }
 }
+
+export const MULTISG_TXN_TYPES: ExtendedTransactionType[] = [
+  "MULTISIG_ADD_SIGNERS",
+  "MULTISIG_UPDATE_THRESHOLD",
+  "MULTISIG_REMOVE_SIGNER",
+]

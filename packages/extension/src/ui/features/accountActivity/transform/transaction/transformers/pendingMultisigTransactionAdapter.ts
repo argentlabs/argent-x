@@ -1,19 +1,19 @@
+import { MultisigPendingTransaction } from "../../../../../../shared/multisig/pendingTransactionsStore"
 import { Transaction } from "../../../../../../shared/transactions"
 import { WalletAccount } from "../../../../../../shared/wallet.model"
-import { EnrichedMultisigPendingTransaction } from "../../../../multisig/multisigTransactions.state"
 
 export const getTransactionFromPendingMultisigTransaction = (
-  pendingMultisigTransaction: EnrichedMultisigPendingTransaction,
+  pendingMultisigTransaction: MultisigPendingTransaction,
   account: WalletAccount,
 ): Transaction => {
-  const { timestamp, transactions } = pendingMultisigTransaction
+  const { timestamp, transaction } = pendingMultisigTransaction
   return {
     account,
     meta: {
-      transactions,
+      transactions: transaction.calls,
     },
     timestamp,
     status: "NOT_RECEIVED",
-    hash: pendingMultisigTransaction.data.content.transactionHash ?? "0x0",
+    hash: pendingMultisigTransaction.transactionHash,
   }
 }

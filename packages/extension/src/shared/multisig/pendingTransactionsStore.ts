@@ -1,15 +1,22 @@
-import { Call } from "starknet"
+import { AllowArray } from "starknet"
 
 import { ArrayStorage } from "../storage"
 import { ExtendedTransactionType } from "../transactions"
+import { ApiMultisigState, ApiMultisigTransaction } from "./multisig.model"
 
 export type MultisigPendingTransaction = {
   requestId: string
   address: string
   networkId: string
   timestamp: number
-  transactions?: Call | Call[]
+  transaction: ApiMultisigTransaction
   type?: ExtendedTransactionType
+  approvedSigners: string[]
+  nonApprovedSigners: string[]
+  state: ApiMultisigState
+  creator: string
+  nonce: number
+  transactionHash: string
 }
 export const multisigPendingTransactionsStore =
   new ArrayStorage<MultisigPendingTransaction>([], {
@@ -24,13 +31,13 @@ export async function getMultisigPendingTransactions(): Promise<
 }
 
 export async function addToMultisigPendingTransactions(
-  pendingTransaction: MultisigPendingTransaction,
+  pendingTransactions: AllowArray<MultisigPendingTransaction>,
 ): Promise<void> {
-  return multisigPendingTransactionsStore.push(pendingTransaction)
+  return multisigPendingTransactionsStore.push(pendingTransactions)
 }
 
 export async function removeFromMultisigPendingTransactions(
-  pendingTransaction: MultisigPendingTransaction,
-): Promise<void> {
-  multisigPendingTransactionsStore.remove(pendingTransaction)
+  pendingTransactions: AllowArray<MultisigPendingTransaction>,
+): Promise<MultisigPendingTransaction[]> {
+  return multisigPendingTransactionsStore.remove(pendingTransactions)
 }

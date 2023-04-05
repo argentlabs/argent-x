@@ -13,7 +13,7 @@ import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { useMultisigAccountPendingTransactions } from "../multisig/multisigTransactions.state"
+import { useMultisigPendingTransactionsByAccount } from "../multisig/multisigTransactions.state"
 import { useCurrentNetwork } from "../networks/useNetworks"
 import { AccountActivity } from "./AccountActivity"
 import { PendingMultisigTransactions } from "./PendingMultisigTransactions"
@@ -60,8 +60,8 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data: nftContractAddresses } = useAspectContractAddresses()
-  const { enrichedPendingMultisigTransactions } =
-    useMultisigAccountPendingTransactions(account)
+  const pendingMultisigTransactions =
+    useMultisigPendingTransactionsByAccount(account)
 
   const { data, setSize, error, isValidating } =
     useArgentExplorerAccountTransactionsInfinite({
@@ -216,7 +216,7 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   if (
     !pendingTransactions.length &&
     !Object.keys(mergedActivity).length &&
-    !enrichedPendingMultisigTransactions?.length
+    !pendingMultisigTransactions?.length
   ) {
     return (
       <Empty icon={<ActivityIcon />} title={"No activity for this network"} />
@@ -225,10 +225,10 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
 
   return (
     <>
-      {enrichedPendingMultisigTransactions &&
-        enrichedPendingMultisigTransactions.length > 0 && (
+      {pendingMultisigTransactions &&
+        pendingMultisigTransactions.length > 0 && (
           <PendingMultisigTransactions
-            pendingTransactions={enrichedPendingMultisigTransactions}
+            pendingTransactions={pendingMultisigTransactions}
             account={account}
             network={network}
           />

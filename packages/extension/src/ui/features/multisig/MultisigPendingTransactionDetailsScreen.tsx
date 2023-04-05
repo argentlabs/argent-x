@@ -11,35 +11,27 @@ import { AccountNetworkInfo } from "../actions/transaction/ApproveTransactionScr
 import { MultisigBanner } from "../actions/transaction/ApproveTransactionScreen/MultisigBanner"
 import { TransactionActions } from "../actions/transaction/ApproveTransactionScreen/TransactionActions"
 import { useRouteAccount } from "../shield/useRouteAccount"
-import { useMultisigPendingTransaction } from "./hooks/useMultisigPendingTransaction"
-import { useMultisigRequest } from "./hooks/useMultisigRequest"
+import { useMultisigPendingTransaction } from "./multisigTransactions.state"
 
 export const MultisigPendingTransactionDetailsScreen = () => {
   const [showtxDetails, setShowTxDetails] = useState(true)
 
   const selectedAccount = useRouteAccount()
   const requestId = useRouteRequestId()
-  const { data: pendingTransaction } = useMultisigPendingTransaction(requestId)
+  const pendingTransaction = useMultisigPendingTransaction(requestId)
   const navigate = useNavigate()
 
-  const { data } = useMultisigRequest({
-    account: selectedAccount,
-    requestId,
-  })
   const transactionTransformed = useMemo(() => {
-    if (data && pendingTransaction && selectedAccount) {
+    if (pendingTransaction && selectedAccount) {
       return transformTransaction({
         transaction: getTransactionFromPendingMultisigTransaction(
-          {
-            ...pendingTransaction,
-            data,
-          },
+          pendingTransaction,
           selectedAccount,
         ),
         accountAddress: selectedAccount.address,
       })
     }
-  }, [data, pendingTransaction, selectedAccount])
+  }, [pendingTransaction, selectedAccount])
   if (!selectedAccount || !requestId) {
     return <Navigate to={routes.accounts()} />
   }
@@ -77,7 +69,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
             </Flex>
           </Flex>
           <MultisigBanner
-            confirmations={data?.content.approvedSigners.length}
+            confirmations={pendingTransaction.approvedSigners.length}
             account={selectedAccount}
             onClick={goToTransactionsConfirmations}
           />
@@ -87,10 +79,10 @@ export const MultisigPendingTransactionDetailsScreen = () => {
         <Box mx={4} my={1}>
           <TransactionActions
             transactions={
-              Array.isArray(pendingTransaction?.transactions)
-                ? pendingTransaction?.transactions
-                : pendingTransaction?.transactions
-                ? [pendingTransaction?.transactions]
+              Array.isArray(pendingTransaction?.transaction.calls)
+                ? pendingTransaction?.transaction.calls
+                : pendingTransaction?.transaction.calls
+                ? [pendingTransaction?.transaction.calls]
                 : []
             }
           />

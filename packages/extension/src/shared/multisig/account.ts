@@ -5,28 +5,30 @@ import {
   Call,
   InvocationsDetails,
   InvocationsSignerDetails,
+  InvokeFunctionResponse,
   KeyPair,
   ProviderInterface,
   ProviderOptions,
-  constants,
   hash,
   number,
+  transaction,
 } from "starknet"
 import urlJoin from "url-join"
 
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
-import { chainIdToStarknetNetwork } from "../utils/starknetNetwork"
+import {
+  chainIdToStarknetNetwork,
+  starknetNetworkToNetworkId,
+} from "../utils/starknetNetwork"
 import {
   ApiMultisigAddRequestSignatureSchema,
   ApiMultisigPostRequestTxnSchema,
   ApiMultisigTransaction,
   ApiMultisigTxnResponseSchema,
-  MultisigInvokeResponse,
 } from "./multisig.model"
+import { addToMultisigPendingTransactions } from "./pendingTransactionsStore"
 import { MultisigSigner } from "./signer"
-
-const ZERO_HASH = number.toHex(constants.ZERO)
 
 export class MultisigAccount extends Account {
   public readonly multsigBaseUrl?: string
@@ -58,7 +60,7 @@ export class MultisigAccount extends Account {
     calls: AllowArray<Call>,
     abis?: Abi[] | undefined,
     transactionsDetail: InvocationsDetails = {},
-  ): Promise<MultisigInvokeResponse> {
+  ): Promise<InvokeFunctionResponse> {
     if (!this.multsigBaseUrl) {
       throw Error("Argent Multisig endpoint is not defined")
     }
@@ -122,12 +124,30 @@ export class MultisigAccount extends Account {
 
     const data = ApiMultisigTxnResponseSchema.parse(response)
 
-    return {
+    const computedTransactionHash = hash.calculateTransactionHash(
+      this.address,
+      version,
+      transaction.fromCallsToExecuteCalldata(transactions),
+      maxFee,
+      chainId,
+      nonce,
+    )
+
+    const transactionHash =
+      data.content.transactionHash ?? computedTransactionHash
+
+    await addToMultisigPendingTransactions({
+      ...data.content,
       requestId: data.content.id,
-      // Should ignore transactionHash till it's available. We do this because
-      // the transactionHash is not available till every owner has signed the transaction.
-      transaction_hash: data.content.transactionHash ?? ZERO_HASH,
-      creator: data.content.creator,
+      timestamp: Date.now(),
+      type: "INVOKE_FUNCTION",
+      address: this.address,
+      networkId: starknetNetworkToNetworkId(starknetNetwork),
+      transactionHash,
+    })
+
+    return {
+      transaction_hash: transactionHash,
     }
   }
 

@@ -16,6 +16,19 @@ export const networkToStarknetNetwork = (network: Network) => {
   }
 }
 
+export const networkIdToStarknetNetwork = (networkId: string) => {
+  switch (networkId) {
+    case "mainnet-alpha":
+      return "mainnet"
+    case "goerli-alpha":
+      return "testnet"
+    case "goerli-alpha-2":
+      return "testnet2"
+    default:
+      return "testnet"
+  }
+}
+
 export const chainIdToStarknetNetwork = (
   chainId: constants.StarknetChainId,
 ) => {
@@ -31,6 +44,19 @@ export const chainIdToStarknetNetwork = (
   }
 }
 
+export const starknetNetworkToNetworkId = (network: string) => {
+  switch (network) {
+    case "mainnet":
+      return "mainnet-alpha"
+    case "testnet":
+      return "goerli-alpha"
+    case "testnet2":
+      return "goerli-alpha-2"
+    default:
+      return "goerli-alpha"
+  }
+}
+
 export const networkNameToChainId = (
   networkName: SupportedNetworks,
 ): constants.StarknetChainId => {
@@ -40,6 +66,19 @@ export const networkNameToChainId = (
     case SupportedNetworks.TESTNET:
       return constants.StarknetChainId.TESTNET
     case SupportedNetworks.TESTNET2:
+      return constants.StarknetChainId.TESTNET2
+    default:
+      return constants.StarknetChainId.TESTNET
+  }
+}
+
+export const networkIdToChainId = (networkId: string) => {
+  switch (networkId) {
+    case "mainnet-alpha":
+      return constants.StarknetChainId.MAINNET
+    case "goerli-alpha":
+      return constants.StarknetChainId.TESTNET
+    case "goerli-alpha-2":
       return constants.StarknetChainId.TESTNET2
     default:
       return constants.StarknetChainId.TESTNET

@@ -17,40 +17,32 @@ import { Account } from "../accounts/Account"
 import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisigInfo } from "./hooks/useMultisigInfo"
-import { useMultisigPendingTransaction } from "./hooks/useMultisigPendingTransaction"
-import { useMultisigRequest } from "./hooks/useMultisigRequest"
+import { useMultisigPendingTransaction } from "./multisigTransactions.state"
 
 const { TickIcon } = icons
 export const TransactionConfirmationsScreen = () => {
   const selectedAccount = useRouteAccount()
   const requestId = useRouteRequestId()
-  const { data: pendingTransaction } = useMultisigPendingTransaction(requestId)
-  const { data } = useMultisigRequest({
-    account: selectedAccount,
-    requestId,
-  })
+  const pendingTransaction = useMultisigPendingTransaction(requestId)
   const signerKey = useSignerKey()
 
   const transactionTransformed = useMemo(() => {
-    if (data && pendingTransaction && selectedAccount) {
+    if (pendingTransaction && selectedAccount) {
       return transformTransaction({
         transaction: getTransactionFromPendingMultisigTransaction(
-          {
-            ...pendingTransaction,
-            data,
-          },
+          pendingTransaction,
           selectedAccount,
         ),
         accountAddress: selectedAccount.address,
       })
     }
-  }, [data, pendingTransaction, selectedAccount])
+  }, [pendingTransaction, selectedAccount])
   const approvedSignersPublicKey = useEncodedPublicKeys(
-    data?.content.approvedSigners ?? [],
+    pendingTransaction?.approvedSigners ?? [],
   )
 
   const nonApprovedSignersPublicKey = useEncodedPublicKeys(
-    data?.content.nonApprovedSigners ?? [],
+    pendingTransaction?.nonApprovedSigners ?? [],
   )
   return (
     <NavigationContainer
@@ -59,10 +51,10 @@ export const TransactionConfirmationsScreen = () => {
     >
       <Box p={4}>
         <H4>Waiting for confirmations...</H4>
-        {selectedAccount && data && (
+        {selectedAccount && pendingTransaction && (
           <TransactionConfirmationsScreenSubtitle
             account={selectedAccount}
-            approvedSignersLength={data?.content.approvedSigners.length}
+            approvedSignersLength={pendingTransaction.approvedSigners.length}
           />
         )}
         <Divider my={4} color="neutrals.800" />
@@ -95,10 +87,8 @@ export const TransactionConfirmationsScreen = () => {
                 my={1}
               >
                 <Flex alignItems="center" justifyContent="space-between">
-                  <H6 color="white">
-                    {formatTruncatedSignerKey(signer)}
-                    <TickIcon color="primary.500" />
-                  </H6>
+                  <H6 color="white">{formatTruncatedSignerKey(signer)}</H6>
+                  <TickIcon color="primary.500" fontSize="md" />
                 </Flex>
               </Box>
             )

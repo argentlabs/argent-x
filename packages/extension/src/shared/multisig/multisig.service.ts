@@ -3,18 +3,19 @@ import urlJoin from "url-join"
 
 import { ARGENT_MULTISIG_URL } from "../api/constants"
 import { Fetcher, fetcher } from "../api/fetcher"
-import { sendMessage, waitForMessage } from "../messages"
 import { Network } from "../network"
-import { networkToStarknetNetwork } from "../utils/starknetNetwork"
+import {
+  networkIdToStarknetNetwork,
+  networkToStarknetNetwork,
+} from "../utils/starknetNetwork"
 import { urlWithQuery } from "../utils/url"
 import {
-  AddOwnerMultisigPayload,
   ApiMultisigContent,
   ApiMultisigDataForSigner,
   ApiMultisigDataForSignerSchema,
+  ApiMultisigGetRequests,
+  ApiMultisigGetRequestsSchema,
   ApiMultisigTxnResponse,
-  RemoveOwnerMultisigPayload,
-  UpdateMultisigThresholdPayload,
 } from "./multisig.model"
 
 const multisigTransactionTypes = {
@@ -70,21 +71,29 @@ export const getMultisigTransactionType = (transactions: Call[]) => {
   }
 }
 
-export const getMultisigAccountData = async ({
-  address,
-  networkId,
-}: {
+export interface IFetchMultisigAccountData {
   address: string
   networkId: string
-}) => {
+  fetcher?: Fetcher<{
+    content: ApiMultisigContent
+  }>
+}
+
+export const fetchMultisigAccountData = async ({
+  address,
+  networkId,
+  fetcher: fetcherImpl = fetcher,
+}: IFetchMultisigAccountData) => {
   try {
     if (!ARGENT_MULTISIG_URL) {
       throw new Error("Multisig endpoint is not defined")
     }
-    const url = urlJoin(ARGENT_MULTISIG_URL, `${networkId}/${address}`)
-    return fetcher<{
-      content: ApiMultisigContent
-    }>(url, {
+
+    const starknetNetwork = networkIdToStarknetNetwork(networkId)
+
+    const url = urlJoin(ARGENT_MULTISIG_URL, starknetNetwork, address)
+
+    return fetcherImpl(url, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -96,7 +105,7 @@ export const getMultisigAccountData = async ({
   }
 }
 
-export const getMultisigRequestData = async ({
+export const fetchMultisigRequestData = async ({
   address,
   networkId,
   requestId,
@@ -109,10 +118,16 @@ export const getMultisigRequestData = async ({
     if (!ARGENT_MULTISIG_URL) {
       throw new Error("Multisig endpoint is not defined")
     }
+
+    const starknetNetwork = networkIdToStarknetNetwork(networkId)
     const url = urlJoin(
       ARGENT_MULTISIG_URL,
-      `${networkId}/${address}/request/${requestId}`,
+      starknetNetwork,
+      address,
+      "request",
+      requestId,
     )
+
     return fetcher<ApiMultisigTxnResponse>(url, {
       method: "GET",
       headers: {
@@ -125,43 +140,37 @@ export const getMultisigRequestData = async ({
   }
 }
 
-export const addMultisigOwners = async (data: AddOwnerMultisigPayload) => {
-  sendMessage({ type: "ADD_MULTISIG_OWNERS", data })
+export const fetchMultisigRequests = async ({
+  address,
+  networkId,
+}: {
+  address: string
+  networkId: string
+}): Promise<ApiMultisigGetRequests> => {
+  try {
+    if (!ARGENT_MULTISIG_URL) {
+      throw new Error("Multisig endpoint is not defined")
+    }
 
-  const response = await Promise.race([
-    waitForMessage("ADD_MULTISIG_OWNERS_RES"),
-    waitForMessage("ADD_MULTISIG_OWNERS_REJ"),
-  ])
+    const starknetNetwork = networkIdToStarknetNetwork(networkId)
 
-  if (response && "error" in response) {
-    throw new Error(response.error)
-  }
-}
+    const url = urlJoin(
+      ARGENT_MULTISIG_URL,
+      starknetNetwork,
+      address,
+      "request",
+    )
 
-export const updateMultisigThreshold = async (
-  data: UpdateMultisigThresholdPayload,
-) => {
-  sendMessage({ type: "UPDATE_MULTISIG_THRESHOLD", data })
+    const data = await fetcher<unknown>(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
 
-  const response = await Promise.race([
-    waitForMessage("UPDATE_MULTISIG_THRESHOLD_RES"),
-    waitForMessage("UPDATE_MULTISIG_THRESHOLD_REJ"),
-  ])
-
-  if (response && "error" in response) {
-    throw new Error(response.error)
-  }
-}
-
-export const removeMultisigOwner = async (data: RemoveOwnerMultisigPayload) => {
-  sendMessage({ type: "REMOVE_MULTISIG_OWNER", data })
-
-  const response = await Promise.race([
-    waitForMessage("REMOVE_MULTISIG_OWNER_RES"),
-    waitForMessage("REMOVE_MULTISIG_OWNER_REJ"),
-  ])
-
-  if (response && "error" in response) {
-    throw new Error(response.error)
+    return ApiMultisigGetRequestsSchema.parse(data)
+  } catch (e) {
+    throw new Error(`An error occured ${e}`)
   }
 }

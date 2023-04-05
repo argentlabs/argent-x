@@ -14,7 +14,6 @@ import {
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
 import { getL1GasPrice } from "../../shared/ethersUtils"
-import { addToMultisigPendingTransactions } from "../../shared/multisig/pendingTransactionsStore"
 import { AllowArray } from "../../shared/storage/types"
 import { nameTransaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
@@ -199,20 +198,10 @@ export const executeTransactionAction = async (
 
   const title = nameTransaction(transactions)
 
-  if (
-    "requestId" in transaction &&
-    typeof transaction.requestId === "string" &&
-    selectedAccount.type === "multisig"
-  ) {
-    await addToMultisigPendingTransactions({
-      requestId: transaction.requestId,
-      address: selectedAccount.address,
-      networkId: selectedAccount.networkId,
-      timestamp: Date.now(),
-      type: action.payload.meta?.type,
-      transactions,
-    })
-  } else {
+  // TODO: Remove this conditional as we now fallback to computed transactionHash for multisig
+  // So we can always add the transaction to the queue. The added transaction will have
+  // status "NOT_RECEIVED" until all the owners have signed the transaction
+  if (selectedAccount.type !== "multisig") {
     await addTransaction({
       hash: transaction.transaction_hash,
       account: selectedAccount,

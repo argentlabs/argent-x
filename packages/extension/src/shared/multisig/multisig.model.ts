@@ -1,4 +1,3 @@
-import { InvokeFunctionResponse } from "starknet"
 import { z } from "zod"
 
 export const ApiMultisigContentSchema = z.object({
@@ -65,10 +64,24 @@ export const ApiMultisigTxnResponseSchema = z.object({
   }),
 })
 
-export interface MultisigInvokeResponse extends InvokeFunctionResponse {
-  requestId: string
-  creator: string
-}
+export const ApiMultisigGetRequestsSchema = z.object({
+  totalPages: z.number(),
+  totalElements: z.number(),
+  size: z.number(),
+  content: z.array(
+    z.object({
+      id: z.string(),
+      multisigAddress: z.string(),
+      creator: z.string(),
+      transaction: ApiMultisigTransactionSchema,
+      nonce: z.number(),
+      approvedSigners: z.array(z.string()),
+      nonApprovedSigners: z.array(z.string()),
+      state: ApiMultisigStateSchema,
+      transactionHash: z.string().optional(),
+    }),
+  ),
+})
 
 export const ApiMultisigAddRequestSignatureSchema = z.object({
   signer: z.string(),
@@ -85,6 +98,10 @@ export type ApiMultisigTransaction = z.infer<
 >
 export type ApiMultisigPostRequestTxn = z.infer<
   typeof ApiMultisigPostRequestTxnSchema
+>
+
+export type ApiMultisigGetRequests = z.infer<
+  typeof ApiMultisigGetRequestsSchema
 >
 export type ApiMultisigState = z.infer<typeof ApiMultisigStateSchema>
 export type ApiMultisigTxnResponse = z.infer<

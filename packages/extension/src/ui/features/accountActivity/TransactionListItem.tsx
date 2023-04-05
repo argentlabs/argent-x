@@ -37,6 +37,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   transactionTransformed,
   network,
   highlighted,
+  txHash,
   children,
   ...props
 }) => {

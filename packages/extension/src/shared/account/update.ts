@@ -1,4 +1,11 @@
-import { WalletAccount } from "./../wallet.model"
+import {
+  BaseMultisigWalletAccount,
+  MultisigWalletAccount,
+  WalletAccount,
+} from "./../wallet.model"
+import { fetchMultisigAccountData } from "../multisig/multisig.service"
+import { multisigBaseWalletStore } from "../multisig/store"
+import { getMultisigAccounts } from "../multisig/utils/baseMultisig"
 import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
 import { BaseWalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
@@ -54,4 +61,32 @@ export async function updateAccountDetails(
   )
 
   await addAccounts(newAccountsWithDetails) // handles deduplication and updates
+}
+
+export async function updateMultisigAccountDetails(
+  accounts?: BaseWalletAccount[],
+) {
+  const multisigAccounts = await getMultisigAccounts((a) =>
+    accounts ? accounts.some((a2) => accountsEqual(a, a2)) : true,
+  )
+
+  const updater = async ({
+    address,
+    networkId,
+  }: MultisigWalletAccount): Promise<BaseMultisigWalletAccount> => {
+    const { content } = await fetchMultisigAccountData({
+      address,
+      networkId,
+    })
+
+    return {
+      ...content,
+      address,
+      networkId,
+    }
+  }
+
+  const updated = await Promise.all(multisigAccounts.map(updater))
+
+  await multisigBaseWalletStore.push(updated) // handles deduplication and updates
 }

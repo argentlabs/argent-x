@@ -9,6 +9,7 @@ import {
   multisigBaseWalletStore,
   pendingMultisigStore,
 } from "../shared/multisig/store"
+import { multisigTracker } from "../shared/multisig/tracking"
 import { getNetwork } from "../shared/network"
 import {
   isPreAuthorized,
@@ -54,47 +55,91 @@ import { Wallet, sessionStore } from "./wallet"
 const DEFAULT_POLLING_INTERVAL = 15
 const LOCAL_POLLING_INTERVAL = 5
 
-browser.alarms.create("core:transactionTracker:history", {
+const enum ALARM_NAMES {
+  TRANSACTION_TRACKER_HISTORY = "core:transactionTracker:history",
+  TRANSACTION_TRACKER_UPDATE = "core:transactionTracker:update",
+  MULTISIG_ACCOUNT_UPDATE = "core:multisig:updateDataForAccounts",
+  MULTISIG_PENDING_MULTISIG_UPDATE = "core:multisig:updateDataForPendingMultisig",
+  MULTISIG_TRANSACTION_TRACKER = "core:multisig:transactionTracker",
+}
+
+browser.alarms.create(ALARM_NAMES.TRANSACTION_TRACKER_HISTORY, {
   periodInMinutes: 5, // fetch history transactions every 5 minutes from voyager
 })
-browser.alarms.create("core:transactionTracker:update", {
+browser.alarms.create(ALARM_NAMES.TRANSACTION_TRACKER_UPDATE, {
   periodInMinutes: 1, // fetch transaction updates of existing transactions every minute from onchain
 })
-browser.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === "core:transactionTracker:history") {
-    console.info("~> fetching transaction history")
-    await transactionTracker.loadHistory(await getAccounts())
-  }
-  if (alarm.name === "core:transactionTracker:update") {
-    console.info("~> fetching transaction updates")
-    let inFlightTransactions = await transactionTracker.update()
-    // the config below will run transaction updates 4x per minute, if there are in-flight transactions
-    // By default it will update on second 0, 15, 30 and 45 but by updating WAIT_TIME we can change the number of executions
-    const maxExecutionTimeInMs = 60000 // 1 minute max execution time
-    let transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
-    const startTime = Date.now()
+browser.alarms.create(ALARM_NAMES.MULTISIG_ACCOUNT_UPDATE, {
+  periodInMinutes: 1, // fetch multisig updates of existing multisigs every 5 minutes from backend
+})
+browser.alarms.create(ALARM_NAMES.MULTISIG_PENDING_MULTISIG_UPDATE, {
+  periodInMinutes: 1, // fetch pending multisig updates of existing multisigs every 3 minutes from backend
+})
+browser.alarms.create(ALARM_NAMES.MULTISIG_TRANSACTION_TRACKER, {
+  periodInMinutes: 1, // fetch transaction updates of existing multisig every 2 minutes from backend
+})
 
-    while (
-      inFlightTransactions.length > 0 &&
-      Date.now() - startTime < maxExecutionTimeInMs
-    ) {
-      const localTransaction = inFlightTransactions.find(
-        (tx) => tx.account.networkId === "localhost",
-      )
-      if (localTransaction) {
-        transactionPollingIntervalInS = LOCAL_POLLING_INTERVAL
-      } else {
-        transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
-      }
-      console.info(
-        `~> waiting ${transactionPollingIntervalInS}s for transaction updates`,
-      )
-      await delay(transactionPollingIntervalInS * 1000)
-      console.info(
-        "~> fetching transaction updates as pending transactions were detected",
-      )
-      inFlightTransactions = await transactionTracker.update()
+browser.alarms.onAlarm.addListener(async (alarm) => {
+  switch (alarm.name) {
+    case ALARM_NAMES.TRANSACTION_TRACKER_HISTORY: {
+      console.info("~> fetching transaction history")
+      await transactionTracker.loadHistory(await getAccounts())
+      break
     }
+
+    case ALARM_NAMES.MULTISIG_ACCOUNT_UPDATE: {
+      console.info("~> fetching multisig account updates")
+      await multisigTracker.updateDataForAccounts()
+      break
+    }
+
+    case ALARM_NAMES.MULTISIG_PENDING_MULTISIG_UPDATE: {
+      console.info("~> fetching pending multisig account updates")
+      await multisigTracker.updateDataForPendingMultisig()
+      break
+    }
+
+    case ALARM_NAMES.MULTISIG_TRANSACTION_TRACKER: {
+      console.info("~> fetching multisig transaction updates")
+      await multisigTracker.updateTransactions()
+      break
+    }
+
+    case ALARM_NAMES.TRANSACTION_TRACKER_UPDATE: {
+      console.info("~> fetching transaction updates")
+      let inFlightTransactions = await transactionTracker.update()
+      // the config below will run transaction updates 4x per minute, if there are in-flight transactions
+      // By default it will update on second 0, 15, 30 and 45 but by updating WAIT_TIME we can change the number of executions
+      const maxExecutionTimeInMs = 60000 // 1 minute max execution time
+      let transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
+      const startTime = Date.now()
+
+      while (
+        inFlightTransactions.length > 0 &&
+        Date.now() - startTime < maxExecutionTimeInMs
+      ) {
+        const localTransaction = inFlightTransactions.find(
+          (tx) => tx.account.networkId === "localhost",
+        )
+        if (localTransaction) {
+          transactionPollingIntervalInS = LOCAL_POLLING_INTERVAL
+        } else {
+          transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
+        }
+        console.info(
+          `~> waiting ${transactionPollingIntervalInS}s for transaction updates`,
+        )
+        await delay(transactionPollingIntervalInS * 1000)
+        console.info(
+          "~> fetching transaction updates as pending transactions were detected",
+        )
+        inFlightTransactions = await transactionTracker.update()
+      }
+      break
+    }
+
+    default:
+      break
   }
 })
 

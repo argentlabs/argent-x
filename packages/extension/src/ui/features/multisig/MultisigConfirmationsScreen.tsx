@@ -7,7 +7,7 @@ import { FormProvider, useFormContext } from "react-hook-form"
 import {
   addMultisigOwners,
   updateMultisigThreshold,
-} from "../../../shared/multisig/multisig.service"
+} from "../../services/backgroundMultisigs"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"

@@ -4,18 +4,18 @@ import { memoize } from "lodash-es"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
 import { Network } from "../../../shared/network"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { useMultisigInfo } from "../multisig/hooks/useMultisigInfo"
-import { EnrichedMultisigPendingTransaction } from "../multisig/multisigTransactions.state"
 import { TransactionListItem } from "./TransactionListItem"
 import { transformTransaction } from "./transform"
 import { getTransactionFromPendingMultisigTransaction } from "./transform/transaction/transformers/pendingMultisigTransactionAdapter"
 
 const { MultisigIcon } = icons
 interface PendingTransactionsProps {
-  pendingTransactions: EnrichedMultisigPendingTransaction[]
+  pendingTransactions: MultisigPendingTransaction[]
   account: Account
   network: Network
 }
@@ -67,7 +67,6 @@ export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
           return (
             <Flex key={hash} flexDirection="column">
               <TransactionListItem
-                key={hash}
                 txHash={hash}
                 transactionTransformed={transactionTransformed}
                 network={network}
@@ -88,9 +87,7 @@ export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
               >
                 <Flex alignItems="center">
                   <MultisigIcon mr={1} />
-                  {getConfirmationSubtext(
-                    pendingTransaction.data.content.approvedSigners,
-                  )}
+                  {getConfirmationSubtext(pendingTransaction.approvedSigners)}
                 </Flex>
                 <L2
                   color="neutrals.500"
