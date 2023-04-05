@@ -2,8 +2,10 @@ import {
   Cosigner,
   CosignerMessage,
   CosignerOffchainMessage,
+  CosignerResponse,
 } from "@argent/guardian"
 import retry from "async-retry"
+import urlJoin from "url-join"
 import { z } from "zod"
 
 import { ARGENT_API_BASE_URL } from "../../api/constants"
@@ -18,7 +20,7 @@ export const requestEmailAuthentication = async (
 ) => {
   try {
     const json = await jwtFetcher(
-      `${ARGENT_API_BASE_URL}/account/requestEmailAuthentication`,
+      urlJoin(ARGENT_API_BASE_URL, `account/requestEmailAuthentication`),
       {
         method: "POST",
         body: JSON.stringify({
@@ -42,7 +44,7 @@ const emailVerificationStatus = [
   "notRequested",
 ] as const
 
-export type EmailVerificationStatus = (typeof emailVerificationStatus)[number]
+export type EmailVerificationStatus = typeof emailVerificationStatus[number]
 
 export const emailVerificationStatusErrorSchema = z.object({
   name: z.string(),
@@ -55,17 +57,20 @@ export const emailVerificationStatusErrorSchema = z.object({
   }),
 })
 
-export const getEmailVerificationStatus =
-  async (): Promise<EmailVerificationStatus> => {
-    try {
-      const json = await jwtFetcher(
-        `${ARGENT_API_BASE_URL}/account/emailVerificationStatus`,
-      )
-      return json.status
-    } catch (error) {
-      throw new Error("Failed to get email verification status")
-    }
+export interface GetEmailVerificationStatusReponse {
+  status: EmailVerificationStatus
+}
+
+export const getEmailVerificationStatus = async () => {
+  try {
+    const json = await jwtFetcher<GetEmailVerificationStatusReponse>(
+      urlJoin(ARGENT_API_BASE_URL, `account/emailVerificationStatus`),
+    )
+    return json.status
+  } catch (error) {
+    throw new Error("Failed to get email verification status")
   }
+}
 
 export const getVerificationErrorMessage = (
   status: EmailVerificationStatus,
@@ -84,10 +89,10 @@ export const getVerificationErrorMessage = (
   }
 }
 
-export const register = async (): Promise<void> => {
+export const register = async () => {
   try {
-    const json = await jwtFetcher(
-      `${ARGENT_API_BASE_URL}/account/asyncRegister`,
+    const json = await jwtFetcher<void>(
+      urlJoin(ARGENT_API_BASE_URL, `account/asyncRegister`),
       {
         method: "POST",
         body: JSON.stringify({}),
@@ -125,11 +130,9 @@ interface VerifyEmailResponse {
   userRegistrationStatus: "registered" | "notRegistered"
 }
 
-export const verifyEmail = async (
-  verificationCode: string,
-): Promise<VerifyEmailResponse> => {
-  const json: VerifyEmailResponse = await jwtFetcher(
-    `${ARGENT_API_BASE_URL}/verifyEmail`,
+export const verifyEmail = async (verificationCode: string) => {
+  const json = await jwtFetcher<VerifyEmailResponse>(
+    urlJoin(ARGENT_API_BASE_URL, `verifyEmail`),
     {
       method: "POST",
       body: JSON.stringify({
@@ -142,10 +145,14 @@ export const verifyEmail = async (
 
 type RegistrationStatus = "notFound" | "registering" | "registered" | "failed"
 
-export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
+interface GetRegistrationStatusResponse {
+  status: RegistrationStatus
+}
+
+export const getRegistrationStatus = async () => {
   try {
-    const json = await jwtFetcher(
-      `${ARGENT_API_BASE_URL}/account/registrationStatus`,
+    const json = await jwtFetcher<GetRegistrationStatusResponse>(
+      urlJoin(ARGENT_API_BASE_URL, `account/registrationStatus`),
     )
     return json.status
   } catch (error) {
@@ -155,7 +162,7 @@ export const getRegistrationStatus = async (): Promise<RegistrationStatus> => {
 
 export const isTokenExpired = async () => {
   try {
-    await jwtFetcher(`${ARGENT_API_BASE_URL}/account`)
+    await jwtFetcher<void>(urlJoin(ARGENT_API_BASE_URL, `account`))
     return false
   } catch (error) {
     IS_DEV && console.warn(coerceErrorToString(error))
@@ -176,10 +183,17 @@ export interface BackendAccount {
   salt: string | null
 }
 
-export const getBackendAccounts = async (): Promise<BackendAccount[]> => {
+interface GetAccountsResponse {
+  accounts: BackendAccount[]
+}
+
+export const getBackendAccounts = async () => {
   try {
-    const json = await jwtFetcher(
-      `${ARGENT_API_BASE_URL}/accounts?application=argentx&chain=starknet`,
+    const json = await jwtFetcher<GetAccountsResponse>(
+      urlJoin(
+        ARGENT_API_BASE_URL,
+        `accounts?application=argentx&chain=starknet`,
+      ),
     )
     return json.accounts
   } catch (error) {
@@ -196,22 +210,25 @@ export const addBackendAccount = async (
   pubKey: string,
   accountAddress: string,
   signature: string[],
-): Promise<AddAccountResponse> => {
+) => {
   try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}/account`, {
-      method: "POST",
-      body: JSON.stringify({
-        chain: "starknet",
-        application: "argentx",
-        ownerAddress: pubKey,
-        accountAddress,
-        signature: {
-          r: signature[0],
-          s: signature[1],
-        },
-        assignCosigner: true,
-      }),
-    })
+    const json = await jwtFetcher<AddAccountResponse>(
+      urlJoin(ARGENT_API_BASE_URL, `account`),
+      {
+        method: "POST",
+        body: JSON.stringify({
+          chain: "starknet",
+          application: "argentx",
+          ownerAddress: pubKey,
+          accountAddress,
+          signature: {
+            r: signature[0],
+            s: signature[1],
+          },
+          assignCosigner: true,
+        }),
+      },
+    )
     return json
   } catch (error) {
     throw new Error("Failed to add account")
@@ -223,14 +240,17 @@ export const cosignerSign: Cosigner = async (
   isOffchainMessage = false,
 ) => {
   const beEndpoint = isOffchainMessage
-    ? "/cosigner/personalSign"
-    : `/cosigner/sign`
+    ? "cosigner/personalSign"
+    : `cosigner/sign`
 
   try {
-    const json = await jwtFetcher(`${ARGENT_API_BASE_URL}${beEndpoint}`, {
-      method: "POST",
-      body: JSON.stringify(message),
-    })
+    const json = await jwtFetcher<CosignerResponse>(
+      urlJoin(ARGENT_API_BASE_URL, beEndpoint),
+      {
+        method: "POST",
+        body: JSON.stringify(message),
+      },
+    )
     return json
   } catch (error) {
     if (isFetcherError(error) && error.responseJson?.status) {

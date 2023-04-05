@@ -4,7 +4,8 @@ import { ARGENT_TRANSACTION_SIMULATION_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
 import { sendMessage, waitForMessage } from "../messages"
 import { findTransfersAndApprovals } from "./findTransferAndApproval"
-import type {
+import {
+  ApiTransactionSimulationResponse,
   IFetchTransactionSimulation,
   TransactionSimulationApproval,
   TransactionSimulationTransfer,
@@ -35,20 +36,21 @@ export const fetchTransactionSimulation = async ({
   try {
     const { invocation, chainId } = data
 
-    const backendSimulation = await fetcherImpl(
-      ARGENT_TRANSACTION_SIMULATION_URL,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+    const backendSimulation =
+      await fetcherImpl<ApiTransactionSimulationResponse>(
+        ARGENT_TRANSACTION_SIMULATION_URL,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...invocation,
+            chainId,
+          }),
         },
-        body: JSON.stringify({
-          ...invocation,
-          chainId,
-        }),
-      },
-    )
+      )
     return backendSimulation
   } catch (e) {
     console.error("Failed to fetch transaction simulation from backend", e)
