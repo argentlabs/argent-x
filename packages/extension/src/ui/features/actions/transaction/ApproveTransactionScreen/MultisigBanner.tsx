@@ -43,7 +43,11 @@ export const MultisigBanner = ({
               {multisig.threshold - confirmations} more required
             </P4>
           )}
-          <ChevronRightIcon color="neutrals.400" ml={1} />
+          {onClick ? (
+            <ChevronRightIcon color="neutrals.400" ml={1} />
+          ) : (
+            <Box ml={0.5} />
+          )}
         </Flex>
       </Flex>
       {multisig?.threshold &&
