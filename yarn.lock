@@ -12466,9 +12466,9 @@ get-port@5.1.1:
   integrity sha512-g/Q1aTSDOxFpchXC4i8ZWvxA1lnPqx/JHqcpIw0/LX9T8x/GBbi6YnlN5nhaKIFkT8oFsscUKgDJYxfwfS6QsQ==
 
 get-starknet-core@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/get-starknet-core/-/get-starknet-core-2.0.0.tgz#2c107982ff3aa3c2dd98586bec8194cc2bfc0d1d"
-  integrity sha512-cpPQrn2/uw1dxn/gpDiVtKrYxyoSkCsrz1mf7CqeyNxcSiiqsHHRNIGyFtqSm2hCduA1kl7ddVugLoTul/oBQQ==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/get-starknet-core/-/get-starknet-core-2.0.1.tgz#bd08ada12b58e1c5db94ccee04eb716dfa35fb5f"
+  integrity sha512-uYI8wn9a2iyIfJRSJeZvoIvAWq495AKP5U154kFf/Izet+nP/VilTxKUG6CxdUwe9KuBpG0UZE9ODIxPgBYo2w==
 
 get-starknet@^1.0.0:
   version "1.5.0"
