@@ -21872,20 +21872,20 @@ typedarray@^0.0.6:
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
 typescript-styled-plugin@^0.18.2:
-  version "0.18.2"
-  resolved "https://registry.yarnpkg.com/typescript-styled-plugin/-/typescript-styled-plugin-0.18.2.tgz#88c11a81247434de5c038aa22dc0b2df412c85ef"
-  integrity sha512-eBs898Zz5C+k59ZydKVYBHjw4dC5WRxidOT7wfGkjLRZHKL6zIl6xkjIHMuctDE9hctxTq+GJcaXgk30lKEM9A==
+  version "0.18.3"
+  resolved "https://registry.yarnpkg.com/typescript-styled-plugin/-/typescript-styled-plugin-0.18.3.tgz#786fc6d7e6cd89c1b1f50df5a68c5fb943dd68f6"
+  integrity sha512-18ZtfeDRwHgu+Zftla/4cNJKyXyyQayHwjL+dSHZzUq6+akZaGCOejUEFPCN9VX5wMwpZ1eLRN8hJbgttI4tjw==
   dependencies:
-    typescript-template-language-service-decorator "^2.2.0"
+    typescript-template-language-service-decorator "^2.3.2"
     vscode-css-languageservice "^5.1.4"
     vscode-emmet-helper "^2.6.4"
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.16.0"
 
-typescript-template-language-service-decorator@^2.2.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-2.3.1.tgz#f5e3a15cd6cdcd32aa0cbaebf2be753f8ceb46a7"
-  integrity sha512-+Q5+cvBtPO4VKNyyI6O+XnIne+/hq/WfNhBaF4hJP8nB8TbikTg+2h9uBMsqduwX1+kVfwG9SBSwMTtvi2Ep7w==
+typescript-template-language-service-decorator@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-2.3.2.tgz#095c1b5ea88c839d9b202fad3ec8c87c1b062953"
+  integrity sha512-hN0zNkr5luPCeXTlXKxsfBPlkAzx86ZRM1vPdL7DbEqqWoeXSxplACy98NpKpLmXsdq7iePUzAXloCAoPKBV6A==
 
 "typescript@^3 || ^4", typescript@^4.9.3, typescript@^4.9.4:
   version "4.9.5"
