@@ -45,5 +45,8 @@
       "matches": ["<all_urls>"],
       "resources": ["inpage.js"]
     }
-  ]
+  ],
+  "externally_connectable": {
+    "matches": ["https://*.voyager.online/*"]
+  }
 }

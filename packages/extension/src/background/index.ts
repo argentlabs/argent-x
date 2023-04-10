@@ -10,6 +10,7 @@ import {
   isPreAuthorized,
   migratePreAuthorizations,
 } from "../shared/preAuthorizations"
+import { settingsStore } from "../shared/settings"
 import { delay } from "../shared/utils/delay"
 import { migrateWallet } from "../shared/wallet/storeMigration"
 import { walletStore } from "../shared/wallet/walletStore"
@@ -273,6 +274,29 @@ browser.runtime.onConnect.addListener((port) => {
 })
 
 messageStream.subscribe(handleMessage)
+
+export type ExternalMessage =
+  | {
+      type: "SET_BLOCK_EXPLORER"
+      blockExplorer: "voyager"
+    }
+  | {
+      type: "GET_BLOCK_EXPLORER"
+    }
+
+browser.runtime.onMessageExternal.addListener(
+  (request: ExternalMessage, _, sendResponse) => {
+    switch (request.type) {
+      case "SET_BLOCK_EXPLORER":
+        settingsStore.set("blockExplorerKey", request.blockExplorer)
+        sendResponse("success")
+        break
+      case "GET_BLOCK_EXPLORER":
+        sendResponse(settingsStore.get("blockExplorerKey"))
+        break
+    }
+  },
+)
 
 // open onboarding flow on initial install
 
