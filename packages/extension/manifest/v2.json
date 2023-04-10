@@ -45,5 +45,8 @@
     "scripts": ["background.js"],
     "persistent": true
   },
-  "web_accessible_resources": ["inpage.js"]
+  "web_accessible_resources": ["inpage.js"],
+  "externally_connectable": {
+    "matches": ["https://*.voyager.online/*"]
+  }
 }
