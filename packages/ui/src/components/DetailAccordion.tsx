@@ -107,8 +107,9 @@ export const DetailAccordionButton: FC<
   AccordionButtonProps & {
     label?: ReactNode
     value?: ReactNode
+    copyValue?: string
   }
-> = ({ label, value, children, ...rest }) => {
+> = ({ label, value, copyValue, children, ...rest }) => {
   const { isDisabled } = useAccordionItemState()
   return (
     <AccordionButton
@@ -132,10 +133,27 @@ export const DetailAccordionButton: FC<
       {...rest}
     >
       {label && <P4 fontWeight="medium">{label}</P4>}
-      {value && (
-        <P4 color="neutrals.400" fontWeight="medium">
-          {value}
-        </P4>
+      {value && copyValue ? (
+        <CopyTooltip copyValue={copyValue}>
+          <P4
+            _hover={{
+              color: "text",
+            }}
+            cursor="pointer"
+            transitionProperty="color"
+            transitionDuration="fast"
+            color="neutrals.400"
+            fontWeight="medium"
+          >
+            {value}
+          </P4>
+        </CopyTooltip>
+      ) : (
+        value && (
+          <P4 color="neutrals.400" fontWeight="medium">
+            {value}
+          </P4>
+        )
       )}
       {children}
     </AccordionButton>
