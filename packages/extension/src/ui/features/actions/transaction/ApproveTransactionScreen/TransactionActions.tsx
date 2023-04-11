@@ -34,6 +34,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
             <DetailAccordionButton
               label={entryPointToHumanReadable(transaction.entrypoint)}
               value={formatTruncatedAddress(transaction.contractAddress)}
+              copyValue={transaction.contractAddress}
             />
             <DetailAccordionPanel>
               {transaction.calldata?.map((calldata, cdIndex) => (
