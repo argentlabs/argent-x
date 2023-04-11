@@ -129,11 +129,11 @@ export const redeployAccount = async (data: BaseWalletAccount) => {
   }
 }
 
-export const getPrivateKey = async () => {
+export const getPrivateKey = async (account: BaseWalletAccount) => {
   const { secret, encryptedSecret } = await generateEncryptedSecret()
   sendMessage({
     type: "GET_ENCRYPTED_PRIVATE_KEY",
-    data: { encryptedSecret },
+    data: { encryptedSecret, account },
   })
 
   const { encryptedPrivateKey } = await waitForMessage(

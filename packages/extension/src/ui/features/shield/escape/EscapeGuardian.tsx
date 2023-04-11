@@ -1,4 +1,4 @@
-import { Button, P4, icons } from "@argent/ui"
+import { Button, FlowHeader, P4, icons } from "@argent/ui"
 import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -7,7 +7,6 @@ import {
   ESCAPE_GUARDIAN_LINK,
   ShieldExternalLinkButton,
 } from "../ui/ShieldExternalLinkButton"
-import { ShieldHeader } from "../ui/ShieldHeader"
 import { getEscapeDisplayAttributes } from "./EscapeBanner"
 import { LiveAccountEscapeProps } from "./useAccountEscape"
 
@@ -27,7 +26,7 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
   const { colorScheme, title } = getEscapeDisplayAttributes(liveAccountEscape)
   return (
     <Flex flexDirection={"column"} flex={1} px={4} pt={8} pb={4}>
-      <ShieldHeader
+      <FlowHeader
         icon={ArgentShieldIcon}
         title={title}
         subtitle={

@@ -44,7 +44,7 @@ const emailVerificationStatus = [
   "notRequested",
 ] as const
 
-export type EmailVerificationStatus = typeof emailVerificationStatus[number]
+export type EmailVerificationStatus = (typeof emailVerificationStatus)[number]
 
 export const emailVerificationStatusErrorSchema = z.object({
   name: z.string(),

@@ -1,7 +1,6 @@
+import { FlowHeader, icons } from "@argent/ui"
 import { FC } from "react"
-
-import { ShieldHeader } from "./ui/ShieldHeader"
-
+const { ArgentShieldIcon } = icons
 interface ShieldAccountNotReadyProps {
   needsUpgrade?: boolean
 }
@@ -11,9 +10,10 @@ export const ShieldAccountNotReady: FC<ShieldAccountNotReadyProps> = ({
 }) => {
   const action = needsUpgrade ? "upgrade" : "deploy"
   return (
-    <ShieldHeader
+    <FlowHeader
       title={"Add Argent Shield"}
       subtitle={`You must ${action} this account before Argent Shield can be added`}
+      icon={ArgentShieldIcon}
     />
   )
 }

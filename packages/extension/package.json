@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.3.17",
+  "version": "5.3.20",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -74,13 +74,13 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
-    "@argent/guardian": "^5.3.17",
-    "@argent/stack-router": "^5.3.17",
-    "@argent/ui": "^5.3.17",
-    "@argent/x-multicall": "^5.3.17",
-    "@argent/x-sessions": "^5.3.17",
-    "@argent/x-swap": "^5.3.17",
-    "@argent/x-window": "^5.3.17",
+    "@argent/guardian": "^5.3.20",
+    "@argent/stack-router": "^5.3.20",
+    "@argent/ui": "^5.3.20",
+    "@argent/x-multicall": "^5.3.20",
+    "@argent/x-sessions": "^5.3.20",
+    "@argent/x-swap": "^5.3.20",
+    "@argent/x-window": "^5.3.20",
     "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/react": "2.5.1",
     "@extend-chrome/messages": "^1.2.2",

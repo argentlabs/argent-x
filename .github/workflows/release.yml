@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - "v*.*.*"
-    branches:
-      - prerelease/*
 
 env:
   FEATURE_PRIVACY_SETTINGS: "true"
@@ -24,26 +22,26 @@ jobs:
       contents: write
     env:
       NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-      FILENAME: argent-extension-${{ github.ref_name }}
       SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+      FILENAME: argent-extension-${{ github.ref_name }}
       UPLOAD_SENTRY_SOURCEMAPS: true
-      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
-      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ secrets.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
-      ARGENT_X_STATUS_URL: ${{ secrets.ARGENT_X_STATUS_URL }}
-      ARGENT_EXPLORER_BASE_URL: ${{ secrets.ARGENT_EXPLORER_BASE_URL }}
       SAFE_ENV_VARS: true
+      ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ vars.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_EXPLORER_BASE_URL: ${{ vars.ARGENT_EXPLORER_BASE_URL }}
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
       - run: yarn setup
       - run: yarn build
+
       - name: Release npm packages
         # if flow is triggered by a tag, publish to npm
         if: startsWith(github.ref, 'refs/tags/')
@@ -52,23 +50,21 @@ jobs:
           cp Readme.md ./packages/get-starknet/README.md
           yarn --cwd packages/get-starknet publish --access public || exit 0
           yarn --cwd packages/sessions publish --access public || exit 0
+
       - run: yarn --cwd packages/dapp export
+
       - name: Check bundlesize for chrome
         run: yarn run bundlewatch
+
       - name: Create chrome zip
-        run: |
-          cd packages/extension/dist
-          zip -r $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ./*
-          mv $(echo "${{ env.FILENAME }}" | tr / -)-chrome.zip ../../../
-          cd ../../../
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME }}-chrome.zip" .)
+
       - name: Build Firefox version
         run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+
       - name: Create firefox zip
-        run: |
-          cd packages/extension/dist
-          zip -r $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ./*
-          mv $(echo "${{ env.FILENAME }}" | tr / -)-firefox.zip ../../../
-          cd ../../../
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME }}-firefox.zip" .)
+
       - name: Check bundlesize for firefox
         run: yarn run bundlewatch
 
@@ -80,6 +76,7 @@ jobs:
           path: "*-chrome.zip"
           retention-days: 14
           if-no-files-found: error
+
       - name: Upload artifacts for firefox
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         uses: actions/upload-artifact@v3

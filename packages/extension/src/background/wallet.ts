@@ -57,7 +57,6 @@ import {
   getPreDeployedAccount,
 } from "./devnet/declareAccounts"
 import {
-  getIndexForPath,
   getNextPathIndex,
   getPathForIndex,
   getStarkPair,
@@ -447,17 +446,15 @@ export class Wallet {
 
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
 
-    const payload = await this.getDeployContractPayloadForAccountIndex(
-      index,
-      networkId,
-    )
+    const { addressSalt, constructorCalldata } =
+      await this.getDeployContractPayloadForAccountIndex(index, networkId)
 
     const proxyClassHash = PROXY_CONTRACT_CLASS_HASHES[0]
 
     const proxyAddress = calculateContractAddressFromHash(
-      payload.addressSalt,
+      addressSalt,
       proxyClassHash,
-      payload.constructorCalldata,
+      constructorCalldata,
       0,
     )
 
@@ -524,29 +521,14 @@ export class Wallet {
     if (!this.isSessionOpen()) {
       throw Error("no open session")
     }
-    const networkId = account.networkId
-    const network = await this.getNetwork(networkId)
-
-    const provider = getProvider(network)
-
-    const index = getIndexForPath(
-      account.signer.derivationPath,
-      baseDerivationPath,
-    )
-
-    const payload = await this.getDeployContractPayloadForAccountIndex(
-      index,
-      networkId,
-    )
 
     const nonce = await getNonce(account, this)
 
-    const deployTransaction = await provider.deployAccountContract(payload, {
-      nonce,
-    })
+    const deployTransaction = await this.deployAccount(account, { nonce })
+
     await increaseStoredNonce(account)
 
-    return { account, txHash: deployTransaction.transaction_hash }
+    return { account, txHash: deployTransaction.txHash }
   }
   /** Get the Account Deployment Payload
    * Use it in the deployAccount and getAccountDeploymentFee methods
@@ -613,10 +595,10 @@ export class Wallet {
     return deployAccountPayload
   }
 
-  public async getDeployContractPayloadForAccountIndex(
+  private async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
-  ): Promise<Required<DeployAccountContractTransaction>> {
+  ): Promise<Omit<Required<DeployAccountContractTransaction>, "signature">> {
     const hasSession = await this.isSessionOpen()
     const session = await this.sessionStore.get()
     const initialised = await this.isInitialized()
@@ -645,7 +627,6 @@ export class Wallet {
         calldata: stark.compileCalldata({ signer: starkPub, guardian: "0" }),
       }),
       addressSalt: starkPub,
-      signature: starkPair.getPrivate(),
     }
 
     return payload
@@ -830,13 +811,16 @@ export class Wallet {
     return starkPub
   }
 
-  public async exportPrivateKey(): Promise<string> {
+  public async exportPrivateKey(
+    baseWalletAccount: BaseWalletAccount,
+  ): Promise<string> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session?.secret) {
       throw new Error("Session is not open")
     }
 
-    const account = await this.getSelectedAccount()
+    const account = await this.getAccount(baseWalletAccount)
+
     if (!account) {
       throw new Error("no selected account")
     }

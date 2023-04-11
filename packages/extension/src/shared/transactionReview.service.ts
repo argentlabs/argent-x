@@ -53,7 +53,7 @@ export const apiTransactionReviewActivityType = [
 ] as const
 
 export type ApiTransactionReviewActivityType =
-  typeof apiTransactionReviewActivityType[number]
+  (typeof apiTransactionReviewActivityType)[number]
 
 export type TransactionReviewWithType = ApiTransactionReview & {
   type: ApiTransactionReviewActivityType

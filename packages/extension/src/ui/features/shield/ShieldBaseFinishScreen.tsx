@@ -1,9 +1,16 @@
-import { Button, CellStack, P3, P4, icons } from "@argent/ui"
+import {
+  Button,
+  CellStack,
+  FlowHeader,
+  FlowHeaderProps,
+  P3,
+  P4,
+  icons,
+} from "@argent/ui"
 import { Center } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { To, useNavigate } from "react-router-dom"
 
-import { ShieldHeader, ShieldHeaderProps } from "./ui/ShieldHeader"
 import {
   ChangeGuardian,
   LiveAccountGuardianState,
@@ -20,15 +27,15 @@ const {
   AlertIcon,
 } = icons
 
-export interface GetShieldHeaderProps {
+export interface GetFlowHeaderProps {
   accountName?: string
   liveAccountGuardianState?: LiveAccountGuardianState
 }
 
-const getShieldHeaderProps = ({
+const getFlowHeaderProps = ({
   liveAccountGuardianState,
   accountName,
-}: GetShieldHeaderProps): ShieldHeaderProps => {
+}: GetFlowHeaderProps): FlowHeaderProps => {
   if (!liveAccountGuardianState) {
     return {
       title: "Argent Shield",
@@ -98,7 +105,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
 }) => {
   const navigate = useNavigate()
 
-  const headerProps = getShieldHeaderProps({
+  const headerProps = getFlowHeaderProps({
     accountName,
     liveAccountGuardianState,
   })
@@ -117,7 +124,7 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>
-        <ShieldHeader size={"lg"} {...headerProps} />
+        <FlowHeader size={"lg"} {...headerProps} icon={ArgentShieldIcon} />
         <Center
           bg={"accent.800"}
           rounded={"xl"}

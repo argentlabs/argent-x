@@ -53,7 +53,7 @@ export const generateJwt = async () => {
     .setProtectedHeader({ alg, jwk: publicJwk })
     .setIssuedAt(backendTimeNowSeconds)
     .setIssuer("kid:" + thumbprint)
-    .setExpirationTime("5m")
+    .setExpirationTime(backendTimeNowSeconds + 5 * 60.0)
     .sign(privateKey)
 
   return jwt
