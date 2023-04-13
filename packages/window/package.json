@@ -24,7 +24,7 @@
     "get-starknet-core": "^2.0.0",
     "mitt": "^3.0.0",
     "typescript": "^4.9.3",
-    "vite": "^3.2.4",
+    "vite": "^4.2.1",
     "vitest": "^0.29.2",
     "zod": "^3.20.6"
   },
