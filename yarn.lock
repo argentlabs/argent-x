@@ -14925,9 +14925,9 @@ jju@~1.4.0:
   integrity sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==
 
 jose@^4.11.2, jose@^4.3.6:
-  version "4.13.1"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-4.13.1.tgz#449111bb5ab171db85c03f1bd2cb1647ca06db1c"
-  integrity sha512-MSJQC5vXco5Br38mzaQKiq9mwt7lwj2eXpgpRyQYNHYt2lq1PjkWa7DLXX0WVcQLE9HhMh3jPiufS7fhJf+CLQ==
+  version "4.13.2"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.13.2.tgz#4db5b4a96742a252e6d3781ac73cc37ee2bd0fbc"
+  integrity sha512-GMUKtV+l05F6NY/06nM7rucHM6Ktvw6sxnyRqINBNWS/hCM/bBk7kanOEckRP8xtC/jzuGfTRVZvkjjuy+g4dA==
 
 joycon@^3.0.1, joycon@^3.1.1:
   version "3.1.1"
