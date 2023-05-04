@@ -32,6 +32,11 @@ const isChecksumAddress = (address: string) => {
   return true
 }
 
+export const isStarknetId = (address: string) => {
+  const starkNetIdRegex = /^[a-zA-Z0-9]+\.stark$/
+  return starkNetIdRegex.test(address)
+}
+
 export const addressSchema = yup
   .string()
   .trim()
@@ -41,7 +46,12 @@ export const addressSchema = yup
       return ctx.createError({ message: "Address is required" })
     }
     try {
-      if (!/^0x[0-9a-fA-F]+$/.test(address)) {
+      if (isStarknetId(address)) {
+        // If the StarknetId is not resolved to any address, it's an error
+        return ctx.createError({ message: "Starknet ID does not exist" })
+      }
+
+      if (!/^0x[0-9a-fA-F]+$/.test(address) && !isStarknetId(address)) {
         return ctx.createError({ message: "Address should be hexadecimal" })
       }
 

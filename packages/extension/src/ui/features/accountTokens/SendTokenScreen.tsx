@@ -32,6 +32,7 @@ import {
   addressSchema,
   formatTruncatedAddress,
   isEqualAddress,
+  isStarknetId,
   isValidAddress,
   normalizeAddress,
 } from "../../services/addresses"
@@ -40,6 +41,7 @@ import {
   sendTransaction,
 } from "../../services/transactions"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
+import { getAddressFromStarkName } from "../../services/useStarknetId"
 import { H3, H5 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
@@ -218,6 +220,7 @@ export const SendTokenScreen: FC = () => {
   >()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { accountNames } = useAccountMetadata()
+  const [starknetIdLoading, setStarknetIdLoading] = useState(false)
 
   const accountName = useMemo(
     () =>
@@ -238,6 +241,8 @@ export const SendTokenScreen: FC = () => {
     control,
     setValue,
     watch,
+    clearErrors,
+    trigger,
   } = useForm<SendInput>({
     defaultValues: {
       recipient: "",
@@ -308,6 +313,8 @@ export const SendTokenScreen: FC = () => {
     [],
   )
 
+  const validateStarknetId = useCallback((id: string) => isStarknetId(id), [])
+
   const validRecipientAddress =
     inputRecipient && !getFieldState("recipient").error
 
@@ -374,6 +381,7 @@ export const SendTokenScreen: FC = () => {
   const resetAddressBookRecipient = () => {
     setAddressBookRecipient(undefined)
     setValue("recipient", "")
+    clearErrors("recipient")
   }
 
   const handleSaveAddress = (savedContact: AddressBookContact) => {
@@ -382,11 +390,34 @@ export const SendTokenScreen: FC = () => {
     setBottomSheetOpen(false)
   }
 
+  const handleStarknetIdNameInput = async (starkName: string) => {
+    setStarknetIdLoading(true)
+
+    const starkNameAddress = await getAddressFromStarkName(
+      starkName,
+      currentNetworkId,
+    )
+
+    setStarknetIdLoading(false)
+
+    if (starkNameAddress && isValidAddress(starkNameAddress)) {
+      handleAddressSelect({
+        id: `${starkName}-${starkNameAddress}`,
+        name: starkName,
+        address: starkNameAddress,
+        networkId: currentNetworkId,
+      })
+    }
+
+    await trigger("recipient")
+  }
+
   const disableSubmit =
     !isDirty ||
     isSubmitting ||
     (submitCount > 0 && !isDirty) ||
-    isInputAmountGtBalance // Balance: 1234, maxInput: 1231, , maxFee: 3, updatedInput: 1233
+    isInputAmountGtBalance ||
+    starknetIdLoading
 
   return (
     <>
@@ -522,8 +553,11 @@ export const SendTokenScreen: FC = () => {
                         paddingRight: "50px",
                         borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
                       }}
-                      onlyAddressHex
-                      onChange={(e) => {
+                      onChange={async (e) => {
+                        if (validateStarknetId(e.target.value)) {
+                          return await handleStarknetIdNameInput(e.target.value)
+                        }
+
                         if (validateStarknetAddress(e.target.value)) {
                           const account = addressBook.contacts.find((c) =>
                             isEqualAddress(c.address, e.target.value),
@@ -534,7 +568,9 @@ export const SendTokenScreen: FC = () => {
                     >
                       <>
                         <InputGroupAfter>
-                          {validRecipientAddress ? (
+                          {starknetIdLoading ? (
+                            <Spinner size={18} />
+                          ) : validRecipientAddress ? (
                             <CloseIconAlt
                               {...makeClickable(resetAddressBookRecipient)}
                               style={{ cursor: "pointer" }}

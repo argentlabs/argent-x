@@ -1,4 +1,12 @@
-import { CellStack, Error, H6, Input, L2, Switch, icons } from "@argent/ui"
+import {
+  CellStack,
+  ErrorMessage,
+  H6,
+  Input,
+  L2,
+  Switch,
+  icons,
+} from "@argent/ui"
 import {
   Flex,
   FormControl,
@@ -104,11 +112,11 @@ const DeploySmartContractParameters: FC<{
                       />
                       {get(errors, `parameters[${index}][${i}]`)?.type ===
                       "required" ? (
-                        <Error message="Constructor argument is required" />
+                        <ErrorMessage message="Constructor argument is required" />
                       ) : (
                         get(errors, `parameters[${index}][${i}]`)?.type ===
                           "manual" && (
-                          <Error
+                          <ErrorMessage
                             message={
                               (get(errors, `parameters[${index}][${i}]`)
                                 ?.message as string) ?? ""
@@ -138,10 +146,10 @@ const DeploySmartContractParameters: FC<{
               isInvalid={!isEmpty(get(errors, `parameters[${index}]`))}
             />
             {get(errors, `parameters[${index}]`)?.type === "required" ? (
-              <Error message="Constructor argument is required" />
+              <ErrorMessage message="Constructor argument is required" />
             ) : (
               get(errors, `parameters[${index}]`)?.type === "manual" && (
-                <Error
+                <ErrorMessage
                   message={
                     (get(errors, `parameters[${index}]`)?.message as string) ??
                     ""

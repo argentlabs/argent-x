@@ -1,34 +1,52 @@
-import join from "url-join"
+import { Status } from "starknet"
 
+import { ARGENT_EXPLORER_BASE_URL } from "../../../shared/api/constants"
+import { argentApiNetworkForNetwork } from "../../../shared/api/fetcher"
 import { Network } from "../../../shared/network"
 import { Transaction, compareTransactions } from "../../../shared/transactions"
+import { urlWithQuery } from "../../../shared/utils/url"
 import { WalletAccount } from "../../../shared/wallet.model"
+import { stripAddressZeroPadding } from "../../../ui/features/accounts/accounts.service"
 import { fetchWithTimeout } from "../../utils/fetchWithTimeout"
 import { mapVoyagerTransactionToTransaction } from "../transformers"
 
 export interface VoyagerTransaction {
   blockId: string
-  entry_point_type: string | null
-  globalIndex?: number
+  blockNumber: number
   hash: string
   index: number
-  signature: string[] | null
   timestamp: number
-  to: string
   type: string
+  status: Status
 }
 
 export const fetchVoyagerTransactions = async (
   address: string,
   network: Network,
 ): Promise<VoyagerTransaction[]> => {
-  const { explorerUrl } = network
-  if (!explorerUrl) {
+  const explorerUrl = ARGENT_EXPLORER_BASE_URL
+  const apiNetwork = argentApiNetworkForNetwork(network.id)
+  if (!explorerUrl || !apiNetwork) {
     return []
   }
-  const response = await fetchWithTimeout(
-    join(explorerUrl, `api/txns?to=${address}`),
+
+  const url = urlWithQuery(
+    [
+      explorerUrl,
+      "accounts",
+      apiNetwork,
+      stripAddressZeroPadding(address),
+      "voyager",
+    ],
+    {
+      page: 0,
+      size: 100,
+      direction: "DESC",
+      withTransfers: true,
+    },
   )
+
+  const response = await fetchWithTimeout(url)
   const { items } = await response.json()
   return items
 }

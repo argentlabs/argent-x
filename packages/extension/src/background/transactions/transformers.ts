@@ -10,6 +10,6 @@ export const mapVoyagerTransactionToTransaction = (
   hash: transaction.hash,
   account,
   meta,
-  status: "ACCEPTED_ON_L2",
+  status: transaction.status,
   timestamp: transaction.timestamp,
 })

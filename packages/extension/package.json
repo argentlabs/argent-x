@@ -1,6 +1,6 @@
 {
   "name": "@argent-x/extension",
-  "version": "5.3.20",
+  "version": "5.3.21",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -74,13 +74,13 @@
     "push-release-branch": "git push --set-upstream origin release/v$npm_package_version --follow-tags"
   },
   "dependencies": {
-    "@argent/guardian": "^5.3.20",
-    "@argent/stack-router": "^5.3.20",
-    "@argent/ui": "^5.3.20",
-    "@argent/x-multicall": "^5.3.20",
-    "@argent/x-sessions": "^5.3.20",
-    "@argent/x-swap": "^5.3.20",
-    "@argent/x-window": "^5.3.20",
+    "@argent/guardian": "^5.3.21",
+    "@argent/stack-router": "^5.3.21",
+    "@argent/ui": "^5.3.21",
+    "@argent/x-multicall": "^5.3.21",
+    "@argent/x-sessions": "^5.3.21",
+    "@argent/x-swap": "^5.3.21",
+    "@argent/x-window": "^5.3.21",
     "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/react": "2.5.1",
     "@extend-chrome/messages": "^1.2.2",
@@ -118,7 +118,7 @@
     "starknet": "^4.21.0",
     "starknet3": "npm:starknet@3.18.2",
     "starknet4": "npm:starknet@4.4.0",
-    "starknet5": "npm:starknet@5.0.0-beta.3",
+    "starknet5": "npm:starknet@5.7.0",
     "styled-components": "^5.3.5",
     "styled-normalize": "^8.0.7",
     "swr": "^1.3.0",

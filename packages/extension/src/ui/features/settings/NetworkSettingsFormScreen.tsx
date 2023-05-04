@@ -162,14 +162,15 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
           </ExtendableControl>
           <Collapse in={expanded} timeout="auto">
             <Wrapper>
-              <ControlledInputText
+              {/** TODO: Add back when we are not using backend explorer api anymore */}
+              {/* <ControlledInputText
                 autoComplete="off"
                 control={control}
                 placeholder="Explorer API URL"
                 name="explorerUrl"
                 type="url"
                 disabled={defaultNetwork.readonly}
-              />
+              /> */}
               <ControlledInputText
                 autoComplete="off"
                 control={control}

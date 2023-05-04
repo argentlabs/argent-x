@@ -49,7 +49,7 @@ export const AspectNftSchema = z.object({
     .transform((s) => s ?? undefined),
   animation_uri: z.string().nullable().optional(),
   external_uri: z.string().nullable().optional(),
-  owner: AspectNftOwnerSchema.optional(),
+  owner: AspectNftOwnerSchema.nullable().optional(),
   contract: AspectNftContractSchema,
 })
 

@@ -1,4 +1,4 @@
-import { Error as ErrorEl, Input, Select } from "@argent/ui"
+import { ErrorMessage, Input, Select } from "@argent/ui"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
 import { get, isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
@@ -149,7 +149,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           )}
         />
         {!isEmpty(errors.contract) && (
-          <ErrorEl
+          <ErrorMessage
             message={
               errors.contract.type === "required"
                 ? "A contract is required"
@@ -192,7 +192,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           )}
         </Box>
         {!isEmpty(errors.classHash) && (
-          <ErrorEl message="Classhash is required" />
+          <ErrorMessage message="Classhash is required" />
         )}
 
         <Controller
@@ -212,7 +212,9 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             />
           )}
         />
-        {!isEmpty(errors.network) && <ErrorEl message="Network is required" />}
+        {!isEmpty(errors.network) && (
+          <ErrorMessage message="Network is required" />
+        )}
 
         <Controller
           name="account"
@@ -233,7 +235,9 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             />
           )}
         />
-        {!isEmpty(errors.account) && <ErrorEl message="Account is required" />}
+        {!isEmpty(errors.account) && (
+          <ErrorMessage message="Account is required" />
+        )}
 
         {children?.({
           isDirty,

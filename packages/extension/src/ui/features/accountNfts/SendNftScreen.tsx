@@ -15,6 +15,7 @@ import { CloseIconAlt } from "../../components/Icons/CloseIconAlt"
 import { AddIcon } from "../../components/Icons/MuiIcons"
 import { StyledControlledTextArea } from "../../components/InputText"
 import Row, { RowBetween, RowCentered } from "../../components/Row"
+import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { makeClickable } from "../../services/a11y"
 import { useAddressBook } from "../../services/addressBook"
@@ -22,6 +23,7 @@ import {
   addressSchema,
   formatTruncatedAddress,
   isEqualAddress,
+  isStarknetId,
   isValidAddress,
   normalizeAddress,
 } from "../../services/addresses"
@@ -30,6 +32,7 @@ import {
   sendTransaction,
 } from "../../services/transactions"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
+import { getAddressFromStarkName } from "../../services/useStarknetId"
 import { H3, H5 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
 import {
@@ -103,11 +106,13 @@ export const SendNftScreen: FC = () => {
   const resolver = useYupValidationResolver(SendNftSchema)
 
   const { id: currentNetworkId } = useCurrentNetwork()
-  const [addressBookRecipient, setAddressBookRecipient] =
-    useState<Account | AddressBookContact>()
+  const [addressBookRecipient, setAddressBookRecipient] = useState<
+    Account | AddressBookContact
+  >()
 
   const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+  const [starknetIdLoading, setStarknetIdLoading] = useState(false)
 
   const accountName = useMemo(
     () =>
@@ -126,6 +131,8 @@ export const SendNftScreen: FC = () => {
     control,
     setValue,
     watch,
+    clearErrors,
+    trigger,
   } = useForm<SendNftInput>({
     defaultValues: {
       recipient: "",
@@ -140,6 +147,8 @@ export const SendNftScreen: FC = () => {
     (addr: string) => isValidAddress(addr),
     [],
   )
+
+  const validateStarknetId = useCallback((id: string) => isStarknetId(id), [])
 
   const validRecipientAddress =
     inputRecipient && !getFieldState("recipient").error
@@ -166,7 +175,8 @@ export const SendNftScreen: FC = () => {
     return <Navigate to={routes.accounts()} />
   }
 
-  const disableSubmit = isSubmitting || (submitCount > 0 && !isDirty)
+  const disableSubmit =
+    isSubmitting || (submitCount > 0 && !isDirty) || starknetIdLoading
 
   const onSubmit = async ({ recipient }: SendNftInput) => {
     if (nft.contract.schema === "ERC721") {
@@ -209,12 +219,35 @@ export const SendNftScreen: FC = () => {
   const resetAddressBookRecipient = () => {
     setAddressBookRecipient(undefined)
     setValue("recipient", "")
+    clearErrors("recipient")
   }
 
   const handleSaveAddress = (savedContact: AddressBookContact) => {
     handleAddressSelect(savedContact)
 
     setBottomSheetOpen(false)
+  }
+
+  const handleStarknetIdNameInput = async (starkName: string) => {
+    setStarknetIdLoading(true)
+
+    const starkNameAddress = await getAddressFromStarkName(
+      starkName,
+      currentNetworkId,
+    )
+
+    setStarknetIdLoading(false)
+
+    if (starkNameAddress && isValidAddress(starkNameAddress)) {
+      handleAddressSelect({
+        id: `${starkName}-${starkNameAddress}`,
+        name: starkName,
+        address: starkNameAddress,
+        networkId: currentNetworkId,
+      })
+    }
+
+    await trigger("recipient")
   }
 
   return (
@@ -291,8 +324,11 @@ export const SendNftScreen: FC = () => {
                         paddingRight: "50px",
                         borderRadius: addressBookOpen ? "8px 8px 0 0" : "8px",
                       }}
-                      onlyAddressHex
-                      onChange={(e: any) => {
+                      onChange={async (e: any) => {
+                        if (validateStarknetId(e.target.value)) {
+                          return await handleStarknetIdNameInput(e.target.value)
+                        }
+
                         if (validateStarknetAddress(e.target.value)) {
                           const account = addressBook.contacts.find((c) =>
                             isEqualAddress(c.address, e.target.value),
@@ -303,7 +339,9 @@ export const SendNftScreen: FC = () => {
                     >
                       <>
                         <InputGroupAfter>
-                          {validRecipientAddress ? (
+                          {starknetIdLoading ? (
+                            <Spinner size={18} />
+                          ) : validRecipientAddress ? (
                             <CloseIconAlt
                               {...makeClickable(resetAddressBookRecipient)}
                               style={{ cursor: "pointer" }}

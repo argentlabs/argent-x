@@ -5,7 +5,9 @@ import { FC } from "react"
 import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
+import { useStarknetId } from "../../services/useStarknetId"
 import { AccountStatus } from "../accounts/accounts.service"
+import { StarknetIdCopyButton } from "./StarknetIdCopyButton"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
 
@@ -28,6 +30,8 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
   const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
   const accountAddress = account.address
 
+  const { data: starknetId } = useStarknetId(account)
+
   return (
     <VStack spacing={0.5}>
       {sumCurrencyValue !== undefined ? (
@@ -35,7 +39,14 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
       ) : (
         <H2>{accountName}</H2>
       )}
-      <AddressCopyButton address={accountAddress} />
+      {starknetId ? (
+        <StarknetIdCopyButton
+          starknetId={starknetId}
+          address={accountAddress}
+        />
+      ) : (
+        <AddressCopyButton address={accountAddress} />
+      )}
       {status.code === "ERROR" && (
         <VStack spacing={2} pt={2}>
           <FieldError>{status.text}</FieldError>

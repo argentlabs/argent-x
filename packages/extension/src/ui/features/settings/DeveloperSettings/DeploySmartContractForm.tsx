@@ -1,11 +1,4 @@
-import {
-  Alert,
-  CellStack,
-  Error as ErrorEl,
-  Input,
-  P4,
-  Select,
-} from "@argent/ui"
+import { Alert, CellStack, ErrorMessage, Input, P4, Select } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useEffect, useState } from "react"
@@ -83,8 +76,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   const { errors, isDirty, isSubmitting } = formState
 
   const [fetchError, setFetchError] = useState("")
-  const [parameterFields, setParameterFields] =
-    useState<ParameterField[] | null>(null)
+  const [parameterFields, setParameterFields] = useState<
+    ParameterField[] | null
+  >(null)
 
   const currentNetwork = watch("network")
   const currentClassHash = watch("classHash")
@@ -237,10 +231,10 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
             />
           </Box>
           {errors.classHash?.type === "required" ? (
-            <ErrorEl message="Classhash is required" />
+            <ErrorMessage message="Classhash is required" />
           ) : (
             errors.classHash?.type === "manual" && (
-              <ErrorEl message={errors.classHash.message ?? ""} />
+              <ErrorMessage message={errors.classHash.message ?? ""} />
             )
           )}
 
@@ -262,7 +256,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
             )}
           />
           {!isEmpty(errors.network) && (
-            <ErrorEl message="Network is required" />
+            <ErrorMessage message="Network is required" />
           )}
 
           <Controller
@@ -285,7 +279,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
             )}
           />
           {!isEmpty(errors.account) && (
-            <ErrorEl message="Account is required" />
+            <ErrorMessage message="Account is required" />
           )}
 
           {fetchError && (
